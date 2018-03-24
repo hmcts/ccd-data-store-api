@@ -1,0 +1,58 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/data/jurisdictions/divorce/case-type"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": [
+      {
+        "id": "application",
+        "version": {
+          "number": 1,
+          "live_from": "2017-01-01"
+        },
+        "name": "Application",
+        "jurisdiction": {
+          "id": "divorce",
+          "name": "divorce"
+        },
+        "states": [
+          {
+            "id": "submitted",
+            "name": "Submitted"
+          },
+          {
+            "id": "in-progress",
+            "name": "In Progress"
+          }
+        ]
+      },
+      {
+        "id": "refund",
+        "version": {
+          "number": 1,
+          "live_from": "2017-01-01"
+        },
+        "name": "Refund Request",
+        "jurisdiction": {
+          "id": "divorce",
+          "name": "divorce"
+        },
+        "states": [
+          {
+            "id": "submitted",
+            "name": "Submitted"
+          },
+          {
+            "id": "in-review",
+            "name": "In Review"
+          }
+        ]
+      }
+    ]
+  }
+}

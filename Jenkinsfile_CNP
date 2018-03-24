@@ -1,0 +1,21 @@
+#!groovy
+properties(
+    [
+        [
+            $class: 'GithubProjectProperty',
+            projectUrlStr: 'https://git.reform.hmcts.net/case-management/case-data-store-app'
+        ],
+        pipelineTriggers([[$class: 'GitHubPushTrigger']])
+    ]
+)
+
+@Library("Infrastructure")
+
+def type = "java"
+
+def product = "ccd"
+
+def app = "data-store-api"
+
+withPipeline(type, product, app) {
+}

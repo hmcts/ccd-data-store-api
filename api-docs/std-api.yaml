@@ -1,0 +1,349 @@
+swagger: "2.0"
+info:
+  title: Standard Case Data API
+  description: |
+    An API to manage standard case data
+  version: "0.0.1"
+host: core-case-data.common-components.reform
+schemes:
+  - https
+basePath: '/'
+produces:
+  - application/json
+paths:
+  /caseworkers/{uid}/cases:
+    get:
+      summary: List all cases with optional filters
+      parameters:
+        - name: uid
+          in: path
+          description: User ID from IdAM
+          required: true
+          type: string
+        - name: caseId
+          in: query
+          description: Case ID
+          required: false
+          type: string
+        - name: jurisdictionId
+          in: query
+          description: Jurisdiction ID
+          required: false
+          type: string
+        - name: jurisdictionName
+          in: query
+          description: Jurisdiction name
+          required: false
+          type: string
+      responses:
+        200:
+          description: A Search Result Collection
+          schema:
+            $ref: "#/definitions/SearchResultCollection"
+        default:
+          description: Unexpected error
+          schema:
+            $ref: "#/definitions/Error"
+
+  /caseworkers/{uid}/jurisdiction/{jid}/case-types/{ctid}/cases:
+    post:
+      summary: Create a new case
+      parameters:
+        - name: uid
+          in: path
+          description: User ID from IdAM
+          required: true
+          type: string
+        - name: jid
+          in: path
+          description: Juristiction ID
+          required: true
+          type: string
+        - name: ctid
+          in: path
+          description: Case Type ID
+          required: true
+          type: string
+        - name: eventData
+          in: body
+          description: The triggering event
+          required: true
+          schema:
+            $ref: "#/definitions/CaseEventData"
+      responses:
+        201:
+          description: Case created
+          schema:
+            $ref: "#/definitions/CaseDetails"
+        default:
+          description: Unexpected error
+          schema:
+            $ref: "#/definitions/Error"
+
+  /caseworkers/{uid}/jurisdiction/{jid}/case-types/{ctid}/cases/{cid}:
+    get:
+      summary: Get a specific case
+      parameters:
+        - name: uid
+          in: path
+          description: User ID from IdAM
+          required: true
+          type: string
+        - name: jid
+          in: path
+          description: Juristiction ID
+          required: true
+          type: string
+        - name: ctid
+          in: path
+          description: Case Type ID
+          required: true
+          type: string
+        - name: cid
+          in: path
+          description: Case ID
+          required: true
+          type: string
+      responses:
+        200:
+          description: A Search Result Collection
+          schema:
+            $ref: "#/definitions/CaseDetails"
+        default:
+          description: Unexpected error
+          schema:
+            $ref: "#/definitions/Error"
+
+  /caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events:
+    parameters:
+      - name: uid
+        in: path
+        description: User ID from IdAM
+        required: true
+        type: string
+      - name: jid
+        in: path
+        description: Juristiction ID
+        required: true
+        type: string
+      - name: ctid
+        in: path
+        description: Case Type ID
+        required: true
+        type: string
+      - name: cid
+        in: path
+        description: Case ID
+        required: true
+        type: number
+        format: int64
+    post:
+      summary: Update case with new event
+      description: |
+        Create a new event for a case. The event can alter case data.
+        Pre-state condition validation, and data validation will occur
+      parameters:
+        - name: eventData
+          in: body
+          description: The triggering event
+          required: true
+          schema:
+            $ref: "#/definitions/CaseEventData"
+      responses:
+        201:
+          description: Event created and case updated
+          schema:
+            $ref: "#/definitions/CaseDetails"
+        422:
+          description: Pre-state condition or data validation error
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Unexpected error
+          schema:
+            $ref: "#/definitions/Error"
+
+  /citizens/{uid}/jurisdiction/{jid}/case-types/{ctid}/cases:
+    post:
+      summary: create a new case
+      parameters:
+        - name: uid
+          in: path
+          description: User ID from IdAM
+          required: true
+          type: string
+        - name: jid
+          in: path
+          description: Juristiction ID
+          required: true
+          type: string
+        - name: ctid
+          in: path
+          description: Case Type ID
+          required: true
+          type: string
+        - name: eventData
+          in: body
+          description: The triggering event
+          required: true
+          schema:
+            $ref: "#/definitions/CaseEventData"
+      responses:
+        201:
+          description: Case created
+          schema:
+            $ref: "#/definitions/CaseDetails"
+        default:
+          description: Unexpected error
+          schema:
+            $ref: "#/definitions/Error"
+
+  /citizens/{uid}/jurisdiction/{jid}/case-types/{ctid}/cases/{cid}:
+    get:
+      summary: get a specific case
+      parameters:
+        - name: uid
+          in: path
+          description: User ID from IdAM
+          required: true
+          type: string
+        - name: jid
+          in: path
+          description: Juristiction ID
+          required: true
+          type: string
+        - name: ctid
+          in: path
+          description: Case Type ID
+          required: true
+          type: string
+        - name: cid
+          in: path
+          description: Case ID
+          required: true
+          type: string
+      responses:
+        200:
+          description: A Case
+          schema:
+            $ref: "#/definitions/CaseDetails"
+        default:
+          description: Unexpected error
+          schema:
+            $ref: "#/definitions/Error"
+
+  /citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events:
+    parameters:
+      - name: uid
+        in: path
+        description: User ID from IdAM
+        required: true
+        type: string
+      - name: jid
+        in: path
+        description: Juristiction ID
+        required: true
+        type: string
+      - name: ctid
+        in: path
+        description: Case Type ID
+        required: true
+        type: string
+      - name: cid
+        in: path
+        description: Case ID
+        required: true
+        type: number
+        format: int64
+    post:
+      summary: Update case with new event
+      description: |
+        Create a new event for a case. The event can alter case data.
+        Pre-state condition validation, and data validation will occur
+      parameters:
+        - name: eventData
+          in: body
+          description: The triggering event
+          required: true
+          schema:
+            $ref: "#/definitions/CaseEventData"
+      responses:
+        201:
+          description: Event created and case updated
+          schema:
+            $ref: "#/definitions/CaseDetails"
+        422:
+          description: Pre-state condition or data validation error
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Unexpected error
+          schema:
+            $ref: "#/definitions/Error"
+
+definitions:
+  SearchResultCollection:
+    type: object
+    properties:
+      cases:
+        type: array
+        items:
+          $ref: "#/definitions/CaseDetails"
+
+  CaseDetails:
+    type: object
+    description: Details for a single case
+    properties:
+      id:
+        type: string
+      case_type_id:
+        type: string
+      created_date:
+        type: string
+        format: date-time
+      last_modified:
+        type: string
+        format: date-time
+      state:
+        type: string
+      locked_by_user_id:
+        type: string
+      security_level:
+        type: string
+      case_data:
+        $ref: "#/definitions/CaseData"
+
+  CaseEventData:
+    type: object
+    properties:
+      event:
+        $ref: "#/definitions/Event"
+      data:
+        $ref: "#/definitions/CaseData"
+
+  CaseData:
+    type: object
+    additionalProperties:
+      type: object
+
+  Event:
+    properties:
+      event_trigger_id:
+        type: string
+      summary:
+        type: string
+      description:
+        type: string
+    required:
+      - event_id
+      - summary
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      fields:
+        type: string

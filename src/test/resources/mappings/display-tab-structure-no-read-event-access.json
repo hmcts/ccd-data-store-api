@@ -1,0 +1,102 @@
+{
+  "request" : {
+    "method" : "GET",
+    "url" : "/api/display/tab-structure/TestAddressBookCaseNoReadEventAccess"
+  },
+  "response" : {
+    "status" : 200,
+    "headers" : {
+      "Content-Type" : "application/json"
+    },
+    "jsonBody" : {
+      "case_type_id" : "TestAddressBookCaseNoReadEventAccess",
+      "channels" : ["channel1"],
+      "tabs" : [{
+        "id" : "NameTab",
+        "label" : "Name",
+        "order" : 1,
+        "tab_fields" : [{
+          "case_field" : {
+            "id" : "PersonFirstName",
+            "case_type_id" : "TestAddressBookCaseNoReadEventAccess",
+            "label" : "First Name",
+            "hint_text" : null,
+            "field_type" : {
+              "type" : "Text"
+            },
+            "hidden" : false,
+            "validation_expr" : null,
+            "security_label" : null,
+            "live_from" : null,
+            "live_until" : null
+          },
+          "order" : 1
+        }, {
+          "case_field" : {
+            "id" : "PersonLastName",
+            "case_type_id" : "TestAddressBookCaseNoReadEventAccess",
+            "label" : "Last Name",
+            "hint_text" : null,
+            "field_type" : {
+              "type" : "Text"
+            },
+            "hidden" : false,
+            "validation_expr" : null,
+            "security_label" : null,
+            "live_from" : null,
+            "live_until" : null
+          },
+          "order" : 2
+        }
+        ]
+      },
+        {
+          "id" : "AddressTab",
+          "label" : "Address",
+          "order" : 2,
+          "tab_fields" : [{
+            "case_field" : {
+              "id" : "PersonAddress",
+              "case_type_id" : "TestAddressBookCaseNoReadEventAccess",
+              "label" : "Address",
+              "hint_text" : null,
+              "field_type" : {
+                "type" : "Address"
+              },
+              "hidden" : false,
+              "validation_expr" : null,
+              "security_label" : null,
+              "live_from" : null,
+              "live_until" : null
+            },
+            "order" : 1
+          }
+          ]
+        },
+        {
+          "id" : "DocumentsTab",
+          "label" : "Documents",
+          "order" : 3,
+          "tab_fields" : [{
+            "case_field" : {
+              "id" : "D8Document",
+              "case_type_id" : "TestAddressBookCaseNoReadEventAccess",
+              "label" : "Document",
+              "hint_text" : null,
+              "field_type" : {
+                "type" : "Document"
+              },
+              "hidden" : false,
+              "validation_expr" : null,
+              "security_label" : null,
+              "live_from" : null,
+              "live_until" : null
+            },
+            "order" : 1
+          }
+          ]
+        }
+      ]
+    }
+  }
+}

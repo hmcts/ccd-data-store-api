@@ -1,0 +1,457 @@
+swagger: '2.0'
+info:
+  title: Core Case Data Definition API
+  description: |
+    An API to manage case data and ui definitions
+  version: "0.0.1"
+host: core-case-data.common-components.reform
+schemes:
+  - https
+basePath: /api
+produces:
+  - application/json
+paths:
+  /display/tab-structure/{id}:
+    get:
+      summary: Fetch a Case Tab Collection for a given Case Type
+      description: |
+        Returns the schema of a single case type.
+      parameters:
+        - name: id
+          in: path
+          description: Case Type ID
+          required: true
+          type: string
+      responses:
+        200:
+          description: A Case Tab Collection
+          schema:
+            $ref: '#/definitions/CaseTabCollection'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /display/work-basket-definition/{id}:
+      get:
+        summary: Fetch the UI definition for the work basket for a given Case Type
+        parameters:
+          - name: id
+            in: path
+            description: Case Type ID
+            required: true
+            type: string
+        responses:
+          200:
+            description: Work Basket Result
+            schema:
+              $ref: '#/definitions/WorkBasketResult'
+          default:
+            description: Unexpected error
+            schema:
+              $ref: '#/definitions/Error'
+
+  /display/search-input-definition/{id}:
+    get:
+      summary: Fetch the UI definition for the search inputs for a given Case Type
+      parameters:
+        - name: id
+          in: path
+          description: Case Type ID
+          required: true
+          type: string
+      responses:
+        200:
+          description: A Search input definition
+          schema:
+            $ref: '#/definitions/SearchInputDefinition'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /display/search-result-definition/{id}:
+    get:
+      summary: Fetch the UI definition for the search result fields for a given Case Type
+      parameters:
+        - name: id
+          in: path
+          description: Case Type ID
+          required: true
+          type: string
+      responses:
+        200:
+          description: A Search result definition
+          schema:
+            $ref: '#/definitions/SearchResultDefinition'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /data/case-type/{id}:
+    get:
+      summary: Fetch a Case Type Schema
+      description: |
+        Returns the schema of a single case type.
+      parameters:
+        - name: id
+          in: path
+          description: Case Type ID
+          required: true
+          type: string
+      responses:
+        200:
+          description: A Case Type Schema
+          schema:
+            $ref: '#/definitions/CaseType'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /data/jurisdictions/{jurisdiction_id}/case-type:
+      parameters:
+        - name: jurisdiction_id
+          in: path
+          description: ID for a Jurisdiction
+          required: true
+          type: string
+      get:
+        summary: Get case types
+        description: Get the case types as a list with optional jurisdiction filter
+        responses:
+          200:
+            description: List of Case Types
+            schema:
+              type: array
+              items:
+                $ref: "#/definitions/CaseType"
+      post:
+        summary: Create a new Case Type
+        description: |
+          Create a new Case Type and return the object which was created
+        parameters:
+          - name: case_type
+            in: body
+            description: case type definition
+            required: true
+            schema:
+              $ref: "#/definitions/CaseType"
+        responses:
+          201:
+            description: Successfully created a new Case Type
+            schema:
+              $ref: '#/definitions/CaseType'
+          default:
+            description: Unexpected error
+            schema:
+              $ref: '#/definitions/Error'
+
+definitions:
+
+  CaseTabCollection:
+    type: object
+    properties:
+      case_type_id:
+        type: string
+        description: Unique identifier for a Case Type.
+      channels:
+        type: array
+        description: The channels this tab is targetted at
+        items:
+          type: string
+      tabs:
+        type: array
+        items:
+          $ref: "#/definitions/CaseTypeTab"
+    required:
+      - case_type_id
+      - tabs
+
+  CaseTypeTab:
+    type: object
+    properties:
+      id:
+        type: string
+      label:
+        type: string
+      order:
+        type: integer
+        format: int32
+      tab_fields:
+        type: array
+        items:
+          $ref: "#/definitions/CaseTypeTabField"
+
+  CaseTypeTabField:
+    type: object
+    properties:
+      case_field:
+        $ref: "#/definitions/CaseField"
+      order:
+        type: integer
+        format: int32
+
+  WorkBasketResult:
+    type: object
+    properties:
+      fields:
+        type: array
+        items:
+          $ref: "#/definitions/WorkBasketResultFields"
+
+  WorkBasketResultFields:
+    type: object
+    properties:
+      case_type_id:
+        type: string
+      case_field_id:
+        type: string
+      label:
+        type: string
+      order:
+        type: integer
+        format: int32
+
+  SearchInputDefinition:
+    type: object
+    properties:
+      fields:
+        type: array
+        items:
+          $ref: "#/definitions/SearchInputFields"
+
+  SearchInputFields:
+    type: object
+    properties:
+      case_type_id:
+        type: string
+      case_field_id:
+        type: string
+      label:
+        type: string
+      order:
+        type: integer
+        format: int32
+
+  SearchResultDefinition:
+    type: object
+    properties:
+      fields:
+        type: array
+        items:
+          $ref: "#/definitions/SearchResultsFields"
+
+  SearchResultsFields:
+    type: object
+    properties:
+      case_type_id:
+        type: string
+      case_field_id:
+        type: string
+      label:
+        type: string
+      order:
+        type: integer
+        format: int32
+
+  CaseType:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Unique identifier for a Case Type.
+      version:
+        $ref: "#/definitions/Version"
+      name:
+        type: string
+        description: Display name of the Case Type.
+      jurisdiction:
+        $ref: "#/definitions/Jurisdiction"
+      events:
+        type: array
+        items:
+          $ref: "#/definitions/CaseEvents"
+      states:
+        type: array
+        items:
+          $ref: "#/definitions/CaseState"
+      case_fields:
+        type: array
+        items:
+          $ref: "#/definitions/CaseField"
+    required:
+      - id
+      - version
+      - name
+      - Jurisdiction
+      - states
+
+  Version:
+    type: object
+    properties:
+      number:
+        type: integer
+        description: Sequantial version number
+      live_from:
+        type: string
+        format: date-time
+        description: Date and time from when this version is valid from
+      live_until:
+        type: string
+        format: date-time
+        description: Date and time this version is to be retired
+    required:
+      - number
+      - live_from
+
+  Jurisdiction:
+    type: object
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      description:
+        type: string
+      live_from:
+        type: string
+        format: date-time
+      live_until:
+        type: string
+        format: date-time
+    required:
+      - id
+      - name
+
+  CaseEvents:
+    type: object
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      description:
+        type: string
+      case_fields:
+        type: array
+        items:
+          $ref: "#/definitions/CaseEventField"
+      valid_pre_states:
+        type: array
+        items:
+          type: string
+      post_state:
+        type: string
+    required:
+      - id
+      - name
+
+  CaseState:
+    type: object
+    properties:
+      id:
+        type: string
+      name:
+        description: Short name to display.
+        type: string
+      description:
+        type: string
+    required:
+      - id
+
+  CaseEventField:
+    type: object
+    properties:
+      case_field_id:
+        type: string
+        description: Foriegn key to CaseField.id
+      required:
+        type: boolean
+        description: whether this field is required for this event or not
+    required:
+      - case_field_id
+      - required
+
+  FieldType:
+    type: object
+    properties:
+      name:
+        type: string
+
+  CaseField:
+    type: object
+    properties:
+      id:
+        type: string
+        description: The id of the case field
+      case_type_id:
+        type: string
+        description: Foriegn key to the case type as fields should not work across
+      label:
+        type: string
+      hint_text:
+        type: string
+      field_type:
+        $ref: "#/definitions/FieldType"
+      hidden:
+        type: boolean
+      validation_expr:
+        type: string
+      security_label:
+        type: string
+        description: Gov security level of the data (official, top secret etc)
+      live_from:
+        type: string
+      live_until:
+        type: string
+    required:
+      - id
+      - label
+      - field_type
+
+  FixedListField:
+    type: object
+    properties:
+      id:
+        type: string
+      field_type:
+        $ref: "#/definitions/FieldType"
+
+  FixedListWithOtherField:
+    type: object
+    properties:
+      id:
+        type: string
+      field_type:
+        $ref: "#/definitions/FieldType"
+
+  TableField:
+    type: object
+    properties:
+      headers:
+        type: array
+        items:
+          $ref: "#/definitions/TableFieldHeader"
+
+  TableFieldHeader:
+    type: object
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      field_type:
+        $ref: "#/definitions/FieldType"
+
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      fields:
+        type: string

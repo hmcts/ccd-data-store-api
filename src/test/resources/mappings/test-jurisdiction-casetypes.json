@@ -1,0 +1,673 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/data/jurisdictions/PROBATE/case-type"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": [
+      {
+        "id": "TestAddressBookCase",
+        "version": {
+          "number": 1,
+          "live_from": "2017-01-01"
+        },
+        "name": "Test Address Book Case",
+        "description": "Test Address Book Case Desc",
+        "jurisdiction": {
+          "id": "PROBATE",
+          "name": "Test",
+          "description": "Test Jurisdiction"
+        },
+        "events": [
+          {
+            "id": "TEST_EVENT_1_1",
+            "name": "string",
+            "description": "string",
+            "case_fields": [
+              {
+                "case_field_id": "string",
+                "required": true
+              }
+            ],
+            "pre_states": [
+              "string"
+            ],
+            "post_state": "string",
+            "acls": [
+              {
+                "role": "caseworker-probate-public",
+                "create": true,
+                "read": false,
+                "update": true,
+                "delete": false
+              }]
+          }
+        ],
+        "states": [
+          {
+            "id": "CaseCreated",
+            "name": "Case Created",
+            "acls": [
+              {
+                "role": "caseworker-probate-public",
+                "create": false,
+                "read": true,
+                "update": true,
+                "delete": false
+              }]
+          },
+          {
+            "id": "CaseEnteredIntoLegacy",
+            "name": "Case Has Been Entered Into Legacy",
+            "acls": [
+              {
+                "role": "caseworker-probate-public",
+                "create": false,
+                "read": true,
+                "update": true,
+                "delete": false
+              }]
+          },
+          {
+            "id": "CaseStopped",
+            "name": "Put case on hold",
+            "acls": [
+              {
+                "role": "caseworker-probate-public",
+                "create": false,
+                "read": true,
+                "update": true,
+                "delete": false
+              }]
+          }
+        ],
+        "case_fields": [
+          {
+            "id": "PersonFirstName",
+            "case_type_id": "TestAddressBookCase",
+            "label": "First name",
+            "security_classification": "PUBLIC",
+            "field_type": {
+              "type": "Text",
+              "id": "Text"
+            },
+            "acls": [
+              {
+                "role": "caseworker-probate-public",
+                "create": true,
+                "read": true,
+                "update": true,
+                "delete": false
+              }]
+          },
+          {
+            "id": "PersonLastName",
+            "case_type_id": "TestAddressBookCase",
+            "label": "Last name",
+            "security_classification": "PUBLIC",
+            "field_type": {
+              "type": "Text",
+              "id": "Text"
+            },
+            "acls": [
+              {
+                "role": "caseworker-probate-public",
+                "create": true,
+                "read": true,
+                "update": true,
+                "delete": false
+              }]
+          },
+          {
+            "id": "PersonAddress",
+            "case_type_id": "TestAddressBookCase",
+            "label": "Address",
+            "security_classification": "PUBLIC",
+            "field_type": {
+              "id": "Address",
+              "type": "Address"
+            },
+            "acls": [
+              {
+                "role": "caseworker-probate-public",
+                "create": true,
+                "read": true,
+                "update": true,
+                "delete": false
+              }]
+          }
+        ],
+        "acls": [
+          {
+            "role": "caseworker-probate-public",
+            "create": true,
+            "read": true,
+            "update": true,
+            "delete": false
+          }]
+      },
+      {
+        "id": "TestAddressBookCase2",
+        "version": {
+          "number": 1,
+          "live_from": "2017-01-01"
+        },
+        "name": "Test Address Book Case",
+        "description": "Test Address Book Case",
+        "jurisdiction": {
+          "id": "PROBATE",
+          "name": "Test",
+          "description": "Test Jurisdiction"
+        },
+        "events": [
+          {
+            "id": "TEST EVENT_2",
+            "name": "string",
+            "description": "string",
+            "case_fields": [
+              {
+                "case_field_id": "string",
+                "required": true
+              }
+            ],
+            "pre_states": [
+              "string"
+            ],
+            "post_state": "string",
+            "acls": [
+              {
+                "role": "caseworker-probate-public",
+                "create": true,
+                "read": true,
+                "update": true,
+                "delete": false
+              }]
+          }
+        ],
+        "states": [
+          {
+            "id": "CaseCreated",
+            "name": "Case Created",
+            "acls": [
+              {
+                "role": "caseworker-probate-public",
+                "create": false,
+                "read": true,
+                "update": true,
+                "delete": false
+              }]
+          },
+          {
+            "id": "CaseEnteredIntoLegacy",
+            "name": "Case Has Been Entered Into Legacy",
+            "acls": [
+              {
+                "role": "caseworker-probate-public",
+                "create": false,
+                "read": true,
+                "update": true,
+                "delete": false
+              }]
+          },
+          {
+            "id": "CaseStopped",
+            "name": "Put case on hold",
+            "acls": [
+              {
+                "role": "caseworker-probate-public",
+                "create": false,
+                "read": true,
+                "update": true,
+                "delete": false
+              }]
+          }
+        ],
+        "case_fields": [
+          {
+            "id": "PersonFirstName_2_1",
+            "case_type_id": "TestAddressBookCase2",
+            "label": "First name",
+            "field_type": {
+              "type": "Text"
+            },
+            "acls": [
+              {
+                "role": "caseworker-probate-public",
+                "create": true,
+                "read": true,
+                "update": true,
+                "delete": false
+              }]
+          },
+          {
+            "id": "PersonLastName_2_2",
+            "case_type_id": "TestAddressBookCase2",
+            "label": "Last name",
+            "field_type": {
+              "type": "Text"
+            },
+            "acls": [
+              {
+                "role": "caseworker-probate-public",
+                "create": true,
+                "read": true,
+                "update": true,
+                "delete": false
+              }]
+          },
+          {
+            "id": "PersonAddress_2_3",
+            "case_type_id": "TestAddressBookCase2",
+            "label": "Address",
+            "field_type": {
+              "type": "Address"
+            },
+            "acls": [
+              {
+                "role": "caseworker-probate-public",
+                "create": true,
+                "read": true,
+                "update": true,
+                "delete": false
+              }]
+          }
+        ],
+        "acls": [
+          {
+            "role": "caseworker-probate-public",
+            "create": true,
+            "read": false,
+            "update": true,
+            "delete": false
+          }]
+      },
+      {
+        "id": "TestAddressBookCase3",
+        "version": {
+          "number": 1,
+          "live_from": "2017-01-01"
+        },
+        "name": "Test Address Book Case",
+        "description": "Test Address Book Case",
+        "jurisdiction": {
+          "id": "PROBATE",
+          "name": "Test",
+          "description": "Test Jurisdiction"
+        },
+        "events": [
+          {
+            "id": "TEST_EVENT_3",
+            "name": "string",
+            "description": "string",
+            "case_fields": [
+              {
+                "case_field_id": "string",
+                "required": true
+              }
+            ],
+            "pre_states": [
+              "string"
+            ],
+            "post_state": "string",
+            "acls": [
+              {
+                "role": "caseworker-probate-public",
+                "create": true,
+                "read": true,
+                "update": true,
+                "delete": false
+              }]
+          }
+        ],
+        "states": [
+          {
+            "id": "CaseCreated",
+            "name": "Case Created",
+            "acls": [
+              {
+                "role": "caseworker-probate-public",
+                "create": false,
+                "read": true,
+                "update": true,
+                "delete": false
+              }]
+          },
+          {
+            "id": "CaseEnteredIntoLegacy",
+            "name": "Case Has Been Entered Into Legacy",
+            "acls": [
+              {
+                "role": "caseworker-probate-public",
+                "create": false,
+                "read": true,
+                "update": true,
+                "delete": false
+              }]
+          },
+          {
+            "id": "CaseStopped",
+            "name": "Put case on hold",
+            "acls": [
+              {
+                "role": "caseworker-probate-public",
+                "create": false,
+                "read": true,
+                "update": true,
+                "delete": false
+              }]
+          }
+        ],
+        "case_fields": [
+          {
+            "id": "PersonFirstName",
+            "case_type_id": "TestAddressBookCase3",
+            "label": "First name",
+            "field_type": {
+              "type": "Text"
+            },
+            "acls": [
+              {
+                "role": "caseworker-probate-public",
+                "create": true,
+                "read": false,
+                "update": true,
+                "delete": false
+              }]
+          },
+          {
+            "id": "PersonLastName",
+            "case_type_id": "TestAddressBookCase3",
+            "label": "Last name",
+            "field_type": {
+              "type": "Text"
+            },
+            "acls": [
+              {
+                "role": "caseworker-probate-public",
+                "create": true,
+                "read": true,
+                "update": true,
+                "delete": false
+              }]
+          },
+          {
+            "id": "PersonAddress",
+            "case_type_id": "TestAddressBookCase3",
+            "label": "Address",
+            "field_type": {
+              "type": "Address"
+            },
+            "acls": [
+              {
+                "role": "caseworker-probate-public",
+                "create": true,
+                "read": true,
+                "update": true,
+                "delete": false
+              }]
+          }
+        ],
+        "acls": [
+          {
+            "role": "caseworker-probate-public",
+            "create": true,
+            "read": true,
+            "update": true,
+            "delete": false
+          }]
+      },
+      {
+        "id": "TestAddressBookCase4",
+        "version": {
+          "number": 1,
+          "live_from": "2017-01-01"
+        },
+        "name": "Test Address Book Case 4",
+        "description": "Test Address Book Case 4",
+        "jurisdiction": {
+          "id": "PROBATE",
+          "name": "Test",
+          "description": "Test Jurisdiction"
+        },
+        "events": [
+          {
+            "id": "TEST_EVENT_4",
+            "name": "string",
+            "description": "string",
+            "case_fields": [
+              {
+                "case_field_id": "string",
+                "required": true
+              }
+            ],
+            "pre_states": [
+              "string"
+            ],
+            "post_state": "string",
+            "acls": [
+              {
+                "role": "caseworker-probate-public",
+                "create": true,
+                "read": true,
+                "update": true,
+                "delete": false
+              }]
+          }
+        ],
+        "states": [
+          {
+            "id": "CaseCreated",
+            "name": "Case Created",
+            "acls": [
+              {
+                "role": "caseworker-probate-public",
+                "create": false,
+                "read": true,
+                "update": true,
+                "delete": false
+              }
+            ]
+          }
+        ],
+        "case_fields": [
+          {
+            "id": "PersonFirstName",
+            "case_type_id": "TestAddressBookCase4",
+            "label": "First name",
+            "field_type": {
+              "type": "Text"
+            },
+            "acls": [
+              {
+                "role": "caseworker-probate-public",
+                "create": true,
+                "read": false,
+                "update": true,
+                "delete": false
+              }]
+          },
+          {
+            "id": "PersonLastName",
+            "case_type_id": "TestAddressBookCase4",
+            "label": "Last name",
+            "field_type": {
+              "type": "Text"
+            },
+            "acls": [
+              {
+                "role": "caseworker-probate-public",
+                "create": true,
+                "read": true,
+                "update": true,
+                "delete": false
+              }]
+          },
+          {
+            "id": "PersonAddress",
+            "case_type_id": "TestAddressBookCase4",
+            "label": "Address",
+            "field_type": {
+              "type": "Address"
+            },
+            "acls": [
+              {
+                "role": "caseworker-probate-public",
+                "create": true,
+                "read": true,
+                "update": true,
+                "delete": false
+              }]
+          }
+        ],
+        "acls": [
+          {
+            "role": "caseworker-probate-public",
+            "create": false,
+            "read": false,
+            "update": false,
+            "delete": false
+          }
+        ]
+      },
+      {
+        "id": "TestAddressBookCaseNoReadFieldAccess",
+        "version": {
+          "number": 1,
+          "live_from": "2017-01-01"
+        },
+        "name": "Test Address Book Case",
+        "description": "Test Address Book Case",
+        "jurisdiction": {
+          "id": "PROBATE",
+          "name": "Test",
+          "description": "Test Jurisdiction"
+        },
+        "events": [
+          {
+            "id": "TEST_EVENT_NO_READ_FIELD_ACCESS",
+            "name": "string",
+            "description": "string",
+            "case_fields": [
+              {
+                "case_field_id": "string",
+                "required": true
+              }
+            ],
+            "pre_states": [
+              "string"
+            ],
+            "post_state": "string",
+            "acls": [
+              {
+                "role": "caseworker-probate-public",
+                "create": true,
+                "read": true,
+                "update": true,
+                "delete": false
+              }]
+          }
+        ],
+        "states": [
+          {
+            "id": "CaseCreated",
+            "name": "Case Created",
+            "acls": [
+              {
+                "role": "caseworker-probate-public",
+                "create": false,
+                "read": true,
+                "update": true,
+                "delete": false
+              }]
+          },
+          {
+            "id": "CaseEnteredIntoLegacy",
+            "name": "Case Has Been Entered Into Legacy",
+            "acls": [
+              {
+                "role": "caseworker-probate-public",
+                "create": false,
+                "read": true,
+                "update": true,
+                "delete": false
+              }]
+          },
+          {
+            "id": "CaseStopped",
+            "name": "Put case on hold",
+            "acls": [
+              {
+                "role": "caseworker-probate-public",
+                "create": false,
+                "read": true,
+                "update": true,
+                "delete": false
+              }]
+          }
+        ],
+        "case_fields": [
+          {
+            "id": "PersonFirstName",
+            "case_type_id": "TestAddressBookCaseNoReadFieldAccess",
+            "label": "First name",
+            "field_type": {
+              "type": "Text"
+            },
+            "acls": [
+              {
+                "role": "caseworker-probate-public",
+                "create": true,
+                "read": false,
+                "update": true,
+                "delete": false
+              }]
+          },
+          {
+            "id": "PersonLastName",
+            "case_type_id": "TestAddressBookCaseNoReadFieldAccess",
+            "label": "Last name",
+            "field_type": {
+              "type": "Text"
+            },
+            "acls": [
+              {
+                "role": "caseworker-probate-public",
+                "create": true,
+                "read": true,
+                "update": true,
+                "delete": false
+              }]
+          },
+          {
+            "id": "PersonAddress",
+            "case_type_id": "TestAddressBookCaseNoReadFieldAccess",
+            "label": "Address",
+            "field_type": {
+              "type": "Address"
+            },
+            "acls": [
+              {
+                "role": "caseworker-probate-public",
+                "create": true,
+                "read": true,
+                "update": true,
+                "delete": false
+              }]
+          }
+        ],
+        "acls": [
+          {
+            "role": "caseworker-probate-public",
+            "create": true,
+            "read": true,
+            "update": true,
+            "delete": false
+          }]
+      }
+    ]
+  }
+}

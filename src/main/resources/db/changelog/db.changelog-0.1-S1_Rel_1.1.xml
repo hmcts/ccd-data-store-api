@@ -1,0 +1,25 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="10" author="andrzej.folga@hmcts.net">
+        <addColumn tableName="case_data">
+            <column
+                    name="reference"
+                    afterColumn="id"
+                    type="bigint">
+                <constraints unique="true"/>
+            </column>
+        </addColumn>
+        <sqlFile
+          path="scripts/case_reference_migration.sql"
+          relativeToChangelogFile="true"
+          splitStatements="false"
+          stripComments="false"/>
+        <addNotNullConstraint
+                tableName="case_data"
+                columnName="reference"
+                columnDataType="BIGINT"/>
+    </changeSet>
+
+</databaseChangeLog>

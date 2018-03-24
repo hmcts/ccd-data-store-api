@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/idam/details",
+    "headers": {
+      "Authorization": {
+        "equalTo": "Bearer not-found"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+    }
+  }
+}

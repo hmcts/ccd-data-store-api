@@ -1,0 +1,21 @@
+{
+  "priority": 10,
+  "request": {
+    "method": "GET",
+    "url": "/idam/details"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "id": "123",
+      "email" : "Cloud.Strife@test.com",
+      "forename" : "Cloud",
+      "surname": "Strife",
+      "roles" : [ "caseworker", "caseworker-test" ],
+      "defaultService" : "ccd"
+    }
+  }
+}

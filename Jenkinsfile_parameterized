@@ -1,0 +1,16 @@
+#!groovy
+@Library("Infrastructure") _
+
+properties([
+  parameters([
+    string(name: 'PRODUCT_NAME', defaultValue: 'ccd', description: ''),
+    string(name: 'APP', defaultValue: 'data-store-api', description: ''),
+    string(name: 'TYPE', defaultValue: 'java', description: ''),
+    string(name: 'ENVIRONMENT', defaultValue: 'sandbox', description: 'Environment where code should be build and deployed'),
+    choice(name: 'SUBSCRIPTION', choices: 'sandbox\nnonprod\nprod', description: 'Azure subscriptions available to build in')
+  ]),
+  [$class: 'GithubProjectProperty', projectUrlStr: 'https://git.reform.hmcts.net/case-management/case-data-store-app'],
+  pipelineTriggers([[$class: 'GitHubPushTrigger']])
+])
+
+withParameterizedPipeline(params.TYPE, params.PRODUCT_NAME, params.APP, params.ENVIRONMENT, params.SUBSCRIPTION) {}

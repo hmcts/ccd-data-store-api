@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/s2s/details"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": "ccd_gw"
+  }
+}

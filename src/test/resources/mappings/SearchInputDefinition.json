@@ -1,0 +1,32 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/display/search-input-definition/TestAddressBookCase"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+  "case_type_id": "TestAddressBookCase",
+  "fields": [
+    {
+      "case_field_id": "PersonFirstName",
+      "label": "First Name",
+      "order": 1
+    },
+    {
+      "case_field_id": "PersonLastName",
+      "label": "Last Name",
+      "order": 2
+    },
+    {
+      "case_field_id": "PersonAddress",
+      "label": "Address",
+      "order": 3
+    }
+  ]
+}
+  }
+}

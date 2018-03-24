@@ -1,0 +1,44 @@
+[
+  {
+    "type": "Text"
+  },
+  {
+    "type": "Number"
+  },
+  {
+    "type": "Email"
+  },
+  {
+    "type": "YesOrNo"
+  },
+  {
+    "type": "Date"
+  },
+  {
+    "type": "FixedList"
+  },
+  {
+    "type": "PostCode",
+    "regular_expression": "^([A-PR-UWYZ0-9][A-HK-Y0-9][AEHMNPRTVXY0-9]?[ABEHMNPRVWXY0-9]? {1,2}[0-9][ABD-HJLN-UW-Z]{2}|GIR 0AA)$"
+  },
+  {
+    "type": "MoneyGBP"
+  },
+  {
+    "type": "PhoneUK",
+    "regular_expression": "^(((\\+44\\s?\\d{4}|\\(?0\\d{4}\\)?)\\s?\\d{3}\\s?\\d{3})|((\\+44\\s?\\d{3}|\\(?0\\d{3}\\)?)\\s?\\d{3}\\s?\\d{4})|((\\+44\\s?\\d{2}|\\(?0\\d{2}\\)?)\\s?\\d{4}\\s?\\d{4}))(\\s?\\#(\\d{4}|\\d{3}))?$"
+  },
+  {
+    "type": "TextArea"
+  },
+  {
+    "type": "Complex"
+  },
+  {
+    "type": "Collection"
+  },
+  {
+    "type": "MultiSelectList"
+  }
+]
+

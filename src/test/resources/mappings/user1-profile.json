@@ -1,0 +1,28 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/user-profile/users?uid=Cloud.Strife@test.com"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "id" : "cloud.strife@test.com",
+      "jurisdictions" : [ {
+        "id" : "PROBATE",
+        "name" : "name test"
+      }, {
+        "id" : "DIVORCE",
+        "name" : "name test2"
+      }, {
+        "id" : "SSCS",
+        "name" : "name test3"
+      } ],
+      "work_basket_default_jurisdiction" : "PROBATE",
+      "work_basket_default_case_type" : "TestAddressBookCase",
+      "work_basket_default_state" : "CaseCreated"
+    }
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/hal+json"
+    },
+    "jsonBody": {
+      "size": 137440,
+      "mimeType": "image/jpeg",
+      "originalDocumentName": "Seagulls_Square.jpg",
+      "createdBy": "485",
+      "lastModifiedBy": "485",
+      "modifiedOn": null,
+      "createOn": "2017-09-28T10:13:39.224+0000",
+      "classification": null,
+      "roles": null,
+      "_links": {
+        "self": {
+          "href": "http://localhost:10000/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0"
+        }
+      },
+      "_embedded": {
+        "allDocumentVersions": {
+          "_embedded": {
+            "documentVersions": [
+              {
+                "size": 137440,
+                "mimeType": "image/jpeg",
+                "originalDocumentName": "Seagulls_Square.jpg",
+                "createdBy": "485",
+                "createOn": "2017-09-28T10:13:39.224+0000",
+                "_links": {
+                  "file": {
+                    "href": "http://localhost:10000/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0"
+                  },
+                  "self": {
+                    "href": "http://localhost:10000/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/versions/3f6b8487-ef22-4984-8a00-286e87f5cc15"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

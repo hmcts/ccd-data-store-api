@@ -1,0 +1,64 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="11" author="valentin.laurin@hmcts.net">
+        <dropColumn tableName="case_data" columnName="security_level"/>
+    </changeSet>
+
+    <changeSet id="12" author="valentin.laurin@hmcts.net">
+        <renameColumn tableName="case_data"
+                      columnDataType="jsonb"
+                      oldColumnName="security_classifications"
+                      newColumnName="data_classification"
+        />
+    </changeSet>
+
+    <changeSet id="13" author="valentin.laurin@hmcts.net">
+        <sql>
+            CREATE TYPE securityclassification AS ENUM ('PUBLIC', 'PRIVATE', 'RESTRICTED');
+        </sql>
+
+        <addColumn tableName="case_data">
+            <column name="security_classification" type="securityclassification"/>
+        </addColumn>
+
+        <!-- Set all existing cases as public-->
+        <update tableName="case_data">
+            <column name="security_classification" value="PUBLIC"/>
+        </update>
+
+        <addNotNullConstraint
+                tableName="case_data"
+                columnName="security_classification"
+                columnDataType="securityclassification"/>
+
+    </changeSet>
+
+    <changeSet id="14" author="andrzej.folga@hmcts.net">
+        <renameColumn tableName="case_event"
+                      columnDataType="jsonb"
+                      oldColumnName="security_classifications"
+                      newColumnName="data_classification"
+        />
+    </changeSet>
+
+    <changeSet id="15" author="andrzej.folga@hmcts.net">
+        <addColumn tableName="case_event">
+            <column name="security_classification" type="securityclassification"/>
+        </addColumn>
+
+        <!-- Set all existing case events as public-->
+        <update tableName="case_event">
+            <column name="security_classification" value="PUBLIC"/>
+        </update>
+
+        <addNotNullConstraint
+                tableName="case_event"
+                columnName="security_classification"
+                columnDataType="securityclassification"/>
+
+    </changeSet>
+
+
+</databaseChangeLog>

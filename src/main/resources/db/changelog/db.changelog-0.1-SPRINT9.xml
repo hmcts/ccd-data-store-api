@@ -1,0 +1,32 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="7" author="andrzej.folga@hmcts.net">
+        <renameColumn
+                tableName="case_event"
+                oldColumnName="state"
+                newColumnName="state_id"
+                columnDataType="varchar(255)"/>
+        <addColumn tableName="case_event">
+            <column
+                    name="state_name"
+                    afterColumn="state_id"
+                    type="varchar(255)"
+                    defaultValue="">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="9" author="phillip.chan@hmcts.net">
+        <addColumn tableName="case_data">
+            <column name="security_classifications" type="jsonb"/>
+        </addColumn>
+        <addColumn tableName="case_event">
+            <column name="security_classifications" type="jsonb"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>
+

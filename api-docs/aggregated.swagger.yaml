@@ -1,0 +1,627 @@
+swagger: '2.0'
+info:
+  title: Core Case Data - Aggregated API
+  description: |
+    One API to bring them all and in the darkness bind them.
+
+    An API aggregating the UI, definition and data API for use in a logged in user context.
+  version: "0.0.1"
+host: core-case-data.common-components.reform
+schemes:
+  - https
+basePath: /api
+produces:
+  - application/json
+paths:
+  /caseworkers/{uid}/profile:
+    get:
+      summary: Retrieve the current user profile
+      description: |
+        Returns all the user-specific data required to display a UI.
+      parameters:
+        - name: uid
+          in: path
+          description: User ID from IdAM
+          required: true
+          type: string
+      responses:
+        200:
+          description: Current user profile.
+          schema:
+            $ref: '#/definitions/Profile'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/inputs:
+    parameters:
+      - name: uid
+        in: path
+        description: User ID from IdAM
+        required: true
+        type: string
+      - name: jid
+        in: path
+        description: Jurisdiction ID
+        required: true
+        type: string
+      - name: ctid
+        in: path
+        description: Case type ID
+        required: true
+        type: string
+    get:
+      summary: Retrieve search inputs for a case type
+      description: |
+        Returns the list of supported input parameters for a search against a given case type.
+      responses:
+        200:
+          description: List of supported search inputs
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/SearchInput'
+
+  /caseworkers/{uid}/cases:
+    get:
+      summary: Search for cases
+      description: |
+        Returns a list of cases, as search result, with all the data necessary to display those results.
+        The workbasket is a search with 3 query parameters (jurisdiction, case type and state) and a custom layout (workbasket).
+        The default search result layout is used when the workbasket layout is not explicitly activated.
+      parameters:
+        - name: uid
+          in: path
+          description: User ID from IdAM
+          required: true
+          type: string
+        - name: view
+          in: query
+          description: Which view to use to structure the results.
+          required: false
+          type: string
+          enum:
+            - SEARCH
+            - WORKBASKET
+          default: SEARCH
+        - name: jurisdiction
+          in: query
+          description: ID of jurisdiction to search for
+          required: true
+          type: array
+          items:
+            type: string
+        - name: case_type
+          in: query
+          description: ID of the case type to search for
+          required: true
+          type: array
+          items:
+            type: string
+        - name: state
+          in: query
+          description: State to search for
+          required: false
+          type: array
+          items:
+            type: string
+        - name: case.<case_field>
+          in: query
+          description: |
+            Search criteria based on dynamic case fields defined as part of a case type definition.
+            `<case_field>` must be replaced by a valid case field name.
+            E.g.: `case.deceased_first_name=John` would search for all cases containing a field `deceased_first_name` with a value of `John`.
+            As many `case.<case_field>` parameters as required can be used.
+            Complex fields values can be searched in 2 ways: `case.address=Westminster` searches the address as a whole; `case.address.postcode=SE19PD` only considers a given field part.
+          required: false
+          type: array
+          items:
+            type: string
+        - name: case.*
+          in: query
+          description: |
+            Search for a value inside all dynamic fields of a case.
+            E.g.: `case.*=John` would search for all cases containing any field with a value of `John`.
+          required: false
+          type: array
+          items:
+            type: string
+      responses:
+        200:
+          description: List of displayable search results.
+          schema:
+            $ref: '#/definitions/SearchResultView'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /caseworkers/{uid}/cases/{cid}:
+    parameters:
+      - name: uid
+        in: path
+        description: User ID from IdAM
+        required: true
+        type: string
+      - name: cid
+        in: path
+        description: Case ID
+        required: true
+        type: string
+    get:
+      summary: Fetch a case for display
+      description: |
+        Returns all the data necessary to display a case in the context of a layout.
+        The case's layout and definition are reconciliated with the fields definitions being denormalised for every field of the layout.
+        The case data is reduced to match the layout and denormalised for every field of the layout.
+        Layout is automatically infered from the caller's role and the case's state.
+      responses:
+        200:
+          description: A displayable case
+          schema:
+            $ref: '#/definitions/CaseView'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /caseworkers/{uid}/cases/{cid}/event-triggers/{etid}:
+    parameters:
+      - name: uid
+        in: path
+        description: User ID from IdAM
+        required: true
+        type: string
+      - name: cid
+        in: path
+        description: Case ID
+        required: true
+        type: string
+      - name: etid
+        in: path
+        description: Event Trigger ID
+        required: true
+        type: string
+    get:
+      summary: Fetch an event trigger in the context of a case
+      description: |
+        Validate pre-state conditions for the given case and event.
+        When valid, return the event trigger with its associated case fields (including type and value).
+      responses:
+        200:
+          description: Valid pre-state conditions.
+          schema:
+            $ref: '#/definitions/CaseEventTrigger'
+        422:
+          description: Invalid pre-state condition.
+          schema:
+            $ref: '#/definitions/Error'
+
+definitions:
+
+  Profile:
+    type: object
+    properties:
+      user:
+        $ref: '#/definitions/ProfileUser'
+      channels:
+        type: array
+        items:
+          type: string
+      jurisdictions:
+        type: array
+        items:
+          $ref: '#/definitions/ProfileJurisdiction'
+      default:
+        $ref: '#/definitions/ProfileDefault'
+
+  ProfileUser:
+    type: object
+    properties:
+      idam:
+        $ref: '#/definitions/ProfileIdam'
+
+  ProfileIdam:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      roles:
+        type: array
+        description: Roles assigned to the user
+        items:
+          type: string
+
+  ProfileJurisdiction:
+    type: object
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      description:
+        type: string
+      case_types:
+        type: array
+        items:
+          $ref: '#/definitions/ProfileCaseType'
+
+  ProfileCaseType:
+    type: object
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      description:
+        type: string
+      states:
+        type: array
+        items:
+          $ref: '#/definitions/ProfileCaseState'
+
+  ProfileCaseState:
+    type: object
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      description:
+        type: string
+
+  ProfileDefault:
+    type: object
+    properties:
+      workbasket:
+        $ref: '#/definitions/ProfileDefaultWorkbasket'
+
+  ProfileDefaultWorkbasket:
+    type: object
+    properties:
+      jurisdiction_id:
+        type: string
+      case_type_id:
+        type: string
+      state_id:
+        type: string
+
+  SearchInput:
+    type: object
+    properties:
+      label:
+        type: string
+      order:
+        type: integer
+        format: int32
+      field:
+        type: object
+        properties:
+          id:
+            type: string
+          type:
+            $ref: '#/definitions/FieldType'
+
+  SearchResultView:
+    type: object
+    properties:
+      columns:
+        type: array
+        items:
+          $ref: '#/definitions/SearchResultViewColumn'
+      results:
+        description: List of result cases. Empty list if no results found.
+        type: array
+        items:
+          $ref: '#/definitions/SearchResultViewItem'
+
+  SearchResultViewColumn:
+    type: object
+    properties:
+      case_field_id:
+        type: string
+      case_field_type:
+        type: string
+      label:
+        type: string
+      order:
+        type: number
+        format: int32
+
+  SearchResultViewItem:
+    type: object
+    properties:
+      case_id:
+        type: string
+      case_fields:
+        type: object
+        description: A map of case field id and the corresponding case value.
+        additionalProperties:
+          type: object
+          description: Values of the fields, type and structure depends on each included field type
+
+  CaseView:
+    type: object
+    properties:
+      case_id:
+        type: string
+        description: Unique ID of the Case
+      case_type:
+        $ref: "#/definitions/CaseViewType"
+      state:
+        $ref: "#/definitions/ProfileCaseState"
+      channels:
+        type: array
+        description: The channels this tab is targetted at
+        items:
+          type: string
+      tabs:
+        type: array
+        items:
+          $ref: "#/definitions/CaseViewTab"
+      triggers:
+        type: array
+        items:
+          $ref: "#/definitions/CaseViewTrigger"
+      events:
+        type: array
+        items:
+          $ref: "#/definitions/CaseViewEvent"
+    required:
+      - case_id
+      - case_type
+      - state
+      - tabs
+
+  CaseViewType:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Unique identifier for a Case Type.
+      name:
+        type: string
+        description: Display name of the Case Type.
+      description:
+        type: string
+      jurisdiction:
+        $ref: "#/definitions/CaseViewJurisdiction"
+    required:
+      - id
+      - name
+      - jurisdiction
+
+  CaseViewJurisdiction:
+    type: object
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      description:
+        type: string
+    required:
+      - id
+      - name
+
+  CaseViewTab:
+    type: object
+    properties:
+      id:
+        type: string
+      label:
+        type: string
+      order:
+        type: integer
+        format: int32
+      fields:
+        type: array
+        items:
+          $ref: "#/definitions/CaseViewField"
+    required:
+      - id
+      - label
+      - fields
+
+  CaseViewField:
+    type: object
+    properties:
+      id:
+        type: string
+        description: The id of the case field
+      label:
+        type: string
+      hint_text:
+        type: string
+      field_type:
+        $ref: "#/definitions/FieldType"
+      hidden:
+        type: boolean
+      validation_expr:
+        type: string
+      security_label:
+        type: string
+        description: Gov security level of the data (official, top secret etc)
+      order:
+        type: integer
+        format: int32
+      value:
+        type: object
+        description: |
+          Value of the field, type and structure depends on the field type
+    required:
+      - id
+      - label
+      - field_type
+
+  FieldType:
+    type: object
+    properties:
+      id:
+        type: string
+        description: |
+          Same as `type` for simple types, or custom type name for complex types
+      type:
+        $ref: "#/definitions/FieldTypeEnum"
+      min:
+        type: integer
+        format: int32
+        description: Minimum number or string length, when applicable
+      max:
+        type: integer
+        format: int32
+        description: Maximum number or string length, when applicable
+      regular_expression:
+        type: string
+        description: Regular expression to conform to, applicable to string
+      fixed_list_items:
+        type: array
+        items:
+          $ref: "#/definitions/FixedListItem"
+        description: Applicable to `FixedList` type
+      complex_fields:
+        type: array
+        items:
+          $ref: "#/definitions/CaseViewField"
+        description: Applicable to `ComplexType` type
+    required:
+      - id
+      - type
+
+  DisplayContextEnum:
+    type: string
+    description: Supported values of case event field display context
+    enum:
+      - READONLY
+      - OPTIONAL
+      - MANDATORY
+
+  FieldTypeEnum:
+    type: string
+    description: Supported values of field types' type
+    enum:
+      - Text
+      - Number
+      - YesOrNo
+      - Date
+      - Email
+      - PhoneUK
+      - FixedList
+      - MoneyGBP
+      - TextArea
+      - ComplexType
+      - Collection
+      - MultiSelectList
+
+  FixedListItem:
+    type: object
+    properties:
+      code:
+        type: string
+        description: Value of the list item, to be saved in case data
+      label:
+        type: string
+        description: Label of the list item, for display only
+    required:
+      - label
+
+  CaseViewTrigger:
+    type: object
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      description:
+        type: string
+      order:
+        type: number
+        format: int32
+    required:
+      - id
+      - name
+
+  CaseViewEvent:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+      timestamp:
+        type: string
+        format: date-time
+      user_id:
+        type: integer
+        format: int64
+      user_first_name:
+        type: string
+      user_last_name:
+        type: string
+      event_id:
+        type: string
+      event_name:
+        type: string
+      summary:
+        type: string
+      comment:
+        type: string
+
+  CaseEventTrigger:
+    type: object
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      description:
+        type: string
+      case_id:
+        type: string
+      case_fields:
+        type: array
+        items:
+          $ref: "#/definitions/CaseEventTriggerField"
+
+  CaseEventTriggerField:
+    type: object
+    properties:
+      id:
+        type: string
+        description: The id of the case field
+      label:
+        type: string
+      hint_text:
+        type: string
+      field_type:
+        $ref: "#/definitions/FieldType"
+      security_label:
+        type: string
+        description: Gov security level of the data (official, top secret etc)
+      display_context:
+        $ref: "#/definitions/DisplayContextEnum"
+      order:
+        type: integer
+        format: int32
+      value:
+        type: object
+        description: |
+          Value of the field, type and structure depends on the field type
+
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      fields:
+        type: string

@@ -1,0 +1,29 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="18" author="valentin.laurin@hmcts.net">
+        <!-- Delete any previously granted creator to prevent duplicate keys -->
+        <sql>
+            delete from case_users cu
+            where cu.case_data_id  = (select e.case_data_id     from case_event e where e.case_data_id = cu.case_data_id and e.created_date = (select min(ce.created_date) from case_event ce where ce.case_data_id = e.case_data_id))
+            and   cu.user_id       = (select e.user_id::varchar from case_event e where e.case_data_id = cu.case_data_id and e.created_date = (select min(ce.created_date) from case_event ce where ce.case_data_id = e.case_data_id))
+        </sql>
+
+        <!-- Grant access to all case creators based on case events -->
+        <sql>
+            insert into case_users(case_data_id, user_id)
+            select e.case_data_id, e.user_id
+            from case_event e
+            where e.created_date = (select min(ce.created_date) from case_event ce where ce.case_data_id = e.case_data_id);
+        </sql>
+
+        <!-- Populate audit for granted creators -->
+        <sql>
+            insert into case_users_audit(case_data_id, user_id, changed_by_id, changed_at, action)
+            select c.id, e.user_id, e.user_id, e.created_date, 'GRANT' from case_data c
+            join case_event e ON c.id = e.case_data_id AND e.created_date = (select min(ce.created_date) from case_event ce where ce.case_data_id = c.id);
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

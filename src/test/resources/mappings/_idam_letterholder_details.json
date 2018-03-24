@@ -1,0 +1,26 @@
+{
+  "priority": 1,
+  "request": {
+    "method": "GET",
+    "url": "/idam/details",
+    "headers": {
+      "Authorization": {
+        "equalTo": "Bearer LetterHolderToken"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "id": "123",
+      "email" : "Cloud.Strife@test.com",
+      "forename" : "Cloud",
+      "surname": "Strife",
+      "roles" : [ "letter-holder" ],
+      "defaultService" : "ccd"
+    }
+  }
+}

@@ -1,0 +1,59 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="3" author="valentin.laurin@hmcts.net">
+        <renameColumn
+                tableName="case_data"
+                oldColumnName="case_type"
+                newColumnName="case_type_id"
+                columnDataType="varchar(255)"/>
+    </changeSet>
+
+    <changeSet id="4" author="valentin.laurin@hmcts.net">
+        <renameColumn
+                tableName="case_event"
+                oldColumnName="short_comment"
+                newColumnName="summary"
+                columnDataType="varchar(1024)"/>
+        <renameColumn
+                tableName="case_event"
+                oldColumnName="long_comment"
+                newColumnName="comment"
+                columnDataType="varchar(65536)"/>
+    </changeSet>
+
+    <changeSet id="5" author="valentin.laurin@hmcts.net">
+        <addColumn tableName="case_event">
+            <column
+                    name="user_first_name"
+                    afterColumn="user_id"
+                    type="varchar(255)"
+                    defaultValue="">
+                <constraints nullable="false"/>
+            </column>
+            <column
+                    name="user_last_name"
+                    afterColumn="user_id"
+                    type="varchar(255)"
+                    defaultValue="">
+                <constraints nullable="false"/>
+            </column>
+            <column
+                    name="event_name"
+                    afterColumn="event_id"
+                    type="varchar(30)"
+                    defaultValue="">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <dropDefaultValue tableName="case_event" columnName="user_first_name"/>
+        <dropDefaultValue tableName="case_event" columnName="user_last_name"/>
+        <dropDefaultValue tableName="case_event" columnName="event_name"/>
+
+        <modifyDataType tableName="case_event" columnName="event_id" newDataType="varchar(40)"/>
+    </changeSet>
+
+</databaseChangeLog>
+

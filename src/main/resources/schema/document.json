@@ -1,0 +1,189 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "",
+  "type": "object",
+  "properties": {
+    "size": {
+      "type": "number"
+    },
+    "mimeType": {
+      "type": "string",
+      "minLength": 1
+    },
+    "originalDocumentName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "createdBy": {
+      "type": "string",
+      "minLength": 1
+    },
+    "lastModifiedBy": {
+      "type": "string",
+      "minLength": 1
+    },
+    "modifiedOn": {
+      "type": "string",
+      "minLength": 1
+    },
+    "createdOn": {
+      "type": "string",
+      "minLength": 1
+    },
+    "classification": {
+      "type": "string",
+      "minLength": 1
+    },
+    "roles": {},
+    "_links": {
+      "type": "object",
+      "properties": {
+        "self": {
+          "type": "object",
+          "properties": {
+            "href": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "href"
+          ]
+        },
+        "binary": {
+          "type": "object",
+          "properties": {
+            "href": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "href"
+          ]
+        }
+      },
+      "required": [
+        "self",
+        "binary"
+      ]
+    },
+    "_embedded": {
+      "type": "object",
+      "properties": {
+        "allDocumentVersions": {
+          "type": "object",
+          "properties": {
+            "_embedded": {
+              "type": "object",
+              "properties": {
+                "documentVersions": {
+                  "type": "array",
+                  "uniqueItems": true,
+                  "minItems": 1,
+                  "items": {
+                    "required": [
+                      "size",
+                      "mimeType",
+                      "originalDocumentName",
+                      "createdBy",
+                      "createdOn"
+                    ],
+                    "properties": {
+                      "size": {
+                        "type": "number"
+                      },
+                      "mimeType": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "originalDocumentName": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "createdBy": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "createdOn": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "_links": {
+                        "type": "object",
+                        "properties": {
+                          "document": {
+                            "type": "object",
+                            "properties": {
+                              "href": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "href"
+                            ]
+                          },
+                          "self": {
+                            "type": "object",
+                            "properties": {
+                              "href": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "href"
+                            ]
+                          },
+                          "binary": {
+                            "type": "object",
+                            "properties": {
+                              "href": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "href"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "document",
+                          "self",
+                          "binary"
+                        ]
+                      }
+                    }
+                  }
+                }
+              },
+              "required": [
+                "documentVersions"
+              ]
+            }
+          },
+          "required": [
+            "_embedded"
+          ]
+        }
+      },
+      "required": [
+        "allDocumentVersions"
+      ]
+    }
+  },
+  "required": [
+    "size",
+    "mimeType",
+    "originalDocumentName",
+    "createdBy",
+    "lastModifiedBy",
+    "modifiedOn",
+    "createdOn",
+    "classification",
+    "_links",
+    "_embedded"
+  ]
+}

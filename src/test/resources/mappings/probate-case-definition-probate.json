@@ -1,0 +1,64 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/data/jurisdictions/probate/case-type"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": [
+      {
+        "id": "application",
+        "version": {
+          "number": 1,
+          "live_from": "2017-01-01"
+        },
+        "name": "Application",
+        "jurisdiction": {
+          "id": "probate",
+          "name": "Probate",
+          "description": "Probate Jurisdiction"
+        },
+        "states": [
+          {
+            "id": "submitted",
+            "name": "Submitted"
+          },
+          {
+            "id": "in-progress",
+            "name": "In Progress"
+          }
+        ],
+        "case_fields": [
+          {
+          }
+        ]
+      },
+      {
+        "id": "refund",
+        "version": {
+          "number": 1,
+          "live_from": "2017-01-01"
+        },
+        "name": "Refund Request",
+        "jurisdiction": {
+          "id": "probate",
+          "name": "Probate",
+          "description": "Probate Jurisdiction"
+        },
+        "states": [
+          {
+            "id": "submitted",
+            "name": "Submitted"
+          },
+          {
+            "id": "sent-to-legacy",
+            "name": "Sent to Legacy"
+          }
+        ]
+      }
+    ]
+  }
+}

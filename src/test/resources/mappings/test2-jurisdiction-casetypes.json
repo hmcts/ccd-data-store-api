@@ -1,0 +1,85 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/data/jurisdictions/DIVORCE/case-type"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": [
+      {
+        "id": "TestAddressBookCase2",
+        "version": {
+          "number": 1,
+          "live_from": "2017-01-01"
+        },
+        "name": "Test Address Book Case 2",
+        "description": "Test Address Book Case 2 Desc",
+        "jurisdiction": {
+          "id": "DIVORCE",
+          "name": "Test 2",
+          "description": "Test Jurisdiction 2"
+        },
+        "events": [
+          {
+            "id": "TEST EVENT",
+            "name": "string",
+            "description": "string",
+            "case_fields": [
+              {
+                "case_field_id": "string",
+                "required": true
+              }
+            ],
+            "pre_states": [
+              "string"
+            ],
+            "post_state": "string"
+          }
+        ],
+        "states": [
+          {
+            "id": "CaseCreated",
+            "name": "Case Created"
+          },
+          {
+            "id": "CaseEnteredIntoLegacy",
+            "name": "Case Has Been Entered Into Legacy"
+          },
+          {
+            "id": "CaseStopped",
+            "name": "Put case on hold"
+          }
+        ],
+        "case_fields": [
+          {
+            "id": "PersonFirstName",
+            "case_type_id": "TestAddressBookCase",
+            "label": "First name",
+            "field_type": {
+              "name": "Text"
+            }
+          },
+          {
+            "id": "PersonLastName",
+            "case_type_id": "TestAddressBookCase",
+            "label": "Last name",
+            "field_type": {
+              "name": "Text"
+            }
+          },
+          {
+            "id": "PersonAddress",
+            "case_type_id": "TestAddressBookCase",
+            "label": "Address",
+            "field_type": {
+              "name": "Address"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

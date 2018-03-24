@@ -1,0 +1,44 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="2" author="phillip.chan@hmcts.net">
+        <createTable tableName="case_event">
+            <column name="id" type="bigserial">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="created_date" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="event_id" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="short_comment" type="varchar(1024)">
+                <constraints/>
+            </column>
+            <column name="long_comment" type="varchar(65536)">
+                <constraints/>
+            </column>
+            <column name="user_id" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="case_data_id" type="bigserial">
+                <constraints nullable="false" foreignKeyName="fk_case_event_case_data" references="case_data(id)"/>
+            </column>
+            <column name="case_type_id" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="case_type_version" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="state" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="data" type="jsonb">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
+

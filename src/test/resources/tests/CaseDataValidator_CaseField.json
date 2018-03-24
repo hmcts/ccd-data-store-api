@@ -1,0 +1,80 @@
+[
+  {
+    "id": "Initials",
+    "case_type_id": "TestAddressBookCase",
+    "field_type": {
+      "type": "Collection",
+      "id": "Text",
+      "collection_field_type": {
+        "id": "Text",
+        "type": "Text",
+        "max": 1
+      }
+    }
+  },
+  {
+    "id": "OtherAddresses",
+    "case_type_id": "TestAddressBookCase",
+    "field_type": {
+      "type": "Collection",
+      "id": "Address",
+      "max": 1,
+      "collection_field_type": {
+        "type": "Complex",
+        "complex_fields": [
+          {
+            "id": "Line1",
+            "label": "Line1",
+            "field_type": {
+              "type": "Text"
+            }
+          },
+          {
+            "id": "Line2",
+            "field_type": {
+              "type": "Text"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "Person",
+    "case_type_id": "TestAddressBookCase",
+    "field_type": {
+      "type": "Complex",
+      "id": "Person",
+      "complex_fields": [
+        {
+          "id": "Name",
+          "field_type": {
+            "type": "Text"
+          }
+        },
+        {
+          "id": "Address",
+          "label": "Address",
+          "field_type": {
+            "type": "Complex",
+            "complex_fields": [
+              {
+                "id": "Line1",
+                "label": "Line1",
+                "field_type": {
+                  "type": "Text"
+                }
+              },
+              {
+                "id": "Line2",
+                "field_type": {
+                  "type": "Text"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+]

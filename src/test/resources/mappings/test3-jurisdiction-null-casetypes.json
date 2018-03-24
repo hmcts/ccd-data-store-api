@@ -1,0 +1,26 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/data/jurisdictions/SSCS/case-type"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": [{
+      "id": "TestAddressBookCase3",
+      "version": {
+        "number": 1,
+        "live_from": "2017-01-01"
+      },
+      "name": "Test Address Book Case 3",
+      "description": "Test Address Book Case 3 Desc",
+      "jurisdiction": {
+        "id": "PROBATE",
+        "name": "Test 3",
+        "description": "Test Jurisdiction 3"
+      }
+    }]
+  }
+}

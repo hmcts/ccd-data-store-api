@@ -1,0 +1,48 @@
+---
+version: '3'
+
+services:
+  ccd-data-store-api:
+    build:
+      context: .
+    image: docker.artifactory.reform.hmcts.net/ccd/ccd-data-store-api
+    environment:
+      - DATA_STORE_DB_HOST=ccd-data-store-database
+      - DATA_STORE_DB_PORT=5432
+      - DATA_STORE_DB_USERNAME
+      - DATA_STORE_DB_PASSWORD
+      - DATA_STORE_IDAM_KEY
+      - DATA_STORE_TOKEN_SECRET=iuasbcuasdcbasdgcasdgcuysachjsacyasdgjcgasdj
+      - DATA_STORE_S2S_AUTHORISED_SERVICES=ccd_gw
+      - DEFINITION_STORE_HOST
+      - USER_PROFILE_HOST
+      - IDAM_USER_URL
+      - IDAM_S2S_URL
+      - REFORM_SERVICE_NAME=ccd-data-store-api
+      - REFORM_TEAM=ccd
+      - REFORM_ENVIRONMENT=local
+    ports:
+      - 4452:4452
+    depends_on:
+      - ccd-data-store-database
+    links:
+      - ccd-data-store-database
+
+  ccd-data-store-database:
+    build:
+      context: docker/database
+    image: docker.artifactory.reform.hmcts.net/ccd/ccd-data-store-database
+    healthcheck:
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    environment:
+      - DATA_STORE_DB_USERNAME
+      - DATA_STORE_DB_PASSWORD
+    ports:
+      - 5452:5432
+    volumes:
+      - ccd-data-store-database-data:/var/lib/postgresql/data
+
+volumes:
+  ccd-data-store-database-data:
