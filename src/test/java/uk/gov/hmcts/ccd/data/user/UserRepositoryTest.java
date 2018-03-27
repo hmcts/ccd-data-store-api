@@ -13,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.data.casedetails.JurisdictionMapper;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
@@ -54,6 +55,8 @@ public class UserRepositoryTest {
     @Mock
     private SecurityContext securityContext;
 
+    private JurisdictionMapper jurisdictionMapper;
+
     private UserRepository userRepository;
 
     @BeforeEach
@@ -64,7 +67,7 @@ public class UserRepositoryTest {
         SecurityContextHolder.setContext(securityContext);
 
         userRepository = spy(new DefaultUserRepository(applicationParams,
-                                                       caseDefinitionRepository, securityUtils, restTemplate));
+                                                       caseDefinitionRepository, securityUtils, restTemplate, jurisdictionMapper));
     }
 
     @Nested

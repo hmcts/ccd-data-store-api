@@ -6,21 +6,26 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
@@ -112,6 +117,45 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             } else {
                 LOG.warn("Error while retrieving classification for user role " + userRole + " because of ", e);
                 throw new ServiceException("Error while retrieving classification for user role " + userRole + " because of " + e.getMessage());
+            }
+        }
+    }
+
+    @Override
+    public List<Jurisdiction> getJurisdictions(List<String> ids) {
+        try {
+            final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
+            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(applicationParams.jurisdictionDefURL())
+                    .queryParam("ids", String.join(",", ids));
+            return restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity,
+                    new ParameterizedTypeReference<List<Jurisdiction>>() {}).getBody();
+        } catch (Exception e) {
+            LOG.warn("Error while retrieving jurisdiction definition", e);
+            if (e instanceof HttpClientErrorException
+                    && ((HttpClientErrorException)e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                throw new ResourceNotFoundException("Resource not found when retrieving jurisdiction definition because of " + e.getMessage());
+            } else {
+                throw new ServiceException("Problem retrieving jurisdiction definition because of " + e.getMessage());
+            }
+        }
+    }
+
+    @Override
+    @Async
+    public CompletableFuture<List<Jurisdiction>> getAllJurisdictionsAsync() {
+        try {
+            LOG.debug("retrieving all jurisdictions");
+            final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
+            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(applicationParams.jurisdictionDefURL());
+            return CompletableFuture.completedFuture(restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET,
+                    requestEntity, new ParameterizedTypeReference<List<Jurisdiction>>() {}).getBody());
+        } catch (Exception e) {
+            LOG.warn("Error while retrieving jurisdiction definition", e);
+            if (e instanceof HttpClientErrorException
+                    && ((HttpClientErrorException)e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                throw new ResourceNotFoundException("Resource not found when retrieving jurisdiction definition because of " + e.getMessage());
+            } else {
+                throw new ServiceException("Problem retrieving jurisdiction definition because of " + e.getMessage());
             }
         }
     }

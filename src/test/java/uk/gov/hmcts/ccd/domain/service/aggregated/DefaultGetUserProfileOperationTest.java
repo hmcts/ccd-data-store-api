@@ -38,7 +38,7 @@ public class DefaultGetUserProfileOperationTest {
         userProfile.setJurisdictions(new JurisdictionDisplayProperties[] {test1JurisdictionDisplayProperties, test2JurisdictionDisplayProperties});
         userProfile.setChannels(new String[] {test1Channel, test2Channel});
         userProfile.setDefaultSettings(testDefaultSettings);
-        doReturn(userProfile).when(userRepository).getUserSettings();
+        doReturn(userProfile).when(userRepository).getUserProfile();
     }
 
     @Test

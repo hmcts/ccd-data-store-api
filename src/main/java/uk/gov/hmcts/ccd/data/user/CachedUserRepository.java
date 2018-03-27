@@ -6,10 +6,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
+import uk.gov.hmcts.ccd.domain.model.aggregated.UserDefault;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import static com.google.common.collect.Maps.newHashMap;
 
@@ -25,7 +27,6 @@ public class CachedUserRepository implements UserRepository {
     private final Map<String, Set<SecurityClassification>> jurisdictionToUserClassifications = newHashMap();
     private final Map<String, IDAMProperties> userDetails = newHashMap();
     private final Map<String, Set<String>> userRoles = newHashMap();
-    private final Map<String, UserProfile> userProfile = newHashMap();
 
     @Autowired
     public CachedUserRepository(@Qualifier(DefaultUserRepository.QUALIFIER) UserRepository userRepository) {
@@ -33,13 +34,18 @@ public class CachedUserRepository implements UserRepository {
     }
 
     @Override
-    public UserProfile getUserSettings() {
-        return userProfile.computeIfAbsent("userProfile", e -> userRepository.getUserSettings());
+    public IDAMProperties getUserDetails() {
+        return userDetails.computeIfAbsent("userDetails", e -> userRepository.getUserDetails());
     }
 
     @Override
-    public IDAMProperties getUserDetails() {
-        return userDetails.computeIfAbsent("userDetails", e -> userRepository.getUserDetails());
+    public CompletableFuture<IDAMProperties> getUserDetailsAsync() {
+        return userRepository.getUserDetailsAsync();
+    }
+
+    @Override
+    public CompletableFuture<UserDefault> getUserDefaultSettingsAsync(String userId) {
+        return userRepository.getUserDefaultSettingsAsync(userId);
     }
 
     @Override

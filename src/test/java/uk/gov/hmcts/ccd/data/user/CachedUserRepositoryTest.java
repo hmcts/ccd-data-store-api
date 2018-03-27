@@ -42,13 +42,13 @@ class CachedUserRepositoryTest {
         @DisplayName("should initially retrieve user settings from decorated repository")
         void shouldRetrieveUserSettingsFromDecorated () {
             final UserProfile expectedUserSettings = new UserProfile();
-            doReturn(expectedUserSettings).when(userRepository).getUserSettings();
+            doReturn(expectedUserSettings).when(userRepository).getUserProfile();
 
-            final UserProfile userSettings = cachedUserRepository.getUserSettings();
+            final UserProfile userSettings = cachedUserRepository.getUserProfile();
 
             assertAll(
                 () -> assertThat(userSettings, is(expectedUserSettings)),
-                () -> verify(userRepository, times(1)).getUserSettings()
+                () -> verify(userRepository, times(1)).getUserProfile()
             );
         }
 
@@ -56,15 +56,15 @@ class CachedUserRepositoryTest {
         @DisplayName("should cache user settings for subsequent calls")
         void shouldCacheUserSettingsForSubsequentCalls () {
             final UserProfile expectedUserSettings = new UserProfile();
-            doReturn(expectedUserSettings).when(userRepository).getUserSettings();
+            doReturn(expectedUserSettings).when(userRepository).getUserProfile();
 
-            cachedUserRepository.getUserSettings();
+            cachedUserRepository.getUserProfile();
 
-            verify(userRepository, times(1)).getUserSettings();
+            verify(userRepository, times(1)).getUserProfile();
 
-            doReturn(new UserProfile()).when(userRepository).getUserSettings();
+            doReturn(new UserProfile()).when(userRepository).getUserProfile();
 
-            final UserProfile userSettings = cachedUserRepository.getUserSettings();
+            final UserProfile userSettings = cachedUserRepository.getUserProfile();
 
             assertAll(
                 () -> assertThat(userSettings, is(expectedUserSettings)),

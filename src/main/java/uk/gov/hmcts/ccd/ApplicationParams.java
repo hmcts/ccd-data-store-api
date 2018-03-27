@@ -79,6 +79,10 @@ public class ApplicationParams {
         return caseDefinitionHost + "/api/data/jurisdictions/" + encode(jurisdictionId) + "/case-type";
     }
 
+    public String jurisdictionDefURL() {
+        return caseDefinitionHost + "/api/data/jurisdictions";
+    }
+
     public String caseTypeDefURL(final String caseTypeId) {
         return caseDefinitionHost + "/api/data/case-type/" + encode(caseTypeId);
     }
