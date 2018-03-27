@@ -54,8 +54,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(CompletionException.class)
     @ResponseBody
     public ResponseEntity<HttpError> handleCompletionException(final HttpServletRequest request, final CompletionException exception) {
-        LOG.error("data store request processing exception", exception);
-
         Throwable cause = exception.getCause();
         if (cause instanceof ApiException) {
             return handleApiException(request, (ApiException) cause);
