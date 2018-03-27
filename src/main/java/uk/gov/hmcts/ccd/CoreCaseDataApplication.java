@@ -46,7 +46,7 @@ public class CoreCaseDataApplication {
 
     @Bean
     public Executor asyncExecutor() {
-
+        //thread pool used for the execution of async tasks (methods marked with @Async)
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(applicationParams.getAsyncCorePoolSize());
         executor.setMaxPoolSize(applicationParams.getAsyncMaxPoolSize());
