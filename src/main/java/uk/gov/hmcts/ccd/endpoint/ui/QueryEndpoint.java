@@ -4,6 +4,8 @@ import com.google.common.collect.Maps;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +23,8 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +40,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.*;
     produces = MediaType.APPLICATION_JSON_VALUE)
 public class QueryEndpoint {
 
+    private static final Logger LOG = LoggerFactory.getLogger(QueryEndpoint.class);
     private final AuthorisedGetCaseViewOperation getCaseViewOperation;
     private final GetEventTriggerOperation getEventTriggerOperation;
     private final SearchQueryOperation searchQueryOperation;
@@ -132,7 +137,11 @@ public class QueryEndpoint {
     public WorkbasketInput[] findWorkbasketInputDetails(@PathVariable("uid") final Integer uid,
                                                         @PathVariable("jid") final String jurisdictionId,
                                                         @PathVariable("ctid") final String caseTypeId) {
-        return findWorkbasketInputOperation.execute(jurisdictionId, caseTypeId, CAN_READ).toArray(new WorkbasketInput[0]);
+        Instant start = Instant.now();
+        WorkbasketInput[] workbasketInputs = findWorkbasketInputOperation.execute(jurisdictionId, caseTypeId, CAN_READ).toArray(new WorkbasketInput[0]);
+        final Duration between = Duration.between(start, Instant.now());
+        LOG.warn("findWorkbasketInputDetails has been completed in {} millisecs...", between.toMillis());
+        return workbasketInputs;
     }
 
     @Transactional
@@ -144,7 +153,11 @@ public class QueryEndpoint {
     public CaseView findCase(@PathVariable("jid") final String jurisdictionId,
                              @PathVariable("ctid") final String caseTypeId,
                              @PathVariable("cid") final String cid) {
-        return getCaseViewOperation.execute(jurisdictionId, caseTypeId, cid);
+        Instant start = Instant.now();
+        CaseView caseView = getCaseViewOperation.execute(jurisdictionId, caseTypeId, cid);
+        final Duration between = Duration.between(start, Instant.now());
+        LOG.warn("findCase has been completed in {} millisecs...", between.toMillis());
+        return caseView;
     }
 
     @Transactional

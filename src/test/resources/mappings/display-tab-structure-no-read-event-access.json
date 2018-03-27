@@ -1,7 +1,7 @@
 {
   "request" : {
     "method" : "GET",
-    "url" : "/api/display/tab-structure/TestAddressBookCaseNoReadEventAccess"
+    "url" : "/api/display/tab-structure/TestAddressBookCaseNoReadEventAccess?version=33"
   },
   "response" : {
     "status" : 200,

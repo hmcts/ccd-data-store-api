@@ -24,9 +24,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.data.definition.CaseTypeVersionInformation;
 import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
-import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
+import uk.gov.hmcts.ccd.data.definition.HttpUIDefinitionGateway;
 import uk.gov.hmcts.ccd.data.user.DefaultUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
@@ -80,7 +79,7 @@ public abstract class BaseTest {
     @Qualifier(DefaultCaseDefinitionRepository.QUALIFIER)
     private CaseDefinitionRepository caseDefinitionRepository;
     @Inject
-    private UIDefinitionRepository uiDefinitionRepository;
+    private HttpUIDefinitionGateway uiDefinitionRepository;
     @Inject
     @Qualifier(DefaultUserRepository.QUALIFIER)
     private UserRepository userRepository;
@@ -105,16 +104,6 @@ public abstract class BaseTest {
         ReflectionTestUtils.setField(documentManagementRestClient, "securityUtils", securityUtils);
 
         setupUIDService();
-
-        setupCaseDefinitionRepository();
-    }
-
-    protected void setupCaseDefinitionRepository() {
-        CaseTypeVersionInformation stubDefinitionVersion = new CaseTypeVersionInformation();
-        stubDefinitionVersion.setVersion(33);
-        when(caseDefinitionRepository.getLatestVersion(anyString())).thenReturn(stubDefinitionVersion);
-//        when(caseDefinitionRepository.getCaseType(anyInt(), anyString())).thenCallRealMethod();
-//        doCallRealMethod().when(caseDefinitionRepository).getCaseType(anyInt(), anyString());
     }
 
     private void setupUIDService() {

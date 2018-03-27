@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.AppInsights;
 import uk.gov.hmcts.ccd.data.casedetails.search.FieldMapSanitizeOperation;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
@@ -88,6 +89,9 @@ class CaseDetailsEndpointTest {
     @Mock
     private ValidateCaseFieldsOperation validateCaseFieldsOperation;
 
+    @Mock
+    private AppInsights appInsights;
+
     private CaseDetailsEndpoint endpoint;
     private Map<String,String> params = newHashMap();
 
@@ -97,14 +101,17 @@ class CaseDetailsEndpointTest {
 
         params = initParams("STATE");
 
-        endpoint = new CaseDetailsEndpoint(classifiedGetCaseOperation,
-                                           createCaseOperation,
-                                           createEventOperation,
-                                           startEventOperation,
-                                           searchOperation,
-                                           fieldMapSanitizeOperation,
-                                           validateCaseFieldsOperation,
-                                           documentsOperation, paginatedSearchMetaDataOperation);
+        endpoint =
+            new CaseDetailsEndpoint(classifiedGetCaseOperation,
+                                    createCaseOperation,
+                                    createEventOperation,
+                                    startEventOperation,
+                                    searchOperation,
+                                    fieldMapSanitizeOperation,
+                                    validateCaseFieldsOperation,
+                                    documentsOperation,
+                                    paginatedSearchMetaDataOperation,
+                                    appInsights);
     }
 
     @Nested

@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -47,7 +47,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 @Service
 @Qualifier("default")
 public class DefaultCreateEventOperation implements CreateEventOperation {
-    private static final Logger LOG = LogManager.getLogger(DefaultCreateEventOperation.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultCreateEventOperation.class);
 
     private static final ObjectMapper mapper = new ObjectMapper();
 

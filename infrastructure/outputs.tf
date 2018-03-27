@@ -1,3 +1,7 @@
-output "case_data_store_app_deployment_endpoint" {
-  value = "${module.ccd-data-store-api.gitendpoint}"
+output "vaultUri" {
+  value = "${module.ccd-data-store-vault.key_vault_uri}"
+}
+
+output "vaultName" {
+  value = "${module.ccd-data-store-vault.key_vault_name}"
 }

@@ -3,8 +3,8 @@ package uk.gov.hmcts.ccd.domain.service.callbacks;
 import com.google.common.collect.Maps;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.impl.TextCodec;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
@@ -24,7 +24,7 @@ import java.util.Date;
 
 @Service
 public class EventTokenService {
-    private static final Logger LOGGER = LogManager.getLogger(EventTokenService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(EventTokenService.class);
 
     private static final CaseDetails EMPTY_CASE = new CaseDetails();
 

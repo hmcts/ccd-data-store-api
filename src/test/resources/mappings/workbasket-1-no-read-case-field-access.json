@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "url": "/api/display/work-basket-definition/TestAddressBookCaseNoReadFieldAccess"
+    "url": "/api/display/work-basket-definition/TestAddressBookCaseNoReadFieldAccess?version=33"
   },
   "response": {
     "status": 200,

@@ -18,6 +18,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -91,7 +92,7 @@ public class DefaultGetCaseViewOperation implements GetCaseViewOperation {
 
         List<CaseViewTab> tabs = caseTabCollection.getTabs().stream().map(tab -> {
             Stream<CaseTypeTabField> tabsWithRelevantFields = tab.getTabFields().stream()
-                .filter(caseDetails::existsInData);
+                .filter(filterCaseTabFieldsBasedOnSecureData(caseDetails));
             List<CaseViewField> fields = tabsWithRelevantFields
                 .map(buildCaseViewField(caseDetails)).collect(Collectors.toList());
             return new CaseViewTab(tab.getId(), tab.getLabel(), tab.getDisplayOrder(),
@@ -133,6 +134,10 @@ public class DefaultGetCaseViewOperation implements GetCaseViewOperation {
                                .toArray(CaseViewEvent[]::new));
 
         return caseView;
+    }
+
+    private Predicate<CaseTypeTabField> filterCaseTabFieldsBasedOnSecureData(CaseDetails caseDetails) {
+        return caseDetails::existsInData;
     }
 
     private Function<CaseTypeTabField, CaseViewField> buildCaseViewField(CaseDetails caseDetails) {

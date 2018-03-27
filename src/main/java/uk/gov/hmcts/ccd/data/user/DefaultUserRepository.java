@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ccd.data.user;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -44,7 +44,7 @@ public class DefaultUserRepository implements UserRepository {
     private final SecurityUtils securityUtils;
     private final RestTemplate restTemplate;
 
-    private static final Logger LOG = LogManager.getLogger(DefaultUserRepository.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultUserRepository.class);
 
     @Inject
     public DefaultUserRepository(final ApplicationParams applicationParams,

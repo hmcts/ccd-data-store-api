@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ccd.domain.types;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 
@@ -21,7 +21,7 @@ public class DocumentValidator implements BaseTypeValidator {
     static final String DOCUMENT_URL = "document_url";
     private static final String DOCUMENT_BINARY_URL = "document_binary_url";
 
-    private static final Logger LOG = LogManager.getLogger(DocumentValidator.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DocumentValidator.class);
 
     private final ApplicationParams applicationParams;
 

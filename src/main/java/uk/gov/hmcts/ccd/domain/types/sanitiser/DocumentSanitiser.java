@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.client.DocumentManagementRestClient;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.document.Binary;
@@ -20,7 +20,7 @@ import javax.inject.Singleton;
 @Singleton
 public class DocumentSanitiser implements Sanitiser {
 
-    private static final Logger LOG = LogManager.getLogger(DocumentSanitiser.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DocumentSanitiser.class);
 
     public static final String DOCUMENT_URL = "document_url";
     public static final String DOCUMENT_BINARY_URL = "document_binary_url";

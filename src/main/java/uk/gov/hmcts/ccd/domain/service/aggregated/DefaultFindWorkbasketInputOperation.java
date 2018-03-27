@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
@@ -19,7 +19,7 @@ import static java.util.stream.Collectors.toList;
 @Service
 @Qualifier(DefaultFindWorkbasketInputOperation.QUALIFIER)
 public class DefaultFindWorkbasketInputOperation implements FindWorkbasketInputOperation{
-    private static final Logger LOG = LogManager.getLogger(DefaultFindWorkbasketInputOperation.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultFindWorkbasketInputOperation.class);
 
     public static final String QUALIFIER = "default";
     private UIDefinitionRepository uiDefinitionRepository;

@@ -1,8 +1,10 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
+import java.io.Serializable;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class SearchResultField {
+public class SearchResultField implements Serializable {
     @JsonProperty("case_type_id")
     private String caseTypeId;
     @JsonProperty("case_field_id")

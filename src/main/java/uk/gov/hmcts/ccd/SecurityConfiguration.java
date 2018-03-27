@@ -37,7 +37,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                                    "/swagger-resources/**",
                                    "/v2/**",
                                    "/health",
-                                   "/status/health");
+                                   "/status/health",
+                                   "/");
     }
 
     @Override

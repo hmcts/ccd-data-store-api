@@ -26,7 +26,7 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
 
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final Map<String, List<CaseType>> caseTypesForJurisdictions = newHashMap();
-    private final Map<String , CaseTypeVersionInformation> versions = newHashMap();
+    private final Map<String , CaseTypeDefinitionVersion> versions = newHashMap();
     private final Map<String, UserRole> userRoleClassifications = newHashMap();
     private final Map<String, List<FieldType>> baseTypes = newHashMap();
 
@@ -40,7 +40,7 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     }
 
     public CaseType getCaseType(final String caseTypeId) {
-        CaseTypeVersionInformation latestVersion = this.getLatestVersion(caseTypeId);
+        CaseTypeDefinitionVersion latestVersion = this.getLatestVersion(caseTypeId);
         return caseDefinitionRepository.getCaseType(latestVersion.getVersion(), caseTypeId);
     }
 
@@ -49,17 +49,20 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     }
 
     @Override
-    public CaseTypeVersionInformation getLatestVersion(String caseTypeId) {
+    public CaseTypeDefinitionVersion getLatestVersion(String caseTypeId) {
         return versions.computeIfAbsent(caseTypeId, caseDefinitionRepository::getLatestVersion);
     }
 
     @Override
-    public CaseType getCaseType(int latestVersion, String caseTypeId) {
-        return caseDefinitionRepository.getCaseType(latestVersion, caseTypeId);
+    public CaseType getCaseType(int version, String caseTypeId) {
+        return caseDefinitionRepository.getCaseType(version, caseTypeId);
     }
 
     public List<FieldType> getBaseTypes() {
         return baseTypes.computeIfAbsent("baseTypes", e -> caseDefinitionRepository.getBaseTypes());
     }
 
+    public CaseDefinitionRepository getCaseDefinitionRepository() {
+        return caseDefinitionRepository;
+    }
 }

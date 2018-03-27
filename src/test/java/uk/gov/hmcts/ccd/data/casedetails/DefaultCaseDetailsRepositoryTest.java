@@ -65,7 +65,7 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
             e.printStackTrace();
         }
         final CaseDetails caseDetailsPersisted = caseDetailsRepository.set(caseDetails);
-        assertThat(caseDetailsPersisted.getId(), not(isEmpty()));
+        assertThat(caseDetailsPersisted.getId(), is(notNullValue()));
         assertThat(caseDetailsPersisted.getReference(), is(caseDetails.getReference()));
         assertThat(caseDetailsPersisted.getJurisdiction(), is(caseDetails.getJurisdiction()));
         assertThat(caseDetailsPersisted.getCaseTypeId(), is(caseDetails.getCaseTypeId()));

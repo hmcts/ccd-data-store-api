@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import uk.gov.hmcts.ccd.AppInsights;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.search.FieldMapSanitizeOperation;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
@@ -31,6 +32,8 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
 import javax.transaction.Transactional;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -50,6 +53,7 @@ public class CaseDetailsEndpoint {
     private final DocumentsOperation documentsOperation;
     private final SearchOperation searchOperation;
     private final PaginatedSearchMetaDataOperation paginatedSearchMetaDataOperation;
+    private final AppInsights appInsights;
     private final FieldMapSanitizeOperation fieldMapSanitizeOperation;
     private final ValidateCaseFieldsOperation validateCaseFieldsOperation;
 
@@ -62,7 +66,8 @@ public class CaseDetailsEndpoint {
                                final FieldMapSanitizeOperation fieldMapSanitizeOperation,
                                final ValidateCaseFieldsOperation validateCaseFieldsOperation,
                                final DocumentsOperation documentsOperation,
-                               final PaginatedSearchMetaDataOperation paginatedSearchMetaDataOperation) {
+                               final PaginatedSearchMetaDataOperation paginatedSearchMetaDataOperation,
+                               final AppInsights appinsights) {
         this.getCaseOperation = getCaseOperation;
         this.createCaseOperation = createCaseOperation;
         this.createEventOperation = createEventOperation;
@@ -72,6 +77,7 @@ public class CaseDetailsEndpoint {
         this.documentsOperation = documentsOperation;
         this.validateCaseFieldsOperation = validateCaseFieldsOperation;
         this.paginatedSearchMetaDataOperation = paginatedSearchMetaDataOperation;
+        this.appInsights = appinsights;
     }
 
     @Transactional
@@ -92,8 +98,12 @@ public class CaseDetailsEndpoint {
         @ApiParam(value = "Case ID", required = true)
         @PathVariable("cid") final String caseId) {
 
-        return getCaseOperation.execute(jurisdictionId, caseTypeId, caseId)
-                               .orElseThrow(() -> new CaseNotFoundException(jurisdictionId, caseTypeId, caseId));
+        final Instant start = Instant.now();
+        final CaseDetails caseDetails = getCaseOperation.execute(jurisdictionId, caseTypeId, caseId)
+                            .orElseThrow(() -> new CaseNotFoundException(jurisdictionId, caseTypeId, caseId));
+        final Duration duration = Duration.between(start, Instant.now());
+        appInsights.trackRequest("findCaseDetailsForCaseworker", duration.toMillis(), true);
+        return caseDetails;
     }
 
     @Transactional

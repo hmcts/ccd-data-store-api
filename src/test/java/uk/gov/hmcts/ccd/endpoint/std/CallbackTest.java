@@ -51,7 +51,6 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
-@Ignore
 public class CallbackTest extends WireMockBaseTest {
 
     private static final int WIREMOCK_PORT = 10000;

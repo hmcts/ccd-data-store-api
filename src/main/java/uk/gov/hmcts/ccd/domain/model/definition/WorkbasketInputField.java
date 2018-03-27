@@ -1,10 +1,12 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
+import java.io.Serializable;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 
 @ApiModel(description = "")
-public class WorkbasketInputField {
+public class WorkbasketInputField implements Serializable {
 
     private String caseFieldId = null;
     private String label = null;

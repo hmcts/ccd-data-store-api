@@ -4,11 +4,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @ApiModel(description = "")
-public class WizardPage {
+public class WizardPage implements Serializable {
 
     private String id = null;
     private String label = null;

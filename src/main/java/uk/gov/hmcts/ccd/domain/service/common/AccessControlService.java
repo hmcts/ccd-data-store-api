@@ -3,8 +3,8 @@ package uk.gov.hmcts.ccd.domain.service.common;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
@@ -26,7 +26,7 @@ import static java.util.stream.Collectors.toList;
 @Service
 public class AccessControlService {
 
-    private static final Logger LOG = LogManager.getLogger(AccessControlService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AccessControlService.class);
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
 
     public static final Predicate<AccessControlList> CAN_CREATE = AccessControlList::isCreate;

@@ -21,7 +21,6 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Ignore
 public class UserProfileEndpointTest extends WireMockBaseTest {
     private static final String URL = "/caseworkers/user1/profile";
 

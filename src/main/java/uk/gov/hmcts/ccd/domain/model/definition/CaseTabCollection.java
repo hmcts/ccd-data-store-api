@@ -2,10 +2,11 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CaseTabCollection {
+public class CaseTabCollection implements Serializable {
 
     @JsonProperty("case_type_id")
     private String caseTypeId = null;

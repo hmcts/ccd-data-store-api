@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -29,7 +29,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 @Qualifier(DefaultCaseDefinitionRepository.QUALIFIER)
 public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository {
 
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(DefaultCaseDefinitionRepository.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultCaseDefinitionRepository.class);
 
     public static final String QUALIFIER = "default";
     private static final int RESOURCE_NOT_FOUND = 404;
@@ -117,12 +117,11 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     @Override
-    public CaseTypeVersionInformation getLatestVersion(String caseTypeId) {
+    public CaseTypeDefinitionVersion getLatestVersion(String caseTypeId) {
         try {
             final HttpEntity requestEntity = new HttpEntity<CaseType>(securityUtils.authorizationHeaders());
-//            System.out.println("returning url:" + applicationParams.caseTypeLatestVersionUrl(caseTypeId));
-            CaseTypeVersionInformation version = restTemplate.exchange(applicationParams.caseTypeLatestVersionUrl
-                    (caseTypeId), HttpMethod.GET, requestEntity, CaseTypeVersionInformation.class).getBody();
+            CaseTypeDefinitionVersion version = restTemplate.exchange(applicationParams.caseTypeLatestVersionUrl
+                    (caseTypeId), HttpMethod.GET, requestEntity, CaseTypeDefinitionVersion.class).getBody();
             LOG.debug("retrieved latest version for case type: " + caseTypeId + ": " + version);
             return version;
 
@@ -138,8 +137,8 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     @Override
-    @Cacheable("caseTypeDefinitions")
-    public CaseType getCaseType(int latestVersion, String caseTypeId) {
+    @Cacheable("caseTypeDefinitionsCache")
+    public CaseType getCaseType(int version, String caseTypeId) {
         return this.getCaseType(caseTypeId);
     }
 

@@ -56,6 +56,10 @@ repositories {
     maven {
         url "http://artifactory.reform.hmcts.net/artifactory/libs-release"
     }
+// https://github.com/hmcts/java-logging/blob/master/java-logging-appinsights/README.md
+    maven {
+        url  "https://dl.bintray.com/hmcts/hmcts-maven"
+    }
     mavenLocal()
     jcenter()
 }
@@ -66,16 +70,18 @@ ext {
     junitJupiterVersion = '5.1.0'
     junitVintageVersion = '5.1.0'
     junitPlatformVersion = '1.1.0'
-    log4j2Version = '2.10.0'
     hibernateVersion = '5.2.12.Final'
+    reformLogging= '2.0.1'
+    swagger2Version = '2.8.0'
     limits = [
-            'instruction': 20,
-            'branch'     : 20,  // TODO needs code update
-            'line'       : 20,
-            'complexity' : 20,
-            'method'     : 20,
-            'class'      : 20
+            'instruction': 84,
+            'branch'     : 72,  // TODO needs code update
+            'line'       : 85,
+            'complexity' : 80,
+            'method'     : 88,
+            'class'      : 88
     ]
+    appInsights= '2.0.1'
 }
 
 group 'uk.gov.hmcts.ccd'
@@ -101,7 +107,7 @@ targetCompatibility = 1.8
 
 configurations {
     providedRuntime
-    compile.exclude(group: 'ch.qos.logback')
+//    runtime.exclude group: 'com.microsoft.azure', module: 'applicationinsights-agent'
 
     aatCompile.extendsFrom(testCompile)
     aatRuntime.extendsFrom(testRuntime)
@@ -133,12 +139,10 @@ spotbugs {
 }
 
 dependencies {
-    compile "org.apache.logging.log4j:log4j-api:${log4j2Version}"
-    compile "org.apache.logging.log4j:log4j-core:${log4j2Version}"
-    compile "org.apache.logging.log4j:log4j-slf4j-impl:${log4j2Version}"
-    compile "org.apache.logging.log4j:log4j-jcl:${log4j2Version}"
+    compile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: reformLogging
+    compile group: 'uk.gov.hmcts.reform', name: 'java-logging-httpcomponents', version: reformLogging
+    compile group: 'uk.gov.hmcts.reform', name: 'java-logging-spring', version: reformLogging
     compile "org.slf4j:slf4j-api:1.7.25"
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-log4j2'
 
     // Needs to explicitly bring in a different hibernate version as in pom.xml
     compile "org.hibernate:hibernate-core:${hibernateVersion}"
@@ -172,6 +176,7 @@ dependencies {
     compile group: 'com.sun.mail', name: 'mailapi', version: '1.6.0'
     compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
 
+
     // FIXME 0.6 doesn't support jsonb; 0.7 doesn't work on Windows
 //    runtime group: 'com.impossibl.pgjdbc-ng', name: 'pgjdbc-ng', version: '0.6'
     runtime group: 'org.postgresql', name: 'postgresql', version: '42.2.0'
@@ -195,9 +200,11 @@ dependencies {
     testCompile group: 'com.xebialabs.restito', name: 'restito', version: '0.9.3'
     testCompile 'io.github.openfeign:feign-jackson:9.5.1'
 
-
     // for sonar analysis
     testCompile group: 'org.openid4java', name: 'openid4java', version: '1.0.0'
+    // remove me once insights is in
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+    compile "org.slf4j:log4j-over-slf4j:1.7.13"
 }
 // end::dependencies[]
 
@@ -403,6 +410,7 @@ project.afterEvaluate {
 sonarqube {
     properties {
         property "sonar.exclusions", "build/generated-sources/**/*.java"
+        property "sonar.coverage.exclusions", "src/main/java/uk/gov/hmcts/ccd/data/definition/DefaultCaseDefinitionRepository.java,src/main/java/uk/gov/hmcts/ccd/AppInsights.java"
         property "sonar.jacoco.reportPaths", "${project.buildDir}/jacoco/junitPlatformTest.exec"
         property "sonar.junit.reportPaths", "${project.buildDir}/test-results/junit-platform"
         property "sonar.projectName", "ccd-data-store-api"
@@ -478,6 +486,7 @@ jacocoTestReport {
 }
 
 junitPlatformTest {
+    environment("APPINSIGHTS_INSTRUMENTATIONKEY", "some-key")
     doFirst {
         logger.lifecycle("junit platform test cases started {}", timestamp())
     }
@@ -487,6 +496,7 @@ junitPlatformTest {
 }
 
 test {
+    environment("APPINSIGHTS_INSTRUMENTATIONKEY", "some-key")
     doFirst {
         logger.lifecycle("junit 4 test cases started {}", timestamp())
     }
@@ -510,23 +520,26 @@ sourceSets {
     }
 }
 task smoke(type: Test) {
+    environment("APPINSIGHTS_INSTRUMENTATIONKEY", "some-key")
     logger.quiet("TODO: Add smoke tests")
-    group = 'Delivery pipeline'
-    description = 'Executes functional tests against an AAT Claim Store instance'
-    setTestClassesDirs(sourceSets.aat.output.classesDirs)
-    setClasspath(sourceSets.aat.runtimeClasspath)
-    include 'uk.gov.hmcts.ccd.datastore.tests.smoke'
-    useJUnitPlatform()
+//    group = 'Delivery pipeline'
+//    description = 'Executes functional tests against an AAT CCD Data Store instance'
+//    setTestClassesDirs(sourceSets.aat.output.classesDirs)
+//    setClasspath(sourceSets.aat.runtimeClasspath)
+//    include 'uk.gov.hmcts.ccd.datastore.tests.smoke'
+//    useJUnitPlatform()
 
 }
 
 task functional(type: Test) {
-    group = 'Delivery pipeline'
-    description = 'Executes functional tests against an AAT CCD Data Store Instance'
-    setTestClassesDirs(sourceSets.aat.output.classesDirs)
-    setClasspath(sourceSets.aat.runtimeClasspath)
-    include "uk/gov/hmcts/ccd/datastore/tests/functional/**"
-    useJUnitPlatform()
+    environment("APPINSIGHTS_INSTRUMENTATIONKEY", "some-key")
+    logger.quiet("TODO: Add functional tests")
+//    group = 'Delivery pipeline'
+//    description = 'Executes functional tests against an AAT CCD Data Store instance'
+//    setTestClassesDirs(sourceSets.aat.output.classesDirs)
+//    setClasspath(sourceSets.aat.runtimeClasspath)
+//    include "uk/gov/hmcts/ccd/datastore/tests/functional/**"
+//    useJUnitPlatform()
 }
 
 
@@ -535,3 +548,12 @@ def timestamp() {
     return date.format('yyyy-MM-dd HH:mm:ss')
 }
 
+//distributions {
+//    main {
+//        contents {
+//            from(file("$projectDir/src/main/resources/AI-Agent.xml")) {
+//                into "lib"
+//            }
+//        }
+//    }
+//}

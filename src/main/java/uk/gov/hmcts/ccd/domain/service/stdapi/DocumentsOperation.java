@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.stdapi;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -28,7 +28,7 @@ import java.util.List;
 @Named
 @Singleton
 public class DocumentsOperation {
-    private static final Logger LOG = LogManager.getLogger(DocumentsOperation.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DocumentsOperation.class);
 
     private final SecurityUtils securityUtils;
     private final CaseDetailsRepository caseDetailsRepository;

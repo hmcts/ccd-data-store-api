@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.data.definition;
 
+import jdk.nashorn.internal.runtime.options.Option;
+import org.assertj.core.util.Lists;
 import org.hamcrest.collection.IsCollectionWithSize;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -10,16 +12,18 @@ import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.beans.HasPropertyWithValue.hasProperty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-@Ignore
 public class CaseDefinitionRepositoryTest extends WireMockBaseTest {
     @Inject
     private CaseDefinitionRepository caseDefinitionRepository;

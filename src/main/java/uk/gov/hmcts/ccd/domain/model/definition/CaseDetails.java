@@ -6,8 +6,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.annotations.ApiModelProperty;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
@@ -18,7 +18,8 @@ import java.util.Map;
 import static org.apache.http.HttpStatus.SC_OK;
 
 public class CaseDetails implements Cloneable {
-    private static final Logger LOG = LogManager.getLogger(CaseDetails.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CaseDetails.class);
+    private static final String LABEL_FIELD_TYPE = "Label";
 
     private Long id;
 
@@ -178,7 +179,9 @@ public class CaseDetails implements Cloneable {
     }
 
     public boolean existsInData(CaseTypeTabField caseTypeTabField) {
-        return data.keySet().contains(caseTypeTabField.getCaseField().getId());
+        // Fields of type "Label" are a special case and should be allowed through regardless
+        return caseTypeTabField.getCaseField().getId().equals(LABEL_FIELD_TYPE) ||
+            data.keySet().contains(caseTypeTabField.getCaseField().getId());
     }
 
     @JsonIgnore

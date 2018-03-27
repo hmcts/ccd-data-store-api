@@ -11,11 +11,11 @@ public interface CaseDefinitionRepository {
 
     CaseType getCaseType(String caseTypeId);
 
+    CaseType getCaseType(int version, String caseTypeId);
+
     List<FieldType> getBaseTypes();
 
     UserRole getUserRoleClassifications(String userRole);
 
-    CaseTypeVersionInformation getLatestVersion(String caseTypeId);
-
-    CaseType getCaseType(int latestVersion, String caseTypeId);
+    CaseTypeDefinitionVersion getLatestVersion(String caseTypeId);
 }

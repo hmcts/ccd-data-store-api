@@ -39,7 +39,6 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Ignore
 public class CallbackTest extends WireMockBaseTest {
     private final JsonNode CALLBACK_DATA = mapper.readTree(
         "{\n" +

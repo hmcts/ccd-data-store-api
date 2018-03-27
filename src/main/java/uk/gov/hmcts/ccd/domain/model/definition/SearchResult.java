@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
-public class SearchResult {
+import java.io.Serializable;
+
+public class SearchResult implements Serializable {
     private SearchResultField[] fields;
 
     public SearchResultField[] getFields() {

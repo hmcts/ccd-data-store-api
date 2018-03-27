@@ -3,7 +3,7 @@ properties(
     [
         [
             $class: 'GithubProjectProperty',
-            projectUrlStr: 'https://git.reform.hmcts.net/case-management/case-data-store-app'
+            projectUrlStr: 'https://github.com/hmcts/ccd-data-store-api'
         ],
         pipelineTriggers([[$class: 'GitHubPushTrigger']])
     ]
@@ -12,10 +12,28 @@ properties(
 @Library("Infrastructure")
 
 def type = "java"
-
 def product = "ccd"
-
 def app = "data-store-api"
 
+List<LinkedHashMap<String, Object>> secrets = [
+    secret('caseworkerAutoTest1Email', 'CCD_CASEWORKER_AUTOTEST_EMAIL'),
+    secret('caseworkerAutoTest1Password', 'CCD_CASEWORKER_AUTOTEST_PASSWORD'),
+    secret('microserviceGatewayName', 'CCD_GW_SERVICE_NAME'),
+    secret('microserviceGatewaySecret', 'CCD_GW_SERVICE_SECRET'),
+]
+
+static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
+    [ $class: 'AzureKeyVaultSecret',
+      secretType: 'Secret',
+      name: secretName,
+      version: '',
+      envVariable: envVar
+    ]
+}
+
 withPipeline(type, product, app) {
+    env.IDAM_URL='http://betadevbccidamapplb.reform.hmcts.net'
+    env.S2S_URL='http://betaDevBccidamS2SLB.reform.hmcts.net'
+
+    loadVaultSecrets(secrets)
 }

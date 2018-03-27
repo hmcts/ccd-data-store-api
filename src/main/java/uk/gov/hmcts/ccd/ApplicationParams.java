@@ -52,6 +52,9 @@ public class ApplicationParams {
     @Value("${pagination.page.size}")
     private String paginationPageSize;
 
+    @Value("${definition.cache.ttl.secs}")
+    private String definitionCacheTTLSecs;
+
     private static String encode(final String stringToEncode) {
         try {
             return URLEncoder.encode(stringToEncode, "UTF-8");
@@ -154,5 +157,9 @@ public class ApplicationParams {
 
     public int getPaginationPageSize() {
         return Integer.valueOf(paginationPageSize);
+    }
+
+    public int getDefinitionCacheTTLSecs() {
+        return Integer.valueOf(this.definitionCacheTTLSecs);
     }
 }

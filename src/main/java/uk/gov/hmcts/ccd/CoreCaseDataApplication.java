@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ccd;
 
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.core.config.Configurator;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
@@ -25,10 +23,10 @@ public class CoreCaseDataApplication {
     public static void main(String[] args) {
 
         if (System.getProperty(LOGGING_LEVEL_CCD) != null) {
-            Configurator.setLevel(LOGGING_LEVEL_CCD, Level.valueOf(System.getProperty(LOGGING_LEVEL_CCD).toUpperCase()));
+//            Configurator.setLevel(LOGGING_LEVEL_CCD, Level.valueOf(System.getProperty(LOGGING_LEVEL_CCD).toUpperCase()));
         }
         if (System.getProperty(LOGGING_LEVEL_SPRINGFRAMEWORK) != null) {
-            Configurator.setLevel(LOGGING_LEVEL_SPRINGFRAMEWORK, Level.valueOf(System.getProperty(LOGGING_LEVEL_SPRINGFRAMEWORK).toUpperCase()));
+//            Configurator.setLevel(LOGGING_LEVEL_SPRINGFRAMEWORK, Level.valueOf(System.getProperty(LOGGING_LEVEL_SPRINGFRAMEWORK).toUpperCase()));
         }
         SpringApplication.run(CoreCaseDataApplication.class, args);
     }

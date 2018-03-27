@@ -1,31 +1,54 @@
 package uk.gov.hmcts.ccd;
 
+import java.util.Optional;
+
 import com.hazelcast.config.Config;
 import com.hazelcast.config.EvictionPolicy;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.config.MaxSizeConfig;
 import com.hazelcast.config.NetworkConfig;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class CachingConfiguration {
 
+    //30 mins
+    public static final int DEFAULT_CACHE_TTL = 1800;
+
+    @Autowired
+    ApplicationParams applicationParams;
+
+
     @Bean
     public Config hazelCastConfig(){
+
+        int definitionCacheTTL = Optional.ofNullable(applicationParams.getDefinitionCacheTTLSecs()).orElse(DEFAULT_CACHE_TTL);
+
         Config config = new Config();
-        NetworkConfig networkConfig = config.setInstanceName("hazelcast-instance").getNetworkConfig();
+        NetworkConfig networkConfig = config.setInstanceName("hazelcast-instance-ccd").getNetworkConfig();
         networkConfig.getJoin().getMulticastConfig().setEnabled(false);
         networkConfig.getJoin().getTcpIpConfig().setEnabled(false);
-        return config.addMapConfig(new MapConfig()
-                                .setName("caseTypeDefinitions")
-                                .setMaxSizeConfig(new MaxSizeConfig(200, MaxSizeConfig.MaxSizePolicy.FREE_HEAP_SIZE))
-                                .setEvictionPolicy(EvictionPolicy.LRU)
-                                .setTimeToLiveSeconds(2000))
-                                .setProperty("hazelcast.multicast.enabled", "false")
-                                .setProperty("hazelcast.tcp-ip.enabled", "false")
-                                .setProperty("hazelcast.logging.type","slf4j");
+        configCaches(definitionCacheTTL, config);
+        return config;
+    }
 
+    private void configCaches(int definitionCacheTTL, Config config) {
+        config.addMapConfig(newMapConfig("caseTypeDefinitionsCache", definitionCacheTTL));
+        config.addMapConfig(newMapConfig("workBasketResultCache", definitionCacheTTL));
+        config.addMapConfig(newMapConfig("searchResultCache", definitionCacheTTL));
+        config.addMapConfig(newMapConfig("searchInputDefinitionCache", definitionCacheTTL));
+        config.addMapConfig(newMapConfig("workbasketInputDefinitionCache", definitionCacheTTL));
+        config.addMapConfig(newMapConfig("caseTabCollectionCache", definitionCacheTTL));
+        config.addMapConfig(newMapConfig("wizardPageCollectionCache", definitionCacheTTL));
+    }
+
+    private MapConfig newMapConfig(final String name, int definitionCacheTTL) {
+        return new MapConfig().setName(name)
+                .setMaxSizeConfig(new MaxSizeConfig(200, MaxSizeConfig.MaxSizePolicy.FREE_HEAP_SIZE))
+                .setEvictionPolicy(EvictionPolicy.LRU)
+                .setTimeToLiveSeconds(definitionCacheTTL);
     }
 
 }

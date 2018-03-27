@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "url": "/api/display/search-input-definition/TestAddressBookCase"
+    "url": "/api/display/search-input-definition/TestAddressBookCase?version=33"
   },
   "response": {
     "status": 200,

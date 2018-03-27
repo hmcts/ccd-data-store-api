@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ccd;
 
 import com.opentable.db.postgres.embedded.EmbeddedPostgres;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +16,7 @@ import java.util.Properties;
 @Component
 public class PostgresUtil {
 
-    private static final Logger LOG = LogManager.getLogger(PostgresUtil.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PostgresUtil.class);
 
     public EmbeddedPostgres embeddedPostgres() throws IOException {
         return EmbeddedPostgres

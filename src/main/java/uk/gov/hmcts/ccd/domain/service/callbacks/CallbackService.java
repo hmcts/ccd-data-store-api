@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.callbacks;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -29,7 +29,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 @Named
 @Singleton
 public class CallbackService {
-    private static final Logger LOG = LogManager.getLogger(CallbackService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CallbackService.class);
 
     private final SecurityUtils securityUtils;
     private final RestTemplate restTemplate;

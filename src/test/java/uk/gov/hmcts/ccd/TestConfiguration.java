@@ -24,6 +24,8 @@ import java.sql.SQLException;
 import java.util.Arrays;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -103,6 +105,8 @@ class TestConfiguration extends ContextCleanupListener {
         ReflectionTestUtils.setField(caseDefinitionRepository, "restTemplate", new RestTemplate());
 
         when(caseDefinitionRepository.getCaseType(any())).thenCallRealMethod();
+        when(caseDefinitionRepository.getLatestVersion(anyString())).thenCallRealMethod();
+        when(caseDefinitionRepository.getCaseType(anyInt(), anyString())).thenCallRealMethod();
         when(caseDefinitionRepository.getCaseTypesForJurisdiction(any())).thenCallRealMethod();
         when(caseDefinitionRepository.getBaseTypes()).thenReturn(Arrays.asList(fieldTypes));
         when(caseDefinitionRepository.getUserRoleClassifications(any())).thenCallRealMethod();

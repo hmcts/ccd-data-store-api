@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
 import io.swagger.annotations.*;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +16,7 @@ import java.util.List;
 @Api(value = "/", description = "Case access API")
 public class CaseAccessEndpoint {
 
-    private static final Logger LOG = LogManager.getLogger(CaseAccessEndpoint.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CaseAccessEndpoint.class);
     private final CaseAccessOperation caseAccessOperation;
 
     public CaseAccessEndpoint(CaseAccessOperation caseAccessOperation) {

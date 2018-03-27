@@ -2,11 +2,11 @@ package uk.gov.hmcts.ccd.data.definition;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-public class CaseTypeVersionInformation {
+public class CaseTypeDefinitionVersion {
 
     private Integer version;
 
-    public CaseTypeVersionInformation() {}
+    public CaseTypeDefinitionVersion() {}
 
     public Integer getVersion() {
         return version;

@@ -25,7 +25,6 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Ignore
 public class SearchInputEndpointTest extends WireMockBaseTest {
     private static final String URL = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/inputs";
 
