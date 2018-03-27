@@ -1,7 +1,9 @@
 package uk.gov.hmcts.ccd;
 
+import java.util.Optional;
 import java.util.concurrent.Executor;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.MethodInvokingFactoryBean;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -22,6 +24,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableAsync
 public class CoreCaseDataApplication {
 
+    @Autowired
+    ApplicationParams applicationParams;
+
     public static final String LOGGING_LEVEL_SPRINGFRAMEWORK = "logging.level.org.springframework.web";
     public static final String LOGGING_LEVEL_CCD = "logging.level.uk.gov.hmcts.ccd";
 
@@ -41,9 +46,10 @@ public class CoreCaseDataApplication {
 
     @Bean
     public Executor asyncExecutor() {
+
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(4);
-        executor.setMaxPoolSize(4);
+        executor.setCorePoolSize(applicationParams.getAsyncCorePoolSize());
+        executor.setMaxPoolSize(applicationParams.getAsyncMaxPoolSize());
         executor.setQueueCapacity(500);
         executor.setThreadNamePrefix("async-exec-");
         executor.initialize();

@@ -55,6 +55,12 @@ public class ApplicationParams {
     @Value("${definition.cache.ttl.secs}")
     private String definitionCacheTTLSecs;
 
+    @Value("${async.core.pool.size}")
+    private String asyncCorePoolSize;
+
+    @Value("${async.max.pool.size}")
+    private String asyncMaxPoolSize;
+
     private static String encode(final String stringToEncode) {
         try {
             return URLEncoder.encode(stringToEncode, "UTF-8");
@@ -165,5 +171,13 @@ public class ApplicationParams {
 
     public int getDefinitionCacheTTLSecs() {
         return Integer.valueOf(this.definitionCacheTTLSecs);
+    }
+
+    public int getAsyncCorePoolSize() {
+        return Integer.valueOf(this.asyncCorePoolSize);
+    }
+
+    public int getAsyncMaxPoolSize() {
+        return Integer.valueOf(this.asyncMaxPoolSize);
     }
 }
