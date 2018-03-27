@@ -1,171 +1,141 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import org.junit.Before;
-import org.junit.Test;
-import uk.gov.hmcts.ccd.BaseTest;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.test.CaseFieldBuilder;
 
-import javax.inject.Inject;
+import java.util.Collections;
 import java.util.List;
 
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.StringEndsWith.endsWith;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static uk.gov.hmcts.ccd.domain.types.MoneyGBPValidator.TYPE_ID;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
-public class MoneyGBPValidatorTest extends BaseTest {
-    private JsonNodeFactory NODE_FACTORY = JsonNodeFactory.instance;
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final String CASE_FIELD_STRING =
-        "{\n" +
-        "  \"id\": \"TEST_FIELD_ID\",\n" +
-        "  \"field_type\": {\n" +
-        "    \"type\": \"MoneyGBP\"\n" +
-        "  }\n" +
-        "}";
+@DisplayName("MoneyGBPValidator")
+class MoneyGBPValidatorTest {
+    private static final String FIELD_ID = "TEST_FIELD_ID";
+    private static final JsonNodeFactory NODE_FACTORY = JsonNodeFactory.instance;
 
-    @Inject
+    @Mock
+    private BaseType moneyGbpBaseType;
+
+    @Mock
+    private CaseDefinitionRepository definitionRepository;
+
     private MoneyGBPValidator validator;
     private CaseField caseField;
 
-    @Before
-    public void setUp() throws Exception {
-        caseField = MAPPER.readValue(CASE_FIELD_STRING, CaseField.class);
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.initMocks(this);
+
+        when(definitionRepository.getBaseTypes()).thenReturn(Collections.emptyList());
+        BaseType.setCaseDefinitionRepository(definitionRepository);
+        BaseType.initialise();
+
+        when(moneyGbpBaseType.getType()).thenReturn(MoneyGBPValidator.TYPE_ID);
+        BaseType.register(moneyGbpBaseType);
+
+        validator = new MoneyGBPValidator();
+
+        caseField = caseField().build();
     }
 
     @Test
-    public void validMoney() throws Exception {
-        final List<ValidationResult> result01 = validator.validate("TEST_FIELD_ID", MAPPER.readTree("\"177978989700\""), caseField);
+    void validMoney() {
+        final List<ValidationResult> result01 = validator.validate(FIELD_ID,
+                                                                   NODE_FACTORY.textNode("177978989700"),
+                                                                   caseField);
         assertEquals(0, result01.size());
 
-        final List<ValidationResult> result02 = validator.validate("TEST_FIELD_ID", MAPPER.readTree("\"-100\""), caseField);
+        final List<ValidationResult> result02 = validator.validate(FIELD_ID, NODE_FACTORY.textNode("-100"), caseField);
         assertEquals(0, result02.size());
     }
 
     @Test
-    public void nullMoney() throws Exception {
-        final List<ValidationResult> result01 = validator.validate("TEST_FIELD_ID", null, caseField);
-        assertEquals("Did not catch null", 0, result01.size());
+    void nullMoney() {
+        final List<ValidationResult> result01 = validator.validate(FIELD_ID, null, caseField);
+        assertEquals(0, result01.size(), "Did not catch null");
     }
 
     @Test
-    public void invalidMoney() throws Exception {
-        final List<ValidationResult> result01 = validator.validate("TEST_FIELD_ID", MAPPER.readTree("\"3321M1 1AA\""), caseField);
-        assertEquals(result01.toString(), 1, result01.size());
+    void invalidMoney() {
+        final List<ValidationResult> result01 = validator.validate(FIELD_ID,
+                                                                   NODE_FACTORY.textNode("3321M1 1AA"),
+                                                                   caseField);
+        assertEquals(1, result01.size(), result01.toString());
 
-        final List<ValidationResult> result02 = validator.validate("TEST_FIELD_ID", MAPPER.readTree("\"100.1\""), caseField);
-        assertEquals(result02.toString(), 1, result01.size());
+        final List<ValidationResult> result02 = validator.validate(FIELD_ID, NODE_FACTORY.textNode("100.1"), caseField);
+        assertEquals(1, result01.size(), result02.toString());
     }
 
     @Test
-    public void checkMaxMin_BothBelow1GBP() throws Exception {
-        final String caseFiledString =
-            "{\n" +
-            "  \"id\": \"TEST_FIELD_ID\",\n" +
-            "  \"field_type\": {\n" +
-            "    \"type\": \"MONEY_GBP\",\n" +
-            "    \"max\": 10,\n" +
-            "    \"min\": 5\n" +
-            "  }\n" +
-            "}";
-
-        final CaseField minMaxCaseField = MAPPER.readValue(caseFiledString, CaseField.class);
+    void checkMaxMin_BothBelow1GBP() {
+        final CaseField minMaxCaseField = caseField().withMin(5)
+                                                     .withMax(10)
+                                                     .build();
 
         // Test valid max min
-        final List<ValidationResult> result01 = validator.validate("TEST_FIELD_ID", MAPPER.readTree("\"5\""), minMaxCaseField);
+        final List<ValidationResult> result01 = validator.validate(FIELD_ID,
+                                                                   NODE_FACTORY.textNode("5"),
+                                                                   minMaxCaseField);
         assertEquals(0, result01.size());
 
-        final List<ValidationResult> result02 = validator.validate("TEST_FIELD_ID", MAPPER.readTree("\"10\""), minMaxCaseField);
+        final List<ValidationResult> result02 = validator.validate(FIELD_ID,
+                                                                   NODE_FACTORY.textNode("10"),
+                                                                   minMaxCaseField);
         assertEquals(0, result02.size());
 
-        final List<ValidationResult> result03 = validator.validate("TEST_FIELD_ID", MAPPER.readTree("\"7\""), minMaxCaseField);
+        final List<ValidationResult> result03 = validator.validate(FIELD_ID,
+                                                                   NODE_FACTORY.textNode("7"),
+                                                                   minMaxCaseField);
         assertEquals(0, result03.size());
 
         // Test invalid max min
-        final List<ValidationResult> result04 = validator.validate("TEST_FIELD_ID", MAPPER.readTree("\"4\""), minMaxCaseField);
+        final List<ValidationResult> result04 = validator.validate(FIELD_ID,
+                                                                   NODE_FACTORY.textNode("4"),
+                                                                   minMaxCaseField);
         assertEquals(1, result04.size());
-        assertEquals("Should be more than or equal to £0.05", result04.get(0).getErrorMessage());
+        assertEquals(result04.get(0).getErrorMessage(), "Should be more than or equal to £0.05");
 
-        final List<ValidationResult> result05 = validator.validate("TEST_FIELD_ID", MAPPER.readTree("\"11\""), minMaxCaseField);
+        final List<ValidationResult> result05 = validator.validate(FIELD_ID,
+                                                                   NODE_FACTORY.textNode("11"),
+                                                                   minMaxCaseField);
         assertEquals(1, result05.size());
-        assertEquals("Should be less than or equal to £0.10", result05.get(0).getErrorMessage());
+        assertEquals(result05.get(0).getErrorMessage(), "Should be less than or equal to £0.10");
     }
 
     @Test
-    public void checkMaxMin_BothAbove1GBP() throws Exception {
-        final String caseFiledString =
-            "{\n" +
-                "  \"id\": \"TEST_FIELD_ID\",\n" +
-                "  \"field_type\": {\n" +
-                "    \"type\": \"MONEY_GBP\",\n" +
-                "    \"max\": 123456,\n" +
-                "    \"min\": 123\n" +
-                "  }\n" +
-                "}";
-
-        final CaseField minMaxCaseField = MAPPER.readValue(caseFiledString, CaseField.class);
+    void checkMaxMin_BothAbove1GBP() {
+        final CaseField minMaxCaseField = caseField().withMin(123)
+                                                     .withMax(123456)
+                                                     .build();
 
         // Test invalid max min
-        final List<ValidationResult> result01 = validator.validate("TEST_FIELD_ID", MAPPER.readTree("\"123457\""), minMaxCaseField);
+        final List<ValidationResult> result01 = validator.validate(FIELD_ID,
+                                                                   NODE_FACTORY.textNode("123457"),
+                                                                   minMaxCaseField);
         assertEquals(1, result01.size());
-        assertEquals("Should be less than or equal to £1,234.56", result01.get(0).getErrorMessage());
+        assertEquals(result01.get(0).getErrorMessage(), "Should be less than or equal to £1,234.56");
 
-        final List<ValidationResult> result02 = validator.validate("TEST_FIELD_ID", MAPPER.readTree("\"122\""), minMaxCaseField);
+        final List<ValidationResult> result02 = validator.validate(FIELD_ID,
+                                                                   NODE_FACTORY.textNode("122"),
+                                                                   minMaxCaseField);
         assertEquals(1, result02.size());
-        assertEquals("Should be more than or equal to £1.23", result02.get(0).getErrorMessage());
+        assertEquals(result02.get(0).getErrorMessage(), "Should be more than or equal to £1.23");
     }
 
     @Test
-    public void shouldFail_whenDataValidatingBooleanNode() {
-        final List<ValidationResult>
-            result =
-            validator.validate("TEST_FIELD_ID", NODE_FACTORY.booleanNode(true), caseField);
-        assertThat(result, hasSize(1));
-        assertThat(result.get(0).getErrorMessage(), is("true is not valid " + TYPE_ID));
+    void getType() {
+        assertEquals(validator.getType(), BaseType.get("MoneyGBP"), "Type is incorrect");
     }
 
-    @Test
-    public void shouldFail_whenDataValidatingBinaryNode() {
-        final List<ValidationResult>
-            result =
-            validator.validate("TEST_FIELD_ID", NODE_FACTORY.binaryNode("Ngitb".getBytes()), caseField);
-        assertThat(result, hasSize(1));
-        assertThat(result.get(0).getErrorMessage(), endsWith(" is not valid " + TYPE_ID));
-    }
-
-    @Test
-    public void shouldPass_whenDataValidatingObjectNode() {
-        final List<ValidationResult>
-            result =
-            validator.validate("TEST_FIELD_ID", NODE_FACTORY.objectNode(), caseField);
-        assertThat(result, empty());
-    }
-
-    @Test
-    public void shouldPass_whenDataValidatingPojoNode() {
-        final List<ValidationResult>
-            result =
-            validator.validate("TEST_FIELD_ID", NODE_FACTORY.pojoNode(1000), caseField);
-        assertThat(result, hasSize(1));
-        assertThat(result.get(0).getErrorMessage(), is("1000 is not valid " + TYPE_ID));
-    }
-
-    @Test
-    public void shouldPass_whenDataValidatingArrayNode() {
-        final List<ValidationResult>
-            result =
-            validator.validate("TEST_FIELD_ID", NODE_FACTORY.arrayNode(), caseField);
-        assertThat(result, hasSize(1));
-        assertThat(result.get(0).getErrorMessage(), is("[] is not valid " + TYPE_ID));
-    }
-
-    @Test
-    public void getType() {
-        assertEquals("Type is incorrect", validator.getType(), BaseType.get(TYPE_ID));
+    private CaseFieldBuilder caseField() {
+        return new CaseFieldBuilder(FIELD_ID).withType(MoneyGBPValidator.TYPE_ID);
     }
 }
