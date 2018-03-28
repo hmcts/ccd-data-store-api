@@ -41,29 +41,17 @@ public class UserService {
     }
 
     public CompletableFuture<UserProfile> getUserProfileAsync() {
-        long start = System.nanoTime();
-        final UserProfile userProfile = new UserProfile();
-        CompletableFuture<UserDefault> userDefaultFuture = userRepository.getUserDetailsAsync()
-                .whenComplete((d,t) -> {
-                    LOG.debug("retrieved user details. duration: {}", (System.nanoTime() - start)/1_000_000);
-                })
-                .thenCompose(idamProperties -> {
-                    String userId = idamProperties.getEmail();
-                    userProfile.getUser().setIdamProperties(idamProperties);
-                    long start2 = System.nanoTime();
-                    CompletableFuture<UserDefault> userDefaultSettingsAsync = userRepository.getUserDefaultSettingsAsync(userId);
-                    userDefaultSettingsAsync.whenComplete((userDefaultSettings, t) -> {
-                        LOG.debug("retrieved user default settings. duration: {}", (System.nanoTime() - start2)/1_000_000);
-                    });
-                    return userDefaultSettingsAsync;
-                });
 
-        long start3 = System.nanoTime();
         CompletableFuture<List<Jurisdiction>> jurisdictionDefsFuture = caseDefinitionRepository.getAllJurisdictionsAsync();
 
-        jurisdictionDefsFuture.whenComplete((j,t) -> {
-            LOG.debug("retrieved jurisdictions. duration: {}", (System.nanoTime() - start3)/1_000_000);
-        });
+        UserProfile userProfile = new UserProfile();
+        CompletableFuture<UserDefault> userDefaultFuture = userRepository.getUserDetailsAsync()
+            .thenCompose(idamProperties -> {
+                String userId = idamProperties.getEmail();
+                userProfile.getUser().setIdamProperties(idamProperties);
+
+                return userRepository.getUserDefaultSettingsAsync(userId);
+            });
 
         return userDefaultFuture.thenCombine(jurisdictionDefsFuture, ((userDefault, jurisdictions) -> {
             List<String> userJurisdictions = userDefault.getJurisdictionsId();
@@ -77,14 +65,12 @@ public class UserService {
             workbasketDefault.setCaseTypeId(userDefault.getWorkBasketDefaultCaseType());
             workbasketDefault.setStateId(userDefault.getWorkBasketDefaultState());
             userProfile.getDefaultSettings().setWorkbasketDefault(workbasketDefault);
-            LOG.debug("returning user profile. duration: {}", (System.nanoTime() - start)/1_000_000);
 
             return userProfile;
         }));
     }
 
-    private JurisdictionDisplayProperties[] toResponse(List<String> userJurisdictions, List<Jurisdiction>
-            jurisdictions) {
+    private JurisdictionDisplayProperties[] toResponse(List<String> userJurisdictions, List<Jurisdiction> jurisdictions) {
         return userJurisdictions.stream().map(id -> {
             Optional<Jurisdiction> definition = jurisdictions.stream().filter(def -> def.getId().equals(id)).findAny();
             if (!definition.isPresent()) {
