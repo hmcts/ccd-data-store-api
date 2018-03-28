@@ -52,7 +52,6 @@ public abstract class WireMockBaseTest extends BaseTest {
 
     protected void stupApiCalls() throws IOException {
         stubGetWizardPageStructure();
-        stubGetDefinitionVersion();
     }
 
     private void stubGetWizardPageStructure() throws IOException {
@@ -62,13 +61,5 @@ public abstract class WireMockBaseTest extends BaseTest {
         wireMockRule.stubFor(WireMock.get(urlMatching("/api/display/wizard-page-structure.*"))
                                      .willReturn(okJson(mapper.writeValueAsString(wizardStructureResponse)).withStatus(
                                              200)));
-    }
-
-    private void stubGetDefinitionVersion() throws JsonProcessingException {
-        CaseTypeDefinitionVersion stubDefinitionVersion = new CaseTypeDefinitionVersion();
-        stubDefinitionVersion.setVersion(33);
-        wireMockRule.stubFor(WireMock.get(urlMatching("/api/data/case-type/.*/version"))
-                .willReturn(okJson(mapper.writeValueAsString(stubDefinitionVersion)).withStatus(
-                        200)));
     }
 }
