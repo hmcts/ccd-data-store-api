@@ -10,16 +10,23 @@
     },
     "jsonBody": [
       {
-        "id": "123",
-        "name" : "JUR1",
-        "description" : "desc 1",
+        "id": "PROBATE",
+        "name" : "Test",
+        "description" : "Test Jurisdiction",
         "live_from": "2017-01-01",
         "live_until": "2017-01-01"
       },
       {
-        "id": "333",
-        "name" : "JUR2",
-        "description" : "desc 2",
+        "id": "DIVORCE",
+        "name" : "Test 2",
+        "description" : "Test Jurisdiction 2",
+        "live_from": "2017-01-01",
+        "live_until": "2017-01-01"
+      },
+      {
+        "id": "SSCS",
+        "name" : "Test 3",
+        "description" : "Test Jurisdiction 3",
         "live_from": "2017-01-01",
         "live_until": "2017-01-01"
       }

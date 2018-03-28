@@ -86,9 +86,9 @@ public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
         List<Jurisdiction> allJurisdictions = caseDefinitionRepository.getAllJurisdictions();
 
         assertAll(
-                () -> assertThat(allJurisdictions, hasSize(2)),
-                () -> assertThat(allJurisdictions, hasItem(hasProperty("name", is("JUR1")))),
-                () -> assertThat(allJurisdictions, hasItem(hasProperty("name", is("JUR2"))))
+                () -> assertThat(allJurisdictions, hasSize(3)),
+                () -> assertThat(allJurisdictions, hasItem(hasProperty("id", is("SSCS")))),
+                () -> assertThat(allJurisdictions, hasItem(hasProperty("id", is("PROBATE"))))
         );
     }
 }
