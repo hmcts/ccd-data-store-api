@@ -14,28 +14,6 @@ before_install:
   | jq -r .assets[0].browser_download_url)
 script:
 - "./gradlew build"
-- "./gradlew codeCoverageReport"
 after_success:
 - java -cp ~/codacy-coverage-reporter-assembly-latest.jar com.codacy.CodacyCoverageReporter
-  -l Java -r build/reports/jacoco/jacocoTestReport.xml
-deploy:
-- provider: script
-  script: "./gradlew bintrayUpload"
-  skip_cleanup: true
-  on:
-    repo: hmcts/java-logging
-    tags: true
-- provider: releases
-  api_key:
-    secure: v1gAVCFHdpRMYEyD2R4zOqxNAkd+TL+RFndzlTw0kUtQT+SbTNfLhnxiMwHfFeIn3ivqQ1MLt8zXo5zDtFHHRGp6QX/kA9I0mIj74rf/sj0z0ElXCDtiB41NVcq9++X1OmvP4qniWxcvi03e4TMg0HIiLGzD41437NVN1So/PUYFVxgvyeENL6JUIe7d2y48ZP2YvWh1tvwj5Z3p/bEd2Kp7H0aTP58l1kSkSHoSonNHpB/yjT9qN6VSWTyMl8GxeRPX4FSYEGBpDy7+8wxVO/MVOMwu0X2T6vgYlmkXj4U7bmXf0kMkvbeBQC/yZEH8D2y1W3piERw0b17kc9t7tigULBXIEhUNUgKFVEdTDSAEJASpytlxKfsaNVjsUx9n9kWhSUqtFgIz9msS4iJpImkSLTr20BivJ829zNfcG1wbHyIqlV5MQKTAqCwU6RWvRrT0OwhCT38R0lzmyDKEUbRbz+kGW4Vqo5BaPRMrxZZFRMtSHDuh8HCp2LzefUcfUX7LCvSd4z0MFK0o1WEn1lEuB1haViF2JWiov973JFqH7FjJe0iF172GOaMMFRR6ck8g8omfGO+ufZtxPeW5Zw47IridV9HaOhN/K8wkT7xVgdKy+qZmRdzdEHOo2hT2n9mbagIFmqc4yKN91elhAc/vzieE1WNx0n8+Aj9joyY=
-  file_glob: true
-  file:
-  - build/libs/user-profile*.jar
-  skip_cleanup: true
-  on:
-    repo: hmcts/ccd-data-store-api
-    tags: true
-env:
-  global:
-  - secure: idyabL0MgrmQw8ZdwgRYe8/ewYrdYlNAaYUZbhTzLnnIkXAnPXhFxPB+k2mDaMf0ww26VpBl4O6aYv5bHrCI+1/oziByTSz6Qny9j3F2h/gnSwyXZUe427BCjTR9Wz1+TvASGansO+igj0FxENGikqKDd0V5Qe8lr4Lm01+xXLoAXfvyqqiAqjsRHvl1vG+9F+G80hzmMBSBm7AkN//uYJRFCJV07yp6J0ALd6Z81cChNJgvS7oG9iXimFltiCwf8KNcotkm/mbGHULyj6YVfnFePSoIuI94QBi2myqxDRQ56bv7wtipsF0zaOn+Zc5hPr6QGPMXNWeD3kp/ZmEYWsg5VFQEdcpnKhyv7zcmKZDaYQgIkdjZTZ1rDBj04ubBJs96dEex2CamascLTuq5XuVs3O8MG4GrcKPDqTbDNDnSVDtyRUakhWwnFn424shotCyXl+k06THlFVQq229eBRKCQDdGWtV2B4Z55AxQdIHqaDLppYJs1wCC7350/gY0pXgm4928UpVxx3Bk/Gu1HT8gIWOiEYigqqPOgFlfrdGMiPyRM0WHImZ9Ru8d/RvMnGYndwlY10q3i2lM+CdwthaPp1f9jZDZw2uqqmiUlOuH+oVG4l61h+gznlH277KXcjTPbLjwczo5nZ0L4H/TBGTVrhTOVUQEsBu/zYrAZo8=
-  - secure: lMbaGTv2PCsjiwGpDMsTKShmtC6Fj6bp++2Re2H2+lgRAmepnr9h8+5ckHyaGYH6HuxSBYN9Q01F1t6lwn1tZQYhJ6EJYK8Kb1KHWnXME3K6VnM/C+6Yr7TkZr0+1SaDE7CIAjCzgF3v5MsWlBUDLhJYViwNuZaJ+Ej73RJkIi0qEu2Dk0PYx6JMK/jwnCojCOYoWjm7d23Tyu5ACo+onZF1WCfVVrI7Gq8kEN4OhClozVvF5IFqfeGEJCWzMsNCxJDE9ptFJcDmp5he41l1GrXNgD9rCxWay03l96Z2+OcqeXV9prIZ36h1mnWy3pd+Xnpxi0LqE09nBFnnGMCwbeer16hG09zsxav6Qk68AUt+smHEcxzFJC9Q6otW+6ud8gxk4kxPkyYo0+adQj5yuudVNS8R7sH8hsTKdD6K0Hv5I3Yob2eSw+1aaE1iz8vplbMCdwOVuZH9uwpgWrivi4HZO9VKgkZ83nr7guJpES7i+YhmiokpN8eUZFrUKCW0ScUJGit8JBjOeaSZod6prd/X7roI4u79eeYG0l76PcN/vPgfUN4cQEOOwg97XLpAvYySghC5ppRUnczDs/iEV5sqWS2QnF20JY+2CDEJkrfC/JlpR2TETrVzeBfzs/VKm811vAoRXscaGWGCfg2FdAWHvpquQ8EViqKnzH/9V5M=
+  -l Java -r build/reports/jacoco/test/jacocoTestReport.xml
