@@ -122,23 +122,28 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     @Override
-    @Async
-    public CompletableFuture<List<Jurisdiction>> getAllJurisdictionsAsync() {
+    public List<Jurisdiction> getAllJurisdictions() {
         try {
             LOG.debug("retrieving all jurisdictions definition");
             final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(applicationParams.jurisdictionDefURL());
-            return CompletableFuture.completedFuture(restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET,
-                    requestEntity, new ParameterizedTypeReference<List<Jurisdiction>>() {}).getBody());
+            return restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET,
+                    requestEntity, new ParameterizedTypeReference<List<Jurisdiction>>() {}).getBody();
         } catch (Exception e) {
-            LOG.warn("Error while retrieving jurisdiction definition", e);
+            LOG.warn("Error while retrieving jurisdictions definition", e);
             if (e instanceof HttpClientErrorException
                     && ((HttpClientErrorException)e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
-                throw new ResourceNotFoundException("Resource not found when retrieving jurisdiction definition because of " + e.getMessage());
+                throw new ResourceNotFoundException("Resource not found when retrieving jurisdictions definition because of " + e.getMessage());
             } else {
-                throw new ServiceException("Problem retrieving jurisdiction definition because of " + e.getMessage());
+                throw new ServiceException("Problem retrieving jurisdictions definition because of " + e.getMessage());
             }
         }
+    }
+
+    @Override
+    @Async
+    public CompletableFuture<List<Jurisdiction>> getAllJurisdictionsAsync() {
+        return CompletableFuture.completedFuture(this.getAllJurisdictions());
     }
 
     @Override

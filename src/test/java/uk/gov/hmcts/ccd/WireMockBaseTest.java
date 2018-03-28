@@ -41,6 +41,7 @@ public abstract class WireMockBaseTest extends BaseTest {
         final String hostUrl = "http://localhost:" + port;
         LOG.info("Wire mock test, host url is {}", hostUrl);
 
+        //FIXME can this be replaced with json stubs like we have for other calls?
         stupApiCalls();
 
         ReflectionTestUtils.setField(applicationParams, "caseDefinitionHost", hostUrl);

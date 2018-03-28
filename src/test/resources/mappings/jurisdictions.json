@@ -1,0 +1,28 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/data/jurisdictions"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": [
+      {
+        "id": "123",
+        "name" : "JUR1",
+        "description" : "desc 1",
+        "live_from": "2017-01-01",
+        "live_until": "2017-01-01"
+      },
+      {
+        "id": "333",
+        "name" : "JUR2",
+        "description" : "desc 2",
+        "live_from": "2017-01-01",
+        "live_until": "2017-01-01"
+      }
+    ]
+  }
+}

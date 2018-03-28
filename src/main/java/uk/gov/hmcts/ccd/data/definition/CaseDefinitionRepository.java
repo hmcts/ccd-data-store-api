@@ -19,6 +19,8 @@ public interface CaseDefinitionRepository {
 
     UserRole getUserRoleClassifications(String userRole);
 
+    List<Jurisdiction> getAllJurisdictions();
+
     CompletableFuture<List<Jurisdiction>> getAllJurisdictionsAsync();
 
     CaseTypeDefinitionVersion getLatestVersion(String caseTypeId);

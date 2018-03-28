@@ -23,7 +23,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
-import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.HttpUIDefinitionGateway;
 import uk.gov.hmcts.ccd.data.user.DefaultUserRepository;
@@ -76,8 +75,7 @@ public abstract class BaseTest {
     @Inject
     protected UIDService uidService;
     @Inject
-    @Qualifier(DefaultCaseDefinitionRepository.QUALIFIER)
-    private CaseDefinitionRepository caseDefinitionRepository;
+    private DefaultCaseDefinitionRepository caseDefinitionRepository;
     @Inject
     private HttpUIDefinitionGateway uiDefinitionRepository;
     @Inject
