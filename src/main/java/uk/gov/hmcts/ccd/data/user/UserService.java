@@ -44,7 +44,7 @@ public class UserService {
         long start = System.nanoTime();
         final UserProfile userProfile = new UserProfile();
         CompletableFuture<UserDefault> userDefaultFuture = userRepository.getUserDetailsAsync()
-                .whenComplete((p,t) -> {
+                .whenComplete((d,t) -> {
                     LOG.debug("retrieved user details. duration: {}", (System.nanoTime() - start)/1_000_000);
                 })
                 .thenCompose(idamProperties -> {
@@ -88,7 +88,7 @@ public class UserService {
         return userJurisdictions.stream().map(id -> {
             Optional<Jurisdiction> definition = jurisdictions.stream().filter(def -> def.getId().equals(id)).findAny();
             if (!definition.isPresent()) {
-                LOG.warn("Could not retrieve definition for jurisdiction '{}'", id);
+                LOG.warn("Could not retrieve definition of jurisdiction '{}'", id);
             }
             return definition.map(jurisdictionMapper::toResponse);
         }).filter(Optional::isPresent).map(Optional::get).toArray(JurisdictionDisplayProperties[]::new);

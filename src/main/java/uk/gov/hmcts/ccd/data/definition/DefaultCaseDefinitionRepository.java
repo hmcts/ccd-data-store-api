@@ -122,13 +122,14 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     @Override
-    public List<Jurisdiction> getJurisdictions(List<String> ids) {
+    @Async
+    public CompletableFuture<List<Jurisdiction>> getJurisdictionsAsync(List<String> ids) {
         try {
             final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(applicationParams.jurisdictionDefURL())
                     .queryParam("ids", String.join(",", ids));
-            return restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity,
-                    new ParameterizedTypeReference<List<Jurisdiction>>() {}).getBody();
+            return CompletableFuture.completedFuture(restTemplate.exchange(builder.build().encode().toUri(),
+                    HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<Jurisdiction>>() {}).getBody());
         } catch (Exception e) {
             LOG.warn("Error while retrieving jurisdiction definition", e);
             if (e instanceof HttpClientErrorException
@@ -144,7 +145,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     @Async
     public CompletableFuture<List<Jurisdiction>> getAllJurisdictionsAsync() {
         try {
-            LOG.debug("retrieving all jurisdictions");
+            LOG.debug("retrieving all jurisdictions definition");
             final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(applicationParams.jurisdictionDefURL());
             return CompletableFuture.completedFuture(restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET,

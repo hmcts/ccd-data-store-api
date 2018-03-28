@@ -56,9 +56,9 @@ public class CoreCaseDataApplication {
         return executor;
     }
 
-    //allows security context to be propagated to child threads running async calls
     @Bean
     public MethodInvokingFactoryBean methodInvokingFactoryBean() {
+        //allows security context to be propagated to child threads running async calls
         MethodInvokingFactoryBean methodInvokingFactoryBean = new MethodInvokingFactoryBean();
         methodInvokingFactoryBean.setTargetClass(SecurityContextHolder.class);
         methodInvokingFactoryBean.setTargetMethod("setStrategyName");

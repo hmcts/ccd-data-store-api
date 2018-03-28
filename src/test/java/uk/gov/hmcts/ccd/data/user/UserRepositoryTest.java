@@ -67,7 +67,7 @@ public class UserRepositoryTest {
         SecurityContextHolder.setContext(securityContext);
 
         userRepository = spy(new DefaultUserRepository(applicationParams,
-                                                       caseDefinitionRepository, securityUtils, restTemplate, jurisdictionMapper));
+                                                       caseDefinitionRepository, securityUtils, restTemplate));
     }
 
     @Nested

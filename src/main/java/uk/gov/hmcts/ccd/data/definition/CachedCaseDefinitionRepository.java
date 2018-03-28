@@ -61,8 +61,8 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     }
 
     @Override
-    public List<Jurisdiction> getJurisdictions(List<String> ids) {
-        return caseDefinitionRepository.getJurisdictions(ids);
+    public CompletableFuture<List<Jurisdiction>> getJurisdictionsAsync(List<String> ids) {
+        return caseDefinitionRepository.getJurisdictionsAsync(ids);
     }
 
     @Override
