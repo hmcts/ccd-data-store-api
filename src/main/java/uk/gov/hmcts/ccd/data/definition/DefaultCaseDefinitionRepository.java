@@ -123,26 +123,6 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
 
     @Override
     @Async
-    public CompletableFuture<List<Jurisdiction>> getJurisdictionsAsync(List<String> ids) {
-        try {
-            final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
-            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(applicationParams.jurisdictionDefURL())
-                    .queryParam("ids", String.join(",", ids));
-            return CompletableFuture.completedFuture(restTemplate.exchange(builder.build().encode().toUri(),
-                    HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<Jurisdiction>>() {}).getBody());
-        } catch (Exception e) {
-            LOG.warn("Error while retrieving jurisdiction definition", e);
-            if (e instanceof HttpClientErrorException
-                    && ((HttpClientErrorException)e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
-                throw new ResourceNotFoundException("Resource not found when retrieving jurisdiction definition because of " + e.getMessage());
-            } else {
-                throw new ServiceException("Problem retrieving jurisdiction definition because of " + e.getMessage());
-            }
-        }
-    }
-
-    @Override
-    @Async
     public CompletableFuture<List<Jurisdiction>> getAllJurisdictionsAsync() {
         try {
             LOG.debug("retrieving all jurisdictions definition");
