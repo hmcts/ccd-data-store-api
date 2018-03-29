@@ -16,8 +16,6 @@ import javax.transaction.Transactional;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
-import java.util.concurrent.Future;
-
 @RestController
 public class UserProfileEndpoint {
     private static final String BEARER = "Bearer ";
@@ -32,8 +30,8 @@ public class UserProfileEndpoint {
     @RequestMapping(value = "/caseworkers/{uid}/profile", method = RequestMethod.GET)
     @ApiOperation(value = "Get default setting for user")
     @ApiResponse(code = 200, message = "User default settings")
-    public Future<UserProfile> getUserProfile(@RequestHeader(value = AUTHORIZATION) final String authHeader) {
+    public UserProfile getUserProfile(@RequestHeader(value = AUTHORIZATION) final String authHeader) {
         final String userToken = authHeader.substring(BEARER.length());
-        return getUserProfileOperation.execute(userToken);
+        return getUserProfileOperation.execute(userToken).join();
     }
 }
