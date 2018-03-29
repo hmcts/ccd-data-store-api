@@ -50,16 +50,16 @@ public class ApplicationParams {
     private String defaultPrintType;
 
     @Value("${pagination.page.size}")
-    private String paginationPageSize;
+    private Integer paginationPageSize;
 
     @Value("${definition.cache.ttl.secs}")
-    private String definitionCacheTTLSecs;
+    private Integer definitionCacheTTLSecs;
 
     @Value("${async.core.pool.size}")
-    private String asyncCorePoolSize;
+    private Integer asyncCorePoolSize;
 
     @Value("${async.max.pool.size}")
-    private String asyncMaxPoolSize;
+    private Integer asyncMaxPoolSize;
 
     private static String encode(final String stringToEncode) {
         try {
@@ -166,18 +166,18 @@ public class ApplicationParams {
     }
 
     public int getPaginationPageSize() {
-        return Integer.valueOf(paginationPageSize);
+        return paginationPageSize;
     }
 
     public int getDefinitionCacheTTLSecs() {
-        return Integer.valueOf(this.definitionCacheTTLSecs);
+        return definitionCacheTTLSecs;
     }
 
     public int getAsyncCorePoolSize() {
-        return Integer.valueOf(this.asyncCorePoolSize);
+        return asyncCorePoolSize;
     }
 
     public int getAsyncMaxPoolSize() {
-        return Integer.valueOf(this.asyncMaxPoolSize);
+        return asyncMaxPoolSize;
     }
 }

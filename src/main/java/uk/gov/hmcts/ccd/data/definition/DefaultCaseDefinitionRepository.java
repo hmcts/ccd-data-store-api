@@ -127,8 +127,11 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             LOG.debug("retrieving all jurisdictions definition");
             final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(applicationParams.jurisdictionDefURL());
-            return restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET,
-                    requestEntity, new ParameterizedTypeReference<List<Jurisdiction>>() {}).getBody();
+            List<Jurisdiction> jurisdictionList = restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET,
+                    requestEntity, new ParameterizedTypeReference<List<Jurisdiction>>() {
+                    }).getBody();
+            LOG.debug("retrieved jurisdictions definition: {}", jurisdictionList);
+            return jurisdictionList;
         } catch (Exception e) {
             LOG.warn("Error while retrieving jurisdictions definition", e);
             if (e instanceof HttpClientErrorException
