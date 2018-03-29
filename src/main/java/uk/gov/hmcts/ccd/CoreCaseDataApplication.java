@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd;
 
-import java.util.Optional;
 import java.util.concurrent.Executor;
 
 import org.springframework.beans.factory.annotation.Autowired;

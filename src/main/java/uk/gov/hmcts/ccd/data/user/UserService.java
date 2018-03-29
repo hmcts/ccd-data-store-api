@@ -44,9 +44,8 @@ public class UserService {
         CompletableFuture<IDAMProperties> idamPropsFuture = userRepository.getUserDetailsAsync();
         CompletableFuture<UserDefault> userDefaultFuture = idamPropsFuture
             .thenCompose(props -> userRepository.getUserDefaultSettingsAsync(props.getEmail()));
-        return userDefaultFuture.thenCombine(jurisdictionDefsFuture, ((userDefault, jurisdictions) -> {
-            return createUserProfile(idamPropsFuture.join(), userDefault, jurisdictions);
-        }));
+        return userDefaultFuture.thenCombine(jurisdictionDefsFuture, ((userDefault, jurisdictions) ->
+                createUserProfile(idamPropsFuture.join(), userDefault, jurisdictions)));
     }
 
     private UserProfile createUserProfile(IDAMProperties idamProperties, UserDefault userDefault, List<Jurisdiction> jurisdictions) {

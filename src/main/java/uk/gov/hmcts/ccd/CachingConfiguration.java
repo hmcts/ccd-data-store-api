@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ccd;
 
-import java.util.Optional;
-
 import com.hazelcast.config.Config;
 import com.hazelcast.config.EvictionPolicy;
 import com.hazelcast.config.MapConfig;
