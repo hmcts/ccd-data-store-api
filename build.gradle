@@ -176,7 +176,7 @@ dependencies {
     compile group: 'com.sun.mail', name: 'mailapi', version: '1.6.0'
     compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
 
-    //simplifies handling of exceptions in Java CompletableFutures
+    //simplifies handling of exceptions with Java CompletableFuture
     compile group: 'org.zalando', name: 'faux-pas', version: '0.6.0'
 
 
