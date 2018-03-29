@@ -8,6 +8,12 @@ buildscript {
     dependencies {
         classpath 'gradle.plugin.com.github.spotbugs:gradlePlugin:1.6.0'
     }
+    dependencies {
+        classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.6.2'
+    }
+    dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
+    }
 }
 
 plugins {
@@ -34,6 +40,7 @@ apply plugin: 'jacoco'
 apply plugin: 'checkstyle'
 apply plugin: 'com.github.spotbugs'
 apply plugin: 'com.github.kt3k.coveralls'
+apply plugin: 'com.jfrog.bintray'
 apply plugin: 'se.patrikerdes.use-latest-versions'
 
 dependencyUpdates.resolutionStrategy = {
@@ -557,3 +564,23 @@ def timestamp() {
 //        }
 //    }
 //}
+
+task codeCoverageReport(type: JacocoReport, dependsOn: allprojects*.test) {
+
+    // Gather execution data from all subprojects
+    // (change this if you e.g. want to calculate unit test/integration test coverage separately)
+    executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
+
+    // Add all relevant sourcesets from the subprojects
+    allprojects.each {
+        sourceSets it.sourceSets.main
+    }
+
+    reports {
+        csv.enabled = false
+        html.enabled = true
+        html.destination = file("${buildDir}/reports/jacoco/html")
+        xml.enabled = true
+        xml.destination = file("${buildDir}/reports/jacoco/jacocoTestReport.xml")
+    }
+}
