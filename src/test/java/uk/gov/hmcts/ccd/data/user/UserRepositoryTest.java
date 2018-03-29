@@ -55,8 +55,6 @@ public class UserRepositoryTest {
     @Mock
     private SecurityContext securityContext;
 
-    private JurisdictionMapper jurisdictionMapper;
-
     private UserRepository userRepository;
 
     @BeforeEach
