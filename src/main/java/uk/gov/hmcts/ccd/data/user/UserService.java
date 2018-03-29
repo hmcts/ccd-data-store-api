@@ -9,13 +9,11 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.ScopedProxyMode;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.annotation.RequestScope;
 import uk.gov.hmcts.ccd.data.casedetails.JurisdictionMapper;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserDefault;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
@@ -43,31 +41,31 @@ public class UserService {
     public CompletableFuture<UserProfile> getUserProfileAsync() {
 
         CompletableFuture<List<Jurisdiction>> jurisdictionDefsFuture = caseDefinitionRepository.getAllJurisdictionsAsync();
+        CompletableFuture<IDAMProperties> idamPropsFuture = userRepository.getUserDetailsAsync();
+        CompletableFuture<UserDefault> userDefaultFuture = idamPropsFuture
+            .thenCompose(props -> userRepository.getUserDefaultSettingsAsync(props.getEmail()));
+        return userDefaultFuture.thenCombine(jurisdictionDefsFuture, ((userDefault, jurisdictions) -> {
+            return createUserProfile(idamPropsFuture.join(), userDefault, jurisdictions);
+        }));
+    }
+
+    private UserProfile createUserProfile(IDAMProperties idamProperties, UserDefault userDefault, List<Jurisdiction> jurisdictions) {
 
         UserProfile userProfile = new UserProfile();
-        CompletableFuture<UserDefault> userDefaultFuture = userRepository.getUserDetailsAsync()
-            .thenCompose(idamProperties -> {
-                String userId = idamProperties.getEmail();
-                userProfile.getUser().setIdamProperties(idamProperties);
 
-                return userRepository.getUserDefaultSettingsAsync(userId);
-            });
+        userProfile.getUser().setIdamProperties(idamProperties);
 
-        return userDefaultFuture.thenCombine(jurisdictionDefsFuture, ((userDefault, jurisdictions) -> {
-            List<String> userJurisdictions = userDefault.getJurisdictionsId();
+        List<String> userJurisdictions = userDefault.getJurisdictionsId();
+        JurisdictionDisplayProperties[] resultJurisdictions = toResponse(userJurisdictions, jurisdictions);
+        userProfile.setJurisdictions(resultJurisdictions);
 
-            JurisdictionDisplayProperties[] resultJurisdictions = toResponse(userJurisdictions, jurisdictions);
+        WorkbasketDefault workbasketDefault = new WorkbasketDefault();
+        workbasketDefault.setJurisdictionId(userDefault.getWorkBasketDefaultJurisdiction());
+        workbasketDefault.setCaseTypeId(userDefault.getWorkBasketDefaultCaseType());
+        workbasketDefault.setStateId(userDefault.getWorkBasketDefaultState());
+        userProfile.getDefaultSettings().setWorkbasketDefault(workbasketDefault);
 
-            userProfile.setJurisdictions(resultJurisdictions);
-
-            final WorkbasketDefault workbasketDefault = new WorkbasketDefault();
-            workbasketDefault.setJurisdictionId(userDefault.getWorkBasketDefaultJurisdiction());
-            workbasketDefault.setCaseTypeId(userDefault.getWorkBasketDefaultCaseType());
-            workbasketDefault.setStateId(userDefault.getWorkBasketDefaultState());
-            userProfile.getDefaultSettings().setWorkbasketDefault(workbasketDefault);
-
-            return userProfile;
-        }));
+        return userProfile;
     }
 
     private JurisdictionDisplayProperties[] toResponse(List<String> userJurisdictions, List<Jurisdiction> jurisdictions) {
@@ -79,5 +77,4 @@ public class UserService {
             return definition.map(jurisdictionMapper::toResponse);
         }).filter(Optional::isPresent).map(Optional::get).toArray(JurisdictionDisplayProperties[]::new);
     }
-
 }
