@@ -14,7 +14,6 @@ before_install:
   | jq -r .assets[0].browser_download_url)
 script:
 - "./gradlew build"
-- "./gradlew codeCoverageReport"
 after_success:
 - java -cp ~/codacy-coverage-reporter-assembly-latest.jar com.codacy.CodacyCoverageReporter
-  -l Java -r build/reports/jacoco/jacocoTestReport.xml
+  -l Java -r build/reports/jacoco/test/jacocoTestReport.xml

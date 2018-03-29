@@ -78,7 +78,7 @@ ext {
     junitVintageVersion = '5.1.0'
     junitPlatformVersion = '1.1.0'
     hibernateVersion = '5.2.12.Final'
-    reformLogging= '2.0.1'
+    reformLogging = '2.0.2'
     swagger2Version = '2.8.0'
     limits = [
             'instruction': 84,
@@ -564,23 +564,3 @@ def timestamp() {
 //        }
 //    }
 //}
-
-task codeCoverageReport(type: JacocoReport, dependsOn: allprojects*.test) {
-
-    // Gather execution data from all subprojects
-    // (change this if you e.g. want to calculate unit test/integration test coverage separately)
-    executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
-
-    // Add all relevant sourcesets from the subprojects
-    allprojects.each {
-        sourceSets it.sourceSets.main
-    }
-
-    reports {
-        csv.enabled = false
-        html.enabled = true
-        html.destination = file("${buildDir}/reports/jacoco/html")
-        xml.enabled = true
-        xml.destination = file("${buildDir}/reports/jacoco/jacocoTestReport.xml")
-    }
-}
