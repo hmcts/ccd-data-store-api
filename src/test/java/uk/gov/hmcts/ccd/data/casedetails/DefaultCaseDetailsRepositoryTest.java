@@ -3,7 +3,9 @@ package uk.gov.hmcts.ccd.data.casedetails;
 import org.hamcrest.MatcherAssert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +13,8 @@ import uk.gov.hmcts.ccd.BaseTest;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
+import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -24,6 +28,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.when;
 
 @Transactional
 public class DefaultCaseDetailsRepositoryTest extends BaseTest {
@@ -38,6 +43,9 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
 
     private JdbcTemplate template;
 
+    @MockBean
+    private UserAuthorisation userAuthorisation;
+
     @Inject
     @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
     private CaseDetailsRepository caseDetailsRepository;
@@ -45,6 +53,8 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
     @Before
     public void setUp() {
         template = new JdbcTemplate(db);
+
+        when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.ALL);
     }
 
     @Test

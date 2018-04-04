@@ -11,11 +11,21 @@ import java.util.Optional;
 public interface CaseDetailsRepository {
     CaseDetails set(CaseDetails caseDetails);
 
+    Optional<CaseDetails> findById(String jurisdiction, Long id);
+
+    Optional<CaseDetails> findByReference(String jurisdiction, Long caseReference);
+
+    Optional<CaseDetails> findByReference(String jurisdiction, String reference);
+
+    Optional<CaseDetails> lockByReference(String jurisdiction, Long reference);
+
+    Optional<CaseDetails> lockByReference(String jurisdiction, String reference);
+
     /**
      *
      * @param id Internal case ID
      * @return Case details
-     * @deprecated Case retrieval should be done by reference. Use {@link CaseDetailsRepository#findByReference(String, Long)} instead.
+     * @deprecated Use {@link CaseDetailsRepository#findByReference(String, Long)} instead.
      */
     @Deprecated
     CaseDetails findById(Long id);
@@ -24,13 +34,18 @@ public interface CaseDetailsRepository {
      *
      * @param caseReference Public case reference
      * @return Case details
-     * @deprecated Case retrieval should be done by reference. Use {@link CaseDetailsRepository#findByReference(String, Long)} instead.
+     * @deprecated Use {@link CaseDetailsRepository#findByReference(String, Long)} instead.
      */
     @Deprecated
     CaseDetails findByReference(Long caseReference);
 
-    Optional<CaseDetails> findByReference(String jurisdictionId, Long caseReference);
-
+    /**
+     *
+     * @param caseReference Public case reference
+     * @return Case details
+     * @deprecated Use {@link CaseDetailsRepository#lockByReference(String, Long)} instead.
+     */
+    @Deprecated
     CaseDetails lockCase(Long caseReference);
 
     /**
@@ -39,7 +54,7 @@ public interface CaseDetailsRepository {
      * @param caseTypeId Case's type ID
      * @param caseReference Public case reference
      * @return Case details
-     * @deprecated Case retrieval should be done by reference. Use {@link CaseDetailsRepository#findByReference(String, Long)} instead.
+     * @deprecated Use {@link CaseDetailsRepository#findByReference(String, String)} instead.
      */
     @Deprecated
     CaseDetails findUniqueCase(String jurisdictionId,

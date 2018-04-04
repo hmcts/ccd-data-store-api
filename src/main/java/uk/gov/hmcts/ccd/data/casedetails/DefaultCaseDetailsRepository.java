@@ -5,6 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.data.casedetails.query.CaseDetailsQueryBuilder;
+import uk.gov.hmcts.ccd.data.casedetails.query.CaseDetailsQueryBuilderFactory;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.data.casedetails.search.SearchQueryFactoryOperation;
@@ -49,15 +51,18 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     private EntityManager em;
 
     private final SearchQueryFactoryOperation queryBuilder;
+    private final CaseDetailsQueryBuilderFactory queryBuilderFactory;
     private final ApplicationParams applicationParams;
 
     @Inject
     public DefaultCaseDetailsRepository(
             final CaseDetailsMapper caseDetailsMapper,
             final SearchQueryFactoryOperation queryBuilder,
+            final CaseDetailsQueryBuilderFactory queryBuilderFactory,
             final ApplicationParams applicationParams) {
         this.caseDetailsMapper = caseDetailsMapper;
         this.queryBuilder = queryBuilder;
+        this.queryBuilderFactory = queryBuilderFactory;
         this.applicationParams = applicationParams;
     }
 
@@ -78,65 +83,83 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     @Override
+    public Optional<CaseDetails> findById(String jurisdiction, Long id) {
+        return find(jurisdiction, id, null).map(this.caseDetailsMapper::entityToModel);
+    }
+
+    @Override
+    public Optional<CaseDetails> findByReference(String jurisdiction, Long caseReference) {
+        return findByReference(jurisdiction, caseReference.toString());
+    }
+
+    @Override
+    public Optional<CaseDetails> findByReference(String jurisdiction, String reference) {
+        return find(jurisdiction, null, reference).map(this.caseDetailsMapper::entityToModel);
+    }
+
+    @Override
+    public Optional<CaseDetails> lockByReference(String jurisdiction, Long reference) {
+        return lockByReference(jurisdiction, reference.toString());
+    }
+
+    @Override
+    public Optional<CaseDetails> lockByReference(String jurisdiction, String reference) {
+        return find(jurisdiction, null, reference).map(entity -> {
+            em.lock(entity, LockModeType.PESSIMISTIC_WRITE);
+            return this.caseDetailsMapper.entityToModel(entity);
+        });
+    }
+
+    /**
+     *
+     * @param id Internal case ID
+     * @return Case details if found; null otherwise
+     * @deprecated Use {@link DefaultCaseDetailsRepository#findByReference(String, Long)} instead
+     */
+    @Override
+    @Deprecated
     public CaseDetails findById(final Long id) {
-        return caseDetailsMapper.entityToModel(em.find(CaseDetailsEntity.class, id));
+        return findById(null, id).orElse(null);
     }
 
+    /**
+     *
+     * @param caseReference Public case reference
+     * @return Case details if found; null otherwise.
+     * @deprecated Use {@link DefaultCaseDetailsRepository#findByReference(String, Long)} instead
+     */
     @Override
+    @Deprecated
     public CaseDetails findByReference(final Long caseReference) {
-        final CaseDetailsEntity caseDetailsEntity = findByReference(caseReference, Optional.empty());
-        return caseDetailsMapper.entityToModel(caseDetailsEntity);
+        return findByReference(null, caseReference).orElseThrow(() -> new ResourceNotFoundException("No case found"));
     }
 
+    /**
+     *
+     * @param jurisdiction Jurisdiction's ID
+     * @param caseTypeId Case's type ID
+     * @param reference Case unique 16-digit reference
+     * @return Case details if found; null otherwise
+     * @deprecated Use {@link DefaultCaseDetailsRepository#findByReference(String, String)} instead
+     */
     @Override
-    public CaseDetails lockCase(final Long caseReference) {
-        final CaseDetailsEntity caseDetailsEntity = findByReference(caseReference, Optional.of(LockModeType.PESSIMISTIC_WRITE));
-        return caseDetailsMapper.entityToModel(caseDetailsEntity);
-    }
-
-    private CaseDetailsEntity findByReference(final Long caseReference, Optional<LockModeType> lockModeType) {
-        final TypedQuery<CaseDetailsEntity> query = em.createNamedQuery(CaseDetailsEntity.FIND_BY_REFERENCE, CaseDetailsEntity.class);
-        query.setParameter(CaseDetailsEntity.CASE_REFERENCE_PARAM, valueOf(caseReference));
-        CaseDetailsEntity caseDetailsEntity = null;
-        try {
-            caseDetailsEntity = query.getSingleResult();
-        } catch (NoResultException e) {
-            throw new ResourceNotFoundException("No case found");
-        }
-        if (caseDetailsEntity == null || caseDetailsEntity.getCaseType() == null)
-            throw new ResourceNotFoundException("No case found");
-        if (lockModeType.isPresent()) {
-            em.lock(caseDetailsEntity, lockModeType.get());
-        }
-        return caseDetailsEntity;
-    }
-
-    public Optional<CaseDetails> findByReference(String jurisdictionId, Long caseReference) {
-        final TypedQuery<CaseDetailsEntity> query = em.createNamedQuery(CaseDetailsEntity.FIND_BY_REF_AND_JURISDICTION,
-                                                                        CaseDetailsEntity.class);
-        query.setParameter(CaseDetailsEntity.JURISDICTION_ID_PARAM, jurisdictionId);
-        query.setParameter(CaseDetailsEntity.CASE_REFERENCE_PARAM, caseReference);
-
-        try {
-            final CaseDetailsEntity caseEntity = query.getSingleResult();
-            return Optional.of(caseDetailsMapper.entityToModel(caseEntity));
-        } catch (NoResultException ex) {
-            LOG.debug("Case not found for jurisdiction '{}' and reference '{}", jurisdictionId, caseReference);
-        }
-
-        return Optional.empty();
-    }
-
-    @Override
-    public CaseDetails findUniqueCase(final String jurisdictionId,
+    @Deprecated
+    public CaseDetails findUniqueCase(final String jurisdiction,
                                       final String caseTypeId,
-                                      final String caseReference) {
-        final TypedQuery<CaseDetailsEntity> query = em.createNamedQuery(CaseDetailsEntity.FIND_CASE, CaseDetailsEntity.class);
-        query.setParameter(CaseDetailsEntity.JURISDICTION_ID_PARAM, jurisdictionId);
-        query.setParameter(CaseDetailsEntity.CASE_TYPE_PARAM, caseTypeId);
-        query.setParameter(CaseDetailsEntity.CASE_REFERENCE_PARAM, valueOf(caseReference));
-        final List<CaseDetailsEntity> result = query.getResultList();
-        return result.isEmpty() ? null : caseDetailsMapper.entityToModel(result.get(0));
+                                      final String reference) {
+        return findByReference(jurisdiction, reference).orElse(null);
+    }
+
+    /**
+     *
+     * @param reference Case unique 16-digit reference
+     * @return Case details if found; throw NotFound exception otherwise
+     * @deprecated Use {@link DefaultCaseDetailsRepository#lockByReference(String, Long)} instead
+     */
+    @Override
+    @Deprecated
+    public CaseDetails lockCase(final Long reference) {
+        return lockByReference(null, reference).orElseThrow(() -> new ResourceNotFoundException("No case found"));
     }
 
     @Override
@@ -155,6 +178,27 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
         sr.setTotalResultsCount(totalResults);
         sr.setTotalPagesCount((int) Math.ceil((double) sr.getTotalResultsCount()/pageSize));
         return sr;
+    }
+
+    // TODO This accepts null values for backward compatibility. Once deprecated methods are removed, parameters should
+    // be annotated with @NotNull
+    private Optional<CaseDetailsEntity> find(String jurisdiction, Long id, String reference) {
+        final CaseDetailsQueryBuilder qb = queryBuilderFactory.create(em);
+
+        if (null != jurisdiction) {
+            qb.whereJurisdiction(jurisdiction);
+        }
+
+        if (null != reference) {
+            qb.whereReference(reference);
+        } else {
+            qb.whereId(id);
+        }
+
+        final TypedQuery<CaseDetailsEntity> query = qb.build();
+        return query.getResultList()
+                    .stream()
+                    .findFirst();
     }
 
     private Query getQuery(MetaData metadata, Map<String, String> dataSearchParams, boolean isCountQuery) {

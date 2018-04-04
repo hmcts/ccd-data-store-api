@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
@@ -22,6 +23,7 @@ class CachedCaseDetailsRepositoryTest {
 
     private final static long CASE_ID = 100000L;
     private final static long CASE_REFERENCE = 999999L;
+    private final static String CASE_REFERENCE_STR = "1234123412341236";
     private final static String JURISDICTION_ID = "JeyOne";
     private final static String CASE_TYPE_ID = "CaseTypeOne";
 
@@ -35,7 +37,8 @@ class CachedCaseDetailsRepositoryTest {
     private Map<String, String> dataSearchParams;
     private PaginatedSearchMetadata paginatedSearchMetadata;
 
-    private CachedCaseDetailsRepository classUnderTest;
+    @InjectMocks
+    private CachedCaseDetailsRepository cachedRepository;
 
     @BeforeEach
     void setUp() {
@@ -56,8 +59,6 @@ class CachedCaseDetailsRepositoryTest {
         dataSearchParams = new HashMap<>();
 
         paginatedSearchMetadata = new PaginatedSearchMetadata();
-
-        classUnderTest = new CachedCaseDetailsRepository(caseDetailsRepository);
     }
 
     @Test
@@ -65,7 +66,7 @@ class CachedCaseDetailsRepositoryTest {
     void set() {
         doReturn(caseDetails).when(caseDetailsRepository).set(caseDetails);
 
-        CaseDetails returned = classUnderTest.set(caseDetails);
+        CaseDetails returned = cachedRepository.set(caseDetails);
 
         assertAll(
             () -> assertThat(returned, is(caseDetails)),
@@ -78,7 +79,7 @@ class CachedCaseDetailsRepositoryTest {
     void lockCase() {
         doReturn(caseDetails).when(caseDetailsRepository).lockCase(CASE_REFERENCE);
 
-        CaseDetails returned = classUnderTest.lockCase(CASE_REFERENCE);
+        CaseDetails returned = cachedRepository.lockCase(CASE_REFERENCE);
 
         assertAll(
             () -> assertThat(returned, is(caseDetails)),
@@ -94,9 +95,9 @@ class CachedCaseDetailsRepositoryTest {
         @DisplayName("should initially retrieve paginated search metadata from decorated repository")
         void getPaginatedSearchMetaData() {
             doReturn(paginatedSearchMetadata).when(caseDetailsRepository).getPaginatedSearchMetadata(metaData,
-                dataSearchParams);
+                                                                                                     dataSearchParams);
 
-            PaginatedSearchMetadata returned = classUnderTest.getPaginatedSearchMetadata(metaData, dataSearchParams);
+            PaginatedSearchMetadata returned = cachedRepository.getPaginatedSearchMetadata(metaData, dataSearchParams);
 
             assertAll(
                 () -> assertThat(returned, is(paginatedSearchMetadata)),
@@ -108,16 +109,16 @@ class CachedCaseDetailsRepositoryTest {
         @DisplayName("should cache paginated search metadata for subsequent calls")
         void getPaginatedSearchMetaDataAgain() {
             doReturn(paginatedSearchMetadata).when(caseDetailsRepository).getPaginatedSearchMetadata(metaData,
-                dataSearchParams);
+                                                                                                     dataSearchParams);
 
-            classUnderTest.getPaginatedSearchMetadata(metaData, dataSearchParams);
+            cachedRepository.getPaginatedSearchMetadata(metaData, dataSearchParams);
 
             verify(caseDetailsRepository, times(1)).getPaginatedSearchMetadata(metaData, dataSearchParams);
 
             PaginatedSearchMetadata newPaginatedSearchMetadata = new PaginatedSearchMetadata();
             doReturn(newPaginatedSearchMetadata).when(caseDetailsRepository).getPaginatedSearchMetadata(metaData,
-                dataSearchParams);
-            PaginatedSearchMetadata returned = classUnderTest.getPaginatedSearchMetadata(metaData, dataSearchParams);
+                                                                                                        dataSearchParams);
+            PaginatedSearchMetadata returned = cachedRepository.getPaginatedSearchMetadata(metaData, dataSearchParams);
 
             assertAll(
                 () -> assertThat(returned, is(paginatedSearchMetadata)),
@@ -133,9 +134,9 @@ class CachedCaseDetailsRepositoryTest {
         @DisplayName("should initially retrieve case details list from decorated repository")
         void findByMetaDataAndFieldData() {
             doReturn(caseDetailsList).when(caseDetailsRepository).findByMetaDataAndFieldData(metaData,
-                dataSearchParams);
+                                                                                             dataSearchParams);
 
-            List<CaseDetails> returned = classUnderTest.findByMetaDataAndFieldData(metaData, dataSearchParams);
+            List<CaseDetails> returned = cachedRepository.findByMetaDataAndFieldData(metaData, dataSearchParams);
 
             assertAll(
                 () -> assertThat(returned, is(caseDetailsList)),
@@ -147,16 +148,16 @@ class CachedCaseDetailsRepositoryTest {
         @DisplayName("should cache case details list for subsequent calls")
         void findByMetaDataAndFieldDataAgain() {
             doReturn(caseDetailsList).when(caseDetailsRepository).findByMetaDataAndFieldData(metaData,
-                dataSearchParams);
+                                                                                             dataSearchParams);
 
-            classUnderTest.findByMetaDataAndFieldData(metaData, dataSearchParams);
+            cachedRepository.findByMetaDataAndFieldData(metaData, dataSearchParams);
 
             verify(caseDetailsRepository, times(1)).findByMetaDataAndFieldData(metaData, dataSearchParams);
 
             List<CaseDetails> newCaseDetailsList = Arrays.asList(new CaseDetails(), new CaseDetails());
             doReturn(newCaseDetailsList).when(caseDetailsRepository).findByMetaDataAndFieldData(metaData,
-                dataSearchParams);
-            List<CaseDetails> returned = classUnderTest.findByMetaDataAndFieldData(metaData, dataSearchParams);
+                                                                                                dataSearchParams);
+            List<CaseDetails> returned = cachedRepository.findByMetaDataAndFieldData(metaData, dataSearchParams);
 
             assertAll(
                 () -> assertThat(returned, is(caseDetailsList)),
@@ -174,7 +175,7 @@ class CachedCaseDetailsRepositoryTest {
             doReturn(caseDetails).when(caseDetailsRepository).findUniqueCase(JURISDICTION_ID, CASE_TYPE_ID, valueOf
                 (CASE_REFERENCE));
 
-            CaseDetails returned = classUnderTest.findUniqueCase(JURISDICTION_ID, CASE_TYPE_ID, valueOf
+            CaseDetails returned = cachedRepository.findUniqueCase(JURISDICTION_ID, CASE_TYPE_ID, valueOf
                 (CASE_REFERENCE));
 
             assertAll(
@@ -190,15 +191,15 @@ class CachedCaseDetailsRepositoryTest {
             doReturn(caseDetails).when(caseDetailsRepository).findUniqueCase(JURISDICTION_ID, CASE_TYPE_ID, valueOf
                 (CASE_REFERENCE));
 
-            classUnderTest.findUniqueCase(JURISDICTION_ID, CASE_TYPE_ID, valueOf(CASE_REFERENCE));
+            cachedRepository.findUniqueCase(JURISDICTION_ID, CASE_TYPE_ID, valueOf(CASE_REFERENCE));
 
             verify(caseDetailsRepository, times(1)).findUniqueCase(JURISDICTION_ID, CASE_TYPE_ID, valueOf
                 (CASE_REFERENCE));
 
             doReturn(new CaseDetails()).when(caseDetailsRepository).findUniqueCase(JURISDICTION_ID, CASE_TYPE_ID,
-                valueOf
-                    (CASE_REFERENCE));
-            CaseDetails returned = classUnderTest.findUniqueCase(JURISDICTION_ID, CASE_TYPE_ID, valueOf
+                                                                                   valueOf
+                                                                                       (CASE_REFERENCE));
+            CaseDetails returned = cachedRepository.findUniqueCase(JURISDICTION_ID, CASE_TYPE_ID, valueOf
                 (CASE_REFERENCE));
 
             assertAll(
@@ -216,7 +217,7 @@ class CachedCaseDetailsRepositoryTest {
         void findByReference() {
             doReturn(caseDetails).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
 
-            CaseDetails returned = classUnderTest.findByReference(CASE_REFERENCE);
+            CaseDetails returned = cachedRepository.findByReference(CASE_REFERENCE);
 
             assertAll(
                 () -> assertThat(returned, is(caseDetails)),
@@ -229,12 +230,12 @@ class CachedCaseDetailsRepositoryTest {
         void findByReferenceAgain() {
             doReturn(caseDetails).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
 
-            classUnderTest.findByReference(CASE_REFERENCE);
+            cachedRepository.findByReference(CASE_REFERENCE);
 
             verify(caseDetailsRepository, times(1)).findByReference(CASE_REFERENCE);
 
             doReturn(new CaseDetails()).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
-            CaseDetails returned = classUnderTest.findByReference(CASE_REFERENCE);
+            CaseDetails returned = cachedRepository.findByReference(CASE_REFERENCE);
 
             assertAll(
                 () -> assertThat(returned, is(caseDetails)),
@@ -252,7 +253,7 @@ class CachedCaseDetailsRepositoryTest {
         void findById() {
             doReturn(caseDetails).when(caseDetailsRepository).findById(CASE_ID);
 
-            CaseDetails returned = classUnderTest.findById(CASE_ID);
+            CaseDetails returned = cachedRepository.findById(CASE_ID);
 
             assertAll(
                 () -> assertThat(returned, is(caseDetails)),
@@ -265,16 +266,117 @@ class CachedCaseDetailsRepositoryTest {
         void findByIdAgain() {
             doReturn(caseDetails).when(caseDetailsRepository).findById(CASE_ID);
 
-            classUnderTest.findById(CASE_ID);
+            cachedRepository.findById(CASE_ID);
 
             verify(caseDetailsRepository, times(1)).findById(CASE_ID);
 
             doReturn(new CaseDetails()).when(caseDetailsRepository).findById(CASE_ID);
-            CaseDetails returned = classUnderTest.findById(CASE_ID);
+            CaseDetails returned = cachedRepository.findById(CASE_ID);
 
             assertAll(
                 () -> assertThat(returned, is(caseDetails)),
                 () -> verifyNoMoreInteractions(caseDetailsRepository)
+            );
+        }
+    }
+
+    @Nested
+    @DisplayName("findById(String, Long)")
+    class findByIdWithJurisdiction {
+        @Test
+        @DisplayName("should initially retrieve case details from decorated repository")
+        void findById() {
+            doReturn(Optional.of(caseDetails)).when(caseDetailsRepository)
+                                              .findById(JURISDICTION_ID, CASE_ID);
+
+            final CaseDetails returned = cachedRepository.findById(JURISDICTION_ID, CASE_ID)
+                                                         .orElseThrow(() -> new AssertionError("Not found"));
+
+            assertAll(
+                () -> assertThat(returned, is(caseDetails)),
+                () -> verify(caseDetailsRepository, times(1)).findById(JURISDICTION_ID, CASE_ID)
+            );
+        }
+
+        @Test
+        @DisplayName("should cache case details for subsequent calls")
+        void findByIdAgain() {
+            doReturn(Optional.of(caseDetails)).when(caseDetailsRepository)
+                                              .findById(JURISDICTION_ID, CASE_ID);
+
+            cachedRepository.findById(JURISDICTION_ID, CASE_ID);
+
+            verify(caseDetailsRepository, times(1)).findById(JURISDICTION_ID, CASE_ID);
+
+            doReturn(Optional.of(new CaseDetails())).when(caseDetailsRepository)
+                                                    .findById(JURISDICTION_ID, CASE_ID);
+
+            final CaseDetails returned = cachedRepository.findById(JURISDICTION_ID, CASE_ID)
+                                                         .orElseThrow(() -> new AssertionError("Not found"));
+
+            assertAll(
+                () -> assertThat(returned, is(caseDetails)),
+                () -> verifyNoMoreInteractions(caseDetailsRepository)
+            );
+        }
+    }
+
+    @Nested
+    @DisplayName("findByReference(String, String)")
+    class findByReferenceAsString {
+        @Test
+        @DisplayName("should initially retrieve case details from decorated repository")
+        void findByReference() {
+            doReturn(Optional.of(caseDetails)).when(caseDetailsRepository)
+                                              .findByReference(JURISDICTION_ID, CASE_REFERENCE_STR);
+
+            final CaseDetails returned = cachedRepository.findByReference(JURISDICTION_ID, CASE_REFERENCE_STR)
+                                                         .orElseThrow(() -> new AssertionError("Not found"));
+
+            assertAll(
+                () -> assertThat(returned, is(caseDetails)),
+                () -> verify(caseDetailsRepository, times(1)).findByReference(JURISDICTION_ID, CASE_REFERENCE_STR)
+            );
+        }
+
+        @Test
+        @DisplayName("should cache case details for subsequent calls")
+        void findByReferenceAgain() {
+            doReturn(Optional.of(caseDetails)).when(caseDetailsRepository)
+                                              .findByReference(JURISDICTION_ID, CASE_REFERENCE_STR);
+
+            cachedRepository.findByReference(JURISDICTION_ID, CASE_REFERENCE_STR);
+
+            verify(caseDetailsRepository, times(1)).findByReference(JURISDICTION_ID, CASE_REFERENCE_STR);
+
+            doReturn(Optional.of(new CaseDetails())).when(caseDetailsRepository)
+                                                    .findByReference(JURISDICTION_ID, CASE_REFERENCE_STR);
+
+            final CaseDetails returned = cachedRepository.findByReference(JURISDICTION_ID, CASE_REFERENCE_STR)
+                                                         .orElseThrow(() -> new AssertionError("Not found"));
+
+            assertAll(
+                () -> assertThat(returned, is(caseDetails)),
+                () -> verifyNoMoreInteractions(caseDetailsRepository)
+            );
+        }
+    }
+
+    @Nested
+    @DisplayName("lockByReference(String, String)")
+    class lockByReferenceAsString {
+        @Test
+        @DisplayName("should delegate to decorated repository")
+        void findByReference() {
+            doReturn(Optional.of(caseDetails)).when(caseDetailsRepository)
+                                              .lockByReference(JURISDICTION_ID, CASE_REFERENCE_STR);
+
+            final CaseDetails returned = cachedRepository.lockByReference(JURISDICTION_ID, CASE_REFERENCE_STR)
+                                                         .orElseThrow(() -> new AssertionError("Not found"));
+
+            assertAll(
+                () -> assertThat(returned, is(caseDetails)),
+                () -> verify(caseDetailsRepository, times(1)).lockByReference(JURISDICTION_ID, CASE_REFERENCE_STR)
             );
         }
     }
