@@ -15,7 +15,7 @@ class UserAuthorisationSecurity {
         this.userAuthorisation = userAuthorisation;
     }
 
-    CaseDetailsQueryBuilder secure(CaseDetailsQueryBuilder builder) {
+    <T> CaseDetailsQueryBuilder<T> secure(CaseDetailsQueryBuilder<T> builder) {
         if (AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
             builder.whereGrantedAccessOnly(userAuthorisation.getUserId());
         }

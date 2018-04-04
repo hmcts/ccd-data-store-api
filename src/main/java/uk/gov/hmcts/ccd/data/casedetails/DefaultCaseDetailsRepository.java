@@ -18,18 +18,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.persistence.*;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.Long.valueOf;
@@ -183,7 +177,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     // TODO This accepts null values for backward compatibility. Once deprecated methods are removed, parameters should
     // be annotated with @NotNull
     private Optional<CaseDetailsEntity> find(String jurisdiction, Long id, String reference) {
-        final CaseDetailsQueryBuilder qb = queryBuilderFactory.create(em);
+        final CaseDetailsQueryBuilder qb = queryBuilderFactory.select(em);
 
         if (null != jurisdiction) {
             qb.whereJurisdiction(jurisdiction);
@@ -217,46 +211,16 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     private Query getCountQueryByMetaData(MetaData metadata) {
-        CriteriaBuilder qb = em.getCriteriaBuilder();
-        CriteriaQuery<Long> cq = qb.createQuery(Long.class);
-        Root<CaseDetailsEntity> cd = cq.from(CaseDetailsEntity.class);
-        List<Optional<Predicate>> predicatesOpt = getPredicates(metadata, qb, cd);
-
-        cq.select(qb.count(cd)).where(qb.and(toArray(predicatesOpt)));
-
-        return em.createQuery(cq);
+        return queryBuilderFactory.count(em)
+                                  .whereMetadata(metadata)
+                                  .build();
     }
 
     private Query getQueryByMetaData(MetaData metadata) {
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<CaseDetailsEntity> q = cb.createQuery(CaseDetailsEntity.class);
-        Root<CaseDetailsEntity> cd = q.from(CaseDetailsEntity.class);
-        List<Optional<Predicate>> predicatesOpt = getPredicates(metadata, cb, cd);
-
-        q.select(cd)
-                .orderBy(cb.asc(cd.get(CREATED_DATE)))
-                .where(cb.and(toArray(predicatesOpt)));
-
-        return em.createQuery(q);
-    }
-
-    private List<Optional<Predicate>> getPredicates(MetaData metadata, CriteriaBuilder cb, Root<CaseDetailsEntity> cd) {
-        Optional<Predicate> eqJurisdiction = Optional.of(cb.equal(cd.get("jurisdiction"), metadata.getJurisdiction()));
-        Optional<Predicate> eqCaseType = Optional.of(cb.equal(cd.get("caseType"), metadata.getCaseTypeId()));
-        Optional<Predicate> eqState = metadata.getState().map(s -> cb.equal(cd.get("state"), s));
-        Optional<Predicate> eqReference = metadata.getCaseReference().map(cr -> cb.equal(cd.get("reference"), cr));
-        Optional<Predicate> eqCreatedDate = metadata.getCreatedDate().map(crDt -> cb.and(
-                cb.greaterThanOrEqualTo((cd.get(CREATED_DATE)), atStartOfDay(crDt)),
-                cb.lessThan((cd.get(CREATED_DATE)), atBeginningOfNextDay(crDt)))
-        );
-        Optional<Predicate> eqLastModified = metadata.getLastModified().map(crDt -> cb.and(
-                cb.greaterThanOrEqualTo((cd.get(LAST_MODIFIED)), atStartOfDay(crDt)),
-                cb.lessThan((cd.get(LAST_MODIFIED)), atBeginningOfNextDay(crDt)))
-        );
-        Optional<Predicate> eqSecurityClassification = metadata.getSecurityClassification().map(sc -> cb.equal(cd.get("securityClassification"), SecurityClassification.valueOf(sc.toUpperCase())));
-
-        return newArrayList(eqJurisdiction, eqCaseType, eqState, eqReference,
-                eqCreatedDate, eqLastModified, eqSecurityClassification);
+        return queryBuilderFactory.select(em)
+                                  .whereMetadata(metadata)
+                                  .orderByCreatedDate()
+                                  .build();
     }
 
     private void paginate(Query query, Optional<String> pageOpt) {
@@ -265,18 +229,5 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
         int firstResult = (page - 1) * pageSize;
         query.setFirstResult(firstResult);
         query.setMaxResults(pageSize);
-    }
-
-    private LocalDateTime atBeginningOfNextDay(String date) {
-        return LocalDate.parse(date).plusDays(1).atStartOfDay();
-    }
-
-    private LocalDateTime atStartOfDay(String date) {
-        return LocalDate.parse(date).atStartOfDay();
-    }
-
-    private Predicate[] toArray(List<Optional<Predicate>> predicatesOpt) {
-        List<Predicate> predicates = predicatesOpt.stream().filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
-        return predicates.toArray(new Predicate[predicates.size()]);
     }
 }

@@ -2,26 +2,33 @@ package uk.gov.hmcts.ccd.data.casedetails.query;
 
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserEntity;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
+import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-public class CaseDetailsQueryBuilder {
+public abstract class CaseDetailsQueryBuilder<T> {
 
-    private final EntityManager em;
-    private final CriteriaBuilder cb;
-    private final CriteriaQuery<CaseDetailsEntity> query;
-    private final Root<CaseDetailsEntity> root;
-    private final ArrayList<Predicate> predicates;
+    protected final EntityManager em;
+    protected final CriteriaBuilder cb;
+    protected final CriteriaQuery<T> query;
+    protected final Root<CaseDetailsEntity> root;
+    protected final ArrayList<Predicate> predicates;
+    protected final ArrayList<Order> orders;
 
     CaseDetailsQueryBuilder(EntityManager em) {
         this.em = em;
         cb = em.getCriteriaBuilder();
-        query = cb.createQuery(CaseDetailsEntity.class);
+        query = createQuery();
         root = query.from(CaseDetailsEntity.class);
         predicates = new ArrayList<>();
+        orders = new ArrayList<>();
+
     }
 
     public CaseDetailsQueryBuilder whereGrantedAccessOnly(String userId) {
@@ -53,8 +60,72 @@ public class CaseDetailsQueryBuilder {
         return this;
     }
 
-    public TypedQuery<CaseDetailsEntity> build() {
-        return em.createQuery(query.select(root)
-                                   .where(predicates.toArray(new Predicate[]{})));
+    public CaseDetailsQueryBuilder whereCaseType(String caseType) {
+        predicates.add(cb.equal(root.get("caseType"), caseType));
+
+        return this;
+    }
+
+    public CaseDetailsQueryBuilder whereState(String state) {
+        predicates.add(cb.equal(root.get("state"), state));
+
+        return this;
+    }
+
+    public CaseDetailsQueryBuilder whereCreatedDate(String createdDate) {
+        predicates.add(whereDate(root.get("createdDate"), createdDate));
+
+        return this;
+    }
+
+    public CaseDetailsQueryBuilder whereLastModified(String lastModified) {
+        predicates.add(whereDate(root.get("lastModified"), lastModified));
+
+        return this;
+    }
+
+    public CaseDetailsQueryBuilder whereSecurityClassification(String rawClassification) {
+        final SecurityClassification securityClassification = SecurityClassification.valueOf(rawClassification.toUpperCase());
+        predicates.add(cb.equal(root.get("securityClassification"), securityClassification));
+
+        return this;
+    }
+
+    public CaseDetailsQueryBuilder whereMetadata(MetaData metadata) {
+        whereJurisdiction(metadata.getJurisdiction());
+        whereCaseType(metadata.getCaseTypeId());
+
+        metadata.getState().map(this::whereState);
+        metadata.getCaseReference().map(this::whereReference);
+        metadata.getCreatedDate().map(this::whereCreatedDate);
+        metadata.getLastModified().map(this::whereLastModified);
+        metadata.getSecurityClassification().map(this::whereSecurityClassification);
+
+        return this;
+    }
+
+    public CaseDetailsQueryBuilder orderByCreatedDate() {
+        orders.add(cb.asc(root.get("createdDate")));
+
+        return this;
+    }
+
+    public abstract TypedQuery<T> build();
+
+    protected abstract CriteriaQuery<T> createQuery();
+
+    private Predicate whereDate(Path<LocalDateTime> field, String value) {
+        return cb.and(
+            cb.greaterThanOrEqualTo((field), atStartOfDay(value)),
+            cb.lessThan((field), atBeginningOfNextDay(value))
+        );
+    }
+
+    private LocalDateTime atBeginningOfNextDay(String date) {
+        return LocalDate.parse(date).plusDays(1).atStartOfDay();
+    }
+
+    private LocalDateTime atStartOfDay(String date) {
+        return LocalDate.parse(date).atStartOfDay();
     }
 }

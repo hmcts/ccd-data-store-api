@@ -8,7 +8,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
 
@@ -18,7 +17,6 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.any;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -65,7 +63,7 @@ class CaseDetailsQueryBuilderFactoryTest {
         @Test
         @DisplayName("should secure new builder instance with user authorisation")
         void secureNewInstance() {
-            final CaseDetailsQueryBuilder queryBuilder = factory.create(em);
+            final CaseDetailsQueryBuilder queryBuilder = factory.select(em);
 
             assertAll(
                 () -> assertThat(queryBuilder, is(notNullValue())),
