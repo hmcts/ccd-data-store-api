@@ -83,6 +83,33 @@ public class CallbackServiceTest {
     }
 
     @Test
+    public void shouldRetryIfCallbackRespondsLate() throws Exception {
+        final String testUrl = "http://localhost:" + mockCallbackServer.port() + "/test-callback";
+
+        final CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setState("test state");
+        caseDetails.setCaseTypeId("test case type");
+
+        final CaseEvent caseEvent = new CaseEvent();
+        caseEvent.setId("TEST-EVENT");
+
+        final CallbackResponse callbackResponse = new CallbackResponse();
+        callbackResponse.setData(caseDetails.getData());
+
+        mockCallbackServer.stubFor(post(urlMatching("/test-callback.*"))
+            .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200).withFixedDelay(1500)));
+
+        long startTime = System.nanoTime();
+        final Optional<CallbackResponse> result = callbackService.send(testUrl, null, caseEvent, caseDetails);
+        long endTime = System.nanoTime();
+
+        long duration = (endTime - startTime);
+        final CallbackResponse response = result.orElseThrow(() -> new AssertionError("Missing result"));
+        assertTrue(duration/1000000 > 2500);
+        assertTrue(response.getErrors().isEmpty());
+    }
+
+    @Test
     public void failurePathWithErrors() throws Exception {
         final String testUrl = "http://localhost:" + mockCallbackServer.port() + "/test-callback";
 
