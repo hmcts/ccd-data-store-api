@@ -105,7 +105,8 @@ public class CallbackServiceTest {
 
         long duration = (endTime - startTime);
         final CallbackResponse response = result.orElseThrow(() -> new AssertionError("Missing result"));
-        assertTrue(duration/1000000 > 2500);
+        verify(exactly(2), postRequestedFor(urlMatching("/test-callback.*")));
+        assertTrue(duration/1_000_000 > 2500);
         assertTrue(response.getErrors().isEmpty());
     }
 
