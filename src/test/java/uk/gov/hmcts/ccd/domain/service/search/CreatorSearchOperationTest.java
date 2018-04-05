@@ -2,10 +2,10 @@ package uk.gov.hmcts.ccd.domain.service.search;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
-import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.mockito.ArgumentMatcher;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -118,18 +118,12 @@ public class CreatorSearchOperationTest {
 
     }
 
-    private Matcher<CaseDetails> matchesCaseIn(final List<CaseDetails> candidatesToMatch) {
+    private ArgumentMatcher<CaseDetails> matchesCaseIn(final List<CaseDetails> candidatesToMatch) {
 
-        return new BaseMatcher<CaseDetails>() {
+        return new ArgumentMatcher<CaseDetails>() {
             @Override
-            public boolean matches(Object o) {
-                return o instanceof CaseDetails
-                    && candidatesToMatch.contains(o);
-            }
-
-            @Override
-            public void describeTo(Description description) {
-
+            public boolean matches(CaseDetails argument) {
+                    return candidatesToMatch.contains(argument);
             }
         };
     }

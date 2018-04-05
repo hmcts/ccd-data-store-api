@@ -1,4 +1,4 @@
-# case-data-store-app
+# case-data-store-app [![Build Status](https://travis-ci.org/hmcts/ccd-data-store-api.svg?branch=master)](https://travis-ci.org/hmcts/ccd-data-store-api)
 Store/search cases and provide workbaskets
 
 ### Prerequisites
