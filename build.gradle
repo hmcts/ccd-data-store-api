@@ -202,7 +202,7 @@ dependencies {
     testCompile "org.junit.platform:junit-platform-runner:${junitPlatformVersion}"
     testRuntime "org.junit.platform:junit-platform-launcher:${junitPlatformVersion}"
     testRuntime "org.junit.vintage:junit-vintage-engine:${junitVintageVersion}"
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '2.17.0'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '1.10.19'
     testCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.0.7'
     testCompile group: 'com.xebialabs.restito', name: 'restito', version: '0.9.3'
     testCompile 'io.github.openfeign:feign-jackson:9.6.0'
