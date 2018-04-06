@@ -83,10 +83,8 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
     public void findByIdShouldReturnCorrectSingleRecord() {
-        // Check that we have the expected test data set size, this is to ensure
-        // that state filtering is correct
-        final List<CaseDetails> resultList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect data initiation", 15, resultList.size());
+        assumeDataInitialised();
+
         final CaseDetails byId = caseDetailsRepository.findById(1L);
         assertAll(
             () -> assertThat(byId.getId(), is(1L)),
@@ -106,10 +104,8 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
     public void findByReferenceShouldReturnCorrectSingleRecord() {
-        // Check that we have the expected test data set size, this is to ensure
-        // that state filtering is correct
-        final List<CaseDetails> resultList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect data initiation", 15, resultList.size());
+        assumeDataInitialised();
+
         final CaseDetails byReference = caseDetailsRepository.findByReference(1504259907353529L);
         assertAll(
             () -> assertThat(byReference.getId(), is(1L)),
@@ -129,17 +125,15 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
     public void getfindByMetadataAndFieldDataReturnCorrectRecords() {
-        // Check that we have the expected test data set size, this is to ensure
-        // that state filtering is correct
-        final List<CaseDetails> resultList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect data initiation", 15, resultList.size());
+        assumeDataInitialised();
+
         MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
         HashMap<String, String> searchParams = new HashMap<>();
         searchParams.put("PersonFirstName", "Janet");
         final List<CaseDetails> byMetaDataAndFieldData = caseDetailsRepository.findByMetaDataAndFieldData(metadata,
                                                                                                           searchParams);
         assertAll(
-            () -> assertThat(byMetaDataAndFieldData.size(), is(1)),
+            () -> assertThat(byMetaDataAndFieldData.size(), is(2)),
             () -> assertThat(byMetaDataAndFieldData.get(0).getId(), is(1L)),
             () -> assertThat(byMetaDataAndFieldData.get(0).getJurisdiction(), is("PROBATE")),
             () -> assertThat(byMetaDataAndFieldData.get(0).getState(), is("CaseCreated")),
@@ -158,35 +152,84 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
     public void getPaginatedSearchMetadataShouldReturnPaginationInfoWhenSearchedWithMetadata() {
-        // Check that we have the expected test data set size, this is to ensure
-        // that state filtering is correct
-        final List<CaseDetails> resultList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect data initiation", 15, resultList.size());
+        assumeDataInitialised();
+
         MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
         metadata.setState(Optional.of("CaseCreated"));
         final PaginatedSearchMetadata paginatedSearchMetadata = caseDetailsRepository.getPaginatedSearchMetadata(metadata,
-                                                                                                                 new HashMap<String, String>());
+                                                                                                                 new HashMap<>());
         assertAll(
-            () -> assertThat(paginatedSearchMetadata.getTotalResultsCount(), is(4)),
-            () -> assertThat(paginatedSearchMetadata.getTotalPagesCount(), is(2))
+            () -> assertThat(paginatedSearchMetadata.getTotalResultsCount(), is(5)),
+            () -> assertThat(paginatedSearchMetadata.getTotalPagesCount(), is(3))
         );
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
     public void getPaginatedSearchMetadataShouldReturnPaginationInfoWhenSearchedWithSearchParams() {
-        // Check that we have the expected test data set size, this is to ensure
-        // that state filtering is correct
-        final List<CaseDetails> resultList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect data initiation", 15, resultList.size());
+        assumeDataInitialised();
+
         MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
         HashMap<String, String> searchParams = new HashMap<>();
         searchParams.put("PersonFirstName", "Janet");
         final PaginatedSearchMetadata paginatedSearchMetadata = caseDetailsRepository.getPaginatedSearchMetadata(metadata,
                                                                                                                  searchParams);
         assertAll(
-            () -> assertThat(paginatedSearchMetadata.getTotalResultsCount(), is(1)),
+            () -> assertThat(paginatedSearchMetadata.getTotalResultsCount(), is(2)),
             () -> assertThat(paginatedSearchMetadata.getTotalPagesCount(), is(1))
+        );
+    }
+
+    private void assumeDataInitialised() {
+        // Check that we have the expected test data set size, this is to ensure
+        // that state filtering is correct
+        final List<CaseDetails> resultList = template.query("SELECT * FROM case_data", this::mapCaseData);
+        assertEquals("Incorrect data initiation", 16, resultList.size());
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
+    public void searchWithParams_withAccessLevelAll() {
+        MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
+        HashMap<String, String> searchParams = new HashMap<>();
+        searchParams.put("PersonFirstName", "Janet");
+
+        final List<CaseDetails> results = caseDetailsRepository.findByMetaDataAndFieldData(metadata,searchParams);
+
+        assertAll(
+            () -> assertThat(results, hasSize(2)),
+            () -> assertThat(results, hasItem(allOf(
+                hasProperty("id", equalTo(1L)),
+                hasProperty("reference", equalTo(1504259907353529L))
+            ))),
+            () -> assertThat(results, hasItem(allOf(
+                hasProperty("id", equalTo(16L)),
+                hasProperty("reference", equalTo(1504254784737847L))
+            )))
+        );
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {
+        "classpath:sql/insert_cases.sql",
+        "classpath:sql/insert_case_users.sql"
+    })
+    public void searchWithParams_withAccessLevelGranted() {
+        when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.GRANTED);
+        when(userAuthorisation.getUserId()).thenReturn("1");
+
+        MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
+        HashMap<String, String> searchParams = new HashMap<>();
+        searchParams.put("PersonFirstName", "Janet");
+
+        final List<CaseDetails> results = caseDetailsRepository.findByMetaDataAndFieldData(metadata,searchParams);
+
+        assertAll(
+            () -> assertThat(results, hasSize(1)),
+            () -> assertThat(results, hasItem(allOf(
+                hasProperty("id", equalTo(16L)),
+                hasProperty("reference", equalTo(1504254784737847L))
+            )))
         );
     }
 
