@@ -1215,7 +1215,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").toString());
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 15, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> CASE_REFERENCE.equals(c.getReference().toString()))
@@ -1298,7 +1298,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").toString());
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 15, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> CASE_REFERENCE.equals(c.getReference().toString()))
@@ -1395,7 +1395,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").toString());
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 15, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> caseReference.equals(c.getReference().toString()))
@@ -1468,7 +1468,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").toString());
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 15, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> caseReference.equals(c.getReference().toString()))
@@ -1542,7 +1542,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").toString());
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 15, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> caseReference.equals(c.getReference().toString()))
@@ -1616,7 +1616,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").toString());
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 15, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> caseReference.equals(c.getReference().toString()))
@@ -1760,7 +1760,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 15, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> CASE_REFERENCE.equals(c.getReference().toString()))
@@ -1799,7 +1799,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 15, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> CASE_REFERENCE.equals(c.getReference().toString()))
@@ -1837,7 +1837,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 15, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> CASE_REFERENCE.equals(c.getReference().toString()))
@@ -1874,7 +1874,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 15, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> CASE_REFERENCE.equals(c.getReference().toString()))
@@ -1914,7 +1914,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 15, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> CASE_REFERENCE.equals(c.getReference().toString()))
@@ -1954,7 +1954,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 15, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> CASE_REFERENCE.equals(c.getReference().toString()))
@@ -1994,7 +1994,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 15, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> CASE_REFERENCE.equals(c.getReference().toString()))
@@ -2034,7 +2034,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 15, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> CASE_REFERENCE.equals(c.getReference().toString()))
@@ -2074,7 +2074,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 15, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> CASE_REFERENCE.equals(c.getReference().toString()))
@@ -2114,7 +2114,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 15, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> CASE_REFERENCE.equals(c.getReference().toString()))
@@ -2147,7 +2147,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 15, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> CASE_REFERENCE.equals(c.getReference().toString()))
@@ -2180,7 +2180,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 15, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> CASE_REFERENCE.equals(c.getReference().toString()))
@@ -2347,7 +2347,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andReturn();
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 15, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> CASE_REFERENCE.equals(c.getReference().toString()))
@@ -2404,7 +2404,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andReturn();
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 15, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> CASE_REFERENCE.equals(c.getReference().toString()))
@@ -3228,7 +3228,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").toString());
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 15, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> CASE_REFERENCE.equals(c.getReference().toString()))
@@ -3315,7 +3315,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").toString());
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 15, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> CASE_REFERENCE.equals(c.getReference().toString()))
@@ -3545,7 +3545,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         String responseAsString = result.getResponse().getContentAsString();
         List<CaseDetails> caseDetails = Arrays.asList(mapper.readValue(responseAsString, CaseDetails[].class));
 
-        assertThat(caseDetails, hasSize(1));
+        assertThat(caseDetails, hasSize(2));
         assertThat(result.getResponse().getContentAsString(), containsString(TEST_JURISDICTION));
         assertThat(result.getResponse().getContentAsString(), containsString(TEST_CASE_TYPE));
         assertThat(result.getResponse().getContentAsString(), containsString(TEST_STATE));
@@ -3899,7 +3899,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         responseAsString = result.getResponse().getContentAsString();
         List<CaseDetails> caseDetailsPage4 = Arrays.asList(mapper.readValue(responseAsString, CaseDetails[].class));
-        assertThat(caseDetailsPage4, hasSize(0));
+        assertThat(caseDetailsPage4, hasSize(1));
 
         Set<Long> references = allPages.stream().map(cd -> cd.getReference()).collect(Collectors.toSet());
         assertThat(references, hasSize(5)); //TODO RDM-1455 due to filtering being applied after pagination, to be fixed after EL implementation
@@ -3922,8 +3922,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         String responseAsString = result.getResponse().getContentAsString();
         PaginatedSearchMetadata metadata = mapper.readValue(responseAsString, PaginatedSearchMetadata.class);
 
-        assertThat(metadata.getTotalPagesCount(), is(3));
-        assertThat(metadata.getTotalResultsCount(), is(6));
+        assertThat(metadata.getTotalPagesCount(), is(4));
+        assertThat(metadata.getTotalResultsCount(), is(7));
 
         result = mockMvc.perform(get(GET_PAGINATED_SEARCH_METADATA)
                 .contentType(JSON_CONTENT_TYPE)
@@ -4011,7 +4011,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
      */
     private void assertCaseDataResultSetSize() {
         final int count = template.queryForObject("SELECT count(1) as n FROM case_data",Integer.class);
-        assertEquals("Incorrect case data size", 15, count);
+        assertEquals("Incorrect case data size", 16, count);
     }
 
     private JsonNode getTextNode(String value) {
