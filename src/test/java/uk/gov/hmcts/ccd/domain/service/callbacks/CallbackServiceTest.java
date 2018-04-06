@@ -99,14 +99,10 @@ public class CallbackServiceTest {
         mockCallbackServer.stubFor(post(urlMatching("/test-callback.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200).withFixedDelay(1500)));
 
-        long startTime = System.nanoTime();
         final Optional<CallbackResponse> result = callbackService.send(testUrl, null, caseEvent, caseDetails);
-        long endTime = System.nanoTime();
 
-        long duration = (endTime - startTime);
         final CallbackResponse response = result.orElseThrow(() -> new AssertionError("Missing result"));
         verify(exactly(2), postRequestedFor(urlMatching("/test-callback.*")));
-        assertTrue(duration/1_000_000 > 2500);
         assertTrue(response.getErrors().isEmpty());
     }
 
