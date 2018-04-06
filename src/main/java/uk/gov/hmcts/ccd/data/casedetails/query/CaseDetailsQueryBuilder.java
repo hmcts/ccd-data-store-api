@@ -95,11 +95,11 @@ public abstract class CaseDetailsQueryBuilder<T> {
         whereJurisdiction(metadata.getJurisdiction());
         whereCaseType(metadata.getCaseTypeId());
 
-        metadata.getState().map(this::whereState);
-        metadata.getCaseReference().map(this::whereReference);
-        metadata.getCreatedDate().map(this::whereCreatedDate);
-        metadata.getLastModified().map(this::whereLastModified);
-        metadata.getSecurityClassification().map(this::whereSecurityClassification);
+        metadata.getState().ifPresent(this::whereState);
+        metadata.getCaseReference().ifPresent(this::whereReference);
+        metadata.getCreatedDate().ifPresent(this::whereCreatedDate);
+        metadata.getLastModified().ifPresent(this::whereLastModified);
+        metadata.getSecurityClassification().ifPresent(this::whereSecurityClassification);
 
         return this;
     }
