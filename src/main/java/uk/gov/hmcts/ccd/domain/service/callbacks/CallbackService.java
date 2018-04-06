@@ -119,6 +119,7 @@ public class CallbackService {
             requestFactory.setConnectionRequestTimeout(secondsToMilliseconds(timeout));
             requestFactory.setReadTimeout(secondsToMilliseconds(timeout));
             requestFactory.setConnectTimeout(secondsToMilliseconds(timeout));
+            restTemplate.setRequestFactory(requestFactory);
             return Optional.ofNullable(
                 restTemplate.exchange(url, HttpMethod.POST, requestEntity, clazz));
         } catch (RestClientException e) {
