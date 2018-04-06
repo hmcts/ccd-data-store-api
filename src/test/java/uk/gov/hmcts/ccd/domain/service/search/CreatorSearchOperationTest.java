@@ -2,10 +2,10 @@ package uk.gov.hmcts.ccd.domain.service.search;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
+import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
-import org.mockito.ArgumentMatcher;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -23,11 +23,10 @@ import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Matchers.same;
+import static org.mockito.Mockito.*;
 
 public class CreatorSearchOperationTest {
 
@@ -118,12 +117,18 @@ public class CreatorSearchOperationTest {
 
     }
 
-    private ArgumentMatcher<CaseDetails> matchesCaseIn(final List<CaseDetails> candidatesToMatch) {
+    private Matcher<CaseDetails> matchesCaseIn(final List<CaseDetails> candidatesToMatch) {
 
-        return new ArgumentMatcher<CaseDetails>() {
+        return new BaseMatcher<CaseDetails>() {
             @Override
-            public boolean matches(CaseDetails argument) {
-                    return candidatesToMatch.contains(argument);
+            public boolean matches(Object o) {
+                return o instanceof CaseDetails
+                    && candidatesToMatch.contains(o);
+            }
+
+            @Override
+            public void describeTo(Description description) {
+
             }
         };
     }
