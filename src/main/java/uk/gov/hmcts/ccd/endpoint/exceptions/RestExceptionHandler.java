@@ -13,6 +13,7 @@ import uk.gov.hmcts.ccd.domain.model.common.HttpError;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
+import java.util.concurrent.CompletionException;
 
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
@@ -28,7 +29,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ApiException.class)
     @ResponseBody
     public ResponseEntity<HttpError> handleApiException(final HttpServletRequest request, final ApiException exception) {
-        LOG.error(exception.getMessage(), exception);
+        LOG.warn("data store request processing api exception", exception);
         appInsights.trackException(exception);
         final HttpError<Serializable> error = new HttpError<>(exception, request)
             .withDetails(exception.getDetails())
@@ -42,11 +43,23 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseBody
     public ResponseEntity<HttpError> handleException(final HttpServletRequest request, final Exception exception) {
-        LOG.error(exception.getMessage(), exception);
+        LOG.error("data store request processing exception", exception);
         appInsights.trackException(exception);
         final HttpError<Serializable> error = new HttpError<>(exception, request);
         return ResponseEntity
             .status(error.getStatus())
             .body(error);
+    }
+
+    @ExceptionHandler(CompletionException.class)
+    @ResponseBody
+    public ResponseEntity<HttpError> handleCompletionException(final HttpServletRequest request, final CompletionException exception) {
+        Throwable cause = exception.getCause();
+        if (cause instanceof ApiException) {
+            return handleApiException(request, (ApiException) cause);
+        } else if (cause instanceof Exception) {
+            return handleException(request, (Exception) cause);
+        }
+        return ResponseEntity.status(new HttpError<>(exception, request).getStatus()).build();
     }
 }
