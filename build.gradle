@@ -1,12 +1,18 @@
 buildscript {
     dependencies {
-        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.3'
+        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.1.0'
     }
     dependencies {
         classpath 'org.jsonschema2pojo:jsonschema2pojo-gradle-plugin:0.5.1'
     }
     dependencies {
-        classpath "gradle.plugin.com.github.spotbugs:gradlePlugin:1.6.0"
+        classpath 'gradle.plugin.com.github.spotbugs:gradlePlugin:1.6.0'
+    }
+    dependencies {
+        classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.6.2'
+    }
+    dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
     }
 }
 
@@ -14,12 +20,12 @@ plugins {
     id 'application'
     id 'io.spring.dependency-management' version '1.0.4.RELEASE'
     id 'org.springframework.boot' version '1.5.9.RELEASE'
-    id 'org.owasp.dependencycheck' version '1.4.5.1'
     id 'com.github.ben-manes.versions' version '0.17.0'
-    id 'org.sonarqube' version '2.6.1'
+    id 'org.sonarqube' version '2.6.2'
     id 'jacoco'
     id 'checkstyle'
-    id "com.github.kt3k.coveralls" version "2.8.2"
+    id 'com.github.kt3k.coveralls' version '2.8.2'
+    id 'se.patrikerdes.use-latest-versions' version '0.2.0'
 }
 
 apply plugin: 'java'
@@ -27,14 +33,15 @@ apply plugin: 'eclipse'
 apply plugin: 'application'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
-apply plugin: "org.sonarqube"
+apply plugin: 'org.sonarqube'
 apply plugin: 'jsonschema2pojo'
 apply plugin: 'org.junit.platform.gradle.plugin'
 apply plugin: 'jacoco'
 apply plugin: 'checkstyle'
-apply plugin: "com.github.spotbugs"
-apply plugin: "com.github.kt3k.coveralls"
-//apply plugin: 'org.owasp.dependencycheck'
+apply plugin: 'com.github.spotbugs'
+apply plugin: 'com.github.kt3k.coveralls'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'se.patrikerdes.use-latest-versions'
 
 dependencyUpdates.resolutionStrategy = {
     componentSelection { rules ->
@@ -54,11 +61,11 @@ mainClassName = 'uk.gov.hmcts.ccd.CoreCaseDataApplication'
 // tag::repositories[]
 repositories {
     maven {
-        url "http://artifactory.reform.hmcts.net/artifactory/libs-release"
+        url 'http://artifactory.reform.hmcts.net/artifactory/libs-release'
     }
 // https://github.com/hmcts/java-logging/blob/master/java-logging-appinsights/README.md
     maven {
-        url  "https://dl.bintray.com/hmcts/hmcts-maven"
+        url  'https://dl.bintray.com/hmcts/hmcts-maven'
     }
     mavenLocal()
     jcenter()
@@ -71,7 +78,7 @@ ext {
     junitVintageVersion = '5.1.0'
     junitPlatformVersion = '1.1.0'
     hibernateVersion = '5.2.12.Final'
-    reformLogging= '2.0.1'
+    reformLogging = '2.0.2'
     swagger2Version = '2.8.0'
     limits = [
             'instruction': 84,
@@ -169,24 +176,24 @@ dependencies {
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
     compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.8.0'
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.8.0'
-    compile group: 'org.liquibase', name: 'liquibase-core', version: '3.5.3'
-    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.3'
+    compile group: 'org.liquibase', name: 'liquibase-core', version: '3.5.5'
+    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.5'
     compile group: 'uk.gov.hmcts.reform.auth', name: 'auth-checker-lib', version: '2.1.1'
-    compile group: 'uk.gov.hmcts.auth.provider.service', name: 'service-token-generator-spring', version: '1.0.5'
-    compile group: 'com.sun.mail', name: 'mailapi', version: '1.6.0'
+    compile group: 'uk.gov.hmcts.auth.provider.service', name: 'service-token-generator-spring', version: '2.1.0'
+    compile group: 'com.sun.mail', name: 'mailapi', version: '1.6.1'
     compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
 
 
     // FIXME 0.6 doesn't support jsonb; 0.7 doesn't work on Windows
 //    runtime group: 'com.impossibl.pgjdbc-ng', name: 'pgjdbc-ng', version: '0.6'
-    runtime group: 'org.postgresql', name: 'postgresql', version: '42.2.0'
-    runtime group: 'com.zaxxer', name: 'HikariCP', version: '2.7.7'
+    runtime group: 'org.postgresql', name: 'postgresql', version: '42.2.2'
+    runtime group: 'com.zaxxer', name: 'HikariCP', version: '2.7.8'
 
     testCompile "junit:junit"
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
-    testCompile group: 'com.opentable.components', name: 'otj-pg-embedded', version: '0.11.0'
-    testCompile group: 'com.github.tomakehurst', name: 'wiremock', version: '2.14.0'
-    testCompile group: 'org.springframework.cloud', name: 'spring-cloud-contract-wiremock', version: '1.2.2.RELEASE'
+    testCompile group: 'com.opentable.components', name: 'otj-pg-embedded', version: '0.11.3'
+    testCompile group: 'com.github.tomakehurst', name: 'wiremock', version: '2.15.0'
+    testCompile group: 'org.springframework.cloud', name: 'spring-cloud-contract-wiremock', version: '1.2.4.RELEASE'
     // To avoid compiler warnings about @API annotations in JUnit5 code.
     testCompileOnly 'org.apiguardian:apiguardian-api:1.0.0'
     testCompile "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
@@ -196,15 +203,15 @@ dependencies {
     testRuntime "org.junit.platform:junit-platform-launcher:${junitPlatformVersion}"
     testRuntime "org.junit.vintage:junit-vintage-engine:${junitVintageVersion}"
     testCompile group: 'org.mockito', name: 'mockito-core', version: '1.10.19'
-    testCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.0.6'
+    testCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.0.7'
     testCompile group: 'com.xebialabs.restito', name: 'restito', version: '0.9.3'
-    testCompile 'io.github.openfeign:feign-jackson:9.5.1'
+    testCompile 'io.github.openfeign:feign-jackson:9.6.0'
 
     // for sonar analysis
     testCompile group: 'org.openid4java', name: 'openid4java', version: '1.0.0'
     // remove me once insights is in
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
-    compile "org.slf4j:log4j-over-slf4j:1.7.13"
+    compile "org.slf4j:log4j-over-slf4j:1.7.25"
 }
 // end::dependencies[]
 
