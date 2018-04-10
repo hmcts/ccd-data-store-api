@@ -177,7 +177,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     // TODO This accepts null values for backward compatibility. Once deprecated methods are removed, parameters should
     // be annotated with @NotNull
     private Optional<CaseDetailsEntity> find(String jurisdiction, Long id, String reference) {
-        final CaseDetailsQueryBuilder qb = queryBuilderFactory.select(em);
+        final CaseDetailsQueryBuilder<CaseDetailsEntity> qb = queryBuilderFactory.select(em);
 
         if (null != jurisdiction) {
             qb.whereJurisdiction(jurisdiction);
