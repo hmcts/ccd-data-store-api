@@ -25,7 +25,7 @@ public class SearchQueryFactoryOperation {
     @PersistenceContext
     private EntityManager entityManager;
 
-    private static final String MAINQUERY = "SELECT * FROM case_data WHERE %s ORDER BY created_date ASC";
+    private static final String MAIN_QUERY = "SELECT * FROM case_data WHERE %s ORDER BY created_date ASC";
     private static final String MAIN_COUNT_QUERY = "SELECT count(*) FROM case_data WHERE %s";
 
     private final CriterionFactory criteraFactory;
@@ -44,7 +44,7 @@ public class SearchQueryFactoryOperation {
 
     public Query build(MetaData metadata, Map<String, String> params, boolean isCountQuery) {
         final List<Criterion> criteria = criteraFactory.build(metadata, params);
-        String queryString = String.format(isCountQuery ? MAIN_COUNT_QUERY : MAINQUERY, secure(toClauses(criteria)));
+        String queryString = String.format(isCountQuery ? MAIN_COUNT_QUERY : MAIN_QUERY, secure(toClauses(criteria)));
         Query query;
         if (isCountQuery) {
             query = entityManager.createNativeQuery(queryString);
