@@ -73,7 +73,9 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
         } else {
             final Optional<CaseDetails> optionalCaseDetails = caseDetailsRepository.findByReference(jurisdiction,
                                                                                                     reference);
-            referenceToCaseDetails.put(reference, optionalCaseDetails.orElse(null));
+
+            optionalCaseDetails.ifPresent(caseDetails -> referenceToCaseDetails.put(reference, caseDetails));
+
             return optionalCaseDetails;
         }
     }
