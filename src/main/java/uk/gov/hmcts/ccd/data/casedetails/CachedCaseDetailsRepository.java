@@ -28,7 +28,7 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
     private static final String META_AND_FIELD_DATA_HASH_FORMAT = "%s%s";
 
     private final CaseDetailsRepository caseDetailsRepository;
-    private final Map<Long, CaseDetails> idToCaseDetails = newHashMap();
+    private final Map<Long, Optional<CaseDetails>> idToCaseDetails = newHashMap();
     private final Map<String, CaseDetails> referenceToCaseDetails = newHashMap();
     private final Map<String, CaseDetails> findHashToCaseDetails = newHashMap();
     private final Map<String, List<CaseDetails>> metaAndFieldDataHashToCaseDetails = newHashMap();
@@ -46,15 +46,13 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
 
     @Override
     public Optional<CaseDetails> findById(String jurisdiction, Long id) {
-        final Function<Long, CaseDetails> findCase = (key) -> caseDetailsRepository.findById(jurisdiction, id)
-                                                                                   .orElse(null);
-        return Optional.ofNullable(idToCaseDetails.computeIfAbsent(id, findCase))
-                       .filter(caseDetails -> jurisdiction.equals(caseDetails.getJurisdiction()));
+        return idToCaseDetails.computeIfAbsent(id, (key) -> caseDetailsRepository.findById(jurisdiction, id));
     }
 
     @Override
     public CaseDetails findById(final Long id) {
-        return idToCaseDetails.computeIfAbsent(id, caseDetailsRepository::findById);
+        return idToCaseDetails.computeIfAbsent(id, (key) -> Optional.ofNullable(caseDetailsRepository.findById(id)))
+                              .orElse(null);
     }
 
     @Override
