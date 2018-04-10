@@ -17,7 +17,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.when;
 
 @DisplayName("UserAuthorisationFactory")
-class UserAuthorisationFactoryTest {
+class UserAuthorisationConfigurationTest {
 
     private static final String USER_ID = "123";
     private static final UserAuthorisation.AccessLevel ACCESS_LEVEL = UserAuthorisation.AccessLevel.GRANTED;
@@ -35,7 +35,7 @@ class UserAuthorisationFactoryTest {
     private CaseAccessService caseAccessService;
 
     @InjectMocks
-    private UserAuthorisationFactory factory;
+    private UserAuthorisationConfiguration factory;
 
     @BeforeEach
     void setUp() {

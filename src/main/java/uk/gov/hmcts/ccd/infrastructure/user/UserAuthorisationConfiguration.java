@@ -10,12 +10,12 @@ import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
 
 @Configuration
-public class UserAuthorisationFactory {
+public class UserAuthorisationConfiguration {
 
     private final CaseAccessService caseAccessService;
 
     @Autowired
-    public UserAuthorisationFactory(CaseAccessService caseAccessService) {
+    public UserAuthorisationConfiguration(CaseAccessService caseAccessService) {
         this.caseAccessService = caseAccessService;
     }
 
