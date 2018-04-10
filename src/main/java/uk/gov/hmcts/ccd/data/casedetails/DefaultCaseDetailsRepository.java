@@ -189,10 +189,10 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
             qb.whereId(id);
         }
 
-        final TypedQuery<CaseDetailsEntity> query = qb.build();
-        return query.getResultList()
-                    .stream()
-                    .findFirst();
+        return qb.build()
+                 .getResultList()
+                 .stream()
+                 .findFirst();
     }
 
     private Query getQuery(MetaData metadata, Map<String, String> dataSearchParams, boolean isCountQuery) {
