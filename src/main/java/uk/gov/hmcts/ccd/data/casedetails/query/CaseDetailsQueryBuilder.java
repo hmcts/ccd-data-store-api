@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public abstract class CaseDetailsQueryBuilder<T> {
 
@@ -112,6 +113,12 @@ public abstract class CaseDetailsQueryBuilder<T> {
     }
 
     public abstract TypedQuery<T> build();
+
+    public Optional<T> getSingleResult() {
+        return build().getResultList()
+                      .stream()
+                      .findFirst();
+    }
 
     protected abstract CriteriaQuery<T> createQuery();
 
