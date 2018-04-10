@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 public class AuditEvent extends Event {
-    @JsonProperty("id")
+    @JsonProperty("audit_event_id")
     private Long id;
     @JsonProperty("user_id")
     private Long userId;
