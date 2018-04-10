@@ -29,7 +29,7 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
 
     private final CaseDetailsRepository caseDetailsRepository;
     private final Map<Long, Optional<CaseDetails>> idToCaseDetails = newHashMap();
-    private final Map<String, CaseDetails> referenceToCaseDetails = newHashMap();
+    private final Map<String, Optional<CaseDetails>> referenceToCaseDetails = newHashMap();
     private final Map<String, CaseDetails> findHashToCaseDetails = newHashMap();
     private final Map<String, List<CaseDetails>> metaAndFieldDataHashToCaseDetails = newHashMap();
     private final Map<String, PaginatedSearchMetadata> hashToPaginatedSearchMetadata = newHashMap();
@@ -57,7 +57,10 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
 
     @Override
     public CaseDetails findByReference(final Long caseReference) {
-        return referenceToCaseDetails.computeIfAbsent(caseReference.toString(), (key) -> caseDetailsRepository.findByReference(caseReference));
+        final Function<String, Optional<CaseDetails>> findFunction = (key) -> Optional.ofNullable(
+            caseDetailsRepository.findByReference(caseReference));
+        return referenceToCaseDetails.computeIfAbsent(caseReference.toString(), findFunction)
+                                     .orElse(null);
     }
 
     @Override
@@ -67,17 +70,9 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
 
     @Override
     public Optional<CaseDetails> findByReference(String jurisdiction, String reference) {
-        if (referenceToCaseDetails.containsKey(reference)) {
-            return Optional.ofNullable(referenceToCaseDetails.get(reference))
-                           .filter(caseDetails -> jurisdiction.equals(caseDetails.getJurisdiction()));
-        } else {
-            final Optional<CaseDetails> optionalCaseDetails = caseDetailsRepository.findByReference(jurisdiction,
-                                                                                                    reference);
-
-            optionalCaseDetails.ifPresent(caseDetails -> referenceToCaseDetails.put(reference, caseDetails));
-
-            return optionalCaseDetails;
-        }
+        return referenceToCaseDetails.computeIfAbsent(reference,
+                                                      (key) -> caseDetailsRepository.findByReference(jurisdiction,
+                                                                                                     reference));
     }
 
     @Override
