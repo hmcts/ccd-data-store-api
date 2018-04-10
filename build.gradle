@@ -543,13 +543,13 @@ task smoke(type: Test) {
 
 task functional(type: Test) {
     environment("APPINSIGHTS_INSTRUMENTATIONKEY", "some-key")
-    logger.quiet("TODO: Add functional tests")
-//    group = 'Delivery pipeline'
-//    description = 'Executes functional tests against an AAT CCD Data Store instance'
-//    setTestClassesDirs(sourceSets.aat.output.classesDirs)
-//    setClasspath(sourceSets.aat.runtimeClasspath)
-//    include "uk/gov/hmcts/ccd/datastore/tests/functional/**"
-//    useJUnitPlatform()
+
+    group = 'Delivery pipeline'
+    description = 'Executes functional tests against an AAT CCD Data Store instance'
+    setTestClassesDirs(sourceSets.aat.output.classesDirs)
+    setClasspath(sourceSets.aat.runtimeClasspath)
+    include "uk/gov/hmcts/ccd/datastore/tests/functional/**"
+    useJUnitPlatform()
 }
 
 
