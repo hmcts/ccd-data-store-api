@@ -11,6 +11,7 @@ import javax.persistence.criteria.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 public abstract class CaseDetailsQueryBuilder<T> {
 
@@ -18,8 +19,8 @@ public abstract class CaseDetailsQueryBuilder<T> {
     protected final CriteriaBuilder cb;
     protected final CriteriaQuery<T> query;
     protected final Root<CaseDetailsEntity> root;
-    protected final ArrayList<Predicate> predicates;
-    protected final ArrayList<Order> orders;
+    protected final List<Predicate> predicates;
+    protected final List<Order> orders;
 
     CaseDetailsQueryBuilder(EntityManager em) {
         this.em = em;
