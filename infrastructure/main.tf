@@ -50,7 +50,7 @@ module "ccd-data-store-api" {
 
 module "postgres-data-store" {
   source              = "git@github.com:hmcts/moj-module-postgres?ref=master"
-  product             = "${local.app_full_name}-db"
+  product             = "${local.app_full_name}-data-store"
   location            = "West Europe"
   env                 = "${var.env}"
   postgresql_user     = "ccd"
