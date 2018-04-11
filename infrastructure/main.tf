@@ -17,7 +17,7 @@ data "vault_generic_secret" "ccd_data_s2s_key" {
 }
 
 module "ccd-data-store-api" {
-  source   = "git@github.com:contino/moj-module-webapp?ref=master"
+  source   = "git@github.com:hmcts/moj-module-webapp?ref=master"
   product  = "${var.product}"
   location = "${var.location}"
   env      = "${var.env}"
@@ -34,17 +34,21 @@ module "ccd-data-store-api" {
     DEFINITION_STORE_HOST               = "http://ccd-definition-store-api-${local.env_ase_url}"
     USER_PROFILE_HOST                   = "http://ccd-user-profile-api-${local.env_ase_url}"
 
+    CCD_DM_DOMAIN                       = "${var.document_management_valid_domain}"
+
     IDAM_USER_URL                       = "${var.idam_api_url}"
     IDAM_S2S_URL                        = "${var.s2s_url}"
     DATA_STORE_IDAM_KEY                 = "${data.vault_generic_secret.ccd_data_s2s_key.data["value"]}"
 
-    CASEDATASTORE_AUTHORISED_SERVICES   = "${var.authorised-services}"
+    DATA_STORE_S2S_AUTHORISED_SERVICES  = "${var.authorised-services}"
+
+    CCD_DEFAULTPRINTURL                 = "${var.default_print_url}"
   }
 
 }
 
 module "postgres-data-store" {
-  source              = "git@github.com:contino/moj-module-postgres?ref=master"
+  source              = "git@github.com:hmcts/moj-module-postgres?ref=master"
   product             = "${var.product}-data-store"
   location            = "West Europe"
   env                 = "${var.env}"
@@ -52,7 +56,7 @@ module "postgres-data-store" {
 }
 
 module "ccd-data-store-vault" {
-  source              = "git@github.com:contino/moj-module-key-vault?ref=master"
+  source              = "git@github.com:hmcts/moj-module-key-vault?ref=master"
   name                = "ccd-data-store-${var.env}" // Max 24 characters
   product             = "${var.product}"
   env                 = "${var.env}"
