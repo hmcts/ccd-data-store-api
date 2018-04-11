@@ -9,6 +9,7 @@ provider "vault" {
 }
 
 locals {
+  app_full_name = "${var.product}-${var.component}"
   env_ase_url = "${var.env}.service.${data.terraform_remote_state.core_apps_compute.ase_name[0]}.internal"
 }
 
@@ -18,7 +19,7 @@ data "vault_generic_secret" "ccd_data_s2s_key" {
 
 module "ccd-data-store-api" {
   source   = "git@github.com:hmcts/moj-module-webapp?ref=master"
-  product  = "${var.product}"
+  product  = "${local.app_full_name}"
   location = "${var.location}"
   env      = "${var.env}"
   ilbIp    = "${var.ilbIp}"
@@ -49,7 +50,7 @@ module "ccd-data-store-api" {
 
 module "postgres-data-store" {
   source              = "git@github.com:hmcts/moj-module-postgres?ref=master"
-  product             = "${var.product}-data-store"
+  product             = "${local.app_full_name}-db"
   location            = "West Europe"
   env                 = "${var.env}"
   postgresql_user     = "ccd"
