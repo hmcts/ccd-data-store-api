@@ -37,15 +37,15 @@ variable "database-name" {
 }
 
 variable "vault_section" {
-  default = "test"
+  default = "preprod"
 }
 
 variable "idam_api_url" {
-  default = "http://betaDevBccidamAppLB.reform.hmcts.net"
+  default = "https://preprod-idamapi.reform.hmcts.net:3511"
 }
 
 variable "s2s_url" {
-  default = "http://betaDevBccidamS2SLB.reform.hmcts.net"
+  default = "https://preprod-s2s-api.reform.hmcts.net:3511"
 }
 
 variable "authorised-services" {
@@ -54,7 +54,7 @@ variable "authorised-services" {
 }
 
 variable "document_management_valid_domain" {
-  default = "https://api-gateway.test.dm.reform.hmcts.net"
+  default = "https://api-gateway.preprod.dm.reform.hmcts.net"
 }
 
 variable "default_print_url" {
