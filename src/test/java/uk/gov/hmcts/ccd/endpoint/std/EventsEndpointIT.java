@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -81,14 +82,17 @@ public class EventsEndpointIT extends WireMockBaseTest {
         String responseAsString = result.getResponse().getContentAsString();
         List<AuditEvent> events = Arrays.asList(mapper.readValue(responseAsString, AuditEvent[].class));
 
-        assertThat(events, hasSize(2));
-        assertThat(events.get(0).getEventName(), containsString("GRACIOUS"));
-        assertThat(events.get(0).getSummary(), containsString("The summary 2"));
-        assertThat(events.get(0).getDescription(), containsString("Some comment 2"));
-        assertThat(events.get(0).getEventName(), containsString("GRACIOUS"));
-        assertThat(events.get(0).getCreatedDate().toString(), containsString(LocalDateTime.of(2017, 05, 9, 15, 31, 43).toString()));
-        assertThat(events.get(0).getCaseTypeId(), containsString("TestAddressBookCase"));
-        assertThat(events.get(0).getStateId(), containsString("state4"));
+        assertAll(
+            () -> assertThat(events, hasSize(2)),
+            () -> assertThat(events.get(0).getEventName(), containsString("GRACIOUS")),
+            () -> assertThat(events.get(0).getSummary(), containsString("The summary 2")),
+            () -> assertThat(events.get(0).getDescription(), containsString("Some comment 2")),
+            () -> assertThat(events.get(0).getEventName(), containsString("GRACIOUS")),
+            () -> assertThat(events.get(0).getCreatedDate().toString(), containsString(
+                LocalDateTime.of(2017, 05, 9, 15, 31, 43).toString())),
+            () -> assertThat(events.get(0).getCaseTypeId(), containsString("TestAddressBookCase")),
+            () -> assertThat(events.get(0).getStateId(), containsString("state4"))
+        );
     }
 
     /**
