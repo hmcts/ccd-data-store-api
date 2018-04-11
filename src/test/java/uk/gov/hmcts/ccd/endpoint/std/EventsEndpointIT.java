@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
@@ -84,6 +85,8 @@ public class EventsEndpointIT extends WireMockBaseTest {
 
         assertAll(
             () -> assertThat(events, hasSize(2)),
+            () -> assertThat(events.get(0).getId(), equalTo(2L)),
+            () -> assertThat(events.get(1).getId(), equalTo(1L)),
             () -> assertThat(events.get(0).getEventName(), containsString("GRACIOUS")),
             () -> assertThat(events.get(0).getSummary(), containsString("The summary 2")),
             () -> assertThat(events.get(0).getDescription(), containsString("Some comment 2")),
