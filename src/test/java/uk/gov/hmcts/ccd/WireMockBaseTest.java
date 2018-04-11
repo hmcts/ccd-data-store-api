@@ -41,33 +41,9 @@ public abstract class WireMockBaseTest extends BaseTest {
         final String hostUrl = "http://localhost:" + port;
         LOG.info("Wire mock test, host url is {}", hostUrl);
 
-        stupApiCalls();
-
         ReflectionTestUtils.setField(applicationParams, "caseDefinitionHost", hostUrl);
         ReflectionTestUtils.setField(applicationParams, "uiDefinitionHost", hostUrl);
         ReflectionTestUtils.setField(applicationParams, "idamHost", hostUrl);
         ReflectionTestUtils.setField(applicationParams, "userProfileHost", hostUrl);
-    }
-
-    protected void stupApiCalls() throws IOException {
-        stubGetWizardPageStructure();
-        stubGetDefinitionVersion();
-    }
-
-    private void stubGetWizardPageStructure() throws IOException {
-        final JsonNode WIZARD_DATA = mapper.readTree(
-            "{\"wizard_pages\": [\n {\n \"id\": \"createCaseInfoPage\",\n \"label\": \"Required Information1\",\n \"order\": 1,\n \"wizard_page_fields\": [\n {\n \"case_field_id\": \"PersonFirstName\",\n \"order\": 1\n },\n {\n \"case_field_id\": \"PersonLastNameWithValidation\",\n \"order\": 2\n }\n ]\n }\n ]}");
-        wizardStructureResponse.setData(mapper.convertValue(WIZARD_DATA, STRING_NODE_TYPE));
-        wireMockRule.stubFor(WireMock.get(urlMatching("/api/display/wizard-page-structure.*"))
-                                     .willReturn(okJson(mapper.writeValueAsString(wizardStructureResponse)).withStatus(
-                                             200)));
-    }
-
-    private void stubGetDefinitionVersion() throws JsonProcessingException {
-        CaseTypeDefinitionVersion stubDefinitionVersion = new CaseTypeDefinitionVersion();
-        stubDefinitionVersion.setVersion(33);
-        wireMockRule.stubFor(WireMock.get(urlMatching("/api/data/case-type/.*/version"))
-                .willReturn(okJson(mapper.writeValueAsString(stubDefinitionVersion)).withStatus(
-                        200)));
     }
 }

@@ -32,6 +32,6 @@ public class UserProfileEndpoint {
     @ApiResponse(code = 200, message = "User default settings")
     public UserProfile getUserProfile(@RequestHeader(value = AUTHORIZATION) final String authHeader) {
         final String userToken = authHeader.substring(BEARER.length());
-        return getUserProfileOperation.execute(userToken);
+        return getUserProfileOperation.execute(userToken).join();
     }
 }

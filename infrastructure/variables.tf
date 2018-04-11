@@ -1,6 +1,9 @@
 variable "product" {
-  type    = "string"
-  default = "ccd-data-store-api"
+  type = "string"
+}
+
+variable "component" {
+  type = "string"
 }
 
 variable "location" {
@@ -37,18 +40,26 @@ variable "database-name" {
 }
 
 variable "vault_section" {
-  default = "test"
+  default = "preprod"
 }
 
 variable "idam_api_url" {
-  default = "http://betaDevBccidamAppLB.reform.hmcts.net"
+  default = "https://preprod-idamapi.reform.hmcts.net:3511"
 }
 
 variable "s2s_url" {
-  default = "http://betaDevBccidamS2SLB.reform.hmcts.net"
+  default = "https://preprod-s2s-api.reform.hmcts.net:3511"
 }
 
 variable "authorised-services" {
   type    = "string"
   default = "ccd_data,ccd_gw,ccd_ps,probate_backend,divorce_ccd_submission,sscs,cmc,cmc_claim_store"
+}
+
+variable "document_management_valid_domain" {
+  default = "https://api-gateway.preprod.dm.reform.hmcts.net"
+}
+
+variable "default_print_url" {
+  default = "https://return-case-doc-ccd.nonprod.platform.hmcts.net/jurisdictions/:jid/case-types/:ctid/cases/:cid"
 }

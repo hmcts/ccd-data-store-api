@@ -50,10 +50,16 @@ public class ApplicationParams {
     private String defaultPrintType;
 
     @Value("${pagination.page.size}")
-    private String paginationPageSize;
+    private Integer paginationPageSize;
 
     @Value("${definition.cache.ttl.secs}")
-    private String definitionCacheTTLSecs;
+    private Integer definitionCacheTTLSecs;
+
+    @Value("${async.core.pool.size}")
+    private Integer asyncCorePoolSize;
+
+    @Value("${async.max.pool.size}")
+    private Integer asyncMaxPoolSize;
 
     private static String encode(final String stringToEncode) {
         try {
@@ -77,6 +83,10 @@ public class ApplicationParams {
 
     public String jurisdictionCaseTypesDefURL(final String jurisdictionId) {
         return caseDefinitionHost + "/api/data/jurisdictions/" + encode(jurisdictionId) + "/case-type";
+    }
+
+    public String jurisdictionDefURL() {
+        return caseDefinitionHost + "/api/data/jurisdictions";
     }
 
     public String caseTypeDefURL(final String caseTypeId) {
@@ -156,10 +166,18 @@ public class ApplicationParams {
     }
 
     public int getPaginationPageSize() {
-        return Integer.valueOf(paginationPageSize);
+        return paginationPageSize;
     }
 
     public int getDefinitionCacheTTLSecs() {
-        return Integer.valueOf(this.definitionCacheTTLSecs);
+        return definitionCacheTTLSecs;
+    }
+
+    public int getAsyncCorePoolSize() {
+        return asyncCorePoolSize;
+    }
+
+    public int getAsyncMaxPoolSize() {
+        return asyncMaxPoolSize;
     }
 }
