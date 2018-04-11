@@ -18,12 +18,13 @@ data "vault_generic_secret" "ccd_data_s2s_key" {
 }
 
 module "ccd-data-store-api" {
-  source   = "git@github.com:contino/moj-module-webapp?ref=master"
-  product  = "${var.product}"
+  source = "git@github.com:contino/moj-module-webapp?ref=master"
+  product = "${local.app_full_name}"
   location = "${var.location}"
-  env      = "${var.env}"
-  ilbIp    = "${var.ilbIp}"
+  env = "${var.env}"
+  ilbIp = "${var.ilbIp}"
   subscription = "${var.subscription}"
+  is_frontend = false
 
   app_settings = {
     DATA_STORE_DB_HOST                  = "${module.postgres-data-store.host_name}"
