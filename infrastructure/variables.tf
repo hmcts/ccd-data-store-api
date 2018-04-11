@@ -1,6 +1,10 @@
 variable "product" {
-  type    = "string"
-  default = "ccd-data-store-api"
+  type = "string"
+//  default = "ccd-data-store-api"
+}
+
+variable "component" {
+  type = "string"
 }
 
 variable "location" {

@@ -13,7 +13,7 @@ properties(
 
 def type = "java"
 def product = "ccd"
-def app = "data-store-api"
+def component = "data-store-api"
 
 List<LinkedHashMap<String, Object>> secrets = [
     secret('caseworkerAutoTest1Email', 'CCD_CASEWORKER_AUTOTEST_EMAIL'),
@@ -31,7 +31,7 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
     ]
 }
 
-withPipeline(type, product, app) {
+withPipeline(type, product, component) {
     env.IDAM_URL='http://betadevbccidamapplb.reform.hmcts.net'
     env.S2S_URL='http://betaDevBccidamS2SLB.reform.hmcts.net'
 

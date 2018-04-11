@@ -9,6 +9,7 @@ provider "vault" {
 }
 
 locals {
+  app_full_name = "${var.product}-${var.component}"
   env_ase_url = "${var.env}.service.${data.terraform_remote_state.core_apps_compute.ase_name[0]}.internal"
 }
 
