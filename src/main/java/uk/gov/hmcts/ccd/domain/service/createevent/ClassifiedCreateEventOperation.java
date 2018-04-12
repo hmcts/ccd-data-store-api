@@ -43,7 +43,7 @@ public class ClassifiedCreateEventOperation implements CreateEventOperation {
                                                                            token,
                                                                            ignoreWarning);
         return Optional.ofNullable(caseDetails)
-                       .flatMap(classificationService::apply)
+                       .flatMap(classificationService::applyClassification)
                        .orElse(null);
     }
 }

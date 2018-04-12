@@ -24,12 +24,12 @@ public class ClassifiedGetCaseOperation implements GetCaseOperation {
     @Override
     public Optional<CaseDetails> execute(String jurisdictionId, String caseTypeId, String caseReference) {
         return getCaseOperation.execute(jurisdictionId, caseTypeId, caseReference)
-                               .flatMap(classificationService::apply);
+                               .flatMap(classificationService::applyClassification);
     }
 
     @Override
     public Optional<CaseDetails> execute(String caseReference) {
         return getCaseOperation.execute(caseReference)
-                               .flatMap(classificationService::apply);
+                               .flatMap(classificationService::applyClassification);
     }
 }

@@ -15,19 +15,16 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import java.util.*;
-import java.util.function.Predicate;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Comparator.comparingInt;
-import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.valueOf;
+import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils.*;
 
 @Service
 public class SecurityClassificationService {
@@ -36,7 +33,6 @@ public class SecurityClassificationService {
     private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
     };
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
-    private static final String ID = "id";
     private static final String VALUE = "value";
     private static final String CLASSIFICATION = "classification";
     private static final ObjectNode EMPTY_NODE = JSON_NODE_FACTORY.objectNode();
@@ -58,7 +54,7 @@ public class SecurityClassificationService {
                              .max(comparingInt(SecurityClassification::getRank));
     }
 
-    public Optional<CaseDetails> apply(CaseDetails caseDetails) {
+    public Optional<CaseDetails> applyClassification(CaseDetails caseDetails) {
         Optional<SecurityClassification> userClassificationOpt = getUserClassification(caseDetails.getJurisdiction());
         Optional<CaseDetails> result = Optional.of(caseDetails);
 
@@ -78,7 +74,7 @@ public class SecurityClassificationService {
                 }));
     }
 
-    public List<AuditEvent> apply(String jurisdictionId, List<AuditEvent> events) {
+    public List<AuditEvent> applyClassification(String jurisdictionId, List<AuditEvent> events) {
         final Optional<SecurityClassification> userClassification = getUserClassification(jurisdictionId);
 
         if (null == events || !userClassification.isPresent()) {
@@ -160,11 +156,13 @@ public class SecurityClassificationService {
                     filterNestedObject(collectionElementValue,
                                        relevantDataClassificationValue,
                                        userClassification);
-                } else if (collectionElementValue.isTextual()) {
+                } else {
                     filterSimpleField(userClassification,
                                       dataCollectionIterator,
                                       relevantDataClassificationValue.get(collectionElementValue.textValue()));
                 }
+            } else {
+                dataCollectionIterator.remove();
             }
             if (collectionElementValue.equals(EMPTY_NODE)) {
                 dataCollectionIterator.remove();
@@ -197,117 +195,5 @@ public class SecurityClassificationService {
 
     private boolean isNull(JsonNode... jsonNodes) {
         return newArrayList(jsonNodes).stream().anyMatch(Objects::isNull);
-    }
-
-    public void validateCallbackClassification(CallbackResponse callbackResponse, CaseDetails caseDetails) {
-        Optional<CaseDetails> result = Optional.of(caseDetails);
-
-        result.filter(caseHasClassificationEqualOrLowerThan(callbackResponse.getSecurityClassification()))
-            .map(cd -> {
-                cd.setSecurityClassification(callbackResponse.getSecurityClassification());
-
-                validateObject(MAPPER.convertValue(callbackResponse.getDataClassification(), JsonNode.class),
-                               MAPPER.convertValue(caseDetails.getDataClassification(), JsonNode.class));
-
-                caseDetails.setDataClassification(MAPPER.convertValue(callbackResponse.getDataClassification(), STRING_JSON_MAP));
-                return cd;
-            })
-            .orElseThrow(() -> {
-                LOG.warn("Case={} classification is higher than callbackResponse={} case classification", caseDetails, callbackResponse);
-                return new ValidationException(VALIDATION_ERR_MSG);
-            });
-    }
-
-    private void validateObject(JsonNode callbackDataClassification, JsonNode defaultDataClassification) {
-
-        if (!isNotNullAndSizeEqual(callbackDataClassification, defaultDataClassification)) {
-            LOG.warn("defaultClassification={} and callbackClassification={} sizes differ", defaultDataClassification, callbackDataClassification);
-            throw new ValidationException(VALIDATION_ERR_MSG);
-        }
-
-        Iterator<Map.Entry<String, JsonNode>> callbackDataClassificationIterator = callbackDataClassification.fields();
-        while (callbackDataClassificationIterator.hasNext()) {
-            Map.Entry<String, JsonNode> callbackClassificationMap = callbackDataClassificationIterator.next();
-            String callbackClassificationKey = callbackClassificationMap.getKey();
-            JsonNode callbackClassificationValue = callbackClassificationMap.getValue();
-            JsonNode defaultClassificationItem = defaultDataClassification.get(callbackClassificationKey);
-            if (callbackClassificationValue.has(CLASSIFICATION)) {
-                validateCallbackClassification(callbackClassificationValue.get(CLASSIFICATION), defaultClassificationItem.get(CLASSIFICATION));
-                if (callbackClassificationValue.has(VALUE)) {
-                    JsonNode defaultClassificationValue = defaultClassificationItem.get(VALUE);
-                    JsonNode callbackClassificationItem = callbackClassificationValue.get(VALUE);
-                    if (callbackClassificationItem.isObject()) {
-                        validateObject(callbackClassificationItem, defaultClassificationValue);
-                    } else {
-                        validateCollection(callbackClassificationItem, defaultClassificationValue);
-                    }
-                }
-            } else {
-                validateCallbackClassification(callbackClassificationValue, defaultClassificationItem);
-            }
-        }
-    }
-
-    private boolean isNotNullAndSizeEqual(JsonNode callbackDataClassification, JsonNode defaultDataClassification) {
-        return defaultDataClassification != null && callbackDataClassification != null &&
-            defaultDataClassification.size() == callbackDataClassification.size();
-    }
-
-
-    private void validateCollection(JsonNode callbackClassificationItem, JsonNode defaultClassificationItem) {
-        for (JsonNode callbackItem : callbackClassificationItem) {
-            JsonNode defaultItem = getDataClassificationForData(callbackItem, defaultClassificationItem.iterator());
-            if (defaultItem.isNull()) {
-                LOG.warn("No defaultClassificationItem for callbackItem={} is null", callbackItem);
-                throw new ValidationException(VALIDATION_ERR_MSG);
-            }
-            JsonNode callbackItemValue = callbackItem.get(VALUE);
-            JsonNode defaultItemValue = defaultItem.get(VALUE);
-            validateObject(callbackItemValue, defaultItemValue);
-        }
-    }
-
-    private void validateCallbackClassification(JsonNode callbackClassificationValue, JsonNode defaultClassificationValue) {
-        Optional<SecurityClassification> callbackSecurityClassification = getSecurityClassification(callbackClassificationValue);
-        Optional<SecurityClassification> defaultSecurityClassification = getSecurityClassification(defaultClassificationValue);
-        if (!defaultSecurityClassification.isPresent() || !callbackSecurityClassification.isPresent()
-            || !callbackSecurityClassification.get().higherOrEqualTo(defaultSecurityClassification.get())) {
-            LOG.warn("defaultClassificationValue={} has higher classification than callbackClassificationValue={} is null",
-                     defaultClassificationValue,
-                     callbackClassificationValue);
-            throw new ValidationException(VALIDATION_ERR_MSG);
-        }
-    }
-
-    private JsonNode getDataClassificationForData(JsonNode data, Iterator<JsonNode> dataIterator) {
-        Boolean found = false;
-        JsonNode dataClassificationValue = null;
-        while (dataIterator.hasNext() && !found) {
-            dataClassificationValue = dataIterator.next();
-            if (null != dataClassificationValue.get(ID)
-                    && dataClassificationValue.get(ID).equals(data.get(ID))) {
-                found = true;
-            }
-        }
-        return found ? dataClassificationValue : JSON_NODE_FACTORY.nullNode();
-    }
-
-    private Optional<SecurityClassification> getSecurityClassification(JsonNode dataNode) {
-        if (dataNode == null || dataNode.isNull()) {
-            return Optional.empty();
-        }
-        SecurityClassification securityClassification;
-        try {
-            securityClassification = valueOf(dataNode.textValue());
-        }
-        catch (IllegalArgumentException e) {
-            LOG.error("Unable to parse security classification for {}", dataNode, e);
-            return Optional.empty();
-        }
-        return Optional.of(securityClassification);
-    }
-
-    private Predicate<CaseDetails> caseHasClassificationEqualOrLowerThan(SecurityClassification classification) {
-        return cd -> Optional.ofNullable(classification).map(uc -> uc.higherOrEqualTo(cd.getSecurityClassification())).orElse(false);
     }
 }

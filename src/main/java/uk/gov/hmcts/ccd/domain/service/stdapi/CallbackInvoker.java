@@ -13,6 +13,7 @@ import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
+import uk.gov.hmcts.ccd.domain.service.common.SecurityValidationService;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 
 import java.util.Map;
@@ -27,18 +28,21 @@ public class CallbackInvoker {
     private final CaseDataService caseDataService;
     private final CaseSanitiser caseSanitiser;
     private final SecurityClassificationService securityClassificationService;
+    private final SecurityValidationService securityValidationService;
 
     @Autowired
     public CallbackInvoker(final CallbackService callbackService,
                            final CaseTypeService caseTypeService,
                            final CaseDataService caseDataService,
                            final CaseSanitiser caseSanitiser,
-                           final SecurityClassificationService securityClassificationService) {
+                           final SecurityClassificationService securityClassificationService,
+                           final SecurityValidationService securityValidationService) {
         this.callbackService = callbackService;
         this.caseTypeService = caseTypeService;
         this.caseDataService = caseDataService;
         this.caseSanitiser = caseSanitiser;
         this.securityClassificationService = securityClassificationService;
+        this.securityValidationService = securityValidationService;
     }
 
     public void invokeAboutToStartCallback(final CaseEvent caseEvent,
@@ -105,7 +109,7 @@ public class CallbackInvoker {
         callbackService.validateCallbackErrorsAndWarnings(callbackResponse, ignoreWarning);
         if (callbackResponse.getData() != null) {
             validateAndSetData(caseType, caseDetails, callbackResponse.getData());
-            securityClassificationService.validateCallbackClassification(callbackResponse, caseDetails);
+            securityValidationService.validateCallbackClassification(callbackResponse, caseDetails);
             final Optional<String> newCaseState = filterCaseState(callbackResponse.getData());
             newCaseState.ifPresent(caseDetails::setState);
             return newCaseState;
