@@ -20,7 +20,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
-import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -214,7 +214,7 @@ public class SecurityClassificationService {
             })
             .orElseThrow(() -> {
                 LOG.warn("Case={} classification is higher than callbackResponse={} case classification", caseDetails, callbackResponse);
-                return new CallbackException(VALIDATION_ERR_MSG);
+                return new ValidationException(VALIDATION_ERR_MSG);
             });
     }
 
@@ -222,7 +222,7 @@ public class SecurityClassificationService {
 
         if (!isNotNullAndSizeEqual(callbackDataClassification, defaultDataClassification)) {
             LOG.warn("defaultClassification={} and callbackClassification={} sizes differ", defaultDataClassification, callbackDataClassification);
-            throw new CallbackException(VALIDATION_ERR_MSG);
+            throw new ValidationException(VALIDATION_ERR_MSG);
         }
 
         Iterator<Map.Entry<String, JsonNode>> callbackDataClassificationIterator = callbackDataClassification.fields();
@@ -259,7 +259,7 @@ public class SecurityClassificationService {
             JsonNode defaultItem = getDataClassificationForData(callbackItem, defaultClassificationItem.iterator());
             if (defaultItem.isNull()) {
                 LOG.warn("No defaultClassificationItem for callbackItem={} is null", callbackItem);
-                throw new CallbackException(VALIDATION_ERR_MSG);
+                throw new ValidationException(VALIDATION_ERR_MSG);
             }
             JsonNode callbackItemValue = callbackItem.get(VALUE);
             JsonNode defaultItemValue = defaultItem.get(VALUE);
@@ -275,7 +275,7 @@ public class SecurityClassificationService {
             LOG.warn("defaultClassificationValue={} has higher classification than callbackClassificationValue={} is null",
                      defaultClassificationValue,
                      callbackClassificationValue);
-            throw new CallbackException(VALIDATION_ERR_MSG);
+            throw new ValidationException(VALIDATION_ERR_MSG);
         }
     }
 
