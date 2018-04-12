@@ -1,5 +1,20 @@
 package uk.gov.hmcts.ccd.data.definition;
 
+import jdk.nashorn.internal.runtime.options.Option;
+import org.assertj.core.util.Lists;
+import org.hamcrest.collection.IsCollectionWithSize;
+import org.junit.Ignore;
+import org.junit.Test;
+import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
+
+import javax.inject.Inject;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
@@ -9,22 +24,9 @@ import static org.hamcrest.beans.HasPropertyWithValue.hasProperty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import java.util.List;
-import javax.inject.Inject;
-
-import org.hamcrest.collection.IsCollectionWithSize;
-import org.junit.Test;
-import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
-import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
-
-public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
-
-    //NOTE: caseDefinitionRepository is a mock configured in TestConfiguration to call some of the real methods
+public class CaseDefinitionRepositoryTest extends WireMockBaseTest {
     @Inject
-    private DefaultCaseDefinitionRepository caseDefinitionRepository;
+    private CaseDefinitionRepository caseDefinitionRepository;
 
     @Test
     public void shouldGetCaseTypesForJurisdiction() {
@@ -78,17 +80,5 @@ public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
     public void shouldReturnNullWhenNoClassificationFound() {
         final UserRole userRole = caseDefinitionRepository.getUserRoleClassifications("caseworker-probate-loa0");
         assertThat(userRole, is(nullValue()));
-    }
-
-    @Test
-    public void shouldGetJurisdictionsDefinition() {
-
-        List<Jurisdiction> allJurisdictions = caseDefinitionRepository.getAllJurisdictions();
-
-        assertAll(
-                () -> assertThat(allJurisdictions, hasSize(3)),
-                () -> assertThat(allJurisdictions, hasItem(hasProperty("id", is("SSCS")))),
-                () -> assertThat(allJurisdictions, hasItem(hasProperty("id", is("PROBATE"))))
-        );
     }
 }

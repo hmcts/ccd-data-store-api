@@ -27,7 +27,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 @Configuration
@@ -111,8 +110,6 @@ class TestConfiguration extends ContextCleanupListener {
         when(caseDefinitionRepository.getCaseTypesForJurisdiction(any())).thenCallRealMethod();
         when(caseDefinitionRepository.getBaseTypes()).thenReturn(Arrays.asList(fieldTypes));
         when(caseDefinitionRepository.getUserRoleClassifications(any())).thenCallRealMethod();
-        when(caseDefinitionRepository.getAllJurisdictions()).thenCallRealMethod();
-        when(caseDefinitionRepository.getAllJurisdictionsAsync()).thenCallRealMethod();
         return caseDefinitionRepository;
     }
 
