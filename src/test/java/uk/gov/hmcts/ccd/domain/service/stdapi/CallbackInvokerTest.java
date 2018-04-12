@@ -20,7 +20,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
-import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
+import uk.gov.hmcts.ccd.domain.service.common.SecurityValidationService;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 
@@ -58,7 +58,7 @@ class CallbackInvokerTest {
     private CaseSanitiser caseSanitiser;
 
     @Mock
-    private SecurityClassificationService securityClassificationService;
+    private SecurityValidationService securityValidationService;
 
     @InjectMocks
     private CallbackInvoker callbackInvoker;
@@ -94,7 +94,7 @@ class CallbackInvokerTest {
         inOrder = inOrder(callbackService,
                                   caseTypeService,
                                   caseDataService,
-                                  securityClassificationService,
+                          securityValidationService,
                                   caseSanitiser);
     }
 
@@ -234,7 +234,7 @@ class CallbackInvokerTest {
                 () -> inOrder.verify(caseTypeService).validateData(callbackResponse.getData(), caseType),
                 () -> inOrder.verify(caseSanitiser).sanitise(caseType, callbackResponse.getData()),
                 () -> inOrder.verify(caseDataService).getDefaultSecurityClassifications(caseType, caseDetails.getData()),
-                () -> inOrder.verify(securityClassificationService, never()).validateCallbackClassification(callbackResponse, caseDetails)
+                () -> inOrder.verify(securityValidationService, never()).validateCallbackClassification(callbackResponse, caseDetails)
             );
         }
 
@@ -250,7 +250,7 @@ class CallbackInvokerTest {
                 () -> inOrder.verify(caseTypeService, never()).validateData(callbackResponse.getData(), caseType),
                 () -> inOrder.verify(caseSanitiser, never()).sanitise(caseType, callbackResponse.getData()),
                 () -> inOrder.verify(caseDataService, never()).getDefaultSecurityClassifications(caseType, caseDetails.getData()),
-                () -> inOrder.verify(securityClassificationService, never()).validateCallbackClassification(callbackResponse, caseDetails)
+                () -> inOrder.verify(securityValidationService, never()).validateCallbackClassification(callbackResponse, caseDetails)
             );
         }
 
@@ -276,7 +276,7 @@ class CallbackInvokerTest {
                 () -> inOrder.verify(caseTypeService, never()).validateData(callbackResponse.getData(), caseType),
                 () -> inOrder.verify(caseSanitiser, never()).sanitise(caseType, callbackResponse.getData()),
                 () -> inOrder.verify(caseDataService, never()).getDefaultSecurityClassifications(caseType, caseDetails.getData()),
-                () -> inOrder.verify(securityClassificationService, never()).validateCallbackClassification(callbackResponse, caseDetails)
+                () -> inOrder.verify(securityValidationService, never()).validateCallbackClassification(callbackResponse, caseDetails)
             );
         }
 
@@ -296,7 +296,7 @@ class CallbackInvokerTest {
                 () -> inOrder.verify(caseTypeService).validateData(callbackResponse.getData(), caseType),
                 () -> inOrder.verify(caseSanitiser).sanitise(caseType, callbackResponse.getData()),
                 () -> inOrder.verify(caseDataService).getDefaultSecurityClassifications(caseType, caseDetails.getData()),
-                () -> inOrder.verify(securityClassificationService).validateCallbackClassification(callbackResponse, caseDetails)
+                () -> inOrder.verify(securityValidationService).validateCallbackClassification(callbackResponse, caseDetails)
             );
 
             assertThat(caseDetails.getState(), is("ngitb"));
@@ -317,7 +317,7 @@ class CallbackInvokerTest {
                 () -> inOrder.verify(caseTypeService).validateData(callbackResponse.getData(), caseType),
                 () -> inOrder.verify(caseSanitiser).sanitise(caseType, callbackResponse.getData()),
                 () -> inOrder.verify(caseDataService).getDefaultSecurityClassifications(caseType, caseDetails.getData()),
-                () -> inOrder.verify(securityClassificationService).validateCallbackClassification(callbackResponse, caseDetails)
+                () -> inOrder.verify(securityValidationService).validateCallbackClassification(callbackResponse, caseDetails)
             );
 
             assertThat(caseDetails.getState(), is("BAYAN"));
@@ -348,7 +348,7 @@ class CallbackInvokerTest {
                 () -> inOrder.verify(caseTypeService, never()).validateData(callbackResponse.getData(), caseType),
                 () -> inOrder.verify(caseSanitiser, never()).sanitise(caseType, callbackResponse.getData()),
                 () -> inOrder.verify(caseDataService, never()).getDefaultSecurityClassifications(caseType, caseDetails.getData()),
-                () -> inOrder.verify(securityClassificationService, never()).validateCallbackClassification(callbackResponse, caseDetails)
+                () -> inOrder.verify(securityValidationService, never()).validateCallbackClassification(callbackResponse, caseDetails)
             );
         }
 
