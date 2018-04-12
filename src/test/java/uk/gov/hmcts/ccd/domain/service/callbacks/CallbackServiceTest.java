@@ -221,7 +221,7 @@ public class CallbackServiceTest {
 
         assertAll(
             () -> assertThat(result.getStatusCodeValue(), is(201)),
-            () -> assertThat(result.getBody(), is("{\"data\":null,\"errors\":[],\"warnings\":[]}"))
+            () -> assertThat(result.getBody(), is("{\"data\":null,\"state\":null,\"errors\":[],\"warnings\":[],\"data_classification\":null,\"security_classification\":null}"))
         );
     }
 

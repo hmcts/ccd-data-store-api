@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import org.hamcrest.Matchers;
+import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -15,24 +17,31 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
+import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 
 import java.io.IOException;
 import java.util.*;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.hamcrest.collection.IsMapContaining.hasEntry;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.*;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlTestUtil.CaseFieldBuilder.aCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlTestUtil.CaseTypeBuilder.aCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CallbackResponseBuilder.aCallbackResponse;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.aCaseDetails;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.aCaseField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.aCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DataClassificationBuilder.aClassificationBuilder;
 
 public class SecurityClassificationServiceTest {
 
@@ -267,13 +276,13 @@ public class SecurityClassificationServiceTest {
 
         @BeforeEach
         void setUp() throws IOException {
-            CaseEvent creatEvent = new CaseEvent();
-            creatEvent.setId("createEvent");
-            creatEvent.setSecurityClassification(RESTRICTED);
+            CaseEvent createEvent = new CaseEvent();
+            createEvent.setId("createEvent");
+            createEvent.setSecurityClassification(RESTRICTED);
             CaseEvent updateEvent = new CaseEvent();
             updateEvent.setId("updateEvent");
             updateEvent.setSecurityClassification(PRIVATE);
-            List<CaseEvent> events = Arrays.asList(creatEvent, updateEvent);
+            List<CaseEvent> events = Arrays.asList(createEvent, updateEvent);
             caseType.setEvents(events);
         }
 
@@ -349,7 +358,7 @@ public class SecurityClassificationServiceTest {
 
         @Test
         @DisplayName("should filter out fields for case if invalid security classification")
-        void shouldFailToFilterFieldsForCaseIfUnparsableSecurityClassification() throws IOException {
+        void shouldFilterOutFieldsForCaseIfUnparsableSecurityClassification() throws IOException {
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Note1\": \"note1\"\n," +
                     "       \"Note2\": \"note2\"\n" +
@@ -485,6 +494,41 @@ public class SecurityClassificationServiceTest {
             assertAll(
                 () -> assertThat(resultNode, is(equalTo(JSON_NODE_FACTORY.objectNode())))
             );
+        }
+
+        @Test
+        @DisplayName("should filter out nested fields for case if missing security classification for complex field")
+        void shouldFilterOutNestedFieldsForCaseIfMissingSecurityClassificationForComplexField() throws IOException {
+            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+                "{  \"Note1\": { \n" +
+                    "           \"Note2\": \"note1\"\n" +
+                    "       },\n" +
+                    "       \"Note3\": { \n" +
+                    "           \"Note4\": \"note4\"\n" +
+                    "       }\n" +
+                    "    }\n"
+            ), STRING_JSON_MAP);
+            caseDetails.setData(data);
+            final Map<String, JsonNode> dataClassification = MAPPER.convertValue(MAPPER.readTree(
+                "{  \"Note1\": { \n" +
+                    "           \"value\": { \n" +
+                    "               \"Note2\": null \n" +
+                    "           } \n" +
+                    "        }, \n" +
+                    "       \"Note3\": { \n" +
+                    "           \"classification\": null,\n" +
+                    "           \"value\": { \n" +
+                    "               \"Note4\": null \n" +
+                    "           } \n" +
+                    "        } \n" +
+                    "    }\n"
+            ), STRING_JSON_MAP);
+            caseDetails.setDataClassification(dataClassification);
+
+            CaseDetails caseDetails = applyClassification(PRIVATE);
+
+            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+            assertThat(resultNode, is(equalTo(JSON_NODE_FACTORY.objectNode())));
         }
 
         @Test
@@ -701,7 +745,6 @@ public class SecurityClassificationServiceTest {
             );
         }
 
-
         @Test
         @DisplayName("should filter out collection items but leave empty collection if classification matches")
         void shouldFilterOutCollectionItemsButLeaveEmptyCollectionIfClassificationMatches() throws IOException {
@@ -726,6 +769,16 @@ public class SecurityClassificationServiceTest {
                     "                }" +
                     "            },\n" +
                     "            \"id\":\"" + SECOND_CHILD_ID + "\"\n" +
+                    "         },\n" +
+                    "         {  \n" +
+                    "            \"value\":{  \n" +
+                    "               \"Address\":\"address3\",\n" +
+                    "               \"Notes\": {\n" +
+                    "                   \"Note1\": \"someNote13\",\n" +
+                    "                   \"Note2\": \"someNote23\"\n" +
+                    "                }" +
+                    "            },\n" +
+                    "            \"id\":\"THIRD_CHILD\"\n" +
                     "         }\n" +
                     "      ]\n" +
                     "    }\n"
@@ -760,6 +813,18 @@ public class SecurityClassificationServiceTest {
                     "           }\n" +
                     "         },\n" +
                     "         \"id\":\"" + SECOND_CHILD_ID + "\"\n" +
+                    "       },\n" +
+                    "       {\n" +
+                    "         \"value\": {\n" +
+                    "           \"Address\": \"PRIVATE\",\n" +
+                    "           \"Notes\": {\n" +
+                    "             \"classification\": \"PRIVATE\",\n" +
+                    "             \"value\": {\n" +
+                    "               \"Note1\": \"PRIVATE\",\n" +
+                    "               \"Note2\": \"PRIVATE\"\n" +
+                    "             }\n" +
+                    "           }\n" +
+                    "         }\n" +
                     "       }\n" +
                     "     ]\n" +
                     "   }\n" +
@@ -861,6 +926,73 @@ public class SecurityClassificationServiceTest {
                 () -> assertThat(resultNode.get("Addresses").get(1).get(VALUE).get("Notes").has("Note1"), is(false)),
                 () -> assertThat(resultNode.get("Addresses").get(1).get(VALUE).get("Notes").get("Note2"),
                                  is(equalTo(getTextNode("someNote22"))))
+            );
+        }
+
+        @Test
+        // TODO Target implementation, see RDM-1204
+        @DisplayName("should filter out collection item if no item classification exists")
+        void shouldFilterFieldOutCollectionItemIfNoItemClassificationExists() throws IOException {
+            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+                "{  \"Addresses\":[  \n" +
+                    "         {  \n" +
+                    "            \"value\":{  \n" +
+                    "               \"Address\":\"address1\",\n" +
+                    "               \"Notes\": {\n" +
+                    "                   \"Note1\": \"someNote11\",\n" +
+                    "                   \"Note2\": \"someNote21\"\n" +
+                    "                }" +
+                    "            },\n" +
+                    "            \"id\":\"" + FIRST_CHILD_ID + "\"\n" +
+                    "         },\n" +
+                    "         {  \n" +
+                    "            \"value\":{  \n" +
+                    "               \"Address\":\"address2\",\n" +
+                    "               \"Notes\": {\n" +
+                    "                   \"Note1\": \"someNote12\",\n" +
+                    "                   \"Note2\": \"someNote22\"\n" +
+                    "                }" +
+                    "            },\n" +
+                    "            \"id\":\"" + SECOND_CHILD_ID + "\"\n" +
+                    "         }\n" +
+                    "      ]\n" +
+                    "    }\n"
+            ), STRING_JSON_MAP);
+            caseDetails.setData(data);
+            final Map<String, JsonNode> dataClassification = MAPPER.convertValue(MAPPER.readTree(
+                "{  \"Addresses\":{  \n" +
+                    "       \"classification\": \"PRIVATE\",\n" +
+                    "       \"value\": [\n" +
+                    "         {  \n" +
+                    "            \"value\":{  \n" +
+                    "               \"Address\":\"RESTRICTED\",\n" +
+                    "               \"Notes\": {\n" +
+                    "                   \"classification\": \"PRIVATE\",\n" +
+                    "                   \"value\": {\n" +
+                    "                     \"Note1\": \"PRIVATE\",\n" +
+                    "                     \"Note2\": \"RESTRICTED\"\n" +
+                    "                   }\n" +
+                    "                }" +
+                    "            },\n" +
+                    "            \"id\":\"" + FIRST_CHILD_ID + "\"\n" +
+                    "         } \n" +
+                    "       ]\n" +
+                    "     }\n" +
+                    "   }\n"
+            ), STRING_JSON_MAP);
+            caseDetails.setDataClassification(dataClassification);
+
+
+            CaseDetails caseDetails = applyClassification(PRIVATE);
+
+            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+            assertAll(
+                () -> assertThat(resultNode.get("Addresses").size(), is(equalTo(1))),
+                () -> assertThat(resultNode.get("Addresses").get(0).get(ID), is(equalTo(getTextNode(FIRST_CHILD_ID)))),
+                () -> assertThat(resultNode.get("Addresses").get(0).get(VALUE).has("Address"), is(false)),
+                () -> assertThat(resultNode.get("Addresses").get(0).get(VALUE).get("Notes").get("Note1"),
+                                 is(equalTo(getTextNode("someNote11")))),
+                () -> assertThat(resultNode.get("Addresses").get(0).get(VALUE).get("Notes").has("Note2"), is(false))
             );
         }
 
@@ -1282,6 +1414,833 @@ public class SecurityClassificationServiceTest {
                                  is(equalTo(JSON_NODE_FACTORY.textNode("Document 2"))))
             );
         }
+    }
+
+    @Nested
+    @DisplayName("Validate data classification simple field")
+    class ValidateDataClassificationSimpleField {
+
+        @Test
+        @DisplayName("should increase security if valid classification level for case and data nodes")
+        void shouldIncreaseSecurityIfValidClassificationLevelForCaseAndDataNodes() {
+            final CaseDetails caseDetails = aCaseDetails()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(
+                    aClassificationBuilder()
+                        .withData("field1", getTextNode("PRIVATE"))
+                        .buildAsMap())
+                .build();
+            final CallbackResponse callbackResponse = aCallbackResponse()
+                .withSecurityClassification(PRIVATE)
+                .withDataClassification(
+                    aClassificationBuilder()
+                        .withData("field1", getTextNode("RESTRICTED"))
+                        .buildAsMap())
+                .build();
+
+            securityClassificationService.validateCallbackClassification(callbackResponse, caseDetails);
+
+            assertAll(
+                () -> Assert.assertThat(caseDetails.getSecurityClassification(), Matchers.is(PRIVATE)),
+                () -> Assert.assertThat(caseDetails.getDataClassification().size(), Matchers.is(1)),
+                () -> Assert.assertThat(caseDetails.getDataClassification(), hasEntry("field1", getTextNode("RESTRICTED")))
+            );
+        }
+
+        @Test
+        @DisplayName("should fail if missing classification for data nodes")
+        void shouldFailIfMissingClassificationForDataNodes() {
+            final CaseDetails caseDetails = aCaseDetails()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(
+                    aClassificationBuilder()
+                        .withData("field1", getTextNode("PUBLIC"))
+                        .withData("missingField2", getTextNode("RESTRICTED"))
+                        .buildAsMap())
+                .build();
+
+            final CallbackResponse callbackResponse = aCallbackResponse()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(
+                    aClassificationBuilder()
+                        .withData("field1", getTextNode("PRIVATE"))
+                        .buildAsMap())
+                .build();
+
+            assertThrowsSecurityCallbackException(caseDetails, callbackResponse);
+        }
+
+        @Test
+        @DisplayName("should fail if extra classification for data nodes")
+        void shouldFailIfExtraClassificationForDataNodes() {
+            final CaseDetails caseDetails = aCaseDetails()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(
+                    aClassificationBuilder()
+                        .withData("field1", getTextNode("PUBLIC"))
+                        .buildAsMap())
+                .build();
+            final CallbackResponse callbackResponse = aCallbackResponse()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(
+                    aClassificationBuilder()
+                        .withData("field1", getTextNode("PRIVATE"))
+                        .withData("extraField2", getTextNode("RESTRICTED"))
+                        .buildAsMap())
+                .build();
+
+            assertThrowsSecurityCallbackException(caseDetails, callbackResponse);
+        }
+
+        @Test
+        @DisplayName("should fail if invalid classification value for callback data nodes")
+        void shouldFailIfInvalidClassificationValueForCallbackDataNodes() {
+            final CaseDetails caseDetails = aCaseDetails()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(
+                    aClassificationBuilder()
+                        .withData("field1", getTextNode("PRIVATE"))
+                        .buildAsMap())
+                .build();
+            final CallbackResponse callbackResponse = aCallbackResponse()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(
+                    aClassificationBuilder()
+                        .withData("field1", getTextNode("PLOP"))
+                        .buildAsMap())
+                .build();
+
+            assertThrowsSecurityCallbackException(caseDetails, callbackResponse);
+        }
+
+        @Test
+        @DisplayName("should fail if invalid classification level for data nodes")
+        void shouldFailIfInvalidClassificationLevelForDataNodes() {
+            final CaseDetails caseDetails = aCaseDetails()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(
+                    aClassificationBuilder()
+                        .withData("field1", getTextNode("PRIVATE"))
+                        .buildAsMap())
+                .build();
+            final CallbackResponse callbackResponse = aCallbackResponse()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(
+                    aClassificationBuilder()
+                        .withData("field1", getTextNode("PUBLIC"))
+                        .buildAsMap())
+                .build();
+
+            assertThrowsSecurityCallbackException(caseDetails, callbackResponse);
+        }
+
+        @Test
+        @DisplayName("should fail if invalid classification level for case")
+        void shouldFailIfInvalidClassificationLevelForCase() {
+            final CaseDetails caseDetails = aCaseDetails()
+                .withSecurityClassification(PRIVATE)
+                .withDataClassification(
+                    aClassificationBuilder()
+                        .withData("field1", getTextNode("PRIVATE"))
+                        .buildAsMap())
+                .build();
+            final CallbackResponse callbackResponse = aCallbackResponse()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(
+                    aClassificationBuilder()
+                        .withData("field1", getTextNode("PRIVATE"))
+                        .buildAsMap())
+                .build();
+
+            assertThrowsSecurityCallbackException(caseDetails, callbackResponse);
+        }
+    }
+
+    @Nested
+    @DisplayName("Validate data classification complex field")
+    class ValidateDataClassificationComplexField {
+
+        @Test
+        @DisplayName("should increase security if valid classification level for case and data nodes")
+        void shouldIncreaseSecurityIfValidClassificationLevelForCaseAndDataNodes() {
+            final CaseDetails caseDetails = aCaseDetails()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(
+                    aClassificationBuilder()
+                        .withData("complexField1",
+                                  aClassificationBuilder()
+                                      .withData("classification", getTextNode("PRIVATE"))
+                                      .withData("value",
+                                                aClassificationBuilder()
+                                                    .withData("field2", getTextNode("PRIVATE"))
+                                                    .buildAsNode())
+                                      .buildAsNode())
+                        .buildAsMap())
+                .build();
+            final CallbackResponse callbackResponse = aCallbackResponse()
+                .withSecurityClassification(PRIVATE)
+                .withDataClassification(
+                    aClassificationBuilder()
+                        .withData("complexField1",
+                                  aClassificationBuilder()
+                                      .withData("classification", getTextNode("RESTRICTED"))
+                                      .withData("value",
+                                                aClassificationBuilder()
+                                                    .withData("field2", getTextNode("RESTRICTED"))
+                                                    .buildAsNode())
+                                      .buildAsNode())
+                        .buildAsMap())
+                .build();
+
+            securityClassificationService.validateCallbackClassification(callbackResponse, caseDetails);
+
+            assertAll(
+                () -> Assert.assertThat(caseDetails.getSecurityClassification(), Matchers.is(PRIVATE)),
+                () -> Assert.assertThat(caseDetails.getDataClassification().size(), Matchers.is(1)),
+                () -> Assert.assertThat(caseDetails.getDataClassification().get("complexField1").size(), Matchers.is(2)),
+                () -> Assert.assertThat(caseDetails.getDataClassification().get("complexField1").get("classification"), Matchers.is(getTextNode("RESTRICTED"))),
+                () -> Assert.assertThat(caseDetails.getDataClassification().get("complexField1").get("value").size(), Matchers.is(1)),
+                () -> Assert.assertThat(caseDetails.getDataClassification().get("complexField1").get("value").get("field2"), Matchers.is(getTextNode("RESTRICTED")))
+            );
+        }
+
+        @Test
+        @DisplayName("should fail if missing classification for complex node")
+        void shouldFailIfMissingClassificationForComplexNode() {
+            final CaseDetails caseDetails = aCaseDetails()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(
+                    aClassificationBuilder()
+                        .withData("complexField1",
+                                  aClassificationBuilder()
+                                      .withData("value",
+                                                aClassificationBuilder()
+                                                    .withData("field2", getTextNode("PUBLIC"))
+                                                    .withData("missingField3", getTextNode("RESTRICTED"))
+                                                    .buildAsNode())
+                                      .buildAsNode())
+                        .buildAsMap())
+                .build();
+            final CallbackResponse callbackResponse = aCallbackResponse()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(
+                    aClassificationBuilder()
+                        .withData("complexField1",
+                                  aClassificationBuilder()
+                                      .withData("classification", getTextNode("PRIVATE"))
+                                      .withData("value",
+                                                aClassificationBuilder()
+                                                    .withData("field2", getTextNode("RESTRICTED"))
+                                                    .buildAsNode())
+                                      .buildAsNode())
+                        .buildAsMap())
+                .build();
+
+            assertThrowsSecurityCallbackException(caseDetails, callbackResponse);
+        }
+
+        @Test
+        @DisplayName("should fail if missing classification for data nodes")
+        void shouldFailIfMissingClassificationForDataNodes() {
+            final CaseDetails caseDetails = aCaseDetails()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(
+                    aClassificationBuilder()
+                        .withData("complexField1",
+                                  aClassificationBuilder()
+                                      .withData("classification", getTextNode("PRIVATE"))
+                                      .withData("value",
+                                                aClassificationBuilder()
+                                                    .withData("field2", getTextNode("PUBLIC"))
+                                                    .withData("missingField3", getTextNode("RESTRICTED"))
+                                                    .buildAsNode())
+                                      .buildAsNode())
+                        .buildAsMap())
+                .build();
+            final CallbackResponse callbackResponse = aCallbackResponse()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(
+                    aClassificationBuilder()
+                        .withData("complexField1",
+                                  aClassificationBuilder()
+                                      .withData("classification", getTextNode("PRIVATE"))
+                                      .withData("value",
+                                                aClassificationBuilder()
+                                                    .withData("field2", getTextNode("RESTRICTED"))
+                                                    .buildAsNode())
+                                      .buildAsNode())
+                        .buildAsMap())
+                .build();
+
+            assertThrowsSecurityCallbackException(caseDetails, callbackResponse);
+        }
+
+        @Test
+        @DisplayName("should fail if extra classification for data nodes")
+        void shouldFailIfExtraClassificationForDataNodes() {
+            final CaseDetails caseDetails = aCaseDetails()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(
+                    aClassificationBuilder()
+                        .withData("complexField1",
+                                  aClassificationBuilder()
+                                      .withData("classification", getTextNode("PRIVATE"))
+                                      .withData("value",
+                                                aClassificationBuilder()
+                                                    .withData("field2", getTextNode("PUBLIC"))
+                                                    .buildAsNode())
+                                      .buildAsNode())
+                        .buildAsMap())
+                .build();
+            final CallbackResponse callbackResponse = aCallbackResponse()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(
+                    aClassificationBuilder()
+                        .withData("complexField1",
+                                  aClassificationBuilder()
+                                      .withData("classification", getTextNode("PRIVATE"))
+                                      .withData("value",
+                                                aClassificationBuilder()
+                                                    .withData("field2", getTextNode("PRIVATE"))
+                                                    .withData("extraField3", getTextNode("RESTRICTED"))
+                                                    .buildAsNode())
+                                      .buildAsNode())
+                        .buildAsMap())
+                .build();
+
+            assertThrowsSecurityCallbackException(caseDetails, callbackResponse);
+        }
+
+        @Test
+        @DisplayName("should fail if invalid classification value for callback data")
+        void shouldFailIfInvalidClassificationValueForCallbackData() {
+            final CaseDetails caseDetails = aCaseDetails()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(
+                    aClassificationBuilder()
+                        .withData("complexField1",
+                                  aClassificationBuilder()
+                                      .withData("classification", getTextNode("PRIVATE"))
+                                      .withData("value",
+                                                aClassificationBuilder()
+                                                    .withData("field2", getTextNode("PRIVATE"))
+                                                    .buildAsNode())
+                                      .buildAsNode())
+                        .buildAsMap())
+                .build();
+            final CallbackResponse callbackResponse = aCallbackResponse()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(
+                    aClassificationBuilder()
+                        .withData("complexField1",
+                                  aClassificationBuilder()
+                                      .withData("classification", getTextNode("PLOP"))
+                                      .withData("value",
+                                                aClassificationBuilder()
+                                                    .withData("field2", getTextNode("PRIVATE"))
+                                                    .buildAsNode())
+                                      .buildAsNode())
+                        .buildAsMap())
+                .build();
+
+            assertThrowsSecurityCallbackException(caseDetails, callbackResponse);
+        }
+
+        @Test
+        @DisplayName("should fail if invalid classification value for callback data nodes")
+        void shouldFailIfInvalidClassificationValueForCallbackDataNodes() {
+            final CaseDetails caseDetails = aCaseDetails()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(
+                    aClassificationBuilder()
+                        .withData("complexField1",
+                                  aClassificationBuilder()
+                                      .withData("classification", getTextNode("PRIVATE"))
+                                      .withData("value",
+                                                aClassificationBuilder()
+                                                    .withData("field2", getTextNode("PRIVATE"))
+                                                    .buildAsNode())
+                                      .buildAsNode())
+                        .buildAsMap())
+                .build();
+            final CallbackResponse callbackResponse = aCallbackResponse()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(
+                    aClassificationBuilder()
+                        .withData("complexField1",
+                                  aClassificationBuilder()
+                                      .withData("classification", getTextNode("PRIVATE"))
+                                      .withData("value",
+                                                aClassificationBuilder()
+                                                    .withData("field2", getTextNode("PLOP"))
+                                                    .buildAsNode())
+                                      .buildAsNode())
+                        .buildAsMap())
+                .build();
+
+            assertThrowsSecurityCallbackException(caseDetails, callbackResponse);
+        }
+
+
+        @Test
+        @DisplayName("should fail if invalid classification level for data")
+        void shouldFailIfInvalidClassificationLevelForData() {
+            final CaseDetails caseDetails = aCaseDetails()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(
+                    aClassificationBuilder()
+                        .withData("complexField1",
+                                  aClassificationBuilder()
+                                      .withData("classification", getTextNode("PRIVATE"))
+                                      .withData("value",
+                                                aClassificationBuilder()
+                                                    .withData("field2", getTextNode("PRIVATE"))
+                                                    .buildAsNode())
+                                      .buildAsNode())
+                        .buildAsMap())
+                .build();
+            final CallbackResponse callbackResponse = aCallbackResponse()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(
+                    aClassificationBuilder()
+                        .withData("complexField1",
+                                  aClassificationBuilder()
+                                      .withData("classification", getTextNode("PUBLIC"))
+                                      .withData("value",
+                                                aClassificationBuilder()
+                                                    .withData("field2", getTextNode("PRIVATE"))
+                                                    .buildAsNode())
+                                      .buildAsNode())
+                        .buildAsMap())
+                .build();
+
+            assertThrowsSecurityCallbackException(caseDetails, callbackResponse);
+        }
+
+        @Test
+        @DisplayName("should fail if invalid classification level for data nodes")
+        void shouldFailIfInvalidClassificationLevelForDataNodes() {
+            final CaseDetails caseDetails = aCaseDetails()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(
+                    aClassificationBuilder()
+                        .withData("complexField1",
+                                  aClassificationBuilder()
+                                      .withData("classification", getTextNode("PRIVATE"))
+                                      .withData("value",
+                                                aClassificationBuilder()
+                                                    .withData("field2", getTextNode("PRIVATE"))
+                                                    .buildAsNode())
+                                      .buildAsNode())
+                        .buildAsMap())
+                .build();
+            final CallbackResponse callbackResponse = aCallbackResponse()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(
+                    aClassificationBuilder()
+                        .withData("complexField1",
+                                  aClassificationBuilder()
+                                      .withData("classification", getTextNode("PRIVATE"))
+                                      .withData("value",
+                                                aClassificationBuilder()
+                                                    .withData("field2", getTextNode("PUBLIC"))
+                                                    .buildAsNode())
+                                      .buildAsNode())
+                        .buildAsMap())
+                .build();
+
+            assertThrowsSecurityCallbackException(caseDetails, callbackResponse);
+        }
+    }
+
+    @Nested
+    @DisplayName("Validate data classification collection field")
+    class ValidateDataClassificationCollectionField {
+
+        @Test
+        @DisplayName("should increase security if valid classification level for case and data nodes")
+        void shouldIncreaseSecurityIfValidClassificationLevelForCaseAndDataNodes() {
+            final CaseDetails caseDetails = aCaseDetails()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(aClassificationBuilder()
+                                            .withData("collectionField1", aClassificationBuilder()
+                                                .withData("classification", getTextNode("PRIVATE"))
+                                                .withData("value",
+                                                          newArrayList(
+                                                              aClassificationBuilder()
+                                                                  .withData("value",
+                                                                            aClassificationBuilder()
+                                                                                .withData("field2", getTextNode("PRIVATE"))
+                                                                                    .buildAsNode())
+                                                                  .withData("id", getTextNode("someId1"))
+                                                                  .buildAsMap()))
+                                                .buildAsNode())
+                                            .buildAsMap())
+                .build();
+            final CallbackResponse callbackResponse = aCallbackResponse()
+                .withSecurityClassification(PRIVATE)
+                .withDataClassification(aClassificationBuilder()
+                                            .withData("collectionField1", aClassificationBuilder()
+                                                .withData("classification", getTextNode("RESTRICTED"))
+                                                .withData("value",
+                                                          newArrayList(
+                                                              aClassificationBuilder()
+                                                                  .withData("value",
+                                                                            aClassificationBuilder()
+                                                                                .withData("field2", getTextNode("RESTRICTED"))
+                                                                                    .buildAsNode())
+                                                                            .withData("id", getTextNode("someId1"))
+                                                                  .buildAsMap()))
+                                                .buildAsNode())
+                                            .buildAsMap())
+                .build();
+
+            securityClassificationService.validateCallbackClassification(callbackResponse, caseDetails);
+
+            assertAll(
+                () -> Assert.assertThat(caseDetails.getSecurityClassification(), Matchers.is(PRIVATE)),
+                () -> Assert.assertThat(caseDetails.getDataClassification().size(), Matchers.is(1)),
+                () -> Assert.assertThat(caseDetails.getDataClassification().get("collectionField1").size(), Matchers.is(2)),
+                () -> Assert.assertThat(caseDetails.getDataClassification().get("collectionField1").get("classification"),
+                                        Matchers.is(getTextNode("RESTRICTED"))),
+                () -> Assert.assertThat(caseDetails.getDataClassification().get("collectionField1").get("value").size(), Matchers.is(1)),
+                () -> Assert.assertThat(caseDetails.getDataClassification().get("collectionField1").get("value").get(0).get("id"),
+                                        Matchers.is(getTextNode("someId1"))),
+                () -> Assert.assertThat(caseDetails.getDataClassification().get("collectionField1").get("value").get(0).get("value").get("field2"),
+                                        Matchers.is(getTextNode("RESTRICTED")))
+            );
+        }
+
+        @Test
+        @DisplayName("should fail if missing collection item for data nodes")
+        void shouldFailIfMissingCollectionItemForDataNodes() {
+            final CaseDetails caseDetails = aCaseDetails()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(aClassificationBuilder()
+                                            .withData("collectionField1", aClassificationBuilder()
+                                                .withData("classification", getTextNode("PRIVATE"))
+                                                .withData("value",
+                                                          newArrayList(
+                                                              aClassificationBuilder()
+                                                                  .withData("value",
+                                                                            aClassificationBuilder()
+                                                                                .withData("field2", getTextNode("PRIVATE"))
+                                                                                .buildAsNode())
+                                                                  .withData("id", getTextNode("someId1"))
+                                                                                .buildAsMap(),
+                                                              aClassificationBuilder()
+                                                                  .withData("value",
+                                                                            aClassificationBuilder()
+                                                                                .withData("field3", getTextNode("PRIVATE"))
+                                                                                .buildAsNode())
+                                                                  .withData("id", getTextNode("someId2"))
+                                                                                .buildAsMap()))
+                                                .buildAsNode())
+                                            .buildAsMap())
+                .build();
+            final CallbackResponse callbackResponse = aCallbackResponse()
+                .withSecurityClassification(PRIVATE)
+                .withDataClassification(aClassificationBuilder()
+                                            .withData("collectionField1", aClassificationBuilder()
+                                                .withData("classification", getTextNode("RESTRICTED"))
+                                                .withData("value",
+                                                          newArrayList(
+                                                              aClassificationBuilder()
+                                                                  .withData("value",
+                                                                            aClassificationBuilder()
+                                                                                .withData("field2", getTextNode("PRIVATE"))
+                                                                                .buildAsNode())
+                                                                  .withData("id", getTextNode("someId1"))
+                                                                                .buildAsMap(),
+                                                              aClassificationBuilder()
+                                                                  .withData("id", getTextNode("someId2"))
+                                                                  .buildAsMap()))
+                                                .buildAsNode())
+                                            .buildAsMap())
+                .build();
+
+            assertThrowsSecurityCallbackException(caseDetails, callbackResponse);
+        }
+
+        @Test
+        @DisplayName("should fail if missing classification for data nodes")
+        void shouldFailIfMissingClassificationForDataNodes() {
+            final CaseDetails caseDetails = aCaseDetails()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(aClassificationBuilder()
+                                            .withData("collectionField1", aClassificationBuilder()
+                                                .withData("classification", getTextNode("PRIVATE"))
+                                                .withData("value",
+                                                          newArrayList(
+                                                              aClassificationBuilder()
+                                                                  .withData("value",
+                                                                            aClassificationBuilder()
+                                                                                .withData("field2", getTextNode("PRIVATE"))
+                                                                                .withData("missingField3", getTextNode("RESTRICTED"))
+                                                                                .buildAsNode())
+                                                                  .withData("id", getTextNode("someId1"))
+                                                                  .buildAsMap()))
+                                                .buildAsNode())
+                                            .buildAsMap())
+                .build();
+            final CallbackResponse callbackResponse = aCallbackResponse()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(aClassificationBuilder()
+                                            .withData("collectionField1", aClassificationBuilder()
+                                                .withData("classification", getTextNode("PRIVATE"))
+                                                .withData("value",
+                                                          newArrayList(
+                                                              aClassificationBuilder()
+                                                                  .withData("value",
+                                                                            aClassificationBuilder()
+                                                                                .withData("field2", getTextNode("RESTRICTED"))
+                                                                                .buildAsNode())
+                                                                  .withData("id", getTextNode("someId1"))
+                                                                  .buildAsMap()))
+                                                .buildAsNode())
+                                            .buildAsMap())
+                .build();
+
+            assertThrowsSecurityCallbackException(caseDetails, callbackResponse);
+        }
+
+        @Test
+        @DisplayName("should fail if extra classification for data nodes")
+        void shouldFailIfExtraClassificationForDataNodes() {
+            final CaseDetails caseDetails = aCaseDetails()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(aClassificationBuilder()
+                                            .withData("collectionField1", aClassificationBuilder()
+                                                .withData("classification", getTextNode("PRIVATE"))
+                                                .withData("value",
+                                                          newArrayList(aClassificationBuilder()
+                                                                           .withData("value", aClassificationBuilder()
+                                                                               .withData("field2", getTextNode("PRIVATE"))
+                                                                                   .buildAsNode())
+                                                                               .withData("id", getTextNode("someId1"))
+                                                                           .buildAsMap()))
+                                                .buildAsNode())
+                                            .buildAsMap())
+                .build();
+            final CallbackResponse callbackResponse = aCallbackResponse()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(aClassificationBuilder()
+                                            .withData("collectionField1", aClassificationBuilder()
+                                                .withData("classification", getTextNode("PRIVATE"))
+                                                .withData("value",
+                                                          newArrayList(aClassificationBuilder()
+                                                                           .withData("value", aClassificationBuilder()
+                                                                               .withData("field2", getTextNode("PRIVATE"))
+                                                                               .withData("extraField3", getTextNode("RESTRICTED"))
+                                                                               .buildAsNode())
+                                                                           .withData("id", getTextNode("someId1"))
+                                                                           .buildAsMap()))
+                                                .buildAsNode())
+                                            .buildAsMap())
+                .build();
+
+            assertThrowsSecurityCallbackException(caseDetails, callbackResponse);
+        }
+
+        @Test
+        @DisplayName("should fail if extra collection item")
+        void shouldFailIfExtraCollectionItem() {
+            final CaseDetails caseDetails = aCaseDetails()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(aClassificationBuilder()
+                                            .withData("collectionField1", aClassificationBuilder()
+                                                .withData("classification", getTextNode("PRIVATE"))
+                                                .withData("value",
+                                                          newArrayList(aClassificationBuilder()
+                                                                           .withData("value", aClassificationBuilder()
+                                                                               .withData("field2", getTextNode("PRIVATE"))
+                                                                               .withData("field3", getTextNode("RESTRICTED"))
+                                                                               .buildAsNode())
+                                                                           .withData("id", getTextNode("someId1"))
+                                                                           .buildAsMap()))
+                                                .buildAsNode())
+                                            .buildAsMap())
+                .build();
+            final CallbackResponse callbackResponse = aCallbackResponse()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(aClassificationBuilder()
+                                            .withData("collectionField1", aClassificationBuilder()
+                                                .withData("classification", getTextNode("PRIVATE"))
+                                                .withData("value",
+                                                          newArrayList(aClassificationBuilder()
+                                                                           .withData("value", aClassificationBuilder()
+                                                                               .withData("field2", getTextNode("PRIVATE"))
+                                                                               .withData("field3", getTextNode("RESTRICTED"))
+                                                                               .buildAsNode())
+                                                                           .withData("id", getTextNode("someId1"))
+                                                                           .buildAsMap(),
+                                                                       aClassificationBuilder()
+                                                                           .withData("value", aClassificationBuilder()
+                                                                               .withData("extraField1", getTextNode("PRIVATE"))
+                                                                               .withData("extraField2", getTextNode("RESTRICTED"))
+                                                                               .buildAsNode())
+                                                                           .withData("id", getTextNode("extraItemId"))
+                                                                           .buildAsMap()))
+                                                .buildAsNode())
+                                            .buildAsMap())
+                .build();
+
+            assertThrowsSecurityCallbackException(caseDetails, callbackResponse);
+        }
+
+        @Test
+        @DisplayName("should fail if invalid classification value for callback data")
+        void shouldFailIfInvalidClassificationValueForCaseDataNodes() {
+            final CaseDetails caseDetails = aCaseDetails()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(aClassificationBuilder()
+                                            .withData("collectionField1", aClassificationBuilder()
+                                                .withData("classification", getTextNode("PRIVATE"))
+                                                .withData("value",
+                                                          newArrayList(aClassificationBuilder()
+                                                                           .withData("value", aClassificationBuilder()
+                                                                               .withData("field2", getTextNode("PRIVATE"))
+                                                                               .buildAsNode())
+                                                                           .withData("id", getTextNode("someId1"))
+                                                                           .buildAsMap()))
+                                                .buildAsNode())
+                                            .buildAsMap())
+                .build();
+            final CallbackResponse callbackResponse = aCallbackResponse()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(aClassificationBuilder()
+                                            .withData("collectionField1", aClassificationBuilder()
+                                                .withData("classification", getTextNode("PLOP"))
+                                                .withData("value",
+                                                          newArrayList(aClassificationBuilder()
+                                                                           .withData("value", aClassificationBuilder()
+                                                                               .withData("field2", getTextNode("PRIVATE"))
+                                                                               .buildAsNode())
+                                                                           .withData("id", getTextNode("someId1"))
+                                                                           .buildAsMap()))
+                                                .buildAsNode())
+                                            .buildAsMap())
+                .build();
+
+            assertThrowsSecurityCallbackException(caseDetails, callbackResponse);
+        }
+
+        @Test
+        @DisplayName("should fail if invalid classification value for callback data nodes")
+        void shouldFailIfInvalidClassificationValueForCallbackDataNodes() {
+            final CaseDetails caseDetails = aCaseDetails()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(aClassificationBuilder()
+                                            .withData("collectionField1", aClassificationBuilder()
+                                                .withData("classification", getTextNode("PRIVATE"))
+                                                .withData("value",
+                                                          newArrayList(aClassificationBuilder()
+                                                                           .withData("value", aClassificationBuilder()
+                                                                               .withData("field2", getTextNode("PRIVATE"))
+                                                                               .buildAsNode())
+                                                                           .withData("id", getTextNode("someId1"))
+                                                                           .buildAsMap()))
+                                                .buildAsNode())
+                                            .buildAsMap())
+                .build();
+            final CallbackResponse callbackResponse = aCallbackResponse()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(aClassificationBuilder()
+                                            .withData("collectionField1", aClassificationBuilder()
+                                                .withData("classification", getTextNode("PRIVATE"))
+                                                .withData("value",
+                                                          newArrayList(aClassificationBuilder()
+                                                                           .withData("value", aClassificationBuilder()
+                                                                               .withData("field2", getTextNode("PLOP"))
+                                                                               .buildAsNode())
+                                                                           .withData("id", getTextNode("someId1"))
+                                                                           .buildAsMap()))
+                                                .buildAsNode())
+                                            .buildAsMap())
+                .build();
+
+            assertThrowsSecurityCallbackException(caseDetails, callbackResponse);
+        }
+
+        @Test
+        @DisplayName("should fail if invalid classification level for data nodes")
+        void shouldFailIfInvalidClassificationLevelForDataNodes() {
+            final CaseDetails caseDetails = aCaseDetails()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(aClassificationBuilder()
+                                            .withData("collectionField1", aClassificationBuilder()
+                                                .withData("classification", getTextNode("PRIVATE"))
+                                                .withData("value",
+                                                          newArrayList(aClassificationBuilder()
+                                                                           .withData("value", aClassificationBuilder()
+                                                                               .withData("field2", getTextNode("PRIVATE"))
+                                                                               .buildAsNode())
+                                                                           .withData("id", getTextNode("someId1"))
+                                                                           .buildAsMap()))
+                                                .buildAsNode())
+                                            .buildAsMap())
+                .build();
+            final CallbackResponse callbackResponse = aCallbackResponse()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(aClassificationBuilder()
+                                            .withData("collectionField1", aClassificationBuilder()
+                                                .withData("classification", getTextNode("PRIVATE"))
+                                                .withData("value",
+                                                          newArrayList(aClassificationBuilder()
+                                                                           .withData("value", aClassificationBuilder()
+                                                                               .withData("field2", getTextNode("PUBLIC"))
+                                                                               .buildAsNode())
+                                                                           .withData("id", getTextNode("someId1"))
+                                                                           .buildAsMap()))
+                                                .buildAsNode())
+                                            .buildAsMap())
+                .build();
+
+            assertThrowsSecurityCallbackException(caseDetails, callbackResponse);
+        }
+
+        @Test
+        @DisplayName("should fail if invalid classification level for data")
+        void shouldFailIfInvalidClassificationLevelForData() {
+            final CaseDetails caseDetails = aCaseDetails()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(aClassificationBuilder()
+                                            .withData("collectionField1", aClassificationBuilder()
+                                                .withData("classification", getTextNode("PRIVATE"))
+                                                .withData("value",
+                                                          newArrayList(aClassificationBuilder()
+                                                                           .withData("value", aClassificationBuilder()
+                                                                               .withData("field2", getTextNode("PRIVATE"))
+                                                                               .buildAsNode())
+                                                                           .withData("id", getTextNode("someId1"))
+                                                                           .buildAsMap()))
+                                                .buildAsNode())
+                                            .buildAsMap())
+                .build();
+            final CallbackResponse callbackResponse = aCallbackResponse()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(aClassificationBuilder()
+                                            .withData("collectionField1", aClassificationBuilder()
+                                                .withData("classification", getTextNode("PUBLIC"))
+                                                .withData("value",
+                                                          newArrayList(aClassificationBuilder()
+                                                                           .withData("value", aClassificationBuilder()
+                                                                               .withData("field2", getTextNode("PRIVATE"))
+                                                                               .buildAsNode())
+                                                                           .withData("id", getTextNode("someId1"))
+                                                                           .buildAsMap()))
+                                                .buildAsNode())
+                                            .buildAsMap())
+                .build();
+
+            assertThrowsSecurityCallbackException(caseDetails, callbackResponse);
+        }
+    }
+
+    private void assertThrowsSecurityCallbackException(CaseDetails caseDetails, CallbackResponse callbackResponse) {
+        CallbackException callbackException = assertThrows(CallbackException.class,
+                                                           () -> securityClassificationService.validateCallbackClassification(callbackResponse, caseDetails));
+        assertEquals("The event cannot be completed as something went wrong while updating the security level of the case or some of the case fields", callbackException.getMessage());
     }
 
     private JsonNode getTextNode(String value) {

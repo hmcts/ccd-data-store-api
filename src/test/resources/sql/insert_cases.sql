@@ -551,16 +551,22 @@ VALUES (13, 'TestAddressBookCaseNoReadFieldAccess', 'PROBATE', 'CaseCreated', 'P
          "PersonFirstName": "PRIVATE",
          "PersonLastName": "PUBLIC",
          "PersonAddress": {
-           "AddressLine1": "PUBLIC",
-           "AddressLine2": "PUBLIC",
-           "AddressLine3": "PUBLIC",
-           "Country": "PUBLIC",
-           "Postcode": "PUBLIC"
+           "classification" : "PUBLIC",
+           "value" : {
+             "AddressLine1": "PUBLIC",
+             "AddressLine2": "PUBLIC",
+             "AddressLine3": "PUBLIC",
+             "Country": "PUBLIC",
+             "Postcode": "PUBLIC"
+           }
          },
          "D8Document": {
-           "document_url": "PUBLIC",
-           "document_binary_url": "PUBLIC",
-           "document_filename": "PUBLIC"
+           "classification" : "PUBLIC",
+           "value" : {
+             "document_url": "PUBLIC",
+             "document_binary_url": "PUBLIC",
+             "document_filename": "PUBLIC"
+           }
          }
        }',
        '1504259907353651'
