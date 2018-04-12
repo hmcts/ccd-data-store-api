@@ -17,7 +17,6 @@ public class CallbackResponse {
     private Map<String, JsonNode> dataClassification;
     @JsonProperty("security_classification")
     private SecurityClassification securityClassification;
-    private String state;
     private List<String> errors;
     private List<String> warnings;
 
@@ -67,11 +66,4 @@ public class CallbackResponse {
         this.securityClassification = securityClassification;
     }
 
-    public String getState() {
-        return state;
-    }
-
-    public void setState(String state) {
-        this.state = state;
-    }
 }
