@@ -9,12 +9,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-//@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CallbackResponse {
     @ApiModelProperty("Case data as defined in case type definition. See `docs/api/case-data.md` for data structure.")
     private Map<String, JsonNode> data;
     @JsonProperty("data_classification")
-    @ApiModelProperty("Same structure as `case_data` with classification (`PUBLIC`, `PRIVATE`, `RESTRICTED`) as field's value.")
+    @ApiModelProperty("Same structure as `data` with classification (`PUBLIC`, `PRIVATE`, `RESTRICTED`) as field's value.")
     private Map<String, JsonNode> dataClassification;
     @JsonProperty("security_classification")
     private SecurityClassification securityClassification;
