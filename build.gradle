@@ -188,7 +188,7 @@ dependencies {
     compile group: 'org.liquibase', name: 'liquibase-core', version: '3.5.5'
     compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.5'
     compile group: 'uk.gov.hmcts.reform.auth', name: 'auth-checker-lib', version: '2.1.1'
-    compile group: 'uk.gov.hmcts.auth.provider.service', name: 'service-token-generator-spring', version: '2.1.0'
+    compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '0.6.0'
     compile group: 'com.sun.mail', name: 'mailapi', version: '1.6.1'
     compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
 

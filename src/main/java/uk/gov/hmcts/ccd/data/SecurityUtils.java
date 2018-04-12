@@ -1,25 +1,24 @@
 package uk.gov.hmcts.ccd.data;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.auth.provider.service.token.ServiceTokenGenerator;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 @Service
 public class SecurityUtils {
-    private final ServiceTokenGenerator serviceTokenGenerator;
+    private final AuthTokenGenerator authTokenGenerator;
 
     @Autowired
-    public SecurityUtils(@Qualifier("cachedServiceTokenGenerator") final ServiceTokenGenerator serviceTokenGenerator) {
-        this.serviceTokenGenerator = serviceTokenGenerator;
+    public SecurityUtils(final AuthTokenGenerator authTokenGenerator) {
+        this.authTokenGenerator = authTokenGenerator;
     }
 
     public HttpHeaders authorizationHeaders() {
         final HttpHeaders headers = new HttpHeaders();
-        headers.add("ServiceAuthorization", serviceTokenGenerator.generate());
+        headers.add("ServiceAuthorization", authTokenGenerator.generate());
 
         if (SecurityContextHolder.getContext().getAuthentication() != null) {
             final ServiceAndUserDetails serviceAndUser = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

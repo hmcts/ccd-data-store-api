@@ -23,7 +23,7 @@ public abstract class BaseTest {
                                                               aat.getCaseworkerAutoTestPassword());
 
         final String s2sToken = aat.getS2SHelper()
-                                   .getToken(aat.getGatewayServiceName(), aat.getGatewayServiceSecret());
+                                   .getToken();
 
         return () -> RestAssured.given()
                           .header("Authorization", "Bearer " + caseworker.getAccessToken())
