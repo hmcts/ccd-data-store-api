@@ -15,10 +15,12 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
+import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -39,6 +41,7 @@ public class SecurityClassificationService {
     private static final String CLASSIFICATION = "classification";
     private static final ObjectNode EMPTY_NODE = JSON_NODE_FACTORY.objectNode();
     private static final ArrayNode EMPTY_ARRAY = JSON_NODE_FACTORY.arrayNode();
+    private static final String VALIDATION_ERR_MSG = "The event cannot be completed as something went wrong while updating the security level of the case or some of the case fields";
 
     private static final Logger LOG = LoggerFactory.getLogger(SecurityClassificationService.class);
 
@@ -59,7 +62,8 @@ public class SecurityClassificationService {
         Optional<SecurityClassification> userClassificationOpt = getUserClassification(caseDetails.getJurisdiction());
         Optional<CaseDetails> result = Optional.of(caseDetails);
 
-        return result.filter(caseIfHasClassificationEqualOrLowerThan(userClassificationOpt))
+        return userClassificationOpt
+            .flatMap(securityClassification -> result.filter(caseHasClassificationEqualOrLowerThan(securityClassification))
                 .map(cd -> {
                     if (cd.getDataClassification() == null) {
                         LOG.warn("No data classification for case with reference={}, all fields removed", cd.getReference());
@@ -67,11 +71,11 @@ public class SecurityClassificationService {
                     }
 
                     JsonNode data = filterNestedObject(MAPPER.convertValue(caseDetails.getData(), JsonNode.class),
-                            MAPPER.convertValue(caseDetails.getDataClassification(), JsonNode.class),
-                            userClassificationOpt.get());
+                                                       MAPPER.convertValue(caseDetails.getDataClassification(), JsonNode.class),
+                                                       securityClassification);
                     caseDetails.setData(MAPPER.convertValue(data, STRING_JSON_MAP));
                     return cd;
-                });
+                }));
     }
 
     public List<AuditEvent> apply(String jurisdictionId, List<AuditEvent> events) {
@@ -116,35 +120,36 @@ public class SecurityClassificationService {
         while (dataIterator.hasNext()) {
             Map.Entry<String, JsonNode> dataElement = dataIterator.next();
             String dataElementKey = dataElement.getKey();
-            JsonNode dataClassificationParent = dataClassification.get(dataElementKey);
-            if (isNull(dataClassificationParent)) {
+            JsonNode dataClassificationElement = dataClassification.get(dataElementKey);
+            if (isNull(dataClassificationElement)) {
                 dataIterator.remove();
-            } else if (dataClassificationParent.has(VALUE)) {
-                JsonNode dataClassificationValue = dataClassificationParent.get(VALUE);
+            } else if (dataClassificationElement.has(VALUE)) {
+                JsonNode dataClassificationValue = dataClassificationElement.get(VALUE);
                 JsonNode dataElementValue = dataElement.getValue();
                 if (dataClassificationValue.isObject()) {
-                    filterObject(userClassification, dataIterator, dataClassificationParent, dataElementValue);
-                } else if (dataClassificationValue.isArray()) {
+                    filterObject(userClassification, dataIterator, dataClassificationElement, dataElementValue);
+                } else {
                     filterCollection(userClassification,
                                      dataIterator,
-                                     dataClassificationParent,
-                                     dataClassificationValue,
+                                     dataClassificationElement,
                                      dataElementValue);
                 }
-            } else if (dataClassificationParent.isTextual()) {
-                filterSimpleField(userClassification, dataIterator, dataClassificationParent);
+            } else if (dataClassificationElement.isTextual()) {
+                filterSimpleField(userClassification, dataIterator, dataClassificationElement);
+            } else {
+                dataIterator.remove();
             }
         }
         return data;
     }
 
-    private void filterCollection(SecurityClassification userClassification, Iterator<Map.Entry<String, JsonNode>> dataIterator, JsonNode dataClassificationParent, JsonNode dataClassificationValue, JsonNode dataElementValue) {
+    private void filterCollection(SecurityClassification userClassification, Iterator<Map.Entry<String, JsonNode>> dataIterator, JsonNode dataClassificationElement, JsonNode dataElementValue) {
         Iterator<JsonNode> dataCollectionIterator = dataElementValue.iterator();
         while (dataCollectionIterator.hasNext()) {
             JsonNode collectionElement = dataCollectionIterator.next();
             JsonNode dataClassificationForData = getDataClassificationForData(collectionElement,
-                                                                              dataClassificationValue.iterator());
-            if (dataClassificationForData == null) {
+                                                                              dataClassificationElement.get(VALUE).iterator());
+            if (dataClassificationForData.isNull()) {
                 dataCollectionIterator.remove();
                 continue;
             }
@@ -168,7 +173,7 @@ public class SecurityClassificationService {
         if (dataElementValue.equals(EMPTY_ARRAY)) {
             filterSimpleField(userClassification,
                               dataIterator,
-                              dataClassificationParent.get(CLASSIFICATION));
+                              dataClassificationElement.get(CLASSIFICATION));
         }
     }
 
@@ -183,8 +188,95 @@ public class SecurityClassificationService {
         }
     }
 
+    private void filterSimpleField(SecurityClassification userClassification, Iterator iterator, JsonNode dataClassificationValue) {
+        Optional<SecurityClassification> securityClassification = getSecurityClassification(dataClassificationValue);
+        if (!securityClassification.isPresent() || !userClassification.higherOrEqualTo(securityClassification.get())) {
+            iterator.remove();
+        }
+    }
+
     private boolean isNull(JsonNode... jsonNodes) {
         return newArrayList(jsonNodes).stream().anyMatch(Objects::isNull);
+    }
+
+    public void validateCallbackClassification(CallbackResponse callbackResponse, CaseDetails caseDetails) {
+        Optional<CaseDetails> result = Optional.of(caseDetails);
+
+        result.filter(caseHasClassificationEqualOrLowerThan(callbackResponse.getSecurityClassification()))
+            .map(cd -> {
+                cd.setSecurityClassification(callbackResponse.getSecurityClassification());
+
+                validateObject(MAPPER.convertValue(callbackResponse.getDataClassification(), JsonNode.class),
+                               MAPPER.convertValue(caseDetails.getDataClassification(), JsonNode.class));
+
+                caseDetails.setDataClassification(MAPPER.convertValue(callbackResponse.getDataClassification(), STRING_JSON_MAP));
+                return cd;
+            })
+            .orElseThrow(() -> {
+                LOG.warn("Case={} classification is higher than callbackResponse={} case classification", caseDetails, callbackResponse);
+                return new CallbackException(VALIDATION_ERR_MSG);
+            });
+    }
+
+    private void validateObject(JsonNode callbackDataClassification, JsonNode defaultDataClassification) {
+
+        if (!isNotNullAndSizeEqual(callbackDataClassification, defaultDataClassification)) {
+            LOG.warn("defaultClassification={} and callbackClassification={} sizes differ", defaultDataClassification, callbackDataClassification);
+            throw new CallbackException(VALIDATION_ERR_MSG);
+        }
+
+        Iterator<Map.Entry<String, JsonNode>> callbackDataClassificationIterator = callbackDataClassification.fields();
+        while (callbackDataClassificationIterator.hasNext()) {
+            Map.Entry<String, JsonNode> callbackClassificationMap = callbackDataClassificationIterator.next();
+            String callbackClassificationKey = callbackClassificationMap.getKey();
+            JsonNode callbackClassificationValue = callbackClassificationMap.getValue();
+            JsonNode defaultClassificationItem = defaultDataClassification.get(callbackClassificationKey);
+            if (callbackClassificationValue.has(CLASSIFICATION)) {
+                validateCallbackClassification(callbackClassificationValue.get(CLASSIFICATION), defaultClassificationItem.get(CLASSIFICATION));
+                if (callbackClassificationValue.has(VALUE)) {
+                    JsonNode defaultClassificationValue = defaultClassificationItem.get(VALUE);
+                    JsonNode callbackClassificationItem = callbackClassificationValue.get(VALUE);
+                    if (callbackClassificationItem.isObject()) {
+                        validateObject(callbackClassificationItem, defaultClassificationValue);
+                    } else {
+                        validateCollection(callbackClassificationItem, defaultClassificationValue);
+                    }
+                }
+            } else {
+                validateCallbackClassification(callbackClassificationValue, defaultClassificationItem);
+            }
+        }
+    }
+
+    private boolean isNotNullAndSizeEqual(JsonNode callbackDataClassification, JsonNode defaultDataClassification) {
+        return defaultDataClassification != null && callbackDataClassification != null &&
+            defaultDataClassification.size() == callbackDataClassification.size();
+    }
+
+
+    private void validateCollection(JsonNode callbackClassificationItem, JsonNode defaultClassificationItem) {
+        for (JsonNode callbackItem : callbackClassificationItem) {
+            JsonNode defaultItem = getDataClassificationForData(callbackItem, defaultClassificationItem.iterator());
+            if (defaultItem.isNull()) {
+                LOG.warn("No defaultClassificationItem for callbackItem={} is null", callbackItem);
+                throw new CallbackException(VALIDATION_ERR_MSG);
+            }
+            JsonNode callbackItemValue = callbackItem.get(VALUE);
+            JsonNode defaultItemValue = defaultItem.get(VALUE);
+            validateObject(callbackItemValue, defaultItemValue);
+        }
+    }
+
+    private void validateCallbackClassification(JsonNode callbackClassificationValue, JsonNode defaultClassificationValue) {
+        Optional<SecurityClassification> callbackSecurityClassification = getSecurityClassification(callbackClassificationValue);
+        Optional<SecurityClassification> defaultSecurityClassification = getSecurityClassification(defaultClassificationValue);
+        if (!defaultSecurityClassification.isPresent() || !callbackSecurityClassification.isPresent()
+            || !callbackSecurityClassification.get().higherOrEqualTo(defaultSecurityClassification.get())) {
+            LOG.warn("defaultClassificationValue={} has higher classification than callbackClassificationValue={} is null",
+                     defaultClassificationValue,
+                     callbackClassificationValue);
+            throw new CallbackException(VALIDATION_ERR_MSG);
+        }
     }
 
     private JsonNode getDataClassificationForData(JsonNode data, Iterator<JsonNode> dataIterator) {
@@ -197,14 +289,7 @@ public class SecurityClassificationService {
                 found = true;
             }
         }
-        return dataClassificationValue;
-    }
-
-    private void filterSimpleField(SecurityClassification userClassification, Iterator iterator, JsonNode dataClassificationValue) {
-        Optional<SecurityClassification> securityClassification = getSecurityClassification(dataClassificationValue);
-        if (!securityClassification.isPresent() || !userClassification.higherOrEqualTo(securityClassification.get())) {
-            iterator.remove();
-        }
+        return found ? dataClassificationValue : JSON_NODE_FACTORY.nullNode();
     }
 
     private Optional<SecurityClassification> getSecurityClassification(JsonNode dataNode) {
@@ -222,7 +307,7 @@ public class SecurityClassificationService {
         return Optional.of(securityClassification);
     }
 
-    private Predicate<CaseDetails> caseIfHasClassificationEqualOrLowerThan(Optional<SecurityClassification> userClassificationOpt) {
-        return cd -> userClassificationOpt.map(uc -> uc.higherOrEqualTo(cd.getSecurityClassification())).orElse(false);
+    private Predicate<CaseDetails> caseHasClassificationEqualOrLowerThan(SecurityClassification classification) {
+        return cd -> Optional.ofNullable(classification).map(uc -> uc.higherOrEqualTo(cd.getSecurityClassification())).orElse(false);
     }
 }

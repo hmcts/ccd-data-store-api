@@ -1,13 +1,24 @@
 package uk.gov.hmcts.ccd.domain.model.callbacks;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
+import io.swagger.annotations.ApiModelProperty;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CallbackResponse {
+    @ApiModelProperty("Case data as defined in case type definition. See `docs/api/case-data.md` for data structure.")
     private Map<String, JsonNode> data;
+    @JsonProperty("data_classification")
+    @ApiModelProperty("Same structure as `case_data` with classification (`PUBLIC`, `PRIVATE`, `RESTRICTED`) as field's value.")
+    private Map<String, JsonNode> dataClassification;
+    @JsonProperty("security_classification")
+    private SecurityClassification securityClassification;
+    private String state;
     private List<String> errors;
     private List<String> warnings;
 
@@ -39,5 +50,29 @@ public class CallbackResponse {
 
     public void setWarnings(List<String> warnings) {
         this.warnings = warnings;
+    }
+
+    public Map<String, JsonNode> getDataClassification() {
+        return dataClassification;
+    }
+
+    public void setDataClassification(Map<String, JsonNode> dataClassification) {
+        this.dataClassification = dataClassification;
+    }
+
+    public SecurityClassification getSecurityClassification() {
+        return securityClassification;
+    }
+
+    public void setSecurityClassification(SecurityClassification securityClassification) {
+        this.securityClassification = securityClassification;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
     }
 }

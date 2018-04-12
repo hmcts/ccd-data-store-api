@@ -12,6 +12,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 
 import java.util.Map;
@@ -20,21 +21,24 @@ import java.util.Optional;
 @Service
 public class CallbackInvoker {
 
-    public static final String CALLBACK_RESPONSE_KEY_STATE = "state";
+    private static final String CALLBACK_RESPONSE_KEY_STATE = "state";
     private final CallbackService callbackService;
     private final CaseTypeService caseTypeService;
     private final CaseDataService caseDataService;
     private final CaseSanitiser caseSanitiser;
+    private final SecurityClassificationService securityClassificationService;
 
     @Autowired
     public CallbackInvoker(final CallbackService callbackService,
                            final CaseTypeService caseTypeService,
                            final CaseDataService caseDataService,
-                           final CaseSanitiser caseSanitiser) {
+                           final CaseSanitiser caseSanitiser,
+                           final SecurityClassificationService securityClassificationService) {
         this.callbackService = callbackService;
         this.caseTypeService = caseTypeService;
         this.caseDataService = caseDataService;
         this.caseSanitiser = caseSanitiser;
+        this.securityClassificationService = securityClassificationService;
     }
 
     public void invokeAboutToStartCallback(final CaseEvent caseEvent,
@@ -61,10 +65,10 @@ public class CallbackInvoker {
             eventTrigger.getCallBackURLAboutToSubmitEvent(),
             eventTrigger.getRetriesTimeoutURLAboutToSubmitEvent(),
             eventTrigger, caseDetailsBefore, caseDetails);
-        return callbackResponse.flatMap(response -> validateAndSetDataAndState(caseType,
-                                                                               caseDetails,
-                                                                               ignoreWarning,
-                                                                               response));
+        return callbackResponse.flatMap(response -> validateSubmitCallback(caseType,
+                                                                           caseDetails,
+                                                                           ignoreWarning,
+                                                                           response));
     }
 
     public ResponseEntity<AfterSubmitCallbackResponse> invokeSubmittedCallback(final CaseEvent eventTrigger,
@@ -94,14 +98,15 @@ public class CallbackInvoker {
         caseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(caseType, caseDetails.getData()));
     }
 
-    Optional<String> validateAndSetDataAndState(final CaseType caseType,
+    Optional<String> validateSubmitCallback(final CaseType caseType,
                                             final CaseDetails caseDetails,
                                             final Boolean ignoreWarning,
                                             final CallbackResponse callbackResponse) {
         callbackService.validateCallbackErrorsAndWarnings(callbackResponse, ignoreWarning);
         if (callbackResponse.getData() != null) {
-            final Optional<String> newCaseState = filterCaseState(callbackResponse.getData());
             validateAndSetData(caseType, caseDetails, callbackResponse.getData());
+            securityClassificationService.validateCallbackClassification(callbackResponse, caseDetails);
+            final Optional<String> newCaseState = filterCaseState(callbackResponse.getData());
             newCaseState.ifPresent(caseDetails::setState);
             return newCaseState;
         }
