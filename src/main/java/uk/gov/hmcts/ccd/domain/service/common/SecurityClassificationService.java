@@ -37,7 +37,6 @@ public class SecurityClassificationService {
     private static final String CLASSIFICATION = "classification";
     private static final ObjectNode EMPTY_NODE = JSON_NODE_FACTORY.objectNode();
     private static final ArrayNode EMPTY_ARRAY = JSON_NODE_FACTORY.arrayNode();
-    private static final String VALIDATION_ERR_MSG = "The event cannot be completed as something went wrong while updating the security level of the case or some of the case fields";
 
     private static final Logger LOG = LoggerFactory.getLogger(SecurityClassificationService.class);
 
