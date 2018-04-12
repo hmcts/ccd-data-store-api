@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
-import static java.util.stream.Collectors.toList;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
@@ -70,9 +68,4 @@ public class UserDefault {
 
     public void setWorkBasketDefaultState(final String workBasketDefaultState) {
         this.workBasketDefaultState = workBasketDefaultState;
-    }
-
-    public List<String> getJurisdictionsId() {
-        return this.jurisdictions.stream().map(Jurisdiction::getId).collect(toList());
-    }
-}
+    }}

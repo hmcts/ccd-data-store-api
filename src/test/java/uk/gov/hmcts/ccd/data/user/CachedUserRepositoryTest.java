@@ -35,6 +35,45 @@ class CachedUserRepositoryTest {
     }
 
     @Nested
+    @DisplayName("getUserSettings()")
+    class getUserSettings {
+
+        @Test
+        @DisplayName("should initially retrieve user settings from decorated repository")
+        void shouldRetrieveUserSettingsFromDecorated () {
+            final UserProfile expectedUserSettings = new UserProfile();
+            doReturn(expectedUserSettings).when(userRepository).getUserSettings();
+
+            final UserProfile userSettings = cachedUserRepository.getUserSettings();
+
+            assertAll(
+                () -> assertThat(userSettings, is(expectedUserSettings)),
+                () -> verify(userRepository, times(1)).getUserSettings()
+            );
+        }
+
+        @Test
+        @DisplayName("should cache user settings for subsequent calls")
+        void shouldCacheUserSettingsForSubsequentCalls () {
+            final UserProfile expectedUserSettings = new UserProfile();
+            doReturn(expectedUserSettings).when(userRepository).getUserSettings();
+
+            cachedUserRepository.getUserSettings();
+
+            verify(userRepository, times(1)).getUserSettings();
+
+            doReturn(new UserProfile()).when(userRepository).getUserSettings();
+
+            final UserProfile userSettings = cachedUserRepository.getUserSettings();
+
+            assertAll(
+                () -> assertThat(userSettings, is(expectedUserSettings)),
+                () -> verifyNoMoreInteractions(userRepository)
+            );
+        }
+    }
+
+    @Nested
     @DisplayName("getUserDetails()")
     class getUserDetails {
 

@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd;
 
+import java.util.Optional;
+
 import com.hazelcast.config.Config;
 import com.hazelcast.config.EvictionPolicy;
 import com.hazelcast.config.MapConfig;
@@ -18,14 +20,17 @@ public class CachingConfiguration {
     @Autowired
     ApplicationParams applicationParams;
 
+
     @Bean
     public Config hazelCastConfig(){
+
+        int definitionCacheTTL = Optional.ofNullable(applicationParams.getDefinitionCacheTTLSecs()).orElse(DEFAULT_CACHE_TTL);
 
         Config config = new Config();
         NetworkConfig networkConfig = config.setInstanceName("hazelcast-instance-ccd").getNetworkConfig();
         networkConfig.getJoin().getMulticastConfig().setEnabled(false);
         networkConfig.getJoin().getTcpIpConfig().setEnabled(false);
-        configCaches(applicationParams.getDefinitionCacheTTLSecs(), config);
+        configCaches(definitionCacheTTL, config);
         return config;
     }
 
