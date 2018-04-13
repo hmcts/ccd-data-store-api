@@ -31,6 +31,8 @@ public class SecurityValidationService {
     private static final String VALUE = "value";
     private static final String CLASSIFICATION = "classification";
     private static final String VALIDATION_ERR_MSG = "The event cannot be completed as something went wrong while updating the security level of the case or some of the case fields";
+    private static final String CASE_SECURITY_LEVEL_TOO_LOW_MSG = "The security level of the case with reference=%s cannot be loosened";
+    private static final String CASE_DATA_SECURITY_LEVEL_TOO_LOW_MSG = "The security level of the caseData=%s cannot be loosened";
 
     public void isValidClassification(CallbackResponse callbackResponse, CaseDetails caseDetails) {
         Optional<CaseDetails> result = Optional.of(caseDetails);
@@ -47,7 +49,7 @@ public class SecurityValidationService {
             })
             .orElseThrow(() -> {
                 LOG.warn("Case={} classification is higher than callbackResponse={} case classification", caseDetails, callbackResponse);
-                return new ValidationException(VALIDATION_ERR_MSG);
+                return new ValidationException(String.format(CASE_SECURITY_LEVEL_TOO_LOW_MSG, caseDetails.getReference()));
             });
     }
 
@@ -69,7 +71,7 @@ public class SecurityValidationService {
                     LOG.warn("defaultClassificationItem={} has higher classification than callbackClassificationItem={}",
                              defaultClassificationItem,
                              callbackClassificationValue);
-                    throw new ValidationException(VALIDATION_ERR_MSG);
+                    throw new ValidationException(String.format(CASE_DATA_SECURITY_LEVEL_TOO_LOW_MSG, callbackClassificationKey));
                 }
                 if (callbackClassificationValue.has(VALUE)) {
                     JsonNode defaultClassificationValue = defaultClassificationItem.get(VALUE);
@@ -80,18 +82,18 @@ public class SecurityValidationService {
                         validateCollection(callbackClassificationItem, defaultClassificationValue);
                     }
                 } else {
-                    LOG.warn("callbackClassification={} is complex object with classification but no value", defaultDataClassification, callbackDataClassification);
+                    LOG.warn("callbackClassification={} is complex object with classification but no value", callbackDataClassification);
                     throw new ValidationException(VALIDATION_ERR_MSG);
                 }
             } else if (callbackClassificationValue.has(VALUE)) {
-                LOG.warn("callbackClassification={} is complex object with value but no classification", defaultDataClassification, callbackDataClassification);
+                LOG.warn("callbackClassification={} is complex object with value but no classification", callbackDataClassification);
                 throw new ValidationException(VALIDATION_ERR_MSG);
             } else {
                 if (!isValidClassification(callbackClassificationValue, defaultClassificationItem)) {
                     LOG.warn("defaultClassificationItem={} has higher classification than callbackClassificationItem={}",
                              defaultDataClassification,
-                             callbackClassificationMap);
-                    throw new ValidationException(VALIDATION_ERR_MSG);
+                             MAPPER.convertValue(callbackClassificationMap, JsonNode.class));
+                    throw new ValidationException(String.format(CASE_DATA_SECURITY_LEVEL_TOO_LOW_MSG, callbackClassificationKey));
                 }
             }
         }
@@ -119,8 +121,15 @@ public class SecurityValidationService {
     private boolean isValidClassification(JsonNode callbackClassificationValue, JsonNode defaultClassificationValue) {
         Optional<SecurityClassification> callbackSecurityClassification = getSecurityClassification(callbackClassificationValue);
         Optional<SecurityClassification> defaultSecurityClassification = getSecurityClassification(defaultClassificationValue);
-        if (!defaultSecurityClassification.isPresent() || !callbackSecurityClassification.isPresent()
-            || !callbackSecurityClassification.get().higherOrEqualTo(defaultSecurityClassification.get())) {
+        if (!defaultSecurityClassification.isPresent()) {
+            LOG.warn("defaultSecurityClassificationValue={} cannot be parsed", defaultClassificationValue);
+            throw new ValidationException(VALIDATION_ERR_MSG);
+        }
+        if(!callbackSecurityClassification.isPresent()) {
+            LOG.warn("callbackSecurityClassificationValue={} cannot be parsed", callbackClassificationValue);
+            throw new ValidationException(VALIDATION_ERR_MSG);
+        }
+        if(!callbackSecurityClassification.get().higherOrEqualTo(defaultSecurityClassification.get())) {
             return false;
         }
         return true;

@@ -234,7 +234,7 @@ class CallbackInvokerTest {
                 () -> inOrder.verify(caseTypeService).validateData(callbackResponse.getData(), caseType),
                 () -> inOrder.verify(caseSanitiser).sanitise(caseType, callbackResponse.getData()),
                 () -> inOrder.verify(caseDataService).getDefaultSecurityClassifications(caseType, caseDetails.getData()),
-                () -> inOrder.verify(securityValidationService, never()).validateCallbackClassification(callbackResponse, caseDetails)
+                () -> inOrder.verify(securityValidationService, never()).isValidClassification(callbackResponse, caseDetails)
             );
         }
 
@@ -250,7 +250,7 @@ class CallbackInvokerTest {
                 () -> inOrder.verify(caseTypeService, never()).validateData(callbackResponse.getData(), caseType),
                 () -> inOrder.verify(caseSanitiser, never()).sanitise(caseType, callbackResponse.getData()),
                 () -> inOrder.verify(caseDataService, never()).getDefaultSecurityClassifications(caseType, caseDetails.getData()),
-                () -> inOrder.verify(securityValidationService, never()).validateCallbackClassification(callbackResponse, caseDetails)
+                () -> inOrder.verify(securityValidationService, never()).isValidClassification(callbackResponse, caseDetails)
             );
         }
 
@@ -276,7 +276,7 @@ class CallbackInvokerTest {
                 () -> inOrder.verify(caseTypeService, never()).validateData(callbackResponse.getData(), caseType),
                 () -> inOrder.verify(caseSanitiser, never()).sanitise(caseType, callbackResponse.getData()),
                 () -> inOrder.verify(caseDataService, never()).getDefaultSecurityClassifications(caseType, caseDetails.getData()),
-                () -> inOrder.verify(securityValidationService, never()).validateCallbackClassification(callbackResponse, caseDetails)
+                () -> inOrder.verify(securityValidationService, never()).isValidClassification(callbackResponse, caseDetails)
             );
         }
 
@@ -296,7 +296,7 @@ class CallbackInvokerTest {
                 () -> inOrder.verify(caseTypeService).validateData(callbackResponse.getData(), caseType),
                 () -> inOrder.verify(caseSanitiser).sanitise(caseType, callbackResponse.getData()),
                 () -> inOrder.verify(caseDataService).getDefaultSecurityClassifications(caseType, caseDetails.getData()),
-                () -> inOrder.verify(securityValidationService).validateCallbackClassification(callbackResponse, caseDetails)
+                () -> inOrder.verify(securityValidationService).isValidClassification(callbackResponse, caseDetails)
             );
 
             assertThat(caseDetails.getState(), is("ngitb"));
@@ -317,7 +317,7 @@ class CallbackInvokerTest {
                 () -> inOrder.verify(caseTypeService).validateData(callbackResponse.getData(), caseType),
                 () -> inOrder.verify(caseSanitiser).sanitise(caseType, callbackResponse.getData()),
                 () -> inOrder.verify(caseDataService).getDefaultSecurityClassifications(caseType, caseDetails.getData()),
-                () -> inOrder.verify(securityValidationService).validateCallbackClassification(callbackResponse, caseDetails)
+                () -> inOrder.verify(securityValidationService).isValidClassification(callbackResponse, caseDetails)
             );
 
             assertThat(caseDetails.getState(), is("BAYAN"));
@@ -348,7 +348,7 @@ class CallbackInvokerTest {
                 () -> inOrder.verify(caseTypeService, never()).validateData(callbackResponse.getData(), caseType),
                 () -> inOrder.verify(caseSanitiser, never()).sanitise(caseType, callbackResponse.getData()),
                 () -> inOrder.verify(caseDataService, never()).getDefaultSecurityClassifications(caseType, caseDetails.getData()),
-                () -> inOrder.verify(securityValidationService, never()).validateCallbackClassification(callbackResponse, caseDetails)
+                () -> inOrder.verify(securityValidationService, never()).isValidClassification(callbackResponse, caseDetails)
             );
         }
 

@@ -8,6 +8,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -221,7 +223,10 @@ public class CallbackServiceTest {
 
         assertAll(
             () -> assertThat(result.getStatusCodeValue(), is(201)),
-            () -> assertThat(result.getBody(), is("{\"data\":null,\"state\":null,\"errors\":[],\"warnings\":[],\"data_classification\":null,\"security_classification\":null}"))
+            () -> JSONAssert.assertEquals(
+                "{\"data\":null,\"errors\":[],\"warnings\":[],\"data_classification\":null,\"security_classification\":null}",
+                result.getBody(),
+                JSONCompareMode.LENIENT)
         );
     }
 
