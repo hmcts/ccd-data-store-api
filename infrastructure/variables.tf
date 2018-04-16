@@ -57,8 +57,7 @@ variable "authorised-services" {
 }
 
 variable "document_management_valid_domain" {
-  type = "string"
-  default = ""
+  default = "https://api-gateway.test.dm.reform.hmcts.net"
 }
 
 variable "default_print_url" {
