@@ -34,4 +34,10 @@
         </notes>
         <cve>CVE-2016-9878</cve>
     </suppress>
+    <suppress>
+        <notes>
+            Introduced by Spring 4.3.13.RELEASE; Upgrade to Spring Boot 1.5.12 or Spring Boot 2 to resolve.
+        </notes>
+        <cve>CVE-2018-1199</cve>
+    </suppress>
 </suppressions>
