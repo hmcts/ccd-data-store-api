@@ -566,6 +566,19 @@ VALUES (13, 'TestAddressBookCaseNoReadFieldAccess', 'PROBATE', 'CaseCreated', 'P
        '1504259907353651'
 );
 
+INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference)
+VALUES (16, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBLIC',
+        '{
+          "PersonFirstName": "Janet",
+          "PersonLastName": "Doe"
+        }',
+        '{
+          "PersonFirstName": "PUBLIC",
+          "PersonLastName": "PUBLIC"
+        }',
+        '1504254784737847'
+);
+
 INSERT INTO case_event (
         case_data_id,
         case_type_id,
