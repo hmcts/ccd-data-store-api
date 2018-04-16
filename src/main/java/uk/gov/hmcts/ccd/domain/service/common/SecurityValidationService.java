@@ -34,7 +34,7 @@ public class SecurityValidationService {
     private static final String CASE_SECURITY_LEVEL_TOO_LOW_MSG = "The security level of the case with reference=%s cannot be loosened";
     private static final String CASE_DATA_SECURITY_LEVEL_TOO_LOW_MSG = "The security level of the caseData=%s cannot be loosened";
 
-    public void isValidClassification(CallbackResponse callbackResponse, CaseDetails caseDetails) {
+    public void setClassificationFromCallbackIfValid(CallbackResponse callbackResponse, CaseDetails caseDetails) {
         Optional<CaseDetails> result = Optional.of(caseDetails);
 
         result.filter(caseHasClassificationEqualOrLowerThan(callbackResponse.getSecurityClassification()))

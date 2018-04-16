@@ -82,7 +82,7 @@ class SecurityValidationServiceTest {
                         .buildAsMap())
                 .build();
 
-            securityValidationService.isValidClassification(callbackResponse, caseDetails);
+            securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails);
 
             assertAll(
                 () -> Assert.assertThat(caseDetails.getSecurityClassification(), Matchers.is(PRIVATE)),
@@ -215,7 +215,7 @@ class SecurityValidationServiceTest {
                         .buildAsMap())
                 .build();
 
-            securityValidationService.isValidClassification(callbackResponse, caseDetails);
+            securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails);
 
             assertAll(
                 () -> Assert.assertThat(caseDetails.getSecurityClassification(), Matchers.is(PRIVATE)),
@@ -614,7 +614,7 @@ class SecurityValidationServiceTest {
                                             .buildAsMap())
                 .build();
 
-            securityValidationService.isValidClassification(callbackResponse, caseDetails);
+            securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails);
 
             assertAll(
                 () -> Assert.assertThat(caseDetails.getSecurityClassification(), Matchers.is(PRIVATE)),
@@ -958,19 +958,19 @@ class SecurityValidationServiceTest {
 
     private void assertThrowsSecurityValidationForCaseException(CaseDetails caseDetails, CallbackResponse callbackResponse) {
         ValidationException validationException = assertThrows(ValidationException.class,
-                                                             () -> securityValidationService.isValidClassification(callbackResponse, caseDetails));
+                                                             () -> securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails));
         assertEquals(String.format("The security level of the case with reference=%s cannot be loosened", caseDetails.getReference()), validationException.getMessage());
     }
 
     private void assertThrowsSecurityValidationForCaseDataException(CaseDetails caseDetails, CallbackResponse callbackResponse, String fieldName) {
         ValidationException validationException = assertThrows(ValidationException.class,
-                                                             () -> securityValidationService.isValidClassification(callbackResponse, caseDetails));
+                                                             () -> securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails));
         assertEquals(String.format("The security level of the caseData=%s cannot be loosened", fieldName), validationException.getMessage());
     }
 
     private void assertThrowsSecurityValidationOtherException(CaseDetails caseDetails, CallbackResponse callbackResponse) {
         ValidationException validationException = assertThrows(ValidationException.class,
-                                                             () -> securityValidationService.isValidClassification(callbackResponse, caseDetails));
+                                                             () -> securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails));
         assertEquals("The event cannot be completed as something went wrong while updating the security level of the case or some of the case fields", validationException.getMessage());
     }
 
