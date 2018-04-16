@@ -11,6 +11,10 @@ provider "vault" {
 locals {
   app_full_name = "${var.product}-${var.component}"
   env_ase_url = "${var.env}.service.${data.terraform_remote_state.core_apps_compute.ase_name[0]}.internal"
+  default_document_management_valid_domain = "https://api-gateway.preprod.dm.reform.hmcts.net"
+  default_default_print_url = "https://return-case-doc-ccd.nonprod.platform.hmcts.net/jurisdictions/:jid/case-types/:ctid/cases/:cid"
+  document_management_valid_domain = "${var.document_management_valid_domain != "" ? var.document_management_valid_domain : local.default_document_management_valid_domain}"
+  default_print_url = "${var.default_print_url != "" ? var.default_print_url : local.default_default_print_url}"
 }
 
 data "vault_generic_secret" "ccd_data_s2s_key" {
