@@ -11,6 +11,7 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.Maps.newHashMap;
@@ -27,8 +28,8 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
     private static final String META_AND_FIELD_DATA_HASH_FORMAT = "%s%s";
 
     private final CaseDetailsRepository caseDetailsRepository;
-    private final Map<Long, CaseDetails> idToCaseDetails = newHashMap();
-    private final Map<Long, CaseDetails> referenceToCaseDetails = newHashMap();
+    private final Map<Long, Optional<CaseDetails>> idToCaseDetails = newHashMap();
+    private final Map<String, Optional<CaseDetails>> referenceToCaseDetails = newHashMap();
     private final Map<String, CaseDetails> findHashToCaseDetails = newHashMap();
     private final Map<String, List<CaseDetails>> metaAndFieldDataHashToCaseDetails = newHashMap();
     private final Map<String, PaginatedSearchMetadata> hashToPaginatedSearchMetadata = newHashMap();
@@ -44,26 +45,44 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     @Override
+    public Optional<CaseDetails> findById(String jurisdiction, Long id) {
+        return idToCaseDetails.computeIfAbsent(id, (key) -> caseDetailsRepository.findById(jurisdiction, id));
+    }
+
+    @Override
     public CaseDetails findById(final Long id) {
-        return idToCaseDetails.computeIfAbsent(id, caseDetailsRepository::findById);
+        return idToCaseDetails.computeIfAbsent(id, (key) -> Optional.ofNullable(caseDetailsRepository.findById(id)))
+                              .orElse(null);
     }
 
     @Override
     public CaseDetails findByReference(final Long caseReference) {
-        return referenceToCaseDetails.computeIfAbsent(caseReference, caseDetailsRepository::findByReference);
+        final Function<String, Optional<CaseDetails>> findFunction = (key) -> Optional.ofNullable(
+            caseDetailsRepository.findByReference(caseReference));
+        return referenceToCaseDetails.computeIfAbsent(caseReference.toString(), findFunction)
+                                     .orElse(null);
     }
 
     @Override
-    public Optional<CaseDetails> findByReference(String jurisdictionId, Long caseReference) {
-        if (referenceToCaseDetails.containsKey(caseReference)) {
-            return Optional.ofNullable(referenceToCaseDetails.get(caseReference))
-                           .filter(caseDetails -> jurisdictionId.equals(caseDetails.getJurisdiction()));
-        } else {
-            final Optional<CaseDetails> optionalCaseDetails = caseDetailsRepository.findByReference(jurisdictionId,
-                                                                                                    caseReference);
-            referenceToCaseDetails.put(caseReference, optionalCaseDetails.orElse(null));
-            return optionalCaseDetails;
-        }
+    public Optional<CaseDetails> findByReference(String jurisdiction, Long reference) {
+        return findByReference(jurisdiction, reference.toString());
+    }
+
+    @Override
+    public Optional<CaseDetails> findByReference(String jurisdiction, String reference) {
+        return referenceToCaseDetails.computeIfAbsent(reference,
+                                                      (key) -> caseDetailsRepository.findByReference(jurisdiction,
+                                                                                                     reference));
+    }
+
+    @Override
+    public Optional<CaseDetails> lockByReference(String jurisdiction, Long reference) {
+        return lockByReference(jurisdiction, reference.toString());
+    }
+
+    @Override
+    public Optional<CaseDetails> lockByReference(String jurisdiction, String reference) {
+        return caseDetailsRepository.lockByReference(jurisdiction, reference);
     }
 
     @Override

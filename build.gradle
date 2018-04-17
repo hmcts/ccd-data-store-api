@@ -26,6 +26,7 @@ plugins {
     id 'checkstyle'
     id 'com.github.kt3k.coveralls' version '2.8.2'
     id 'se.patrikerdes.use-latest-versions' version '0.2.0'
+    id 'org.owasp.dependencycheck' version '3.1.2'
 }
 
 apply plugin: 'java'
@@ -42,6 +43,7 @@ apply plugin: 'com.github.spotbugs'
 apply plugin: 'com.github.kt3k.coveralls'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'se.patrikerdes.use-latest-versions'
+apply plugin: 'org.owasp.dependencycheck'
 
 dependencyUpdates.resolutionStrategy = {
     componentSelection { rules ->
@@ -54,6 +56,13 @@ dependencyUpdates.resolutionStrategy = {
             }
         }
     }
+}
+
+dependencyCheck {
+    // Specifies if the build should be failed if a CVSS score above a specified level is identified.
+    // range of 0-10 fails the build, anything greater and it doesn't fail the build
+    failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'true' ? 0 : 11
+    suppressionFile = 'dependency-check-suppressions.xml'
 }
 
 mainClassName = 'uk.gov.hmcts.ccd.CoreCaseDataApplication'
@@ -211,7 +220,6 @@ dependencies {
     testCompile group: 'org.openid4java', name: 'openid4java', version: '1.0.0'
     // remove me once insights is in
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
-    compile "org.slf4j:log4j-over-slf4j:1.7.25"
 }
 // end::dependencies[]
 
@@ -564,3 +572,7 @@ def timestamp() {
 //        }
 //    }
 //}
+
+// for cnp pipeline
+task dependencyCheck(dependsOn: dependencyCheckAnalyze)
+

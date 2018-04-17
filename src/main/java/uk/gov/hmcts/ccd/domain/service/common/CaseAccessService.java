@@ -1,12 +1,15 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
+import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -14,12 +17,12 @@ import java.util.stream.Stream;
 
 /**
  * Check access to a case for the current user.
- *
+ * <p>
  * User with the following roles should only be given access to the cases explicitly granted:
  * <ul>
- *     <li>caseworker-*-solicitor: Solicitors</li>
- *     <li>citizen(-loa[0-3]): Citizens</li>
- *     <li>letter-holder: Citizen with temporary user account, as per CMC journey</li>
+ * <li>caseworker-*-solicitor: Solicitors</li>
+ * <li>citizen(-loa[0-3]): Citizens</li>
+ * <li>letter-holder: Citizen with temporary user account, as per CMC journey</li>
  * </ul>
  */
 @Service
@@ -45,6 +48,16 @@ public class CaseAccessService {
 
     }
 
+    public AccessLevel getAccessLevel(ServiceAndUserDetails serviceAndUserDetails) {
+        return serviceAndUserDetails.getAuthorities()
+                                    .stream()
+                                    .map(GrantedAuthority::getAuthority)
+                                    .filter(role -> RESTRICT_GRANTED_ROLES_PATTERN.matcher(role).matches())
+                                    .findFirst()
+                                    .map(role -> AccessLevel.GRANTED)
+                                    .orElse(AccessLevel.ALL);
+    }
+
     private Boolean accessGranted(CaseDetails caseDetails, IDAMProperties currentUser) {
         final List<Long> grantedCases = caseUserRepository.findCasesUserIdHasAccessTo(currentUser.getId());
 
@@ -57,7 +70,7 @@ public class CaseAccessService {
 
     private Boolean canOnlyViewGrantedCases(IDAMProperties currentUser) {
         return Stream.of(currentUser.getRoles())
-                .anyMatch(role -> RESTRICT_GRANTED_ROLES_PATTERN.matcher(role).matches());
+                     .anyMatch(role -> RESTRICT_GRANTED_ROLES_PATTERN.matcher(role).matches());
     }
 
 }
