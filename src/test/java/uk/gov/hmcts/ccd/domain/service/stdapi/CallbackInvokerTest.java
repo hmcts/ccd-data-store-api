@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.TextNode;
+import com.google.common.collect.Maps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -184,10 +185,11 @@ class CallbackInvokerTest {
         final Map<String, JsonNode> data = new HashMap<>();
         data.put("xxx", TextNode.valueOf("ngitb"));
         callbackResponse.setData(data);
-        callbackInvoker.validateAndSetData(caseType, caseDetails, TRUE, callbackResponse);
+        caseDetails.setDataClassification(Maps.newHashMap());
+        callbackInvoker.validateAndSetFromAboutToStartCallback(caseType, caseDetails, TRUE, callbackResponse);
         verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE);
         verify(caseTypeService).validateData(callbackResponse.getData(), caseType);
-        verify(caseDataService).getDefaultSecurityClassifications(caseType, caseDetails.getData());
+        verify(caseDataService).getDefaultSecurityClassifications(caseType, caseDetails.getData(), caseDetails.getDataClassification());
         verify(caseSanitiser).sanitise(caseType, callbackResponse.getData());
     }
 
@@ -195,10 +197,10 @@ class CallbackInvokerTest {
     @Test
     void validateAndDoNotSetData() {
         final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackInvoker.validateAndSetData(caseType, caseDetails, TRUE, callbackResponse);
+        callbackInvoker.validateAndSetFromAboutToStartCallback(caseType, caseDetails, TRUE, callbackResponse);
         verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE);
         verify(caseTypeService, never()).validateData(any(), any());
-        verify(caseDataService, never()).getDefaultSecurityClassifications(any(), any());
+        verify(caseDataService, never()).getDefaultSecurityClassifications(any(), any(), any());
         verify(caseSanitiser, never()).sanitise(any(), any());
     }
 
@@ -214,12 +216,12 @@ class CallbackInvokerTest {
             .when(callbackService).validateCallbackErrorsAndWarnings(any(), any());
         final ApiException apiException =
             assertThrows(ApiException.class,
-                         () -> callbackInvoker.validateAndSetData(caseType, caseDetails, TRUE, callbackResponse));
+                         () -> callbackInvoker.validateAndSetFromAboutToStartCallback(caseType, caseDetails, TRUE, callbackResponse));
         assertThat(apiException.getMessage(), is(ErrorMessage));
         verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE);
-        verify(caseTypeService, never()).validateData(callbackResponse.getData(), caseType);
-        verify(caseDataService, never()).getDefaultSecurityClassifications(caseType, caseDetails.getData());
-        verify(caseSanitiser, never()).sanitise(caseType, callbackResponse.getData());
+        verify(caseTypeService, never()).validateData(any(), any());
+        verify(caseDataService, never()).getDefaultSecurityClassifications(any(), any(), any());
+        verify(caseSanitiser, never()).sanitise(any(), any());
     }
 
     @DisplayName("validate call back response and set case details state")
@@ -229,11 +231,12 @@ class CallbackInvokerTest {
         final Map<String, JsonNode> data = new HashMap<>();
         data.put("state", TextNode.valueOf("ngitb"));
         callbackResponse.setData(data);
+        caseDetails.setDataClassification(Maps.newHashMap());
         caseDetails.setState("BAYAN");
-        callbackInvoker.validateAndSetDataAndState(caseType, caseDetails, TRUE, callbackResponse);
+        callbackInvoker.validateAndSetFromAboutToSubmitCallback(caseType, caseDetails, TRUE, callbackResponse);
         verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE);
         verify(caseTypeService).validateData(callbackResponse.getData(), caseType);
-        verify(caseDataService).getDefaultSecurityClassifications(caseType, caseDetails.getData());
+        verify(caseDataService).getDefaultSecurityClassifications(caseType, caseDetails.getData(), caseDetails.getDataClassification());
         verify(caseSanitiser).sanitise(caseType, callbackResponse.getData());
 
         assertThat(caseDetails.getState(), is("ngitb"));
@@ -246,10 +249,11 @@ class CallbackInvokerTest {
         final Map<String, JsonNode> data = new HashMap<>();
         caseDetails.setState("BAYAN");
         callbackResponse.setData(data);
-        callbackInvoker.validateAndSetDataAndState(caseType, caseDetails, TRUE, callbackResponse);
+        caseDetails.setDataClassification(Maps.newHashMap());
+        callbackInvoker.validateAndSetFromAboutToSubmitCallback(caseType, caseDetails, TRUE, callbackResponse);
         verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE);
         verify(caseTypeService).validateData(callbackResponse.getData(), caseType);
-        verify(caseDataService).getDefaultSecurityClassifications(caseType, caseDetails.getData());
+        verify(caseDataService).getDefaultSecurityClassifications(caseType, caseDetails.getData(), caseDetails.getDataClassification());
         verify(caseSanitiser).sanitise(caseType, callbackResponse.getData());
 
         assertThat(caseDetails.getState(), is("BAYAN"));
@@ -268,17 +272,17 @@ class CallbackInvokerTest {
             .when(callbackService).validateCallbackErrorsAndWarnings(any(), any());
         final ApiException apiException =
             assertThrows(ApiException.class,
-                         () -> callbackInvoker.validateAndSetDataAndState(caseType,
-                                                                          caseDetails,
-                                                                          TRUE,
-                                                                          callbackResponse));
+                         () -> callbackInvoker.validateAndSetFromAboutToSubmitCallback(caseType,
+                                                                                       caseDetails,
+                                                                                       TRUE,
+                                                                                       callbackResponse));
         assertAll(() -> assertThat(apiException.getMessage(), is(errorMessgae)),
                   () -> assertThat(caseDetails.getState(), is("BAYAN")));
 
         verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE);
-        verify(caseTypeService, never()).validateData(callbackResponse.getData(), caseType);
-        verify(caseDataService, never()).getDefaultSecurityClassifications(caseType, caseDetails.getData());
-        verify(caseSanitiser, never()).sanitise(caseType, callbackResponse.getData());
+        verify(caseTypeService, never()).validateData(any(), any());
+        verify(caseDataService, never()).getDefaultSecurityClassifications(any(), any(), any());
+        verify(caseSanitiser, never()).sanitise(any(), any());
     }
 
     @DisplayName("state is filtered in json map")

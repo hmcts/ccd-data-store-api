@@ -32,14 +32,7 @@ VALUES (1, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBLIC',
              "Postcode": "PUBLIC"
            }
          },
-         "D8Document": {
-           "classification" : "PUBLIC",
-           "value" : {
-             "document_url": "PUBLIC",
-             "document_binary_url": "PUBLIC",
-             "document_filename": "PUBLIC"
-           }
-         }
+         "D8Document": "PUBLIC"
        }',
        '1504259907353529',
        '2016-06-22 20:44:52.824',
@@ -72,14 +65,7 @@ VALUES (2, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBLIC',
               "Postcode": "PUBLIC"
             }
           },
-          "D8Document": {
-            "classification" : "PUBLIC",
-            "value" : {
-              "document_url": "PUBLIC",
-              "document_binary_url": "PUBLIC",
-              "document_filename": "PUBLIC"
-            }
-          }
+          "D8Document": "PUBLIC"
         }',
         '1504259907353545',
         '2016-08-22 20:44:52.824',
@@ -227,14 +213,7 @@ VALUES (5, 'TestAddressBookCaseNoUpdateCaseAccess', 'PROBATE', 'CaseCreated', 'P
              "Postcode": "PUBLIC"
            }
          },
-         "D8Document": {
-           "classification" : "PUBLIC",
-           "value" : {
-             "document_url": "PUBLIC",
-             "document_binary_url": "PUBLIC",
-             "document_filename": "PUBLIC"
-           }
-         }
+         "D8Document": "PUBLIC"
        }',
        '1504259907353578'
 );
@@ -270,14 +249,7 @@ VALUES (6, 'TestAddressBookCaseNoCreateEventAccess', 'PROBATE', 'CaseCreated', '
              "Postcode": "PUBLIC"
            }
          },
-         "D8Document": {
-           "classification" : "PUBLIC",
-           "value" : {
-             "document_url": "PUBLIC",
-             "document_binary_url": "PUBLIC",
-             "document_filename": "PUBLIC"
-           }
-         }
+         "D8Document": "PUBLIC"
        }',
        '1504259907353586'
 );
@@ -313,14 +285,7 @@ VALUES (7, 'TestAddressBookCaseNoCreateFieldAccess', 'PROBATE', 'CaseCreated', '
              "Postcode": "PUBLIC"
            }
          },
-         "D8Document": {
-           "classification" : "PUBLIC",
-           "value" : {
-             "document_url": "PUBLIC",
-             "document_binary_url": "PUBLIC",
-             "document_filename": "PUBLIC"
-           }
-         }
+         "D8Document": "PUBLIC"
        }',
        '1504259907353594'
 );
@@ -356,14 +321,7 @@ VALUES (8, 'TestAddressBookCaseNoCreateFieldAccess', 'PROBATE', 'CaseCreated', '
              "Postcode": "PUBLIC"
            }
          },
-         "D8Document": {
-           "classification" : "PUBLIC",
-           "value" : {
-             "document_url": "PUBLIC",
-             "document_binary_url": "PUBLIC",
-             "document_filename": "PUBLIC"
-           }
-         }
+         "D8Document": "PUBLIC"
        }',
        '1504259907353602'
 );
@@ -399,14 +357,7 @@ VALUES (9, 'TestAddressBookCaseNoReadCaseTypeAccess', 'PROBATE', 'CaseCreated', 
              "Postcode": "PUBLIC"
            }
          },
-         "D8Document": {
-           "classification" : "PUBLIC",
-           "value" : {
-             "document_url": "PUBLIC",
-             "document_binary_url": "PUBLIC",
-             "document_filename": "PUBLIC"
-           }
-         }
+         "D8Document": "PUBLIC"
        }',
        '1504259907353610'
 );
@@ -442,14 +393,7 @@ VALUES (10, 'TestAddressBookCaseNoReadFieldAccess', 'PROBATE', 'CaseCreated', 'P
              "Postcode": "PUBLIC"
            }
          },
-         "D8Document": {
-           "classification" : "PUBLIC",
-           "value" : {
-             "document_url": "PUBLIC",
-             "document_binary_url": "PUBLIC",
-             "document_filename": "PUBLIC"
-           }
-         }
+         "D8Document": "PUBLIC"
        }',
        '1504259907353628'
 );
@@ -476,17 +420,16 @@ VALUES (11, 'TestAddressBookCaseNoReadEventAccess', 'PROBATE', 'CaseCreated', 'P
          "PersonFirstName": "PUBLIC",
          "PersonLastName": "PUBLIC",
          "PersonAddress": {
-           "AddressLine1": "PUBLIC",
-           "AddressLine2": "PUBLIC",
-           "AddressLine3": "PUBLIC",
-           "Country": "PUBLIC",
-           "Postcode": "PUBLIC"
-         },
-         "D8Document": {
-           "document_url": "PUBLIC",
-           "document_binary_url": "PUBLIC",
-           "document_filename": "PUBLIC"
-         }
+           "classification" : "PUBLIC",
+           "value" : {
+               "AddressLine1": "PUBLIC",
+               "AddressLine2": "PUBLIC",
+               "AddressLine3": "PUBLIC",
+               "Country": "PUBLIC",
+               "Postcode": "PUBLIC"
+            }
+          },
+         "D8Document": "PUBLIC"
        }',
        '1504259907353636'
 );
@@ -513,17 +456,16 @@ VALUES (12, 'TestAddressBookCaseNoReadCaseTypeAccess', 'PROBATE', 'CaseCreated',
          "PersonFirstName": "PUBLIC",
          "PersonLastName": "PUBLIC",
          "PersonAddress": {
-           "AddressLine1": "PUBLIC",
-           "AddressLine2": "PUBLIC",
-           "AddressLine3": "PUBLIC",
-           "Country": "PUBLIC",
-           "Postcode": "PUBLIC"
+           "classification" : "PUBLIC",
+           "value" : {
+               "AddressLine1": "PUBLIC",
+               "AddressLine2": "PUBLIC",
+               "AddressLine3": "PUBLIC",
+               "Country": "PUBLIC",
+               "Postcode": "PUBLIC"
+           }
          },
-         "D8Document": {
-           "document_url": "PUBLIC",
-           "document_binary_url": "PUBLIC",
-           "document_filename": "PUBLIC"
-         }
+         "D8Document": "PUBLIC"
        }',
        '1504259907353643'
 );
@@ -551,17 +493,16 @@ VALUES (13, 'TestAddressBookCaseNoReadFieldAccess', 'PROBATE', 'CaseCreated', 'P
          "PersonFirstName": "PRIVATE",
          "PersonLastName": "PUBLIC",
          "PersonAddress": {
-           "AddressLine1": "PUBLIC",
-           "AddressLine2": "PUBLIC",
-           "AddressLine3": "PUBLIC",
-           "Country": "PUBLIC",
-           "Postcode": "PUBLIC"
+           "classification" : "PUBLIC",
+           "value" : {
+               "AddressLine1": "PUBLIC",
+               "AddressLine2": "PUBLIC",
+               "AddressLine3": "PUBLIC",
+               "Country": "PUBLIC",
+               "Postcode": "PUBLIC"
+           }
          },
-         "D8Document": {
-           "document_url": "PUBLIC",
-           "document_binary_url": "PUBLIC",
-           "document_filename": "PUBLIC"
-         }
+         "D8Document": "PUBLIC"
        }',
        '1504259907353651'
 );
