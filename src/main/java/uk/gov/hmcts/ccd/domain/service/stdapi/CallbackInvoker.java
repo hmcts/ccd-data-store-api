@@ -114,7 +114,7 @@ public class CallbackInvoker {
         callbackService.validateCallbackErrorsAndWarnings(callbackResponse, ignoreWarning);
         if (callbackResponse.getData() != null) {
             validateAndSetData(caseType, caseDetails, callbackResponse.getData());
-            securityValidationService.isValidClassification(callbackResponse, caseDetails);
+            securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails);
             final Optional<String> newCaseState = filterCaseState(callbackResponse.getData());
             newCaseState.ifPresent(caseDetails::setState);
             return newCaseState;

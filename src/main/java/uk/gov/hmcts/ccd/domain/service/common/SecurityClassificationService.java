@@ -21,12 +21,10 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
 import java.util.*;
-import java.util.function.Predicate;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Comparator.comparingInt;
-import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.valueOf;
-import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils.getDataClassificationForData;
+import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils.*;
 
 @Service
 public class SecurityClassificationService {
