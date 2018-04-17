@@ -235,8 +235,8 @@ class CallbackInvokerTest {
                 () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE),
                 () -> inOrder.verify(caseTypeService).validateData(callbackResponse.getData(), caseType),
                 () -> inOrder.verify(caseSanitiser).sanitise(caseType, callbackResponse.getData()),
-                () -> inOrder.verify(caseDataService).getDefaultSecurityClassifications(caseType, caseDetails.getData()),
-                () -> inOrder.verify(securityValidationService, never()).isValidClassification(callbackResponse, caseDetails)
+                () -> inOrder.verify(caseDataService).getDefaultSecurityClassifications(caseType, caseDetails.getData(), caseDetails.getDataClassification()),
+                () -> inOrder.verify(securityValidationService, never()).setClassificationFromCallbackIfValid(callbackResponse, caseDetails)
             );
         }
 
