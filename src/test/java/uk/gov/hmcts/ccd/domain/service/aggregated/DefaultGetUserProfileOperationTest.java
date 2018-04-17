@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.data.user.UserService;
 import uk.gov.hmcts.ccd.domain.model.aggregated.*;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -15,13 +14,10 @@ import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-
 public class DefaultGetUserProfileOperationTest {
 
     @Mock
-    private UserService userService;
+    private UserRepository userRepository;
 
     private DefaultGetUserProfileOperation defaultGetUserProfileOperation;
 
@@ -36,22 +32,21 @@ public class DefaultGetUserProfileOperationTest {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        defaultGetUserProfileOperation = new DefaultGetUserProfileOperation(userService);
+        defaultGetUserProfileOperation = new DefaultGetUserProfileOperation(userRepository);
 
         userProfile.setUser(user);
         userProfile.setJurisdictions(new JurisdictionDisplayProperties[] {test1JurisdictionDisplayProperties, test2JurisdictionDisplayProperties});
         userProfile.setChannels(new String[] {test1Channel, test2Channel});
         userProfile.setDefaultSettings(testDefaultSettings);
-        doReturn(CompletableFuture.completedFuture(userProfile)).when(userService).getUserProfileAsync();
+        doReturn(userProfile).when(userRepository).getUserSettings();
     }
 
     @Test
-    void shouldReturnUserProfile() throws ExecutionException, InterruptedException {
+    void shouldReturnUserProfile() {
         String userToken = "testToken";
 
-        CompletableFuture<UserProfile> userProfileFuture = defaultGetUserProfileOperation.execute(userToken);
+        UserProfile userProfile = defaultGetUserProfileOperation.execute(userToken);
 
-        UserProfile userProfile = userProfileFuture.get();
         assertAll(
             () -> assertThat(userProfile.getUser(), is(equalTo(user))),
             () -> assertThat(userProfile.getDefaultSettings(), is(equalTo(testDefaultSettings))),

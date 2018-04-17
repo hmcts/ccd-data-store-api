@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.TextNode;
+import com.google.common.collect.Maps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -226,8 +227,9 @@ class CallbackInvokerTest {
             final Map<String, JsonNode> data = new HashMap<>();
             data.put("xxx", TextNode.valueOf("ngitb"));
             callbackResponse.setData(data);
+            caseDetails.setDataClassification(Maps.newHashMap());
 
-            callbackInvoker.validateAndSetData(caseType, caseDetails, TRUE, callbackResponse);
+            callbackInvoker.validateAndSetFromAboutToStartCallback(caseType, caseDetails, TRUE, callbackResponse);
 
             assertAll(
                 () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE),
@@ -243,14 +245,14 @@ class CallbackInvokerTest {
         void validateAndDoNotSetData() {
             final CallbackResponse callbackResponse = new CallbackResponse();
 
-            callbackInvoker.validateAndSetData(caseType, caseDetails, TRUE, callbackResponse);
+            callbackInvoker.validateAndSetFromAboutToStartCallback(caseType, caseDetails, TRUE, callbackResponse);
 
             assertAll(
                 () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE),
-                () -> inOrder.verify(caseTypeService, never()).validateData(callbackResponse.getData(), caseType),
-                () -> inOrder.verify(caseSanitiser, never()).sanitise(caseType, callbackResponse.getData()),
-                () -> inOrder.verify(caseDataService, never()).getDefaultSecurityClassifications(caseType, caseDetails.getData()),
-                () -> inOrder.verify(securityValidationService, never()).isValidClassification(callbackResponse, caseDetails)
+                () -> inOrder.verify(caseTypeService, never()).validateData(any(), any()),
+                () -> inOrder.verify(caseSanitiser, never()).sanitise(any(), any()),
+                () -> inOrder.verify(caseDataService, never()).getDefaultSecurityClassifications(any(), any(), any()),
+                () -> inOrder.verify(securityValidationService, never()).setClassificationFromCallbackIfValid(any(), any())
             );
         }
 
@@ -267,16 +269,16 @@ class CallbackInvokerTest {
 
             final ApiException apiException =
                 assertThrows(ApiException.class,
-                             () -> callbackInvoker.validateAndSetData(caseType, caseDetails, TRUE, callbackResponse));
+                             () -> callbackInvoker.validateAndSetFromAboutToStartCallback(caseType, caseDetails, TRUE, callbackResponse));
 
             assertThat(apiException.getMessage(), is(ErrorMessage));
 
             assertAll(
                 () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE),
-                () -> inOrder.verify(caseTypeService, never()).validateData(callbackResponse.getData(), caseType),
-                () -> inOrder.verify(caseSanitiser, never()).sanitise(caseType, callbackResponse.getData()),
-                () -> inOrder.verify(caseDataService, never()).getDefaultSecurityClassifications(caseType, caseDetails.getData()),
-                () -> inOrder.verify(securityValidationService, never()).isValidClassification(callbackResponse, caseDetails)
+                () -> inOrder.verify(caseTypeService, never()).validateData(any(), any()),
+                () -> inOrder.verify(caseSanitiser, never()).sanitise(any(), any()),
+                () -> inOrder.verify(caseDataService, never()).getDefaultSecurityClassifications(any(), any(), any()),
+                () -> inOrder.verify(securityValidationService, never()).setClassificationFromCallbackIfValid(any(), any())
             );
         }
 
@@ -287,16 +289,17 @@ class CallbackInvokerTest {
             final Map<String, JsonNode> data = new HashMap<>();
             data.put("state", TextNode.valueOf("ngitb"));
             callbackResponse.setData(data);
+            caseDetails.setDataClassification(Maps.newHashMap());
             caseDetails.setState("BAYAN");
 
-            callbackInvoker.validateSubmitCallback(caseType, caseDetails, TRUE, callbackResponse);
+            callbackInvoker.validateAndSetFromAboutToSubmitCallback(caseType, caseDetails, TRUE, callbackResponse);
 
             assertAll(
                 () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE),
                 () -> inOrder.verify(caseTypeService).validateData(callbackResponse.getData(), caseType),
                 () -> inOrder.verify(caseSanitiser).sanitise(caseType, callbackResponse.getData()),
-                () -> inOrder.verify(caseDataService).getDefaultSecurityClassifications(caseType, caseDetails.getData()),
-                () -> inOrder.verify(securityValidationService).isValidClassification(callbackResponse, caseDetails)
+                () -> inOrder.verify(caseDataService).getDefaultSecurityClassifications(caseType, caseDetails.getData(), caseDetails.getDataClassification()),
+                () -> inOrder.verify(securityValidationService).setClassificationFromCallbackIfValid(callbackResponse, caseDetails)
             );
 
             assertThat(caseDetails.getState(), is("ngitb"));
@@ -309,15 +312,16 @@ class CallbackInvokerTest {
             final Map<String, JsonNode> data = new HashMap<>();
             caseDetails.setState("BAYAN");
             callbackResponse.setData(data);
+            caseDetails.setDataClassification(Maps.newHashMap());
 
-            callbackInvoker.validateSubmitCallback(caseType, caseDetails, TRUE, callbackResponse);
+            callbackInvoker.validateAndSetFromAboutToSubmitCallback(caseType, caseDetails, TRUE, callbackResponse);
 
             assertAll(
                 () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE),
                 () -> inOrder.verify(caseTypeService).validateData(callbackResponse.getData(), caseType),
                 () -> inOrder.verify(caseSanitiser).sanitise(caseType, callbackResponse.getData()),
-                () -> inOrder.verify(caseDataService).getDefaultSecurityClassifications(caseType, caseDetails.getData()),
-                () -> inOrder.verify(securityValidationService).isValidClassification(callbackResponse, caseDetails)
+                () -> inOrder.verify(caseDataService).getDefaultSecurityClassifications(caseType, caseDetails.getData(), caseDetails.getDataClassification()),
+                () -> inOrder.verify(securityValidationService).setClassificationFromCallbackIfValid(callbackResponse, caseDetails)
             );
 
             assertThat(caseDetails.getState(), is("BAYAN"));
@@ -336,7 +340,7 @@ class CallbackInvokerTest {
                 .when(callbackService).validateCallbackErrorsAndWarnings(any(), any());
             final ApiException apiException =
                 assertThrows(ApiException.class,
-                             () -> callbackInvoker.validateSubmitCallback(caseType,
+                             () -> callbackInvoker.validateAndSetFromAboutToSubmitCallback(caseType,
                                                                           caseDetails,
                                                                           TRUE,
                                                                           callbackResponse));
@@ -345,10 +349,10 @@ class CallbackInvokerTest {
 
             assertAll(
                 () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE),
-                () -> inOrder.verify(caseTypeService, never()).validateData(callbackResponse.getData(), caseType),
-                () -> inOrder.verify(caseSanitiser, never()).sanitise(caseType, callbackResponse.getData()),
-                () -> inOrder.verify(caseDataService, never()).getDefaultSecurityClassifications(caseType, caseDetails.getData()),
-                () -> inOrder.verify(securityValidationService, never()).isValidClassification(callbackResponse, caseDetails)
+                () -> inOrder.verify(caseTypeService, never()).validateData(any(), any()),
+                () -> inOrder.verify(caseSanitiser, never()).sanitise(any(), any()),
+                () -> inOrder.verify(caseDataService, never()).getDefaultSecurityClassifications(any(), any(), any()),
+                () -> inOrder.verify(securityValidationService, never()).setClassificationFromCallbackIfValid(any(), any())
             );
         }
 

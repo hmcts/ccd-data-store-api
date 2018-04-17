@@ -362,6 +362,7 @@ public class TestBuildersUtil {
 
     public static class CaseFieldBuilder {
         private final CaseField caseField;
+        private FieldType caseFieldType;
         private final List<AccessControlList> accessControlLists = newArrayList();
         private CaseFieldBuilder() {
             this.caseField = new CaseField();
@@ -377,6 +378,11 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public CaseFieldBuilder withFieldType(FieldType fieldType) {
+            caseFieldType = fieldType;
+            return this;
+        }
+
         public CaseFieldBuilder withAcl(AccessControlList accessControlList) {
             accessControlLists.add(accessControlList);
             return this;
@@ -384,11 +390,55 @@ public class TestBuildersUtil {
 
         public CaseField build() {
             caseField.setAccessControlLists(accessControlLists);
+            caseField.setFieldType(caseFieldType);
             return caseField;
         }
 
         public static CaseFieldBuilder aCaseField() {
             return new CaseFieldBuilder();
+        }
+    }
+
+    public static class FieldTypeBuilder {
+        private final FieldType fieldType;
+        private List<CaseField> complexFields;
+        private FieldTypeBuilder() {
+            this.fieldType = new FieldType();
+            this.complexFields = Lists.newArrayList();
+        }
+
+        public FieldTypeBuilder withId(String id) {
+            fieldType.setId(id);
+            return this;
+        }
+
+        public FieldTypeBuilder withType(String type) {
+            fieldType.setType(type);
+            return this;
+        }
+
+        public FieldTypeBuilder withComplexField(CaseField complexField) {
+            complexFields.add(complexField);
+            return this;
+        }
+
+        public FieldTypeBuilder withCollectionFieldType(FieldType collectionFieldType) {
+            fieldType.setCollectionFieldType(collectionFieldType);
+            return this;
+        }
+
+        public FieldTypeBuilder withCollectionField(CaseField complexField) {
+            complexFields.add(complexField);
+            return this;
+        }
+
+        public FieldType build() {
+            fieldType.setComplexFields(complexFields);
+            return fieldType;
+        }
+
+        public static FieldTypeBuilder aFieldType() {
+            return new FieldTypeBuilder();
         }
     }
 

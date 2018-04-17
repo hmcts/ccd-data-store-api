@@ -8,12 +8,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 import static com.google.common.collect.Maps.newHashMap;
 
@@ -58,16 +56,6 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     @Override
     public CaseType getCaseType(int version, String caseTypeId) {
         return caseDefinitionRepository.getCaseType(version, caseTypeId);
-    }
-
-    @Override
-    public List<Jurisdiction> getAllJurisdictions() {
-        return caseDefinitionRepository.getAllJurisdictions();
-    }
-
-    @Override
-    public CompletableFuture<List<Jurisdiction>> getAllJurisdictionsAsync() {
-        return caseDefinitionRepository.getAllJurisdictionsAsync();
     }
 
     public List<FieldType> getBaseTypes() {

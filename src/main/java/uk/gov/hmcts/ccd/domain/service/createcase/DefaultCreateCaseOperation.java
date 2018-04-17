@@ -1,12 +1,13 @@
 package uk.gov.hmcts.ccd.domain.service.createcase;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.data.user.DefaultUserRepository;
+import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
@@ -44,7 +45,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
     private final ValidateCaseFieldsOperation validateCaseFieldsOperation;
 
     @Inject
-    public DefaultCreateCaseOperation(@Qualifier(DefaultUserRepository.QUALIFIER) final UserRepository userRepository,
+    public DefaultCreateCaseOperation(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
                                       @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
                                       final EventTriggerService eventTriggerService,
                                       final EventTokenService eventTokenService,
@@ -109,7 +110,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         newCaseDetails.setState(eventTrigger.getPostState());
         newCaseDetails.setSecurityClassification(caseType.getSecurityClassification());
         newCaseDetails.setData(caseSanitiser.sanitise(caseType, data));
-        newCaseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(caseType, newCaseDetails.getData()));
+        newCaseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(caseType, newCaseDetails.getData(), Maps.newHashMap()));
 
         final CaseDetails savedCaseDetails = submitCaseTransaction.submitCase(event,
                                                                               caseType,
