@@ -11,6 +11,8 @@ provider "vault" {
 locals {
   app_full_name = "${var.product}-${var.component}"
   env_ase_url = "${var.env}.service.${data.terraform_remote_state.core_apps_compute.ase_name[0]}.internal"
+  default_default_print_url = "http://ccd-case-print-service-${local.env_ase_url}"
+  default_print_url = "${var.default_print_url != "" ? var.default_print_url : local.default_default_print_url}"
 }
 
 data "vault_generic_secret" "ccd_data_s2s_key" {
@@ -43,7 +45,7 @@ module "ccd-data-store-api" {
 
     DATA_STORE_S2S_AUTHORISED_SERVICES  = "${var.authorised-services}"
 
-    CCD_DEFAULTPRINTURL                 = "${var.default_print_url}"
+    CCD_DEFAULTPRINTURL                 = "${local.default_print_url}"
   }
 
 }
