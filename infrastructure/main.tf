@@ -11,7 +11,7 @@ provider "vault" {
 locals {
   app_full_name = "${var.product}-${var.component}"
   env_ase_url = "${var.env}.service.${data.terraform_remote_state.core_apps_compute.ase_name[0]}.internal"
-  default_default_print_url = "http://ccd-case-print-service-${local.env_ase_url}"
+  default_default_print_url = "https://ccd-case-print-service-${local.env_ase_url}"
   default_print_url = "${var.default_print_url != "" ? var.default_print_url : local.default_default_print_url}"
 }
 
