@@ -35,7 +35,7 @@ import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
-public class EventsEndpointIT extends WireMockBaseTest {
+        public class EventsEndpointIT extends WireMockBaseTest {
     private static final String GET_EVENTS_AS_CASEWORKER = "/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/1504259907353529/events";
 
     @Inject
@@ -85,8 +85,7 @@ public class EventsEndpointIT extends WireMockBaseTest {
 
         assertAll(
             () -> assertThat(events, hasSize(2)),
-            () -> assertThat(events.get(0).getId(), equalTo(2L)),
-            () -> assertThat(events.get(1).getId(), equalTo(1L)),
+            () -> assertThat(events.get(1).getEventName(), equalTo("TEST TRIGGER_EVENT NAME")),
             () -> assertThat(events.get(0).getEventName(), containsString("GRACIOUS")),
             () -> assertThat(events.get(0).getSummary(), containsString("The summary 2")),
             () -> assertThat(events.get(0).getDescription(), containsString("Some comment 2")),

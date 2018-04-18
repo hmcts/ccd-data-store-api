@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.model.std;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.annotations.ApiModelProperty;
@@ -10,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 public class AuditEvent extends Event {
-    @JsonProperty("audit_event_id")
+    @JsonIgnore
     private Long id;
     @JsonProperty("user_id")
     private Long userId;
@@ -20,7 +21,7 @@ public class AuditEvent extends Event {
     private String userFirstName;
     @JsonProperty("event_name")
     private String eventName;
-    @JsonProperty("case_data_id")
+    @JsonIgnore
     private Long caseDataId;
     @JsonProperty("created_date")
     private LocalDateTime createdDate;
