@@ -33,9 +33,9 @@ public class CaseDataService {
     public Map<String, JsonNode> getDefaultSecurityClassifications(final CaseType caseType,
                                                                    final Map<String, JsonNode> caseData,
                                                                    final Map<String, JsonNode> currentDataClassification) {
-        final JsonNode newDataClassification = cloneAndConvertDataMap(caseData);
-        deduceDefaultClassifications(newDataClassification, MAPPER.convertValue(currentDataClassification, JsonNode.class), caseType.getCaseFields(), EMPTY_STRING);
-        return MAPPER.convertValue(newDataClassification, STRING_JSON_MAP);
+        final JsonNode clonedDataClassification = cloneAndConvertDataMap(caseData);
+        deduceDefaultClassifications(clonedDataClassification, MAPPER.convertValue(currentDataClassification, JsonNode.class), caseType.getCaseFields(), EMPTY_STRING);
+        return MAPPER.convertValue(clonedDataClassification, STRING_JSON_MAP);
     }
 
     private void deduceDefaultClassifications(final JsonNode dataNode,
