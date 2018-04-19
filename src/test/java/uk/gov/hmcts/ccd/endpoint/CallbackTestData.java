@@ -335,21 +335,7 @@ public class CallbackTestData {
             "        \"id\": \"Document\"\n" +
             "      }\n" +
             "    }\n" +
-            "  ],\n" +
-            " \"data_classification\": {\n" +
-            "    \"PersonFirstName\": \"PUBLIC\",\n" +
-            "    \"PersonLastName\": \"PUBLIC\",\n" +
-            "    \"PersonAddress\": {\n" +
-            "      \"classification\" : \"PUBLIC\",\n" +
-            "      \"value\" : {\n" +
-            "        \"AddressLine1\": \"PUBLIC\",\n" +
-            "        \"AddressLine2\": \"PUBLIC\",\n" +
-            "        \"AddressLine3\": \"PUBLIC\",\n" +
-            "        \"Country\": \"PUBLIC\",\n" +
-            "        \"Postcode\": \"PUBLIC\"\n" +
-            "      }\n" +
-            "    }\n" +
-            "  }\n" +
+            "  ]\n" +
             "}";
     }
 }

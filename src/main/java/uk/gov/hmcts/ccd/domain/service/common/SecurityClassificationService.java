@@ -193,6 +193,6 @@ public class SecurityClassificationService {
     }
 
     private boolean isNull(JsonNode... jsonNodes) {
-        return newArrayList(jsonNodes).stream().allMatch(Objects::isNull);
+        return newArrayList(jsonNodes).stream().anyMatch(Objects::isNull);
     }
 }

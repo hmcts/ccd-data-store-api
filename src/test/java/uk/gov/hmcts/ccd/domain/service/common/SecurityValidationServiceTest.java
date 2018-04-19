@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.domain.service.common;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,6 +15,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import java.util.Map;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsMapContaining.hasEntry;
 import static org.junit.jupiter.api.Assertions.*;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
@@ -47,18 +47,39 @@ class SecurityValidationServiceTest {
                 .withSecurityClassification(PRIVATE)
                 .withDataClassification(
                     aClassificationBuilder()
-                        .withData("field1", getTextNode("PRIVATE"))
                         .buildAsMap())
                 .build();
             final CallbackResponse callbackResponse = aCallbackResponse()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(
                     aClassificationBuilder()
-                        .withData("field1", getTextNode("PRIVATE"))
                         .buildAsMap())
                 .build();
 
             assertThrowsSecurityValidationDueToClassificationException(caseDetails, callbackResponse);
+        }
+
+
+        @Test
+        @DisplayName("should increase security if valid classification level for case")
+        void shouldIncreaseSecurityIfValidClassificationLevelForCase() {
+            final CaseDetails caseDetails = aCaseDetails()
+                .withSecurityClassification(PUBLIC)
+                .withDataClassification(
+                    aClassificationBuilder()
+                        .buildAsMap())
+                .build();
+            final Map<String, JsonNode> defaultDataClassification = caseDetails.getDataClassification();
+            final CallbackResponse callbackResponse = aCallbackResponse()
+                .withSecurityClassification(PRIVATE)
+                .withDataClassification(
+                    aClassificationBuilder()
+                        .buildAsMap())
+                .build();
+
+            securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails, defaultDataClassification);
+
+            Assert.assertThat(caseDetails.getSecurityClassification(), is(PRIVATE));
         }
     }
 
@@ -78,7 +99,7 @@ class SecurityValidationServiceTest {
                 .build();
             final Map<String, JsonNode> defaultDataClassification = caseDetails.getDataClassification();
             final CallbackResponse callbackResponse = aCallbackResponse()
-                .withSecurityClassification(PRIVATE)
+                .withSecurityClassification(PUBLIC)
                 .withDataClassification(
                     aClassificationBuilder()
                         .withData("field1", getTextNode("RESTRICTED"))
@@ -88,8 +109,7 @@ class SecurityValidationServiceTest {
             securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails, defaultDataClassification);
 
             assertAll(
-                () -> Assert.assertThat(caseDetails.getSecurityClassification(), Matchers.is(PRIVATE)),
-                () -> Assert.assertThat(caseDetails.getDataClassification().size(), Matchers.is(1)),
+                () -> Assert.assertThat(caseDetails.getDataClassification().size(), is(1)),
                 () -> Assert.assertThat(caseDetails.getDataClassification(), hasEntry("field1", getTextNode("RESTRICTED")))
             );
         }
@@ -205,7 +225,7 @@ class SecurityValidationServiceTest {
                 .build();
             final Map<String, JsonNode> defaultDataClassification = caseDetails.getDataClassification();
             final CallbackResponse callbackResponse = aCallbackResponse()
-                .withSecurityClassification(PRIVATE)
+                .withSecurityClassification(PUBLIC)
                 .withDataClassification(
                     aClassificationBuilder()
                         .withData("complexField1",
@@ -222,12 +242,11 @@ class SecurityValidationServiceTest {
             securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails, defaultDataClassification);
 
             assertAll(
-                () -> Assert.assertThat(caseDetails.getSecurityClassification(), Matchers.is(PRIVATE)),
-                () -> Assert.assertThat(caseDetails.getDataClassification().size(), Matchers.is(1)),
-                () -> Assert.assertThat(caseDetails.getDataClassification().get("complexField1").size(), Matchers.is(2)),
-                () -> Assert.assertThat(caseDetails.getDataClassification().get("complexField1").get("classification"), Matchers.is(getTextNode("RESTRICTED"))),
-                () -> Assert.assertThat(caseDetails.getDataClassification().get("complexField1").get("value").size(), Matchers.is(1)),
-                () -> Assert.assertThat(caseDetails.getDataClassification().get("complexField1").get("value").get("field2"), Matchers.is(getTextNode("RESTRICTED")))
+                () -> Assert.assertThat(caseDetails.getDataClassification().size(), is(1)),
+                () -> Assert.assertThat(caseDetails.getDataClassification().get("complexField1").size(), is(2)),
+                () -> Assert.assertThat(caseDetails.getDataClassification().get("complexField1").get("classification"), is(getTextNode("RESTRICTED"))),
+                () -> Assert.assertThat(caseDetails.getDataClassification().get("complexField1").get("value").size(), is(1)),
+                () -> Assert.assertThat(caseDetails.getDataClassification().get("complexField1").get("value").get("field2"), is(getTextNode("RESTRICTED")))
             );
         }
 
@@ -602,7 +621,7 @@ class SecurityValidationServiceTest {
                 .build();
             final Map<String, JsonNode> defaultDataClassification = caseDetails.getDataClassification();
             final CallbackResponse callbackResponse = aCallbackResponse()
-                .withSecurityClassification(PRIVATE)
+                .withSecurityClassification(PUBLIC)
                 .withDataClassification(aClassificationBuilder()
                                             .withData("collectionField1", aClassificationBuilder()
                                                 .withData("classification", getTextNode("RESTRICTED"))
@@ -622,16 +641,13 @@ class SecurityValidationServiceTest {
             securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails, defaultDataClassification);
 
             assertAll(
-                () -> Assert.assertThat(caseDetails.getSecurityClassification(), Matchers.is(PRIVATE)),
-                () -> Assert.assertThat(caseDetails.getDataClassification().size(), Matchers.is(1)),
-                () -> Assert.assertThat(caseDetails.getDataClassification().get("collectionField1").size(), Matchers.is(2)),
-                () -> Assert.assertThat(caseDetails.getDataClassification().get("collectionField1").get("classification"),
-                                        Matchers.is(getTextNode("RESTRICTED"))),
-                () -> Assert.assertThat(caseDetails.getDataClassification().get("collectionField1").get("value").size(), Matchers.is(1)),
-                () -> Assert.assertThat(caseDetails.getDataClassification().get("collectionField1").get("value").get(0).get("id"),
-                                        Matchers.is(getTextNode("someId1"))),
+                () -> Assert.assertThat(caseDetails.getDataClassification().size(), is(1)),
+                () -> Assert.assertThat(caseDetails.getDataClassification().get("collectionField1").size(), is(2)),
+                () -> Assert.assertThat(caseDetails.getDataClassification().get("collectionField1").get("classification"), is(getTextNode("RESTRICTED"))),
+                () -> Assert.assertThat(caseDetails.getDataClassification().get("collectionField1").get("value").size(), is(1)),
+                () -> Assert.assertThat(caseDetails.getDataClassification().get("collectionField1").get("value").get(0).get("id"), is(getTextNode("someId1"))),
                 () -> Assert.assertThat(caseDetails.getDataClassification().get("collectionField1").get("value").get(0).get("value").get("field2"),
-                                        Matchers.is(getTextNode("RESTRICTED")))
+                                        is(getTextNode("RESTRICTED")))
             );
         }
 
@@ -663,7 +679,7 @@ class SecurityValidationServiceTest {
                                             .buildAsMap())
                 .build();
             final CallbackResponse callbackResponse = aCallbackResponse()
-                .withSecurityClassification(PRIVATE)
+                .withSecurityClassification(PUBLIC)
                 .withDataClassification(aClassificationBuilder()
                                             .withData("collectionField1", aClassificationBuilder()
                                                 .withData("classification", getTextNode("RESTRICTED"))
@@ -964,7 +980,9 @@ class SecurityValidationServiceTest {
     private void assertThrowsSecurityValidationDueToClassificationException(CaseDetails caseDetails, CallbackResponse callbackResponse) {
         final Map<String, JsonNode> defaultDataClassification = caseDetails.getDataClassification();
         ValidationException validationException = assertThrows(ValidationException.class,
-                                                             () -> securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails, defaultDataClassification));
+                                                               () -> securityValidationService.setClassificationFromCallbackIfValid(callbackResponse,
+                                                                                                                                    caseDetails,
+                                                                                                                                    defaultDataClassification));
         assertEquals("The event cannot be complete due to a callback returned data validation error (c)", validationException.getMessage());
     }
 

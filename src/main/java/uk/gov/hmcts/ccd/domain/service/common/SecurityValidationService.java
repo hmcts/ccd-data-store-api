@@ -44,7 +44,7 @@ public class SecurityValidationService {
                 return cd;
             })
             .orElseThrow(() -> {
-                LOG.warn("Case={} classification is higher than callbackResponse={} case classification", caseDetails, callbackResponse);
+                LOG.warn("callbackResponse={} has lower classification than Case={}", caseDetails, callbackResponse);
                 return new ValidationException(VALIDATION_ERR_MSG);
             });
     }
@@ -52,7 +52,7 @@ public class SecurityValidationService {
     private void validateObject(JsonNode callbackDataClassification, JsonNode defaultDataClassification) {
 
         if (!isNotNullAndSizeEqual(callbackDataClassification, defaultDataClassification)) {
-            LOG.warn("defaultClassification={} and callbackClassification={} sizes differ", defaultDataClassification, callbackDataClassification);
+            LOG.warn("callbackClassification={} and defaultClassification={} sizes differ", defaultDataClassification, callbackDataClassification);
             throw new ValidationException(VALIDATION_ERR_MSG);
         }
 
@@ -64,7 +64,7 @@ public class SecurityValidationService {
             JsonNode defaultClassificationItem = defaultDataClassification.get(callbackClassificationKey);
             if (callbackClassificationValue.has(CLASSIFICATION)) {
                 if (!isValidClassification(callbackClassificationValue.get(CLASSIFICATION), defaultClassificationItem.get(CLASSIFICATION))) {
-                    LOG.warn("defaultClassificationItem={} has higher classification than callbackClassificationItem={}",
+                    LOG.warn("callbackClassificationItem={} has lower classification than defaultClassificationItem={}",
                              defaultClassificationItem,
                              callbackClassificationValue);
                     throw new ValidationException(VALIDATION_ERR_MSG);
@@ -86,7 +86,7 @@ public class SecurityValidationService {
                 throw new ValidationException(VALIDATION_ERR_MSG);
             } else {
                 if (!isValidClassification(callbackClassificationValue, defaultClassificationItem)) {
-                    LOG.warn("defaultClassificationItem={} has higher classification than callbackClassificationItem={}",
+                    LOG.warn("callbackClassificationItem={} has lower classification than defaultClassificationItem={}",
                              defaultDataClassification,
                              MAPPER.convertValue(callbackClassificationMap, JsonNode.class));
                     throw new ValidationException(VALIDATION_ERR_MSG);
