@@ -13,6 +13,8 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
+import java.util.Map;
+
 import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.collection.IsMapContaining.hasEntry;
 import static org.junit.jupiter.api.Assertions.*;
@@ -56,7 +58,7 @@ class SecurityValidationServiceTest {
                         .buildAsMap())
                 .build();
 
-            assertThrowsSecurityValidationForCaseException(caseDetails, callbackResponse);
+            assertThrowsSecurityValidationDueToClassificationException(caseDetails, callbackResponse);
         }
     }
 
@@ -74,6 +76,7 @@ class SecurityValidationServiceTest {
                         .withData("field1", getTextNode("PRIVATE"))
                         .buildAsMap())
                 .build();
+            final Map<String, JsonNode> defaultDataClassification = caseDetails.getDataClassification();
             final CallbackResponse callbackResponse = aCallbackResponse()
                 .withSecurityClassification(PRIVATE)
                 .withDataClassification(
@@ -82,7 +85,7 @@ class SecurityValidationServiceTest {
                         .buildAsMap())
                 .build();
 
-            securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails);
+            securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails, defaultDataClassification);
 
             assertAll(
                 () -> Assert.assertThat(caseDetails.getSecurityClassification(), Matchers.is(PRIVATE)),
@@ -111,7 +114,7 @@ class SecurityValidationServiceTest {
                         .buildAsMap())
                 .build();
 
-            assertThrowsSecurityValidationOtherException(caseDetails, callbackResponse);
+            assertThrowsSecurityValidationDueToClassificationException(caseDetails, callbackResponse);
         }
 
         @Test
@@ -133,7 +136,7 @@ class SecurityValidationServiceTest {
                         .buildAsMap())
                 .build();
 
-            assertThrowsSecurityValidationOtherException(caseDetails, callbackResponse);
+            assertThrowsSecurityValidationDueToClassificationException(caseDetails, callbackResponse);
         }
 
         @Test
@@ -154,7 +157,7 @@ class SecurityValidationServiceTest {
                         .buildAsMap())
                 .build();
 
-            assertThrowsSecurityValidationOtherException(caseDetails, callbackResponse);
+            assertThrowsSecurityValidationDueToClassificationException(caseDetails, callbackResponse);
         }
 
         @Test
@@ -175,7 +178,7 @@ class SecurityValidationServiceTest {
                         .buildAsMap())
                 .build();
 
-            assertThrowsSecurityValidationForCaseDataException(caseDetails, callbackResponse, "field1");
+            assertThrowsSecurityValidationDueToClassificationException(caseDetails, callbackResponse);
         }
     }
 
@@ -200,6 +203,7 @@ class SecurityValidationServiceTest {
                                       .buildAsNode())
                         .buildAsMap())
                 .build();
+            final Map<String, JsonNode> defaultDataClassification = caseDetails.getDataClassification();
             final CallbackResponse callbackResponse = aCallbackResponse()
                 .withSecurityClassification(PRIVATE)
                 .withDataClassification(
@@ -215,7 +219,7 @@ class SecurityValidationServiceTest {
                         .buildAsMap())
                 .build();
 
-            securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails);
+            securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails, defaultDataClassification);
 
             assertAll(
                 () -> Assert.assertThat(caseDetails.getSecurityClassification(), Matchers.is(PRIVATE)),
@@ -259,7 +263,7 @@ class SecurityValidationServiceTest {
                         .buildAsMap())
                 .build();
 
-            assertThrowsSecurityValidationOtherException(caseDetails, callbackResponse);
+            assertThrowsSecurityValidationDueToClassificationException(caseDetails, callbackResponse);
         }
 
         @Test
@@ -293,7 +297,7 @@ class SecurityValidationServiceTest {
                         .buildAsMap())
                 .build();
 
-            assertThrowsSecurityValidationOtherException(caseDetails, callbackResponse);
+            assertThrowsSecurityValidationDueToClassificationException(caseDetails, callbackResponse);
         }
 
         @Test
@@ -324,7 +328,7 @@ class SecurityValidationServiceTest {
                         .buildAsMap())
                 .build();
 
-            assertThrowsSecurityValidationOtherException(caseDetails, callbackResponse);
+            assertThrowsSecurityValidationDueToClassificationException(caseDetails, callbackResponse);
         }
 
         @Test
@@ -355,7 +359,7 @@ class SecurityValidationServiceTest {
                         .buildAsMap())
                 .build();
 
-            assertThrowsSecurityValidationOtherException(caseDetails, callbackResponse);
+            assertThrowsSecurityValidationDueToClassificationException(caseDetails, callbackResponse);
         }
 
         @Test
@@ -391,7 +395,7 @@ class SecurityValidationServiceTest {
                         .buildAsMap())
                 .build();
 
-            assertThrowsSecurityValidationOtherException(caseDetails, callbackResponse);
+            assertThrowsSecurityValidationDueToClassificationException(caseDetails, callbackResponse);
         }
 
         @Test
@@ -427,7 +431,7 @@ class SecurityValidationServiceTest {
                         .buildAsMap())
                 .build();
 
-            assertThrowsSecurityValidationOtherException(caseDetails, callbackResponse);
+            assertThrowsSecurityValidationDueToClassificationException(caseDetails, callbackResponse);
         }
 
         @Test
@@ -462,7 +466,7 @@ class SecurityValidationServiceTest {
                         .buildAsMap())
                 .build();
 
-            assertThrowsSecurityValidationOtherException(caseDetails, callbackResponse);
+            assertThrowsSecurityValidationDueToClassificationException(caseDetails, callbackResponse);
         }
 
         @Test
@@ -497,7 +501,7 @@ class SecurityValidationServiceTest {
                         .buildAsMap())
                 .build();
 
-            assertThrowsSecurityValidationOtherException(caseDetails, callbackResponse);
+            assertThrowsSecurityValidationDueToClassificationException(caseDetails, callbackResponse);
         }
 
 
@@ -533,7 +537,7 @@ class SecurityValidationServiceTest {
                         .buildAsMap())
                 .build();
 
-            assertThrowsSecurityValidationForCaseDataException(caseDetails, callbackResponse, "complexField1");
+            assertThrowsSecurityValidationDueToClassificationException(caseDetails, callbackResponse);
         }
 
         @Test
@@ -568,7 +572,7 @@ class SecurityValidationServiceTest {
                         .buildAsMap())
                 .build();
 
-            assertThrowsSecurityValidationForCaseDataException(caseDetails, callbackResponse, "field2");
+            assertThrowsSecurityValidationDueToClassificationException(caseDetails, callbackResponse);
         }
     }
 
@@ -596,6 +600,7 @@ class SecurityValidationServiceTest {
                                                 .buildAsNode())
                                             .buildAsMap())
                 .build();
+            final Map<String, JsonNode> defaultDataClassification = caseDetails.getDataClassification();
             final CallbackResponse callbackResponse = aCallbackResponse()
                 .withSecurityClassification(PRIVATE)
                 .withDataClassification(aClassificationBuilder()
@@ -614,7 +619,7 @@ class SecurityValidationServiceTest {
                                             .buildAsMap())
                 .build();
 
-            securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails);
+            securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails, defaultDataClassification);
 
             assertAll(
                 () -> Assert.assertThat(caseDetails.getSecurityClassification(), Matchers.is(PRIVATE)),
@@ -678,7 +683,7 @@ class SecurityValidationServiceTest {
                                             .buildAsMap())
                 .build();
 
-            assertThrowsSecurityValidationOtherException(caseDetails, callbackResponse);
+            assertThrowsSecurityValidationDueToClassificationException(caseDetails, callbackResponse);
         }
 
         @Test
@@ -720,7 +725,7 @@ class SecurityValidationServiceTest {
                                             .buildAsMap())
                 .build();
 
-            assertThrowsSecurityValidationOtherException(caseDetails, callbackResponse);
+            assertThrowsSecurityValidationDueToClassificationException(caseDetails, callbackResponse);
         }
 
         @Test
@@ -758,7 +763,7 @@ class SecurityValidationServiceTest {
                                             .buildAsMap())
                 .build();
 
-            assertThrowsSecurityValidationOtherException(caseDetails, callbackResponse);
+            assertThrowsSecurityValidationDueToClassificationException(caseDetails, callbackResponse);
         }
 
         @Test
@@ -804,7 +809,7 @@ class SecurityValidationServiceTest {
                                             .buildAsMap())
                 .build();
 
-            assertThrowsSecurityValidationOtherException(caseDetails, callbackResponse);
+            assertThrowsSecurityValidationDueToClassificationException(caseDetails, callbackResponse);
         }
 
         @Test
@@ -841,7 +846,7 @@ class SecurityValidationServiceTest {
                                             .buildAsMap())
                 .build();
 
-            assertThrowsSecurityValidationOtherException(caseDetails, callbackResponse);
+            assertThrowsSecurityValidationDueToClassificationException(caseDetails, callbackResponse);
         }
 
         @Test
@@ -878,7 +883,7 @@ class SecurityValidationServiceTest {
                                             .buildAsMap())
                 .build();
 
-            assertThrowsSecurityValidationOtherException(caseDetails, callbackResponse);
+            assertThrowsSecurityValidationDueToClassificationException(caseDetails, callbackResponse);
         }
 
         @Test
@@ -915,7 +920,7 @@ class SecurityValidationServiceTest {
                                             .buildAsMap())
                 .build();
 
-            assertThrowsSecurityValidationForCaseDataException(caseDetails, callbackResponse, "field2");
+            assertThrowsSecurityValidationDueToClassificationException(caseDetails, callbackResponse);
         }
 
         @Test
@@ -952,26 +957,15 @@ class SecurityValidationServiceTest {
                                             .buildAsMap())
                 .build();
 
-            assertThrowsSecurityValidationForCaseDataException(caseDetails, callbackResponse, "collectionField1");
+            assertThrowsSecurityValidationDueToClassificationException(caseDetails, callbackResponse);
         }
     }
 
-    private void assertThrowsSecurityValidationForCaseException(CaseDetails caseDetails, CallbackResponse callbackResponse) {
+    private void assertThrowsSecurityValidationDueToClassificationException(CaseDetails caseDetails, CallbackResponse callbackResponse) {
+        final Map<String, JsonNode> defaultDataClassification = caseDetails.getDataClassification();
         ValidationException validationException = assertThrows(ValidationException.class,
-                                                             () -> securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails));
-        assertEquals(String.format("The security level of the case with reference=%s cannot be loosened", caseDetails.getReference()), validationException.getMessage());
-    }
-
-    private void assertThrowsSecurityValidationForCaseDataException(CaseDetails caseDetails, CallbackResponse callbackResponse, String fieldName) {
-        ValidationException validationException = assertThrows(ValidationException.class,
-                                                             () -> securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails));
-        assertEquals(String.format("The security level of the caseData=%s cannot be loosened", fieldName), validationException.getMessage());
-    }
-
-    private void assertThrowsSecurityValidationOtherException(CaseDetails caseDetails, CallbackResponse callbackResponse) {
-        ValidationException validationException = assertThrows(ValidationException.class,
-                                                             () -> securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails));
-        assertEquals("The event cannot be completed as something went wrong while updating the security level of the case or some of the case fields", validationException.getMessage());
+                                                             () -> securityValidationService.setClassificationFromCallbackIfValid(callbackResponse, caseDetails, defaultDataClassification));
+        assertEquals("The event cannot be complete due to a callback returned data validation error (c)", validationException.getMessage());
     }
 
     private JsonNode getTextNode(String value) {

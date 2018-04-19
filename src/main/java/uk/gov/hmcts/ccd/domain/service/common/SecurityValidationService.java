@@ -16,9 +16,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 
-import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils.caseHasClassificationEqualOrLowerThan;
-import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils.getDataClassificationForData;
-import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils.getSecurityClassification;
+import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils.*;
 
 @Service
 public class SecurityValidationService {
@@ -30,11 +28,9 @@ public class SecurityValidationService {
     };
     private static final String VALUE = "value";
     private static final String CLASSIFICATION = "classification";
-    private static final String VALIDATION_ERR_MSG = "The event cannot be completed as something went wrong while updating the security level of the case or some of the case fields";
-    private static final String CASE_SECURITY_LEVEL_TOO_LOW_MSG = "The security level of the case with reference=%s cannot be loosened";
-    private static final String CASE_DATA_SECURITY_LEVEL_TOO_LOW_MSG = "The security level of the caseData=%s cannot be loosened";
+    private static final String VALIDATION_ERR_MSG = "The event cannot be complete due to a callback returned data validation error (c)";
 
-    public void setClassificationFromCallbackIfValid(CallbackResponse callbackResponse, CaseDetails caseDetails) {
+    public void setClassificationFromCallbackIfValid(CallbackResponse callbackResponse, CaseDetails caseDetails, Map<String, JsonNode> defaultDataClassification) {
         Optional<CaseDetails> result = Optional.of(caseDetails);
 
         result.filter(caseHasClassificationEqualOrLowerThan(callbackResponse.getSecurityClassification()))
@@ -42,14 +38,14 @@ public class SecurityValidationService {
                 cd.setSecurityClassification(callbackResponse.getSecurityClassification());
 
                 validateObject(MAPPER.convertValue(callbackResponse.getDataClassification(), JsonNode.class),
-                               MAPPER.convertValue(caseDetails.getDataClassification(), JsonNode.class));
+                               MAPPER.convertValue(defaultDataClassification, JsonNode.class));
 
                 caseDetails.setDataClassification(MAPPER.convertValue(callbackResponse.getDataClassification(), STRING_JSON_MAP));
                 return cd;
             })
             .orElseThrow(() -> {
                 LOG.warn("Case={} classification is higher than callbackResponse={} case classification", caseDetails, callbackResponse);
-                return new ValidationException(String.format(CASE_SECURITY_LEVEL_TOO_LOW_MSG, caseDetails.getReference()));
+                return new ValidationException(VALIDATION_ERR_MSG);
             });
     }
 
@@ -71,7 +67,7 @@ public class SecurityValidationService {
                     LOG.warn("defaultClassificationItem={} has higher classification than callbackClassificationItem={}",
                              defaultClassificationItem,
                              callbackClassificationValue);
-                    throw new ValidationException(String.format(CASE_DATA_SECURITY_LEVEL_TOO_LOW_MSG, callbackClassificationKey));
+                    throw new ValidationException(VALIDATION_ERR_MSG);
                 }
                 if (callbackClassificationValue.has(VALUE)) {
                     JsonNode defaultClassificationValue = defaultClassificationItem.get(VALUE);
@@ -93,7 +89,7 @@ public class SecurityValidationService {
                     LOG.warn("defaultClassificationItem={} has higher classification than callbackClassificationItem={}",
                              defaultDataClassification,
                              MAPPER.convertValue(callbackClassificationMap, JsonNode.class));
-                    throw new ValidationException(String.format(CASE_DATA_SECURITY_LEVEL_TOO_LOW_MSG, callbackClassificationKey));
+                    throw new ValidationException(VALIDATION_ERR_MSG);
                 }
             }
         }
