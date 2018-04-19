@@ -44,7 +44,7 @@ public class DocumentManagementRestClient {
     }
 
     public Document getDocument(FieldType fieldType, String url) {
-        final HttpHeaders headers = securityUtils.userAuthorizationHeaders();
+        final HttpHeaders headers = securityUtils.authorizationHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         final HttpEntity requestEntity = new HttpEntity(headers);
 
