@@ -52,6 +52,7 @@ public class DocumentManagementRestClientTest extends StubServerDependent {
     private static final ObjectNode DOCUMENT_VALUE_INITIAL = JSON_FACTORY.objectNode();
     private static final ObjectNode DOCUMENT_VALUE_SANITISED = JSON_FACTORY.objectNode();
     private static final String BEARER_TEST_JWT = "Bearer testJwt";
+    private static final String SERVICE_JWT = "ey373478378347847834783784";
 
     private ObjectMapper objectMapper = new ObjectMapper();
     private RestTemplate restTemplate = new RestTemplate();
@@ -80,8 +81,9 @@ public class DocumentManagementRestClientTest extends StubServerDependent {
     public void setUp() {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", BEARER_TEST_JWT);
+        headers.add("ServiceAuthorization", SERVICE_JWT);
         headers.add("Content-Type", MediaType.APPLICATION_JSON_VALUE);
-        when(securityUtils.userAuthorizationHeaders()).thenReturn(headers);
+        when(securityUtils.authorizationHeaders()).thenReturn(headers);
 
         document = new Document();
         _links links = new _links();
@@ -102,6 +104,7 @@ public class DocumentManagementRestClientTest extends StubServerDependent {
         whenHttp(server)
             .match(get(RESOURCE_URI),
                 withHeader("Authorization", BEARER_TEST_JWT),
+                withHeader("ServiceAuthorization", SERVICE_JWT),
                 withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE))
             .then(ok(), jsonContent(document), contentType("application/ccd"));
 
@@ -113,6 +116,7 @@ public class DocumentManagementRestClientTest extends StubServerDependent {
             .once(method(Method.GET),
                 uri(RESOURCE_URI),
                 withHeader("Authorization", BEARER_TEST_JWT),
+                withHeader("ServiceAuthorization", SERVICE_JWT),
                 withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE));
     }
 
@@ -123,6 +127,7 @@ public class DocumentManagementRestClientTest extends StubServerDependent {
         whenHttp(server)
             .match(get(RESOURCE_URI),
                 withHeader("Authorization", BEARER_TEST_JWT),
+                withHeader("ServiceAuthorization", SERVICE_JWT),
                 withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE))
             .then(unauthorized());
 
@@ -137,6 +142,7 @@ public class DocumentManagementRestClientTest extends StubServerDependent {
         whenHttp(server)
             .match(get(RESOURCE_URI),
                 withHeader("Authorization", BEARER_TEST_JWT),
+                withHeader("ServiceAuthorization", SERVICE_JWT),
                 withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE))
             .then(r -> {
                 r.setStatus(HttpStatus.SERVICE_UNAVAILABLE_503);
@@ -153,6 +159,7 @@ public class DocumentManagementRestClientTest extends StubServerDependent {
         whenHttp(server)
             .match(get(RESOURCE_URI),
                 withHeader("Authorization", BEARER_TEST_JWT),
+                withHeader("ServiceAuthorization", SERVICE_JWT),
                 withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE))
             .then(r -> {
                 r.setStatus(HttpStatus.BAD_GATEWAY_502);
@@ -169,6 +176,7 @@ public class DocumentManagementRestClientTest extends StubServerDependent {
         whenHttp(server)
             .match(get(RESOURCE_URI),
                 withHeader("Authorization", BEARER_TEST_JWT),
+                withHeader("ServiceAuthorization", SERVICE_JWT),
                 withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE))
             .then(r -> {
                 r.setStatus(HttpStatus.INTERNAL_SERVER_ERROR_500);
