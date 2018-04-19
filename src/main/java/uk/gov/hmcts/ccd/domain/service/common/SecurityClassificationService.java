@@ -108,7 +108,7 @@ public class SecurityClassificationService {
     }
 
     private JsonNode filterNestedObject(JsonNode data, JsonNode dataClassification, SecurityClassification userClassification) {
-        if (isNull(data, dataClassification)) {
+        if (isAnyNull(data, dataClassification)) {
             return EMPTY_NODE;
         }
         Iterator<Map.Entry<String, JsonNode>> dataIterator = data.fields();
@@ -116,7 +116,7 @@ public class SecurityClassificationService {
             Map.Entry<String, JsonNode> dataElement = dataIterator.next();
             String dataElementKey = dataElement.getKey();
             JsonNode dataClassificationElement = dataClassification.get(dataElementKey);
-            if (isNull(dataClassificationElement)) {
+            if (isAnyNull(dataClassificationElement)) {
                 dataIterator.remove();
             } else if (dataClassificationElement.has(VALUE)) {
                 JsonNode dataClassificationValue = dataClassificationElement.get(VALUE);
@@ -192,7 +192,7 @@ public class SecurityClassificationService {
         }
     }
 
-    private boolean isNull(JsonNode... jsonNodes) {
+    private boolean isAnyNull(JsonNode... jsonNodes) {
         return newArrayList(jsonNodes).stream().anyMatch(Objects::isNull);
     }
 }
