@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.1.xsd">
+
+    <suppress>
+        <notes><![CDATA[
+     Does not apply as we're not using the XmlMapper.
+     ]]></notes>
+        <gav regex="true">^com\.fasterxml\.jackson\.core:jackson-databind:.*$</gav>
+        <cpe>cpe:/a:fasterxml:jackson-databind</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   Does not apply as we're not using the XmlMapper.
+   ]]></notes>
+        <gav regex="true">^com\.fasterxml\.jackson\.core:jackson-databind:.*$</gav>
+        <cpe>cpe:/a:fasterxml:jackson</cpe>
+    </suppress>
+    <suppress>
+        <gav regex="true">^org\.postgresql:postgresql:.*$</gav>
+        <cpe>cpe:/a:postgresql:postgresql</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[ https://github.com/jeremylong/DependencyCheck/issues/987
+   file name: tomcat-annotations-api-8.5.23.jar
+   ]]></notes>
+        <gav regex="true">^org\.apache\.tomcat:tomcat-annotations-api:.*$</gav>
+        <cpe>cpe:/a:apache:tomcat</cpe>
+        <cpe>cpe:/a:apache_tomcat:apache_tomcat</cpe>
+        <cpe>cpe:/a:apache_software_foundation:tomcat</cpe>
+    </suppress>
+    <suppress>
+        <notes>
+            Introduced by service-token-generator-spring-2.1.0.jar
+        </notes>
+        <cve>CVE-2016-9878</cve>
+    </suppress>
+    <suppress>
+        <notes>
+            Introduced by Spring 4.3.13.RELEASE; Upgrade to Spring Boot 1.5.12 or Spring Boot 2 to resolve.
+        </notes>
+        <cve>CVE-2018-1199</cve>
+    </suppress>
+    <suppress>
+        <notes>
+            Introduced by Apache Tomcat. Wrong documentation of algorithm, fixed in later versions.
+        </notes>
+        <cve>CVE-2017-15706</cve>
+    </suppress>
+    <suppress>
+        <notes>
+            Introduced by Apache Tomcat.
+        </notes>
+        <cve>CVE-2018-1304</cve>
+    </suppress>
+    <suppress>
+        <notes>
+            Introduced by Apache Tomcat.
+        </notes>
+        <cve>CVE-2018-1305</cve>
+    </suppress>
+</suppressions>
