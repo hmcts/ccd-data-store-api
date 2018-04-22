@@ -36,6 +36,12 @@
     </suppress>
     <suppress>
         <notes>
+            Spring Boot application that are not installed as a service, or are not using the embedded launch script are not susceptible.
+        </notes>
+        <cve>CVE-2018-1196</cve>
+    </suppress>
+    <suppress>
+        <notes>
             Introduced by Spring 4.3.13.RELEASE; Upgrade to Spring Boot 1.5.12 or Spring Boot 2 to resolve.
         </notes>
         <cve>CVE-2018-1199</cve>
