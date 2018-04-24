@@ -32,8 +32,8 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 }
 
 withPipeline(type, product, component) {
-    env.IDAM_URL='http://betadevbccidamapplb.reform.hmcts.net'
-    env.S2S_URL='http://betaDevBccidamS2SLB.reform.hmcts.net'
+    env.IDAM_URL='https://preprod-idamapi.reform.hmcts.net:3511'
+    env.S2S_URL='https://preprod-s2s-api.reform.hmcts.net:3511'
 
     loadVaultSecrets(secrets)
 }
