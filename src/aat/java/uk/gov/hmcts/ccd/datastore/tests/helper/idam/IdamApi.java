@@ -9,9 +9,12 @@ import java.util.List;
 
 public interface IdamApi {
 
-    @RequestLine("POST /oauth2/authorize?continue-url=https%3A%2F%2Fccd-case-management-web-aat.service.core-compute-aat.internal")
+    @RequestLine("POST /oauth2/authorize")
     @Headers("Authorization: Basic {basic_auth}")
     AuthenticateUserResponse authenticateUser(@Param("basic_auth") String basicAuth);
+
+    @RequestLine("POST /testing-support/lease?id=1&role={role}")
+    AuthenticateUserResponse testingLease(@Param("role") String role);
 
     @RequestLine("GET /details")
     @Headers("Authorization: Bearer {access_token}")

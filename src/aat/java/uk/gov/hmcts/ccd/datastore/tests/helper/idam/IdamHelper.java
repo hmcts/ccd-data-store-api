@@ -24,7 +24,8 @@ public class IdamHelper {
     public AuthenticatedUser authenticate(String email, String password) {
         return users.computeIfAbsent(email, e -> {
             final String basicAuth = getBasicAuthHeader(email, password);
-            final IdamApi.AuthenticateUserResponse authResponse = idamApi.authenticateUser(basicAuth);
+//            final IdamApi.AuthenticateUserResponse authResponse = idamApi.authenticateUser(basicAuth);
+            final IdamApi.AuthenticateUserResponse authResponse = idamApi.testingLease("caseworker-autotest1");
             final IdamApi.IdamUser user = idamApi.getUser(authResponse.getAccessToken());
 
             return new AuthenticatedUser(user.getId(), email, authResponse.getAccessToken(), user.getRoles());
