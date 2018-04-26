@@ -31,6 +31,9 @@ public class RestTemplateConfiguration {
     @Value("${http.client.validate.after.inactivity}")
     private int validateAfterInactivity;
 
+    @Value("${http.client.connection.timeout}")
+    private int connectionTimeout;
+
     @Bean
     public RestTemplate restTemplate() {
         final RestTemplate restTemplate = new RestTemplate();
@@ -45,18 +48,18 @@ public class RestTemplateConfiguration {
             LOG.info("maxSecondsIdleConnection: {}", maxSecondsIdleConnection);
             LOG.info("maxClientPerRoute: {}", maxClientPerRoute);
             LOG.info("validateAfterInactivity: {}", validateAfterInactivity);
+            LOG.info("connectionTimeout: {}", connectionTimeout);
 
             cm.setMaxTotal(maxTotalHttpClient);
             cm.closeIdleConnections(maxSecondsIdleConnection, TimeUnit.SECONDS);
             cm.setDefaultMaxPerRoute(maxClientPerRoute);
             cm.setValidateAfterInactivity(validateAfterInactivity);
 
-            final int timeout = 10000;
             final RequestConfig config =
                 RequestConfig.custom()
-                             .setConnectTimeout(timeout)
-                             .setConnectionRequestTimeout(timeout)
-                             .setSocketTimeout(timeout)
+                             .setConnectTimeout(connectionTimeout)
+                             .setConnectionRequestTimeout(connectionTimeout)
+                             .setSocketTimeout(connectionTimeout)
                              .build();
 
             return HttpClientBuilder.create()

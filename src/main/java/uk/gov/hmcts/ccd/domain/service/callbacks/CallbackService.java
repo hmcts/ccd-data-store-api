@@ -6,7 +6,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -114,12 +113,14 @@ public class CallbackService {
             }
 
             final HttpEntity requestEntity = new HttpEntity(callbackRequest, httpHeaders);
-            final HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
 
-            requestFactory.setConnectionRequestTimeout(secondsToMilliseconds(timeout));
-            requestFactory.setReadTimeout(secondsToMilliseconds(timeout));
-            requestFactory.setConnectTimeout(secondsToMilliseconds(timeout));
-            restTemplate.setRequestFactory(requestFactory);
+            //TODO Disable the following code for now as timeout does not work
+//            final HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
+//
+//            requestFactory.setConnectionRequestTimeout(secondsToMilliseconds(timeout));
+//            requestFactory.setReadTimeout(secondsToMilliseconds(timeout));
+//            requestFactory.setConnectTimeout(secondsToMilliseconds(timeout));
+//            restTemplate.setRequestFactory(requestFactory);
             return Optional.ofNullable(
                 restTemplate.exchange(url, HttpMethod.POST, requestEntity, clazz));
         } catch (RestClientException e) {
