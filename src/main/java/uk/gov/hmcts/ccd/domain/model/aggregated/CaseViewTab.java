@@ -5,16 +5,18 @@ public class CaseViewTab {
     private String label;
     private Integer order;
     private CaseViewField[] fields;
+    private String showCondition;
 
     public CaseViewTab() {
         // default constructor
     }
 
-    public CaseViewTab(String id, String label, Integer order, CaseViewField[] fields) {
+    public CaseViewTab(String id, String label, Integer order, CaseViewField[] fields, String showCondition) {
         this.id = id;
         this.label = label;
         this.order = order;
         this.fields = fields;
+        this.showCondition = showCondition;
     }
 
     public String getId() {
@@ -47,5 +49,13 @@ public class CaseViewTab {
 
     public void setFields(CaseViewField[] fields) {
         this.fields = fields;
+    }
+
+    public String getShowCondition() {
+        return showCondition;
+    }
+
+    public void setShowCondition(String showCondition) {
+        this.showCondition = showCondition;
     }
 }
