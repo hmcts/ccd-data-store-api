@@ -27,6 +27,11 @@ The following environment variables are required:
 | APPINSIGHTS_INSTRUMENTATIONKEY | - | For CNP environment this is provided by the terraform scripts. However any value would do for your local environment. |
 | DATA_STORE_DB_USE_SSL | true | Mandated by Cloud Native Platform.  For local testing, set this variable to false |
 | DATA_STORE_DEFAULT_LOG_LEVEL | INFO | Default log level for classes under package uk.gov.hmcts.ccd |
+| HTTP_CLIENT_MAX_TOTAL | 100 | Used for Pooling connection manager; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
+| HTTP_CLIENT_SECONDS_IDLE_CONNECTION | 120 | Used for Pooling connection manager; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
+| HTTP_CLIENT_MAX_CLIENT_PER_ROUTE | 20 | Used for Pooling connection manager; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
+| HTTP_CLIENT_VALIDATE_AFTER_INACTIVITY | 0 | Used for Pooling connection manager; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
+
 
 ### Building
 
