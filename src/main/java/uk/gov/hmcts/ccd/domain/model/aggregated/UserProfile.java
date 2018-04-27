@@ -1,8 +1,7 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.util.Arrays;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 public class UserProfile {
 
@@ -46,11 +45,11 @@ public class UserProfile {
 
     @Override
     public String toString() {
-        return "UserProfile{" +
-               "user=" + user +
-               ", channels=" + Arrays.toString(channels) +
-               ", jurisdictions=" + Arrays.toString(jurisdictions) +
-               ", defaultSettings=" + defaultSettings +
-               '}';
+        return new ToStringBuilder(this)
+            .append("user", user)
+            .append("channels", channels)
+            .append("jurisdictions", jurisdictions)
+            .append("defaultSettings", defaultSettings)
+            .toString();
     }
 }

@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -40,12 +41,9 @@ public class SearchInputDefinition implements Serializable {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("class SearchInputDefinition {");
-
-        sb.append("  caseTypeId: ").append(caseTypeId).append("");
-        sb.append("  fields: ").append(fields).append("");
-        sb.append("}");
-        return sb.toString();
+        return new ToStringBuilder(this)
+            .append("caseTypeId", caseTypeId)
+            .append("fields", fields)
+            .toString();
     }
 }

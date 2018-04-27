@@ -2,7 +2,7 @@ package uk.gov.hmcts.ccd.domain.model.aggregated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 
 public class CaseViewField {
@@ -123,9 +123,22 @@ public class CaseViewField {
         this.showSummaryChangeOption = showSummaryChangeOption;
     }
 
+
     @Override
     public String toString() {
-        return ReflectionToStringBuilder.toString(this);
+        return new ToStringBuilder(this)
+            .append("id", id)
+            .append("label", label)
+            .append("hintText", hintText)
+            .append("fieldType", fieldType)
+            .append("hidden", hidden)
+            .append("validationExpression", validationExpression)
+            .append("securityLabel", securityLabel)
+            .append("order", order)
+            .append("value", value)
+            .append("displayContext", displayContext)
+            .append("showCondition", showCondition)
+            .append("showSummaryChangeOption", showSummaryChangeOption)
+            .toString();
     }
-
 }

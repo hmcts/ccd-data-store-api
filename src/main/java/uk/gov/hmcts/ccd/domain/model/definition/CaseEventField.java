@@ -1,10 +1,11 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
-import java.io.Serializable;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
+import java.io.Serializable;
 
 @ApiModel(description = "")
 public class CaseEventField implements Serializable {
@@ -56,13 +57,11 @@ public class CaseEventField implements Serializable {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("class CaseEventField {");
-
-        sb.append("  caseFieldId: ").append(caseFieldId).append("");
-        sb.append("  displayContext: ").append(displayContext).append("");
-        sb.append("  showCondition: ").append(showCondition).append("");
-        sb.append("}");
-        return sb.toString();
+        return new ToStringBuilder(this)
+            .append("caseFieldId", caseFieldId)
+            .append("displayContext", displayContext)
+            .append("showCondition", showCondition)
+            .append("showSummaryChangeOption", showSummaryChangeOption)
+            .toString();
     }
 }

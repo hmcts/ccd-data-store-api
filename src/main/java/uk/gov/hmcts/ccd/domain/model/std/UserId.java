@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.model.std;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 public class UserId {
 
@@ -16,6 +17,8 @@ public class UserId {
 
     @Override
     public String toString() {
-        return String.format("UserId{id='%s'}", id);
+        return new ToStringBuilder(this)
+            .append("id", id)
+            .toString();
     }
 }

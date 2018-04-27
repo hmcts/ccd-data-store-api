@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 public class WorkbasketDefault {
     @JsonProperty("jurisdiction_id")
@@ -36,10 +37,10 @@ public class WorkbasketDefault {
 
     @Override
     public String toString() {
-        return "WorkbasketDefault{" +
-               "jurisdictionId='" + jurisdictionId + '\'' +
-               ", caseTypeId='" + caseTypeId + '\'' +
-               ", stateId='" + stateId + '\'' +
-               '}';
+        return new ToStringBuilder(this)
+            .append("jurisdictionId", jurisdictionId)
+            .append("caseTypeId", caseTypeId)
+            .append("stateId", stateId)
+            .toString();
     }
 }

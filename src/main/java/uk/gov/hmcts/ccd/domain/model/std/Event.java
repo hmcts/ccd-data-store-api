@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.model.std;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 public class Event {
     @JsonProperty("id")
@@ -37,6 +37,10 @@ public class Event {
 
     @Override
     public String toString() {
-        return ReflectionToStringBuilder.toString(this);
+        return new ToStringBuilder(this)
+            .append("eventId", eventId)
+            .append("summary", summary)
+            .append("description", description)
+            .toString();
     }
 }

@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
-import java.io.Serializable;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import java.io.Serializable;
 
 public class AccessControlList implements Serializable {
 
@@ -54,6 +54,12 @@ public class AccessControlList implements Serializable {
 
     @Override
     public String toString() {
-        return ReflectionToStringBuilder.toString(this);
+        return new ToStringBuilder(this)
+            .append("role", role)
+            .append("create", create)
+            .append("read", read)
+            .append("update", update)
+            .append("delete", delete)
+            .toString();
     }
 }
