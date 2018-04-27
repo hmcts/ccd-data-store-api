@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.data.definition.CaseTypeDefinitionVersion;
 
 import javax.inject.Inject;
@@ -34,9 +33,6 @@ public abstract class WireMockBaseTest extends BaseTest {
 
     @Inject
     private ApplicationParams applicationParams;
-
-    @Inject
-    private RestTemplate restTemplate;
 
     @Before
     public void initMock() throws IOException {

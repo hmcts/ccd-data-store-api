@@ -5,7 +5,6 @@ import org.junit.Test;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
@@ -26,9 +25,6 @@ public class UserProfileEndpointTest extends WireMockBaseTest {
 
     @Inject
     private WebApplicationContext wac;
-
-    @Inject
-    private RestTemplate restTemplate;
 
     private MockMvc mockMvc;
 
