@@ -2,7 +2,9 @@ package uk.gov.hmcts.ccd.domain.types.sanitiser;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,6 +23,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import java.util.Collections;
 
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -171,6 +174,16 @@ class DocumentSanitiserTest {
         assertThrows(ValidationException.class, () -> {
             documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, DOCUMENT_VALUE_INITIAL);
         });
+    }
+
+    @Test
+    @DisplayName("should not sanitise document when null node")
+    void shouldNotSanitizeIfDocumentIsNullNode() {
+        final NullNode initialValue = JSON_FACTORY.nullNode();
+
+        final JsonNode saneValue = documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, initialValue);
+
+        assertThat(saneValue, sameInstance(initialValue));
     }
 
     private Document buildDocument() {
