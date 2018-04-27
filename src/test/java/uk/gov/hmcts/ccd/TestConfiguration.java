@@ -58,6 +58,9 @@ class TestConfiguration extends ContextCleanupListener {
             "    \"type\": \"Date\"\n" +
             "  },\n" +
             "  {\n" +
+            "    \"type\": \"DateTime\"\n" +
+            "  },\n" +
+            "  {\n" +
             "    \"type\": \"FixedList\"\n" +
             "  },\n" +
             "  {\n" +
