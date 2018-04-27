@@ -35,9 +35,9 @@ public class CallbackService {
     private final List<Integer> defaultRetries;
 
     public CallbackService(final SecurityUtils securityUtils,
-                           RestTemplate restTemplate, final ApplicationParams applicationParams) {
+                           final ApplicationParams applicationParams) {
         this.securityUtils = securityUtils;
-        this.restTemplate = restTemplate;
+        this.restTemplate = new RestTemplate();
         this.defaultRetries = applicationParams.getCallbackRetries();
     }
 
@@ -114,7 +114,8 @@ public class CallbackService {
 
             final HttpEntity requestEntity = new HttpEntity(callbackRequest, httpHeaders);
 
-            //TODO Disable the following code for now as timeout does not work
+            //TODO Disable the following code for now; TO INVESTIAGE WHETHER TIMOUT WORKS, IN RELATION TO OTHERS CALLS
+            // and socket issues in Azure
 //            final HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
 //
 //            requestFactory.setConnectionRequestTimeout(secondsToMilliseconds(timeout));

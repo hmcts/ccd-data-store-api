@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd;
 
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.slf4j.Logger;
@@ -10,11 +10,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.concurrent.TimeUnit;
 
 @Configuration
+@Component
 public class RestTemplateConfiguration {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestTemplateConfiguration.class);
@@ -41,14 +43,18 @@ public class RestTemplateConfiguration {
         return restTemplate;
     }
 
-    private CloseableHttpClient getHttpClient() {
+    public HttpClient getHttpClient() {
+        return getHttpClient(connectionTimeout);
+    }
+
+    public HttpClient getHttpClient(final int timeout) {
         try (PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager()) {
 
             LOG.info("maxTotalHttpClient: {}", maxTotalHttpClient);
             LOG.info("maxSecondsIdleConnection: {}", maxSecondsIdleConnection);
             LOG.info("maxClientPerRoute: {}", maxClientPerRoute);
             LOG.info("validateAfterInactivity: {}", validateAfterInactivity);
-            LOG.info("connectionTimeout: {}", connectionTimeout);
+            LOG.info("connectionTimeout: {}", timeout);
 
             cm.setMaxTotal(maxTotalHttpClient);
             cm.closeIdleConnections(maxSecondsIdleConnection, TimeUnit.SECONDS);
@@ -57,9 +63,9 @@ public class RestTemplateConfiguration {
 
             final RequestConfig config =
                 RequestConfig.custom()
-                             .setConnectTimeout(connectionTimeout)
-                             .setConnectionRequestTimeout(connectionTimeout)
-                             .setSocketTimeout(connectionTimeout)
+                             .setConnectTimeout(timeout)
+                             .setConnectionRequestTimeout(timeout)
+                             .setSocketTimeout(timeout)
                              .build();
 
             return HttpClientBuilder.create()
@@ -68,6 +74,5 @@ public class RestTemplateConfiguration {
                                     .setConnectionManager(cm)
                                     .build();
         }
-
     }
 }
