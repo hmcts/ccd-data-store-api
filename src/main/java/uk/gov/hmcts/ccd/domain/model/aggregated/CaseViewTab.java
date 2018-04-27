@@ -1,10 +1,13 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class CaseViewTab {
     private String id;
     private String label;
     private Integer order;
     private CaseViewField[] fields;
+    @JsonProperty("show_condition")
     private String showCondition;
 
     public CaseViewTab() {
