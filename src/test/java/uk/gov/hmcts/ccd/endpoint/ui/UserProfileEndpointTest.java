@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.endpoint.ui;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -36,8 +35,6 @@ public class UserProfileEndpointTest extends WireMockBaseTest {
     @Before
     public void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
-        // runs successfully on local but need this for now on Jenkins
-        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
     }
 
     @Test
