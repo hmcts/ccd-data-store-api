@@ -32,6 +32,7 @@ class AuthorisedListEventsOperationTest {
 
     private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_TYPE_ID = "CaseTypeId";
+    private final static String CASE_REFERENCE = "999999";
 
     @Mock
     private ListEventsOperation listEventsOperation;
@@ -70,6 +71,7 @@ class AuthorisedListEventsOperationTest {
         doReturn(caseType).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         doReturn(USER_ROLES).when(userRepository).getUserRoles();
         doReturn(classifiedEvents).when(listEventsOperation).execute(caseDetails);
+        doReturn(classifiedEvents).when(listEventsOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
 
         authorisedEvents = newArrayList(new AuditEvent());
 
@@ -147,8 +149,8 @@ class AuthorisedListEventsOperationTest {
     }
 
     @Test
-    @DisplayName("should apply authorization")
-    void shouldApplyAuthorisation() {
+    @DisplayName("should apply authorization for case details")
+    void shouldApplyAuthorisationForCaseDetails() {
         final List<AuditEvent> outputs = authorisedOperation.execute(caseDetails);
 
         InOrder inOrder = inOrder(caseDefinitionRepository, userRepository, listEventsOperation, accessControlService);
@@ -162,4 +164,20 @@ class AuthorisedListEventsOperationTest {
         );
     }
 
+    @Test
+    @DisplayName("should apply authorization when jurisdiction, case type id and case reference is received")
+    void shouldApplyAuthorisationForJurisdictionCaseTypeIdAndCaseReference() {
+        final List<AuditEvent> outputs = authorisedOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+
+        InOrder inOrder = inOrder(caseDefinitionRepository, userRepository, listEventsOperation, accessControlService);
+        assertAll(
+            () -> inOrder.verify(listEventsOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE),
+            () -> inOrder.verify(caseDefinitionRepository).getCaseType(caseDetails.getCaseTypeId()),
+            () -> inOrder.verify(userRepository).getUserRoles(),
+            () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(caseType, USER_ROLES, CAN_READ),
+            () -> inOrder.verify(accessControlService).filterCaseAuditEventsByReadAccess(classifiedEvents, caseType.getEvents(), USER_ROLES),
+            () -> assertThat(outputs, is(authorisedEvents))
+        );
+    }
+    
 }

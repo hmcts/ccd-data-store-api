@@ -21,6 +21,8 @@ import static org.mockito.Mockito.*;
 class ClassifiedListEventsOperationTest {
 
     private static final String JURISDICTION_ID = "Probate";
+    private static final String CASE_TYPE_ID = "CaseTypeId";
+    private final static String CASE_REFERENCE = "999999";
 
     @Mock
     private ListEventsOperation listEventsOperation;
@@ -42,6 +44,7 @@ class ClassifiedListEventsOperationTest {
         events = Arrays.asList(new AuditEvent(), new AuditEvent());
 
         doReturn(events).when(listEventsOperation).execute(caseDetails);
+        doReturn(events).when(listEventsOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
 
         classifiedEvents = Lists.newArrayList(new AuditEvent());
 
@@ -74,9 +77,20 @@ class ClassifiedListEventsOperationTest {
     }
 
     @Test
-    @DisplayName("should apply security classifications")
-    void shouldApplySecurityClassifications() {
+    @DisplayName("should apply security classifications for case details")
+    void shouldApplySecurityClassificationsForCaseDetails() {
         final List<AuditEvent> outputs = classifiedOperation.execute(caseDetails);
+
+        assertAll(
+            () -> verify(classificationService).apply(JURISDICTION_ID, events),
+            () -> assertThat(outputs, sameInstance(classifiedEvents))
+        );
+    }
+
+    @Test
+    @DisplayName("should apply security classifications when jurisdiction, case type id and case reference is received")
+    void shouldApplySecurityClassificationsForJurisdictionCaseTypeIdAndCaseReference() {
+        final List<AuditEvent> outputs = classifiedOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
 
         assertAll(
             () -> verify(classificationService).apply(JURISDICTION_ID, events),

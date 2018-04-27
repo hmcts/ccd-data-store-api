@@ -1,6 +1,10 @@
 package uk.gov.hmcts.ccd.domain.service.listevents;
 
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+
 import com.google.common.collect.Lists;
+import java.util.List;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
@@ -12,11 +16,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
-
-import java.util.List;
-import java.util.Set;
-
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
 @Service
 @Qualifier("authorised")
@@ -40,24 +39,14 @@ public class AuthorisedListEventsOperation implements ListEventsOperation {
     @Override
     public List<AuditEvent> execute(CaseDetails caseDetails) {
 
-
         final List<AuditEvent> events = listEventsOperation.execute(caseDetails);
 
-        if (null == events) {
-            return Lists.newArrayList();
-        }
+        return secureEvents(caseDetails.getCaseTypeId(), events);
+    }
 
-        final CaseType caseType = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
-        if (caseType == null) {
-            throw new ValidationException("Cannot find case type definition for  " + caseDetails.getCaseTypeId());
-        }
-
-        Set<String> userRoles = userRepository.getUserRoles();
-        if (userRoles == null || userRoles.isEmpty()) {
-            throw new ValidationException("Cannot find user roles for the user");
-        }
-
-        return verifyReadAccess(events, userRoles, caseType);
+    @Override
+    public List<AuditEvent> execute(String jurisdiction, String caseTypeId, String caseReference) {
+        return secureEvents(caseTypeId, listEventsOperation.execute(jurisdiction, caseTypeId, caseReference));
     }
 
     private List<AuditEvent> verifyReadAccess(List<AuditEvent> events, Set<String> userRoles, CaseType caseType) {
@@ -71,5 +60,23 @@ public class AuthorisedListEventsOperation implements ListEventsOperation {
         return accessControlService.filterCaseAuditEventsByReadAccess(events,
                                                                       caseType.getEvents(),
                                                                       userRoles);
+    }
+
+    private List<AuditEvent> secureEvents(String caseTypeId, List<AuditEvent> events) {
+        if (null == events) {
+            return Lists.newArrayList();
+        }
+
+        final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
+        if (caseType == null) {
+            throw new ValidationException("Cannot find case type definition for  " + caseTypeId);
+        }
+
+        Set<String> userRoles = userRepository.getUserRoles();
+        if (userRoles == null || userRoles.isEmpty()) {
+            throw new ValidationException("Cannot find user roles for the user");
+        }
+
+        return verifyReadAccess(events, userRoles, caseType);
     }
 }

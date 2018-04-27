@@ -57,9 +57,11 @@ variable "authorised-services" {
 }
 
 variable "document_management_valid_domain" {
-  default = "https://api-gateway.test.dm.reform.hmcts.net"
+  type = "string"
+  default = ""
 }
 
 variable "default_print_url" {
-  default = "https://return-case-doc-ccd.nonprod.platform.hmcts.net/jurisdictions/:jid/case-types/:ctid/cases/:cid"
+  type = "string"
+  default = ""
 }

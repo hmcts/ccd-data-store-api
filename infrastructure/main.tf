@@ -11,6 +11,11 @@ provider "vault" {
 locals {
   app_full_name = "${var.product}-${var.component}"
   env_ase_url = "${var.env}.service.${data.terraform_remote_state.core_apps_compute.ase_name[0]}.internal"
+  default_default_print_url = "https://ccd-case-print-service-${local.env_ase_url}/jurisdictions/:jid/case-types/:ctid/cases/:cid"
+  default_print_url = "${var.default_print_url != "" ? var.default_print_url : local.default_default_print_url}"
+
+  default_dm_valid_domain = "^https?://(?:api-gateway\\.test\\.dm\\.reform\\.hmcts\\.net|dm-store-${var.env}\\.service\\.core-compute-${var.env}\\.internal(?::\\d+)?)"
+  dm_valid_domain = "${var.document_management_valid_domain != "" ? var.document_management_valid_domain : local.default_dm_valid_domain}"
 }
 
 data "vault_generic_secret" "ccd_data_s2s_key" {
@@ -35,7 +40,7 @@ module "ccd-data-store-api" {
     DEFINITION_STORE_HOST               = "http://ccd-definition-store-api-${local.env_ase_url}"
     USER_PROFILE_HOST                   = "http://ccd-user-profile-api-${local.env_ase_url}"
 
-    CCD_DM_DOMAIN                       = "${var.document_management_valid_domain}"
+    CCD_DM_DOMAIN                       = "${local.dm_valid_domain}"
 
     IDAM_USER_URL                       = "${var.idam_api_url}"
     IDAM_S2S_URL                        = "${var.s2s_url}"
@@ -43,7 +48,7 @@ module "ccd-data-store-api" {
 
     DATA_STORE_S2S_AUTHORISED_SERVICES  = "${var.authorised-services}"
 
-    CCD_DEFAULTPRINTURL                 = "${var.default_print_url}"
+    CCD_DEFAULTPRINTURL                 = "${local.default_print_url}"
   }
 
 }
