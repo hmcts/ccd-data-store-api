@@ -10,14 +10,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.concurrent.TimeUnit;
 
 @Configuration
-@Component
-public class RestTemplateConfiguration {
+class RestTemplateConfiguration {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestTemplateConfiguration.class);
 
@@ -37,17 +35,17 @@ public class RestTemplateConfiguration {
     private int connectionTimeout;
 
     @Bean
-    public RestTemplate restTemplate() {
+    RestTemplate restTemplate() {
         final RestTemplate restTemplate = new RestTemplate();
         restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(getHttpClient()));
         return restTemplate;
     }
 
-    public HttpClient getHttpClient() {
+    HttpClient getHttpClient() {
         return getHttpClient(connectionTimeout);
     }
 
-    public HttpClient getHttpClient(final int timeout) {
+    private HttpClient getHttpClient(final int timeout) {
         try (PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager()) {
 
             LOG.info("maxTotalHttpClient: {}", maxTotalHttpClient);
