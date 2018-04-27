@@ -12,12 +12,15 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.PreDestroy;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
 class RestTemplateConfiguration {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestTemplateConfiguration.class);
+
+    private PoolingHttpClientConnectionManager cm;
 
     @Value("${http.client.max.total}")
     private int maxTotalHttpClient;
@@ -41,36 +44,44 @@ class RestTemplateConfiguration {
         return restTemplate;
     }
 
-    HttpClient getHttpClient() {
+    @PreDestroy
+    void close() {
+        if (null != cm) {
+            cm.close();
+        }
+    }
+
+
+    private HttpClient getHttpClient() {
         return getHttpClient(connectionTimeout);
     }
 
     private HttpClient getHttpClient(final int timeout) {
-        try (PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager()) {
+        cm = new PoolingHttpClientConnectionManager();
 
-            LOG.info("maxTotalHttpClient: {}", maxTotalHttpClient);
-            LOG.info("maxSecondsIdleConnection: {}", maxSecondsIdleConnection);
-            LOG.info("maxClientPerRoute: {}", maxClientPerRoute);
-            LOG.info("validateAfterInactivity: {}", validateAfterInactivity);
-            LOG.info("connectionTimeout: {}", timeout);
+        LOG.info("maxTotalHttpClient: {}", maxTotalHttpClient);
+        LOG.info("maxSecondsIdleConnection: {}", maxSecondsIdleConnection);
+        LOG.info("maxClientPerRoute: {}", maxClientPerRoute);
+        LOG.info("validateAfterInactivity: {}", validateAfterInactivity);
+        LOG.info("connectionTimeout: {}", timeout);
 
-            cm.setMaxTotal(maxTotalHttpClient);
-            cm.closeIdleConnections(maxSecondsIdleConnection, TimeUnit.SECONDS);
-            cm.setDefaultMaxPerRoute(maxClientPerRoute);
-            cm.setValidateAfterInactivity(validateAfterInactivity);
+        cm.setMaxTotal(maxTotalHttpClient);
+        cm.closeIdleConnections(maxSecondsIdleConnection, TimeUnit.SECONDS);
+        cm.setDefaultMaxPerRoute(maxClientPerRoute);
+        cm.setValidateAfterInactivity(validateAfterInactivity);
 
-            final RequestConfig config =
-                RequestConfig.custom()
-                             .setConnectTimeout(timeout)
-                             .setConnectionRequestTimeout(timeout)
-                             .setSocketTimeout(timeout)
-                             .build();
+        final RequestConfig
+            config =
+            RequestConfig.custom()
+                         .setConnectTimeout(timeout)
+                         .setConnectionRequestTimeout(timeout)
+                         .setSocketTimeout(timeout)
+                         .build();
 
-            return HttpClientBuilder.create()
-                                    .useSystemProperties()
-                                    .setDefaultRequestConfig(config)
-                                    .setConnectionManager(cm)
-                                    .build();
-        }
+        return HttpClientBuilder.create()
+                                .useSystemProperties()
+                                .setDefaultRequestConfig(config)
+                                .setConnectionManager(cm)
+                                .build();
     }
 }
