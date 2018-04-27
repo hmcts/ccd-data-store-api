@@ -15,9 +15,9 @@
         "id" : "NameTab",
         "label" : "Name",
         "order" : 1,
-        "show_condition": "NameTabShowCondition",
+        "show_condition": "PersonFirstName=\"George\"",
         "tab_fields" : [{
-          "show_condition": "PersonFirstNameFieldShowCondition",
+          "show_condition": "PersonLastName=\"Jones\"",
           "case_field" : {
             "id" : "PersonFirstName",
             "case_type_id" : "TestAddressBookCase",
@@ -34,7 +34,7 @@
           },
           "order" : 1
         }, {
-          "show_condition": "PersonLastNameFieldShowCondition",
+          "show_condition": "PersonFirstName=\"Tom\"",
           "case_field" : {
             "id" : "PersonLastName",
             "case_type_id" : "TestAddressBookCase",
@@ -57,9 +57,9 @@
           "id" : "AddressTab",
           "label" : "Address",
           "order" : 2,
-          "show_condition": "AddressTabShowCondition",
+          "show_condition": "PersonLastName=\"Smith\"",
           "tab_fields" : [{
-            "show_condition": "PersonAddressFieldShowCondition",
+            "show_condition": "PersonLastName=\"Smart\"",
             "case_field" : {
               "id" : "PersonAddress",
               "case_type_id" : "TestAddressBookCase",
@@ -82,9 +82,9 @@
           "id" : "DocumentsTab",
           "label" : "Documents",
           "order" : 3,
-          "show_condition": "DocumentsTabShowCondition",
+          "show_condition": "PersonFistName=\"George\"",
           "tab_fields" : [{
-            "show_condition": "D8DocumentsFieldShowCondition",
+            "show_condition": "PersonLastName=\"Dumb\"",
             "case_field" : {
               "id" : "D8Document",
               "case_type_id" : "TestAddressBookCase",
