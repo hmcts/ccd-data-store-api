@@ -235,6 +235,7 @@ public class CallbackServiceTest {
 
         // Builds a new callback service to avoid wiremock exception to get in the way
         final CallbackService underTest = new CallbackService(Mockito.mock(SecurityUtils.class),
+                                                              restTemplate,
                                                               applicationParams);
         final CaseDetails caseDetails = new CaseDetails();
         final CaseEvent caseEvent = new CaseEvent();

@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.callbacks;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -34,10 +35,12 @@ public class CallbackService {
     private final RestTemplate restTemplate;
     private final List<Integer> defaultRetries;
 
+    @Autowired
     public CallbackService(final SecurityUtils securityUtils,
+                           final RestTemplate restTemplate,
                            final ApplicationParams applicationParams) {
         this.securityUtils = securityUtils;
-        this.restTemplate = new RestTemplate();
+        this.restTemplate = restTemplate;
         this.defaultRetries = applicationParams.getCallbackRetries();
     }
 
