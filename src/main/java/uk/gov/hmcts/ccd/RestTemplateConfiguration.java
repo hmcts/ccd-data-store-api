@@ -51,7 +51,6 @@ class RestTemplateConfiguration {
         }
     }
 
-
     private HttpClient getHttpClient() {
         return getHttpClient(connectionTimeout);
     }
