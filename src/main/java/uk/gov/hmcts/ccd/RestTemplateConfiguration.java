@@ -46,7 +46,9 @@ class RestTemplateConfiguration {
 
     @PreDestroy
     void close() {
+        LOG.info("PreDestory called");
         if (null != cm) {
+            LOG.info("closing connection manager");
             cm.close();
         }
     }
