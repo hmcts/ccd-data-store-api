@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
+import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -34,6 +35,10 @@ public class SQLBuilderForSearchTest {
 
     @Mock
     private ApplicationParams mockApp;
+
+    @Mock
+    private UserAuthorisation userAuthorisation;
+
     private Map<String, String> params;
 
     public SQLBuilderForSearchTest() {
@@ -45,11 +50,11 @@ public class SQLBuilderForSearchTest {
         MockitoAnnotations.initMocks(this);
         subject = new SearchQueryFactoryOperation(
                 criterionFactory,
-                new FieldMapSanitizeOperation(),
                 em,
-                mockApp);
+                mockApp,
+                userAuthorisation);
 
-        params = new HashMap<String, String>();
+        params = new HashMap<>();
 
     }
 

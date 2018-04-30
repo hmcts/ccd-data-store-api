@@ -7,4 +7,7 @@ import java.util.List;
 
 public interface ListEventsOperation {
     List<AuditEvent> execute(CaseDetails caseDetails);
+
+    List<AuditEvent> execute(String jurisdiction, String caseTypeId, String caseReference);
+
 }

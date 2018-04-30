@@ -8,21 +8,48 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
 import java.util.List;
+import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
+import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 @Service
 @Qualifier("default")
 public class DefaultListEventsOperation implements ListEventsOperation {
 
     private final CaseAuditEventRepository auditEventRepository;
+    private final GetCaseOperation getCaseOperation;
+    private final UIDService uidService;
+    public static final String RESOURCE_NOT_FOUND //
+        = "No case found ( jurisdiction = '%s', case type id = '%s', case reference = '%s' )";
 
     @Autowired
-    public DefaultListEventsOperation(CaseAuditEventRepository auditEventRepository) {
+    public DefaultListEventsOperation(CaseAuditEventRepository auditEventRepository,
+                                      @Qualifier(CreatorGetCaseOperation.QUALIFIER) final GetCaseOperation getCaseOperation,
+                                      UIDService uidService) {
 
         this.auditEventRepository = auditEventRepository;
+        this.getCaseOperation = getCaseOperation;
+        this.uidService = uidService;
     }
 
     @Override
     public List<AuditEvent> execute(CaseDetails caseDetails) {
         return auditEventRepository.findByCase(caseDetails);
+    }
+
+    @Override
+    public List<AuditEvent> execute(String jurisdiction, String caseTypeId, String caseReference) {
+        if (!uidService.validateUID(caseReference)) {
+            throw new BadRequestException("Case reference " + caseReference + " is not valid");
+        }
+
+        final CaseDetails caseDetails =
+            getCaseOperation.execute(caseReference)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                    String.format(RESOURCE_NOT_FOUND, jurisdiction, caseTypeId, caseReference)));
+
+        return execute(caseDetails);
     }
 }
