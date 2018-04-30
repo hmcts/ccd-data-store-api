@@ -93,7 +93,7 @@ class ClassifiedListEventsOperationTest {
         final List<AuditEvent> outputs = classifiedOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
 
         assertAll(
-            () -> verify(classificationService).apply(JURISDICTION_ID, events),
+            () -> verify(classificationService).applyClassification(JURISDICTION_ID, events),
             () -> assertThat(outputs, sameInstance(classifiedEvents))
         );
     }
