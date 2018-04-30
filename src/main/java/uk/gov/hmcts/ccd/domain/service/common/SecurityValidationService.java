@@ -52,7 +52,7 @@ public class SecurityValidationService {
     private void validateObject(JsonNode callbackDataClassification, JsonNode defaultDataClassification) {
 
         if (!isNotNullAndSizeEqual(callbackDataClassification, defaultDataClassification)) {
-            LOG.warn("callbackClassification={} and defaultClassification={} sizes differ", defaultDataClassification, callbackDataClassification);
+            LOG.warn("callbackClassification={} and defaultClassification={} sizes differ", callbackDataClassification, defaultDataClassification);
             throw new ValidationException(VALIDATION_ERR_MSG);
         }
 
@@ -65,8 +65,8 @@ public class SecurityValidationService {
             if (callbackClassificationValue.has(CLASSIFICATION)) {
                 if (!isValidClassification(callbackClassificationValue.get(CLASSIFICATION), defaultClassificationItem.get(CLASSIFICATION))) {
                     LOG.warn("callbackClassificationItem={} has lower classification than defaultClassificationItem={}",
-                             defaultClassificationItem,
-                             callbackClassificationValue);
+                             callbackClassificationValue,
+                             defaultClassificationItem);
                     throw new ValidationException(VALIDATION_ERR_MSG);
                 }
                 if (callbackClassificationValue.has(VALUE)) {
@@ -87,8 +87,8 @@ public class SecurityValidationService {
             } else {
                 if (!isValidClassification(callbackClassificationValue, defaultClassificationItem)) {
                     LOG.warn("callbackClassificationItem={} has lower classification than defaultClassificationItem={}",
-                             defaultDataClassification,
-                             MAPPER.convertValue(callbackClassificationMap, JsonNode.class));
+                             MAPPER.convertValue(callbackClassificationMap, JsonNode.class),
+                             defaultDataClassification);
                     throw new ValidationException(VALIDATION_ERR_MSG);
                 }
             }
