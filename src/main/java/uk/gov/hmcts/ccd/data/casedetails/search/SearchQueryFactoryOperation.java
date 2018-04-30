@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.data.casedetails.search;
 
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
+import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -24,25 +25,26 @@ public class SearchQueryFactoryOperation {
     @PersistenceContext
     private EntityManager entityManager;
 
-    private static final String MAINQUERY = "SELECT * FROM case_data WHERE %s ORDER BY created_date ASC";
+    private static final String MAIN_QUERY = "SELECT * FROM case_data WHERE %s ORDER BY created_date ASC";
     private static final String MAIN_COUNT_QUERY = "SELECT count(*) FROM case_data WHERE %s";
 
     private final CriterionFactory criteraFactory;
-
     private final ApplicationParams applicationParam;
+    private final UserAuthorisation userAuthorisation;
 
     public SearchQueryFactoryOperation(CriterionFactory criteraFactory,
-            FieldMapSanitizeOperation fieldMapSanitizeOperation,
-            final EntityManager entityManager,
-            ApplicationParams applicationParam) {
+                                       EntityManager entityManager,
+                                       ApplicationParams applicationParam,
+                                       UserAuthorisation userAuthorisation) {
         this.criteraFactory = criteraFactory;
         this.entityManager = entityManager;
         this.applicationParam = applicationParam;
+        this.userAuthorisation = userAuthorisation;
     }
 
     public Query build(MetaData metadata, Map<String, String> params, boolean isCountQuery) {
         final List<Criterion> criteria = criteraFactory.build(metadata, params);
-        String queryString = String.format(isCountQuery ? MAIN_COUNT_QUERY : MAINQUERY, toClauses(criteria));
+        String queryString = String.format(isCountQuery ? MAIN_COUNT_QUERY : MAIN_QUERY, secure(toClauses(criteria)));
         Query query;
         if (isCountQuery) {
             query = entityManager.createNativeQuery(queryString);
@@ -51,6 +53,16 @@ public class SearchQueryFactoryOperation {
         }
         addParameters(query, criteria);
         return query;
+    }
+
+    private String secure(String clauses) {
+        if (UserAuthorisation.AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
+            clauses += String.format(
+                " AND id IN (SELECT cu.case_data_id FROM case_users AS cu WHERE user_id = '%s')",
+                userAuthorisation.getUserId()
+            );
+        }
+        return clauses;
     }
 
     private void addParameters(final Query query, List<Criterion> critereon) {
