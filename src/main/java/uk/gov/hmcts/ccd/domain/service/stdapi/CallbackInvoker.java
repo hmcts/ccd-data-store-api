@@ -27,7 +27,7 @@ import static java.util.Optional.ofNullable;
 public class CallbackInvoker {
 
     private static final String CALLBACK_RESPONSE_KEY_STATE = "state";
-    public static final HashMap<String, JsonNode> EMPTY_DATA_CLASSIFICATION = Maps.newHashMap();
+    private static final HashMap<String, JsonNode> EMPTY_DATA_CLASSIFICATION = Maps.newHashMap();
     private final CallbackService callbackService;
     private final CaseTypeService caseTypeService;
     private final CaseDataService caseDataService;

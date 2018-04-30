@@ -34,7 +34,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 @Service
 @Qualifier("default")
 public class DefaultCreateCaseOperation implements CreateCaseOperation {
-    public static final HashMap<String, JsonNode> EMPTY_DATA_CLASSIFICATION = Maps.newHashMap();
+    private static final HashMap<String, JsonNode> EMPTY_DATA_CLASSIFICATION = Maps.newHashMap();
     private final UserRepository userRepository;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final EventTriggerService eventTriggerService;
