@@ -1,8 +1,9 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.ToString;
 
+@ToString
 public class UserProfile {
 
     private User user = new User();
@@ -43,13 +44,4 @@ public class UserProfile {
         this.defaultSettings = defaultSettings;
     }
 
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-            .append("user", user)
-            .append("channels", channels)
-            .append("jurisdictions", jurisdictions)
-            .append("defaultSettings", defaultSettings)
-            .toString();
-    }
 }

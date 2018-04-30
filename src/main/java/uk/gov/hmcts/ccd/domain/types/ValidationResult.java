@@ -1,7 +1,8 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.ToString;
 
+@ToString
 public class ValidationResult {
     private final String errorMessage;
     private final String fieldId;
@@ -19,11 +20,4 @@ public class ValidationResult {
         return fieldId;
     }
 
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-            .append("errorMessage", errorMessage)
-            .append("fieldId", fieldId)
-            .toString();
-    }
 }

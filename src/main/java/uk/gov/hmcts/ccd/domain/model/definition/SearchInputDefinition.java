@@ -3,12 +3,13 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+@ToString
 @ApiModel(description = "")
 public class SearchInputDefinition implements Serializable {
 
@@ -39,11 +40,4 @@ public class SearchInputDefinition implements Serializable {
         this.fields = fields;
     }
 
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-            .append("caseTypeId", caseTypeId)
-            .append("fields", fields)
-            .toString();
-    }
 }

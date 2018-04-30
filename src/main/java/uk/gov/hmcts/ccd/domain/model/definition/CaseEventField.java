@@ -3,10 +3,11 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.ToString;
 
 import java.io.Serializable;
 
+@ToString
 @ApiModel(description = "")
 public class CaseEventField implements Serializable {
 
@@ -55,13 +56,4 @@ public class CaseEventField implements Serializable {
         this.showSummaryChangeOption = showSummaryChangeOption;
     }
 
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-            .append("caseFieldId", caseFieldId)
-            .append("displayContext", displayContext)
-            .append("showCondition", showCondition)
-            .append("showSummaryChangeOption", showSummaryChangeOption)
-            .toString();
-    }
 }

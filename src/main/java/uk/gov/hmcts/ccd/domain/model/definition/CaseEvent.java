@@ -1,13 +1,14 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.ToString;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+@ToString
 public class CaseEvent implements Serializable {
 
     private String id = null;
@@ -169,25 +170,4 @@ public class CaseEvent implements Serializable {
         this.showSummary = showSummary;
     }
 
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-            .append("id", id)
-            .append("name", name)
-            .append("description", description)
-            .append("displayOrder", displayOrder)
-            .append("caseFields", caseFields)
-            .append("preStates", preStates)
-            .append("postState", postState)
-            .append("callBackURLAboutToStartEvent", callBackURLAboutToStartEvent)
-            .append("retriesTimeoutAboutToStartEvent", retriesTimeoutAboutToStartEvent)
-            .append("callBackURLAboutToSubmitEvent", callBackURLAboutToSubmitEvent)
-            .append("retriesTimeoutURLAboutToSubmitEvent", retriesTimeoutURLAboutToSubmitEvent)
-            .append("callBackURLSubmittedEvent", callBackURLSubmittedEvent)
-            .append("retriesTimeoutURLSubmittedEvent", retriesTimeoutURLSubmittedEvent)
-            .append("securityClassification", securityClassification)
-            .append("showSummary", showSummary)
-            .append("accessControlLists", accessControlLists)
-            .toString();
-    }
 }

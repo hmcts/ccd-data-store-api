@@ -1,8 +1,9 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.ToString;
 
+@ToString
 public class DefaultSettings {
     @JsonProperty("workbasket")
     private WorkbasketDefault workbasketDefault;
@@ -15,10 +16,4 @@ public class DefaultSettings {
         this.workbasketDefault = workbasketDefault;
     }
 
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-            .append("workbasketDefault", workbasketDefault)
-            .toString();
-    }
 }
