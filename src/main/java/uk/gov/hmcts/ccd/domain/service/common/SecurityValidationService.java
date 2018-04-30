@@ -44,7 +44,7 @@ public class SecurityValidationService {
                 return cd;
             })
             .orElseThrow(() -> {
-                LOG.warn("callbackResponse={} has lower classification than Case={}", caseDetails, callbackResponse);
+                LOG.warn("callbackResponse={} has lower classification than case={}", callbackResponse, caseDetails);
                 return new ValidationException(VALIDATION_ERR_MSG);
             });
     }
@@ -125,10 +125,7 @@ public class SecurityValidationService {
             LOG.warn("callbackSecurityClassificationValue={} cannot be parsed", callbackClassificationValue);
             throw new ValidationException(VALIDATION_ERR_MSG);
         }
-        if(!callbackSecurityClassification.get().higherOrEqualTo(defaultSecurityClassification.get())) {
-            return false;
-        }
-        return true;
+        return callbackSecurityClassification.get().higherOrEqualTo(defaultSecurityClassification.get());
     }
 
 }
