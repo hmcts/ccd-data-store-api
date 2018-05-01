@@ -55,8 +55,8 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     }
 
     @Override
-    public List<Jurisdiction> getAllJurisdictions() {
-        return this.caseDefinitionRepository.getAllJurisdictions();
+    public List<Jurisdiction> getJurisdictions(List<String> ids) {
+        return this.caseDefinitionRepository.getJurisdictions(ids);
     }
 
     @Override

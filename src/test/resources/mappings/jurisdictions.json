@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "url": "/api/data/jurisdictions"
+    "url": "/api/data/jurisdictions?ids=PROBATE,DIVORCE,SSCS"
   },
   "response": {
     "status": 200,

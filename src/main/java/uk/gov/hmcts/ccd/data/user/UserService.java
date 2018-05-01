@@ -44,16 +44,16 @@ public class UserService {
         IDAMProperties idamProperties = userRepository.getUserDetails();
         String userId = idamProperties.getEmail();
         UserDefault userDefault = userRepository.getUserDefaultSettings(userId);
-        List<Jurisdiction> jurisdictionsDefinition = caseDefinitionRepository.getAllJurisdictions();
+        List<String> jurisdictionsId = userDefault.getJurisdictionsId();
+
+        List<Jurisdiction> jurisdictionsDefinition = caseDefinitionRepository.getJurisdictions(jurisdictionsId);
 
         return createUserProfile(idamProperties, userDefault, jurisdictionsDefinition);
     }
 
     private UserProfile createUserProfile(IDAMProperties idamProperties, UserDefault userDefault, List<Jurisdiction> jurisdictionsDefinition) {
 
-        List<String> jurisdictionsId = userDefault.getJurisdictionsId();
-        List<Jurisdiction> userJurisdictionsDefinition = extractDefinitions(jurisdictionsId, jurisdictionsDefinition);
-        JurisdictionDisplayProperties[] resultJurisdictions = toResponse(userJurisdictionsDefinition);
+        JurisdictionDisplayProperties[] resultJurisdictions = toResponse(jurisdictionsDefinition);
 
         WorkbasketDefault workbasketDefault = new WorkbasketDefault();
         workbasketDefault.setJurisdictionId(userDefault.getWorkBasketDefaultJurisdiction());
@@ -66,16 +66,6 @@ public class UserService {
         userProfile.getDefaultSettings().setWorkbasketDefault(workbasketDefault);
 
         return userProfile;
-    }
-
-    private List<Jurisdiction> extractDefinitions(List<String> jurisdictionsId, List<Jurisdiction> jurisdictionsDefinition) {
-        return jurisdictionsId.stream().map(id -> {
-            Optional<Jurisdiction> definition = jurisdictionsDefinition.stream().filter(def -> def.getId().equals(id)).findAny();
-            if (!definition.isPresent()) {
-                LOG.warn("Could not retrieve definition of jurisdiction '{}'", id);
-            }
-            return definition;
-        }).filter(Optional::isPresent).map(Optional::get).collect(toList());
     }
 
     private JurisdictionDisplayProperties[] toResponse(List<Jurisdiction> jurisdictionsDefinition) {

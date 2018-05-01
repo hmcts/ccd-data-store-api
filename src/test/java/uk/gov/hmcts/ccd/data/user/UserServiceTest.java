@@ -4,13 +4,14 @@ import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.JurisdictionMapper;
@@ -57,7 +58,7 @@ public class UserServiceTest {
         UserDefault userDefaultMock = aUserDefault();
         when(userRepoMock.getUserDefaultSettings("email")).thenReturn(userDefaultMock);
         List<Jurisdiction> jurisdictionsDef = newArrayList(j1, j2);
-        when(caseDefinitionRepoMock.getAllJurisdictions()).thenReturn(jurisdictionsDef);
+        when(caseDefinitionRepoMock.getJurisdictions(anyList())).thenReturn(jurisdictionsDef);
         when(jurisdictionMapperMock.toResponse(j1)).thenReturn(jdp1);
         when(jurisdictionMapperMock.toResponse(j2)).thenReturn(jdp2);
 

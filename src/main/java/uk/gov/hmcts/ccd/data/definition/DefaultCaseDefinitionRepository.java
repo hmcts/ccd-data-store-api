@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
@@ -15,6 +16,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -146,11 +148,12 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     @Override
-    public List<Jurisdiction> getAllJurisdictions() {
+    public List<Jurisdiction> getJurisdictions(List<String> ids) {
         try {
-            LOG.debug("retrieving all jurisdictions definition");
+            LOG.debug("retrieving jurisdictions definitions for {}", ids);
             HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
-            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(applicationParams.jurisdictionDefURL());
+            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(applicationParams.jurisdictionDefURL())
+                    .queryParam("ids", String.join(",", ids));
             List<Jurisdiction> jurisdictionList = restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET,
                     requestEntity, new ParameterizedTypeReference<List<Jurisdiction>>() {
                     }).getBody();
