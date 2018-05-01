@@ -17,10 +17,13 @@ import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.google.common.collect.Maps.newHashMap;
+import static java.util.Optional.ofNullable;
+
 @Service
 public class CallbackInvoker {
 
-    public static final String CALLBACK_RESPONSE_KEY_STATE = "state";
+    private static final String CALLBACK_RESPONSE_KEY_STATE = "state";
     private final CallbackService callbackService;
     private final CaseTypeService caseTypeService;
     private final CaseDataService caseDataService;
@@ -46,25 +49,25 @@ public class CallbackInvoker {
             caseEvent.getRetriesTimeoutAboutToStartEvent(),
             caseEvent, caseDetails);
 
-        callbackResponse.ifPresent(response -> validateAndSetData(caseType,
-                                                                  caseDetails,
-                                                                  ignoreWarning,
-                                                                  response));
+        callbackResponse.ifPresent(response -> validateAndSetFromAboutToStartCallback(caseType,
+                                                                                      caseDetails,
+                                                                                      ignoreWarning,
+                                                                                      response));
     }
 
     public Optional<String> invokeAboutToSubmitCallback(final CaseEvent eventTrigger,
-                                            final CaseDetails caseDetailsBefore,
-                                            final CaseDetails caseDetails,
-                                            final CaseType caseType,
-                                            final Boolean ignoreWarning) {
+                                                        final CaseDetails caseDetailsBefore,
+                                                        final CaseDetails caseDetails,
+                                                        final CaseType caseType,
+                                                        final Boolean ignoreWarning) {
         final Optional<CallbackResponse> callbackResponse = callbackService.send(
             eventTrigger.getCallBackURLAboutToSubmitEvent(),
             eventTrigger.getRetriesTimeoutURLAboutToSubmitEvent(),
             eventTrigger, caseDetailsBefore, caseDetails);
-        return callbackResponse.flatMap(response -> validateAndSetDataAndState(caseType,
-                                                                               caseDetails,
-                                                                               ignoreWarning,
-                                                                               response));
+        return callbackResponse.flatMap(response -> validateAndSetFromAboutToSubmitCallback(caseType,
+                                                                                            caseDetails,
+                                                                                            ignoreWarning,
+                                                                                            response));
     }
 
     public ResponseEntity<AfterSubmitCallbackResponse> invokeSubmittedCallback(final CaseEvent eventTrigger,
@@ -78,7 +81,7 @@ public class CallbackInvoker {
                                     AfterSubmitCallbackResponse.class);
     }
 
-    void validateAndSetData(CaseType caseType, CaseDetails caseDetails, Boolean ignoreWarning, CallbackResponse callbackResponse) {
+    void validateAndSetFromAboutToStartCallback(CaseType caseType, CaseDetails caseDetails, Boolean ignoreWarning, CallbackResponse callbackResponse) {
         callbackService.validateCallbackErrorsAndWarnings(callbackResponse, ignoreWarning);
 
         if (callbackResponse.getData() != null) {
@@ -91,13 +94,15 @@ public class CallbackInvoker {
                                     final Map<String, JsonNode> responseData) {
         caseTypeService.validateData(responseData, caseType);
         caseDetails.setData(caseSanitiser.sanitise(caseType, responseData));
-        caseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(caseType, caseDetails.getData()));
+        caseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(caseType,
+                                                                                            caseDetails.getData(),
+                                                                                            ofNullable(caseDetails.getDataClassification()).orElse(newHashMap())));
     }
 
-    Optional<String> validateAndSetDataAndState(final CaseType caseType,
-                                            final CaseDetails caseDetails,
-                                            final Boolean ignoreWarning,
-                                            final CallbackResponse callbackResponse) {
+    Optional<String> validateAndSetFromAboutToSubmitCallback(final CaseType caseType,
+                                                             final CaseDetails caseDetails,
+                                                             final Boolean ignoreWarning,
+                                                             final CallbackResponse callbackResponse) {
         callbackService.validateCallbackErrorsAndWarnings(callbackResponse, ignoreWarning);
         if (callbackResponse.getData() != null) {
             final Optional<String> newCaseState = filterCaseState(callbackResponse.getData());
@@ -109,7 +114,7 @@ public class CallbackInvoker {
     }
 
     Optional<String> filterCaseState(final Map<String, JsonNode> data) {
-        final Optional<JsonNode> jsonNode = Optional.ofNullable(data.get(CALLBACK_RESPONSE_KEY_STATE));
+        final Optional<JsonNode> jsonNode = ofNullable(data.get(CALLBACK_RESPONSE_KEY_STATE));
         jsonNode.ifPresent(value -> data.remove(CALLBACK_RESPONSE_KEY_STATE));
         return jsonNode.flatMap(value -> value.isTextual() ? Optional.of(value.textValue()) : Optional.empty());
     }
