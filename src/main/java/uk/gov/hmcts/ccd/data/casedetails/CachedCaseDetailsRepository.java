@@ -71,7 +71,7 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
     @Override
     public Optional<CaseDetails> findByReference(String jurisdiction, String reference) {
         return referenceToCaseDetails.computeIfAbsent(reference,
-                                                      (key) -> caseDetailsRepository.findByReference(jurisdiction,
+                                                      key -> caseDetailsRepository.findByReference(jurisdiction,
                                                                                                      reference));
     }
 
