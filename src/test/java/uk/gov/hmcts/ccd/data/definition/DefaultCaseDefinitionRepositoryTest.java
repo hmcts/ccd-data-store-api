@@ -19,7 +19,8 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 
 @Ignore("for now")
-public class DefaultCaseDefinitionRepositoryTest {
+public class
+DefaultCaseDefinitionRepositoryTest {
     private final String JURISDICTION_ID = "Some Jurisdiction";
 
     @Mock

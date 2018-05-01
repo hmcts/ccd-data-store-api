@@ -8,6 +8,7 @@ import org.junit.Test;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 
 import javax.inject.Inject;
@@ -24,7 +25,7 @@ import static org.hamcrest.beans.HasPropertyWithValue.hasProperty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-public class CaseDefinitionRepositoryTest extends WireMockBaseTest {
+public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
     @Inject
     private CaseDefinitionRepository caseDefinitionRepository;
 
@@ -80,5 +81,17 @@ public class CaseDefinitionRepositoryTest extends WireMockBaseTest {
     public void shouldReturnNullWhenNoClassificationFound() {
         final UserRole userRole = caseDefinitionRepository.getUserRoleClassifications("caseworker-probate-loa0");
         assertThat(userRole, is(nullValue()));
+    }
+
+    @Test
+    public void shouldGetJurisdictionsDefinition() {
+
+        List<Jurisdiction> allJurisdictions = caseDefinitionRepository.getAllJurisdictions();
+
+        assertAll(
+                () -> assertThat(allJurisdictions, hasSize(3)),
+                () -> assertThat(allJurisdictions, hasItem(hasProperty("id", is("SSCS")))),
+                () -> assertThat(allJurisdictions, hasItem(hasProperty("id", is("PROBATE"))))
+        );
     }
 }

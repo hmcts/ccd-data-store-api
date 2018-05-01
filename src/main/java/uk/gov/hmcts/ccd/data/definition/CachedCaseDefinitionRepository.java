@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 
 import java.util.List;
@@ -51,6 +52,11 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     @Override
     public CaseTypeDefinitionVersion getLatestVersion(String caseTypeId) {
         return versions.computeIfAbsent(caseTypeId, caseDefinitionRepository::getLatestVersion);
+    }
+
+    @Override
+    public List<Jurisdiction> getAllJurisdictions() {
+        return this.caseDefinitionRepository.getAllJurisdictions();
     }
 
     @Override
