@@ -25,8 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static java.lang.Long.valueOf;
 
 @Named
 @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)

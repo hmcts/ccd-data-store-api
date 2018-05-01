@@ -21,11 +21,6 @@ public class DefaultGetUserProfileOperation implements GetUserProfileOperation {
 
     @Override
     public UserProfile execute(final String userToken) {
-        final UserProfile userProfile = userService.getUserProfile();
-        //TODO verify is up can be null
-        if (userProfile == null) {
-            throw new ResourceNotFoundException("No such user");
-        }
-        return userProfile;
+        return userService.getUserProfile();
     }
 }
