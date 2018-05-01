@@ -37,6 +37,12 @@ module "ccd-data-store-api" {
     DATA_STORE_DB_USERNAME = "${var.use_uk_db != "true" ? module.postgres-data-store.user_name : module.data-store-db.user_name}"
     DATA_STORE_DB_PASSWORD = "${var.use_uk_db != "true" ? module.postgres-data-store.postgresql_password : module.data-store-db.postgresql_password}"
 
+    UK_DB_HOST = "${module.data-store-db.host_name}"
+    UK_DB_PORT = "${module.data-store-db.postgresql_listen_port}"
+    UK_DB_NAME = "${module.data-store-db.postgresql_database}"
+    UK_DB_USERNAME = "${module.data-store-db.user_name}"
+    UK_DB_PASSWORD = "${module.data-store-db.postgresql_password}"
+
     DEFINITION_STORE_HOST               = "http://ccd-definition-store-api-${local.env_ase_url}"
     USER_PROFILE_HOST                   = "http://ccd-user-profile-api-${local.env_ase_url}"
 
