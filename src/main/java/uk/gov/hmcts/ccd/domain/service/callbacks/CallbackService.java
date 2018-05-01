@@ -2,11 +2,11 @@ package uk.gov.hmcts.ccd.domain.service.callbacks;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -35,8 +35,10 @@ public class CallbackService {
     private final RestTemplate restTemplate;
     private final List<Integer> defaultRetries;
 
+    @Autowired
     public CallbackService(final SecurityUtils securityUtils,
-                           RestTemplate restTemplate, final ApplicationParams applicationParams) {
+                           final RestTemplate restTemplate,
+                           final ApplicationParams applicationParams) {
         this.securityUtils = securityUtils;
         this.restTemplate = restTemplate;
         this.defaultRetries = applicationParams.getCallbackRetries();
@@ -114,12 +116,15 @@ public class CallbackService {
             }
 
             final HttpEntity requestEntity = new HttpEntity(callbackRequest, httpHeaders);
-            final HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
 
-            requestFactory.setConnectionRequestTimeout(secondsToMilliseconds(timeout));
-            requestFactory.setReadTimeout(secondsToMilliseconds(timeout));
-            requestFactory.setConnectTimeout(secondsToMilliseconds(timeout));
-            restTemplate.setRequestFactory(requestFactory);
+            //TODO Disable the following code for now; TO INVESTIAGE WHETHER TIMOUT WORKS, IN RELATION TO OTHERS CALLS
+            // and socket issues in Azure
+//            final HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
+//
+//            requestFactory.setConnectionRequestTimeout(secondsToMilliseconds(timeout));
+//            requestFactory.setReadTimeout(secondsToMilliseconds(timeout));
+//            requestFactory.setConnectTimeout(secondsToMilliseconds(timeout));
+//            restTemplate.setRequestFactory(requestFactory);
             return Optional.ofNullable(
                 restTemplate.exchange(url, HttpMethod.POST, requestEntity, clazz));
         } catch (RestClientException e) {

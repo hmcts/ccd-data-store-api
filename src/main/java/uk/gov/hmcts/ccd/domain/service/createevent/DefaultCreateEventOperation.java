@@ -218,12 +218,12 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
             for (Map.Entry<String, JsonNode> field : sanitisedData.entrySet()) {
                 caseDetails.getData().put(field.getKey(), field.getValue());
             }
+            caseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(caseType, caseDetails.getData(), caseDetails.getDataClassification()));
         }
         caseDetails.setLastModified(LocalDateTime.now(ZoneOffset.UTC));
         if (!StringUtils.equalsAnyIgnoreCase(CaseState.ANY, caseEvent.getPostState())) {
             caseDetails.setState(caseEvent.getPostState());
         }
-        caseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(caseType, caseDetails.getData()));
     }
 
     private void saveAuditEventForCaseDetails(final Event event,

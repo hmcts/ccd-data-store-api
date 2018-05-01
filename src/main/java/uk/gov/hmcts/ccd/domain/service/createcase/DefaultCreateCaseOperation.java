@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.createcase;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -109,7 +110,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         newCaseDetails.setState(eventTrigger.getPostState());
         newCaseDetails.setSecurityClassification(caseType.getSecurityClassification());
         newCaseDetails.setData(caseSanitiser.sanitise(caseType, data));
-        newCaseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(caseType, newCaseDetails.getData()));
+        newCaseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(caseType, newCaseDetails.getData(), Maps.newHashMap()));
 
         final CaseDetails savedCaseDetails = submitCaseTransaction.submitCase(event,
                                                                               caseType,
