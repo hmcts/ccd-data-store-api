@@ -26,6 +26,7 @@ import java.util.function.Predicate;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Comparator.comparingInt;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.valueOf;
+import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils.getDataClassificationForData;
 
 @Service
 public class SecurityClassificationService {
@@ -185,19 +186,6 @@ public class SecurityClassificationService {
 
     private boolean isNull(JsonNode... jsonNodes) {
         return newArrayList(jsonNodes).stream().anyMatch(Objects::isNull);
-    }
-
-    private JsonNode getDataClassificationForData(JsonNode data, Iterator<JsonNode> dataIterator) {
-        Boolean found = false;
-        JsonNode dataClassificationValue = null;
-        while (dataIterator.hasNext() && !found) {
-            dataClassificationValue = dataIterator.next();
-            if (null != dataClassificationValue.get(ID)
-                    && dataClassificationValue.get(ID).equals(data.get(ID))) {
-                found = true;
-            }
-        }
-        return dataClassificationValue;
     }
 
     private void filterSimpleField(SecurityClassification userClassification, Iterator iterator, JsonNode dataClassificationValue) {
