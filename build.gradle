@@ -547,6 +547,11 @@ task smoke(type: Test) {
 }
 
 task functional(type: Test) {
+    systemProperty "http.proxyHost", System.getProperty('http.proxyHost')
+    systemProperty "http.proxyPort", System.getProperty('http.proxyPort')
+    systemProperty "https.proxyHost", System.getProperty('https.proxyHost')
+    systemProperty "https.proxyPort", System.getProperty('https.proxyPort')
+
     environment("APPINSIGHTS_INSTRUMENTATIONKEY", "some-key")
 
     group = 'Delivery pipeline'

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
+import feign.Response;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ public interface IdamApi {
     AuthenticateUserResponse authenticateUser(@Param("basic_auth") String basicAuth);
 
     @RequestLine("POST /testing-support/lease?id=1&role={role}")
-    AuthenticateUserResponse testingLease(@Param("role") String role);
+    Response testingLease(@Param("role") String role);
 
     @RequestLine("GET /details")
     @Headers("Authorization: Bearer {access_token}")
@@ -45,3 +46,4 @@ public interface IdamApi {
         }
     }
 }
+
