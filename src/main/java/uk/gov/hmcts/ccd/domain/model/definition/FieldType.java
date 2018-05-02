@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -84,5 +85,10 @@ public class FieldType implements Serializable {
 
     public void setCollectionFieldType(FieldType collectionFieldType) {
         this.collectionFieldType = collectionFieldType;
+    }
+
+    @Override
+    public String toString() {
+        return ReflectionToStringBuilder.toString(this);
     }
 }

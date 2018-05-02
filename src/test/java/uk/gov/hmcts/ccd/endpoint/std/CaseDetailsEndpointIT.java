@@ -957,10 +957,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value").get("AddressLine3").asText());
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value").get("Country").asText());
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value").get("Postcode").asText());
-            assertEquals("PUBLIC", caseDetails.getDataClassification().get("D8Document").get("classification").asText());
-            assertEquals("PUBLIC", caseDetails.getDataClassification().get("D8Document").get("value").get("document_url").asText());
-            assertEquals("PUBLIC", caseDetails.getDataClassification().get("D8Document").get("value").get("document_binary_url").asText());
-            assertEquals("PUBLIC", caseDetails.getDataClassification().get("D8Document").get("value").get("document_filename").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("D8Document").asText());
         }
 
         {
@@ -1050,11 +1047,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             assertEquals("PUBLIC",  caseDetails.getDataClassification().get("PersonAddress").get("classification").asText());
             assertEquals("PUBLIC", caseDetails.getDataClassification().get("PersonAddress").get("value").get("AddressLine1").asText());
             assertEquals("PUBLIC",  caseDetails.getDataClassification().get("PersonAddress").get("classification").asText());
-            assertEquals("PUBLIC", caseDetails.getDataClassification().get("D8Document").get("classification").asText());
-            assertEquals("PUBLIC", caseDetails.getDataClassification().get("D8Document").get("classification").asText());
-            assertEquals("PUBLIC", caseDetails.getDataClassification().get("D8Document").get("value").get("document_url").asText());
-            assertEquals("PUBLIC", caseDetails.getDataClassification().get("D8Document").get("value").get("document_binary_url").asText());
-            assertEquals("PUBLIC", caseDetails.getDataClassification().get("D8Document").get("value").get("document_filename").asText());
+            assertEquals("PUBLIC", caseDetails.getDataClassification().get("D8Document").asText());
         }
 
         {
@@ -1188,20 +1181,21 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                                               "\"AddressLine3\":\"ButtonVillie\"}," +
                                               "\"PersonLastName\":\"Roof\"," +
                                               "\"PersonFirstName\":\"George\"}");
-        final JsonNode EXPECTED_CLASSIFICATION = mapper.readTree("{" +
-                                                                     "\"PersonAddress\":{" +
-                                                                     "   \"classification\": \"PUBLIC\"," +
-                                                                     "   \"value\":{" +
-                                                                     "       \"Country\":\"PUBLIC\"," +
-                                                                     "       \"Postcode\":\"PUBLIC\"," +
-                                                                     "       \"AddressLine1\":\"PUBLIC\"," +
-                                                                     "       \"AddressLine2\":\"PUBLIC\"," +
-                                                                     "       \"AddressLine3\":\"PUBLIC\"" +
-                                                                     "       }" +
-                                                                     "   }," +
-                                                                     "   \"PersonLastName\":\"PUBLIC\"," +
-                                                                     "   \"PersonFirstName\":\"PUBLIC\"}" +
-                                                                     "}");
+        final String EXPECTED_CLASSIFICATION_STRING = "{" +
+            "  \"PersonAddress\":{" +
+            "    \"classification\": \"PUBLIC\"," +
+            "    \"value\": {" +
+            "      \"Country\":\"PUBLIC\"," +
+            "      \"Postcode\":\"PUBLIC\"," +
+            "      \"AddressLine1\":\"PUBLIC\"," +
+            "      \"AddressLine2\":\"PUBLIC\"," +
+            "      \"AddressLine3\":\"PUBLIC\"" +
+            "    }" +
+            "  }," +
+            "  \"PersonLastName\":\"PUBLIC\"," +
+            "  \"PersonFirstName\":\"PUBLIC\"," +
+            "  \"D8Document\": \"PUBLIC\"" +
+            "}";
         final String token = generateEventToken(template, 0, JURISDICTION, CASE_TYPE, CASE_REFERENCE, PRE_STATES_EVENT_ID);
         caseDetailsToSave.setToken(token);
         final MvcResult mvcResult = mockMvc.perform(post(URL)
@@ -1226,7 +1220,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect Data content: Data should not have changed", mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
         }), savedCaseDetails.getData());
         assertEquals("State should have been updated", "state4", savedCaseDetails.getState());
-        assertEquals(mapper.convertValue(EXPECTED_CLASSIFICATION, new TypeReference<HashMap<String, JsonNode>>() {}), savedCaseDetails.getDataClassification());
+        JSONAssert.assertEquals(EXPECTED_CLASSIFICATION_STRING, mapper.convertValue(savedCaseDetails.getDataClassification(), JsonNode.class).toString(), JSONCompareMode.LENIENT);
 
         final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
         assertEquals("A new event should have been created", 5, caseAuditEventList.size());
@@ -1245,7 +1239,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals(savedCaseDetails.getData(), caseAuditEvent.getData());
         assertEquals(SUMMARY, caseAuditEvent.getSummary());
         assertEquals(DESCRIPTION, caseAuditEvent.getDescription());
-        assertEquals(mapper.convertValue(EXPECTED_CLASSIFICATION, new TypeReference<HashMap<String, JsonNode>>() {}), caseAuditEvent.getDataClassification());
+        JSONAssert.assertEquals(EXPECTED_CLASSIFICATION_STRING, mapper.convertValue(caseAuditEvent.getDataClassification(), JsonNode.class).toString(), JSONCompareMode.LENIENT);
     }
 
 
@@ -1271,20 +1265,21 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                                               "\"AddressLine3\":\"ButtonVillie\"}," +
                                               "\"PersonLastName\":\"Roof\"," +
                                               "\"PersonFirstName\":\"George\"}");
-        final JsonNode EXPECTED_CLASSIFICATION = mapper.readTree("{" +
-                                                                     "  \"PersonAddress\":{" +
-                                                                     "    \"classification\": \"PUBLIC\"," +
-                                                                     "    \"value\":{" +
-                                                                     "      \"Country\":\"PUBLIC\"," +
-                                                                     "      \"Postcode\":\"PUBLIC\"," +
-                                                                     "      \"AddressLine1\":\"PUBLIC\"," +
-                                                                     "      \"AddressLine2\":\"PUBLIC\"," +
-                                                                     "      \"AddressLine3\":\"PUBLIC\"" +
-                                                                     "    }" +
-                                                                     "  }," +
-                                                                     "    \"PersonLastName\":\"PUBLIC\"," +
-                                                                     "    \"PersonFirstName\":\"PUBLIC\"" +
-                                                                     "}");
+        String EXPECTED_CLASSIFICATION_STRING = "{" +
+            "  \"PersonAddress\":{" +
+            "    \"classification\": \"PUBLIC\"," +
+            "    \"value\":{" +
+            "      \"Country\":\"PUBLIC\"," +
+            "      \"Postcode\":\"PUBLIC\"," +
+            "      \"AddressLine1\":\"PUBLIC\"," +
+            "      \"AddressLine2\":\"PUBLIC\"," +
+            "      \"AddressLine3\":\"PUBLIC\"" +
+            "    }" +
+            "  }," +
+            "    \"PersonLastName\":\"PUBLIC\"," +
+            "    \"PersonFirstName\":\"PUBLIC\"," +
+            "    \"D8Document\":\"PUBLIC\"" +
+            "}";
         final String token = generateEventToken(template, 0, JURISDICTION, CASE_TYPE, CASE_REFERENCE, PRE_STATES_EVENT_ID);
         caseDetailsToSave.setToken(token);
         final MvcResult mvcResult = mockMvc.perform(post(URL)
@@ -1309,7 +1304,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect Data content: Data should not have changed", mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
         }), savedCaseDetails.getData());
         assertEquals("State should have been updated", "state4", savedCaseDetails.getState());
-        assertEquals(mapper.convertValue(EXPECTED_CLASSIFICATION, new TypeReference<HashMap<String, JsonNode>>() {}), savedCaseDetails.getDataClassification());
+        JSONAssert.assertEquals(EXPECTED_CLASSIFICATION_STRING, mapper.convertValue(savedCaseDetails.getDataClassification(), JsonNode.class).toString(), JSONCompareMode.LENIENT);
 
         final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
         assertEquals("A new event should have been created", 5, caseAuditEventList.size());
@@ -1328,7 +1323,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals(savedCaseDetails.getData(), caseAuditEvent.getData());
         assertEquals(SUMMARY, caseAuditEvent.getSummary());
         assertEquals(DESCRIPTION, caseAuditEvent.getDescription());
-        assertEquals(mapper.convertValue(EXPECTED_CLASSIFICATION, new TypeReference<HashMap<String, JsonNode>>() {}), caseAuditEvent.getDataClassification());
+        JSONAssert.assertEquals(EXPECTED_CLASSIFICATION_STRING, mapper.convertValue(caseAuditEvent.getDataClassification(), JsonNode.class).toString(), JSONCompareMode.LENIENT);
     }
 
     @Test
@@ -3151,11 +3146,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 () -> assertThat(nodeClassification.get("PersonAddress").get("value").get("AddressLine1"), CoreMatchers.is(getTextNode("PUBLIC"))),
                 () -> assertThat(nodeClassification.get("PersonAddress").get("value").get("AddressLine2"), CoreMatchers.is(getTextNode("PUBLIC"))),
                 () -> assertThat(nodeClassification.get("PersonAddress").get("value").get("AddressLine3"), CoreMatchers.is(getTextNode("PUBLIC"))),
-                () -> assertThat(nodeClassification.has("D8Document"), CoreMatchers.is(true)),
-                () -> assertThat(nodeClassification.get("D8Document").get("classification"), CoreMatchers.is(getTextNode("PUBLIC"))),
-                () -> assertThat(nodeClassification.get("D8Document").get("value").get("document_url"), CoreMatchers.is(getTextNode("PUBLIC"))),
-                () -> assertThat(nodeClassification.get("D8Document").get("value").get("document_binary_url"), CoreMatchers.is(getTextNode("PUBLIC"))),
-                () -> assertThat(nodeClassification.get("D8Document").get("value").get("document_filename"), CoreMatchers.is(getTextNode("PUBLIC")))
+                () -> assertThat(nodeClassification.get("D8Document"), CoreMatchers.is(getTextNode("PUBLIC")))
             );
         }
     }
@@ -3198,22 +3189,23 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "    \"document_binary_url\": \"http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\"," +
             "    \"document_filename\": \"Seagulls_Square.jpg\"" +
             "}" +
-            "}");        caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
-        final JsonNode EXPECTED_CLASSIFICATION = mapper.readTree("{" +
-                                                                     "  \"PersonAddress\":{" +
-                                                                     "    \"classification\": \"PUBLIC\"," +
-                                                                     "    \"value\": {" +
-                                                                     "      \"Country\":\"PUBLIC\"," +
-                                                                     "      \"Postcode\":\"PUBLIC\"," +
-                                                                     "      \"AddressLine1\":\"PUBLIC\"," +
-                                                                     "      \"AddressLine2\":\"PUBLIC\"," +
-                                                                     "      \"AddressLine3\":\"PUBLIC\"" +
-                                                                     "    }" +
-                                                                     "  }," +
-                                                                     "  \"PersonLastName\":\"PUBLIC\"," +
-                                                                     "  \"PersonFirstName\":\"PUBLIC\"," +
-                                                                     "  \"D8Document\": \"PUBLIC\"" +
-                                                                     "}");
+            "}");
+        caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
+        final String EXPECTED_CLASSIFICATION_STRING = "{" +
+            "  \"PersonAddress\":{" +
+            "    \"classification\": \"PUBLIC\"," +
+            "    \"value\": {" +
+            "      \"Country\":\"PUBLIC\"," +
+            "      \"Postcode\":\"PUBLIC\"," +
+            "      \"AddressLine1\":\"PUBLIC\"," +
+            "      \"AddressLine2\":\"PUBLIC\"," +
+            "      \"AddressLine3\":\"PUBLIC\"" +
+            "    }" +
+            "  }," +
+            "  \"PersonLastName\":\"PUBLIC\"," +
+            "  \"PersonFirstName\":\"PUBLIC\"," +
+            "  \"D8Document\": \"PUBLIC\"" +
+            "}";
         final String token = generateEventToken(template, 0, JURISDICTION, CASE_TYPE, CASE_REFERENCE, PRE_STATES_EVENT_ID);
         caseDetailsToSave.setToken(token);
 
@@ -3242,7 +3234,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "Incorrect Data content: Data should have changed",
             savedCaseDetails.getData().entrySet(), everyItem(isIn(sanitizedData.entrySet())));
         assertEquals("State should have been updated", "state4", savedCaseDetails.getState());
-        assertEquals("Security Classification should have been updated", mapper.convertValue(EXPECTED_CLASSIFICATION, new TypeReference<HashMap<String, JsonNode>>() {}), savedCaseDetails.getDataClassification());
+        JSONAssert.assertEquals(EXPECTED_CLASSIFICATION_STRING, mapper.convertValue(savedCaseDetails.getDataClassification(), JsonNode.class).toString(), JSONCompareMode.LENIENT);
 
         final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
         assertEquals("A new event should have been created", 5, caseAuditEventList.size());
@@ -3261,7 +3253,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals(savedCaseDetails.getData(), caseAuditEvent.getData());
         assertEquals(SUMMARY, caseAuditEvent.getSummary());
         assertEquals(DESCRIPTION, caseAuditEvent.getDescription());
-        assertEquals(mapper.convertValue(EXPECTED_CLASSIFICATION, new TypeReference<HashMap<String, JsonNode>>() {}), caseAuditEvent.getDataClassification());
+        JSONAssert.assertEquals(EXPECTED_CLASSIFICATION_STRING, mapper.convertValue(caseAuditEvent.getDataClassification(), JsonNode.class).toString(), JSONCompareMode.LENIENT);
     }
 
     private void shouldReturn201WhenPostCreateCaseEventWithExistingDocumentBinary(String userRole) throws Exception {
