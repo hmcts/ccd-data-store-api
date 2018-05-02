@@ -37,6 +37,8 @@ public class CaseEvent implements Serializable {
     private SecurityClassification securityClassification;
     @JsonProperty("show_summary")
     private Boolean showSummary = null;
+    @JsonProperty("end_button_label")
+    private String endButtonLabel = null;
     @JsonProperty("acls")
     private List<AccessControlList> accessControlLists;
 
@@ -167,6 +169,14 @@ public class CaseEvent implements Serializable {
 
     public void setShowSummary(final Boolean showSummary) {
         this.showSummary = showSummary;
+    }
+
+    public String getEndButtonLabel() {
+        return endButtonLabel;
+    }
+
+    public void setEndButtonLabel(String endButtonLabel) {
+        this.endButtonLabel = endButtonLabel;
     }
 
     @Override

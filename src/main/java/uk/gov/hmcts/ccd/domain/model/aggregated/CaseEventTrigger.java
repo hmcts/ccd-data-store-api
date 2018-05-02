@@ -19,6 +19,8 @@ public class CaseEventTrigger {
     private List<WizardPage> wizardPages;
     @JsonProperty("show_summary")
     private Boolean showSummary;
+    @JsonProperty("end_button_label")
+    private String endButtonLabel;
 
     public String getId() {
         return id;
@@ -82,5 +84,13 @@ public class CaseEventTrigger {
 
     public void setShowSummary(final Boolean showSummary) {
         this.showSummary = showSummary;
+    }
+
+    public String getEndButtonLabel() {
+        return endButtonLabel;
+    }
+
+    public void setEndButtonLabel(String endButtonLabel) {
+        this.endButtonLabel = endButtonLabel;
     }
 }
