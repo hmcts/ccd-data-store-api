@@ -11,7 +11,6 @@ import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -52,18 +51,12 @@ public class CallbackServiceTest {
     @Inject
     private CallbackService callbackService;
 
-    @Inject
-    private RestTemplate restTemplate;
-
     @Before
     public void setUp() {
         // IDAM
         final SecurityUtils securityUtils = Mockito.mock(SecurityUtils.class);
         Mockito.when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
         ReflectionTestUtils.setField(callbackService, "securityUtils", securityUtils);
-
-        // to allow restTemplate to shut down gracefully and overcome wiremock problems
-        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
     }
 
     @Test

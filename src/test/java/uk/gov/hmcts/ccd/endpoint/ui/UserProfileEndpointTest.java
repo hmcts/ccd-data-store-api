@@ -2,11 +2,9 @@ package uk.gov.hmcts.ccd.endpoint.ui;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
@@ -28,16 +26,11 @@ public class UserProfileEndpointTest extends WireMockBaseTest {
     @Inject
     private WebApplicationContext wac;
 
-    @Inject
-    private RestTemplate restTemplate;
-
     private MockMvc mockMvc;
 
     @Before
     public void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
-        // runs successfully on local but need this for now on Jenkins
-        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
     }
 
     @Test
