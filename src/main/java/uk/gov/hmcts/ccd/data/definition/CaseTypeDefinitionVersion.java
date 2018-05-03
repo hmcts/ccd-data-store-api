@@ -18,7 +18,8 @@ public class CaseTypeDefinitionVersion {
 
     @Override
     public String toString() {
-        return ToStringBuilder.reflectionToString(this);
+        return new ToStringBuilder(this)
+            .append("version", version)
+            .toString();
     }
-
 }

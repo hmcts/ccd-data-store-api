@@ -1,9 +1,9 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.ToString;
 
-import java.util.Arrays;
-
+@ToString
 public class UserProfile {
 
     private User user = new User();
@@ -44,13 +44,4 @@ public class UserProfile {
         this.defaultSettings = defaultSettings;
     }
 
-    @Override
-    public String toString() {
-        return "UserProfile{" +
-               "user=" + user +
-               ", channels=" + Arrays.toString(channels) +
-               ", jurisdictions=" + Arrays.toString(jurisdictions) +
-               ", defaultSettings=" + defaultSettings +
-               '}';
-    }
 }

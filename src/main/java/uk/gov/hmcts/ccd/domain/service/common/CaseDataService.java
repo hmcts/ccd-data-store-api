@@ -46,24 +46,31 @@ public class CaseDataService {
         while (fieldNames.hasNext()) {
             Boolean found = false;
             final String fieldName = fieldNames.next();
-            for (CaseField caseField : caseFieldDefinitions) {
+            Iterator<CaseField> cFIterator = caseFieldDefinitions.iterator();
+            while (!found && cFIterator.hasNext()) {
+                CaseField caseField = cFIterator.next();
                 if (caseField.getId().equalsIgnoreCase(fieldName)) {
                     final String caseFieldType = caseField.getFieldType().getType();
                     if (caseFieldType.equalsIgnoreCase(COMPLEX_TYPE)) {
                         found = true;
                         deduceClassificationForComplexType(dataNode,
-                                                           getExistingDataClassificationNodeOrEmpty(existingDataClassificationNode, fieldName), fieldIdPrefix, fieldName, caseField);
-                        break;
+                                                           getExistingDataClassificationNodeOrEmpty(existingDataClassificationNode, fieldName),
+                                                           fieldIdPrefix,
+                                                           fieldName,
+                                                           caseField);
                     } else if (caseFieldType.equalsIgnoreCase(COLLECTION_TYPE)) {
                         found = true;
                         deduceClassificationForCollectionType(dataNode,
-                                                              getExistingDataClassificationNodeOrEmpty(existingDataClassificationNode, fieldName), fieldIdPrefix, fieldName, caseField);
-                        break;
+                                                              getExistingDataClassificationNodeOrEmpty(existingDataClassificationNode, fieldName),
+                                                              fieldIdPrefix,
+                                                              fieldName,
+                                                              caseField);
                     } else {
                         found = true;
                         deduceClassificationForSimpleType((ObjectNode) dataNode,
-                                                          getExistingDataClassificationNodeOrEmpty(existingDataClassificationNode, fieldName), fieldName, caseField);
-                        break;
+                                                          getExistingDataClassificationNodeOrEmpty(existingDataClassificationNode, fieldName),
+                                                          fieldName,
+                                                          caseField);
                     }
                 }
             }
