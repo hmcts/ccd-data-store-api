@@ -60,7 +60,7 @@ class CaseDetailsTest {
         CaseField caseField = new CaseField();
         caseField.setId(id);
         FieldType labelFieldType = new FieldType();
-        labelFieldType.setId(type);
+        labelFieldType.setType(type);
         caseField.setFieldType(labelFieldType);
         tabField.setCaseField(caseField);
         return tabField;

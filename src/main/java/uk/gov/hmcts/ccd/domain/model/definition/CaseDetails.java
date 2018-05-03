@@ -180,7 +180,7 @@ public class CaseDetails implements Cloneable {
 
     public boolean existsInData(CaseTypeTabField caseTypeTabField) {
         // Fields of type "Label" are a special case and should be allowed through regardless
-        return caseTypeTabField.getCaseField().getFieldType().getId().equals(LABEL_FIELD_TYPE) ||
+        return caseTypeTabField.getCaseField().getFieldType().getType().equals(LABEL_FIELD_TYPE) ||
             data.keySet().contains(caseTypeTabField.getCaseField().getId());
     }
 
