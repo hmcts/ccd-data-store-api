@@ -14,13 +14,17 @@ public abstract class BaseTest {
     protected BaseTest(AATHelper aat) {
         this.aat = aat;
         RestAssured.baseURI = aat.getTestUrl();
+        RestAssured.useRelaxedHTTPSValidation();
     }
 
     protected Supplier<RequestSpecification> asAutoTestCaseworker() {
 
+//        final AuthenticatedUser caseworker = aat.getIdamHelper()
+//                                                .authenticate(aat.getCaseworkerAutoTestEmail(),
+//                                                              aat.getCaseworkerAutoTestPassword());
+
         final AuthenticatedUser caseworker = aat.getIdamHelper()
-                                                .authenticate(aat.getCaseworkerAutoTestEmail(),
-                                                              aat.getCaseworkerAutoTestPassword());
+                                                .authenticate("caseworker-autotest1");
 
         final String s2sToken = aat.getS2SHelper()
                                    .getToken();

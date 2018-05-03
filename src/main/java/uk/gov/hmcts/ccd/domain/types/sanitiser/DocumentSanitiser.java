@@ -44,8 +44,9 @@ public class DocumentSanitiser implements Sanitiser {
     public JsonNode sanitise(FieldType fieldType, JsonNode fieldData) {
         final ObjectNode sanitisedData = JSON_NODE_FACTORY.objectNode();
 
-        if (fieldData.has(DOCUMENT_BINARY_URL)
-            && fieldData.has(DOCUMENT_FILENAME)) {
+        if ((fieldData.has(DOCUMENT_BINARY_URL)
+            && fieldData.has(DOCUMENT_FILENAME))
+            || fieldData.isNull()) {
             return fieldData;
         } else {
             final String documentUrl = fieldData.get(DOCUMENT_URL).textValue();

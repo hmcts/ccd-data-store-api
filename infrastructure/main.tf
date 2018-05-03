@@ -11,8 +11,11 @@ provider "vault" {
 locals {
   app_full_name = "${var.product}-${var.component}"
   env_ase_url = "${var.env}.service.${data.terraform_remote_state.core_apps_compute.ase_name[0]}.internal"
-  default_default_print_url = "https://ccd-case-print-service-${local.env_ase_url}"
+  default_default_print_url = "https://ccd-case-print-service-${local.env_ase_url}/jurisdictions/:jid/case-types/:ctid/cases/:cid"
   default_print_url = "${var.default_print_url != "" ? var.default_print_url : local.default_default_print_url}"
+
+  default_dm_valid_domain = "^https?://(?:api-gateway\\.test\\.dm\\.reform\\.hmcts\\.net|dm-store-${var.env}\\.service\\.core-compute-${var.env}\\.internal(?::\\d+)?)"
+  dm_valid_domain = "${var.document_management_valid_domain != "" ? var.document_management_valid_domain : local.default_dm_valid_domain}"
 }
 
 data "vault_generic_secret" "ccd_data_s2s_key" {
@@ -23,9 +26,10 @@ module "ccd-data-store-api" {
   source   = "git@github.com:hmcts/moj-module-webapp?ref=master"
   product  = "${local.app_full_name}"
   location = "${var.location}"
-  env      = "${var.env}"
-  ilbIp    = "${var.ilbIp}"
+  env = "${var.env}"
+  ilbIp = "${var.ilbIp}"
   subscription = "${var.subscription}"
+  is_frontend = false
 
   app_settings = {
     DATA_STORE_DB_HOST                  = "${module.postgres-data-store.host_name}"
@@ -37,7 +41,7 @@ module "ccd-data-store-api" {
     DEFINITION_STORE_HOST               = "http://ccd-definition-store-api-${local.env_ase_url}"
     USER_PROFILE_HOST                   = "http://ccd-user-profile-api-${local.env_ase_url}"
 
-    CCD_DM_DOMAIN                       = "${var.document_management_valid_domain}"
+    CCD_DM_DOMAIN                       = "${local.dm_valid_domain}"
 
     IDAM_USER_URL                       = "${var.idam_api_url}"
     IDAM_S2S_URL                        = "${var.s2s_url}"

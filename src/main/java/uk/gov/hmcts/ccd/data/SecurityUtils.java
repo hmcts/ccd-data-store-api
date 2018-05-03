@@ -2,10 +2,13 @@ package uk.gov.hmcts.ccd.data;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+
+import java.util.stream.Collectors;
 
 @Service
 public class SecurityUtils {
@@ -19,6 +22,8 @@ public class SecurityUtils {
     public HttpHeaders authorizationHeaders() {
         final HttpHeaders headers = new HttpHeaders();
         headers.add("ServiceAuthorization", authTokenGenerator.generate());
+        headers.add("user-id", getUserId());
+        headers.add("user-roles", getUserRolesHeader());
 
         if (SecurityContextHolder.getContext().getAuthentication() != null) {
             final ServiceAndUserDetails serviceAndUser = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -39,5 +44,13 @@ public class SecurityUtils {
     public String getUserId() {
         final ServiceAndUserDetails serviceAndUser = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return serviceAndUser.getUsername();
+    }
+
+    public String getUserRolesHeader() {
+        final ServiceAndUserDetails serviceAndUser = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return serviceAndUser.getAuthorities()
+                             .stream()
+                             .map(GrantedAuthority::getAuthority)
+                             .collect(Collectors.joining(","));
     }
 }
