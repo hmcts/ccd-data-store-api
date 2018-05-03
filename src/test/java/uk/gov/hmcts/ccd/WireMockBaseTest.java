@@ -9,10 +9,8 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.data.definition.CaseTypeDefinitionVersion;
 
 import javax.inject.Inject;
@@ -36,9 +34,6 @@ public abstract class WireMockBaseTest extends BaseTest {
     @Inject
     private ApplicationParams applicationParams;
 
-    @Inject
-    private RestTemplate restTemplate;
-
     @Before
     public void initMock() throws IOException {
         super.initMock();
@@ -52,9 +47,6 @@ public abstract class WireMockBaseTest extends BaseTest {
         ReflectionTestUtils.setField(applicationParams, "uiDefinitionHost", hostUrl);
         ReflectionTestUtils.setField(applicationParams, "idamHost", hostUrl);
         ReflectionTestUtils.setField(applicationParams, "userProfileHost", hostUrl);
-
-        // to allow restTemplate to shut down gracefully and overcome wiremock problems
-        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
     }
 
     protected void stupApiCalls() throws IOException {
