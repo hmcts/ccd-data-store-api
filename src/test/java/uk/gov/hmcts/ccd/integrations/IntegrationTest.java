@@ -18,7 +18,7 @@ import java.sql.SQLException;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureWireMock(port = 12345)
+@AutoConfigureWireMock(port = 0)
 @TestPropertySource(locations = "classpath:integration_tests.properties")
 public abstract class IntegrationTest {
 
