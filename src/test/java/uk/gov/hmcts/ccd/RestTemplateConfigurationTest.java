@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -81,6 +82,7 @@ public class RestTemplateConfigurationTest {
         restTemplate.exchange(request, String.class);
     }
 
+    @Ignore("for local dev only")
     @Test
     public void shouldBeAbleToUseMultipleTimes() throws Exception {
         stubResponse();
