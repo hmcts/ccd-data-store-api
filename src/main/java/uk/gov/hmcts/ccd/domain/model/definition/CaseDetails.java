@@ -19,7 +19,7 @@ import static org.apache.http.HttpStatus.SC_OK;
 
 public class CaseDetails implements Cloneable {
     private static final Logger LOG = LoggerFactory.getLogger(CaseDetails.class);
-    private static final String LABEL_FIELD_TYPE = "Label";
+    protected static final String LABEL_FIELD_TYPE = "Label";
 
     private Long id;
 
