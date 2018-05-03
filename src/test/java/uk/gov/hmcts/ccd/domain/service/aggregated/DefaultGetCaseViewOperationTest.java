@@ -167,7 +167,9 @@ class DefaultGetCaseViewOperationTest {
             CaseTypeTabField tabField = new CaseTypeTabField();
             CaseField caseField = new CaseField();
             caseField.setId(caseFieldId);
-            caseField.setFieldType(new FieldType());
+            FieldType fieldType = new FieldType();
+            fieldType.setId("YesOrNo");
+            caseField.setFieldType(fieldType);
             tabField.setCaseField(caseField);
             tabFields.add(tabField);
         });
