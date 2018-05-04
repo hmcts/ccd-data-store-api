@@ -68,8 +68,8 @@ An Address type field which accepts three types `AddressUK` `AddressGlobalUK` an
       "AddressLine2": "2A",
       "AddressLine3": "3A",
       "PostTown": "London",
-      "County": "SW1H 9AJ",
-      "PostCode": "SW20 0LR",
+      "County": "",
+      "PostCode": "SW1H 9AJ",
       "Country": "United Kingdom"
     }
 ```
