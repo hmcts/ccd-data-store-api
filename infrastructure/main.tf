@@ -10,12 +10,27 @@ provider "vault" {
 
 locals {
   app_full_name = "${var.product}-${var.component}"
-  env_ase_url = "${var.env}.service.${data.terraform_remote_state.core_apps_compute.ase_name[0]}.internal"
+
+  aseName = "${data.terraform_remote_state.core_apps_compute.ase_name[0]}"
+  local_env = "${(var.env == "preview" || var.env == "spreview") ? (var.env == "preview" ) ? "aat" : "saat" : var.env}"
+  local_ase = "${(var.env == "preview" || var.env == "spreview") ? (var.env == "preview" ) ? "core-compute-aat" : "core-compute-saat" : local.aseName}"
+  env_ase_url = "${local.local_env}.service.${local.local_ase}.internal"
+
   default_default_print_url = "https://ccd-case-print-service-${local.env_ase_url}/jurisdictions/:jid/case-types/:ctid/cases/:cid"
   default_print_url = "${var.default_print_url != "" ? var.default_print_url : local.default_default_print_url}"
 
-  default_dm_valid_domain = "^https?://(?:api-gateway\\.test\\.dm\\.reform\\.hmcts\\.net|dm-store-${var.env}\\.service\\.core-compute-${var.env}\\.internal(?::\\d+)?)"
+  default_dm_valid_domain = "^https?://(?:api-gateway\\.test\\.dm\\.reform\\.hmcts\\.net|dm-store-${local.local_env}\\.service\\.${local.local_ase}\\.internal(?::\\d+)?)"
   dm_valid_domain = "${var.document_management_valid_domain != "" ? var.document_management_valid_domain : local.default_dm_valid_domain}"
+
+  // Vault name
+  previewVaultName = "ccd-data-store-preview"
+  nonPreviewVaultName = "ccd-data-store-${var.env}"
+  vaultName = "${(var.env == "preview" || var.env == "spreview") ? local.previewVaultName : local.nonPreviewVaultName}"
+
+  // Vault URI
+  previewVaultUri = "https://ccd-data-store-aat.vault.azure.net/"
+  nonPreviewVaultUri = "${module.ccd-data-store-vault.key_vault_uri}"
+  vaultUri = "${(var.env == "preview" || var.env == "spreview") ? local.previewVaultUri : local.nonPreviewVaultUri}"
 }
 
 data "vault_generic_secret" "ccd_data_s2s_key" {
@@ -26,9 +41,10 @@ module "ccd-data-store-api" {
   source   = "git@github.com:hmcts/moj-module-webapp?ref=master"
   product  = "${local.app_full_name}"
   location = "${var.location}"
-  env      = "${var.env}"
-  ilbIp    = "${var.ilbIp}"
+  env = "${var.env}"
+  ilbIp = "${var.ilbIp}"
   subscription = "${var.subscription}"
+  is_frontend = false
 
   app_settings = {
     DATA_STORE_DB_HOST                  = "${module.postgres-data-store.host_name}"
@@ -63,7 +79,7 @@ module "postgres-data-store" {
 
 module "ccd-data-store-vault" {
   source              = "git@github.com:hmcts/moj-module-key-vault?ref=master"
-  name                = "ccd-data-store-${var.env}" // Max 24 characters
+  name                = "${local.vaultName}" // Max 24 characters
   product             = "${var.product}"
   env                 = "${var.env}"
   tenant_id           = "${var.tenant_id}"
