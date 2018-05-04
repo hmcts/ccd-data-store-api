@@ -40,7 +40,10 @@ public class SecurityValidationService {
 
             caseDetails.setDataClassification(MAPPER.convertValue(callbackResponse.getDataClassification(), STRING_JSON_MAP));
         } else {
-            LOG.warn("callbackResponse={} has lower classification than case={}", callbackResponse, caseDetails);
+            LOG.warn("callback response case level classification={} has lower classification than case classification={} for caseReference={}",
+                     callbackResponse.getSecurityClassification(),
+                     caseDetails.getSecurityClassification(),
+                     caseDetails.getReference());
             throw new ValidationException(VALIDATION_ERR_MSG);
         }
     }
