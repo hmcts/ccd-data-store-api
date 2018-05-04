@@ -64,14 +64,14 @@ An Address type field which accepts three types `AddressUK` `AddressGlobalUK` an
 
 ```json
 {  
-      "AddressLine1":"line one address",
-      "AddressLine2":"line two address",
-      "AddressLine3":"",
-      "PostTown":"London",
-      "County":"",
-      "PostCode":"SW1H 9AJ",
-      "Country":"United Kingdom"
-   }
+  "AddressLine1":"line one address",
+  "AddressLine2":"line two address",
+  "AddressLine3":"",
+  "PostTown":"London",
+  "County":"",
+  "PostCode":"SW1H 9AJ",
+  "Country":"United Kingdom"
+}
 ```
 
 ### MoneyGBP
