@@ -103,14 +103,20 @@ public class CallbackInvoker {
         callbackService.validateCallbackErrorsAndWarnings(callbackResponse, ignoreWarning);
         if (callbackResponse.getData() != null) {
             validateAndSetData(caseType, caseDetails, callbackResponse.getData());
-            securityValidationService.setClassificationFromCallbackIfValid(callbackResponse,
-                                                                           caseDetails,
-                                                                           deduceDefaultClassificationForExistingFields(caseType, caseDetails));
+            if (callbackResponseHasCaseAndDataClassification(callbackResponse)) {
+                securityValidationService.setClassificationFromCallbackIfValid(callbackResponse,
+                                                                               caseDetails,
+                                                                               deduceDefaultClassificationForExistingFields(caseType, caseDetails));
+            }
             final Optional<String> newCaseState = filterCaseState(callbackResponse.getData());
             newCaseState.ifPresent(caseDetails::setState);
             return newCaseState;
         }
         return Optional.empty();
+    }
+
+    private boolean callbackResponseHasCaseAndDataClassification(CallbackResponse callbackResponse) {
+        return (callbackResponse.getSecurityClassification() != null && callbackResponse.getDataClassification() != null) ? true : false;
     }
 
     private Map<String, JsonNode> deduceDefaultClassificationForExistingFields(CaseType caseType, CaseDetails caseDetails) {

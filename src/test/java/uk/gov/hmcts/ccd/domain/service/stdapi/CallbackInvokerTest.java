@@ -10,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -318,7 +319,10 @@ class CallbackInvokerTest {
                 currentDataClassification.put("currentKey", JSON_NODE_FACTORY.textNode("currentValue"));
                 caseDetails.setState("BAYAN");
                 newFieldsDataClassification.put("key", JSON_NODE_FACTORY.textNode("value"));
+
                 allFieldsDataClassification.put("key", JSON_NODE_FACTORY.textNode("otherValue"));
+                callbackResponse.setSecurityClassification(SecurityClassification.PRIVATE);
+                callbackResponse.setDataClassification(allFieldsDataClassification);
                 when(callbackService.send(caseEvent.getCallBackURLAboutToSubmitEvent(),
                                           caseEvent.getRetriesTimeoutURLAboutToSubmitEvent(),
                                           caseEvent,
@@ -328,6 +332,47 @@ class CallbackInvokerTest {
                 when(caseDataService.getDefaultSecurityClassifications(eq(caseType), eq(caseDetails.getData()), eq(currentDataClassification))).thenReturn(newFieldsDataClassification);
                 when(caseDataService.getDefaultSecurityClassifications(eq(caseType), eq(caseDetails.getData()), eq(Maps.newHashMap()))).thenReturn(allFieldsDataClassification);
             }
+
+            @DisplayName("do not validate call back response if no data security passed back")
+            @Test
+            void doNotValidateCallbackResponseIfNoDataSecurityPassedBack() {
+                callbackResponse.setDataClassification(null);
+                data.put("state", TextNode.valueOf("ngitb"));
+
+                callbackInvoker.invokeAboutToSubmitCallback(caseEvent, caseDetailsBefore, caseDetails, caseType, TRUE);
+
+                assertAll(
+                    () -> assertThat(caseDetails.getState(), is("ngitb")),
+                    () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE),
+                    () -> inOrder.verify(caseTypeService).validateData(callbackResponse.getData(), caseType),
+                    () -> inOrder.verify(caseSanitiser).sanitise(caseType, callbackResponse.getData()),
+                    () -> inOrder.verify(caseDataService, times(1)).getDefaultSecurityClassifications(eq(caseType),
+                                                                                                      eq(caseDetails.getData()),
+                                                                                                      eq(currentDataClassification)),
+                    () -> inOrder.verify(securityValidationService, never()).setClassificationFromCallbackIfValid(any(), any(), any())
+                );
+            }
+
+            @DisplayName("do not validate call back response if no case security passed back")
+            @Test
+            void doNotValidateCallbackResponseIfNoCaseSecurityPassedBack() {
+                callbackResponse.setSecurityClassification(null);
+                data.put("state", TextNode.valueOf("ngitb"));
+
+                callbackInvoker.invokeAboutToSubmitCallback(caseEvent, caseDetailsBefore, caseDetails, caseType, TRUE);
+
+                assertAll(
+                    () -> assertThat(caseDetails.getState(), is("ngitb")),
+                    () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE),
+                    () -> inOrder.verify(caseTypeService).validateData(callbackResponse.getData(), caseType),
+                    () -> inOrder.verify(caseSanitiser).sanitise(caseType, callbackResponse.getData()),
+                    () -> inOrder.verify(caseDataService, times(1)).getDefaultSecurityClassifications(eq(caseType),
+                                                                                                      eq(caseDetails.getData()),
+                                                                                                      eq(currentDataClassification)),
+                    () -> inOrder.verify(securityValidationService, never()).setClassificationFromCallbackIfValid(any(), any(), any())
+                );
+            }
+
 
             @DisplayName("validate call back response and set case details state for about to submit")
             @Test
