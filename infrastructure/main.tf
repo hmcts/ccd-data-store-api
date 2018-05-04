@@ -23,7 +23,7 @@ locals {
   dm_valid_domain = "${var.document_management_valid_domain != "" ? var.document_management_valid_domain : local.default_dm_valid_domain}"
 
   // Vault name
-  previewVaultName = "${var.product}-data-store-prev"
+  previewVaultName = "${var.product}-data-store-preview"
   nonPreviewVaultName = "ccd-data-store-${var.env}"
   vaultName = "${(var.env == "preview" || var.env == "spreview") ? local.previewVaultName : local.nonPreviewVaultName}"
 
