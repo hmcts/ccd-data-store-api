@@ -60,12 +60,18 @@ A `Email` value is a `string` representing a valid email address.
 }
 ```
 ### Address Type fields, implementing Postcode Lookup 
-An Address type field which accepts three types `AddressUK` `AddressGlobalUK` and `AddressGlobal` and standard postcode format values as a string.
+An Address type field which accepts three types `AddressUK` `AddressGlobalUK` and `AddressGlobal`, and below standard postcode format field values as a string values.
 
 ```json
-{
-  "AddressUK": "SW1H 9AJ"
-}
+{  
+      "AddressLine1":"line one address",
+      "AddressLine2":"line two address",
+      "AddressLine3":"",
+      "PostTown":"London",
+      "County":"",
+      "PostCode":"SW1H 9AJ",
+      "Country":"United Kingdom"
+   }
 ```
 
 ### MoneyGBP
