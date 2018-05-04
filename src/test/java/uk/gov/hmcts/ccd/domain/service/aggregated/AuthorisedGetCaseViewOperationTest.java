@@ -25,10 +25,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlTestUtil.CaseEventBuilder.anEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlTestUtil.CaseTypeBuilder.aCaseType;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlTestUtil.CaseViewBuilder.aCaseView;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlTestUtil.CaseViewTriggerBuilder.aViewTrigger;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.anEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.aCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewBuilder.aCaseView;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewTriggerBuilder.aViewTrigger;
 
 class AuthorisedGetCaseViewOperationTest {
     private static final String JURISDICTION_ID = "Probate";
