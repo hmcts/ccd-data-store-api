@@ -48,7 +48,7 @@ class ClassifiedStartEventOperationTest {
         startEvent.setCaseDetails(caseDetails);
 
         classifiedDetails = new CaseDetails();
-        doReturn(Optional.of(classifiedDetails)).when(classificationService).apply(caseDetails);
+        doReturn(Optional.of(classifiedDetails)).when(classificationService).applyClassification(caseDetails);
 
         classifiedStartEventOperation = new ClassifiedStartEventOperation(startEventOperation, classificationService);
     }
@@ -111,7 +111,7 @@ class ClassifiedStartEventOperationTest {
 
             assertAll(
                 () -> assertThat(output.getCaseDetails(), sameInstance(classifiedDetails)),
-                () -> verify(classificationService).apply(caseDetails)
+                () -> verify(classificationService).applyClassification(caseDetails)
             );
         }
     }

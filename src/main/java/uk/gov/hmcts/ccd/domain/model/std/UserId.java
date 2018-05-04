@@ -1,7 +1,9 @@
 package uk.gov.hmcts.ccd.domain.model.std;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.ToString;
 
+@ToString
 public class UserId {
 
     private String id;
@@ -14,8 +16,4 @@ public class UserId {
         return id;
     }
 
-    @Override
-    public String toString() {
-        return String.format("UserId{id='%s'}", id);
-    }
 }

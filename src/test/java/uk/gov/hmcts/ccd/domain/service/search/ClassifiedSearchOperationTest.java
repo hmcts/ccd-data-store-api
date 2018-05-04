@@ -55,8 +55,8 @@ class ClassifiedSearchOperationTest {
         classifiedCase1 = new CaseDetails();
         classifiedCase2 = new CaseDetails();
 
-        doReturn(Optional.of(classifiedCase1)).when(classificationService).apply(case1);
-        doReturn(Optional.of(classifiedCase2)).when(classificationService).apply(case2);
+        doReturn(Optional.of(classifiedCase1)).when(classificationService).applyClassification(case1);
+        doReturn(Optional.of(classifiedCase2)).when(classificationService).applyClassification(case2);
 
         classifiedSearchOperation = new ClassifiedSearchOperation(searchOperation, classificationService);
     }
@@ -90,15 +90,15 @@ class ClassifiedSearchOperationTest {
         assertAll(
             () -> assertThat(output, hasSize(2)),
             () -> assertThat(output, hasItems(classifiedCase1, classifiedCase2)),
-            () -> verify(classificationService).apply(case1),
-            () -> verify(classificationService).apply(case2)
+            () -> verify(classificationService).applyClassification(case1),
+            () -> verify(classificationService).applyClassification(case2)
         );
     }
 
     @Test
     @DisplayName("should remove cases with higher classification from search results")
     void shouldRemoveCaseHigherClassification() {
-        doReturn(Optional.empty()).when(classificationService).apply(case2);
+        doReturn(Optional.empty()).when(classificationService).applyClassification(case2);
 
         final List<CaseDetails> output = classifiedSearchOperation.execute(metaData, criteria);
 

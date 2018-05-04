@@ -1,9 +1,10 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
+import lombok.ToString;
+
 import java.io.Serializable;
 
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-
+@ToString
 public class AccessControlList implements Serializable {
 
     private String role;
@@ -52,8 +53,4 @@ public class AccessControlList implements Serializable {
         this.delete = delete;
     }
 
-    @Override
-    public String toString() {
-        return ReflectionToStringBuilder.toString(this);
-    }
 }

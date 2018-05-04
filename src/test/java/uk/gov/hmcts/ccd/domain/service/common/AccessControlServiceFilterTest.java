@@ -21,14 +21,14 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.*;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlTestUtil.AccessControlListBuilder.anAcl;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlTestUtil.CaseEventBuilder.anEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlTestUtil.CaseEventTriggerBuilder.anEventTrigger;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlTestUtil.CaseFieldBuilder.aCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlTestUtil.CaseTypeBuilder.aCaseType;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlTestUtil.CaseViewFieldBuilder.aViewField;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlTestUtil.CaseViewTriggerBuilder.aViewTrigger;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlTestUtil.WizardPageBuilder.aWizardPage;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.anEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventTriggerBuilder.anEventTrigger;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.aCaseField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.aCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewTriggerBuilder.aViewTrigger;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageBuilder.aWizardPage;
 
 class AccessControlServiceFilterTest {
     private static final String EVENT_ID_1 = "EVENT_ID_1";
@@ -38,7 +38,7 @@ class AccessControlServiceFilterTest {
     private static final CaseViewTrigger CASE_VIEW_TRIGGER_2 = aViewTrigger().withId(EVENT_ID_2).build();
     private static final CaseViewTrigger CASE_VIEW_TRIGGER_3 = aViewTrigger().withId(EVENT_ID_3).build();
 
-    private CaseViewTrigger[] caseViewTriggers = {CASE_VIEW_TRIGGER_1, CASE_VIEW_TRIGGER_2, CASE_VIEW_TRIGGER_3};
+    private final CaseViewTrigger[] caseViewTriggers = {CASE_VIEW_TRIGGER_1, CASE_VIEW_TRIGGER_2, CASE_VIEW_TRIGGER_3};
     private AccessControlService accessControlService;
 
     @BeforeEach

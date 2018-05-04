@@ -44,10 +44,6 @@ public class CallbackService {
         this.defaultRetries = applicationParams.getCallbackRetries();
     }
 
-    private Integer secondsToMilliseconds(final Integer seconds) {
-        return seconds * 1000;
-    }
-
     public Optional<CallbackResponse> send(final String url,
                                            final List<Integer> callbackRetries,
                                            final CaseEvent caseEvent,

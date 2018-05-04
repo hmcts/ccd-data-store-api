@@ -78,6 +78,14 @@ class SubmitCaseTransaction {
          */
         callbackInvoker.invokeAboutToSubmitCallback(eventTrigger, null, newCaseDetails, caseType, ignoreWarning);
 
+        final CaseDetails savedCaseDetails = saveAuditEventForCaseDetails(event, caseType, idamUser, eventTrigger, newCaseDetails);
+
+        caseUserRepository.grantAccess(savedCaseDetails.getId(), idamUser.getId());
+
+        return savedCaseDetails;
+    }
+
+    private CaseDetails saveAuditEventForCaseDetails(Event event, CaseType caseType, IDAMProperties idamUser, CaseEvent eventTrigger, CaseDetails newCaseDetails) {
         final CaseDetails savedCaseDetails = caseDetailsRepository.set(newCaseDetails);
         final AuditEvent auditEvent = new AuditEvent();
         auditEvent.setEventId(event.getEventId());
@@ -94,14 +102,11 @@ class SubmitCaseTransaction {
         auditEvent.setUserId(Long.valueOf(idamUser.getId()));
         auditEvent.setUserLastName(idamUser.getSurname());
         auditEvent.setUserFirstName(idamUser.getForename());
-        auditEvent.setCreatedDate(createdDate);
+        auditEvent.setCreatedDate(newCaseDetails.getCreatedDate());
         auditEvent.setSecurityClassification(securityClassificationService.getClassificationForEvent(caseType,
                                                                                                      eventTrigger));
         auditEvent.setDataClassification(savedCaseDetails.getDataClassification());
         caseAuditEventRepository.set(auditEvent);
-
-        caseUserRepository.grantAccess(savedCaseDetails.getId(), idamUser.getId());
-
         return savedCaseDetails;
     }
 
