@@ -19,6 +19,9 @@ public class SecurityClassificationUtils {
     private static final String ID = "id";
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
 
+    private SecurityClassificationUtils() {
+    }
+
     public static Predicate<CaseDetails> caseHasClassificationEqualOrLowerThan(SecurityClassification classification) {
         return cd -> Optional.ofNullable(classification).map(sc -> sc.higherOrEqualTo(cd.getSecurityClassification())).orElse(false);
     }
