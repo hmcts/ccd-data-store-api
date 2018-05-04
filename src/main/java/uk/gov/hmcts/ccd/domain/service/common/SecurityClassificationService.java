@@ -35,7 +35,6 @@ public class SecurityClassificationService {
     private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
     };
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
-    private static final String ID = "id";
     private static final String VALUE = "value";
     private static final String CLASSIFICATION = "classification";
     private static final ObjectNode EMPTY_NODE = JSON_NODE_FACTORY.objectNode();

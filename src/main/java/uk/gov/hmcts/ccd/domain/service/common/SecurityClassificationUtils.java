@@ -13,6 +13,9 @@ public class SecurityClassificationUtils {
     private static final String ID = "id";
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
 
+    private SecurityClassificationUtils() {
+    }
+
     public static JsonNode getDataClassificationForData(JsonNode data, Iterator<JsonNode> dataIterator) {
         Boolean found = false;
         JsonNode dataClassificationValue = null;
