@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.annotations.ApiModelProperty;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -203,4 +204,11 @@ public class CaseDetails implements Cloneable {
             setIncompleteCallbackResponse();
         }
     }
+
+    @JsonIgnore
+    @Override
+    public String toString() {
+        return ReflectionToStringBuilder.toString(this);
+    }
+
 }

@@ -81,4 +81,3 @@ You can connect to the database at `http://localhost:5452` with the username and
 ## LICENSE
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE.md) file for details.
-
