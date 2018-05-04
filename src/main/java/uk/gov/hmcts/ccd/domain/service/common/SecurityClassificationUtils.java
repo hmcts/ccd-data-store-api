@@ -20,7 +20,7 @@ public class SecurityClassificationUtils {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
 
     public static Predicate<CaseDetails> caseHasClassificationEqualOrLowerThan(SecurityClassification classification) {
-        return cd -> Optional.ofNullable(classification).map(uc -> uc.higherOrEqualTo(cd.getSecurityClassification())).orElse(false);
+        return cd -> Optional.ofNullable(classification).map(sc -> sc.higherOrEqualTo(cd.getSecurityClassification())).orElse(false);
     }
 
     public static Optional<SecurityClassification> getSecurityClassification(JsonNode dataNode) {

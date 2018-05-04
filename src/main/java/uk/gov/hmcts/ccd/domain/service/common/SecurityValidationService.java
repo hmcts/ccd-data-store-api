@@ -31,22 +31,18 @@ public class SecurityValidationService {
     private static final String VALIDATION_ERR_MSG = "The event cannot be complete due to a callback returned data validation error (c)";
 
     public void setClassificationFromCallbackIfValid(CallbackResponse callbackResponse, CaseDetails caseDetails, Map<String, JsonNode> defaultDataClassification) {
-        Optional<CaseDetails> result = Optional.of(caseDetails);
 
-        result.filter(caseHasClassificationEqualOrLowerThan(callbackResponse.getSecurityClassification()))
-            .map(cd -> {
-                cd.setSecurityClassification(callbackResponse.getSecurityClassification());
+        if (caseHasClassificationEqualOrLowerThan(callbackResponse.getSecurityClassification()).test(caseDetails)) {
+            caseDetails.setSecurityClassification(callbackResponse.getSecurityClassification());
 
-                validateObject(MAPPER.convertValue(callbackResponse.getDataClassification(), JsonNode.class),
-                               MAPPER.convertValue(defaultDataClassification, JsonNode.class));
+            validateObject(MAPPER.convertValue(callbackResponse.getDataClassification(), JsonNode.class),
+                           MAPPER.convertValue(defaultDataClassification, JsonNode.class));
 
-                caseDetails.setDataClassification(MAPPER.convertValue(callbackResponse.getDataClassification(), STRING_JSON_MAP));
-                return cd;
-            })
-            .orElseThrow(() -> {
-                LOG.warn("callbackResponse={} has lower classification than case={}", callbackResponse, caseDetails);
-                return new ValidationException(VALIDATION_ERR_MSG);
-            });
+            caseDetails.setDataClassification(MAPPER.convertValue(callbackResponse.getDataClassification(), STRING_JSON_MAP));
+        } else {
+            LOG.warn("callbackResponse={} has lower classification than case={}", callbackResponse, caseDetails);
+            throw new ValidationException(VALIDATION_ERR_MSG);
+        }
     }
 
     private void validateObject(JsonNode callbackDataClassification, JsonNode defaultDataClassification) {
