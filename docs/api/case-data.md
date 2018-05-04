@@ -59,6 +59,14 @@ A `Email` value is a `string` representing a valid email address.
   "FieldId": "ccd@hmcts.net"
 }
 ```
+### Address Type fields, implementing Postcode Lookup 
+An Address type field which accepts three types `AddressUK` `AddressGlobalUK` and `AddressGlobal` and standard postcode format values as a string.
+
+```json
+{
+  "AddressUK": "SW1H 9AJ"
+}
+```
 
 ### MoneyGBP
 
