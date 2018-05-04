@@ -1,11 +1,13 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
-import java.io.Serializable;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.ToString;
 
+import java.io.Serializable;
+
+@ToString
 @ApiModel(description = "")
 public class SearchInputField implements Serializable {
 
@@ -49,15 +51,4 @@ public class SearchInputField implements Serializable {
         this.displayOrder = displayOrder;
     }
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("class SearchInputField {");
-
-        sb.append("  caseFieldId: ").append(caseFieldId).append("");
-        sb.append("  label: ").append(label).append("");
-        sb.append("  displayOrder: ").append(displayOrder).append("");
-        sb.append("}");
-        return sb.toString();
-    }
 }

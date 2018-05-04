@@ -614,6 +614,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertNotNull("First tab is null", nameTab);
         assertEquals("Unexpected tab Id", "NameTab", nameTab.getId());
         assertEquals("Unexpected tab label", "Name", nameTab.getLabel());
+        assertEquals("Unexpected tab show condition", "PersonFirstName=\"George\"", nameTab.getShowCondition());
         assertEquals("Unexpected tab order", 1, nameTab.getOrder().intValue());
 
         final CaseViewField[] nameFields = nameTab.getFields();
@@ -625,6 +626,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected Field id", "PersonFirstName", firstNameField.getId());
         assertEquals("Unexpected Field label", "First Name", firstNameField.getLabel());
         assertEquals("Unexpected Field order", 1, firstNameField.getOrder().intValue());
+        assertEquals("Unexpected Field show condition", "PersonLastName=\"Jones\"", firstNameField.getShowCondition());
         assertEquals("Unexpected Field field type", "Text", firstNameField.getFieldType().getType());
         assertEquals("Unexpected Field value", "Janet", firstNameField.getValue().asText());
 
@@ -633,6 +635,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected Field id", "PersonLastName", lastNameField.getId());
         assertEquals("Unexpected Field label", "Last Name", lastNameField.getLabel());
         assertEquals("Unexpected Field order", 2, lastNameField.getOrder().intValue());
+        assertEquals("Unexpected Field show condition", "PersonFirstName=\"Tom\"", lastNameField.getShowCondition());
         assertEquals("Unexpected Field field type", "Text", lastNameField.getFieldType().getType());
         assertEquals("Unexpected Field value", "Parker", lastNameField.getValue().asText());
 
@@ -640,6 +643,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertNotNull("First tab is null", addressTab);
         assertEquals("Unexpected tab Id", "AddressTab", addressTab.getId());
         assertEquals("Unexpected tab label", "Address", addressTab.getLabel());
+        assertEquals("Unexpected tab show condition", "PersonLastName=\"Smith\"", addressTab.getShowCondition());
         assertEquals("Unexpected tab order", 2, addressTab.getOrder().intValue());
 
         final CaseViewField[] addressFields = addressTab.getFields();
@@ -651,6 +655,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected Field id", "PersonAddress", addressField.getId());
         assertEquals("Unexpected Field label", "Address", addressField.getLabel());
         assertEquals("Unexpected Field order", 1, addressField.getOrder().intValue());
+        assertEquals("Unexpected Field show condition", "PersonLastName=\"Smart\"", addressField.getShowCondition());
         assertEquals("Unexpected Field field type", "Address", addressField.getFieldType().getType());
 
         final JsonNode addressNode = addressField.getValue();
@@ -665,6 +670,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertNotNull("First tab is null", documentTab);
         assertEquals("Unexpected tab Id", "DocumentsTab", documentTab.getId());
         assertEquals("Unexpected tab label", "Documents", documentTab.getLabel());
+        assertEquals("Unexpected tab show condition", "PersonFistName=\"George\"", documentTab.getShowCondition());
         assertEquals("Unexpected tab order", 3, documentTab.getOrder().intValue());
 
         final CaseViewField[] documentFields = documentTab.getFields();
@@ -675,6 +681,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertNotNull("Field is null", documentField);
         assertEquals("Unexpected Field id", "D8Document", documentField.getId());
         assertEquals("Unexpected Field label", "Document", documentField.getLabel());
+        assertEquals("Unexpected Field show condition", "PersonLastName=\"Dumb\"", documentField.getShowCondition());
         assertEquals("Unexpected Field order", 1, documentField.getOrder().intValue());
         assertEquals("Unexpected Field field type", "Document", documentField.getFieldType().getType());
 
