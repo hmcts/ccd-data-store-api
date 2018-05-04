@@ -63,7 +63,8 @@ A `Email` value is a `string` representing a valid email address.
 An Address type field which accepts three types `AddressUK` `AddressGlobalUK` and `AddressGlobal`, and below standard postcode format field values as a string values.
 
 ```json
-"FieldId": {
+{
+  "FieldId": {
       "AddressLine1": "1A",
       "AddressLine2": "2A",
       "AddressLine3": "3A",
@@ -72,6 +73,7 @@ An Address type field which accepts three types `AddressUK` `AddressGlobalUK` an
       "PostCode": "SW1H 9AJ",
       "Country": "United Kingdom"
     }
+}
 ```
 
 ### MoneyGBP
