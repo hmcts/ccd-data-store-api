@@ -44,8 +44,7 @@ public class EventsEndpoint {
         @ApiParam(value = "Case ID", required = true)
         @PathVariable("cid") final String caseId) {
 
-        final List<AuditEvent> events = listEventsOperation.execute(jurisdictionId, caseTypeId, caseId);
-        return events;
+        return listEventsOperation.execute(jurisdictionId, caseTypeId, caseId);
     }
 
 }

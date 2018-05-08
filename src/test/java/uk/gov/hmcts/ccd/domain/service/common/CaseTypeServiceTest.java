@@ -10,13 +10,11 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 import java.util.Arrays;
 
-import static org.hamcrest.core.Is.is;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-
 class CaseTypeServiceTest {
-
     CaseTypeService subject;
 
     @BeforeEach
@@ -26,7 +24,7 @@ class CaseTypeServiceTest {
 
     @Nested
     @DisplayName("State")
-    class state {
+    class State {
 
         @Test
         @DisplayName("happy path finding a state")

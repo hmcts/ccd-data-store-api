@@ -21,12 +21,10 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
 import java.util.*;
-import java.util.function.Predicate;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Comparator.comparingInt;
-import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.valueOf;
-import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils.getDataClassificationForData;
+import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils.*;
 
 @Service
 public class SecurityClassificationService {
@@ -35,7 +33,6 @@ public class SecurityClassificationService {
     private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
     };
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
-    private static final String ID = "id";
     private static final String VALUE = "value";
     private static final String CLASSIFICATION = "classification";
     private static final ObjectNode EMPTY_NODE = JSON_NODE_FACTORY.objectNode();
@@ -56,11 +53,12 @@ public class SecurityClassificationService {
                              .max(comparingInt(SecurityClassification::getRank));
     }
 
-    public Optional<CaseDetails> apply(CaseDetails caseDetails) {
+    public Optional<CaseDetails> applyClassification(CaseDetails caseDetails) {
         Optional<SecurityClassification> userClassificationOpt = getUserClassification(caseDetails.getJurisdiction());
         Optional<CaseDetails> result = Optional.of(caseDetails);
 
-        return result.filter(caseIfHasClassificationEqualOrLowerThan(userClassificationOpt))
+        return userClassificationOpt
+            .flatMap(securityClassification -> result.filter(caseHasClassificationEqualOrLowerThan(securityClassification))
                 .map(cd -> {
                     if (cd.getDataClassification() == null) {
                         LOG.warn("No data classification for case with reference={}, all fields removed", cd.getReference());
@@ -68,14 +66,14 @@ public class SecurityClassificationService {
                     }
 
                     JsonNode data = filterNestedObject(MAPPER.convertValue(caseDetails.getData(), JsonNode.class),
-                            MAPPER.convertValue(caseDetails.getDataClassification(), JsonNode.class),
-                            userClassificationOpt.get());
+                                                       MAPPER.convertValue(caseDetails.getDataClassification(), JsonNode.class),
+                                                       securityClassification);
                     caseDetails.setData(MAPPER.convertValue(data, STRING_JSON_MAP));
                     return cd;
-                });
+                }));
     }
 
-    public List<AuditEvent> apply(String jurisdictionId, List<AuditEvent> events) {
+    public List<AuditEvent> applyClassification(String jurisdictionId, List<AuditEvent> events) {
         final Optional<SecurityClassification> userClassification = getUserClassification(jurisdictionId);
 
         if (null == events || !userClassification.isPresent()) {
@@ -110,42 +108,43 @@ public class SecurityClassificationService {
     }
 
     private JsonNode filterNestedObject(JsonNode data, JsonNode dataClassification, SecurityClassification userClassification) {
-        if (isNull(data, dataClassification)) {
+        if (isAnyNull(data, dataClassification)) {
             return EMPTY_NODE;
         }
         Iterator<Map.Entry<String, JsonNode>> dataIterator = data.fields();
         while (dataIterator.hasNext()) {
             Map.Entry<String, JsonNode> dataElement = dataIterator.next();
             String dataElementKey = dataElement.getKey();
-            JsonNode dataClassificationParent = dataClassification.get(dataElementKey);
-            if (isNull(dataClassificationParent)) {
+            JsonNode dataClassificationElement = dataClassification.get(dataElementKey);
+            if (isAnyNull(dataClassificationElement)) {
                 dataIterator.remove();
-            } else if (dataClassificationParent.has(VALUE)) {
-                JsonNode dataClassificationValue = dataClassificationParent.get(VALUE);
+            } else if (dataClassificationElement.has(VALUE)) {
+                JsonNode dataClassificationValue = dataClassificationElement.get(VALUE);
                 JsonNode dataElementValue = dataElement.getValue();
                 if (dataClassificationValue.isObject()) {
-                    filterObject(userClassification, dataIterator, dataClassificationParent, dataElementValue);
-                } else if (dataClassificationValue.isArray()) {
+                    filterObject(userClassification, dataIterator, dataClassificationElement, dataElementValue);
+                } else {
                     filterCollection(userClassification,
                                      dataIterator,
-                                     dataClassificationParent,
-                                     dataClassificationValue,
+                                     dataClassificationElement,
                                      dataElementValue);
                 }
-            } else if (dataClassificationParent.isTextual()) {
-                filterSimpleField(userClassification, dataIterator, dataClassificationParent);
+            } else if (dataClassificationElement.isTextual()) {
+                filterSimpleField(userClassification, dataIterator, dataClassificationElement);
+            } else {
+                dataIterator.remove();
             }
         }
         return data;
     }
 
-    private void filterCollection(SecurityClassification userClassification, Iterator<Map.Entry<String, JsonNode>> dataIterator, JsonNode dataClassificationParent, JsonNode dataClassificationValue, JsonNode dataElementValue) {
+    private void filterCollection(SecurityClassification userClassification, Iterator<Map.Entry<String, JsonNode>> dataIterator, JsonNode dataClassificationElement, JsonNode dataElementValue) {
         Iterator<JsonNode> dataCollectionIterator = dataElementValue.iterator();
         while (dataCollectionIterator.hasNext()) {
             JsonNode collectionElement = dataCollectionIterator.next();
             JsonNode dataClassificationForData = getDataClassificationForData(collectionElement,
-                                                                              dataClassificationValue.iterator());
-            if (dataClassificationForData == null) {
+                                                                              dataClassificationElement.get(VALUE).iterator());
+            if (dataClassificationForData.isNull()) {
                 dataCollectionIterator.remove();
                 continue;
             }
@@ -156,11 +155,13 @@ public class SecurityClassificationService {
                     filterNestedObject(collectionElementValue,
                                        relevantDataClassificationValue,
                                        userClassification);
-                } else if (collectionElementValue.isTextual()) {
+                } else {
                     filterSimpleField(userClassification,
                                       dataCollectionIterator,
                                       relevantDataClassificationValue.get(collectionElementValue.textValue()));
                 }
+            } else {
+                dataCollectionIterator.remove();
             }
             if (collectionElementValue.equals(EMPTY_NODE)) {
                 dataCollectionIterator.remove();
@@ -169,7 +170,7 @@ public class SecurityClassificationService {
         if (dataElementValue.equals(EMPTY_ARRAY)) {
             filterSimpleField(userClassification,
                               dataIterator,
-                              dataClassificationParent.get(CLASSIFICATION));
+                              dataClassificationElement.get(CLASSIFICATION));
         }
     }
 
@@ -184,10 +185,6 @@ public class SecurityClassificationService {
         }
     }
 
-    private boolean isNull(JsonNode... jsonNodes) {
-        return newArrayList(jsonNodes).stream().anyMatch(Objects::isNull);
-    }
-
     private void filterSimpleField(SecurityClassification userClassification, Iterator iterator, JsonNode dataClassificationValue) {
         Optional<SecurityClassification> securityClassification = getSecurityClassification(dataClassificationValue);
         if (!securityClassification.isPresent() || !userClassification.higherOrEqualTo(securityClassification.get())) {
@@ -195,22 +192,7 @@ public class SecurityClassificationService {
         }
     }
 
-    private Optional<SecurityClassification> getSecurityClassification(JsonNode dataNode) {
-        if (dataNode == null || dataNode.isNull()) {
-            return Optional.empty();
-        }
-        SecurityClassification securityClassification;
-        try {
-            securityClassification = valueOf(dataNode.textValue());
-        }
-        catch (IllegalArgumentException e) {
-            LOG.error("Unable to parse security classification for {}", dataNode, e);
-            return Optional.empty();
-        }
-        return Optional.of(securityClassification);
-    }
-
-    private Predicate<CaseDetails> caseIfHasClassificationEqualOrLowerThan(Optional<SecurityClassification> userClassificationOpt) {
-        return cd -> userClassificationOpt.map(uc -> uc.higherOrEqualTo(cd.getSecurityClassification())).orElse(false);
+    private boolean isAnyNull(JsonNode... jsonNodes) {
+        return newArrayList(jsonNodes).stream().anyMatch(Objects::isNull);
     }
 }

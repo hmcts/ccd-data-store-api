@@ -39,7 +39,7 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
 
     private StartEventTrigger applyClassificationIfCaseDetailsExist(StartEventTrigger startEventTrigger) {
         if (null != startEventTrigger.getCaseDetails()) {
-            startEventTrigger.setCaseDetails(classificationService.apply(startEventTrigger.getCaseDetails()).orElse(null));
+            startEventTrigger.setCaseDetails(classificationService.applyClassification(startEventTrigger.getCaseDetails()).orElse(null));
         }
         return startEventTrigger;
     }

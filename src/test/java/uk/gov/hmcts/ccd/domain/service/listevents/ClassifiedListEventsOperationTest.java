@@ -48,7 +48,7 @@ class ClassifiedListEventsOperationTest {
 
         classifiedEvents = Lists.newArrayList(new AuditEvent());
 
-        doReturn(classifiedEvents).when(classificationService).apply(JURISDICTION_ID, events);
+        doReturn(classifiedEvents).when(classificationService).applyClassification(JURISDICTION_ID, events);
 
         classifiedOperation = new ClassifiedListEventsOperation(listEventsOperation, classificationService);
     }
@@ -72,7 +72,7 @@ class ClassifiedListEventsOperationTest {
         assertAll(
             () -> assertThat(outputs, is(notNullValue())),
             () -> assertThat(outputs, hasSize(0)),
-            () -> verify(classificationService, never()).apply(JURISDICTION_ID,null)
+            () -> verify(classificationService, never()).applyClassification(JURISDICTION_ID, null)
         );
     }
 
@@ -82,7 +82,7 @@ class ClassifiedListEventsOperationTest {
         final List<AuditEvent> outputs = classifiedOperation.execute(caseDetails);
 
         assertAll(
-            () -> verify(classificationService).apply(JURISDICTION_ID, events),
+            () -> verify(classificationService).applyClassification(JURISDICTION_ID, events),
             () -> assertThat(outputs, sameInstance(classifiedEvents))
         );
     }
@@ -93,7 +93,7 @@ class ClassifiedListEventsOperationTest {
         final List<AuditEvent> outputs = classifiedOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
 
         assertAll(
-            () -> verify(classificationService).apply(JURISDICTION_ID, events),
+            () -> verify(classificationService).applyClassification(JURISDICTION_ID, events),
             () -> assertThat(outputs, sameInstance(classifiedEvents))
         );
     }

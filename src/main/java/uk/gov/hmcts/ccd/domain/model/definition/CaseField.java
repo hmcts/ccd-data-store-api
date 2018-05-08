@@ -2,11 +2,12 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.List;
 
+@ToString
 @ApiModel(description = "")
 public class CaseField implements Serializable {
 
@@ -114,8 +115,4 @@ public class CaseField implements Serializable {
         this.accessControlLists = accessControlLists;
     }
 
-    @Override
-    public String toString() {
-        return ReflectionToStringBuilder.toString(this);
-    }
 }
