@@ -7,7 +7,6 @@ import org.assertj.core.util.Lists;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -20,8 +19,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.MockUtils;
+import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
@@ -38,6 +37,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
 
 public class CallbackTest extends WireMockBaseTest {
     private final JsonNode CALLBACK_DATA = mapper.readTree(
@@ -49,6 +49,22 @@ public class CallbackTest extends WireMockBaseTest {
         "    \"AddressLine2\": \"Address Line 12\"\n" +
         "  }\n" +
         "}\n"
+    );
+    private final JsonNode CALLBACK_DATA_CLASSIFICATION = mapper.readTree(
+        "{\n" +
+            "    \"PersonFirstName\": \"PUBLIC\",\n" +
+            "    \"PersonLastName\": \"PUBLIC\",\n" +
+            "    \"PersonAddress\": {\n" +
+            "      \"classification\" : \"PUBLIC\",\n" +
+            "      \"value\" : {\n" +
+            "        \"AddressLine1\": \"PUBLIC\",\n" +
+            "        \"AddressLine2\": \"PUBLIC\",\n" +
+            "        \"AddressLine3\": \"PUBLIC\",\n" +
+            "        \"Country\": \"PUBLIC\",\n" +
+            "        \"Postcode\": \"PUBLIC\"\n" +
+            "      }\n" +
+            "    }\n" +
+            "  }"
     );
 
     private final JsonNode INVALID_CALLBACK_DATA = mapper.readTree(
@@ -116,6 +132,8 @@ public class CallbackTest extends WireMockBaseTest {
 
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setData(mapper.convertValue(CALLBACK_DATA, STRING_NODE_TYPE));
+        callbackResponse.setDataClassification(mapper.convertValue(CALLBACK_DATA_CLASSIFICATION, STRING_NODE_TYPE));
+        callbackResponse.setSecurityClassification(PUBLIC);
 
         wireMockRule.stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
@@ -284,6 +302,8 @@ public class CallbackTest extends WireMockBaseTest {
 
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setData(mapper.convertValue(CALLBACK_DATA, STRING_NODE_TYPE));
+        callbackResponse.setDataClassification(mapper.convertValue(CALLBACK_DATA_CLASSIFICATION, STRING_NODE_TYPE));
+        callbackResponse.setSecurityClassification(PUBLIC);
 
         wireMockRule.stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
@@ -512,7 +532,7 @@ public class CallbackTest extends WireMockBaseTest {
     }
 
     private Matcher<Iterable<? extends CaseViewField>> hasIds(String[] expectedIds) {
-        return containsInAnyOrder(Arrays.stream(expectedIds).map(id -> id(id)).collect(Collectors.toList()));
+        return containsInAnyOrder(Arrays.stream(expectedIds).map(this::id).collect(Collectors.toList()));
     }
 
     private Matcher<CaseViewField> id(String id) {

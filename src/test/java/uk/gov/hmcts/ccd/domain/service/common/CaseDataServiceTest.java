@@ -17,8 +17,8 @@ import java.util.Map;
 
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.*;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlTestUtil.CaseFieldBuilder.aCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlTestUtil.FieldTypeBuilder.aFieldType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.aCaseField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 public class CaseDataServiceTest {
     private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
@@ -159,7 +159,7 @@ public class CaseDataServiceTest {
                                                      .build())
                                .build())
             .build();
-        caseType = AccessControlTestUtil.CaseTypeBuilder.aCaseType()
+        caseType = TestBuildersUtil.CaseTypeBuilder.aCaseType()
             .withField(aCaseField()
                            .withId("ClientsAddresses")
                            .withSC(PRIVATE.name())

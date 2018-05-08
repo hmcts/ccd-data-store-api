@@ -32,9 +32,6 @@ import java.util.Optional;
 public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultCaseDetailsRepository.class);
-    private static final String CREATED_DATE = "createdDate";
-    private static final String LAST_MODIFIED = "lastModified";
-
     public static final String QUALIFIER = "default";
 
     private final CaseDetailsMapper caseDetailsMapper;

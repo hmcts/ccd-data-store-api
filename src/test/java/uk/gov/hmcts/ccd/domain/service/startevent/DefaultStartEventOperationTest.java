@@ -235,7 +235,7 @@ public class DefaultStartEventOperationTest {
 //        void shouldFailToGetEventTriggerIfClassifiedCaseNotFound() {
 //
 //            setupForCase();
-//            doReturn(Optional.empty()).when(classificationService).apply(defaultCaseDetails);
+//            doReturn(Optional.empty()).when(classificationService).applyClassification(defaultCaseDetails);
 //
 //            assertThrows(ResourceNotFoundException.class, () -> getEventTriggerOperation.executeForCase(UID,
 //                                                                                                        TEST_CASE_REFERENCE,
@@ -311,7 +311,7 @@ public class DefaultStartEventOperationTest {
 //        classifiedCaseDetails.setData(classifiedData);
 //        classifiedCaseDetails.setReference(TEST_CASE_REFERENCE_L);
 //        classifiedCaseDetailsOpt = Optional.of(classifiedCaseDetails);
-//        doReturn(classifiedCaseDetailsOpt).when(classificationService).apply(defaultCaseDetails);
+//        doReturn(classifiedCaseDetailsOpt).when(classificationService).applyClassification(defaultCaseDetails);
 //        doReturn(true).when(eventTriggerService).isPreStateValid(CASE_STATE, eventTrigger);
 //        doReturn(TEST_EVENT_TOKEN).when(eventTokenService).generateToken(UID, defaultCaseDetails, eventTrigger, jurisdiction, caseType);
 //        doReturn(caseViewFields).when(caseViewFieldBuilder).build(any(List.class), any(List.class), eq(classifiedData));
