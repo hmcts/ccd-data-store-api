@@ -41,10 +41,11 @@ module "ccd-data-store-api" {
   source   = "git@github.com:hmcts/moj-module-webapp?ref=master"
   product  = "${local.app_full_name}"
   location = "${var.location}"
-  env = "${var.env}"
-  ilbIp = "${var.ilbIp}"
+  env      = "${var.env}"
+  ilbIp    = "${var.ilbIp}"
   subscription = "${var.subscription}"
   is_frontend = false
+  additional_host_name = "debugparam"
 
   app_settings = {
     DATA_STORE_DB_HOST                  = "${module.postgres-data-store.host_name}"
