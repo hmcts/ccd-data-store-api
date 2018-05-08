@@ -130,7 +130,6 @@ configurations {
 }
 
 junitPlatform {
-    logManager 'org.apache.logging.log4j.jul.LogManager'
     enableStandardTestTask true
 }
 
