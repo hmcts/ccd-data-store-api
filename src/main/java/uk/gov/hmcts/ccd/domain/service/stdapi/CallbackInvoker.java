@@ -26,7 +26,6 @@ import static java.util.Optional.ofNullable;
 @Service
 public class CallbackInvoker {
 
-    private static final String CALLBACK_RESPONSE_KEY_STATE = "state";
     private static final HashMap<String, JsonNode> EMPTY_DATA_CLASSIFICATION = Maps.newHashMap();
     private final CallbackService callbackService;
     private final CaseTypeService caseTypeService;
@@ -106,10 +105,13 @@ public class CallbackInvoker {
             securityValidationService.setClassificationFromCallbackIfValid(callbackResponse,
                                                                            caseDetails,
                                                                            deduceDefaultClassificationForExistingFields(caseType, caseDetails));
-            final Optional<String> newCaseState = filterCaseState(callbackResponse.getData());
-            newCaseState.ifPresent(caseDetails::setState);
-            return newCaseState;
         }
+
+        if (callbackResponse.getState() != null) {
+            caseDetails.setState(callbackResponse.getState());
+            return Optional.of(callbackResponse.getState());
+        }
+
         return Optional.empty();
     }
 
@@ -134,11 +136,5 @@ public class CallbackInvoker {
                                                                                                                  ofNullable(caseDetails.getDataClassification()).orElse(
                                                                                                                      newHashMap()));
         caseDetails.setDataClassification(defaultSecurityClassifications);
-    }
-
-    Optional<String> filterCaseState(final Map<String, JsonNode> data) {
-        final Optional<JsonNode> jsonNode = ofNullable(data.get(CALLBACK_RESPONSE_KEY_STATE));
-        jsonNode.ifPresent(value -> data.remove(CALLBACK_RESPONSE_KEY_STATE));
-        return jsonNode.flatMap(value -> value.isTextual() ? Optional.of(value.textValue()) : Optional.empty());
     }
 }

@@ -186,9 +186,7 @@ class CallbackInvokerTest {
 
         private CallbackResponse mockCallbackResponse(final String state) {
             final CallbackResponse response = new CallbackResponse();
-            final Map<String, JsonNode> data = new HashMap<>();
-            data.put("state", JsonNodeFactory.instance.textNode(state));
-            response.setData(data);
+            response.setState(state);
             return response;
         }
 
@@ -332,7 +330,7 @@ class CallbackInvokerTest {
             @DisplayName("validate call back response and set case details state for about to submit")
             @Test
             void validateAndSetStateForAboutToSubmit() {
-                data.put("state", TextNode.valueOf("ngitb"));
+                callbackResponse.setState("ngitb");
 
                 callbackInvoker.invokeAboutToSubmitCallback(caseEvent, caseDetailsBefore, caseDetails, caseType, TRUE);
 
@@ -389,36 +387,6 @@ class CallbackInvokerTest {
                     () -> inOrder.verify(securityValidationService, never()).setClassificationFromCallbackIfValid(any(), any(), any())
                 );
             }
-        }
-
-        @DisplayName("state is filtered in json map")
-        @Test
-        void filterCaseState() {
-            final Map<String, JsonNode> data = new HashMap<>();
-            data.put("state", TextNode.valueOf("ngitb"));
-            data.put("blah", IntNode.valueOf(678));
-
-            assertThat("Before filter", data.keySet(), hasSize(2));
-
-            final Optional<String> state = callbackInvoker.filterCaseState(data);
-
-            assertAll(() -> assertThat(state.get(), is("ngitb")),
-                      () -> assertThat(data.keySet(), hasSize(1)),
-                      () -> assertThat(data.get("blah").intValue(), is(678)));
-        }
-
-        @DisplayName("state is filtered but state is not returned when it is not a text value")
-        @Test
-        void filterCaseStateButNotReturned() {
-            final Map<String, JsonNode> data = new HashMap<>();
-            data.put("state", IntNode.valueOf(678));
-
-            assertThat("Before filter", data.keySet(), hasSize(1));
-
-            final Optional<String> state = callbackInvoker.filterCaseState(data);
-
-            assertAll(() -> assertFalse(state.isPresent()),
-                      () -> assertThat(data.keySet(), hasSize(0)));
         }
     }
 }

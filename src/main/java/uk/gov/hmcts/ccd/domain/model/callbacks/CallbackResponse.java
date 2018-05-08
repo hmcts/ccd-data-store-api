@@ -21,6 +21,7 @@ public class CallbackResponse {
     private SecurityClassification securityClassification;
     private List<String> errors;
     private List<String> warnings;
+    private String state;
 
     public Map<String, JsonNode> getData() {
         return data;
@@ -66,6 +67,14 @@ public class CallbackResponse {
 
     public void setSecurityClassification(SecurityClassification securityClassification) {
         this.securityClassification = securityClassification;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
     }
 
     @JsonIgnore
