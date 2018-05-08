@@ -42,7 +42,7 @@ class ClassifiedGetCaseOperationTest {
         doReturn(caseDetails).when(getCaseOperation).execute(CASE_REFERENCE);
 
         classifiedDetails = Optional.of(new CaseDetails());
-        doReturn(classifiedDetails).when(classificationService).apply(caseDetails.get());
+        doReturn(classifiedDetails).when(classificationService).applyClassification(caseDetails.get());
 
         classifiedGetCaseOperation = new ClassifiedGetCaseOperation(getCaseOperation, classificationService);
     }
@@ -69,7 +69,7 @@ class ClassifiedGetCaseOperationTest {
 
             assertAll(
                 () -> assertThat(output.isPresent(), is(false)),
-                () -> verify(classificationService, never()).apply(any())
+                () -> verify(classificationService, never()).applyClassification(any())
             );
         }
 
@@ -80,14 +80,14 @@ class ClassifiedGetCaseOperationTest {
                                                                                     CASE_TYPE_ID,
                                                                                     CASE_REFERENCE);
 
-            verify(classificationService).apply(caseDetails.get());
+            verify(classificationService).applyClassification(caseDetails.get());
             assertThat(result, sameInstance(classifiedDetails));
         }
 
         @Test
         @DisplayName("should return empty case details when case has higher classification")
         void shouldReturnEmptyWhenClassifiedCaseIsEmpty() {
-            doReturn(Optional.empty()).when(classificationService).apply(caseDetails.get());
+            doReturn(Optional.empty()).when(classificationService).applyClassification(caseDetails.get());
 
             final Optional<CaseDetails> output = classifiedGetCaseOperation.execute(JURISDICTION_ID,
                                                                                     CASE_TYPE_ID,
@@ -117,7 +117,7 @@ class ClassifiedGetCaseOperationTest {
 
             assertAll(
                 () -> assertThat(output.isPresent(), is(false)),
-                () -> verify(classificationService, never()).apply(any())
+                () -> verify(classificationService, never()).applyClassification(any())
             );
         }
 
@@ -127,7 +127,7 @@ class ClassifiedGetCaseOperationTest {
             final Optional<CaseDetails> result = classifiedGetCaseOperation.execute(CASE_REFERENCE);
 
             assertAll(
-                () -> verify(classificationService).apply(caseDetails.get()),
+                () -> verify(classificationService).applyClassification(caseDetails.get()),
                 () -> assertThat(result, sameInstance(classifiedDetails))
             );
         }
@@ -135,7 +135,7 @@ class ClassifiedGetCaseOperationTest {
         @Test
         @DisplayName("should return empty optional when case has higher classification")
         void shouldThrowNotFoundWhenClassifiedCaseIsNull() {
-            doReturn(Optional.empty()).when(classificationService).apply(caseDetails.get());
+            doReturn(Optional.empty()).when(classificationService).applyClassification(caseDetails.get());
 
             final Optional<CaseDetails> output = classifiedGetCaseOperation.execute(CASE_REFERENCE);
 
