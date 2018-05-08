@@ -5,7 +5,7 @@ services:
   ccd-data-store-api:
     build:
       context: .
-    image: docker.artifactory.reform.hmcts.net/ccd/ccd-data-store-api
+    image: hmcts/ccd-data-store-api
     environment:
       - DATA_STORE_DB_HOST=ccd-data-store-database
       - DATA_STORE_DB_PORT=5432
@@ -31,7 +31,7 @@ services:
   ccd-data-store-database:
     build:
       context: docker/database
-    image: docker.artifactory.reform.hmcts.net/ccd/ccd-data-store-database
+    image: hmcts/ccd-data-store-database
     healthcheck:
       interval: 10s
       timeout: 10s

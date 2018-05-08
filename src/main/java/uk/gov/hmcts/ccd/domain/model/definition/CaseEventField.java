@@ -1,11 +1,13 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
-import java.io.Serializable;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.ToString;
 
+import java.io.Serializable;
+
+@ToString
 @ApiModel(description = "")
 public class CaseEventField implements Serializable {
 
@@ -54,15 +56,4 @@ public class CaseEventField implements Serializable {
         this.showSummaryChangeOption = showSummaryChangeOption;
     }
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("class CaseEventField {");
-
-        sb.append("  caseFieldId: ").append(caseFieldId).append("");
-        sb.append("  displayContext: ").append(displayContext).append("");
-        sb.append("  showCondition: ").append(showCondition).append("");
-        sb.append("}");
-        return sb.toString();
-    }
 }

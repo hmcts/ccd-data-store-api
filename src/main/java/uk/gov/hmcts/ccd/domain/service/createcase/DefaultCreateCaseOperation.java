@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.createcase;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import javax.inject.Inject;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -32,6 +34,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 @Service
 @Qualifier("default")
 public class DefaultCreateCaseOperation implements CreateCaseOperation {
+    private static final HashMap<String, JsonNode> EMPTY_DATA_CLASSIFICATION = Maps.newHashMap();
     private final UserRepository userRepository;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final EventTriggerService eventTriggerService;
@@ -109,7 +112,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         newCaseDetails.setState(eventTrigger.getPostState());
         newCaseDetails.setSecurityClassification(caseType.getSecurityClassification());
         newCaseDetails.setData(caseSanitiser.sanitise(caseType, data));
-        newCaseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(caseType, newCaseDetails.getData()));
+        newCaseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(caseType, newCaseDetails.getData(), EMPTY_DATA_CLASSIFICATION));
 
         final CaseDetails savedCaseDetails = submitCaseTransaction.submitCase(event,
                                                                               caseType,

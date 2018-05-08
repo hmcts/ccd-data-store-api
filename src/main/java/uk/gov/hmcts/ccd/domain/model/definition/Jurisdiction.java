@@ -3,11 +3,13 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.Date;
 
 @ApiModel(description = "")
+@ToString
 public class Jurisdiction implements Serializable {
 
     private String id = null;
@@ -76,17 +78,4 @@ public class Jurisdiction implements Serializable {
         this.liveUntil = liveUntil;
     }
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("class Jurisdiction {");
-
-        sb.append("  id: ").append(id).append("");
-        sb.append("  name: ").append(name).append("");
-        sb.append("  description: ").append(description).append("");
-        sb.append("  liveFrom: ").append(liveFrom).append("");
-        sb.append("  liveUntil: ").append(liveUntil).append("");
-        sb.append("}");
-        return sb.toString();
-    }
 }

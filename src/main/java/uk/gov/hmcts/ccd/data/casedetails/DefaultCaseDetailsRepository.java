@@ -25,18 +25,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static java.lang.Long.valueOf;
-
 @Named
 @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
 @Singleton
 public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultCaseDetailsRepository.class);
-    private static final String CREATED_DATE = "createdDate";
-    private static final String LAST_MODIFIED = "lastModified";
-
     public static final String QUALIFIER = "default";
 
     private final CaseDetailsMapper caseDetailsMapper;

@@ -31,8 +31,8 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.*;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlTestUtil.CaseFieldBuilder.aCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlTestUtil.CaseTypeBuilder.aCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.aCaseField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.aCaseType;
 
 public class SecurityClassificationServiceTest {
 
@@ -152,7 +152,7 @@ public class SecurityClassificationServiceTest {
 
             caseDetails.setSecurityClassification(caseClassification);
 
-            return securityClassificationService.apply(caseDetails);
+            return securityClassificationService.applyClassification(caseDetails);
         }
 
         @Test
@@ -206,7 +206,7 @@ public class SecurityClassificationServiceTest {
         @Test
         @DisplayName("should return empty list when given null")
         void shouldReturnEmptyListInsteadOfNull() {
-            final List<AuditEvent> classifiedEvents = securityClassificationService.apply(JURISDICTION_ID, null);
+            final List<AuditEvent> classifiedEvents = securityClassificationService.applyClassification(JURISDICTION_ID, null);
 
             assertAll(
                 () -> assertThat(classifiedEvents, is(notNullValue())),
@@ -219,8 +219,8 @@ public class SecurityClassificationServiceTest {
         void shouldReturnAllEventsWhenUserHigherClassification() {
             doReturn(Optional.of(RESTRICTED)).when(securityClassificationService).getUserClassification(JURISDICTION_ID);
 
-            final List<AuditEvent> classifiedEvents = securityClassificationService.apply(JURISDICTION_ID,
-                                                                                          Arrays.asList(publicEvent,
+            final List<AuditEvent> classifiedEvents = securityClassificationService.applyClassification(JURISDICTION_ID,
+                                                                                                        Arrays.asList(publicEvent,
                                                                                                         privateEvent,
                                                                                                         restrictedEvent));
 
@@ -235,8 +235,8 @@ public class SecurityClassificationServiceTest {
         void shouldFilterOutEventsHigherClassification() {
             doReturn(Optional.of(PUBLIC)).when(securityClassificationService).getUserClassification(JURISDICTION_ID);
 
-            final List<AuditEvent> classifiedEvents = securityClassificationService.apply(JURISDICTION_ID,
-                                                                                          Arrays.asList(publicEvent,
+            final List<AuditEvent> classifiedEvents = securityClassificationService.applyClassification(JURISDICTION_ID,
+                                                                                                        Arrays.asList(publicEvent,
                                                                                                         privateEvent,
                                                                                                         restrictedEvent));
 
@@ -250,8 +250,8 @@ public class SecurityClassificationServiceTest {
         @DisplayName("should return empty list when user has no classification")
         void shouldReturnEmptyListWhenNoUserClassification() {
 
-            final List<AuditEvent> classifiedEvents = securityClassificationService.apply(JURISDICTION_ID,
-                                                                                          Arrays.asList(publicEvent,
+            final List<AuditEvent> classifiedEvents = securityClassificationService.applyClassification(JURISDICTION_ID,
+                                                                                                        Arrays.asList(publicEvent,
                                                                                                         privateEvent,
                                                                                                         restrictedEvent));
 
@@ -267,13 +267,13 @@ public class SecurityClassificationServiceTest {
 
         @BeforeEach
         void setUp() throws IOException {
-            CaseEvent creatEvent = new CaseEvent();
-            creatEvent.setId("createEvent");
-            creatEvent.setSecurityClassification(RESTRICTED);
+            CaseEvent createEvent = new CaseEvent();
+            createEvent.setId("createEvent");
+            createEvent.setSecurityClassification(RESTRICTED);
             CaseEvent updateEvent = new CaseEvent();
             updateEvent.setId("updateEvent");
             updateEvent.setSecurityClassification(PRIVATE);
-            List<CaseEvent> events = Arrays.asList(creatEvent, updateEvent);
+            List<CaseEvent> events = Arrays.asList(createEvent, updateEvent);
             caseType.setEvents(events);
         }
 
@@ -324,7 +324,7 @@ public class SecurityClassificationServiceTest {
 
             caseDetails.setSecurityClassification(PRIVATE);
 
-            return securityClassificationService.apply(caseDetails).get();
+            return securityClassificationService.applyClassification(caseDetails).get();
         }
 
 
@@ -349,7 +349,7 @@ public class SecurityClassificationServiceTest {
 
         @Test
         @DisplayName("should filter out fields for case if invalid security classification")
-        void shouldFailToFilterFieldsForCaseIfUnparsableSecurityClassification() throws IOException {
+        void shouldFilterOutFieldsForCaseIfUnparsableSecurityClassification() throws IOException {
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Note1\": \"note1\"\n," +
                     "       \"Note2\": \"note2\"\n" +
@@ -485,6 +485,41 @@ public class SecurityClassificationServiceTest {
             assertAll(
                 () -> assertThat(resultNode, is(equalTo(JSON_NODE_FACTORY.objectNode())))
             );
+        }
+
+        @Test
+        @DisplayName("should filter out nested fields for case if missing security classification for complex field")
+        void shouldFilterOutNestedFieldsForCaseIfMissingSecurityClassificationForComplexField() throws IOException {
+            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+                "{  \"Note1\": { \n" +
+                    "           \"Note2\": \"note1\"\n" +
+                    "       },\n" +
+                    "       \"Note3\": { \n" +
+                    "           \"Note4\": \"note4\"\n" +
+                    "       }\n" +
+                    "    }\n"
+            ), STRING_JSON_MAP);
+            caseDetails.setData(data);
+            final Map<String, JsonNode> dataClassification = MAPPER.convertValue(MAPPER.readTree(
+                "{  \"Note1\": { \n" +
+                    "           \"value\": { \n" +
+                    "               \"Note2\": null \n" +
+                    "           } \n" +
+                    "        }, \n" +
+                    "       \"Note3\": { \n" +
+                    "           \"classification\": null,\n" +
+                    "           \"value\": { \n" +
+                    "               \"Note4\": null \n" +
+                    "           } \n" +
+                    "        } \n" +
+                    "    }\n"
+            ), STRING_JSON_MAP);
+            caseDetails.setDataClassification(dataClassification);
+
+            CaseDetails caseDetails = applyClassification(PRIVATE);
+
+            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+            assertThat(resultNode, is(equalTo(JSON_NODE_FACTORY.objectNode())));
         }
 
         @Test
@@ -701,7 +736,6 @@ public class SecurityClassificationServiceTest {
             );
         }
 
-
         @Test
         @DisplayName("should filter out collection items but leave empty collection if classification matches")
         void shouldFilterOutCollectionItemsButLeaveEmptyCollectionIfClassificationMatches() throws IOException {
@@ -726,6 +760,16 @@ public class SecurityClassificationServiceTest {
                     "                }" +
                     "            },\n" +
                     "            \"id\":\"" + SECOND_CHILD_ID + "\"\n" +
+                    "         },\n" +
+                    "         {  \n" +
+                    "            \"value\":{  \n" +
+                    "               \"Address\":\"address3\",\n" +
+                    "               \"Notes\": {\n" +
+                    "                   \"Note1\": \"someNote13\",\n" +
+                    "                   \"Note2\": \"someNote23\"\n" +
+                    "                }" +
+                    "            },\n" +
+                    "            \"id\":\"THIRD_CHILD\"\n" +
                     "         }\n" +
                     "      ]\n" +
                     "    }\n"
@@ -760,6 +804,18 @@ public class SecurityClassificationServiceTest {
                     "           }\n" +
                     "         },\n" +
                     "         \"id\":\"" + SECOND_CHILD_ID + "\"\n" +
+                    "       },\n" +
+                    "       {\n" +
+                    "         \"value\": {\n" +
+                    "           \"Address\": \"PRIVATE\",\n" +
+                    "           \"Notes\": {\n" +
+                    "             \"classification\": \"PRIVATE\",\n" +
+                    "             \"value\": {\n" +
+                    "               \"Note1\": \"PRIVATE\",\n" +
+                    "               \"Note2\": \"PRIVATE\"\n" +
+                    "             }\n" +
+                    "           }\n" +
+                    "         }\n" +
                     "       }\n" +
                     "     ]\n" +
                     "   }\n" +
@@ -866,8 +922,75 @@ public class SecurityClassificationServiceTest {
 
         @Test
         // TODO Target implementation, see RDM-1204
+        @DisplayName("should filter out collection item if no item classification exists")
+        void shouldFilterFieldOutCollectionItemIfNoItemClassificationExists() throws IOException {
+            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+                "{  \"Addresses\":[  \n" +
+                    "         {  \n" +
+                    "            \"value\":{  \n" +
+                    "               \"Address\":\"address1\",\n" +
+                    "               \"Notes\": {\n" +
+                    "                   \"Note1\": \"someNote11\",\n" +
+                    "                   \"Note2\": \"someNote21\"\n" +
+                    "                }" +
+                    "            },\n" +
+                    "            \"id\":\"" + FIRST_CHILD_ID + "\"\n" +
+                    "         },\n" +
+                    "         {  \n" +
+                    "            \"value\":{  \n" +
+                    "               \"Address\":\"address2\",\n" +
+                    "               \"Notes\": {\n" +
+                    "                   \"Note1\": \"someNote12\",\n" +
+                    "                   \"Note2\": \"someNote22\"\n" +
+                    "                }" +
+                    "            },\n" +
+                    "            \"id\":\"" + SECOND_CHILD_ID + "\"\n" +
+                    "         }\n" +
+                    "      ]\n" +
+                    "    }\n"
+            ), STRING_JSON_MAP);
+            caseDetails.setData(data);
+            final Map<String, JsonNode> dataClassification = MAPPER.convertValue(MAPPER.readTree(
+                "{  \"Addresses\":{  \n" +
+                    "       \"classification\": \"PRIVATE\",\n" +
+                    "       \"value\": [\n" +
+                    "         {  \n" +
+                    "            \"value\":{  \n" +
+                    "               \"Address\":\"RESTRICTED\",\n" +
+                    "               \"Notes\": {\n" +
+                    "                   \"classification\": \"PRIVATE\",\n" +
+                    "                   \"value\": {\n" +
+                    "                     \"Note1\": \"PRIVATE\",\n" +
+                    "                     \"Note2\": \"RESTRICTED\"\n" +
+                    "                   }\n" +
+                    "                }" +
+                    "            },\n" +
+                    "            \"id\":\"" + FIRST_CHILD_ID + "\"\n" +
+                    "         } \n" +
+                    "       ]\n" +
+                    "     }\n" +
+                    "   }\n"
+            ), STRING_JSON_MAP);
+            caseDetails.setDataClassification(dataClassification);
+
+
+            CaseDetails caseDetails = applyClassification(PRIVATE);
+
+            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+            assertAll(
+                () -> assertThat(resultNode.get("Addresses").size(), is(equalTo(1))),
+                () -> assertThat(resultNode.get("Addresses").get(0).get(ID), is(equalTo(getTextNode(FIRST_CHILD_ID)))),
+                () -> assertThat(resultNode.get("Addresses").get(0).get(VALUE).has("Address"), is(false)),
+                () -> assertThat(resultNode.get("Addresses").get(0).get(VALUE).get("Notes").get("Note1"),
+                                 is(equalTo(getTextNode("someNote11")))),
+                () -> assertThat(resultNode.get("Addresses").get(0).get(VALUE).get("Notes").has("Note2"), is(false))
+            );
+        }
+
+        @Test
+        // TODO Target implementation, see RDM-1204
         @DisplayName("should filter out collection items with higher classification")
-        void shouldFilterOutCollectionItemsHigherClassification() throws IOException {
+        void shouldFilterOutCollectionItemsWithHigherClassification() throws IOException {
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\":[  \n" +
                     "         {  \n" +
@@ -896,6 +1019,57 @@ public class SecurityClassificationServiceTest {
                     "             \"value\": {\n" +
                     "               \"Address2\": \"RESTRICTED\"\n" +
                     "             },\n" +
+                    "             \"id\":\"" + SECOND_CHILD_ID + "\"\n" +
+                    "           }\n" +
+                    "         ]\n" +
+                    "      }\n" +
+                    "    }\n"
+            ), STRING_JSON_MAP);
+            caseDetails.setDataClassification(dataClassification);
+
+
+            CaseDetails caseDetails = applyClassification(PRIVATE);
+
+            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+            assertThat(resultNode.get("Addresses"), is(notNullValue()));
+            assertAll(
+                () -> assertThat(resultNode.get("Addresses").size(), equalTo(1)),
+                () -> assertThat(resultNode.get("Addresses").get(0).get(ID),
+                                 is(equalTo(JSON_NODE_FACTORY.textNode(FIRST_CHILD_ID)))),
+                () -> assertThat(resultNode.get("Addresses").get(0).get(VALUE),
+                                 equalTo(JSON_NODE_FACTORY.textNode("Address1")))
+            );
+        }
+
+        @Test
+        // TODO Target implementation, see RDM-1204
+        @DisplayName("should filter out collection items with missing value")
+        void shouldFilterOutCollectionItemsWithMissingValue() throws IOException {
+            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+                "{  \"Addresses\":[  \n" +
+                    "         {  \n" +
+                    "            \"value\": \"Address1\",\n" +
+                    "            \"id\":\"" + FIRST_CHILD_ID + "\"\n" +
+                    "         },\n" +
+                    "         {  \n" +
+                    "            \"value\": \"Address2\",\n" +
+                    "            \"id\":\"" + SECOND_CHILD_ID + "\"\n" +
+                    "         }\n" +
+                    "      ]\n" +
+                    "    }\n"
+            ), STRING_JSON_MAP);
+            caseDetails.setData(data);
+            final Map<String, JsonNode> dataClassification = MAPPER.convertValue(MAPPER.readTree(
+                "{  \"Addresses\": {  \n" +
+                    "         \"classification\": \"PRIVATE\", \n" +
+                    "         \"value\": [  \n" +
+                    "           {  \n" +
+                    "             \"value\": {\n" +
+                    "               \"Address1\": \"PRIVATE\"\n" +
+                    "             },\n" +
+                    "             \"id\":\"" + FIRST_CHILD_ID + "\"\n" +
+                    "           },\n" +
+                    "           {  \n" +
                     "             \"id\":\"" + SECOND_CHILD_ID + "\"\n" +
                     "           }\n" +
                     "         ]\n" +

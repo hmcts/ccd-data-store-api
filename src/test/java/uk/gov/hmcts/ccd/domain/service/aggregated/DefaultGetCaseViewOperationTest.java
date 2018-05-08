@@ -120,8 +120,8 @@ class DefaultGetCaseViewOperationTest {
     }
 
     @Test
-    @DisplayName("should retrieve all authorised audit events")
-    void shouldRetrieveAllAuthorisedAuditEvents() {
+    @DisplayName("should retrieve all authorised audit events and tabs")
+    void shouldRetrieveAllAuthorisedAuditEventsAndTabs() {
         Map<String, JsonNode> dataMap = buildData("dataTestField1", "dataTestField2");
         caseDetails.setData(dataMap);
 
@@ -131,8 +131,10 @@ class DefaultGetCaseViewOperationTest {
             () -> verify(listEventsOperation).execute(caseDetails),
             () -> assertThat(caseView.getTabs(), arrayWithSize(1)),
             () -> assertThat(caseView.getTabs()[0].getFields(), arrayWithSize(2)),
-            () -> assertThat(caseView.getTabs()[0].getFields(), hasItemInArray(hasProperty("id", equalTo("dataTestField1")))),
-            () -> assertThat(caseView.getTabs()[0].getFields(), hasItemInArray(hasProperty("id", equalTo("dataTestField2")))),
+            () -> assertThat(caseView.getTabs()[0].getFields(), hasItemInArray(allOf(hasProperty("id", equalTo("dataTestField1")),
+                                                                                     hasProperty("showCondition", equalTo("dataTestField1-fieldShowCondition"))))),
+            () -> assertThat(caseView.getTabs()[0].getFields(), hasItemInArray(allOf(hasProperty("id", equalTo("dataTestField2")),
+                                                                                     hasProperty("showCondition", equalTo("dataTestField2-fieldShowCondition"))))),
             () -> assertThat(caseView.getEvents(), arrayWithSize(2)),
             () -> assertThat(caseView.getEvents(), hasItemInArray(hasProperty("summary", equalTo(EVENT_SUMMARY_1)))),
             () -> assertThat(caseView.getEvents(), hasItemInArray(hasProperty("summary", equalTo(EVENT_SUMMARY_2))))
@@ -167,10 +169,14 @@ class DefaultGetCaseViewOperationTest {
             CaseTypeTabField tabField = new CaseTypeTabField();
             CaseField caseField = new CaseField();
             caseField.setId(caseFieldId);
-            caseField.setFieldType(new FieldType());
+            FieldType fieldType = new FieldType();
+            fieldType.setType("YesOrNo");
+            caseField.setFieldType(fieldType);
             tabField.setCaseField(caseField);
+            tabField.setShowCondition(caseFieldId + "-fieldShowCondition");
             tabFields.add(tabField);
         });
+        tab.setShowCondition("tabShowCondition");
         tab.setTabFields(tabFields);
         tabs.add(tab);
         caseTabCollection.setTabs(tabs);
