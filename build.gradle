@@ -45,6 +45,8 @@ apply plugin: 'com.jfrog.bintray'
 apply plugin: 'se.patrikerdes.use-latest-versions'
 apply plugin: 'org.owasp.dependencycheck'
 
+apply from: 'liquibase.gradle'
+
 dependencyUpdates.resolutionStrategy = {
     componentSelection { rules ->
         rules.all { ComponentSelection selection ->
