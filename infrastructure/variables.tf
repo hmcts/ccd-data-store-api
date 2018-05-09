@@ -39,6 +39,11 @@ variable "database-name" {
   default = "ccd_data"
 }
 
+variable "use_uk_db" {
+  type = "string"
+  default = "false"
+}
+
 variable "vault_section" {
   default = "test"
 }
