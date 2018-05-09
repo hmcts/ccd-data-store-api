@@ -1,7 +1,12 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.aggregated.*;
+import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.search.Field;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
@@ -9,10 +14,94 @@ import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
 import java.util.List;
+import java.util.Map;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-public class AccessControlTestUtil {
+public class TestBuildersUtil {
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
+    public static class CallbackResponseBuilder {
+        private final CallbackResponse callbackResponse;
+
+        public CallbackResponseBuilder() {
+            callbackResponse = new CallbackResponse();
+        }
+
+        public CallbackResponseBuilder withSecurityClassification(SecurityClassification securityClassification) {
+            callbackResponse.setSecurityClassification(securityClassification);
+            return this;
+        }
+
+        public CallbackResponseBuilder withDataClassification(Map<String, JsonNode> dataClassification) {
+            callbackResponse.setDataClassification(dataClassification);
+            return this;
+        }
+
+        public CallbackResponse build() {
+            return callbackResponse;
+        }
+
+        public static CallbackResponseBuilder aCallbackResponse() {
+            return new CallbackResponseBuilder();
+        }
+    }
+
+    public static class CaseDetailsBuilder {
+        private final CaseDetails caseDetails;
+
+        public CaseDetailsBuilder() {
+            caseDetails = new CaseDetails();
+        }
+
+        public CaseDetailsBuilder withSecurityClassification(SecurityClassification securityClassification) {
+            caseDetails.setSecurityClassification(securityClassification);
+            return this;
+        }
+
+        public CaseDetailsBuilder withDataClassification(Map<String, JsonNode> dataClassification) {
+            caseDetails.setDataClassification(dataClassification);
+            return this;
+        }
+
+        public CaseDetails build() {
+            return caseDetails;
+        }
+
+        public static CaseDetailsBuilder aCaseDetails() {
+            return new CaseDetailsBuilder();
+        }
+    }
+
+    public static class DataClassificationBuilder {
+        private final Map<String, JsonNode> dataClassification;
+
+        public DataClassificationBuilder() {
+            dataClassification = Maps.newHashMap();
+        }
+
+        public DataClassificationBuilder withData(String key, JsonNode value) {
+            dataClassification.put(key, value);
+            return this;
+        }
+
+        public DataClassificationBuilder withData(String key, List value) {
+            dataClassification.put(key, MAPPER.convertValue(value, JsonNode.class));
+            return this;
+        }
+
+        public Map<String, JsonNode> buildAsMap() {
+            return dataClassification;
+        }
+
+        public JsonNode buildAsNode() {
+            return MAPPER.convertValue(dataClassification, JsonNode.class);
+        }
+
+        public static DataClassificationBuilder aClassificationBuilder() {
+            return new DataClassificationBuilder();
+        }
+    }
 
     public static class CaseTypeBuilder {
         private final CaseType caseType;
@@ -26,7 +115,9 @@ public class AccessControlTestUtil {
             caseType.setId(id);
             return this;
 
-        }        public CaseTypeBuilder withJurisdiction(Jurisdiction jurisdiction) {
+        }
+
+        public CaseTypeBuilder withJurisdiction(Jurisdiction jurisdiction) {
             caseType.setJurisdiction(jurisdiction);
             return this;
         }
@@ -206,7 +297,7 @@ public class AccessControlTestUtil {
     public static class CaseEventTriggerBuilder {
         private final CaseEventTrigger caseEventTrigger;
         private final List<CaseViewField> caseFields = Lists.newArrayList();
-        private List<WizardPage> wizardPages = Lists.newArrayList();
+        private final List<WizardPage> wizardPages = Lists.newArrayList();
 
         private CaseEventTriggerBuilder() {
             this.caseEventTrigger = new CaseEventTrigger();

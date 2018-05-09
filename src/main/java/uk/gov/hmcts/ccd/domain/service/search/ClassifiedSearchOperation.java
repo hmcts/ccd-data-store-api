@@ -36,7 +36,7 @@ public class ClassifiedSearchOperation implements SearchOperation {
         }
 
         return results.stream()
-                      .map(classificationService::apply)
+                      .map(classificationService::applyClassification)
                       .filter(Optional::isPresent)
                       .map(Optional::get)
                       .collect(Collectors.toList());

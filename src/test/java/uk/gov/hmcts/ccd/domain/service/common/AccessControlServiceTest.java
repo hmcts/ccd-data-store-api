@@ -22,14 +22,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.*;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlTestUtil.AccessControlListBuilder.anAcl;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlTestUtil.AuditEventBuilder.anAuditEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlTestUtil.CaseEventBuilder.anEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlTestUtil.CaseEventTriggerBuilder.anEventTrigger;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlTestUtil.CaseFieldBuilder.aCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlTestUtil.CaseStateBuilder.aState;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlTestUtil.CaseTypeBuilder.aCaseType;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlTestUtil.CaseViewFieldBuilder.aViewField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AuditEventBuilder.anAuditEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.anEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventTriggerBuilder.anEventTrigger;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.aCaseField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseStateBuilder.aState;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.aCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
 
 public class AccessControlServiceTest {
 
@@ -934,7 +934,7 @@ public class AccessControlServiceTest {
             final CaseType caseType = new CaseType();
             CaseEvent eventDefinition = new CaseEvent();
             eventDefinition.setId(EVENT_ID);
-            caseType.setEvents(Arrays.asList(eventDefinition));
+            caseType.setEvents(Collections.singletonList(eventDefinition));
 
             assertThat(
                 accessControlService.canAccessCaseEventWithCriteria(
@@ -956,7 +956,7 @@ public class AccessControlServiceTest {
             accessControlList.setCreate(true);
             List<AccessControlList> accessControlLists = newArrayList(accessControlList);
             eventDefinition.setAccessControlLists(accessControlLists);
-            caseType.setEvents(Arrays.asList(eventDefinition));
+            caseType.setEvents(Collections.singletonList(eventDefinition));
 
             assertThat(
                 accessControlService.canAccessCaseEventWithCriteria(

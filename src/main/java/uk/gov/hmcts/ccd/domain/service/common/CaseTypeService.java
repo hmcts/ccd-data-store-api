@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
@@ -26,6 +28,7 @@ import java.util.stream.Collectors;
 public class CaseTypeService {
     private final CaseDataValidator caseDataValidator;
     private final CaseDefinitionRepository caseDefinitionRepository;
+    private static final Logger LOG = LoggerFactory.getLogger(CaseTypeService.class);
 
     @Inject
     public CaseTypeService(final CaseDataValidator caseDataValidator,
@@ -56,6 +59,7 @@ public class CaseTypeService {
                              final CaseType caseType) {
         final List<ValidationResult> dataValidationResults = caseDataValidator.validate(data, caseType.getCaseFields());
         if (!dataValidationResults.isEmpty()) {
+            LOG.warn("There have been validation errors={}", dataValidationResults);
             final List<CaseFieldValidationError> fieldErrors = dataValidationResults.stream()
                 .map(validationResult -> new CaseFieldValidationError(validationResult.getFieldId(), validationResult.getErrorMessage()))
                 .collect(Collectors.toList());

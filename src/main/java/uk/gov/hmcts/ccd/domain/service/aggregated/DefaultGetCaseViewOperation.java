@@ -96,7 +96,8 @@ public class DefaultGetCaseViewOperation implements GetCaseViewOperation {
             List<CaseViewField> fields = tabsWithRelevantFields
                 .map(buildCaseViewField(caseDetails)).collect(Collectors.toList());
             return new CaseViewTab(tab.getId(), tab.getLabel(), tab.getDisplayOrder(),
-                                   fields.toArray(new CaseViewField[fields.size()]));
+                                   fields.toArray(new CaseViewField[fields.size()]),
+                                   tab.getShowCondition());
         }).collect(Collectors.toList());
         caseView.setTabs(tabs.toArray(new CaseViewTab[tabs.size()]));
 
@@ -152,6 +153,7 @@ public class DefaultGetCaseViewOperation implements GetCaseViewOperation {
             caseViewField.setSecurityLabel(caseField.getSecurityLabel());
             caseViewField.setValidationExpression(caseField.getFieldType().getRegularExpression());
             caseViewField.setOrder(field.getDisplayOrder());
+            caseViewField.setShowCondition(field.getShowCondition());
             caseViewField.setValue(caseDetails.getData().get(caseField.getId()));
             return caseViewField;
         };

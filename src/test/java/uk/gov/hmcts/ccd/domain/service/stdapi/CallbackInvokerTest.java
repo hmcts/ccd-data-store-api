@@ -9,9 +9,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -20,6 +19,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.common.SecurityValidationService;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 
@@ -27,17 +27,16 @@ import java.util.*;
 
 import static java.lang.Boolean.TRUE;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.*;
 
 class CallbackInvokerTest {
-
+    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private static final Boolean IGNORE_WARNING = true;
     private static final String URL_ABOUT_TO_START = "http://about-to-start";
     private static final String URL_ABOUT_TO_SUBMIT = "http://about-to-submit";
@@ -58,6 +57,9 @@ class CallbackInvokerTest {
     @Mock
     private CaseSanitiser caseSanitiser;
 
+    @Mock
+    private SecurityValidationService securityValidationService;
+
     @InjectMocks
     private CallbackInvoker callbackInvoker;
 
@@ -65,6 +67,7 @@ class CallbackInvokerTest {
     private CaseType caseType;
     private CaseDetails caseDetailsBefore;
     private CaseDetails caseDetails;
+    private InOrder inOrder;
 
     @BeforeEach
     void setUp() {
@@ -87,6 +90,12 @@ class CallbackInvokerTest {
                                                               same(caseEvent),
                                                               same(caseDetailsBefore),
                                                               same(caseDetails));
+
+        inOrder = inOrder(callbackService,
+                                  caseTypeService,
+                                  caseDataService,
+                          securityValidationService,
+                                  caseSanitiser);
     }
 
     @Nested
@@ -151,12 +160,41 @@ class CallbackInvokerTest {
             assertThat(response.get(), is(expectedState));
         }
 
+        @Test
+        @DisplayName("should send callback and get no state")
+        void sendCallbackAndGetNoState() {
+            doReturn(Optional.of(mockCallbackResponseWithNoState())).when(callbackService)
+                                                                      .send(any(),
+                                                                            any(),
+                                                                            same(caseEvent),
+                                                                            same(caseDetailsBefore),
+                                                                            same(caseDetails));
+            final Optional<String>
+                response =
+                callbackInvoker.invokeAboutToSubmitCallback(caseEvent,
+                                                            caseDetailsBefore,
+                                                            caseDetails,
+                                                            caseType,
+                                                            IGNORE_WARNING);
+
+            verify(callbackService).send(URL_ABOUT_TO_SUBMIT,
+                                         RETRIES_ABOUT_TO_SUBMIT,
+                                         caseEvent,
+                                         caseDetailsBefore,
+                                         caseDetails);
+            assertThat(response.isPresent(), is(false));
+        }
+
         private CallbackResponse mockCallbackResponse(final String state) {
             final CallbackResponse response = new CallbackResponse();
             final Map<String, JsonNode> data = new HashMap<>();
             data.put("state", JsonNodeFactory.instance.textNode(state));
             response.setData(data);
             return response;
+        }
+
+        private CallbackResponse mockCallbackResponseWithNoState() {
+            return new CallbackResponse();
         }
     }
 
@@ -178,140 +216,254 @@ class CallbackInvokerTest {
         }
     }
 
-    @DisplayName("validate call back response and update case details data")
-    @Test
-    void validateAndSetData() {
-        final CallbackResponse callbackResponse = new CallbackResponse();
-        final Map<String, JsonNode> data = new HashMap<>();
-        data.put("xxx", TextNode.valueOf("ngitb"));
-        callbackResponse.setData(data);
-        caseDetails.setDataClassification(Maps.newHashMap());
-        callbackInvoker.validateAndSetFromAboutToStartCallback(caseType, caseDetails, TRUE, callbackResponse);
-        verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE);
-        verify(caseTypeService).validateData(callbackResponse.getData(), caseType);
-        verify(caseDataService).getDefaultSecurityClassifications(caseType, caseDetails.getData(), caseDetails.getDataClassification());
-        verify(caseSanitiser).sanitise(caseType, callbackResponse.getData());
-    }
+    @Nested
+    @DisplayName("validations")
+    class Validations {
 
-    @DisplayName("validate call back response and no case details data is updated")
-    @Test
-    void validateAndDoNotSetData() {
-        final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackInvoker.validateAndSetFromAboutToStartCallback(caseType, caseDetails, TRUE, callbackResponse);
-        verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE);
-        verify(caseTypeService, never()).validateData(any(), any());
-        verify(caseDataService, never()).getDefaultSecurityClassifications(any(), any(), any());
-        verify(caseSanitiser, never()).sanitise(any(), any());
-    }
+        @Nested
+        @DisplayName("about to start")
+        class AboutToStart {
+            @DisplayName("validate call back response and update case details data for about to start")
+            @Test
+            void validateAndSetDataForAboutToStart() {
+                final CallbackResponse callbackResponse = new CallbackResponse();
+                final Map<String, JsonNode> data = new HashMap<>();
+                data.put("xxx", TextNode.valueOf("ngitb"));
+                callbackResponse.setData(data);
+                HashMap<String, JsonNode> currentDataClassification = Maps.newHashMap();
+                when(caseDataService.getDefaultSecurityClassifications(caseType, data, caseDetails.getDataClassification())).thenReturn(
+                    currentDataClassification);
+                when(callbackService.send(caseEvent.getCallBackURLAboutToStartEvent(),
+                                          caseEvent.getRetriesTimeoutAboutToStartEvent(),
+                                          caseEvent,
+                                          caseDetails)).thenReturn(Optional.of(callbackResponse));
 
-    @DisplayName("validate call back response and there are errors in call back validation when setting data")
-    @Test
-    void validateAndSetDataMetError() throws ApiException {
-        final CallbackResponse callbackResponse = new CallbackResponse();
-        final Map<String, JsonNode> data = new HashMap<>();
-        callbackResponse.setData(data);
+                callbackInvoker.invokeAboutToStartCallback(caseEvent, caseType, caseDetails, TRUE);
 
-        final String ErrorMessage = "Royal marriage *!><}{^";
-        doThrow(new ApiException(ErrorMessage))
-            .when(callbackService).validateCallbackErrorsAndWarnings(any(), any());
-        final ApiException apiException =
-            assertThrows(ApiException.class,
-                         () -> callbackInvoker.validateAndSetFromAboutToStartCallback(caseType, caseDetails, TRUE, callbackResponse));
-        assertThat(apiException.getMessage(), is(ErrorMessage));
-        verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE);
-        verify(caseTypeService, never()).validateData(any(), any());
-        verify(caseDataService, never()).getDefaultSecurityClassifications(any(), any(), any());
-        verify(caseSanitiser, never()).sanitise(any(), any());
-    }
+                assertAll(
+                    () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE),
+                    () -> inOrder.verify(caseTypeService).validateData(callbackResponse.getData(), caseType),
+                    () -> inOrder.verify(caseSanitiser).sanitise(caseType, callbackResponse.getData()),
+                    () -> inOrder.verify(caseDataService).getDefaultSecurityClassifications(caseType,
+                                                                                            caseDetails.getData(),
+                                                                                            caseDetails.getDataClassification()),
+                    () -> inOrder.verify(securityValidationService, never()).setClassificationFromCallbackIfValid(any(), any(), any())
+                );
+            }
 
-    @DisplayName("validate call back response and set case details state")
-    @Test
-    void validateAndSetState() {
-        final CallbackResponse callbackResponse = new CallbackResponse();
-        final Map<String, JsonNode> data = new HashMap<>();
-        data.put("state", TextNode.valueOf("ngitb"));
-        callbackResponse.setData(data);
-        caseDetails.setDataClassification(Maps.newHashMap());
-        caseDetails.setState("BAYAN");
-        callbackInvoker.validateAndSetFromAboutToSubmitCallback(caseType, caseDetails, TRUE, callbackResponse);
-        verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE);
-        verify(caseTypeService).validateData(callbackResponse.getData(), caseType);
-        verify(caseDataService).getDefaultSecurityClassifications(caseType, caseDetails.getData(), caseDetails.getDataClassification());
-        verify(caseSanitiser).sanitise(caseType, callbackResponse.getData());
+            @DisplayName("validate call back response and no case details data is updated")
+            @Test
+            void validateAndDoNotSetData() {
+                final CallbackResponse callbackResponse = new CallbackResponse();
+                when(callbackService.send(caseEvent.getCallBackURLAboutToStartEvent(),
+                                          caseEvent.getRetriesTimeoutAboutToStartEvent(),
+                                          caseEvent,
+                                          caseDetails)).thenReturn(Optional.of(callbackResponse));
 
-        assertThat(caseDetails.getState(), is("ngitb"));
-    }
+                callbackInvoker.invokeAboutToStartCallback(caseEvent, caseType, caseDetails, TRUE);
 
-    @DisplayName("validate call back response and neither case details nor state is updated")
-    @Test
-    void validateAndDoNotSetStateOrData() {
-        final CallbackResponse callbackResponse = new CallbackResponse();
-        final Map<String, JsonNode> data = new HashMap<>();
-        caseDetails.setState("BAYAN");
-        callbackResponse.setData(data);
-        caseDetails.setDataClassification(Maps.newHashMap());
-        callbackInvoker.validateAndSetFromAboutToSubmitCallback(caseType, caseDetails, TRUE, callbackResponse);
-        verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE);
-        verify(caseTypeService).validateData(callbackResponse.getData(), caseType);
-        verify(caseDataService).getDefaultSecurityClassifications(caseType, caseDetails.getData(), caseDetails.getDataClassification());
-        verify(caseSanitiser).sanitise(caseType, callbackResponse.getData());
+                assertAll(
+                    () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE),
+                    () -> inOrder.verify(caseTypeService, never()).validateData(any(), any()),
+                    () -> inOrder.verify(caseSanitiser, never()).sanitise(any(), any()),
+                    () -> inOrder.verify(caseDataService, never()).getDefaultSecurityClassifications(any(), any(), any()),
+                    () -> inOrder.verify(securityValidationService, never()).setClassificationFromCallbackIfValid(any(), any(), any())
+                );
+            }
 
-        assertThat(caseDetails.getState(), is("BAYAN"));
-    }
+            @DisplayName("validate call back response and there are errors in call back validation when setting data")
+            @Test
+            void validateAndSetDataMetError() throws ApiException {
+                final CallbackResponse callbackResponse = new CallbackResponse();
+                when(callbackService.send(caseEvent.getCallBackURLAboutToStartEvent(),
+                                          caseEvent.getRetriesTimeoutAboutToStartEvent(),
+                                          caseEvent,
+                                          caseDetails)).thenReturn(Optional.of(callbackResponse));
+                final Map<String, JsonNode> data = new HashMap<>();
+                callbackResponse.setData(data);
 
-    @DisplayName("validate call back response and there are errors in call back validation when setting data and state")
-    @Test
-    void validateAndSetStateMetError() throws ApiException {
-        final CallbackResponse callbackResponse = new CallbackResponse();
-        final Map<String, JsonNode> data = new HashMap<>();
-        caseDetails.setState("BAYAN");
-        callbackResponse.setData(data);
+                final String ErrorMessage = "Royal marriage *!><}{^";
+                doThrow(new ApiException(ErrorMessage))
+                    .when(callbackService).validateCallbackErrorsAndWarnings(any(), any());
 
-        final String errorMessgae = "Royal carriage is stuck AGAIN!!!!";
-        doThrow(new ApiException(errorMessgae))
-            .when(callbackService).validateCallbackErrorsAndWarnings(any(), any());
-        final ApiException apiException =
-            assertThrows(ApiException.class,
-                         () -> callbackInvoker.validateAndSetFromAboutToSubmitCallback(caseType,
-                                                                                       caseDetails,
-                                                                                       TRUE,
-                                                                                       callbackResponse));
-        assertAll(() -> assertThat(apiException.getMessage(), is(errorMessgae)),
-                  () -> assertThat(caseDetails.getState(), is("BAYAN")));
+                final ApiException apiException =
+                    assertThrows(ApiException.class,
+                                 () -> callbackInvoker.invokeAboutToStartCallback(caseEvent, caseType, caseDetails, TRUE));
 
-        verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE);
-        verify(caseTypeService, never()).validateData(any(), any());
-        verify(caseDataService, never()).getDefaultSecurityClassifications(any(), any(), any());
-        verify(caseSanitiser, never()).sanitise(any(), any());
-    }
+                assertThat(apiException.getMessage(), is(ErrorMessage));
 
-    @DisplayName("state is filtered in json map")
-    @Test
-    void filterCaseState() {
-        final Map<String, JsonNode> data = new HashMap<>();
-        data.put("state", TextNode.valueOf("ngitb"));
-        data.put("blah", IntNode.valueOf(678));
+                assertAll(
+                    () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE),
+                    () -> inOrder.verify(caseTypeService, never()).validateData(any(), any()),
+                    () -> inOrder.verify(caseSanitiser, never()).sanitise(any(), any()),
+                    () -> inOrder.verify(caseDataService, never()).getDefaultSecurityClassifications(any(), any(), any()),
+                    () -> inOrder.verify(securityValidationService, never()).setClassificationFromCallbackIfValid(any(), any(), any())
+                );
+            }
+        }
 
-        assertThat("Before filter", data.keySet(), hasSize(2));
+        @Nested
+        @DisplayName("about to submit")
+        class AboutToSubmit {
+            final HashMap<String, JsonNode> currentDataClassification = Maps.newHashMap();
+            final Map<String, JsonNode> newFieldsDataClassification = Maps.newHashMap();
+            final Map<String, JsonNode> allFieldsDataClassification = Maps.newHashMap();
+            final CallbackResponse callbackResponse = new CallbackResponse();
+            final Map<String, JsonNode> data = new HashMap<>();
 
-        final Optional<String> state = callbackInvoker.filterCaseState(data);
+            @BeforeEach
+            private void setup() {
+                caseDetails.setDataClassification(currentDataClassification);
+                caseDetails.setData(data);
+                callbackResponse.setData(data);
+                currentDataClassification.put("currentKey", JSON_NODE_FACTORY.textNode("currentValue"));
+                caseDetails.setState("BAYAN");
+                newFieldsDataClassification.put("key", JSON_NODE_FACTORY.textNode("value"));
 
-        assertAll(() -> assertThat(state.get(), is("ngitb")),
-                  () -> assertThat(data.keySet(), hasSize(1)),
-                  () -> assertThat(data.get("blah").intValue(), is(678)));
-    }
+                allFieldsDataClassification.put("key", JSON_NODE_FACTORY.textNode("otherValue"));
+                callbackResponse.setSecurityClassification(SecurityClassification.PRIVATE);
+                callbackResponse.setDataClassification(allFieldsDataClassification);
+                when(callbackService.send(caseEvent.getCallBackURLAboutToSubmitEvent(),
+                                          caseEvent.getRetriesTimeoutURLAboutToSubmitEvent(),
+                                          caseEvent,
+                                          caseDetailsBefore,
+                                          caseDetails)).thenReturn(Optional.of(callbackResponse));
+                when(caseSanitiser.sanitise(eq(caseType), eq(caseDetails.getData()))).thenReturn(data);
+                when(caseDataService.getDefaultSecurityClassifications(eq(caseType), eq(caseDetails.getData()), eq(currentDataClassification))).thenReturn(newFieldsDataClassification);
+                when(caseDataService.getDefaultSecurityClassifications(eq(caseType), eq(caseDetails.getData()), eq(Maps.newHashMap()))).thenReturn(allFieldsDataClassification);
+            }
 
-    @DisplayName("state is filtered but state is not returned when it is not a text value")
-    @Test
-    void filterCaseStateButNotReturned() {
-        final Map<String, JsonNode> data = new HashMap<>();
-        data.put("state", IntNode.valueOf(678));
+            @DisplayName("do not validate call back response if no data security passed back")
+            @Test
+            void doNotValidateCallbackResponseIfNoDataSecurityPassedBack() {
+                callbackResponse.setDataClassification(null);
+                data.put("state", TextNode.valueOf("ngitb"));
 
-        assertThat("Before filter", data.keySet(), hasSize(1));
+                callbackInvoker.invokeAboutToSubmitCallback(caseEvent, caseDetailsBefore, caseDetails, caseType, TRUE);
 
-        final Optional<String> state = callbackInvoker.filterCaseState(data);
+                assertAll(
+                    () -> assertThat(caseDetails.getState(), is("ngitb")),
+                    () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE),
+                    () -> inOrder.verify(caseTypeService).validateData(callbackResponse.getData(), caseType),
+                    () -> inOrder.verify(caseSanitiser).sanitise(caseType, callbackResponse.getData()),
+                    () -> inOrder.verify(caseDataService, times(1)).getDefaultSecurityClassifications(eq(caseType),
+                                                                                                      eq(caseDetails.getData()),
+                                                                                                      eq(currentDataClassification)),
+                    () -> inOrder.verify(securityValidationService, never()).setClassificationFromCallbackIfValid(any(), any(), any())
+                );
+            }
 
-        assertAll(() -> assertFalse(state.isPresent()),
-                  () -> assertThat(data.keySet(), hasSize(0)));
+            @DisplayName("do not validate call back response if no case security passed back")
+            @Test
+            void doNotValidateCallbackResponseIfNoCaseSecurityPassedBack() {
+                callbackResponse.setSecurityClassification(null);
+                data.put("state", TextNode.valueOf("ngitb"));
+
+                callbackInvoker.invokeAboutToSubmitCallback(caseEvent, caseDetailsBefore, caseDetails, caseType, TRUE);
+
+                assertAll(
+                    () -> assertThat(caseDetails.getState(), is("ngitb")),
+                    () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE),
+                    () -> inOrder.verify(caseTypeService).validateData(callbackResponse.getData(), caseType),
+                    () -> inOrder.verify(caseSanitiser).sanitise(caseType, callbackResponse.getData()),
+                    () -> inOrder.verify(caseDataService, times(1)).getDefaultSecurityClassifications(eq(caseType),
+                                                                                                      eq(caseDetails.getData()),
+                                                                                                      eq(currentDataClassification)),
+                    () -> inOrder.verify(securityValidationService, never()).setClassificationFromCallbackIfValid(any(), any(), any())
+                );
+            }
+
+
+            @DisplayName("validate call back response and set case details state for about to submit")
+            @Test
+            void validateAndSetStateForAboutToSubmit() {
+                data.put("state", TextNode.valueOf("ngitb"));
+
+                callbackInvoker.invokeAboutToSubmitCallback(caseEvent, caseDetailsBefore, caseDetails, caseType, TRUE);
+
+                ArgumentCaptor<Map> argumentDataClassification = ArgumentCaptor.forClass(Map.class);
+                assertAll(
+                    () -> assertThat(caseDetails.getState(), is("ngitb")),
+                    () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE),
+                    () -> inOrder.verify(caseTypeService).validateData(callbackResponse.getData(), caseType),
+                    () -> inOrder.verify(caseSanitiser).sanitise(caseType, callbackResponse.getData()),
+                    () -> inOrder.verify(caseDataService, times(2)).getDefaultSecurityClassifications(eq(caseType),
+                                                                                            eq(caseDetails.getData()),
+                                                                                            argumentDataClassification.capture()),
+                    () -> inOrder.verify(securityValidationService).setClassificationFromCallbackIfValid(eq(callbackResponse), eq(caseDetails), eq(allFieldsDataClassification)),
+                    () -> assertThat(argumentDataClassification.getAllValues(), contains(currentDataClassification, Maps.newHashMap()))
+                );
+            }
+
+            @DisplayName("validate call back response and neither case details nor state is updated")
+            @Test
+            void validateAndDoNotSetStateOrData() {
+                callbackInvoker.invokeAboutToSubmitCallback(caseEvent, caseDetailsBefore, caseDetails, caseType, TRUE);
+
+                ArgumentCaptor<Map> argumentDataClassification = ArgumentCaptor.forClass(Map.class);
+                assertAll(
+                    () -> assertThat(caseDetails.getState(), is("BAYAN")),
+                    () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE),
+                    () -> inOrder.verify(caseTypeService).validateData(callbackResponse.getData(), caseType),
+                    () -> inOrder.verify(caseSanitiser).sanitise(caseType, callbackResponse.getData()),
+                    () -> inOrder.verify(caseDataService, times(2)).getDefaultSecurityClassifications(eq(caseType),
+                                                                                            eq(caseDetails.getData()),
+                                                                                            argumentDataClassification.capture()),
+                    () -> inOrder.verify(securityValidationService).setClassificationFromCallbackIfValid(callbackResponse, caseDetails, allFieldsDataClassification),
+                    () -> assertThat(argumentDataClassification.getAllValues(), contains(currentDataClassification, Maps.newHashMap()))
+                );
+            }
+
+            @DisplayName("validate call back response and there are errors in call back validation when setting data and state")
+            @Test
+            void validateAndSetStateMetError() throws ApiException {
+                final String errorMessgae = "Royal carriage is stuck AGAIN!!!!";
+                doThrow(new ApiException(errorMessgae))
+                    .when(callbackService).validateCallbackErrorsAndWarnings(any(), any());
+                final ApiException apiException =
+                    assertThrows(ApiException.class,
+                                 () -> callbackInvoker.invokeAboutToSubmitCallback(caseEvent, caseDetailsBefore, caseDetails, caseType, TRUE));
+
+                assertAll(
+                    () -> assertThat(apiException.getMessage(), is(errorMessgae)),
+                    () -> assertThat(caseDetails.getState(), is("BAYAN")),
+                    () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE),
+                    () -> inOrder.verify(caseTypeService, never()).validateData(any(), any()),
+                    () -> inOrder.verify(caseSanitiser, never()).sanitise(any(), any()),
+                    () -> inOrder.verify(caseDataService, never()).getDefaultSecurityClassifications(any(), any(), any()),
+                    () -> inOrder.verify(securityValidationService, never()).setClassificationFromCallbackIfValid(any(), any(), any())
+                );
+            }
+        }
+
+        @DisplayName("state is filtered in json map")
+        @Test
+        void filterCaseState() {
+            final Map<String, JsonNode> data = new HashMap<>();
+            data.put("state", TextNode.valueOf("ngitb"));
+            data.put("blah", IntNode.valueOf(678));
+
+            assertThat("Before filter", data.keySet(), hasSize(2));
+
+            final Optional<String> state = callbackInvoker.filterCaseState(data);
+
+            assertAll(() -> assertThat(state.get(), is("ngitb")),
+                      () -> assertThat(data.keySet(), hasSize(1)),
+                      () -> assertThat(data.get("blah").intValue(), is(678)));
+        }
+
+        @DisplayName("state is filtered but state is not returned when it is not a text value")
+        @Test
+        void filterCaseStateButNotReturned() {
+            final Map<String, JsonNode> data = new HashMap<>();
+            data.put("state", IntNode.valueOf(678));
+
+            assertThat("Before filter", data.keySet(), hasSize(1));
+
+            final Optional<String> state = callbackInvoker.filterCaseState(data);
+
+            assertAll(() -> assertFalse(state.isPresent()),
+                      () -> assertThat(data.keySet(), hasSize(0)));
+        }
     }
 }

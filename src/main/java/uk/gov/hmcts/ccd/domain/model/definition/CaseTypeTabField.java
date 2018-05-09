@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiModelProperty;
 public class CaseTypeTabField implements Serializable {
     private CaseField caseField = null;
     private Integer displayOrder = null;
+    private String showCondition = null;
 
     @ApiModelProperty(value = "")
     @JsonProperty("case_field")
@@ -29,5 +30,15 @@ public class CaseTypeTabField implements Serializable {
 
     public void setDisplayOrder(final Integer displayOrder) {
         this.displayOrder = displayOrder;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("show_condition")
+    public String getShowCondition() {
+        return showCondition;
+    }
+
+    public void setShowCondition(String showCondition) {
+        this.showCondition = showCondition;
     }
 }

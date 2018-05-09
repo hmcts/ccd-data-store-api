@@ -39,6 +39,6 @@ public class ClassifiedListEventsOperation implements ListEventsOperation {
             return Lists.newArrayList();
         }
 
-        return classificationService.apply(jurisdiction, events);
+        return classificationService.applyClassification(jurisdiction, events);
     }
 }
