@@ -15,6 +15,7 @@ public class CaseEventField implements Serializable {
     private String displayContext = null;
     private String showCondition = null;
     private Boolean showSummaryChangeOption = null;
+    private Integer showSummaryContentOption = null;
 
     @ApiModelProperty(required = true, value = "Foreign key to CaseField.id")
     @JsonProperty("case_field_id")
@@ -56,4 +57,13 @@ public class CaseEventField implements Serializable {
         this.showSummaryChangeOption = showSummaryChangeOption;
     }
 
+    @ApiModelProperty(value = "Show Summary Content Option")
+    @JsonProperty("show_summary_content_option")
+    public Integer getShowSummaryContentOption() {
+        return showSummaryContentOption;
+    }
+
+    public void setShowSummaryContentOption(Integer showSummaryContentOption) {
+        this.showSummaryContentOption = showSummaryContentOption;
+    }
 }
