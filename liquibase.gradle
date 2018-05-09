@@ -12,7 +12,7 @@ Properties liquibaseProps = new Properties()
 liquibaseProps.load(new FileInputStream("$projectDir/src/main/resources/liquibase.properties"))
 
 task createReportDir << {
-//    mkdir project.buildDir/reports/db/changelog
+    mkdir '$buildDir/reports/db/changelog'
 }
 
 task liquibaseDiffChangelog(type: JavaExec, dependsOn: 'createReportDir') {
@@ -23,8 +23,7 @@ task liquibaseDiffChangelog(type: JavaExec, dependsOn: 'createReportDir') {
     classpath configurations.liquibase
     main = "liquibase.integration.commandline.Main"
 
-//    args "--changeLogFile=" + "$projectDir/build/reports/db/changelog/db.changelog-diff-" + buildTimestamp() + ".xml"
-    args "--changeLogFile=" + "$projectDir/src/main/resources/db/changelog/db.changelog-diff-" + buildTimestamp() + ".xml"
+    args "--changeLogFile=" + "$buildDir/reports/db/changelog/db.changelog-diff-" + buildTimestamp() + ".xml"
     args "--referenceUrl=hibernate:spring:uk.gov.hmcts.ccd?dialect=org.hibernate.dialect.PostgreSQL94Dialect"
     args "--username=" + liquibaseProps.getProperty('username')
     args "--password=" + liquibaseProps.getProperty('password')
