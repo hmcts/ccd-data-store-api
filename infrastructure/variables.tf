@@ -34,13 +34,20 @@ variable "jenkins_AAD_objectId" {
   description                 = "(Required) The Azure AD object ID of a user, service principal or security group in the Azure Active Directory tenant for the vault. The object ID must be unique for the list of access policies."
 }
 
+variable "vault_section" {
+  default = "test"
+}
+
+////////////////////////////////
+// Database
+////////////////////////////////
+
 variable "postgresql_user" {
   default = "ccd"
 }
 
-variable "database-name" {
-  type    = "string"
-  default = "ccd_data"
+variable "database_name" {
+  default = "ccd_data_store"
 }
 
 variable "use_uk_db" {
@@ -48,13 +55,9 @@ variable "use_uk_db" {
   default = "false"
 }
 
-variable "vault_section" {
-  default = "test"
-}
-
-variable "idam_api_url" {
-  default = "http://betaDevBccidamAppLB.reform.hmcts.net"
-}
+////////////////////////////////
+// S2S
+////////////////////////////////
 
 variable "s2s_url" {
   default = "http://betaDevBccidamS2SLB.reform.hmcts.net"
@@ -63,6 +66,10 @@ variable "s2s_url" {
 variable "authorised-services" {
   type    = "string"
   default = "ccd_data,ccd_gw,ccd_ps,probate_backend,divorce_ccd_submission,sscs,cmc,cmc_claim_store"
+}
+
+variable "idam_api_url" {
+  default = "http://betaDevBccidamAppLB.reform.hmcts.net"
 }
 
 variable "document_management_valid_domain" {
