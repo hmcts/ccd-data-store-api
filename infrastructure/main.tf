@@ -56,6 +56,12 @@ module "ccd-data-store-api" {
     DATA_STORE_DB_USERNAME              = "${module.postgres-data-store.user_name}"
     DATA_STORE_DB_PASSWORD              = "${module.postgres-data-store.postgresql_password}"
 
+    UK_DB_HOST = "${module.ccd-data-store-api.host_name}"
+    UK_DB_PORT = "${module.ccd-data-store-db.postgresql_listen_port}"
+    UK_DB_NAME = "${module.ccd-data-store-db.postgresql_database}"
+    UK_DB_USERNAME = "${module.ccd-data-store-db.user_name}"
+    UK_DB_PASSWORD = "${module.ccd-data-store-db.postgresql_password}"
+
     DEFINITION_STORE_HOST               = "http://ccd-definition-store-api-${local.env_ase_url}"
     USER_PROFILE_HOST                   = "http://ccd-user-profile-api-${local.env_ase_url}"
 
@@ -78,6 +84,18 @@ module "postgres-data-store" {
   location            = "West Europe"
   env                 = "${var.env}"
   postgresql_user     = "ccd"
+}
+
+module "ccd-data-store-db" {
+  source = "git@github.com:hmcts/moj-module-postgres?ref=cnp-449-tactical"
+  product = "${local.app_full_name}-postgres-db"
+  location = "${var.location}"
+  env = "${var.env}"
+  postgresql_user = "${var.postgresql_user}"
+  database_name = "${var.database-name}"
+  sku_name = "GP_Gen5_2"
+  sku_tier = "GeneralPurpose"
+  storage_mb = "51200"
 }
 
 module "ccd-data-store-vault" {
