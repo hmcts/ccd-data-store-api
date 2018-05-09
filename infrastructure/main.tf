@@ -87,3 +87,33 @@ module "ccd-data-store-vault" {
   resource_group_name = "${module.ccd-data-store-api.resource_group_name}"
   product_group_object_id = "be8b3850-998a-4a66-8578-da268b8abd6b"
 }
+
+resource "azurerm_key_vault_secret" "POSTGRES-USER" {
+  name = "${local.app_full_name}-POSTGRES-USER"
+  value = "${module.ccd-data-store-api.user_name}"
+  vault_uri = "${local.vaultUri}"
+}
+
+resource "azurerm_key_vault_secret" "POSTGRES-PASS" {
+  name = "${local.app_full_name}-POSTGRES-PASS"
+  value = "${module.ccd-data-store-api.postgresql_password}"
+  vault_uri = "${local.vaultUri}"
+}
+
+resource "azurerm_key_vault_secret" "POSTGRES_HOST" {
+  name = "${local.app_full_name}-POSTGRES-HOST"
+  value = "${module.ccd-data-store-api.host_name}"
+  vault_uri = "${local.vaultUri}"
+}
+
+resource "azurerm_key_vault_secret" "POSTGRES_PORT" {
+  name = "${local.app_full_name}-POSTGRES-PORT"
+  value = "${module.ccd-data-store-api.postgresql_listen_port}"
+  vault_uri = "${local.vaultUri}"
+}
+
+resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
+  name = "${local.app_full_name}-POSTGRES-DATABASE"
+  value = "${module.ccd-data-store-api.postgresql_database}"
+  vault_uri = "${local.vaultUri}"
+}
