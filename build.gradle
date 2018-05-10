@@ -164,10 +164,8 @@ spotbugs {
 }
 
 dependencies {
+    compile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: reformLogging
     compile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: reformLogging
-    compile group: 'uk.gov.hmcts.reform', name: 'java-logging-httpcomponents', version: reformLogging
-    compile group: 'uk.gov.hmcts.reform', name: 'java-logging-spring', version: reformLogging
-    compile "org.slf4j:slf4j-api:1.7.25"
     compileOnly 'org.projectlombok:lombok:1.16.20'
 
     // Needs to explicitly bring in a different hibernate version as in pom.xml
