@@ -50,11 +50,17 @@ module "ccd-data-store-api" {
   is_frontend = false
 
   app_settings = {
-    DATA_STORE_DB_HOST                  = "${module.postgres-data-store.host_name}"
-    DATA_STORE_DB_PORT                  = "${module.postgres-data-store.postgresql_listen_port}"
-    DATA_STORE_DB_NAME                  = "${module.postgres-data-store.postgresql_database}"
-    DATA_STORE_DB_USERNAME              = "${module.postgres-data-store.user_name}"
-    DATA_STORE_DB_PASSWORD              = "${module.postgres-data-store.postgresql_password}"
+    DATA_STORE_DB_HOST = "${var.use_uk_db != "true" ? module.postgres-data-store.host_name : module.data-store-db.host_name}"
+    DATA_STORE_DB_PORT = "${var.use_uk_db != "true" ? module.postgres-data-store.postgresql_listen_port : module.data-store-db.postgresql_listen_port}"
+    DATA_STORE_DB_NAME = "${var.use_uk_db != "true" ? module.postgres-data-store.postgresql_database : module.data-store-db.postgresql_database}"
+    DATA_STORE_DB_USERNAME = "${var.use_uk_db != "true" ? module.postgres-data-store.user_name : module.data-store-db.user_name}"
+    DATA_STORE_DB_PASSWORD = "${var.use_uk_db != "true" ? module.postgres-data-store.postgresql_password : module.data-store-db.postgresql_password}"
+
+    UK_DB_HOST = "${module.data-store-db.host_name}"
+    UK_DB_PORT = "${module.data-store-db.postgresql_listen_port}"
+    UK_DB_NAME = "${module.data-store-db.postgresql_database}"
+    UK_DB_USERNAME = "${module.data-store-db.user_name}"
+    UK_DB_PASSWORD = "${module.data-store-db.postgresql_password}"
 
     DEFINITION_STORE_HOST               = "http://ccd-definition-store-api-${local.env_ase_url}"
     USER_PROFILE_HOST                   = "http://ccd-user-profile-api-${local.env_ase_url}"
@@ -78,6 +84,18 @@ module "postgres-data-store" {
   location            = "West Europe"
   env                 = "${var.env}"
   postgresql_user     = "ccd"
+}
+
+module "data-store-db" {
+  source = "git@github.com:hmcts/moj-module-postgres?ref=cnp-449-tactical"
+  product = "${local.app_full_name}-postgres-db"
+  location = "${var.location}"
+  env = "${var.env}"
+  postgresql_user = "${var.postgresql_user}"
+  database_name = "${var.database_name}"
+  sku_name = "GP_Gen5_2"
+  sku_tier = "GeneralPurpose"
+  storage_mb = "51200"
 }
 
 module "ccd-data-store-vault" {
