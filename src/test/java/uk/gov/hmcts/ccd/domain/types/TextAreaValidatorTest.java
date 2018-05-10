@@ -36,7 +36,7 @@ public class TextAreaValidatorTest {
         CASE_FIELD.setFieldType(fieldType);
     }
 
-    @org.junit.Ignore("TODO investigate why this unit case failed on BaseType#L32")
+    @org.junit.Ignore("RDM-2190 investigate why this unit case failed on BaseType#L32")
     @Test
     public void getType() {
         assertThat(validator.getType(), is(BaseType.get("TextArea")));
