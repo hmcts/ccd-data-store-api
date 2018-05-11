@@ -1,32 +1,25 @@
 package uk.gov.hmcts.ccd.datastore.tests.helper;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.HttpClients;
-import uk.gov.hmcts.auth.provider.service.token.HttpComponentsBasedServiceTokenGenerator;
-import uk.gov.hmcts.auth.totp.GoogleTotpAuthenticator;
-
-import java.util.HashMap;
+import feign.Feign;
+import feign.jackson.JacksonEncoder;
+import org.springframework.cloud.netflix.feign.support.SpringMvcContract;
+import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
+import uk.gov.hmcts.reform.authorisation.generators.ServiceAuthTokenGenerator;
 
 public class S2SHelper {
 
-    private final String baseUrl;
-    private final HashMap<String, String> services = new HashMap<>();
-    private final GoogleTotpAuthenticator authenticator = new GoogleTotpAuthenticator();
-    private final HttpClient httpClient = HttpClients.createDefault();
+    private final ServiceAuthTokenGenerator tokenGenerator;
 
-    public S2SHelper(String baseUrl) {
-        this.baseUrl = baseUrl;
+    public S2SHelper(final String s2sUrl, final String secret, final String microservice) {
+        final ServiceAuthorisationApi serviceAuthorisationApi = Feign.builder()
+            .encoder(new JacksonEncoder())
+            .contract(new SpringMvcContract())
+            .target(ServiceAuthorisationApi.class, s2sUrl);
+
+        this.tokenGenerator = new ServiceAuthTokenGenerator(secret, microservice, serviceAuthorisationApi);
     }
 
-    public String getToken(String microservice, String secret) {
-        return services.computeIfAbsent(microservice, e -> {
-            final HttpComponentsBasedServiceTokenGenerator tokenGenerator = new HttpComponentsBasedServiceTokenGenerator(
-                httpClient,
-                baseUrl,
-                microservice,
-                authenticator,
-                secret);
-            return tokenGenerator.generate();
-        });
+    public String getToken() {
+        return tokenGenerator.generate();
     }
 }
