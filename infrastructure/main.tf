@@ -146,6 +146,7 @@ resource "azurerm_key_vault_secret" "POSTGRES_PORT" {
 resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
   name = "${local.app_full_name}-POSTGRES-DATABASE"
   value = "${var.use_uk_db != "true" ? module.postgres-data-store.postgresql_database : module.data-store-db.postgresql_database}"
+}
 
 resource "azurerm_key_vault_secret" "gw_s2s_key" {
   name = "microserviceGatewaySecret"
