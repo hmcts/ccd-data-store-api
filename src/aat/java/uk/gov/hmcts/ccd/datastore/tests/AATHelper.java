@@ -14,7 +14,7 @@ public enum AATHelper {
 
     AATHelper() {
         idamHelper = new IdamHelper(getIdamURL());
-        s2SHelper = new S2SHelper(getS2SURL());
+        s2SHelper = new S2SHelper(getS2SURL(), getGatewayServiceSecret(), getGatewayServiceName());
         ccdHelper = new CCDHelper();
     }
 
