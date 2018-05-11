@@ -24,5 +24,6 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 }
 
 withParameterizedPipeline('java', 'ccd', 'data-store-api', params.ENVIRONMENT, 'sandbox') {
+    enableDbMigration()  
     loadVaultSecrets(secrets)
 }
