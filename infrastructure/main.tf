@@ -37,6 +37,10 @@ data "vault_generic_secret" "ccd_data_s2s_key" {
   path = "secret/${var.vault_section}/ccidam/service-auth-provider/api/microservice-keys/ccd-data"
 }
 
+data "vault_generic_secret" "gateway_idam_key" {
+  path = "secret/${var.vault_section}/ccidam/service-auth-provider/api/microservice-keys/ccd-gw"
+}
+
 module "ccd-data-store-api" {
   source   = "git@github.com:hmcts/moj-module-webapp?ref=master"
   product  = "${local.app_full_name}"
@@ -104,4 +108,10 @@ module "ccd-data-store-vault" {
   object_id           = "${var.jenkins_AAD_objectId}"
   resource_group_name = "${module.ccd-data-store-api.resource_group_name}"
   product_group_object_id = "be8b3850-998a-4a66-8578-da268b8abd6b"
+}
+
+resource "azurerm_key_vault_secret" "gw_s2s_key" {
+  name = "microserviceGatewaySecret"
+  value = "${data.vault_generic_secret.gateway_idam_key.data["value"]}"
+  vault_uri = "${module.ccd-data-store-vault.key_vault_uri}"
 }
