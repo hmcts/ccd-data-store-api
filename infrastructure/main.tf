@@ -40,6 +40,10 @@ data "vault_generic_secret" "ccd_data_s2s_key" {
   path = "secret/${var.vault_section}/ccidam/service-auth-provider/api/microservice-keys/ccd-data"
 }
 
+data "vault_generic_secret" "gateway_idam_key" {
+  path = "secret/${var.vault_section}/ccidam/service-auth-provider/api/microservice-keys/ccd-gw"
+}
+
 module "ccd-data-store-api" {
   source   = "git@github.com:hmcts/moj-module-webapp?ref=master"
   product  = "${local.app_full_name}"
@@ -142,5 +146,9 @@ resource "azurerm_key_vault_secret" "POSTGRES_PORT" {
 resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
   name = "${local.app_full_name}-POSTGRES-DATABASE"
   value = "${var.use_uk_db != "true" ? module.postgres-data-store.postgresql_database : module.data-store-db.postgresql_database}"
+
+resource "azurerm_key_vault_secret" "gw_s2s_key" {
+  name = "microserviceGatewaySecret"
+  value = "${data.vault_generic_secret.gateway_idam_key.data["value"]}"
   vault_uri = "${module.ccd-data-store-vault.key_vault_uri}"
 }

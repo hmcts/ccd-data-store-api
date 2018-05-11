@@ -17,3 +17,7 @@ output "idam_url" {
 output "s2s_url" {
   value = "${local.s2s_url}"
 }
+
+output "CCD_GW_SERVICE_NAME" {
+  value = "ccd_gw"
+}
