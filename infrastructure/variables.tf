@@ -55,14 +55,6 @@ variable "use_uk_db" {
   default = "false"
 }
 
-////////////////////////////////
-// S2S
-////////////////////////////////
-
-variable "s2s_url" {
-  default = "http://betaDevBccidamS2SLB.reform.hmcts.net"
-}
-
 variable "authorised-services" {
   type    = "string"
   default = "ccd_data,ccd_gw,ccd_ps,probate_backend,divorce_ccd_submission,sscs,cmc,cmc_claim_store"

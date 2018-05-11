@@ -31,6 +31,9 @@ locals {
   previewVaultUri = "https://ccd-data-store-aat.vault.azure.net/"
   nonPreviewVaultUri = "${module.ccd-data-store-vault.key_vault_uri}"
   vaultUri = "${(var.env == "preview" || var.env == "spreview") ? local.previewVaultUri : local.nonPreviewVaultUri}"
+
+  // S2S
+  s2s_url = "http://rpe-service-auth-provider-${local.env_ase_url}"
 }
 
 data "vault_generic_secret" "ccd_data_s2s_key" {
@@ -69,7 +72,7 @@ module "ccd-data-store-api" {
     CCD_DM_DOMAIN                       = "${local.dm_valid_domain}"
 
     IDAM_USER_URL                       = "${var.idam_api_url}"
-    IDAM_S2S_URL                        = "${var.s2s_url}"
+    IDAM_S2S_URL                        = "${local.s2s_url}"
     DATA_STORE_IDAM_KEY                 = "${data.vault_generic_secret.ccd_data_s2s_key.data["value"]}"
 
     DATA_STORE_S2S_AUTHORISED_SERVICES  = "${var.authorised-services}"
