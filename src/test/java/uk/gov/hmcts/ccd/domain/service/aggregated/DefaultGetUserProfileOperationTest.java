@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.data.user.UserService;
 import uk.gov.hmcts.ccd.domain.model.aggregated.*;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -17,7 +18,7 @@ import static org.mockito.Mockito.doReturn;
 public class DefaultGetUserProfileOperationTest {
 
     @Mock
-    private UserRepository userRepository;
+    private UserService userService;
 
     private DefaultGetUserProfileOperation defaultGetUserProfileOperation;
 
@@ -32,13 +33,13 @@ public class DefaultGetUserProfileOperationTest {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        defaultGetUserProfileOperation = new DefaultGetUserProfileOperation(userRepository);
+        defaultGetUserProfileOperation = new DefaultGetUserProfileOperation(userService);
 
         userProfile.setUser(user);
         userProfile.setJurisdictions(new JurisdictionDisplayProperties[] {test1JurisdictionDisplayProperties, test2JurisdictionDisplayProperties});
         userProfile.setChannels(new String[] {test1Channel, test2Channel});
         userProfile.setDefaultSettings(testDefaultSettings);
-        doReturn(userProfile).when(userRepository).getUserSettings();
+        doReturn(userProfile).when(userService).getUserProfile();
     }
 
     @Test
