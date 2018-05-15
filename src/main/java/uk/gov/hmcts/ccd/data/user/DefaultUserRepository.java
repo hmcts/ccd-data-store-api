@@ -38,13 +38,13 @@ public class DefaultUserRepository implements UserRepository {
 
     public static final String QUALIFIER = "default";
 
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultUserRepository.class);
     private static final String RELEVANT_ROLES = "caseworker-%s";
+
     private final ApplicationParams applicationParams;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final SecurityUtils securityUtils;
     private final RestTemplate restTemplate;
-
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultUserRepository.class);
 
     @Inject
     public DefaultUserRepository(final ApplicationParams applicationParams,
@@ -58,43 +58,6 @@ public class DefaultUserRepository implements UserRepository {
     }
 
     @Override
-    public UserProfile getUserSettings() {
-        final IDAMProperties idamProperties = getUserDetails();
-        final String userId = idamProperties.getEmail();
-        final UserProfile userProfile = new UserProfile();
-        final UserDefault userDefault = getUserDefaultSettings(userId);
-        final JurisdictionDisplayProperties[] jurisdictions = userDefault.getJurisdictions()
-            .stream()
-            .map(j -> {
-                final JurisdictionDisplayProperties jurisdiction = new JurisdictionDisplayProperties();
-                jurisdiction.setId(j.getId());
-                // TODO https://tools.hmcts.net/jira/browse/RDM-1433
-                Optional<Jurisdiction> caseTypeJurisdiction = caseDefinitionRepository.getCaseTypesForJurisdiction(jurisdiction.getId())
-                    .stream()
-                    .findAny()
-                    .map(CaseType::getJurisdiction);
-                if (caseTypeJurisdiction.isPresent()) {
-                    jurisdiction.setName(caseTypeJurisdiction.get().getName());
-                    jurisdiction.setDescription(caseTypeJurisdiction.get().getDescription());
-                }
-                return jurisdiction;
-            })
-            .toArray(JurisdictionDisplayProperties[]::new);
-
-        if (jurisdictions.length == 0)
-            throw new BadRequestException("No Case Type's found for the Jurisdictions associated with User " + userId);
-        userProfile.setJurisdictions(jurisdictions);
-        userProfile.getUser().setIdamProperties(idamProperties);
-
-        final WorkbasketDefault workbasketDefault = new WorkbasketDefault();
-        workbasketDefault.setJurisdictionId(userDefault.getWorkBasketDefaultJurisdiction());
-        workbasketDefault.setCaseTypeId(userDefault.getWorkBasketDefaultCaseType());
-        workbasketDefault.setStateId(userDefault.getWorkBasketDefaultState());
-        userProfile.getDefaultSettings().setWorkbasketDefault(workbasketDefault);
-        return userProfile;
-    }
-
-    @Override
     public IDAMProperties getUserDetails() {
         final HttpEntity requestEntity = new HttpEntity(securityUtils.userAuthorizationHeaders());
         return restTemplate.exchange(applicationParams.idamUserProfileURL(), HttpMethod.GET, requestEntity, IDAMProperties.class).getBody();
@@ -102,6 +65,7 @@ public class DefaultUserRepository implements UserRepository {
 
     @Override
     public Set<String> getUserRoles() {
+        LOG.debug("retrieving user roles");
         final ServiceAndUserDetails serviceAndUser = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return serviceAndUser.getAuthorities()
             .stream()
@@ -127,8 +91,10 @@ public class DefaultUserRepository implements UserRepository {
      * @param userId user id
      * @return UserDefault
      */
-    private UserDefault getUserDefaultSettings(final String userId) {
+    @Override
+    public UserDefault getUserDefaultSettings(final String userId) {
         try {
+            LOG.debug("retrieving default user settings for user {}", userId);
             final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
             final Map<String, String> queryParams = new HashMap<>();
             queryParams.put("uid", userId);
@@ -142,7 +108,6 @@ public class DefaultUserRepository implements UserRepository {
                 throw new BadRequestException(message);
             throw new ServiceException("Problem getting user default settings for " + userId);
         }
-
     }
 
     private boolean filterRole(final String jurisdictionId, final String role) {
