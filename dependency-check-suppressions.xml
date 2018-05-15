@@ -20,25 +20,8 @@
         <cpe>cpe:/a:postgresql:postgresql</cpe>
     </suppress>
     <suppress>
-        <notes><![CDATA[ https://github.com/jeremylong/DependencyCheck/issues/987
-   file name: tomcat-annotations-api-8.5.23.jar
-   ]]></notes>
-        <gav regex="true">^org\.apache\.tomcat:tomcat-annotations-api:.*$</gav>
-        <cpe>cpe:/a:apache:tomcat</cpe>
-        <cpe>cpe:/a:apache_tomcat:apache_tomcat</cpe>
-        <cpe>cpe:/a:apache_software_foundation:tomcat</cpe>
-    </suppress>
-    <suppress>
-        <notes>
-            Introduced by service-token-generator-spring-2.1.0.jar
-        </notes>
-        <cve>CVE-2016-9878</cve>
-    </suppress>
-    <suppress>
-        <notes>
-            Spring Boot application that are not installed as a service, or are not using the embedded launch script are not susceptible.
-        </notes>
-        <cve>CVE-2018-1196</cve>
+        <notes>See https://github.com/jeremylong/DependencyCheck/issues/1146 for Embedded Tomcat</notes>
+        <cve>CVE-2017-12617</cve>
     </suppress>
     <suppress>
         <notes>
@@ -48,20 +31,31 @@
     </suppress>
     <suppress>
         <notes>
-            Introduced by Apache Tomcat. Wrong documentation of algorithm, fixed in later versions.
+            Spring Boot application that are not installed as a service, or are not using the embedded launch script are not susceptible.
         </notes>
-        <cve>CVE-2017-15706</cve>
+        <cve>CVE-2018-1196</cve>
     </suppress>
     <suppress>
         <notes>
-            Introduced by Apache Tomcat.
+            Only affect PATCH requests, those are not supported by CCD APIs.
         </notes>
-        <cve>CVE-2018-1304</cve>
+        <cve>CVE-2017-8046</cve>
     </suppress>
     <suppress>
-        <notes>
-            Introduced by Apache Tomcat.
-        </notes>
-        <cve>CVE-2018-1305</cve>
+        <notes>SSL related</notes>
+        <cve>CVE-2014-3488</cve>
+    </suppress>
+    <suppress>
+        <notes>cookie related</notes>
+        <cve>CVE-2015-2156</cve>
+    </suppress>
+    <suppress>
+        <notes>ssl related</notes>
+        <cve>CVE-2016-4970</cve>
+    </suppress>
+    <suppress>
+        <notes>suppress false positives</notes>
+        <gav regex="true">^org\.apache\.tomcat:tomcat-annotations-api:.*$</gav>
+        <cpe>cpe:/a:apache:tomcat</cpe>
     </suppress>
 </suppressions>

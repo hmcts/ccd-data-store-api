@@ -31,10 +31,17 @@ locals {
   previewVaultUri = "https://ccd-data-store-aat.vault.azure.net/"
   nonPreviewVaultUri = "${module.ccd-data-store-vault.key_vault_uri}"
   vaultUri = "${(var.env == "preview" || var.env == "spreview") ? local.previewVaultUri : local.nonPreviewVaultUri}"
+
+  // S2S
+  s2s_url = "http://rpe-service-auth-provider-${local.env_ase_url}"
 }
 
 data "vault_generic_secret" "ccd_data_s2s_key" {
   path = "secret/${var.vault_section}/ccidam/service-auth-provider/api/microservice-keys/ccd-data"
+}
+
+data "vault_generic_secret" "gateway_idam_key" {
+  path = "secret/${var.vault_section}/ccidam/service-auth-provider/api/microservice-keys/ccd-gw"
 }
 
 module "ccd-data-store-api" {
@@ -48,11 +55,19 @@ module "ccd-data-store-api" {
   additional_host_name = "debugparam"
 
   app_settings = {
-    DATA_STORE_DB_HOST                  = "${module.postgres-data-store.host_name}"
-    DATA_STORE_DB_PORT                  = "${module.postgres-data-store.postgresql_listen_port}"
-    DATA_STORE_DB_NAME                  = "${module.postgres-data-store.postgresql_database}"
-    DATA_STORE_DB_USERNAME              = "${module.postgres-data-store.user_name}"
-    DATA_STORE_DB_PASSWORD              = "${module.postgres-data-store.postgresql_password}"
+    DATA_STORE_DB_HOST = "${var.use_uk_db != "true" ? module.postgres-data-store.host_name : module.data-store-db.host_name}"
+    DATA_STORE_DB_PORT = "${var.use_uk_db != "true" ? module.postgres-data-store.postgresql_listen_port : module.data-store-db.postgresql_listen_port}"
+    DATA_STORE_DB_NAME = "${var.use_uk_db != "true" ? module.postgres-data-store.postgresql_database : module.data-store-db.postgresql_database}"
+    DATA_STORE_DB_USERNAME = "${var.use_uk_db != "true" ? module.postgres-data-store.user_name : module.data-store-db.user_name}"
+    DATA_STORE_DB_PASSWORD = "${var.use_uk_db != "true" ? module.postgres-data-store.postgresql_password : module.data-store-db.postgresql_password}"
+
+    UK_DB_HOST = "${module.data-store-db.host_name}"
+    UK_DB_PORT = "${module.data-store-db.postgresql_listen_port}"
+    UK_DB_NAME = "${module.data-store-db.postgresql_database}"
+    UK_DB_USERNAME = "${module.data-store-db.user_name}"
+    UK_DB_PASSWORD = "${module.data-store-db.postgresql_password}"
+
+    ENABLE_DB_MIGRATE = "false"
 
     DEFINITION_STORE_HOST               = "http://ccd-definition-store-api-${local.env_ase_url}"
     USER_PROFILE_HOST                   = "http://ccd-user-profile-api-${local.env_ase_url}"
@@ -60,7 +75,7 @@ module "ccd-data-store-api" {
     CCD_DM_DOMAIN                       = "${local.dm_valid_domain}"
 
     IDAM_USER_URL                       = "${var.idam_api_url}"
-    IDAM_S2S_URL                        = "${var.s2s_url}"
+    IDAM_S2S_URL                        = "${local.s2s_url}"
     DATA_STORE_IDAM_KEY                 = "${data.vault_generic_secret.ccd_data_s2s_key.data["value"]}"
 
     DATA_STORE_S2S_AUTHORISED_SERVICES  = "${var.authorised-services}"
@@ -78,6 +93,18 @@ module "postgres-data-store" {
   postgresql_user     = "ccd"
 }
 
+module "data-store-db" {
+  source = "git@github.com:hmcts/moj-module-postgres?ref=cnp-449-tactical"
+  product = "${local.app_full_name}-postgres-db"
+  location = "${var.location}"
+  env = "${var.env}"
+  postgresql_user = "${var.postgresql_user}"
+  database_name = "${var.database_name}"
+  sku_name = "GP_Gen5_2"
+  sku_tier = "GeneralPurpose"
+  storage_mb = "51200"
+}
+
 module "ccd-data-store-vault" {
   source              = "git@github.com:hmcts/moj-module-key-vault?ref=master"
   name                = "${local.vaultName}" // Max 24 characters
@@ -87,4 +114,44 @@ module "ccd-data-store-vault" {
   object_id           = "${var.jenkins_AAD_objectId}"
   resource_group_name = "${module.ccd-data-store-api.resource_group_name}"
   product_group_object_id = "be8b3850-998a-4a66-8578-da268b8abd6b"
+}
+
+////////////////////////////////
+// Populate Vault with DB info
+////////////////////////////////
+
+resource "azurerm_key_vault_secret" "POSTGRES-USER" {
+  name = "${local.app_full_name}-POSTGRES-USER"
+  value = "${var.use_uk_db != "true" ? module.postgres-data-store.user_name : module.data-store-db.user_name}"
+  vault_uri = "${module.ccd-data-store-vault.key_vault_uri}"
+}
+
+resource "azurerm_key_vault_secret" "POSTGRES-PASS" {
+  name = "${local.app_full_name}-POSTGRES-PASS"
+  value = "${var.use_uk_db != "true" ? module.postgres-data-store.postgresql_password : module.data-store-db.postgresql_password}"
+  vault_uri = "${module.ccd-data-store-vault.key_vault_uri}"
+}
+
+resource "azurerm_key_vault_secret" "POSTGRES_HOST" {
+  name = "${local.app_full_name}-POSTGRES-HOST"
+  value = "${var.use_uk_db != "true" ? module.postgres-data-store.host_name : module.data-store-db.host_name}"
+  vault_uri = "${module.ccd-data-store-vault.key_vault_uri}"
+}
+
+resource "azurerm_key_vault_secret" "POSTGRES_PORT" {
+  name = "${local.app_full_name}-POSTGRES-PORT"
+  value = "${var.use_uk_db != "true" ? module.postgres-data-store.postgresql_listen_port : module.data-store-db.postgresql_listen_port}"
+  vault_uri = "${module.ccd-data-store-vault.key_vault_uri}"
+}
+
+resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
+  name = "${local.app_full_name}-POSTGRES-DATABASE"
+  value = "${var.use_uk_db != "true" ? module.postgres-data-store.postgresql_database : module.data-store-db.postgresql_database}"
+  vault_uri = "${module.ccd-data-store-vault.key_vault_uri}"
+}
+
+resource "azurerm_key_vault_secret" "gw_s2s_key" {
+  name = "microserviceGatewaySecret"
+  value = "${data.vault_generic_secret.gateway_idam_key.data["value"]}"
+  vault_uri = "${module.ccd-data-store-vault.key_vault_uri}"
 }

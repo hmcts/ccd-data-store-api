@@ -50,10 +50,10 @@ public class ApplicationParams {
     private String defaultPrintType;
 
     @Value("${pagination.page.size}")
-    private String paginationPageSize;
+    private Integer paginationPageSize;
 
     @Value("${definition.cache.ttl.secs}")
-    private String definitionCacheTTLSecs;
+    private Integer definitionCacheTTLSecs;
 
     private static String encode(final String stringToEncode) {
         try {
@@ -107,6 +107,10 @@ public class ApplicationParams {
         return uiDefinitionHost + "/api/display/wizard-page-structure/case-types/" + encode(caseTypeId) +"/event-triggers/" + encode(eventTriggerId);
     }
 
+    public String jurisdictionDefURL() {
+        return caseDefinitionHost + "/api/data/jurisdictions";
+    }
+
     public String searchInputDefinition(final String caseTypeId) {
         return uiDefinitionHost + "/api/display/search-input-definition/" + encode(caseTypeId);
     }
@@ -156,10 +160,10 @@ public class ApplicationParams {
     }
 
     public int getPaginationPageSize() {
-        return Integer.valueOf(paginationPageSize);
+        return paginationPageSize;
     }
 
     public int getDefinitionCacheTTLSecs() {
-        return Integer.valueOf(this.definitionCacheTTLSecs);
+        return definitionCacheTTLSecs;
     }
 }
