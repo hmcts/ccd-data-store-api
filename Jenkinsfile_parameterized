@@ -3,14 +3,27 @@
 
 properties([
   parameters([
-    string(name: 'PRODUCT_NAME', defaultValue: 'ccd', description: ''),
-    string(name: 'APP', defaultValue: 'data-store-api', description: ''),
-    string(name: 'TYPE', defaultValue: 'java', description: ''),
-    string(name: 'ENVIRONMENT', defaultValue: 'sandbox', description: 'Environment where code should be build and deployed'),
-    choice(name: 'SUBSCRIPTION', choices: 'sandbox\nnonprod\nprod', description: 'Azure subscriptions available to build in')
+    choice(name: 'ENVIRONMENT', choices: 'saat\nsprod\nsandbox', description: 'Environment where code should be build and deployed')
   ]),
-  [$class: 'GithubProjectProperty', projectUrlStr: 'https://github.com/hmcts/ccd-data-store-api'],
   pipelineTriggers([[$class: 'GitHubPushTrigger']])
 ])
 
-withParameterizedPipeline(params.TYPE, params.PRODUCT_NAME, params.APP, params.ENVIRONMENT, params.SUBSCRIPTION) {}
+List<LinkedHashMap<String, Object>> secrets = [
+    secret('caseworkerAutoTest1Email', 'CCD_CASEWORKER_AUTOTEST_EMAIL'),
+    secret('caseworkerAutoTest1Password', 'CCD_CASEWORKER_AUTOTEST_PASSWORD'),
+    secret('microserviceGatewaySecret', 'CCD_GW_SERVICE_SECRET'),
+]
+
+static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
+    [ $class: 'AzureKeyVaultSecret',
+      secretType: 'Secret',
+      name: secretName,
+      version: '',
+      envVariable: envVar
+    ]
+}
+
+withParameterizedPipeline('java', 'ccd', 'data-store-api', params.ENVIRONMENT, 'sandbox') {
+    enableDbMigration()  
+    loadVaultSecrets(secrets)
+}
