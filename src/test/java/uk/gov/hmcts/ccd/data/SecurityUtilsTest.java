@@ -11,8 +11,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import uk.gov.hmcts.auth.provider.service.token.ServiceTokenGenerator;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.util.Arrays;
 
@@ -39,7 +39,7 @@ class SecurityUtilsTest {
     private ServiceAndUserDetails principal;
 
     @Mock
-    private ServiceTokenGenerator serviceTokenGenerator;
+    private AuthTokenGenerator serviceTokenGenerator;
 
     @InjectMocks
     private SecurityUtils securityUtils;
