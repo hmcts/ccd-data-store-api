@@ -15,9 +15,9 @@ public class MetaData {
     public static final String LAST_MODIFIED_PARAM = "last_modified_date";
     public static final String SECURITY_CLASSIFICATION_PARAM = "security_classification";
     public static final String PAGE_PARAM = "page";
-    public static final String SORT_DIRECTION = "sortDirection";
+    public static final String SORT_DIRECTION_PARAM = "sortDirection";
     private static final List<String> ALL_METADATA = newArrayList(STATE_PARAM, CASE_REFERENCE_PARAM,
-            CREATED_DATE_PARAM, LAST_MODIFIED_PARAM, SECURITY_CLASSIFICATION_PARAM, PAGE_PARAM, SORT_DIRECTION);
+            CREATED_DATE_PARAM, LAST_MODIFIED_PARAM, SECURITY_CLASSIFICATION_PARAM, PAGE_PARAM, SORT_DIRECTION_PARAM);
 
     private String caseTypeId;
     private String jurisdiction;

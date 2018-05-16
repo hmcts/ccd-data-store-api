@@ -473,7 +473,7 @@ public class CaseDetailsEndpoint {
             }
         });
 
-        param(queryParameters, MetaData.SORT_DIRECTION).ifPresent(sd -> {
+        param(queryParameters, MetaData.SORT_DIRECTION_PARAM).ifPresent(sd -> {
             if (Stream.of("ASC", "DESC").noneMatch(direction -> direction.equalsIgnoreCase(sd))) {
                 throw new BadRequestException(String.format("Unknown sort direction: %s", sd));
             }
@@ -495,7 +495,7 @@ public class CaseDetailsEndpoint {
         metadata.setLastModified(param(queryParameters, MetaData.LAST_MODIFIED_PARAM));
         metadata.setSecurityClassification(param(queryParameters, MetaData.SECURITY_CLASSIFICATION_PARAM));
         metadata.setPage(param(queryParameters, MetaData.PAGE_PARAM));
-        metadata.setSortDirection(param(queryParameters, MetaData.SORT_DIRECTION));
+        metadata.setSortDirection(param(queryParameters, MetaData.SORT_DIRECTION_PARAM));
 
         return metadata;
     }
