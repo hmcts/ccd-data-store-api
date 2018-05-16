@@ -115,7 +115,7 @@ public abstract class CaseDetailsQueryBuilder<T> {
     }
 
     private CaseDetailsQueryBuilder orderByCreatedDate(String sortDirection) {
-        if (sortDirection.equals("asc")) {
+        if (sortDirection.equalsIgnoreCase("asc")) {
             orders.add(cb.asc(root.get("createdDate")));
         } else {
             orders.add(cb.desc(root.get("createdDate")));
