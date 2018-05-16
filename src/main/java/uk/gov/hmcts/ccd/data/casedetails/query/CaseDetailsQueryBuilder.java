@@ -109,12 +109,10 @@ public abstract class CaseDetailsQueryBuilder<T> {
         metadata.getLastModified().ifPresent(this::whereLastModified);
         metadata.getSecurityClassification().ifPresent(this::whereSecurityClassification);
 
-        orderByCreatedDate(metadata.getSortDirection().orElse("asc"));
-
         return this;
     }
 
-    private CaseDetailsQueryBuilder orderByCreatedDate(String sortDirection) {
+    public CaseDetailsQueryBuilder orderByCreatedDate(String sortDirection) {
         if (sortDirection.equalsIgnoreCase("asc")) {
             orders.add(cb.asc(root.get("createdDate")));
         } else {

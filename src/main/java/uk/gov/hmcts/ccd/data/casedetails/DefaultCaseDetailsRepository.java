@@ -214,6 +214,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     private Query getQueryByMetaData(MetaData metadata) {
         return queryBuilderFactory.select(em)
                                   .whereMetadata(metadata)
+                                  .orderByCreatedDate(metadata.getSortDirection().orElse("asc"))
                                   .build();
     }
 
