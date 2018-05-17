@@ -1,0 +1,32 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPattern": "/api/display/wizard-page-structure.*"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "wizard_pages": [
+        {
+          "id": "createCaseInfoPage",
+          "label" : "Required Information1",
+          "order": 1,
+          "wizard_page_fields" : [
+            {
+              "case_field_id" : "PersonFirstName",
+              "order": 1
+            },
+            {
+              "case_field_id" : "PersonLastNameWithValidation",
+              "order": 2
+            }
+          ],
+          "defaultService" : "ccd"
+        }
+      ]
+    }
+  }
+}
