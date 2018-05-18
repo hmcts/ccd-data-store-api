@@ -40,6 +40,10 @@ data "vault_generic_secret" "ccd_data_s2s_key" {
   path = "secret/${var.vault_section}/ccidam/service-auth-provider/api/microservice-keys/ccd-data"
 }
 
+data "vault_generic_secret" "gateway_idam_key" {
+  path = "secret/${var.vault_section}/ccidam/service-auth-provider/api/microservice-keys/ccd-gw"
+}
+
 module "ccd-data-store-api" {
   source   = "git@github.com:hmcts/moj-module-webapp?ref=master"
   product  = "${local.app_full_name}"
@@ -61,6 +65,8 @@ module "ccd-data-store-api" {
     UK_DB_NAME = "${module.data-store-db.postgresql_database}"
     UK_DB_USERNAME = "${module.data-store-db.user_name}"
     UK_DB_PASSWORD = "${module.data-store-db.postgresql_password}"
+
+    ENABLE_DB_MIGRATE = "false"
 
     DEFINITION_STORE_HOST               = "http://ccd-definition-store-api-${local.env_ase_url}"
     USER_PROFILE_HOST                   = "http://ccd-user-profile-api-${local.env_ase_url}"
@@ -107,4 +113,44 @@ module "ccd-data-store-vault" {
   object_id           = "${var.jenkins_AAD_objectId}"
   resource_group_name = "${module.ccd-data-store-api.resource_group_name}"
   product_group_object_id = "be8b3850-998a-4a66-8578-da268b8abd6b"
+}
+
+////////////////////////////////
+// Populate Vault with DB info
+////////////////////////////////
+
+resource "azurerm_key_vault_secret" "POSTGRES-USER" {
+  name = "${local.app_full_name}-POSTGRES-USER"
+  value = "${var.use_uk_db != "true" ? module.postgres-data-store.user_name : module.data-store-db.user_name}"
+  vault_uri = "${module.ccd-data-store-vault.key_vault_uri}"
+}
+
+resource "azurerm_key_vault_secret" "POSTGRES-PASS" {
+  name = "${local.app_full_name}-POSTGRES-PASS"
+  value = "${var.use_uk_db != "true" ? module.postgres-data-store.postgresql_password : module.data-store-db.postgresql_password}"
+  vault_uri = "${module.ccd-data-store-vault.key_vault_uri}"
+}
+
+resource "azurerm_key_vault_secret" "POSTGRES_HOST" {
+  name = "${local.app_full_name}-POSTGRES-HOST"
+  value = "${var.use_uk_db != "true" ? module.postgres-data-store.host_name : module.data-store-db.host_name}"
+  vault_uri = "${module.ccd-data-store-vault.key_vault_uri}"
+}
+
+resource "azurerm_key_vault_secret" "POSTGRES_PORT" {
+  name = "${local.app_full_name}-POSTGRES-PORT"
+  value = "${var.use_uk_db != "true" ? module.postgres-data-store.postgresql_listen_port : module.data-store-db.postgresql_listen_port}"
+  vault_uri = "${module.ccd-data-store-vault.key_vault_uri}"
+}
+
+resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
+  name = "${local.app_full_name}-POSTGRES-DATABASE"
+  value = "${var.use_uk_db != "true" ? module.postgres-data-store.postgresql_database : module.data-store-db.postgresql_database}"
+  vault_uri = "${module.ccd-data-store-vault.key_vault_uri}"
+}
+
+resource "azurerm_key_vault_secret" "gw_s2s_key" {
+  name = "microserviceGatewaySecret"
+  value = "${data.vault_generic_secret.gateway_idam_key.data["value"]}"
+  vault_uri = "${module.ccd-data-store-vault.key_vault_uri}"
 }
