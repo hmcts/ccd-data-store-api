@@ -1,0 +1,15 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPattern": "/api/data/case-type/.*/version"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "version": "33"
+    }
+  }
+}

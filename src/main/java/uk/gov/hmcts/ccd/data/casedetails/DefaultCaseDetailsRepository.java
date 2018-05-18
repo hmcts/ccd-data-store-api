@@ -29,6 +29,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 
+
 @Named
 @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
 @Singleton
