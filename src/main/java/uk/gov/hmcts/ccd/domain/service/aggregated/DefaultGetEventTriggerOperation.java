@@ -81,6 +81,7 @@ public class DefaultGetEventTriggerOperation implements GetEventTriggerOperation
         caseTrigger.setName(eventTrigger.getName());
         caseTrigger.setDescription(eventTrigger.getDescription());
         caseTrigger.setShowSummary(eventTrigger.getShowSummary());
+        caseTrigger.setShowEventNotes(eventTrigger.getShowEventNotes());
         return caseTrigger;
     }
 
