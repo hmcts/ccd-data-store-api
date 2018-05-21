@@ -40,6 +40,8 @@ public class CaseEvent implements Serializable {
     private Boolean showSummary = null;
     @JsonProperty("show_event_notes")
     private Boolean showEventNotes = null;
+    @JsonProperty("end_button_label")
+    private String endButtonLabel = null;
     @JsonProperty("acls")
     private List<AccessControlList> accessControlLists;
 
@@ -179,4 +181,12 @@ public class CaseEvent implements Serializable {
     public void setShowEventNotes(Boolean showEventNotes) {
         this.showEventNotes = showEventNotes;
     }
+    public String getEndButtonLabel() {
+        return endButtonLabel;
+    }
+
+    public void setEndButtonLabel(String endButtonLabel) {
+        this.endButtonLabel = endButtonLabel;
+    }
+
 }

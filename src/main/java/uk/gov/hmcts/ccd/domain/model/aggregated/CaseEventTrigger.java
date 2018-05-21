@@ -21,6 +21,8 @@ public class CaseEventTrigger {
     private Boolean showSummary;
     @JsonProperty("show_event_notes")
     private Boolean showEventNotes;
+    @JsonProperty("end_button_label")
+    private String endButtonLabel;
 
     public String getId() {
         return id;
@@ -92,5 +94,13 @@ public class CaseEventTrigger {
 
     public void setShowEventNotes(Boolean showEventNotes) {
         this.showEventNotes = showEventNotes;
+    }
+
+    public String getEndButtonLabel() {
+        return endButtonLabel;
+    }
+
+    public void setEndButtonLabel(String endButtonLabel) {
+        this.endButtonLabel = endButtonLabel;
     }
 }
