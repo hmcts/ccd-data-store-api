@@ -38,6 +38,8 @@ public class CaseEvent implements Serializable {
     private SecurityClassification securityClassification;
     @JsonProperty("show_summary")
     private Boolean showSummary = null;
+    @JsonProperty("show_event_notes")
+    private Boolean showEventNotes = null;
     @JsonProperty("end_button_label")
     private String endButtonLabel = null;
     @JsonProperty("acls")
@@ -172,6 +174,13 @@ public class CaseEvent implements Serializable {
         this.showSummary = showSummary;
     }
 
+    public Boolean getShowEventNotes() {
+        return showEventNotes;
+    }
+
+    public void setShowEventNotes(Boolean showEventNotes) {
+        this.showEventNotes = showEventNotes;
+    }
     public String getEndButtonLabel() {
         return endButtonLabel;
     }
