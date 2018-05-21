@@ -14,16 +14,20 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
+import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
+import javax.persistence.Query;
 
 
 @Named
@@ -211,7 +215,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     private Query getQueryByMetaData(MetaData metadata) {
         return queryBuilderFactory.select(em)
                                   .whereMetadata(metadata)
-                                  .orderByCreatedDate()
+                                  .orderByCreatedDate(metadata.getSortDirection().orElse("asc"))
                                   .build();
     }
 
