@@ -167,7 +167,7 @@ public class QueryEndpoint {
         @ApiResponse(code = 200, message = "Empty pre-state conditions"),
         @ApiResponse(code = 422, message = "The case status did not qualify for the event")
     })
-    public CaseEventTrigger getEventTriggerForCaseType(@PathVariable("uid") Integer userId,
+    public CaseEventTrigger getEventTriggerForCaseType(@PathVariable("uid") String userId,
                                                        @PathVariable("jid") String jurisdictionId,
                                                        @PathVariable("ctid") String casetTypeId,
                                                        @PathVariable("etid") String eventTriggerId,
@@ -185,7 +185,7 @@ public class QueryEndpoint {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Valid pre-state conditions")
     })
-    public CaseEventTrigger getEventTriggerForCase(@PathVariable("uid") Integer userId,
+    public CaseEventTrigger getEventTriggerForCase(@PathVariable("uid") String userId,
                                                    @PathVariable("jid") String jurisdictionId,
                                                    @PathVariable("ctid") String caseTypeId,
                                                    @PathVariable("cid") String caseId,

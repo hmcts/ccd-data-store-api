@@ -99,7 +99,7 @@ class SubmitCaseTransaction {
         auditEvent.setStateName(caseState.getName());
         auditEvent.setCaseTypeId(caseType.getId());
         auditEvent.setCaseTypeVersion(caseType.getVersion().getNumber());
-        auditEvent.setUserId(Long.valueOf(idamUser.getId()));
+        auditEvent.setUserId(idamUser.getId());
         auditEvent.setUserLastName(idamUser.getSurname());
         auditEvent.setUserFirstName(idamUser.getForename());
         auditEvent.setCreatedDate(newCaseDetails.getCreatedDate());
