@@ -1,13 +1,23 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.AppInsights;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.search.FieldMapSanitizeOperation;
@@ -31,12 +41,13 @@ import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
-import javax.transaction.Transactional;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
+import javax.transaction.Transactional;
 
 import static java.util.stream.Collectors.toList;
 
@@ -461,6 +472,12 @@ public class CaseDetailsEndpoint {
                 throw new BadRequestException(String.format("unknown security classification '%s'", sc));
             }
         });
+
+        param(queryParameters, MetaData.SORT_DIRECTION_PARAM).ifPresent(sd -> {
+            if (Stream.of("ASC", "DESC").noneMatch(direction -> direction.equalsIgnoreCase(sd))) {
+                throw new BadRequestException(String.format("Unknown sort direction: %s", sd));
+            }
+        });
     }
 
     private Optional<String> param(Map<String, String> queryParameters, String param) {
@@ -478,6 +495,8 @@ public class CaseDetailsEndpoint {
         metadata.setLastModified(param(queryParameters, MetaData.LAST_MODIFIED_PARAM));
         metadata.setSecurityClassification(param(queryParameters, MetaData.SECURITY_CLASSIFICATION_PARAM));
         metadata.setPage(param(queryParameters, MetaData.PAGE_PARAM));
+        metadata.setSortDirection(param(queryParameters, MetaData.SORT_DIRECTION_PARAM));
+
         return metadata;
     }
 }

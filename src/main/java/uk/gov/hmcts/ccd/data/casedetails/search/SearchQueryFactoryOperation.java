@@ -4,15 +4,15 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Named
 @Singleton
@@ -25,8 +25,10 @@ public class SearchQueryFactoryOperation {
     @PersistenceContext
     private EntityManager entityManager;
 
-    private static final String MAIN_QUERY = "SELECT * FROM case_data WHERE %s ORDER BY created_date ASC";
+    private static final String MAIN_QUERY = "SELECT * FROM case_data WHERE %s ORDER BY created_date %s";
     private static final String MAIN_COUNT_QUERY = "SELECT count(*) FROM case_data WHERE %s";
+
+    private static final String SORT_ASCENDING = "ASC";
 
     private final CriterionFactory criteraFactory;
     private final ApplicationParams applicationParam;
@@ -44,12 +46,15 @@ public class SearchQueryFactoryOperation {
 
     public Query build(MetaData metadata, Map<String, String> params, boolean isCountQuery) {
         final List<Criterion> criteria = criteraFactory.build(metadata, params);
-        String queryString = String.format(isCountQuery ? MAIN_COUNT_QUERY : MAIN_QUERY, secure(toClauses(criteria)));
+        String queryString = String.format(isCountQuery ? MAIN_COUNT_QUERY : MAIN_QUERY,
+            secure(toClauses(criteria)),
+            metadata.getSortDirection().orElse(SORT_ASCENDING).toUpperCase()
+        );
         Query query;
         if (isCountQuery) {
             query = entityManager.createNativeQuery(queryString);
         } else {
-             query = entityManager.createNativeQuery(queryString, CaseDetailsEntity.class);
+            query = entityManager.createNativeQuery(queryString, CaseDetailsEntity.class);
         }
         addParameters(query, criteria);
         return query;
