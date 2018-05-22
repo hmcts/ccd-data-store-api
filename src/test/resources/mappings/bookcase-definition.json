@@ -75,7 +75,8 @@
               "read": true,
               "update": false,
               "delete": false
-            }]
+            }],
+          "show_event_notes": false
         },
         {
           "id": "NO_PRE_STATES_EVENT",
@@ -103,7 +104,8 @@
               "read": true,
               "update": false,
               "delete": false
-            }]
+            }],
+          "show_event_notes": true
         },
         {
           "id": "TEST_EVENT",
@@ -122,7 +124,8 @@
               "read": true,
               "update": false,
               "delete": false
-            }]
+            }],
+          "show_event_notes": true
         },
         {
           "id": "Goodness",
@@ -142,7 +145,8 @@
               "read": true,
               "update": false,
               "delete": false
-            }]
+            }],
+          "show_event_notes": true
         },
         {
           "id": "Create2",
@@ -160,7 +164,8 @@
               "read": true,
               "update": false,
               "delete": false
-            }]
+            }],
+          "show_event_notes": true
         }
       ],
       "states": [

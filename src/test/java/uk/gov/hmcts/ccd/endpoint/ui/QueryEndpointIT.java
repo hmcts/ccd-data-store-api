@@ -998,6 +998,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertThat("Unexpected Case ID", eventTrigger.getCaseId(), is(nullValue()));
         assertEquals("Unexpected Event ID", "NO_PRE_STATES_EVENT", eventTrigger.getId());
         assertEquals("Unexpected Event Name", "NO PRE STATES EVENT", eventTrigger.getName());
+        assertEquals("Unexpected Event Show Event Notes", true, eventTrigger.getShowEventNotes());
         assertEquals("Unexpected Event Description", "Test event for null pre-states", eventTrigger.getDescription());
         assertEquals("Unexpected Case Fields", 2, eventTrigger.getCaseFields().size());
 
@@ -1060,6 +1061,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected Case Reference", "1504259907353545", eventTrigger.getCaseId());
         assertEquals("Unexpected Event ID", "HAS_PRE_STATES_EVENT", eventTrigger.getId());
         assertEquals("Unexpected Event Name", "HAS PRE STATES EVENT", eventTrigger.getName());
+        assertEquals("Unexpected Show Event Notes", false, eventTrigger.getShowEventNotes());
         assertEquals("Unexpected Event Description", "Test event for non null pre-states", eventTrigger
             .getDescription());
         assertEquals("Unexpected Case Fields", 2, eventTrigger.getCaseFields().size());
