@@ -18,4 +18,4 @@ HEALTHCHECK --interval=10s --timeout=10s --retries=10 CMD http_proxy="" wget -q 
 
 EXPOSE 4452
 
-ENTRYPOINT ["/usr/bin/java", "-jar", "/opt/app/core-case-data.jar"]
+ENTRYPOINT exec java ${JAVA_OPTS} -jar "/opt/app/core-case-data.jar"

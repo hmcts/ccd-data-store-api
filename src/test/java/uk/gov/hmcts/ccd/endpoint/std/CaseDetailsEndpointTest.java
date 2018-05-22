@@ -319,6 +319,17 @@ class CaseDetailsEndpointTest {
     }
 
     @Test
+    @DisplayName("case worker search cases should throw error when sort direction is invalid")
+    void caseWorkersSearchCasesCaseInvalidSortDirection() {
+
+        params.put("sortDirection", "XX");
+        BadRequestException badRequestException = assertThrows(BadRequestException.class,
+            () -> endpoint.searchCasesForCaseWorkers(JURISDICTION_ID, "", params));
+
+        assertThat(badRequestException.getMessage(), is("Unknown sort direction: XX"));
+    }
+
+    @Test
     void citizenSearchCases() {
         final Map<String, String> sanitizedParams = initParams("StateC");
         given(fieldMapSanitizeOperation.execute(params)).willReturn(sanitizedParams);
