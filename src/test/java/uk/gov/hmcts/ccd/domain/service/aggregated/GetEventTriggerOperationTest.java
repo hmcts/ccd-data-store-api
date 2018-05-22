@@ -32,7 +32,7 @@ import static org.mockito.Mockito.doReturn;
 
 public class GetEventTriggerOperationTest {
 
-    private static final int UID = 1;
+    private static final String UID = "1";
     private static final String TEST_JURISDICTION_ID = "TestJurisdictionId";
     private static final String TEST_CASE_TYPE_ID = "TestCaseTypeId";
     private static final String TEST_EVENT_TRIGGER_ID = "TestEventTriggerId";

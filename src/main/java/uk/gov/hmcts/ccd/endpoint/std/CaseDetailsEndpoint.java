@@ -101,7 +101,7 @@ public class CaseDetailsEndpoint {
     })
     public CaseDetails findCaseDetailsForCaseworker(
         @ApiParam(value = "Idam user ID", required = true)
-        @PathVariable("uid") final Integer uid,
+        @PathVariable("uid") final String uid,
         @ApiParam(value = "Jurisdiction ID", required = true)
         @PathVariable("jid") final String jurisdictionId,
         @ApiParam(value = "Case type ID", required = true)
@@ -127,7 +127,7 @@ public class CaseDetailsEndpoint {
     })
     public CaseDetails findCaseDetailsForCitizen(
         @ApiParam(value = "Idam user ID", required = true)
-        @PathVariable("uid") final Integer uid,
+        @PathVariable("uid") final String uid,
         @ApiParam(value = "Jurisdiction ID", required = true)
         @PathVariable("jid") final String jurisdictionId,
         @ApiParam(value = "Case type ID", required = true)
@@ -149,7 +149,7 @@ public class CaseDetailsEndpoint {
     })
     public StartEventTrigger startEventForCaseworker(
         @ApiParam(value = "Idam user ID", required = true)
-        @PathVariable("uid") final Integer uid,
+        @PathVariable("uid") final String uid,
         @ApiParam(value = "Jurisdiction ID", required = true)
         @PathVariable("jid") final String jurisdictionId,
         @ApiParam(value = "Case type ID", required = true)
@@ -174,7 +174,7 @@ public class CaseDetailsEndpoint {
     })
     public StartEventTrigger startEventForCitizen(
         @ApiParam(value = "Idam user ID", required = true)
-        @PathVariable("uid") final Integer uid,
+        @PathVariable("uid") final String uid,
         @ApiParam(value = "Jurisdiction ID", required = true)
         @PathVariable("jid") final String jurisdictionId,
         @ApiParam(value = "Case type ID", required = true)
@@ -198,7 +198,7 @@ public class CaseDetailsEndpoint {
     })
     public StartEventTrigger startCaseForCaseworker(
         @ApiParam(value = "Idam user ID", required = true)
-        @PathVariable("uid") final Integer uid,
+        @PathVariable("uid") final String uid,
         @ApiParam(value = "Jurisdiction ID", required = true)
         @PathVariable("jid") final String jurisdictionId,
         @ApiParam(value = "Case type ID", required = true)
@@ -220,7 +220,7 @@ public class CaseDetailsEndpoint {
     })
     public StartEventTrigger startCaseForCitizen(
         @ApiParam(value = "Idam user ID", required = true)
-        @PathVariable("uid") final Integer uid,
+        @PathVariable("uid") final String uid,
         @ApiParam(value = "Jurisdiction ID", required = true)
         @PathVariable("jid") final String jurisdictionId,
         @ApiParam(value = "Case type ID", required = true)

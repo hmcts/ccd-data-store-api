@@ -55,7 +55,7 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
         this.uidService = uidService;
     }
 
-    public CaseEventTrigger executeForCaseType(Integer uid,
+    public CaseEventTrigger executeForCaseType(String uid,
                                                String jurisdictionId,
                                                String caseTypeId,
                                                String eventTriggerId,
@@ -73,7 +73,7 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
                                                            ignoreWarning));
     }
 
-    public CaseEventTrigger executeForCase(Integer uid,
+    public CaseEventTrigger executeForCase(String uid,
                                            String jurisdictionId,
                                            String caseTypeId,
                                            String caseReference,

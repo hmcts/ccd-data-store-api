@@ -20,7 +20,7 @@ import static org.mockito.Mockito.verify;
 
 class ClassifiedStartEventOperationTest {
 
-    private static final Integer UID = 23;
+    private static final String UID = "23";
     private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_TYPE_ID = "GrantOnly";
     private static final String CASE_REFERENCE = "1234123412341234";
