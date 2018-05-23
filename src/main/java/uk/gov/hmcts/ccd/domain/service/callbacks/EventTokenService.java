@@ -45,7 +45,7 @@ public class EventTokenService {
         this.caseService = caseService;
     }
 
-    public String generateToken(final Integer uid,
+    public String generateToken(final String uid,
                                 final CaseEvent event,
                                 final Jurisdiction jurisdiction,
                                 final CaseType caseType) {
@@ -53,14 +53,14 @@ public class EventTokenService {
         return generateToken(uid, EMPTY_CASE, event, jurisdiction, caseType);
     }
 
-    public String generateToken(final Integer uid,
+    public String generateToken(final String uid,
                                 final CaseDetails caseDetails,
                                 final CaseEvent event,
                                 final Jurisdiction jurisdiction,
                                 final CaseType caseType) {
         return Jwts.builder()
             .setId(randomKeyGenerator.generate())
-            .setSubject(uid.toString())
+            .setSubject(uid)
             .setIssuedAt(new Date())
             .signWith(SignatureAlgorithm.HS256, TextCodec.BASE64.encode(tokenSecret))
             .claim(EventTokenProperties.CASE_ID, caseDetails.getId())

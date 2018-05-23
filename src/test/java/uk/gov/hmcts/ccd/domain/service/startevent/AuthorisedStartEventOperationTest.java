@@ -41,7 +41,7 @@ class AuthorisedStartEventOperationTest {
     private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
     };
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
-    private static final Integer UID = 23;
+    private static final String UID = "23";
     private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_TYPE_ID = "GrantOnly";
     private static final String CASE_REFERENCE = "1234123412341234";

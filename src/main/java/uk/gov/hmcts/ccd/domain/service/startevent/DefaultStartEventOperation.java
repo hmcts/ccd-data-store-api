@@ -58,11 +58,11 @@ public class DefaultStartEventOperation implements StartEventOperation {
     }
 
     @Override
-    public StartEventTrigger triggerStartForCaseType(final Integer uid,
-                                                               final String jurisdictionId,
-                                                               final String caseTypeId,
-                                                               final String eventTriggerId,
-                                                               final Boolean ignoreWarning) {
+    public StartEventTrigger triggerStartForCaseType(final String uid,
+                                                     final String jurisdictionId,
+                                                     final String caseTypeId,
+                                                     final String eventTriggerId,
+                                                     final Boolean ignoreWarning) {
 
         final CaseType caseType = getCaseType(caseTypeId);
         final CaseEvent eventTrigger = getEventTrigger(caseTypeId, eventTriggerId, caseType);
@@ -81,7 +81,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
     }
 
     @Override
-    public StartEventTrigger triggerStartForCase(final Integer uid,
+    public StartEventTrigger triggerStartForCase(final String uid,
                                                  final String jurisdictionId,
                                                  final String caseTypeId,
                                                  final String caseReference,
