@@ -45,7 +45,7 @@ class DefaultGetEventTriggerOperationTest {
     private static final String EVENT_TRIGGER_DESCRIPTION = "testEventTriggerDescription";
     private static final Boolean EVENT_TRIGGER_SHOW_SUMMARY = true;
     private static final Boolean EVENT_TRIGGER_SHOW_EVENT_NOTES = false;
-    private static final Integer UID = 123;
+    private static final String UID = "123";
     private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_REFERENCE = "1234567891012345";
     private static final Long CASE_REFERENCE_LONG = 1234567891012345L;

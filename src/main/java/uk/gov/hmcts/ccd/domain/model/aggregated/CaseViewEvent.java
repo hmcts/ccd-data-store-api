@@ -16,7 +16,7 @@ public class CaseViewEvent {
     private String eventName;
 
     @JsonProperty("user_id")
-    private Long userId;
+    private String userId;
 
     @JsonProperty("user_last_name")
     private String userLastName;
@@ -66,11 +66,11 @@ public class CaseViewEvent {
         this.eventName = eventName;
     }
 
-    public Long getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 

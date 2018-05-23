@@ -244,7 +244,7 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
         auditEvent.setStateName(caseState.getName());
         auditEvent.setCaseTypeId(caseType.getId());
         auditEvent.setCaseTypeVersion(caseType.getVersion().getNumber());
-        auditEvent.setUserId(Long.valueOf(user.getId()));
+        auditEvent.setUserId(user.getId());
         auditEvent.setUserLastName(user.getSurname());
         auditEvent.setUserFirstName(user.getForename());
         auditEvent.setCreatedDate(LocalDateTime.now(ZoneOffset.UTC));

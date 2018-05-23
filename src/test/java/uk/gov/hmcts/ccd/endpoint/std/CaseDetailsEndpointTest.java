@@ -43,8 +43,7 @@ import static org.mockito.Mockito.verify;
 
 class CaseDetailsEndpointTest {
 
-    private static final Integer UID = 1231;
-    private static final String UID_STR = "1231";
+    private static final String UID = "1231";
     private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_TYPE_ID = "GrantOnly";
     private static final String CASE_ID = "1234qwer5678tyui";
@@ -194,7 +193,7 @@ class CaseDetailsEndpointTest {
     @Test
     void createCaseForCaseWorker() {
         final CaseDetails toBeReturned = new CaseDetails();
-        doReturn(toBeReturned).when(createCaseOperation).createCaseDetails(UID_STR,
+        doReturn(toBeReturned).when(createCaseOperation).createCaseDetails(UID,
                                                                            JURISDICTION_ID,
                                                                            CASE_TYPE_ID,
                                                                            EVENT,
@@ -202,7 +201,7 @@ class CaseDetailsEndpointTest {
                                                                            IGNORE_WARNING,
                                                                            TOKEN);
 
-        final CaseDetails output = endpoint.saveCaseDetailsForCaseWorker(UID_STR,
+        final CaseDetails output = endpoint.saveCaseDetailsForCaseWorker(UID,
                                                                          JURISDICTION_ID,
                                                                          CASE_TYPE_ID,
                                                                          IGNORE_WARNING,
@@ -210,7 +209,7 @@ class CaseDetailsEndpointTest {
 
         assertAll(
             () -> assertThat(output, sameInstance(toBeReturned)),
-            () -> verify(createCaseOperation).createCaseDetails(UID_STR,
+            () -> verify(createCaseOperation).createCaseDetails(UID,
                                                                 JURISDICTION_ID,
                                                                 CASE_TYPE_ID,
                                                                 EVENT_DATA.getEvent(),
@@ -224,7 +223,7 @@ class CaseDetailsEndpointTest {
     void createCaseEventForCaseWorker() {
         final CaseDetails toBeReturned = new CaseDetails();
         doReturn(toBeReturned).when(createEventOperation).createCaseEvent(
-            UID_STR,
+            UID,
             JURISDICTION_ID,
             CASE_TYPE_ID,
             CASE_ID,
@@ -234,7 +233,7 @@ class CaseDetailsEndpointTest {
             IGNORE_WARNING);
 
         final CaseDetails output = endpoint.createCaseEventForCaseWorker(
-            UID_STR,
+            UID,
             JURISDICTION_ID,
             CASE_TYPE_ID,
             CASE_ID,
@@ -243,7 +242,7 @@ class CaseDetailsEndpointTest {
         assertAll(
             () -> assertThat(output, sameInstance(toBeReturned)),
             () -> verify(createEventOperation).createCaseEvent(
-                UID_STR,
+                UID,
                 JURISDICTION_ID,
                 CASE_TYPE_ID,
                 CASE_ID,
@@ -264,7 +263,7 @@ class CaseDetailsEndpointTest {
             DATA);
 
         final Map<String, JsonNode> output = endpoint.validateCaseDetailsForCaseWorker(
-            UID_STR,
+            UID,
             JURISDICTION_ID,
             CASE_TYPE_ID,
             EVENT_DATA);

@@ -707,7 +707,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Event Name", "GRACIOUS", event.getEventName());
         assertEquals("Current case state id", "state4", event.getStateId());
         assertEquals("Current case state name", "Case in state 4", event.getStateName());
-        assertEquals("User ID", Long.valueOf(0), event.getUserId());
+        assertEquals("User ID", "0", event.getUserId());
         assertEquals("User First name", "Justin", event.getUserFirstName());
         assertEquals("User Last name", "Smith", event.getUserLastName());
         assertEquals("Summary", "The summary 2", event.getSummary());
@@ -720,7 +720,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Event Name", "TEST TRIGGER_EVENT NAME", event2.getEventName());
         assertEquals("Current case state id", "CaseCreated", event2.getStateId());
         assertEquals("Current case state name", "Created a case", event2.getStateName());
-        assertEquals("User ID", Long.valueOf(0), event2.getUserId());
+        assertEquals("User ID", "0", event2.getUserId());
         assertEquals("User First name", "Justin", event2.getUserFirstName());
         assertEquals("User Last name", "Smith", event2.getUserLastName());
         assertEquals("Summary", "The summary", event2.getSummary());
@@ -788,7 +788,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Event Name", "GRACIOUS", event.getEventName());
         assertEquals("Current case state id", "state4", event.getStateId());
         assertEquals("Current case state name", "Case in state 4", event.getStateName());
-        assertEquals("User ID", Long.valueOf(0), event.getUserId());
+        assertEquals("User ID", "0", event.getUserId());
         assertEquals("User First name", "Justin", event.getUserFirstName());
         assertEquals("User Last name", "Smith", event.getUserLastName());
         assertEquals("Summary", "The summary 2", event.getSummary());

@@ -178,7 +178,7 @@ class SubmitCaseTransactionTest {
     private void assertAuditEvent(final AuditEvent auditEvent) {
         assertAll("Audit event",
                   () -> assertThat(auditEvent.getCaseDataId(), is(savedCaseDetails.getId())),
-                  () -> assertThat(auditEvent.getUserId(), is(Long.valueOf(IDAM_ID))),
+                  () -> assertThat(auditEvent.getUserId(), is(IDAM_ID)),
                   () -> assertThat(auditEvent.getUserLastName(), is(IDAM_LNAME)),
                   () -> assertThat(auditEvent.getUserFirstName(), is(IDAM_FNAME)),
                   () -> assertThat(auditEvent.getEventName(), is(EVENT_NAME)),

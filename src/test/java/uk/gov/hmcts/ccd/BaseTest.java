@@ -177,7 +177,7 @@ public abstract class BaseTest {
     protected AuditEvent mapAuditEvent(ResultSet resultSet, Integer i) throws SQLException {
         final AuditEvent auditEvent = new AuditEvent();
         auditEvent.setId(resultSet.getLong("id"));
-        auditEvent.setUserId(resultSet.getLong("user_id"));
+        auditEvent.setUserId(resultSet.getString("user_id"));
         auditEvent.setUserFirstName(resultSet.getString("user_first_name"));
         auditEvent.setUserLastName(resultSet.getString("user_last_name"));
         auditEvent.setCaseDataId(resultSet.getLong("case_data_id"));
@@ -218,11 +218,11 @@ public abstract class BaseTest {
         return auditEvent;
     }
 
-    protected String generateEventToken(JdbcTemplate template, Integer userId, String jurisdictionId, String caseTypeId, String caseReference, String eventId) {
+    protected String generateEventToken(JdbcTemplate template, String userId, String jurisdictionId, String caseTypeId, String caseReference, String eventId) {
         return generateEventToken(template, userId, jurisdictionId, caseTypeId, new Long(caseReference), eventId);
     }
 
-    protected String generateEventToken(JdbcTemplate template, Integer userId, String jurisdictionId, String caseTypeId, Long caseReference, String eventId) {
+    protected String generateEventToken(JdbcTemplate template, String userId, String jurisdictionId, String caseTypeId, Long caseReference, String eventId) {
         final Jurisdiction jurisdiction = new Jurisdiction();
         jurisdiction.setId(jurisdictionId);
 
@@ -235,7 +235,7 @@ public abstract class BaseTest {
         return eventTokenService.generateToken(userId, getCase(template, caseReference), eventTrigger, jurisdiction, caseType);
     }
 
-    protected String generateEventTokenNewCase(Integer userId, String jurisdictionId, String caseTypeId, String eventId) {
+    protected String generateEventTokenNewCase(String userId, String jurisdictionId, String caseTypeId, String eventId) {
         final Jurisdiction jurisdiction = new Jurisdiction();
         jurisdiction.setId(jurisdictionId);
 
