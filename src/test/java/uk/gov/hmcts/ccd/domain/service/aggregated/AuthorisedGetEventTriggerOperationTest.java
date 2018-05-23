@@ -47,7 +47,7 @@ class AuthorisedGetEventTriggerOperationTest {
     private static final String CASEWORKER_DIVORCE = "caseworker-divorce-loa3";
 
     private static final String EVENT_TRIGGER_ID = "testEventTriggerId";
-    private static final Integer UID = 123;
+    private static final String UID = "123";
     private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_REFERENCE = "1234567891012345";
     private static final Long CASE_REFERENCE_LONG = 1234567891012345L;

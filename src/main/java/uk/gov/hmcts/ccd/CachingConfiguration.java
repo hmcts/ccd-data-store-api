@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ccd;
 
-import java.util.Optional;
-
 import com.hazelcast.config.Config;
 import com.hazelcast.config.EvictionPolicy;
 import com.hazelcast.config.MapConfig;
@@ -14,9 +12,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class CachingConfiguration {
 
-    //30 mins
-    public static final int DEFAULT_CACHE_TTL = 1800;
-
     @Autowired
     ApplicationParams applicationParams;
 
@@ -24,13 +19,11 @@ public class CachingConfiguration {
     @Bean
     public Config hazelCastConfig(){
 
-        int definitionCacheTTL = Optional.ofNullable(applicationParams.getDefinitionCacheTTLSecs()).orElse(DEFAULT_CACHE_TTL);
-
         Config config = new Config();
         NetworkConfig networkConfig = config.setInstanceName("hazelcast-instance-ccd").getNetworkConfig();
         networkConfig.getJoin().getMulticastConfig().setEnabled(false);
         networkConfig.getJoin().getTcpIpConfig().setEnabled(false);
-        configCaches(definitionCacheTTL, config);
+        configCaches(applicationParams.getDefinitionCacheTTLSecs(), config);
         return config;
     }
 

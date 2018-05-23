@@ -225,7 +225,8 @@ public class CallbackTest extends WireMockBaseTest {
     private static final String CREATE_CASE_EVENT_TRIGGER_ID = CREATE_CASE_EVENT_ID;
     private static final String CASE_TYPE_ID = "CallbackCase";
     private static final String JURISDICTION_ID = "TEST";
-    private static final Integer USER_ID = 123;
+    private static final String USER_ID = "123";
+    private static final String OTHER_USER_ID = "456";
     private static final Long CASE_REFERENCE = 1504259907353545L;
     private static final Long INVALID_REFERENCE = 1504259907L;
 
@@ -253,7 +254,7 @@ public class CallbackTest extends WireMockBaseTest {
 
     @Test
     public void shouldReturn201WhenPostCreateCaseWithModifiedDataForCaseworker() throws Exception {
-        final String URL = String.format("/caseworkers/%d/jurisdictions/%s/case-types/%s/cases", USER_ID, JURISDICTION_ID, CASE_TYPE_ID);
+        final String URL = String.format("/caseworkers/%s/jurisdictions/%s/case-types/%s/cases", USER_ID, JURISDICTION_ID, CASE_TYPE_ID);
         final CaseDataContent caseDetailsToSave = new CaseDataContent();
         caseDetailsToSave.setEvent(new Event());
         caseDetailsToSave.getEvent().setEventId(CREATE_CASE_EVENT_ID);
@@ -297,7 +298,7 @@ public class CallbackTest extends WireMockBaseTest {
 
         // Assertion belows are for creation event
         final AuditEvent caseAuditEvent = caseAuditEventList.get(0);
-        assertEquals(USER_ID.intValue(), caseAuditEvent.getUserId().intValue());
+        assertEquals(USER_ID, caseAuditEvent.getUserId());
         assertEquals("Strife", caseAuditEvent.getUserLastName());
         assertEquals("Cloud", caseAuditEvent.getUserFirstName());
         assertEquals(CREATE_CASE_EVENT_ID, caseAuditEvent.getEventId());
@@ -312,7 +313,7 @@ public class CallbackTest extends WireMockBaseTest {
 
     @Test
     public void shouldReturn201WhenPostCreateCaseWithModifiedDataForCitizen() throws Exception {
-        final String URL = String.format("/citizens/%d/jurisdictions/%s/case-types/%s/cases", USER_ID, JURISDICTION_ID, CASE_TYPE_ID);
+        final String URL = String.format("/citizens/%s/jurisdictions/%s/case-types/%s/cases", USER_ID, JURISDICTION_ID, CASE_TYPE_ID);
         final CaseDataContent caseDetailsToSave = new CaseDataContent();
         caseDetailsToSave.setEvent(new Event());
         caseDetailsToSave.getEvent().setEventId(CREATE_CASE_EVENT_ID);
@@ -356,7 +357,7 @@ public class CallbackTest extends WireMockBaseTest {
 
         // Assertion belows are for creation event
         final AuditEvent caseAuditEvent = caseAuditEventList.get(0);
-        assertEquals(USER_ID.intValue(), caseAuditEvent.getUserId().intValue());
+        assertEquals(USER_ID, caseAuditEvent.getUserId());
         assertEquals("Strife", caseAuditEvent.getUserLastName());
         assertEquals("Cloud", caseAuditEvent.getUserFirstName());
         assertEquals(CREATE_CASE_EVENT_ID, caseAuditEvent.getEventId());
@@ -371,7 +372,7 @@ public class CallbackTest extends WireMockBaseTest {
 
     @Test
     public void shouldReturn201WhenPostCreateCaseWithCallbackOverridingDataClassificationForCaseworker() throws Exception {
-        final String URL = String.format("/caseworkers/%d/jurisdictions/%s/case-types/%s/cases", USER_ID, JURISDICTION_ID, CASE_TYPE_ID);
+        final String URL = String.format("/caseworkers/%s/jurisdictions/%s/case-types/%s/cases", USER_ID, JURISDICTION_ID, CASE_TYPE_ID);
         final CaseDataContent caseDetailsToSave = new CaseDataContent();
         caseDetailsToSave.setEvent(new Event());
         caseDetailsToSave.getEvent().setEventId(CREATE_CASE_EVENT_ID);
@@ -416,7 +417,7 @@ public class CallbackTest extends WireMockBaseTest {
 
         // Assertion belows are for creation event
         final AuditEvent caseAuditEvent = caseAuditEventList.get(0);
-        assertEquals(USER_ID.intValue(), caseAuditEvent.getUserId().intValue());
+        assertEquals(USER_ID, caseAuditEvent.getUserId());
         assertEquals("Strife", caseAuditEvent.getUserLastName());
         assertEquals("Cloud", caseAuditEvent.getUserFirstName());
         assertEquals(CREATE_CASE_EVENT_ID, caseAuditEvent.getEventId());
@@ -431,7 +432,7 @@ public class CallbackTest extends WireMockBaseTest {
 
     @Test
     public void shouldReturn422WhenPostCreateCaseWithCallbackOverridingDataWithMissingClassificationForCaseworker() throws Exception {
-        final String URL = String.format("/caseworkers/%d/jurisdictions/%s/case-types/%s/cases", USER_ID, JURISDICTION_ID, CASE_TYPE_ID);
+        final String URL = String.format("/caseworkers/%s/jurisdictions/%s/case-types/%s/cases", USER_ID, JURISDICTION_ID, CASE_TYPE_ID);
         final CaseDataContent caseDetailsToSave = new CaseDataContent();
         caseDetailsToSave.setEvent(new Event());
         caseDetailsToSave.getEvent().setEventId(CREATE_CASE_EVENT_ID);
@@ -461,7 +462,7 @@ public class CallbackTest extends WireMockBaseTest {
 
     @Test
     public void shouldReturn422WhenPostCreateCaseWithInvalidModifiedDataFromBeforeCommitForCaseworker() throws Exception {
-        final String URL = String.format("/caseworkers/%d/jurisdictions/%s/case-types/%s/cases", USER_ID, JURISDICTION_ID, CASE_TYPE_ID);
+        final String URL = String.format("/caseworkers/%s/jurisdictions/%s/case-types/%s/cases", USER_ID, JURISDICTION_ID, CASE_TYPE_ID);
         final CaseDataContent caseDetailsToSave = new CaseDataContent();
         caseDetailsToSave.setEvent(new Event());
         caseDetailsToSave.getEvent().setEventId(CREATE_CASE_EVENT_ID);
@@ -487,7 +488,7 @@ public class CallbackTest extends WireMockBaseTest {
 
     @Test
     public void shouldReturn422WhenPostCreateCaseWithInvalidModifiedDataFromBeforeCommitForCitizen() throws Exception {
-        final String URL = String.format("/citizens/%d/jurisdictions/%s/case-types/%s/cases", USER_ID, JURISDICTION_ID, CASE_TYPE_ID);
+        final String URL = String.format("/citizens/%s/jurisdictions/%s/case-types/%s/cases", USER_ID, JURISDICTION_ID, CASE_TYPE_ID);
         final CaseDataContent caseDetailsToSave = new CaseDataContent();
         caseDetailsToSave.setEvent(new Event());
         caseDetailsToSave.getEvent().setEventId(CREATE_CASE_EVENT_ID);
@@ -510,7 +511,7 @@ public class CallbackTest extends WireMockBaseTest {
     }
     @Test
     public void shouldReturn422WhenPostCreateCaseWithInvalidModifiedMissingDocumentDataFromBeforeCommitForCaseworker() throws Exception {
-        final String URL = String.format("/caseworkers/%d/jurisdictions/%s/case-types/%s/cases", USER_ID, JURISDICTION_ID, CASE_TYPE_ID);
+        final String URL = String.format("/caseworkers/%s/jurisdictions/%s/case-types/%s/cases", USER_ID, JURISDICTION_ID, CASE_TYPE_ID);
         final CaseDataContent caseDetailsToSave = new CaseDataContent();
         caseDetailsToSave.setEvent(new Event());
         caseDetailsToSave.getEvent().setEventId(CREATE_CASE_EVENT_ID);
@@ -536,7 +537,7 @@ public class CallbackTest extends WireMockBaseTest {
 
     @Test
     public void shouldReturn422WhenPostCreateCaseWithInvalidModifiedMissingDocumentDataFromBeforeCommitForCitizen() throws Exception {
-        final String URL = String.format("/citizens/%d/jurisdictions/%s/case-types/%s/cases", USER_ID, JURISDICTION_ID, CASE_TYPE_ID);
+        final String URL = String.format("/citizens/%s/jurisdictions/%s/case-types/%s/cases", USER_ID, JURISDICTION_ID, CASE_TYPE_ID);
         final CaseDataContent caseDetailsToSave = new CaseDataContent();
         caseDetailsToSave.setEvent(new Event());
         caseDetailsToSave.getEvent().setEventId(CREATE_CASE_EVENT_ID);
@@ -560,7 +561,7 @@ public class CallbackTest extends WireMockBaseTest {
 
     @Test
     public void shouldReturn422WhenPostCreateCaseWithErrorsFromBeforeCommitForCaseworker() throws Exception {
-        final String URL = String.format("/caseworkers/%d/jurisdictions/%s/case-types/%s/cases", USER_ID, JURISDICTION_ID, CASE_TYPE_ID);
+        final String URL = String.format("/caseworkers/%s/jurisdictions/%s/case-types/%s/cases", USER_ID, JURISDICTION_ID, CASE_TYPE_ID);
         final CaseDataContent caseDetailsToSave = new CaseDataContent();
         caseDetailsToSave.setEvent(new Event());
         caseDetailsToSave.getEvent().setEventId(CREATE_CASE_EVENT_ID);
@@ -579,7 +580,7 @@ public class CallbackTest extends WireMockBaseTest {
 
     @Test
     public void shouldReturn422WhenPostCreateCaseWithErrorsFromBeforeCommitForCitizen() throws Exception {
-        final String URL = String.format("/citizens/%d/jurisdictions/%s/case-types/%s/cases", USER_ID, JURISDICTION_ID, CASE_TYPE_ID);
+        final String URL = String.format("/citizens/%s/jurisdictions/%s/case-types/%s/cases", USER_ID, JURISDICTION_ID, CASE_TYPE_ID);
         final CaseDataContent caseDetailsToSave = new CaseDataContent();
         caseDetailsToSave.setEvent(new Event());
         caseDetailsToSave.getEvent().setEventId(CREATE_CASE_EVENT_ID);
@@ -599,7 +600,7 @@ public class CallbackTest extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
     public void shouldReturn422WhenGetEventTokenForCaseWithCallbackErrorsForCaseworker() throws Exception {
-        final String URL = String.format("/caseworkers/%d/jurisdictions/%s/case-types/%s/cases/%d/event-triggers/%s/token", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, UPDATE_EVENT_TRIGGER_ID);
+        final String URL = String.format("/caseworkers/%s/jurisdictions/%s/case-types/%s/cases/%d/event-triggers/%s/token", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, UPDATE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setErrors(Collections.singletonList("Just a test"));
@@ -617,7 +618,7 @@ public class CallbackTest extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
     public void shouldReturn422WhenGetEventTokenForCaseWithCallbackErrorsForCitizen() throws Exception {
-        final String URL = String.format("/citizens/%d/jurisdictions/%s/case-types/%s/cases/%d/event-triggers/%s/token", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, UPDATE_EVENT_TRIGGER_ID);
+        final String URL = String.format("/citizens/%s/jurisdictions/%s/case-types/%s/cases/%d/event-triggers/%s/token", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, UPDATE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setErrors(Collections.singletonList("Just a test"));
@@ -636,7 +637,7 @@ public class CallbackTest extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
     public void shouldReturn200WhenGetEventTokenForCaseWithValidCallbackDataForCaseworker() throws Exception {
-        final String URL = String.format("/caseworkers/%d/jurisdictions/%s/case-types/%s/cases/%d/event-triggers/%s/token", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, UPDATE_EVENT_TRIGGER_ID);
+        final String URL = String.format("/caseworkers/%s/jurisdictions/%s/case-types/%s/cases/%d/event-triggers/%s/token", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, UPDATE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setData(mapper.convertValue(MODIFIED_DATA, STRING_NODE_TYPE));
@@ -658,7 +659,7 @@ public class CallbackTest extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
     public void shouldReturn422WhenGetEventTokenForCaseWithCallbackDataWithValidationErrorsForCaseworker() throws Exception {
-        final String URL = String.format("/caseworkers/%d/jurisdictions/%s/case-types/%s/cases/%d/event-triggers/%s/token", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, CREATE_CASE_EVENT_TRIGGER_ID);
+        final String URL = String.format("/caseworkers/%s/jurisdictions/%s/case-types/%s/cases/%d/event-triggers/%s/token", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, CREATE_CASE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setData(mapper.convertValue(INVALID_CALLBACK_DATA, STRING_NODE_TYPE));
@@ -676,7 +677,7 @@ public class CallbackTest extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
     public void shouldReturn422WhenGetEventTokenForCaseWithCallbackDataWithValidationErrorsForCitizen() throws Exception {
-        final String URL = String.format("/citizens/%d/jurisdictions/%s/case-types/%s/cases/%d/event-triggers/%s/token", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, CREATE_CASE_EVENT_TRIGGER_ID);
+        final String URL = String.format("/citizens/%s/jurisdictions/%s/case-types/%s/cases/%d/event-triggers/%s/token", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, CREATE_CASE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setData(mapper.convertValue(INVALID_CALLBACK_DATA, STRING_NODE_TYPE));
@@ -694,7 +695,7 @@ public class CallbackTest extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
     public void shouldReturn400WhenGetEventTokenForCaseWithInvalidCaseReferenceForCaseworker() throws Exception {
-        final String URL = String.format("/caseworkers/%d/jurisdictions/%s/case-types/%s/cases/%d/event-triggers/%s/token", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, INVALID_REFERENCE, CREATE_CASE_EVENT_TRIGGER_ID);
+        final String URL = String.format("/caseworkers/%s/jurisdictions/%s/case-types/%s/cases/%d/event-triggers/%s/token", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, INVALID_REFERENCE, CREATE_CASE_EVENT_TRIGGER_ID);
 
         final MvcResult mvcResult = mockMvc
             .perform(MockMvcRequestBuilders.get(URL).contentType(MediaType.APPLICATION_JSON))
@@ -706,7 +707,7 @@ public class CallbackTest extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
     public void shouldReturn400WhenGetEventTokenForCaseWithInvalidCaseReferenceForCitizen() throws Exception {
-        final String URL = String.format("/citizens/%d/jurisdictions/%s/case-types/%s/cases/%d/event-triggers/%s/token", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, INVALID_REFERENCE, CREATE_CASE_EVENT_TRIGGER_ID);
+        final String URL = String.format("/citizens/%s/jurisdictions/%s/case-types/%s/cases/%d/event-triggers/%s/token", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, INVALID_REFERENCE, CREATE_CASE_EVENT_TRIGGER_ID);
 
         final MvcResult mvcResult = mockMvc
             .perform(MockMvcRequestBuilders.get(URL).contentType(MediaType.APPLICATION_JSON))
@@ -718,7 +719,7 @@ public class CallbackTest extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
     public void shouldReturn200WhenGetEventTokenForCaseWithValidCallbackDataForCitizen() throws Exception {
-        final String URL = String.format("/citizens/%d/jurisdictions/%s/case-types/%s/cases/%d/event-triggers/%s/token", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, UPDATE_EVENT_TRIGGER_ID);
+        final String URL = String.format("/citizens/%s/jurisdictions/%s/case-types/%s/cases/%d/event-triggers/%s/token", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, UPDATE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setData(mapper.convertValue(MODIFIED_DATA, STRING_NODE_TYPE));
@@ -741,7 +742,7 @@ public class CallbackTest extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
     public void shouldReturn422WhenGetEventTokenForCaseTypeWithCallbackErrorsForCaseworker() throws Exception {
-        final String URL = String.format("/caseworkers/%d/jurisdictions/%s/case-types/%s/event-triggers/%s/token", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, UPDATE_EVENT_TRIGGER_ID);
+        final String URL = String.format("/caseworkers/%s/jurisdictions/%s/case-types/%s/event-triggers/%s/token", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, UPDATE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setErrors(Collections.singletonList("Just a test"));
@@ -759,7 +760,7 @@ public class CallbackTest extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
     public void shouldReturn422WhenGetEventTokenForCaseTypeWithCallbackErrorsForCitizen() throws Exception {
-        final String URL = String.format("/citizens/%d/jurisdictions/%s/case-types/%s/event-triggers/%s/token", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, UPDATE_EVENT_TRIGGER_ID);
+        final String URL = String.format("/citizens/%s/jurisdictions/%s/case-types/%s/event-triggers/%s/token", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, UPDATE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setErrors(Collections.singletonList("Just a test"));
@@ -777,7 +778,7 @@ public class CallbackTest extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
     public void shouldReturn200WhenGetEventTokenForCaseTypeWithValidModifiedDataForCaseworker() throws Exception {
-        final String URL = String.format("/caseworkers/%d/jurisdictions/%s/case-types/%s/event-triggers/%s/token", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CREATE_CASE_EVENT_TRIGGER_ID);
+        final String URL = String.format("/caseworkers/%s/jurisdictions/%s/case-types/%s/event-triggers/%s/token", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CREATE_CASE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setData(mapper.convertValue(MODIFIED_DATA, STRING_NODE_TYPE));
@@ -799,7 +800,7 @@ public class CallbackTest extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
     public void shouldReturn200WhenGetEventTokenForCaseTypeWithValidModifiedDataForCitizen() throws Exception {
-        final String URL = String.format("/citizens/%d/jurisdictions/%s/case-types/%s/event-triggers/%s/token", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CREATE_CASE_EVENT_TRIGGER_ID);
+        final String URL = String.format("/citizens/%s/jurisdictions/%s/case-types/%s/event-triggers/%s/token", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CREATE_CASE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setData(mapper.convertValue(MODIFIED_DATA, STRING_NODE_TYPE));
@@ -821,7 +822,7 @@ public class CallbackTest extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
     public void shouldReturn422WhenGetEventTokenForCaseTypeWithCallbackDataWithValidationErrorsForCaseworker() throws Exception {
-        final String URL = String.format("/caseworkers/%d/jurisdictions/%s/case-types/%s/event-triggers/%s/token", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CREATE_CASE_EVENT_TRIGGER_ID);
+        final String URL = String.format("/caseworkers/%s/jurisdictions/%s/case-types/%s/event-triggers/%s/token", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CREATE_CASE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setData(mapper.convertValue(INVALID_CALLBACK_DATA, STRING_NODE_TYPE));
@@ -839,7 +840,7 @@ public class CallbackTest extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
     public void shouldReturn422WhenGetEventTokenForCaseTypeWithCallbackDataWithValidationErrorsForCitizen() throws Exception {
-        final String URL = String.format("/citizens/%d/jurisdictions/%s/case-types/%s/event-triggers/%s/token", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CREATE_CASE_EVENT_TRIGGER_ID);
+        final String URL = String.format("/citizens/%s/jurisdictions/%s/case-types/%s/event-triggers/%s/token", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CREATE_CASE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setData(mapper.convertValue(INVALID_CALLBACK_DATA, STRING_NODE_TYPE));
@@ -859,7 +860,7 @@ public class CallbackTest extends WireMockBaseTest {
     public void shouldReturn201WhenPostCreateEventWithValidDataForCaseworker() throws Exception {
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
-        final String URL = String.format("/caseworkers/%d/jurisdictions/%s/case-types/%s/cases/%d/events", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+        final String URL = String.format("/caseworkers/%s/jurisdictions/%s/case-types/%s/cases/%d/events", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
 
         final CaseDataContent caseDetailsToSave = new CaseDataContent();
         final Event event = new Event();
@@ -908,7 +909,7 @@ public class CallbackTest extends WireMockBaseTest {
 
         // Assertion belows are for creation event
         final AuditEvent caseAuditEvent = caseAuditEventList.get(0);
-        assertEquals(USER_ID.intValue(), caseAuditEvent.getUserId().intValue());
+        assertEquals(USER_ID, caseAuditEvent.getUserId());
         assertEquals("Strife", caseAuditEvent.getUserLastName());
         assertEquals("Cloud", caseAuditEvent.getUserFirstName());
         assertEquals(UPDATE_EVENT_ID, caseAuditEvent.getEventId());
@@ -924,7 +925,7 @@ public class CallbackTest extends WireMockBaseTest {
     public void shouldReturn201WhenPostCreateEventWithValidDataForCitizen() throws Exception {
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
-        final String URL = String.format("/citizens/%d/jurisdictions/%s/case-types/%s/cases/%d/events", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+        final String URL = String.format("/citizens/%s/jurisdictions/%s/case-types/%s/cases/%d/events", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
 
         final CaseDataContent caseDetailsToSave = new CaseDataContent();
         final Event event = new Event();
@@ -973,7 +974,7 @@ public class CallbackTest extends WireMockBaseTest {
 
         // Assertion belows are for creation event
         final AuditEvent caseAuditEvent = caseAuditEventList.get(0);
-        assertEquals(USER_ID.intValue(), caseAuditEvent.getUserId().intValue());
+        assertEquals(USER_ID, caseAuditEvent.getUserId());
         assertEquals("Strife", caseAuditEvent.getUserLastName());
         assertEquals("Cloud", caseAuditEvent.getUserFirstName());
         assertEquals(UPDATE_EVENT_ID, caseAuditEvent.getEventId());
@@ -990,10 +991,9 @@ public class CallbackTest extends WireMockBaseTest {
         final String EVENT_ID = "UPDATE-EVENT";
         final String CASE_TYPE_ID = "CallbackCase";
         final String JURISDICTION_ID = "TEST";
-        final Integer USER_ID = 123;
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
-        final String URL = String.format("/caseworkers/%d/jurisdictions/%s/case-types/%s/cases/%d/events", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+        final String URL = String.format("/caseworkers/%s/jurisdictions/%s/case-types/%s/cases/%d/events", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
 
         final CaseDataContent caseDetailsToSave = new CaseDataContent();
         final Event event = new Event();
@@ -1022,11 +1022,10 @@ public class CallbackTest extends WireMockBaseTest {
         final String EVENT_ID = "UPDATE-EVENT";
         final String CASE_TYPE_ID = "CallbackCase";
         final String JURISDICTION_ID = "TEST";
-        final Integer USER_ID = 123;
         final Long CASE_REFERENCE = 1504259907353545L;
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
-        final String URL = String.format("/citizens/%d/jurisdictions/%s/case-types/%s/cases/%d/events", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+        final String URL = String.format("/citizens/%s/jurisdictions/%s/case-types/%s/cases/%d/events", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
 
         final CaseDataContent caseDetailsToSave = new CaseDataContent();
         final Event event = new Event();
@@ -1059,10 +1058,9 @@ public class CallbackTest extends WireMockBaseTest {
         final String JURISDICTION_ID = "TEST";
         final Jurisdiction jurisdiction = new Jurisdiction();
         jurisdiction.setId(JURISDICTION_ID);
-        final Integer USER_ID = 123;
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
-        final String URL = String.format("/caseworkers/%d/jurisdictions/%s/case-types/%s/cases/%d/events", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+        final String URL = String.format("/caseworkers/%s/jurisdictions/%s/case-types/%s/cases/%d/events", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
 
         final CaseDataContent caseDetailsToSave = new CaseDataContent();
         final Event event = new Event();
@@ -1102,10 +1100,9 @@ public class CallbackTest extends WireMockBaseTest {
         final String JURISDICTION_ID = "TEST";
         final Jurisdiction jurisdiction = new Jurisdiction();
         jurisdiction.setId(JURISDICTION_ID);
-        final Integer USER_ID = 123;
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
-        final String URL = String.format("/citizens/%d/jurisdictions/%s/case-types/%s/cases/%d/events", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+        final String URL = String.format("/citizens/%s/jurisdictions/%s/case-types/%s/cases/%d/events", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
 
         final CaseDataContent caseDetailsToSave = new CaseDataContent();
         final Event event = new Event();
@@ -1141,10 +1138,9 @@ public class CallbackTest extends WireMockBaseTest {
         final String EVENT_ID = "UPDATE-EVENT";
         final String CASE_TYPE_ID = "CallbackCase";
         final String JURISDICTION_ID = "TEST";
-        final Integer USER_ID = 123;
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
-        final String URL = String.format("/caseworkers/%d/jurisdictions/%s/case-types/%s/cases/%d/events", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+        final String URL = String.format("/caseworkers/%s/jurisdictions/%s/case-types/%s/cases/%d/events", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
 
         final CaseDataContent caseDetailsToSave = new CaseDataContent();
         final Event event = new Event();
@@ -1152,7 +1148,7 @@ public class CallbackTest extends WireMockBaseTest {
         event.setSummary(SUMMARY);
         event.setDescription(DESCRIPTION);
 
-        final String token = generateEventToken(jdbcTemplate, 231321, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, EVENT_ID);
+        final String token = generateEventToken(jdbcTemplate, OTHER_USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, EVENT_ID);
         caseDetailsToSave.setToken(token);
         caseDetailsToSave.setEvent(event);
         caseDetailsToSave.setData(mapper.convertValue(DATA, STRING_NODE_TYPE));
@@ -1171,10 +1167,9 @@ public class CallbackTest extends WireMockBaseTest {
         final String EVENT_ID = "UPDATE-EVENT";
         final String CASE_TYPE_ID = "CallbackCase";
         final String JURISDICTION_ID = "TEST";
-        final Integer USER_ID = 123;
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
-        final String URL = String.format("/citizens/%d/jurisdictions/%s/case-types/%s/cases/%d/events", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+        final String URL = String.format("/citizens/%s/jurisdictions/%s/case-types/%s/cases/%d/events", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
 
         final CaseDataContent caseDetailsToSave = new CaseDataContent();
         final Event event = new Event();
@@ -1182,7 +1177,7 @@ public class CallbackTest extends WireMockBaseTest {
         event.setSummary(SUMMARY);
         event.setDescription(DESCRIPTION);
 
-        final String token = generateEventToken(jdbcTemplate, 231321, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, EVENT_ID);
+        final String token = generateEventToken(jdbcTemplate, OTHER_USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, EVENT_ID);
         caseDetailsToSave.setToken(token);
         caseDetailsToSave.setEvent(event);
         caseDetailsToSave.setData(mapper.convertValue(DATA, STRING_NODE_TYPE));
