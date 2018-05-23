@@ -54,7 +54,7 @@
         <cve>CVE-2016-4970</cve>
     </suppress>
     <suppress>
-        <notes>h2 not used in production</notes>
+        <notes>h2database is not used in production</notes>
         <cve>CVE-2018-10054</cve>
     </suppress>
     <suppress>
