@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.data.user;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -7,14 +8,21 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
 
 import java.util.Arrays;
@@ -147,6 +155,45 @@ class DefaultUserRepositoryTest {
 
             verifyNoMoreInteractions(caseDefinitionRepository);
         }
+    }
+
+    @Test
+    void getUserDefaultSettingsShouldReturnServiceExceptionWhenMessageIsNull() {
+        Assertions.assertThrows(ServiceException.class, ()-> {
+            HttpClientErrorException response = createErrorResponse(HttpStatus.BAD_GATEWAY, null);
+            doThrow(response).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class), anyMap());
+
+            userRepository.getUserDefaultSettings("222");
+        }, "some message");
+    }
+
+    @Test
+    void getUserDefaultSettingsShouldReturnResourceNotFoundExceptionWhen404() {
+        Assertions.assertThrows(ResourceNotFoundException.class, ()-> {
+            HttpClientErrorException response = createErrorResponse(HttpStatus.NOT_FOUND, "some message");
+            doThrow(response).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class), anyMap());
+
+            userRepository.getUserDefaultSettings("222");
+        }, "some message");
+    }
+
+    @Test
+    void getUserDefaultSettingsShouldReturnBadRequestWhenNot404() {
+        Assertions.assertThrows(BadRequestException.class, ()-> {
+            HttpClientErrorException response = createErrorResponse(HttpStatus.BAD_GATEWAY, "some message");
+            doThrow(response).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class), anyMap());
+
+            userRepository.getUserDefaultSettings("222");
+        }, "some message");
+    }
+
+    private HttpClientErrorException createErrorResponse(HttpStatus status, String message) {
+        HttpClientErrorException response = mock(HttpClientErrorException.class);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Message", message);
+        when(response.getResponseHeaders()).thenReturn(headers);
+        when(response.getStatusCode()).thenReturn(status);
+        return response;
     }
 
     private void asCitizen() {
