@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -20,6 +21,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.*;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
 
@@ -104,8 +106,13 @@ public class DefaultUserRepository implements UserRepository {
             LOG.error("Failed to retrieve user profile", e);
             final List<String> headerMessages = e.getResponseHeaders().get("Message");
             final String message = headerMessages != null ? headerMessages.get(0) : e.getMessage();
-            if (message != null)
-                throw new BadRequestException(message);
+            if (message != null) {
+                if (HttpStatus.NOT_FOUND == e.getStatusCode()) {
+                    throw new ResourceNotFoundException(message);
+                } else {
+                    throw new BadRequestException(message);
+                }
+            }
             throw new ServiceException("Problem getting user default settings for " + userId);
         }
     }
