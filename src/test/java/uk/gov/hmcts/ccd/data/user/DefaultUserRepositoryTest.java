@@ -164,7 +164,7 @@ class DefaultUserRepositoryTest {
             doThrow(response).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class), anyMap());
 
             userRepository.getUserDefaultSettings("222");
-        }, "some message");
+        });
     }
 
     @Test
@@ -174,7 +174,7 @@ class DefaultUserRepositoryTest {
             doThrow(response).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class), anyMap());
 
             userRepository.getUserDefaultSettings("222");
-        }, "some message");
+        });
     }
 
     @Test
@@ -184,7 +184,7 @@ class DefaultUserRepositoryTest {
             doThrow(response).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class), anyMap());
 
             userRepository.getUserDefaultSettings("222");
-        }, "some message");
+        });
     }
 
     private HttpClientErrorException createErrorResponse(HttpStatus status, String message) {
