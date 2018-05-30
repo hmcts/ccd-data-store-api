@@ -12,7 +12,11 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
@@ -58,7 +62,9 @@ public class TextValidatorTest {
 
         assertAll(
             () -> assertThat("Min not catched", validMinResults, hasSize(1)),
-            () -> assertThat("Max not catched", validMaxResults, hasSize(1))
+            () -> assertThat("Max not catched", validMaxResults, hasSize(1)),
+            () -> assertThat(validMinResults.get(0).getErrorMessage(),  equalTo("Test require minimum length 5")),
+            () -> assertThat(validMaxResults.get(0).getErrorMessage(), equalTo("Test Test Test exceed maximum length 10"))
         );
     }
 
