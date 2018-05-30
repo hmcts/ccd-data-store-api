@@ -1074,6 +1074,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertThat(field1.getFieldType().getType(), equalTo("Text"));
         assertThat(field1.getId(), equalTo("PersonFirstName"));
         assertThat(field1.getDisplayContext(), equalTo("READONLY"));
+        assertThat(field1.getShowSummaryContentOption(), equalTo(2));
 
         final CaseViewField field2 = eventTrigger.getCaseFields().get(1);
         assertThat(field2.getValue(), equalTo(JSON_NODE_FACTORY.textNode("Roof")));
@@ -1083,6 +1084,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertThat(field2.getFieldType().getType(), equalTo("Text"));
         assertThat(field2.getId(), equalTo("PersonLastName"));
         assertThat(field2.getDisplayContext(), equalTo("OPTIONAL"));
+        assertThat(field2.getShowSummaryContentOption(), equalTo(1));
     }
 
     @Test
