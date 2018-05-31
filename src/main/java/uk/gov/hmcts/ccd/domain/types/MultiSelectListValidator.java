@@ -12,6 +12,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
+import static java.math.BigDecimal.ONE;
+
 @Named
 @Singleton
 public class MultiSelectListValidator implements BaseTypeValidator {
@@ -60,13 +62,15 @@ public class MultiSelectListValidator implements BaseTypeValidator {
 
         final BigDecimal minimum = caseFieldDefinition.getFieldType().getMin();
         if (!checkMin(minimum, uniqueValues.size())) {
-            final String message = String.format("Select at least %d %s", minimum.intValue(), minimum.equals(new BigDecimal(1)) ? "option" : "options");
+            final String message = String.format("Select at least %d %s",
+                                                 minimum.intValue(), minimum.equals(ONE) ? "option" : "options");
             results.add(new ValidationResult(message, dataFieldId));
         }
 
         final BigDecimal maximum = caseFieldDefinition.getFieldType().getMax();
         if (!checkMax(maximum, uniqueValues.size())) {
-            final String message = String.format("Cannot select more than %d %s", maximum.intValue(), maximum.equals(new BigDecimal(1)) ? "option" : "options");
+            final String message = String.format("Cannot select more than %d %s",
+                                                 maximum.intValue(), maximum.equals(ONE) ? "option" : "options");
             results.add(new ValidationResult(message, dataFieldId));
         }
 
