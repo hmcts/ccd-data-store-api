@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.domain.types;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
@@ -14,8 +13,9 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
+import static java.math.BigDecimal.ONE;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 public class MultiSelectListValidatorTest {
 
@@ -125,7 +125,7 @@ public class MultiSelectListValidatorTest {
 
     @Test
     public void validate_shouldNOTBeValidWhenAboveMax() {
-        fieldType.setMax(new BigDecimal(1));
+        fieldType.setMax(ONE);
 
         final ArrayNode values = NODE_FACTORY.arrayNode()
             .add(OPTION_1)

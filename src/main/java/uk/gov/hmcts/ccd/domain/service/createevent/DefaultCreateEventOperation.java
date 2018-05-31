@@ -201,10 +201,8 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
     private CaseDetails saveCaseDetails(final CaseDetails caseDetails,
                                         final CaseEvent eventTrigger,
                                         final Optional<String> state) {
-        if (!state.isPresent()) {
-            if (!equalsIgnoreCase(CaseState.ANY, eventTrigger.getPostState())) {
-                caseDetails.setState(eventTrigger.getPostState());
-            }
+        if (!state.isPresent() && !equalsIgnoreCase(CaseState.ANY, eventTrigger.getPostState())) {
+            caseDetails.setState(eventTrigger.getPostState());
         }
         return caseDetailsRepository.set(caseDetails);
     }
