@@ -16,7 +16,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
@@ -63,9 +62,11 @@ public class TextValidatorTest {
         assertAll(
             () -> assertThat("Min not catched", validMinResults, hasSize(1)),
             () -> assertThat("Max not catched", validMaxResults, hasSize(1)),
-            () -> assertThat(validMinResults, hasItem(hasProperty("errorMessage", equalTo("Test require minimum length 5")))),
+            () -> assertThat(validMinResults, hasItem(
+                    hasProperty("errorMessage", equalTo("Test require minimum length 5")))),
             () -> assertThat(validMinResults, hasItem(hasProperty("fieldId", equalTo("TEST_FIELD_ID")))),
-            () -> assertThat(validMaxResults, hasItem(hasProperty("errorMessage", equalTo("Test Test Test exceed maximum length 10")))),
+            () -> assertThat(validMaxResults, hasItem(
+                    hasProperty("errorMessage", equalTo("Test Test Test exceed maximum length 10")))),
             () -> assertThat(validMaxResults, hasItem(hasProperty("fieldId", equalTo("TEST_FIELD_ID"))))
         );
     }
