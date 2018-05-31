@@ -41,7 +41,7 @@ public class DefaultGetEventTriggerOperation implements GetEventTriggerOperation
     }
 
     @Override
-    public CaseEventTrigger executeForCaseType(Integer uid,
+    public CaseEventTrigger executeForCaseType(String uid,
                                                String jurisdictionId,
                                                String caseTypeId,
                                                String eventTriggerId,
@@ -57,7 +57,7 @@ public class DefaultGetEventTriggerOperation implements GetEventTriggerOperation
     }
 
     @Override
-    public CaseEventTrigger executeForCase(Integer uid,
+    public CaseEventTrigger executeForCase(String uid,
                                            String jurisdictionId,
                                            String caseTypeId,
                                            String caseReference,
@@ -81,6 +81,8 @@ public class DefaultGetEventTriggerOperation implements GetEventTriggerOperation
         caseTrigger.setName(eventTrigger.getName());
         caseTrigger.setDescription(eventTrigger.getDescription());
         caseTrigger.setShowSummary(eventTrigger.getShowSummary());
+        caseTrigger.setShowEventNotes(eventTrigger.getShowEventNotes());
+        caseTrigger.setEndButtonLabel(eventTrigger.getEndButtonLabel());
         return caseTrigger;
     }
 

@@ -5,14 +5,20 @@ import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Order;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
 
 public abstract class CaseDetailsQueryBuilder<T> {
 
@@ -106,8 +112,12 @@ public abstract class CaseDetailsQueryBuilder<T> {
         return this;
     }
 
-    public CaseDetailsQueryBuilder orderByCreatedDate() {
-        orders.add(cb.asc(root.get("createdDate")));
+    public CaseDetailsQueryBuilder orderByCreatedDate(String sortDirection) {
+        if (sortDirection.equalsIgnoreCase("asc")) {
+            orders.add(cb.asc(root.get("createdDate")));
+        } else {
+            orders.add(cb.desc(root.get("createdDate")));
+        }
 
         return this;
     }
