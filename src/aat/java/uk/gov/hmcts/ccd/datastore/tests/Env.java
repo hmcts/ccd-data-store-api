@@ -1,14 +1,12 @@
 package uk.gov.hmcts.ccd.datastore.tests;
 
+import org.apache.commons.lang3.Validate;
+
 public class Env {
 
     private Env() {}
 
     public static String require(String name) {
-        final String value = System.getenv(name);
-        if (null == value) {
-            throw new IllegalStateException(String.format("Environment variable `%s` is required", name));
-        }
-        return value;
+        return Validate.notNull(System.getenv(name), "Environment variable `%s` is required", name);
     }
 }
