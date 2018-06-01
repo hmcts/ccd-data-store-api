@@ -34,6 +34,10 @@ locals {
 
   // S2S
   s2s_url = "http://rpe-service-auth-provider-${local.env_ase_url}"
+
+  custom_redirect_uri = "${var.frontend_url}/oauth2redirect"
+  default_redirect_uri = "https://ccd-case-management-web-${local.env_ase_url}/oauth2redirect"
+  oauth2_redirect_uri = "${var.frontend_url != "" ? local.custom_redirect_uri : local.default_redirect_uri}"
 }
 
 data "vault_generic_secret" "ccd_data_s2s_key" {
@@ -42,6 +46,10 @@ data "vault_generic_secret" "ccd_data_s2s_key" {
 
 data "vault_generic_secret" "gateway_idam_key" {
   path = "secret/${var.vault_section}/ccidam/service-auth-provider/api/microservice-keys/ccd-gw"
+}
+
+data "vault_generic_secret" "gateway_oauth2_client_secret" {
+  path = "secret/${var.vault_section}/ccidam/idam-api/oauth2/client-secrets/ccd-gateway"
 }
 
 module "ccd-data-store-api" {
@@ -152,5 +160,11 @@ resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
 resource "azurerm_key_vault_secret" "gw_s2s_key" {
   name = "microserviceGatewaySecret"
   value = "${data.vault_generic_secret.gateway_idam_key.data["value"]}"
+  vault_uri = "${module.ccd-data-store-vault.key_vault_uri}"
+}
+
+resource "azurerm_key_vault_secret" "gw_oauth2_secret" {
+  name = "gatewayOAuth2ClientSecret"
+  value = "${data.vault_generic_secret.gateway_oauth2_client_secret.data["value"]}"
   vault_uri = "${module.ccd-data-store-vault.key_vault_uri}"
 }
