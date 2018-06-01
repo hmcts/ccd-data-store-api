@@ -35,7 +35,9 @@ locals {
   // S2S
   s2s_url = "http://rpe-service-auth-provider-${local.env_ase_url}"
 
-  oauth2_redirect_uri = "https://ccd-case-management-web-${local.env_ase_url}/oauth2redirect"
+  custom_redirect_uri = "${var.frontend_url}/oauth2redirect"
+  default_redirect_uri = "https://ccd-case-management-web-${local.env_ase_url}/oauth2redirect"
+  oauth2_redirect_uri = "${var.frontend_url != "" ? local.custom_redirect_uri : local.default_redirect_uri}"
 }
 
 data "vault_generic_secret" "ccd_data_s2s_key" {
