@@ -128,7 +128,7 @@ public class CallbackTest extends WireMockBaseTest {
         + "    \"AddressLine2\": \"Address Line 12\"\n"
         + "  },\n"
         + "  \"D8Document\":{"
-        + "    \"document_url\": \"http://localhost:" + wireMockRule.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+        + "    \"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
         + "  }\n"
         + "}\n";
 
@@ -141,11 +141,15 @@ public class CallbackTest extends WireMockBaseTest {
         + "    \"AddressLine2\": \"Address Line 12\"\n"
         + "  },\n"
         + "  \"D8Document\":{"
-        + "    \"document_url\": \"http://localhost:" + wireMockRule.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
+        + "    \"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
         + "    \"document_binary_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n"
         + "    \"document_filename\": \"Seagulls_Square.jpg\""
         + "  }\n"
         + "}\n";
+
+    private int getPort() {
+        return wireMockRule.port();
+    }
 
     private JsonNode EXPECTED_SAVED_DATA = null;
 
@@ -157,7 +161,7 @@ public class CallbackTest extends WireMockBaseTest {
         "    \"AddressLine2\": \"Address Line 12\"\n" +
         "  },\n" +
         "  \"D8Document\":{" +
-        "    \"document_url\": \"http://localhost:" + wireMockRule.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n" +
+        "    \"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n" +
         "    \"document_binary_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n" +
         "    \"document_filename\": \"Seagulls_Square.jpg\"" +
         "  }\n" +
@@ -172,7 +176,7 @@ public class CallbackTest extends WireMockBaseTest {
         "    \"AddressLine2\": \"Address Line 12\"\n" +
         "  },\n" +
         "  \"D8Document\":{" +
-        "    \"document_url\": \"http://localhost:" + wireMockRule.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\"\n" +
+        "    \"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\"\n" +
         "  }\n" +
         "}\n";
 
@@ -237,7 +241,7 @@ public class CallbackTest extends WireMockBaseTest {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
         jdbcTemplate = new JdbcTemplate(db);
         wireMockRule.stubFor(get(urlMatching("/api/data/case-type/CallbackCase"))
-            .willReturn(okJson(CallbackTestData.getTestDefinition(wireMockRule.port())).withStatus(200)));
+            .willReturn(okJson(CallbackTestData.getTestDefinition(getPort())).withStatus(200)));
         MODIFIED_DATA = mapper.readTree(MODIFIED_DATA_STRING);
         EXPECTED_MODIFIED_DATA = mapper.readTree(EXPECTED_MODIFIED_DATA_AFTER_AUTH_STRING);
         EXPECTED_SAVED_DATA = mapper.readTree(EXPECTED_SAVED_DATA_STRING);
