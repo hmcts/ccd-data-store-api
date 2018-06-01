@@ -4,25 +4,50 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
-import feign.Response;
 
 import java.util.List;
 
 public interface IdamApi {
 
-    @RequestLine("POST /oauth2/authorize")
-    @Headers("Authorization: Basic {basic_auth}")
-    AuthenticateUserResponse authenticateUser(@Param("basic_auth") String basicAuth);
+    @RequestLine("POST /oauth2/authorize"
+        + "?response_type={response_type}"
+        + "&client_id={client_id}"
+        + "&redirect_uri={redirect_uri}")
+    @Headers("Authorization: {authorization}")
+    AuthenticateUserResponse authenticateUser(@Param("authorization") String authorization,
+                                              @Param("response_type") String responseType,
+                                              @Param("client_id") String clientId,
+                                              @Param("redirect_uri") String redirectUri);
 
-    @RequestLine("POST /testing-support/lease?id=1&role={role}")
-    Response testingLease(@Param("role") String role);
+    @RequestLine("POST /oauth2/token"
+        + "?code={code}"
+        + "&grant_type={grant_type}"
+        + "&client_id={client_id}"
+        + "&client_secret={client_secret}"
+        + "&redirect_uri={redirect_uri}")
+    @Headers("Content-Type: application/x-www-form-urlencoded")
+    TokenExchangeResponse exchangeCode(@Param("code") String code,
+                                       @Param("grant_type") String grantType,
+                                       @Param("client_id") String clientId,
+                                       @Param("client_secret") String clientSecret,
+                                       @Param("redirect_uri") String redirectUri);
 
     @RequestLine("GET /details")
     @Headers("Authorization: Bearer {access_token}")
     IdamUser getUser(@Param("access_token") String accessToken);
 
     class AuthenticateUserResponse {
-        @JsonProperty("access-token")
+        @JsonProperty("code")
+        private String code;
+
+        public String getCode() {
+            return code;
+        }
+    }
+
+    class TokenExchangeResponse {
+
+        @JsonProperty("access_token")
         private String accessToken;
 
         public String getAccessToken() {
