@@ -107,7 +107,7 @@ public class CallbackTest extends WireMockBaseTest {
         "  }"
     );
 
-    private final String EXPECTED_CALLBACK_DATA_CLASSIFICATION_STRING =
+    private static final String EXPECTED_CALLBACK_DATA_CLASSIFICATION_STRING =
     "{\n" +
         "    \"PersonLastName\": \"PRIVATE\",\n" +
         "    \"PersonAddress\": {\n" +
@@ -120,7 +120,7 @@ public class CallbackTest extends WireMockBaseTest {
         "    \"D8Document\": \"PRIVATE\"" +
         "  }";
 
-    private final String MODIFIED_DATA_STRING = "{\n"
+    private final String modifiedDataString = "{\n"
         + "  \"PersonFirstName\": \"ccd-First Name\",\n"
         + "  \"PersonLastName\": \"Last Name\",\n"
         + "  \"PersonAddress\": {\n"
@@ -132,9 +132,9 @@ public class CallbackTest extends WireMockBaseTest {
         + "  }\n"
         + "}\n";
 
-    private JsonNode MODIFIED_DATA = null;
+    private static JsonNode MODIFIED_DATA = null;
 
-    private final String EXPECTED_MODIFIED_DATA_AFTER_AUTH_STRING = "{\n"
+    private final String expectedModifiedDataAfterAuthString = "{\n"
         + "  \"PersonLastName\": \"Last Name\",\n"
         + "  \"PersonAddress\": {\n"
         + "    \"AddressLine1\": \"Address Line 11\",\n"
@@ -151,25 +151,25 @@ public class CallbackTest extends WireMockBaseTest {
         return wireMockRule.port();
     }
 
-    private JsonNode EXPECTED_SAVED_DATA = null;
+    private static JsonNode EXPECTED_SAVED_DATA = null;
 
-    private final String EXPECTED_SAVED_DATA_STRING = "{\n" +
-        "  \"PersonFirstName\": \"ccd-First Name\",\n" +
-        "  \"PersonLastName\": \"Last Name\",\n" +
-        "  \"PersonAddress\": {\n" +
-        "    \"AddressLine1\": \"Address Line 11\",\n" +
-        "    \"AddressLine2\": \"Address Line 12\"\n" +
-        "  },\n" +
-        "  \"D8Document\":{" +
-        "    \"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n" +
-        "    \"document_binary_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n" +
-        "    \"document_filename\": \"Seagulls_Square.jpg\"" +
-        "  }\n" +
-        "}\n";
+    private final String expectedSavedDataString = "{\n"
+        + "  \"PersonFirstName\": \"ccd-First Name\",\n"
+        + "  \"PersonLastName\": \"Last Name\",\n"
+        + "  \"PersonAddress\": {\n"
+        + "    \"AddressLine1\": \"Address Line 11\",\n"
+        + "    \"AddressLine2\": \"Address Line 12\"\n"
+        + "  },\n"
+        + "  \"D8Document\":{"
+        + "    \"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
+        + "    \"document_binary_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n"
+        + "    \"document_filename\": \"Seagulls_Square.jpg\""
+        + "  }\n"
+        + "}\n";
 
-    private JsonNode EXPECTED_MODIFIED_DATA = null;
+    private static JsonNode EXPECTED_MODIFIED_DATA = null;
 
-    private final String SANITIZED_MODIFIED_DATA_WITH_MISSING_BINARY_LINK_STRING = "{\n" +
+    private final String sanitizedModifiedDataWithMissingBinaryLinkString = "{\n" +
         "  \"PersonLastName\": \"Last Name\",\n" +
         "  \"PersonAddress\": {\n" +
         "    \"AddressLine1\": \"Address Line 11\",\n" +
@@ -180,7 +180,7 @@ public class CallbackTest extends WireMockBaseTest {
         "  }\n" +
         "}\n";
 
-    private JsonNode SANITIZED_MODIFIED_DATA_WITH_MISSING_BINARY_LINK = null;
+    private static JsonNode SANITIZED_MODIFIED_DATA_WITH_MISSING_BINARY_LINK = null;
 
     private final JsonNode INVALID_CALLBACK_DATA = mapper.readTree(
         "{\n" +
@@ -242,10 +242,10 @@ public class CallbackTest extends WireMockBaseTest {
         jdbcTemplate = new JdbcTemplate(db);
         wireMockRule.stubFor(get(urlMatching("/api/data/case-type/CallbackCase"))
             .willReturn(okJson(CallbackTestData.getTestDefinition(getPort())).withStatus(200)));
-        MODIFIED_DATA = mapper.readTree(MODIFIED_DATA_STRING);
-        EXPECTED_MODIFIED_DATA = mapper.readTree(EXPECTED_MODIFIED_DATA_AFTER_AUTH_STRING);
-        EXPECTED_SAVED_DATA = mapper.readTree(EXPECTED_SAVED_DATA_STRING);
-        SANITIZED_MODIFIED_DATA_WITH_MISSING_BINARY_LINK = mapper.readTree(SANITIZED_MODIFIED_DATA_WITH_MISSING_BINARY_LINK_STRING);
+        MODIFIED_DATA = mapper.readTree(modifiedDataString);
+        EXPECTED_MODIFIED_DATA = mapper.readTree(expectedModifiedDataAfterAuthString);
+        EXPECTED_SAVED_DATA = mapper.readTree(expectedSavedDataString);
+        SANITIZED_MODIFIED_DATA_WITH_MISSING_BINARY_LINK = mapper.readTree(sanitizedModifiedDataWithMissingBinaryLinkString);
     }
 
     @Test

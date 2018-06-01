@@ -328,31 +328,31 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases?ignore-warning=true";
         final JsonNode DATA = mapper.readTree(
-            "{\n" +
-            "  \"PersonFirstName\": \"First Name\",\n" +
-            "  \"PersonLastName\": \"Last Name\",\n" +
-            "  \"PersonAddress\": {\n" +
-            "    \"AddressLine1\": \"Address Line 1\",\n" +
-            "    \"AddressLine2\": \"Address Line 2\"\n" +
-            "  },\n" +
-            "\"D8Document\":{" +
-            "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"}" +
-            "}\n"
+            "{\n"
+            + "  \"PersonFirstName\": \"First Name\",\n"
+            + "  \"PersonLastName\": \"Last Name\",\n"
+            + "  \"PersonAddress\": {\n"
+            + "    \"AddressLine1\": \"Address Line 1\",\n"
+            + "    \"AddressLine2\": \"Address Line 2\"\n"
+            + "  },\n"
+            + "\"D8Document\":{"
+            + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"}"
+            + "}\n"
         );
         final JsonNode SANITIZED_DATA = mapper.readTree(
-        "{\n" +
-            "  \"PersonFirstName\": \"First Name\",\n" +
-            "  \"PersonLastName\": \"Last Name\",\n" +
-            "  \"PersonAddress\": {\n" +
-            "    \"AddressLine1\": \"Address Line 1\",\n" +
-            "    \"AddressLine2\": \"Address Line 2\"\n" +
-            "  },\n" +
-            "  \"D8Document\":{\n" +
-            "    \"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n" +
-            "    \"document_binary_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n" +
-            "    \"document_filename\": \"Seagulls_Square.jpg\"" +
-            "}\n" +
-            "}\n"
+        "{\n"
+            + "  \"PersonFirstName\": \"First Name\",\n"
+            + "  \"PersonLastName\": \"Last Name\",\n"
+            + "  \"PersonAddress\": {\n"
+            + "    \"AddressLine1\": \"Address Line 1\",\n"
+            + "    \"AddressLine2\": \"Address Line 2\"\n"
+            + "  },\n"
+            + "  \"D8Document\":{\n"
+            + "    \"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
+            + "    \"document_binary_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n"
+            + "    \"document_filename\": \"Seagulls_Square.jpg\""
+            + "}\n"
+            + "}\n"
         );
         final CaseDataContent caseDetailsToSave = new CaseDataContent();
         final Event triggeringEvent = new Event();
@@ -468,16 +468,16 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases?ignore-warning=true";
         final JsonNode DATA = mapper.readTree(
-            "{\n" +
-            "  \"PersonFirstName\": \"First Name\",\n" +
-            "  \"PersonLastName\": \"Last Name\",\n" +
-            "  \"PersonAddress\": {\n" +
-            "    \"AddressLine1\": \"Address Line 1\",\n" +
-            "    \"AddressLine2\": \"Address Line 2\"\n" +
-            "  },\n" +
-            "\"D8Document\":{" +
-            "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\"}" +
-            "}\n"
+            "{\n"
+            + "  \"PersonFirstName\": \"First Name\",\n"
+            + "  \"PersonLastName\": \"Last Name\",\n"
+            + "  \"PersonAddress\": {\n"
+            + "    \"AddressLine1\": \"Address Line 1\",\n"
+            + "    \"AddressLine2\": \"Address Line 2\"\n"
+            + "  },\n"
+            + "\"D8Document\":{"
+            + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\"}"
+            + "}\n"
         );
         final CaseDataContent caseDetailsToSave = new CaseDataContent();
         final Event triggeringEvent = new Event();
