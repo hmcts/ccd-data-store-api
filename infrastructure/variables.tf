@@ -57,7 +57,7 @@ variable "use_uk_db" {
 
 variable "authorised-services" {
   type    = "string"
-  default = "ccd_data,ccd_gw,ccd_ps,probate_backend,divorce_ccd_submission,sscs,cmc,cmc_claim_store"
+  default = "ccd_data,ccd_gw,ccd_ps,probate_backend,divorce_ccd_submission,sscs,cmc,cmc_claim_store,jui_webapp,pui_webapp"
 }
 
 variable "idam_api_url" {
