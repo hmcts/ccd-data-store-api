@@ -120,32 +120,32 @@ public class CallbackTest extends WireMockBaseTest {
         "    \"D8Document\": \"PRIVATE\"" +
         "  }";
 
-    private final String MODIFIED_DATA_STRING = "{\n" +
-        "  \"PersonFirstName\": \"ccd-First Name\",\n" +
-        "  \"PersonLastName\": \"Last Name\",\n" +
-        "  \"PersonAddress\": {\n" +
-        "    \"AddressLine1\": \"Address Line 11\",\n" +
-        "    \"AddressLine2\": \"Address Line 12\"\n" +
-        "  },\n" +
-        "  \"D8Document\":{" +
-        "    \"document_url\": \"http://localhost:" + wireMockRule.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"" +
-        "  }\n" +
-        "}\n";
+    private final String MODIFIED_DATA_STRING = "{\n"
+        + "  \"PersonFirstName\": \"ccd-First Name\",\n"
+        + "  \"PersonLastName\": \"Last Name\",\n"
+        + "  \"PersonAddress\": {\n"
+        + "    \"AddressLine1\": \"Address Line 11\",\n"
+        + "    \"AddressLine2\": \"Address Line 12\"\n"
+        + "  },\n"
+        + "  \"D8Document\":{"
+        + "    \"document_url\": \"http://localhost:" + wireMockRule.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+        + "  }\n"
+        + "}\n";
 
     private JsonNode MODIFIED_DATA = null;
 
-    private final String EXPECTED_MODIFIED_DATA_AFTER_AUTH_STRING = "{\n" +
-        "  \"PersonLastName\": \"Last Name\",\n" +
-        "  \"PersonAddress\": {\n" +
-        "    \"AddressLine1\": \"Address Line 11\",\n" +
-        "    \"AddressLine2\": \"Address Line 12\"\n" +
-        "  },\n" +
-        "  \"D8Document\":{" +
-        "    \"document_url\": \"http://localhost:" + wireMockRule.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n" +
-        "    \"document_binary_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n" +
-        "    \"document_filename\": \"Seagulls_Square.jpg\"" +
-        "  }\n" +
-        "}\n";
+    private final String EXPECTED_MODIFIED_DATA_AFTER_AUTH_STRING = "{\n"
+        + "  \"PersonLastName\": \"Last Name\",\n"
+        + "  \"PersonAddress\": {\n"
+        + "    \"AddressLine1\": \"Address Line 11\",\n"
+        + "    \"AddressLine2\": \"Address Line 12\"\n"
+        + "  },\n"
+        + "  \"D8Document\":{"
+        + "    \"document_url\": \"http://localhost:" + wireMockRule.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
+        + "    \"document_binary_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n"
+        + "    \"document_filename\": \"Seagulls_Square.jpg\""
+        + "  }\n"
+        + "}\n";
 
     private JsonNode EXPECTED_SAVED_DATA = null;
 
