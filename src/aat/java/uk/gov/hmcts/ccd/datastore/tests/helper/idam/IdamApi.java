@@ -9,22 +9,22 @@ import java.util.List;
 
 public interface IdamApi {
 
-    @RequestLine("POST /oauth2/authorize" +
-        "?response_type={response_type}" +
-        "&client_id={client_id}" +
-        "&redirect_uri={redirect_uri}")
+    @RequestLine("POST /oauth2/authorize"
+        + "?response_type={response_type}"
+        + "&client_id={client_id}"
+        + "&redirect_uri={redirect_uri}")
     @Headers("Authorization: {authorization}")
     AuthenticateUserResponse authenticateUser(@Param("authorization") String authorization,
                                               @Param("response_type") String responseType,
                                               @Param("client_id") String clientId,
                                               @Param("redirect_uri") String redirectUri);
 
-    @RequestLine("POST /oauth2/token" +
-        "?code={code}" +
-        "&grant_type={grant_type}" +
-        "&client_id={client_id}" +
-        "&client_secret={client_secret}" +
-        "&redirect_uri={redirect_uri}")
+    @RequestLine("POST /oauth2/token"
+        + "?code={code}"
+        + "&grant_type={grant_type}"
+        + "&client_id={client_id}"
+        + "&client_secret={client_secret}"
+        + "&redirect_uri={redirect_uri}")
     @Headers("Content-Type: application/x-www-form-urlencoded")
     TokenExchangeResponse exchangeCode(@Param("code") String code,
                                        @Param("grant_type") String grantType,
