@@ -73,3 +73,9 @@ variable "default_print_url" {
   type = "string"
   default = ""
 }
+
+variable "frontend_url" {
+  type = "string"
+  default = ""
+  description = "Optional front end URL to use for building redirect URI"
+}
