@@ -340,7 +340,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "}\n"
         );
         final JsonNode SANITIZED_DATA = mapper.readTree(
-        "{\n"
+            "{\n"
             + "  \"PersonFirstName\": \"First Name\",\n"
             + "  \"PersonLastName\": \"Last Name\",\n"
             + "  \"PersonAddress\": {\n"

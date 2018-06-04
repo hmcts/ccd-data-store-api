@@ -147,10 +147,6 @@ public class CallbackTest extends WireMockBaseTest {
         + "  }\n"
         + "}\n";
 
-    private int getPort() {
-        return wireMockRule.port();
-    }
-
     private static JsonNode EXPECTED_SAVED_DATA = null;
 
     private final String expectedSavedDataString = "{\n"
@@ -169,16 +165,16 @@ public class CallbackTest extends WireMockBaseTest {
 
     private static JsonNode EXPECTED_MODIFIED_DATA = null;
 
-    private final String sanitizedModifiedDataWithMissingBinaryLinkString = "{\n" +
-        "  \"PersonLastName\": \"Last Name\",\n" +
-        "  \"PersonAddress\": {\n" +
-        "    \"AddressLine1\": \"Address Line 11\",\n" +
-        "    \"AddressLine2\": \"Address Line 12\"\n" +
-        "  },\n" +
-        "  \"D8Document\":{" +
-        "    \"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\"\n" +
-        "  }\n" +
-        "}\n";
+    private final String sanitizedModifiedDataWithMissingBinaryLinkString = "{\n"
+        + "  \"PersonLastName\": \"Last Name\",\n"
+        + "  \"PersonAddress\": {\n"
+        + "    \"AddressLine1\": \"Address Line 11\",\n"
+        + "    \"AddressLine2\": \"Address Line 12\"\n"
+        + "  },\n"
+        + "  \"D8Document\":{"
+        + "    \"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\"\n"
+        + "  }\n"
+        + "}\n";
 
     private static JsonNode SANITIZED_MODIFIED_DATA_WITH_MISSING_BINARY_LINK = null;
 
@@ -1194,4 +1190,7 @@ public class CallbackTest extends WireMockBaseTest {
                                      .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
     }
 
+    private int getPort() {
+        return wireMockRule.port();
+    }
 }
