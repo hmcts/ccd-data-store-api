@@ -19,12 +19,9 @@ public abstract class BaseTest {
 
     protected Supplier<RequestSpecification> asAutoTestCaseworker() {
 
-//        final AuthenticatedUser caseworker = aat.getIdamHelper()
-//                                                .authenticate(aat.getCaseworkerAutoTestEmail(),
-//                                                              aat.getCaseworkerAutoTestPassword());
-
         final AuthenticatedUser caseworker = aat.getIdamHelper()
-                                                .authenticate("caseworker-autotest1");
+                                                .authenticate(aat.getCaseworkerAutoTestEmail(),
+                                                              aat.getCaseworkerAutoTestPassword());
 
         final String s2sToken = aat.getS2SHelper()
                                    .getToken();
