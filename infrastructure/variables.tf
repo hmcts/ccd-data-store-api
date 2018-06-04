@@ -57,7 +57,7 @@ variable "use_uk_db" {
 
 variable "authorised-services" {
   type    = "string"
-  default = "ccd_data,ccd_gw,ccd_ps,probate_backend,divorce_ccd_submission,sscs,cmc,cmc_claim_store"
+  default = "ccd_data,ccd_gw,ccd_ps,probate_backend,divorce_ccd_submission,sscs,cmc,cmc_claim_store,jui_webapp,pui_webapp"
 }
 
 variable "idam_api_url" {
@@ -72,4 +72,10 @@ variable "document_management_valid_domain" {
 variable "default_print_url" {
   type = "string"
   default = ""
+}
+
+variable "frontend_url" {
+  type = "string"
+  default = ""
+  description = "Optional front end URL to use for building redirect URI"
 }

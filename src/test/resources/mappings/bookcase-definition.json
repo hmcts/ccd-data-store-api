@@ -53,11 +53,13 @@
           "case_fields": [
             {
               "case_field_id": "PersonFirstName",
-              "display_context": "READONLY"
+              "display_context": "READONLY",
+              "show_summary_content_option": 2
             },
             {
               "case_field_id": "PersonLastName",
-              "display_context": "OPTIONAL"
+              "display_context": "OPTIONAL",
+              "show_summary_content_option": 1
             }
           ],
           "pre_states": [
