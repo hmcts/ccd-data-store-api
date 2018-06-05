@@ -1,4 +1,4 @@
-# case-data-store-app 
+# ccd-data-store-api 
 [![API Docs](https://img.shields.io/badge/API%20Docs-site-green.svg?style=flat-square)](https://hmcts.github.io/ccd-data-store-api/api/latest/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://travis-ci.org/hmcts/ccd-data-store-api.svg?branch=master)](https://travis-ci.org/hmcts/ccd-data-store-api)
@@ -6,7 +6,7 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/3038977127484764ad0ae9b81a1a14ad)](https://www.codacy.com/app/adr1ancho/ccd-data-store-api?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=hmcts/ccd-data-store-api&amp;utm_campaign=Badge_Grade)
 [![Codacy Badge](https://api.codacy.com/project/badge/Coverage/3038977127484764ad0ae9b81a1a14ad)](https://www.codacy.com/app/adr1ancho/ccd-data-store-api?utm_source=github.com&utm_medium=referral&utm_content=hmcts/ccd-data-store-api&utm_campaign=Badge_Coverage)
 [![Known Vulnerabilities](https://snyk.io/test/github/hmcts/ccd-data-store-api/badge.svg)](https://snyk.io/test/github/hmcts/ccd-data-store-api)
-[![HitCount](http://hits.dwyl.io/SP9gBJ/ccd-data-store-api.svg)](http://hits.dwyl.io/hmcts/ccd-data-store-api)
+[![HitCount](http://hits.dwyl.io/SP9gBJ/ccd-data-store-api.svg)](#ccd-data-store-api)
 [![Issue Stats](http://issuestats.com/github/hmcts/ccd-data-store-api/badge/pr)](http://issuestats.com/github/hmcts/ccd-data-store-api)
 
 Store/search cases and provide workbaskets
