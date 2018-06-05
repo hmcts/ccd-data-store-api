@@ -4,3 +4,4 @@ document_management_valid_domain = "^https?://(?:api-gateway\\.preprod\\.dm\\.re
 default_print_url = "https://return-case-doc.ccd.demo.platform.hmcts.net/jurisdictions/:jid/case-types/:ctid/cases/:cid"
 capacity = "2"
 frontend_url = "https://www.ccd.demo.platform.hmcts.net"
+use_uk_db = "true"
