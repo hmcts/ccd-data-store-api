@@ -262,7 +262,7 @@ Once this gets sent to us we will retrieve the relevant metadata and send you ba
 
 ### OrderSummary
 
-An `OrderSummary` value is a Json `object`. We accept the following structure with a mandatory field `Fees` which is a collection of `Fee` objects and mandatory `PaymentTotal` field. The `PaymentReference` is the only optional field.
+An `OrderSummary` value is a Json `object`. We accept the following structure with a mandatory field `Fees` which is a collection of `Fee` objects and mandatory `PaymentTotal` field. The `PaymentReference` is the only optional field. The `PaymentTotal` and `FeeAmount` are `MoneyGBP` field types so proper formatting is required.
 
 ```json
 {
