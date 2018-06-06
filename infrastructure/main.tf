@@ -92,14 +92,6 @@ module "ccd-data-store-api" {
 
 }
 
-module "postgres-data-store" {
-  source              = "git@github.com:hmcts/moj-module-postgres?ref=master"
-  product             = "${local.app_full_name}-data-store"
-  location            = "West Europe"
-  env                 = "${var.env}"
-  postgresql_user     = "ccd"
-}
-
 module "data-store-db" {
   source = "git@github.com:hmcts/moj-module-postgres?ref=cnp-449-tactical"
   product = "${local.app_full_name}-postgres-db"
