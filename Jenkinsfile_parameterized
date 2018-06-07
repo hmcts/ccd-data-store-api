@@ -12,6 +12,7 @@ List<LinkedHashMap<String, Object>> secrets = [
     secret('caseworkerAutoTest1Email', 'CCD_CASEWORKER_AUTOTEST_EMAIL'),
     secret('caseworkerAutoTest1Password', 'CCD_CASEWORKER_AUTOTEST_PASSWORD'),
     secret('microserviceGatewaySecret', 'CCD_GW_SERVICE_SECRET'),
+    secret('gatewayOAuth2ClientSecret', 'OAUTH2_CLIENT_SECRET'),
 ]
 
 static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
@@ -24,6 +25,6 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 }
 
 withParameterizedPipeline('java', 'ccd', 'data-store-api', params.ENVIRONMENT, 'sandbox') {
-    enableDbMigration()  
+    enableDbMigration()
     loadVaultSecrets(secrets)
 }
