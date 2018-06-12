@@ -12,6 +12,8 @@ import javax.persistence.Query;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.Optional.ofNullable;
+
 @Named
 @Singleton
 public class CaseAuditEventRepository {
@@ -46,5 +48,14 @@ public class CaseAuditEventRepository {
 
         return (auditEvents == null || auditEvents.size() == 0) ?
                 Optional.empty() : Optional.of(caseAuditEventMapper.entityToModel(auditEvents.get(0)));
+    }
+
+    public Optional<AuditEvent> findByEventId(Long eventId) {
+        Query query = em.createNamedQuery(CaseAuditEventEntity.FIND_BY_ID);
+
+        query.setParameter(CaseAuditEventEntity.EVENT_ID, eventId);
+        CaseAuditEventEntity caseAuditEvent = (CaseAuditEventEntity) query.getSingleResult();
+
+        return ofNullable(caseAuditEvent).map(caseAuditEventMapper::entityToModel);
     }
 }

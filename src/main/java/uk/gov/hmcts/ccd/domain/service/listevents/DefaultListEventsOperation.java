@@ -6,13 +6,13 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
-
-import java.util.List;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+
+import java.util.List;
 
 @Service
 @Qualifier("default")
@@ -21,8 +21,9 @@ public class DefaultListEventsOperation implements ListEventsOperation {
     private final CaseAuditEventRepository auditEventRepository;
     private final GetCaseOperation getCaseOperation;
     private final UIDService uidService;
-    public static final String RESOURCE_NOT_FOUND //
+    private static final String RESOURCE_NOT_FOUND //
         = "No case found ( jurisdiction = '%s', case type id = '%s', case reference = '%s' )";
+    private static final String CASE_EVENT_NOT_FOUND = "Case event not found";
 
     @Autowired
     public DefaultListEventsOperation(CaseAuditEventRepository auditEventRepository,
@@ -51,5 +52,10 @@ public class DefaultListEventsOperation implements ListEventsOperation {
                     String.format(RESOURCE_NOT_FOUND, jurisdiction, caseTypeId, caseReference)));
 
         return execute(caseDetails);
+    }
+
+    @Override
+    public AuditEvent execute(String jurisdiction, String caseTypeId, Long eventId) {
+        return auditEventRepository.findByEventId(eventId).orElseThrow(() -> new ResourceNotFoundException(CASE_EVENT_NOT_FOUND));
     }
 }

@@ -2,8 +2,6 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,8 +9,17 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTab;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
@@ -20,14 +27,19 @@ import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.listevents.ListEventsOperation;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.arrayWithSize;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItemInArray;
+import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
@@ -37,6 +49,7 @@ class DefaultGetCaseViewOperationTest {
     private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_TYPE_ID = "Grant";
     private static final String CASE_REFERENCE = "1111222233334444";
+    private static final Long EVENT_ID = 100L;
     private static final String EVENT_SUMMARY_1 = "some summary";
     private static final String EVENT_SUMMARY_2 = "Another summary";
     private static final String STATE = "Plop";
@@ -87,7 +100,7 @@ class DefaultGetCaseViewOperationTest {
         event1.setSummary(EVENT_SUMMARY_1);
         event2 = new AuditEvent();
         event2.setSummary(EVENT_SUMMARY_2);
-        auditEvents = Arrays.asList(event1, event2);
+        auditEvents = asList(event1, event2);
         doReturn(auditEvents).when(listEventsOperation).execute(caseDetails);
 
         doReturn(Boolean.TRUE).when(uidService).validateUID(CASE_REFERENCE);
@@ -97,7 +110,9 @@ class DefaultGetCaseViewOperationTest {
         doReturn(caseTabCollection).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
 
         caseType = new CaseType();
-        caseType.setJurisdiction(new Jurisdiction());
+        Jurisdiction jurisdiction = new Jurisdiction();
+        jurisdiction.setName(JURISDICTION_ID);
+        caseType.setJurisdiction(jurisdiction);
         doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
 
         caseState = new CaseState();
@@ -109,14 +124,6 @@ class DefaultGetCaseViewOperationTest {
                                                                       caseTypeService,
                                                                       eventTriggerService,
                                                                       uidService);
-    }
-
-    private Map<String, JsonNode> buildData(String... dataFieldIds) {
-        Map<String, JsonNode> dataMap = Maps.newHashMap();
-        Lists.newArrayList(dataFieldIds).forEach(dataFieldId -> {
-            dataMap.put(dataFieldId, JSON_NODE_FACTORY.textNode(dataFieldId));
-        });
-        return dataMap;
     }
 
     @Test
@@ -159,13 +166,39 @@ class DefaultGetCaseViewOperationTest {
         );
     }
 
+    @Test
+    @DisplayName("should retrieve historic case data for the event")
+    void shouldRetrieveCaseHistoryForTheEvent() {
+        Map<String, JsonNode> dataMap = buildData("dataTestField2");
+        caseDetails.setData(dataMap);
+        event1.setData(dataMap);
+        doReturn(event1).when(listEventsOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
+
+        CaseHistoryView caseHistoryView = defaultGetCaseViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, EVENT_ID);
+
+        assertAll(
+            () -> verify(listEventsOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID),
+            () -> assertThat(caseHistoryView.getTabs()[0].getFields(), arrayWithSize(1)),
+            () -> assertThat(caseHistoryView.getTabs()[0].getFields(), hasItemInArray(hasProperty("id", equalTo("dataTestField2")))),
+            () -> assertThat(caseHistoryView.getEvent(), hasProperty("summary", equalTo(EVENT_SUMMARY_1))),
+            () -> assertThat(caseHistoryView.getCaseType().getJurisdiction().getName(), equalTo(JURISDICTION_ID))
+        );
+    }
+
+    private Map<String, JsonNode> buildData(String... dataFieldIds) {
+        Map<String, JsonNode> dataMap = new HashMap<>();
+        asList(dataFieldIds).forEach(dataFieldId -> {
+            dataMap.put(dataFieldId, JSON_NODE_FACTORY.textNode(dataFieldId));
+        });
+        return dataMap;
+    }
+
     private CaseTabCollection buildCaseTabCollection(String... caseFieldIds) {
         CaseTabCollection caseTabCollection = new CaseTabCollection();
-        caseTabCollection.setChannels(Arrays.asList());
-        List<CaseTypeTab> tabs = newArrayList();
+        List<CaseTypeTab> tabs = new ArrayList<>();
         CaseTypeTab tab = new CaseTypeTab();
-        List<CaseTypeTabField> tabFields = newArrayList();
-        newArrayList(caseFieldIds).forEach(caseFieldId -> {
+        List<CaseTypeTabField> tabFields = new ArrayList<>();
+        asList(caseFieldIds).forEach(caseFieldId -> {
             CaseTypeTabField tabField = new CaseTypeTabField();
             CaseField caseField = new CaseField();
             caseField.setId(caseFieldId);
@@ -180,6 +213,7 @@ class DefaultGetCaseViewOperationTest {
         tab.setTabFields(tabFields);
         tabs.add(tab);
         caseTabCollection.setTabs(tabs);
+
         return caseTabCollection;
     }
 }

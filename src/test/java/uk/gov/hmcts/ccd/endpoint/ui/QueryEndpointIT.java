@@ -18,13 +18,23 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.domain.model.aggregated.*;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewJurisdiction;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
+import uk.gov.hmcts.ccd.domain.model.aggregated.ProfileCaseState;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewColumn;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
+import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
 import javax.inject.Inject;
 import java.time.format.DateTimeFormatter;
@@ -32,8 +42,15 @@ import java.util.List;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -82,6 +99,9 @@ public class QueryEndpointIT extends WireMockBaseTest {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private static final String TEST_CASE_TYPE = "TestAddressBookCase";
     private static final String TEST_JURISDICTION = "PROBATE";
+
+    private static final String GET_CASE_HISTORY_FOR_EVENT = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/1504259907353529/events/";
+
 
     @Inject
     private WebApplicationContext wac;
@@ -1202,5 +1222,143 @@ public class QueryEndpointIT extends WireMockBaseTest {
             () -> assertThat(caseTypes[2].getCaseFields(), hasItems(hasProperty("id", equalTo("PersonLastName")),
                 hasProperty("id", equalTo("PersonAddress"))))
         );
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_case_event_history.sql"})
+    public void shouldGetCaseHistoryForEvent() throws Exception {
+
+        // Check that we have the expected test data set size
+        List<CaseDetails> resultList = template.query("SELECT * FROM case_data", this::mapCaseData);
+        assertEquals("Incorrect data initiation", 1, resultList.size());
+
+        List<AuditEvent> eventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
+        assertEquals("Incorrect data initiation", 2, eventList.size());
+
+        MvcResult result = mockMvc.perform(get(GET_CASE_HISTORY_FOR_EVENT + eventList.get(1).getId())
+            .contentType(JSON_CONTENT_TYPE)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(200))
+            .andReturn();
+
+        final CaseHistoryView caseHistoryView = mapper.readValue(result.getResponse().getContentAsString(), CaseHistoryView.class);
+        assertNotNull("Case View is null", caseHistoryView);
+        assertEquals("Unexpected Case ID", Long.valueOf(1504259907353529L), Long.valueOf(caseHistoryView.getCaseId()));
+
+        final CaseViewType caseViewType = caseHistoryView.getCaseType();
+        assertNotNull("Case View Type is null", caseViewType);
+        assertEquals("Unexpected Case Type Id", "TestAddressBookCase", caseViewType.getId());
+        assertEquals("Unexpected Case Type name", "Test Address Book Case", caseViewType.getName());
+        assertEquals("Unexpected Case Type description", "Test Address Book Case", caseViewType.getDescription());
+
+        final CaseViewJurisdiction caseViewJurisdiction = caseViewType.getJurisdiction();
+        assertNotNull("Case View Jurisdiction is null", caseViewJurisdiction);
+        assertEquals("Unexpected Jurisdiction Id", TEST_JURISDICTION, caseViewJurisdiction.getId());
+        assertEquals("Unexpected Jurisdiction name", "Test", caseViewJurisdiction.getName());
+        assertEquals("Unexpected Jurisdiction description", "Test Jurisdiction", caseViewJurisdiction.getDescription());
+
+        final CaseViewTab[] caseViewTabs = caseHistoryView.getTabs();
+        assertNotNull("Tabs are null", caseViewTabs);
+        assertEquals("Unexpected number of tabs", 3, caseViewTabs.length);
+
+        final CaseViewTab nameTab = caseViewTabs[0];
+        assertNotNull("First tab is null", nameTab);
+        assertEquals("Unexpected tab Id", "NameTab", nameTab.getId());
+        assertEquals("Unexpected tab label", "Name", nameTab.getLabel());
+        assertEquals("Unexpected tab show condition", "PersonFirstName=\"George\"", nameTab.getShowCondition());
+        assertEquals("Unexpected tab order", 1, nameTab.getOrder().intValue());
+
+        final CaseViewField[] nameFields = nameTab.getFields();
+        assertNotNull("Fields are null", nameFields);
+        assertEquals("Unexpected number of fields", 2, nameFields.length);
+
+        final CaseViewField firstNameField = nameFields[0];
+        assertNotNull("Field is null", firstNameField);
+        assertEquals("Unexpected Field id", "PersonFirstName", firstNameField.getId());
+        assertEquals("Unexpected Field label", "First Name", firstNameField.getLabel());
+        assertEquals("Unexpected Field order", 1, firstNameField.getOrder().intValue());
+        assertEquals("Unexpected Field show condition", "PersonLastName=\"Jones\"", firstNameField.getShowCondition());
+        assertEquals("Unexpected Field field type", "Text", firstNameField.getFieldType().getType());
+        assertEquals("Unexpected Field value", "Janet", firstNameField.getValue().asText());
+
+        final CaseViewField lastNameField = nameFields[1];
+        assertNotNull("Field is null", lastNameField);
+        assertEquals("Unexpected Field id", "PersonLastName", lastNameField.getId());
+        assertEquals("Unexpected Field label", "Last Name", lastNameField.getLabel());
+        assertEquals("Unexpected Field order", 2, lastNameField.getOrder().intValue());
+        assertEquals("Unexpected Field show condition", "PersonFirstName=\"Tom\"", lastNameField.getShowCondition());
+        assertEquals("Unexpected Field field type", "Text", lastNameField.getFieldType().getType());
+        assertEquals("Unexpected Field value", "Parker", lastNameField.getValue().asText());
+
+        final CaseViewTab addressTab = caseViewTabs[1];
+        assertNotNull("First tab is null", addressTab);
+        assertEquals("Unexpected tab Id", "AddressTab", addressTab.getId());
+        assertEquals("Unexpected tab label", "Address", addressTab.getLabel());
+        assertEquals("Unexpected tab show condition", "PersonLastName=\"Smith\"", addressTab.getShowCondition());
+        assertEquals("Unexpected tab order", 2, addressTab.getOrder().intValue());
+
+        final CaseViewField[] addressFields = addressTab.getFields();
+        assertNotNull("Fields are null", addressFields);
+        assertEquals("Unexpected number of fields", 1, addressFields.length);
+
+        final CaseViewField addressField = addressFields[0];
+        assertNotNull("Field is null", addressField);
+        assertEquals("Unexpected Field id", "PersonAddress", addressField.getId());
+        assertEquals("Unexpected Field label", "Address", addressField.getLabel());
+        assertEquals("Unexpected Field order", 1, addressField.getOrder().intValue());
+        assertEquals("Unexpected Field show condition", "PersonLastName=\"Smart\"", addressField.getShowCondition());
+        assertEquals("Unexpected Field field type", "Address", addressField.getFieldType().getType());
+
+        final JsonNode addressNode = addressField.getValue();
+        assertNotNull("Null address value", addressNode);
+        assertEquals("Unexpected address value", "123", addressNode.get("AddressLine1").asText());
+        assertEquals("Unexpected address value", "Fake Street", addressNode.get("AddressLine2").asText());
+        assertEquals("Unexpected address value", "Hexton", addressNode.get("AddressLine3").asText());
+        assertEquals("Unexpected address value", "England", addressNode.get("Country").asText());
+        assertEquals("Unexpected address value", "HX08 UTG", addressNode.get("Postcode").asText());
+
+        final CaseViewTab documentTab = caseViewTabs[2];
+        assertNotNull("First tab is null", documentTab);
+        assertEquals("Unexpected tab Id", "DocumentsTab", documentTab.getId());
+        assertEquals("Unexpected tab label", "Documents", documentTab.getLabel());
+        assertEquals("Unexpected tab show condition", "PersonFistName=\"George\"", documentTab.getShowCondition());
+        assertEquals("Unexpected tab order", 3, documentTab.getOrder().intValue());
+
+        final CaseViewField[] documentFields = documentTab.getFields();
+        assertNotNull("Fields are null", documentFields);
+        assertEquals("Unexpected number of fields", 1, documentFields.length);
+
+        final CaseViewField documentField = documentFields[0];
+        assertNotNull("Field is null", documentField);
+        assertEquals("Unexpected Field id", "D8Document", documentField.getId());
+        assertEquals("Unexpected Field label", "Document", documentField.getLabel());
+        assertEquals("Unexpected Field show condition", "PersonLastName=\"Dumb\"", documentField.getShowCondition());
+        assertEquals("Unexpected Field order", 1, documentField.getOrder().intValue());
+        assertEquals("Unexpected Field field type", "Document", documentField.getFieldType().getType());
+
+        final JsonNode documentNode = documentField.getValue();
+        final int dmApiPort = 10000;
+        assertNotNull("Null address value", documentNode);
+        assertEquals("Unexpected address value",
+            "http://localhost:" + dmApiPort + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1", documentNode.get
+                ("document_url").asText());
+        assertEquals("Unexpected address value",
+            "http://localhost:" + dmApiPort + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary", documentNode
+                .get("document_binary_url").asText());
+        assertEquals("Unexpected address value",
+            "Seagulls_Square.jpg", documentNode.get("document_filename").asText());
+
+        final CaseViewEvent event = caseHistoryView.getEvent();
+        assertNotNull("Null event value", event);
+        assertEquals("Event ID", "Goodness", event.getEventId());
+        assertEquals("Event Name", "GRACIOUS", event.getEventName());
+        assertEquals("Current case state id", "state2", event.getStateId());
+        assertEquals("Current case state name", "Case in state 2", event.getStateName());
+        assertEquals("User ID", "0", event.getUserId());
+        assertEquals("User First name", "Justin", event.getUserFirstName());
+        assertEquals("User Last name", "Smith", event.getUserLastName());
+        assertEquals("Summary", "The summary 2", event.getSummary());
+        assertEquals("Comment", "Some comment 2", event.getComment());
+        assertEquals("Timestamp", "2017-05-09T15:31:43", event.getTimestamp().format(DateTimeFormatter.ISO_DATE_TIME));
     }
 }

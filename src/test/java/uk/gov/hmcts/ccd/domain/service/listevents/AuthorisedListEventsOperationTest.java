@@ -14,18 +14,29 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import static java.util.Collections.singletonList;
+import static org.assertj.core.util.Lists.emptyList;
 import static org.assertj.core.util.Lists.newArrayList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyListOf;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
 class AuthorisedListEventsOperationTest {
@@ -33,6 +44,7 @@ class AuthorisedListEventsOperationTest {
     private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_TYPE_ID = "CaseTypeId";
     private final static String CASE_REFERENCE = "999999";
+    private final static Long EVENT_ID = 100L;
 
     @Mock
     private ListEventsOperation listEventsOperation;
@@ -51,6 +63,7 @@ class AuthorisedListEventsOperationTest {
     private List<AuditEvent> classifiedEvents;
     private List<AuditEvent> authorisedEvents;
     private CaseType caseType;
+    private AuditEvent event;
     private static final String CASEWORKER_PROBATE_LOA1 = "caseworker-probate-loa1";
     private static final String CASEWORKER_PROBATE_LOA3 = "caseworker-probate-loa3";
     private static final String CASEWORKER_DIVORCE = "caseworker-divorce-loa3";
@@ -61,12 +74,13 @@ class AuthorisedListEventsOperationTest {
         MockitoAnnotations.initMocks(this);
 
         caseType = new CaseType();
-        List<CaseEvent> eventsDefinition = newArrayList();
+        List<CaseEvent> eventsDefinition = new ArrayList<>();
         caseType.setEvents(eventsDefinition);
         caseDetails = new CaseDetails();
         caseDetails.setJurisdiction(JURISDICTION_ID);
         caseDetails.setCaseTypeId(CASE_TYPE_ID);
         classifiedEvents = newArrayList(new AuditEvent(), new AuditEvent());
+        event = new AuditEvent();
 
         doReturn(caseType).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         doReturn(USER_ROLES).when(userRepository).getUserRoles();
@@ -179,5 +193,32 @@ class AuthorisedListEventsOperationTest {
             () -> assertThat(outputs, is(authorisedEvents))
         );
     }
-    
+
+    @Test
+    @DisplayName("should apply authorization when jurisdiction, case type id and event id is received")
+    void shouldApplyAuthorisationForJurisdictionCaseTypeIdAndEvent() {
+        doReturn(event).when(listEventsOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
+        doReturn(singletonList(event)).when(accessControlService).filterCaseAuditEventsByReadAccess(anyListOf(AuditEvent.class), anyListOf(CaseEvent.class), eq(USER_ROLES));
+
+        AuditEvent output = authorisedOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
+
+        InOrder inOrder = inOrder(caseDefinitionRepository, userRepository, listEventsOperation, accessControlService);
+        assertAll(
+            () -> inOrder.verify(listEventsOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID),
+            () -> inOrder.verify(caseDefinitionRepository).getCaseType(caseDetails.getCaseTypeId()),
+            () -> inOrder.verify(userRepository).getUserRoles(),
+            () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(caseType, USER_ROLES, CAN_READ),
+            () -> inOrder.verify(accessControlService).filterCaseAuditEventsByReadAccess(anyListOf(AuditEvent.class), eq(caseType.getEvents()), eq(USER_ROLES)),
+            () -> assertThat(output, is(event))
+        );
+    }
+
+    @Test
+    @DisplayName("should throw exception when no event returned after securing event")
+    void shouldThrowExceptionWhenNoEventReturnedAfterSecuringEvent() {
+        doReturn(event).when(listEventsOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
+        doReturn(emptyList()).when(accessControlService).filterCaseAuditEventsByReadAccess(anyListOf(AuditEvent.class), anyListOf(CaseEvent.class), eq(USER_ROLES));
+
+        assertThrows(ResourceNotFoundException.class, () -> authorisedOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID));
+    }
 }

@@ -401,7 +401,7 @@ public class TestBuildersUtil {
 
     public static class FieldTypeBuilder {
         private final FieldType fieldType;
-        private List<CaseField> complexFields;
+        private final List<CaseField> complexFields;
         private FieldTypeBuilder() {
             this.fieldType = new FieldType();
             this.complexFields = Lists.newArrayList();
@@ -526,6 +526,48 @@ public class TestBuildersUtil {
 
         public static SearchInputBuilder aSearchInput() {
             return new SearchInputBuilder();
+        }
+    }
+
+    public static class CaseHistoryViewBuilder {
+        private final CaseHistoryView caseHistoryView;
+
+        private CaseHistoryViewBuilder() {
+            this.caseHistoryView = new CaseHistoryView();
+        }
+
+        public CaseHistoryViewBuilder withEvent(CaseViewEvent caseViewEvent) {
+            this.caseHistoryView.setEvent(caseViewEvent);
+            return this;
+        }
+
+        public CaseHistoryView build() {
+            return caseHistoryView;
+        }
+
+        public static CaseHistoryViewBuilder aCaseHistoryView() {
+            return new CaseHistoryViewBuilder();
+        }
+    }
+
+    public static class CaseViewEventBuilder {
+        private final CaseViewEvent caseViewEvent;
+
+        private CaseViewEventBuilder() {
+            this.caseViewEvent = new CaseViewEvent();
+        }
+
+        public CaseViewEventBuilder withId(String eventId) {
+            this.caseViewEvent.setEventId(eventId);
+            return this;
+        }
+
+        public CaseViewEvent build() {
+            return caseViewEvent;
+        }
+
+        public static CaseViewEventBuilder aCaseViewEvent() {
+            return new CaseViewEventBuilder();
         }
     }
 }

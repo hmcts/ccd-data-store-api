@@ -1,10 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.listevents;
 
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-
 import com.google.common.collect.Lists;
-import java.util.List;
-import java.util.Set;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
@@ -15,11 +11,21 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+
+import java.util.List;
+import java.util.Set;
+
+import static java.util.Collections.singletonList;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
 @Service
 @Qualifier("authorised")
 public class AuthorisedListEventsOperation implements ListEventsOperation {
+
+    private static final String EVENT_NOT_FOUND = "Case event not found";
+
     private final ListEventsOperation listEventsOperation;
     private final AccessControlService accessControlService;
     private final CaseDefinitionRepository caseDefinitionRepository;
@@ -49,17 +55,14 @@ public class AuthorisedListEventsOperation implements ListEventsOperation {
         return secureEvents(caseTypeId, listEventsOperation.execute(jurisdiction, caseTypeId, caseReference));
     }
 
-    private List<AuditEvent> verifyReadAccess(List<AuditEvent> events, Set<String> userRoles, CaseType caseType) {
+    @Override
+    public AuditEvent execute(String jurisdiction, String caseTypeId, Long eventId) {
+        return secureEvent(caseTypeId, listEventsOperation.execute(jurisdiction, caseTypeId, eventId));
+    }
 
-        if (!accessControlService.canAccessCaseTypeWithCriteria(caseType,
-                                                                userRoles,
-                                                                CAN_READ)) {
-            return Lists.newArrayList();
-        }
-
-        return accessControlService.filterCaseAuditEventsByReadAccess(events,
-                                                                      caseType.getEvents(),
-                                                                      userRoles);
+    private AuditEvent secureEvent(String caseTypeId, AuditEvent event) {
+        return secureEvents(caseTypeId, singletonList(event)).stream().findFirst()
+            .orElseThrow(() -> new ResourceNotFoundException(EVENT_NOT_FOUND));
     }
 
     private List<AuditEvent> secureEvents(String caseTypeId, List<AuditEvent> events) {
@@ -79,4 +82,18 @@ public class AuthorisedListEventsOperation implements ListEventsOperation {
 
         return verifyReadAccess(events, userRoles, caseType);
     }
+
+    private List<AuditEvent> verifyReadAccess(List<AuditEvent> events, Set<String> userRoles, CaseType caseType) {
+
+        if (!accessControlService.canAccessCaseTypeWithCriteria(caseType,
+            userRoles,
+            CAN_READ)) {
+            return Lists.newArrayList();
+        }
+
+        return accessControlService.filterCaseAuditEventsByReadAccess(events,
+            caseType.getEvents(),
+            userRoles);
+    }
+
 }

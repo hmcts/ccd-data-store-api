@@ -10,4 +10,5 @@ public interface ListEventsOperation {
 
     List<AuditEvent> execute(String jurisdiction, String caseTypeId, String caseReference);
 
+    AuditEvent execute(String jurisdiction, String caseTypeId, Long eventId);
 }

@@ -1,11 +1,24 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.aggregated.*;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
+import uk.gov.hmcts.ccd.domain.model.aggregated.ProfileCaseState;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
@@ -17,10 +30,9 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @Qualifier(DefaultGetCaseViewOperation.QUALIFIER)
@@ -52,54 +64,61 @@ public class DefaultGetCaseViewOperation implements GetCaseViewOperation {
         this.uidService = uidService;
     }
 
+    @Override
     public CaseView execute(String jurisdictionId, String caseTypeId, String caseReference) {
+        validateCaseReference(caseReference);
+
+        final CaseType caseType = getCaseType(jurisdictionId, caseTypeId);
+        final CaseDetails caseDetails = getCaseDetails(jurisdictionId, caseTypeId, caseReference);
+
+        final List<AuditEvent> events = listEventsOperation.execute(caseDetails);
+        final CaseTabCollection caseTabCollection = getCaseTabCollection(caseDetails.getCaseTypeId());
+
+        return merge(caseDetails, events, caseType, caseTabCollection);
+    }
+
+    @Override
+    public CaseHistoryView execute(String jurisdictionId, String caseTypeId, String caseReference, Long eventId) {
+        validateCaseReference(caseReference);
+
+        CaseType caseType = getCaseType(jurisdictionId, caseTypeId);
+        CaseDetails caseDetails = getCaseDetails(jurisdictionId, caseTypeId, caseReference);
+
+        AuditEvent event = listEventsOperation.execute(jurisdictionId, caseTypeId, eventId);
+
+        return merge(caseDetails, event, caseType);
+    }
+
+    private void validateCaseReference(String caseReference) {
         if (!uidService.validateUID(caseReference)) {
             throw new BadRequestException("Case reference " + caseReference + " is not valid");
         }
-
-        final CaseType caseType = getCaseType(jurisdictionId, caseTypeId);
-        final CaseDetails caseDetails =
-            getCaseOperation.execute(jurisdictionId, caseTypeId, caseReference)
-                            .orElseThrow(() -> new ResourceNotFoundException(
-                                String.format(RESOURCE_NOT_FOUND, jurisdictionId, caseTypeId, caseReference)));
-
-        final List<AuditEvent> events = listEventsOperation.execute(caseDetails);
-        final CaseTabCollection caseTabCollection = uiDefinitionRepository.getCaseTabCollection(caseDetails.getCaseTypeId());
-
-        return merge(caseDetails, events, caseType, caseTabCollection);
     }
 
     private CaseType getCaseType(String jurisdictionId, String caseTypeId) {
         return caseTypeService.getCaseTypeForJurisdiction(caseTypeId, jurisdictionId);
     }
 
+    private CaseDetails getCaseDetails(String jurisdictionId, String caseTypeId, String caseReference) {
+        return getCaseOperation.execute(jurisdictionId, caseTypeId, caseReference)
+            .orElseThrow(() -> new ResourceNotFoundException(
+                String.format(RESOURCE_NOT_FOUND, jurisdictionId, caseTypeId, caseReference)));
+    }
+
+    private CaseTabCollection getCaseTabCollection(String caseTypeId) {
+        return uiDefinitionRepository.getCaseTabCollection(caseTypeId);
+    }
+
     private CaseView merge(CaseDetails caseDetails, List<AuditEvent> events, CaseType caseType, CaseTabCollection caseTabCollection) {
         CaseView caseView = new CaseView();
         caseView.setCaseId(caseDetails.getReference().toString());
-        caseView.setChannels(caseTabCollection.getChannels().toArray(new String[caseTabCollection.getChannels().size()]));
+        caseView.setChannels(caseTabCollection.getChannels().toArray(new String[0]));
 
         CaseState caseState = caseTypeService.findState(caseType, caseDetails.getState());
         caseView.setState(new ProfileCaseState(caseState.getId(), caseState.getName(), caseState.getDescription()));
 
-        Jurisdiction jurisdiction = caseType.getJurisdiction();
-        CaseViewJurisdiction caseViewJurisdiction = new CaseViewJurisdiction(jurisdiction.getId(),
-                                                                             jurisdiction.getName(),
-                                                                             jurisdiction.getDescription());
-        caseView.setCaseType(new CaseViewType(caseType.getId(),
-                                              caseType.getName(),
-                                              caseType.getDescription(),
-                                              caseViewJurisdiction));
-
-        List<CaseViewTab> tabs = caseTabCollection.getTabs().stream().map(tab -> {
-            Stream<CaseTypeTabField> tabsWithRelevantFields = tab.getTabFields().stream()
-                .filter(filterCaseTabFieldsBasedOnSecureData(caseDetails));
-            List<CaseViewField> fields = tabsWithRelevantFields
-                .map(buildCaseViewField(caseDetails)).collect(Collectors.toList());
-            return new CaseViewTab(tab.getId(), tab.getLabel(), tab.getDisplayOrder(),
-                                   fields.toArray(new CaseViewField[fields.size()]),
-                                   tab.getShowCondition());
-        }).collect(Collectors.toList());
-        caseView.setTabs(tabs.toArray(new CaseViewTab[tabs.size()]));
+        caseView.setCaseType(CaseViewType.createFrom(caseType));
+        caseView.setTabs(getTabs(caseDetails, caseDetails.getData(), caseTabCollection));
 
         final CaseViewTrigger[] triggers = caseType.getEvents()
             .stream()
@@ -116,23 +135,9 @@ public class DefaultGetCaseViewOperation implements GetCaseViewOperation {
         caseView.setTriggers(triggers);
 
         caseView.setEvents(events
-                               .stream()
-                               .map(event -> {
-                                   final CaseViewEvent caseEvent = new CaseViewEvent();
-                                   caseEvent.setId(event.getId());
-                                   caseEvent.setEventId(event.getEventId());
-                                   caseEvent.setEventName(event.getEventName());
-                                   caseEvent.setUserId(event.getUserId());
-                                   caseEvent.setUserLastName(event.getUserLastName());
-                                   caseEvent.setUserFirstName(event.getUserFirstName());
-                                   caseEvent.setSummary(event.getSummary());
-                                   caseEvent.setComment(event.getDescription());
-                                   caseEvent.setTimestamp(event.getCreatedDate());
-                                   caseEvent.setStateId(event.getStateId());
-                                   caseEvent.setStateName(event.getStateName());
-                                   return caseEvent;
-                               })
-                               .toArray(CaseViewEvent[]::new));
+            .stream()
+            .map(CaseViewEvent::createFrom)
+            .toArray(CaseViewEvent[]::new));
 
         return caseView;
     }
@@ -141,7 +146,39 @@ public class DefaultGetCaseViewOperation implements GetCaseViewOperation {
         return caseDetails::existsInData;
     }
 
-    private Function<CaseTypeTabField, CaseViewField> buildCaseViewField(CaseDetails caseDetails) {
+    private CaseHistoryView merge(CaseDetails caseDetails, AuditEvent event, CaseType caseType) {
+        CaseHistoryView caseHistoryView = new CaseHistoryView();
+        caseHistoryView.setCaseId(String.valueOf(caseDetails.getReference()));
+        caseHistoryView.setCaseType(CaseViewType.createFrom(caseType));
+        caseHistoryView.setTabs(getTabs(caseDetails, event.getData()));
+        caseHistoryView.setEvent(CaseViewEvent.createFrom(event));
+
+        return caseHistoryView;
+    }
+
+    private CaseViewTab[] getTabs(CaseDetails caseDetails, Map<String, JsonNode> data) {
+        return getTabs(caseDetails, data, getCaseTabCollection(caseDetails.getCaseTypeId()));
+    }
+
+    private CaseViewTab[] getTabs(CaseDetails caseDetails, Map<String, JsonNode> data, CaseTabCollection caseTabCollection) {
+        return caseTabCollection.getTabs().stream().map(tab -> {
+            CaseViewField[] caseViewFields = tab.getTabFields()
+                .stream()
+                .filter(filterCaseTabFieldsBasedOnSecureData(caseDetails))
+                .map(buildCaseViewField(data))
+                .toArray(CaseViewField[]::new);
+
+            return new CaseViewTab(tab.getId(),
+                tab.getLabel(),
+                tab.getDisplayOrder(),
+                caseViewFields,
+                tab.getShowCondition());
+
+        }).toArray(CaseViewTab[]::new);
+    }
+
+
+    private Function<CaseTypeTabField, CaseViewField> buildCaseViewField(Map<String, JsonNode> data) {
         return field -> {
             CaseViewField caseViewField = new CaseViewField();
             CaseField caseField = field.getCaseField();
@@ -154,7 +191,7 @@ public class DefaultGetCaseViewOperation implements GetCaseViewOperation {
             caseViewField.setValidationExpression(caseField.getFieldType().getRegularExpression());
             caseViewField.setOrder(field.getDisplayOrder());
             caseViewField.setShowCondition(field.getShowCondition());
-            caseViewField.setValue(caseDetails.getData().get(caseField.getId()));
+            caseViewField.setValue(data.get(caseField.getId()));
             return caseViewField;
         };
     }

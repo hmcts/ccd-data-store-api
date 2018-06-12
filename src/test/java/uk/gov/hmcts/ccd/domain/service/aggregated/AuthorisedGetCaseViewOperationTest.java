@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -7,7 +8,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
 import uk.gov.hmcts.ccd.domain.model.aggregated.ProfileCaseState;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
@@ -18,22 +21,27 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import java.util.Set;
 
 import static com.google.common.collect.Sets.newHashSet;
+import static java.lang.String.valueOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.arrayWithSize;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.anEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseHistoryViewBuilder.aCaseHistoryView;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.aCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewBuilder.aCaseView;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewEventBuilder.aCaseViewEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewTriggerBuilder.aViewTrigger;
 
 class AuthorisedGetCaseViewOperationTest {
     private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_TYPE_ID = "Grant";
     private static final String CASE_REFERENCE = "1111222233334444";
+    private static final Long EVENT_ID = 100L;
     private static final String STATE = "Plop";
     private static final ProfileCaseState caseState = new ProfileCaseState(STATE, STATE, STATE);
 
@@ -41,15 +49,17 @@ class AuthorisedGetCaseViewOperationTest {
     private static final String ROLE_IN_USER_ROLES = "caseworker-probate-loa1";
     private static final String ROLE_IN_USER_ROLES_2 = "caseworker-divorce-loa";
     private static final Set<String> USER_ROLES = newHashSet(ROLE_IN_USER_ROLES, ROLE_IN_USER_ROLES_2);
-    private static final String EVENT_ID = "EVENT_ID";
+    private static final String EVENT_ID_STRING = valueOf(EVENT_ID);
     private static final CaseViewTrigger[] EMPTY_TRIGGERS = new CaseViewTrigger[]{};
-    private static final CaseEvent CASE_EVENT = anEvent().withId(EVENT_ID).build();
+    private static final CaseEvent CASE_EVENT = anEvent().withId(EVENT_ID_STRING).build();
     private static final CaseEvent CASE_EVENT_2 = anEvent().withId("event2").build();
-    private static final CaseViewTrigger CASE_VIEW_TRIGGER = aViewTrigger().withId(EVENT_ID).build();
+    private static final CaseViewTrigger CASE_VIEW_TRIGGER = aViewTrigger().withId(EVENT_ID_STRING).build();
     private static final CaseViewTrigger CASE_VIEW_TRIGGER_2 = aViewTrigger().withId("event2").build();
     private static final CaseViewTrigger[] AUTH_CASE_VIEW_TRIGGERS = new CaseViewTrigger[] {CASE_VIEW_TRIGGER};
     private static final CaseType TEST_CASE_TYPE = aCaseType().withEvent(CASE_EVENT).withEvent(CASE_EVENT_2).build();
     private static final CaseView TEST_CASE_VIEW = aCaseView().withState(caseState).withCaseViewTrigger(CASE_VIEW_TRIGGER).withCaseViewTrigger(CASE_VIEW_TRIGGER_2).build();
+    private static final CaseViewEvent CASE_VIEW_EVENT = aCaseViewEvent().withId(EVENT_ID_STRING).build();
+    private static final CaseHistoryView TEST_CASE_HISTORY_VIEW = aCaseHistoryView().withEvent(CASE_VIEW_EVENT).build();
 
     @Mock
     private GetCaseViewOperation getCaseViewOperation;
@@ -132,6 +142,21 @@ class AuthorisedGetCaseViewOperationTest {
         CaseView caseView = authorisedGetCaseViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
 
         assertThat(caseView.getTriggers(), arrayWithSize(0));
+    }
+
+    @Test
+    @DisplayName("should return case history view")
+    void shouldReturnCaseHistoryView() {
+        doReturn(TEST_CASE_HISTORY_VIEW).when(getCaseViewOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, EVENT_ID);
+        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES, CAN_READ);
+
+        CaseHistoryView caseHistoryView = authorisedGetCaseViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, EVENT_ID);
+
+        assertThat(caseHistoryView, CoreMatchers.is(TEST_CASE_HISTORY_VIEW));
+        verify(getCaseViewOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, EVENT_ID);
+        verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
+        verify(userRepository).getUserRoles();
+        verify(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES, CAN_READ);
     }
 
 }

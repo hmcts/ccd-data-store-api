@@ -9,13 +9,16 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 import java.util.Arrays;
 import java.util.List;
 
+import static java.util.Collections.emptyList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 class ClassifiedListEventsOperationTest {
@@ -23,6 +26,7 @@ class ClassifiedListEventsOperationTest {
     private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_TYPE_ID = "CaseTypeId";
     private final static String CASE_REFERENCE = "999999";
+    private final static Long EVENT_ID = 100L;
 
     @Mock
     private ListEventsOperation listEventsOperation;
@@ -33,6 +37,7 @@ class ClassifiedListEventsOperationTest {
     private ClassifiedListEventsOperation classifiedOperation;
     private CaseDetails caseDetails;
     private List<AuditEvent> events;
+    private AuditEvent event;
     private List<AuditEvent> classifiedEvents;
 
     @BeforeEach
@@ -42,11 +47,12 @@ class ClassifiedListEventsOperationTest {
         caseDetails = new CaseDetails();
         caseDetails.setJurisdiction(JURISDICTION_ID);
         events = Arrays.asList(new AuditEvent(), new AuditEvent());
+        event = new AuditEvent();
 
         doReturn(events).when(listEventsOperation).execute(caseDetails);
         doReturn(events).when(listEventsOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
 
-        classifiedEvents = Lists.newArrayList(new AuditEvent());
+        classifiedEvents = Lists.newArrayList(event);
 
         doReturn(classifiedEvents).when(classificationService).applyClassification(JURISDICTION_ID, events);
 
@@ -98,4 +104,26 @@ class ClassifiedListEventsOperationTest {
         );
     }
 
+    @Test
+    @DisplayName("should apply security classifications when jurisdiction, case type id and case event id is received")
+    void shouldApplySecurityClassificationsForJurisdictionCaseTypeIdAndEventId() {
+        doReturn(event).when(listEventsOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
+        doReturn(classifiedEvents).when(classificationService).applyClassification(eq(JURISDICTION_ID), anyListOf(AuditEvent.class));
+
+        AuditEvent output = classifiedOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
+
+        assertAll(
+            () -> verify(classificationService).applyClassification(eq(JURISDICTION_ID), anyListOf(AuditEvent.class)),
+            () -> assertThat(output, sameInstance(event))
+        );
+    }
+
+    @Test
+    @DisplayName("should apply security classifications when jurisdiction, case type id and case event id is received")
+    void shouldThrowExceptionWhenNoEventReturnAfterSecurityClassifications() {
+        doReturn(event).when(listEventsOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
+        doReturn(emptyList()).when(classificationService).applyClassification(eq(JURISDICTION_ID), anyListOf(AuditEvent.class));
+
+        assertThrows(ResourceNotFoundException.class, () -> classifiedOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID));
+    }
 }

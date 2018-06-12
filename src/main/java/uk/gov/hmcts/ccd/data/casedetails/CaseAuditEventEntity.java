@@ -6,6 +6,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 import static uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventEntity.FIND_BY_CASE_DATA_ID_HQL;
+import static uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventEntity.FIND_BY_ID_HQL;
 
 @NamedQueries({
     @NamedQuery(name = CaseAuditEventEntity.FIND_BY_CASE, query =
@@ -17,6 +18,9 @@ import static uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventEntity.FIND_BY_CAS
             " AND createdDate = " +
                 "(select min(caeDate.createdDate) from CaseAuditEventEntity caeDate WHERE caeDate.caseDataId = :"
                     + CaseAuditEventEntity.CASE_DATA_ID + ")"
+    ),
+    @NamedQuery(name = CaseAuditEventEntity.FIND_BY_ID, query =
+        FIND_BY_ID_HQL
     )
 })
 @Table(name = "case_event")
@@ -26,11 +30,18 @@ public class CaseAuditEventEntity {
     static final String FIND_BY_CASE_DATA_ID_HQL = "SELECT cae FROM CaseAuditEventEntity cae" +
         " WHERE cae.caseDataId = :" + CaseAuditEventEntity.CASE_DATA_ID;
 
+    static final String FIND_BY_ID_HQL = "SELECT cae FROM CaseAuditEventEntity cae" +
+        " WHERE cae.id = :" + CaseAuditEventEntity.EVENT_ID;
+
     static final String FIND_BY_CASE = "CaseAuditEventEntity_FIND_BY_CASE";
 
     static final String FIND_CREATE_EVENT = "CaseAuditEventEntity_FIND_CREATE_EVENT";
 
+    static final String FIND_BY_ID = "CaseAuditEventEntity_FIND_BY_ID";
+
     static final String CASE_DATA_ID = "CASE_DATA_ID";
+
+    static final String EVENT_ID = "EVENT_ID";
 
     @Id
     @Column(name = "id")
@@ -65,7 +76,6 @@ public class CaseAuditEventEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "security_classification", nullable = false)
     private SecurityClassification securityClassification;
-    @SuppressWarnings("JpaAttributeTypeInspection")
     @Column(name = "data", nullable = false)
     @Convert(converter = uk.gov.hmcts.ccd.data.JSONBConverter.class)
     private JsonNode data;

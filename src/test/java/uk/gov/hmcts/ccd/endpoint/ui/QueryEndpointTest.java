@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.search.FieldMapSanitizeOperation;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
 import uk.gov.hmcts.ccd.domain.service.aggregated.*;
@@ -13,6 +14,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
@@ -71,5 +73,16 @@ class QueryEndpointTest {
         when(findWorkbasketInputOperation.execute("TEST", "TEST-CASE-TYPE", CAN_READ)).thenReturn(workBasketResults);
         queryEndpoint.findWorkbasketInputDetails(22, "TEST", "TEST-CASE-TYPE");
         verify(findWorkbasketInputOperation, times(1)).execute("TEST", "TEST-CASE-TYPE", CAN_READ);
+    }
+
+    @Test
+    void shouldCallGetCaseViewOperationWithEvent() {
+        CaseHistoryView caseView = new CaseHistoryView();
+        doReturn(caseView).when(getCaseViewOperation).execute("jurisdictionId", "caseTypeId", "caseId", 11L);
+
+        CaseHistoryView response = queryEndpoint.getCaseHistoryForEvent("jurisdictionId", "caseTypeId", "caseId", 11L);
+
+        assertSame(caseView, response);
+        verify(getCaseViewOperation, times(1)).execute("jurisdictionId", "caseTypeId", "caseId", 11L);
     }
 }

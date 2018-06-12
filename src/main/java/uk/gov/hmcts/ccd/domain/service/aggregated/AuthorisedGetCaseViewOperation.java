@@ -6,6 +6,7 @@ import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
@@ -50,6 +51,17 @@ public class AuthorisedGetCaseViewOperation implements GetCaseViewOperation {
         CaseView caseView = getCaseViewOperation.execute(jurisdictionId, caseTypeId, caseReference);
 
         return filterUpsertAccess(caseType, userRoles, caseView);
+    }
+
+    @Override
+    public CaseHistoryView execute(String jurisdictionId, String caseTypeId, String caseReference, Long eventId) {
+        CaseType caseType = getCaseType(caseTypeId);
+
+        Set<String> userRoles = getUserRoles();
+
+        verifyReadAccess(caseType, userRoles);
+
+        return getCaseViewOperation.execute(jurisdictionId, caseTypeId, caseReference, eventId);
     }
 
     private void verifyReadAccess(CaseType caseType, Set<String> userRoles) {

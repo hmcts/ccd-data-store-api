@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 public class CaseViewTab {
     private String id;
@@ -60,5 +62,11 @@ public class CaseViewTab {
 
     public void setShowCondition(String showCondition) {
         this.showCondition = showCondition;
+    }
+
+    @JsonIgnore
+    @Override
+    public String toString() {
+        return ReflectionToStringBuilder.toString(this);
     }
 }
