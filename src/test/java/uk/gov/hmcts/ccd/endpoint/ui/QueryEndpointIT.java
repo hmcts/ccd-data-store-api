@@ -1233,7 +1233,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect data initiation", 1, resultList.size());
 
         List<AuditEvent> eventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
-        assertEquals("Incorrect data initiation", 2, eventList.size());
+        assertEquals("Incorrect data initiation", 3, eventList.size());
 
         MvcResult result = mockMvc.perform(get(GET_CASE_HISTORY_FOR_EVENT + eventList.get(1).getId())
             .contentType(JSON_CONTENT_TYPE)
@@ -1360,5 +1360,24 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Summary", "The summary 2", event.getSummary());
         assertEquals("Comment", "Some comment 2", event.getComment());
         assertEquals("Timestamp", "2017-05-09T15:31:43", event.getTimestamp().format(DateTimeFormatter.ISO_DATE_TIME));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_case_event_history.sql"})
+    public void shouldReturn404WhenEventClassificationDoesNotMatchUserRole() throws Exception {
+
+        // Check that we have the expected test data set size
+        List<CaseDetails> resultList = template.query("SELECT * FROM case_data", this::mapCaseData);
+        assertEquals("Incorrect data initiation", 1, resultList.size());
+
+        List<AuditEvent> eventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
+        assertEquals("Incorrect data initiation", 3, eventList.size());
+
+        // User role has access to PUBLIC and event is classified as PRIVATE
+        mockMvc.perform(get(GET_CASE_HISTORY_FOR_EVENT + eventList.get(2).getId())
+            .contentType(JSON_CONTENT_TYPE)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(404))
+            .andReturn();
     }
 }
