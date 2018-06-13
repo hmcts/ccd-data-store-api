@@ -2,7 +2,17 @@ package uk.gov.hmcts.ccd.data.casedetails;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
 import java.time.LocalDateTime;
 
 import static uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventEntity.FIND_BY_CASE_DATA_ID_HQL;
@@ -27,11 +37,11 @@ import static uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventEntity.FIND_BY_ID_
 @Entity
 public class CaseAuditEventEntity {
 
-    static final String FIND_BY_CASE_DATA_ID_HQL = "SELECT cae FROM CaseAuditEventEntity cae" +
-        " WHERE cae.caseDataId = :" + CaseAuditEventEntity.CASE_DATA_ID;
+    static final String FIND_BY_CASE_DATA_ID_HQL = "SELECT cae FROM CaseAuditEventEntity cae"
+        + " WHERE cae.caseDataId = :" + CaseAuditEventEntity.CASE_DATA_ID;
 
-    static final String FIND_BY_ID_HQL = "SELECT cae FROM CaseAuditEventEntity cae" +
-        " WHERE cae.id = :" + CaseAuditEventEntity.EVENT_ID;
+    static final String FIND_BY_ID_HQL = "SELECT cae FROM CaseAuditEventEntity cae"
+        + " WHERE cae.id = :" + CaseAuditEventEntity.EVENT_ID;
 
     static final String FIND_BY_CASE = "CaseAuditEventEntity_FIND_BY_CASE";
 

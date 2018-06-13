@@ -26,10 +26,7 @@ public class DefaultListEventsOperation implements ListEventsOperation {
     private static final String CASE_EVENT_NOT_FOUND = "Case event not found";
 
     @Autowired
-    public DefaultListEventsOperation(CaseAuditEventRepository auditEventRepository,
-                                      @Qualifier(CreatorGetCaseOperation.QUALIFIER) final GetCaseOperation getCaseOperation,
-                                      UIDService uidService) {
-
+    public DefaultListEventsOperation(CaseAuditEventRepository auditEventRepository, @Qualifier(CreatorGetCaseOperation.QUALIFIER) final GetCaseOperation getCaseOperation, UIDService uidService) {
         this.auditEventRepository = auditEventRepository;
         this.getCaseOperation = getCaseOperation;
         this.uidService = uidService;
@@ -56,6 +53,7 @@ public class DefaultListEventsOperation implements ListEventsOperation {
 
     @Override
     public AuditEvent execute(String jurisdiction, String caseTypeId, Long eventId) {
-        return auditEventRepository.findByEventId(eventId).orElseThrow(() -> new ResourceNotFoundException(CASE_EVENT_NOT_FOUND));
+        return auditEventRepository.findByEventId(eventId)
+            .orElseThrow(() -> new ResourceNotFoundException(CASE_EVENT_NOT_FOUND));
     }
 }

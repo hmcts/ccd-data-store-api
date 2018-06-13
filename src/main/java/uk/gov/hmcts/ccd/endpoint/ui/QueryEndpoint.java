@@ -202,8 +202,9 @@ public class QueryEndpoint {
     }
 
     @Transactional
-    @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events/{eventId}", method = RequestMethod.GET)
-    @ApiOperation(value = "Fetch case data version for the case event")
+    @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events/{eventId}",
+        method = RequestMethod.GET)
+    @ApiOperation(value = "Fetch case history for the event")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Displayable case data")
     })
