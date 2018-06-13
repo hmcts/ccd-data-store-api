@@ -8,7 +8,7 @@ import java.util.List;
 public interface BaseTypeValidator {
 
     String REGEX_GUIDANCE
-        = "the data entered is not valid for this type of field, please delete and re-enter using only valid data";
+        = "The data entered is not valid for this type of field, please delete and re-enter using only valid data";
 
     BaseType getType();
 
