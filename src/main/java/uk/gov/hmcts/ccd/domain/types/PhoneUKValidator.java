@@ -44,19 +44,14 @@ public class PhoneUKValidator implements BaseTypeValidator {
         if (userRegex != null && userRegex.length() > 0) {
             return (value.matches(userRegex)) ?
                 Collections.emptyList() :
-                Collections.singletonList((new ValidationResult(value + " did not match field regex:" + userRegex, dataFieldId)));
+                Collections.singletonList((new ValidationResult(REGEX_GUIDANCE, dataFieldId)));
         }
 
         final String baseTypeRegex = getType().getRegularExpression();
         return (value.matches(baseTypeRegex)) ?
             Collections.emptyList() :
             Collections.singletonList(
-                new ValidationResult(
-                    value
-                        + " did not match default regex:"
-                        + baseTypeRegex
-                        +". Valid examples are: +447222555555 | +44 7222 555 555 | (0722) 5555555 #2222",
-                    dataFieldId)
+                new ValidationResult(REGEX_GUIDANCE, dataFieldId)
             );
     }
 }

@@ -16,6 +16,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.StringEndsWith.endsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static uk.gov.hmcts.ccd.domain.types.BaseTypeValidator.REGEX_GUIDANCE;
 
 public class NumberValidatorTest extends BaseTest implements IVallidatorTest {
     private static final String
@@ -176,7 +177,7 @@ public class NumberValidatorTest extends BaseTest implements IVallidatorTest {
 
         List<ValidationResult> results = validator.validate("TEST_FIELD_ID", MAPPER.readTree("\"8.2\""), caseField);
         assertEquals("regular expression check", 1, results.size());
-        assertEquals("8.2 fails regex: ^\\d\\.\\d\\d$", results.get(0).getErrorMessage());
+        assertEquals(REGEX_GUIDANCE, results.get(0).getErrorMessage());
     }
 
     @Test

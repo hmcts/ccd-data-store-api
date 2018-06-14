@@ -6,6 +6,10 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import java.util.List;
 
 public interface BaseTypeValidator {
+
+    String REGEX_GUIDANCE
+        = "The data entered is not valid for this type of field, please delete and re-enter using only valid data";
+
     BaseType getType();
 
     List<ValidationResult> validate(final String dataFieldId,

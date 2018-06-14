@@ -55,17 +55,13 @@ public class PostCodeValidator implements BaseTypeValidator {
         if (userRegex != null && userRegex.length() > 0) {
             return (value.matches(userRegex)) ?
                 Collections.emptyList() :
-                Collections.singletonList((new ValidationResult(value + " did not match field regex:" + userRegex, dataFieldId)));
+                Collections.singletonList((new ValidationResult(REGEX_GUIDANCE, dataFieldId)));
         }
 
         final String baseTypeRegex = getType().getRegularExpression();
         if (!checkRegex(baseTypeRegex, value)) {
             return Collections.singletonList(
-                new ValidationResult(
-                    value
-                        + " Regex Failed:"
-                        + getType().getRegularExpression(),
-                    dataFieldId)
+                new ValidationResult(REGEX_GUIDANCE, dataFieldId)
             );
         }
         return Collections.emptyList();

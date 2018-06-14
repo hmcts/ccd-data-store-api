@@ -50,21 +50,13 @@ public class EmailValidator implements BaseTypeValidator {
 
         if (!checkRegex(caseFieldDefinition.getFieldType().getRegularExpression(), value)) {
             return Collections.singletonList(
-                new ValidationResult(
-                    value
-                        + " field type Regex Failed: "
-                        + caseFieldDefinition.getFieldType().getRegularExpression(),
-                    dataFieldId)
+                new ValidationResult(REGEX_GUIDANCE, dataFieldId)
             );
         }
 
         if (!checkRegex(getType().getRegularExpression(), value)) {
             return Collections.singletonList(
-                new ValidationResult(
-                    value
-                        + " base type Regex Failed: "
-                        + getType().getRegularExpression(),
-                    dataFieldId)
+                new ValidationResult(REGEX_GUIDANCE, dataFieldId)
             );
         }
 
