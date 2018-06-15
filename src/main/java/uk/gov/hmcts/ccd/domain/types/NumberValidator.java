@@ -49,7 +49,7 @@ public class NumberValidator implements BaseTypeValidator {
             }
 
             if (!checkRegex(caseFieldDefinition.getFieldType().getRegularExpression(), value)) {
-                return Collections.singletonList(new ValidationResult(value + " fails regex: " + caseFieldDefinition.getFieldType().getRegularExpression(), dataFieldId));
+                return Collections.singletonList(new ValidationResult(REGEX_GUIDANCE, dataFieldId));
             }
 
             if (!checkRegex(getType().getRegularExpression(), numberValue.toString())) {

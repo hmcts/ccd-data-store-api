@@ -46,8 +46,7 @@ public class FixedListValidator implements BaseTypeValidator {
                                               final String value,
                                               final CaseField caseFieldDefinition) {
         if (!checkRegex(caseFieldDefinition.getFieldType().getRegularExpression(), value)) {
-            return Collections.singletonList(new ValidationResult(value + " fails regex: "
-                + caseFieldDefinition.getFieldType().getRegularExpression(), dataFieldId));
+            return Collections.singletonList(new ValidationResult(REGEX_GUIDANCE, dataFieldId));
         }
         return Collections.emptyList();
     }
