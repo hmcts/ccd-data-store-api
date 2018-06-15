@@ -528,4 +528,30 @@ public class TestBuildersUtil {
             return new SearchInputBuilder();
         }
     }
+
+    public static class UserRoleBuilder {
+        private final UserRole userRole;
+
+        private UserRoleBuilder() {
+            this.userRole = new UserRole();
+        }
+
+        public UserRoleBuilder withRole(String role) {
+            userRole.setRole(role);
+            return this;
+        }
+
+        public UserRoleBuilder withSecurityClassification(SecurityClassification securityClassification) {
+            userRole.setSecurityClassification(securityClassification.name());
+            return this;
+        }
+
+        public UserRole build() {
+            return this.userRole;
+        }
+
+        public static UserRoleBuilder aUserRole() {
+            return new UserRoleBuilder();
+        }
+    }
 }

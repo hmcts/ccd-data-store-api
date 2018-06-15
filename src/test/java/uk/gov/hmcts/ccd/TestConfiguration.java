@@ -111,6 +111,7 @@ class TestConfiguration extends ContextCleanupListener {
         when(caseDefinitionRepository.getCaseTypesForJurisdiction(any())).thenCallRealMethod();
         when(caseDefinitionRepository.getBaseTypes()).thenReturn(Arrays.asList(fieldTypes));
         when(caseDefinitionRepository.getUserRoleClassifications(any())).thenCallRealMethod();
+        when(caseDefinitionRepository.getClassificationsForUserRoleList(any())).thenCallRealMethod();
         when(caseDefinitionRepository.getJurisdictions(anyList())).thenCallRealMethod();
         return caseDefinitionRepository;
     }
