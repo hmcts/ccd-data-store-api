@@ -27,6 +27,8 @@ public class CaseViewField {
     private String showCondition;
     @JsonProperty("show_summary_change_option")
     private Boolean showSummaryChangeOption;
+    @JsonProperty("show_summary_content_option")
+    private Integer showSummaryContentOption;
 
     public String getId() {
         return id;
@@ -124,4 +126,11 @@ public class CaseViewField {
         this.showSummaryChangeOption = showSummaryChangeOption;
     }
 
+    public Integer getShowSummaryContentOption() {
+        return showSummaryContentOption;
+    }
+
+    public void setShowSummaryContentOption(Integer showSummaryContentOption) {
+        this.showSummaryContentOption = showSummaryContentOption;
+    }
 }
