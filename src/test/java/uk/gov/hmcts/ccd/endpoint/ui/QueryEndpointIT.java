@@ -100,7 +100,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
     private static final String TEST_CASE_TYPE = "TestAddressBookCase";
     private static final String TEST_JURISDICTION = "PROBATE";
 
-    private static final String GET_CASE_HISTORY_FOR_EVENT = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/1504259907353529/events/";
+    private static final String GET_CASE_HISTORY_FOR_EVENT = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/1504259907353529/events/%d/case-history";
 
 
     @Inject
@@ -1235,7 +1235,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         List<AuditEvent> eventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
         assertEquals("Incorrect data initiation", 3, eventList.size());
 
-        MvcResult result = mockMvc.perform(get(GET_CASE_HISTORY_FOR_EVENT + eventList.get(1).getId())
+        MvcResult result = mockMvc.perform(get(String.format(GET_CASE_HISTORY_FOR_EVENT, eventList.get(1).getId()))
             .contentType(JSON_CONTENT_TYPE)
             .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
@@ -1374,7 +1374,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect data initiation", 3, eventList.size());
 
         // User role has access to PUBLIC and event is classified as PRIVATE
-        mockMvc.perform(get(GET_CASE_HISTORY_FOR_EVENT + eventList.get(2).getId())
+        mockMvc.perform(get(String.format(GET_CASE_HISTORY_FOR_EVENT, eventList.get(2).getId()))
             .contentType(JSON_CONTENT_TYPE)
             .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(404))
