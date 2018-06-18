@@ -9,16 +9,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTab;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
@@ -27,7 +22,6 @@ import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.listevents.ListEventsOperation;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +37,7 @@ import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTabCollectionBuilder.aCaseTabCollection;
 
 class DefaultGetCaseViewOperationTest {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
@@ -105,8 +100,7 @@ class DefaultGetCaseViewOperationTest {
 
         doReturn(Boolean.TRUE).when(uidService).validateUID(CASE_REFERENCE);
 
-
-        caseTabCollection = buildCaseTabCollection("dataTestField1", "dataTestField2");
+        caseTabCollection = aCaseTabCollection().withFieldIds("dataTestField1", "dataTestField2").build();
         doReturn(caseTabCollection).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
 
         caseType = new CaseType();
@@ -166,25 +160,6 @@ class DefaultGetCaseViewOperationTest {
         );
     }
 
-    @Test
-    @DisplayName("should retrieve historic case data for the event")
-    void shouldRetrieveCaseHistoryForTheEvent() {
-        Map<String, JsonNode> dataMap = buildData("dataTestField2");
-        caseDetails.setData(dataMap);
-        event1.setData(dataMap);
-        doReturn(event1).when(listEventsOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
-
-        CaseHistoryView caseHistoryView = defaultGetCaseViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, EVENT_ID);
-
-        assertAll(
-            () -> verify(listEventsOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID),
-            () -> assertThat(caseHistoryView.getTabs()[0].getFields(), arrayWithSize(1)),
-            () -> assertThat(caseHistoryView.getTabs()[0].getFields(), hasItemInArray(hasProperty("id", equalTo("dataTestField2")))),
-            () -> assertThat(caseHistoryView.getEvent(), hasProperty("summary", equalTo(EVENT_SUMMARY_1))),
-            () -> assertThat(caseHistoryView.getCaseType().getJurisdiction().getName(), equalTo(JURISDICTION_ID))
-        );
-    }
-
     private Map<String, JsonNode> buildData(String... dataFieldIds) {
         Map<String, JsonNode> dataMap = new HashMap<>();
         asList(dataFieldIds).forEach(dataFieldId -> {
@@ -193,27 +168,4 @@ class DefaultGetCaseViewOperationTest {
         return dataMap;
     }
 
-    private CaseTabCollection buildCaseTabCollection(String... caseFieldIds) {
-        CaseTabCollection caseTabCollection = new CaseTabCollection();
-        List<CaseTypeTab> tabs = new ArrayList<>();
-        CaseTypeTab tab = new CaseTypeTab();
-        List<CaseTypeTabField> tabFields = new ArrayList<>();
-        asList(caseFieldIds).forEach(caseFieldId -> {
-            CaseTypeTabField tabField = new CaseTypeTabField();
-            CaseField caseField = new CaseField();
-            caseField.setId(caseFieldId);
-            FieldType fieldType = new FieldType();
-            fieldType.setType("YesOrNo");
-            caseField.setFieldType(fieldType);
-            tabField.setCaseField(caseField);
-            tabField.setShowCondition(caseFieldId + "-fieldShowCondition");
-            tabFields.add(tabField);
-        });
-        tab.setShowCondition("tabShowCondition");
-        tab.setTabFields(tabFields);
-        tabs.add(tab);
-        caseTabCollection.setTabs(tabs);
-
-        return caseTabCollection;
-    }
 }

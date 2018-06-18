@@ -1,10 +1,8 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.ToString;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 
 @ToString
@@ -136,9 +134,4 @@ public class CaseViewField {
         this.showSummaryContentOption = showSummaryContentOption;
     }
 
-    @JsonIgnore
-    @Override
-    public String toString() {
-        return ReflectionToStringBuilder.toString(this);
-    }
 }

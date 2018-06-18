@@ -25,12 +25,15 @@ import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
 import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedFindSearchInputOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedFindWorkbasketInputOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCaseHistoryViewOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCaseTypesOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCaseViewOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetEventTriggerOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.FindSearchInputOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.FindWorkbasketInputOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseHistoryViewOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseTypesOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseViewOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetEventTriggerOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
@@ -57,7 +60,8 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UP
 public class QueryEndpoint {
 
     private static final Logger LOG = LoggerFactory.getLogger(QueryEndpoint.class);
-    private final AuthorisedGetCaseViewOperation getCaseViewOperation;
+    private final GetCaseViewOperation getCaseViewOperation;
+    private final GetCaseHistoryViewOperation getCaseHistoryViewOperation;
     private final GetEventTriggerOperation getEventTriggerOperation;
     private final SearchQueryOperation searchQueryOperation;
     private final FieldMapSanitizeOperation fieldMapSanitizeOperation;
@@ -67,14 +71,20 @@ public class QueryEndpoint {
     private final HashMap<String, Predicate<AccessControlList>> accessMap;
 
     @Inject
-    public QueryEndpoint(final AuthorisedGetCaseViewOperation getCaseViewOperation,
-                         @Qualifier(AuthorisedGetEventTriggerOperation.QUALIFIER) final GetEventTriggerOperation getEventTriggerOperation,
-                         final SearchQueryOperation searchQueryOperation,
-                         final FieldMapSanitizeOperation fieldMapSanitizeOperation,
-                         @Qualifier(AuthorisedFindSearchInputOperation.QUALIFIER) final FindSearchInputOperation findSearchInputOperation,
-                         @Qualifier(AuthorisedFindWorkbasketInputOperation.QUALIFIER) final FindWorkbasketInputOperation findWorkbasketInputOperation,
-                         @Qualifier(AuthorisedGetCaseTypesOperation.QUALIFIER) final GetCaseTypesOperation getCaseTypesOperation) {
+    public QueryEndpoint(@Qualifier(AuthorisedGetCaseViewOperation.QUALIFIER) GetCaseViewOperation getCaseViewOperation,
+                         @Qualifier(
+                             AuthorisedGetCaseHistoryViewOperation.QUALIFIER) GetCaseHistoryViewOperation getCaseHistoryViewOperation,
+                         @Qualifier(
+                             AuthorisedGetEventTriggerOperation.QUALIFIER) GetEventTriggerOperation getEventTriggerOperation,
+                         SearchQueryOperation searchQueryOperation, FieldMapSanitizeOperation fieldMapSanitizeOperation,
+                         @Qualifier(
+                             AuthorisedFindSearchInputOperation.QUALIFIER) FindSearchInputOperation findSearchInputOperation,
+                         @Qualifier(
+                             AuthorisedFindWorkbasketInputOperation.QUALIFIER) FindWorkbasketInputOperation findWorkbasketInputOperation,
+                         @Qualifier(
+                             AuthorisedGetCaseTypesOperation.QUALIFIER) GetCaseTypesOperation getCaseTypesOperation) {
         this.getCaseViewOperation = getCaseViewOperation;
+        this.getCaseHistoryViewOperation = getCaseHistoryViewOperation;
         this.getEventTriggerOperation = getEventTriggerOperation;
         this.searchQueryOperation = searchQueryOperation;
         this.fieldMapSanitizeOperation = fieldMapSanitizeOperation;
@@ -217,7 +227,8 @@ public class QueryEndpoint {
     }
 
     @Transactional
-    @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events/{eventId}/case-history",
+    @RequestMapping(
+        value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events/{eventId}/case-history",
         method = RequestMethod.GET)
     @ApiOperation(value = "Fetch case history for the event")
     @ApiResponses(value = {
@@ -228,7 +239,8 @@ public class QueryEndpoint {
                                                   @PathVariable("cid") final String caseReference,
                                                   @PathVariable("eventId") final Long eventId) {
         Instant start = Instant.now();
-        CaseHistoryView caseView = getCaseViewOperation.execute(jurisdictionId, caseTypeId, caseReference, eventId);
+        CaseHistoryView caseView = getCaseHistoryViewOperation.execute(jurisdictionId, caseTypeId, caseReference,
+            eventId);
         final Duration between = Duration.between(start, Instant.now());
         LOG.warn("getCaseHistoryForEvent has been completed in {} millisecs...", between.toMillis());
         return caseView;

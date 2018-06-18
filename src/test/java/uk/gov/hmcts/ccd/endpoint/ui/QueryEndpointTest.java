@@ -8,7 +8,13 @@ import uk.gov.hmcts.ccd.data.casedetails.search.FieldMapSanitizeOperation;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
-import uk.gov.hmcts.ccd.domain.service.aggregated.*;
+import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedFindSearchInputOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCaseHistoryViewOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCaseViewOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.DefaultFindWorkbasketInputOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseTypesOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.GetEventTriggerOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 import java.util.ArrayList;
@@ -17,7 +23,10 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.model.callbacks.EventTokenProperties.JURISDICTION_ID;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
@@ -25,6 +34,8 @@ class QueryEndpointTest {
 
     @Mock
     private AuthorisedGetCaseViewOperation getCaseViewOperation;
+    @Mock
+    private AuthorisedGetCaseHistoryViewOperation getCaseHistoryViewOperation;
     @Mock
     private GetEventTriggerOperation getEventTriggerOperation;
     @Mock
@@ -44,7 +55,7 @@ class QueryEndpointTest {
     @BeforeEach
     void setup(){
         MockitoAnnotations.initMocks(this);
-        queryEndpoint = new QueryEndpoint(getCaseViewOperation,
+        queryEndpoint = new QueryEndpoint(getCaseViewOperation, getCaseHistoryViewOperation,
             getEventTriggerOperation,
             searchQueryOperation,
             fieldMapSanitizerOperation,
@@ -78,11 +89,11 @@ class QueryEndpointTest {
     @Test
     void shouldCallGetCaseViewOperationWithEvent() {
         CaseHistoryView caseView = new CaseHistoryView();
-        doReturn(caseView).when(getCaseViewOperation).execute("jurisdictionId", "caseTypeId", "caseId", 11L);
+        doReturn(caseView).when(getCaseHistoryViewOperation).execute("jurisdictionId", "caseTypeId", "caseId", 11L);
 
         CaseHistoryView response = queryEndpoint.getCaseHistoryForEvent("jurisdictionId", "caseTypeId", "caseId", 11L);
 
         assertSame(caseView, response);
-        verify(getCaseViewOperation, times(1)).execute("jurisdictionId", "caseTypeId", "caseId", 11L);
+        verify(getCaseHistoryViewOperation, times(1)).execute("jurisdictionId", "caseTypeId", "caseId", 11L);
     }
 }

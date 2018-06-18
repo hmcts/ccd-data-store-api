@@ -1,9 +1,9 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import lombok.ToString;
 
+@ToString
 public abstract class AbstractCaseView {
 
     @JsonProperty("case_id")
@@ -36,9 +36,4 @@ public abstract class AbstractCaseView {
         this.tabs = tabs;
     }
 
-    @JsonIgnore
-    @Override
-    public String toString() {
-        return ReflectionToStringBuilder.toString(this);
-    }
 }

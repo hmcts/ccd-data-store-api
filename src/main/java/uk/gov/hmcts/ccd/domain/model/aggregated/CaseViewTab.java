@@ -1,9 +1,9 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import lombok.ToString;
 
+@ToString
 public class CaseViewTab {
     private String id;
     private String label;
@@ -64,9 +64,4 @@ public class CaseViewTab {
         this.showCondition = showCondition;
     }
 
-    @JsonIgnore
-    @Override
-    public String toString() {
-        return ReflectionToStringBuilder.toString(this);
-    }
 }
