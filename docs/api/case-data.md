@@ -259,3 +259,32 @@ Once this gets sent to us we will retrieve the relevant metadata and send you ba
   "document_filename": ""
 }
 ```
+
+### OrderSummary
+
+An `OrderSummary` value is a Json `object`. We accept the following structure with a mandatory field `Fees` which is a collection of `Fee` objects and mandatory `PaymentTotal` field. The `PaymentReference` is the only optional field. `Fee` object itself has 3 mandatory fields: `FeeCode`, `FeeAmount` and `FeeVersion` and one optional field `FeeDescription`.
+
+```json
+{
+  "PaymentReference": "RC-1521-1095-0964-3143",
+  "Fees": [
+    {
+      "value": {
+        "FeeAmount": "4545",
+        "FeeCode": "FEE0001",
+        "FeeDescription": "First fee description",
+        "FeeVersion": "1"
+      }
+    },
+    {
+      "value": {
+        "FeeAmount": "0455",
+        "FeeCode": "FEE0002",
+        "FeeDescription": "Second fee description",
+        "FeeVersion": "2"
+      }
+    }
+  ],
+  "PaymentTotal": "5000"
+}
+```
