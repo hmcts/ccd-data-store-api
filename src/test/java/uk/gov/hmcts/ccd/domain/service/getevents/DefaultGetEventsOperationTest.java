@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.listevents;
+package uk.gov.hmcts.ccd.domain.service.getevents;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,13 +18,14 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
-class DefaultListEventsOperationTest {
+class DefaultGetEventsOperationTest {
 
     private static final Long CASE_ID = 123L;
     private static final String JURISDICTION_ID = "Probate";
@@ -39,7 +40,7 @@ class DefaultListEventsOperationTest {
     @Mock
     private UIDService uidService;
 
-    private DefaultListEventsOperation listEventsOperation;
+    private DefaultGetEventsOperation listEventsOperation;
     private CaseDetails caseDetails;
     private AuditEvent event;
 
@@ -52,7 +53,7 @@ class DefaultListEventsOperationTest {
 
         doReturn(EVENTS).when(auditEventRepository).findByCase(caseDetails);
 
-        listEventsOperation = new DefaultListEventsOperation(auditEventRepository, getCaseOperation, uidService);
+        listEventsOperation = new DefaultGetEventsOperation(auditEventRepository, getCaseOperation, uidService);
         event = new AuditEvent();
     }
 
@@ -103,8 +104,10 @@ class DefaultListEventsOperationTest {
     void shouldFindEventAndDelegateCallToRepository() {
         doReturn(Optional.of(event)).when(auditEventRepository).findByEventId(EVENT_ID);
 
-        AuditEvent output = listEventsOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
+        Optional<AuditEvent> optionalAuditEvent = listEventsOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
 
+        assertThat(optionalAuditEvent.isPresent(), is(true));
+        AuditEvent output = optionalAuditEvent.get();
         assertAll(
             () -> verify(auditEventRepository).findByEventId(EVENT_ID),
             () -> assertThat(output, sameInstance(event))

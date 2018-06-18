@@ -19,7 +19,7 @@ import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
-import uk.gov.hmcts.ccd.domain.service.listevents.ListEventsOperation;
+import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
 
 import java.util.List;
 
@@ -29,19 +29,19 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
 
     public static final String QUALIFIER = "default";
 
-    private final ListEventsOperation listEventsOperation;
+    private final GetEventsOperation getEventsOperation;
     private final CaseTypeService caseTypeService;
     private final EventTriggerService eventTriggerService;
 
     @Autowired
     public DefaultGetCaseViewOperation(@Qualifier(CreatorGetCaseOperation.QUALIFIER) GetCaseOperation getCaseOperation,
-                                       @Qualifier("authorised") ListEventsOperation listEventsOperation,
+                                       @Qualifier("authorised") GetEventsOperation getEventsOperation,
                                        UIDefinitionRepository uiDefinitionRepository,
                                        CaseTypeService caseTypeService,
                                        EventTriggerService eventTriggerService,
                                        UIDService uidService) {
         super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService);
-        this.listEventsOperation = listEventsOperation;
+        this.getEventsOperation = getEventsOperation;
         this.caseTypeService = caseTypeService;
         this.eventTriggerService = eventTriggerService;
     }
@@ -53,7 +53,7 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
         final CaseType caseType = getCaseType(jurisdictionId, caseTypeId);
         final CaseDetails caseDetails = getCaseDetails(jurisdictionId, caseTypeId, caseReference);
 
-        final List<AuditEvent> events = listEventsOperation.execute(caseDetails);
+        final List<AuditEvent> events = getEventsOperation.execute(caseDetails);
         final CaseTabCollection caseTabCollection = getCaseTabCollection(caseDetails.getCaseTypeId());
 
         return merge(caseDetails, events, caseType, caseTabCollection);

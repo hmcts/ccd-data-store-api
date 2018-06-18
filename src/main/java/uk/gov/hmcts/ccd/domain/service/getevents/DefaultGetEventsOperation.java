@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.listevents;
+package uk.gov.hmcts.ccd.domain.service.getevents;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -13,10 +13,11 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Qualifier("default")
-public class DefaultListEventsOperation implements ListEventsOperation {
+public class DefaultGetEventsOperation implements GetEventsOperation {
 
     private final CaseAuditEventRepository auditEventRepository;
     private final GetCaseOperation getCaseOperation;
@@ -26,7 +27,8 @@ public class DefaultListEventsOperation implements ListEventsOperation {
     private static final String CASE_EVENT_NOT_FOUND = "Case event not found";
 
     @Autowired
-    public DefaultListEventsOperation(CaseAuditEventRepository auditEventRepository, @Qualifier(CreatorGetCaseOperation.QUALIFIER) final GetCaseOperation getCaseOperation, UIDService uidService) {
+    public DefaultGetEventsOperation(CaseAuditEventRepository auditEventRepository, @Qualifier(
+        CreatorGetCaseOperation.QUALIFIER) final GetCaseOperation getCaseOperation, UIDService uidService) {
         this.auditEventRepository = auditEventRepository;
         this.getCaseOperation = getCaseOperation;
         this.uidService = uidService;
@@ -52,8 +54,8 @@ public class DefaultListEventsOperation implements ListEventsOperation {
     }
 
     @Override
-    public AuditEvent execute(String jurisdiction, String caseTypeId, Long eventId) {
-        return auditEventRepository.findByEventId(eventId)
+    public Optional<AuditEvent> execute(String jurisdiction, String caseTypeId, Long eventId) {
+        return auditEventRepository.findByEventId(eventId).map(Optional::of)
             .orElseThrow(() -> new ResourceNotFoundException(CASE_EVENT_NOT_FOUND));
     }
 }

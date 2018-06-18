@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.listevents;
+package uk.gov.hmcts.ccd.domain.service.getevents;
 
 import com.google.common.collect.Sets;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,15 +14,14 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static java.util.Collections.singletonList;
-import static org.assertj.core.util.Lists.emptyList;
 import static org.assertj.core.util.Lists.newArrayList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -39,7 +38,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
-class AuthorisedListEventsOperationTest {
+class AuthorisedGetEventsOperationTest {
 
     private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_TYPE_ID = "CaseTypeId";
@@ -47,7 +46,7 @@ class AuthorisedListEventsOperationTest {
     private final static Long EVENT_ID = 100L;
 
     @Mock
-    private ListEventsOperation listEventsOperation;
+    private GetEventsOperation getEventsOperation;
 
     @Mock
     private AccessControlService accessControlService;
@@ -58,7 +57,7 @@ class AuthorisedListEventsOperationTest {
     @Mock
     private UserRepository userRepository;
 
-    private AuthorisedListEventsOperation authorisedOperation;
+    private AuthorisedGetEventsOperation authorisedOperation;
     private CaseDetails caseDetails;
     private List<AuditEvent> classifiedEvents;
     private List<AuditEvent> authorisedEvents;
@@ -84,15 +83,16 @@ class AuthorisedListEventsOperationTest {
 
         doReturn(caseType).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         doReturn(USER_ROLES).when(userRepository).getUserRoles();
-        doReturn(classifiedEvents).when(listEventsOperation).execute(caseDetails);
-        doReturn(classifiedEvents).when(listEventsOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+        doReturn(classifiedEvents).when(getEventsOperation).execute(caseDetails);
+        doReturn(classifiedEvents).when(getEventsOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
 
         authorisedEvents = newArrayList(new AuditEvent());
 
         doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(caseType, USER_ROLES, CAN_READ);
         doReturn(authorisedEvents).when(accessControlService).filterCaseAuditEventsByReadAccess(classifiedEvents, eventsDefinition, USER_ROLES);
 
-        authorisedOperation = new AuthorisedListEventsOperation(listEventsOperation, caseDefinitionRepository, accessControlService, userRepository);
+        authorisedOperation = new AuthorisedGetEventsOperation(getEventsOperation, caseDefinitionRepository,
+            accessControlService, userRepository);
     }
 
     @Test
@@ -101,13 +101,13 @@ class AuthorisedListEventsOperationTest {
 
         authorisedOperation.execute(caseDetails);
 
-        verify(listEventsOperation).execute(caseDetails);
+        verify(getEventsOperation).execute(caseDetails);
     }
 
     @Test
     @DisplayName("should return empty list when decorated implementation returns null")
     void shouldReturnEmptyListInsteadOfNull() {
-        doReturn(null).when(listEventsOperation).execute(caseDetails);
+        doReturn(null).when(getEventsOperation).execute(caseDetails);
 
         final List<AuditEvent> outputs = authorisedOperation.execute(caseDetails);
 
@@ -150,9 +150,8 @@ class AuthorisedListEventsOperationTest {
 
         final List<AuditEvent> outputs = authorisedOperation.execute(caseDetails);
 
-        InOrder inOrder = inOrder(caseDefinitionRepository, userRepository, listEventsOperation, accessControlService);
-        assertAll(
-            () -> inOrder.verify(listEventsOperation).execute(caseDetails),
+        InOrder inOrder = inOrder(caseDefinitionRepository, userRepository, getEventsOperation, accessControlService);
+        assertAll(() -> inOrder.verify(getEventsOperation).execute(caseDetails),
             () -> inOrder.verify(caseDefinitionRepository).getCaseType(caseDetails.getCaseTypeId()),
             () -> inOrder.verify(userRepository).getUserRoles(),
             () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(caseType, USER_ROLES, CAN_READ),
@@ -167,9 +166,8 @@ class AuthorisedListEventsOperationTest {
     void shouldApplyAuthorisationForCaseDetails() {
         final List<AuditEvent> outputs = authorisedOperation.execute(caseDetails);
 
-        InOrder inOrder = inOrder(caseDefinitionRepository, userRepository, listEventsOperation, accessControlService);
-        assertAll(
-            () -> inOrder.verify(listEventsOperation).execute(caseDetails),
+        InOrder inOrder = inOrder(caseDefinitionRepository, userRepository, getEventsOperation, accessControlService);
+        assertAll(() -> inOrder.verify(getEventsOperation).execute(caseDetails),
             () -> inOrder.verify(caseDefinitionRepository).getCaseType(caseDetails.getCaseTypeId()),
             () -> inOrder.verify(userRepository).getUserRoles(),
             () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(caseType, USER_ROLES, CAN_READ),
@@ -183,9 +181,8 @@ class AuthorisedListEventsOperationTest {
     void shouldApplyAuthorisationForJurisdictionCaseTypeIdAndCaseReference() {
         final List<AuditEvent> outputs = authorisedOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
 
-        InOrder inOrder = inOrder(caseDefinitionRepository, userRepository, listEventsOperation, accessControlService);
-        assertAll(
-            () -> inOrder.verify(listEventsOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE),
+        InOrder inOrder = inOrder(caseDefinitionRepository, userRepository, getEventsOperation, accessControlService);
+        assertAll(() -> inOrder.verify(getEventsOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE),
             () -> inOrder.verify(caseDefinitionRepository).getCaseType(caseDetails.getCaseTypeId()),
             () -> inOrder.verify(userRepository).getUserRoles(),
             () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(caseType, USER_ROLES, CAN_READ),
@@ -197,28 +194,20 @@ class AuthorisedListEventsOperationTest {
     @Test
     @DisplayName("should apply authorization when jurisdiction, case type id and event id is received")
     void shouldApplyAuthorisationForJurisdictionCaseTypeIdAndEvent() {
-        doReturn(event).when(listEventsOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
+        doReturn(Optional.of(event)).when(getEventsOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
         doReturn(singletonList(event)).when(accessControlService).filterCaseAuditEventsByReadAccess(anyListOf(AuditEvent.class), anyListOf(CaseEvent.class), eq(USER_ROLES));
 
-        AuditEvent output = authorisedOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
+        Optional<AuditEvent> optionalAuditEvent = authorisedOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
 
-        InOrder inOrder = inOrder(caseDefinitionRepository, userRepository, listEventsOperation, accessControlService);
-        assertAll(
-            () -> inOrder.verify(listEventsOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID),
+        assertThat(optionalAuditEvent.isPresent(), is(true));
+        AuditEvent output = optionalAuditEvent.get();
+        InOrder inOrder = inOrder(caseDefinitionRepository, userRepository, getEventsOperation, accessControlService);
+        assertAll(() -> inOrder.verify(getEventsOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID),
             () -> inOrder.verify(caseDefinitionRepository).getCaseType(caseDetails.getCaseTypeId()),
             () -> inOrder.verify(userRepository).getUserRoles(),
             () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(caseType, USER_ROLES, CAN_READ),
             () -> inOrder.verify(accessControlService).filterCaseAuditEventsByReadAccess(anyListOf(AuditEvent.class), eq(caseType.getEvents()), eq(USER_ROLES)),
             () -> assertThat(output, is(event))
         );
-    }
-
-    @Test
-    @DisplayName("should throw exception when no event returned after securing event")
-    void shouldThrowExceptionWhenNoEventReturnedAfterSecuringEvent() {
-        doReturn(event).when(listEventsOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
-        doReturn(emptyList()).when(accessControlService).filterCaseAuditEventsByReadAccess(anyListOf(AuditEvent.class), anyListOf(CaseEvent.class), eq(USER_ROLES));
-
-        assertThrows(ResourceNotFoundException.class, () -> authorisedOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID));
     }
 }

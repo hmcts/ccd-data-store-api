@@ -18,7 +18,7 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
-import uk.gov.hmcts.ccd.domain.service.listevents.ListEventsOperation;
+import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
@@ -53,7 +53,7 @@ class DefaultGetCaseHistoryViewOperationTest {
     private GetCaseOperation getCaseOperation;
 
     @Mock
-    private ListEventsOperation listEventsOperation;
+    private GetEventsOperation getEventsOperation;
 
     @Mock
     private UIDefinitionRepository uiDefinitionRepository;
@@ -84,7 +84,7 @@ class DefaultGetCaseHistoryViewOperationTest {
         AuditEvent event2 = new AuditEvent();
         event2.setSummary(EVENT_SUMMARY_2);
         List<AuditEvent> auditEvents = asList(event1, event2);
-        doReturn(auditEvents).when(listEventsOperation).execute(caseDetails);
+        doReturn(auditEvents).when(getEventsOperation).execute(caseDetails);
 
         doReturn(Boolean.TRUE).when(uidService).validateUID(CASE_REFERENCE);
 
@@ -103,7 +103,7 @@ class DefaultGetCaseHistoryViewOperationTest {
         doReturn(caseState).when(caseTypeService).findState(caseType, STATE);
 
         defaultGetCaseHistoryViewOperation = new DefaultGetCaseHistoryViewOperation(getCaseOperation,
-            listEventsOperation, uiDefinitionRepository, caseTypeService, uidService);
+            getEventsOperation, uiDefinitionRepository, caseTypeService, uidService);
     }
 
     @Test
@@ -112,12 +112,12 @@ class DefaultGetCaseHistoryViewOperationTest {
         Map<String, JsonNode> dataMap = buildData("dataTestField2");
         caseDetails.setData(dataMap);
         event1.setData(dataMap);
-        doReturn(event1).when(listEventsOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
+        doReturn(Optional.of(event1)).when(getEventsOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
 
         CaseHistoryView caseHistoryView = defaultGetCaseHistoryViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID,
             CASE_REFERENCE, EVENT_ID);
 
-        assertAll(() -> verify(listEventsOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID),
+        assertAll(() -> verify(getEventsOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID),
             () -> assertThat(caseHistoryView.getTabs()[0].getFields(), arrayWithSize(1)),
             () -> assertThat(caseHistoryView.getTabs()[0].getFields(),
                 hasItemInArray(hasProperty("id", equalTo("dataTestField2")))),
@@ -138,6 +138,15 @@ class DefaultGetCaseHistoryViewOperationTest {
     @DisplayName("should throw exception when case is not found")
     void shouldThrowExceptionWhenCaseIsNotFound() {
         doReturn(Optional.empty()).when(getCaseOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+
+        assertThrows(ResourceNotFoundException.class,
+            () -> defaultGetCaseHistoryViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, EVENT_ID));
+    }
+
+    @Test
+    @DisplayName("should throw exception when no event found")
+    void shouldThrowExceptionWhenNoEventFound() {
+        doReturn(Optional.empty()).when(getEventsOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
 
         assertThrows(ResourceNotFoundException.class,
             () -> defaultGetCaseHistoryViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, EVENT_ID));

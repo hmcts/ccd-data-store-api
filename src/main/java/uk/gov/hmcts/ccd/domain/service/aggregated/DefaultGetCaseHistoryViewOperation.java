@@ -14,23 +14,25 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
-import uk.gov.hmcts.ccd.domain.service.listevents.ListEventsOperation;
+import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 @Service
 @Qualifier(DefaultGetCaseHistoryViewOperation.QUALIFIER)
 public class DefaultGetCaseHistoryViewOperation extends AbstractDefaultGetCaseViewOperation implements GetCaseHistoryViewOperation {
 
     public static final String QUALIFIER = "default";
+    private static final String EVENT_NOT_FOUND = "Case event not found";
 
-    private final ListEventsOperation listEventsOperation;
+    private final GetEventsOperation getEventsOperation;
 
     @Autowired
     public DefaultGetCaseHistoryViewOperation(@Qualifier(CreatorGetCaseOperation.QUALIFIER) GetCaseOperation getCaseOperation,
-                                              @Qualifier("authorised") ListEventsOperation listEventsOperation,
+                                              @Qualifier("authorised") GetEventsOperation getEventsOperation,
                                               UIDefinitionRepository uiDefinitionRepository, CaseTypeService caseTypeService,
                                               UIDService uidService) {
         super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService);
-        this.listEventsOperation = listEventsOperation;
+        this.getEventsOperation = getEventsOperation;
     }
 
     @Override
@@ -40,7 +42,8 @@ public class DefaultGetCaseHistoryViewOperation extends AbstractDefaultGetCaseVi
         CaseType caseType = getCaseType(jurisdictionId, caseTypeId);
         CaseDetails caseDetails = getCaseDetails(jurisdictionId, caseTypeId, caseReference);
 
-        AuditEvent event = listEventsOperation.execute(jurisdictionId, caseTypeId, eventId);
+        AuditEvent event = getEventsOperation.execute(jurisdictionId, caseTypeId, eventId).orElseThrow(
+            () -> new ResourceNotFoundException(EVENT_NOT_FOUND));
 
         return merge(caseDetails, event, caseType);
     }

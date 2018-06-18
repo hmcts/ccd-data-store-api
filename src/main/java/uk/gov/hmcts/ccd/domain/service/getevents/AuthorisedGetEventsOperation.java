@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.listevents;
+package uk.gov.hmcts.ccd.domain.service.getevents;
 
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -11,10 +11,10 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static java.util.Collections.singletonList;
@@ -22,21 +22,20 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_RE
 
 @Service
 @Qualifier("authorised")
-public class AuthorisedListEventsOperation implements ListEventsOperation {
+public class AuthorisedGetEventsOperation implements GetEventsOperation {
 
-    private static final String EVENT_NOT_FOUND = "Case event not found";
-
-    private final ListEventsOperation listEventsOperation;
+    private final GetEventsOperation getEventsOperation;
     private final AccessControlService accessControlService;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final UserRepository userRepository;
 
-    public AuthorisedListEventsOperation(@Qualifier("classified") final ListEventsOperation listEventsOperation,
-                                         @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
-                                         final AccessControlService accessControlService,
-                                         @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository) {
+    public AuthorisedGetEventsOperation(@Qualifier("classified") GetEventsOperation getEventsOperation,
+                                        @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                                            CaseDefinitionRepository caseDefinitionRepository,
+                                        AccessControlService accessControlService,
+                                        @Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository) {
 
-        this.listEventsOperation = listEventsOperation;
+        this.getEventsOperation = getEventsOperation;
         this.accessControlService = accessControlService;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.userRepository = userRepository;
@@ -45,24 +44,24 @@ public class AuthorisedListEventsOperation implements ListEventsOperation {
     @Override
     public List<AuditEvent> execute(CaseDetails caseDetails) {
 
-        final List<AuditEvent> events = listEventsOperation.execute(caseDetails);
+        final List<AuditEvent> events = getEventsOperation.execute(caseDetails);
 
         return secureEvents(caseDetails.getCaseTypeId(), events);
     }
 
     @Override
     public List<AuditEvent> execute(String jurisdiction, String caseTypeId, String caseReference) {
-        return secureEvents(caseTypeId, listEventsOperation.execute(jurisdiction, caseTypeId, caseReference));
+        return secureEvents(caseTypeId, getEventsOperation.execute(jurisdiction, caseTypeId, caseReference));
     }
 
     @Override
-    public AuditEvent execute(String jurisdiction, String caseTypeId, Long eventId) {
-        return secureEvent(caseTypeId, listEventsOperation.execute(jurisdiction, caseTypeId, eventId));
+    public Optional<AuditEvent> execute(String jurisdiction, String caseTypeId, Long eventId) {
+        return getEventsOperation.execute(jurisdiction, caseTypeId, eventId).flatMap(
+            event -> secureEvent(caseTypeId, event));
     }
 
-    private AuditEvent secureEvent(String caseTypeId, AuditEvent event) {
-        return secureEvents(caseTypeId, singletonList(event)).stream().findFirst()
-            .orElseThrow(() -> new ResourceNotFoundException(EVENT_NOT_FOUND));
+    private Optional<AuditEvent> secureEvent(String caseTypeId, AuditEvent event) {
+        return secureEvents(caseTypeId, singletonList(event)).stream().findFirst();
     }
 
     private List<AuditEvent> secureEvents(String caseTypeId, List<AuditEvent> events) {

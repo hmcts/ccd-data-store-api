@@ -20,7 +20,7 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
-import uk.gov.hmcts.ccd.domain.service.listevents.ListEventsOperation;
+import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
 
 import java.util.HashMap;
 import java.util.List;
@@ -56,7 +56,7 @@ class DefaultGetCaseViewOperationTest {
     private CaseAuditEventRepository auditEventRepository;
 
     @Mock
-    private ListEventsOperation listEventsOperation;
+    private GetEventsOperation getEventsOperation;
 
     @Mock
     private UIDefinitionRepository uiDefinitionRepository;
@@ -96,7 +96,7 @@ class DefaultGetCaseViewOperationTest {
         event2 = new AuditEvent();
         event2.setSummary(EVENT_SUMMARY_2);
         auditEvents = asList(event1, event2);
-        doReturn(auditEvents).when(listEventsOperation).execute(caseDetails);
+        doReturn(auditEvents).when(getEventsOperation).execute(caseDetails);
 
         doReturn(Boolean.TRUE).when(uidService).validateUID(CASE_REFERENCE);
 
@@ -112,8 +112,7 @@ class DefaultGetCaseViewOperationTest {
         caseState = new CaseState();
         doReturn(caseState).when(caseTypeService).findState(caseType, STATE);
 
-        defaultGetCaseViewOperation = new DefaultGetCaseViewOperation(getCaseOperation,
-                                                                      listEventsOperation,
+        defaultGetCaseViewOperation = new DefaultGetCaseViewOperation(getCaseOperation, getEventsOperation,
                                                                       uiDefinitionRepository,
                                                                       caseTypeService,
                                                                       eventTriggerService,
@@ -128,8 +127,7 @@ class DefaultGetCaseViewOperationTest {
 
         final CaseView caseView = defaultGetCaseViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
 
-        assertAll(
-            () -> verify(listEventsOperation).execute(caseDetails),
+        assertAll(() -> verify(getEventsOperation).execute(caseDetails),
             () -> assertThat(caseView.getTabs(), arrayWithSize(1)),
             () -> assertThat(caseView.getTabs()[0].getFields(), arrayWithSize(2)),
             () -> assertThat(caseView.getTabs()[0].getFields(), hasItemInArray(allOf(hasProperty("id", equalTo("dataTestField1")),
@@ -150,8 +148,7 @@ class DefaultGetCaseViewOperationTest {
 
         final CaseView caseView = defaultGetCaseViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
 
-        assertAll(
-            () -> verify(listEventsOperation).execute(caseDetails),
+        assertAll(() -> verify(getEventsOperation).execute(caseDetails),
             () -> assertThat(caseView.getTabs()[0].getFields(), arrayWithSize(1)),
             () -> assertThat(caseView.getTabs()[0].getFields(), hasItemInArray(hasProperty("id", equalTo("dataTestField2")))),
             () -> assertThat(caseView.getEvents(), arrayWithSize(2)),
