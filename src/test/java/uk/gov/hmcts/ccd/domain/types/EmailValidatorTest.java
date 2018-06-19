@@ -19,6 +19,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.StringEndsWith.endsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static uk.gov.hmcts.ccd.domain.types.BaseTypeValidator.REGEX_GUIDANCE;
 
 public class EmailValidatorTest extends BaseTest {
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -92,7 +93,7 @@ public class EmailValidatorTest extends BaseTest {
         final JsonNode invalidValue = NODE_FACTORY.textNode("9k@hmcts.net");
         final List<ValidationResult> invalidResult = validator.validate("TEST_FIELD_ID", invalidValue, regexCaseField);
         assertEquals(invalidResult.toString(), 1, invalidResult.size());
-        assertEquals("9k@hmcts.net field type Regex Failed: ^[a-z]\\w*@hmcts.net$", invalidResult.get(0).getErrorMessage());
+        assertEquals(REGEX_GUIDANCE, invalidResult.get(0).getErrorMessage());
     }
 
     @Test
@@ -101,7 +102,7 @@ public class EmailValidatorTest extends BaseTest {
         final List<ValidationResult> result01 = validator.validate("TEST_FIELD_ID",
             NODE_FACTORY.textNode("9k@hmcts.net"), caseField);
         assertEquals(1, result01.size());
-        assertEquals("9k@hmcts.net base type Regex Failed: \\\\w*@hmcts.net", result01.get(0).getErrorMessage());
+        assertEquals(REGEX_GUIDANCE, result01.get(0).getErrorMessage());
     }
 
     @Test
