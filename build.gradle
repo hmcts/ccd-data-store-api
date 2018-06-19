@@ -550,14 +550,21 @@ sourceSets {
     }
 }
 task smoke(type: Test) {
+    systemProperty "http.proxyHost", System.getProperty('http.proxyHost')
+    systemProperty "http.proxyPort", System.getProperty('http.proxyPort')
+    systemProperty "https.proxyHost", System.getProperty('https.proxyHost')
+    systemProperty "https.proxyPort", System.getProperty('https.proxyPort')
+
     environment("APPINSIGHTS_INSTRUMENTATIONKEY", "some-key")
-    logger.quiet("TODO: Add smoke tests")
-//    group = 'Delivery pipeline'
-//    description = 'Executes functional tests against an AAT CCD Data Store instance'
-//    setTestClassesDirs(sourceSets.aat.output.classesDirs)
-//    setClasspath(sourceSets.aat.runtimeClasspath)
-//    include 'uk.gov.hmcts.ccd.datastore.tests.smoke'
-//    useJUnitPlatform()
+
+    group = 'Delivery pipeline'
+    description = 'Executes smoke tests against an AAT CCD Data Store instance'
+    setTestClassesDirs(sourceSets.aat.output.classesDirs)
+    setClasspath(sourceSets.aat.runtimeClasspath)
+    include "uk/gov/hmcts/ccd/datastore/tests/functional/**"
+    useJUnitPlatform {
+        includeTags 'smoke'
+    }
 
 }
 
