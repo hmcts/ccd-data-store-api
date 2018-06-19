@@ -22,7 +22,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 public class DefaultGetCaseHistoryViewOperation extends AbstractDefaultGetCaseViewOperation implements GetCaseHistoryViewOperation {
 
     public static final String QUALIFIER = "default";
-    private static final String EVENT_NOT_FOUND = "Case event not found";
+    private static final String EVENT_NOT_FOUND = "Event history not found";
 
     private final GetEventsOperation getEventsOperation;
 

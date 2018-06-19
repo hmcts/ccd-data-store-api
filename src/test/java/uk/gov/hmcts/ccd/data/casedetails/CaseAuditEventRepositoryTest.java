@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.BaseTest;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 import javax.inject.Inject;
 import javax.sql.DataSource;
@@ -19,6 +20,7 @@ import java.util.Optional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Transactional
 public class CaseAuditEventRepositoryTest extends BaseTest {
@@ -74,6 +76,12 @@ public class CaseAuditEventRepositoryTest extends BaseTest {
 
         assertTrue(createEventOptional.isPresent());
         assertEquals(createEventSummary, createEventOptional.get().getSummary());
+    }
+
+    @Test
+    @DisplayName("should throw exception when audit event is not found")
+    public void shouldThrowExceptionWhenAuditEventNotFound() {
+        assertThrows(ResourceNotFoundException.class, () -> classUnderTest.findByEventId(10000L));
     }
 
     private void setUpCaseData(Long caseDataId) {

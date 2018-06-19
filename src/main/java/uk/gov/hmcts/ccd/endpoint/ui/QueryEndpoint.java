@@ -232,7 +232,8 @@ public class QueryEndpoint {
         method = RequestMethod.GET)
     @ApiOperation(value = "Fetch case history for the event")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Displayable case data")
+        @ApiResponse(code = 200, message = "Displayable case data"),
+        @ApiResponse(code = 404, message = "Invalid jurisdiction/case type/case reference or event id")
     })
     public CaseHistoryView getCaseHistoryForEvent(@PathVariable("jid") final String jurisdictionId,
                                                   @PathVariable("ctid") final String caseTypeId,
