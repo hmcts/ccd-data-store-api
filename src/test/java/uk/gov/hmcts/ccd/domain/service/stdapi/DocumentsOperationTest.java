@@ -48,7 +48,7 @@ public class DocumentsOperationTest extends BaseTest {
     @Before
     public void setUp() {
         final SecurityUtils securityUtils = Mockito.mock(SecurityUtils.class);
-        Mockito.when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
+        when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
         ReflectionTestUtils.setField(documentsOperation, "securityUtils", securityUtils);
 
         setupUIDService();
@@ -79,13 +79,13 @@ public class DocumentsOperationTest extends BaseTest {
         final String TEST_URL = "/test-document-callback";
 
         final CaseDetailsRepository mockCaseDetailsRepository = Mockito.mock(DefaultCaseDetailsRepository.class);
-        Mockito.when(mockCaseDetailsRepository.findByReference(Long.valueOf(TEST_CASE_REFERENCE))).thenReturn(new CaseDetails());
+        when(mockCaseDetailsRepository.findByReference(Long.valueOf(TEST_CASE_REFERENCE))).thenReturn(new CaseDetails());
         ReflectionTestUtils.setField(documentsOperation, "caseDetailsRepository", mockCaseDetailsRepository);
 
         final CaseType caseType = new CaseType();
         caseType.setPrintableDocumentsUrl("http://localhost:" + mockServer.port() + TEST_URL);
         final CaseTypeService mockCaseTypeService = Mockito.mock(CaseTypeService.class);
-        Mockito.when(mockCaseTypeService.getCaseTypeForJurisdiction(TEST_CASE_TYPE, TEST_JURISDICTION)).thenReturn(caseType);
+        when(mockCaseTypeService.getCaseTypeForJurisdiction(TEST_CASE_TYPE, TEST_JURISDICTION)).thenReturn(caseType);
         ReflectionTestUtils.setField(documentsOperation, "caseTypeService", mockCaseTypeService);
 
         mockServer.stubFor(post(urlMatching(TEST_URL + ".*"))
@@ -102,13 +102,13 @@ public class DocumentsOperationTest extends BaseTest {
         final String TEST_URL = "/test-document-callback";
 
         final CaseDetailsRepository mockCaseDetailsRepository = Mockito.mock(DefaultCaseDetailsRepository.class);
-        Mockito.when(mockCaseDetailsRepository.findByReference(Long.valueOf(TEST_CASE_REFERENCE))).thenReturn(new CaseDetails());
+        when(mockCaseDetailsRepository.findByReference(Long.valueOf(TEST_CASE_REFERENCE))).thenReturn(new CaseDetails());
         ReflectionTestUtils.setField(documentsOperation, "caseDetailsRepository", mockCaseDetailsRepository);
 
         final CaseType caseType = new CaseType();
         caseType.setPrintableDocumentsUrl("http://localhost:" + mockServer.port() + TEST_URL);
         final CaseTypeService mockCaseTypeService = Mockito.mock(CaseTypeService.class);
-        Mockito.when(mockCaseTypeService.getCaseTypeForJurisdiction(TEST_CASE_TYPE, TEST_JURISDICTION)).thenReturn(caseType);
+        when(mockCaseTypeService.getCaseTypeForJurisdiction(TEST_CASE_TYPE, TEST_JURISDICTION)).thenReturn(caseType);
         ReflectionTestUtils.setField(documentsOperation, "caseTypeService", mockCaseTypeService);
 
         final Document TEST_DOC_1 = new Document();

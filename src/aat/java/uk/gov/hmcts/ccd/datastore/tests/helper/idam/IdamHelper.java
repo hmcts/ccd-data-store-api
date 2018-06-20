@@ -1,12 +1,9 @@
 package uk.gov.hmcts.ccd.datastore.tests.helper.idam;
 
 import feign.Feign;
-import feign.Response;
-import feign.codec.Decoder;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 
-import java.io.IOException;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +15,6 @@ public class IdamHelper {
     private static final String BASIC = "Basic ";
 
     private final Map<String, AuthenticatedUser> users = new HashMap<>();
-    private final Decoder.Default defaultDecoder = new Decoder.Default();
 
     private final IdamApi idamApi;
     private final OAuth2 oauth2;

@@ -9,7 +9,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
@@ -43,9 +42,6 @@ class DefaultGetCaseViewOperationTest {
 
     @Mock
     private GetCaseOperation getCaseOperation;
-
-    @Mock
-    private CaseAuditEventRepository auditEventRepository;
 
     @Mock
     private ListEventsOperation listEventsOperation;
