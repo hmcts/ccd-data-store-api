@@ -20,7 +20,8 @@ import static org.apache.http.HttpStatus.SC_OK;
 
 public class CaseDetails implements Cloneable {
     private static final Logger LOG = LoggerFactory.getLogger(CaseDetails.class);
-    protected static final String LABEL_FIELD_TYPE = "Label";
+    private static final String LABEL_FIELD_TYPE = "Label";
+    private static final String CASE_PAYMENT_HISTORY_VIEWER_FIELD_TYPE = "CasePaymentHistoryViewer";
 
     private Long id;
 
@@ -180,8 +181,9 @@ public class CaseDetails implements Cloneable {
     }
 
     public boolean existsInData(CaseTypeTabField caseTypeTabField) {
-        // Fields of type "Label" are a special case and should be allowed through regardless
+        // Fields of type "Label" and "CasePaymentHistoryViewer" are a special cases and should be allowed through regardless
         return caseTypeTabField.getCaseField().getFieldType().getType().equals(LABEL_FIELD_TYPE) ||
+            caseTypeTabField.getCaseField().getFieldType().getType().equals(CASE_PAYMENT_HISTORY_VIEWER_FIELD_TYPE) ||
             data.keySet().contains(caseTypeTabField.getCaseField().getId());
     }
 
