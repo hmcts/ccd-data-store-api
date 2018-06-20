@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.data.definition;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -119,12 +120,12 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     @Override
     public List<UserRole> getClassificationsForUserRoleList(List<String> userRoles) {
         try {
+            if (userRoles.isEmpty()) {
+                return Collections.EMPTY_LIST;
+            }
             final HttpEntity requestEntity = new HttpEntity<CaseType>(securityUtils.authorizationHeaders());
             final Map<String, String> queryParams = new HashMap<>();
-            Optional<String> roles = userRoles.stream().reduce((s1, s2) -> s1 + "," + s2);
-            if(roles.isPresent()) {
-                queryParams.put("roles", roles.get());
-            }
+            queryParams.put("roles", StringUtils.join(userRoles, "," ));
             return Arrays.asList(restTemplate.exchange(applicationParams.userRolesClassificationsURL(), HttpMethod.GET, requestEntity, UserRole[].class, queryParams).getBody());
         } catch (Exception e) {
             LOG.warn("Error while retrieving classification for user roles {} because of ", userRoles, e);

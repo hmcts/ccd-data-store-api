@@ -54,7 +54,7 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
             .collect(Collectors.toList());
         if (!missingRoles.isEmpty()) {
             final List<UserRole> missingClassifications = caseDefinitionRepository.getClassificationsForUserRoleList(missingRoles);
-            missingClassifications.forEach(userRole -> userRoleClassifications.putIfAbsent(userRole.getRole(), userRole));
+            missingClassifications.forEach(userClassification -> userRoleClassifications.putIfAbsent(userClassification.getRole(), userClassification));
         }
         return userRoles.stream().map(userRoleClassifications::get).collect(Collectors.toList());
     }
