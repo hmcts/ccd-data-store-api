@@ -181,10 +181,13 @@ public class CaseDetails implements Cloneable {
     }
 
     public boolean existsInData(CaseTypeTabField caseTypeTabField) {
-        // Fields of type "Label" and "CasePaymentHistoryViewer" are a special cases and should be allowed through regardless
-        return caseTypeTabField.getCaseField().getFieldType().getType().equals(LABEL_FIELD_TYPE) ||
-            caseTypeTabField.getCaseField().getFieldType().getType().equals(CASE_PAYMENT_HISTORY_VIEWER_FIELD_TYPE) ||
+        return isFieldWithNoValue(caseTypeTabField) ||
             data.keySet().contains(caseTypeTabField.getCaseField().getId());
+    }
+
+    private boolean isFieldWithNoValue(CaseTypeTabField caseTypeTabField) {
+        return caseTypeTabField.getCaseField().getFieldType().getType().equals(LABEL_FIELD_TYPE) ||
+            caseTypeTabField.getCaseField().getFieldType().getType().equals(CASE_PAYMENT_HISTORY_VIEWER_FIELD_TYPE);
     }
 
     @JsonIgnore
