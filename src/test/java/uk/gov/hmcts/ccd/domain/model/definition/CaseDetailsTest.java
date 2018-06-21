@@ -28,7 +28,14 @@ class CaseDetailsTest {
 
     @Test
     void testExistsInDataIsAlwaysTrueForLabels() {
-        CaseTypeTabField tabField = createCaseTypeTabField("someId", CaseDetails.LABEL_FIELD_TYPE);
+        CaseTypeTabField tabField = createCaseTypeTabField("someId", "Label");
+
+        assertThat(caseDetails.existsInData(tabField), equalTo(true));
+    }
+
+    @Test
+    void testExistsInDataIsAlwaysTrueForCasePaymentHistoryViewer() {
+        CaseTypeTabField tabField = createCaseTypeTabField("someId", "CasePaymentHistoryViewer");
 
         assertThat(caseDetails.existsInData(tabField), equalTo(true));
     }
