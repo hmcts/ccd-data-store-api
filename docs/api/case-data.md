@@ -262,11 +262,41 @@ Once this gets sent to us we will retrieve the relevant metadata and send you ba
 
 ### OrderSummary
 
-An `OrderSummary` value is a Json `object`. We accept the following structure with a mandatory field `Fees` which is a collection of `Fee` objects and mandatory `PaymentTotal` field. The `PaymentReference` is the only optional field. `Fee` object itself has 3 mandatory fields: `FeeCode`, `FeeAmount` and `FeeVersion` and one optional field `FeeDescription`.
+An `OrderSummary` value is a Json `object`. We accept the following structure with a mandatory fields as follows:
+- `Fees` (a collection of `Fee` objects inside which `FeeAmount`, `FeeCode` and `FeeVersion` are mandatory and `FeeDescription` is optional),
+- `PaymentTotal`.
+
+The optional fields are:
+- `PaymentReference`,
+- `PaymentStatus`,
+- `PaymentPayer`,
+- `PaymentDescription`,
+- `PaymentCurrency`,
+- `PaymentCCDCaseNumber`,
+- `PaymentCaseReference`,
+- `PaymentChannel`,
+- `PaymentMethod`,
+- `PaymentExternalProvider`,
+- `PaymentExternalReference`,
+- `PaymentSiteId`,
+- `PaymentServiceName`.
 
 ```json
 {
   "PaymentReference": "RC-1521-1095-0964-3143",
+  "PaymentStatus": "Initiated",
+  "PaymentDate": "2012-04-23T18:25:43.511Z",
+  "PaymentPayer": "Mr Payer",
+  "PaymentDescription": "cmc",
+  "PaymentCurrency": "GBP",
+  "PaymentCCDCaseNumber": "1234567891234567",
+  "PaymentCaseReference": "3123213",
+  "PaymentChannel": "online",
+  "PaymentMethod": "card",
+  "PaymentExternalProvider": "gov pay",
+  "PaymentExternalReference": "il7d49d56icblsgsb4m6v16e26",
+  "PaymentSiteId": "SIT01",
+  "PaymentServiceName": "Civil Money Claims",
   "Fees": [
     {
       "value": {
