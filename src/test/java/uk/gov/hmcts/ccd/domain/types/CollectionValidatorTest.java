@@ -1,20 +1,18 @@
 package uk.gov.hmcts.ccd.domain.types;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 
-import javax.inject.Inject;
-
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static java.math.BigDecimal.ONE;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 public class CollectionValidatorTest {
 
@@ -63,7 +61,7 @@ public class CollectionValidatorTest {
 
     @Test
     public void validate_invalidMax() throws IOException {
-        caseField.getFieldType().setMax(new BigDecimal(1));
+        caseField.getFieldType().setMax(ONE);
 
         final List<ValidationResult> results = validator.validate(CASE_FIELD_ID, MAPPER.readTree("[ { \"value\": \"V1\"}, { \"value\": \"V2\"} ]"), caseField);
 
@@ -73,8 +71,8 @@ public class CollectionValidatorTest {
 
     @Test
     public void validate_validMinMax() throws IOException {
-        caseField.getFieldType().setMin(new BigDecimal(1));
-        caseField.getFieldType().setMax(new BigDecimal(1));
+        caseField.getFieldType().setMin(ONE);
+        caseField.getFieldType().setMax(ONE);
 
         final List<ValidationResult> results = validator.validate(CASE_FIELD_ID, MAPPER.readTree("[ { \"value\": \"V1\"} ]"), caseField);
 
