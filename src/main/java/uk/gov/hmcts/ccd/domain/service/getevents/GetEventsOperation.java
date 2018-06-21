@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface GetEventsOperation {
-    List<AuditEvent> execute(CaseDetails caseDetails);
+    List<AuditEvent> getEvents(CaseDetails caseDetails);
 
-    List<AuditEvent> execute(String jurisdiction, String caseTypeId, String caseReference);
+    List<AuditEvent> getEvents(String jurisdiction, String caseTypeId, String caseReference);
 
-    Optional<AuditEvent> execute(String jurisdiction, String caseTypeId, Long eventId);
+    Optional<AuditEvent> getEvent(String jurisdiction, String caseTypeId, Long eventId);
 }

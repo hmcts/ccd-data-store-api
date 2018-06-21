@@ -37,7 +37,7 @@ class EventsEndpointTest {
     @Test
     void shouldReturnEventsForCase() {
         final List<AuditEvent> events = new ArrayList<>();
-        doReturn(events).when(getEventsOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_ID);
+        doReturn(events).when(getEventsOperation).getEvents(JURISDICTION_ID, CASE_TYPE_ID, CASE_ID);
 
         final List<AuditEvent> output = endpoint.findEventDetailsForCase(UID,
             JURISDICTION_ID,
@@ -45,7 +45,7 @@ class EventsEndpointTest {
             CASE_ID);
 
         assertThat(output, sameInstance(events));
-        verify(getEventsOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_ID);
+        verify(getEventsOperation).getEvents(JURISDICTION_ID, CASE_TYPE_ID, CASE_ID);
     }
 
 }

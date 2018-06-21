@@ -84,7 +84,7 @@ class DefaultGetCaseHistoryViewOperationTest {
         AuditEvent event2 = new AuditEvent();
         event2.setSummary(EVENT_SUMMARY_2);
         List<AuditEvent> auditEvents = asList(event1, event2);
-        doReturn(auditEvents).when(getEventsOperation).execute(caseDetails);
+        doReturn(auditEvents).when(getEventsOperation).getEvents(caseDetails);
 
         doReturn(Boolean.TRUE).when(uidService).validateUID(CASE_REFERENCE);
 
@@ -112,17 +112,18 @@ class DefaultGetCaseHistoryViewOperationTest {
         Map<String, JsonNode> dataMap = buildData("dataTestField2");
         caseDetails.setData(dataMap);
         event1.setData(dataMap);
-        doReturn(Optional.of(event1)).when(getEventsOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
+        doReturn(Optional.of(event1)).when(getEventsOperation).getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
 
         CaseHistoryView caseHistoryView = defaultGetCaseHistoryViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID,
             CASE_REFERENCE, EVENT_ID);
 
-        assertAll(() -> verify(getEventsOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID),
-            () -> assertThat(caseHistoryView.getTabs()[0].getFields(), arrayWithSize(1)),
-            () -> assertThat(caseHistoryView.getTabs()[0].getFields(),
+        assertAll(() -> verify(getEventsOperation).getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID),
+                  () -> assertThat(caseHistoryView.getTabs()[0].getFields(), arrayWithSize(1)),
+                  () -> assertThat(caseHistoryView.getTabs()[0].getFields(),
                 hasItemInArray(hasProperty("id", equalTo("dataTestField2")))),
-            () -> assertThat(caseHistoryView.getEvent(), hasProperty("summary", equalTo(EVENT_SUMMARY_1))),
-            () -> assertThat(caseHistoryView.getCaseType().getJurisdiction().getName(), equalTo(JURISDICTION_ID)));
+                  () -> assertThat(caseHistoryView.getEvent(), hasProperty("summary", equalTo(EVENT_SUMMARY_1))),
+                  () -> assertThat(caseHistoryView.getCaseType().getJurisdiction().getName(),
+                                   equalTo(JURISDICTION_ID)));
     }
 
     @Test
@@ -146,7 +147,7 @@ class DefaultGetCaseHistoryViewOperationTest {
     @Test
     @DisplayName("should throw exception when no event found")
     void shouldThrowExceptionWhenNoEventFound() {
-        doReturn(Optional.empty()).when(getEventsOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
+        doReturn(Optional.empty()).when(getEventsOperation).getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
 
         assertThrows(ResourceNotFoundException.class,
             () -> defaultGetCaseHistoryViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, EVENT_ID));

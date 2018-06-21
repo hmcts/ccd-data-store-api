@@ -42,21 +42,21 @@ public class AuthorisedGetEventsOperation implements GetEventsOperation {
     }
 
     @Override
-    public List<AuditEvent> execute(CaseDetails caseDetails) {
+    public List<AuditEvent> getEvents(CaseDetails caseDetails) {
 
-        final List<AuditEvent> events = getEventsOperation.execute(caseDetails);
+        final List<AuditEvent> events = getEventsOperation.getEvents(caseDetails);
 
         return secureEvents(caseDetails.getCaseTypeId(), events);
     }
 
     @Override
-    public List<AuditEvent> execute(String jurisdiction, String caseTypeId, String caseReference) {
-        return secureEvents(caseTypeId, getEventsOperation.execute(jurisdiction, caseTypeId, caseReference));
+    public List<AuditEvent> getEvents(String jurisdiction, String caseTypeId, String caseReference) {
+        return secureEvents(caseTypeId, getEventsOperation.getEvents(jurisdiction, caseTypeId, caseReference));
     }
 
     @Override
-    public Optional<AuditEvent> execute(String jurisdiction, String caseTypeId, Long eventId) {
-        return getEventsOperation.execute(jurisdiction, caseTypeId, eventId).flatMap(
+    public Optional<AuditEvent> getEvent(String jurisdiction, String caseTypeId, Long eventId) {
+        return getEventsOperation.getEvent(jurisdiction, caseTypeId, eventId).flatMap(
             event -> secureEvent(caseTypeId, event));
     }
 

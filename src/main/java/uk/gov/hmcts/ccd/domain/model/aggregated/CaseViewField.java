@@ -3,7 +3,11 @@ package uk.gov.hmcts.ccd.domain.model.aggregated;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.ToString;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+
+import java.util.Map;
 
 @ToString
 public class CaseViewField {
@@ -134,4 +138,21 @@ public class CaseViewField {
         this.showSummaryContentOption = showSummaryContentOption;
     }
 
+    public static CaseViewField createFrom(CaseTypeTabField field, Map<String, JsonNode> data) {
+        CaseViewField caseViewField = new CaseViewField();
+        CaseField caseField = field.getCaseField();
+        caseViewField.setId(caseField.getId());
+        caseViewField.setLabel(caseField.getLabel());
+        caseViewField.setFieldType(caseField.getFieldType());
+        caseViewField.setHidden(caseField.getHidden());
+        caseViewField.setHintText(caseField.getHintText());
+        caseViewField.setSecurityLabel(caseField.getSecurityLabel());
+        caseViewField.setValidationExpression(caseField.getFieldType().getRegularExpression());
+        caseViewField.setOrder(field.getDisplayOrder());
+        caseViewField.setShowCondition(field.getShowCondition());
+        caseViewField.setValue(data.get(caseField.getId()));
+
+        return caseViewField;
+
+    }
 }

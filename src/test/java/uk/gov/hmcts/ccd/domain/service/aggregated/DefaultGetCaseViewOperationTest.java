@@ -95,7 +95,7 @@ class DefaultGetCaseViewOperationTest {
         event2 = new AuditEvent();
         event2.setSummary(EVENT_SUMMARY_2);
         auditEvents = asList(event1, event2);
-        doReturn(auditEvents).when(getEventsOperation).execute(caseDetails);
+        doReturn(auditEvents).when(getEventsOperation).getEvents(caseDetails);
 
         doReturn(Boolean.TRUE).when(uidService).validateUID(CASE_REFERENCE);
 
@@ -126,7 +126,7 @@ class DefaultGetCaseViewOperationTest {
 
         final CaseView caseView = defaultGetCaseViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
 
-        assertAll(() -> verify(getEventsOperation).execute(caseDetails),
+        assertAll(() -> verify(getEventsOperation).getEvents(caseDetails),
                   () -> assertThat(caseView.getTabs(), arrayWithSize(1)),
                   () -> assertThat(caseView.getTabs()[0].getFields(), arrayWithSize(2)),
                   () -> assertThat(caseView.getTabs()[0].getFields(),
@@ -153,7 +153,7 @@ class DefaultGetCaseViewOperationTest {
 
         final CaseView caseView = defaultGetCaseViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
 
-        assertAll(() -> verify(getEventsOperation).execute(caseDetails),
+        assertAll(() -> verify(getEventsOperation).getEvents(caseDetails),
                   () -> assertThat(caseView.getTabs()[0].getFields(), arrayWithSize(1)),
                   () -> assertThat(caseView.getTabs()[0].getFields(),
                                    hasItemInArray(hasProperty("id", equalTo("dataTestField2")))),

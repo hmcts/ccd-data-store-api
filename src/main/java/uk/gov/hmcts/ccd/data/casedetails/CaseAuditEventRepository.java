@@ -65,7 +65,7 @@ public class CaseAuditEventRepository {
         try {
             caseAuditEvent = (CaseAuditEventEntity) query.getSingleResult();
         } catch (NoResultException e) {
-            LOG.error(EVENT_NOT_FOUND, e);
+            LOG.warn(EVENT_NOT_FOUND, e);
             throw new ResourceNotFoundException(EVENT_NOT_FOUND);
         }
         return ofNullable(caseAuditEvent).map(caseAuditEventMapper::entityToModel);

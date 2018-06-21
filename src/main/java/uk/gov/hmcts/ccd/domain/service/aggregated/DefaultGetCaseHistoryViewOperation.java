@@ -45,7 +45,7 @@ public class DefaultGetCaseHistoryViewOperation extends AbstractDefaultGetCaseVi
         CaseType caseType = getCaseType(jurisdictionId, caseTypeId);
         CaseDetails caseDetails = getCaseDetails(jurisdictionId, caseTypeId, caseReference);
 
-        AuditEvent event = getEventsOperation.execute(jurisdictionId, caseTypeId, eventId).orElseThrow(
+        AuditEvent event = getEventsOperation.getEvent(jurisdictionId, caseTypeId, eventId).orElseThrow(
             () -> new ResourceNotFoundException(EVENT_NOT_FOUND));
 
         return merge(caseDetails, event, caseType);

@@ -5,7 +5,6 @@ import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
@@ -16,7 +15,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 import java.util.Map;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 public abstract class AbstractDefaultGetCaseViewOperation {
@@ -74,7 +72,7 @@ public abstract class AbstractDefaultGetCaseViewOperation {
         return caseTabCollection.getTabs().stream().map(tab -> {
             CaseViewField[] caseViewFields = tab.getTabFields().stream()
                 .filter(filterCaseTabFieldsBasedOnSecureData(caseDetails))
-                .map(buildCaseViewField(data))
+                .map(field -> CaseViewField.createFrom(field, data))
                 .toArray(CaseViewField[]::new);
 
             return new CaseViewTab(tab.getId(), tab.getLabel(), tab.getDisplayOrder(), caseViewFields,
@@ -83,22 +81,4 @@ public abstract class AbstractDefaultGetCaseViewOperation {
         }).toArray(CaseViewTab[]::new);
     }
 
-
-    private Function<CaseTypeTabField, CaseViewField> buildCaseViewField(Map<String, JsonNode> data) {
-        return field -> {
-            CaseViewField caseViewField = new CaseViewField();
-            CaseField caseField = field.getCaseField();
-            caseViewField.setId(caseField.getId());
-            caseViewField.setLabel(caseField.getLabel());
-            caseViewField.setFieldType(caseField.getFieldType());
-            caseViewField.setHidden(caseField.getHidden());
-            caseViewField.setHintText(caseField.getHintText());
-            caseViewField.setSecurityLabel(caseField.getSecurityLabel());
-            caseViewField.setValidationExpression(caseField.getFieldType().getRegularExpression());
-            caseViewField.setOrder(field.getDisplayOrder());
-            caseViewField.setShowCondition(field.getShowCondition());
-            caseViewField.setValue(data.get(caseField.getId()));
-            return caseViewField;
-        };
-    }
 }

@@ -60,7 +60,7 @@ class DefaultGetEventsOperationTest {
     @Test
     @DisplayName("should retrieve events from repository")
     void shouldDelegateCallToRepository() {
-        final List<AuditEvent> events = listEventsOperation.execute(caseDetails);
+        final List<AuditEvent> events = listEventsOperation.getEvents(caseDetails);
 
         assertAll(
             () -> verify(auditEventRepository).findByCase(caseDetails),
@@ -74,7 +74,7 @@ class DefaultGetEventsOperationTest {
         doReturn(true).when(uidService).validateUID(CASE_REFERENCE);
         doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
 
-        final List<AuditEvent> events = listEventsOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+        final List<AuditEvent> events = listEventsOperation.getEvents(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
 
         assertAll(
             () -> verify(auditEventRepository).findByCase(caseDetails),
@@ -87,7 +87,8 @@ class DefaultGetEventsOperationTest {
     void shouldThrowBadRequestExceptionWhenCaseDetailsCannotBeFound() {
         doReturn(false).when(uidService).validateUID(CASE_REFERENCE);
 
-        assertThrows(BadRequestException.class, () -> listEventsOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE));
+        assertThrows(BadRequestException.class,
+                     () -> listEventsOperation.getEvents(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE));
     }
 
     @Test
@@ -96,7 +97,8 @@ class DefaultGetEventsOperationTest {
         doReturn(true).when(uidService).validateUID(CASE_REFERENCE);
         doReturn(Optional.empty()).when(getCaseOperation).execute(CASE_REFERENCE);
 
-        assertThrows(ResourceNotFoundException.class, () -> listEventsOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE));
+        assertThrows(ResourceNotFoundException.class,
+                     () -> listEventsOperation.getEvents(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE));
     }
 
     @Test
@@ -104,7 +106,7 @@ class DefaultGetEventsOperationTest {
     void shouldFindEventAndDelegateCallToRepository() {
         doReturn(Optional.of(event)).when(auditEventRepository).findByEventId(EVENT_ID);
 
-        Optional<AuditEvent> optionalAuditEvent = listEventsOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
+        Optional<AuditEvent> optionalAuditEvent = listEventsOperation.getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
 
         assertThat(optionalAuditEvent.isPresent(), is(true));
         AuditEvent output = optionalAuditEvent.get();
@@ -119,6 +121,7 @@ class DefaultGetEventsOperationTest {
     void shouldReturnErrorWhenEventCannotBeFound() {
         doReturn(Optional.empty()).when(auditEventRepository).findByEventId(EVENT_ID);
 
-        assertThrows(ResourceNotFoundException.class, () -> listEventsOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID));
+        assertThrows(ResourceNotFoundException.class,
+                     () -> listEventsOperation.getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID));
     }
 }

@@ -54,8 +54,8 @@ class ClassifiedGetEventsOperationTest {
         events = Arrays.asList(new AuditEvent(), new AuditEvent());
         event = new AuditEvent();
 
-        doReturn(events).when(getEventsOperation).execute(caseDetails);
-        doReturn(events).when(getEventsOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+        doReturn(events).when(getEventsOperation).getEvents(caseDetails);
+        doReturn(events).when(getEventsOperation).getEvents(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
 
         classifiedEvents = Lists.newArrayList(event);
 
@@ -68,17 +68,17 @@ class ClassifiedGetEventsOperationTest {
     @DisplayName("should call decorated implementation")
     void shouldCallDecoratedImplementation() {
 
-        classifiedOperation.execute(caseDetails);
+        classifiedOperation.getEvents(caseDetails);
 
-        verify(getEventsOperation).execute(caseDetails);
+        verify(getEventsOperation).getEvents(caseDetails);
     }
 
     @Test
     @DisplayName("should return empty list when decorated implementation returns null")
     void shouldReturnEmptyListInsteadOfNull() {
-        doReturn(null).when(getEventsOperation).execute(caseDetails);
+        doReturn(null).when(getEventsOperation).getEvents(caseDetails);
 
-        final List<AuditEvent> outputs = classifiedOperation.execute(caseDetails);
+        final List<AuditEvent> outputs = classifiedOperation.getEvents(caseDetails);
 
         assertAll(
             () -> assertThat(outputs, is(notNullValue())),
@@ -90,7 +90,7 @@ class ClassifiedGetEventsOperationTest {
     @Test
     @DisplayName("should apply security classifications for case details")
     void shouldApplySecurityClassificationsForCaseDetails() {
-        final List<AuditEvent> outputs = classifiedOperation.execute(caseDetails);
+        final List<AuditEvent> outputs = classifiedOperation.getEvents(caseDetails);
 
         assertAll(
             () -> verify(classificationService).applyClassification(JURISDICTION_ID, events),
@@ -101,7 +101,7 @@ class ClassifiedGetEventsOperationTest {
     @Test
     @DisplayName("should apply security classifications when jurisdiction, case type id and case reference is received")
     void shouldApplySecurityClassificationsForJurisdictionCaseTypeIdAndCaseReference() {
-        final List<AuditEvent> outputs = classifiedOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+        final List<AuditEvent> outputs = classifiedOperation.getEvents(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
 
         assertAll(
             () -> verify(classificationService).applyClassification(JURISDICTION_ID, events),
@@ -112,11 +112,11 @@ class ClassifiedGetEventsOperationTest {
     @Test
     @DisplayName("should apply security classifications when jurisdiction, case type id and case event id is received")
     void shouldApplySecurityClassificationsForJurisdictionCaseTypeIdAndEventId() {
-        doReturn(Optional.of(event)).when(getEventsOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
+        doReturn(Optional.of(event)).when(getEventsOperation).getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
         doReturn(classifiedEvents).when(classificationService)
             .applyClassification(eq(JURISDICTION_ID), anyListOf(AuditEvent.class));
 
-        Optional<AuditEvent> optionalAuditEvent = classifiedOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
+        Optional<AuditEvent> optionalAuditEvent = classifiedOperation.getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
 
         assertThat(optionalAuditEvent.isPresent(), is(true));
         AuditEvent output = optionalAuditEvent.get();

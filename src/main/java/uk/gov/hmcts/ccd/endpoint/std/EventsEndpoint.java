@@ -49,7 +49,7 @@ public class EventsEndpoint {
         @ApiParam(value = "Case ID", required = true)
         @PathVariable("cid") final String caseId) {
 
-        return getEventsOperation.execute(jurisdictionId, caseTypeId, caseId);
+        return getEventsOperation.getEvents(jurisdictionId, caseTypeId, caseId);
     }
 
 }

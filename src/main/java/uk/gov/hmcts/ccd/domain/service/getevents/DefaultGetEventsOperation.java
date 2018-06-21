@@ -35,12 +35,12 @@ public class DefaultGetEventsOperation implements GetEventsOperation {
     }
 
     @Override
-    public List<AuditEvent> execute(CaseDetails caseDetails) {
+    public List<AuditEvent> getEvents(CaseDetails caseDetails) {
         return auditEventRepository.findByCase(caseDetails);
     }
 
     @Override
-    public List<AuditEvent> execute(String jurisdiction, String caseTypeId, String caseReference) {
+    public List<AuditEvent> getEvents(String jurisdiction, String caseTypeId, String caseReference) {
         if (!uidService.validateUID(caseReference)) {
             throw new BadRequestException("Case reference " + caseReference + " is not valid");
         }
@@ -50,11 +50,11 @@ public class DefaultGetEventsOperation implements GetEventsOperation {
                 .orElseThrow(() -> new ResourceNotFoundException(
                     String.format(RESOURCE_NOT_FOUND, jurisdiction, caseTypeId, caseReference)));
 
-        return execute(caseDetails);
+        return getEvents(caseDetails);
     }
 
     @Override
-    public Optional<AuditEvent> execute(String jurisdiction, String caseTypeId, Long eventId) {
+    public Optional<AuditEvent> getEvent(String jurisdiction, String caseTypeId, Long eventId) {
         return auditEventRepository.findByEventId(eventId).map(Optional::of)
             .orElseThrow(() -> new ResourceNotFoundException(CASE_EVENT_NOT_FOUND));
     }
