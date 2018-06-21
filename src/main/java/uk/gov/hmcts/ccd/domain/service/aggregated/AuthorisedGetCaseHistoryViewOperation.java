@@ -14,7 +14,8 @@ import java.util.Set;
 
 @Service
 @Qualifier(AuthorisedGetCaseHistoryViewOperation.QUALIFIER)
-public class AuthorisedGetCaseHistoryViewOperation extends AbstractAuthorisedCaseViewOperation implements GetCaseHistoryViewOperation {
+public class AuthorisedGetCaseHistoryViewOperation extends AbstractAuthorisedCaseViewOperation implements
+    GetCaseHistoryViewOperation {
 
     public static final String QUALIFIER = "authorised-case-history";
     private final GetCaseHistoryViewOperation getCaseHistoryViewOperation;
@@ -22,7 +23,9 @@ public class AuthorisedGetCaseHistoryViewOperation extends AbstractAuthorisedCas
     public AuthorisedGetCaseHistoryViewOperation(
         @Qualifier(DefaultGetCaseViewOperation.QUALIFIER) GetCaseHistoryViewOperation getCaseHistoryViewOperation,
         @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) CaseDefinitionRepository caseDefinitionRepository,
-        AccessControlService accessControlService, @Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository) {
+        AccessControlService accessControlService,
+        @Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository) {
+
         super(caseDefinitionRepository, accessControlService, userRepository);
         this.getCaseHistoryViewOperation = getCaseHistoryViewOperation;
     }

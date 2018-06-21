@@ -30,8 +30,10 @@ public abstract class AbstractDefaultGetCaseViewOperation {
     private final CaseTypeService caseTypeService;
     private final UIDService uidService;
 
-    AbstractDefaultGetCaseViewOperation(GetCaseOperation getCaseOperation, UIDefinitionRepository uiDefinitionRepository,
-                                        CaseTypeService caseTypeService, UIDService uidService) {
+    AbstractDefaultGetCaseViewOperation(GetCaseOperation getCaseOperation,
+                                        UIDefinitionRepository uiDefinitionRepository,
+                                        CaseTypeService caseTypeService,
+                                        UIDService uidService) {
         this.getCaseOperation = getCaseOperation;
         this.uiDefinitionRepository = uiDefinitionRepository;
         this.caseTypeService = caseTypeService;
@@ -50,7 +52,10 @@ public abstract class AbstractDefaultGetCaseViewOperation {
 
     CaseDetails getCaseDetails(String jurisdictionId, String caseTypeId, String caseReference) {
         return getCaseOperation.execute(jurisdictionId, caseTypeId, caseReference).orElseThrow(
-            () -> new ResourceNotFoundException(String.format(RESOURCE_NOT_FOUND, jurisdictionId, caseTypeId, caseReference)));
+            () -> new ResourceNotFoundException(String.format(RESOURCE_NOT_FOUND,
+                                                              jurisdictionId,
+                                                              caseTypeId,
+                                                              caseReference)));
     }
 
     CaseTabCollection getCaseTabCollection(String caseTypeId) {
@@ -67,10 +72,13 @@ public abstract class AbstractDefaultGetCaseViewOperation {
 
     CaseViewTab[] getTabs(CaseDetails caseDetails, Map<String, JsonNode> data, CaseTabCollection caseTabCollection) {
         return caseTabCollection.getTabs().stream().map(tab -> {
-            CaseViewField[] caseViewFields = tab.getTabFields().stream().filter(filterCaseTabFieldsBasedOnSecureData(caseDetails)).map(
-                buildCaseViewField(data)).toArray(CaseViewField[]::new);
+            CaseViewField[] caseViewFields = tab.getTabFields().stream()
+                .filter(filterCaseTabFieldsBasedOnSecureData(caseDetails))
+                .map(buildCaseViewField(data))
+                .toArray(CaseViewField[]::new);
 
-            return new CaseViewTab(tab.getId(), tab.getLabel(), tab.getDisplayOrder(), caseViewFields, tab.getShowCondition());
+            return new CaseViewTab(tab.getId(), tab.getLabel(), tab.getDisplayOrder(), caseViewFields,
+                                   tab.getShowCondition());
 
         }).toArray(CaseViewTab[]::new);
     }

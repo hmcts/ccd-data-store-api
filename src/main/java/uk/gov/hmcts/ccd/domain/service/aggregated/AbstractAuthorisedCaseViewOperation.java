@@ -18,7 +18,8 @@ public abstract class AbstractAuthorisedCaseViewOperation {
     private final AccessControlService accessControlService;
     private final UserRepository userRepository;
 
-    AbstractAuthorisedCaseViewOperation(CaseDefinitionRepository caseDefinitionRepository, AccessControlService accessControlService,
+    AbstractAuthorisedCaseViewOperation(CaseDefinitionRepository caseDefinitionRepository,
+                                        AccessControlService accessControlService,
                                         UserRepository userRepository) {
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.accessControlService = accessControlService;
@@ -27,7 +28,8 @@ public abstract class AbstractAuthorisedCaseViewOperation {
 
     void verifyReadAccess(CaseType caseType, Set<String> userRoles) {
         if (!accessControlService.canAccessCaseTypeWithCriteria(caseType, userRoles, CAN_READ)) {
-            ResourceNotFoundException resourceNotFoundException = new ResourceNotFoundException(AccessControlService.NO_CASE_TYPE_FOUND);
+            ResourceNotFoundException resourceNotFoundException = new ResourceNotFoundException(AccessControlService
+                                                                                                   .NO_CASE_TYPE_FOUND);
             resourceNotFoundException.withDetails(NO_CASE_TYPE_FOUND_DETAILS);
             throw resourceNotFoundException;
         }

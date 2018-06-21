@@ -30,8 +30,8 @@ class ClassifiedGetEventsOperationTest {
 
     private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_TYPE_ID = "CaseTypeId";
-    private final static String CASE_REFERENCE = "999999";
-    private final static Long EVENT_ID = 100L;
+    private static final String CASE_REFERENCE = "999999";
+    private static final Long EVENT_ID = 100L;
 
     @Mock
     private GetEventsOperation getEventsOperation;
@@ -113,7 +113,8 @@ class ClassifiedGetEventsOperationTest {
     @DisplayName("should apply security classifications when jurisdiction, case type id and case event id is received")
     void shouldApplySecurityClassificationsForJurisdictionCaseTypeIdAndEventId() {
         doReturn(Optional.of(event)).when(getEventsOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
-        doReturn(classifiedEvents).when(classificationService).applyClassification(eq(JURISDICTION_ID), anyListOf(AuditEvent.class));
+        doReturn(classifiedEvents).when(classificationService)
+            .applyClassification(eq(JURISDICTION_ID), anyListOf(AuditEvent.class));
 
         Optional<AuditEvent> optionalAuditEvent = classifiedOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
 

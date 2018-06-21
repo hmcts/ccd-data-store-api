@@ -599,22 +599,22 @@ public class TestBuildersUtil {
         }
 
         public CaseTabCollectionBuilder withFieldIds(String... caseFieldIds) {
-            List<CaseTypeTab> tabs = new ArrayList<>();
             CaseTypeTab tab = new CaseTypeTab();
             List<CaseTypeTabField> tabFields = new ArrayList<>();
             asList(caseFieldIds).forEach(caseFieldId -> {
-                CaseTypeTabField tabField = new CaseTypeTabField();
                 CaseField caseField = new CaseField();
                 caseField.setId(caseFieldId);
                 FieldType fieldType = new FieldType();
                 fieldType.setType("YesOrNo");
                 caseField.setFieldType(fieldType);
+                CaseTypeTabField tabField = new CaseTypeTabField();
                 tabField.setCaseField(caseField);
                 tabField.setShowCondition(caseFieldId + "-fieldShowCondition");
                 tabFields.add(tabField);
             });
             tab.setShowCondition("tabShowCondition");
             tab.setTabFields(tabFields);
+            List<CaseTypeTab> tabs = new ArrayList<>();
             tabs.add(tab);
             caseTabCollection.setTabs(tabs);
 

@@ -19,7 +19,8 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 @Service
 @Qualifier(DefaultGetCaseHistoryViewOperation.QUALIFIER)
-public class DefaultGetCaseHistoryViewOperation extends AbstractDefaultGetCaseViewOperation implements GetCaseHistoryViewOperation {
+public class DefaultGetCaseHistoryViewOperation extends AbstractDefaultGetCaseViewOperation implements
+    GetCaseHistoryViewOperation {
 
     public static final String QUALIFIER = "default";
     private static final String EVENT_NOT_FOUND = "Event history not found";
@@ -27,10 +28,12 @@ public class DefaultGetCaseHistoryViewOperation extends AbstractDefaultGetCaseVi
     private final GetEventsOperation getEventsOperation;
 
     @Autowired
-    public DefaultGetCaseHistoryViewOperation(@Qualifier(CreatorGetCaseOperation.QUALIFIER) GetCaseOperation getCaseOperation,
-                                              @Qualifier("authorised") GetEventsOperation getEventsOperation,
-                                              UIDefinitionRepository uiDefinitionRepository, CaseTypeService caseTypeService,
-                                              UIDService uidService) {
+    public DefaultGetCaseHistoryViewOperation(
+        @Qualifier(CreatorGetCaseOperation.QUALIFIER) GetCaseOperation getCaseOperation,
+        @Qualifier("authorised") GetEventsOperation getEventsOperation,
+        UIDefinitionRepository uiDefinitionRepository, CaseTypeService caseTypeService,
+        UIDService uidService) {
+
         super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService);
         this.getEventsOperation = getEventsOperation;
     }

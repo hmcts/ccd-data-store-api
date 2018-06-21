@@ -15,15 +15,17 @@ import java.util.Set;
 
 @Service
 @Qualifier(AuthorisedGetCaseTypesOperation.QUALIFIER)
-public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOperation implements GetCaseViewOperation {
+public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOperation implements
+    GetCaseViewOperation {
 
     public static final String QUALIFIER = "authorised";
     private final GetCaseViewOperation getCaseViewOperation;
 
-    public AuthorisedGetCaseViewOperation(final @Qualifier(DefaultGetCaseViewOperation.QUALIFIER) GetCaseViewOperation getCaseViewOperation,
-                                          @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
-                                          final AccessControlService accessControlService,
-                                          final @Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository) {
+    public AuthorisedGetCaseViewOperation(
+        final @Qualifier(DefaultGetCaseViewOperation.QUALIFIER) GetCaseViewOperation getCaseViewOperation,
+        @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
+        final AccessControlService accessControlService,
+        final @Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository) {
         super(caseDefinitionRepository, accessControlService, userRepository);
         this.getCaseViewOperation = getCaseViewOperation;
     }
@@ -45,16 +47,17 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
     private CaseView filterUpsertAccess(CaseType caseType, Set<String> userRoles, CaseView caseView) {
         CaseViewTrigger[] authorisedTriggers;
         if (!getAccessControlService().canAccessCaseTypeWithCriteria(caseType,
-                                                                userRoles,
-            AccessControlService.CAN_UPDATE) || !getAccessControlService().canAccessCaseStateWithCriteria(caseView.getState().getId(),
-                                                                 caseType,
-                                                                 userRoles,
-                                                                 AccessControlService.CAN_UPDATE)) {
-            authorisedTriggers = new CaseViewTrigger[] {};
+                                                                     userRoles,
+                                                                     AccessControlService.CAN_UPDATE) ||
+            !getAccessControlService().canAccessCaseStateWithCriteria(caseView.getState().getId(),
+                                                                      caseType,
+                                                                      userRoles,
+                                                                      AccessControlService.CAN_UPDATE)) {
+            authorisedTriggers = new CaseViewTrigger[]{};
         } else {
             authorisedTriggers = getAccessControlService().filterCaseViewTriggersByCreateAccess(caseView.getTriggers(),
-                                                                               caseType.getEvents(),
-                                                                               userRoles);
+                                                                                                caseType.getEvents(),
+                                                                                                userRoles);
         }
 
         caseView.setTriggers(authorisedTriggers);

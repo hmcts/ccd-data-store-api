@@ -44,7 +44,6 @@ class DefaultGetCaseViewOperationTest {
     private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_TYPE_ID = "Grant";
     private static final String CASE_REFERENCE = "1111222233334444";
-    private static final Long EVENT_ID = 100L;
     private static final String EVENT_SUMMARY_1 = "some summary";
     private static final String EVENT_SUMMARY_2 = "Another summary";
     private static final String STATE = "Plop";
@@ -128,15 +127,21 @@ class DefaultGetCaseViewOperationTest {
         final CaseView caseView = defaultGetCaseViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
 
         assertAll(() -> verify(getEventsOperation).execute(caseDetails),
-            () -> assertThat(caseView.getTabs(), arrayWithSize(1)),
-            () -> assertThat(caseView.getTabs()[0].getFields(), arrayWithSize(2)),
-            () -> assertThat(caseView.getTabs()[0].getFields(), hasItemInArray(allOf(hasProperty("id", equalTo("dataTestField1")),
-                                                                                     hasProperty("showCondition", equalTo("dataTestField1-fieldShowCondition"))))),
-            () -> assertThat(caseView.getTabs()[0].getFields(), hasItemInArray(allOf(hasProperty("id", equalTo("dataTestField2")),
-                                                                                     hasProperty("showCondition", equalTo("dataTestField2-fieldShowCondition"))))),
-            () -> assertThat(caseView.getEvents(), arrayWithSize(2)),
-            () -> assertThat(caseView.getEvents(), hasItemInArray(hasProperty("summary", equalTo(EVENT_SUMMARY_1)))),
-            () -> assertThat(caseView.getEvents(), hasItemInArray(hasProperty("summary", equalTo(EVENT_SUMMARY_2))))
+                  () -> assertThat(caseView.getTabs(), arrayWithSize(1)),
+                  () -> assertThat(caseView.getTabs()[0].getFields(), arrayWithSize(2)),
+                  () -> assertThat(caseView.getTabs()[0].getFields(),
+                                   hasItemInArray(allOf(hasProperty("id", equalTo("dataTestField1")),
+                                                        hasProperty("showCondition",
+                                                                    equalTo("dataTestField1-fieldShowCondition"))))),
+                  () -> assertThat(caseView.getTabs()[0].getFields(),
+                                   hasItemInArray(allOf(hasProperty("id", equalTo("dataTestField2")),
+                                                        hasProperty("showCondition",
+                                                                    equalTo("dataTestField2-fieldShowCondition"))))),
+                  () -> assertThat(caseView.getEvents(), arrayWithSize(2)),
+                  () -> assertThat(caseView.getEvents(),
+                                   hasItemInArray(hasProperty("summary", equalTo(EVENT_SUMMARY_1)))),
+                  () -> assertThat(caseView.getEvents(),
+                                   hasItemInArray(hasProperty("summary", equalTo(EVENT_SUMMARY_2))))
         );
     }
 
@@ -149,11 +154,14 @@ class DefaultGetCaseViewOperationTest {
         final CaseView caseView = defaultGetCaseViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
 
         assertAll(() -> verify(getEventsOperation).execute(caseDetails),
-            () -> assertThat(caseView.getTabs()[0].getFields(), arrayWithSize(1)),
-            () -> assertThat(caseView.getTabs()[0].getFields(), hasItemInArray(hasProperty("id", equalTo("dataTestField2")))),
-            () -> assertThat(caseView.getEvents(), arrayWithSize(2)),
-            () -> assertThat(caseView.getEvents(), hasItemInArray(hasProperty("summary", equalTo(EVENT_SUMMARY_1)))),
-            () -> assertThat(caseView.getEvents(), hasItemInArray(hasProperty("summary", equalTo(EVENT_SUMMARY_2))))
+                  () -> assertThat(caseView.getTabs()[0].getFields(), arrayWithSize(1)),
+                  () -> assertThat(caseView.getTabs()[0].getFields(),
+                                   hasItemInArray(hasProperty("id", equalTo("dataTestField2")))),
+                  () -> assertThat(caseView.getEvents(), arrayWithSize(2)),
+                  () -> assertThat(caseView.getEvents(),
+                                   hasItemInArray(hasProperty("summary", equalTo(EVENT_SUMMARY_1)))),
+                  () -> assertThat(caseView.getEvents(),
+                                   hasItemInArray(hasProperty("summary", equalTo(EVENT_SUMMARY_2))))
         );
     }
 
