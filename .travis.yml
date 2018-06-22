@@ -10,10 +10,8 @@ cache:
   - "$HOME/.gradle/wrapper/"
 script:
   - "./gradlew build"
-
-before_install:
-  - sudo apt-get install jq
-  - wget -O ~/codacy-coverage-reporter-assembly-latest.jar $(curl https://api.github.com/repos/codacy/codacy-coverage-reporter/releases/latest | jq -r .assets[0].browser_download_url)
+  - "./gradlew dependencyCheckAnalyze || echo 'dependencyCheckAnalyze failed'"
+  - "./gradlew sendCoverageToCodacy || echo sendCoverageToCodacy failed"
 
 env:
   global:
@@ -21,5 +19,3 @@ env:
 
 after_success:
   - "bash <(curl -s https://codecov.io/bash) || echo 'Codecov failed to upload'"
-  - java -jar ~/codacy-coverage-reporter-assembly-latest.jar report -l Java -r build/reports/jacoco/jacocoTestReport.xml
-
