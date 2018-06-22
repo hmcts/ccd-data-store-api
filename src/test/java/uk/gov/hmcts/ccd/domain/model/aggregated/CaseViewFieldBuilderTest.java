@@ -45,6 +45,7 @@ public class CaseViewFieldBuilderTest {
         EVENT_FIELD.setDisplayContext("READONLY");
         EVENT_FIELD.setShowCondition("ShowCondition");
         EVENT_FIELD.setShowSummaryChangeOption(Boolean.TRUE);
+        EVENT_FIELD.setShowSummaryContentOption(3);
 
         EVENT_FIELD_2.setCaseFieldId("PersonLastName");
     }
@@ -73,6 +74,7 @@ public class CaseViewFieldBuilderTest {
         assertThat(field.getDisplayContext(), is(EVENT_FIELD.getDisplayContext()));
         assertThat(field.getShowCondition(), is(EVENT_FIELD.getShowCondition()));
         assertThat(field.getShowSummaryChangeOption(), is(Boolean.TRUE));
+        assertThat(field.getShowSummaryContentOption(), is(3));
     }
 
     @Test

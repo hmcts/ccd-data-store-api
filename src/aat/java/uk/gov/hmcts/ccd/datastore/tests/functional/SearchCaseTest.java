@@ -9,8 +9,8 @@ import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.BaseTest;
 import java.util.function.Supplier;
 
+@Tag("smoke")
 class SearchCaseTest extends BaseTest {
-
 
     private static final String JURISDICTION = "AUTOTEST1";
     private static final String CASE_TYPE = "AAT";
@@ -21,7 +21,7 @@ class SearchCaseTest extends BaseTest {
     @DisplayName("Search for cases")
 
 
-    public void shouldUpdateACase() {
+    void shouldUpdateACase() {
 
         Supplier<RequestSpecification> asUser = asAutoTestCaseworker();
 
