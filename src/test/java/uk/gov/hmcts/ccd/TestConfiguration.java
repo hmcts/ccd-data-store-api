@@ -25,6 +25,7 @@ import java.util.Arrays;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -56,6 +57,9 @@ class TestConfiguration extends ContextCleanupListener {
             "  },\n" +
             "  {\n" +
             "    \"type\": \"Date\"\n" +
+            "  },\n" +
+            "  {\n" +
+            "    \"type\": \"DateTime\"\n" +
             "  },\n" +
             "  {\n" +
             "    \"type\": \"FixedList\"\n" +
@@ -110,6 +114,7 @@ class TestConfiguration extends ContextCleanupListener {
         when(caseDefinitionRepository.getCaseTypesForJurisdiction(any())).thenCallRealMethod();
         when(caseDefinitionRepository.getBaseTypes()).thenReturn(Arrays.asList(fieldTypes));
         when(caseDefinitionRepository.getUserRoleClassifications(any())).thenCallRealMethod();
+        when(caseDefinitionRepository.getJurisdictions(anyList())).thenCallRealMethod();
         return caseDefinitionRepository;
     }
 

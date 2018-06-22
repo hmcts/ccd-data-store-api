@@ -201,10 +201,8 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
     private CaseDetails saveCaseDetails(final CaseDetails caseDetails,
                                         final CaseEvent eventTrigger,
                                         final Optional<String> state) {
-        if (!state.isPresent()) {
-            if (!equalsIgnoreCase(CaseState.ANY, eventTrigger.getPostState())) {
-                caseDetails.setState(eventTrigger.getPostState());
-            }
+        if (!state.isPresent() && !equalsIgnoreCase(CaseState.ANY, eventTrigger.getPostState())) {
+            caseDetails.setState(eventTrigger.getPostState());
         }
         return caseDetailsRepository.set(caseDetails);
     }
@@ -244,7 +242,7 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
         auditEvent.setStateName(caseState.getName());
         auditEvent.setCaseTypeId(caseType.getId());
         auditEvent.setCaseTypeVersion(caseType.getVersion().getNumber());
-        auditEvent.setUserId(Long.valueOf(user.getId()));
+        auditEvent.setUserId(user.getId());
         auditEvent.setUserLastName(user.getSurname());
         auditEvent.setUserFirstName(user.getForename());
         auditEvent.setCreatedDate(LocalDateTime.now(ZoneOffset.UTC));

@@ -18,6 +18,7 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.StringEndsWith.endsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static uk.gov.hmcts.ccd.domain.types.BaseTypeValidator.REGEX_GUIDANCE;
 
 public class DateValidatorTest extends BaseTest implements IVallidatorTest {
     private static final String CASE_FIELD_STRING =
@@ -217,7 +218,7 @@ public class DateValidatorTest extends BaseTest implements IVallidatorTest {
         final List<ValidationResult> result = validator.validate("TEST_FIELD_ID",
             NODE_FACTORY.textNode(validDate), caseField);
         assertEquals("RegEx validation failed", 1, result.size());
-        assertEquals("2001-12-10Z Field Type Regex Failed:InvalidRegEx", result.get(0).getErrorMessage());
+        assertEquals(REGEX_GUIDANCE, result.get(0).getErrorMessage());
         assertEquals("TEST_FIELD_ID", result.get(0).getFieldId());
     }
 
@@ -235,7 +236,7 @@ public class DateValidatorTest extends BaseTest implements IVallidatorTest {
         final List<ValidationResult> result = validator.validate("TEST_FIELD_ID",
             NODE_FACTORY.textNode("2001-12-10"), caseField);
         assertEquals("RegEx validation failed", 1, result.size());
-        assertEquals("2001-12-10 Date Type Regex Failed:InvalidRegEx", result.get(0).getErrorMessage());
+        assertEquals(REGEX_GUIDANCE, result.get(0).getErrorMessage());
         assertEquals("TEST_FIELD_ID", result.get(0).getFieldId());
     }
 

@@ -46,7 +46,7 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
     }
 
     @Override
-    public StartEventTrigger triggerStartForCaseType(Integer uid, String jurisdictionId, String caseTypeId, String eventTriggerId, Boolean ignoreWarning) {
+    public StartEventTrigger triggerStartForCaseType(String uid, String jurisdictionId, String caseTypeId, String eventTriggerId, Boolean ignoreWarning) {
         return verifyReadAccess(caseTypeId, startEventOperation.triggerStartForCaseType(uid,
                                                                                         jurisdictionId,
                                                                                         caseTypeId,
@@ -55,7 +55,7 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
     }
 
     @Override
-    public StartEventTrigger triggerStartForCase(Integer uid, String jurisdictionId, String caseTypeId, String caseReference, String eventTriggerId, Boolean ignoreWarning) {
+    public StartEventTrigger triggerStartForCase(String uid, String jurisdictionId, String caseTypeId, String caseReference, String eventTriggerId, Boolean ignoreWarning) {
         return verifyReadAccess(caseTypeId, startEventOperation.triggerStartForCase(uid,
                                                                                     jurisdictionId,
                                                                                     caseTypeId,

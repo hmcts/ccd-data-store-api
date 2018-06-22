@@ -37,7 +37,7 @@ public class CaseAuditEventEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name = "user_id")
-    private Long userId;
+    private String userId;
     @Column(name = "user_last_name")
     private String userLastName;
     @Column(name = "user_first_name")
@@ -80,11 +80,11 @@ public class CaseAuditEventEntity {
         this.id = id;
     }
 
-    public Long getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 

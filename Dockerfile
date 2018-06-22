@@ -1,6 +1,6 @@
 FROM openjdk:8-jre
 
-COPY build/libs/core-case-data-*-all.jar /app.jar
+COPY build/libs/core-case-data.jar /app.jar
 
 HEALTHCHECK --interval=10s --timeout=10s --retries=10 CMD http_proxy="" curl --silent --fail http://localhost:4452/status/health
 

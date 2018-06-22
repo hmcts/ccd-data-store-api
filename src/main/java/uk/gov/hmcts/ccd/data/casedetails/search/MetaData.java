@@ -1,11 +1,11 @@
 package uk.gov.hmcts.ccd.data.casedetails.search;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static java.util.stream.Collectors.toList;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toList;
 
 public class MetaData {
 
@@ -15,8 +15,9 @@ public class MetaData {
     public static final String LAST_MODIFIED_PARAM = "last_modified_date";
     public static final String SECURITY_CLASSIFICATION_PARAM = "security_classification";
     public static final String PAGE_PARAM = "page";
+    public static final String SORT_DIRECTION_PARAM = "sortDirection";
     private static final List<String> ALL_METADATA = newArrayList(STATE_PARAM, CASE_REFERENCE_PARAM,
-            CREATED_DATE_PARAM, LAST_MODIFIED_PARAM, SECURITY_CLASSIFICATION_PARAM, PAGE_PARAM);
+            CREATED_DATE_PARAM, LAST_MODIFIED_PARAM, SECURITY_CLASSIFICATION_PARAM, PAGE_PARAM, SORT_DIRECTION_PARAM);
 
     private String caseTypeId;
     private String jurisdiction;
@@ -26,6 +27,7 @@ public class MetaData {
     private Optional<String> lastModified = Optional.empty();
     private Optional<String> securityClassification = Optional.empty();
     private Optional<String> page = Optional.empty();
+    private Optional<String> sortDirection = Optional.empty();
 
     public MetaData(String caseTypeId, String jurisdiction) {
         this.caseTypeId = caseTypeId;
@@ -88,6 +90,14 @@ public class MetaData {
         this.page = page;
     }
 
+    public Optional<String> getSortDirection() {
+        return sortDirection;
+    }
+
+    public void setSortDirection(Optional<String> sortDirection) {
+        this.sortDirection = sortDirection;
+    }
+
     public static List<String> unknownMetadata(List<String> parameters) {
         return parameters.stream().filter(p -> !ALL_METADATA.contains(p)).collect(toList());
     }
@@ -108,7 +118,8 @@ public class MetaData {
             Objects.equals(createdDate, metaData.createdDate) &&
             Objects.equals(lastModified, metaData.lastModified) &&
             Objects.equals(securityClassification, metaData.securityClassification) &&
-            Objects.equals(page, metaData.page);
+            Objects.equals(page, metaData.page) &&
+            Objects.equals(sortDirection, metaData.sortDirection);
     }
 
     @Override
@@ -120,6 +131,7 @@ public class MetaData {
                             createdDate,
                             lastModified,
                             securityClassification,
-                            page);
+                            page,
+                            sortDirection);
     }
 }

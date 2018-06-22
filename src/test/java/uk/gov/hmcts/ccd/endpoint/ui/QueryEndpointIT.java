@@ -192,21 +192,21 @@ public class QueryEndpointIT extends WireMockBaseTest {
 
         assertNotNull(searchResultViewItems[0].getCaseId());
         assertThat(searchResultViewItems[0].getCaseFields().get("PersonFirstName"), is(nullValue()));
-        assertEquals("Parker", searchResultViewItems[0].getCaseFields().get("PersonLastName").asText());
-        assertEquals("123", searchResultViewItems[0].getCaseFields().get("PersonAddress").get("AddressLine1").asText());
-        assertEquals("Fake Street", searchResultViewItems[0].getCaseFields().get("PersonAddress").get("AddressLine2").asText());
-        assertEquals("Hexton", searchResultViewItems[0].getCaseFields().get("PersonAddress").get("AddressLine3").asText());
+        assertEquals("Pullen", searchResultViewItems[0].getCaseFields().get("PersonLastName").asText());
+        assertEquals("Governer House", searchResultViewItems[0].getCaseFields().get("PersonAddress").get("AddressLine1").asText());
+        assertEquals("1 Puddle Lane", searchResultViewItems[0].getCaseFields().get("PersonAddress").get("AddressLine2").asText());
+        assertEquals("London", searchResultViewItems[0].getCaseFields().get("PersonAddress").get("AddressLine3").asText());
         assertEquals("England", searchResultViewItems[0].getCaseFields().get("PersonAddress").get("Country").asText());
-        assertEquals("HX08 UTG", searchResultViewItems[0].getCaseFields().get("PersonAddress").get("Postcode").asText());
+        assertEquals("SE1 4EE", searchResultViewItems[0].getCaseFields().get("PersonAddress").get("Postcode").asText());
 
         assertNotNull(searchResultViewItems[1].getCaseId());
         assertThat(searchResultViewItems[1].getCaseFields().get("PersonFirstName"), is(nullValue()));
-        assertEquals("Pullen", searchResultViewItems[1].getCaseFields().get("PersonLastName").asText());
-        assertEquals("Governer House", searchResultViewItems[1].getCaseFields().get("PersonAddress").get("AddressLine1").asText());
-        assertEquals("1 Puddle Lane", searchResultViewItems[1].getCaseFields().get("PersonAddress").get("AddressLine2").asText());
-        assertEquals("London", searchResultViewItems[1].getCaseFields().get("PersonAddress").get("AddressLine3").asText());
+        assertEquals("Parker", searchResultViewItems[1].getCaseFields().get("PersonLastName").asText());
+        assertEquals("123", searchResultViewItems[1].getCaseFields().get("PersonAddress").get("AddressLine1").asText());
+        assertEquals("Fake Street", searchResultViewItems[1].getCaseFields().get("PersonAddress").get("AddressLine2").asText());
+        assertEquals("Hexton", searchResultViewItems[1].getCaseFields().get("PersonAddress").get("AddressLine3").asText());
         assertEquals("England", searchResultViewItems[1].getCaseFields().get("PersonAddress").get("Country").asText());
-        assertEquals("SE1 4EE", searchResultViewItems[1].getCaseFields().get("PersonAddress").get("Postcode").asText());
+        assertEquals("HX08 UTG", searchResultViewItems[1].getCaseFields().get("PersonAddress").get("Postcode").asText());
     }
 
     @Test
@@ -707,7 +707,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Event Name", "GRACIOUS", event.getEventName());
         assertEquals("Current case state id", "state4", event.getStateId());
         assertEquals("Current case state name", "Case in state 4", event.getStateName());
-        assertEquals("User ID", Long.valueOf(0), event.getUserId());
+        assertEquals("User ID", "0", event.getUserId());
         assertEquals("User First name", "Justin", event.getUserFirstName());
         assertEquals("User Last name", "Smith", event.getUserLastName());
         assertEquals("Summary", "The summary 2", event.getSummary());
@@ -720,7 +720,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Event Name", "TEST TRIGGER_EVENT NAME", event2.getEventName());
         assertEquals("Current case state id", "CaseCreated", event2.getStateId());
         assertEquals("Current case state name", "Created a case", event2.getStateName());
-        assertEquals("User ID", Long.valueOf(0), event2.getUserId());
+        assertEquals("User ID", "0", event2.getUserId());
         assertEquals("User First name", "Justin", event2.getUserFirstName());
         assertEquals("User Last name", "Smith", event2.getUserLastName());
         assertEquals("Summary", "The summary", event2.getSummary());
@@ -788,7 +788,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Event Name", "GRACIOUS", event.getEventName());
         assertEquals("Current case state id", "state4", event.getStateId());
         assertEquals("Current case state name", "Case in state 4", event.getStateName());
-        assertEquals("User ID", Long.valueOf(0), event.getUserId());
+        assertEquals("User ID", "0", event.getUserId());
         assertEquals("User First name", "Justin", event.getUserFirstName());
         assertEquals("User Last name", "Smith", event.getUserLastName());
         assertEquals("Summary", "The summary 2", event.getSummary());
@@ -998,6 +998,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertThat("Unexpected Case ID", eventTrigger.getCaseId(), is(nullValue()));
         assertEquals("Unexpected Event ID", "NO_PRE_STATES_EVENT", eventTrigger.getId());
         assertEquals("Unexpected Event Name", "NO PRE STATES EVENT", eventTrigger.getName());
+        assertEquals("Unexpected Event Show Event Notes", true, eventTrigger.getShowEventNotes());
         assertEquals("Unexpected Event Description", "Test event for null pre-states", eventTrigger.getDescription());
         assertEquals("Unexpected Case Fields", 2, eventTrigger.getCaseFields().size());
 
@@ -1060,6 +1061,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected Case Reference", "1504259907353545", eventTrigger.getCaseId());
         assertEquals("Unexpected Event ID", "HAS_PRE_STATES_EVENT", eventTrigger.getId());
         assertEquals("Unexpected Event Name", "HAS PRE STATES EVENT", eventTrigger.getName());
+        assertEquals("Unexpected Show Event Notes", false, eventTrigger.getShowEventNotes());
         assertEquals("Unexpected Event Description", "Test event for non null pre-states", eventTrigger
             .getDescription());
         assertEquals("Unexpected Case Fields", 2, eventTrigger.getCaseFields().size());
@@ -1072,6 +1074,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertThat(field1.getFieldType().getType(), equalTo("Text"));
         assertThat(field1.getId(), equalTo("PersonFirstName"));
         assertThat(field1.getDisplayContext(), equalTo("READONLY"));
+        assertThat(field1.getShowSummaryContentOption(), equalTo(2));
 
         final CaseViewField field2 = eventTrigger.getCaseFields().get(1);
         assertThat(field2.getValue(), equalTo(JSON_NODE_FACTORY.textNode("Roof")));
@@ -1081,6 +1084,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertThat(field2.getFieldType().getType(), equalTo("Text"));
         assertThat(field2.getId(), equalTo("PersonLastName"));
         assertThat(field2.getDisplayContext(), equalTo("OPTIONAL"));
+        assertThat(field2.getShowSummaryContentOption(), equalTo(1));
     }
 
     @Test

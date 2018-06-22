@@ -21,6 +21,10 @@ variable "subscription" {
   type    = "string"
 }
 
+variable "capacity" {
+  default = "1"
+}
+
 variable "tenant_id" {
   description = "(Required) The Azure Active Directory tenant ID that should be used for authenticating requests to the key vault. This is usually sourced from environemnt variables and not normally required to be specified."
 }
@@ -34,26 +38,34 @@ variable "jenkins_AAD_objectId" {
   description                 = "(Required) The Azure AD object ID of a user, service principal or security group in the Azure Active Directory tenant for the vault. The object ID must be unique for the list of access policies."
 }
 
-variable "database-name" {
-  type    = "string"
-  default = "ccd_data"
-}
-
 variable "vault_section" {
   default = "test"
 }
 
-variable "idam_api_url" {
-  default = "http://betaDevBccidamAppLB.reform.hmcts.net"
+////////////////////////////////
+// Database
+////////////////////////////////
+
+variable "postgresql_user" {
+  default = "ccd"
 }
 
-variable "s2s_url" {
-  default = "http://betaDevBccidamS2SLB.reform.hmcts.net"
+variable "database_name" {
+  default = "ccd_data_store"
+}
+
+variable "use_uk_db" {
+  type = "string"
+  default = "false"
 }
 
 variable "authorised-services" {
   type    = "string"
-  default = "ccd_data,ccd_gw,ccd_ps,probate_backend,divorce_ccd_submission,sscs,cmc,cmc_claim_store"
+  default = "ccd_data,ccd_gw,ccd_ps,probate_backend,divorce_ccd_submission,sscs,cmc,cmc_claim_store,jui_webapp,pui_webapp"
+}
+
+variable "idam_api_url" {
+  default = "http://betaDevBccidamAppLB.reform.hmcts.net"
 }
 
 variable "document_management_valid_domain" {
@@ -64,4 +76,10 @@ variable "document_management_valid_domain" {
 variable "default_print_url" {
   type = "string"
   default = ""
+}
+
+variable "frontend_url" {
+  type = "string"
+  default = ""
+  description = "Optional front end URL to use for building redirect URI"
 }

@@ -10,13 +10,16 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class SQLBuilderForSearchTest {
 
@@ -92,4 +95,31 @@ public class SQLBuilderForSearchTest {
         verify(result, times(1)).setParameter(1, TEST_CASE_TYPE_VALUE);
     }
 
+    @Test
+    public void searchFactorysqlGeneratedTestFromMetaandFieldSortDescending() {
+        MetaData metadata = new MetaData(TEST_CASE_TYPE_VALUE, null);
+        metadata.setSortDirection(Optional.of("desc"));
+        params.put(TEST_FIELD_NAME, TEST_FIELD_VALUE);
+        when(em.createNativeQuery(any(String.class), any(Class.class)))
+            .thenReturn(mockQuery);
+        Query result = subject.build(metadata, params, false);
+        verify(em, times(1)).createNativeQuery("SELECT * FROM case_data WHERE TRIM( UPPER ( data #>> '{name}')) = TRIM( UPPER ( ?0)) AND case_type_id = ?1 ORDER BY created_date DESC",
+            CaseDetailsEntity.class);
+        verify(result, times(1)).setParameter(0, TEST_FIELD_VALUE);
+        verify(result, times(1)).setParameter(1, TEST_CASE_TYPE_VALUE);
+    }
+
+    @Test
+    public void searchFactorysqlGeneratedTestFromMetaandFieldSortDescendingIgnoresCase() {
+        MetaData metadata = new MetaData(TEST_CASE_TYPE_VALUE, null);
+        metadata.setSortDirection(Optional.of("DESC"));
+        params.put(TEST_FIELD_NAME, TEST_FIELD_VALUE);
+        when(em.createNativeQuery(any(String.class), any(Class.class)))
+            .thenReturn(mockQuery);
+        Query result = subject.build(metadata, params, false);
+        verify(em, times(1)).createNativeQuery("SELECT * FROM case_data WHERE TRIM( UPPER ( data #>> '{name}')) = TRIM( UPPER ( ?0)) AND case_type_id = ?1 ORDER BY created_date DESC",
+            CaseDetailsEntity.class);
+        verify(result, times(1)).setParameter(0, TEST_FIELD_VALUE);
+        verify(result, times(1)).setParameter(1, TEST_CASE_TYPE_VALUE);
+    }
 }
