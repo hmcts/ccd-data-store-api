@@ -10,3 +10,4 @@ cache:
   - "$HOME/.gradle/wrapper/"
 script:
 - "./gradlew build"
+- "./gradlew dependencyCheckAnalyze || echo 'dependencyCheckAnalyze failed'"
