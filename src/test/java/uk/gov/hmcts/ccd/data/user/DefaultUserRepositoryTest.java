@@ -10,7 +10,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
@@ -34,6 +33,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 class DefaultUserRepositoryTest {
@@ -159,7 +159,7 @@ class DefaultUserRepositoryTest {
 
     @Test
     void getUserDefaultSettingsShouldReturnServiceExceptionWhenMessageIsNull() {
-        Assertions.assertThrows(ServiceException.class, ()-> {
+        assertThrows(ServiceException.class, () -> {
             HttpClientErrorException response = createErrorResponse(HttpStatus.BAD_GATEWAY, null);
             doThrow(response).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class), anyMap());
 
@@ -169,7 +169,7 @@ class DefaultUserRepositoryTest {
 
     @Test
     void getUserDefaultSettingsShouldReturnResourceNotFoundExceptionWhen404() {
-        Assertions.assertThrows(ResourceNotFoundException.class, ()-> {
+        assertThrows(ResourceNotFoundException.class, () -> {
             HttpClientErrorException response = createErrorResponse(HttpStatus.NOT_FOUND, "some message");
             doThrow(response).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class), anyMap());
 
@@ -179,7 +179,7 @@ class DefaultUserRepositoryTest {
 
     @Test
     void getUserDefaultSettingsShouldReturnBadRequestWhenNot404() {
-        Assertions.assertThrows(BadRequestException.class, ()-> {
+        assertThrows(BadRequestException.class, () -> {
             HttpClientErrorException response = createErrorResponse(HttpStatus.BAD_GATEWAY, "some message");
             doThrow(response).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class), anyMap());
 
