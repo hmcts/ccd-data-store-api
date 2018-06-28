@@ -22,6 +22,15 @@ public class ApplicationParams {
     @Value("${ccd.case-definition.host}")
     private String caseDefinitionHost;
 
+    @Value("${ccd.draft.host}")
+    private String draftHost;
+
+    @Value("${ccd.draft.encryptionKey}")
+    private String draftEncryptionKey;
+
+    @Value("${ccd.draft.maxStaleDays}")
+    private Integer draftMaxStaleDays;
+
     @Value("${ccd.ui-definition.host}")
     private String uiDefinitionHost;
 
@@ -81,6 +90,22 @@ public class ApplicationParams {
 
     public String caseTypeDefURL(final String caseTypeId) {
         return caseDefinitionHost + "/api/data/case-type/" + encode(caseTypeId);
+    }
+
+    public String draftBaseURL() {
+        return draftHost + "/drafts";
+    }
+
+    public String draftURL(String draftId) {
+        return draftHost + "/drafts/" + draftId;
+    }
+
+    public String getDraftEncryptionKey() {
+        return draftEncryptionKey;
+    }
+
+    public Integer getDraftMaxStaleDays() {
+        return draftMaxStaleDays;
     }
 
     public String caseTypeLatestVersionUrl(String caseTypeId) {

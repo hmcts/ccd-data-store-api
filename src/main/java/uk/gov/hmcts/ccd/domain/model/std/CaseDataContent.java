@@ -2,9 +2,11 @@ package uk.gov.hmcts.ccd.domain.model.std;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.ToString;
 
 import java.util.Map;
 
+@ToString
 public class CaseDataContent {
     private Event event;
     private Map<String, JsonNode> data;
@@ -14,6 +16,9 @@ public class CaseDataContent {
     private String token;
     @JsonProperty("ignore_warning")
     private Boolean ignoreWarning;
+
+    public CaseDataContent() {
+    }
 
     public Event getEvent() {
         return event;

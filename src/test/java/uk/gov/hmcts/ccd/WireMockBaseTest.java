@@ -45,5 +45,6 @@ public abstract class WireMockBaseTest extends BaseTest {
         ReflectionTestUtils.setField(applicationParams, "uiDefinitionHost", hostUrl);
         ReflectionTestUtils.setField(applicationParams, "idamHost", hostUrl);
         ReflectionTestUtils.setField(applicationParams, "userProfileHost", hostUrl);
+        ReflectionTestUtils.setField(applicationParams, "draftHost", hostUrl);
     }
 }
