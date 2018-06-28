@@ -45,11 +45,12 @@ public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
 
         assertAll(
             "Assert All of these",
-            () -> assertThat(baseTypes, IsCollectionWithSize.hasSize(14)),
+            () -> assertThat(baseTypes, IsCollectionWithSize.hasSize(15)),
             () -> assertThat(baseTypes, hasItem(hasProperty("type", is("Text")))),
             () -> assertThat(baseTypes, hasItem(hasProperty("type", is("Number")))),
             () -> assertThat(baseTypes, hasItem(hasProperty("type", is("Email")))),
             () -> assertThat(baseTypes, hasItem(hasProperty("type", is("YesOrNo")))),
+            () -> assertThat(baseTypes, hasItem(hasProperty("type", is("Date")))),
             () -> assertThat(baseTypes, hasItem(hasProperty("type", is("Date")))),
             () -> assertThat(baseTypes, hasItem(hasProperty("type", is("FixedList")))),
             () -> assertThat(baseTypes, hasItem(hasProperty("type", is("PostCode")))),
