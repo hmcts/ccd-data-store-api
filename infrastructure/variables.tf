@@ -54,11 +54,6 @@ variable "database_name" {
   default = "ccd_data_store"
 }
 
-variable "use_uk_db" {
-  type = "string"
-  default = "false"
-}
-
 variable "authorised-services" {
   type    = "string"
   default = "ccd_data,ccd_gw,ccd_ps,probate_backend,divorce_ccd_submission,sscs,cmc,cmc_claim_store,jui_webapp,pui_webapp"
