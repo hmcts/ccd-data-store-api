@@ -29,7 +29,7 @@ public class DraftsEndpoint {
         value = "Save draft as a caseworker."
     )
     @ApiResponses(value = {
-        @ApiResponse(code = 201, message = "Case created"),
+        @ApiResponse(code = 201, message = "Draft created"),
         @ApiResponse(code = 400, message = "Bad request")
     })
     public Draft saveDraftForCaseWorker(
