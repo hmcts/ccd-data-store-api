@@ -24,7 +24,7 @@ public class CaseEventTrigger {
     @JsonProperty("end_button_label")
     private String endButtonLabel;
     @JsonProperty("can_save_draft")
-    private String canSaveDraft;
+    private Boolean canSaveDraft;
 
     public String getId() {
         return id;
@@ -106,11 +106,11 @@ public class CaseEventTrigger {
         this.endButtonLabel = endButtonLabel;
     }
 
-    public String getCanSaveDraft() {
+    public Boolean getCanSaveDraft() {
         return canSaveDraft;
     }
 
-    public void setCanSaveDraft(String canSaveDraft) {
+    public void setCanSaveDraft(Boolean canSaveDraft) {
         this.canSaveDraft = canSaveDraft;
     }
 }
