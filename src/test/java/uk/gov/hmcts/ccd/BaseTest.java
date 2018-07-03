@@ -26,6 +26,8 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.HttpUIDefinitionGateway;
+import uk.gov.hmcts.ccd.data.draft.DefaultDraftRepository;
+import uk.gov.hmcts.ccd.data.draft.DraftRepository;
 import uk.gov.hmcts.ccd.data.user.DefaultUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
@@ -84,6 +86,9 @@ public abstract class BaseTest {
     @Qualifier(DefaultUserRepository.QUALIFIER)
     private UserRepository userRepository;
     @Inject
+    @Qualifier(DefaultDraftRepository.QUALIFIER)
+    private DraftRepository draftRepository;
+    @Inject
     private CallbackService callbackService;
     @Inject
     private EventTokenService eventTokenService;
@@ -102,6 +107,7 @@ public abstract class BaseTest {
         ReflectionTestUtils.setField(userRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(callbackService, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(documentManagementRestClient, "securityUtils", securityUtils);
+        ReflectionTestUtils.setField(draftRepository, "securityUtils", securityUtils);
 
         setupUIDService();
     }

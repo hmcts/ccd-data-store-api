@@ -8,6 +8,9 @@ public class Draft {
     private Long id;
 
     public Draft() {
+    /*
+        Jackson required
+     */
     }
 
     public Long getId() {
