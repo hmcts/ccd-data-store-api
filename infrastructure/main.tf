@@ -87,7 +87,7 @@ module "ccd-data-store-api" {
 }
 
 module "data-store-db" {
-  source = "git@github.com:hmcts/moj-module-postgres?ref=cnp-449-tactical"
+  source = "git@github.com:hmcts/moj-module-postgres?ref=master"
   product = "${local.app_full_name}-postgres-db"
   location = "${var.location}"
   env = "${var.env}"
