@@ -6,7 +6,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.data.draft.DraftRepository;
+import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.draft.*;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 
@@ -32,7 +32,7 @@ class DefaultUpsertDraftOperationTest {
     private ApplicationParams applicationParams;
 
     @Mock
-    private DraftRepository draftRepository;
+    private DraftGateway draftGateway;
 
     private UpsertDraftOperation upsertDraftOperation;
 
@@ -45,7 +45,7 @@ class DefaultUpsertDraftOperationTest {
         MockitoAnnotations.initMocks(this);
         when(applicationParams.getDraftMaxStaleDays()).thenReturn(DRAFT_MAX_STALE_DAYS);
 
-        upsertDraftOperation = new DefaultUpsertDraftOperation(draftRepository, applicationParams);
+        upsertDraftOperation = new DefaultUpsertDraftOperation(draftGateway, applicationParams);
     }
 
     @Test
@@ -58,13 +58,13 @@ class DefaultUpsertDraftOperationTest {
             .withCaseDataContent(caseDataContent)
             .build();
         final ArgumentCaptor<CreateCaseDataContentDraft> argument = ArgumentCaptor.forClass(CreateCaseDataContentDraft.class);
-        doReturn(draft).when(draftRepository).save(any(CreateCaseDataContentDraft.class));
+        doReturn(draft).when(draftGateway).save(any(CreateCaseDataContentDraft.class));
 
 
         Draft result = upsertDraftOperation.saveDraft(UID, JID, CTID, ETID, caseDataContent);
 
         assertAll(
-            () ->  verify(draftRepository).save(argument.capture()),
+            () ->  verify(draftGateway).save(argument.capture()),
             () ->  assertThat(argument.getValue().document, hasProperty("userId", is(caseDataContentDraft.getUserId()))),
             () ->  assertThat(argument.getValue().document, hasProperty("jurisdictionId", is(caseDataContentDraft.getJurisdictionId()))),
             () ->  assertThat(argument.getValue().document, hasProperty("caseTypeId", is(caseDataContentDraft.getCaseTypeId()))),
@@ -87,13 +87,13 @@ class DefaultUpsertDraftOperationTest {
             .build();
         final ArgumentCaptor<String> draftIdCaptor = ArgumentCaptor.forClass(String.class);
         final ArgumentCaptor<UpdateCaseDataContentDraft> caseDataContentCaptor = ArgumentCaptor.forClass(UpdateCaseDataContentDraft.class);
-        doReturn(draft).when(draftRepository).update(any(UpdateCaseDataContentDraft.class), any(String.class));
+        doReturn(draft).when(draftGateway).update(any(UpdateCaseDataContentDraft.class), any(String.class));
 
 
         Draft result = upsertDraftOperation.updateDraft(UID, JID, CTID, ETID, DID, caseDataContent);
 
         assertAll(
-            () ->  verify(draftRepository).update(caseDataContentCaptor.capture(), draftIdCaptor.capture()),
+            () ->  verify(draftGateway).update(caseDataContentCaptor.capture(), draftIdCaptor.capture()),
             () ->  assertThat(draftIdCaptor.getValue(), is("5")),
             () ->  assertThat(caseDataContentCaptor.getValue().document, hasProperty("userId", is(caseDataContentDraft.getUserId()))),
             () ->  assertThat(caseDataContentCaptor.getValue().document, hasProperty("jurisdictionId", is(caseDataContentDraft.getJurisdictionId()))),

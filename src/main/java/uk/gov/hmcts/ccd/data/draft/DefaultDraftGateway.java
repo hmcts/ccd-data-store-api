@@ -22,11 +22,11 @@ import javax.inject.Singleton;
 
 
 @Named
-@Qualifier(DefaultDraftRepository.QUALIFIER)
+@Qualifier(DefaultDraftGateway.QUALIFIER)
 @Singleton
-public class DefaultDraftRepository implements DraftRepository {
+public class DefaultDraftGateway implements DraftGateway {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultDraftRepository.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultDraftGateway.class);
     public static final String QUALIFIER = "default";
     private static final String DRAFT_ENCRYPTION_KEY_HEADER = "Secret";
     private static final int RESOURCE_NOT_FOUND = 404;
@@ -36,7 +36,7 @@ public class DefaultDraftRepository implements DraftRepository {
     private final ApplicationParams applicationParams;
 
     @Inject
-    public DefaultDraftRepository(
+    public DefaultDraftGateway(
             final RestTemplate restTemplate,
             final SecurityUtils securityUtils,
             final ApplicationParams applicationParams) {
