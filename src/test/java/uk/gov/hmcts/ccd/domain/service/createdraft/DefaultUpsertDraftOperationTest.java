@@ -7,11 +7,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.draft.DraftRepository;
-import uk.gov.hmcts.ccd.domain.model.draft.CaseDataContentDraft;
-import uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDataContentDraft;
+import uk.gov.hmcts.ccd.domain.model.draft.*;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
-import uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDataContentDraft;
-import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 
 import java.net.URISyntaxException;
 
@@ -20,6 +17,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.ccd.domain.model.draft.CaseDraftBuilder.aCaseDraft;
 import static uk.gov.hmcts.ccd.domain.service.createdraft.DefaultUpsertDraftOperation.CASE_DATA_CONTENT;
 
 class DefaultUpsertDraftOperationTest {
@@ -52,7 +50,13 @@ class DefaultUpsertDraftOperationTest {
 
     @Test
     void shouldSuccessfullySaveDraft() throws URISyntaxException {
-        caseDataContentDraft = new CaseDataContentDraft(UID, JID, CTID, ETID, caseDataContent);
+        caseDataContentDraft = aCaseDraft()
+            .withUserId(UID)
+            .withJurisdictionId(JID)
+            .withCaseTypeId(CTID)
+            .withEventTriggerId(ETID)
+            .withCaseDataContent(caseDataContent)
+            .build();
         final ArgumentCaptor<CreateCaseDataContentDraft> argument = ArgumentCaptor.forClass(CreateCaseDataContentDraft.class);
         doReturn(draft).when(draftRepository).save(any(CreateCaseDataContentDraft.class));
 
@@ -74,7 +78,13 @@ class DefaultUpsertDraftOperationTest {
 
     @Test
     void shouldSuccessfullyUpdateDraft() throws URISyntaxException {
-        caseDataContentDraft = new CaseDataContentDraft(UID, JID, CTID, ETID, caseDataContent);
+        caseDataContentDraft = new CaseDraftBuilder()
+            .withUserId(UID)
+            .withJurisdictionId(JID)
+            .withCaseTypeId(CTID)
+            .withEventTriggerId(ETID)
+            .withCaseDataContent(caseDataContent)
+            .build();
         final ArgumentCaptor<String> draftIdCaptor = ArgumentCaptor.forClass(String.class);
         final ArgumentCaptor<UpdateCaseDataContentDraft> caseDataContentCaptor = ArgumentCaptor.forClass(UpdateCaseDataContentDraft.class);
         doReturn(draft).when(draftRepository).update(any(UpdateCaseDataContentDraft.class), any(String.class));

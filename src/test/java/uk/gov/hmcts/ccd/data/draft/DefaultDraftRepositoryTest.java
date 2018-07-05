@@ -8,13 +8,9 @@ import org.springframework.http.*;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.BaseTest;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
-import uk.gov.hmcts.ccd.domain.model.draft.CaseDataContentDraft;
-import uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDataContentDraft;
+import uk.gov.hmcts.ccd.domain.model.draft.*;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
-import uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDataContentDraft;
-import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import java.net.URI;
@@ -29,6 +25,8 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDataContentDraftBuilder.aCreateCaseDraftBuilder;
+import static uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDataContentDraftBuilder.anUpdateCaseDraftBuilder;
 
 class DefaultDraftRepositoryTest {
 
@@ -67,9 +65,17 @@ class DefaultDraftRepositoryTest {
         when(applicationParams.draftURL(DID)).thenReturn(draftURL5);
         when(applicationParams.getDraftMaxStaleDays()).thenReturn(7);
 
-        caseDataContentDraft = new CaseDataContentDraft(UID, JID, CTID, ETID, caseDataContent);
-        createCaseDataContentDraft =  new CreateCaseDataContentDraft(caseDataContentDraft, CASE_DATA_CONTENT, applicationParams.getDraftMaxStaleDays());
-        updateCaseDataContentDraft =  new UpdateCaseDataContentDraft(caseDataContentDraft, CASE_DATA_CONTENT);
+        caseDataContentDraft = new CaseDraftBuilder().withUserId(UID).withJurisdictionId(JID).withCaseTypeId(CTID).withEventTriggerId(ETID).withCaseDataContent(
+            caseDataContent).build();
+        createCaseDataContentDraft = aCreateCaseDraftBuilder()
+            .withDocument(caseDataContentDraft)
+            .withType(CASE_DATA_CONTENT)
+            .withMaxStaleDays(applicationParams.getDraftMaxStaleDays())
+            .build();
+        updateCaseDataContentDraft = anUpdateCaseDraftBuilder()
+            .withDocument(caseDataContentDraft)
+            .withType(CASE_DATA_CONTENT)
+            .build();
         draftRepository = new DefaultDraftRepository(restTemplate, securityUtils, applicationParams);
     }
 
@@ -81,8 +87,8 @@ class DefaultDraftRepositoryTest {
         Draft result = draftRepository.save(createCaseDataContentDraft);
 
         assertAll(
-            () ->  verify(restTemplate).exchange(eq(draftBaseURL), eq(HttpMethod.POST), any(RequestEntity.class), eq(HttpEntity.class)),
-            () ->  assertThat(result, hasProperty("id", is(4L)))
+            () -> verify(restTemplate).exchange(eq(draftBaseURL), eq(HttpMethod.POST), any(RequestEntity.class), eq(HttpEntity.class)),
+            () -> assertThat(result, hasProperty("id", is(4L)))
         );
     }
 
@@ -102,8 +108,8 @@ class DefaultDraftRepositoryTest {
         Draft result = draftRepository.update(updateCaseDataContentDraft, DID);
 
         assertAll(
-            () ->  verify(restTemplate).exchange(eq(draftURL5), eq(HttpMethod.PUT), any(RequestEntity.class), eq(HttpEntity.class)),
-            () ->  assertThat(result, hasProperty("id", is(Long.valueOf(DID))))
+            () -> verify(restTemplate).exchange(eq(draftURL5), eq(HttpMethod.PUT), any(RequestEntity.class), eq(HttpEntity.class)),
+            () -> assertThat(result, hasProperty("id", is(Long.valueOf(DID))))
         );
     }
 

@@ -5,13 +5,14 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.draft.DefaultDraftRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftRepository;
-import uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDataContentDraft;
+import uk.gov.hmcts.ccd.domain.model.draft.*;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
-import uk.gov.hmcts.ccd.domain.model.draft.CaseDataContentDraft;
-import uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDataContentDraft;
-import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 
 import javax.inject.Inject;
+
+import static uk.gov.hmcts.ccd.domain.model.draft.CaseDraftBuilder.aCaseDraft;
+import static uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDataContentDraftBuilder.aCreateCaseDraftBuilder;
+import static uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDataContentDraftBuilder.anUpdateCaseDraftBuilder;
 
 @Service
 @Qualifier("default")
@@ -35,9 +36,7 @@ public class DefaultUpsertDraftOperation implements UpsertDraftOperation {
                            final String caseTypeId,
                            final String eventTriggerId,
                            final CaseDataContent caseDataContent) {
-        CaseDataContentDraft caseDataContentDraft = buildCaseDataContentDraft(uid, jurisdictionId, caseTypeId, eventTriggerId, caseDataContent);
-        CreateCaseDataContentDraft createCaseDataContentDraft = new CreateCaseDataContentDraft(caseDataContentDraft, CASE_DATA_CONTENT, applicationParams.getDraftMaxStaleDays());
-        return draftRepository.save(createCaseDataContentDraft);
+        return draftRepository.save(buildCreateCaseDraft(uid, jurisdictionId, caseTypeId, eventTriggerId, caseDataContent));
     }
 
     @Override
@@ -47,13 +46,35 @@ public class DefaultUpsertDraftOperation implements UpsertDraftOperation {
                              final String eventTriggerId,
                              final String draftId,
                              final CaseDataContent caseDataContent) {
-        CaseDataContentDraft caseDataContentDraft = buildCaseDataContentDraft(uid, jurisdictionId, caseTypeId, eventTriggerId, caseDataContent);
-        UpdateCaseDataContentDraft updateCaseDataContentDraft = new UpdateCaseDataContentDraft(caseDataContentDraft, CASE_DATA_CONTENT);
-        return draftRepository.update(updateCaseDataContentDraft, draftId);
+        return draftRepository.update(buildUpdateCaseDraft(uid, jurisdictionId, caseTypeId, eventTriggerId, caseDataContent),
+                                      draftId);
     }
 
-    private CaseDataContentDraft buildCaseDataContentDraft(String uid, String jurisdictionId, String caseTypeId, String eventTriggerId, CaseDataContent caseDataContent) {
-        return new CaseDataContentDraft(uid, jurisdictionId, caseTypeId, eventTriggerId, caseDataContent);
+    private CreateCaseDataContentDraft buildCreateCaseDraft(String uid, String jurisdictionId, String caseTypeId, String eventTriggerId, CaseDataContent caseDataContent) {
+        return aCreateCaseDraftBuilder()
+            .withDocument(aCaseDraft()
+                              .withUserId(uid)
+                              .withJurisdictionId(jurisdictionId)
+                              .withCaseTypeId(caseTypeId)
+                              .withEventTriggerId(eventTriggerId)
+                              .withCaseDataContent(caseDataContent)
+                              .build())
+            .withType(CASE_DATA_CONTENT)
+            .withMaxStaleDays(applicationParams.getDraftMaxStaleDays())
+            .build();
+    }
+
+    private UpdateCaseDataContentDraft buildUpdateCaseDraft(String uid, String jurisdictionId, String caseTypeId, String eventTriggerId, CaseDataContent caseDataContent) {
+        return anUpdateCaseDraftBuilder()
+            .withDocument(aCaseDraft()
+                              .withUserId(uid)
+                              .withJurisdictionId(jurisdictionId)
+                              .withCaseTypeId(caseTypeId)
+                              .withEventTriggerId(eventTriggerId)
+                              .withCaseDataContent(caseDataContent)
+                              .build())
+            .withType(CASE_DATA_CONTENT)
+            .build();
     }
 
 }

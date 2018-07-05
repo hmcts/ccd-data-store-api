@@ -92,6 +92,7 @@ public class DefaultDraftRepository implements DraftRepository {
     }
 
     private Long getId(HttpHeaders responseHeaders) {
-        return Long.valueOf(responseHeaders.getLocation().getRawPath().split("/")[2]);
+        String path = responseHeaders.getLocation().getPath();
+        return Long.valueOf(path.substring(path.lastIndexOf("/") + 1));
     }
 }
