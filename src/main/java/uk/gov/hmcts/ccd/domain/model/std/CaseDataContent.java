@@ -18,6 +18,9 @@ public class CaseDataContent {
     private Boolean ignoreWarning;
 
     public CaseDataContent() {
+    /*
+        Jackson required
+     */
     }
 
     public Event getEvent() {

@@ -25,7 +25,7 @@ public class CreateCaseDataContentDraft {
     public CreateCaseDataContentDraft(
         @JsonProperty("document") CaseDataContentDraft document,
         @JsonProperty("type") String type,
-        @JsonProperty("max_age") Integer maxStaleDays
+        @JsonProperty("max_stale_days") Integer maxStaleDays
     ) {
         this.document = document;
         this.type = type;
