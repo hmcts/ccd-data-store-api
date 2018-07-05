@@ -60,6 +60,7 @@ module "ccd-data-store-api" {
   ilbIp = "${var.ilbIp}"
   subscription = "${var.subscription}"
   is_frontend = false
+  common_tags  = "${var.common_tags}"
 
   app_settings = {
     DATA_STORE_DB_HOST = "${module.data-store-db.host_name}"
@@ -96,6 +97,7 @@ module "data-store-db" {
   sku_name = "GP_Gen5_2"
   sku_tier = "GeneralPurpose"
   storage_mb = "51200"
+  common_tags  = "${var.common_tags}"
 }
 
 module "ccd-data-store-vault" {
