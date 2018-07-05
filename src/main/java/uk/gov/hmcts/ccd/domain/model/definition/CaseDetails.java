@@ -181,8 +181,11 @@ public class CaseDetails implements Cloneable {
     }
 
     public boolean existsInData(CaseTypeTabField caseTypeTabField) {
-        return isFieldWithNoValue(caseTypeTabField)
-            || data.keySet().contains(caseTypeTabField.getCaseField().getId());
+        return isFieldWithNoValue(caseTypeTabField) || hasDataForTabField(caseTypeTabField);
+    }
+
+    private boolean hasDataForTabField(CaseTypeTabField caseTypeTabField) {
+        return data.keySet().contains(caseTypeTabField.getCaseField().getId());
     }
 
     private boolean isFieldWithNoValue(CaseTypeTabField caseTypeTabField) {
