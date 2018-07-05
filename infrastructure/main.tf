@@ -52,6 +52,17 @@ data "vault_generic_secret" "gateway_oauth2_client_secret" {
   path = "secret/${var.vault_section}/ccidam/idam-api/oauth2/client-secrets/ccd-gateway"
 }
 
+resource "random_string" "draft_encryption_key" {
+  length  = 16
+  special = true
+  upper   = true
+  lower   = true
+  number  = true
+  lifecycle {
+    ignore_changes = ["*"]
+  }
+}
+
 module "ccd-data-store-api" {
   source   = "git@github.com:hmcts/moj-module-webapp?ref=master"
   product  = "${local.app_full_name}"
@@ -78,6 +89,8 @@ module "ccd-data-store-api" {
     IDAM_USER_URL                       = "${var.idam_api_url}"
     IDAM_S2S_URL                        = "${local.s2s_url}"
     DATA_STORE_IDAM_KEY                 = "${data.vault_generic_secret.ccd_data_s2s_key.data["value"]}"
+
+    CCD_DRAFT_ENCRYPTION_KEY            = "${random_string.draft_encryption_key.result}"
 
     DATA_STORE_S2S_AUTHORISED_SERVICES  = "${var.authorised-services}"
 
@@ -152,5 +165,11 @@ resource "azurerm_key_vault_secret" "gw_s2s_key" {
 resource "azurerm_key_vault_secret" "gw_oauth2_secret" {
   name = "gatewayOAuth2ClientSecret"
   value = "${data.vault_generic_secret.gateway_oauth2_client_secret.data["value"]}"
+  vault_uri = "${module.ccd-data-store-vault.key_vault_uri}"
+}
+
+resource "azurerm_key_vault_secret" "ccd_draft_encryption_key" {
+  name = "draftStoreEncryptionSecret"
+  value = "${random_string.draft_encryption_key.result}"
   vault_uri = "${module.ccd-data-store-vault.key_vault_uri}"
 }
