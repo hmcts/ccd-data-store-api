@@ -8,7 +8,7 @@ Installation on MacOS: `brew install swagger-codegen`
 
 #### Pre-requisite
 
-`case-data-store-app` application must be running locally.
+`ccd-data-store-api` application must be running locally.
 
 #### Generate latest
 
