@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
 import java.time.LocalDateTime;
 
@@ -120,5 +121,21 @@ public class CaseViewEvent {
 
     public void setStateId(String stateId) {
         this.stateId = stateId;
+    }
+
+    public static CaseViewEvent createFrom(AuditEvent event) {
+        CaseViewEvent caseEvent = new CaseViewEvent();
+        caseEvent.setId(event.getId());
+        caseEvent.setEventId(event.getEventId());
+        caseEvent.setEventName(event.getEventName());
+        caseEvent.setUserId(event.getUserId());
+        caseEvent.setUserLastName(event.getUserLastName());
+        caseEvent.setUserFirstName(event.getUserFirstName());
+        caseEvent.setSummary(event.getSummary());
+        caseEvent.setComment(event.getDescription());
+        caseEvent.setTimestamp(event.getCreatedDate());
+        caseEvent.setStateId(event.getStateId());
+        caseEvent.setStateName(event.getStateName());
+        return caseEvent;
     }
 }

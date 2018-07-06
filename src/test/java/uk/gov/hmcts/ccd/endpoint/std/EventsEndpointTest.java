@@ -1,18 +1,19 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.sameInstance;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
-
-import java.util.ArrayList;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
-import uk.gov.hmcts.ccd.domain.service.listevents.ListEventsOperation;
+import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
 
 class EventsEndpointTest {
 
@@ -22,7 +23,7 @@ class EventsEndpointTest {
     private static final String CASE_ID = "1234qwer5678tyui";
 
     @Mock
-    private ListEventsOperation listEventsOperation;
+    private GetEventsOperation getEventsOperation;
 
     private EventsEndpoint endpoint;
 
@@ -30,13 +31,13 @@ class EventsEndpointTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        endpoint = new EventsEndpoint(listEventsOperation);
+        endpoint = new EventsEndpoint(getEventsOperation);
     }
 
     @Test
     void shouldReturnEventsForCase() {
         final List<AuditEvent> events = new ArrayList<>();
-        doReturn(events).when(listEventsOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_ID);
+        doReturn(events).when(getEventsOperation).getEvents(JURISDICTION_ID, CASE_TYPE_ID, CASE_ID);
 
         final List<AuditEvent> output = endpoint.findEventDetailsForCase(UID,
             JURISDICTION_ID,
@@ -44,7 +45,7 @@ class EventsEndpointTest {
             CASE_ID);
 
         assertThat(output, sameInstance(events));
-        verify(listEventsOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_ID);
+        verify(getEventsOperation).getEvents(JURISDICTION_ID, CASE_TYPE_ID, CASE_ID);
     }
 
 }
