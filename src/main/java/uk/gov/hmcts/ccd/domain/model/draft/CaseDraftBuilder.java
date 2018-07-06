@@ -38,7 +38,7 @@ public class CaseDraftBuilder {
         return new CaseDraftBuilder();
     }
 
-    public CaseDataContentDraft build() {
-        return new CaseDataContentDraft(userId, jurisdictionId, caseTypeId, eventTriggerId, caseDataContent);
+    public CaseDraft build() {
+        return new CaseDraft(userId, jurisdictionId, caseTypeId, eventTriggerId, caseDataContent);
     }
 }
