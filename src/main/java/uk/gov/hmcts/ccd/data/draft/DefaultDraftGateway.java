@@ -81,7 +81,7 @@ public class DefaultDraftGateway implements DraftGateway {
 
     private Draft assembleDraft(HttpHeaders responseHeaders) {
         Draft responseDraft = new Draft();
-        responseDraft.setId(getId(responseHeaders));
+        responseDraft.setId(getDraftId(responseHeaders));
         return responseDraft;
     }
 
@@ -91,7 +91,7 @@ public class DefaultDraftGateway implements DraftGateway {
         return draft;
     }
 
-    private Long getId(HttpHeaders responseHeaders) {
+    private Long getDraftId(HttpHeaders responseHeaders) {
         String path = responseHeaders.getLocation().getPath();
         return Long.valueOf(path.substring(path.lastIndexOf("/") + 1));
     }
