@@ -8,9 +8,9 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 @ToString
-public class CreateCaseDataContentDraft {
+public class CreateCaseDraft {
 
-    public final CaseDataContentDraft document;
+    public final CaseDraft document;
 
     @NotNull
     public final String type;
@@ -22,8 +22,8 @@ public class CreateCaseDataContentDraft {
     @Min(value = 1L)
     public final Integer maxStaleDays;
 
-    public CreateCaseDataContentDraft(
-        @JsonProperty("document") CaseDataContentDraft document,
+    public CreateCaseDraft(
+        @JsonProperty("document") CaseDraft document,
         @JsonProperty("type") String type,
         @JsonProperty("max_stale_days") Integer maxStaleDays
     ) {

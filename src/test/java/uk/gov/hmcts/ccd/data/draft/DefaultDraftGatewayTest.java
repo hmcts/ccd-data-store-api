@@ -25,8 +25,8 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDataContentDraftBuilder.aCreateCaseDraftBuilder;
-import static uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDataContentDraftBuilder.anUpdateCaseDraftBuilder;
+import static uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDraftBuilder.aCreateCaseDraftBuilder;
+import static uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDraftBuilder.anUpdateCaseDraftBuilder;
 
 class DefaultDraftGatewayTest {
 
@@ -50,9 +50,9 @@ class DefaultDraftGatewayTest {
 
     private Draft draft = new Draft();
     private CaseDataContent caseDataContent = new CaseDataContent();
-    private CaseDataContentDraft caseDataContentDraft;
-    private CreateCaseDataContentDraft createCaseDataContentDraft;
-    private UpdateCaseDataContentDraft updateCaseDataContentDraft;
+    private CaseDraft caseDraft;
+    private CreateCaseDraft createCaseDraft;
+    private UpdateCaseDraft updateCaseDraft;
     private String draftBaseURL = "draftBaseURL";
     private String draftURL5 = "draftBaseURL/" + DID;
 
@@ -65,15 +65,15 @@ class DefaultDraftGatewayTest {
         when(applicationParams.draftURL(DID)).thenReturn(draftURL5);
         when(applicationParams.getDraftMaxStaleDays()).thenReturn(7);
 
-        caseDataContentDraft = new CaseDraftBuilder().withUserId(UID).withJurisdictionId(JID).withCaseTypeId(CTID).withEventTriggerId(ETID).withCaseDataContent(
+        caseDraft = new CaseDraftBuilder().withUserId(UID).withJurisdictionId(JID).withCaseTypeId(CTID).withEventTriggerId(ETID).withCaseDataContent(
             caseDataContent).build();
-        createCaseDataContentDraft = aCreateCaseDraftBuilder()
-            .withDocument(caseDataContentDraft)
+        createCaseDraft = aCreateCaseDraftBuilder()
+            .withDocument(caseDraft)
             .withType(CASE_DATA_CONTENT)
             .withMaxStaleDays(applicationParams.getDraftMaxStaleDays())
             .build();
-        updateCaseDataContentDraft = anUpdateCaseDraftBuilder()
-            .withDocument(caseDataContentDraft)
+        updateCaseDraft = anUpdateCaseDraftBuilder()
+            .withDocument(caseDraft)
             .withType(CASE_DATA_CONTENT)
             .build();
         draftGateway = new DefaultDraftGateway(restTemplate, securityUtils, applicationParams);
@@ -84,7 +84,7 @@ class DefaultDraftGatewayTest {
         ResponseEntity<HttpEntity> response = ResponseEntity.created(new URI("http://localhost:8800/drafts/4")).build();
         doReturn(response).when(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(HttpEntity.class));
 
-        Draft result = draftGateway.save(createCaseDataContentDraft);
+        Draft result = draftGateway.save(createCaseDraft);
 
         assertAll(
             () -> verify(restTemplate).exchange(eq(draftBaseURL), eq(HttpMethod.POST), any(RequestEntity.class), eq(HttpEntity.class)),
@@ -97,7 +97,7 @@ class DefaultDraftGatewayTest {
         Exception exception = new RestClientException("connectivity issue");
         doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(HttpEntity.class));
 
-        final ServiceException actualException = assertThrows(ServiceException.class, () -> draftGateway.save(createCaseDataContentDraft));
+        final ServiceException actualException = assertThrows(ServiceException.class, () -> draftGateway.save(createCaseDraft));
         assertThat(actualException.getMessage(), is("Problem saving draft because of connectivity issue"));
     }
 
@@ -105,7 +105,7 @@ class DefaultDraftGatewayTest {
     void shouldSuccessfullyUpdateToDraft() throws URISyntaxException {
         doReturn(ResponseEntity.status(204).build()).when(restTemplate).exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(HttpEntity.class));
 
-        Draft result = draftGateway.update(updateCaseDataContentDraft, DID);
+        Draft result = draftGateway.update(updateCaseDraft, DID);
 
         assertAll(
             () -> verify(restTemplate).exchange(eq(draftURL5), eq(HttpMethod.PUT), any(RequestEntity.class), eq(HttpEntity.class)),
@@ -118,7 +118,7 @@ class DefaultDraftGatewayTest {
         Exception exception = new RestClientException("connectivity issue");
         doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(HttpEntity.class));
 
-        final ServiceException actualException = assertThrows(ServiceException.class, () -> draftGateway.update(updateCaseDataContentDraft, DID));
+        final ServiceException actualException = assertThrows(ServiceException.class, () -> draftGateway.update(updateCaseDraft, DID));
         assertThat(actualException.getMessage(), is("Problem updating draft because of connectivity issue"));
     }
 }

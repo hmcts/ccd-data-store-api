@@ -37,7 +37,7 @@ class DefaultUpsertDraftOperationTest {
     private UpsertDraftOperation upsertDraftOperation;
 
     private CaseDataContent caseDataContent = new CaseDataContent();
-    private CaseDataContentDraft caseDataContentDraft;
+    private CaseDraft caseDraft;
     private Draft draft = new Draft();
 
     @BeforeEach
@@ -50,25 +50,25 @@ class DefaultUpsertDraftOperationTest {
 
     @Test
     void shouldSuccessfullySaveDraft() throws URISyntaxException {
-        caseDataContentDraft = aCaseDraft()
+        caseDraft = aCaseDraft()
             .withUserId(UID)
             .withJurisdictionId(JID)
             .withCaseTypeId(CTID)
             .withEventTriggerId(ETID)
             .withCaseDataContent(caseDataContent)
             .build();
-        final ArgumentCaptor<CreateCaseDataContentDraft> argument = ArgumentCaptor.forClass(CreateCaseDataContentDraft.class);
-        doReturn(draft).when(draftGateway).save(any(CreateCaseDataContentDraft.class));
+        final ArgumentCaptor<CreateCaseDraft> argument = ArgumentCaptor.forClass(CreateCaseDraft.class);
+        doReturn(draft).when(draftGateway).save(any(CreateCaseDraft.class));
 
 
         Draft result = upsertDraftOperation.saveDraft(UID, JID, CTID, ETID, caseDataContent);
 
         assertAll(
             () ->  verify(draftGateway).save(argument.capture()),
-            () ->  assertThat(argument.getValue().document, hasProperty("userId", is(caseDataContentDraft.getUserId()))),
-            () ->  assertThat(argument.getValue().document, hasProperty("jurisdictionId", is(caseDataContentDraft.getJurisdictionId()))),
-            () ->  assertThat(argument.getValue().document, hasProperty("caseTypeId", is(caseDataContentDraft.getCaseTypeId()))),
-            () ->  assertThat(argument.getValue().document, hasProperty("eventTriggerId", is(caseDataContentDraft.getEventTriggerId()))),
+            () ->  assertThat(argument.getValue().document, hasProperty("userId", is(caseDraft.getUserId()))),
+            () ->  assertThat(argument.getValue().document, hasProperty("jurisdictionId", is(caseDraft.getJurisdictionId()))),
+            () ->  assertThat(argument.getValue().document, hasProperty("caseTypeId", is(caseDraft.getCaseTypeId()))),
+            () ->  assertThat(argument.getValue().document, hasProperty("eventTriggerId", is(caseDraft.getEventTriggerId()))),
             () ->  assertThat(argument.getValue().document, hasProperty("caseDataContent", is(caseDataContent))),
             () ->  assertThat(argument.getValue().maxStaleDays, is(DRAFT_MAX_STALE_DAYS)),
             () ->  assertThat(argument.getValue().type, is(CASE_DATA_CONTENT)),
@@ -78,7 +78,7 @@ class DefaultUpsertDraftOperationTest {
 
     @Test
     void shouldSuccessfullyUpdateDraft() throws URISyntaxException {
-        caseDataContentDraft = new CaseDraftBuilder()
+        caseDraft = new CaseDraftBuilder()
             .withUserId(UID)
             .withJurisdictionId(JID)
             .withCaseTypeId(CTID)
@@ -86,8 +86,8 @@ class DefaultUpsertDraftOperationTest {
             .withCaseDataContent(caseDataContent)
             .build();
         final ArgumentCaptor<String> draftIdCaptor = ArgumentCaptor.forClass(String.class);
-        final ArgumentCaptor<UpdateCaseDataContentDraft> caseDataContentCaptor = ArgumentCaptor.forClass(UpdateCaseDataContentDraft.class);
-        doReturn(draft).when(draftGateway).update(any(UpdateCaseDataContentDraft.class), any(String.class));
+        final ArgumentCaptor<UpdateCaseDraft> caseDataContentCaptor = ArgumentCaptor.forClass(UpdateCaseDraft.class);
+        doReturn(draft).when(draftGateway).update(any(UpdateCaseDraft.class), any(String.class));
 
 
         Draft result = upsertDraftOperation.updateDraft(UID, JID, CTID, ETID, DID, caseDataContent);
@@ -95,10 +95,10 @@ class DefaultUpsertDraftOperationTest {
         assertAll(
             () ->  verify(draftGateway).update(caseDataContentCaptor.capture(), draftIdCaptor.capture()),
             () ->  assertThat(draftIdCaptor.getValue(), is("5")),
-            () ->  assertThat(caseDataContentCaptor.getValue().document, hasProperty("userId", is(caseDataContentDraft.getUserId()))),
-            () ->  assertThat(caseDataContentCaptor.getValue().document, hasProperty("jurisdictionId", is(caseDataContentDraft.getJurisdictionId()))),
-            () ->  assertThat(caseDataContentCaptor.getValue().document, hasProperty("caseTypeId", is(caseDataContentDraft.getCaseTypeId()))),
-            () ->  assertThat(caseDataContentCaptor.getValue().document, hasProperty("eventTriggerId", is(caseDataContentDraft.getEventTriggerId()))),
+            () ->  assertThat(caseDataContentCaptor.getValue().document, hasProperty("userId", is(caseDraft.getUserId()))),
+            () ->  assertThat(caseDataContentCaptor.getValue().document, hasProperty("jurisdictionId", is(caseDraft.getJurisdictionId()))),
+            () ->  assertThat(caseDataContentCaptor.getValue().document, hasProperty("caseTypeId", is(caseDraft.getCaseTypeId()))),
+            () ->  assertThat(caseDataContentCaptor.getValue().document, hasProperty("eventTriggerId", is(caseDraft.getEventTriggerId()))),
             () ->  assertThat(caseDataContentCaptor.getValue().document, hasProperty("caseDataContent", is(caseDataContent))),
             () ->  assertThat(caseDataContentCaptor.getValue().type, is(CASE_DATA_CONTENT)),
             () ->  assertThat(result, is(draft))
