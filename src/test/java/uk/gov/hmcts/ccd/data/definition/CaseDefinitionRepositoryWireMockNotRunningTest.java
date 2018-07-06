@@ -62,8 +62,8 @@ public class CaseDefinitionRepositoryWireMockNotRunningTest extends BaseTest {
         final ServiceException
             exception =
             assertThrows(ServiceException.class,
-                         () -> caseDefinitionRepository.getClassificationsForUserRoleList(userRoles));
+                () -> caseDefinitionRepository.getClassificationsForUserRoleList(userRoles));
         assertThat(exception.getMessage(),
-                   startsWith("Error while retrieving classification for user roles " + userRoles + " because of "));
+                   startsWith("Error    while retrieving classification for user roles " + userRoles + " because of "));
     }
 }

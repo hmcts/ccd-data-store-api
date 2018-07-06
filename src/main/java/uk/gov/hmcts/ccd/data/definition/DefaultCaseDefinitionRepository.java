@@ -125,7 +125,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             }
             final HttpEntity requestEntity = new HttpEntity<CaseType>(securityUtils.authorizationHeaders());
             final Map<String, String> queryParams = new HashMap<>();
-            queryParams.put("roles", StringUtils.join(userRoles, "," ));
+            queryParams.put("roles", StringUtils.join(userRoles, ","));
             return Arrays.asList(restTemplate.exchange(applicationParams.userRolesClassificationsURL(), HttpMethod.GET, requestEntity, UserRole[].class, queryParams).getBody());
         } catch (Exception e) {
             LOG.warn("Error while retrieving classification for user roles {} because of ", userRoles, e);
