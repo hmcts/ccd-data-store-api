@@ -52,14 +52,14 @@ public class DefaultFindSearchInputOperation implements FindSearchInputOperation
         result.setOrder(in.getDisplayOrder());
         final Field field =new Field();
         field.setId(in.getCaseFieldId());
-        CaseField caseField = getFieldType(in.getCaseFieldId(), caseType);
+        CaseField caseField = getCaseField(in.getCaseFieldId(), caseType);
         field.setType(caseField.getFieldType());
         field.setMetadata(caseField.isMetadata());
         result.setField(field);
         return result;
     }
 
-    private CaseField getFieldType(final String fieldId, final CaseType caseType) {
+    private CaseField getCaseField(final String fieldId, final CaseType caseType) {
         return caseType.getCaseFields().stream()
             .filter(c -> c.getId().equals(fieldId))
             .findFirst()
