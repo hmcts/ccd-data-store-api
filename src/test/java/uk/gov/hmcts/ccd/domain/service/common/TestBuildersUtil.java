@@ -5,18 +5,38 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
-import uk.gov.hmcts.ccd.domain.model.aggregated.*;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.ProfileCaseState;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTab;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPageField;
 import uk.gov.hmcts.ccd.domain.model.search.Field;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Arrays.asList;
 
 public class TestBuildersUtil {
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -401,7 +421,7 @@ public class TestBuildersUtil {
 
     public static class FieldTypeBuilder {
         private final FieldType fieldType;
-        private List<CaseField> complexFields;
+        private final List<CaseField> complexFields;
         private FieldTypeBuilder() {
             this.fieldType = new FieldType();
             this.complexFields = Lists.newArrayList();
@@ -526,6 +546,87 @@ public class TestBuildersUtil {
 
         public static SearchInputBuilder aSearchInput() {
             return new SearchInputBuilder();
+        }
+    }
+
+    public static class CaseHistoryViewBuilder {
+        private final CaseHistoryView caseHistoryView;
+
+        private CaseHistoryViewBuilder() {
+            this.caseHistoryView = new CaseHistoryView();
+        }
+
+        public CaseHistoryViewBuilder withEvent(CaseViewEvent caseViewEvent) {
+            this.caseHistoryView.setEvent(caseViewEvent);
+            return this;
+        }
+
+        public CaseHistoryView build() {
+            return caseHistoryView;
+        }
+
+        public static CaseHistoryViewBuilder aCaseHistoryView() {
+            return new CaseHistoryViewBuilder();
+        }
+    }
+
+    public static class CaseViewEventBuilder {
+        private final CaseViewEvent caseViewEvent;
+
+        private CaseViewEventBuilder() {
+            this.caseViewEvent = new CaseViewEvent();
+        }
+
+        public CaseViewEventBuilder withId(String eventId) {
+            this.caseViewEvent.setEventId(eventId);
+            return this;
+        }
+
+        public CaseViewEvent build() {
+            return caseViewEvent;
+        }
+
+        public static CaseViewEventBuilder aCaseViewEvent() {
+            return new CaseViewEventBuilder();
+        }
+    }
+
+    public static class CaseTabCollectionBuilder {
+        private final CaseTabCollection caseTabCollection;
+
+        private CaseTabCollectionBuilder() {
+            this.caseTabCollection = new CaseTabCollection();
+        }
+
+        public CaseTabCollectionBuilder withFieldIds(String... caseFieldIds) {
+            CaseTypeTab tab = new CaseTypeTab();
+            List<CaseTypeTabField> tabFields = new ArrayList<>();
+            asList(caseFieldIds).forEach(caseFieldId -> {
+                CaseField caseField = new CaseField();
+                caseField.setId(caseFieldId);
+                FieldType fieldType = new FieldType();
+                fieldType.setType("YesOrNo");
+                caseField.setFieldType(fieldType);
+                CaseTypeTabField tabField = new CaseTypeTabField();
+                tabField.setCaseField(caseField);
+                tabField.setShowCondition(caseFieldId + "-fieldShowCondition");
+                tabFields.add(tabField);
+            });
+            tab.setShowCondition("tabShowCondition");
+            tab.setTabFields(tabFields);
+            List<CaseTypeTab> tabs = new ArrayList<>();
+            tabs.add(tab);
+            caseTabCollection.setTabs(tabs);
+
+            return this;
+        }
+
+        public CaseTabCollection build() {
+            return caseTabCollection;
+        }
+
+        public static CaseTabCollectionBuilder aCaseTabCollection() {
+            return new CaseTabCollectionBuilder();
         }
     }
 }
