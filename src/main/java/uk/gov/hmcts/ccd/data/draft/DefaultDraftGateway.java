@@ -10,9 +10,9 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
-import uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDataContentDraft;
+import uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDraft;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
-import uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDataContentDraft;
+import uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDraft;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
@@ -22,11 +22,11 @@ import javax.inject.Singleton;
 
 
 @Named
-@Qualifier(DefaultDraftRepository.QUALIFIER)
+@Qualifier(DefaultDraftGateway.QUALIFIER)
 @Singleton
-public class DefaultDraftRepository implements DraftRepository {
+public class DefaultDraftGateway implements DraftGateway {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultDraftRepository.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultDraftGateway.class);
     public static final String QUALIFIER = "default";
     private static final String DRAFT_ENCRYPTION_KEY_HEADER = "Secret";
     private static final int RESOURCE_NOT_FOUND = 404;
@@ -36,7 +36,7 @@ public class DefaultDraftRepository implements DraftRepository {
     private final ApplicationParams applicationParams;
 
     @Inject
-    public DefaultDraftRepository(
+    public DefaultDraftGateway(
             final RestTemplate restTemplate,
             final SecurityUtils securityUtils,
             final ApplicationParams applicationParams) {
@@ -46,7 +46,7 @@ public class DefaultDraftRepository implements DraftRepository {
     }
 
     @Override
-    public Draft save(final CreateCaseDataContentDraft draft) {
+    public Draft save(final CreateCaseDraft draft) {
         try {
             HttpHeaders headers = securityUtils.authorizationHeaders();
             headers.add(DRAFT_ENCRYPTION_KEY_HEADER, applicationParams.getDraftEncryptionKey());
@@ -60,7 +60,7 @@ public class DefaultDraftRepository implements DraftRepository {
     }
 
     @Override
-    public Draft update(final UpdateCaseDataContentDraft draft, final String draftId) {
+    public Draft update(final UpdateCaseDraft draft, final String draftId) {
         try {
             HttpHeaders headers = securityUtils.authorizationHeaders();
             headers.add(DRAFT_ENCRYPTION_KEY_HEADER, applicationParams.getDraftEncryptionKey());
@@ -81,7 +81,7 @@ public class DefaultDraftRepository implements DraftRepository {
 
     private Draft assembleDraft(HttpHeaders responseHeaders) {
         Draft responseDraft = new Draft();
-        responseDraft.setId(getId(responseHeaders));
+        responseDraft.setId(getDraftId(responseHeaders));
         return responseDraft;
     }
 
@@ -91,7 +91,8 @@ public class DefaultDraftRepository implements DraftRepository {
         return draft;
     }
 
-    private Long getId(HttpHeaders responseHeaders) {
-        return Long.valueOf(responseHeaders.getLocation().getRawPath().split("/")[2]);
+    private Long getDraftId(HttpHeaders responseHeaders) {
+        String path = responseHeaders.getLocation().getPath();
+        return Long.valueOf(path.substring(path.lastIndexOf("/") + 1));
     }
 }

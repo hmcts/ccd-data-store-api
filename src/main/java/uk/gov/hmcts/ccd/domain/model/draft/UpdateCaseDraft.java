@@ -4,16 +4,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.validation.constraints.NotNull;
 
-public class UpdateCaseDataContentDraft {
+public class UpdateCaseDraft {
 
-    public final CaseDataContentDraft document;
+    public final CaseDraft document;
 
     @NotNull
     public final String type;
 
     // region constructor
-    public UpdateCaseDataContentDraft(
-        @JsonProperty("document") CaseDataContentDraft document,
+    public UpdateCaseDraft(
+        @JsonProperty("document") CaseDraft document,
         @JsonProperty("type") String type
     ) {
         this.document = document;

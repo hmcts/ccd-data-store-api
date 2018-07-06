@@ -4,7 +4,7 @@ import lombok.ToString;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 
 @ToString
-public class CaseDataContentDraft {
+public class CaseDraft {
 
     private String userId;
     private String jurisdictionId;
@@ -12,10 +12,10 @@ public class CaseDataContentDraft {
     private String eventTriggerId;
     private CaseDataContent caseDataContent;
 
-    public CaseDataContentDraft() {
+    public CaseDraft() {
     }
 
-    public CaseDataContentDraft(String userId, String jurisdictionId, String caseTypeId, String eventTriggerId, CaseDataContent caseDataContent) {
+    public CaseDraft(String userId, String jurisdictionId, String caseTypeId, String eventTriggerId, CaseDataContent caseDataContent) {
         this.userId = userId;
         this.jurisdictionId = jurisdictionId;
         this.caseTypeId = caseTypeId;

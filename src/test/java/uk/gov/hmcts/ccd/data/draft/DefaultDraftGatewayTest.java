@@ -8,13 +8,9 @@ import org.springframework.http.*;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.BaseTest;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
-import uk.gov.hmcts.ccd.domain.model.draft.CaseDataContentDraft;
-import uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDataContentDraft;
+import uk.gov.hmcts.ccd.domain.model.draft.*;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
-import uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDataContentDraft;
-import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import java.net.URI;
@@ -29,8 +25,10 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDraftBuilder.aCreateCaseDraftBuilder;
+import static uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDraftBuilder.anUpdateCaseDraftBuilder;
 
-class DefaultDraftRepositoryTest {
+class DefaultDraftGatewayTest {
 
     private static final String CASE_DATA_CONTENT = "CaseDataContent";
     private static final String UID = "1";
@@ -48,13 +46,13 @@ class DefaultDraftRepositoryTest {
     @Mock
     private RestTemplate restTemplate;
 
-    private DraftRepository draftRepository;
+    private DraftGateway draftGateway;
 
     private Draft draft = new Draft();
     private CaseDataContent caseDataContent = new CaseDataContent();
-    private CaseDataContentDraft caseDataContentDraft;
-    private CreateCaseDataContentDraft createCaseDataContentDraft;
-    private UpdateCaseDataContentDraft updateCaseDataContentDraft;
+    private CaseDraft caseDraft;
+    private CreateCaseDraft createCaseDraft;
+    private UpdateCaseDraft updateCaseDraft;
     private String draftBaseURL = "draftBaseURL";
     private String draftURL5 = "draftBaseURL/" + DID;
 
@@ -67,10 +65,18 @@ class DefaultDraftRepositoryTest {
         when(applicationParams.draftURL(DID)).thenReturn(draftURL5);
         when(applicationParams.getDraftMaxStaleDays()).thenReturn(7);
 
-        caseDataContentDraft = new CaseDataContentDraft(UID, JID, CTID, ETID, caseDataContent);
-        createCaseDataContentDraft =  new CreateCaseDataContentDraft(caseDataContentDraft, CASE_DATA_CONTENT, applicationParams.getDraftMaxStaleDays());
-        updateCaseDataContentDraft =  new UpdateCaseDataContentDraft(caseDataContentDraft, CASE_DATA_CONTENT);
-        draftRepository = new DefaultDraftRepository(restTemplate, securityUtils, applicationParams);
+        caseDraft = new CaseDraftBuilder().withUserId(UID).withJurisdictionId(JID).withCaseTypeId(CTID).withEventTriggerId(ETID).withCaseDataContent(
+            caseDataContent).build();
+        createCaseDraft = aCreateCaseDraftBuilder()
+            .withDocument(caseDraft)
+            .withType(CASE_DATA_CONTENT)
+            .withMaxStaleDays(applicationParams.getDraftMaxStaleDays())
+            .build();
+        updateCaseDraft = anUpdateCaseDraftBuilder()
+            .withDocument(caseDraft)
+            .withType(CASE_DATA_CONTENT)
+            .build();
+        draftGateway = new DefaultDraftGateway(restTemplate, securityUtils, applicationParams);
     }
 
     @Test
@@ -78,11 +84,11 @@ class DefaultDraftRepositoryTest {
         ResponseEntity<HttpEntity> response = ResponseEntity.created(new URI("http://localhost:8800/drafts/4")).build();
         doReturn(response).when(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(HttpEntity.class));
 
-        Draft result = draftRepository.save(createCaseDataContentDraft);
+        Draft result = draftGateway.save(createCaseDraft);
 
         assertAll(
-            () ->  verify(restTemplate).exchange(eq(draftBaseURL), eq(HttpMethod.POST), any(RequestEntity.class), eq(HttpEntity.class)),
-            () ->  assertThat(result, hasProperty("id", is(4L)))
+            () -> verify(restTemplate).exchange(eq(draftBaseURL), eq(HttpMethod.POST), any(RequestEntity.class), eq(HttpEntity.class)),
+            () -> assertThat(result, hasProperty("id", is(4L)))
         );
     }
 
@@ -91,7 +97,7 @@ class DefaultDraftRepositoryTest {
         Exception exception = new RestClientException("connectivity issue");
         doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(HttpEntity.class));
 
-        final ServiceException actualException = assertThrows(ServiceException.class, () -> draftRepository.save(createCaseDataContentDraft));
+        final ServiceException actualException = assertThrows(ServiceException.class, () -> draftGateway.save(createCaseDraft));
         assertThat(actualException.getMessage(), is("Problem saving draft because of connectivity issue"));
     }
 
@@ -99,11 +105,11 @@ class DefaultDraftRepositoryTest {
     void shouldSuccessfullyUpdateToDraft() throws URISyntaxException {
         doReturn(ResponseEntity.status(204).build()).when(restTemplate).exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(HttpEntity.class));
 
-        Draft result = draftRepository.update(updateCaseDataContentDraft, DID);
+        Draft result = draftGateway.update(updateCaseDraft, DID);
 
         assertAll(
-            () ->  verify(restTemplate).exchange(eq(draftURL5), eq(HttpMethod.PUT), any(RequestEntity.class), eq(HttpEntity.class)),
-            () ->  assertThat(result, hasProperty("id", is(Long.valueOf(DID))))
+            () -> verify(restTemplate).exchange(eq(draftURL5), eq(HttpMethod.PUT), any(RequestEntity.class), eq(HttpEntity.class)),
+            () -> assertThat(result, hasProperty("id", is(Long.valueOf(DID))))
         );
     }
 
@@ -112,7 +118,7 @@ class DefaultDraftRepositoryTest {
         Exception exception = new RestClientException("connectivity issue");
         doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(HttpEntity.class));
 
-        final ServiceException actualException = assertThrows(ServiceException.class, () -> draftRepository.update(updateCaseDataContentDraft, DID));
+        final ServiceException actualException = assertThrows(ServiceException.class, () -> draftGateway.update(updateCaseDraft, DID));
         assertThat(actualException.getMessage(), is("Problem updating draft because of connectivity issue"));
     }
 }
