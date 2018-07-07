@@ -20,7 +20,7 @@ public class CreateCaseDraftBuilder {
         return this;
     }
 
-    public static CreateCaseDraftBuilder aCreateCaseDraftBuilder() {
+    public static CreateCaseDraftBuilder aCreateCaseDraft() {
         return new CreateCaseDraftBuilder();
     }
 

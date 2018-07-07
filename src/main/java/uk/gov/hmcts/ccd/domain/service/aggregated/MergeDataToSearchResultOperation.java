@@ -23,7 +23,7 @@ public class MergeDataToSearchResultOperation {
         this.uiDefinitionRepository = uiDefinitionRepository;
     }
 
-    public SearchResultView execute(final CaseType caseType, final List<CaseDetails> caseDetails,final String view) {
+    public SearchResultView execute(final CaseType caseType, final List<CaseDetails> caseDetails, final String view) {
         final SearchResult searchResult = getSearchResult(caseType, view);
         final SearchResultViewColumn[] viewColumns = Arrays.stream(searchResult.getFields())
             .flatMap(searchResultField -> caseType.getCaseFields().stream()

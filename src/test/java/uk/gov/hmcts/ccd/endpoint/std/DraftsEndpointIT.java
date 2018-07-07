@@ -18,18 +18,21 @@ import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
-import uk.gov.hmcts.ccd.domain.model.std.Event;
 
 import javax.inject.Inject;
+import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.doReturn;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.ccd.domain.model.std.CaseDataContentBuilder.aCaseDataContent;
+import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 
 public class DraftsEndpointIT extends WireMockBaseTest {
     private static final String CTID = "TestAddressBookCase";
@@ -39,6 +42,7 @@ public class DraftsEndpointIT extends WireMockBaseTest {
     private static final String JID = "PROBATE";
     private static final String TEST_EVENT_ID = "TEST_EVENT";
     private static final String UID = "0";
+    private JsonNode data;
 
     @Inject
     private WebApplicationContext wac;
@@ -51,7 +55,7 @@ public class DraftsEndpointIT extends WireMockBaseTest {
     private SecurityContext securityContext;
 
     @Before
-    public void setUp() {
+    public void setUp() throws IOException {
         MockitoAnnotations.initMocks(this);
 
         doReturn(authentication).when(securityContext).getAuthentication();
@@ -60,17 +64,23 @@ public class DraftsEndpointIT extends WireMockBaseTest {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
 
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+
+        data = mapper.readTree("{\n" +
+                                "    \"PersonFirstName\": \"John\",\n" +
+                                "    \"PersonLastName\": \"Smith\"\n" +
+                                " }\n");
     }
 
     @Test
     public void shouldReturn201WhenPostSaveDraftForCaseworker() throws Exception {
         final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JID + "/case-types/" + CTID + "/event-trigger/" + ETID + "/drafts";
-        final JsonNode DATA = mapper.readTree("{\n" +
-                                                  "    \"PersonFirstName\": \"John\",\n" +
-                                                  "    \"PersonLastName\": \"Smith\"\n" +
-                                                  " }\n");
-
-        CaseDataContent caseDetailsToSave = buildCaseDataContent(DATA);
+        CaseDataContent caseDetailsToSave = aCaseDataContent()
+            .withData(getData(data))
+            .withEvent(anEvent()
+                           .withEventId(TEST_EVENT_ID)
+                           .build())
+            .withToken(generateEventTokenNewCase(UID, JID, CTID, TEST_EVENT_ID))
+            .build();
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
                                                         .contentType(JSON_CONTENT_TYPE)
@@ -100,11 +110,13 @@ public class DraftsEndpointIT extends WireMockBaseTest {
     @Test
     public void shouldReturn200WhenPutUpdateDraftForCaseworker() throws Exception {
         final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JID + "/case-types/" + CTID + "/event-trigger/" + ETID + "/drafts/" + DID;
-        final JsonNode DATA = mapper.readTree("{\n" +
-                                                  "    \"PersonFirstName\": \"John\",\n" +
-                                                  "    \"PersonLastName\": \"Smith\"\n" +
-                                                  " }\n");
-        CaseDataContent caseDetailsToUpdate = buildCaseDataContent(DATA);
+        CaseDataContent caseDetailsToUpdate = aCaseDataContent()
+            .withData(getData(data))
+            .withEvent(anEvent()
+                           .withEventId(TEST_EVENT_ID)
+                           .build())
+            .withToken(generateEventTokenNewCase(UID, JID, CTID, TEST_EVENT_ID))
+            .build();
 
         final MvcResult mvcResult = mockMvc.perform(put(URL)
                                                         .contentType(JSON_CONTENT_TYPE)
@@ -132,12 +144,13 @@ public class DraftsEndpointIT extends WireMockBaseTest {
     @Test
     public void shouldReturn404WhenPutUpdateDraftForCaseworkerWithDraftIdNotFound() throws Exception {
         final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JID + "/case-types/" + CTID + "/event-trigger/" + ETID + "/drafts/" + WRONG_DID;
-        final JsonNode DATA =
-            mapper.readTree("{\n" +
-                                "    \"PersonFirstName\": \"John\",\n" +
-                                "    \"PersonLastName\": \"Smith\"\n" +
-                                " }\n");
-        CaseDataContent caseDetailsToUpdate = buildCaseDataContent(DATA);
+        CaseDataContent caseDetailsToUpdate = aCaseDataContent()
+            .withData(getData(data))
+            .withEvent(anEvent()
+                           .withEventId(TEST_EVENT_ID)
+                           .build())
+            .withToken(generateEventTokenNewCase(UID, JID, CTID, TEST_EVENT_ID))
+            .build();
 
         final MvcResult mvcResult = mockMvc.perform(put(URL)
                                                         .contentType(JSON_CONTENT_TYPE)
@@ -149,15 +162,51 @@ public class DraftsEndpointIT extends WireMockBaseTest {
         assertThat(actualResponse, containsString("\"message\":\"Resource not found when getting draft for draftId=6 because of 404 Not Found\""));
     }
 
-    private CaseDataContent buildCaseDataContent(JsonNode data) {
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        caseDetailsToSave.setEvent(new Event());
-        caseDetailsToSave.getEvent().setEventId(TEST_EVENT_ID);
-        caseDetailsToSave.setData(mapper.convertValue(data, new TypeReference<HashMap<String, JsonNode>>() {
-        }));
-        final String token = generateEventTokenNewCase(UID, JID, CTID, TEST_EVENT_ID);
-        caseDetailsToSave.setToken(token);
-        return caseDetailsToSave;
+    @Test
+    public void shouldReturn200WhenGetDraftForCaseworker() throws Exception {
+        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JID + "/case-types/" + CTID + "/drafts/" + DID;
+
+        final MvcResult mvcResult = mockMvc.perform(get(URL)
+                                                        .contentType(JSON_CONTENT_TYPE)
+        ).andReturn();
+
+        assertEquals("Incorrect Response Status Code", 200, mvcResult.getResponse().getStatus());
+        Draft actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString()).toString(), Draft.class);
+
+        CaseDataContent expectedCaseDataContent = aCaseDataContent()
+            .withData(getData(mapper.readTree("{\n" +
+                                                  "    \"PersonFirstName\": \"John\",\n" +
+                                                  "    \"PersonLastName\": \"Smith\"\n" +
+                                                  " }\n")))
+            .withEvent(anEvent()
+                           .withEventId("createCase")
+                           .withSummary("Create Case")
+                           .withDescription("This event will create a new case")
+                           .build())
+            .withToken("testToken")
+            .withIgnoreWarning(true)
+            .build();
+        assertThat(actualData, hasProperty("id", is(5L)));
+        assertThat(actualData, hasProperty("document", is(expectedCaseDataContent)));
+        assertThat(actualData, hasProperty("type", is("caseDataContent")));
+        assertThat(actualData, hasProperty("created", is(LocalDateTime.parse("2018-06-06T18:13:55.882"))));
+        assertThat(actualData, hasProperty("updated", is(LocalDateTime.parse("2018-06-06T18:18:55.882"))));
+    }
+
+    @Test
+    public void shouldReturn404WhenGetDraftForCaseworkerWithDraftIdNotFound() throws Exception {
+        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JID + "/case-types/" + CTID + "/drafts/" + WRONG_DID;
+
+        final MvcResult mvcResult = mockMvc.perform(get(URL)
+                                                        .contentType(JSON_CONTENT_TYPE)
+        ).andReturn();
+
+        assertEquals("Incorrect Response Status Code", 404, mvcResult.getResponse().getStatus());
+    }
+
+    private Map<String, JsonNode> getData(JsonNode expectedData) {
+        return mapper.convertValue(expectedData, new TypeReference<HashMap<String, JsonNode>>() {
+        });
     }
 
 }
