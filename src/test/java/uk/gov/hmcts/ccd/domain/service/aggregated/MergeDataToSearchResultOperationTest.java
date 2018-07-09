@@ -80,8 +80,8 @@ class MergeDataToSearchResultOperationTest {
 
         final SearchResultView searchResultView = classUnderTest.execute(caseType, caseDetailsList, WORKBASKET_VIEW);
         assertAll(
-            () -> assertThat(searchResultView.getSearchResultViewItems().length, is(2)),
-            () -> assertThat(searchResultView.getSearchResultViewColumns().length, is(2))
+            () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
+            () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(2))
         );
     }
 
@@ -96,8 +96,8 @@ class MergeDataToSearchResultOperationTest {
 
         final SearchResultView searchResultView = classUnderTest.execute(caseType, caseDetailsList, SEARCH_VIEW);
         assertAll(
-            () -> assertThat(searchResultView.getSearchResultViewItems().length, is(2)),
-            () -> assertThat(searchResultView.getSearchResultViewColumns().length, is(1))
+            () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
+            () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(1))
         );
     }
 }
