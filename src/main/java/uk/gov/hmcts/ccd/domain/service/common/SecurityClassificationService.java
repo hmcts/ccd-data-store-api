@@ -156,9 +156,8 @@ public class SecurityClassificationService {
                                        relevantDataClassificationValue,
                                        userClassification);
                 } else {
-                    filterSimpleField(userClassification,
-                                      dataCollectionIterator,
-                                      relevantDataClassificationValue.get(collectionElementValue.textValue()));
+                    LOG.warn("Invalid security classification structure for collection item: {}", relevantDataClassificationValue.toString());
+                    dataCollectionIterator.remove();
                 }
             } else {
                 // For collection of simple field type, the classification is stored as `classification`, not `value`

@@ -1049,62 +1049,7 @@ public class SecurityClassificationServiceTest {
         }
 
         @Test
-        // TODO Target implementation, see RDM-1204
-        @DisplayName("should filter out collection items with higher classification")
-        void shouldFilterOutCollectionItemsWithHigherClassification() throws IOException {
-            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
-                "{  \"Addresses\":[  \n" +
-                    "         {  \n" +
-                    "            \"value\": \"Address1\",\n" +
-                    "            \"id\":\"" + FIRST_CHILD_ID + "\"\n" +
-                    "         },\n" +
-                    "         {  \n" +
-                    "            \"value\": \"Address2\",\n" +
-                    "            \"id\":\"" + SECOND_CHILD_ID + "\"\n" +
-                    "         }\n" +
-                    "      ]\n" +
-                    "    }\n"
-            ), STRING_JSON_MAP);
-            caseDetails.setData(data);
-            final Map<String, JsonNode> dataClassification = MAPPER.convertValue(MAPPER.readTree(
-                "{  \"Addresses\": {  \n" +
-                    "         \"classification\": \"PRIVATE\", \n" +
-                    "         \"value\": [  \n" +
-                    "           {  \n" +
-                    "             \"value\": {\n" +
-                    "               \"Address1\": \"PRIVATE\"\n" +
-                    "             },\n" +
-                    "             \"id\":\"" + FIRST_CHILD_ID + "\"\n" +
-                    "           },\n" +
-                    "           {  \n" +
-                    "             \"value\": {\n" +
-                    "               \"Address2\": \"RESTRICTED\"\n" +
-                    "             },\n" +
-                    "             \"id\":\"" + SECOND_CHILD_ID + "\"\n" +
-                    "           }\n" +
-                    "         ]\n" +
-                    "      }\n" +
-                    "    }\n"
-            ), STRING_JSON_MAP);
-            caseDetails.setDataClassification(dataClassification);
-
-
-            CaseDetails caseDetails = applyClassification(PRIVATE);
-
-            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
-            assertThat(resultNode.get("Addresses"), is(notNullValue()));
-            assertAll(
-                () -> assertThat(resultNode.get("Addresses").size(), equalTo(1)),
-                () -> assertThat(resultNode.get("Addresses").get(0).get(ID),
-                                 is(equalTo(JSON_NODE_FACTORY.textNode(FIRST_CHILD_ID)))),
-                () -> assertThat(resultNode.get("Addresses").get(0).get(VALUE),
-                                 equalTo(JSON_NODE_FACTORY.textNode("Address1")))
-            );
-        }
-
-        @Test
-        // TODO Target implementation, see RDM-1204
-        @DisplayName("should filter out collection items with missing value")
+        @DisplayName("should filter out simple collection items with missing classification")
         void shouldFilterOutCollectionItemsWithMissingValue() throws IOException {
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\":[  \n" +
@@ -1125,9 +1070,7 @@ public class SecurityClassificationServiceTest {
                     "         \"classification\": \"PRIVATE\", \n" +
                     "         \"value\": [  \n" +
                     "           {  \n" +
-                    "             \"value\": {\n" +
-                    "               \"Address1\": \"PRIVATE\"\n" +
-                    "             },\n" +
+                    "             \"classification\": \"PRIVATE\",\n" +
                     "             \"id\":\"" + FIRST_CHILD_ID + "\"\n" +
                     "           },\n" +
                     "           {  \n" +
@@ -1143,12 +1086,14 @@ public class SecurityClassificationServiceTest {
             CaseDetails caseDetails = applyClassification(PRIVATE);
 
             JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
-            assertThat(resultNode.get("Addresses"), is(notNullValue()));
+
+            final JsonNode addresses = resultNode.get("Addresses");
+            assertThat(addresses, is(notNullValue()));
             assertAll(
-                () -> assertThat(resultNode.get("Addresses").size(), equalTo(1)),
-                () -> assertThat(resultNode.get("Addresses").get(0).get(ID),
+                () -> assertThat(addresses.size(), equalTo(1)),
+                () -> assertThat(addresses.get(0).get(ID),
                                  is(equalTo(JSON_NODE_FACTORY.textNode(FIRST_CHILD_ID)))),
-                () -> assertThat(resultNode.get("Addresses").get(0).get(VALUE),
+                () -> assertThat(addresses.get(0).get(VALUE),
                                  equalTo(JSON_NODE_FACTORY.textNode("Address1")))
             );
         }
