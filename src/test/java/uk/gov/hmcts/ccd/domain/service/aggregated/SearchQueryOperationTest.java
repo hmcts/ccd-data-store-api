@@ -10,6 +10,7 @@ import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftsOperation;
 import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
 
 import java.util.ArrayList;
@@ -43,6 +44,9 @@ public class SearchQueryOperationTest {
     @Mock
     private GetCaseTypesOperation getCaseTypesOperation;
 
+    @Mock
+    private GetDraftsOperation getDraftsOperation;
+
     private SearchQueryOperation searchQueryOperation;
     private MetaData metadata;
     private HashMap<String, String> criteria;
@@ -68,6 +72,7 @@ public class SearchQueryOperationTest {
         searchQueryOperation = new SearchQueryOperation(searchOperation,
                                                         mergeDataToSearchResultOperation,
                                                         getCaseTypesOperation,
+                                                        getDraftsOperation,
                                                         caseTypeService);
         metadata = new MetaData(CASE_TYPE_ID, JURISDICTION_ID);
         criteria = new HashMap<>();
