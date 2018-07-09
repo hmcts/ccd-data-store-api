@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.draft;
 
-import com.fasterxml.jackson.annotation.JsonRawValue;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import java.time.ZonedDateTime;
 
@@ -8,8 +8,7 @@ public class GetDraft {
 
     private String id;
 
-    @JsonRawValue
-    private String document;
+    private JsonNode document;
 
     private String type;
 
@@ -24,7 +23,7 @@ public class GetDraft {
     // region constructor
     public GetDraft(
         String id,
-        String document,
+        JsonNode document,
         String type,
         ZonedDateTime created,
         ZonedDateTime updated
@@ -42,7 +41,7 @@ public class GetDraft {
         return id;
     }
 
-    public String getDocument() {
+    public JsonNode getDocument() {
         return document;
     }
 

@@ -1,10 +1,12 @@
 package uk.gov.hmcts.ccd.domain.model.draft;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import java.time.ZonedDateTime;
 
 public class GetDraftBuilder {
     private String id;
-    private String document;
+    private JsonNode document;
     private String type;
     private ZonedDateTime created;
     private ZonedDateTime updated;
@@ -14,7 +16,7 @@ public class GetDraftBuilder {
         return this;
     }
 
-    public GetDraftBuilder withDocument(String document) {
+    public GetDraftBuilder withDocument(JsonNode document) {
         this.document = document;
         return this;
     }

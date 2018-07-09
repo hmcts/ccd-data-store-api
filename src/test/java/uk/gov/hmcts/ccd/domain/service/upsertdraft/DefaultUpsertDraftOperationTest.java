@@ -58,11 +58,10 @@ class DefaultUpsertDraftOperationTest {
     void shouldSuccessfullySaveDraft() {
         final ArgumentCaptor<CreateCaseDraft> argument = ArgumentCaptor.forClass(CreateCaseDraft.class);
         doReturn(Long.valueOf(DID)).when(draftGateway).save(any(CreateCaseDraft.class));
-
+        draft.setId(DID);
 
         Draft result = upsertDraftOperation.executeSave(UID, JID, CTID, ETID, caseDataContent);
 
-        draft.setId(Long.valueOf(DID));
         assertAll(
             () ->  verify(draftGateway).save(argument.capture()),
             () ->  assertThat(argument.getValue().document, hasProperty("userId", is(caseDraft.getUserId()))),

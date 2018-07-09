@@ -4,11 +4,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftBuilder;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
-import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContentBuilder;
 import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftOperation;
+import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftsOperation;
 import uk.gov.hmcts.ccd.domain.service.upsertdraft.UpsertDraftOperation;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -30,13 +31,15 @@ class DraftsEndpointTest {
     private UpsertDraftOperation upsertDraftOperation;
     @Mock
     private GetDraftOperation getDraftOperation;
+    @Mock
+    private GetDraftsOperation getDraftsOperation;
 
     private DraftsEndpoint endpoint;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-        endpoint = new DraftsEndpoint(upsertDraftOperation, getDraftOperation);
+        endpoint = new DraftsEndpoint(upsertDraftOperation, getDraftOperation, getDraftsOperation);
     }
 
     @Test

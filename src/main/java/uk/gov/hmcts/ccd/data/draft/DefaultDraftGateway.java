@@ -11,11 +11,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
-import uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDraft;
-import uk.gov.hmcts.ccd.domain.model.draft.Draft;
-import uk.gov.hmcts.ccd.domain.model.draft.GetDraft;
-import uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDraft;
-import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
+import uk.gov.hmcts.ccd.domain.model.draft.*;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
@@ -23,6 +19,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.IOException;
+import java.util.List;
 
 import static uk.gov.hmcts.ccd.domain.model.draft.DraftBuilder.aDraft;
 
@@ -74,7 +71,7 @@ public class DefaultDraftGateway implements DraftGateway {
             final HttpEntity requestEntity = new HttpEntity(draft, headers);
             restTemplate.exchange(applicationParams.draftURL(draftId), HttpMethod.PUT, requestEntity, HttpEntity.class);
             return aDraft()
-                .withId(Long.valueOf(draftId))
+                .withId(draftId)
                 .build();
         } catch (HttpClientErrorException e) {
             LOG.warn("Error while updating draftId=" + draftId, e);
@@ -108,14 +105,35 @@ public class DefaultDraftGateway implements DraftGateway {
         return null;
     }
 
-    private Draft assembleDraft(GetDraft getDraft) throws IOException {
-        return aDraft()
-            .withId(Long.valueOf(getDraft.getId()))
-            .withDocument(mapper.readValue(getDraft.getDocument(), CaseDataContent.class))
-            .withType(getDraft.getType())
-            .withCreated(getDraft.getCreated().toLocalDateTime())
-            .withUpdated(getDraft.getUpdated().toLocalDateTime())
-            .build();
+    @Override
+    public List<Draft> getAll() {
+        try {
+            HttpHeaders headers = securityUtils.authorizationHeaders();
+            headers.add(DRAFT_ENCRYPTION_KEY_HEADER, applicationParams.getDraftEncryptionKey());
+            final HttpEntity requestEntity = new HttpEntity(headers);
+            DraftList getDrafts = restTemplate.exchange(applicationParams.draftBaseURL(), HttpMethod.GET, requestEntity, DraftList.class).getBody();
+            return getDrafts.getData();
+        } catch (Exception e) {
+            LOG.warn("Error while getting drafts", e);
+            throw new ServiceException("Problem getting drafts because of " + e.getMessage());
+        }
+    }
+
+    private Draft assembleDraft(GetDraft getDraft) {
+        Draft draft = null;
+        try {
+            draft = aDraft()
+                .withId(getDraft.getId())
+                .withDocument(mapper.treeToValue(getDraft.getDocument(), CaseDraft.class))
+                .withType(getDraft.getType())
+                .withCreated(getDraft.getCreated().toLocalDateTime())
+                .withUpdated(getDraft.getUpdated().toLocalDateTime())
+                .build();
+        } catch (IOException e) {
+            LOG.warn("Error while deserializing case data content", e);
+            throw new ServiceException("Problem deserializing case data content because of " + e.getMessage());
+        }
+        return draft;
     }
 
     private Long getDraftId(HttpHeaders responseHeaders) {
