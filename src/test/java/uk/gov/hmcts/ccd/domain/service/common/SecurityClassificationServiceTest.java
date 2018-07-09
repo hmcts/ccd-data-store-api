@@ -896,6 +896,48 @@ public class SecurityClassificationServiceTest {
         }
 
         @Test
+        @DisplayName("should apply collection-level classification before items-level classification")
+        void shouldApplyCollectionLevelClassification() throws IOException {
+            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+                "{  \"Aliases\":[  \n" +
+                    "         {  \n" +
+                    "            \"value\": \"Alias #1\",\n" +
+                    "            \"id\":\"" + FIRST_CHILD_ID + "\"\n" +
+                    "         },\n" +
+                    "         {  \n" +
+                    "            \"value\": \"Alias #2\",\n" +
+                    "            \"id\":\"" + SECOND_CHILD_ID + "\"\n" +
+                    "         }\n" +
+                    "      ]\n" +
+                    "    }\n"
+            ), STRING_JSON_MAP);
+            caseDetails.setData(data);
+            final Map<String, JsonNode> dataClassification = MAPPER.convertValue(MAPPER.readTree(
+                "{  \"Aliases\": {\n" +
+                    "     \"classification\": \"RESTRICTED\",\n" +
+                    "     \"value\": [\n" +
+                    "       {\n" +
+                    "         \"classification\": \"PRIVATE\",\n" +
+                    "         \"id\":\"" + FIRST_CHILD_ID + "\"\n" +
+                    "       },\n" +
+                    "       {\n" +
+                    "         \"classification\": \"PRIVATE\",\n" +
+                    "         \"id\":\"" + SECOND_CHILD_ID + "\"\n" +
+                    "       }\n" +
+                    "     ]\n" +
+                    "   }\n" +
+                    " }\n"
+            ), STRING_JSON_MAP);
+            caseDetails.setDataClassification(dataClassification);
+
+            CaseDetails caseDetails = applyClassification(PRIVATE);
+
+            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+            assertThat("should remove classified collection node",
+                       resultNode.has("Aliases"), is(false));
+        }
+
+        @Test
         // TODO Target implementation, see RDM-1204
         @DisplayName("should filter out fields within collection items")
         void shouldFilterFieldsWithinCollectionItems() throws IOException {
