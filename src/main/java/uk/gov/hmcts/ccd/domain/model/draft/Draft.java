@@ -3,16 +3,15 @@ package uk.gov.hmcts.ccd.domain.model.draft;
 import lombok.ToString;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 
 import java.time.LocalDateTime;
 
 @ToString
 public class Draft {
 
-    private Long id;
+    private String id;
 
-    private CaseDataContent document;
+    private CaseDraft document;
 
     private String type;
 
@@ -20,7 +19,7 @@ public class Draft {
 
     private LocalDateTime updated;
 
-    public Draft(Long id, CaseDataContent document, String type, LocalDateTime created, LocalDateTime updated) {
+    public Draft(String id, CaseDraft document, String type, LocalDateTime created, LocalDateTime updated) {
         this.id = id;
         this.document = document;
         this.type = type;
@@ -34,19 +33,19 @@ public class Draft {
      */
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
-    public CaseDataContent getDocument() {
+    public CaseDraft getDocument() {
         return document;
     }
 
-    public void setDocument(CaseDataContent document) {
+    public void setDocument(CaseDraft document) {
         this.document = document;
     }
 

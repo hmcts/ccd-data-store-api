@@ -107,7 +107,7 @@ class DefaultDraftGatewayTest {
 
         getDraft = aGetDraft()
             .withId(DID)
-            .withDocument(mapper.writeValueAsString(caseDataContent))
+            .withDocument(mapper.convertValue(caseDataContent, JsonNode.class))
             .withType(TYPE)
             .withCreated(NOW)
             .withUpdated(NOW_PLUS_5_MIN)

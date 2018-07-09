@@ -1,22 +1,25 @@
 package uk.gov.hmcts.ccd.domain.model.draft;
 
-import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
-
 import java.time.LocalDateTime;
 
 public class DraftBuilder {
-    private Long id;
-    private CaseDataContent document;
+    private String id;
+    private CaseDraft document;
     private String type;
     private LocalDateTime created;
     private LocalDateTime updated;
 
-    public DraftBuilder withId(Long id) {
+    public DraftBuilder withId(String id) {
         this.id = id;
         return this;
     }
 
-    public DraftBuilder withDocument(CaseDataContent document) {
+    public DraftBuilder withId(Long id) {
+        this.id = String.valueOf(id);
+        return this;
+    }
+
+    public DraftBuilder withDocument(CaseDraft document) {
         this.document = document;
         return this;
     }
