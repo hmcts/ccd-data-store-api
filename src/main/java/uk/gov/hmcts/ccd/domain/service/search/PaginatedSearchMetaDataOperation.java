@@ -30,19 +30,7 @@ public class PaginatedSearchMetaDataOperation {
     }
 
     public PaginatedSearchMetadata execute(MetaData metaData, Map<String, String> criteria) {
-        PaginatedSearchMetadata paginatedSearchMetadata = caseDetailsRepository.getPaginatedSearchMetadata(metaData, criteria);
-        calculatePaginationWithDrafts(metaData, paginatedSearchMetadata);
-        return paginatedSearchMetadata;
-    }
-
-    private void calculatePaginationWithDrafts(MetaData metaData, PaginatedSearchMetadata paginatedSearchMetadata) {
-        Integer totalResultsCount = paginatedSearchMetadata.getTotalResultsCount();
-        totalResultsCount += (int) getDraftsOperation.execute()
-            .stream()
-            .filter(d -> caseTypeIdsEqual(metaData, d))
-            .count();
-        paginatedSearchMetadata.setTotalResultsCount(totalResultsCount);
-        paginatedSearchMetadata.setTotalPagesCount((int) Math.ceil((double) totalResultsCount / applicationParams.getPaginationPageSize()));
+        return caseDetailsRepository.getPaginatedSearchMetadata(metaData, criteria);
     }
 
     private boolean caseTypeIdsEqual(MetaData metaData, DraftResponse d) {
