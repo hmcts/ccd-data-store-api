@@ -8,7 +8,7 @@ import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.draft.CaseDraft;
-import uk.gov.hmcts.ccd.domain.model.draft.Draft;
+import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewColumn;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
@@ -29,8 +29,8 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_RE
 
 @Service
 public class SearchQueryOperation {
-    public static final ArrayList<Object> EMPTY_LIST = Lists.newArrayList();
-    public static final String PAGE_ONE = "1";
+    private static final ArrayList<Object> EMPTY_LIST = Lists.newArrayList();
+    private static final String PAGE_ONE = "1";
     private final MergeDataToSearchResultOperation mergeDataToSearchResultOperation;
     private final GetCaseTypesOperation getCaseTypesOperation;
     private final SearchOperation searchOperation;
@@ -64,7 +64,8 @@ public class SearchQueryOperation {
             return new SearchResultView(new SearchResultViewColumn[0], new SearchResultViewItem[0]);
         }
         final List<CaseDetails> caseData = searchOperation.execute(metadata, queryParameters);
-        List<CaseDetails> caseDataFromDrafts = metadata.getPage()
+        List<CaseDetails> caseDataFromDrafts = metadata
+            .getPage()
             .flatMap(page -> buildDraftsForFirstPage(metadata))
             .orElse(EMPTY_LIST);
         caseDataFromDrafts.addAll(caseData);
@@ -74,13 +75,20 @@ public class SearchQueryOperation {
     private Optional<List> buildDraftsForFirstPage(MetaData metadata) {
         List<CaseDetails> caseDataFromDrafts = Lists.newArrayList();
         if (metadata.getPage().get().equals(PAGE_ONE)) {
-            List<Draft> caseDrafts = filterCaseTypeDrafts(metadata, getDraftsOperation.execute());
+            List<DraftResponse> caseDrafts = getDraftsOperation.execute()
+                .stream()
+                .filter(d -> caseTypeIdsEqual(metadata, d))
+                .collect(Collectors.toList());
             caseDataFromDrafts = buildCaseDataFromDrafts(caseDrafts);
         }
         return Optional.of(caseDataFromDrafts);
     }
 
-    private List<CaseDetails> buildCaseDataFromDrafts(List<Draft> drafts) {
+    private boolean caseTypeIdsEqual(MetaData metadata, DraftResponse d) {
+        return d.getDocument().getCaseTypeId().equals(metadata.getCaseTypeId());
+    }
+
+    private List<CaseDetails> buildCaseDataFromDrafts(List<DraftResponse> drafts) {
         return drafts.stream()
             .map(d -> {
                 CaseDraft document = d.getDocument();
@@ -94,13 +102,4 @@ public class SearchQueryOperation {
             .collect(Collectors.toList());
     }
 
-    private List<Draft> filterCaseTypeDrafts(MetaData metadata, List<Draft> draftData) {
-        return draftData.stream()
-            .filter(draft -> hasEqualCaseTypeIds(metadata, draft))
-            .collect(Collectors.toList());
-    }
-
-    private boolean hasEqualCaseTypeIds(MetaData metadata, Draft draft) {
-        return draft.getDocument().getCaseTypeId().equals(metadata.getCaseTypeId());
-    }
 }

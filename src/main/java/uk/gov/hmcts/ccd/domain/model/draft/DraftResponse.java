@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.model.draft;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.ToString;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -8,11 +7,11 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import java.time.LocalDateTime;
 
 @ToString
-public class Draft {
+public class DraftResponse {
 
     private String id;
 
-    private JsonNode document;
+    private CaseDraft document;
 
     private String type;
 
@@ -28,11 +27,11 @@ public class Draft {
         this.id = id;
     }
 
-    public JsonNode getDocument() {
+    public CaseDraft getDocument() {
         return document;
     }
 
-    public void setDocument(JsonNode document) {
+    public void setDocument(CaseDraft document) {
         this.document = document;
     }
 
@@ -66,7 +65,7 @@ public class Draft {
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        Draft draft = (Draft) o;
+        DraftResponse draft = (DraftResponse) o;
 
         return new EqualsBuilder()
             .append(id, draft.id)

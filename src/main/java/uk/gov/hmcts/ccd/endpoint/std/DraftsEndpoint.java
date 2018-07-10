@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
-import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftOperation;
 import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftsOperation;
 import uk.gov.hmcts.ccd.domain.service.upsertdraft.UpsertDraftOperation;
@@ -42,7 +42,7 @@ public class DraftsEndpoint {
         @ApiResponse(code = 201, message = "Draft created"),
         @ApiResponse(code = 400, message = "Bad request")
     })
-    public Draft saveDraftForCaseWorker(
+    public DraftResponse saveDraftForCaseWorker(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
         @ApiParam(value = "Jurisdiction ID", required = true)
@@ -65,7 +65,7 @@ public class DraftsEndpoint {
         @ApiResponse(code = 200, message = "Draft updated"),
         @ApiResponse(code = 400, message = "Bad request")
     })
-    public Draft updateDraftForCaseWorker(
+    public DraftResponse updateDraftForCaseWorker(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
         @ApiParam(value = "Jurisdiction ID", required = true)
@@ -91,7 +91,7 @@ public class DraftsEndpoint {
         @ApiResponse(code = 400, message = "Invalid draft ID"),
         @ApiResponse(code = 404, message = "No case draft found for the given ID")
     })
-    public Draft getDraftForCaseWorker(
+    public DraftResponse getDraftForCaseWorker(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
         @ApiParam(value = "Jurisdiction ID", required = true)
@@ -114,7 +114,7 @@ public class DraftsEndpoint {
         @ApiResponse(code = 400, message = "Invalid draft ID"),
         @ApiResponse(code = 404, message = "No case draft found for the given ID")
     })
-    public List<Draft> getDraftsForCaseWorker(
+    public List<DraftResponse> getDraftsForCaseWorker(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
         @ApiParam(value = "Jurisdiction ID", required = true)

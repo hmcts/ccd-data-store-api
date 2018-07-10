@@ -20,8 +20,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.ccd.domain.model.draft.DraftBuilder.aDraft;
+import static uk.gov.hmcts.ccd.domain.model.draft.DraftResponseBuilder.aDraftResponse;
 
 
 @Named
@@ -30,7 +31,7 @@ import static uk.gov.hmcts.ccd.domain.model.draft.DraftBuilder.aDraft;
 public class DefaultDraftGateway implements DraftGateway {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultDraftGateway.class);
-    protected static final ObjectMapper mapper = new ObjectMapper();
+    protected static final ObjectMapper MAPPER = new ObjectMapper();
     public static final String QUALIFIER = "default";
     private static final String DRAFT_ENCRYPTION_KEY_HEADER = "Secret";
     private static final int RESOURCE_NOT_FOUND = 404;
@@ -64,13 +65,13 @@ public class DefaultDraftGateway implements DraftGateway {
     }
 
     @Override
-    public Draft update(final UpdateCaseDraft draft, final String draftId) {
+    public DraftResponse update(final UpdateCaseDraft draft, final String draftId) {
         try {
             HttpHeaders headers = securityUtils.authorizationHeaders();
             headers.add(DRAFT_ENCRYPTION_KEY_HEADER, applicationParams.getDraftEncryptionKey());
             final HttpEntity requestEntity = new HttpEntity(draft, headers);
             restTemplate.exchange(applicationParams.draftURL(draftId), HttpMethod.PUT, requestEntity, HttpEntity.class);
-            return aDraft()
+            return aDraftResponse()
                 .withId(draftId)
                 .build();
         } catch (HttpClientErrorException e) {
@@ -86,13 +87,13 @@ public class DefaultDraftGateway implements DraftGateway {
     }
 
     @Override
-    public Draft get(final String draftId) {
+    public DraftResponse get(final String draftId) {
         try {
             HttpHeaders headers = securityUtils.authorizationHeaders();
             headers.add(DRAFT_ENCRYPTION_KEY_HEADER, applicationParams.getDraftEncryptionKey());
             final HttpEntity requestEntity = new HttpEntity(headers);
-            GetDraft getDraft = restTemplate.exchange(applicationParams.draftURL(draftId), HttpMethod.GET, requestEntity, GetDraft.class).getBody();
-            return assembleDraft(getDraft);
+            Draft draft = restTemplate.exchange(applicationParams.draftURL(draftId), HttpMethod.GET, requestEntity, Draft.class).getBody();
+            return assembleDraft(draft);
         } catch (HttpClientErrorException e) {
             LOG.warn("Error while getting draftId=" + draftId, e);
             if (e.getRawStatusCode() == RESOURCE_NOT_FOUND) {
@@ -106,34 +107,37 @@ public class DefaultDraftGateway implements DraftGateway {
     }
 
     @Override
-    public List<Draft> getAll() {
+    public List<DraftResponse> getAll() {
         try {
             HttpHeaders headers = securityUtils.authorizationHeaders();
             headers.add(DRAFT_ENCRYPTION_KEY_HEADER, applicationParams.getDraftEncryptionKey());
             final HttpEntity requestEntity = new HttpEntity(headers);
             DraftList getDrafts = restTemplate.exchange(applicationParams.draftBaseURL(), HttpMethod.GET, requestEntity, DraftList.class).getBody();
-            return getDrafts.getData();
+            return getDrafts.getData()
+                .stream()
+                .map(d -> assembleDraft(d))
+                .collect(Collectors.toList());
         } catch (Exception e) {
             LOG.warn("Error while getting drafts", e);
             throw new ServiceException("Problem getting drafts because of " + e.getMessage());
         }
     }
 
-    private Draft assembleDraft(GetDraft getDraft) {
-        Draft draft = null;
+    private DraftResponse assembleDraft(Draft getDraft) {
+        DraftResponse draftResponse = null;
         try {
-            draft = aDraft()
+            draftResponse = aDraftResponse()
                 .withId(getDraft.getId())
-                .withDocument(mapper.treeToValue(getDraft.getDocument(), CaseDraft.class))
+                .withDocument(MAPPER.treeToValue(getDraft.getDocument(), CaseDraft.class))
                 .withType(getDraft.getType())
-                .withCreated(getDraft.getCreated().toLocalDateTime())
-                .withUpdated(getDraft.getUpdated().toLocalDateTime())
+                .withCreated(getDraft.getCreated())
+                .withUpdated(getDraft.getUpdated())
                 .build();
         } catch (IOException e) {
             LOG.warn("Error while deserializing case data content", e);
             throw new ServiceException("Problem deserializing case data content because of " + e.getMessage());
         }
-        return draft;
+        return draftResponse;
     }
 
     private Long getDraftId(HttpHeaders responseHeaders) {

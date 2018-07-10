@@ -1,41 +1,43 @@
 package uk.gov.hmcts.ccd.domain.model.draft;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import java.time.LocalDateTime;
 
 public class DraftBuilder {
-    private String id;
-    private CaseDraft document;
-    private String type;
-    private LocalDateTime created;
-    private LocalDateTime updated;
+    private Draft draft;
+
+    public DraftBuilder() {
+        draft = new Draft();
+    }
 
     public DraftBuilder withId(String id) {
-        this.id = id;
+        this.draft.setId(id);
         return this;
     }
 
     public DraftBuilder withId(Long id) {
-        this.id = String.valueOf(id);
+        this.draft.setId(String.valueOf(id));
         return this;
     }
 
-    public DraftBuilder withDocument(CaseDraft document) {
-        this.document = document;
+    public DraftBuilder withDocument(JsonNode document) {
+        this.draft.setDocument(document);
         return this;
     }
 
     public DraftBuilder withType(String type) {
-        this.type = type;
+        this.draft.setType(type);
         return this;
     }
 
     public DraftBuilder withCreated(LocalDateTime created) {
-        this.created = created;
+        this.draft.setCreated(created);
         return this;
     }
 
     public DraftBuilder withUpdated(LocalDateTime updated) {
-        this.updated = updated;
+        this.draft.setUpdated(updated);
         return this;
     }
 
@@ -44,6 +46,6 @@ public class DraftBuilder {
     }
 
     public Draft build() {
-        return new Draft(id, document, type, created, updated);
+        return this.draft;
     }
 }

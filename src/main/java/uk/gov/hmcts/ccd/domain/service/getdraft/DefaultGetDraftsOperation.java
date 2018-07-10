@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
-import uk.gov.hmcts.ccd.domain.model.draft.Draft;
+import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -21,7 +21,7 @@ public class DefaultGetDraftsOperation implements GetDraftsOperation {
     }
 
     @Override
-    public List<Draft > execute() {
+    public List<DraftResponse> execute() {
         return draftGateway.getAll();
     }
 

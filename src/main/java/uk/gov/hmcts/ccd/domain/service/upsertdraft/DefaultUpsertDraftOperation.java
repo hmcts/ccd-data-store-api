@@ -5,14 +5,16 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
-import uk.gov.hmcts.ccd.domain.model.draft.*;
+import uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDraft;
+import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
+import uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDraft;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 
 import javax.inject.Inject;
 
 import static uk.gov.hmcts.ccd.domain.model.draft.CaseDraftBuilder.aCaseDraft;
 import static uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDraftBuilder.aCreateCaseDraft;
-import static uk.gov.hmcts.ccd.domain.model.draft.DraftBuilder.aDraft;
+import static uk.gov.hmcts.ccd.domain.model.draft.DraftResponseBuilder.aDraftResponse;
 import static uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDraftBuilder.anUpdateCaseDraft;
 
 @Service
@@ -32,18 +34,18 @@ public class DefaultUpsertDraftOperation implements UpsertDraftOperation {
     }
 
     @Override
-    public Draft executeSave(final String uid,
+    public DraftResponse executeSave(final String uid,
                              final String jurisdictionId,
                              final String caseTypeId,
                              final String eventTriggerId,
                              final CaseDataContent caseDataContent) {
-        return aDraft()
+        return aDraftResponse()
             .withId(draftGateway.save(buildCreateCaseDraft(uid, jurisdictionId, caseTypeId, eventTriggerId, caseDataContent)))
             .build();
     }
 
     @Override
-    public Draft executeUpdate(final String uid,
+    public DraftResponse executeUpdate(final String uid,
                                final String jurisdictionId,
                                final String caseTypeId,
                                final String eventTriggerId,
