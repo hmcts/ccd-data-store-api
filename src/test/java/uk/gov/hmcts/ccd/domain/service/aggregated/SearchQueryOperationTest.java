@@ -9,6 +9,8 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.draft.Draft;
+import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftsOperation;
 import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
@@ -16,9 +18,12 @@ import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.ccd.domain.model.draft.CaseDraftBuilder.aCaseDraft;
+import static uk.gov.hmcts.ccd.domain.model.draft.DraftBuilder.aDraft;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.aCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.aCaseType;
@@ -34,6 +39,8 @@ public class SearchQueryOperationTest {
     private static final CaseField CASE_FIELD_1_1 = aCaseField().withId(CASE_FIELD_ID_1_1).build();
     private static final CaseField CASE_FIELD_1_2 = aCaseField().withId(CASE_FIELD_ID_1_2).build();
     private static final CaseField CASE_FIELD_1_3 = aCaseField().withId(CASE_FIELD_ID_1_3).build();
+    private static final String DRAFT_ID = "1";
+    private static final CaseDataContent CASE_DATA_CONTENT = new CaseDataContent();
 
     @Mock
     private SearchOperation searchOperation;
@@ -50,6 +57,7 @@ public class SearchQueryOperationTest {
     private SearchQueryOperation searchQueryOperation;
     private MetaData metadata;
     private HashMap<String, String> criteria;
+    private List<Draft> drafts = Lists.newArrayList();
 
     @Mock
     private CaseTypeService caseTypeService;
@@ -76,6 +84,14 @@ public class SearchQueryOperationTest {
                                                         caseTypeService);
         metadata = new MetaData(CASE_TYPE_ID, JURISDICTION_ID);
         criteria = new HashMap<>();
+        drafts.add(aDraft()
+                       .withId(DRAFT_ID)
+                       .withDocument(aCaseDraft()
+                                         .withJurisdictionId(JURISDICTION_ID)
+                                         .withCaseTypeId(CASE_TYPE_ID)
+                                         .withCaseDataContent(CASE_DATA_CONTENT)
+                                         .build())
+                       .build());
     }
 
     @Test
@@ -84,7 +100,24 @@ public class SearchQueryOperationTest {
         searchQueryOperation.execute(VIEW, metadata, criteria);
 
         assertAll(
+            () -> verify(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ),
             () -> verify(searchOperation).execute(metadata, criteria),
+            () -> verify(getDraftsOperation, never()).execute(),
+            () -> verify(mergeDataToSearchResultOperation, times(1)).execute(anyObject(), anyList(), anyString())
+        );
+    }
+
+    @Test
+    @DisplayName("should include drafts on first page")
+    public void shouldIncludeDraftsWhenOnFirstPage() {
+        doReturn(drafts).when(getDraftsOperation).execute();
+        metadata.setPage(Optional.of("1"));
+        searchQueryOperation.execute(VIEW, metadata, criteria);
+
+        assertAll(
+            () -> verify(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ),
+            () -> verify(searchOperation).execute(metadata, criteria),
+            () -> verify(getDraftsOperation).execute(),
             () -> verify(mergeDataToSearchResultOperation, times(1)).execute(anyObject(), anyList(), anyString())
         );
     }
@@ -95,5 +128,12 @@ public class SearchQueryOperationTest {
         doReturn(new ArrayList<>()).when(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ);
 
         searchQueryOperation.execute(VIEW, metadata, criteria);
+        assertAll(
+            () -> verify(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID),
+            () -> verify(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ),
+            () -> verify(searchOperation, never()).execute(metadata, criteria),
+            () -> verify(getDraftsOperation, never()).execute(),
+            () -> verify(mergeDataToSearchResultOperation, never()).execute(anyObject(), anyList(), anyString())
+        );
     }
 }

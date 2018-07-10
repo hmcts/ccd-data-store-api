@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftsOperation;
 import uk.gov.hmcts.ccd.domain.service.search.CreatorSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -27,6 +29,8 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_RE
 
 @Service
 public class SearchQueryOperation {
+    public static final ArrayList<Object> EMPTY_LIST = Lists.newArrayList();
+    public static final String PAGE_ONE = "1";
     private final MergeDataToSearchResultOperation mergeDataToSearchResultOperation;
     private final GetCaseTypesOperation getCaseTypesOperation;
     private final SearchOperation searchOperation;
@@ -36,8 +40,7 @@ public class SearchQueryOperation {
     @Autowired
     public SearchQueryOperation(@Qualifier(CreatorSearchOperation.QUALIFIER) final SearchOperation searchOperation,
                                 final MergeDataToSearchResultOperation mergeDataToSearchResultOperation,
-                                @Qualifier(AuthorisedGetCaseTypesOperation.QUALIFIER) final GetCaseTypesOperation
-                                        getCaseTypesOperation,
+                                @Qualifier(AuthorisedGetCaseTypesOperation.QUALIFIER) final GetCaseTypesOperation getCaseTypesOperation,
                                 @Qualifier(DefaultGetDraftsOperation.QUALIFIER) GetDraftsOperation getDraftsOperation,
                                 final CaseTypeService caseTypeService) {
         this.searchOperation = searchOperation;
@@ -51,7 +54,7 @@ public class SearchQueryOperation {
                                     final MetaData metadata,
                                     final Map<String, String> queryParameters) {
         CaseType validCaseType = caseTypeService.getCaseTypeForJurisdiction(metadata.getCaseTypeId(),
-            metadata.getJurisdiction());
+                                                                            metadata.getJurisdiction());
         Optional<CaseType> caseType = this.getCaseTypesOperation.execute(metadata.getJurisdiction(), CAN_READ)
             .stream()
             .filter(ct -> ct.getId().equalsIgnoreCase(validCaseType.getId()))
@@ -61,10 +64,20 @@ public class SearchQueryOperation {
             return new SearchResultView(new SearchResultViewColumn[0], new SearchResultViewItem[0]);
         }
         final List<CaseDetails> caseData = searchOperation.execute(metadata, queryParameters);
-        List<Draft> caseDrafts = filterCaseTypeDrafts(metadata, getDraftsOperation.execute());
-        List<CaseDetails> caseDataFromDrafts = buildCaseDataFromDrafts(caseDrafts);
+        List<CaseDetails> caseDataFromDrafts = metadata.getPage()
+            .flatMap(page -> buildDraftsForFirstPage(metadata))
+            .orElse(EMPTY_LIST);
         caseDataFromDrafts.addAll(caseData);
         return mergeDataToSearchResultOperation.execute(caseType.get(), caseDataFromDrafts, view);
+    }
+
+    private Optional<List> buildDraftsForFirstPage(MetaData metadata) {
+        List<CaseDetails> caseDataFromDrafts = Lists.newArrayList();
+        if (metadata.getPage().get().equals(PAGE_ONE)) {
+            List<Draft> caseDrafts = filterCaseTypeDrafts(metadata, getDraftsOperation.execute());
+            caseDataFromDrafts = buildCaseDataFromDrafts(caseDrafts);
+        }
+        return Optional.of(caseDataFromDrafts);
     }
 
     private List<CaseDetails> buildCaseDataFromDrafts(List<Draft> drafts) {
@@ -82,6 +95,12 @@ public class SearchQueryOperation {
     }
 
     private List<Draft> filterCaseTypeDrafts(MetaData metadata, List<Draft> draftData) {
-        return draftData.stream().filter(draft -> draft.getDocument().getCaseTypeId().equals(metadata.getCaseTypeId())).collect(Collectors.toList());
+        return draftData.stream()
+            .filter(draft -> hasEqualCaseTypeIds(metadata, draft))
+            .collect(Collectors.toList());
+    }
+
+    private boolean hasEqualCaseTypeIds(MetaData metadata, Draft draft) {
+        return draft.getDocument().getCaseTypeId().equals(metadata.getCaseTypeId());
     }
 }
