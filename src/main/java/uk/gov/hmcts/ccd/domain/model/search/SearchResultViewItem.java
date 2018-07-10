@@ -2,7 +2,10 @@ package uk.gov.hmcts.ccd.domain.model.search;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 
+import java.util.List;
 import java.util.Map;
 
 public class SearchResultViewItem {
@@ -16,9 +19,13 @@ public class SearchResultViewItem {
     }
 
     public SearchResultViewItem(final String caseId,
-                                final Map<String, JsonNode> caseFields) {
+                                final Map<String, JsonNode> caseFields,
+                                final List<CaseField> labelFields) {
         this.caseId = caseId;
         this.caseFields = caseFields;
+        labelFields
+            .stream()
+            .forEach(f -> caseFields.put(f.getId(), JsonNodeFactory.instance.textNode(f.getLabel())));
     }
 
     public String getCaseId() {
