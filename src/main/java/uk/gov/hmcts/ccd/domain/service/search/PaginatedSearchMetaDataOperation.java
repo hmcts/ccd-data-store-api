@@ -33,8 +33,4 @@ public class PaginatedSearchMetaDataOperation {
         return caseDetailsRepository.getPaginatedSearchMetadata(metaData, criteria);
     }
 
-    private boolean caseTypeIdsEqual(MetaData metaData, DraftResponse d) {
-        return d.getDocument().getCaseTypeId().equals(metaData.getCaseTypeId());
-    }
-
 }
