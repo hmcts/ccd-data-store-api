@@ -60,7 +60,7 @@ class DefaultUpsertDraftOperationTest {
         doReturn(Long.valueOf(DID)).when(draftGateway).save(any(CreateCaseDraft.class));
         draft.setId(DID);
 
-        Draft result = upsertDraftOperation.executeSave(UID, JID, CTID, ETID, caseDataContent);
+        DraftResponse result = upsertDraftOperation.executeSave(UID, JID, CTID, ETID, caseDataContent);
 
         assertAll(
             () ->  verify(draftGateway).save(argument.capture()),
@@ -82,7 +82,7 @@ class DefaultUpsertDraftOperationTest {
         doReturn(draft).when(draftGateway).update(any(UpdateCaseDraft.class), any(String.class));
 
 
-        Draft result = upsertDraftOperation.executeUpdate(UID, JID, CTID, ETID, DID, caseDataContent);
+        DraftResponse result = upsertDraftOperation.executeUpdate(UID, JID, CTID, ETID, DID, caseDataContent);
 
         assertAll(
             () ->  verify(draftGateway).update(caseDataContentCaptor.capture(), draftIdCaptor.capture()),

@@ -6,6 +6,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftBuilder;
+import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContentBuilder;
 import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftOperation;
@@ -51,11 +52,11 @@ class DraftsEndpointTest {
                                                                       EVENT_TRIGGER_ID,
                                                                       CASE_DATA_CONTENT);
 
-        final Draft output = endpoint.saveDraftForCaseWorker(UID,
-                                                             JURISDICTION_ID,
-                                                             CASE_TYPE_ID,
-                                                             EVENT_TRIGGER_ID,
-                                                             CASE_DATA_CONTENT);
+        final DraftResponse output = endpoint.saveDraftForCaseWorker(UID,
+                                                                     JURISDICTION_ID,
+                                                                     CASE_TYPE_ID,
+                                                                     EVENT_TRIGGER_ID,
+                                                                     CASE_DATA_CONTENT);
 
         assertAll(
             () -> assertThat(output, sameInstance(toBeReturned)),
@@ -77,7 +78,7 @@ class DraftsEndpointTest {
                                                                         DRAFT_ID,
                                                                         CASE_DATA_CONTENT);
 
-        final Draft output = endpoint.updateDraftForCaseWorker(UID,
+        final DraftResponse output = endpoint.updateDraftForCaseWorker(UID,
                                                                JURISDICTION_ID,
                                                                CASE_TYPE_ID,
                                                                EVENT_TRIGGER_ID,
@@ -100,7 +101,7 @@ class DraftsEndpointTest {
         final Draft toBeReturned = new DraftBuilder().build();
         doReturn(toBeReturned).when(getDraftOperation).execute(DRAFT_ID);
 
-        final Draft output = endpoint.getDraftForCaseWorker(UID,
+        final DraftResponse output = endpoint.getDraftForCaseWorker(UID,
                                                                JURISDICTION_ID,
                                                                CASE_TYPE_ID,
                                                                DRAFT_ID);

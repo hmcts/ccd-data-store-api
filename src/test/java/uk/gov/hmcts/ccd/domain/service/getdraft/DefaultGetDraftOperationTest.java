@@ -8,12 +8,14 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftBuilder;
+import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.ccd.domain.model.draft.DraftBuilder.aDraft;
 
 class DefaultGetDraftOperationTest {
 
@@ -24,7 +26,7 @@ class DefaultGetDraftOperationTest {
 
     private GetDraftOperation getDraftOperation;
 
-    private Draft draft = new DraftBuilder().build();
+    private Draft draft = aDraft().build();
 
     @BeforeEach
     public void setup() {
@@ -37,7 +39,7 @@ class DefaultGetDraftOperationTest {
     void shouldSuccessfullyGetDraft() {
         doReturn(draft).when(draftGateway).get(DID);
 
-        Draft result = getDraftOperation.execute(DID);
+        DraftResponse result = getDraftOperation.execute(DID);
 
         assertAll(
             () ->  verify(draftGateway).get(DID),

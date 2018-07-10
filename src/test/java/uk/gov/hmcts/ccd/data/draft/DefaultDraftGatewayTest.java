@@ -39,7 +39,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDraftBuilder.aCreateCaseDraft;
 import static uk.gov.hmcts.ccd.domain.model.draft.CaseDraftBuilder.aCaseDraft;
-import static uk.gov.hmcts.ccd.domain.model.draft.GetDraftBuilder.aGetDraft;
+import static uk.gov.hmcts.ccd.domain.model.draft.DraftBuilder.aDraft;
 import static uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDraftBuilder.anUpdateCaseDraft;
 import static uk.gov.hmcts.ccd.domain.model.std.CaseDataContentBuilder.aCaseDataContent;
 
@@ -78,8 +78,7 @@ class DefaultDraftGatewayTest {
 
     private CaseDataContent caseDataContent;
 
-    private GetDraft getDraft;
-    private Draft draft = new DraftBuilder().build();
+    private Draft draft = aDraft().build();
     private CaseDraft caseDraft;
     private CreateCaseDraft createCaseDraft;
     private UpdateCaseDraft updateCaseDraft;
@@ -106,13 +105,13 @@ class DefaultDraftGatewayTest {
             .withToken(TOKEN)
             .build();
 
-        getDraft = aGetDraft()
-            .withId(DID)
-            .withDocument(mapper.convertValue(caseDataContent, JsonNode.class))
-            .withType(TYPE)
-            .withCreated(NOW)
-            .withUpdated(NOW_PLUS_5_MIN)
-            .build();
+//        getDraft = aGetDraft()
+//            .withId(DID)
+//            .withDocument(mapper.convertValue(caseDataContent, JsonNode.class))
+//            .withType(TYPE)
+//            .withCreated(NOW)
+//            .withUpdated(NOW_PLUS_5_MIN)
+//            .build();
 
         caseDraft = aCaseDraft()
             .withUserId(UID)
@@ -159,7 +158,7 @@ class DefaultDraftGatewayTest {
     void shouldSuccessfullyUpdateToDraft() throws URISyntaxException {
         doReturn(ResponseEntity.status(204).build()).when(restTemplate).exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(HttpEntity.class));
 
-        Draft result = draftGateway.update(updateCaseDraft, DID);
+        DraftResponse result = draftGateway.update(updateCaseDraft, DID);
 
         assertAll(
             () -> verify(restTemplate).exchange(eq(draftURL5), eq(HttpMethod.PUT), any(RequestEntity.class), eq(HttpEntity.class)),
@@ -187,12 +186,12 @@ class DefaultDraftGatewayTest {
 
     @Test
     void shouldSuccessfullyRetrieveDraft() throws URISyntaxException {
-        doReturn(ResponseEntity.ok(getDraft)).when(restTemplate).exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(GetDraft.class));
+        doReturn(ResponseEntity.ok(draft)).when(restTemplate).exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(Draft.class));
 
-        Draft result = draftGateway.get(DID);
+        DraftResponse result = draftGateway.get(DID);
 
         assertAll(
-            () -> verify(restTemplate).exchange(eq(draftURL5), eq(HttpMethod.GET), any(RequestEntity.class), eq(GetDraft.class)),
+            () -> verify(restTemplate).exchange(eq(draftURL5), eq(HttpMethod.GET), any(RequestEntity.class), eq(Draft.class)),
             () -> assertThat(result, hasProperty("id", is(Long.valueOf(DID)))),
             () -> assertThat(result, hasProperty("type", is(TYPE))),
             () -> assertThat(result, hasProperty("document", is(equalTo(caseDataContent)))),
@@ -205,7 +204,7 @@ class DefaultDraftGatewayTest {
     @Test
     void shouldFailToGetFromDraftWhenConnectivityIssue() {
         Exception exception = new RestClientException("connectivity issue");
-        doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(GetDraft.class));
+        doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(Draft.class));
 
         final ServiceException actualException = assertThrows(ServiceException.class, () -> draftGateway.get(DID));
         assertThat(actualException.getMessage(), is("Problem getting draft because of connectivity issue"));
@@ -214,7 +213,7 @@ class DefaultDraftGatewayTest {
     @Test
     void shouldFailToGetFromDraftWhenNotFound() {
         Exception exception = new HttpClientErrorException(HttpStatus.NOT_FOUND);
-        doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(GetDraft.class));
+        doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(Draft.class));
 
         final ResourceNotFoundException actualException = assertThrows(ResourceNotFoundException.class, () -> draftGateway.get(DID));
         assertThat(actualException.getMessage(), is("Resource not found when getting draft for draftId=5 because of 404 NOT_FOUND"));

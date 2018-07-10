@@ -10,6 +10,7 @@ import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
+import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftsOperation;
@@ -24,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.domain.model.draft.CaseDraftBuilder.aCaseDraft;
 import static uk.gov.hmcts.ccd.domain.model.draft.DraftBuilder.aDraft;
+import static uk.gov.hmcts.ccd.domain.model.draft.DraftResponseBuilder.aDraftResponse;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.aCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.aCaseType;
@@ -57,7 +59,7 @@ public class SearchQueryOperationTest {
     private SearchQueryOperation searchQueryOperation;
     private MetaData metadata;
     private HashMap<String, String> criteria;
-    private List<Draft> drafts = Lists.newArrayList();
+    private List<DraftResponse> drafts = Lists.newArrayList();
 
     @Mock
     private CaseTypeService caseTypeService;
@@ -84,7 +86,7 @@ public class SearchQueryOperationTest {
                                                         caseTypeService);
         metadata = new MetaData(CASE_TYPE_ID, JURISDICTION_ID);
         criteria = new HashMap<>();
-        drafts.add(aDraft()
+        drafts.add(aDraftResponse()
                        .withId(DRAFT_ID)
                        .withDocument(aCaseDraft()
                                          .withJurisdictionId(JURISDICTION_ID)
