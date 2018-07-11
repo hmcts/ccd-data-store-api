@@ -3,11 +3,14 @@ package uk.gov.hmcts.ccd.data.draft;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
@@ -16,8 +19,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,17 +26,19 @@ import java.util.stream.Collectors;
 import static uk.gov.hmcts.ccd.domain.model.draft.DraftResponseBuilder.aDraftResponse;
 
 
-@Named
+@Service
 @Qualifier(DefaultDraftGateway.QUALIFIER)
-@Singleton
 public class DefaultDraftGateway implements DraftGateway {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultDraftGateway.class);
-    protected static final ObjectMapper MAPPER = new ObjectMapper();
     public static final String QUALIFIER = "default";
+    public static final String DRAFT_ACCESS_EXCEPTION_MSG = "There is a problem with retrieving drafts.";
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultDraftGateway.class);
+    private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final String DRAFT_ENCRYPTION_KEY_HEADER = "Secret";
     private static final int RESOURCE_NOT_FOUND = 404;
 
+    @Qualifier("draftsRestTemplate")
+    @Autowired
     private final RestTemplate restTemplate;
     private final SecurityUtils securityUtils;
     private final ApplicationParams applicationParams;
@@ -117,6 +120,9 @@ public class DefaultDraftGateway implements DraftGateway {
                 .stream()
                 .map(d -> assembleDraft(d))
                 .collect(Collectors.toList());
+        } catch (ResourceAccessException e) {
+            LOG.warn("Error while getting drafts", e);
+            throw new DraftAccessException(DRAFT_ACCESS_EXCEPTION_MSG);
         } catch (Exception e) {
             LOG.warn("Error while getting drafts", e);
             throw new ServiceException("Problem getting drafts because of " + e.getMessage());

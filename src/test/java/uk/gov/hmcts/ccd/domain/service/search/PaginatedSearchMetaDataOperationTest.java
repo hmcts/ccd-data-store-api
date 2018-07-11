@@ -28,41 +28,31 @@ class PaginatedSearchMetaDataOperationTest {
     private static final String CTID = "CTID";
     private static final String JID = "JID";
     @Mock
-    private GetDraftsOperation getDraftsOperation;
-    @Mock
     private CaseDetailsRepository caseDetailsRepository;
-    @Mock
-    private ApplicationParams applicationParams;
 
     private PaginatedSearchMetaDataOperation paginatedSearchMetaDataOperation;
 
     private MetaData metadata = new MetaData(CTID, JID);
     private Map<String, String> criteria = Maps.newHashMap();
     private PaginatedSearchMetadata paginatedSearchMetadata = new PaginatedSearchMetadata();
-    private List<Draft> drafts = Lists.newArrayList();
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
         paginatedSearchMetadata.setTotalResultsCount(60);
         paginatedSearchMetadata.setTotalPagesCount(3);
-        drafts.add(aDraft().build());
-        drafts.add(aDraft().build());
-        drafts.add(aDraft().build());
-        paginatedSearchMetaDataOperation = new PaginatedSearchMetaDataOperation(getDraftsOperation, caseDetailsRepository, applicationParams);
+        paginatedSearchMetaDataOperation = new PaginatedSearchMetaDataOperation(caseDetailsRepository);
     }
 
     @Test
     void shouldReturnCorrectPaginationMetadata() {
-        doReturn(drafts).when(getDraftsOperation).execute();
         doReturn(paginatedSearchMetadata).when(caseDetailsRepository).getPaginatedSearchMetadata(metadata, criteria);
-        doReturn(20).when(applicationParams).getPaginationPageSize();
 
         PaginatedSearchMetadata paginatedSearchMetadata = paginatedSearchMetaDataOperation.execute(metadata, criteria);
 
         assertAll(
-            () -> assertThat(paginatedSearchMetadata.getTotalResultsCount(), is(63)),
-            () -> assertThat(paginatedSearchMetadata.getTotalPagesCount(), is(4))
+            () -> assertThat(paginatedSearchMetadata.getTotalResultsCount(), is(60)),
+            () -> assertThat(paginatedSearchMetadata.getTotalPagesCount(), is(3))
         );
     }
 }

@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
+import uk.gov.hmcts.ccd.data.draft.DraftAccessException;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.draft.CaseDraft;
@@ -18,7 +19,6 @@ import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftsOperation;
 import uk.gov.hmcts.ccd.domain.service.search.CreatorSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -29,8 +29,8 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_RE
 
 @Service
 public class SearchQueryOperation {
-    private static final ArrayList<Object> EMPTY_LIST = Lists.newArrayList();
     private static final String PAGE_ONE = "1";
+    protected static final String NO_ERROR = null;
     private final MergeDataToSearchResultOperation mergeDataToSearchResultOperation;
     private final GetCaseTypesOperation getCaseTypesOperation;
     private final SearchOperation searchOperation;
@@ -61,27 +61,27 @@ public class SearchQueryOperation {
             .findFirst();
 
         if (!caseType.isPresent()) {
-            return new SearchResultView(new SearchResultViewColumn[0], new SearchResultViewItem[0]);
+            return new SearchResultView(new SearchResultViewColumn[0], new SearchResultViewItem[0], NO_ERROR);
         }
-        final List<CaseDetails> caseData = searchOperation.execute(metadata, queryParameters);
-        List<CaseDetails> caseDataFromDrafts = metadata
-            .getPage()
-            .flatMap(page -> buildDraftsForFirstPage(metadata))
-            .orElse(EMPTY_LIST);
-        caseDataFromDrafts.addAll(caseData);
-        return mergeDataToSearchResultOperation.execute(caseType.get(), caseDataFromDrafts, view);
-    }
 
-    private Optional<List> buildDraftsForFirstPage(MetaData metadata) {
+        final List<CaseDetails> caseData = searchOperation.execute(metadata, queryParameters);
+
+        String draftResultError = NO_ERROR;
         List<CaseDetails> caseDataFromDrafts = Lists.newArrayList();
-        if (metadata.getPage().get().equals(PAGE_ONE)) {
-            List<DraftResponse> caseDrafts = getDraftsOperation.execute()
-                .stream()
-                .filter(d -> caseTypeIdsEqual(metadata, d))
-                .collect(Collectors.toList());
-            caseDataFromDrafts = buildCaseDataFromDrafts(caseDrafts);
+        if (metadata.getPage().isPresent() && metadata.getPage().get().equals(PAGE_ONE)) {
+            try {
+                List<DraftResponse> caseDrafts = getDraftsOperation.execute()
+                    .stream()
+                    .filter(d -> caseTypeIdsEqual(metadata, d))
+                    .collect(Collectors.toList());
+                caseDataFromDrafts = buildCaseDataFromDrafts(caseDrafts);
+            } catch (DraftAccessException dae) {
+                draftResultError = dae.getMessage();
+            }
         }
-        return Optional.of(caseDataFromDrafts);
+        caseDataFromDrafts.addAll(caseData);
+
+        return mergeDataToSearchResultOperation.execute(caseType.get(), caseDataFromDrafts, view, draftResultError);
     }
 
     private boolean caseTypeIdsEqual(MetaData metadata, DraftResponse d) {
@@ -93,7 +93,7 @@ public class SearchQueryOperation {
             .map(d -> {
                 CaseDraft document = d.getDocument();
                 return aCaseDetails()
-                    .withId(Long.valueOf(d.getId()))
+                    .withId(d.getId())
                     .withCaseTypeId(document.getCaseTypeId())
                     .withJurisdiction(document.getJurisdictionId())
                     .withData(document.getCaseDataContent().getData())

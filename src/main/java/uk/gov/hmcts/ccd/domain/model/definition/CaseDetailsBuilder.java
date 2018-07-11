@@ -19,6 +19,11 @@ public class CaseDetailsBuilder {
         return this;
     }
 
+    public CaseDetailsBuilder withId(String id) {
+        this.caseDetails.setId(Long.valueOf(id));
+        return this;
+    }
+
     public CaseDetailsBuilder withReference(Long reference) {
         this.caseDetails.setReference(reference);
         return this;
