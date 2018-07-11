@@ -1,23 +1,27 @@
 package uk.gov.hmcts.ccd.domain.model.draft;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import javax.validation.constraints.NotNull;
 
 public class UpdateCaseDraft {
 
-    public final CaseDraft document;
+    private CaseDraft document;
 
     @NotNull
-    public final String type;
+    private String type;
 
-    // region constructor
-    public UpdateCaseDraft(
-        @JsonProperty("document") CaseDraft document,
-        @JsonProperty("type") String type
-    ) {
+    public CaseDraft getDocument() {
+        return document;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setDocument(CaseDraft document) {
         this.document = document;
+    }
+
+    public void setType(String type) {
         this.type = type;
     }
-    // endregion
 }

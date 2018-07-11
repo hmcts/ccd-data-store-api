@@ -10,6 +10,7 @@ public class CaseDraft {
     private String jurisdictionId;
     private String caseTypeId;
     private String eventTriggerId;
+
     private CaseDataContent caseDataContent;
 
     public String getUserId() {

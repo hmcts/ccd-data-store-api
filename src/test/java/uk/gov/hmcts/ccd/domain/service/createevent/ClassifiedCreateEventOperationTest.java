@@ -20,6 +20,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 
 class ClassifiedCreateEventOperationTest {
 
@@ -27,7 +28,7 @@ class ClassifiedCreateEventOperationTest {
     private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_TYPE_ID = "Grant";
     private static final String CASE_REFERENCE = "1234123412341234";
-    private static final Event EVENT = new EventBuilder().build();
+    private static final Event EVENT = anEvent().build();
     private static final Map<String, JsonNode> DATA = new HashMap<>();
     private static final String TOKEN = "JwtToken";
     private static final Boolean IGNORE = Boolean.TRUE;

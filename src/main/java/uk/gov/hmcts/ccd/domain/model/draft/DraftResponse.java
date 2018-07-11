@@ -1,8 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.draft;
 
 import lombok.ToString;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.time.LocalDateTime;
 
@@ -59,31 +57,4 @@ public class DraftResponse {
         this.updated = updated;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-
-        if (o == null || getClass() != o.getClass()) return false;
-
-        DraftResponse draft = (DraftResponse) o;
-
-        return new EqualsBuilder()
-            .append(id, draft.id)
-            .append(document, draft.document)
-            .append(type, draft.type)
-            .append(created, draft.created)
-            .append(updated, draft.updated)
-            .isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-            .append(id)
-            .append(document)
-            .append(type)
-            .append(created)
-            .append(updated)
-            .toHashCode();
-    }
 }

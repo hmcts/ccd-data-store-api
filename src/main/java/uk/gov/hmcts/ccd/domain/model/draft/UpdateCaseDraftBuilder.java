@@ -1,16 +1,19 @@
 package uk.gov.hmcts.ccd.domain.model.draft;
 
 public class UpdateCaseDraftBuilder {
-    private CaseDraft document;
-    private String type;
+    private final UpdateCaseDraft updateCaseDraft;
+
+    private UpdateCaseDraftBuilder() {
+        this.updateCaseDraft = new UpdateCaseDraft();
+    }
 
     public UpdateCaseDraftBuilder withDocument(CaseDraft document) {
-        this.document = document;
+        this.updateCaseDraft.setDocument(document);
         return this;
     }
 
     public UpdateCaseDraftBuilder withType(String type) {
-        this.type = type;
+        this.updateCaseDraft.setType(type);
         return this;
     }
 
@@ -19,6 +22,6 @@ public class UpdateCaseDraftBuilder {
     }
 
     public UpdateCaseDraft build() {
-        return new UpdateCaseDraft(document, type);
+        return this.updateCaseDraft;
     }
 }

@@ -72,7 +72,7 @@ public class DraftsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn201WhenPostSaveDraftForCaseworker() throws Exception {
+    public void shouldReturn201WhenSaveDraftForCaseworker() throws Exception {
         final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JID + "/case-types/" + CTID + "/event-trigger/" + ETID + "/drafts";
         CaseDataContent caseDetailsToSave = aCaseDataContent()
             .withData(getData(data))
@@ -91,12 +91,12 @@ public class DraftsEndpointIT extends WireMockBaseTest {
         Draft actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString()).toString(), Draft.class);
 
         Assertions.assertAll(
-            () -> assertThat(actualData, hasProperty("id", is(4L)))
+            () -> assertThat(actualData, hasProperty("id", is("4")))
         );
     }
 
     @Test
-    public void shouldReturn400WhenPostSaveDraftForCaseworkerWithMalformedData() throws Exception {
+    public void shouldReturn400WhenSaveDraftForCaseworkerWithMalformedData() throws Exception {
         final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JID + "/case-types/" + CTID + "/event-trigger/" + ETID + "/drafts";
 
         {
@@ -108,7 +108,7 @@ public class DraftsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn200WhenPutUpdateDraftForCaseworker() throws Exception {
+    public void shouldReturn200WhenUpdateDraftForCaseworker() throws Exception {
         final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JID + "/case-types/" + CTID + "/event-trigger/" + ETID + "/drafts/" + DID;
         CaseDataContent caseDetailsToUpdate = aCaseDataContent()
             .withData(getData(data))
@@ -126,11 +126,11 @@ public class DraftsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect Response Status Code", 200, mvcResult.getResponse().getStatus());
         Draft actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString()).toString(), Draft.class);
 
-        assertThat(actualData, hasProperty("id", is(5L)));
+        assertThat(actualData, hasProperty("id", is(DID)));
     }
 
     @Test
-    public void shouldReturn400WhenPutUpdateDraftForCaseworkerWithMalformedData() throws Exception {
+    public void shouldReturn400WhenUpdateDraftForCaseworkerWithMalformedData() throws Exception {
         final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JID + "/case-types/" + CTID + "/event-trigger/" + ETID + "/drafts/" + DID;
 
         {
@@ -142,7 +142,7 @@ public class DraftsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn404WhenPutUpdateDraftForCaseworkerWithDraftIdNotFound() throws Exception {
+    public void shouldReturn404WhenUpdateDraftForCaseworkerWithDraftIdNotFound() throws Exception {
         final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JID + "/case-types/" + CTID + "/event-trigger/" + ETID + "/drafts/" + WRONG_DID;
         CaseDataContent caseDetailsToUpdate = aCaseDataContent()
             .withData(getData(data))
@@ -160,48 +160,6 @@ public class DraftsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect Response Status Code", 404, mvcResult.getResponse().getStatus());
         String actualResponse = mapper.readTree(mvcResult.getResponse().getContentAsString()).toString();
         assertThat(actualResponse, containsString("\"message\":\"Resource not found when getting draft for draftId=6 because of 404 Not Found\""));
-    }
-
-    @Test
-    public void shouldReturn200WhenGetDraftForCaseworker() throws Exception {
-        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JID + "/case-types/" + CTID + "/drafts/" + DID;
-
-        final MvcResult mvcResult = mockMvc.perform(get(URL)
-                                                        .contentType(JSON_CONTENT_TYPE)
-        ).andReturn();
-
-        assertEquals("Incorrect Response Status Code", 200, mvcResult.getResponse().getStatus());
-        Draft actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString()).toString(), Draft.class);
-
-        CaseDataContent expectedCaseDataContent = aCaseDataContent()
-            .withData(getData(mapper.readTree("{\n" +
-                                                  "    \"PersonFirstName\": \"John\",\n" +
-                                                  "    \"PersonLastName\": \"Smith\"\n" +
-                                                  " }\n")))
-            .withEvent(anEvent()
-                           .withEventId("createCase")
-                           .withSummary("Create Case")
-                           .withDescription("This event will create a new case")
-                           .build())
-            .withToken("testToken")
-            .withIgnoreWarning(true)
-            .build();
-        assertThat(actualData, hasProperty("id", is(5L)));
-        assertThat(actualData, hasProperty("document", is(expectedCaseDataContent)));
-        assertThat(actualData, hasProperty("type", is("caseDataContent")));
-        assertThat(actualData, hasProperty("created", is(LocalDateTime.parse("2018-06-06T18:13:55.882"))));
-        assertThat(actualData, hasProperty("updated", is(LocalDateTime.parse("2018-06-06T18:18:55.882"))));
-    }
-
-    @Test
-    public void shouldReturn404WhenGetDraftForCaseworkerWithDraftIdNotFound() throws Exception {
-        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JID + "/case-types/" + CTID + "/drafts/" + WRONG_DID;
-
-        final MvcResult mvcResult = mockMvc.perform(get(URL)
-                                                        .contentType(JSON_CONTENT_TYPE)
-        ).andReturn();
-
-        assertEquals("Incorrect Response Status Code", 404, mvcResult.getResponse().getStatus());
     }
 
     private Map<String, JsonNode> getData(JsonNode expectedData) {

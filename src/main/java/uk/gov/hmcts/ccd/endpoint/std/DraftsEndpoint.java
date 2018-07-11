@@ -12,8 +12,6 @@ import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftOperation;
 import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftsOperation;
 import uk.gov.hmcts.ccd.domain.service.upsertdraft.UpsertDraftOperation;
 
-import java.util.List;
-
 @RestController
 @RequestMapping(path = "/",
     consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -79,50 +77,6 @@ public class DraftsEndpoint {
         @RequestBody final CaseDataContent caseDataContent) {
 
         return upsertDraftOperation.executeUpdate(uid, jurisdictionId, caseTypeId, eventTriggerId, draftId, caseDataContent);
-    }
-
-    @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/drafts/{did}", method = RequestMethod.GET)
-    @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(
-        value = "Update draft as a caseworker."
-    )
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Case draft found for the given ID"),
-        @ApiResponse(code = 400, message = "Invalid draft ID"),
-        @ApiResponse(code = 404, message = "No case draft found for the given ID")
-    })
-    public DraftResponse getDraftForCaseWorker(
-        @ApiParam(value = "Idam user ID", required = true)
-        @PathVariable("uid") final String uid,
-        @ApiParam(value = "Jurisdiction ID", required = true)
-        @PathVariable("jid") final String jurisdictionId,
-        @ApiParam(value = "Case type ID", required = true)
-        @PathVariable("ctid") final String caseTypeId,
-        @ApiParam(value = "Draft ID", required = true)
-        @PathVariable("did") final String draftId) {
-
-        return getDraftOperation.execute(draftId);
-    }
-
-    @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/drafts", method = RequestMethod.GET)
-    @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(
-        value = "Update draft as a caseworker."
-    )
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Case draft found for the given ID"),
-        @ApiResponse(code = 400, message = "Invalid draft ID"),
-        @ApiResponse(code = 404, message = "No case draft found for the given ID")
-    })
-    public List<DraftResponse> getDraftsForCaseWorker(
-        @ApiParam(value = "Idam user ID", required = true)
-        @PathVariable("uid") final String uid,
-        @ApiParam(value = "Jurisdiction ID", required = true)
-        @PathVariable("jid") final String jurisdictionId,
-        @ApiParam(value = "Case type ID", required = true)
-        @PathVariable("ctid") final String caseTypeId) {
-
-        return getDraftsOperation.execute();
     }
 
 }

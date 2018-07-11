@@ -11,9 +11,6 @@ public class DraftList {
     @JsonProperty("paging_cursors")
     private PagingCursors paging;
 
-    public DraftList() {
-    }
-
     static class PagingCursors {
         private String after;
 

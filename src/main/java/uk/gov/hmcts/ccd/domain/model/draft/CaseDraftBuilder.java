@@ -3,7 +3,7 @@ package uk.gov.hmcts.ccd.domain.model.draft;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 
 public class CaseDraftBuilder {
-    private CaseDraft caseDraft;
+    private final CaseDraft caseDraft;
 
     private CaseDraftBuilder() {
         this.caseDraft = new CaseDraft();

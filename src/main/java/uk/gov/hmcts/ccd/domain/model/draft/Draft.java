@@ -2,10 +2,8 @@ package uk.gov.hmcts.ccd.domain.model.draft;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.ToString;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @ToString
 public class Draft {
@@ -16,9 +14,9 @@ public class Draft {
 
     private String type;
 
-    private LocalDateTime created;
+    private ZonedDateTime created;
 
-    private LocalDateTime updated;
+    private ZonedDateTime updated;
 
     public String getId() {
         return id;
@@ -44,47 +42,20 @@ public class Draft {
         this.type = type;
     }
 
-    public LocalDateTime getCreated() {
+    public ZonedDateTime getCreated() {
         return created;
     }
 
-    public void setCreated(LocalDateTime created) {
+    public void setCreated(ZonedDateTime created) {
         this.created = created;
     }
 
-    public LocalDateTime getUpdated() {
+    public ZonedDateTime getUpdated() {
         return updated;
     }
 
-    public void setUpdated(LocalDateTime updated) {
+    public void setUpdated(ZonedDateTime updated) {
         this.updated = updated;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Draft draft = (Draft) o;
-
-        return new EqualsBuilder()
-            .append(id, draft.id)
-            .append(document, draft.document)
-            .append(type, draft.type)
-            .append(created, draft.created)
-            .append(updated, draft.updated)
-            .isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-            .append(id)
-            .append(document)
-            .append(type)
-            .append(created)
-            .append(updated)
-            .toHashCode();
-    }
 }

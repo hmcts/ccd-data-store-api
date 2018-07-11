@@ -28,6 +28,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Matchers.notNull;
 import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 
 class SubmitCaseTransactionTest {
 
@@ -193,7 +194,7 @@ class SubmitCaseTransactionTest {
     }
 
     private Event buildEvent() {
-        final Event event = new EventBuilder().build();
+        final Event event = anEvent().build();
         event.setEventId(EVENT_ID);
         event.setDescription(EVENT_DESC);
         event.setSummary(EVENT_SUMMARY);

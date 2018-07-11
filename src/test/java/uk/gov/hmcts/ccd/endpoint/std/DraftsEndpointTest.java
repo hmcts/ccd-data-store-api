@@ -4,11 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.domain.model.draft.Draft;
-import uk.gov.hmcts.ccd.domain.model.draft.DraftBuilder;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
-import uk.gov.hmcts.ccd.domain.model.std.CaseDataContentBuilder;
 import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftOperation;
 import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftsOperation;
 import uk.gov.hmcts.ccd.domain.service.upsertdraft.UpsertDraftOperation;
@@ -18,13 +15,15 @@ import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.ccd.domain.model.draft.DraftResponseBuilder.aDraftResponse;
+import static uk.gov.hmcts.ccd.domain.model.std.CaseDataContentBuilder.aCaseDataContent;
 
 class DraftsEndpointTest {
 
     private static final String UID = "1231";
     private static final String JURISDICTION_ID = "Test";
     private static final String CASE_TYPE_ID = "TestAddressBookCase";
-    private static final CaseDataContent CASE_DATA_CONTENT = new CaseDataContentBuilder().build();
+    private static final CaseDataContent CASE_DATA_CONTENT = aCaseDataContent().build();
     private static final String EVENT_TRIGGER_ID = "createCase";
     private static final String DRAFT_ID = "5";
 
@@ -45,7 +44,7 @@ class DraftsEndpointTest {
 
     @Test
     void shouldSaveDraftForCaseWorker() {
-        final Draft toBeReturned = new DraftBuilder().build();
+        final DraftResponse toBeReturned = aDraftResponse().build();
         doReturn(toBeReturned).when(upsertDraftOperation).executeSave(UID,
                                                                       JURISDICTION_ID,
                                                                       CASE_TYPE_ID,
@@ -70,7 +69,7 @@ class DraftsEndpointTest {
 
     @Test
     void shouldUpdateDraftForCaseWorker() {
-        final Draft toBeReturned = new DraftBuilder().build();
+        final DraftResponse toBeReturned = aDraftResponse().build();
         doReturn(toBeReturned).when(upsertDraftOperation).executeUpdate(UID,
                                                                         JURISDICTION_ID,
                                                                         CASE_TYPE_ID,
@@ -96,19 +95,4 @@ class DraftsEndpointTest {
         );
     }
 
-    @Test
-    void shouldGetDraftForCaseWorker() {
-        final Draft toBeReturned = new DraftBuilder().build();
-        doReturn(toBeReturned).when(getDraftOperation).execute(DRAFT_ID);
-
-        final DraftResponse output = endpoint.getDraftForCaseWorker(UID,
-                                                               JURISDICTION_ID,
-                                                               CASE_TYPE_ID,
-                                                               DRAFT_ID);
-
-        assertAll(
-            () -> assertThat(output, sameInstance(toBeReturned)),
-            () -> verify(getDraftOperation).execute(DRAFT_ID)
-        );
-    }
 }

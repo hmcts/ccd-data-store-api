@@ -3,9 +3,9 @@ package uk.gov.hmcts.ccd.domain.model.draft;
 import java.time.LocalDateTime;
 
 public class DraftResponseBuilder {
-    private DraftResponse draftResponse;
+    private final DraftResponse draftResponse;
 
-    public DraftResponseBuilder() {
+    private DraftResponseBuilder() {
         draftResponse = new DraftResponse();
     }
 

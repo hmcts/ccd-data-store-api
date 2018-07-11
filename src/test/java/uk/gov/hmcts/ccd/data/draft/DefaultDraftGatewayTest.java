@@ -19,7 +19,6 @@ import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.draft.*;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
-import uk.gov.hmcts.ccd.domain.model.std.EventBuilder;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
@@ -37,11 +36,12 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDraftBuilder.aCreateCaseDraft;
 import static uk.gov.hmcts.ccd.domain.model.draft.CaseDraftBuilder.aCaseDraft;
+import static uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDraftBuilder.aCreateCaseDraft;
 import static uk.gov.hmcts.ccd.domain.model.draft.DraftBuilder.aDraft;
 import static uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDraftBuilder.anUpdateCaseDraft;
 import static uk.gov.hmcts.ccd.domain.model.std.CaseDataContentBuilder.aCaseDataContent;
+import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 
 class DefaultDraftGatewayTest {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
@@ -74,11 +74,11 @@ class DefaultDraftGatewayTest {
 
     Map<String, JsonNode> data = Maps.newHashMap();
     Map<String, JsonNode> dataClassification = Maps.newHashMap();
-    Event event = new EventBuilder().build();
+    Event event = anEvent().build();
 
     private CaseDataContent caseDataContent;
 
-    private Draft draft = aDraft().build();
+    private Draft draft;
     private CaseDraft caseDraft;
     private CreateCaseDraft createCaseDraft;
     private UpdateCaseDraft updateCaseDraft;
@@ -104,21 +104,19 @@ class DefaultDraftGatewayTest {
             .withSecurityClassification(dataClassification)
             .withToken(TOKEN)
             .build();
-
-//        getDraft = aGetDraft()
-//            .withId(DID)
-//            .withDocument(mapper.convertValue(caseDataContent, JsonNode.class))
-//            .withType(TYPE)
-//            .withCreated(NOW)
-//            .withUpdated(NOW_PLUS_5_MIN)
-//            .build();
-
         caseDraft = aCaseDraft()
             .withUserId(UID)
             .withJurisdictionId(JID)
             .withCaseTypeId(CTID)
             .withEventTriggerId(ETID)
             .withCaseDataContent(caseDataContent)
+            .build();
+        draft = aDraft()
+            .withId(DID)
+            .withType(TYPE)
+            .withDocument(mapper.convertValue(caseDraft, JsonNode.class))
+            .withCreated(NOW)
+            .withUpdated(NOW_PLUS_5_MIN)
             .build();
         createCaseDraft = aCreateCaseDraft()
             .withDocument(caseDraft)
@@ -162,7 +160,7 @@ class DefaultDraftGatewayTest {
 
         assertAll(
             () -> verify(restTemplate).exchange(eq(draftURL5), eq(HttpMethod.PUT), any(RequestEntity.class), eq(HttpEntity.class)),
-            () -> assertThat(result, hasProperty("id", is(Long.valueOf(DID))))
+            () -> assertThat(result, hasProperty("id", is(DID)))
         );
     }
 
@@ -186,15 +184,26 @@ class DefaultDraftGatewayTest {
 
     @Test
     void shouldSuccessfullyRetrieveDraft() throws URISyntaxException {
-        doReturn(ResponseEntity.ok(draft)).when(restTemplate).exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(Draft.class));
+        doReturn(ResponseEntity.ok(draft)).when(restTemplate).exchange(eq(draftURL5), eq(HttpMethod.GET), any(HttpEntity.class), eq(Draft.class));
 
         DraftResponse result = draftGateway.get(DID);
 
         assertAll(
             () -> verify(restTemplate).exchange(eq(draftURL5), eq(HttpMethod.GET), any(RequestEntity.class), eq(Draft.class)),
-            () -> assertThat(result, hasProperty("id", is(Long.valueOf(DID)))),
+            () -> assertThat(result, hasProperty("id", is(DID))),
             () -> assertThat(result, hasProperty("type", is(TYPE))),
-            () -> assertThat(result, hasProperty("document", is(equalTo(caseDataContent)))),
+            () -> assertThat(result, hasProperty("document", hasProperty("userId", is(caseDraft.getUserId())))),
+            () -> assertThat(result, hasProperty("document", hasProperty("jurisdictionId", is(caseDraft.getJurisdictionId())))),
+            () -> assertThat(result, hasProperty("document", hasProperty("caseTypeId", is(caseDraft.getCaseTypeId())))),
+            () -> assertThat(result, hasProperty("document", hasProperty("eventTriggerId", is(caseDraft.getEventTriggerId())))),
+            () -> assertThat(result, hasProperty("document", hasProperty("caseDataContent", hasProperty("data", is(caseDataContent.getData()))))),
+            () -> assertThat(result,
+                             hasProperty("document",
+                                         hasProperty("caseDataContent",
+                                                     hasProperty("securityClassification", is(caseDataContent.getSecurityClassification()))))),
+            () -> assertThat(result, hasProperty("document", hasProperty("caseDataContent", hasProperty("token", is(caseDataContent.getToken()))))),
+            () -> assertThat(result, hasProperty("document", hasProperty("caseDataContent", hasProperty("ignoreWarning", is(caseDataContent.getIgnoreWarning()))))),
+            () -> assertThat(result, hasProperty("document", hasProperty("caseDataContent", hasProperty("event", samePropertyValuesAs(caseDataContent.getEvent()))))),
             () -> assertThat(result, hasProperty("created", is(NOW.toLocalDateTime()))),
             () -> assertThat(result, hasProperty("updated", is(NOW_PLUS_5_MIN.toLocalDateTime())))
         );

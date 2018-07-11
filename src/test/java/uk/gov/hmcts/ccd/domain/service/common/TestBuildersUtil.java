@@ -67,32 +67,6 @@ public class TestBuildersUtil {
         }
     }
 
-    public static class CaseDetailsBuilder {
-        private final CaseDetails caseDetails;
-
-        public CaseDetailsBuilder() {
-            caseDetails = new CaseDetails();
-        }
-
-        public CaseDetailsBuilder withSecurityClassification(SecurityClassification securityClassification) {
-            caseDetails.setSecurityClassification(securityClassification);
-            return this;
-        }
-
-        public CaseDetailsBuilder withDataClassification(Map<String, JsonNode> dataClassification) {
-            caseDetails.setDataClassification(dataClassification);
-            return this;
-        }
-
-        public CaseDetails build() {
-            return caseDetails;
-        }
-
-        public static CaseDetailsBuilder aCaseDetails() {
-            return new CaseDetailsBuilder();
-        }
-    }
-
     public static class DataClassificationBuilder {
         private final Map<String, JsonNode> dataClassification;
 
@@ -289,7 +263,7 @@ public class TestBuildersUtil {
             return caseEvent;
         }
 
-        public static CaseEventBuilder anEvent() {
+        public static CaseEventBuilder aCaseEvent() {
             return new CaseEventBuilder();
         }
     }

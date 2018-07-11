@@ -2,12 +2,12 @@ package uk.gov.hmcts.ccd.domain.model.draft;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 public class DraftBuilder {
-    private Draft draft;
+    private final Draft draft;
 
-    public DraftBuilder() {
+    private DraftBuilder() {
         draft = new Draft();
     }
 
@@ -31,12 +31,12 @@ public class DraftBuilder {
         return this;
     }
 
-    public DraftBuilder withCreated(LocalDateTime created) {
+    public DraftBuilder withCreated(ZonedDateTime created) {
         this.draft.setCreated(created);
         return this;
     }
 
-    public DraftBuilder withUpdated(LocalDateTime updated) {
+    public DraftBuilder withUpdated(ZonedDateTime updated) {
         this.draft.setUpdated(updated);
         return this;
     }

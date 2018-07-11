@@ -14,9 +14,7 @@ import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
-import uk.gov.hmcts.ccd.domain.model.std.CaseDataContentBuilder;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
-import uk.gov.hmcts.ccd.domain.model.std.EventBuilder;
 import uk.gov.hmcts.ccd.domain.service.createcase.CreateCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.createevent.CreateEventOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
@@ -42,6 +40,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.ccd.domain.model.std.CaseDataContentBuilder.aCaseDataContent;
+import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 
 class CaseDetailsEndpointTest {
 
@@ -51,8 +51,8 @@ class CaseDetailsEndpointTest {
     private static final String CASE_ID = "1234qwer5678tyui";
     private static final String EVENT_TRIGGER_ID = "updateEvent";
     private static final Boolean IGNORE_WARNING = Boolean.TRUE;
-    private static final CaseDataContent EVENT_DATA = new CaseDataContentBuilder().build();
-    private static final Event EVENT = new EventBuilder().build();
+    private static final CaseDataContent EVENT_DATA = aCaseDataContent().build();
+    private static final Event EVENT = anEvent().build();
     private static final Map<String, JsonNode> DATA = new HashMap<>();
     private static final String TOKEN = "csdcsdcdscsdcsdcsdcd";
 

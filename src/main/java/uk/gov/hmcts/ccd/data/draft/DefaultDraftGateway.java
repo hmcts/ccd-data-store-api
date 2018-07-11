@@ -10,8 +10,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.draft.*;
@@ -115,29 +115,31 @@ public class DefaultDraftGateway implements DraftGateway {
             HttpHeaders headers = securityUtils.authorizationHeaders();
             headers.add(DRAFT_ENCRYPTION_KEY_HEADER, applicationParams.getDraftEncryptionKey());
             final HttpEntity requestEntity = new HttpEntity(headers);
-            DraftList getDrafts = restTemplate.exchange(applicationParams.draftBaseURL(), HttpMethod.GET, requestEntity, DraftList.class).getBody();
+            DraftList getDrafts = restTemplate.exchange(getUriWithQueryParams(), HttpMethod.GET, requestEntity, DraftList.class).getBody();
             return getDrafts.getData()
                 .stream()
-                .map(d -> assembleDraft(d))
+                .map(this::assembleDraft)
                 .collect(Collectors.toList());
-        } catch (ResourceAccessException e) {
-            LOG.warn("Error while getting drafts", e);
-            throw new DraftAccessException(DRAFT_ACCESS_EXCEPTION_MSG);
         } catch (Exception e) {
             LOG.warn("Error while getting drafts", e);
-            throw new ServiceException("Problem getting drafts because of " + e.getMessage());
+            throw new DraftAccessException(DRAFT_ACCESS_EXCEPTION_MSG);
         }
     }
 
+    private String getUriWithQueryParams() {
+        return UriComponentsBuilder.fromUriString(applicationParams.draftBaseURL())
+                    .queryParam("limit", Integer.MAX_VALUE).toUriString();
+    }
+
     private DraftResponse assembleDraft(Draft getDraft) {
-        DraftResponse draftResponse = null;
+        DraftResponse draftResponse;
         try {
             draftResponse = aDraftResponse()
                 .withId(getDraft.getId())
                 .withDocument(MAPPER.treeToValue(getDraft.getDocument(), CaseDraft.class))
                 .withType(getDraft.getType())
-                .withCreated(getDraft.getCreated())
-                .withUpdated(getDraft.getUpdated())
+                .withCreated(getDraft.getCreated().toLocalDateTime())
+                .withUpdated(getDraft.getUpdated().toLocalDateTime())
                 .build();
         } catch (IOException e) {
             LOG.warn("Error while deserializing case data content", e);

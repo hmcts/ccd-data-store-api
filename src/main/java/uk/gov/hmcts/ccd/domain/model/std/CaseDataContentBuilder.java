@@ -5,34 +5,34 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Map;
 
 public class CaseDataContentBuilder {
-    private Event event;
-    private Map<String, JsonNode> data;
-    private Map<String, JsonNode> securityClassification;
-    private String token;
-    private Boolean ignoreWarning;
+    private final CaseDataContent caseDataContent;
+
+    private CaseDataContentBuilder() {
+        this.caseDataContent = new CaseDataContent();
+    }
 
     public CaseDataContentBuilder withEvent(Event event) {
-        this.event = event;
+        this.caseDataContent.setEvent(event);
         return this;
     }
 
     public CaseDataContentBuilder withData(Map<String, JsonNode> data) {
-        this.data = data;
+        this.caseDataContent.setData(data);
         return this;
     }
 
     public CaseDataContentBuilder withSecurityClassification(Map<String, JsonNode> securityClassification) {
-        this.securityClassification = securityClassification;
+        this.caseDataContent.setSecurityClassification(securityClassification);
         return this;
     }
 
     public CaseDataContentBuilder withToken(String token) {
-        this.token = token;
+        this.caseDataContent.setToken(token);
         return this;
     }
 
     public CaseDataContentBuilder withIgnoreWarning(Boolean ignoreWarning) {
-        this.ignoreWarning = ignoreWarning;
+        this.caseDataContent.setIgnoreWarning(ignoreWarning);
         return this;
     }
 
@@ -41,6 +41,6 @@ public class CaseDataContentBuilder {
     }
 
     public CaseDataContent build() {
-        return new CaseDataContent(event, data, securityClassification, token, ignoreWarning);
+        return this.caseDataContent;
     }
 }

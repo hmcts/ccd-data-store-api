@@ -35,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
@@ -48,7 +49,7 @@ class AuthorisedCreateCaseOperationTest {
     private static final String UID = "123";
     private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_TYPE_ID = "Grant";
-    private static final Event EVENT = new EventBuilder().build();
+    private static final Event EVENT = anEvent().build();
     private static final String EVENT_ID = "EVENT_ID";
     private static final Map<String, JsonNode> DATA = new HashMap<>();
     private static final String TOKEN = "JwtToken";
