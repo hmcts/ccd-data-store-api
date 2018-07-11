@@ -896,6 +896,124 @@ public class SecurityClassificationServiceTest {
         }
 
         @Test
+        @DisplayName("should apply classifications on collections nested in collection")
+        void shouldApplyClassificationsOnNestedCollections() throws IOException {
+            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+                "{  \"collection\":[  \n" +
+                    "         {  \n" +
+                    "            \"id\":\"" + FIRST_CHILD_ID + "\",\n" +
+                    "            \"value\": {\n" +
+                    "               \"collection1\": [" +
+                    "                  {" +
+                    "                     \"id\": \"ITEM_1_1\"," +
+                    "                     \"value\": \"ITEM_1_1\"" +
+                    "                  }," +
+                    "                  {" +
+                    "                     \"id\": \"ITEM_1_2\"," +
+                    "                     \"value\": \"ITEM_1_2\"" +
+                    "                  }" +
+                    "               ]" +
+                    "            }\n" +
+                    "         },\n" +
+                    "         {  \n" +
+                    "            \"id\":\"" + SECOND_CHILD_ID + "\",\n" +
+                    "            \"value\": {\n" +
+                    "               \"collection1\": [" +
+                    "                  {" +
+                    "                     \"id\": \"ITEM_2_1\"," +
+                    "                     \"value\": \"ITEM_2_1\"" +
+                    "                  }," +
+                    "                  {" +
+                    "                     \"id\": \"ITEM_2_2\"," +
+                    "                     \"value\": \"ITEM_2_2\"" +
+                    "                  }" +
+                    "               ]" +
+                    "            }\n" +
+                    "         }\n" +
+                    "      ]\n" +
+                    "    }\n"
+            ), STRING_JSON_MAP);
+            caseDetails.setData(data);
+            final Map<String, JsonNode> dataClassification = MAPPER.convertValue(MAPPER.readTree(
+                "{  \"collection\": {\n" +
+                    "     \"classification\": \"PRIVATE\",\n" +
+                    "     \"value\": [\n" +
+                    "       {\n" +
+                    "         \"classification\": \"PRIVATE\",\n" +
+                    "         \"id\":\"" + FIRST_CHILD_ID + "\",\n" +
+                    "         \"value\": {" +
+                    "            \"collection1\": {" +
+                    "              \"classification\": \"PRIVATE\",\n" +
+                    "              \"value\": [" +
+                    "                {" +
+                    "                  \"id\": \"ITEM_1_1\"," +
+                    "                  \"classification\": \"PRIVATE\"" +
+                    "                }," +
+                    "                {" +
+                    "                  \"id\": \"ITEM_1_2\"," +
+                    "                  \"classification\": \"RESTRICTED\"" +
+                    "                }" +
+                    "              ]" +
+                    "            }" +
+                    "         }" +
+                    "       },\n" +
+                    "       {\n" +
+                    "         \"classification\": \"PRIVATE\",\n" +
+                    "         \"id\":\"" + SECOND_CHILD_ID + "\",\n" +
+                    "         \"value\": {" +
+                    "            \"collection1\": {" +
+                    "              \"classification\": \"PRIVATE\",\n" +
+                    "              \"value\": [" +
+                    "                {" +
+                    "                  \"id\": \"ITEM_2_1\"," +
+                    "                  \"classification\": \"RESTRICTED\"" +
+                    "                }," +
+                    "                {" +
+                    "                  \"id\": \"ITEM_2_2\"," +
+                    "                  \"classification\": \"PRIVATE\"" +
+                    "                }" +
+                    "              ]" +
+                    "            }" +
+                    "         }" +
+                    "       }\n" +
+                    "     ]\n" +
+                    "   }\n" +
+                    " }\n"
+            ), STRING_JSON_MAP);
+            caseDetails.setDataClassification(dataClassification);
+
+            CaseDetails caseDetails = applyClassification(PRIVATE);
+
+            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+
+            assertThat(resultNode.has("collection"), is(true));
+
+            final JsonNode collection = resultNode.get("collection");
+
+            assertAll(
+                () -> assertThat(collection.isArray(), is(true)),
+                () -> assertThat(collection.size(), is(2))
+            );
+            final JsonNode item1Collection1 = collection.get(0).get("value").get("collection1");
+            final JsonNode item2Collection1 = collection.get(1).get("value").get("collection1");
+
+            assertAll(
+                () -> assertThat(item1Collection1.isArray(), is(true)),
+                () -> assertThat(item1Collection1.size(), is(1)),
+                () -> assertThat(item2Collection1.isArray(), is(true)),
+                () -> assertThat(item2Collection1.size(), is(1))
+            );
+
+            final String item1_1 = item1Collection1.get(0).get("value").textValue();
+            final String item2_2 = item2Collection1.get(0).get("value").textValue();
+
+            assertAll(
+                () -> assertThat(item1_1, equalTo("ITEM_1_1")),
+                () -> assertThat(item2_2, equalTo("ITEM_2_2"))
+            );
+        }
+
+        @Test
         // TODO Target implementation, see RDM-1204
         @DisplayName("should filter out fields within collection items")
         void shouldFilterFieldsWithinCollectionItems() throws IOException {
