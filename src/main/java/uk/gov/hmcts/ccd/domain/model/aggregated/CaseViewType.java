@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
+import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+
 public class CaseViewType {
     private String id;
     private String name;
@@ -10,7 +12,7 @@ public class CaseViewType {
         // default constructor
     }
 
-    public CaseViewType(String id, String name, String description, CaseViewJurisdiction jurisdiction) {
+    private CaseViewType(String id, String name, String description, CaseViewJurisdiction jurisdiction) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -47,5 +49,12 @@ public class CaseViewType {
 
     public void setJurisdiction(CaseViewJurisdiction jurisdiction) {
         this.jurisdiction = jurisdiction;
+    }
+
+    public static CaseViewType createFrom(CaseType caseType) {
+        return new CaseViewType(caseType.getId(),
+            caseType.getName(),
+            caseType.getDescription(),
+            CaseViewJurisdiction.createFrom(caseType.getJurisdiction()));
     }
 }
