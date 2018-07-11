@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.createdraft;
+package uk.gov.hmcts.ccd.domain.service.upsertdraft;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,8 +9,7 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.draft.*;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
-
-import java.net.URISyntaxException;
+import uk.gov.hmcts.ccd.domain.model.std.CaseDataContentBuilder;
 
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
@@ -18,7 +17,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.domain.model.draft.CaseDraftBuilder.aCaseDraft;
-import static uk.gov.hmcts.ccd.domain.service.createdraft.DefaultUpsertDraftOperation.CASE_DATA_CONTENT;
+import static uk.gov.hmcts.ccd.domain.service.upsertdraft.DefaultUpsertDraftOperation.CASE_DATA_CONTENT;
 
 class DefaultUpsertDraftOperationTest {
 
@@ -36,9 +35,9 @@ class DefaultUpsertDraftOperationTest {
 
     private UpsertDraftOperation upsertDraftOperation;
 
-    private CaseDataContent caseDataContent = new CaseDataContent();
+    private CaseDataContent caseDataContent = new CaseDataContentBuilder().build();
     private CaseDraft caseDraft;
-    private Draft draft = new Draft();
+    private Draft draft = new DraftBuilder().build();
 
     @BeforeEach
     public void setup() {
@@ -46,10 +45,6 @@ class DefaultUpsertDraftOperationTest {
         when(applicationParams.getDraftMaxStaleDays()).thenReturn(DRAFT_MAX_STALE_DAYS);
 
         upsertDraftOperation = new DefaultUpsertDraftOperation(draftGateway, applicationParams);
-    }
-
-    @Test
-    void shouldSuccessfullySaveDraft() throws URISyntaxException {
         caseDraft = aCaseDraft()
             .withUserId(UID)
             .withJurisdictionId(JID)
@@ -57,12 +52,17 @@ class DefaultUpsertDraftOperationTest {
             .withEventTriggerId(ETID)
             .withCaseDataContent(caseDataContent)
             .build();
+    }
+
+    @Test
+    void shouldSuccessfullySaveDraft() {
         final ArgumentCaptor<CreateCaseDraft> argument = ArgumentCaptor.forClass(CreateCaseDraft.class);
-        doReturn(draft).when(draftGateway).save(any(CreateCaseDraft.class));
+        doReturn(Long.valueOf(DID)).when(draftGateway).save(any(CreateCaseDraft.class));
 
 
-        Draft result = upsertDraftOperation.saveDraft(UID, JID, CTID, ETID, caseDataContent);
+        Draft result = upsertDraftOperation.executeSave(UID, JID, CTID, ETID, caseDataContent);
 
+        draft.setId(Long.valueOf(DID));
         assertAll(
             () ->  verify(draftGateway).save(argument.capture()),
             () ->  assertThat(argument.getValue().document, hasProperty("userId", is(caseDraft.getUserId()))),
@@ -77,20 +77,13 @@ class DefaultUpsertDraftOperationTest {
     }
 
     @Test
-    void shouldSuccessfullyUpdateDraft() throws URISyntaxException {
-        caseDraft = new CaseDraftBuilder()
-            .withUserId(UID)
-            .withJurisdictionId(JID)
-            .withCaseTypeId(CTID)
-            .withEventTriggerId(ETID)
-            .withCaseDataContent(caseDataContent)
-            .build();
+    void shouldSuccessfullyUpdateDraft() {
         final ArgumentCaptor<String> draftIdCaptor = ArgumentCaptor.forClass(String.class);
         final ArgumentCaptor<UpdateCaseDraft> caseDataContentCaptor = ArgumentCaptor.forClass(UpdateCaseDraft.class);
         doReturn(draft).when(draftGateway).update(any(UpdateCaseDraft.class), any(String.class));
 
 
-        Draft result = upsertDraftOperation.updateDraft(UID, JID, CTID, ETID, DID, caseDataContent);
+        Draft result = upsertDraftOperation.executeUpdate(UID, JID, CTID, ETID, DID, caseDataContent);
 
         assertAll(
             () ->  verify(draftGateway).update(caseDataContentCaptor.capture(), draftIdCaptor.capture()),

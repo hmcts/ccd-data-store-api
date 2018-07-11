@@ -14,7 +14,7 @@ public class UpdateCaseDraftBuilder {
         return this;
     }
 
-    public static UpdateCaseDraftBuilder anUpdateCaseDraftBuilder() {
+    public static UpdateCaseDraftBuilder anUpdateCaseDraft() {
         return new UpdateCaseDraftBuilder();
     }
 
