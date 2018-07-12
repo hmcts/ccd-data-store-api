@@ -236,6 +236,7 @@ dependencies {
     testCompile group: 'org.openid4java', name: 'openid4java', version: '1.0.0'
     // remove me once insights is in
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+    runtime("org.springframework.boot:spring-boot-properties-migrator")
 }
 // end::dependencies[]
 
