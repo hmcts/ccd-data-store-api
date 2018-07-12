@@ -8,8 +8,6 @@ import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.draft.DraftAccessException;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.draft.CaseDraft;
-import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewColumn;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
@@ -22,9 +20,7 @@ import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.ccd.domain.model.definition.CaseDetailsBuilder.aCaseDetails;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
 @Service
@@ -75,26 +71,6 @@ public class SearchQueryOperation {
         draftsAndCases.addAll(cases);
 
         return mergeDataToSearchResultOperation.execute(caseType.get(), draftsAndCases, view, draftResultError);
-    }
-
-    private boolean hasSameJurisdictionAndCaseType(MetaData metadata, DraftResponse draftResponse) {
-        CaseDraft document = draftResponse.getDocument();
-        return document.getCaseTypeId().equalsIgnoreCase(metadata.getCaseTypeId())
-            && document.getJurisdictionId().equalsIgnoreCase(metadata.getJurisdiction());
-    }
-
-    private List<CaseDetails> buildCaseDataFromDrafts(List<DraftResponse> drafts) {
-        return drafts.stream()
-            .map(d -> {
-                CaseDraft document = d.getDocument();
-                return aCaseDetails()
-                    .withId(d.getId())
-                    .withCaseTypeId(document.getCaseTypeId())
-                    .withJurisdiction(document.getJurisdictionId())
-                    .withData(document.getCaseDataContent().getData())
-                    .build();
-            })
-            .collect(Collectors.toList());
     }
 
 }
