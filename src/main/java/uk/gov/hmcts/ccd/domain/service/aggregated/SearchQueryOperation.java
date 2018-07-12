@@ -66,15 +66,15 @@ public class SearchQueryOperation {
         final List<CaseDetails> cases = searchOperation.execute(metadata, queryParameters);
 
         String draftResultError = NO_ERROR;
-        List<CaseDetails> drafts = Lists.newArrayList();
+        List<CaseDetails> draftsAndCases = Lists.newArrayList();
         try {
-            drafts = getDraftsOperation.execute(metadata);
+            draftsAndCases = getDraftsOperation.execute(metadata);
         } catch (DraftAccessException dae) {
             draftResultError = dae.getMessage();
         }
-        drafts.addAll(cases);
+        draftsAndCases.addAll(cases);
 
-        return mergeDataToSearchResultOperation.execute(caseType.get(), drafts, view, draftResultError);
+        return mergeDataToSearchResultOperation.execute(caseType.get(), draftsAndCases, view, draftResultError);
     }
 
     private boolean hasSameJurisdictionAndCaseType(MetaData metadata, DraftResponse draftResponse) {
