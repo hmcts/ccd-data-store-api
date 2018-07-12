@@ -9,6 +9,8 @@ import static java.util.stream.Collectors.toList;
 
 public class MetaData {
 
+    public static final String JURISDICTION_PARAM = "jurisdiction";
+    public static final String CASE_TYPE_PARAM = "case_type";
     public static final String STATE_PARAM = "state";
     public static final String CASE_REFERENCE_PARAM = "case_reference";
     public static final String CREATED_DATE_PARAM = "created_date";
@@ -19,8 +21,8 @@ public class MetaData {
     private static final List<String> ALL_METADATA = newArrayList(STATE_PARAM, CASE_REFERENCE_PARAM,
             CREATED_DATE_PARAM, LAST_MODIFIED_PARAM, SECURITY_CLASSIFICATION_PARAM, PAGE_PARAM, SORT_DIRECTION_PARAM);
 
-    private String caseTypeId;
-    private String jurisdiction;
+    private final String caseTypeId;
+    private final String jurisdiction;
     private Optional<String> state = Optional.empty();
     private Optional<String> caseReference = Optional.empty();
     private Optional<String> createdDate = Optional.empty();
@@ -108,8 +110,12 @@ public class MetaData {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         MetaData metaData = (MetaData) o;
         return Objects.equals(caseTypeId, metaData.caseTypeId) &&
             Objects.equals(jurisdiction, metaData.jurisdiction) &&
