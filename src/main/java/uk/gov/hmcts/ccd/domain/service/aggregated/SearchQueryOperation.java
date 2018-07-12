@@ -29,7 +29,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_RE
 
 @Service
 public class SearchQueryOperation {
-    private static final String PAGE_ONE = "1";
     protected static final String NO_ERROR = null;
     private final MergeDataToSearchResultOperation mergeDataToSearchResultOperation;
     private final GetCaseTypesOperation getCaseTypesOperation;
@@ -64,24 +63,18 @@ public class SearchQueryOperation {
             return new SearchResultView(new SearchResultViewColumn[0], new SearchResultViewItem[0], NO_ERROR);
         }
 
-        final List<CaseDetails> caseData = searchOperation.execute(metadata, queryParameters);
+        final List<CaseDetails> cases = searchOperation.execute(metadata, queryParameters);
 
         String draftResultError = NO_ERROR;
-        List<CaseDetails> caseDataFromDrafts = Lists.newArrayList();
-        if (metadata.getPage().isPresent() && metadata.getPage().get().equals(PAGE_ONE)) {
-            try {
-                List<DraftResponse> caseDrafts = getDraftsOperation.execute()
-                    .stream()
-                    .filter(d -> hasSameJurisdictionAndCaseType(metadata, d))
-                    .collect(Collectors.toList());
-                caseDataFromDrafts = buildCaseDataFromDrafts(caseDrafts);
-            } catch (DraftAccessException dae) {
-                draftResultError = dae.getMessage();
-            }
+        List<CaseDetails> drafts = Lists.newArrayList();
+        try {
+            drafts = getDraftsOperation.execute(metadata);
+        } catch (DraftAccessException dae) {
+            draftResultError = dae.getMessage();
         }
-        caseDataFromDrafts.addAll(caseData);
+        drafts.addAll(cases);
 
-        return mergeDataToSearchResultOperation.execute(caseType.get(), caseDataFromDrafts, view, draftResultError);
+        return mergeDataToSearchResultOperation.execute(caseType.get(), drafts, view, draftResultError);
     }
 
     private boolean hasSameJurisdictionAndCaseType(MetaData metadata, DraftResponse draftResponse) {
