@@ -48,7 +48,7 @@ public abstract class AbstractDefaultGetCaseViewOperation {
         return caseTypeService.getCaseTypeForJurisdiction(caseTypeId, jurisdictionId);
     }
 
-    CaseDetails getCaseDetails(String jurisdictionId, String caseTypeId, String caseReference) {
+    CaseDetails getDraftDetails(String jurisdictionId, String caseTypeId, String caseReference) {
         return getCaseOperation.execute(jurisdictionId, caseTypeId, caseReference).orElseThrow(
             () -> new ResourceNotFoundException(String.format(RESOURCE_NOT_FOUND,
                                                               jurisdictionId,

@@ -7,5 +7,12 @@ import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import java.util.List;
 
 public interface GetDraftsOperation {
+    /**
+     *
+     * @param metadata a metadata containing jurisdiction and case type ids
+     * @return A list of CaseDetails matching jurisdiction and case type ids
+     *
+     */
+
     List<CaseDetails> execute(MetaData metadata);
 }
