@@ -39,6 +39,7 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import javax.inject.Inject;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -173,33 +174,31 @@ public class QueryEndpointIT extends WireMockBaseTest {
 
         assertNotNull(searchResultViewItems.get(0).getCaseId());
         assertEquals("Janet", searchResultViewItems.get(0).getCaseFields().get("PersonFirstName"));
-        assertEquals("Parker", ((JsonNode) searchResultViewItems.get(0).getCaseFields().get("PersonLastName"))
-            .asText());
-        assertEquals("123", ((JsonNode) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
-            .get("AddressLine1").asText());
-        assertEquals("Fake Street", ((JsonNode) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
-            .get("AddressLine2").asText());
-        assertEquals("Hexton", ((JsonNode) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
-            .get("AddressLine3").asText());
-        assertEquals("England", ((JsonNode) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
-            .get("Country").asText());
-        assertEquals("HX08 UTG", ((JsonNode) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
-            .get("Postcode").asText());
+        assertEquals("Parker", searchResultViewItems.get(0).getCaseFields().get("PersonLastName"));
+        assertEquals("123", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+            .get("AddressLine1"));
+        assertEquals("Fake Street", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+            .get("AddressLine2"));
+        assertEquals("Hexton", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+            .get("AddressLine3"));
+        assertEquals("England", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+            .get("Country"));
+        assertEquals("HX08 UTG", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+            .get("Postcode"));
 
         assertNotNull(searchResultViewItems.get(1).getCaseId());
-        assertEquals("George", ((JsonNode) searchResultViewItems.get(1).getCaseFields().get("PersonFirstName"))
-            .asText());
-        assertEquals("Roof", ((JsonNode) searchResultViewItems.get(1).getCaseFields().get("PersonLastName")).asText());
-        assertEquals("Flat 9", ((JsonNode) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
-            .get("AddressLine1").asText());
-        assertEquals("2 Hubble Avenue", ((JsonNode) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
-            .get("AddressLine2").asText());
-        assertEquals("ButtonVillie", ((JsonNode) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
-            .get("AddressLine3").asText());
-        assertEquals("Wales", ((JsonNode) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
-            .get("Country").asText());
-        assertEquals("W11 5DF", ((JsonNode) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
-            .get("Postcode").asText());
+        assertEquals("George", searchResultViewItems.get(1).getCaseFields().get("PersonFirstName"));
+        assertEquals("Roof", searchResultViewItems.get(1).getCaseFields().get("PersonLastName"));
+        assertEquals("Flat 9", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+            .get("AddressLine1"));
+        assertEquals("2 Hubble Avenue", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+            .get("AddressLine2"));
+        assertEquals("ButtonVillie", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+            .get("AddressLine3"));
+        assertEquals("Wales", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+            .get("Country"));
+        assertEquals("W11 5DF", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+            .get("Postcode"));
     }
 
     @Test
@@ -225,31 +224,30 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertNotNull(searchResultViewItems.get(0).getCaseId());
         assertThat(searchResultViewItems.get(0).getCaseFields().get("PersonFirstName"), is(nullValue()));
         assertEquals("Pullen", searchResultViewItems.get(0).getCaseFields().get("PersonLastName"));
-        assertEquals("Governer House", ((JsonNode) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
-            .get("AddressLine1").asText());
-        assertEquals("1 Puddle Lane", ((JsonNode) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
-            .get("AddressLine2").asText());
-        assertEquals("London", ((JsonNode) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
-            .get("AddressLine3").asText());
-        assertEquals("England", ((JsonNode) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
-            .get("Country").asText());
-        assertEquals("SE1 4EE", ((JsonNode) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
-            .get("Postcode").asText());
+        assertEquals("Governer House", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+            .get("AddressLine1"));
+        assertEquals("1 Puddle Lane", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+            .get("AddressLine2"));
+        assertEquals("London", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+            .get("AddressLine3"));
+        assertEquals("England", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+            .get("Country"));
+        assertEquals("SE1 4EE", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+            .get("Postcode"));
 
         assertNotNull(searchResultViewItems.get(1).getCaseId());
         assertThat(searchResultViewItems.get(1).getCaseFields().get("PersonFirstName"), is(nullValue()));
-        assertEquals("Parker", ((JsonNode) searchResultViewItems.get(1).getCaseFields().get("PersonLastName"))
-            .asText());
-        assertEquals("123", ((JsonNode) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
-            .get("AddressLine1").asText());
-        assertEquals("Fake Street", ((JsonNode) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
-            .get("AddressLine2").asText());
-        assertEquals("Hexton", ((JsonNode) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
-            .get("AddressLine3").asText());
-        assertEquals("England", ((JsonNode) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
-            .get("Country").asText());
-        assertEquals("HX08 UTG", ((JsonNode) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
-            .get("Postcode").asText());
+        assertEquals("Parker", searchResultViewItems.get(1).getCaseFields().get("PersonLastName"));
+        assertEquals("123", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+            .get("AddressLine1"));
+        assertEquals("Fake Street", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+            .get("AddressLine2"));
+        assertEquals("Hexton", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+            .get("AddressLine3"));
+        assertEquals("England", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+            .get("Country"));
+        assertEquals("HX08 UTG", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+            .get("Postcode"));
     }
 
     @Test
@@ -311,20 +309,18 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect view items count", 2, searchResultViewItems.size());
 
         assertNotNull(searchResultViewItems.get(0).getCaseId());
-        assertEquals("Janet", ((JsonNode) searchResultViewItems.get(0).getCaseFields().get("PersonFirstName"))
-            .asText());
-        assertEquals("Parker", ((JsonNode) searchResultViewItems.get(0).getCaseFields().get("PersonLastName"))
-            .asText());
-        assertEquals("123", ((JsonNode) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
-            .get("AddressLine1").asText());
-        assertEquals("Fake Street", ((JsonNode) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
-            .get("AddressLine2").asText());
-        assertEquals("Hexton", ((JsonNode) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
-            .get("AddressLine3").asText());
-        assertEquals("England", ((JsonNode) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
-            .get("Country").asText());
-        assertEquals("HX08 UTG", ((JsonNode) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
-            .get("Postcode").asText());
+        assertEquals("Janet", searchResultViewItems.get(0).getCaseFields().get("PersonFirstName"));
+        assertEquals("Parker", searchResultViewItems.get(0).getCaseFields().get("PersonLastName"));
+        assertEquals("123", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+            .get("AddressLine1"));
+        assertEquals("Fake Street", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+            .get("AddressLine2"));
+        assertEquals("Hexton", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+            .get("AddressLine3"));
+        assertEquals("England", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+            .get("Country"));
+        assertEquals("HX08 UTG", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+            .get("Postcode"));
     }
 
     @Test
@@ -428,11 +424,9 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertNotNull(searchResultViewItems.get(1).getCaseId());
         assertNotEquals(searchResultViewItems.get(1).getCaseId(), searchResultViewItems.get(0).getCaseId());
         assertEquals("England",
-                     ((JsonNode) searchResultViewItems.get(0).getCaseFields().get("PersonAddress")).get("Country")
-                         .asText());
+                     ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress")).get("Country"));
         assertEquals("England",
-                     ((JsonNode) searchResultViewItems.get(1).getCaseFields().get("PersonAddress")).get("Country")
-                         .asText());
+                     ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress")).get("Country"));
     }
 
     @Test
@@ -516,35 +510,32 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect view items count", 2, searchResultViewItems.size());
 
         assertNotNull(searchResultViewItems.get(0).getCaseId());
-        assertEquals("Janet", ((JsonNode) searchResultViewItems.get(0).getCaseFields().get("PersonFirstName"))
-            .asText());
-        assertEquals("Parker", ((JsonNode) searchResultViewItems.get(0).getCaseFields().get("PersonLastName"))
-            .asText());
-        assertEquals("123", ((JsonNode) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
-            .get("AddressLine1").asText());
-        assertEquals("Fake Street", ((JsonNode) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
-            .get("AddressLine2").asText());
-        assertEquals("Hexton", ((JsonNode) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
-            .get("AddressLine3").asText());
-        assertEquals("England", ((JsonNode) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
-            .get("Country").asText());
-        assertEquals("HX08 UTG", ((JsonNode) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
-            .get("Postcode").asText());
+        assertEquals("Janet", searchResultViewItems.get(0).getCaseFields().get("PersonFirstName"));
+        assertEquals("Parker", searchResultViewItems.get(0).getCaseFields().get("PersonLastName"));
+        assertEquals("123", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+            .get("AddressLine1"));
+        assertEquals("Fake Street", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+            .get("AddressLine2"));
+        assertEquals("Hexton", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+            .get("AddressLine3"));
+        assertEquals("England", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+            .get("Country"));
+        assertEquals("HX08 UTG", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+            .get("Postcode"));
 
         assertNotNull(searchResultViewItems.get(1).getCaseId());
-        assertEquals("George", ((JsonNode) searchResultViewItems.get(1).getCaseFields().get("PersonFirstName"))
-            .asText());
-        assertEquals("Roof", ((JsonNode) searchResultViewItems.get(1).getCaseFields().get("PersonLastName")).asText());
-        assertEquals("Flat 9", ((JsonNode) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
-            .get("AddressLine1").asText());
-        assertEquals("2 Hubble Avenue", ((JsonNode) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
-            .get("AddressLine2").asText());
-        assertEquals("ButtonVillie", ((JsonNode) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
-            .get("AddressLine3").asText());
-        assertEquals("Wales", ((JsonNode) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
-            .get("Country").asText());
-        assertEquals("W11 5DF", ((JsonNode) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
-            .get("Postcode").asText());
+        assertEquals("George", searchResultViewItems.get(1).getCaseFields().get("PersonFirstName"));
+        assertEquals("Roof", searchResultViewItems.get(1).getCaseFields().get("PersonLastName"));
+        assertEquals("Flat 9", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+            .get("AddressLine1"));
+        assertEquals("2 Hubble Avenue", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+            .get("AddressLine2"));
+        assertEquals("ButtonVillie", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+            .get("AddressLine3"));
+        assertEquals("Wales", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+            .get("Country"));
+        assertEquals("W11 5DF", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+            .get("Postcode"));
     }
 
     @Test
@@ -586,31 +577,30 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertNotNull(searchResultViewItems.get(0).getCaseId());
         assertEquals("Janet", searchResultViewItems.get(0).getCaseFields().get("PersonFirstName"));
         assertEquals("Parker", searchResultViewItems.get(0).getCaseFields().get("PersonLastName"));
-        assertEquals("123", ((JsonNode) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
-            .get("AddressLine1").asText());
-        assertEquals("Fake Street", ((JsonNode) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
-            .get("AddressLine2").asText());
-        assertEquals("Hexton", ((JsonNode) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
-            .get("AddressLine3").asText());
-        assertEquals("England", ((JsonNode) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
-            .get("Country").asText());
-        assertEquals("HX08 UTG", ((JsonNode) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
-            .get("Postcode").asText());
+        assertEquals("123", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+            .get("AddressLine1"));
+        assertEquals("Fake Street", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+            .get("AddressLine2"));
+        assertEquals("Hexton", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+            .get("AddressLine3"));
+        assertEquals("England", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+            .get("Country"));
+        assertEquals("HX08 UTG", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+            .get("Postcode"));
 
         assertNotNull(searchResultViewItems.get(1).getCaseId());
-        assertEquals("George",
-                     ((JsonNode) searchResultViewItems.get(1).getCaseFields().get("PersonFirstName")).asText());
-        assertEquals("Roof", ((JsonNode) searchResultViewItems.get(1).getCaseFields().get("PersonLastName")).asText());
-        assertEquals("Flat 9", ((JsonNode) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
-            .get("AddressLine1").asText());
-        assertEquals("2 Hubble Avenue", ((JsonNode) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
-            .get("AddressLine2").asText());
-        assertEquals("ButtonVillie", ((JsonNode) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
-            .get("AddressLine3").asText());
-        assertEquals("Wales", ((JsonNode) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
-            .get("Country").asText());
-        assertEquals("W11 5DF", ((JsonNode) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
-            .get("Postcode").asText());
+        assertEquals("George", searchResultViewItems.get(1).getCaseFields().get("PersonFirstName"));
+        assertEquals("Roof", searchResultViewItems.get(1).getCaseFields().get("PersonLastName"));
+        assertEquals("Flat 9", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+            .get("AddressLine1"));
+        assertEquals("2 Hubble Avenue", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+            .get("AddressLine2"));
+        assertEquals("ButtonVillie", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+            .get("AddressLine3"));
+        assertEquals("Wales", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+            .get("Country"));
+        assertEquals("W11 5DF", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+            .get("Postcode"));
     }
 
     @Test
@@ -770,9 +760,9 @@ public class QueryEndpointIT extends WireMockBaseTest {
                 ("document_url").asText());
         assertEquals("Unexpected address value",
             "http://localhost:" + dmApiPort + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary", documentNode
-                .get("document_binary_url").asText());
+                         .get("document_binary_url").asText());
         assertEquals("Unexpected address value",
-            "Seagulls_Square.jpg", documentNode.get("document_filename").asText());
+                     "Seagulls_Square.jpg", documentNode.get("document_filename").asText());
 
         final CaseViewEvent[] events = caseView.getEvents();
         assertNotNull("Events are null", events);
@@ -1401,9 +1391,9 @@ public class QueryEndpointIT extends WireMockBaseTest {
                 ("document_url").asText());
         assertEquals("Unexpected address value",
             "http://localhost:" + dmApiPort + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary", documentNode
-                .get("document_binary_url").asText());
+                         .get("document_binary_url").asText());
         assertEquals("Unexpected address value",
-            "Seagulls_Square.jpg", documentNode.get("document_filename").asText());
+                     "Seagulls_Square.jpg", documentNode.get("document_filename").asText());
 
         final CaseViewEvent event = caseHistoryView.getEvent();
         assertNotNull("Null event value", event);
