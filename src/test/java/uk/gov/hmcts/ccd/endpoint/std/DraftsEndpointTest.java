@@ -6,8 +6,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
-import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftOperation;
-import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftsOperation;
 import uk.gov.hmcts.ccd.domain.service.upsertdraft.UpsertDraftOperation;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -29,17 +27,13 @@ class DraftsEndpointTest {
 
     @Mock
     private UpsertDraftOperation upsertDraftOperation;
-    @Mock
-    private GetDraftOperation getDraftOperation;
-    @Mock
-    private GetDraftsOperation getDraftsOperation;
 
     private DraftsEndpoint endpoint;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-        endpoint = new DraftsEndpoint(upsertDraftOperation, getDraftOperation, getDraftsOperation);
+        endpoint = new DraftsEndpoint(upsertDraftOperation);
     }
 
     @Test
