@@ -14,6 +14,7 @@ import org.springframework.http.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.ccd.AppInsights;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.draft.*;
@@ -69,6 +70,9 @@ class DefaultDraftGatewayTest {
 
     @Mock
     private RestTemplate restTemplate;
+
+    @Mock
+    private AppInsights appInsights;
 
     private DraftGateway draftGateway;
 
@@ -127,7 +131,7 @@ class DefaultDraftGatewayTest {
             .withDocument(caseDraft)
             .withType(CASE_DATA_CONTENT)
             .build();
-        draftGateway = new DefaultDraftGateway(restTemplate, securityUtils, applicationParams);
+        draftGateway = new DefaultDraftGateway(restTemplate, securityUtils, applicationParams, appInsights);
     }
 
     @Test
