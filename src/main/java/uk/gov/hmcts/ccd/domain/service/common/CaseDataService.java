@@ -110,17 +110,24 @@ public class CaseDataService {
             ArrayNode arrayNode = (ArrayNode) fieldNode;
             final FieldType collectionFieldType = caseField.getFieldType().getCollectionFieldType();
             for (JsonNode field : arrayNode) {
+
+                final JsonNode itemClassification = getExistingDataClassificationFromArrayOrEmpty(
+                    existingDataClassificationNode,
+                    field);
+
                 if (COMPLEX_TYPE.equalsIgnoreCase(collectionFieldType.getType())) {
                     deduceDefaultClassifications(
                         field.get(VALUE),
                         // get value of the field with given ID
-                        getExistingDataClassificationFromArrayOrEmpty(existingDataClassificationNode, field),
+                        itemClassification,
                         caseField.getFieldType().getCollectionFieldType().getComplexFields(),
                         fieldIdPrefix + fieldName + FIELD_SEPARATOR);
                 } else {
                     final ObjectNode simpleCollectionItemNode = (ObjectNode) field;
                     // Add `classification` property
-                    deduceClassificationForSimpleType(simpleCollectionItemNode, existingDataClassificationNode, CLASSIFICATION, caseField);
+                    final String newClassification = itemClassification.isTextual() ?
+                        itemClassification.textValue() : getClassificationFromCaseFieldOrEmpty(caseField);
+                    simpleCollectionItemNode.put(CLASSIFICATION, newClassification);
                     // Remove `value` property
                     simpleCollectionItemNode.remove(VALUE);
                 }
