@@ -5,7 +5,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.context.config.ResourceNotFoundException;
+import org.springframework.boot.context.properties.source.InvalidConfigurationPropertyValueException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
@@ -42,14 +42,14 @@ public class DefaultCaseDefinitionRepositoryTest {
         caseDefinitionRepository = new DefaultCaseDefinitionRepository(applicationParams, securityUtils, restTemplate);
     }
 
-    @Test(expected = ResourceNotFoundException.class)
+    @Test(expected = InvalidConfigurationPropertyValueException.class)
     public void shouldThrowResourceNotFoundExceptionWhenGetCaseTypesForJurisdictionIsCalledAndResourceIsNotFound() {
         HttpClientErrorException exception = new HttpClientErrorException(HttpStatus.NOT_FOUND);
         doThrow(exception).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class));
         caseDefinitionRepository.getCaseTypesForJurisdiction(JURISDICTION_ID);
     }
 
-    @Test(expected = ResourceNotFoundException.class)
+    @Test(expected = InvalidConfigurationPropertyValueException.class)
     public void shouldThrowResourceNotFoundExceptionWhenGetBaseTypesIsCalledAndResourceIsNotFound() {
         HttpClientErrorException exception = new HttpClientErrorException(HttpStatus.NOT_FOUND);
         doThrow(exception).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class));
