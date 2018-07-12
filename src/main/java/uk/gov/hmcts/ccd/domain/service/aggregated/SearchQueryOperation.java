@@ -72,7 +72,7 @@ public class SearchQueryOperation {
             try {
                 List<DraftResponse> caseDrafts = getDraftsOperation.execute()
                     .stream()
-                    .filter(d -> caseTypeIdsEqual(metadata, d))
+                    .filter(d -> hasSameJurisdictionAndCaseType(metadata, d))
                     .collect(Collectors.toList());
                 caseDataFromDrafts = buildCaseDataFromDrafts(caseDrafts);
             } catch (DraftAccessException dae) {
@@ -84,8 +84,10 @@ public class SearchQueryOperation {
         return mergeDataToSearchResultOperation.execute(caseType.get(), caseDataFromDrafts, view, draftResultError);
     }
 
-    private boolean caseTypeIdsEqual(MetaData metadata, DraftResponse d) {
-        return d.getDocument().getCaseTypeId().equals(metadata.getCaseTypeId());
+    private boolean hasSameJurisdictionAndCaseType(MetaData metadata, DraftResponse draftResponse) {
+        CaseDraft document = draftResponse.getDocument();
+        return document.getCaseTypeId().equalsIgnoreCase(metadata.getCaseTypeId())
+            && document.getJurisdictionId().equalsIgnoreCase(metadata.getJurisdiction());
     }
 
     private List<CaseDetails> buildCaseDataFromDrafts(List<DraftResponse> drafts) {

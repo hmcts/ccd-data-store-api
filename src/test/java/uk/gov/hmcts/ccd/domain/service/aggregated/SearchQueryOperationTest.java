@@ -42,7 +42,9 @@ public class SearchQueryOperationTest {
 
     private static final String VIEW = "WORKBASKET";
     private static final String CASE_TYPE_ID = "GrantOnly";
+    private static final String OTHER_CASE_TYPE_ID = "PROBATE";
     private static final String JURISDICTION_ID = "Probate";
+    private static final String OTHER_JURISDICTION_ID = "DIVORCE";
     private static final String CASE_FIELD_ID_1_1 = "CASE_FIELD_1_1";
     private static final String CASE_FIELD_ID_1_2 = "CASE_FIELD_1_2";
     private static final String CASE_FIELD_ID_1_3 = "CASE_FIELD_1_3";
@@ -122,7 +124,7 @@ public class SearchQueryOperationTest {
     }
 
     @Test
-    @DisplayName("should include drafts on first page")
+    @DisplayName("should include drafts matching criteria on first page")
     public void shouldIncludeDraftsWhenOnFirstPage() {
         doReturn(drafts).when(getDraftsOperation).execute();
         metadata.setPage(Optional.of("1"));
@@ -137,6 +139,62 @@ public class SearchQueryOperationTest {
             () -> verify(mergeDataToSearchResultOperation).execute(anyObject(), argument.capture(), anyString(), eq(NO_ERROR)),
             () -> assertThat(argument.getValue().size(), is(2)),
             () -> assertThat(argument.getValue(), hasDraftItemInResults())
+        );
+    }
+
+    @Test
+    @DisplayName("should not include drafts that do not match jurisdiction criteria")
+    public void shouldNotIncludeDraftsThatDoNotMatchJurisdiction() {
+        drafts = Lists.newArrayList();
+        drafts.add(aDraftResponse()
+                       .withId(DRAFT_ID)
+                       .withDocument(aCaseDraft()
+                                         .withJurisdictionId(OTHER_JURISDICTION_ID)
+                                         .withCaseTypeId(CASE_TYPE_ID)
+                                         .withCaseDataContent(CASE_DATA_CONTENT)
+                                         .build())
+                       .build());
+
+        doReturn(drafts).when(getDraftsOperation).execute();
+        metadata.setPage(Optional.of("1"));
+        doReturn(cases).when(searchOperation).execute(metadata, criteria);
+
+        searchQueryOperation.execute(VIEW, metadata, criteria);
+
+        assertAll(
+            () -> verify(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ),
+            () -> verify(searchOperation).execute(metadata, criteria),
+            () -> verify(getDraftsOperation).execute(),
+            () -> verify(mergeDataToSearchResultOperation).execute(anyObject(), argument.capture(), anyString(), eq(NO_ERROR)),
+            () -> assertThat(argument.getValue().size(), is(1))
+        );
+    }
+
+    @Test
+    @DisplayName("should not include drafts that do not match case type criteria")
+    public void shouldNotIncludeDraftsThatDoNotMatchCaseType() {
+        drafts = Lists.newArrayList();
+        drafts.add(aDraftResponse()
+                       .withId(DRAFT_ID)
+                       .withDocument(aCaseDraft()
+                                         .withJurisdictionId(JURISDICTION_ID)
+                                         .withCaseTypeId(OTHER_CASE_TYPE_ID)
+                                         .withCaseDataContent(CASE_DATA_CONTENT)
+                                         .build())
+                       .build());
+
+        doReturn(drafts).when(getDraftsOperation).execute();
+        metadata.setPage(Optional.of("1"));
+        doReturn(cases).when(searchOperation).execute(metadata, criteria);
+
+        searchQueryOperation.execute(VIEW, metadata, criteria);
+
+        assertAll(
+            () -> verify(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ),
+            () -> verify(searchOperation).execute(metadata, criteria),
+            () -> verify(getDraftsOperation).execute(),
+            () -> verify(mergeDataToSearchResultOperation).execute(anyObject(), argument.capture(), anyString(), eq(NO_ERROR)),
+            () -> assertThat(argument.getValue().size(), is(1))
         );
     }
 
