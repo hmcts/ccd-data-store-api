@@ -8,8 +8,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
-import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftOperation;
-import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftsOperation;
 import uk.gov.hmcts.ccd.domain.service.upsertdraft.UpsertDraftOperation;
 
 @RestController
@@ -19,16 +17,10 @@ import uk.gov.hmcts.ccd.domain.service.upsertdraft.UpsertDraftOperation;
 @Api(value = "/", description = "Drafts API")
 public class DraftsEndpoint {
     private final UpsertDraftOperation upsertDraftOperation;
-    private final GetDraftOperation getDraftOperation;
-    private final GetDraftsOperation getDraftsOperation;
 
     @Autowired
-    public DraftsEndpoint(@Qualifier("default") final UpsertDraftOperation upsertDraftOperation,
-                          @Qualifier("default") final GetDraftOperation getDraftOperation,
-                          @Qualifier("default") final GetDraftsOperation getDraftsOperation) {
+    public DraftsEndpoint(@Qualifier("default") final UpsertDraftOperation upsertDraftOperation) {
         this.upsertDraftOperation = upsertDraftOperation;
-        this.getDraftOperation = getDraftOperation;
-        this.getDraftsOperation = getDraftsOperation;
     }
 
     @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-trigger/{etid}/drafts", method = RequestMethod.POST)
