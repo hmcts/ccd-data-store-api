@@ -35,7 +35,7 @@ import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
-        public class EventsEndpointIT extends WireMockBaseTest {
+public class EventsEndpointIT extends WireMockBaseTest {
     private static final String GET_EVENTS_AS_CASEWORKER = "/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/1504259907353529/events";
 
     @Inject
@@ -48,11 +48,6 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
     @Mock
     private SecurityContext securityContext;
-
-    private static final int WIREMOCK_PORT = 10000;
-
-    @ClassRule
-    public static WireMockClassRule DM_API_RULE = new WireMockClassRule(new WireMockConfiguration().port(WIREMOCK_PORT).notifier(slf4jNotifier));
 
     @Before
     public void setUp() {
