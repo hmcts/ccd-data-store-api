@@ -97,10 +97,10 @@ public class CaseDataService {
 
     private void deduceClassificationForSimpleType(ObjectNode dataNode, JsonNode existingDataClassificationNode, String fieldName, CaseField caseField) {
         dataNode.put(fieldName, existingDataClassificationNode.equals(JSON_NODE_FACTORY.objectNode())
-            ? getClassificationFromCaseFieldOrEmpty(caseField) : existingDataClassificationNode.textValue());
+            ? getClassificationFromCaseFieldOrDefault(caseField) : existingDataClassificationNode.textValue());
     }
 
-    private String getClassificationFromCaseFieldOrEmpty(CaseField caseField) {
+    private String getClassificationFromCaseFieldOrDefault(CaseField caseField) {
         return ofNullable(caseField.getSecurityLabel()).orElse(DEFAULT_CLASSIFICATION);
     }
 
@@ -126,7 +126,7 @@ public class CaseDataService {
                     final ObjectNode simpleCollectionItemNode = (ObjectNode) field;
                     // Add `classification` property
                     final String newClassification = itemClassification.isTextual() ?
-                        itemClassification.textValue() : getClassificationFromCaseFieldOrEmpty(caseField);
+                        itemClassification.textValue() : getClassificationFromCaseFieldOrDefault(caseField);
                     simpleCollectionItemNode.put(CLASSIFICATION, newClassification);
                     // Remove `value` property
                     simpleCollectionItemNode.remove(VALUE);
