@@ -33,7 +33,8 @@ public class MergeDataToSearchResultOperation {
                 searchResultField.getCaseFieldId(),
                 caseField.getFieldType(),
                 searchResultField.getLabel(),
-                searchResultField.getDisplayOrder())
+                searchResultField.getDisplayOrder(),
+                searchResultField.isMetadata())
              ))
             .collect(Collectors.toList());
 
