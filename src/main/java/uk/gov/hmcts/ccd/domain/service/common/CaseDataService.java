@@ -125,8 +125,8 @@ public class CaseDataService {
                 } else {
                     final ObjectNode simpleCollectionItemNode = (ObjectNode) field;
                     // Add `classification` property
-                    final String newClassification = itemClassification.isTextual() ?
-                        itemClassification.textValue() : getClassificationFromCaseFieldOrDefault(caseField);
+                    final String newClassification = itemClassification.isTextual()
+                        ? itemClassification.textValue() : getClassificationFromCaseFieldOrDefault(caseField);
                     simpleCollectionItemNode.put(CLASSIFICATION, newClassification);
                     // Remove `value` property
                     simpleCollectionItemNode.remove(VALUE);

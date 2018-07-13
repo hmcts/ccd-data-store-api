@@ -25,6 +25,8 @@ import static java.util.Arrays.asList;
 public class TestBuildersUtil {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
+    private TestBuildersUtil() {}
+
     public static class CallbackResponseBuilder {
         private final CallbackResponse callbackResponse;
 
@@ -626,7 +628,7 @@ public class TestBuildersUtil {
             return (JsonNode node) -> caseData.put(fieldId, node);
         }
 
-        public static CaseDataBuilder aCaseData() {
+        public static CaseDataBuilder caseData() {
             return new CaseDataBuilder();
         }
 
@@ -656,11 +658,11 @@ public class TestBuildersUtil {
         }
     }
 
-    public static JsonNode aCollectionItem(String id, String value) {
-        return aCollectionItem(id, JsonNodeFactory.instance.textNode(value));
+    public static JsonNode collectionItem(String id, String value) {
+        return collectionItem(id, JsonNodeFactory.instance.textNode(value));
     }
 
-    public static JsonNode aCollectionItem(String id, JsonNode value) {
+    public static JsonNode collectionItem(String id, JsonNode value) {
         final ObjectNode item = JsonNodeFactory.instance.objectNode();
         item.put("id", id);
         item.set("value", value);
@@ -679,7 +681,7 @@ public class TestBuildersUtil {
             return (JsonNode node) -> dataClassification.put(fieldId, node);
         }
 
-        public static CaseDataClassificationBuilder aDataClassification() {
+        public static CaseDataClassificationBuilder dataClassification() {
             return new CaseDataClassificationBuilder();
         }
 
@@ -696,7 +698,8 @@ public class TestBuildersUtil {
         private final CaseDataClassificationBuilder caseDataClassificationBuilder;
         private final Consumer<JsonNode> putFn;
 
-        CaseDataClassificationFieldBuilder(CaseDataClassificationBuilder caseDataClassificationBuilder, Consumer<JsonNode> putFn) {
+        CaseDataClassificationFieldBuilder(CaseDataClassificationBuilder caseDataClassificationBuilder,
+                                           Consumer<JsonNode> putFn) {
             this.caseDataClassificationBuilder = caseDataClassificationBuilder;
             this.putFn = putFn;
         }
@@ -714,11 +717,11 @@ public class TestBuildersUtil {
         }
     }
 
-    public static JsonNode aCollectionClassification(String id, String classification) {
-        return aCollectionItem(id, JsonNodeFactory.instance.textNode(classification));
+    public static JsonNode collectionClassification(String id, String classification) {
+        return collectionItem(id, JsonNodeFactory.instance.textNode(classification));
     }
 
-    public static JsonNode aCollectionClassification(String id, JsonNode classification) {
+    public static JsonNode collectionClassification(String id, JsonNode classification) {
         final ObjectNode item = JsonNodeFactory.instance.objectNode();
         item.put("id", id);
         item.set("classification", classification);

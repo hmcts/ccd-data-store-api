@@ -22,12 +22,12 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.*;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataBuilder.aCaseData;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataClassificationBuilder.aDataClassification;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataBuilder.caseData;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataClassificationBuilder.dataClassification;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.aCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.aCollectionClassification;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.aCollectionItem;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.collectionClassification;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.collectionItem;
 
 class CaseDataServiceTest {
     private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
@@ -37,7 +37,7 @@ class CaseDataServiceTest {
     private CaseType caseType;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         setCaseType(RESTRICTED);
     }
 
@@ -194,7 +194,8 @@ class CaseDataServiceTest {
     }
 
     @Test
-    void testGetDefaultSecurityClassifications() throws IOException, JSONException {
+    @DisplayName("should get the default security classifications")
+    void shouldGetDefaultClassifications() throws IOException, JSONException {
         final Map<String, JsonNode> DATA = MAPPER.convertValue(MAPPER.readTree(
             "{\n" +
                 "  \"PersonFirstName\": \"First Name\",\n" +
@@ -303,7 +304,8 @@ class CaseDataServiceTest {
     }
 
     @Test
-    void shouldNotOverwriteExistingClassificationIfSet() throws IOException, JSONException {
+    @DisplayName("should not overwrite previously set classifications")
+    void shouldKeepExistingClassifications() throws IOException, JSONException {
         // ARRANGE
         final Map<String, JsonNode> DATA = MAPPER.convertValue(MAPPER.readTree(
             "{\n" +
@@ -491,12 +493,12 @@ class CaseDataServiceTest {
     @Test
     @DisplayName("should assign default classifications to simple collection items")
     void shouldAssignDefaultClassificationToCollectionItems() {
-        final Map<String, JsonNode> caseData = aCaseData().withField("simple_collection")
-                                                          .asCollectionOf(
-                                                              aCollectionItem("1", "Item 1"),
-                                                              aCollectionItem("2", "Item 2")
+        final Map<String, JsonNode> caseData = caseData().withField("simple_collection")
+                                                         .asCollectionOf(
+                                                             TestBuildersUtil.collectionItem("1", "Item 1"),
+                                                             TestBuildersUtil.collectionItem("2", "Item 2")
                                                           )
-                                                          .build();
+                                                         .build();
 
         final Map<String, JsonNode> classifications = caseDataService.getDefaultSecurityClassifications(
             caseType,
@@ -513,23 +515,23 @@ class CaseDataServiceTest {
     @Test
     @DisplayName("should preserve existing classifications to simple collection items")
     void shouldPreserveExistingClassificationForCollectionItems() {
-        final Map<String, JsonNode> caseData = aCaseData().withField("simple_collection")
-                                                          .asCollectionOf(
-                                                              aCollectionItem("1", "Item 1"),
-                                                              aCollectionItem("2", "Item 2")
+        final Map<String, JsonNode> caseData = caseData().withField("simple_collection")
+                                                         .asCollectionOf(
+                                                             TestBuildersUtil.collectionItem("1", "Item 1"),
+                                                             TestBuildersUtil.collectionItem("2", "Item 2")
                                                           )
-                                                          .build();
+                                                         .build();
         final Map<String, JsonNode> existingClassification =
-            aDataClassification().withField("simple_collection")
-                                 .asCollectionOf("PRIVATE",
-                                                 aCollectionClassification(
+            dataClassification().withField("simple_collection")
+                                .asCollectionOf("PRIVATE",
+                                                TestBuildersUtil.collectionClassification(
                                                      "1",
                                                      "PUBLIC"),
-                                                 aCollectionClassification(
+                                                TestBuildersUtil.collectionClassification(
                                                      "2",
                                                      "RESTRICTED")
                                  )
-                                 .build();
+                                .build();
 
         final Map<String, JsonNode> classifications = caseDataService.getDefaultSecurityClassifications(
             caseType,
