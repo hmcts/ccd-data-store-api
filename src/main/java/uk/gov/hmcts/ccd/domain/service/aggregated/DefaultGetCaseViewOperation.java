@@ -51,7 +51,7 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
         validateCaseReference(caseReference);
 
         final CaseType caseType = getCaseType(jurisdictionId, caseTypeId);
-        final CaseDetails caseDetails = getDraftDetails(jurisdictionId, caseTypeId, caseReference);
+        final CaseDetails caseDetails = getCaseDetails(jurisdictionId, caseTypeId, caseReference);
 
         final List<AuditEvent> events = getEventsOperation.getEvents(caseDetails);
         final CaseTabCollection caseTabCollection = getCaseTabCollection(caseDetails.getCaseTypeId());

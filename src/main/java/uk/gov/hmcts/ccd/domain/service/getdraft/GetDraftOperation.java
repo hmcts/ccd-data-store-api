@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.getdraft;
 
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 
 import java.util.Optional;
 
@@ -12,5 +12,5 @@ public interface GetDraftOperation {
      * @return Optional containing DraftResponse when found; empty optional otherwise
      *
      */
-    Optional<CaseDetails> execute(String draftId);
+    Optional<DraftResponse> execute(String draftId);
 }
