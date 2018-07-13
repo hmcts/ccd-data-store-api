@@ -153,7 +153,7 @@ class DefaultDraftGatewayTest {
         doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(HttpEntity.class));
 
         final ServiceException actualException = assertThrows(ServiceException.class, () -> draftGateway.save(createCaseDraft));
-        assertThat(actualException.getMessage(), is("Problem saving draft because of connectivity issue"));
+        assertThat(actualException.getMessage(), is("The draft service is currently down, please refresh your browser or try again later"));
     }
 
     @Test
@@ -174,7 +174,7 @@ class DefaultDraftGatewayTest {
         doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(HttpEntity.class));
 
         final ServiceException actualException = assertThrows(ServiceException.class, () -> draftGateway.update(updateCaseDraft, DID));
-        assertThat(actualException.getMessage(), is("Problem updating draft because of connectivity issue"));
+        assertThat(actualException.getMessage(), is("The draft service is currently down, please refresh your browser or try again later"));
     }
 
     @Test
@@ -183,7 +183,7 @@ class DefaultDraftGatewayTest {
         doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(HttpEntity.class));
 
         final ResourceNotFoundException actualException = assertThrows(ResourceNotFoundException.class, () -> draftGateway.update(updateCaseDraft, DID));
-        assertThat(actualException.getMessage(), is("Resource not found when getting draft for draftId=5 because of 404 NOT_FOUND"));
+        assertThat(actualException.getMessage(), is("No draft found ( draft reference = '5' )"));
     }
 
     @Test
@@ -220,7 +220,7 @@ class DefaultDraftGatewayTest {
         doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(Draft.class));
 
         final ServiceException actualException = assertThrows(ServiceException.class, () -> draftGateway.get(DID));
-        assertThat(actualException.getMessage(), is("Problem getting draft because of connectivity issue"));
+        assertThat(actualException.getMessage(), is("The draft service is currently down, please refresh your browser or try again later"));
     }
 
     @Test
@@ -229,7 +229,7 @@ class DefaultDraftGatewayTest {
         doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(Draft.class));
 
         final ResourceNotFoundException actualException = assertThrows(ResourceNotFoundException.class, () -> draftGateway.get(DID));
-        assertThat(actualException.getMessage(), is("Resource not found when getting draft for draftId=5"));
+        assertThat(actualException.getMessage(), is("No draft found ( draft reference = '5' )"));
     }
 
 }

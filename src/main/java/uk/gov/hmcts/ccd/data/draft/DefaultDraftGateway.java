@@ -35,11 +35,12 @@ import static uk.gov.hmcts.ccd.domain.model.draft.DraftResponseBuilder.aDraftRes
 public class DefaultDraftGateway implements DraftGateway {
 
     public static final String QUALIFIER = "default";
-    public static final String DRAFT_ACCESS_EXCEPTION_MSG = "There is a problem with retrieving drafts.";
     private static final Logger LOG = LoggerFactory.getLogger(DefaultDraftGateway.class);
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final String DRAFT_ENCRYPTION_KEY_HEADER = "Secret";
     private static final int RESOURCE_NOT_FOUND = 404;
+    public static final String DRAFT_STORE_DOWN_ERR_MESSAGE = "The draft service is currently down, please refresh your browser or try again later";
+    private static final String RESOURCE_NOT_FOUND_MSG = "No draft found ( draft reference = '%s' )";
 
     @Qualifier("draftsRestTemplate")
     @Autowired
@@ -76,7 +77,7 @@ public class DefaultDraftGateway implements DraftGateway {
             return getDraftId(responseHeaders);
         } catch (Exception e) {
             LOG.warn("Error while saving draft=" + draft, e);
-            throw new ServiceException("Problem saving draft because of " + e.getMessage());
+            throw new ServiceException(DRAFT_STORE_DOWN_ERR_MESSAGE);
         }
     }
 
@@ -96,11 +97,11 @@ public class DefaultDraftGateway implements DraftGateway {
         } catch (HttpClientErrorException e) {
             LOG.warn("Error while updating draftId=" + draftId, e);
             if (e.getRawStatusCode() == RESOURCE_NOT_FOUND) {
-                throw new ResourceNotFoundException("Resource not found when getting draft for draftId=" + draftId + " because of " + e.getMessage());
+                throw new ResourceNotFoundException(String.format(RESOURCE_NOT_FOUND_MSG, draftId));
             }
         } catch (Exception e) {
             LOG.warn("Error while updating draftId=" + draftId, e);
-            throw new ServiceException("Problem updating draft because of " + e.getMessage());
+            throw new ServiceException(DRAFT_STORE_DOWN_ERR_MESSAGE);
         }
         return null;
     }
@@ -119,11 +120,11 @@ public class DefaultDraftGateway implements DraftGateway {
         } catch (HttpClientErrorException e) {
             LOG.warn("Error while getting draftId=" + draftId, e);
             if (e.getRawStatusCode() == RESOURCE_NOT_FOUND) {
-                throw new ResourceNotFoundException("Resource not found when getting draft for draftId=" + draftId);
+                throw new ResourceNotFoundException(String.format(RESOURCE_NOT_FOUND_MSG, draftId));
             }
         } catch (Exception e) {
             LOG.warn("Error while getting draftId=" + draftId, e);
-            throw new ServiceException("Problem getting draft because of " + e.getMessage());
+            throw new ServiceException(DRAFT_STORE_DOWN_ERR_MESSAGE);
         }
         return null;
     }
@@ -144,7 +145,7 @@ public class DefaultDraftGateway implements DraftGateway {
                 .collect(Collectors.toList());
         } catch (Exception e) {
             LOG.warn("Error while getting drafts", e);
-            throw new DraftAccessException(DRAFT_ACCESS_EXCEPTION_MSG);
+            throw new DraftAccessException(DRAFT_STORE_DOWN_ERR_MESSAGE);
         }
     }
 
