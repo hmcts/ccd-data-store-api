@@ -26,7 +26,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.ccd.AppInsights.DOC_MANAGEMENT;
 import static uk.gov.hmcts.ccd.AppInsights.DRAFT_STORE;
 import static uk.gov.hmcts.ccd.domain.model.draft.DraftResponseBuilder.aDraftResponse;
 
