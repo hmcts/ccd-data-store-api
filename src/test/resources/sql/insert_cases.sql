@@ -14,8 +14,8 @@ VALUES (1, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBLIC',
             "Postcode": "HX08 UTG"
           },
           "D8Document": {
-            "document_url": "http://localhost:10000/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
-            "document_binary_url": "http://localhost:10000/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary",
+            "document_url": "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
+            "document_binary_url": "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary",
             "document_filename": "Seagulls_Square.jpg"
           }
         }',
@@ -195,8 +195,8 @@ VALUES (5, 'TestAddressBookCaseNoUpdateCaseAccess', 'PROBATE', 'CaseCreated', 'P
             "Postcode": "HX08 UTG"
           },
           "D8Document": {
-            "document_url": "http://localhost:10000/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
-            "document_binary_url": "http://localhost:10000/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary",
+            "document_url": "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
+            "document_binary_url": "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary",
             "document_filename": "Seagulls_Square.jpg"
           }
         }',
@@ -231,8 +231,8 @@ VALUES (6, 'TestAddressBookCaseNoCreateEventAccess', 'PROBATE', 'CaseCreated', '
             "Postcode": "HX08 UTG"
           },
           "D8Document": {
-            "document_url": "http://localhost:10000/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
-            "document_binary_url": "http://localhost:10000/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary",
+            "document_url": "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
+            "document_binary_url": "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary",
             "document_filename": "Seagulls_Square.jpg"
           }
         }',
@@ -267,8 +267,8 @@ VALUES (7, 'TestAddressBookCaseNoCreateFieldAccess', 'PROBATE', 'CaseCreated', '
             "Postcode": "HX08 UTG"
           },
           "D8Document": {
-            "document_url": "http://localhost:10000/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
-            "document_binary_url": "http://localhost:10000/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary",
+            "document_url": "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
+            "document_binary_url": "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary",
             "document_filename": "Seagulls_Square.jpg"
           }
         }',
@@ -303,8 +303,8 @@ VALUES (8, 'TestAddressBookCaseNoCreateFieldAccess', 'PROBATE', 'CaseCreated', '
             "Postcode": "HX08 UTG"
           },
           "D8Document": {
-            "document_url": "http://localhost:10000/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
-            "document_binary_url": "http://localhost:10000/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary",
+            "document_url": "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
+            "document_binary_url": "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary",
             "document_filename": "Seagulls_Square.jpg"
           }
         }',
@@ -339,8 +339,8 @@ VALUES (9, 'TestAddressBookCaseNoReadCaseTypeAccess', 'PROBATE', 'CaseCreated', 
             "Postcode": "HX08 UTG"
           },
           "D8Document": {
-            "document_url": "http://localhost:10000/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
-            "document_binary_url": "http://localhost:10000/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary",
+            "document_url": "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
+            "document_binary_url": "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary",
             "document_filename": "Seagulls_Square.jpg"
           }
         }',
@@ -375,8 +375,8 @@ VALUES (10, 'TestAddressBookCaseNoReadFieldAccess', 'PROBATE', 'CaseCreated', 'P
             "Postcode": "HX08 UTG"
           },
           "D8Document": {
-            "document_url": "http://localhost:10000/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
-            "document_binary_url": "http://localhost:10000/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary",
+            "document_url": "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
+            "document_binary_url": "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary",
             "document_filename": "Seagulls_Square.jpg"
           }
         }',
@@ -411,8 +411,8 @@ VALUES (11, 'TestAddressBookCaseNoReadEventAccess', 'PROBATE', 'CaseCreated', 'P
             "Postcode": "HX08 UTG"
           },
           "D8Document": {
-            "document_url": "http://localhost:10000/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
-            "document_binary_url": "http://localhost:10000/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary",
+            "document_url": "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
+            "document_binary_url": "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary",
             "document_filename": "Seagulls_Square.jpg"
           }
         }',
@@ -447,8 +447,8 @@ VALUES (12, 'TestAddressBookCaseNoReadCaseTypeAccess', 'PROBATE', 'CaseCreated',
             "Postcode": "HX08 UTG"
           },
           "D8Document": {
-            "document_url": "http://localhost:10000/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
-            "document_binary_url": "http://localhost:10000/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary",
+            "document_url": "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
+            "document_binary_url": "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary",
             "document_filename": "Seagulls_Square.jpg"
           }
         }',
@@ -484,8 +484,8 @@ VALUES (13, 'TestAddressBookCaseNoReadFieldAccess', 'PROBATE', 'CaseCreated', 'P
             "Postcode": "SE1 4EE"
           },
           "D8Document": {
-            "document_url": "http://localhost:10000/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
-            "document_binary_url": "http://localhost:10000/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary",
+            "document_url": "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
+            "document_binary_url": "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary",
             "document_filename": "Seagulls_Square.jpg"
           }
         }',
