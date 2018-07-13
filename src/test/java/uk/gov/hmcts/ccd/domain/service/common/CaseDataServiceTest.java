@@ -26,8 +26,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataBu
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataClassificationBuilder.dataClassification;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.aCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.collectionClassification;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.collectionItem;
 
 class CaseDataServiceTest {
     private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
