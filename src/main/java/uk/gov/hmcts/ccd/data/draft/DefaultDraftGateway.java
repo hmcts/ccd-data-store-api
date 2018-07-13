@@ -173,6 +173,6 @@ public class DefaultDraftGateway implements DraftGateway {
 
     private Long getDraftId(HttpHeaders responseHeaders) {
         String path = responseHeaders.getLocation().getPath();
-        return Long.valueOf(path.substring(path.lastIndexOf("/") + 1));
+        return Long.valueOf(path.substring(path.lastIndexOf('/') + 1));
     }
 }
