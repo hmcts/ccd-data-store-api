@@ -27,7 +27,7 @@ public class SearchResultViewItem {
         return caseFields;
     }
 
-    public <T> SearchResultViewItem addCaseFields(Map<String, T> caseFields) {
+    public SearchResultViewItem addCaseFields(Map<String, ?> caseFields) {
         this.caseFields.putAll(caseFields);
         return this;
     }
