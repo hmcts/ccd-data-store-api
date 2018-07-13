@@ -13,13 +13,13 @@ import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CASE_REFERENCE_PARAM;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CASE_TYPE_PARAM;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CREATED_DATE_PARAM;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.JURISDICTION_PARAM;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.LAST_MODIFIED_PARAM;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.SECURITY_CLASSIFICATION_PARAM;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.STATE_PARAM;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CASE_REFERENCE_METADATA;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CASE_TYPE_METADATA;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CREATED_DATE_METADATA;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.JURISDICTION_METADATA;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.LAST_MODIFIED_METADATA;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.SECURITY_CLASSIFICATION_METADATA;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.STATE_METADATA;
 
 class CaseDetailsTest {
 
@@ -75,14 +75,14 @@ class CaseDetailsTest {
         caseDetails.setSecurityClassification(SecurityClassification.PUBLIC);
 
         Map<String, Object> metadata = caseDetails.getMetadata();
-        
-        assertThat(metadata.get(JURISDICTION_PARAM), equalTo(caseDetails.getJurisdiction()));
-        assertThat(metadata.get(CASE_TYPE_PARAM), equalTo(caseDetails.getCaseTypeId()));
-        assertThat(metadata.get(STATE_PARAM), equalTo(caseDetails.getState()));
-        assertThat(metadata.get(CASE_REFERENCE_PARAM), equalTo(caseDetails.getReference()));
-        assertThat(metadata.get(CREATED_DATE_PARAM), equalTo(caseDetails.getCreatedDate()));
-        assertThat(metadata.get(LAST_MODIFIED_PARAM), equalTo(caseDetails.getLastModified()));
-        assertThat(metadata.get(SECURITY_CLASSIFICATION_PARAM), equalTo(caseDetails.getSecurityClassification()));
+
+        assertThat(metadata.get(JURISDICTION_METADATA), equalTo(caseDetails.getJurisdiction()));
+        assertThat(metadata.get(CASE_TYPE_METADATA), equalTo(caseDetails.getCaseTypeId()));
+        assertThat(metadata.get(STATE_METADATA), equalTo(caseDetails.getState()));
+        assertThat(metadata.get(CASE_REFERENCE_METADATA), equalTo(caseDetails.getReference()));
+        assertThat(metadata.get(CREATED_DATE_METADATA), equalTo(caseDetails.getCreatedDate()));
+        assertThat(metadata.get(LAST_MODIFIED_METADATA), equalTo(caseDetails.getLastModified()));
+        assertThat(metadata.get(SECURITY_CLASSIFICATION_METADATA), equalTo(caseDetails.getSecurityClassification()));
     }
 
     private Map<String, JsonNode> buildData(String... dataFieldIds) {
