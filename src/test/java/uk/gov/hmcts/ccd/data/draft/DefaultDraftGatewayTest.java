@@ -229,7 +229,7 @@ class DefaultDraftGatewayTest {
         doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(Draft.class));
 
         final ResourceNotFoundException actualException = assertThrows(ResourceNotFoundException.class, () -> draftGateway.get(DID));
-        assertThat(actualException.getMessage(), is("Resource not found when getting draft for draftId=5 because of 404 NOT_FOUND"));
+        assertThat(actualException.getMessage(), is("Resource not found when getting draft for draftId=5"));
     }
 
 }

@@ -4,7 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.aggregated.*;
+import uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway;
+import uk.gov.hmcts.ccd.data.draft.DraftGateway;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
@@ -14,9 +18,6 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
-import uk.gov.hmcts.ccd.domain.service.getdraft.DefaultGetDraftOperation;
-import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftOperation;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTriggerBuilder.aCaseViewTrigger;
 import static uk.gov.hmcts.ccd.domain.model.definition.CaseDetailsBuilder.aCaseDetails;
@@ -26,8 +27,6 @@ import static uk.gov.hmcts.ccd.domain.model.definition.CaseDetailsBuilder.aCaseD
 public class DefaultGetDraftViewOperation extends AbstractDefaultGetCaseViewOperation implements GetCaseViewOperation {
 
     public static final String QUALIFIER = "defaultDraft";
-    private static final String RESOURCE_NOT_FOUND //
-        = "No draft found ( jurisdiction = '%s', caseType = '%s', draftId = '%s' )";
     private static final CaseViewTrigger DELETE_TRIGGER = aCaseViewTrigger()
         .withName("Delete")
         .withDescription("Delete draft")
@@ -35,27 +34,23 @@ public class DefaultGetDraftViewOperation extends AbstractDefaultGetCaseViewOper
         .build();
     private static final String RESUME = "Resume";
 
-    private final GetDraftOperation getDraftOperation;
+    private final DraftGateway draftGateway;
 
     @Autowired
     public DefaultGetDraftViewOperation(@Qualifier(CreatorGetCaseOperation.QUALIFIER) final GetCaseOperation getCaseOperation,
                                         final UIDefinitionRepository uiDefinitionRepository,
                                         final CaseTypeService caseTypeService,
                                         final UIDService uidService,
-                                        @Qualifier(DefaultGetDraftOperation.QUALIFIER) final GetDraftOperation getDraftOperation) {
+                                        @Qualifier(DefaultDraftGateway.QUALIFIER) final DraftGateway draftGateway) {
         super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService);
-        this.getDraftOperation = getDraftOperation;
+        this.draftGateway = draftGateway;
     }
 
     @Override
     public CaseView execute(String jurisdictionId, String caseTypeId, String draftId) {
 
         final CaseType caseType = getCaseType(jurisdictionId, caseTypeId);
-        final DraftResponse draftResponse = getDraftOperation.execute(draftId).orElseThrow(
-            () -> new ResourceNotFoundException(String.format(RESOURCE_NOT_FOUND,
-                                                              jurisdictionId,
-                                                              caseTypeId,
-                                                              draftId)));
+        final DraftResponse draftResponse = draftGateway.get(draftId);
 
         final CaseDetails caseDetails = buildCaseDetailsFromDraft(draftResponse);
         final CaseViewTrigger resumeTrigger = buildResumeTriggerFromDraft(draftResponse);

@@ -120,7 +120,7 @@ public class DefaultDraftGateway implements DraftGateway {
         } catch (HttpClientErrorException e) {
             LOG.warn("Error while getting draftId=" + draftId, e);
             if (e.getRawStatusCode() == RESOURCE_NOT_FOUND) {
-                throw new ResourceNotFoundException("Resource not found when getting draft for draftId=" + draftId + " because of " + e.getMessage());
+                throw new ResourceNotFoundException("Resource not found when getting draft for draftId=" + draftId);
             }
         } catch (Exception e) {
             LOG.warn("Error while getting draftId=" + draftId, e);
