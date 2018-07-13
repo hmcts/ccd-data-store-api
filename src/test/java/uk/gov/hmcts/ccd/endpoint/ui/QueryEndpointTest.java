@@ -75,6 +75,14 @@ class QueryEndpointTest {
     }
 
     @Test
+    void shouldCallGetDraftViewOperation() {
+        CaseView caseView = new CaseView();
+        doReturn(caseView).when(getDraftViewOperation).execute(any(), any(), any());
+        queryEndpoint.findDraft("jurisdictionId", "caseTypeId", "caseId");
+        verify(getDraftViewOperation).execute("jurisdictionId", "caseTypeId", "caseId");
+    }
+
+    @Test
     void shouldCallFindWorkBasketOperation() {
         List<WorkbasketInput> workBasketResults = new ArrayList<>();
         when(findWorkbasketInputOperation.execute("TEST", "TEST-CASE-TYPE", CAN_READ)).thenReturn(workBasketResults);

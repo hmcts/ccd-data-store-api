@@ -7,6 +7,7 @@ import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -82,6 +83,7 @@ public class DefaultGetDraftViewOperation extends AbstractDefaultGetCaseViewOper
         caseView.setTabs(getTabs(caseDetails, caseDetails.getData(), caseTabCollection));
 
         caseView.setTriggers(new CaseViewTrigger[] {resumeTrigger, DELETE_TRIGGER});
+        caseView.setEvents(new CaseViewEvent[]{});
 
         return caseView;
     }

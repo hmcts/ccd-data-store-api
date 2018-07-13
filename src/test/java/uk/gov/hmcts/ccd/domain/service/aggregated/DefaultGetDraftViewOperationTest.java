@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import org.hamcrest.collection.IsArrayWithSize;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -123,7 +124,7 @@ class DefaultGetDraftViewOperationTest {
                                          hasProperty("description", equalTo("Delete draft")),
                                          hasProperty("order", equalTo(2)))),
                   () -> assertThat(caseView.getState(), is(nullValue())),
-                  () -> assertThat(caseView.getEvents(), is(nullValue()))
+                  () -> assertThat(caseView.getEvents(), is(arrayWithSize(0)))
         );
     }
 }
