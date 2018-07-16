@@ -41,6 +41,7 @@ public class DefaultDraftGateway implements DraftGateway {
     private static final int RESOURCE_NOT_FOUND = 404;
     public static final String DRAFT_STORE_DOWN_ERR_MESSAGE = "The draft service is currently down, please refresh your browser or try again later";
     private static final String RESOURCE_NOT_FOUND_MSG = "No draft found ( draft reference = '%s' )";
+    private static final String DRAFT_STORE_DESERIALIZATION_ERR_MESSAGE = "Unable to read from draft service";
 
     @Qualifier("draftsRestTemplate")
     @Autowired
@@ -166,7 +167,7 @@ public class DefaultDraftGateway implements DraftGateway {
                 .build();
         } catch (IOException e) {
             LOG.warn("Error while deserializing case data content", e);
-            throw new ServiceException("Problem deserializing case data content because of " + e.getMessage());
+            throw new ServiceException(DRAFT_STORE_DESERIALIZATION_ERR_MESSAGE);
         }
         return draftResponse;
     }
