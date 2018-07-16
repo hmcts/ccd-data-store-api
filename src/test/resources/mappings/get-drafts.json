@@ -14,7 +14,7 @@
           "id": "5",
           "document": {
             "userId":"25",
-            "jurisdictionId":"TEST",
+            "jurisdictionId":"PROBATE",
             "caseTypeId":"TestAddressBookCase",
             "eventTriggerId":"createCase",
             "caseDataContent" : {
