@@ -26,7 +26,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.ccd.AppInsights.DOC_MANAGEMENT;
 import static uk.gov.hmcts.ccd.AppInsights.DRAFT_STORE;
 import static uk.gov.hmcts.ccd.domain.model.draft.DraftResponseBuilder.aDraftResponse;
 
@@ -62,7 +61,7 @@ public class DefaultDraftGateway implements DraftGateway {
     }
 
     @Override
-    public Long save(final CreateCaseDraft draft) {
+    public Long save(final CreateCaseDraftRequest draft) {
         try {
             HttpHeaders headers = securityUtils.authorizationHeaders();
             headers.add(DRAFT_ENCRYPTION_KEY_HEADER, applicationParams.getDraftEncryptionKey());
@@ -76,13 +75,13 @@ public class DefaultDraftGateway implements DraftGateway {
             appInsights.trackDependency(DRAFT_STORE, "Create", duration.toMillis(), true);
             return getDraftId(responseHeaders);
         } catch (Exception e) {
-            LOG.warn("Error while saving draft=" + draft, e);
-            throw new ServiceException("Problem saving draft because of " + e.getMessage());
+            LOG.warn("Error while saving draft={}", draft, e);
+            throw new ServiceException("Problem saving draft because of " + e.getMessage(), e);
         }
     }
 
     @Override
-    public DraftResponse update(final UpdateCaseDraft draft, final String draftId) {
+    public DraftResponse update(final UpdateCaseDraftRequest draft, final String draftId) {
         try {
             HttpHeaders headers = securityUtils.authorizationHeaders();
             headers.add(DRAFT_ENCRYPTION_KEY_HEADER, applicationParams.getDraftEncryptionKey());
@@ -95,13 +94,13 @@ public class DefaultDraftGateway implements DraftGateway {
                 .withId(draftId)
                 .build();
         } catch (HttpClientErrorException e) {
-            LOG.warn("Error while updating draftId=" + draftId, e);
+            LOG.warn("Error while updating draftId={}", draftId, e);
             if (e.getRawStatusCode() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException("Resource not found when getting draft for draftId=" + draftId + " because of " + e.getMessage());
             }
         } catch (Exception e) {
-            LOG.warn("Error while updating draftId=" + draftId, e);
-            throw new ServiceException("Problem updating draft because of " + e.getMessage());
+            LOG.warn("Error while updating draftId={}", draftId, e);
+            throw new ServiceException("Problem updating draft because of " + e.getMessage(), e);
         }
         return null;
     }
@@ -123,8 +122,8 @@ public class DefaultDraftGateway implements DraftGateway {
                 throw new ResourceNotFoundException("Resource not found when getting draft for draftId=" + draftId + " because of " + e.getMessage());
             }
         } catch (Exception e) {
-            LOG.warn("Error while getting draftId=" + draftId, e);
-            throw new ServiceException("Problem getting draft because of " + e.getMessage());
+            LOG.warn("Error while getting draftId={}", draftId, e);
+            throw new ServiceException("Problem getting draft because of " + e.getMessage(), e);
         }
         return null;
     }
@@ -166,7 +165,7 @@ public class DefaultDraftGateway implements DraftGateway {
                 .build();
         } catch (IOException e) {
             LOG.warn("Error while deserializing case data content", e);
-            throw new ServiceException("Problem deserializing case data content because of " + e.getMessage());
+            throw new ServiceException("Problem deserializing case data content because of " + e.getMessage(), e);
         }
         return draftResponse;
     }

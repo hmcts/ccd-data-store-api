@@ -5,9 +5,9 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
-import uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDraft;
+import uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDraftRequest;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
-import uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDraft;
+import uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDraftRequest;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 
 import javax.inject.Inject;
@@ -55,7 +55,7 @@ public class DefaultUpsertDraftOperation implements UpsertDraftOperation {
                                    draftId);
     }
 
-    private CreateCaseDraft buildCreateCaseDraft(String uid, String jurisdictionId, String caseTypeId, String eventTriggerId, CaseDataContent caseDataContent) {
+    private CreateCaseDraftRequest buildCreateCaseDraft(String uid, String jurisdictionId, String caseTypeId, String eventTriggerId, CaseDataContent caseDataContent) {
         return aCreateCaseDraft()
             .withDocument(aCaseDraft()
                               .withUserId(uid)
@@ -69,7 +69,7 @@ public class DefaultUpsertDraftOperation implements UpsertDraftOperation {
             .build();
     }
 
-    private UpdateCaseDraft buildUpdateCaseDraft(String uid, String jurisdictionId, String caseTypeId, String eventTriggerId, CaseDataContent caseDataContent) {
+    private UpdateCaseDraftRequest buildUpdateCaseDraft(String uid, String jurisdictionId, String caseTypeId, String eventTriggerId, CaseDataContent caseDataContent) {
         return anUpdateCaseDraft()
             .withDocument(aCaseDraft()
                               .withUserId(uid)

@@ -2,24 +2,24 @@ package uk.gov.hmcts.ccd.domain.model.draft;
 
 public class CreateCaseDraftBuilder {
 
-    private final CreateCaseDraft createCaseDraft;
+    private final CreateCaseDraftRequest createCaseDraftRequest;
 
     private CreateCaseDraftBuilder() {
-        this.createCaseDraft = new CreateCaseDraft();
+        this.createCaseDraftRequest = new CreateCaseDraftRequest();
     }
 
     public CreateCaseDraftBuilder withDocument(CaseDraft document) {
-        this.createCaseDraft.setDocument(document);
+        this.createCaseDraftRequest.setDocument(document);
         return this;
     }
 
     public CreateCaseDraftBuilder withType(String type) {
-        this.createCaseDraft.setType(type);
+        this.createCaseDraftRequest.setType(type);
         return this;
     }
 
     public CreateCaseDraftBuilder withMaxStaleDays(Integer maxStaleDays) {
-        this.createCaseDraft.setMaxStaleDays(maxStaleDays);
+        this.createCaseDraftRequest.setMaxStaleDays(maxStaleDays);
         return this;
     }
 
@@ -27,7 +27,7 @@ public class CreateCaseDraftBuilder {
         return new CreateCaseDraftBuilder();
     }
 
-    public CreateCaseDraft build() {
-        return this.createCaseDraft;
+    public CreateCaseDraftRequest build() {
+        return this.createCaseDraftRequest;
     }
 }
