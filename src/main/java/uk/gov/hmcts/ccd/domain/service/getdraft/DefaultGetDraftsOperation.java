@@ -30,15 +30,14 @@ public class DefaultGetDraftsOperation implements GetDraftsOperation {
 
     @Override
     public List<CaseDetails> execute(final MetaData metadata) {
-        List<CaseDetails> casesFromDrafts = Lists.newArrayList();
-        if (metadata.getPage().isPresent() && metadata.getPage().get().equals(PAGE_ONE)) {
-
+        final List<CaseDetails> casesFromDrafts = Lists.newArrayList();
+        metadata.getPage().filter(pg -> pg.equals(PAGE_ONE)).ifPresent(pg -> {
             List<DraftResponse> caseDrafts = draftGateway.getAll()
                 .stream()
                 .filter(draftResponse -> hasSameJurisdictionAndCaseType(metadata, draftResponse))
                 .collect(Collectors.toList());
-            casesFromDrafts = buildCaseDataFromDrafts(caseDrafts);
-        }
+            casesFromDrafts.addAll(buildCaseDataFromDrafts(caseDrafts));
+        });
         return casesFromDrafts;
     }
 

@@ -38,13 +38,25 @@ public class MergeDataToSearchResultOperation {
             .toArray(SearchResultViewColumn[]::new);
 
         final SearchResultViewItem[] viewItems = caseDetails.stream()
-            .map(caseData -> new SearchResultViewItem(hasReference(caseData) ? caseData.getReference().toString() : String.format(DRAFT_ID, caseData.getId()),
-                                                      caseData.getData()))
+            .map(caseData -> buildSearchResultViewItem(caseData))
             .toArray(SearchResultViewItem[]::new);
         return new SearchResultView(viewColumns, viewItems, resultError);
     }
 
-    private boolean hasReference(CaseDetails caseData) {
+    private SearchResultViewItem buildSearchResultViewItem(CaseDetails caseData) {
+        return new SearchResultViewItem(hasCaseReference(caseData) ? getCaseReference(caseData) : getDraftReference(caseData),
+                                        caseData.getData());
+    }
+
+    private String getCaseReference(CaseDetails caseData) {
+        return caseData.getReference().toString();
+    }
+
+    private String getDraftReference(CaseDetails caseData) {
+        return String.format(DRAFT_ID, caseData.getId());
+    }
+
+    private boolean hasCaseReference(CaseDetails caseData) {
         return caseData.getReference() != null;
     }
 

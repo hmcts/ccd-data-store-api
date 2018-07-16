@@ -146,7 +146,7 @@ public class DefaultDraftGateway implements DraftGateway {
                 .collect(Collectors.toList());
         } catch (Exception e) {
             LOG.warn("Error while getting drafts", e);
-            throw new DraftAccessException(DRAFT_STORE_DOWN_ERR_MESSAGE);
+            throw new DraftAccessException(DRAFT_STORE_DOWN_ERR_MESSAGE, e);
         }
     }
 
@@ -166,7 +166,7 @@ public class DefaultDraftGateway implements DraftGateway {
                 .withUpdated(getDraft.getUpdated().toLocalDateTime())
                 .build();
         } catch (IOException e) {
-            LOG.warn("Error while deserializing case data content", e);
+            LOG.warn("Error while deserializing draft data content", e);
             throw new ServiceException(DRAFT_STORE_DESERIALIZATION_ERR_MESSAGE, e);
         }
         return draftResponse;
