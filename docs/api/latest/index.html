@@ -887,6 +887,27 @@ margin-bottom: 20px;
   },
   "title" : "CaseDetails"
 };
+            defs.CaseDraft = {
+  "type" : "object",
+  "properties" : {
+    "caseDataContent" : {
+      "$ref" : "#/definitions/CaseDataContent"
+    },
+    "caseTypeId" : {
+      "type" : "string"
+    },
+    "eventTriggerId" : {
+      "type" : "string"
+    },
+    "jurisdictionId" : {
+      "type" : "string"
+    },
+    "userId" : {
+      "type" : "string"
+    }
+  },
+  "title" : "CaseDraft"
+};
             defs.CaseEvent = {
   "type" : "object",
   "properties" : {
@@ -1087,6 +1108,27 @@ margin-bottom: 20px;
     }
   },
   "title" : "CaseField"
+};
+            defs.CaseHistoryView = {
+  "type" : "object",
+  "properties" : {
+    "case_id" : {
+      "type" : "string"
+    },
+    "case_type" : {
+      "$ref" : "#/definitions/CaseViewType"
+    },
+    "event" : {
+      "$ref" : "#/definitions/CaseViewEvent"
+    },
+    "tabs" : {
+      "type" : "array",
+      "items" : {
+        "$ref" : "#/definitions/CaseViewTab"
+      }
+    }
+  },
+  "title" : "CaseHistoryView"
 };
             defs.CaseState = {
   "type" : "object",
@@ -1399,15 +1441,28 @@ margin-bottom: 20px;
   },
   "title" : "Document"
 };
-            defs.Draft = {
+            defs.DraftResponse = {
   "type" : "object",
   "properties" : {
+    "created" : {
+      "type" : "string",
+      "format" : "date-time"
+    },
+    "document" : {
+      "$ref" : "#/definitions/CaseDraft"
+    },
     "id" : {
-      "type" : "integer",
-      "format" : "int64"
+      "type" : "string"
+    },
+    "type" : {
+      "type" : "string"
+    },
+    "updated" : {
+      "type" : "string",
+      "format" : "date-time"
     }
   },
-  "title" : "Draft"
+  "title" : "DraftResponse"
 };
             defs.Event = {
   "type" : "object",
@@ -1673,6 +1728,9 @@ margin-bottom: 20px;
       "items" : {
         "$ref" : "#/definitions/SearchResultViewColumn"
       }
+    },
+    "result_error" : {
+      "type" : "string"
     },
     "results" : {
       "type" : "array",
@@ -1966,11 +2024,17 @@ margin-bottom: 20px;
                     <li data-group="QueryEndpoint" data-name="findCaseUsingGET" class="">
                       <a href="#api-QueryEndpoint-findCaseUsingGET">findCaseUsingGET</a>
                     </li>
+                    <li data-group="QueryEndpoint" data-name="findDraftUsingGET" class="">
+                      <a href="#api-QueryEndpoint-findDraftUsingGET">findDraftUsingGET</a>
+                    </li>
                     <li data-group="QueryEndpoint" data-name="findSearchInputDetailsUsingGET" class="">
                       <a href="#api-QueryEndpoint-findSearchInputDetailsUsingGET">findSearchInputDetailsUsingGET</a>
                     </li>
                     <li data-group="QueryEndpoint" data-name="findWorkbasketInputDetailsUsingGET" class="">
                       <a href="#api-QueryEndpoint-findWorkbasketInputDetailsUsingGET">findWorkbasketInputDetailsUsingGET</a>
+                    </li>
+                    <li data-group="QueryEndpoint" data-name="getCaseHistoryForEventUsingGET" class="">
+                      <a href="#api-QueryEndpoint-getCaseHistoryForEventUsingGET">getCaseHistoryForEventUsingGET</a>
                     </li>
                     <li data-group="QueryEndpoint" data-name="getCaseTypesUsingGET" class="">
                       <a href="#api-QueryEndpoint-getCaseTypesUsingGET">getCaseTypesUsingGET</a>
@@ -10837,7 +10901,7 @@ public class DraftsEndpointApiExample {
         String jid = jid_example; // String | Jurisdiction ID
         String uid = uid_example; // String | Idam user ID
         try {
-            Draft result = apiInstance.saveDraftForCaseWorkerUsingPOST(caseDataContent, ctid, etid, jid, uid);
+            DraftResponse result = apiInstance.saveDraftForCaseWorkerUsingPOST(caseDataContent, ctid, etid, jid, uid);
             System.out.println(result);
         } catch (ApiException e) {
             System.err.println("Exception when calling DraftsEndpointApi#saveDraftForCaseWorkerUsingPOST");
@@ -10860,7 +10924,7 @@ public class DraftsEndpointApiExample {
         String jid = jid_example; // String | Jurisdiction ID
         String uid = uid_example; // String | Idam user ID
         try {
-            Draft result = apiInstance.saveDraftForCaseWorkerUsingPOST(caseDataContent, ctid, etid, jid, uid);
+            DraftResponse result = apiInstance.saveDraftForCaseWorkerUsingPOST(caseDataContent, ctid, etid, jid, uid);
             System.out.println(result);
         } catch (ApiException e) {
             System.err.println("Exception when calling DraftsEndpointApi#saveDraftForCaseWorkerUsingPOST");
@@ -10888,7 +10952,7 @@ DraftsEndpointApi *apiInstance = [[DraftsEndpointApi alloc] init];
     etid:etid
     jid:jid
     uid:uid
-              completionHandler: ^(Draft output, NSError* error) {
+              completionHandler: ^(DraftResponse output, NSError* error) {
                             if (output) {
                                 NSLog(@"%@", output);
                             }
@@ -10953,7 +11017,7 @@ namespace Example
             try
             {
                 // Save draft as a caseworker.
-                Draft result = apiInstance.saveDraftForCaseWorkerUsingPOST(caseDataContent, ctid, etid, jid, uid);
+                DraftResponse result = apiInstance.saveDraftForCaseWorkerUsingPOST(caseDataContent, ctid, etid, jid, uid);
                 Debug.WriteLine(result);
             }
             catch (Exception e)
@@ -11197,7 +11261,7 @@ $(document).ready(function() {
                                         var schemaWrapper = {
   "description" : "Draft created",
   "schema" : {
-    "$ref" : "#/definitions/Draft"
+    "$ref" : "#/definitions/DraftResponse"
   }
 };
                                         var schema = schemaWrapper.schema;
@@ -11289,7 +11353,7 @@ public class DraftsEndpointApiExample {
         String jid = jid_example; // String | Jurisdiction ID
         String uid = uid_example; // String | Idam user ID
         try {
-            Draft result = apiInstance.updateDraftForCaseWorkerUsingPUT(caseDataContent, ctid, did, etid, jid, uid);
+            DraftResponse result = apiInstance.updateDraftForCaseWorkerUsingPUT(caseDataContent, ctid, did, etid, jid, uid);
             System.out.println(result);
         } catch (ApiException e) {
             System.err.println("Exception when calling DraftsEndpointApi#updateDraftForCaseWorkerUsingPUT");
@@ -11313,7 +11377,7 @@ public class DraftsEndpointApiExample {
         String jid = jid_example; // String | Jurisdiction ID
         String uid = uid_example; // String | Idam user ID
         try {
-            Draft result = apiInstance.updateDraftForCaseWorkerUsingPUT(caseDataContent, ctid, did, etid, jid, uid);
+            DraftResponse result = apiInstance.updateDraftForCaseWorkerUsingPUT(caseDataContent, ctid, did, etid, jid, uid);
             System.out.println(result);
         } catch (ApiException e) {
             System.err.println("Exception when calling DraftsEndpointApi#updateDraftForCaseWorkerUsingPUT");
@@ -11343,7 +11407,7 @@ DraftsEndpointApi *apiInstance = [[DraftsEndpointApi alloc] init];
     etid:etid
     jid:jid
     uid:uid
-              completionHandler: ^(Draft output, NSError* error) {
+              completionHandler: ^(DraftResponse output, NSError* error) {
                             if (output) {
                                 NSLog(@"%@", output);
                             }
@@ -11411,7 +11475,7 @@ namespace Example
             try
             {
                 // Update draft as a caseworker.
-                Draft result = apiInstance.updateDraftForCaseWorkerUsingPUT(caseDataContent, ctid, did, etid, jid, uid);
+                DraftResponse result = apiInstance.updateDraftForCaseWorkerUsingPUT(caseDataContent, ctid, did, etid, jid, uid);
                 Debug.WriteLine(result);
             }
             catch (Exception e)
@@ -11681,7 +11745,7 @@ $(document).ready(function() {
                                         var schemaWrapper = {
   "description" : "Draft updated",
   "schema" : {
-    "$ref" : "#/definitions/Draft"
+    "$ref" : "#/definitions/DraftResponse"
   }
 };
                                         var schema = schemaWrapper.schema;
@@ -12495,6 +12559,364 @@ except ApiException as e:
                         </article>
                       </div>
                       <hr>
+                    <div id="api-QueryEndpoint-findDraftUsingGET">
+                      <article id="api-QueryEndpoint-findDraftUsingGET-0" data-group="User" data-name="findDraftUsingGET" data-version="0">
+                        <div class="pull-left">
+                          <h1>findDraftUsingGET</h1>
+                          <p>Fetch a draft for display</p>
+                        </div>
+                        <div class="pull-right"></div>
+                        <div class="clearfix"></div>
+                        <p></p>
+                        <p class="marked"></p>
+                        <p></p>
+                        <br />
+                        <pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/aggregated/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/drafts/{did}</span></code></pre>
+                        <p>
+                          <h3>Usage and SDK Samples</h3>
+                        </p>
+                        <ul class="nav nav-tabs nav-tabs-examples">
+                          <li class="active"><a href="#examples-QueryEndpoint-findDraftUsingGET-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-QueryEndpoint-findDraftUsingGET-0-java">Java</a></li>
+                          <li class=""><a href="#examples-QueryEndpoint-findDraftUsingGET-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-QueryEndpoint-findDraftUsingGET-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-QueryEndpoint-findDraftUsingGET-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-QueryEndpoint-findDraftUsingGET-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-QueryEndpoint-findDraftUsingGET-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-QueryEndpoint-findDraftUsingGET-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-QueryEndpoint-findDraftUsingGET-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-QueryEndpoint-findDraftUsingGET-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-QueryEndpoint-findDraftUsingGET-0-python">Python</a></li>
+                        </ul>
+
+                        <div class="tab-content">
+                          <div class="tab-pane active" id="examples-QueryEndpoint-findDraftUsingGET-0-curl">
+                            <pre class="prettyprint"><code class="language-bsh">curl -X GET "https://case-data-app.dev.ccd.reform.hmcts.net:4451/aggregated/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/drafts/{did}"</code></pre>
+                          </div>
+                          <div class="tab-pane" id="examples-QueryEndpoint-findDraftUsingGET-0-java">
+                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
+import io.swagger.client.auth.*;
+import io.swagger.client.model.*;
+import io.swagger.client.api.QueryEndpointApi;
+
+import java.io.File;
+import java.util.*;
+
+public class QueryEndpointApiExample {
+
+    public static void main(String[] args) {
+        
+        QueryEndpointApi apiInstance = new QueryEndpointApi();
+        String ctid = ctid_example; // String | ctid
+        String did = did_example; // String | did
+        String jid = jid_example; // String | jid
+        try {
+            CaseView result = apiInstance.findDraftUsingGET(ctid, did, jid);
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling QueryEndpointApi#findDraftUsingGET");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+
+                          <div class="tab-pane" id="examples-QueryEndpoint-findDraftUsingGET-0-android">
+                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.api.QueryEndpointApi;
+
+public class QueryEndpointApiExample {
+
+    public static void main(String[] args) {
+        QueryEndpointApi apiInstance = new QueryEndpointApi();
+        String ctid = ctid_example; // String | ctid
+        String did = did_example; // String | did
+        String jid = jid_example; // String | jid
+        try {
+            CaseView result = apiInstance.findDraftUsingGET(ctid, did, jid);
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling QueryEndpointApi#findDraftUsingGET");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+  <!--
+  <div class="tab-pane" id="examples-QueryEndpoint-findDraftUsingGET-0-groovy">
+  <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+  </div> -->
+                            <div class="tab-pane" id="examples-QueryEndpoint-findDraftUsingGET-0-objc">
+                              <pre class="prettyprint"><code class="language-cpp">String *ctid = ctid_example; // ctid
+String *did = did_example; // did
+String *jid = jid_example; // jid
+
+QueryEndpointApi *apiInstance = [[QueryEndpointApi alloc] init];
+
+// Fetch a draft for display
+[apiInstance findDraftUsingGETWith:ctid
+    did:did
+    jid:jid
+              completionHandler: ^(CaseView output, NSError* error) {
+                            if (output) {
+                                NSLog(@"%@", output);
+                            }
+                            if (error) {
+                                NSLog(@"Error: %@", error);
+                            }
+                        }];
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-QueryEndpoint-findDraftUsingGET-0-javascript">
+                              <pre class="prettyprint"><code class="language-js">var CoreCaseDataDataStoreApi = require('core_case_data___data_store_api');
+
+var api = new CoreCaseDataDataStoreApi.QueryEndpointApi()
+
+var ctid = ctid_example; // {String} ctid
+
+var did = did_example; // {String} did
+
+var jid = jid_example; // {String} jid
+
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+};
+api.findDraftUsingGET(ctid, did, jid, callback);
+</code></pre>
+                            </div>
+
+                            <!--<div class="tab-pane" id="examples-QueryEndpoint-findDraftUsingGET-0-angular">
+              <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+            </div>-->
+                            <div class="tab-pane" id="examples-QueryEndpoint-findDraftUsingGET-0-csharp">
+                              <pre class="prettyprint"><code class="language-cs">using System;
+using System.Diagnostics;
+using IO.Swagger.Api;
+using IO.Swagger.Client;
+using IO.Swagger.Model;
+
+namespace Example
+{
+    public class findDraftUsingGETExample
+    {
+        public void main()
+        {
+            
+            var apiInstance = new QueryEndpointApi();
+            var ctid = ctid_example;  // String | ctid
+            var did = did_example;  // String | did
+            var jid = jid_example;  // String | jid
+
+            try
+            {
+                // Fetch a draft for display
+                CaseView result = apiInstance.findDraftUsingGET(ctid, did, jid);
+                Debug.WriteLine(result);
+            }
+            catch (Exception e)
+            {
+                Debug.Print("Exception when calling QueryEndpointApi.findDraftUsingGET: " + e.Message );
+            }
+        }
+    }
+}
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-QueryEndpoint-findDraftUsingGET-0-php">
+                              <pre class="prettyprint"><code class="language-php"><&#63;php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+$api_instance = new Swagger\Client\Api\QueryEndpointApi();
+$ctid = ctid_example; // String | ctid
+$did = did_example; // String | did
+$jid = jid_example; // String | jid
+
+try {
+    $result = $api_instance->findDraftUsingGET($ctid, $did, $jid);
+    print_r($result);
+} catch (Exception $e) {
+    echo 'Exception when calling QueryEndpointApi->findDraftUsingGET: ', $e->getMessage(), PHP_EOL;
+}
+?></code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-QueryEndpoint-findDraftUsingGET-0-perl">
+                              <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
+use WWW::SwaggerClient::Configuration;
+use WWW::SwaggerClient::QueryEndpointApi;
+
+my $api_instance = WWW::SwaggerClient::QueryEndpointApi->new();
+my $ctid = ctid_example; # String | ctid
+my $did = did_example; # String | did
+my $jid = jid_example; # String | jid
+
+eval { 
+    my $result = $api_instance->findDraftUsingGET(ctid => $ctid, did => $did, jid => $jid);
+    print Dumper($result);
+};
+if ($@) {
+    warn "Exception when calling QueryEndpointApi->findDraftUsingGET: $@\n";
+}</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-QueryEndpoint-findDraftUsingGET-0-python">
+                              <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
+import time
+import swagger_client
+from swagger_client.rest import ApiException
+from pprint import pprint
+
+# create an instance of the API class
+api_instance = swagger_client.QueryEndpointApi()
+ctid = ctid_example # String | ctid
+did = did_example # String | did
+jid = jid_example # String | jid
+
+try: 
+    # Fetch a draft for display
+    api_response = api_instance.find_draft_using_get(ctid, did, jid)
+    pprint(api_response)
+except ApiException as e:
+    print("Exception when calling QueryEndpointApi->findDraftUsingGET: %s\n" % e)</code></pre>
+                            </div>
+                          </div>
+
+                          <h2>Parameters</h2>
+
+                            <div class="methodsubtabletitle">Path parameters</div>
+                            <table id="methodsubtable">
+                                <tr>
+                                  <th width="150px">Name</th>
+                                  <th>Description</th>
+                                </tr>
+                                  <tr><td style="width:150px;">ctid*</td>
+<td>
+
+
+    <div id="d2e199_findDraftUsingGET_ctid">
+        <div class="json-schema-view">
+            <div class="primitive">
+                <span class="type">
+                    String
+                </span>
+
+                    <div class="inner description">
+                        ctid
+                    </div>
+            </div>
+                <div class="inner required">
+                    Required
+                </div>
+        </div>
+    </div>
+</td>
+</tr>
+
+                                  <tr><td style="width:150px;">did*</td>
+<td>
+
+
+    <div id="d2e199_findDraftUsingGET_did">
+        <div class="json-schema-view">
+            <div class="primitive">
+                <span class="type">
+                    String
+                </span>
+
+                    <div class="inner description">
+                        did
+                    </div>
+            </div>
+                <div class="inner required">
+                    Required
+                </div>
+        </div>
+    </div>
+</td>
+</tr>
+
+                                  <tr><td style="width:150px;">jid*</td>
+<td>
+
+
+    <div id="d2e199_findDraftUsingGET_jid">
+        <div class="json-schema-view">
+            <div class="primitive">
+                <span class="type">
+                    String
+                </span>
+
+                    <div class="inner description">
+                        jid
+                    </div>
+            </div>
+                <div class="inner required">
+                    Required
+                </div>
+        </div>
+    </div>
+</td>
+</tr>
+
+                            </table>
+
+
+
+
+
+                          <h2>Responses</h2>
+                            <h3> Status: 200 - A displayable draft </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                                <li class="active">
+                                  <a data-toggle="tab" href="#responses-findDraftUsingGET-200-schema">Schema</a>
+                                </li>
+
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-findDraftUsingGET-200-schema">
+                                  <div id='responses-findDraftUsingGET-200-schema-200' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "A displayable draft",
+  "schema" : {
+    "$ref" : "#/definitions/CaseView"
+  }
+};
+                                        var schema = schemaWrapper.schema;
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else {
+                                          schemaWrapper.definitions = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        //console.log(JSON.stringify(schema));
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-findDraftUsingGET-200-schema-data').val(stringify(schema));
+                                        var result = $('#responses-findDraftUsingGET-200-schema-200');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-findDraftUsingGET-200-schema-data' type='hidden' value=''></input>
+                                </div>
+                            </div>
+
+                        </article>
+                      </div>
+                      <hr>
                     <div id="api-QueryEndpoint-findSearchInputDetailsUsingGET">
                       <article id="api-QueryEndpoint-findSearchInputDetailsUsingGET-0" data-group="User" data-name="findSearchInputDetailsUsingGET" data-version="0">
                         <div class="pull-left">
@@ -13229,6 +13651,408 @@ except ApiException as e:
                             </div>
 
                             <h3> Status: 404 - No Workbasket Input found for the given case type and jurisdiction </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                            </div>
+
+                        </article>
+                      </div>
+                      <hr>
+                    <div id="api-QueryEndpoint-getCaseHistoryForEventUsingGET">
+                      <article id="api-QueryEndpoint-getCaseHistoryForEventUsingGET-0" data-group="User" data-name="getCaseHistoryForEventUsingGET" data-version="0">
+                        <div class="pull-left">
+                          <h1>getCaseHistoryForEventUsingGET</h1>
+                          <p>Fetch case history for the event</p>
+                        </div>
+                        <div class="pull-right"></div>
+                        <div class="clearfix"></div>
+                        <p></p>
+                        <p class="marked"></p>
+                        <p></p>
+                        <br />
+                        <pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/aggregated/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events/{eventId}/case-history</span></code></pre>
+                        <p>
+                          <h3>Usage and SDK Samples</h3>
+                        </p>
+                        <ul class="nav nav-tabs nav-tabs-examples">
+                          <li class="active"><a href="#examples-QueryEndpoint-getCaseHistoryForEventUsingGET-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-QueryEndpoint-getCaseHistoryForEventUsingGET-0-java">Java</a></li>
+                          <li class=""><a href="#examples-QueryEndpoint-getCaseHistoryForEventUsingGET-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-QueryEndpoint-getCaseHistoryForEventUsingGET-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-QueryEndpoint-getCaseHistoryForEventUsingGET-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-QueryEndpoint-getCaseHistoryForEventUsingGET-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-QueryEndpoint-getCaseHistoryForEventUsingGET-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-QueryEndpoint-getCaseHistoryForEventUsingGET-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-QueryEndpoint-getCaseHistoryForEventUsingGET-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-QueryEndpoint-getCaseHistoryForEventUsingGET-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-QueryEndpoint-getCaseHistoryForEventUsingGET-0-python">Python</a></li>
+                        </ul>
+
+                        <div class="tab-content">
+                          <div class="tab-pane active" id="examples-QueryEndpoint-getCaseHistoryForEventUsingGET-0-curl">
+                            <pre class="prettyprint"><code class="language-bsh">curl -X GET "https://case-data-app.dev.ccd.reform.hmcts.net:4451/aggregated/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events/{eventId}/case-history"</code></pre>
+                          </div>
+                          <div class="tab-pane" id="examples-QueryEndpoint-getCaseHistoryForEventUsingGET-0-java">
+                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
+import io.swagger.client.auth.*;
+import io.swagger.client.model.*;
+import io.swagger.client.api.QueryEndpointApi;
+
+import java.io.File;
+import java.util.*;
+
+public class QueryEndpointApiExample {
+
+    public static void main(String[] args) {
+        
+        QueryEndpointApi apiInstance = new QueryEndpointApi();
+        String cid = cid_example; // String | cid
+        String ctid = ctid_example; // String | ctid
+        Long eventId = 789; // Long | eventId
+        String jid = jid_example; // String | jid
+        try {
+            CaseHistoryView result = apiInstance.getCaseHistoryForEventUsingGET(cid, ctid, eventId, jid);
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling QueryEndpointApi#getCaseHistoryForEventUsingGET");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+
+                          <div class="tab-pane" id="examples-QueryEndpoint-getCaseHistoryForEventUsingGET-0-android">
+                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.api.QueryEndpointApi;
+
+public class QueryEndpointApiExample {
+
+    public static void main(String[] args) {
+        QueryEndpointApi apiInstance = new QueryEndpointApi();
+        String cid = cid_example; // String | cid
+        String ctid = ctid_example; // String | ctid
+        Long eventId = 789; // Long | eventId
+        String jid = jid_example; // String | jid
+        try {
+            CaseHistoryView result = apiInstance.getCaseHistoryForEventUsingGET(cid, ctid, eventId, jid);
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling QueryEndpointApi#getCaseHistoryForEventUsingGET");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+  <!--
+  <div class="tab-pane" id="examples-QueryEndpoint-getCaseHistoryForEventUsingGET-0-groovy">
+  <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+  </div> -->
+                            <div class="tab-pane" id="examples-QueryEndpoint-getCaseHistoryForEventUsingGET-0-objc">
+                              <pre class="prettyprint"><code class="language-cpp">String *cid = cid_example; // cid
+String *ctid = ctid_example; // ctid
+Long *eventId = 789; // eventId
+String *jid = jid_example; // jid
+
+QueryEndpointApi *apiInstance = [[QueryEndpointApi alloc] init];
+
+// Fetch case history for the event
+[apiInstance getCaseHistoryForEventUsingGETWith:cid
+    ctid:ctid
+    eventId:eventId
+    jid:jid
+              completionHandler: ^(CaseHistoryView output, NSError* error) {
+                            if (output) {
+                                NSLog(@"%@", output);
+                            }
+                            if (error) {
+                                NSLog(@"Error: %@", error);
+                            }
+                        }];
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-QueryEndpoint-getCaseHistoryForEventUsingGET-0-javascript">
+                              <pre class="prettyprint"><code class="language-js">var CoreCaseDataDataStoreApi = require('core_case_data___data_store_api');
+
+var api = new CoreCaseDataDataStoreApi.QueryEndpointApi()
+
+var cid = cid_example; // {String} cid
+
+var ctid = ctid_example; // {String} ctid
+
+var eventId = 789; // {Long} eventId
+
+var jid = jid_example; // {String} jid
+
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+};
+api.getCaseHistoryForEventUsingGET(cid, ctid, eventId, jid, callback);
+</code></pre>
+                            </div>
+
+                            <!--<div class="tab-pane" id="examples-QueryEndpoint-getCaseHistoryForEventUsingGET-0-angular">
+              <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+            </div>-->
+                            <div class="tab-pane" id="examples-QueryEndpoint-getCaseHistoryForEventUsingGET-0-csharp">
+                              <pre class="prettyprint"><code class="language-cs">using System;
+using System.Diagnostics;
+using IO.Swagger.Api;
+using IO.Swagger.Client;
+using IO.Swagger.Model;
+
+namespace Example
+{
+    public class getCaseHistoryForEventUsingGETExample
+    {
+        public void main()
+        {
+            
+            var apiInstance = new QueryEndpointApi();
+            var cid = cid_example;  // String | cid
+            var ctid = ctid_example;  // String | ctid
+            var eventId = 789;  // Long | eventId
+            var jid = jid_example;  // String | jid
+
+            try
+            {
+                // Fetch case history for the event
+                CaseHistoryView result = apiInstance.getCaseHistoryForEventUsingGET(cid, ctid, eventId, jid);
+                Debug.WriteLine(result);
+            }
+            catch (Exception e)
+            {
+                Debug.Print("Exception when calling QueryEndpointApi.getCaseHistoryForEventUsingGET: " + e.Message );
+            }
+        }
+    }
+}
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-QueryEndpoint-getCaseHistoryForEventUsingGET-0-php">
+                              <pre class="prettyprint"><code class="language-php"><&#63;php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+$api_instance = new Swagger\Client\Api\QueryEndpointApi();
+$cid = cid_example; // String | cid
+$ctid = ctid_example; // String | ctid
+$eventId = 789; // Long | eventId
+$jid = jid_example; // String | jid
+
+try {
+    $result = $api_instance->getCaseHistoryForEventUsingGET($cid, $ctid, $eventId, $jid);
+    print_r($result);
+} catch (Exception $e) {
+    echo 'Exception when calling QueryEndpointApi->getCaseHistoryForEventUsingGET: ', $e->getMessage(), PHP_EOL;
+}
+?></code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-QueryEndpoint-getCaseHistoryForEventUsingGET-0-perl">
+                              <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
+use WWW::SwaggerClient::Configuration;
+use WWW::SwaggerClient::QueryEndpointApi;
+
+my $api_instance = WWW::SwaggerClient::QueryEndpointApi->new();
+my $cid = cid_example; # String | cid
+my $ctid = ctid_example; # String | ctid
+my $eventId = 789; # Long | eventId
+my $jid = jid_example; # String | jid
+
+eval { 
+    my $result = $api_instance->getCaseHistoryForEventUsingGET(cid => $cid, ctid => $ctid, eventId => $eventId, jid => $jid);
+    print Dumper($result);
+};
+if ($@) {
+    warn "Exception when calling QueryEndpointApi->getCaseHistoryForEventUsingGET: $@\n";
+}</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-QueryEndpoint-getCaseHistoryForEventUsingGET-0-python">
+                              <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
+import time
+import swagger_client
+from swagger_client.rest import ApiException
+from pprint import pprint
+
+# create an instance of the API class
+api_instance = swagger_client.QueryEndpointApi()
+cid = cid_example # String | cid
+ctid = ctid_example # String | ctid
+eventId = 789 # Long | eventId
+jid = jid_example # String | jid
+
+try: 
+    # Fetch case history for the event
+    api_response = api_instance.get_case_history_for_event_using_get(cid, ctid, eventId, jid)
+    pprint(api_response)
+except ApiException as e:
+    print("Exception when calling QueryEndpointApi->getCaseHistoryForEventUsingGET: %s\n" % e)</code></pre>
+                            </div>
+                          </div>
+
+                          <h2>Parameters</h2>
+
+                            <div class="methodsubtabletitle">Path parameters</div>
+                            <table id="methodsubtable">
+                                <tr>
+                                  <th width="150px">Name</th>
+                                  <th>Description</th>
+                                </tr>
+                                  <tr><td style="width:150px;">cid*</td>
+<td>
+
+
+    <div id="d2e199_getCaseHistoryForEventUsingGET_cid">
+        <div class="json-schema-view">
+            <div class="primitive">
+                <span class="type">
+                    String
+                </span>
+
+                    <div class="inner description">
+                        cid
+                    </div>
+            </div>
+                <div class="inner required">
+                    Required
+                </div>
+        </div>
+    </div>
+</td>
+</tr>
+
+                                  <tr><td style="width:150px;">ctid*</td>
+<td>
+
+
+    <div id="d2e199_getCaseHistoryForEventUsingGET_ctid">
+        <div class="json-schema-view">
+            <div class="primitive">
+                <span class="type">
+                    String
+                </span>
+
+                    <div class="inner description">
+                        ctid
+                    </div>
+            </div>
+                <div class="inner required">
+                    Required
+                </div>
+        </div>
+    </div>
+</td>
+</tr>
+
+                                  <tr><td style="width:150px;">eventId*</td>
+<td>
+
+
+    <div id="d2e199_getCaseHistoryForEventUsingGET_eventId">
+        <div class="json-schema-view">
+            <div class="primitive">
+                <span class="type">
+                    Long
+                </span>
+                    <span class="format">
+                        (int64)
+                    </span>
+
+                    <div class="inner description">
+                        eventId
+                    </div>
+            </div>
+                <div class="inner required">
+                    Required
+                </div>
+        </div>
+    </div>
+</td>
+</tr>
+
+                                  <tr><td style="width:150px;">jid*</td>
+<td>
+
+
+    <div id="d2e199_getCaseHistoryForEventUsingGET_jid">
+        <div class="json-schema-view">
+            <div class="primitive">
+                <span class="type">
+                    String
+                </span>
+
+                    <div class="inner description">
+                        jid
+                    </div>
+            </div>
+                <div class="inner required">
+                    Required
+                </div>
+        </div>
+    </div>
+</td>
+</tr>
+
+                            </table>
+
+
+
+
+
+                          <h2>Responses</h2>
+                            <h3> Status: 200 - Displayable case data </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                                <li class="active">
+                                  <a data-toggle="tab" href="#responses-getCaseHistoryForEventUsingGET-200-schema">Schema</a>
+                                </li>
+
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-getCaseHistoryForEventUsingGET-200-schema">
+                                  <div id='responses-getCaseHistoryForEventUsingGET-200-schema-200' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "Displayable case data",
+  "schema" : {
+    "$ref" : "#/definitions/CaseHistoryView"
+  }
+};
+                                        var schema = schemaWrapper.schema;
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else {
+                                          schemaWrapper.definitions = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        //console.log(JSON.stringify(schema));
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-getCaseHistoryForEventUsingGET-200-schema-data').val(stringify(schema));
+                                        var result = $('#responses-getCaseHistoryForEventUsingGET-200-schema-200');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-getCaseHistoryForEventUsingGET-200-schema-data' type='hidden' value=''></input>
+                                </div>
+                            </div>
+
+                            <h3> Status: 404 - Invalid jurisdiction/case type/case reference or event id </h3>
 
                             <ul class="nav nav-tabs nav-tabs-examples" >
                             </ul>
@@ -15163,7 +15987,7 @@ except ApiException as e:
           </div>
           <div id="generator">
             <div class="content">
-              Generated 2018-07-06T11:23:12.567+01:00
+              Generated 2018-07-16T10:00:49.010+01:00
             </div>
           </div>
       </div>

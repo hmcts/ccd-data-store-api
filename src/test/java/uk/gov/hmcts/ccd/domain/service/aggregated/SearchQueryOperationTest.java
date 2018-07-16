@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import com.google.common.collect.Lists;
 import org.hamcrest.Matcher;
-import org.hamcrest.collection.IsCollectionWithSize;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,7 +26,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway.DRAFT_ACCESS_EXCEPTION_MSG;
+import static uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway.DRAFT_STORE_DOWN_ERR_MESSAGE;
 import static uk.gov.hmcts.ccd.domain.model.definition.CaseDetailsBuilder.aCaseDetails;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.NO_ERROR;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
@@ -134,7 +133,7 @@ public class SearchQueryOperationTest {
     @Test
     @DisplayName("should return cases and resultError but not drafts when draft store unresponsive")
     public void shouldReturnCasesAndResultErrorButNoDraftsWhenDraftStoreUnresponsive() {
-        DraftAccessException draftAccessException = new DraftAccessException(DRAFT_ACCESS_EXCEPTION_MSG);
+        DraftAccessException draftAccessException = new DraftAccessException(DRAFT_STORE_DOWN_ERR_MESSAGE);
         doThrow(draftAccessException).when(getDraftsOperation).execute(metadata);
         doReturn(cases).when(searchOperation).execute(metadata, criteria);
         searchQueryOperation.execute(VIEW, metadata, criteria);
@@ -143,7 +142,7 @@ public class SearchQueryOperationTest {
             () -> verify(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ),
             () -> verify(searchOperation).execute(metadata, criteria),
             () -> verify(getDraftsOperation).execute(metadata),
-            () -> verify(mergeDataToSearchResultOperation).execute(anyObject(), eq(cases), anyString(), eq(DRAFT_ACCESS_EXCEPTION_MSG))
+            () -> verify(mergeDataToSearchResultOperation).execute(anyObject(), eq(cases), anyString(), eq(DRAFT_STORE_DOWN_ERR_MESSAGE))
         );
     }
 

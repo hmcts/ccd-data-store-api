@@ -603,4 +603,25 @@ public class TestBuildersUtil {
             return new CaseTabCollectionBuilder();
         }
     }
+
+    public static class CaseDataBuilder {
+        private final Map<String, JsonNode> data;
+
+        private CaseDataBuilder() {
+            this.data = Maps.newHashMap();
+        }
+
+        public CaseDataBuilder withPair(String key, JsonNode value) {
+            data.put(key, value);
+            return this;
+        }
+
+        public Map<String, JsonNode> build() {
+            return this.data;
+        }
+
+        public static CaseDataBuilder aCaseData() {
+            return new CaseDataBuilder();
+        }
+    }
 }
