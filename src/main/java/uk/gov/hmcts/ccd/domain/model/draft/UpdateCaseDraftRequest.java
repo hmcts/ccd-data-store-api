@@ -2,7 +2,7 @@ package uk.gov.hmcts.ccd.domain.model.draft;
 
 import javax.validation.constraints.NotNull;
 
-public class UpdateCaseDraft {
+public class UpdateCaseDraftRequest {
 
     private CaseDraft document;
 

@@ -63,7 +63,7 @@ public class DefaultDraftGateway implements DraftGateway {
     }
 
     @Override
-    public Long save(final CreateCaseDraft draft) {
+    public Long save(final CreateCaseDraftRequest draft) {
         try {
             HttpHeaders headers = securityUtils.authorizationHeaders();
             headers.add(DRAFT_ENCRYPTION_KEY_HEADER, applicationParams.getDraftEncryptionKey());
@@ -77,13 +77,13 @@ public class DefaultDraftGateway implements DraftGateway {
             appInsights.trackDependency(DRAFT_STORE, "Create", duration.toMillis(), true);
             return getDraftId(responseHeaders);
         } catch (Exception e) {
-            LOG.warn("Error while saving draft=" + draft, e);
-            throw new ServiceException(DRAFT_STORE_DOWN_ERR_MESSAGE);
+            LOG.warn("Error while saving draft={}", draft, e);
+            throw new ServiceException(DRAFT_STORE_DOWN_ERR_MESSAGE, e);
         }
     }
 
     @Override
-    public DraftResponse update(final UpdateCaseDraft draft, final String draftId) {
+    public DraftResponse update(final UpdateCaseDraftRequest draft, final String draftId) {
         try {
             HttpHeaders headers = securityUtils.authorizationHeaders();
             headers.add(DRAFT_ENCRYPTION_KEY_HEADER, applicationParams.getDraftEncryptionKey());
@@ -96,13 +96,13 @@ public class DefaultDraftGateway implements DraftGateway {
                 .withId(draftId)
                 .build();
         } catch (HttpClientErrorException e) {
-            LOG.warn("Error while updating draftId=" + draftId, e);
+            LOG.warn("Error while updating draftId={}", draftId, e);
             if (e.getRawStatusCode() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException(String.format(RESOURCE_NOT_FOUND_MSG, draftId));
             }
         } catch (Exception e) {
-            LOG.warn("Error while updating draftId=" + draftId, e);
-            throw new ServiceException(DRAFT_STORE_DOWN_ERR_MESSAGE);
+            LOG.warn("Error while updating draftId={}", draftId, e);
+            throw new ServiceException(DRAFT_STORE_DOWN_ERR_MESSAGE, e);
         }
         return null;
     }
@@ -125,7 +125,7 @@ public class DefaultDraftGateway implements DraftGateway {
             }
         } catch (Exception e) {
             LOG.warn("Error while getting draftId=" + draftId, e);
-            throw new ServiceException(DRAFT_STORE_DOWN_ERR_MESSAGE);
+            throw new ServiceException(DRAFT_STORE_DOWN_ERR_MESSAGE, e);
         }
         return null;
     }
@@ -167,7 +167,7 @@ public class DefaultDraftGateway implements DraftGateway {
                 .build();
         } catch (IOException e) {
             LOG.warn("Error while deserializing case data content", e);
-            throw new ServiceException(DRAFT_STORE_DESERIALIZATION_ERR_MESSAGE);
+            throw new ServiceException(DRAFT_STORE_DESERIALIZATION_ERR_MESSAGE, e);
         }
         return draftResponse;
     }

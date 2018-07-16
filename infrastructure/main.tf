@@ -38,6 +38,8 @@ locals {
   custom_redirect_uri = "${var.frontend_url}/oauth2redirect"
   default_redirect_uri = "https://ccd-case-management-web-${local.env_ase_url}/oauth2redirect"
   oauth2_redirect_uri = "${var.frontend_url != "" ? local.custom_redirect_uri : local.default_redirect_uri}"
+
+  draftStoreUrl = "http://draft-store-service-${local.local_env}.service.${local.local_ase}.internal"
 }
 
 data "vault_generic_secret" "ccd_data_s2s_key" {
@@ -91,6 +93,8 @@ module "ccd-data-store-api" {
     IDAM_S2S_URL                        = "${local.s2s_url}"
     DATA_STORE_IDAM_KEY                 = "${data.vault_generic_secret.ccd_data_s2s_key.data["value"]}"
 
+    CCD_DRAFT_STORE_URL                 = "${local.draftStoreUrl}"
+    CCD_DRAFT_MAX_STALE_DAYS            = "${var.draft_store_max_stale_days}"
     CCD_DRAFT_ENCRYPTION_KEY            = "${random_string.draft_encryption_key.result}"
 
     DATA_STORE_S2S_AUTHORISED_SERVICES  = "${var.authorised-services}"

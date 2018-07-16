@@ -8,9 +8,9 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.draft.CaseDraft;
-import uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDraft;
+import uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDraftRequest;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
-import uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDraft;
+import uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDraftRequest;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 
 import static org.hamcrest.Matchers.*;
@@ -60,8 +60,8 @@ class DefaultUpsertDraftOperationTest {
 
     @Test
     void shouldSuccessfullySaveDraft() {
-        final ArgumentCaptor<CreateCaseDraft> argument = ArgumentCaptor.forClass(CreateCaseDraft.class);
-        doReturn(Long.valueOf(DID)).when(draftGateway).save(any(CreateCaseDraft.class));
+        final ArgumentCaptor<CreateCaseDraftRequest> argument = ArgumentCaptor.forClass(CreateCaseDraftRequest.class);
+        doReturn(Long.valueOf(DID)).when(draftGateway).save(any(CreateCaseDraftRequest.class));
         draftResponse.setId(DID);
 
         DraftResponse result = upsertDraftOperation.executeSave(UID, JID, CTID, ETID, caseDataContent);
@@ -82,8 +82,8 @@ class DefaultUpsertDraftOperationTest {
     @Test
     void shouldSuccessfullyUpdateDraft() {
         final ArgumentCaptor<String> draftIdCaptor = ArgumentCaptor.forClass(String.class);
-        final ArgumentCaptor<UpdateCaseDraft> caseDataContentCaptor = ArgumentCaptor.forClass(UpdateCaseDraft.class);
-        doReturn(draftResponse).when(draftGateway).update(any(UpdateCaseDraft.class), any(String.class));
+        final ArgumentCaptor<UpdateCaseDraftRequest> caseDataContentCaptor = ArgumentCaptor.forClass(UpdateCaseDraftRequest.class);
+        doReturn(draftResponse).when(draftGateway).update(any(UpdateCaseDraftRequest.class), any(String.class));
 
 
         DraftResponse result = upsertDraftOperation.executeUpdate(UID, JID, CTID, ETID, DID, caseDataContent);

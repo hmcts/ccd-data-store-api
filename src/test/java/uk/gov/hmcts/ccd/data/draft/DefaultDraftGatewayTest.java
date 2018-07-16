@@ -84,8 +84,8 @@ class DefaultDraftGatewayTest {
 
     private Draft draft;
     private CaseDraft caseDraft;
-    private CreateCaseDraft createCaseDraft;
-    private UpdateCaseDraft updateCaseDraft;
+    private CreateCaseDraftRequest createCaseDraftRequest;
+    private UpdateCaseDraftRequest updateCaseDraftRequest;
     private String draftBaseURL = "draftBaseURL";
     private String draftURL5 = "draftBaseURL/" + DID;
 
@@ -122,12 +122,12 @@ class DefaultDraftGatewayTest {
             .withCreated(NOW)
             .withUpdated(NOW_PLUS_5_MIN)
             .build();
-        createCaseDraft = aCreateCaseDraft()
+        createCaseDraftRequest = aCreateCaseDraft()
             .withDocument(caseDraft)
             .withType(CASE_DATA_CONTENT)
             .withMaxStaleDays(applicationParams.getDraftMaxStaleDays())
             .build();
-        updateCaseDraft = anUpdateCaseDraft()
+        updateCaseDraftRequest = anUpdateCaseDraft()
             .withDocument(caseDraft)
             .withType(CASE_DATA_CONTENT)
             .build();
@@ -139,7 +139,7 @@ class DefaultDraftGatewayTest {
         ResponseEntity<HttpEntity> response = ResponseEntity.created(new URI("http://localhost:8800/drafts/4")).build();
         doReturn(response).when(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(HttpEntity.class));
 
-        Long result = draftGateway.save(createCaseDraft);
+        Long result = draftGateway.save(createCaseDraftRequest);
 
         assertAll(
             () -> verify(restTemplate).exchange(eq(draftBaseURL), eq(HttpMethod.POST), any(RequestEntity.class), eq(HttpEntity.class)),
@@ -152,7 +152,7 @@ class DefaultDraftGatewayTest {
         Exception exception = new RestClientException("connectivity issue");
         doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(HttpEntity.class));
 
-        final ServiceException actualException = assertThrows(ServiceException.class, () -> draftGateway.save(createCaseDraft));
+        final ServiceException actualException = assertThrows(ServiceException.class, () -> draftGateway.save(createCaseDraftRequest));
         assertThat(actualException.getMessage(), is("The draft service is currently down, please refresh your browser or try again later"));
     }
 
@@ -160,7 +160,7 @@ class DefaultDraftGatewayTest {
     void shouldSuccessfullyUpdateToDraft() throws URISyntaxException {
         doReturn(ResponseEntity.status(204).build()).when(restTemplate).exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(HttpEntity.class));
 
-        DraftResponse result = draftGateway.update(updateCaseDraft, DID);
+        DraftResponse result = draftGateway.update(updateCaseDraftRequest, DID);
 
         assertAll(
             () -> verify(restTemplate).exchange(eq(draftURL5), eq(HttpMethod.PUT), any(RequestEntity.class), eq(HttpEntity.class)),
@@ -173,7 +173,7 @@ class DefaultDraftGatewayTest {
         Exception exception = new RestClientException("connectivity issue");
         doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(HttpEntity.class));
 
-        final ServiceException actualException = assertThrows(ServiceException.class, () -> draftGateway.update(updateCaseDraft, DID));
+        final ServiceException actualException = assertThrows(ServiceException.class, () -> draftGateway.update(updateCaseDraftRequest, DID));
         assertThat(actualException.getMessage(), is("The draft service is currently down, please refresh your browser or try again later"));
     }
 
@@ -182,7 +182,7 @@ class DefaultDraftGatewayTest {
         Exception exception = new HttpClientErrorException(HttpStatus.NOT_FOUND);
         doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(HttpEntity.class));
 
-        final ResourceNotFoundException actualException = assertThrows(ResourceNotFoundException.class, () -> draftGateway.update(updateCaseDraft, DID));
+        final ResourceNotFoundException actualException = assertThrows(ResourceNotFoundException.class, () -> draftGateway.update(updateCaseDraftRequest, DID));
         assertThat(actualException.getMessage(), is("No draft found ( draft reference = '5' )"));
     }
 

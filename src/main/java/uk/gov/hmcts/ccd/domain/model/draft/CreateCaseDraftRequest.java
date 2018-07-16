@@ -8,7 +8,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 @ToString
-public class CreateCaseDraft {
+public class CreateCaseDraftRequest {
 
     private CaseDraft document;
 
