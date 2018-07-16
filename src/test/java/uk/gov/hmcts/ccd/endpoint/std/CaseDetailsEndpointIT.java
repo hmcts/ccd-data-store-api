@@ -4,11 +4,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
-import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -87,11 +84,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private SecurityContext securityContext;
 
     private static final String REFERENCE_2 = "1504259907353545";
-
-    private static final int WIREMOCK_PORT = 10000;
-
-    @ClassRule
-    public static WireMockClassRule DM_API_RULE = new WireMockClassRule(new WireMockConfiguration().port(WIREMOCK_PORT).notifier(slf4jNotifier));
 
     @Before
     public void setUp() {
@@ -238,31 +230,31 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     public void shouldReturn201WhenPostCreateCaseWithEmptyDataClassificationForCaseworker() throws Exception {
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
         final JsonNode DATA = mapper.readTree(
-            "{\n" +
-            "  \"PersonFirstName\": \"First Name\",\n" +
-            "  \"PersonLastName\": \"Last Name\",\n" +
-            "  \"PersonAddress\": {\n" +
-            "    \"AddressLine1\": \"Address Line 1\",\n" +
-            "    \"AddressLine2\": \"Address Line 2\"\n" +
-            "  },\n" +
-                "\"D8Document\":{" +
-                "\"document_url\": \"http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"}" +
-            "}\n"
+            "{\n"
+            + "  \"PersonFirstName\": \"First Name\",\n"
+            + "  \"PersonLastName\": \"Last Name\",\n"
+            + "  \"PersonAddress\": {\n"
+            + "    \"AddressLine1\": \"Address Line 1\",\n"
+            + "    \"AddressLine2\": \"Address Line 2\"\n"
+            + "  },\n"
+            +     "\"D8Document\":{"
+            +     "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"}"
+            + "}\n"
         );
         final JsonNode SANITIZED_DATA = mapper.readTree(
-            "{\n" +
-            "  \"PersonFirstName\": \"First Name\",\n" +
-            "  \"PersonLastName\": \"Last Name\",\n" +
-            "  \"PersonAddress\": {\n" +
-            "    \"AddressLine1\": \"Address Line 1\",\n" +
-            "    \"AddressLine2\": \"Address Line 2\"\n" +
-            "  },\n" +
-            "  \"D8Document\":{\n" +
-            "    \"document_url\": \"http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n" +
-            "    \"document_binary_url\": \"http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n" +
-            "    \"document_filename\": \"Seagulls_Square.jpg\"" +
-            "}\n" +
-            "}\n"
+            "{\n"
+            + "  \"PersonFirstName\": \"First Name\",\n"
+            + "  \"PersonLastName\": \"Last Name\",\n"
+            + "  \"PersonAddress\": {\n"
+            + "    \"AddressLine1\": \"Address Line 1\",\n"
+            + "    \"AddressLine2\": \"Address Line 2\"\n"
+            + "  },\n"
+            + "  \"D8Document\":{\n"
+            + "    \"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
+            + "    \"document_binary_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n"
+            + "    \"document_filename\": \"Seagulls_Square.jpg\""
+            + "}\n"
+            + "}\n"
         );
         final CaseDataContent caseDetailsToSave = new CaseDataContent();
         caseDetailsToSave.setEvent(new Event());
@@ -336,31 +328,31 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases?ignore-warning=true";
         final JsonNode DATA = mapper.readTree(
-            "{\n" +
-            "  \"PersonFirstName\": \"First Name\",\n" +
-            "  \"PersonLastName\": \"Last Name\",\n" +
-            "  \"PersonAddress\": {\n" +
-            "    \"AddressLine1\": \"Address Line 1\",\n" +
-            "    \"AddressLine2\": \"Address Line 2\"\n" +
-            "  },\n" +
-            "\"D8Document\":{" +
-            "\"document_url\": \"http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"}" +
-            "}\n"
+            "{\n"
+            + "  \"PersonFirstName\": \"First Name\",\n"
+            + "  \"PersonLastName\": \"Last Name\",\n"
+            + "  \"PersonAddress\": {\n"
+            + "    \"AddressLine1\": \"Address Line 1\",\n"
+            + "    \"AddressLine2\": \"Address Line 2\"\n"
+            + "  },\n"
+            + "\"D8Document\":{"
+            + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"}"
+            + "}\n"
         );
         final JsonNode SANITIZED_DATA = mapper.readTree(
-        "{\n" +
-            "  \"PersonFirstName\": \"First Name\",\n" +
-            "  \"PersonLastName\": \"Last Name\",\n" +
-            "  \"PersonAddress\": {\n" +
-            "    \"AddressLine1\": \"Address Line 1\",\n" +
-            "    \"AddressLine2\": \"Address Line 2\"\n" +
-            "  },\n" +
-            "  \"D8Document\":{\n" +
-            "    \"document_url\": \"http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n" +
-            "    \"document_binary_url\": \"http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n" +
-            "    \"document_filename\": \"Seagulls_Square.jpg\"" +
-            "}\n" +
-            "}\n"
+            "{\n"
+            + "  \"PersonFirstName\": \"First Name\",\n"
+            + "  \"PersonLastName\": \"Last Name\",\n"
+            + "  \"PersonAddress\": {\n"
+            + "    \"AddressLine1\": \"Address Line 1\",\n"
+            + "    \"AddressLine2\": \"Address Line 2\"\n"
+            + "  },\n"
+            + "  \"D8Document\":{\n"
+            + "    \"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
+            + "    \"document_binary_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n"
+            + "    \"document_filename\": \"Seagulls_Square.jpg\""
+            + "}\n"
+            + "}\n"
         );
         final CaseDataContent caseDetailsToSave = new CaseDataContent();
         final Event triggeringEvent = new Event();
@@ -427,20 +419,24 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(caseAuditEvent.getSecurityClassification(), equalTo(PRIVATE));
     }
 
+    private int getPort() {
+        return wireMockRule.port();
+    }
+
     @Test
     public void shouldReturn422WhenPostCreateCaseWithMissingDocumentBinaryLinkForCaseworker() throws Exception {
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
         final JsonNode DATA = mapper.readTree(
-            "{\n" +
-            "  \"PersonFirstName\": \"First Name\",\n" +
-            "  \"PersonLastName\": \"Last Name\",\n" +
-            "  \"PersonAddress\": {\n" +
-            "    \"AddressLine1\": \"Address Line 1\",\n" +
-            "    \"AddressLine2\": \"Address Line 2\"\n" +
-            "  },\n" +
-                "\"D8Document\":{" +
-                "\"document_url\": \"http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\"}" +
-            "}\n"
+            "{\n"
+            + "  \"PersonFirstName\": \"First Name\",\n"
+            + "  \"PersonLastName\": \"Last Name\",\n"
+            + "  \"PersonAddress\": {\n"
+            + "    \"AddressLine1\": \"Address Line 1\",\n"
+            + "    \"AddressLine2\": \"Address Line 2\"\n"
+            + "  },\n"
+            +     "\"D8Document\":{"
+            +     "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\"}"
+            + "}\n"
         );
 
         final CaseDataContent caseDetailsToSave = new CaseDataContent();
@@ -472,16 +468,16 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases?ignore-warning=true";
         final JsonNode DATA = mapper.readTree(
-            "{\n" +
-            "  \"PersonFirstName\": \"First Name\",\n" +
-            "  \"PersonLastName\": \"Last Name\",\n" +
-            "  \"PersonAddress\": {\n" +
-            "    \"AddressLine1\": \"Address Line 1\",\n" +
-            "    \"AddressLine2\": \"Address Line 2\"\n" +
-            "  },\n" +
-            "\"D8Document\":{" +
-            "\"document_url\": \"http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\"}" +
-            "}\n"
+            "{\n"
+            + "  \"PersonFirstName\": \"First Name\",\n"
+            + "  \"PersonLastName\": \"Last Name\",\n"
+            + "  \"PersonAddress\": {\n"
+            + "    \"AddressLine1\": \"Address Line 1\",\n"
+            + "    \"AddressLine2\": \"Address Line 2\"\n"
+            + "  },\n"
+            + "\"D8Document\":{"
+            + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\"}"
+            + "}\n"
         );
         final CaseDataContent caseDetailsToSave = new CaseDataContent();
         final Event triggeringEvent = new Event();
@@ -942,9 +938,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             assertEquals("Hexton", caseDetails.getData().get("PersonAddress").get("AddressLine3").asText());
             assertEquals("England", caseDetails.getData().get("PersonAddress").get("Country").asText());
             assertEquals("HX08 UTG", caseDetails.getData().get("PersonAddress").get("Postcode").asText());
-            assertEquals("http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
+            assertEquals("http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
                 caseDetails.getData().get("D8Document").get("document_url").asText());
-            assertEquals("http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary",
+            assertEquals("http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary",
                 caseDetails.getData().get("D8Document").get("document_binary_url").asText());
             assertEquals("Seagulls_Square.jpg",
                 caseDetails.getData().get("D8Document").get("document_filename").asText());
@@ -1035,9 +1031,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             assertEquals("Hexton", caseDetails.getData().get("PersonAddress").get("AddressLine3").asText());
             assertEquals("England", caseDetails.getData().get("PersonAddress").get("Country").asText());
             assertEquals("HX08 UTG", caseDetails.getData().get("PersonAddress").get("Postcode").asText());
-            assertEquals("http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
+            assertEquals("http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
                 caseDetails.getData().get("D8Document").get("document_url").asText());
-            assertEquals("http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary",
+            assertEquals("http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary",
                 caseDetails.getData().get("D8Document").get("document_binary_url").asText());
             assertEquals("Seagulls_Square.jpg",
                 caseDetails.getData().get("D8Document").get("document_filename").asText());
@@ -3151,8 +3147,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 () -> assertThat(nodeData.get("PersonAddress").get("AddressLine2"), CoreMatchers.is(getTextNode("Fake Street"))),
                 () -> assertThat(nodeData.get("PersonAddress").get("AddressLine3"), CoreMatchers.is(getTextNode("Hexton"))),
                 () -> assertThat(nodeData.has("D8Document"), CoreMatchers.is(true)),
-                () -> assertThat(nodeData.get("D8Document").get("document_url"), CoreMatchers.is(getTextNode("http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1"))),
-                () -> assertThat(nodeData.get("D8Document").get("document_binary_url"), CoreMatchers.is(getTextNode("http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary"))),
+                () -> assertThat(nodeData.get("D8Document").get("document_url"), CoreMatchers.is(getTextNode("http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1"))),
+                () -> assertThat(nodeData.get("D8Document").get("document_binary_url"), CoreMatchers.is(getTextNode("http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary"))),
                 () -> assertThat(nodeData.get("D8Document").get("document_filename"), CoreMatchers.is(getTextNode("Seagulls_Square.jpg")))
             );
             JsonNode nodeClassification = mapper.convertValue(caseDetails.getDataClassification(), JsonNode.class);
@@ -3192,7 +3188,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "\"PersonLastName\":\"_ Roof\"," +
             "\"PersonFirstName\":\"_ George\"," +
             "\"D8Document\":{" +
-            "\"document_url\": \"http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"" +
+            "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"" +
             "}" +
             "}");
         final JsonNode SANITIZED_DATA = mapper.readTree("{" +
@@ -3205,8 +3201,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "\"PersonLastName\":\"_ Roof\"," +
             "\"PersonFirstName\":\"_ George\"," +
             "\"D8Document\":{" +
-            "    \"document_url\": \"http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"," +
-            "    \"document_binary_url\": \"http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\"," +
+            "    \"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"," +
+            "    \"document_binary_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\"," +
             "    \"document_filename\": \"Seagulls_Square.jpg\"" +
             "}" +
             "}");
@@ -3308,9 +3304,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "\"PersonLastName\":\"_ Roof\"," +
             "\"PersonFirstName\":\"_ George\"," +
             "\"D8Document\":{" +
-            "    \"document_url\": \"http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\"," +
+            "    \"document_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\"," +
             "    \"document_filename\": \"Seagulls_Square.jpg\"," +
-            "    \"document_binary_url\": \"http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary\"" +
+            "    \"document_binary_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary\"" +
             "}" +
             "}");
         caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
@@ -3357,7 +3353,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                                                   "\"PersonLastName\":\"_ Roof\"," +
                                                   "\"PersonFirstName\":\"_ George\"," +
                                                   "\"D8Document\":{" +
-                                                  "\"document_url\": \"http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"" +
+                                                  "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"" +
                                                   "}" +
                                                   "}");
         final String DESCRIPTION = "A very long comment.......";
@@ -3396,7 +3392,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                                                   "\"PersonLastName\":\"_ Roof\"," +
                                                   "\"PersonFirstName\":\"_ George\"," +
                                                   "\"D8Document\":{" +
-                                                  "\"document_url\": \"http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"" +
+                                                  "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"" +
                                                   "}" +
                                                   "}");
         final String DESCRIPTION = "A very long comment.......";
@@ -3438,7 +3434,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                                                   "\"PersonLastName\":\"_ Roof\"," +
                                                   "\"PersonFirstName\":\"_ George\"," +
                                                   "\"D8Document\":{" +
-                                                  "\"document_url\": \"http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"" +
+                                                  "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"" +
                                                   "}" +
                                                   "}");
         final String DESCRIPTION = "A very long comment.......";
@@ -3477,7 +3473,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                                                   "\"PersonLastName\":\"_ Roof\"," +
                                                   "\"PersonFirstName\":\"_ George\"," +
                                                   "\"D8Document\":{" +
-                                                  "\"document_url\": \"http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"" +
+                                                  "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"" +
                                                   "}" +
                                                   "}");
         final String DESCRIPTION = "A very long comment.......";
@@ -3535,7 +3531,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(responseAsString, containsString("Fake Street"));
         assertThat(responseAsString, containsString("\"PersonLastName\":\"PUBLIC\""));
         assertThat(responseAsString,
-                containsString("http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1"));
+                containsString("http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1"));
 
         assertThat(responseAsString, containsString("George"));
         assertThat(responseAsString, containsString("Roof"));
@@ -3568,7 +3564,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(result.getResponse().getContentAsString(), containsString("Fake Street"));
         assertThat(result.getResponse().getContentAsString(), containsString("Hexton"));
         assertThat(result.getResponse().getContentAsString(), containsString("HX08 UTG"));
-        assertThat(result.getResponse().getContentAsString(), containsString("http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1"));
+        assertThat(result.getResponse().getContentAsString(), containsString("http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1"));
     }
 
     @Test

@@ -18,6 +18,8 @@ public interface CaseDefinitionRepository {
 
     UserRole getUserRoleClassifications(String userRole);
 
+    List<UserRole> getClassificationsForUserRoleList(List<String> userRoles);
+
     CaseTypeDefinitionVersion getLatestVersion(String caseTypeId);
 
     List<Jurisdiction> getJurisdictions(List<String> ids);
