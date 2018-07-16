@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.domain.service.callbacks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -33,8 +32,6 @@ public class CallbackService {
     private static final Logger LOG = LoggerFactory.getLogger(CallbackService.class);
 
     private final SecurityUtils securityUtils;
-    @Qualifier("restTemplate")
-    @Autowired
     private final RestTemplate restTemplate;
     private final List<Integer> defaultRetries;
 

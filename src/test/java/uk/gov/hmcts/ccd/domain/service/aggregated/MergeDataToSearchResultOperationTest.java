@@ -33,8 +33,6 @@ class MergeDataToSearchResultOperationTest {
     private static final String CASE_FIELD_1 = "Case field 1";
     private static final String CASE_FIELD_2 = "Case field 2";
     private static final String CASE_FIELD_3 = "Case field 3";
-    private static final String NO_ERROR = null;
-    private static final String TIMEOUT_ERROR = "Error while retrieving drafts.";
 
     @Mock
     private UIDefinitionRepository uiDefinitionRepository;
@@ -80,11 +78,10 @@ class MergeDataToSearchResultOperationTest {
         doReturn(searchResult).when(uiDefinitionRepository).getWorkBasketResult(CASE_TYPE_ID);
 
 
-        final SearchResultView searchResultView = classUnderTest.execute(caseType, caseDetailsList, WORKBASKET_VIEW, NO_ERROR);
+        final SearchResultView searchResultView = classUnderTest.execute(caseType, caseDetailsList, WORKBASKET_VIEW);
         assertAll(
             () -> assertThat(searchResultView.getSearchResultViewItems().length, is(2)),
-            () -> assertThat(searchResultView.getSearchResultViewColumns().length, is(2)),
-            () -> assertThat(searchResultView.getResultError(), is(NO_ERROR))
+            () -> assertThat(searchResultView.getSearchResultViewColumns().length, is(2))
         );
     }
 
@@ -97,11 +94,10 @@ class MergeDataToSearchResultOperationTest {
 
         doReturn(searchResult).when(uiDefinitionRepository).getSearchResult(CASE_TYPE_ID);
 
-        final SearchResultView searchResultView = classUnderTest.execute(caseType, caseDetailsList, SEARCH_VIEW, TIMEOUT_ERROR);
+        final SearchResultView searchResultView = classUnderTest.execute(caseType, caseDetailsList, SEARCH_VIEW);
         assertAll(
             () -> assertThat(searchResultView.getSearchResultViewItems().length, is(2)),
-            () -> assertThat(searchResultView.getSearchResultViewColumns().length, is(1)),
-            () -> assertThat(searchResultView.getResultError(), is(TIMEOUT_ERROR))
+            () -> assertThat(searchResultView.getSearchResultViewColumns().length, is(1))
         );
     }
 }

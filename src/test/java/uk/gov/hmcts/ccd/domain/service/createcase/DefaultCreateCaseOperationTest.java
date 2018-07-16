@@ -14,7 +14,6 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
-import uk.gov.hmcts.ccd.domain.model.std.EventBuilder;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
@@ -37,7 +36,6 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verifyZeroInteractions;
-import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 
 class DefaultCreateCaseOperationTest {
 
@@ -362,7 +360,7 @@ class DefaultCreateCaseOperationTest {
     }
 
     private static Event buildEvent() {
-        final Event event = anEvent().build();
+        final Event event = new Event();
         event.setEventId("eid");
         event.setDescription("e-desc");
         event.setSummary("e-summ");
