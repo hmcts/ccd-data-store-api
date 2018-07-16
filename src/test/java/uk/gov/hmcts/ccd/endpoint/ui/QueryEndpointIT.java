@@ -753,16 +753,15 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected Field field type", "Document", documentField.getFieldType().getType());
 
         final JsonNode documentNode = documentField.getValue();
-        final int dmApiPort = 10000;
         assertNotNull("Null address value", documentNode);
         assertEquals("Unexpected address value",
-            "http://localhost:" + dmApiPort + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1", documentNode.get
+            "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1", documentNode.get
                 ("document_url").asText());
         assertEquals("Unexpected address value",
-            "http://localhost:" + dmApiPort + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary", documentNode
-                         .get("document_binary_url").asText());
+            "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary", documentNode
+                .get("document_binary_url").asText());
         assertEquals("Unexpected address value",
-                     "Seagulls_Square.jpg", documentNode.get("document_filename").asText());
+            "Seagulls_Square.jpg", documentNode.get("document_filename").asText());
 
         final CaseViewEvent[] events = caseView.getEvents();
         assertNotNull("Events are null", events);
@@ -1391,9 +1390,9 @@ public class QueryEndpointIT extends WireMockBaseTest {
                 ("document_url").asText());
         assertEquals("Unexpected address value",
             "http://localhost:" + dmApiPort + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary", documentNode
-                         .get("document_binary_url").asText());
+                .get("document_binary_url").asText());
         assertEquals("Unexpected address value",
-                     "Seagulls_Square.jpg", documentNode.get("document_filename").asText());
+            "Seagulls_Square.jpg", documentNode.get("document_filename").asText());
 
         final CaseViewEvent event = caseHistoryView.getEvent();
         assertNotNull("Null event value", event);
