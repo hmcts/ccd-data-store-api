@@ -20,7 +20,7 @@ public abstract class WireMockBaseTest extends BaseTest {
     private static final Logger LOG = LoggerFactory.getLogger(WireMockBaseTest.class);
 
     @ClassRule  // use next available port
-    public static WireMockClassRule wireMockRule = new WireMockClassRule(wireMockConfig().port(0)
+    public static WireMockClassRule wireMockRule = new WireMockClassRule(wireMockConfig().port(0).notifier(slf4jNotifier)
             .disableRequestJournal());
     @Rule
     public WireMockClassRule instanceRule = wireMockRule;
