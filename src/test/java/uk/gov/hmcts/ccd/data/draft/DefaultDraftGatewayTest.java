@@ -154,6 +154,7 @@ class DefaultDraftGatewayTest {
 
         final ServiceException actualException = assertThrows(ServiceException.class, () -> draftGateway.save(createCaseDraftRequest));
         assertThat(actualException.getMessage(), is("The draft service is currently down, please refresh your browser or try again later"));
+        assertThat(actualException.getCause(), is(exception));
     }
 
     @Test
@@ -175,6 +176,7 @@ class DefaultDraftGatewayTest {
 
         final ServiceException actualException = assertThrows(ServiceException.class, () -> draftGateway.update(updateCaseDraftRequest, DID));
         assertThat(actualException.getMessage(), is("The draft service is currently down, please refresh your browser or try again later"));
+        assertThat(actualException.getCause(), is(exception));
     }
 
     @Test
@@ -221,6 +223,7 @@ class DefaultDraftGatewayTest {
 
         final ServiceException actualException = assertThrows(ServiceException.class, () -> draftGateway.get(DID));
         assertThat(actualException.getMessage(), is("The draft service is currently down, please refresh your browser or try again later"));
+        assertThat(actualException.getCause(), is(exception));
     }
 
     @Test
