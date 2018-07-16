@@ -17,12 +17,6 @@ public class CaseDataContent {
     @JsonProperty("ignore_warning")
     private Boolean ignoreWarning;
 
-    public CaseDataContent() {
-    /*
-        Jackson required
-     */
-    }
-
     public Event getEvent() {
         return event;
     }
@@ -33,6 +27,14 @@ public class CaseDataContent {
 
     public Map<String, JsonNode> getData() {
         return data;
+    }
+
+    public Map<String, JsonNode> getSecurityClassification() {
+        return securityClassification;
+    }
+
+    public void setSecurityClassification(Map<String, JsonNode> securityClassification) {
+        this.securityClassification = securityClassification;
     }
 
     public void setData(Map<String, JsonNode> data) {
@@ -51,8 +53,8 @@ public class CaseDataContent {
         return ignoreWarning;
     }
 
-    public CaseDataContent setIgnoreWarning(Boolean ignoreWarning) {
+    public void setIgnoreWarning(Boolean ignoreWarning) {
         this.ignoreWarning = ignoreWarning;
-        return this;
     }
+
 }

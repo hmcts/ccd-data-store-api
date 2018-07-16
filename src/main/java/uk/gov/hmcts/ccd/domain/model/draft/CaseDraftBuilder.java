@@ -3,34 +3,34 @@ package uk.gov.hmcts.ccd.domain.model.draft;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 
 public class CaseDraftBuilder {
-    private String userId;
-    private String jurisdictionId;
-    private String caseTypeId;
-    private String eventTriggerId;
-    private CaseDataContent caseDataContent;
+    private final CaseDraft caseDraft;
+
+    private CaseDraftBuilder() {
+        this.caseDraft = new CaseDraft();
+    }
 
     public CaseDraftBuilder withUserId(String userId) {
-        this.userId = userId;
+        this.caseDraft.setUserId(userId);
         return this;
     }
 
     public CaseDraftBuilder withJurisdictionId(String jurisdictionId) {
-        this.jurisdictionId = jurisdictionId;
+        this.caseDraft.setJurisdictionId(jurisdictionId);
         return this;
     }
 
     public CaseDraftBuilder withCaseTypeId(String caseTypeId) {
-        this.caseTypeId = caseTypeId;
+        this.caseDraft.setCaseTypeId(caseTypeId);
         return this;
     }
 
     public CaseDraftBuilder withEventTriggerId(String eventTriggerId) {
-        this.eventTriggerId = eventTriggerId;
+        this.caseDraft.setEventTriggerId(eventTriggerId);
         return this;
     }
 
     public CaseDraftBuilder withCaseDataContent(CaseDataContent caseDataContent) {
-        this.caseDataContent = caseDataContent;
+        this.caseDraft.setCaseDataContent(caseDataContent);
         return this;
     }
 
@@ -39,6 +39,6 @@ public class CaseDraftBuilder {
     }
 
     public CaseDraft build() {
-        return new CaseDraft(userId, jurisdictionId, caseTypeId, eventTriggerId, caseDataContent);
+        return this.caseDraft;
     }
 }

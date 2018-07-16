@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
-import uk.gov.hmcts.ccd.domain.model.draft.Draft;
-import uk.gov.hmcts.ccd.domain.service.createdraft.UpsertDraftOperation;
+import uk.gov.hmcts.ccd.domain.service.upsertdraft.UpsertDraftOperation;
 
 @RestController
 @RequestMapping(path = "/",
@@ -32,7 +32,7 @@ public class DraftsEndpoint {
         @ApiResponse(code = 201, message = "Draft created"),
         @ApiResponse(code = 400, message = "Bad request")
     })
-    public Draft saveDraftForCaseWorker(
+    public DraftResponse saveDraftForCaseWorker(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
         @ApiParam(value = "Jurisdiction ID", required = true)
@@ -43,7 +43,7 @@ public class DraftsEndpoint {
         @PathVariable("etid") final String eventTriggerId,
         @RequestBody final CaseDataContent caseDataContent) {
 
-        return upsertDraftOperation.saveDraft(uid, jurisdictionId, caseTypeId, eventTriggerId, caseDataContent);
+        return upsertDraftOperation.executeSave(uid, jurisdictionId, caseTypeId, eventTriggerId, caseDataContent);
     }
 
     @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-trigger/{etid}/drafts/{did}", method = RequestMethod.PUT)
@@ -55,7 +55,7 @@ public class DraftsEndpoint {
         @ApiResponse(code = 200, message = "Draft updated"),
         @ApiResponse(code = 400, message = "Bad request")
     })
-    public Draft updateDraftForCaseWorker(
+    public DraftResponse updateDraftForCaseWorker(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
         @ApiParam(value = "Jurisdiction ID", required = true)
@@ -68,7 +68,7 @@ public class DraftsEndpoint {
         @PathVariable("did") final String draftId,
         @RequestBody final CaseDataContent caseDataContent) {
 
-        return upsertDraftOperation.updateDraft(uid, jurisdictionId, caseTypeId, eventTriggerId, draftId, caseDataContent);
+        return upsertDraftOperation.executeUpdate(uid, jurisdictionId, caseTypeId, eventTriggerId, draftId, caseDataContent);
     }
 
 }

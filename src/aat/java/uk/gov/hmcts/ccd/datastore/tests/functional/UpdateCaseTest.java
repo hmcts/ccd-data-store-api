@@ -5,13 +5,16 @@ import io.restassured.specification.RequestSpecification;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.BaseTest;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
+
 import java.util.function.Supplier;
+
+import static uk.gov.hmcts.ccd.domain.model.std.CaseDataContentBuilder.aCaseDataContent;
+import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 
 class UpdateCaseTest extends BaseTest {
 
@@ -66,10 +69,10 @@ class UpdateCaseTest extends BaseTest {
         }
 
         private CaseDataContent createEmptyCase() {
-            final Event event = new Event();
+            final Event event = anEvent().build();
             event.setEventId("CREATE");
 
-            final CaseDataContent caseData = new CaseDataContent();
+            final CaseDataContent caseData = aCaseDataContent().build();
             caseData.setEvent(event);
 
         return caseData;
