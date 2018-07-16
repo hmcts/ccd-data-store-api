@@ -159,7 +159,7 @@ public class DraftsEndpointIT extends WireMockBaseTest {
 
         assertEquals("Incorrect Response Status Code", 404, mvcResult.getResponse().getStatus());
         String actualResponse = mapper.readTree(mvcResult.getResponse().getContentAsString()).toString();
-        assertThat(actualResponse, containsString("\"message\":\"Resource not found when getting draft for draftId=6 because of 404 Not Found\""));
+        assertThat(actualResponse, containsString("\"message\":\"No draft found ( draft reference = '6' )\""));
     }
 
     private Map<String, JsonNode> getData(JsonNode expectedData) {
