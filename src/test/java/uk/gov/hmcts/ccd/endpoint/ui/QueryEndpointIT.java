@@ -144,7 +144,6 @@ public class QueryEndpointIT extends WireMockBaseTest {
             .param("case_type", TEST_CASE_TYPE)
             .param("jurisdiction", TEST_JURISDICTION)
             .param("state", TEST_STATE)
-            .param("page", "1")
             .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();
@@ -170,30 +169,25 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Address", searchResultViewColumns[2].getCaseFieldType().getId());
         assertEquals("Address", searchResultViewColumns[2].getCaseFieldType().getType());
 
-        assertEquals("Incorrect view items count", 3, searchResultViewItems.length);
+        assertEquals("Incorrect view items count", 2, searchResultViewItems.length);
 
         assertNotNull(searchResultViewItems[0].getCaseId());
-        assertEquals("John", searchResultViewItems[0].getCaseFields().get("PersonFirstName").asText());
-        assertEquals("Smith", searchResultViewItems[0].getCaseFields().get("PersonLastName").asText());
-        assertEquals(null, searchResultViewItems[0].getCaseFields().get("PersonAddress"));
+        assertEquals("Janet", searchResultViewItems[0].getCaseFields().get("PersonFirstName").asText());
+        assertEquals("Parker", searchResultViewItems[0].getCaseFields().get("PersonLastName").asText());
+        assertEquals("123", searchResultViewItems[0].getCaseFields().get("PersonAddress").get("AddressLine1").asText());
+        assertEquals("Fake Street", searchResultViewItems[0].getCaseFields().get("PersonAddress").get("AddressLine2").asText());
+        assertEquals("Hexton", searchResultViewItems[0].getCaseFields().get("PersonAddress").get("AddressLine3").asText());
+        assertEquals("England", searchResultViewItems[0].getCaseFields().get("PersonAddress").get("Country").asText());
+        assertEquals("HX08 UTG", searchResultViewItems[0].getCaseFields().get("PersonAddress").get("Postcode").asText());
 
         assertNotNull(searchResultViewItems[1].getCaseId());
-        assertEquals("Janet", searchResultViewItems[1].getCaseFields().get("PersonFirstName").asText());
-        assertEquals("Parker", searchResultViewItems[1].getCaseFields().get("PersonLastName").asText());
-        assertEquals("123", searchResultViewItems[1].getCaseFields().get("PersonAddress").get("AddressLine1").asText());
-        assertEquals("Fake Street", searchResultViewItems[1].getCaseFields().get("PersonAddress").get("AddressLine2").asText());
-        assertEquals("Hexton", searchResultViewItems[1].getCaseFields().get("PersonAddress").get("AddressLine3").asText());
-        assertEquals("England", searchResultViewItems[1].getCaseFields().get("PersonAddress").get("Country").asText());
-        assertEquals("HX08 UTG", searchResultViewItems[1].getCaseFields().get("PersonAddress").get("Postcode").asText());
-
-        assertNotNull(searchResultViewItems[2].getCaseId());
-        assertEquals("George", searchResultViewItems[2].getCaseFields().get("PersonFirstName").asText());
-        assertEquals("Roof", searchResultViewItems[2].getCaseFields().get("PersonLastName").asText());
-        assertEquals("Flat 9", searchResultViewItems[2].getCaseFields().get("PersonAddress").get("AddressLine1").asText());
-        assertEquals("2 Hubble Avenue", searchResultViewItems[2].getCaseFields().get("PersonAddress").get("AddressLine2").asText());
-        assertEquals("ButtonVillie", searchResultViewItems[2].getCaseFields().get("PersonAddress").get("AddressLine3").asText());
-        assertEquals("Wales", searchResultViewItems[2].getCaseFields().get("PersonAddress").get("Country").asText());
-        assertEquals("W11 5DF", searchResultViewItems[2].getCaseFields().get("PersonAddress").get("Postcode").asText());
+        assertEquals("George", searchResultViewItems[1].getCaseFields().get("PersonFirstName").asText());
+        assertEquals("Roof", searchResultViewItems[1].getCaseFields().get("PersonLastName").asText());
+        assertEquals("Flat 9", searchResultViewItems[1].getCaseFields().get("PersonAddress").get("AddressLine1").asText());
+        assertEquals("2 Hubble Avenue", searchResultViewItems[1].getCaseFields().get("PersonAddress").get("AddressLine2").asText());
+        assertEquals("ButtonVillie", searchResultViewItems[1].getCaseFields().get("PersonAddress").get("AddressLine3").asText());
+        assertEquals("Wales", searchResultViewItems[1].getCaseFields().get("PersonAddress").get("Country").asText());
+        assertEquals("W11 5DF", searchResultViewItems[1].getCaseFields().get("PersonAddress").get("Postcode").asText());
     }
 
     @Test

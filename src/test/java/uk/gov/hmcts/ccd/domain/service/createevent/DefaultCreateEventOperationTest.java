@@ -16,7 +16,6 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
-import uk.gov.hmcts.ccd.domain.model.std.EventBuilder;
 import uk.gov.hmcts.ccd.domain.model.std.validator.EventValidator;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.*;
@@ -37,7 +36,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 
 class DefaultCreateEventOperationTest {
 
@@ -100,7 +98,7 @@ class DefaultCreateEventOperationTest {
     private IDAMProperties user;
 
     private static Event buildEvent() {
-        final Event event = anEvent().build();
+        final Event event = new Event();
         event.setEventId(EVENT_ID);
         event.setSummary("Update case summary");
         event.setDescription("Update case description");

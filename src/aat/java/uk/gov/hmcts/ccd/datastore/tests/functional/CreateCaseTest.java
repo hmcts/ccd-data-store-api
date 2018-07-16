@@ -7,9 +7,6 @@ import uk.gov.hmcts.ccd.datastore.tests.BaseTest;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 
-import static uk.gov.hmcts.ccd.domain.model.std.CaseDataContentBuilder.aCaseDataContent;
-import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
-
 class CreateCaseTest extends BaseTest {
 
     private static final String EVENT_CREATE = "CREATE";
@@ -30,10 +27,10 @@ class CreateCaseTest extends BaseTest {
     }
 
     private CaseDataContent createEmptyCase() {
-        final Event event =  anEvent().build();
+        final Event event = new Event();
         event.setEventId(EVENT_CREATE);
 
-        final CaseDataContent caseData = aCaseDataContent().build();
+        final CaseDataContent caseData = new CaseDataContent();
         caseData.setEvent(event);
 
         return caseData;

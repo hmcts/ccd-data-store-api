@@ -12,7 +12,6 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -41,8 +40,6 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
 
     private final ApplicationParams applicationParams;
     private final SecurityUtils securityUtils;
-    @Qualifier("restTemplate")
-    @Autowired
     private final RestTemplate restTemplate;
     private final AppInsights appInsights;
 
