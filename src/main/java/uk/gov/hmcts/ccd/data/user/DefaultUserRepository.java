@@ -78,10 +78,11 @@ public class DefaultUserRepository implements UserRepository {
     @Override
     public Set<SecurityClassification> getUserClassifications(String jurisdictionId) {
         Set<String> roles = this.getUserRoles();
+        final List<String> filteredRoles = roles.stream()
+            .filter(role -> filterRole(jurisdictionId, role))
+            .collect(Collectors.toList());
 
-        return roles.stream()
-                    .filter(role -> filterRole(jurisdictionId, role))
-                    .map(caseDefinitionRepository::getUserRoleClassifications)
+        return caseDefinitionRepository.getClassificationsForUserRoleList(filteredRoles).stream()
                     .filter(Objects::nonNull)
                     .filter(userRole -> Objects.nonNull(userRole.getSecurityClassification()))
                     .map(userRole -> SecurityClassification.valueOf(userRole.getSecurityClassification()))
