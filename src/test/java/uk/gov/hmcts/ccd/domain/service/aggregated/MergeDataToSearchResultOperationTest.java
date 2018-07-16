@@ -9,6 +9,7 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 
@@ -20,11 +21,13 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
+import static uk.gov.hmcts.ccd.domain.model.definition.CaseDetails.LABEL_FIELD_TYPE;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.SearchResultBuilder.aSearchResult;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildData;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildSearchResultField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.aCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.aCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 class MergeDataToSearchResultOperationTest {
     private static final String WORKBASKET_VIEW = "WORKBASKET";
@@ -56,11 +59,14 @@ class MergeDataToSearchResultOperationTest {
         caseDetails2.setData(dataMap);
         caseDetailsList = Arrays.asList(caseDetails1, caseDetails2);
 
+        final FieldType ftt = aFieldType().withType("Text").build();
+        final FieldType ftl = aFieldType().withType(LABEL_FIELD_TYPE).build();
+
         caseType = aCaseType()
             .withCaseTypeId(CASE_TYPE_ID)
-            .withField(aCaseField().withId(CASE_FIELD_1).build())
-            .withField(aCaseField().withId(CASE_FIELD_2).build())
-            .withField(aCaseField().withId(CASE_FIELD_3).build())
+            .withField(aCaseField().withId(CASE_FIELD_1).withFieldType(ftt).build())
+            .withField(aCaseField().withId(CASE_FIELD_2).withFieldType(ftt).build())
+            .withField(aCaseField().withId(CASE_FIELD_3).withFieldType(ftl).build())
             .build();
 
         classUnderTest = new MergeDataToSearchResultOperation(uiDefinitionRepository);
