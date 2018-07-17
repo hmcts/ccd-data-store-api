@@ -64,6 +64,11 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
                                                                                     ignoreWarning));
     }
 
+    @Override
+    public StartEventTrigger triggerStartForDraft(String uid, String jurisdictionId, String caseTypeId, String draftReference, String eventTriggerId, Boolean ignoreWarning) {
+        return null;
+    }
+
     private CaseType getCaseType(String caseTypeId) {
         final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
         if (caseType == null) {

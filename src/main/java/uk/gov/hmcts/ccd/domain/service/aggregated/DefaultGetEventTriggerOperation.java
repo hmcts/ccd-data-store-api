@@ -74,6 +74,19 @@ public class DefaultGetEventTriggerOperation implements GetEventTriggerOperation
                      caseReference);
     }
 
+    @Override
+    public CaseEventTrigger executeForDraft(String uid, String jurisdictionId, String caseTypeId, String draftReference, String eventTriggerId, Boolean ignoreWarning) {
+        return merge(startEventOperation.triggerStartForDraft(uid,
+                                                             jurisdictionId,
+                                                             caseTypeId,
+                                                             draftReference,
+                                                             eventTriggerId,
+                                                             ignoreWarning),
+                     caseTypeId,
+                     eventTriggerId,
+                     draftReference);
+    }
+
     private CaseEventTrigger buildCaseEventTrigger(final CaseEvent eventTrigger) {
         final CaseEventTrigger caseTrigger = new CaseEventTrigger();
 

@@ -37,6 +37,11 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
                                                                                       ignoreWarning));
     }
 
+    @Override
+    public StartEventTrigger triggerStartForDraft(String uid, String jurisdictionId, String caseTypeId, String draftReference, String eventTriggerId, Boolean ignoreWarning) {
+        return null;
+    }
+
     private StartEventTrigger applyClassificationIfCaseDetailsExist(StartEventTrigger startEventTrigger) {
         if (null != startEventTrigger.getCaseDetails()) {
             startEventTrigger.setCaseDetails(classificationService.applyClassification(startEventTrigger.getCaseDetails()).orElse(null));

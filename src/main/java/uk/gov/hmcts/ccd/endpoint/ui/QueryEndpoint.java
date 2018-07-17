@@ -245,6 +245,29 @@ public class QueryEndpoint {
 
     @Transactional
     @RequestMapping(
+        value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/drafts/{did}/event-triggers/{etid}",
+        method = RequestMethod.GET)
+    @ApiOperation(value = "Fetch an event trigger in the context of a case")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Valid pre-state conditions")
+    })
+    public CaseEventTrigger getEventTriggerForDraft(@PathVariable("uid") String userId,
+                                                   @PathVariable("jid") String jurisdictionId,
+                                                   @PathVariable("ctid") String caseTypeId,
+                                                   @PathVariable("did") String draftId,
+                                                   @PathVariable("etid") String eventTriggerId,
+                                                   @RequestParam(value = "ignore-warning",
+                                                       required = false) Boolean ignoreWarning) {
+        return getEventTriggerOperation.executeForDraft(userId,
+                                                       jurisdictionId,
+                                                       caseTypeId,
+                                                       draftId,
+                                                       eventTriggerId,
+                                                       ignoreWarning);
+    }
+
+    @Transactional
+    @RequestMapping(
         value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events/{eventId}/case-history",
         method = RequestMethod.GET)
     @ApiOperation(value = "Fetch case history for the event")

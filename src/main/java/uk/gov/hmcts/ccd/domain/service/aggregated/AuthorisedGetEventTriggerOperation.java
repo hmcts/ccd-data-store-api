@@ -98,6 +98,11 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
                                                        ignoreWarning));
     }
 
+    @Override
+    public CaseEventTrigger executeForDraft(String uid, String jurisdictionId, String caseTypeId, String draftReference, String eventTriggerId, Boolean ignoreWarning) {
+        return null;
+    }
+
     private CaseDetails getCaseDetails(String caseReference) {
         if (!uidService.validateUID(caseReference)) {
             throw new BadRequestException("Case reference is not valid");

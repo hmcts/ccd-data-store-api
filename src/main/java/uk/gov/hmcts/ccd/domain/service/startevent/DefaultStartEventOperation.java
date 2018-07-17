@@ -8,10 +8,14 @@ import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway;
+import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.draft.CaseDraft;
+import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
@@ -24,12 +28,15 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import java.util.function.Supplier;
 
+import static uk.gov.hmcts.ccd.domain.model.definition.CaseDetailsBuilder.aCaseDetails;
+
 @Service
 @Qualifier("default")
 public class DefaultStartEventOperation implements StartEventOperation {
 
     private final EventTokenService eventTokenService;
     private final CaseDefinitionRepository caseDefinitionRepository;
+    private final DraftGateway draftGateway;
     private final CaseDetailsRepository caseDetailsRepository;
     private final EventTriggerService eventTriggerService;
     private final CaseService caseService;
@@ -39,17 +46,19 @@ public class DefaultStartEventOperation implements StartEventOperation {
 
     @Autowired
     public DefaultStartEventOperation(final EventTokenService eventTokenService,
-                               @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
-                               @Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
-                               final EventTriggerService eventTriggerService,
-                               final CaseService caseService,
-                               final CaseTypeService caseTypeService,
-                               final CallbackInvoker callbackInvoker,
-                               final UIDService uidService) {
+                                      @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
+                                      @Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
+                                      @Qualifier(DefaultDraftGateway.QUALIFIER) final DraftGateway draftGateway,
+                                      final EventTriggerService eventTriggerService,
+                                      final CaseService caseService,
+                                      final CaseTypeService caseTypeService,
+                                      final CallbackInvoker callbackInvoker,
+                                      final UIDService uidService) {
 
         this.eventTokenService = eventTokenService;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.caseDetailsRepository = caseDetailsRepository;
+        this.draftGateway = draftGateway;
         this.eventTriggerService = eventTriggerService;
         this.caseService = caseService;
         this.caseTypeService = caseTypeService;
@@ -88,17 +97,37 @@ public class DefaultStartEventOperation implements StartEventOperation {
                                                  final String eventTriggerId,
                                                  final Boolean ignoreWarning) {
 
+        return buildStartEventTrigger(uid, jurisdictionId, caseTypeId, caseReference, eventTriggerId, ignoreWarning, () -> getCaseDetails(jurisdictionId, caseTypeId, caseReference));
+    }
+
+    @Override
+    public StartEventTrigger triggerStartForDraft(final String uid,
+                                                  final String jurisdictionId,
+                                                  final String caseTypeId,
+                                                  final String draftReference,
+                                                  final String eventTriggerId,
+                                                  final Boolean ignoreWarning) {
+        return buildStartEventTrigger(uid, jurisdictionId, caseTypeId, draftReference, eventTriggerId, ignoreWarning, () -> getDraftDetails(jurisdictionId, caseTypeId, draftReference));
+    }
+
+    private StartEventTrigger buildStartEventTrigger(final String uid,
+                                                     final String jurisdictionId,
+                                                     final String caseTypeId,
+                                                     final String reference,
+                                                     final String eventTriggerId,
+                                                     final Boolean ignoreWarning,
+                                                     final Supplier<CaseDetails> caseDetailsSupplier) {
         final CaseType caseType = getCaseType(caseTypeId);
         final CaseEvent eventTrigger = getEventTrigger(caseTypeId, eventTriggerId, caseType);
 
         validateJurisdiction(jurisdictionId, caseTypeId, caseType);
 
-        final CaseDetails caseDetails = getCaseDetails(jurisdictionId, caseTypeId, caseReference);
+        final CaseDetails caseDetails = caseDetailsSupplier.get();
 
         validateEventTrigger(() -> !eventTriggerService.isPreStateValid(caseDetails.getState(), eventTrigger));
 
         final String eventToken = eventTokenService.generateToken(uid, caseDetails, eventTrigger,
-            caseType.getJurisdiction(), caseType);
+                                                                  caseType.getJurisdiction(), caseType);
 
         callbackInvoker.invokeAboutToStartCallback(eventTrigger, caseType, caseDetails, ignoreWarning);
 
@@ -117,6 +146,17 @@ public class DefaultStartEventOperation implements StartEventOperation {
         if (!caseTypeService.isJurisdictionValid(jurisdictionId, caseType)) {
             throw new ValidationException(caseTypeId + " is not defined as a case type for " + jurisdictionId);
         }
+    }
+
+    private CaseDetails getDraftDetails(String jurisdictionId, String caseTypeId, String draftId) {
+        final DraftResponse draftResponse= draftGateway.get(draftId);
+        CaseDraft document = draftResponse.getDocument();
+        return aCaseDetails()
+            .withId(draftResponse.getId())
+            .withCaseTypeId(document.getCaseTypeId())
+            .withJurisdiction(document.getJurisdictionId())
+            .withData(document.getCaseDataContent().getData())
+            .build();
     }
 
     private CaseDetails getCaseDetails(String jurisdictionId, String caseTypeId, String caseReference) {
