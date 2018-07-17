@@ -14,10 +14,11 @@ import javax.inject.Singleton;
 import java.util.Arrays;
 import java.util.List;
 
+import static uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetDraftViewOperation.DRAFT_ID;
+
 @Named
 @Singleton
 public class MergeDataToSearchResultOperation {
-    public static final String DRAFT_ID = "DRAFT%s";
     private final UIDefinitionRepository uiDefinitionRepository;
 
     public MergeDataToSearchResultOperation(final UIDefinitionRepository uiDefinitionRepository) {

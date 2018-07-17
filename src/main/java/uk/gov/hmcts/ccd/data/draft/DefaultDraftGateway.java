@@ -77,7 +77,7 @@ public class DefaultDraftGateway implements DraftGateway {
             appInsights.trackDependency(DRAFT_STORE, "Create", duration.toMillis(), true);
             return getDraftId(responseHeaders);
         } catch (Exception e) {
-            LOG.warn("Error while saving draft={}", draft, e);
+            LOG.warn("Error while saving draft", e);
             throw new ServiceException(DRAFT_STORE_DOWN_ERR_MESSAGE, e);
         }
     }

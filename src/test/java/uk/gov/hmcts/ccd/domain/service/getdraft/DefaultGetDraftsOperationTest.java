@@ -147,7 +147,7 @@ class DefaultGetDraftsOperationTest {
     }
 
     private Matcher<Iterable<? super CaseDetails>> hasDraftItemInResults() {
-        return hasItem(allOf(hasProperty("id", is(Long.valueOf(DRAFT_ID))),
+        return hasItem(allOf(hasProperty("id", is(DRAFT_ID)),
                              hasProperty("jurisdiction", is(JURISDICTION_ID)),
                              hasProperty("caseTypeId", is(CASE_TYPE_ID))));
     }

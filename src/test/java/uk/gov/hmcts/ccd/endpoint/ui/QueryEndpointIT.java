@@ -589,7 +589,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
 
         final CaseView caseView = mapper.readValue(result.getResponse().getContentAsString(), CaseView.class);
         assertNotNull("Case View is null", caseView);
-        assertEquals("Unexpected Case ID", "5", caseView.getCaseId());
+        assertEquals("Unexpected Case ID", "DRAFT5", caseView.getCaseId());
 
         final CaseViewType caseViewType = caseView.getCaseType();
         assertNotNull("Case View Type is null", caseViewType);

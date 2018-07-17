@@ -146,7 +146,7 @@ public abstract class BaseTest {
 
     protected CaseDetails mapCaseData(ResultSet resultSet, Integer i) throws SQLException {
         final CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setId(resultSet.getLong("id"));
+        caseDetails.setId(String.valueOf(resultSet.getLong("id")));
         caseDetails.setReference(resultSet.getLong("reference"));
         caseDetails.setState(resultSet.getString("state"));
         caseDetails.setSecurityClassification(SecurityClassification.valueOf(resultSet.getString("security_classification")));
@@ -186,7 +186,7 @@ public abstract class BaseTest {
         auditEvent.setUserId(resultSet.getString("user_id"));
         auditEvent.setUserFirstName(resultSet.getString("user_first_name"));
         auditEvent.setUserLastName(resultSet.getString("user_last_name"));
-        auditEvent.setCaseDataId(resultSet.getLong("case_data_id"));
+        auditEvent.setCaseDataId(String.valueOf(resultSet.getLong("case_data_id")));
         final Timestamp createdAt = resultSet.getTimestamp("created_date");
         if (null != createdAt) {
             auditEvent.setCreatedDate(createdAt.toLocalDateTime());

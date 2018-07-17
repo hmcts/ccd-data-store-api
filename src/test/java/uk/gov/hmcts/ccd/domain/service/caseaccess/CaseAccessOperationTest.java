@@ -126,7 +126,7 @@ class CaseAccessOperationTest {
 
     private void configureCaseRepository() {
         final CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setId(CASE_ID);
+        caseDetails.setId(String.valueOf(CASE_ID));
         caseDetails.setReference(CASE_REFERENCE);
 
         doReturn(Optional.of(caseDetails)).when(caseDetailsRepository)

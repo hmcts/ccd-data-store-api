@@ -28,6 +28,7 @@ import static uk.gov.hmcts.ccd.domain.model.definition.CaseDetailsBuilder.aCaseD
 public class DefaultGetDraftViewOperation extends AbstractDefaultGetCaseViewOperation implements GetCaseViewOperation {
 
     public static final String QUALIFIER = "defaultDraft";
+    static final String DRAFT_ID = "DRAFT%s";
     private static final CaseViewTrigger DELETE_TRIGGER = aCaseViewTrigger()
         .withName("Delete")
         .withDescription("Delete draft")
@@ -91,7 +92,7 @@ public class DefaultGetDraftViewOperation extends AbstractDefaultGetCaseViewOper
     private CaseDetails buildCaseDetailsFromDraft(DraftResponse draftResponse) {
         CaseDraft document = draftResponse.getDocument();
         return aCaseDetails()
-            .withId(draftResponse.getId())
+            .withId(String.format(DRAFT_ID, draftResponse.getId()))
             .withCaseTypeId(document.getCaseTypeId())
             .withJurisdiction(document.getJurisdictionId())
             .withData(document.getCaseDataContent().getData())

@@ -15,12 +15,12 @@ public class CaseDetailsBuilder {
     }
 
     public CaseDetailsBuilder withId(Long id) {
-        this.caseDetails.setId(id);
+        this.caseDetails.setId(String.valueOf(id));
         return this;
     }
 
     public CaseDetailsBuilder withId(String id) {
-        this.caseDetails.setId(Long.valueOf(id));
+        this.caseDetails.setId(id);
         return this;
     }
 

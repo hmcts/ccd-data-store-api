@@ -46,7 +46,7 @@ class SubmitCaseTransactionTest {
     private static final String STATE_ID = "CREATED_ID";
     private static final String STATE_NAME = "Created name";
     private static final String CASE_UID = "1234123412341236";
-    private static final Long CASE_ID = 45677L;
+    private static final String CASE_ID = "45677";
 
     @Mock
     private CaseDetailsRepository caseDetailsRepository;
@@ -161,7 +161,7 @@ class SubmitCaseTransactionTest {
                                          this.caseDetails,
                                          IGNORE_WARNING);
 
-        verify(caseUserRepository).grantAccess(CASE_ID, IDAM_ID);
+        verify(caseUserRepository).grantAccess(Long.valueOf(CASE_ID), IDAM_ID);
     }
 
     @Test

@@ -34,6 +34,7 @@ class DefaultGetDraftViewOperationTest {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_TYPE_ID = "Grant";
+    private static final String DRAFT_ID_FORMAT = "DRAFT%s";
     private static final String DRAFT_ID = "1";
     private static final String EVENT_TRIGGER_ID = "createCase";
     private static final String EVENT_DESCRIPTION = "Create case";
@@ -102,6 +103,7 @@ class DefaultGetDraftViewOperationTest {
                                                           DRAFT_ID);
 
         assertAll(() -> verify(getDraftOperation).get(DRAFT_ID),
+                  () -> assertThat(caseView.getCaseId(), is(String.format(DRAFT_ID_FORMAT, DRAFT_ID))),
                   () -> assertThat(caseView.getTabs(), arrayWithSize(1)),
                   () -> assertThat(caseView.getTabs()[0].getFields(), arrayWithSize(2)),
                   () -> assertThat(caseView.getTabs()[0].getFields(),
