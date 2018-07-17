@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.ToString;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
@@ -24,7 +23,7 @@ public class CaseViewField {
     private String securityLabel;
     @JsonProperty("order")
     private Integer order;
-    private JsonNode value;
+    private Object value;
     @JsonProperty("display_context")
     private String displayContext;
     @JsonProperty("show_condition")
@@ -98,11 +97,11 @@ public class CaseViewField {
         this.order = order;
     }
 
-    public JsonNode getValue() {
+    public Object getValue() {
         return value;
     }
 
-    public void setValue(JsonNode value) {
+    public void setValue(Object value) {
         this.value = value;
     }
 
@@ -138,7 +137,7 @@ public class CaseViewField {
         this.showSummaryContentOption = showSummaryContentOption;
     }
 
-    public static CaseViewField createFrom(CaseTypeTabField field, Map<String, JsonNode> data) {
+    public static CaseViewField createFrom(CaseTypeTabField field, Map<String, ?> data) {
         CaseViewField caseViewField = new CaseViewField();
         CaseField caseField = field.getCaseField();
         caseViewField.setId(caseField.getId());

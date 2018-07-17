@@ -39,9 +39,7 @@ public class MergeDataToSearchResultOperation {
             .collect(Collectors.toList());
 
         final List<SearchResultViewItem> viewItems = caseDetails.stream()
-            .map(caseData -> new SearchResultViewItem(caseData.getReference().toString())
-                .addCaseFields(caseData.getData())
-                .addCaseFields(caseData.getMetadata()))
+            .map(caseData -> new SearchResultViewItem(caseData.getReference().toString(), caseData.getCaseDataAndMetadata()))
             .collect(Collectors.toList());
         return new SearchResultView(viewColumns, viewItems);
     }

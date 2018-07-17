@@ -64,7 +64,7 @@ class CaseDetailsTest {
     }
 
     @Test
-    void shouldReturnMetadataFieldMap() {
+    void shouldReturnCaseDataAndMetadataFieldMap() {
         LocalDateTime now = LocalDateTime.now();
         caseDetails.setJurisdiction("jurisdiction");
         caseDetails.setCaseTypeId("caseType");
@@ -74,22 +74,22 @@ class CaseDetailsTest {
         caseDetails.setLastModified(now);
         caseDetails.setSecurityClassification(SecurityClassification.PUBLIC);
 
-        Map<String, Object> metadata = caseDetails.getMetadata();
+        Map<String, Object> allData = caseDetails.getCaseDataAndMetadata();
 
-        assertThat(metadata.get(JURISDICTION_METADATA), equalTo(caseDetails.getJurisdiction()));
-        assertThat(metadata.get(CASE_TYPE_METADATA), equalTo(caseDetails.getCaseTypeId()));
-        assertThat(metadata.get(STATE_METADATA), equalTo(caseDetails.getState()));
-        assertThat(metadata.get(CASE_REFERENCE_METADATA), equalTo(caseDetails.getReference()));
-        assertThat(metadata.get(CREATED_DATE_METADATA), equalTo(caseDetails.getCreatedDate()));
-        assertThat(metadata.get(LAST_MODIFIED_METADATA), equalTo(caseDetails.getLastModified()));
-        assertThat(metadata.get(SECURITY_CLASSIFICATION_METADATA), equalTo(caseDetails.getSecurityClassification()));
+        assertThat(((JsonNode) allData.get(CASE_DETAIL_FIELD)).asText(), equalTo(CASE_DETAIL_FIELD));
+        assertThat(allData.get(JURISDICTION_METADATA), equalTo(caseDetails.getJurisdiction()));
+        assertThat(allData.get(CASE_TYPE_METADATA), equalTo(caseDetails.getCaseTypeId()));
+        assertThat(allData.get(STATE_METADATA), equalTo(caseDetails.getState()));
+        assertThat(allData.get(CASE_REFERENCE_METADATA), equalTo(caseDetails.getReference()));
+        assertThat(allData.get(CREATED_DATE_METADATA), equalTo(caseDetails.getCreatedDate()));
+        assertThat(allData.get(LAST_MODIFIED_METADATA), equalTo(caseDetails.getLastModified()));
+        assertThat(allData.get(SECURITY_CLASSIFICATION_METADATA), equalTo(caseDetails.getSecurityClassification()));
     }
 
     private Map<String, JsonNode> buildData(String... dataFieldIds) {
         Map<String, JsonNode> dataMap = Maps.newHashMap();
-        Lists.newArrayList(dataFieldIds).forEach(dataFieldId -> {
-            dataMap.put(dataFieldId, JSON_NODE_FACTORY.textNode(dataFieldId));
-        });
+        Lists.newArrayList(dataFieldIds)
+            .forEach(dataFieldId -> dataMap.put(dataFieldId, JSON_NODE_FACTORY.textNode(dataFieldId)));
         return dataMap;
     }
 
@@ -103,6 +103,5 @@ class CaseDetailsTest {
         tabField.setCaseField(caseField);
         return tabField;
     }
-
 
 }
