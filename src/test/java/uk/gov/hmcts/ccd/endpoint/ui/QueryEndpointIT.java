@@ -754,8 +754,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         final Map documentNode = (Map) documentField.getValue();
         assertNotNull("Null address value", documentNode);
         assertEquals("Unexpected address value",
-            "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1", documentNode.get
-                ("document_url"));
+                     "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1", documentNode.get("document_url"));
         assertEquals("Unexpected address value",
             "http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary", documentNode
                          .get("document_binary_url"));
@@ -968,8 +967,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         // Check all field values are mapped correctly
         Map companyNode = (Map) companyField.getValue();
         assertEquals("Unexpected Field value", "Test Company", companyNode.get("Name"));
-        assertEquals("Unexpected Field value", "New Country", ((Map) companyNode.get("PostalAddress")).get
-            ("Country"));
+        assertEquals("Unexpected Field value", "New Country", ((Map) companyNode.get("PostalAddress")).get("Country"));
         Map addressNode = (Map) companyNode.get("PostalAddress");
         assertEquals("Unexpected Field value", "PP01 PPQ", addressNode.get("Postcode"));
         assertEquals("Unexpected Field value", "123", addressNode.get("AddressLine1"));

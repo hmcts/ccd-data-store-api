@@ -84,10 +84,8 @@ class MergeDataToSearchResultOperationTest {
         assertAll(
             () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(2)),
             () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
-            () -> assertThat(searchResultView.getSearchResultViewItems().get(0).getCaseFields().get("state"), is
-                ("state1")),
-            () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getCaseFields().get("state"), is
-                ("state2"))
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(0).getCaseFields().get("state"), is("state1")),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getCaseFields().get("state"), is("state2"))
         );
     }
 
