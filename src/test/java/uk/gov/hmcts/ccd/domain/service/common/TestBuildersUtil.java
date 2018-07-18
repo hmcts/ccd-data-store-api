@@ -30,6 +30,10 @@ public class TestBuildersUtil {
             callbackResponse = new CallbackResponse();
         }
 
+        public static CallbackResponseBuilder aCallbackResponse() {
+            return new CallbackResponseBuilder();
+        }
+
         public CallbackResponseBuilder withSecurityClassification(SecurityClassification securityClassification) {
             callbackResponse.setSecurityClassification(securityClassification);
             return this;
@@ -43,10 +47,6 @@ public class TestBuildersUtil {
         public CallbackResponse build() {
             return callbackResponse;
         }
-
-        public static CallbackResponseBuilder aCallbackResponse() {
-            return new CallbackResponseBuilder();
-        }
     }
 
     public static class DataClassificationBuilder {
@@ -54,6 +54,10 @@ public class TestBuildersUtil {
 
         public DataClassificationBuilder() {
             dataClassification = Maps.newHashMap();
+        }
+
+        public static DataClassificationBuilder aClassificationBuilder() {
+            return new DataClassificationBuilder();
         }
 
         public DataClassificationBuilder withData(String key, JsonNode value) {
@@ -73,18 +77,19 @@ public class TestBuildersUtil {
         public JsonNode buildAsNode() {
             return MAPPER.convertValue(dataClassification, JsonNode.class);
         }
-
-        public static DataClassificationBuilder aClassificationBuilder() {
-            return new DataClassificationBuilder();
-        }
     }
 
     public static class CaseTypeBuilder {
         private final CaseType caseType;
         private final List<AccessControlList> acls = newArrayList();
+
         private CaseTypeBuilder() {
             this.caseType = new CaseType();
             caseType.setJurisdiction(new Jurisdiction());
+        }
+
+        public static CaseTypeBuilder aCaseType() {
+            return new CaseTypeBuilder();
         }
 
         public CaseTypeBuilder withId(String id) {
@@ -127,17 +132,18 @@ public class TestBuildersUtil {
             caseType.setAccessControlLists(this.acls);
             return caseType;
         }
-
-        public static CaseTypeBuilder aCaseType() {
-            return new CaseTypeBuilder();
-        }
     }
 
     public static class CaseViewBuilder {
         private final CaseView caseView;
         private final List<CaseViewTrigger> caseViewTriggers = newArrayList();
+
         private CaseViewBuilder() {
             this.caseView = new CaseView();
+        }
+
+        public static CaseViewBuilder aCaseView() {
+            return new CaseViewBuilder();
         }
 
         public CaseViewBuilder withCaseViewTrigger(CaseViewTrigger caseViewTrigger) {
@@ -154,17 +160,18 @@ public class TestBuildersUtil {
             caseView.setTriggers(caseViewTriggers.toArray(new CaseViewTrigger[]{}));
             return caseView;
         }
-
-        public static CaseViewBuilder aCaseView() {
-            return new CaseViewBuilder();
-        }
     }
 
     public static class CaseStateBuilder {
         private final CaseState caseState;
         private final List<AccessControlList> acls = newArrayList();
+
         private CaseStateBuilder() {
             this.caseState = new CaseState();
+        }
+
+        public static CaseStateBuilder aState() {
+            return new CaseStateBuilder();
         }
 
         public CaseStateBuilder withAcl(AccessControlList accessControlList) {
@@ -181,10 +188,6 @@ public class TestBuildersUtil {
             caseState.setAccessControlLists(this.acls);
             return caseState;
         }
-
-        public static CaseStateBuilder aState() {
-            return new CaseStateBuilder();
-        }
     }
 
     public static class AccessControlListBuilder {
@@ -192,6 +195,10 @@ public class TestBuildersUtil {
 
         private AccessControlListBuilder() {
             this.accessControlList = new AccessControlList();
+        }
+
+        public static AccessControlListBuilder anAcl() {
+            return new AccessControlListBuilder();
         }
 
         public AccessControlListBuilder withRole(String role) {
@@ -217,17 +224,18 @@ public class TestBuildersUtil {
         public AccessControlList build() {
             return accessControlList;
         }
-
-        public static AccessControlListBuilder anAcl() {
-            return new AccessControlListBuilder();
-        }
     }
 
     public static class CaseEventBuilder {
         private final CaseEvent caseEvent;
         private final List<AccessControlList> accessControlLists = newArrayList();
+
         private CaseEventBuilder() {
             this.caseEvent = new CaseEvent();
+        }
+
+        public static CaseEventBuilder aCaseEvent() {
+            return new CaseEventBuilder();
         }
 
         public CaseEventBuilder withAcl(AccessControlList accessControlList) {
@@ -245,15 +253,21 @@ public class TestBuildersUtil {
             return caseEvent;
         }
 
-        public static CaseEventBuilder aCaseEvent() {
-            return new CaseEventBuilder();
+        public CaseEventBuilder withCanSaveDraft(Boolean canSaveDraft) {
+            caseEvent.setCanSaveDraft(canSaveDraft);
+            return this;
         }
     }
 
     public static class CaseViewTriggerBuilder {
         private final CaseViewTrigger caseViewTrigger;
+
         private CaseViewTriggerBuilder() {
             this.caseViewTrigger = new CaseViewTrigger();
+        }
+
+        public static CaseViewTriggerBuilder aViewTrigger() {
+            return new CaseViewTriggerBuilder();
         }
 
         public CaseViewTriggerBuilder withId(String id) {
@@ -264,10 +278,6 @@ public class TestBuildersUtil {
         public CaseViewTrigger build() {
             return caseViewTrigger;
         }
-
-        public static CaseViewTriggerBuilder aViewTrigger() {
-            return new CaseViewTriggerBuilder();
-        }
     }
 
     public static class CaseEventTriggerBuilder {
@@ -277,6 +287,10 @@ public class TestBuildersUtil {
 
         private CaseEventTriggerBuilder() {
             this.caseEventTrigger = new CaseEventTrigger();
+        }
+
+        public static CaseEventTriggerBuilder anEventTrigger() {
+            return new CaseEventTriggerBuilder();
         }
 
         public CaseEventTriggerBuilder withId(String id) {
@@ -294,10 +308,6 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public static CaseEventTriggerBuilder anEventTrigger() {
-            return new CaseEventTriggerBuilder();
-        }
-
         public CaseEventTrigger build() {
             this.caseEventTrigger.setCaseFields(this.caseFields);
             caseEventTrigger.setWizardPages(this.wizardPages);
@@ -308,8 +318,13 @@ public class TestBuildersUtil {
     public static class WizardPageBuilder {
         private final WizardPage wizardPage;
         private final List<WizardPageField> wizardPageFields = Lists.newArrayList();
+
         private WizardPageBuilder() {
             this.wizardPage = new WizardPage();
+        }
+
+        static WizardPageBuilder aWizardPage() {
+            return new WizardPageBuilder();
         }
 
         public WizardPageBuilder withId(String id) {
@@ -326,10 +341,6 @@ public class TestBuildersUtil {
             return this;
         }
 
-        static WizardPageBuilder aWizardPage() {
-            return new WizardPageBuilder();
-        }
-
         public WizardPage build() {
             this.wizardPage.setWizardPageFields(this.wizardPageFields);
             return wizardPage;
@@ -338,10 +349,15 @@ public class TestBuildersUtil {
 
     public static class CaseFieldBuilder {
         private final CaseField caseField;
-        private FieldType caseFieldType;
         private final List<AccessControlList> accessControlLists = newArrayList();
+        private FieldType caseFieldType;
+
         private CaseFieldBuilder() {
             this.caseField = new CaseField();
+        }
+
+        public static CaseFieldBuilder aCaseField() {
+            return new CaseFieldBuilder();
         }
 
         public CaseFieldBuilder withId(String id) {
@@ -369,18 +385,19 @@ public class TestBuildersUtil {
             caseField.setFieldType(caseFieldType);
             return caseField;
         }
-
-        public static CaseFieldBuilder aCaseField() {
-            return new CaseFieldBuilder();
-        }
     }
 
     public static class FieldTypeBuilder {
         private final FieldType fieldType;
         private final List<CaseField> complexFields;
+
         private FieldTypeBuilder() {
             this.fieldType = new FieldType();
             this.complexFields = Lists.newArrayList();
+        }
+
+        public static FieldTypeBuilder aFieldType() {
+            return new FieldTypeBuilder();
         }
 
         public FieldTypeBuilder withId(String id) {
@@ -412,16 +429,17 @@ public class TestBuildersUtil {
             fieldType.setComplexFields(complexFields);
             return fieldType;
         }
-
-        public static FieldTypeBuilder aFieldType() {
-            return new FieldTypeBuilder();
-        }
     }
 
     public static class CaseViewFieldBuilder {
         private final CaseViewField caseViewField;
+
         private CaseViewFieldBuilder() {
             this.caseViewField = new CaseViewField();
+        }
+
+        public static CaseViewFieldBuilder aViewField() {
+            return new CaseViewFieldBuilder();
         }
 
         public CaseViewFieldBuilder withId(String id) {
@@ -432,16 +450,17 @@ public class TestBuildersUtil {
         public CaseViewField build() {
             return caseViewField;
         }
-
-        public static CaseViewFieldBuilder aViewField() {
-            return new CaseViewFieldBuilder();
-        }
     }
 
     public static class AuditEventBuilder {
         private final AuditEvent auditEvent;
+
         private AuditEventBuilder() {
             this.auditEvent = new AuditEvent();
+        }
+
+        public static AuditEventBuilder anAuditEvent() {
+            return new AuditEventBuilder();
         }
 
         public AuditEventBuilder withEventId(String id) {
@@ -451,10 +470,6 @@ public class TestBuildersUtil {
 
         public AuditEvent build() {
             return auditEvent;
-        }
-
-        public static AuditEventBuilder anAuditEvent() {
-            return new AuditEventBuilder();
         }
     }
 
@@ -466,7 +481,11 @@ public class TestBuildersUtil {
             this.workbasketInput = new WorkbasketInput();
         }
 
-        public WorkbasketInputBuilder withFieldId(String fieldId){
+        public static WorkbasketInputBuilder aWorkbasketInput() {
+            return new WorkbasketInputBuilder();
+        }
+
+        public WorkbasketInputBuilder withFieldId(String fieldId) {
             Field f = new Field();
             f.setId(fieldId);
             this.workbasketInput.setField(f);
@@ -475,10 +494,6 @@ public class TestBuildersUtil {
 
         public WorkbasketInput build() {
             return this.workbasketInput;
-        }
-
-        public static WorkbasketInputBuilder aWorkbasketInput() {
-            return new WorkbasketInputBuilder();
         }
     }
 
@@ -489,7 +504,11 @@ public class TestBuildersUtil {
             this.searchInput = new SearchInput();
         }
 
-        public SearchInputBuilder withFieldId(String fieldId){
+        public static SearchInputBuilder aSearchInput() {
+            return new SearchInputBuilder();
+        }
+
+        public SearchInputBuilder withFieldId(String fieldId) {
             Field f = new Field();
             f.setId(fieldId);
             this.searchInput.setField(f);
@@ -498,10 +517,6 @@ public class TestBuildersUtil {
 
         public SearchInput build() {
             return this.searchInput;
-        }
-
-        public static SearchInputBuilder aSearchInput() {
-            return new SearchInputBuilder();
         }
     }
 
@@ -512,6 +527,10 @@ public class TestBuildersUtil {
             this.caseHistoryView = new CaseHistoryView();
         }
 
+        public static CaseHistoryViewBuilder aCaseHistoryView() {
+            return new CaseHistoryViewBuilder();
+        }
+
         public CaseHistoryViewBuilder withEvent(CaseViewEvent caseViewEvent) {
             this.caseHistoryView.setEvent(caseViewEvent);
             return this;
@@ -519,10 +538,6 @@ public class TestBuildersUtil {
 
         public CaseHistoryView build() {
             return caseHistoryView;
-        }
-
-        public static CaseHistoryViewBuilder aCaseHistoryView() {
-            return new CaseHistoryViewBuilder();
         }
     }
 
@@ -533,6 +548,10 @@ public class TestBuildersUtil {
             this.caseViewEvent = new CaseViewEvent();
         }
 
+        public static CaseViewEventBuilder aCaseViewEvent() {
+            return new CaseViewEventBuilder();
+        }
+
         public CaseViewEventBuilder withId(String eventId) {
             this.caseViewEvent.setEventId(eventId);
             return this;
@@ -541,10 +560,6 @@ public class TestBuildersUtil {
         public CaseViewEvent build() {
             return caseViewEvent;
         }
-
-        public static CaseViewEventBuilder aCaseViewEvent() {
-            return new CaseViewEventBuilder();
-        }
     }
 
     public static class CaseTabCollectionBuilder {
@@ -552,6 +567,10 @@ public class TestBuildersUtil {
 
         private CaseTabCollectionBuilder() {
             this.caseTabCollection = new CaseTabCollection();
+        }
+
+        public static CaseTabCollectionBuilder aCaseTabCollection() {
+            return new CaseTabCollectionBuilder();
         }
 
         public CaseTabCollectionBuilder withFieldIds(String... caseFieldIds) {
@@ -580,10 +599,6 @@ public class TestBuildersUtil {
         public CaseTabCollection build() {
             return caseTabCollection;
         }
-
-        public static CaseTabCollectionBuilder aCaseTabCollection() {
-            return new CaseTabCollectionBuilder();
-        }
     }
 
     public static class CaseDataBuilder {
@@ -591,6 +606,10 @@ public class TestBuildersUtil {
 
         private CaseDataBuilder() {
             this.data = Maps.newHashMap();
+        }
+
+        public static CaseDataBuilder aCaseData() {
+            return new CaseDataBuilder();
         }
 
         public CaseDataBuilder withPair(String key, JsonNode value) {
@@ -601,10 +620,6 @@ public class TestBuildersUtil {
         public Map<String, JsonNode> build() {
             return this.data;
         }
-
-        public static CaseDataBuilder aCaseData() {
-            return new CaseDataBuilder();
-        }
     }
 
     public static class UserRoleBuilder {
@@ -612,6 +627,10 @@ public class TestBuildersUtil {
 
         private UserRoleBuilder() {
             this.userRole = new UserRole();
+        }
+
+        public static UserRoleBuilder aUserRole() {
+            return new UserRoleBuilder();
         }
 
         public UserRoleBuilder withRole(String role) {
@@ -626,10 +645,6 @@ public class TestBuildersUtil {
 
         public UserRole build() {
             return this.userRole;
-        }
-
-        public static UserRoleBuilder aUserRole() {
-            return new UserRoleBuilder();
         }
     }
 }

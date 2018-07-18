@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetDraftViewOperation.DRAFT_ID;
+import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WORKBASKET;
 
 @Named
 @Singleton
@@ -63,7 +64,7 @@ public class MergeDataToSearchResultOperation {
 
     private SearchResult getSearchResult(final CaseType caseType, final String view) {
         final SearchResult searchResult;
-        if (StringUtils.equalsAnyIgnoreCase("WORKBASKET", view)) {
+        if (StringUtils.equalsAnyIgnoreCase(WORKBASKET, view)) {
             searchResult = uiDefinitionRepository.getWorkBasketResult(caseType.getId());
         } else {
             searchResult = uiDefinitionRepository.getSearchResult(caseType.getId());

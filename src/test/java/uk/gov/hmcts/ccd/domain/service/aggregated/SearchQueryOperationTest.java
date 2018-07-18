@@ -29,14 +29,15 @@ import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway.DRAFT_STORE_DOWN_ERR_MESSAGE;
 import static uk.gov.hmcts.ccd.domain.model.definition.CaseDetailsBuilder.aCaseDetails;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.NO_ERROR;
+import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WORKBASKET;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.aCaseEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.aCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.aCaseType;
 
 public class SearchQueryOperationTest {
-
-    private static final String VIEW = "WORKBASKET";
     private static final String CASE_TYPE_ID = "GrantOnly";
+    private static final String EVENT_ID = "An event";
     private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_FIELD_ID_1_1 = "CASE_FIELD_1_1";
     private static final String CASE_FIELD_ID_1_2 = "CASE_FIELD_1_2";
@@ -63,6 +64,7 @@ public class SearchQueryOperationTest {
     private HashMap<String, String> criteria;
     private List<CaseDetails> drafts = Lists.newArrayList();
     private List<CaseDetails> cases = Lists.newArrayList();
+    private CaseType testCaseType;
 
     @Mock
     private CaseTypeService caseTypeService;
@@ -74,12 +76,13 @@ public class SearchQueryOperationTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        CaseType testCaseType = aCaseType()
+        testCaseType = aCaseType()
+            .withId(CASE_TYPE_ID)
             .withField(CASE_FIELD_1_1)
             .withField(CASE_FIELD_1_2)
             .withField(CASE_FIELD_1_3)
+            .withEvent(aCaseEvent().withId(EVENT_ID).withCanSaveDraft(true).build())
             .build();
-        testCaseType.setId(CASE_TYPE_ID);
         List<CaseType> testCaseTypes = Lists.newArrayList(testCaseType);
 
         doReturn(testCaseTypes).when(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ);
@@ -102,7 +105,7 @@ public class SearchQueryOperationTest {
     @Test
     @DisplayName("should search using search operation")
     public void shouldSearchUsingSearchOperation() {
-        searchQueryOperation.execute(VIEW, metadata, criteria);
+        searchQueryOperation.execute(WORKBASKET, metadata, criteria);
 
         assertAll(
             () -> verify(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ),
@@ -113,12 +116,12 @@ public class SearchQueryOperationTest {
     }
 
     @Test
-    @DisplayName("should include drafts if present")
+    @DisplayName("should include drafts if drafts enabled and if drafts are present")
     public void shouldIncludeDrafts() {
         doReturn(drafts).when(getDraftsOperation).execute(metadata);
         doReturn(cases).when(searchOperation).execute(metadata, criteria);
 
-        searchQueryOperation.execute(VIEW, metadata, criteria);
+        searchQueryOperation.execute(WORKBASKET, metadata, criteria);
 
         assertAll(
             () -> verify(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ),
@@ -131,12 +134,49 @@ public class SearchQueryOperationTest {
     }
 
     @Test
+    @DisplayName("should not call draft-store if drafts are not enabled")
+    public void shouldNotCallDraftStore() {
+        testCaseType.getEvents().get(0).setCanSaveDraft(false);
+        doReturn(drafts).when(getDraftsOperation).execute(metadata);
+        doReturn(cases).when(searchOperation).execute(metadata, criteria);
+
+        searchQueryOperation.execute(WORKBASKET, metadata, criteria);
+
+        assertAll(
+            () -> verify(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ),
+            () -> verify(searchOperation).execute(metadata, criteria),
+            () -> verifyNoMoreInteractions(getDraftsOperation),
+            () -> verify(mergeDataToSearchResultOperation).execute(anyObject(), argument.capture(), anyString(), eq(NO_ERROR)),
+            () -> assertThat(argument.getValue(), hasSize(1)),
+            () -> assertThat(argument.getValue(), not(hasDraftItemInResults()))
+        );
+    }
+
+    @Test
+    @DisplayName("should not call draft-store for actual Search")
+    public void shouldNotCallDraftStoreForSearch() {
+        doReturn(drafts).when(getDraftsOperation).execute(metadata);
+        doReturn(cases).when(searchOperation).execute(metadata, criteria);
+
+        searchQueryOperation.execute("not a" + WORKBASKET, metadata, criteria);
+
+        assertAll(
+            () -> verify(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ),
+            () -> verify(searchOperation).execute(metadata, criteria),
+            () -> verifyNoMoreInteractions(getDraftsOperation),
+            () -> verify(mergeDataToSearchResultOperation).execute(anyObject(), argument.capture(), anyString(), eq(NO_ERROR)),
+            () -> assertThat(argument.getValue(), hasSize(1)),
+            () -> assertThat(argument.getValue(), not(hasDraftItemInResults()))
+        );
+    }
+
+    @Test
     @DisplayName("should return cases and resultError but not drafts when draft store unresponsive")
     public void shouldReturnCasesAndResultErrorButNoDraftsWhenDraftStoreUnresponsive() {
         DraftAccessException draftAccessException = new DraftAccessException(DRAFT_STORE_DOWN_ERR_MESSAGE);
         doThrow(draftAccessException).when(getDraftsOperation).execute(metadata);
         doReturn(cases).when(searchOperation).execute(metadata, criteria);
-        searchQueryOperation.execute(VIEW, metadata, criteria);
+        searchQueryOperation.execute(WORKBASKET, metadata, criteria);
 
         assertAll(
             () -> verify(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ),
@@ -151,7 +191,7 @@ public class SearchQueryOperationTest {
     public void shouldReturnEmptyNoCaseTypeFound() {
         doReturn(new ArrayList<>()).when(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ);
 
-        searchQueryOperation.execute(VIEW, metadata, criteria);
+        searchQueryOperation.execute(WORKBASKET, metadata, criteria);
         assertAll(
             () -> verify(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID),
             () -> verify(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ),

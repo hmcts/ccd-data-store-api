@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_RE
 @Service
 public class SearchQueryOperation {
     protected static final String NO_ERROR = null;
+    public static final String WORKBASKET = "WORKBASKET";
     private final MergeDataToSearchResultOperation mergeDataToSearchResultOperation;
     private final GetCaseTypesOperation getCaseTypesOperation;
     private final SearchOperation searchOperation;
@@ -63,13 +65,14 @@ public class SearchQueryOperation {
 
         String draftResultError = NO_ERROR;
         List<CaseDetails> draftsAndCases = Lists.newArrayList();
-        try {
-            draftsAndCases = getDraftsOperation.execute(metadata);
-        } catch (DraftAccessException dae) {
-            draftResultError = dae.getMessage();
+        if (StringUtils.equalsAnyIgnoreCase(WORKBASKET, view) && caseType.get().hasDraftEnabledEvent()) {
+            try {
+                draftsAndCases = getDraftsOperation.execute(metadata);
+            } catch (DraftAccessException dae) {
+                draftResultError = dae.getMessage();
+            }
         }
         draftsAndCases.addAll(cases);
-
         return mergeDataToSearchResultOperation.execute(caseType.get(), draftsAndCases, view, draftResultError);
     }
 
