@@ -42,6 +42,7 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WORKBASKET;
 
 public class QueryEndpointIT extends WireMockBaseTest {
     private static final String GET_CASES = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases";
@@ -126,7 +127,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
 
         final MvcResult result = mockMvc.perform(get(GET_CASES)
             .contentType(JSON_CONTENT_TYPE)
-            .param("view", "WORKBASKET")
+            .param("view", WORKBASKET)
             .param("case_type", TEST_CASE_TYPE)
             .param("jurisdiction", TEST_JURISDICTION)
             .param("state", TEST_STATE)
@@ -192,7 +193,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
 
         final MvcResult result = mockMvc.perform(get(GET_CASES_NO_READ_CASE_FIELD_ACCESS)
             .contentType(JSON_CONTENT_TYPE)
-            .param("view", "WORKBASKET")
+            .param("view", WORKBASKET)
             .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();
@@ -231,7 +232,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
 
         final MvcResult result = mockMvc.perform(get(GET_CASES_NO_READ_CASE_TYPE_ACCESS)
             .contentType(JSON_CONTENT_TYPE)
-            .param("view", "WORKBASKET")
+            .param("view", WORKBASKET)
             .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();
@@ -447,7 +448,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
 
         final MvcResult result = mockMvc.perform(get(GET_CASES)
             .contentType(JSON_CONTENT_TYPE)
-            .param("view", "WORKBASKET")
+            .param("view", WORKBASKET)
             .param("case_type", TEST_CASE_TYPE)
             .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
@@ -564,7 +565,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
     public void invalidJurisdiction() throws Exception {
         mockMvc.perform(get(GET_CASES_INVALID_JURISDICTION)
             .contentType(JSON_CONTENT_TYPE)
-            .param("view", "WORKBASKET")
+            .param("view", WORKBASKET)
             .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(404));
     }
@@ -573,7 +574,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
     public void invalidCaseType() throws Exception {
         mockMvc.perform(get(GET_CASES_INVALID_CASE_TYPE)
             .contentType(JSON_CONTENT_TYPE)
-            .param("view", "WORKBASKET")
+            .param("view", WORKBASKET)
             .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(404));
     }
@@ -1298,7 +1299,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertAll(
             () -> assertThat(caseTypes.length, is(equalTo(3))),
             () -> assertThat(caseTypes[0], hasProperty("id", equalTo("TestAddressBookCase"))),
-            () -> assertThat(caseTypes[0].getEvents(), hasSize(0)),
+            () -> assertThat(caseTypes[0].getEvents(), hasSize(1)), // added a create event with read access for testing drafts properly
             () -> assertThat(caseTypes[0].getCaseFields(), hasSize(3)),
             () -> assertThat(caseTypes[0].getCaseFields(), hasItems(hasProperty("id", equalTo("PersonFirstName")),
                 hasProperty("id", equalTo("PersonLastName")),
