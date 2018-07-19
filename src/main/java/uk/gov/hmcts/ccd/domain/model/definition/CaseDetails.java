@@ -14,9 +14,18 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 
+import static java.util.Optional.ofNullable;
 import static org.apache.http.HttpStatus.SC_OK;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CASE_REFERENCE_METADATA;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CASE_TYPE_METADATA;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CREATED_DATE_METADATA;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.JURISDICTION_METADATA;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.LAST_MODIFIED_METADATA;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.SECURITY_CLASSIFICATION_METADATA;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.STATE_METADATA;
 
 public class CaseDetails implements Cloneable {
     private static final Logger LOG = LoggerFactory.getLogger(CaseDetails.class);
@@ -63,6 +72,9 @@ public class CaseDetails implements Cloneable {
     /** Attribute passed to UI layer, does not need persistence */
     @JsonProperty("callback_response_status")
     private String callbackResponseStatus;
+
+    @JsonIgnore
+    private final Map<String, Object> metadata = new HashMap<>();
 
     public Long getId() {
         return id;
@@ -182,7 +194,8 @@ public class CaseDetails implements Cloneable {
 
     public boolean existsInData(CaseTypeTabField caseTypeTabField) {
         return isFieldWithNoValue(caseTypeTabField)
-            || data.keySet().contains(caseTypeTabField.getCaseField().getId());
+            || data.keySet().contains(caseTypeTabField.getCaseField().getId())
+            || getMetadata().containsKey(caseTypeTabField.getCaseField().getId());
     }
 
     private boolean isFieldWithNoValue(CaseTypeTabField caseTypeTabField) {
@@ -208,6 +221,26 @@ public class CaseDetails implements Cloneable {
                      callBackResponse.getBody().toJson());
             setIncompleteCallbackResponse();
         }
+    }
+
+    private Map<String, Object> getMetadata() {
+        if (metadata.isEmpty()) {
+            metadata.put(JURISDICTION_METADATA, getJurisdiction());
+            metadata.put(CASE_TYPE_METADATA, getCaseTypeId());
+            metadata.put(STATE_METADATA, getState());
+            metadata.put(CASE_REFERENCE_METADATA, getReference());
+            metadata.put(CREATED_DATE_METADATA, getCreatedDate());
+            metadata.put(LAST_MODIFIED_METADATA, getLastModified());
+            metadata.put(SECURITY_CLASSIFICATION_METADATA, getSecurityClassification());
+        }
+        return metadata;
+    }
+
+    @JsonIgnore
+    public Map<String, Object> getCaseDataAndMetadata() {
+        Map<String, Object> allData = new HashMap<>(getMetadata());
+        ofNullable(getData()).ifPresent(allData::putAll);
+        return allData;
     }
 
     @JsonIgnore
