@@ -9,6 +9,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 
 import javax.inject.Inject;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -71,6 +72,22 @@ public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
         assertAll(
             () -> assertThat(userRole, hasProperty("securityClassification", is("PUBLIC"))),
             () -> assertThat(userRole, hasProperty("role", is("caseworker-probate")))
+        );
+    }
+
+    @Test
+    public void shouldGetClassificationsForUserRolesList() {
+        List<String> roles = Arrays.asList("caseworker-test", "caseworker-probate", "caseworker-divorce", "caseworker");
+        final List<UserRole> userRoles = caseDefinitionRepository.getClassificationsForUserRoleList(roles);
+
+        assertAll(
+            () -> assertThat(userRoles.size(), is(3)),
+            () -> assertThat(userRoles.get(0), hasProperty("securityClassification", is("PRIVATE"))),
+            () -> assertThat(userRoles.get(0), hasProperty("role", is("caseworker-test"))),
+            () -> assertThat(userRoles.get(1), hasProperty("securityClassification", is("PUBLIC"))),
+            () -> assertThat(userRoles.get(1), hasProperty("role", is("caseworker-probate"))),
+            () -> assertThat(userRoles.get(2), hasProperty("securityClassification", is("RESTRICTED"))),
+            () -> assertThat(userRoles.get(2), hasProperty("role", is("caseworker-divorce")))
         );
     }
 

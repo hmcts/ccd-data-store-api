@@ -91,6 +91,10 @@ public class ApplicationParams {
         return caseDefinitionHost + "/api/user-role?role={userRole}";
     }
 
+    public String userRolesClassificationsURL() {
+        return caseDefinitionHost + "/api/user-roles/{roles}";
+    }
+
     public String displayWorkbasketDefURL(final String caseTypeId) {
         return uiDefinitionHost + "/api/display/work-basket-definition/" + encode(caseTypeId);
     }

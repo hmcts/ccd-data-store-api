@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ccd.data.definition;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -13,6 +11,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.google.common.collect.Maps.newHashMap;
 
@@ -23,7 +22,6 @@ import static com.google.common.collect.Maps.newHashMap;
 public class CachedCaseDefinitionRepository implements CaseDefinitionRepository {
 
     public static final String QUALIFIER = "cached";
-    private static final Logger LOG = LoggerFactory.getLogger(CachedCaseDefinitionRepository.class);
 
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final Map<String, List<CaseType>> caseTypesForJurisdictions = newHashMap();
@@ -47,6 +45,18 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
 
     public UserRole getUserRoleClassifications(String userRole) {
         return userRoleClassifications.computeIfAbsent(userRole, caseDefinitionRepository::getUserRoleClassifications);
+    }
+
+    @Override
+    public List<UserRole> getClassificationsForUserRoleList(List<String> userRoles) {
+        final List<String> missingRoles = userRoles.stream()
+            .filter(role -> !userRoleClassifications.containsKey(role))
+            .collect(Collectors.toList());
+        if (!missingRoles.isEmpty()) {
+            final List<UserRole> missingClassifications = caseDefinitionRepository.getClassificationsForUserRoleList(missingRoles);
+            missingClassifications.forEach(userClassification -> userRoleClassifications.putIfAbsent(userClassification.getRole(), userClassification));
+        }
+        return userRoles.stream().map(userRoleClassifications::get).collect(Collectors.toList());
     }
 
     @Override
