@@ -138,8 +138,15 @@ public class CaseViewField {
     }
 
     public static CaseViewField createFrom(CaseTypeTabField field, Map<String, ?> data) {
+        CaseViewField caseViewField = createFrom(field.getCaseField(), data);
+        caseViewField.setOrder(field.getDisplayOrder());
+        caseViewField.setShowCondition(field.getShowCondition());
+
+        return caseViewField;
+    }
+
+    public static CaseViewField createFrom(CaseField caseField, Map<String, ?> data) {
         CaseViewField caseViewField = new CaseViewField();
-        CaseField caseField = field.getCaseField();
         caseViewField.setId(caseField.getId());
         caseViewField.setLabel(caseField.getLabel());
         caseViewField.setFieldType(caseField.getFieldType());
@@ -147,11 +154,8 @@ public class CaseViewField {
         caseViewField.setHintText(caseField.getHintText());
         caseViewField.setSecurityLabel(caseField.getSecurityLabel());
         caseViewField.setValidationExpression(caseField.getFieldType().getRegularExpression());
-        caseViewField.setOrder(field.getDisplayOrder());
-        caseViewField.setShowCondition(field.getShowCondition());
         caseViewField.setValue(data.get(caseField.getId()));
 
         return caseViewField;
-
     }
 }

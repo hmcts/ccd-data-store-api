@@ -223,7 +223,8 @@ public class CaseDetails implements Cloneable {
         }
     }
 
-    private Map<String, Object> getMetadata() {
+    @JsonIgnore
+    public Map<String, Object> getMetadata() {
         if (metadata.isEmpty()) {
             metadata.put(JURISDICTION_METADATA, getJurisdiction());
             metadata.put(CASE_TYPE_METADATA, getCaseTypeId());
