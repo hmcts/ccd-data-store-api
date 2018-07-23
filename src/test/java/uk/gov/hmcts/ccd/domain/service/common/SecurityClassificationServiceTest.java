@@ -835,6 +835,67 @@ public class SecurityClassificationServiceTest {
         }
 
         @Test
+        @DisplayName("should filter out simple collection items with higher classification")
+        void shouldFilterOutSimpleCollectionItemsWithHigherClassification() throws IOException {
+            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+                "{  \"Aliases\":[  \n" +
+                    "         {  \n" +
+                    "            \"value\": \"Alias #1\",\n" +
+                    "            \"id\":\"" + FIRST_CHILD_ID + "\"\n" +
+                    "         },\n" +
+                    "         {  \n" +
+                    "            \"value\": \"Alias #2\",\n" +
+                    "            \"id\":\"" + SECOND_CHILD_ID + "\"\n" +
+                    "         },\n" +
+                    "         {  \n" +
+                    "            \"value\": \"Alias #3\",\n" +
+                    "            \"id\":\"THIRD_CHILD\"\n" +
+                    "         }\n" +
+                    "      ]\n" +
+                    "    }\n"
+            ), STRING_JSON_MAP);
+            caseDetails.setData(data);
+            final Map<String, JsonNode> dataClassification = MAPPER.convertValue(MAPPER.readTree(
+                "{  \"Aliases\": {\n" +
+                    "     \"classification\": \"PRIVATE\",\n" +
+                    "     \"value\": [\n" +
+                    "       {\n" +
+                    "         \"classification\": \"PRIVATE\",\n" +
+                    "         \"id\":\"" + FIRST_CHILD_ID + "\"\n" +
+                    "       },\n" +
+                    "       {\n" +
+                    "         \"classification\": \"RESTRICTED\",\n" +
+                    "         \"id\":\"" + SECOND_CHILD_ID + "\"\n" +
+                    "       },\n" +
+                    "       {\n" +
+                    "         \"classification\": \"PRIVATE\",\n" +
+                    "         \"id\":\"THIRD_CHILD\"\n" +
+                    "       }\n" +
+                    "     ]\n" +
+                    "   }\n" +
+                    " }\n"
+            ), STRING_JSON_MAP);
+            caseDetails.setDataClassification(dataClassification);
+
+            CaseDetails caseDetails = applyClassification(PRIVATE);
+
+            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+            assertAll(
+                () -> assertThat(resultNode.has("Aliases"), is(true)),
+                () -> assertThat(resultNode.get("Aliases").isArray(), is(true)),
+                () -> assertThat(resultNode.get("Aliases").size(), is(2))
+            );
+            final JsonNode aliases = resultNode.get("Aliases");
+            final String alias1 = aliases.get(0).get("value").textValue();
+            final String alias3 = aliases.get(1).get("value").textValue();
+
+            assertAll("Restricted Alias #2 should have been removed",
+                () -> assertThat(alias1, is("Alias #1")),
+                () -> assertThat(alias3, is("Alias #3"))
+            );
+        }
+
+        @Test
         // TODO Target implementation, see RDM-1204
         @DisplayName("should filter out fields within collection items")
         void shouldFilterFieldsWithinCollectionItems() throws IOException {

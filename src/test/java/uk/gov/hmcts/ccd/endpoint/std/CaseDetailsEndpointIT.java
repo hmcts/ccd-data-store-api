@@ -230,31 +230,33 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     public void shouldReturn201WhenPostCreateCaseWithEmptyDataClassificationForCaseworker() throws Exception {
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
         final JsonNode DATA = mapper.readTree(
-            "{\n"
-            + "  \"PersonFirstName\": \"First Name\",\n"
-            + "  \"PersonLastName\": \"Last Name\",\n"
-            + "  \"PersonAddress\": {\n"
-            + "    \"AddressLine1\": \"Address Line 1\",\n"
-            + "    \"AddressLine2\": \"Address Line 2\"\n"
-            + "  },\n"
-            +     "\"D8Document\":{"
-            +     "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"}"
-            + "}\n"
+            "{\n" +
+            "  \"PersonFirstName\": \"First Name\",\n" +
+            "  \"PersonLastName\": \"Last Name\",\n" +
+            "  \"PersonAddress\": {\n" +
+            "    \"AddressLine1\": \"Address Line 1\",\n" +
+            "    \"AddressLine2\": \"Address Line 2\"\n" +
+            "  },\n" +
+            "  \"Aliases\": [{\"value\": \"x1\", \"id\": \"1\"}, {\"value\": \"x2\", \"id\": \"2\"}]," +
+            "  \"D8Document\":{" +
+            "    \"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"}" +
+            "}\n"
         );
         final JsonNode SANITIZED_DATA = mapper.readTree(
-            "{\n"
-            + "  \"PersonFirstName\": \"First Name\",\n"
-            + "  \"PersonLastName\": \"Last Name\",\n"
-            + "  \"PersonAddress\": {\n"
-            + "    \"AddressLine1\": \"Address Line 1\",\n"
-            + "    \"AddressLine2\": \"Address Line 2\"\n"
-            + "  },\n"
-            + "  \"D8Document\":{\n"
-            + "    \"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
-            + "    \"document_binary_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n"
-            + "    \"document_filename\": \"Seagulls_Square.jpg\""
-            + "}\n"
-            + "}\n"
+            "{\n" +
+            "  \"PersonFirstName\": \"First Name\",\n" +
+            "  \"PersonLastName\": \"Last Name\",\n" +
+            "  \"PersonAddress\": {\n" +
+            "    \"AddressLine1\": \"Address Line 1\",\n" +
+            "    \"AddressLine2\": \"Address Line 2\"\n" +
+            "  },\n" +
+            "  \"Aliases\": [{\"value\": \"x1\", \"id\": \"1\"}, {\"value\": \"x2\", \"id\": \"2\"}]," +
+            "  \"D8Document\":{\n" +
+            "    \"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n" +
+            "    \"document_binary_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n" +
+            "    \"document_filename\": \"Seagulls_Square.jpg\"" +
+            "}\n" +
+            "}\n"
         );
         final CaseDataContent caseDetailsToSave = new CaseDataContent();
         caseDetailsToSave.setEvent(new Event());
@@ -285,7 +287,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         Map sanitizedData = mapper.convertValue(SANITIZED_DATA, new TypeReference<HashMap<String, JsonNode>>() {
         });
         assertThat( "Incorrect Data content", savedCaseDetails.getData().entrySet(), everyItem(isIn(sanitizedData.entrySet())));
-        assertEquals("Incorrect security classification size", 4, savedCaseDetails.getDataClassification().size());
+        assertEquals("Incorrect security classification size", 5, savedCaseDetails.getDataClassification().size());
         JsonNode expectedClassification = mapper.readTree("{" +
                                                               "  \"PersonAddress\":{" +
                                                               "    \"classification\": \"PUBLIC\"," +
@@ -296,6 +298,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                                                               "  }," +
                                                               "  \"PersonLastName\":\"PUBLIC\"," +
                                                               "  \"PersonFirstName\":\"PUBLIC\"," +
+                                                              "  \"Aliases\": {\"classification\": \"PUBLIC\", \"value\": [{\"id\": \"1\", \"classification\": \"PUBLIC\"}, {\"id\": \"2\", \"classification\": \"PUBLIC\"}]}," +
                                                               "  \"D8Document\":\"PUBLIC\"" +
                                                               "}");
         JsonNode actualClassification = mapper.convertValue(savedCaseDetails.getDataClassification(), JsonNode.class);
