@@ -16,9 +16,8 @@ import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.aggregated.*;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
+import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
+import uk.gov.hmcts.ccd.domain.model.aggregated.UserDefault;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
@@ -76,10 +75,11 @@ public class DefaultUserRepository implements UserRepository {
     @Override
     public Set<SecurityClassification> getUserClassifications(String jurisdictionId) {
         Set<String> roles = this.getUserRoles();
+        final List<String> filteredRoles = roles.stream()
+            .filter(role -> filterRole(jurisdictionId, role))
+            .collect(Collectors.toList());
 
-        return roles.stream()
-                    .filter(role -> filterRole(jurisdictionId, role))
-                    .map(caseDefinitionRepository::getUserRoleClassifications)
+        return caseDefinitionRepository.getClassificationsForUserRoleList(filteredRoles).stream()
                     .filter(Objects::nonNull)
                     .filter(userRole -> Objects.nonNull(userRole.getSecurityClassification()))
                     .map(userRole -> SecurityClassification.valueOf(userRole.getSecurityClassification()))

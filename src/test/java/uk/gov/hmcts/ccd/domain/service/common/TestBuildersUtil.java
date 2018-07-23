@@ -2,44 +2,30 @@ package uk.gov.hmcts.ccd.domain.service.common;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
-import uk.gov.hmcts.ccd.domain.model.aggregated.ProfileCaseState;
+import uk.gov.hmcts.ccd.domain.model.aggregated.*;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
-import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTab;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
-import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
-import uk.gov.hmcts.ccd.domain.model.definition.WizardPageField;
+import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.search.Field;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Consumer;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Arrays.asList;
 
 public class TestBuildersUtil {
     private static final ObjectMapper MAPPER = new ObjectMapper();
+
+    private TestBuildersUtil() {}
 
     public static class CallbackResponseBuilder {
         private final CallbackResponse callbackResponse;
@@ -627,6 +613,144 @@ public class TestBuildersUtil {
 
         public static CaseTabCollectionBuilder aCaseTabCollection() {
             return new CaseTabCollectionBuilder();
+        }
+    }
+
+    public static class CaseDataBuilder {
+
+        private final HashMap<String, JsonNode> caseData;
+
+        private CaseDataBuilder() {
+            caseData = new HashMap<>();
+        }
+
+        private Consumer<JsonNode> putFn(String fieldId) {
+            return (JsonNode node) -> caseData.put(fieldId, node);
+        }
+
+        public static CaseDataBuilder caseData() {
+            return new CaseDataBuilder();
+        }
+
+        public CaseDataFieldBuilder withField(String fieldId) {
+            return new CaseDataFieldBuilder(this, putFn(fieldId));
+        }
+
+        public Map<String, JsonNode> build() {
+            return caseData;
+        }
+    }
+
+    public static class CaseDataFieldBuilder {
+        private final CaseDataBuilder caseDataBuilder;
+        private final Consumer<JsonNode> putFn;
+
+        CaseDataFieldBuilder(CaseDataBuilder caseDataBuilder, Consumer<JsonNode> putFn) {
+            this.caseDataBuilder = caseDataBuilder;
+            this.putFn = putFn;
+        }
+
+        public CaseDataBuilder asCollectionOf(JsonNode... nodes) {
+            final ArrayNode collection = JsonNodeFactory.instance.arrayNode();
+            Arrays.stream(nodes).forEach(collection::add);
+            putFn.accept(collection);
+            return caseDataBuilder;
+        }
+    }
+
+    public static JsonNode collectionItem(String id, String value) {
+        return collectionItem(id, JsonNodeFactory.instance.textNode(value));
+    }
+
+    public static JsonNode collectionItem(String id, JsonNode value) {
+        final ObjectNode item = JsonNodeFactory.instance.objectNode();
+        item.put("id", id);
+        item.set("value", value);
+        return item;
+    }
+
+    public static class CaseDataClassificationBuilder {
+
+        private final HashMap<String, JsonNode> dataClassification;
+
+        private CaseDataClassificationBuilder() {
+            dataClassification = new HashMap<>();
+        }
+
+        private Consumer<JsonNode> putFn(String fieldId) {
+            return (JsonNode node) -> dataClassification.put(fieldId, node);
+        }
+
+        public static CaseDataClassificationBuilder dataClassification() {
+            return new CaseDataClassificationBuilder();
+        }
+
+        public CaseDataClassificationFieldBuilder withField(String fieldId) {
+            return new CaseDataClassificationFieldBuilder(this, putFn(fieldId));
+        }
+
+        public Map<String, JsonNode> build() {
+            return dataClassification;
+        }
+    }
+
+    public static class CaseDataClassificationFieldBuilder {
+        private final CaseDataClassificationBuilder caseDataClassificationBuilder;
+        private final Consumer<JsonNode> putFn;
+
+        CaseDataClassificationFieldBuilder(CaseDataClassificationBuilder caseDataClassificationBuilder,
+                                           Consumer<JsonNode> putFn) {
+            this.caseDataClassificationBuilder = caseDataClassificationBuilder;
+            this.putFn = putFn;
+        }
+
+        public CaseDataClassificationBuilder asCollectionOf(String classification, JsonNode... nodes) {
+            final ObjectNode collection = JsonNodeFactory.instance.objectNode();
+            final ArrayNode collectionValue = JsonNodeFactory.instance.arrayNode();
+            Arrays.stream(nodes).forEach(collectionValue::add);
+
+            collection.put("classification", classification);
+            collection.set("value", collectionValue);
+
+            putFn.accept(collection);
+            return caseDataClassificationBuilder;
+        }
+    }
+
+    public static JsonNode collectionClassification(String id, String classification) {
+        return collectionItem(id, JsonNodeFactory.instance.textNode(classification));
+    }
+
+    public static JsonNode collectionClassification(String id, JsonNode classification) {
+        final ObjectNode item = JsonNodeFactory.instance.objectNode();
+        item.put("id", id);
+        item.set("classification", classification);
+        return item;
+    }
+
+    public static class UserRoleBuilder {
+        private final UserRole userRole;
+
+        private UserRoleBuilder() {
+            this.userRole = new UserRole();
+        }
+
+        public UserRoleBuilder withRole(String role) {
+            userRole.setRole(role);
+            return this;
+        }
+
+        public UserRoleBuilder withSecurityClassification(SecurityClassification securityClassification) {
+            userRole.setSecurityClassification(securityClassification.name());
+            return this;
+        }
+
+        public UserRole build() {
+            return this.userRole;
+        }
+
+        public static UserRoleBuilder aUserRole() {
+            return new UserRoleBuilder();
         }
     }
 }

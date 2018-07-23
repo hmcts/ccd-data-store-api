@@ -16,9 +16,10 @@ import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 import static com.google.common.collect.Sets.newHashSet;
@@ -27,13 +28,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.*;
+import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
+import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.UserRoleBuilder.aUserRole;
 
 public class UserRepositoryTest {
 
     private static final String CASEWORKER_PROBATE_LOA1 = "caseworker-probate-loa1";
     private static final String CASEWORKER_PROBATE_LOA2 = "caseworker-probate-loa2";
-    private static final String CASEWORKER_PROBATE_LOA3 = "caseworker-probate-loa3";
     private static final String CASEWORKER_DIVORCE = "caseworker-divorce-loa3";
 
     @Mock
@@ -74,13 +76,13 @@ public class UserRepositoryTest {
         @Test
         @DisplayName("should retrieve roles from security principals")
         void shouldRetrieveRolesFromPrincipal() {
-            MockUtils.setSecurityAuthorities(authentication, CASEWORKER_PROBATE_LOA1, CASEWORKER_PROBATE_LOA3, CASEWORKER_DIVORCE);
+            MockUtils.setSecurityAuthorities(authentication, CASEWORKER_PROBATE_LOA1, CASEWORKER_PROBATE_LOA2, CASEWORKER_DIVORCE);
 
             Set<String> userRoles = userRepository.getUserRoles();
 
             verify(securityContext, times(1)).getAuthentication();
             verify(authentication, times(1)).getPrincipal();
-            assertThat(userRoles, hasItems(CASEWORKER_PROBATE_LOA1, CASEWORKER_PROBATE_LOA3, CASEWORKER_DIVORCE));
+            assertThat(userRoles, hasItems(CASEWORKER_PROBATE_LOA1, CASEWORKER_PROBATE_LOA2, CASEWORKER_DIVORCE));
         }
 
         @Test
@@ -103,7 +105,6 @@ public class UserRepositoryTest {
         @DisplayName("should retrieve roles from user repository")
         public void shouldRetrieveRolesFromPrincipal() {
             doReturn(newHashSet(CASEWORKER_PROBATE_LOA1)).when(userRepository).getUserRoles();
-            setSecurityClassification(PUBLIC, CASEWORKER_PROBATE_LOA1);
 
             userRepository.getUserClassifications("PROBATE");
 
@@ -113,10 +114,13 @@ public class UserRepositoryTest {
         @Test
         @DisplayName("should list classifications for roles")
         public void shouldRetrieveClassificationsForRoles() {
-            setSecurityClassification(PUBLIC, CASEWORKER_PROBATE_LOA1);
-            setSecurityClassification(RESTRICTED, CASEWORKER_PROBATE_LOA2);
-            setSecurityClassification(PRIVATE, CASEWORKER_PROBATE_LOA3);
-            doReturn(newHashSet(CASEWORKER_PROBATE_LOA1, CASEWORKER_PROBATE_LOA3)).when(userRepository).getUserRoles();
+            final List<UserRole> userRoleList = Arrays.asList(
+                aUserRole().withRole(CASEWORKER_PROBATE_LOA1).withSecurityClassification(PUBLIC).build(),
+                aUserRole().withRole(CASEWORKER_PROBATE_LOA2).withSecurityClassification(PRIVATE).build()
+            );
+            List<String> roles = Arrays.asList(CASEWORKER_PROBATE_LOA2, CASEWORKER_PROBATE_LOA1);
+            when(caseDefinitionRepository.getClassificationsForUserRoleList(roles)).thenReturn(userRoleList);
+            doReturn(newHashSet(CASEWORKER_PROBATE_LOA1, CASEWORKER_PROBATE_LOA2)).when(userRepository).getUserRoles();
 
             final Set<SecurityClassification> userClassifications = userRepository.getUserClassifications("PROBATE");
 
@@ -127,7 +131,6 @@ public class UserRepositoryTest {
         @Test
         @DisplayName("should filter out roles irrelevant to the current jurisdiction")
         public void shouldFilterOutRolesForOtherJurisdiction() {
-            setSecurityClassification(RESTRICTED, CASEWORKER_DIVORCE);
             doReturn(newHashSet(CASEWORKER_DIVORCE)).when(userRepository).getUserRoles();
 
             assertNoClassifications();
@@ -137,7 +140,6 @@ public class UserRepositoryTest {
         @DisplayName("should not return security classification if null role returned from def store")
         public void shouldFailToGetUserClassificationIfNoRelevantRoleFound() {
             doReturn(newHashSet(CASEWORKER_PROBATE_LOA1)).when(userRepository).getUserRoles();
-            doReturn(null).when(caseDefinitionRepository).getUserRoleClassifications(CASEWORKER_PROBATE_LOA1);
 
             assertNoClassifications();
         }
@@ -146,7 +148,6 @@ public class UserRepositoryTest {
         @DisplayName("should retrieve no security classification if empty list of roles returned from case definition store")
         public void shouldRetrieveNoSecurityClassificationIfEmptyListOfRolesFromCaseDefinition() {
             doReturn(newHashSet()).when(userRepository).getUserRoles();
-            doThrow(ResourceNotFoundException.class).when(caseDefinitionRepository).getUserRoleClassifications(CASEWORKER_PROBATE_LOA1);
 
             assertNoClassifications();
         }
@@ -155,7 +156,7 @@ public class UserRepositoryTest {
         @DisplayName("should fail to retrieve security classifications if unable to talk to definition store")
         public void shouldFailIfExceptionWhileRetrievingUserRoleFromCaseDefinition() {
             doReturn(newHashSet(CASEWORKER_PROBATE_LOA1)).when(userRepository).getUserRoles();
-            doThrow(ServiceException.class).when(caseDefinitionRepository).getUserRoleClassifications(CASEWORKER_PROBATE_LOA1);
+            doThrow(ServiceException.class).when(caseDefinitionRepository).getClassificationsForUserRoleList(Arrays.asList(CASEWORKER_PROBATE_LOA1));
 
             assertThrows(ServiceException.class, () -> userRepository.getUserClassifications("PROBATE"),
                          "Classification retrieval should have failed");
@@ -166,14 +167,5 @@ public class UserRepositoryTest {
 
             assertThat(userClassifications, hasSize(0));
         }
-
-        private void setSecurityClassification(SecurityClassification classification, String role) {
-            UserRole roleClassification = new UserRole();
-            roleClassification.setSecurityClassification(classification.name());
-            when(caseDefinitionRepository.getUserRoleClassifications(role)).thenReturn(roleClassification);
-        }
-
     }
-
-
 }
