@@ -45,4 +45,8 @@
         <gav regex="true">^com\.jcraft:jsch:.*$</gav>
         <cpe>cpe:/a:jcraft:jsch</cpe>
     </suppress>
+    <suppress>
+        <notes>Temporarly supress until we can migration to Spring Boot 2 see https://tools.hmcts.net/jira/browse/RDM-2464</notes>
+        <cve>CVE-2018-1258</cve>
+    </suppress>
 </suppressions>

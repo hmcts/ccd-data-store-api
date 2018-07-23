@@ -1,8 +1,5 @@
 buildscript {
     dependencies {
-        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.2.0'
-    }
-    dependencies {
         classpath 'org.jsonschema2pojo:jsonschema2pojo-gradle-plugin:0.5.1'
     }
     dependencies {
@@ -36,7 +33,6 @@ apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'org.sonarqube'
 apply plugin: 'jsonschema2pojo'
-apply plugin: 'org.junit.platform.gradle.plugin'
 apply plugin: 'jacoco'
 apply plugin: 'checkstyle'
 apply plugin: 'pmd'
@@ -99,20 +95,18 @@ repositories {
 // end::repositories[]
 
 ext {
-    junitVersion = '4.12'
-    junitJupiterVersion = '5.1.1'
-    junitVintageVersion = '5.1.1'
-    junitPlatformVersion = '1.1.1'
+    junitJupiterVersion = '5.2.0'
+    junitVintageVersion = '5.2.0'
     hibernateVersion = '5.2.16.Final'
     reformLogging = '2.2.1'
     swagger2Version = '2.9.0'
     limits = [
-            'instruction': 84,
-            'branch'     : 72,  // TODO needs code update
-            'line'       : 85,
-            'complexity' : 80,
-            'method'     : 88,
-            'class'      : 88
+            'instruction': 90,
+            'branch'     : 85,
+            'line'       : 90,
+            'complexity' : 88,
+            'method'     : 90,
+            'class'      : 98
     ]
     appInsights= '2.0.1'
 }
@@ -144,10 +138,6 @@ configurations {
 
     aatCompile.extendsFrom(testCompile)
     aatRuntime.extendsFrom(testRuntime)
-}
-
-junitPlatform {
-    enableStandardTestTask true
 }
 
 checkstyle {
@@ -213,7 +203,6 @@ dependencies {
     runtime group: 'org.postgresql', name: 'postgresql', version: '42.2.2'
     runtime group: 'com.zaxxer', name: 'HikariCP', version: '2.7.9'
 
-    testCompile "junit:junit"
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
     testCompile group: 'com.opentable.components', name: 'otj-pg-embedded', version: '0.12.0'
     testCompile group: 'com.github.tomakehurst', name: 'wiremock', version: '2.17.0'
@@ -223,9 +212,6 @@ dependencies {
     testCompileOnly 'org.apiguardian:apiguardian-api:1.0.0'
     testCompile "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
     testRuntime "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
-    testCompile "org.junit.platform:junit-platform-suite-api:${junitPlatformVersion}"
-    testCompile "org.junit.platform:junit-platform-runner:${junitPlatformVersion}"
-    testRuntime "org.junit.platform:junit-platform-launcher:${junitPlatformVersion}"
     testRuntime "org.junit.vintage:junit-vintage-engine:${junitVintageVersion}"
     testCompile group: 'org.mockito', name: 'mockito-core', version: '1.10.19'
     testCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.1.0'
@@ -241,7 +227,7 @@ dependencies {
 
 // tag::wrapper[]
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.6'
+    gradleVersion = '4.7'
 }
 // end::wrapper[]
 
@@ -422,22 +408,6 @@ jacoco {
     toolVersion = "0.8.0"
 }
 
-project.afterEvaluate {
-    def junitPlatformTestTask = project.tasks.getByName('junitPlatformTest')
-
-    // configure jacoco to analyze the junitPlatformTest task
-    jacoco {
-        // IDE may give warning but this is required for now, for the world of Junit5, Gradle and sonar
-        applyTo junitPlatformTestTask
-    }
-
-    // create junit platform jacoco task
-    project.task(type: JacocoReport, "junitPlatformJacocoReport",
-            {
-                executionData junitPlatformTestTask
-            })
-}
-
 sonarqube {
     properties {
         property "sonar.exclusions", "build/generated-sources/**/*.java"
@@ -516,23 +486,17 @@ jacocoTestReport {
     }
 }
 
-junitPlatformTest {
-    environment("APPINSIGHTS_INSTRUMENTATIONKEY", "some-key")
-    doFirst {
-        logger.lifecycle("junit platform test cases started {}", timestamp())
-    }
-    doLast {
-        logger.lifecycle("junit platform test cases finished {}", timestamp())
-    }
-}
-
 test {
     environment("APPINSIGHTS_INSTRUMENTATIONKEY", "some-key")
-    doFirst {
-        logger.lifecycle("junit 4 test cases started {}", timestamp())
+
+    useJUnitPlatform()
+
+    testLogging {
+        events "passed", "skipped", "failed"
     }
-    doLast {
-        logger.lifecycle("junit 4 test cases finished {}", timestamp())
+
+    reports {
+        html.enabled = true
     }
 }
 
