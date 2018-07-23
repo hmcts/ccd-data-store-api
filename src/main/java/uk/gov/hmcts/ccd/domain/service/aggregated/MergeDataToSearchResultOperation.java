@@ -45,7 +45,7 @@ public class MergeDataToSearchResultOperation {
                                                                  caseType.getCaseFields()
                                                                          .stream()
                                                                          .filter(caseField -> LABEL_FIELD_TYPE.equals(
-                                                                             caseField.getFieldType().getId()))
+                                                                             caseField.getFieldType().getType()))
                                                                          .collect(Collectors.toList())))
                        .toArray(SearchResultViewItem[]::new);
         return new SearchResultView(viewColumns, viewItems);
