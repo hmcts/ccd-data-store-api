@@ -380,6 +380,35 @@
           }
         },
         {
+          "id": "Aliases",
+          "case_type_id": "TestAddressBookCase",
+          "label": "Aliases",
+          "security_classification": "PUBLIC",
+          "acls": [
+            {
+              "role": "caseworker-probate-public",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-probate-private",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            }],
+          "field_type": {
+            "type": "Collection",
+            "id": "Collection",
+            "collection_field_type": {
+              "type": "Text",
+              "id": "Text"
+            }
+          }
+        },
+        {
           "id": "D8Document",
           "case_type_id": "TestAddressBookCase",
           "label": "Document",
