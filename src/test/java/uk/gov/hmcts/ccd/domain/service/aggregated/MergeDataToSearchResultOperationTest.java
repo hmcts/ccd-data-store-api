@@ -111,8 +111,9 @@ class MergeDataToSearchResultOperationTest {
 
         doReturn(searchResult).when(uiDefinitionRepository).getWorkBasketResult(CASE_TYPE_ID);
 
-
-        final SearchResultView searchResultView = classUnderTest.execute(caseTypeWithLabels, caseDetailsList, WORKBASKET_VIEW);
+        final SearchResultView searchResultView = classUnderTest.execute(caseTypeWithLabels,
+                                                                         caseDetailsList,
+                                                                         WORKBASKET_VIEW);
         assertAll(
             () -> assertThat(searchResultView.getSearchResultViewItems().length, is(2)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().length, is(2)),
@@ -151,7 +152,9 @@ class MergeDataToSearchResultOperationTest {
 
         doReturn(searchResult).when(uiDefinitionRepository).getSearchResult(CASE_TYPE_ID);
 
-        final SearchResultView searchResultView = classUnderTest.execute(caseTypeWithLabels, caseDetailsList, SEARCH_VIEW);
+        final SearchResultView searchResultView = classUnderTest.execute(caseTypeWithLabels,
+                                                                         caseDetailsList,
+                                                                         SEARCH_VIEW);
         assertAll(() -> assertThat(searchResultView.getSearchResultViewItems().length, is(2)),
                   () -> assertThat(searchResultView.getSearchResultViewColumns().length, is(1)),
                   () -> assertThat(searchResultView.getSearchResultViewItems()[0].getCaseFields()
