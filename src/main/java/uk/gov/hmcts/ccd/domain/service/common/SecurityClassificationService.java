@@ -161,7 +161,16 @@ public class SecurityClassificationService {
                                       relevantDataClassificationValue.get(collectionElementValue.textValue()));
                 }
             } else {
-                dataCollectionIterator.remove();
+                // For collection of simple field type, the classification is stored as `classification`, not `value`
+                relevantDataClassificationValue = dataClassificationForData.get(CLASSIFICATION);
+
+                if (null != relevantDataClassificationValue) {
+                    filterSimpleField(userClassification,
+                                      dataCollectionIterator,
+                                      relevantDataClassificationValue);
+                } else {
+                    dataCollectionIterator.remove();
+                }
             }
             if (collectionElementValue.equals(EMPTY_NODE)) {
                 dataCollectionIterator.remove();
