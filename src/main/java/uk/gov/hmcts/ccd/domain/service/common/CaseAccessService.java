@@ -61,7 +61,7 @@ public class CaseAccessService {
     private Boolean accessGranted(CaseDetails caseDetails, IDAMProperties currentUser) {
         final List<Long> grantedCases = caseUserRepository.findCasesUserIdHasAccessTo(currentUser.getId());
 
-        if (null != grantedCases && grantedCases.contains(caseDetails.getId())) {
+        if (null != grantedCases && grantedCases.contains(Long.valueOf(caseDetails.getId()))) {
             return Boolean.TRUE;
         }
 

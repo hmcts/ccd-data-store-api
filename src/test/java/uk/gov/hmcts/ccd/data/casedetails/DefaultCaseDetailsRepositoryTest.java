@@ -87,7 +87,7 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
 
         final CaseDetails byId = caseDetailsRepository.findById(1L);
         assertAll(
-            () -> assertThat(byId.getId(), is(1L)),
+            () -> assertThat(byId.getId(), is("1")),
             () -> assertThat(byId.getJurisdiction(), is("PROBATE")),
             () -> assertThat(byId.getState(), is("CaseCreated")),
             () -> assertThat(byId.getCaseTypeId(), is("TestAddressBookCase")),
@@ -108,7 +108,7 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
 
         final CaseDetails byReference = caseDetailsRepository.findByReference(1504259907353529L);
         assertAll(
-            () -> assertThat(byReference.getId(), is(1L)),
+            () -> assertThat(byReference.getId(), is("1")),
             () -> assertThat(byReference.getJurisdiction(), is("PROBATE")),
             () -> assertThat(byReference.getState(), is("CaseCreated")),
             () -> assertThat(byReference.getCaseTypeId(), is("TestAddressBookCase")),
@@ -134,7 +134,7 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
                                                                                                           searchParams);
         assertAll(
             () -> assertThat(byMetaDataAndFieldData.size(), is(2)),
-            () -> assertThat(byMetaDataAndFieldData.get(0).getId(), is(1L)),
+            () -> assertThat(byMetaDataAndFieldData.get(0).getId(), is("1")),
             () -> assertThat(byMetaDataAndFieldData.get(0).getJurisdiction(), is("PROBATE")),
             () -> assertThat(byMetaDataAndFieldData.get(0).getState(), is("CaseCreated")),
             () -> assertThat(byMetaDataAndFieldData.get(0).getCaseTypeId(), is("TestAddressBookCase")),
@@ -199,11 +199,11 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
         assertAll(
             () -> assertThat(results, hasSize(2)),
             () -> assertThat(results, hasItem(allOf(
-                hasProperty("id", equalTo(1L)),
+                hasProperty("id", equalTo("1")),
                 hasProperty("reference", equalTo(1504259907353529L))
             ))),
             () -> assertThat(results, hasItem(allOf(
-                hasProperty("id", equalTo(16L)),
+                hasProperty("id", equalTo("16")),
                 hasProperty("reference", equalTo(1504254784737847L))
             )))
         );
@@ -227,7 +227,7 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
         assertAll(
             () -> assertThat(results, hasSize(1)),
             () -> assertThat(results, hasItem(allOf(
-                hasProperty("id", equalTo(16L)),
+                hasProperty("id", equalTo("16")),
                 hasProperty("reference", equalTo(1504254784737847L))
             )))
         );
@@ -240,7 +240,7 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
 
         final CaseDetails caseDetails = maybeCase.orElseThrow(() -> new AssertionError("No case found"));
 
-        assertCaseDetails(caseDetails, 1L, JURISDICTION, REFERENCE);
+        assertCaseDetails(caseDetails, "1", JURISDICTION, REFERENCE);
     }
 
     @Test
@@ -259,7 +259,7 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
         MatcherAssert.assertThat(maybeCase.isPresent(), is(false));
     }
 
-    private void assertCaseDetails(CaseDetails caseDetails, Long id, String jurisdictionId, Long caseReference) {
+    private void assertCaseDetails(CaseDetails caseDetails, String id, String jurisdictionId, Long caseReference) {
         MatcherAssert.assertThat(caseDetails.getId(), equalTo(id));
         MatcherAssert.assertThat(caseDetails.getJurisdiction(), equalTo(jurisdictionId));
         MatcherAssert.assertThat(caseDetails.getReference(), equalTo(caseReference));

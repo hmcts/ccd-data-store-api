@@ -27,7 +27,7 @@ import java.util.List;
 @Qualifier(DefaultGetCaseViewOperation.QUALIFIER)
 public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOperation implements GetCaseViewOperation {
 
-    public static final String QUALIFIER = "default";
+    public static final String QUALIFIER = "defaultCase";
 
     private final GetEventsOperation getEventsOperation;
     private final CaseTypeService caseTypeService;

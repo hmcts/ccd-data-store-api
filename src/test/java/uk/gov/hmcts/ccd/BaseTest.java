@@ -26,6 +26,8 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.HttpUIDefinitionGateway;
+import uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway;
+import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.data.user.DefaultUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
@@ -84,6 +86,9 @@ public abstract class BaseTest {
     @Qualifier(DefaultUserRepository.QUALIFIER)
     private UserRepository userRepository;
     @Inject
+    @Qualifier(DefaultDraftGateway.QUALIFIER)
+    private DraftGateway draftGateway;
+    @Inject
     private CallbackService callbackService;
     @Inject
     private EventTokenService eventTokenService;
@@ -102,6 +107,7 @@ public abstract class BaseTest {
         ReflectionTestUtils.setField(userRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(callbackService, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(documentManagementRestClient, "securityUtils", securityUtils);
+        ReflectionTestUtils.setField(draftGateway, "securityUtils", securityUtils);
 
         setupUIDService();
     }
@@ -140,7 +146,7 @@ public abstract class BaseTest {
 
     protected CaseDetails mapCaseData(ResultSet resultSet, Integer i) throws SQLException {
         final CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setId(resultSet.getLong("id"));
+        caseDetails.setId(String.valueOf(resultSet.getLong("id")));
         caseDetails.setReference(resultSet.getLong("reference"));
         caseDetails.setState(resultSet.getString("state"));
         caseDetails.setSecurityClassification(SecurityClassification.valueOf(resultSet.getString("security_classification")));
@@ -180,7 +186,7 @@ public abstract class BaseTest {
         auditEvent.setUserId(resultSet.getString("user_id"));
         auditEvent.setUserFirstName(resultSet.getString("user_first_name"));
         auditEvent.setUserLastName(resultSet.getString("user_last_name"));
-        auditEvent.setCaseDataId(resultSet.getLong("case_data_id"));
+        auditEvent.setCaseDataId(String.valueOf(resultSet.getLong("case_data_id")));
         final Timestamp createdAt = resultSet.getTimestamp("created_date");
         if (null != createdAt) {
             auditEvent.setCreatedDate(createdAt.toLocalDateTime());
