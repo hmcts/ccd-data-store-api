@@ -898,89 +898,8 @@ public class SecurityClassificationServiceTest {
         @Test
         @DisplayName("should apply classifications on collections nested in collection")
         void shouldApplyClassificationsOnNestedCollections() throws IOException {
-            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
-                "{  \"collection\":[  \n" +
-                    "         {  \n" +
-                    "            \"id\":\"" + FIRST_CHILD_ID + "\",\n" +
-                    "            \"value\": {\n" +
-                    "               \"collection1\": [" +
-                    "                  {" +
-                    "                     \"id\": \"ITEM_1_1\"," +
-                    "                     \"value\": \"ITEM_1_1\"" +
-                    "                  }," +
-                    "                  {" +
-                    "                     \"id\": \"ITEM_1_2\"," +
-                    "                     \"value\": \"ITEM_1_2\"" +
-                    "                  }" +
-                    "               ]" +
-                    "            }\n" +
-                    "         },\n" +
-                    "         {  \n" +
-                    "            \"id\":\"" + SECOND_CHILD_ID + "\",\n" +
-                    "            \"value\": {\n" +
-                    "               \"collection1\": [" +
-                    "                  {" +
-                    "                     \"id\": \"ITEM_2_1\"," +
-                    "                     \"value\": \"ITEM_2_1\"" +
-                    "                  }," +
-                    "                  {" +
-                    "                     \"id\": \"ITEM_2_2\"," +
-                    "                     \"value\": \"ITEM_2_2\"" +
-                    "                  }" +
-                    "               ]" +
-                    "            }\n" +
-                    "         }\n" +
-                    "      ]\n" +
-                    "    }\n"
-            ), STRING_JSON_MAP);
-            caseDetails.setData(data);
-            final Map<String, JsonNode> dataClassification = MAPPER.convertValue(MAPPER.readTree(
-                "{  \"collection\": {\n" +
-                    "     \"classification\": \"PRIVATE\",\n" +
-                    "     \"value\": [\n" +
-                    "       {\n" +
-                    "         \"classification\": \"PRIVATE\",\n" +
-                    "         \"id\":\"" + FIRST_CHILD_ID + "\",\n" +
-                    "         \"value\": {" +
-                    "            \"collection1\": {" +
-                    "              \"classification\": \"PRIVATE\",\n" +
-                    "              \"value\": [" +
-                    "                {" +
-                    "                  \"id\": \"ITEM_1_1\"," +
-                    "                  \"classification\": \"PRIVATE\"" +
-                    "                }," +
-                    "                {" +
-                    "                  \"id\": \"ITEM_1_2\"," +
-                    "                  \"classification\": \"RESTRICTED\"" +
-                    "                }" +
-                    "              ]" +
-                    "            }" +
-                    "         }" +
-                    "       },\n" +
-                    "       {\n" +
-                    "         \"classification\": \"PRIVATE\",\n" +
-                    "         \"id\":\"" + SECOND_CHILD_ID + "\",\n" +
-                    "         \"value\": {" +
-                    "            \"collection1\": {" +
-                    "              \"classification\": \"PRIVATE\",\n" +
-                    "              \"value\": [" +
-                    "                {" +
-                    "                  \"id\": \"ITEM_2_1\"," +
-                    "                  \"classification\": \"RESTRICTED\"" +
-                    "                }," +
-                    "                {" +
-                    "                  \"id\": \"ITEM_2_2\"," +
-                    "                  \"classification\": \"PRIVATE\"" +
-                    "                }" +
-                    "              ]" +
-                    "            }" +
-                    "         }" +
-                    "       }\n" +
-                    "     ]\n" +
-                    "   }\n" +
-                    " }\n"
-            ), STRING_JSON_MAP);
-            caseDetails.setDataClassification(dataClassification);
+            caseDetails.setData(nestedCollectionData());
+            caseDetails.setDataClassification(nestedCollectionClassification());
 
             CaseDetails caseDetails = applyClassification(PRIVATE);
 
@@ -1012,7 +931,94 @@ public class SecurityClassificationServiceTest {
                 () -> assertThat(item2_2, equalTo("ITEM_2_2"))
             );
         }
-      
+
+        private Map<String, JsonNode> nestedCollectionClassification() throws IOException {
+            return MAPPER.convertValue(MAPPER.readTree(
+                        "{  \"collection\": {\n" +
+                            "     \"classification\": \"PRIVATE\",\n" +
+                            "     \"value\": [\n" +
+                            "       {\n" +
+                            "         \"classification\": \"PRIVATE\",\n" +
+                            "         \"id\":\"" + FIRST_CHILD_ID + "\",\n" +
+                            "         \"value\": {" +
+                            "            \"collection1\": {" +
+                            "              \"classification\": \"PRIVATE\",\n" +
+                            "              \"value\": [" +
+                            "                {" +
+                            "                  \"id\": \"ITEM_1_1\"," +
+                            "                  \"classification\": \"PRIVATE\"" +
+                            "                }," +
+                            "                {" +
+                            "                  \"id\": \"ITEM_1_2\"," +
+                            "                  \"classification\": \"RESTRICTED\"" +
+                            "                }" +
+                            "              ]" +
+                            "            }" +
+                            "         }" +
+                            "       },\n" +
+                            "       {\n" +
+                            "         \"classification\": \"PRIVATE\",\n" +
+                            "         \"id\":\"" + SECOND_CHILD_ID + "\",\n" +
+                            "         \"value\": {" +
+                            "            \"collection1\": {" +
+                            "              \"classification\": \"PRIVATE\",\n" +
+                            "              \"value\": [" +
+                            "                {" +
+                            "                  \"id\": \"ITEM_2_1\"," +
+                            "                  \"classification\": \"RESTRICTED\"" +
+                            "                }," +
+                            "                {" +
+                            "                  \"id\": \"ITEM_2_2\"," +
+                            "                  \"classification\": \"PRIVATE\"" +
+                            "                }" +
+                            "              ]" +
+                            "            }" +
+                            "         }" +
+                            "       }\n" +
+                            "     ]\n" +
+                            "   }\n" +
+                            " }\n"
+                    ), STRING_JSON_MAP);
+        }
+
+        private Map<String, JsonNode> nestedCollectionData() throws IOException {
+            return MAPPER.convertValue(MAPPER.readTree(
+                        "{  \"collection\":[  \n" +
+                            "         {  \n" +
+                            "            \"id\":\"" + FIRST_CHILD_ID + "\",\n" +
+                            "            \"value\": {\n" +
+                            "               \"collection1\": [" +
+                            "                  {" +
+                            "                     \"id\": \"ITEM_1_1\"," +
+                            "                     \"value\": \"ITEM_1_1\"" +
+                            "                  }," +
+                            "                  {" +
+                            "                     \"id\": \"ITEM_1_2\"," +
+                            "                     \"value\": \"ITEM_1_2\"" +
+                            "                  }" +
+                            "               ]" +
+                            "            }\n" +
+                            "         },\n" +
+                            "         {  \n" +
+                            "            \"id\":\"" + SECOND_CHILD_ID + "\",\n" +
+                            "            \"value\": {\n" +
+                            "               \"collection1\": [" +
+                            "                  {" +
+                            "                     \"id\": \"ITEM_2_1\"," +
+                            "                     \"value\": \"ITEM_2_1\"" +
+                            "                  }," +
+                            "                  {" +
+                            "                     \"id\": \"ITEM_2_2\"," +
+                            "                     \"value\": \"ITEM_2_2\"" +
+                            "                  }" +
+                            "               ]" +
+                            "            }\n" +
+                            "         }\n" +
+                            "      ]\n" +
+                            "    }\n"
+                    ), STRING_JSON_MAP);
+        }
+
         @Test
         @DisplayName("should apply collection-level classification before items-level classification")
         void shouldApplyCollectionLevelClassification() throws IOException {
