@@ -46,9 +46,9 @@ apply plugin: 'org.owasp.dependencycheck'
 apply from: 'liquibase.gradle'
 
 def versions = [
-        pitest: '1.3.2',
-        gradlePitest: '1.3.0',
-        sonarPitest: '0.5'
+    pitest: '1.3.2',
+    gradlePitest: '1.3.0',
+    sonarPitest: '0.5'
 ]
 
 dependencyUpdates.resolutionStrategy = {
