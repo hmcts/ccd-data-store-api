@@ -26,7 +26,7 @@ class SearchResultViewItemTest {
     private JsonNodeFactory jnf = JsonNodeFactory.instance;
 
     @BeforeEach
-    void setup() {
+    void setUp() {
         caseFields = new HashMap<>();
         caseFields.put(CASE_FIELD_ID, jnf.textNode(CASE_FIELD_TEXT));
         final CaseField caseField = new CaseField();

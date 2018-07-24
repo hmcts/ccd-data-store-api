@@ -117,13 +117,14 @@ class MergeDataToSearchResultOperationTest {
         assertAll(
             () -> assertThat(searchResultView.getSearchResultViewItems().length, is(2)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().length, is(2)),
-            () -> assertThat(searchResultView.getSearchResultViewItems()[0].getCaseFields()
-                                 .get(LABEL_ID)
-                                 .asText(), is(LABEL_TEXT)),
-            () -> assertThat(searchResultView.getSearchResultViewItems()[1].getCaseFields()
-                                 .get(LABEL_ID)
-                                 .asText(), is(LABEL_TEXT))
-                 );
+            () -> assertThat(searchResultView.getSearchResultViewItems()[0]
+                .getCaseFields()
+                .get(LABEL_ID)
+                .asText(), is(LABEL_TEXT)),
+            () -> assertThat(searchResultView.getSearchResultViewItems()[1]
+                .getCaseFields()
+                .get(LABEL_ID)
+                .asText(), is(LABEL_TEXT)));
     }
 
     @Test
