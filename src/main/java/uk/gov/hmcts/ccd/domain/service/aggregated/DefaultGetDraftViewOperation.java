@@ -31,7 +31,7 @@ public class DefaultGetDraftViewOperation extends AbstractDefaultGetCaseViewOper
 
     public static final String QUALIFIER = "defaultDraft";
     static final String DRAFT_ID = "DRAFT%s";
-    static final String DELETE = "DELETE";
+    public static final String DELETE = "DELETE";
     private static final CaseViewTrigger DELETE_TRIGGER = aCaseViewTrigger()
         .withId(DELETE)
         .withName("Delete")

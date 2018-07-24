@@ -22,7 +22,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.*;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataBuilder.caseData;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataBuilder.aCaseData;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataClassificationBuilder.dataClassification;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.aCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
@@ -491,7 +491,7 @@ class CaseDataServiceTest {
     @Test
     @DisplayName("should assign default classifications to simple collection items")
     void shouldAssignDefaultClassificationToCollectionItems() {
-        final Map<String, JsonNode> caseData = caseData().withField("simple_collection")
+        final Map<String, JsonNode> caseData = aCaseData().withField("simple_collection")
                                                          .asCollectionOf(
                                                              TestBuildersUtil.collectionItem("1", "Item 1"),
                                                              TestBuildersUtil.collectionItem("2", "Item 2")
@@ -513,7 +513,7 @@ class CaseDataServiceTest {
     @Test
     @DisplayName("should preserve existing classifications to simple collection items")
     void shouldPreserveExistingClassificationForCollectionItems() {
-        final Map<String, JsonNode> caseData = caseData().withField("simple_collection")
+        final Map<String, JsonNode> caseData = aCaseData().withField("simple_collection")
                                                          .asCollectionOf(
                                                              TestBuildersUtil.collectionItem("1", "Item 1"),
                                                              TestBuildersUtil.collectionItem("2", "Item 2")

@@ -27,6 +27,7 @@ import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewColumn;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
+import uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetDraftViewOperation;
 
 import javax.inject.Inject;
 import java.time.format.DateTimeFormatter;
@@ -42,6 +43,7 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetDraftViewOperation.DELETE;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WORKBASKET;
 
 public class QueryEndpointIT extends WireMockBaseTest {
@@ -665,7 +667,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected number of fields", 0, documentFields.length);
 
         final CaseViewEvent[] events = caseView.getEvents();
-        assertThat("Events are not empty", events, arrayWithSize(0));
+        assertThat("Events are not empty", events, arrayWithSize(2));
 
         final CaseViewTrigger[] triggers = caseView.getTriggers();
         assertNotNull("Triggers are null", triggers);
@@ -676,7 +678,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Trigger Description", "This event will create a new case", triggers[0].getDescription());
         assertEquals("Trigger Order", Integer.valueOf(1), triggers[0].getOrder());
 
-        assertEquals("Trigger ID", null, triggers[1].getId());
+        assertEquals("Trigger ID", DELETE, triggers[1].getId());
         assertEquals("Trigger Name", "Delete", triggers[1].getName());
         assertEquals("Trigger Description", "Delete draft", triggers[1].getDescription());
         assertEquals("Trigger Order", Integer.valueOf(2), triggers[1].getOrder());
