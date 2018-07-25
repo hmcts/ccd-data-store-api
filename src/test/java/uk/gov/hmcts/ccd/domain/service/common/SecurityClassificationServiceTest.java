@@ -835,6 +835,233 @@ public class SecurityClassificationServiceTest {
         }
 
         @Test
+        @DisplayName("should filter out simple collection items with higher classification")
+        void shouldFilterOutSimpleCollectionItemsWithHigherClassification() throws IOException {
+            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+                "{  \"Aliases\":[  \n" +
+                    "         {  \n" +
+                    "            \"value\": \"Alias #1\",\n" +
+                    "            \"id\":\"" + FIRST_CHILD_ID + "\"\n" +
+                    "         },\n" +
+                    "         {  \n" +
+                    "            \"value\": \"Alias #2\",\n" +
+                    "            \"id\":\"" + SECOND_CHILD_ID + "\"\n" +
+                    "         },\n" +
+                    "         {  \n" +
+                    "            \"value\": \"Alias #3\",\n" +
+                    "            \"id\":\"THIRD_CHILD\"\n" +
+                    "         }\n" +
+                    "      ]\n" +
+                    "    }\n"
+            ), STRING_JSON_MAP);
+            caseDetails.setData(data);
+            final Map<String, JsonNode> dataClassification = MAPPER.convertValue(MAPPER.readTree(
+                "{  \"Aliases\": {\n" +
+                    "     \"classification\": \"PRIVATE\",\n" +
+                    "     \"value\": [\n" +
+                    "       {\n" +
+                    "         \"classification\": \"PRIVATE\",\n" +
+                    "         \"id\":\"" + FIRST_CHILD_ID + "\"\n" +
+                    "       },\n" +
+                    "       {\n" +
+                    "         \"classification\": \"RESTRICTED\",\n" +
+                    "         \"id\":\"" + SECOND_CHILD_ID + "\"\n" +
+                    "       },\n" +
+                    "       {\n" +
+                    "         \"classification\": \"PRIVATE\",\n" +
+                    "         \"id\":\"THIRD_CHILD\"\n" +
+                    "       }\n" +
+                    "     ]\n" +
+                    "   }\n" +
+                    " }\n"
+            ), STRING_JSON_MAP);
+            caseDetails.setDataClassification(dataClassification);
+
+            CaseDetails caseDetails = applyClassification(PRIVATE);
+
+            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+            assertAll(
+                () -> assertThat(resultNode.has("Aliases"), is(true)),
+                () -> assertThat(resultNode.get("Aliases").isArray(), is(true)),
+                () -> assertThat(resultNode.get("Aliases").size(), is(2))
+            );
+            final JsonNode aliases = resultNode.get("Aliases");
+            final String alias1 = aliases.get(0).get("value").textValue();
+            final String alias3 = aliases.get(1).get("value").textValue();
+
+            assertAll("Restricted Alias #2 should have been removed",
+                () -> assertThat(alias1, is("Alias #1")),
+                () -> assertThat(alias3, is("Alias #3"))
+            );
+        }
+
+        @Test
+        @DisplayName("should apply classifications on collections nested in collection")
+        void shouldApplyClassificationsOnNestedCollections() throws IOException {
+            caseDetails.setData(nestedCollectionData());
+            caseDetails.setDataClassification(nestedCollectionClassification());
+
+            CaseDetails caseDetails = applyClassification(PRIVATE);
+
+            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+
+            assertThat(resultNode.has("collection"), is(true));
+
+            final JsonNode collection = resultNode.get("collection");
+
+            assertAll(
+                () -> assertThat(collection.isArray(), is(true)),
+                () -> assertThat(collection.size(), is(2))
+            );
+            final JsonNode item1Collection1 = collection.get(0).get("value").get("collection1");
+            final JsonNode item2Collection1 = collection.get(1).get("value").get("collection1");
+
+            assertAll(
+                () -> assertThat(item1Collection1.isArray(), is(true)),
+                () -> assertThat(item1Collection1.size(), is(1)),
+                () -> assertThat(item2Collection1.isArray(), is(true)),
+                () -> assertThat(item2Collection1.size(), is(1))
+            );
+
+            final String item1_1 = item1Collection1.get(0).get("value").textValue();
+            final String item2_2 = item2Collection1.get(0).get("value").textValue();
+
+            assertAll(
+                () -> assertThat(item1_1, equalTo("ITEM_1_1")),
+                () -> assertThat(item2_2, equalTo("ITEM_2_2"))
+            );
+        }
+
+        private Map<String, JsonNode> nestedCollectionClassification() throws IOException {
+            return MAPPER.convertValue(MAPPER.readTree(
+                        "{  \"collection\": {\n" +
+                            "     \"classification\": \"PRIVATE\",\n" +
+                            "     \"value\": [\n" +
+                            "       {\n" +
+                            "         \"classification\": \"PRIVATE\",\n" +
+                            "         \"id\":\"" + FIRST_CHILD_ID + "\",\n" +
+                            "         \"value\": {" +
+                            "            \"collection1\": {" +
+                            "              \"classification\": \"PRIVATE\",\n" +
+                            "              \"value\": [" +
+                            "                {" +
+                            "                  \"id\": \"ITEM_1_1\"," +
+                            "                  \"classification\": \"PRIVATE\"" +
+                            "                }," +
+                            "                {" +
+                            "                  \"id\": \"ITEM_1_2\"," +
+                            "                  \"classification\": \"RESTRICTED\"" +
+                            "                }" +
+                            "              ]" +
+                            "            }" +
+                            "         }" +
+                            "       },\n" +
+                            "       {\n" +
+                            "         \"classification\": \"PRIVATE\",\n" +
+                            "         \"id\":\"" + SECOND_CHILD_ID + "\",\n" +
+                            "         \"value\": {" +
+                            "            \"collection1\": {" +
+                            "              \"classification\": \"PRIVATE\",\n" +
+                            "              \"value\": [" +
+                            "                {" +
+                            "                  \"id\": \"ITEM_2_1\"," +
+                            "                  \"classification\": \"RESTRICTED\"" +
+                            "                }," +
+                            "                {" +
+                            "                  \"id\": \"ITEM_2_2\"," +
+                            "                  \"classification\": \"PRIVATE\"" +
+                            "                }" +
+                            "              ]" +
+                            "            }" +
+                            "         }" +
+                            "       }\n" +
+                            "     ]\n" +
+                            "   }\n" +
+                            " }\n"
+                    ), STRING_JSON_MAP);
+        }
+
+        private Map<String, JsonNode> nestedCollectionData() throws IOException {
+            return MAPPER.convertValue(MAPPER.readTree(
+                        "{  \"collection\":[  \n" +
+                            "         {  \n" +
+                            "            \"id\":\"" + FIRST_CHILD_ID + "\",\n" +
+                            "            \"value\": {\n" +
+                            "               \"collection1\": [" +
+                            "                  {" +
+                            "                     \"id\": \"ITEM_1_1\"," +
+                            "                     \"value\": \"ITEM_1_1\"" +
+                            "                  }," +
+                            "                  {" +
+                            "                     \"id\": \"ITEM_1_2\"," +
+                            "                     \"value\": \"ITEM_1_2\"" +
+                            "                  }" +
+                            "               ]" +
+                            "            }\n" +
+                            "         },\n" +
+                            "         {  \n" +
+                            "            \"id\":\"" + SECOND_CHILD_ID + "\",\n" +
+                            "            \"value\": {\n" +
+                            "               \"collection1\": [" +
+                            "                  {" +
+                            "                     \"id\": \"ITEM_2_1\"," +
+                            "                     \"value\": \"ITEM_2_1\"" +
+                            "                  }," +
+                            "                  {" +
+                            "                     \"id\": \"ITEM_2_2\"," +
+                            "                     \"value\": \"ITEM_2_2\"" +
+                            "                  }" +
+                            "               ]" +
+                            "            }\n" +
+                            "         }\n" +
+                            "      ]\n" +
+                            "    }\n"
+                    ), STRING_JSON_MAP);
+        }
+
+        @Test
+        @DisplayName("should apply collection-level classification before items-level classification")
+        void shouldApplyCollectionLevelClassification() throws IOException {
+            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+                "{  \"Aliases\":[  \n" +
+                    "         {  \n" +
+                    "            \"value\": \"Alias #1\",\n" +
+                    "            \"id\":\"" + FIRST_CHILD_ID + "\"\n" +
+                    "         },\n" +
+                    "         {  \n" +
+                    "            \"value\": \"Alias #2\",\n" +
+                    "            \"id\":\"" + SECOND_CHILD_ID + "\"\n" +
+                    "         }\n" +
+                    "      ]\n" +
+                    "    }\n"
+            ), STRING_JSON_MAP);
+            caseDetails.setData(data);
+            final Map<String, JsonNode> dataClassification = MAPPER.convertValue(MAPPER.readTree(
+                "{  \"Aliases\": {\n" +
+                    "     \"classification\": \"RESTRICTED\",\n" +
+                    "     \"value\": [\n" +
+                    "       {\n" +
+                    "         \"classification\": \"PRIVATE\",\n" +
+                    "         \"id\":\"" + FIRST_CHILD_ID + "\"\n" +
+                    "       },\n" +
+                    "       {\n" +
+                    "         \"classification\": \"PRIVATE\",\n" +
+                    "         \"id\":\"" + SECOND_CHILD_ID + "\"\n" +
+                    "       }\n" +
+                    "     ]\n" +
+                    "   }\n" +
+                    " }\n"
+            ), STRING_JSON_MAP);
+            caseDetails.setDataClassification(dataClassification);
+
+            CaseDetails caseDetails = applyClassification(PRIVATE);
+
+            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+            assertThat("should remove classified collection node",
+                       resultNode.has("Aliases"), is(false));
+        }
+
+        @Test
         // TODO Target implementation, see RDM-1204
         @DisplayName("should filter out fields within collection items")
         void shouldFilterFieldsWithinCollectionItems() throws IOException {
@@ -988,62 +1215,7 @@ public class SecurityClassificationServiceTest {
         }
 
         @Test
-        // TODO Target implementation, see RDM-1204
-        @DisplayName("should filter out collection items with higher classification")
-        void shouldFilterOutCollectionItemsWithHigherClassification() throws IOException {
-            final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
-                "{  \"Addresses\":[  \n" +
-                    "         {  \n" +
-                    "            \"value\": \"Address1\",\n" +
-                    "            \"id\":\"" + FIRST_CHILD_ID + "\"\n" +
-                    "         },\n" +
-                    "         {  \n" +
-                    "            \"value\": \"Address2\",\n" +
-                    "            \"id\":\"" + SECOND_CHILD_ID + "\"\n" +
-                    "         }\n" +
-                    "      ]\n" +
-                    "    }\n"
-            ), STRING_JSON_MAP);
-            caseDetails.setData(data);
-            final Map<String, JsonNode> dataClassification = MAPPER.convertValue(MAPPER.readTree(
-                "{  \"Addresses\": {  \n" +
-                    "         \"classification\": \"PRIVATE\", \n" +
-                    "         \"value\": [  \n" +
-                    "           {  \n" +
-                    "             \"value\": {\n" +
-                    "               \"Address1\": \"PRIVATE\"\n" +
-                    "             },\n" +
-                    "             \"id\":\"" + FIRST_CHILD_ID + "\"\n" +
-                    "           },\n" +
-                    "           {  \n" +
-                    "             \"value\": {\n" +
-                    "               \"Address2\": \"RESTRICTED\"\n" +
-                    "             },\n" +
-                    "             \"id\":\"" + SECOND_CHILD_ID + "\"\n" +
-                    "           }\n" +
-                    "         ]\n" +
-                    "      }\n" +
-                    "    }\n"
-            ), STRING_JSON_MAP);
-            caseDetails.setDataClassification(dataClassification);
-
-
-            CaseDetails caseDetails = applyClassification(PRIVATE);
-
-            JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
-            assertThat(resultNode.get("Addresses"), is(notNullValue()));
-            assertAll(
-                () -> assertThat(resultNode.get("Addresses").size(), equalTo(1)),
-                () -> assertThat(resultNode.get("Addresses").get(0).get(ID),
-                                 is(equalTo(JSON_NODE_FACTORY.textNode(FIRST_CHILD_ID)))),
-                () -> assertThat(resultNode.get("Addresses").get(0).get(VALUE),
-                                 equalTo(JSON_NODE_FACTORY.textNode("Address1")))
-            );
-        }
-
-        @Test
-        // TODO Target implementation, see RDM-1204
-        @DisplayName("should filter out collection items with missing value")
+        @DisplayName("should filter out simple collection items with missing classification")
         void shouldFilterOutCollectionItemsWithMissingValue() throws IOException {
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\":[  \n" +
@@ -1064,9 +1236,7 @@ public class SecurityClassificationServiceTest {
                     "         \"classification\": \"PRIVATE\", \n" +
                     "         \"value\": [  \n" +
                     "           {  \n" +
-                    "             \"value\": {\n" +
-                    "               \"Address1\": \"PRIVATE\"\n" +
-                    "             },\n" +
+                    "             \"classification\": \"PRIVATE\",\n" +
                     "             \"id\":\"" + FIRST_CHILD_ID + "\"\n" +
                     "           },\n" +
                     "           {  \n" +
@@ -1082,12 +1252,14 @@ public class SecurityClassificationServiceTest {
             CaseDetails caseDetails = applyClassification(PRIVATE);
 
             JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
-            assertThat(resultNode.get("Addresses"), is(notNullValue()));
+
+            final JsonNode addresses = resultNode.get("Addresses");
+            assertThat(addresses, is(notNullValue()));
             assertAll(
-                () -> assertThat(resultNode.get("Addresses").size(), equalTo(1)),
-                () -> assertThat(resultNode.get("Addresses").get(0).get(ID),
+                () -> assertThat(addresses.size(), equalTo(1)),
+                () -> assertThat(addresses.get(0).get(ID),
                                  is(equalTo(JSON_NODE_FACTORY.textNode(FIRST_CHILD_ID)))),
-                () -> assertThat(resultNode.get("Addresses").get(0).get(VALUE),
+                () -> assertThat(addresses.get(0).get(VALUE),
                                  equalTo(JSON_NODE_FACTORY.textNode("Address1")))
             );
         }
