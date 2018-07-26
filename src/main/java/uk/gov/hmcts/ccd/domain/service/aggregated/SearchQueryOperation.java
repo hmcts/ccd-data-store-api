@@ -7,11 +7,12 @@ import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
+import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewColumn;
+import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.search.CreatorSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -48,7 +49,7 @@ public class SearchQueryOperation {
             .findFirst();
 
         if (!caseType.isPresent()) {
-            return new SearchResultView(Collections.emptyList(), Collections.emptyList());
+            return new SearchResultView(new SearchResultViewColumn[0], new SearchResultViewItem[0]);
         }
         final List<CaseDetails> caseData = searchOperation.execute(metadata, queryParameters);
         return mergeDataToSearchResultOperation.execute(caseType.get(), caseData, view);

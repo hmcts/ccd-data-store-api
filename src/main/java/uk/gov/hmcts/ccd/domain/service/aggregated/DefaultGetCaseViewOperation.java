@@ -68,8 +68,7 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
         caseView.setState(new ProfileCaseState(caseState.getId(), caseState.getName(), caseState.getDescription()));
 
         caseView.setCaseType(CaseViewType.createFrom(caseType));
-        caseView.setTabs(getTabs(caseDetails, caseDetails.getCaseDataAndMetadata(), caseTabCollection));
-        caseView.setMetadataFields(getMetadataFields(caseType, caseDetails));
+        caseView.setTabs(getTabs(caseDetails, caseDetails.getData(), caseTabCollection));
 
         final CaseViewTrigger[] triggers = caseType.getEvents()
             .stream()

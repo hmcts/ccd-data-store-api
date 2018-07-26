@@ -41,13 +41,13 @@ import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
-import javax.transaction.Transactional;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
+import javax.transaction.Transactional;
 
 import static java.util.stream.Collectors.toList;
 
@@ -467,13 +467,13 @@ public class CaseDetailsEndpoint {
             throw new BadRequestException(String.format("unknown metadata search parameters: %s",
                     String.join((","), MetaData.unknownMetadata(metadataParams))));
         }
-        param(queryParameters, MetaData.SECURITY_CLASSIFICATION_METADATA).ifPresent(sc -> {
+        param(queryParameters, MetaData.SECURITY_CLASSIFICATION_PARAM).ifPresent(sc -> {
             if(!EnumUtils.isValidEnum(SecurityClassification.class, sc.toUpperCase())) {
                 throw new BadRequestException(String.format("unknown security classification '%s'", sc));
             }
         });
 
-        param(queryParameters, MetaData.SORT_DIRECTION_METADATA).ifPresent(sd -> {
+        param(queryParameters, MetaData.SORT_DIRECTION_PARAM).ifPresent(sd -> {
             if (Stream.of("ASC", "DESC").noneMatch(direction -> direction.equalsIgnoreCase(sd))) {
                 throw new BadRequestException(String.format("Unknown sort direction: %s", sd));
             }
@@ -489,13 +489,13 @@ public class CaseDetailsEndpoint {
         validateMetadataSearchParameters(queryParameters);
 
         final MetaData metadata = new MetaData(caseTypeId, jurisdictionId);
-        metadata.setState(param(queryParameters, MetaData.STATE_METADATA));
-        metadata.setCaseReference(param(queryParameters, MetaData.CASE_REFERENCE_METADATA));
-        metadata.setCreatedDate(param(queryParameters, MetaData.CREATED_DATE_METADATA));
-        metadata.setLastModified(param(queryParameters, MetaData.LAST_MODIFIED_METADATA));
-        metadata.setSecurityClassification(param(queryParameters, MetaData.SECURITY_CLASSIFICATION_METADATA));
-        metadata.setPage(param(queryParameters, MetaData.PAGE_METADATA));
-        metadata.setSortDirection(param(queryParameters, MetaData.SORT_DIRECTION_METADATA));
+        metadata.setState(param(queryParameters, MetaData.STATE_PARAM));
+        metadata.setCaseReference(param(queryParameters, MetaData.CASE_REFERENCE_PARAM));
+        metadata.setCreatedDate(param(queryParameters, MetaData.CREATED_DATE_PARAM));
+        metadata.setLastModified(param(queryParameters, MetaData.LAST_MODIFIED_PARAM));
+        metadata.setSecurityClassification(param(queryParameters, MetaData.SECURITY_CLASSIFICATION_PARAM));
+        metadata.setPage(param(queryParameters, MetaData.PAGE_PARAM));
+        metadata.setSortDirection(param(queryParameters, MetaData.SORT_DIRECTION_PARAM));
 
         return metadata;
     }

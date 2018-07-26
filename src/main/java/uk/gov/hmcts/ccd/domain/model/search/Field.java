@@ -7,7 +7,6 @@ public class Field {
     private String id;
     @JsonProperty("field_type")
     private FieldType type;
-    private boolean metadata;
 
     public String getId() {
         return id;
@@ -23,13 +22,5 @@ public class Field {
 
     public void setType(FieldType type) {
         this.type = type;
-    }
-
-    public boolean isMetadata() {
-        return metadata;
-    }
-
-    public void setMetadata(boolean metadata) {
-        this.metadata = metadata;
     }
 }
