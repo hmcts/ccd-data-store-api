@@ -37,7 +37,7 @@ class AuthorisedGetCaseViewOperationTest {
     private static final String CASE_REFERENCE = "1111222233334444";
     private static final Long EVENT_ID = 100L;
     private static final String STATE = "Plop";
-    private static final ProfileCaseState caseState = new ProfileCaseState(STATE, STATE, STATE);
+    private static final ProfileCaseState caseState = new ProfileCaseState(STATE, STATE, STATE, STATE);
 
     private static final String ROLE_IN_USER_ROLES = "caseworker-probate-loa1";
     private static final String ROLE_IN_USER_ROLES_2 = "caseworker-divorce-loa";
