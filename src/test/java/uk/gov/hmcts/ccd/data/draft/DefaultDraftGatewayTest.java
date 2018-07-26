@@ -105,7 +105,7 @@ class DefaultDraftGatewayTest {
             .withData(data)
             .withEvent(event)
             .withIgnoreWarning(true)
-            .withSecurityClassification(dataClassification)
+            .withDataClassification(dataClassification)
             .withToken(TOKEN)
             .build();
         caseDraft = aCaseDraft()
@@ -207,6 +207,10 @@ class DefaultDraftGatewayTest {
                              hasProperty("document",
                                          hasProperty("caseDataContent",
                                                      hasProperty("securityClassification", is(caseDataContent.getSecurityClassification()))))),
+            () -> assertThat(result,
+                             hasProperty("document",
+                                         hasProperty("caseDataContent",
+                                                     hasProperty("dataClassification", is(caseDataContent.getDataClassification()))))),
             () -> assertThat(result, hasProperty("document", hasProperty("caseDataContent", hasProperty("token", is(caseDataContent.getToken()))))),
             () -> assertThat(result, hasProperty("document", hasProperty("caseDataContent", hasProperty("ignoreWarning", is(caseDataContent.getIgnoreWarning()))))),
             () -> assertThat(result, hasProperty("document", hasProperty("caseDataContent", hasProperty("event", samePropertyValuesAs(caseDataContent.getEvent()))))),

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway;
@@ -156,6 +157,8 @@ public class DefaultStartEventOperation implements StartEventOperation {
             .withId(draftResponse.getId())
             .withCaseTypeId(document.getCaseTypeId())
             .withJurisdiction(document.getJurisdictionId())
+            .withSecurityClassification(SecurityClassification.valueOf(document.getCaseDataContent().getSecurityClassification()))
+            .withDataClassification(document.getCaseDataContent().getDataClassification())
             .withData(document.getCaseDataContent().getData())
             .build();
     }

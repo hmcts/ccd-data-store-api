@@ -156,6 +156,7 @@ public class DefaultDraftGateway implements DraftGateway {
     }
 
     private DraftResponse assembleDraft(Draft getDraft) {
+        //TODO whenever a data structure changes we get stcuk here, better ignore corrupt one and move next
         DraftResponse draftResponse;
         try {
             draftResponse = aDraftResponse()

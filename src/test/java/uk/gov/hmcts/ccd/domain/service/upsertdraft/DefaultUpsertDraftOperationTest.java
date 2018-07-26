@@ -6,21 +6,28 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.draft.CaseDraft;
 import uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDraftRequest;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDraftRequest;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
+import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
+import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.domain.model.draft.CaseDraftBuilder.aCaseDraft;
 import static uk.gov.hmcts.ccd.domain.model.draft.DraftResponseBuilder.aDraftResponse;
 import static uk.gov.hmcts.ccd.domain.model.std.CaseDataContentBuilder.aCaseDataContent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.aCaseType;
 import static uk.gov.hmcts.ccd.domain.service.upsertdraft.DefaultUpsertDraftOperation.CASE_DATA_CONTENT;
 
 class DefaultUpsertDraftOperationTest {
@@ -31,11 +38,21 @@ class DefaultUpsertDraftOperationTest {
     private static final String CTID = "TestAddressBookCase";
     private static final String ETID = "createCase";
     private static final String DID = "5";
+    private static final CaseType CASE_TYPE = aCaseType()
+        .withId(CTID)
+        .withSecurityClassification(SecurityClassification.PUBLIC)
+        .build();
     @Mock
     private ApplicationParams applicationParams;
 
     @Mock
     private DraftGateway draftGateway;
+    @Mock
+    private CaseDefinitionRepository caseDefinitionRepository;
+    @Mock
+    private CaseDataService caseDataService;
+    @Mock
+    private CaseSanitiser caseSanitiser;
 
     private UpsertDraftOperation upsertDraftOperation;
 
@@ -47,8 +64,9 @@ class DefaultUpsertDraftOperationTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
         when(applicationParams.getDraftMaxStaleDays()).thenReturn(DRAFT_MAX_STALE_DAYS);
+        given(caseDefinitionRepository.getCaseType(CTID)).willReturn(CASE_TYPE);
 
-        upsertDraftOperation = new DefaultUpsertDraftOperation(draftGateway, applicationParams);
+        upsertDraftOperation = new DefaultUpsertDraftOperation(draftGateway, caseDefinitionRepository, caseDataService, caseSanitiser, applicationParams);
         caseDraft = aCaseDraft()
             .withUserId(UID)
             .withJurisdictionId(JID)
