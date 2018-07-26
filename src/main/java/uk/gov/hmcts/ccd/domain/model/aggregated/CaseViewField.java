@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.ToString;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
@@ -23,7 +24,7 @@ public class CaseViewField {
     private String securityLabel;
     @JsonProperty("order")
     private Integer order;
-    private Object value;
+    private JsonNode value;
     @JsonProperty("display_context")
     private String displayContext;
     @JsonProperty("show_condition")
@@ -97,11 +98,11 @@ public class CaseViewField {
         this.order = order;
     }
 
-    public Object getValue() {
+    public JsonNode getValue() {
         return value;
     }
 
-    public void setValue(Object value) {
+    public void setValue(JsonNode value) {
         this.value = value;
     }
 
@@ -137,16 +138,9 @@ public class CaseViewField {
         this.showSummaryContentOption = showSummaryContentOption;
     }
 
-    public static CaseViewField createFrom(CaseTypeTabField field, Map<String, ?> data) {
-        CaseViewField caseViewField = createFrom(field.getCaseField(), data);
-        caseViewField.setOrder(field.getDisplayOrder());
-        caseViewField.setShowCondition(field.getShowCondition());
-
-        return caseViewField;
-    }
-
-    public static CaseViewField createFrom(CaseField caseField, Map<String, ?> data) {
+    public static CaseViewField createFrom(CaseTypeTabField field, Map<String, JsonNode> data) {
         CaseViewField caseViewField = new CaseViewField();
+        CaseField caseField = field.getCaseField();
         caseViewField.setId(caseField.getId());
         caseViewField.setLabel(caseField.getLabel());
         caseViewField.setFieldType(caseField.getFieldType());
@@ -154,8 +148,11 @@ public class CaseViewField {
         caseViewField.setHintText(caseField.getHintText());
         caseViewField.setSecurityLabel(caseField.getSecurityLabel());
         caseViewField.setValidationExpression(caseField.getFieldType().getRegularExpression());
+        caseViewField.setOrder(field.getDisplayOrder());
+        caseViewField.setShowCondition(field.getShowCondition());
         caseViewField.setValue(data.get(caseField.getId()));
 
         return caseViewField;
+
     }
 }

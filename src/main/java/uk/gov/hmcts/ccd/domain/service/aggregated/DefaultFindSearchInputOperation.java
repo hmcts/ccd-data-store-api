@@ -7,11 +7,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchInputDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchInputField;
+import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.search.Field;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
 
@@ -34,7 +30,6 @@ public class DefaultFindSearchInputOperation implements FindSearchInputOperation
         this.caseDefinitionRepository = caseDefinitionRepository;
     }
 
-    @Override
     public List<SearchInput> execute(final String jurisdictionId, final String caseTypeId, Predicate<AccessControlList> access) {
         LOG.debug("Finding SearchInput fields for jurisdiction={}, caseType={}", jurisdictionId, caseTypeId);
         final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
@@ -42,7 +37,7 @@ public class DefaultFindSearchInputOperation implements FindSearchInputOperation
 
         return searchInputDefinition.getFields()
             .stream()
-            .map(field -> toSearchInput(field, caseType))
+            .map(field -> toSearchInput(field,caseType))
             .collect(toList());
     }
 
@@ -52,17 +47,16 @@ public class DefaultFindSearchInputOperation implements FindSearchInputOperation
         result.setOrder(in.getDisplayOrder());
         final Field field =new Field();
         field.setId(in.getCaseFieldId());
-        CaseField caseField = getCaseField(in.getCaseFieldId(), caseType);
-        field.setType(caseField.getFieldType());
-        field.setMetadata(caseField.isMetadata());
+        field.setType(getFieldType(in.getCaseFieldId(), caseType));
         result.setField(field);
         return result;
     }
 
-    private CaseField getCaseField(final String fieldId, final CaseType caseType) {
+    private FieldType getFieldType(final String fieldId, final CaseType caseType){
         return caseType.getCaseFields().stream()
             .filter(c -> c.getId().equals(fieldId))
             .findFirst()
-            .orElseThrow(() -> new RuntimeException(String.format("FieldId %s not found", fieldId)));
+            .orElseThrow(() -> new RuntimeException(String.format("FieldId %s not found",fieldId)))
+            .getFieldType();
     }
 }

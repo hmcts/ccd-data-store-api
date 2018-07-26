@@ -6,11 +6,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputField;
+import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
 
 import java.util.Arrays;
@@ -28,12 +24,11 @@ class DefaultFindWorkbasketInputOperationTest {
     @Mock
     private CaseDefinitionRepository caseDefinitionRepository;
 
-    private final CaseType caseType = new CaseType();
+    private CaseType caseType = new CaseType();
     private DefaultFindWorkbasketInputOperation findWorkbasketInputOperation;
-    private final CaseField caseField1 = new CaseField();
-    private final CaseField caseField2 = new CaseField();
-    private final CaseField caseField3 = new CaseField();
-    private final CaseField caseField4 = new CaseField();
+    private CaseField caseField1 = new CaseField();
+    private CaseField caseField2 = new CaseField();
+    private CaseField caseField3 = new CaseField();
 
     @BeforeEach
     void setup() {
@@ -45,11 +40,8 @@ class DefaultFindWorkbasketInputOperationTest {
         caseField2.setFieldType(fieldType);
         caseField3.setId("field3");
         caseField3.setFieldType(fieldType);
-        caseField4.setId("field4");
-        caseField4.setFieldType(fieldType);
-        caseField4.setMetadata(true);
         caseType.setId("Test case type");
-        caseType.setCaseFields(Arrays.asList(caseField1, caseField2, caseField3, caseField4));
+        caseType.setCaseFields(Arrays.asList(caseField1, caseField2, caseField3));
 
         findWorkbasketInputOperation = new DefaultFindWorkbasketInputOperation(uiDefinitionRepository, caseDefinitionRepository);
 
@@ -62,20 +54,15 @@ class DefaultFindWorkbasketInputOperationTest {
         List<WorkbasketInput> workbasketInputs = findWorkbasketInputOperation.execute("TEST", caseType.getId(), CAN_READ);
 
         assertAll(
-            () -> assertThat(workbasketInputs.size(), is(4)),
-            () -> assertThat(workbasketInputs.get(0).getField().getId(), is("field1")),
-            () -> assertThat(workbasketInputs.get(3).getField().isMetadata(), is(true))
+            () -> assertThat(workbasketInputs.size(), is(3)),
+            () -> assertThat(workbasketInputs.get(0).getField().getId(), is("field1"))
         );
     }
 
     private WorkbasketInputDefinition generateWorkbasketInput() {
         WorkbasketInputDefinition workbasketInputDefinition = new WorkbasketInputDefinition();
         workbasketInputDefinition.setCaseTypeId(caseType.getId());
-        workbasketInputDefinition.setFields(
-            Arrays.asList(getField(caseField1.getId(), 1),
-                          getField(caseField2.getId(), 2),
-                          getField(caseField3.getId(), 3),
-                          getField(caseField4.getId(), 4)));
+        workbasketInputDefinition.setFields(Arrays.asList(getField(caseField1.getId(), 1), getField(caseField2.getId(), 2), getField(caseField3.getId(), 3)));
         return workbasketInputDefinition;
     }
 

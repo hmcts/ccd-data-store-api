@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.io.Serializable;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class SearchResultField implements Serializable {
     @JsonProperty("case_type_id")
@@ -12,7 +12,6 @@ public class SearchResultField implements Serializable {
     private String label;
     @JsonProperty("order")
     private Integer displayOrder;
-    private boolean metadata;
 
     public String getCaseTypeId() {
         return caseTypeId;
@@ -44,13 +43,5 @@ public class SearchResultField implements Serializable {
 
     public void setDisplayOrder(Integer displayOrder) {
         this.displayOrder = displayOrder;
-    }
-
-    public boolean isMetadata() {
-        return metadata;
-    }
-
-    public void setMetadata(boolean metadata) {
-        this.metadata = metadata;
     }
 }

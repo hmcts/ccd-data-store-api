@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 
@@ -31,14 +32,14 @@ public class CaseViewFieldBuilder {
         return field;
     }
 
-    public CaseViewField build(CaseField caseField, CaseEventField eventField, Object value) {
+    public CaseViewField build(CaseField caseField, CaseEventField eventField, JsonNode value) {
         final CaseViewField field = build(caseField, eventField);
         field.setValue(value);
 
         return field;
     }
 
-    public List<CaseViewField> build(List<CaseField> caseFields, List<CaseEventField> eventFields, Map<String, ?> data) {
+    public List<CaseViewField> build(List<CaseField> caseFields, List<CaseEventField> eventFields, Map<String, JsonNode> data) {
         final Map<String, CaseField> caseFieldMap = caseFields.stream()
             .collect(Collectors.toMap(CaseField::getId, Function.identity()));
 
