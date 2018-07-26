@@ -15,6 +15,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.draft.CaseDraft;
+import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
@@ -149,7 +150,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
     }
 
     private CaseDetails getDraftDetails(String jurisdictionId, String caseTypeId, String draftId) {
-        final DraftResponse draftResponse= draftGateway.get(draftId);
+        final DraftResponse draftResponse= draftGateway.get(Draft.stripId(draftId));
         CaseDraft document = draftResponse.getDocument();
         return aCaseDetails()
             .withId(draftResponse.getId())

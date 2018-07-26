@@ -99,8 +99,20 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
     }
 
     @Override
-    public CaseEventTrigger executeForDraft(String uid, String jurisdictionId, String caseTypeId, String draftReference, String eventTriggerId, Boolean ignoreWarning) {
-        return null;
+    public CaseEventTrigger executeForDraft(String uid, String jurisdictionId, String caseTypeId,
+                                            String draftReference, String eventTriggerId, Boolean ignoreWarning) {
+        final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
+
+        Set<String> userRoles = getUserRoles();
+
+        verifyRequiredAccessExistsForCaseType(eventTriggerId, caseType, userRoles);
+
+        return filterCaseFieldsByCreateAccess(caseType, userRoles, getEventTriggerOperation.executeForDraft(uid,
+            jurisdictionId,
+            caseTypeId,
+            draftReference,
+            eventTriggerId,
+            ignoreWarning));
     }
 
     private CaseDetails getCaseDetails(String caseReference) {

@@ -51,9 +51,9 @@ public class DefaultGetEventTriggerOperation implements GetEventTriggerOperation
                                                                  caseTypeId,
                                                                  eventTriggerId,
                                                                  ignoreWarning),
-                     caseTypeId,
-                     eventTriggerId,
-                     null);
+                                                                 caseTypeId,
+                                                                 eventTriggerId,
+                                                                 null);
     }
 
     @Override
@@ -69,9 +69,9 @@ public class DefaultGetEventTriggerOperation implements GetEventTriggerOperation
                                                              caseReference,
                                                              eventTriggerId,
                                                              ignoreWarning),
-                     caseTypeId,
-                     eventTriggerId,
-                     caseReference);
+                                                             caseTypeId,
+                                                             eventTriggerId,
+                                                             caseReference);
     }
 
     @Override
@@ -82,9 +82,9 @@ public class DefaultGetEventTriggerOperation implements GetEventTriggerOperation
                                                              draftReference,
                                                              eventTriggerId,
                                                              ignoreWarning),
-                     caseTypeId,
-                     eventTriggerId,
-                     draftReference);
+                                                             caseTypeId,
+                                                             eventTriggerId,
+                                                             draftReference);
     }
 
     private CaseEventTrigger buildCaseEventTrigger(final CaseEvent eventTrigger) {
