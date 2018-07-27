@@ -20,6 +20,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.SearchResultBuilder.aSearchResult;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildData;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildSearchResultField;
@@ -84,8 +85,8 @@ class MergeDataToSearchResultOperationTest {
         assertAll(
             () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(2)),
             () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
-            () -> assertThat(searchResultView.getSearchResultViewItems().get(0).getCaseFields().get("state"), is("state1")),
-            () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getCaseFields().get("state"), is("state2"))
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(0).getCaseFields().get(STATE.getReference()), is("state1")),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getCaseFields().get(STATE.getReference()), is("state2"))
         );
     }
 
