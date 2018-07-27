@@ -156,14 +156,15 @@ class MergeDataToSearchResultOperationTest {
         final SearchResultView searchResultView = classUnderTest.execute(caseTypeWithLabels,
                                                                          caseDetailsList,
                                                                          SEARCH_VIEW);
-        assertAll(() -> assertThat(searchResultView.getSearchResultViewItems().length, is(2)),
-                  () -> assertThat(searchResultView.getSearchResultViewColumns().length, is(1)),
-                  () -> assertThat(searchResultView.getSearchResultViewItems()[0].getCaseFields()
-                                       .get(LABEL_ID)
-                                       .asText(), is(LABEL_TEXT)),
-                  () -> assertThat(searchResultView.getSearchResultViewItems()[1].getCaseFields()
-                                       .get(LABEL_ID)
-                                       .asText(), is(LABEL_TEXT)))
+        assertAll(
+            () -> assertThat(searchResultView.getSearchResultViewItems().length, is(2)),
+            () -> assertThat(searchResultView.getSearchResultViewColumns().length, is(1)),
+            () -> assertThat(searchResultView.getSearchResultViewItems()[0].getCaseFields()
+                    .get(LABEL_ID)
+                    .asText(), is(LABEL_TEXT)),
+            () -> assertThat(searchResultView.getSearchResultViewItems()[1].getCaseFields()
+                    .get(LABEL_ID)
+                    .asText(), is(LABEL_TEXT)))
         ;
     }
 
@@ -171,9 +172,9 @@ class MergeDataToSearchResultOperationTest {
         final CaseField caseField = aCaseField()
             .withId(labelId)
             .withFieldType(aFieldType()
-                               .withType(LABEL_FIELD_TYPE)
-                               .withId(UUID.randomUUID().toString())
-                               .build())
+                .withType(LABEL_FIELD_TYPE)
+                .withId(UUID.randomUUID().toString())
+                .build())
             .withFieldLabelText(labelText)
             .build();
         return caseField;
