@@ -6,23 +6,47 @@ import java.util.Optional;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toList;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CASE_REFERENCE;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CREATED_DATE;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.LAST_MODIFIED_DATE;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.SECURITY_CLASSIFICATION;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
 
 public class MetaData {
 
-    public static final String JURISDICTION_METADATA = "jurisdiction";
-    public static final String CASE_TYPE_METADATA = "case_type";
-    public static final String STATE_METADATA = "state";
-    public static final String CASE_REFERENCE_METADATA = "case_reference";
-    public static final String CREATED_DATE_METADATA = "created_date";
-    public static final String LAST_MODIFIED_METADATA = "last_modified_date";
-    public static final String SECURITY_CLASSIFICATION_METADATA = "security_classification";
-    public static final String PAGE_METADATA = "page";
-    public static final String SORT_DIRECTION_METADATA = "sortDirection";
-    private static final List<String> METADATA_QUERY_PARAMETERS = newArrayList(STATE_METADATA, CASE_REFERENCE_METADATA,
-                                                                               CREATED_DATE_METADATA,
-                                                                               LAST_MODIFIED_METADATA,
-                                                                               SECURITY_CLASSIFICATION_METADATA,
-                                                                               PAGE_METADATA, SORT_DIRECTION_METADATA);
+    public static final String PAGE_PARAM = "page";
+    public static final String SORT_PARAM = "sortDirection";
+    private static final List<String> METADATA_QUERY_PARAMETERS = newArrayList(STATE.getParameterName(),
+                                                                               CASE_REFERENCE.getParameterName(),
+                                                                               CREATED_DATE.getParameterName(),
+                                                                               LAST_MODIFIED_DATE.getParameterName(),
+                                                                               SECURITY_CLASSIFICATION.getParameterName(),
+                                                                               PAGE_PARAM, SORT_PARAM);
+
+    // Metadata case fields
+    public enum CaseField {
+        JURISDICTION("jurisdiction"),
+        CASE_TYPE("case_type"),
+        STATE("state"),
+        CASE_REFERENCE("case_reference"),
+        CREATED_DATE("created_date"),
+        LAST_MODIFIED_DATE("last_modified_date"),
+        SECURITY_CLASSIFICATION("security_classification");
+
+        private final String parameterName;
+
+        CaseField(String parameterName) {
+            this.parameterName = parameterName;
+        }
+
+        public String getParameterName() {
+            return parameterName;
+        }
+
+        public String getReference() {
+            return String.join(getParameterName().toUpperCase(), "[", "]");
+        }
+    }
 
     private final String caseTypeId;
     private final String jurisdiction;

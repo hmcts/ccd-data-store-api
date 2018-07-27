@@ -111,7 +111,7 @@ class DefaultGetCaseViewOperationTest {
         jurisdiction.setName(JURISDICTION_ID);
         caseType.setJurisdiction(jurisdiction);
         CaseField caseField = new CaseField();
-        caseField.setId(MetaData.CASE_TYPE_METADATA);
+        caseField.setId(MetaData.CaseField.CASE_TYPE.getReference());
         caseField.setMetadata(true);
         caseField.setFieldType(new FieldType());
         caseType.setCaseFields(Collections.singletonList(caseField));
