@@ -2,6 +2,9 @@ package uk.gov.hmcts.ccd.domain.service.common;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.aggregated.*;
@@ -12,13 +15,16 @@ import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Consumer;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Arrays.asList;
 
 public class TestBuildersUtil {
     private static final ObjectMapper MAPPER = new ObjectMapper();
+
+    private TestBuildersUtil() {}
 
     public static class CallbackResponseBuilder {
         private final CallbackResponse callbackResponse;
@@ -400,7 +406,7 @@ public class TestBuildersUtil {
 
     public static class FieldTypeBuilder {
         private final FieldType fieldType;
-        private List<CaseField> complexFields;
+        private final List<CaseField> complexFields;
         private FieldTypeBuilder() {
             this.fieldType = new FieldType();
             this.complexFields = newArrayList();
@@ -525,6 +531,225 @@ public class TestBuildersUtil {
 
         public static SearchInputBuilder aSearchInput() {
             return new SearchInputBuilder();
+        }
+    }
+
+    public static class CaseHistoryViewBuilder {
+        private final CaseHistoryView caseHistoryView;
+
+        private CaseHistoryViewBuilder() {
+            this.caseHistoryView = new CaseHistoryView();
+        }
+
+        public CaseHistoryViewBuilder withEvent(CaseViewEvent caseViewEvent) {
+            this.caseHistoryView.setEvent(caseViewEvent);
+            return this;
+        }
+
+        public CaseHistoryView build() {
+            return caseHistoryView;
+        }
+
+        public static CaseHistoryViewBuilder aCaseHistoryView() {
+            return new CaseHistoryViewBuilder();
+        }
+    }
+
+    public static class CaseViewEventBuilder {
+        private final CaseViewEvent caseViewEvent;
+
+        private CaseViewEventBuilder() {
+            this.caseViewEvent = new CaseViewEvent();
+        }
+
+        public CaseViewEventBuilder withId(String eventId) {
+            this.caseViewEvent.setEventId(eventId);
+            return this;
+        }
+
+        public CaseViewEvent build() {
+            return caseViewEvent;
+        }
+
+        public static CaseViewEventBuilder aCaseViewEvent() {
+            return new CaseViewEventBuilder();
+        }
+    }
+
+    public static class CaseTabCollectionBuilder {
+        private final CaseTabCollection caseTabCollection;
+
+        private CaseTabCollectionBuilder() {
+            this.caseTabCollection = new CaseTabCollection();
+        }
+
+        public CaseTabCollectionBuilder withFieldIds(String... caseFieldIds) {
+            CaseTypeTab tab = new CaseTypeTab();
+            List<CaseTypeTabField> tabFields = new ArrayList<>();
+            asList(caseFieldIds).forEach(caseFieldId -> {
+                CaseField caseField = new CaseField();
+                caseField.setId(caseFieldId);
+                FieldType fieldType = new FieldType();
+                fieldType.setType("YesOrNo");
+                caseField.setFieldType(fieldType);
+                CaseTypeTabField tabField = new CaseTypeTabField();
+                tabField.setCaseField(caseField);
+                tabField.setShowCondition(caseFieldId + "-fieldShowCondition");
+                tabFields.add(tabField);
+            });
+            tab.setShowCondition("tabShowCondition");
+            tab.setTabFields(tabFields);
+            List<CaseTypeTab> tabs = new ArrayList<>();
+            tabs.add(tab);
+            caseTabCollection.setTabs(tabs);
+
+            return this;
+        }
+
+        public CaseTabCollection build() {
+            return caseTabCollection;
+        }
+
+        public static CaseTabCollectionBuilder aCaseTabCollection() {
+            return new CaseTabCollectionBuilder();
+        }
+    }
+
+    public static class CaseDataBuilder {
+
+        private final HashMap<String, JsonNode> caseData;
+
+        private CaseDataBuilder() {
+            caseData = new HashMap<>();
+        }
+
+        private Consumer<JsonNode> putFn(String fieldId) {
+            return (JsonNode node) -> caseData.put(fieldId, node);
+        }
+
+        public static CaseDataBuilder caseData() {
+            return new CaseDataBuilder();
+        }
+
+        public CaseDataFieldBuilder withField(String fieldId) {
+            return new CaseDataFieldBuilder(this, putFn(fieldId));
+        }
+
+        public Map<String, JsonNode> build() {
+            return caseData;
+        }
+    }
+
+    public static class CaseDataFieldBuilder {
+        private final CaseDataBuilder caseDataBuilder;
+        private final Consumer<JsonNode> putFn;
+
+        CaseDataFieldBuilder(CaseDataBuilder caseDataBuilder, Consumer<JsonNode> putFn) {
+            this.caseDataBuilder = caseDataBuilder;
+            this.putFn = putFn;
+        }
+
+        public CaseDataBuilder asCollectionOf(JsonNode... nodes) {
+            final ArrayNode collection = JsonNodeFactory.instance.arrayNode();
+            Arrays.stream(nodes).forEach(collection::add);
+            putFn.accept(collection);
+            return caseDataBuilder;
+        }
+    }
+
+    public static JsonNode collectionItem(String id, String value) {
+        return collectionItem(id, JsonNodeFactory.instance.textNode(value));
+    }
+
+    public static JsonNode collectionItem(String id, JsonNode value) {
+        final ObjectNode item = JsonNodeFactory.instance.objectNode();
+        item.put("id", id);
+        item.set("value", value);
+        return item;
+    }
+
+    public static class CaseDataClassificationBuilder {
+
+        private final HashMap<String, JsonNode> dataClassification;
+
+        private CaseDataClassificationBuilder() {
+            dataClassification = new HashMap<>();
+        }
+
+        private Consumer<JsonNode> putFn(String fieldId) {
+            return (JsonNode node) -> dataClassification.put(fieldId, node);
+        }
+
+        public static CaseDataClassificationBuilder dataClassification() {
+            return new CaseDataClassificationBuilder();
+        }
+
+        public CaseDataClassificationFieldBuilder withField(String fieldId) {
+            return new CaseDataClassificationFieldBuilder(this, putFn(fieldId));
+        }
+
+        public Map<String, JsonNode> build() {
+            return dataClassification;
+        }
+    }
+
+    public static class CaseDataClassificationFieldBuilder {
+        private final CaseDataClassificationBuilder caseDataClassificationBuilder;
+        private final Consumer<JsonNode> putFn;
+
+        CaseDataClassificationFieldBuilder(CaseDataClassificationBuilder caseDataClassificationBuilder,
+                                           Consumer<JsonNode> putFn) {
+            this.caseDataClassificationBuilder = caseDataClassificationBuilder;
+            this.putFn = putFn;
+        }
+
+        public CaseDataClassificationBuilder asCollectionOf(String classification, JsonNode... nodes) {
+            final ObjectNode collection = JsonNodeFactory.instance.objectNode();
+            final ArrayNode collectionValue = JsonNodeFactory.instance.arrayNode();
+            Arrays.stream(nodes).forEach(collectionValue::add);
+
+            collection.put("classification", classification);
+            collection.set("value", collectionValue);
+
+            putFn.accept(collection);
+            return caseDataClassificationBuilder;
+        }
+    }
+
+    public static JsonNode collectionClassification(String id, String classification) {
+        return collectionItem(id, JsonNodeFactory.instance.textNode(classification));
+    }
+
+    public static JsonNode collectionClassification(String id, JsonNode classification) {
+        final ObjectNode item = JsonNodeFactory.instance.objectNode();
+        item.put("id", id);
+        item.set("classification", classification);
+        return item;
+    }
+
+    public static class UserRoleBuilder {
+        private final UserRole userRole;
+
+        private UserRoleBuilder() {
+            this.userRole = new UserRole();
+        }
+
+        public UserRoleBuilder withRole(String role) {
+            userRole.setRole(role);
+            return this;
+        }
+
+        public UserRoleBuilder withSecurityClassification(SecurityClassification securityClassification) {
+            userRole.setSecurityClassification(securityClassification.name());
+            return this;
+        }
+
+        public UserRole build() {
+            return this.userRole;
+        }
+
+        public static UserRoleBuilder aUserRole() {
+            return new UserRoleBuilder();
         }
     }
 }

@@ -97,10 +97,10 @@ public class CaseDataService {
 
     private void deduceClassificationForSimpleType(ObjectNode dataNode, JsonNode existingDataClassificationNode, String fieldName, CaseField caseField) {
         dataNode.put(fieldName, existingDataClassificationNode.equals(JSON_NODE_FACTORY.objectNode())
-            ? getClassificationFromCaseFieldOrEmpty(caseField) : existingDataClassificationNode.textValue());
+            ? getClassificationFromCaseFieldOrDefault(caseField) : existingDataClassificationNode.textValue());
     }
 
-    private String getClassificationFromCaseFieldOrEmpty(CaseField caseField) {
+    private String getClassificationFromCaseFieldOrDefault(CaseField caseField) {
         return ofNullable(caseField.getSecurityLabel()).orElse(DEFAULT_CLASSIFICATION);
     }
 
@@ -110,17 +110,24 @@ public class CaseDataService {
             ArrayNode arrayNode = (ArrayNode) fieldNode;
             final FieldType collectionFieldType = caseField.getFieldType().getCollectionFieldType();
             for (JsonNode field : arrayNode) {
+
+                final JsonNode itemClassification = getExistingDataClassificationFromArrayOrEmpty(
+                    existingDataClassificationNode,
+                    field);
+
                 if (COMPLEX_TYPE.equalsIgnoreCase(collectionFieldType.getType())) {
                     deduceDefaultClassifications(
                         field.get(VALUE),
                         // get value of the field with given ID
-                        getExistingDataClassificationFromArrayOrEmpty(existingDataClassificationNode, field),
+                        itemClassification,
                         caseField.getFieldType().getCollectionFieldType().getComplexFields(),
                         fieldIdPrefix + fieldName + FIELD_SEPARATOR);
                 } else {
                     final ObjectNode simpleCollectionItemNode = (ObjectNode) field;
                     // Add `classification` property
-                    deduceClassificationForSimpleType(simpleCollectionItemNode, existingDataClassificationNode, CLASSIFICATION, caseField);
+                    final String newClassification = itemClassification.isTextual()
+                        ? itemClassification.textValue() : getClassificationFromCaseFieldOrDefault(caseField);
+                    simpleCollectionItemNode.put(CLASSIFICATION, newClassification);
                     // Remove `value` property
                     simpleCollectionItemNode.remove(VALUE);
                 }

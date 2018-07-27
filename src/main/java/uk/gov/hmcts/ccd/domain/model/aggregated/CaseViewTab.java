@@ -1,7 +1,9 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.ToString;
 
+@ToString
 public class CaseViewTab {
     private String id;
     private String label;
@@ -61,4 +63,5 @@ public class CaseViewTab {
     public void setShowCondition(String showCondition) {
         this.showCondition = showCondition;
     }
+
 }
