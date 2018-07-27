@@ -9,7 +9,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
@@ -24,7 +28,11 @@ import java.util.Optional;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.arrayWithSize;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItemInArray;
+import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
@@ -59,12 +67,6 @@ class DefaultGetCaseViewOperationTest {
 
     private DefaultGetCaseViewOperation defaultGetCaseViewOperation;
     private CaseDetails caseDetails;
-    private List<AuditEvent> auditEvents;
-    private AuditEvent event1;
-    private AuditEvent event2;
-    private CaseTabCollection caseTabCollection;
-    private CaseType caseType;
-    private CaseState caseState;
 
     @BeforeEach
     void setUp() {
@@ -78,28 +80,29 @@ class DefaultGetCaseViewOperationTest {
                                                                           CASE_TYPE_ID,
                                                                           CASE_REFERENCE);
 
-        event1 = new AuditEvent();
+        final AuditEvent event1 = new AuditEvent();
         event1.setSummary(EVENT_SUMMARY_1);
-        event2 = new AuditEvent();
+        final AuditEvent event2 = new AuditEvent();
         event2.setSummary(EVENT_SUMMARY_2);
-        auditEvents = asList(event1, event2);
+        final List<AuditEvent> auditEvents = asList(event1, event2);
         doReturn(auditEvents).when(getEventsOperation).getEvents(caseDetails);
 
         doReturn(Boolean.TRUE).when(uidService).validateUID(CASE_REFERENCE);
 
-        caseTabCollection = aCaseTabCollection().withFieldIds("dataTestField1", "dataTestField2").build();
+        final CaseTabCollection caseTabCollection = aCaseTabCollection()
+            .withFieldIds("dataTestField1", "dataTestField2").build();
         doReturn(caseTabCollection).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
 
-        caseType = new CaseType();
+        final CaseType caseType = new CaseType();
         Jurisdiction jurisdiction = new Jurisdiction();
         jurisdiction.setName(JURISDICTION_ID);
         caseType.setJurisdiction(jurisdiction);
         doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
 
-        caseState = new CaseState();
-        doReturn(caseState).when(caseTypeService).findState(caseType, STATE);
+        doReturn(new CaseState()).when(caseTypeService).findState(caseType, STATE);
 
-        defaultGetCaseViewOperation = new DefaultGetCaseViewOperation(getCaseOperation, getEventsOperation,
+        defaultGetCaseViewOperation = new DefaultGetCaseViewOperation(getCaseOperation,
+                                                                      getEventsOperation,
                                                                       uiDefinitionRepository,
                                                                       caseTypeService,
                                                                       eventTriggerService,
