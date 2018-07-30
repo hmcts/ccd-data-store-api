@@ -1,44 +1,44 @@
 package uk.gov.hmcts.ccd.domain.service.startevent;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.collect.Maps;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewFieldBuilder;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
-import uk.gov.hmcts.ccd.domain.service.aggregated.GetEventTriggerOperation;
-import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
-import uk.gov.hmcts.ccd.domain.service.common.CaseService;
-import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
-import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
-import uk.gov.hmcts.ccd.domain.service.common.UIDService;
-import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
-import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import static com.google.common.collect.Lists.newArrayList;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
+//import com.fasterxml.jackson.databind.JsonNode;
+//import com.google.common.collect.Maps;
+//import org.junit.jupiter.api.BeforeEach;
+//import org.junit.jupiter.api.DisplayName;
+//import org.junit.jupiter.api.Nested;
+//import org.junit.jupiter.api.Test;
+//import org.mockito.Mock;
+//import org.mockito.MockitoAnnotations;
+//import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+//import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
+//import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
+//import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
+//import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewFieldBuilder;
+//import uk.gov.hmcts.ccd.domain.model.definition.*;
+//import uk.gov.hmcts.ccd.domain.service.aggregated.GetEventTriggerOperation;
+//import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
+//import uk.gov.hmcts.ccd.domain.service.common.CaseService;
+//import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
+//import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
+//import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+//import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
+//import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
+//import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+//import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+//import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+//
+//import java.util.List;
+//import java.util.Map;
+//import java.util.Optional;
+//
+//import static com.google.common.collect.Lists.newArrayList;
+//import static org.hamcrest.Matchers.equalTo;
+//import static org.hamcrest.Matchers.is;
+//import static org.junit.jupiter.api.Assertions.assertAll;
+//import static org.junit.jupiter.api.Assertions.assertThrows;
+//import static org.mockito.Matchers.any;
+//import static org.mockito.Matchers.eq;
+//import static org.mockito.Mockito.doNothing;
+//import static org.mockito.Mockito.doReturn;
 
 public class DefaultStartEventOperationTest {
 
