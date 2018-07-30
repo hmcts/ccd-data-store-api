@@ -76,7 +76,8 @@
               "update": false,
               "delete": false
             }],
-          "show_event_notes": false
+          "show_event_notes": false,
+          "can_save_draft": false
         },
         {
           "id": "NO_PRE_STATES_EVENT",
@@ -105,7 +106,8 @@
               "update": false,
               "delete": false
             }],
-          "show_event_notes": true
+          "show_event_notes": true,
+          "can_save_draft": true
         },
         {
           "id": "TEST_EVENT",
@@ -125,7 +127,8 @@
               "update": false,
               "delete": false
             }],
-          "show_event_notes": true
+          "show_event_notes": true,
+          "can_save_draft": true
         },
         {
           "id": "Goodness",
@@ -146,7 +149,8 @@
               "update": false,
               "delete": false
             }],
-          "show_event_notes": true
+          "show_event_notes": true,
+          "can_save_draft": false
         },
         {
           "id": "Create2",
@@ -165,7 +169,8 @@
               "update": false,
               "delete": false
             }],
-          "show_event_notes": true
+          "show_event_notes": true,
+          "can_save_draft": true
         }
       ],
       "states": [

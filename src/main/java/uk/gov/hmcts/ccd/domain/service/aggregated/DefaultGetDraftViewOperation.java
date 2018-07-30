@@ -1,0 +1,133 @@
+package uk.gov.hmcts.ccd.domain.service.aggregated;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
+import uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway;
+import uk.gov.hmcts.ccd.data.draft.DraftGateway;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.draft.CaseDraft;
+import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
+import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
+import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
+
+import java.util.ArrayList;
+
+import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTriggerBuilder.aCaseViewTrigger;
+import static uk.gov.hmcts.ccd.domain.model.definition.CaseDetailsBuilder.aCaseDetails;
+
+@Service
+@Qualifier(DefaultGetDraftViewOperation.QUALIFIER)
+public class DefaultGetDraftViewOperation extends AbstractDefaultGetCaseViewOperation implements GetCaseViewOperation {
+
+    public static final String QUALIFIER = "defaultDraft";
+    static final String DRAFT_ID = "DRAFT%s";
+    static final String DELETE = "DELETE";
+    private static final CaseViewTrigger DELETE_TRIGGER = aCaseViewTrigger()
+        .withId(DELETE)
+        .withName("Delete")
+        .withDescription("Delete draft")
+        .withOrder(2)
+        .build();
+    private static final String RESUME = "Resume";
+
+    private final DraftGateway draftGateway;
+
+    @Autowired
+    public DefaultGetDraftViewOperation(@Qualifier(CreatorGetCaseOperation.QUALIFIER) final GetCaseOperation getCaseOperation,
+                                        final UIDefinitionRepository uiDefinitionRepository,
+                                        final CaseTypeService caseTypeService,
+                                        final UIDService uidService,
+                                        @Qualifier(DefaultDraftGateway.QUALIFIER) final DraftGateway draftGateway) {
+        super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService);
+        this.draftGateway = draftGateway;
+    }
+
+    @Override
+    public CaseView execute(String jurisdictionId, String caseTypeId, String draftId) {
+
+        final CaseType caseType = getCaseType(jurisdictionId, caseTypeId);
+        final DraftResponse draftResponse = draftGateway.get(draftId);
+
+        final CaseDetails caseDetails = buildCaseDetailsFromDraft(draftResponse);
+        final CaseViewTrigger resumeTrigger = buildResumeTriggerFromDraft(draftResponse);
+
+        final CaseTabCollection caseTabCollection = getCaseTabCollection(getCaseTypeIdFromDraft(draftResponse));
+
+        CaseViewEvent[] events = buildEventsFromDraft(draftResponse);
+
+        return merge(caseDetails, resumeTrigger, events, caseType, caseTabCollection);
+    }
+
+    private CaseViewEvent[] buildEventsFromDraft(DraftResponse draftResponse) {
+        ArrayList<CaseViewEvent> events = new ArrayList<>();
+        if(draftResponse.getUpdated() != null) {
+            CaseViewEvent lastUpdatedEvent = new CaseViewEvent();
+            lastUpdatedEvent.setEventId("Draft updated");
+            lastUpdatedEvent.setEventName("Draft updated");
+            lastUpdatedEvent.setStateId("Draft");
+            lastUpdatedEvent.setStateName("Draft");
+            lastUpdatedEvent.setTimestamp(draftResponse.getUpdated());
+            lastUpdatedEvent.setUserId("");
+            events.add(lastUpdatedEvent);
+        }
+        if (draftResponse.getCreated() != null) {
+            CaseViewEvent createEvent = new CaseViewEvent();
+            createEvent.setEventId("Draft created");
+            createEvent.setEventName("Draft created");
+            createEvent.setStateId("Draft");
+            createEvent.setStateName("Draft");
+            createEvent.setUserId("");
+            createEvent.setTimestamp(draftResponse.getCreated());
+            events.add(createEvent);
+        }
+        return events.toArray(new CaseViewEvent[0]);
+    }
+
+    private CaseViewTrigger buildResumeTriggerFromDraft(DraftResponse draftResponse) {
+        return aCaseViewTrigger()
+            .withId(draftResponse.getDocument().getEventTriggerId())
+            .withName(RESUME)
+            .withDescription(draftResponse.getDocument().getCaseDataContent().getEvent().getDescription())
+            .withOrder(1)
+            .build();
+    }
+
+    private String getCaseTypeIdFromDraft(DraftResponse draftResponse) {
+        return draftResponse.getDocument().getCaseTypeId();
+    }
+
+    private CaseView merge(CaseDetails caseDetails, CaseViewTrigger resumeTrigger, CaseViewEvent[] events, CaseType caseType, CaseTabCollection caseTabCollection) {
+        CaseView caseView = new CaseView();
+        caseView.setCaseId(caseDetails.getId().toString());
+        caseView.setChannels(caseTabCollection.getChannels().toArray(new String[0]));
+
+        caseView.setCaseType(CaseViewType.createFrom(caseType));
+        caseView.setTabs(getTabs(caseDetails, caseDetails.getData(), caseTabCollection));
+
+        caseView.setTriggers(new CaseViewTrigger[] {resumeTrigger, DELETE_TRIGGER});
+        caseView.setEvents(events);
+
+        return caseView;
+    }
+
+    private CaseDetails buildCaseDetailsFromDraft(DraftResponse draftResponse) {
+        CaseDraft document = draftResponse.getDocument();
+        return aCaseDetails()
+            .withId(String.format(DRAFT_ID, draftResponse.getId()))
+            .withCaseTypeId(document.getCaseTypeId())
+            .withJurisdiction(document.getJurisdictionId())
+            .withData(document.getCaseDataContent().getData())
+            .build();
+    }
+
+}

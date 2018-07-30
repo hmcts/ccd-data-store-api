@@ -21,6 +21,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
+import uk.gov.hmcts.ccd.domain.model.std.EventBuilder;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
@@ -34,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.*;
 
 class AuthorisedCreateEventOperationTest {
@@ -53,7 +55,7 @@ class AuthorisedCreateEventOperationTest {
     private static final String CASE_TYPE_ID = "Grant";
     private static final String CASE_REFERENCE = "123456789012345";
     private static final String STATE_ID = "STATE_1";
-    private static final Event EVENT = new Event();
+    private static final Event EVENT = anEvent().build();
     private static final String EVENT_ID = "EVENT_ID";
     private static final Event NULL_EVENT = null;
     private static final Map<String, JsonNode> NEW_DATA = Maps.newHashMap();

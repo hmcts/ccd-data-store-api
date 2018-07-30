@@ -38,6 +38,8 @@ locals {
   custom_redirect_uri = "${var.frontend_url}/oauth2redirect"
   default_redirect_uri = "https://ccd-case-management-web-${local.env_ase_url}/oauth2redirect"
   oauth2_redirect_uri = "${var.frontend_url != "" ? local.custom_redirect_uri : local.default_redirect_uri}"
+
+  draftStoreUrl = "http://draft-store-service-${local.local_env}.service.${local.local_ase}.internal"
 }
 
 data "vault_generic_secret" "ccd_data_s2s_key" {
@@ -50,6 +52,17 @@ data "vault_generic_secret" "gateway_idam_key" {
 
 data "vault_generic_secret" "gateway_oauth2_client_secret" {
   path = "secret/${var.vault_section}/ccidam/idam-api/oauth2/client-secrets/ccd-gateway"
+}
+
+resource "random_string" "draft_encryption_key" {
+  length  = 16
+  special = true
+  upper   = true
+  lower   = true
+  number  = true
+  lifecycle {
+    ignore_changes = ["*"]
+  }
 }
 
 module "ccd-data-store-api" {
@@ -79,6 +92,10 @@ module "ccd-data-store-api" {
     IDAM_USER_URL                       = "${var.idam_api_url}"
     IDAM_S2S_URL                        = "${local.s2s_url}"
     DATA_STORE_IDAM_KEY                 = "${data.vault_generic_secret.ccd_data_s2s_key.data["value"]}"
+
+    CCD_DRAFT_STORE_URL                 = "${local.draftStoreUrl}"
+    CCD_DRAFT_MAX_STALE_DAYS            = "${var.draft_store_max_stale_days}"
+    CCD_DRAFT_ENCRYPTION_KEY            = "${random_string.draft_encryption_key.result}"
 
     DATA_STORE_S2S_AUTHORISED_SERVICES  = "${var.authorised-services}"
 
@@ -154,5 +171,11 @@ resource "azurerm_key_vault_secret" "gw_s2s_key" {
 resource "azurerm_key_vault_secret" "gw_oauth2_secret" {
   name = "gatewayOAuth2ClientSecret"
   value = "${data.vault_generic_secret.gateway_oauth2_client_secret.data["value"]}"
+  vault_uri = "${module.ccd-data-store-vault.key_vault_uri}"
+}
+
+resource "azurerm_key_vault_secret" "ccd_draft_encryption_key" {
+  name = "draftStoreEncryptionSecret"
+  value = "${random_string.draft_encryption_key.result}"
   vault_uri = "${module.ccd-data-store-vault.key_vault_uri}"
 }

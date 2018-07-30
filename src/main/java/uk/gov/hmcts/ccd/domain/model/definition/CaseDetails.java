@@ -23,7 +23,7 @@ public class CaseDetails implements Cloneable {
     private static final String LABEL_FIELD_TYPE = "Label";
     private static final String CASE_PAYMENT_HISTORY_VIEWER_FIELD_TYPE = "CasePaymentHistoryViewer";
 
-    private Long id;
+    private String id;
 
     @JsonIgnore
     private Long reference;
@@ -64,11 +64,11 @@ public class CaseDetails implements Cloneable {
     @JsonProperty("callback_response_status")
     private String callbackResponseStatus;
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -181,8 +181,11 @@ public class CaseDetails implements Cloneable {
     }
 
     public boolean existsInData(CaseTypeTabField caseTypeTabField) {
-        return isFieldWithNoValue(caseTypeTabField)
-            || data.keySet().contains(caseTypeTabField.getCaseField().getId());
+        return isFieldWithNoValue(caseTypeTabField) || hasDataForTabField(caseTypeTabField);
+    }
+
+    private boolean hasDataForTabField(CaseTypeTabField caseTypeTabField) {
+        return data.keySet().contains(caseTypeTabField.getCaseField().getId());
     }
 
     private boolean isFieldWithNoValue(CaseTypeTabField caseTypeTabField) {

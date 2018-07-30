@@ -14,6 +14,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
+import uk.gov.hmcts.ccd.domain.model.std.EventBuilder;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
@@ -27,6 +28,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Matchers.notNull;
 import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 
 class SubmitCaseTransactionTest {
 
@@ -44,7 +46,7 @@ class SubmitCaseTransactionTest {
     private static final String STATE_ID = "CREATED_ID";
     private static final String STATE_NAME = "Created name";
     private static final String CASE_UID = "1234123412341236";
-    private static final Long CASE_ID = 45677L;
+    private static final String CASE_ID = "45677";
 
     @Mock
     private CaseDetailsRepository caseDetailsRepository;
@@ -159,7 +161,7 @@ class SubmitCaseTransactionTest {
                                          this.caseDetails,
                                          IGNORE_WARNING);
 
-        verify(caseUserRepository).grantAccess(CASE_ID, IDAM_ID);
+        verify(caseUserRepository).grantAccess(Long.valueOf(CASE_ID), IDAM_ID);
     }
 
     @Test
@@ -192,7 +194,7 @@ class SubmitCaseTransactionTest {
     }
 
     private Event buildEvent() {
-        final Event event = new Event();
+        final Event event = anEvent().build();
         event.setEventId(EVENT_ID);
         event.setDescription(EVENT_DESC);
         event.setSummary(EVENT_SUMMARY);

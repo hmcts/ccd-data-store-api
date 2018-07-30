@@ -8,13 +8,7 @@ import uk.gov.hmcts.ccd.data.casedetails.search.FieldMapSanitizeOperation;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
-import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedFindSearchInputOperation;
-import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCaseHistoryViewOperation;
-import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCaseViewOperation;
-import uk.gov.hmcts.ccd.domain.service.aggregated.DefaultFindWorkbasketInputOperation;
-import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseTypesOperation;
-import uk.gov.hmcts.ccd.domain.service.aggregated.GetEventTriggerOperation;
-import uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.*;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 import java.util.ArrayList;
@@ -34,6 +28,8 @@ class QueryEndpointTest {
 
     @Mock
     private AuthorisedGetCaseViewOperation getCaseViewOperation;
+    @Mock
+    private DefaultGetDraftViewOperation getDraftViewOperation;
     @Mock
     private AuthorisedGetCaseHistoryViewOperation getCaseHistoryViewOperation;
     @Mock
@@ -55,13 +51,13 @@ class QueryEndpointTest {
     @BeforeEach
     void setup(){
         MockitoAnnotations.initMocks(this);
-        queryEndpoint = new QueryEndpoint(getCaseViewOperation, getCaseHistoryViewOperation,
-            getEventTriggerOperation,
-            searchQueryOperation,
-            fieldMapSanitizerOperation,
-            findSearchInputOperation,
-            findWorkbasketInputOperation,
-            getCaseTypesOperation);
+        queryEndpoint = new QueryEndpoint(getCaseViewOperation, getDraftViewOperation, getCaseHistoryViewOperation,
+                                          getEventTriggerOperation,
+                                          searchQueryOperation,
+                                          fieldMapSanitizerOperation,
+                                          findSearchInputOperation,
+                                          findWorkbasketInputOperation,
+                                          getCaseTypesOperation);
     }
 
     @Test
@@ -76,6 +72,14 @@ class QueryEndpointTest {
         doReturn(caseView).when(getCaseViewOperation).execute(any(), any(), any());
         queryEndpoint.findCase("jurisdictionId", "caseTypeId", "caseId");
         verify(getCaseViewOperation, times(1)).execute("jurisdictionId", "caseTypeId", "caseId");
+    }
+
+    @Test
+    void shouldCallGetDraftViewOperation() {
+        CaseView caseView = new CaseView();
+        doReturn(caseView).when(getDraftViewOperation).execute(any(), any(), any());
+        queryEndpoint.findDraft("jurisdictionId", "caseTypeId", "caseId");
+        verify(getDraftViewOperation).execute("jurisdictionId", "caseTypeId", "caseId");
     }
 
     @Test

@@ -1,0 +1,15 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/drafts"
+  },
+  "response": {
+    "status": 201,
+    "headers": {
+      "Content-Type": "application/json",
+      "Location": "http://localhost:8800/drafts/4"
+    },
+    "jsonBody": {
+    }
+  }
+}
