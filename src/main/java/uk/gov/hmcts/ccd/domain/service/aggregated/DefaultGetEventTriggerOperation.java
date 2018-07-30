@@ -84,7 +84,7 @@ public class DefaultGetEventTriggerOperation implements GetEventTriggerOperation
                                                              ignoreWarning),
                                                              caseTypeId,
                                                              eventTriggerId,
-                                                             draftReference);
+                                                             null);
     }
 
     private CaseEventTrigger buildCaseEventTrigger(final CaseEvent eventTrigger) {

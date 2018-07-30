@@ -99,7 +99,13 @@ public class DefaultStartEventOperation implements StartEventOperation {
                                                  final String eventTriggerId,
                                                  final Boolean ignoreWarning) {
 
-        return buildStartEventTrigger(uid, jurisdictionId, caseTypeId, caseReference, eventTriggerId, ignoreWarning, () -> getCaseDetails(jurisdictionId, caseTypeId, caseReference));
+        return buildStartEventTrigger(uid,
+                                      jurisdictionId,
+                                      caseTypeId,
+                                      caseReference,
+                                      eventTriggerId,
+                                      ignoreWarning,
+                                      () -> getCaseDetails(jurisdictionId, caseTypeId, caseReference));
     }
 
     @Override
@@ -109,7 +115,13 @@ public class DefaultStartEventOperation implements StartEventOperation {
                                                   final String draftReference,
                                                   final String eventTriggerId,
                                                   final Boolean ignoreWarning) {
-        return buildStartEventTrigger(uid, jurisdictionId, caseTypeId, draftReference, eventTriggerId, ignoreWarning, () -> getDraftDetails(jurisdictionId, caseTypeId, draftReference));
+        return buildStartEventTrigger(uid,
+                                      jurisdictionId,
+                                      caseTypeId,
+                                      draftReference,
+                                      eventTriggerId,
+                                      ignoreWarning,
+                                      () -> getDraftDetails(jurisdictionId, caseTypeId, draftReference));
     }
 
     private StartEventTrigger buildStartEventTrigger(final String uid,
@@ -151,16 +163,20 @@ public class DefaultStartEventOperation implements StartEventOperation {
     }
 
     private CaseDetails getDraftDetails(String jurisdictionId, String caseTypeId, String draftId) {
-        final DraftResponse draftResponse= draftGateway.get(Draft.stripId(draftId));
+        final DraftResponse draftResponse = draftGateway.get(Draft.stripId(draftId));
         CaseDraft document = draftResponse.getDocument();
         return aCaseDetails()
-            .withId(draftResponse.getId())
             .withCaseTypeId(document.getCaseTypeId())
             .withJurisdiction(document.getJurisdictionId())
-            .withSecurityClassification(SecurityClassification.valueOf(document.getCaseDataContent().getSecurityClassification()))
+            .withSecurityClassification(getSecurityClassification(document))
             .withDataClassification(document.getCaseDataContent().getDataClassification())
             .withData(document.getCaseDataContent().getData())
             .build();
+    }
+
+    private SecurityClassification getSecurityClassification(CaseDraft document) {
+        String securityClassification = document.getCaseDataContent().getSecurityClassification();
+        return securityClassification != null ? SecurityClassification.valueOf(securityClassification) : null;
     }
 
     private CaseDetails getCaseDetails(String jurisdictionId, String caseTypeId, String caseReference) {
