@@ -62,10 +62,6 @@ public abstract class AbstractDefaultGetCaseViewOperation {
         return getTabs(caseDetails, data, getCaseTabCollection(caseDetails.getCaseTypeId()));
     }
 
-    CaseTabCollection getCaseTabCollection(String caseTypeId) {
-        return uiDefinitionRepository.getCaseTabCollection(caseTypeId);
-    }
-
     CaseViewTab[] getTabs(CaseDetails caseDetails, Map<String, ?> data, CaseTabCollection caseTabCollection) {
         return caseTabCollection.getTabs().stream().map(tab -> {
             CaseViewField[] caseViewFields = tab.getTabFields().stream()
@@ -77,6 +73,10 @@ public abstract class AbstractDefaultGetCaseViewOperation {
                                    tab.getShowCondition());
 
         }).toArray(CaseViewTab[]::new);
+    }
+
+    CaseTabCollection getCaseTabCollection(String caseTypeId) {
+        return uiDefinitionRepository.getCaseTabCollection(caseTypeId);
     }
 
     private Predicate<CaseTypeTabField> filterCaseTabFieldsBasedOnSecureData(CaseDetails caseDetails) {

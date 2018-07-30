@@ -1375,11 +1375,9 @@ public class QueryEndpointIT extends WireMockBaseTest {
         final int dmApiPort = 10000;
         assertNotNull("Null address value", documentNode);
         assertEquals("Unexpected address value",
-            "http://localhost:" + dmApiPort + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1", documentNode.get
-                ("document_url"));
+                     "http://localhost:" + dmApiPort + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1", documentNode.get("document_url"));
         assertEquals("Unexpected address value",
-            "http://localhost:" + dmApiPort + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary", documentNode
-                         .get("document_binary_url"));
+                     "http://localhost:" + dmApiPort + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary", documentNode.get("document_binary_url"));
         assertEquals("Unexpected address value",
                      "Seagulls_Square.jpg", documentNode.get("document_filename"));
 
