@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.upsertdraft;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.Maps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -15,8 +17,9 @@ import uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDraftRequest;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDraftRequest;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
-import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
+
+import java.util.Map;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
@@ -42,6 +45,8 @@ class DefaultUpsertDraftOperationTest {
         .withId(CTID)
         .withSecurityClassification(SecurityClassification.PUBLIC)
         .build();
+    private static final Map<String, JsonNode> DATA = Maps.newHashMap();
+    private static final Map<String, JsonNode> SANITISED_DATA = Maps.newHashMap();
     @Mock
     private ApplicationParams applicationParams;
 
@@ -50,13 +55,11 @@ class DefaultUpsertDraftOperationTest {
     @Mock
     private CaseDefinitionRepository caseDefinitionRepository;
     @Mock
-    private CaseDataService caseDataService;
-    @Mock
     private CaseSanitiser caseSanitiser;
 
     private UpsertDraftOperation upsertDraftOperation;
 
-    private CaseDataContent caseDataContent = aCaseDataContent().build();
+    private CaseDataContent caseDataContent = aCaseDataContent().withData(DATA).build();
     private CaseDraft caseDraft;
     private DraftResponse draftResponse = aDraftResponse().build();
 
@@ -65,8 +68,9 @@ class DefaultUpsertDraftOperationTest {
         MockitoAnnotations.initMocks(this);
         when(applicationParams.getDraftMaxStaleDays()).thenReturn(DRAFT_MAX_STALE_DAYS);
         given(caseDefinitionRepository.getCaseType(CTID)).willReturn(CASE_TYPE);
+        given(caseSanitiser.sanitise(CASE_TYPE, DATA)).willReturn(SANITISED_DATA);
 
-        upsertDraftOperation = new DefaultUpsertDraftOperation(draftGateway, caseDefinitionRepository, caseDataService, caseSanitiser, applicationParams);
+        upsertDraftOperation = new DefaultUpsertDraftOperation(draftGateway, caseDefinitionRepository, caseSanitiser, applicationParams);
         caseDraft = aCaseDraft()
             .withUserId(UID)
             .withJurisdictionId(JID)
@@ -78,22 +82,25 @@ class DefaultUpsertDraftOperationTest {
 
     @Test
     void shouldSuccessfullySaveDraft() {
-        final ArgumentCaptor<CreateCaseDraftRequest> argument = ArgumentCaptor.forClass(CreateCaseDraftRequest.class);
+        final ArgumentCaptor<CreateCaseDraftRequest> captor = ArgumentCaptor.forClass(CreateCaseDraftRequest.class);
         doReturn(Long.valueOf(DID)).when(draftGateway).save(any(CreateCaseDraftRequest.class));
         draftResponse.setId(DID);
 
         DraftResponse result = upsertDraftOperation.executeSave(UID, JID, CTID, ETID, caseDataContent);
 
         assertAll(
-            () ->  verify(draftGateway).save(argument.capture()),
-            () ->  assertThat(argument.getValue().getDocument(), hasProperty("userId", is(caseDraft.getUserId()))),
-            () ->  assertThat(argument.getValue().getDocument(), hasProperty("jurisdictionId", is(caseDraft.getJurisdictionId()))),
-            () ->  assertThat(argument.getValue().getDocument(), hasProperty("caseTypeId", is(caseDraft.getCaseTypeId()))),
-            () ->  assertThat(argument.getValue().getDocument(), hasProperty("eventTriggerId", is(caseDraft.getEventTriggerId()))),
-            () ->  assertThat(argument.getValue().getDocument(), hasProperty("caseDataContent", is(caseDataContent))),
-            () ->  assertThat(argument.getValue().getMaxStaleDays(), is(DRAFT_MAX_STALE_DAYS)),
-            () ->  assertThat(argument.getValue().getType(), is(CASE_DATA_CONTENT)),
-            () ->  assertThat(result, samePropertyValuesAs(draftResponse))
+            () -> verify(draftGateway).save(captor.capture()),
+            () -> verify(caseDefinitionRepository).getCaseType(CTID),
+            () -> verify(caseSanitiser).sanitise(CASE_TYPE, DATA),
+            () -> assertThat(captor.getValue().getDocument(), hasProperty("userId", is(caseDraft.getUserId()))),
+            () -> assertThat(captor.getValue().getDocument(), hasProperty("jurisdictionId", is(caseDraft.getJurisdictionId()))),
+            () -> assertThat(captor.getValue().getDocument(), hasProperty("caseTypeId", is(caseDraft.getCaseTypeId()))),
+            () -> assertThat(captor.getValue().getDocument(), hasProperty("eventTriggerId", is(caseDraft.getEventTriggerId()))),
+            () -> assertThat(captor.getValue().getDocument(), hasProperty("caseDataContent", is(caseDataContent))),
+            () -> assertThat(captor.getValue().getDocument(), hasProperty("caseDataContent", hasProperty("data", is(SANITISED_DATA)))),
+            () -> assertThat(captor.getValue().getMaxStaleDays(), is(DRAFT_MAX_STALE_DAYS)),
+            () -> assertThat(captor.getValue().getType(), is(CASE_DATA_CONTENT)),
+            () -> assertThat(result, samePropertyValuesAs(draftResponse))
         );
     }
 
@@ -107,15 +114,18 @@ class DefaultUpsertDraftOperationTest {
         DraftResponse result = upsertDraftOperation.executeUpdate(UID, JID, CTID, ETID, DID, caseDataContent);
 
         assertAll(
-            () ->  verify(draftGateway).update(caseDataContentCaptor.capture(), draftIdCaptor.capture()),
-            () ->  assertThat(draftIdCaptor.getValue(), is("5")),
-            () ->  assertThat(caseDataContentCaptor.getValue().getDocument(), hasProperty("userId", is(caseDraft.getUserId()))),
-            () ->  assertThat(caseDataContentCaptor.getValue().getDocument(), hasProperty("jurisdictionId", is(caseDraft.getJurisdictionId()))),
-            () ->  assertThat(caseDataContentCaptor.getValue().getDocument(), hasProperty("caseTypeId", is(caseDraft.getCaseTypeId()))),
-            () ->  assertThat(caseDataContentCaptor.getValue().getDocument(), hasProperty("eventTriggerId", is(caseDraft.getEventTriggerId()))),
-            () ->  assertThat(caseDataContentCaptor.getValue().getDocument(), hasProperty("caseDataContent", is(caseDataContent))),
-            () ->  assertThat(caseDataContentCaptor.getValue().getType(), is(CASE_DATA_CONTENT)),
-            () ->  assertThat(result, is(draftResponse))
+            () -> verify(draftGateway).update(caseDataContentCaptor.capture(), draftIdCaptor.capture()),
+            () -> verify(caseDefinitionRepository).getCaseType(CTID),
+            () -> verify(caseSanitiser).sanitise(CASE_TYPE, DATA),
+            () -> assertThat(draftIdCaptor.getValue(), is("5")),
+            () -> assertThat(caseDataContentCaptor.getValue().getDocument(), hasProperty("userId", is(caseDraft.getUserId()))),
+            () -> assertThat(caseDataContentCaptor.getValue().getDocument(), hasProperty("jurisdictionId", is(caseDraft.getJurisdictionId()))),
+            () -> assertThat(caseDataContentCaptor.getValue().getDocument(), hasProperty("caseTypeId", is(caseDraft.getCaseTypeId()))),
+            () -> assertThat(caseDataContentCaptor.getValue().getDocument(), hasProperty("eventTriggerId", is(caseDraft.getEventTriggerId()))),
+            () -> assertThat(caseDataContentCaptor.getValue().getDocument(), hasProperty("caseDataContent", is(caseDataContent))),
+            () -> assertThat(caseDataContentCaptor.getValue().getDocument(), hasProperty("caseDataContent", hasProperty("data", is(SANITISED_DATA)))),
+            () -> assertThat(caseDataContentCaptor.getValue().getType(), is(CASE_DATA_CONTENT)),
+            () -> assertThat(result, is(draftResponse))
         );
     }
 

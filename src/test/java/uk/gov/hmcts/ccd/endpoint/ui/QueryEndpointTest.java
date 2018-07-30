@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.search.FieldMapSanitizeOperation;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
@@ -49,7 +50,7 @@ class QueryEndpointTest {
 
 
     @BeforeEach
-    void setup(){
+    void setup() {
         MockitoAnnotations.initMocks(this);
         queryEndpoint = new QueryEndpoint(getCaseViewOperation, getDraftViewOperation, getCaseHistoryViewOperation,
                                           getEventTriggerOperation,
@@ -80,6 +81,14 @@ class QueryEndpointTest {
         doReturn(caseView).when(getDraftViewOperation).execute(any(), any(), any());
         queryEndpoint.findDraft("jurisdictionId", "caseTypeId", "caseId");
         verify(getDraftViewOperation).execute("jurisdictionId", "caseTypeId", "caseId");
+    }
+
+    @Test
+    void shouldCallGetEventTriggerOperationForDraft() {
+        CaseEventTrigger caseEventTrigger = new CaseEventTrigger();
+        doReturn(caseEventTrigger).when(getEventTriggerOperation).executeForDraft(any(), any(), any(), any(), any(), any());
+        queryEndpoint.getEventTriggerForDraft("userId", "jurisdictionId", "caseTypeId", "draftId", "eventTriggerId", false);
+        verify(getEventTriggerOperation).executeForDraft("userId", "jurisdictionId", "caseTypeId", "draftId", "eventTriggerId", false);
     }
 
     @Test
