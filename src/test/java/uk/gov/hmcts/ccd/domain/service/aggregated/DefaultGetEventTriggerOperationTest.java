@@ -324,7 +324,7 @@ class DefaultGetEventTriggerOperationTest {
                 () -> assertThat(caseEventTrigger, hasProperty("showSummary", equalTo(EVENT_TRIGGER_SHOW_SUMMARY))),
                 () -> assertThat(caseEventTrigger, hasProperty("showEventNotes", equalTo(EVENT_TRIGGER_SHOW_EVENT_NOTES))),
                 () -> assertThat(caseEventTrigger, hasProperty("eventToken", equalTo(TOKEN))),
-                () -> assertThat(caseEventTrigger, hasProperty("caseId", equalTo(DRAFT_ID))),
+                () -> assertThat(caseEventTrigger, hasProperty("caseId", is(nullValue()))),
                 () -> assertThat(caseEventTrigger, hasProperty("caseFields", equalTo(viewFields))),
                 () -> assertThat(caseEventTrigger, hasProperty("wizardPages", equalTo(wizardPageCollection)))
             );
