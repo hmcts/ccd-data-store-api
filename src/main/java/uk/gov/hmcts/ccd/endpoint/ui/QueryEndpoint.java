@@ -49,6 +49,13 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CASE_REFERENCE;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CREATED_DATE;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.LAST_MODIFIED_DATE;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.SECURITY_CLASSIFICATION;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.PAGE_PARAM;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.SORT_PARAM;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
@@ -123,13 +130,13 @@ public class QueryEndpoint {
                                       @RequestParam java.util.Map<String, String> params) {
         String view = params.get("view");
         MetaData metadata = new MetaData(caseTypeId, jurisdictionId);
-        metadata.setState(param(params, MetaData.STATE_PARAM));
-        metadata.setCaseReference(param(params, MetaData.CASE_REFERENCE_PARAM));
-        metadata.setCreatedDate(param(params, MetaData.CREATED_DATE_PARAM));
-        metadata.setLastModified(param(params, MetaData.LAST_MODIFIED_PARAM));
-        metadata.setSecurityClassification(param(params, MetaData.SECURITY_CLASSIFICATION_PARAM));
-        metadata.setPage(param(params, MetaData.PAGE_PARAM));
-        metadata.setSortDirection(param(params, MetaData.SORT_DIRECTION_PARAM));
+        metadata.setState(param(params, STATE.getParameterName()));
+        metadata.setCaseReference(param(params, CASE_REFERENCE.getParameterName()));
+        metadata.setCreatedDate(param(params, CREATED_DATE.getParameterName()));
+        metadata.setLastModified(param(params, LAST_MODIFIED_DATE.getParameterName()));
+        metadata.setSecurityClassification(param(params, SECURITY_CLASSIFICATION.getParameterName()));
+        metadata.setPage(param(params, PAGE_PARAM));
+        metadata.setSortDirection(param(params, SORT_PARAM));
 
         Map<String, String> sanitized = fieldMapSanitizeOperation.execute(params);
 
