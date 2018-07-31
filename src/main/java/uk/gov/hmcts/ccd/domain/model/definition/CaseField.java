@@ -30,6 +30,7 @@ public class CaseField implements Serializable {
     private String showConditon = null;
     @JsonProperty("acls")
     private List<AccessControlList> accessControlLists;
+    private boolean metadata;
 
     public String getId() {
         return id;
@@ -115,4 +116,11 @@ public class CaseField implements Serializable {
         this.accessControlLists = accessControlLists;
     }
 
+    public boolean isMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(boolean metadata) {
+        this.metadata = metadata;
+    }
 }
