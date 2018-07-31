@@ -75,20 +75,12 @@ public class DefaultStartEventOperation implements StartEventOperation {
                                                      final String eventTriggerId,
                                                      final Boolean ignoreWarning) {
 
-        final CaseType caseType = getCaseType(caseTypeId);
-        final CaseEvent eventTrigger = getEventTrigger(caseTypeId, eventTriggerId, caseType);
-
-        validateJurisdiction(jurisdictionId, caseTypeId, caseType);
-
-        final CaseDetails caseDetails = caseService.createNewCaseDetails(caseTypeId, jurisdictionId, Maps.newHashMap());
-
-        validateEventTrigger(() -> !eventTriggerService.isPreStateEmpty(eventTrigger));
-
-        final String eventToken = eventTokenService.generateToken(uid, eventTrigger, caseType.getJurisdiction(), caseType);
-
-        callbackInvoker.invokeAboutToStartCallback(eventTrigger, caseType, caseDetails, ignoreWarning);
-
-        return buildStartEventTrigger(eventTriggerId, eventToken, caseDetails);
+        return buildStartEventTrigger(uid,
+                                      jurisdictionId,
+                                      caseTypeId,
+                                      eventTriggerId,
+                                      ignoreWarning,
+                                      () -> caseService.createNewCaseDetails(caseTypeId, jurisdictionId, Maps.newHashMap()));
     }
 
     @Override
@@ -99,13 +91,20 @@ public class DefaultStartEventOperation implements StartEventOperation {
                                                  final String eventTriggerId,
                                                  final Boolean ignoreWarning) {
 
-        return buildStartEventTrigger(uid,
-                                      jurisdictionId,
-                                      caseTypeId,
-                                      caseReference,
-                                      eventTriggerId,
-                                      ignoreWarning,
-                                      () -> getCaseDetails(jurisdictionId, caseTypeId, caseReference));
+        final CaseType caseType = getCaseType(caseTypeId);
+        final CaseEvent eventTrigger = getEventTrigger(caseTypeId, eventTriggerId, caseType);
+
+        validateJurisdiction(jurisdictionId, caseTypeId, caseType);
+
+        final CaseDetails caseDetails = getCaseDetails(jurisdictionId, caseTypeId, caseReference);
+
+        validateEventTrigger(() -> !eventTriggerService.isPreStateValid(caseDetails.getState(), eventTrigger));
+
+        final String eventToken = eventTokenService.generateToken(uid, caseDetails, eventTrigger, caseType.getJurisdiction(), caseType);
+
+        callbackInvoker.invokeAboutToStartCallback(eventTrigger, caseType, caseDetails, ignoreWarning);
+
+        return buildStartEventTrigger(eventTriggerId, eventToken, caseDetails);
     }
 
     @Override
@@ -118,7 +117,6 @@ public class DefaultStartEventOperation implements StartEventOperation {
         return buildStartEventTrigger(uid,
                                       jurisdictionId,
                                       caseTypeId,
-                                      draftReference,
                                       eventTriggerId,
                                       ignoreWarning,
                                       () -> getDraftDetails(jurisdictionId, caseTypeId, draftReference));
@@ -127,7 +125,6 @@ public class DefaultStartEventOperation implements StartEventOperation {
     private StartEventTrigger buildStartEventTrigger(final String uid,
                                                      final String jurisdictionId,
                                                      final String caseTypeId,
-                                                     final String reference,
                                                      final String eventTriggerId,
                                                      final Boolean ignoreWarning,
                                                      final Supplier<CaseDetails> caseDetailsSupplier) {
@@ -138,10 +135,9 @@ public class DefaultStartEventOperation implements StartEventOperation {
 
         final CaseDetails caseDetails = caseDetailsSupplier.get();
 
-        validateEventTrigger(() -> !eventTriggerService.isPreStateValid(caseDetails.getState(), eventTrigger));
+        validateEventTrigger(() -> !eventTriggerService.isPreStateEmpty(eventTrigger));
 
-        final String eventToken = eventTokenService.generateToken(uid, caseDetails, eventTrigger,
-                                                                  caseType.getJurisdiction(), caseType);
+        final String eventToken = eventTokenService.generateToken(uid, eventTrigger, caseType.getJurisdiction(), caseType);
 
         callbackInvoker.invokeAboutToStartCallback(eventTrigger, caseType, caseDetails, ignoreWarning);
 
@@ -162,18 +158,6 @@ public class DefaultStartEventOperation implements StartEventOperation {
         }
     }
 
-    private CaseDetails getDraftDetails(String jurisdictionId, String caseTypeId, String draftId) {
-        final DraftResponse draftResponse = draftGateway.get(Draft.stripId(draftId));
-        CaseDraft document = draftResponse.getDocument();
-        return aCaseDetails()
-            .withCaseTypeId(document.getCaseTypeId())
-            .withJurisdiction(document.getJurisdictionId())
-            .withSecurityClassification(getSecurityClassification(document))
-            .withDataClassification(document.getCaseDataContent().getDataClassification())
-            .withData(document.getCaseDataContent().getData())
-            .build();
-    }
-
     private SecurityClassification getSecurityClassification(CaseDraft document) {
         String securityClassification = document.getCaseDataContent().getSecurityClassification();
         return securityClassification != null ? SecurityClassification.valueOf(securityClassification) : null;
@@ -191,6 +175,18 @@ public class DefaultStartEventOperation implements StartEventOperation {
         return caseDetails;
     }
 
+    private CaseDetails getDraftDetails(String jurisdictionId, String caseTypeId, String draftId) {
+        final DraftResponse draftResponse = draftGateway.get(Draft.stripId(draftId));
+        CaseDraft document = draftResponse.getDocument();
+        return aCaseDetails()
+            .withCaseTypeId(document.getCaseTypeId())
+            .withJurisdiction(document.getJurisdictionId())
+            .withSecurityClassification(getSecurityClassification(document))
+            .withDataClassification(document.getCaseDataContent().getDataClassification())
+            .withData(document.getCaseDataContent().getData())
+            .build();
+    }
+
     private CaseEvent getEventTrigger(String caseTypeId, String eventTriggerId, CaseType caseType) {
         final CaseEvent eventTrigger = eventTriggerService.findCaseEvent(caseType, eventTriggerId);
         if (eventTrigger == null) {
@@ -202,7 +198,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
     private CaseType getCaseType(String caseTypeId) {
         final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
         if (caseType == null) {
-            throw new ResourceNotFoundException("Cannot findCaseEvent case type definition for  " + caseTypeId);
+            throw new ResourceNotFoundException("Cannot findCaseEvent case type definition for " + caseTypeId);
         }
         return caseType;
     }
