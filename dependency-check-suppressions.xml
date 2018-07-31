@@ -46,7 +46,7 @@
         <cpe>cpe:/a:jcraft:jsch</cpe>
     </suppress>
     <suppress>
-        <notes>Temporarly supress until we can migration to Spring Boot 2 see https://tools.hmcts.net/jira/browse/RDM-2464</notes>
+        <notes>We do not use: Spring Framework 5.0.5.RELEASE + Spring Security (any version), see https://pivotal.io/security/cve-2018-1258</notes>
         <cve>CVE-2018-1258</cve>
     </suppress>
 </suppressions>
