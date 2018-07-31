@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.arrayWithSize;
@@ -47,6 +48,7 @@ class DefaultGetCaseViewOperationTest {
     private static final String EVENT_SUMMARY_1 = "some summary";
     private static final String EVENT_SUMMARY_2 = "Another summary";
     private static final String STATE = "Plop";
+    private static final String TITLE_DISPLAY = "titleDisplay";
 
     @Mock
     private GetCaseOperation getCaseOperation;
@@ -106,9 +108,12 @@ class DefaultGetCaseViewOperationTest {
         Jurisdiction jurisdiction = new Jurisdiction();
         jurisdiction.setName(JURISDICTION_ID);
         caseType.setJurisdiction(jurisdiction);
+
         doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
 
         caseState = new CaseState();
+        caseState.setId(STATE);
+        caseState.setTitleDisplay(TITLE_DISPLAY);
         doReturn(caseState).when(caseTypeService).findState(caseType, STATE);
 
         defaultGetCaseViewOperation = new DefaultGetCaseViewOperation(getCaseOperation, getEventsOperation,
@@ -141,7 +146,9 @@ class DefaultGetCaseViewOperationTest {
                   () -> assertThat(caseView.getEvents(),
                                    hasItemInArray(hasProperty("summary", equalTo(EVENT_SUMMARY_1)))),
                   () -> assertThat(caseView.getEvents(),
-                                   hasItemInArray(hasProperty("summary", equalTo(EVENT_SUMMARY_2))))
+                                   hasItemInArray(hasProperty("summary", equalTo(EVENT_SUMMARY_2)))),
+                  () -> assertThat(caseView.getState().getId(), is(STATE)),
+                  () -> assertThat(caseView.getState().getTitleDisplay(), is(TITLE_DISPLAY))
         );
     }
 
