@@ -28,28 +28,29 @@ public class MergeDataToSearchResultOperation {
 
     public SearchResultView execute(final CaseType caseType, final List<CaseDetails> caseDetails, final String view) {
         final SearchResult searchResult = getSearchResult(caseType, view);
-        final SearchResultViewColumn[] viewColumns = Arrays.stream(searchResult.getFields())
+        final List<SearchResultViewColumn> viewColumns = Arrays.stream(searchResult.getFields())
             .flatMap(searchResultField -> caseType.getCaseFields().stream()
             .filter(caseField -> caseField.getId().equals(searchResultField.getCaseFieldId()))
             .map(caseField ->  new SearchResultViewColumn(
                 searchResultField.getCaseFieldId(),
                 caseField.getFieldType(),
                 searchResultField.getLabel(),
-                searchResultField.getDisplayOrder())
+                searchResultField.getDisplayOrder(),
+                searchResultField.isMetadata())
              ))
-            .toArray(SearchResultViewColumn[]::new);
+            .collect(Collectors.toList());
 
-        final SearchResultViewItem[]
+        final List<SearchResultViewItem>
             viewItems =
             caseDetails.stream()
                        .map(caseData -> new SearchResultViewItem(caseData.getReference().toString(),
-                                                                 caseData.getData(),
+                                                                 caseData.getCaseDataAndMetadata(),
                                                                  caseType.getCaseFields()
                                                                          .stream()
                                                                          .filter(caseField -> LABEL_FIELD_TYPE.equals(
                                                                              caseField.getFieldType().getType()))
                                                                          .collect(Collectors.toList())))
-                       .toArray(SearchResultViewItem[]::new);
+                        .collect(Collectors.toList());
         return new SearchResultView(viewColumns, viewItems);
     }
 
