@@ -13,6 +13,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Named
 @Singleton
@@ -25,20 +26,21 @@ public class MergeDataToSearchResultOperation {
 
     public SearchResultView execute(final CaseType caseType, final List<CaseDetails> caseDetails,final String view) {
         final SearchResult searchResult = getSearchResult(caseType, view);
-        final SearchResultViewColumn[] viewColumns = Arrays.stream(searchResult.getFields())
+        final List<SearchResultViewColumn> viewColumns = Arrays.stream(searchResult.getFields())
             .flatMap(searchResultField -> caseType.getCaseFields().stream()
             .filter(caseField -> caseField.getId().equals(searchResultField.getCaseFieldId()))
             .map(caseField ->  new SearchResultViewColumn(
                 searchResultField.getCaseFieldId(),
                 caseField.getFieldType(),
                 searchResultField.getLabel(),
-                searchResultField.getDisplayOrder())
+                searchResultField.getDisplayOrder(),
+                searchResultField.isMetadata())
              ))
-            .toArray(SearchResultViewColumn[]::new);
+            .collect(Collectors.toList());
 
-        final SearchResultViewItem[] viewItems = caseDetails.stream()
-            .map(caseData -> new SearchResultViewItem(caseData.getReference().toString(), caseData.getData()))
-            .toArray(SearchResultViewItem[]::new);
+        final List<SearchResultViewItem> viewItems = caseDetails.stream()
+            .map(caseData -> new SearchResultViewItem(caseData.getReference().toString(), caseData.getCaseDataAndMetadata()))
+            .collect(Collectors.toList());
         return new SearchResultView(viewColumns, viewItems);
     }
 

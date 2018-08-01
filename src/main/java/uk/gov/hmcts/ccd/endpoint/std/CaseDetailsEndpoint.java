@@ -41,15 +41,22 @@ import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
+import javax.transaction.Transactional;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
-import javax.transaction.Transactional;
 
 import static java.util.stream.Collectors.toList;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CASE_REFERENCE;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CREATED_DATE;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.LAST_MODIFIED_DATE;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.SECURITY_CLASSIFICATION;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.PAGE_PARAM;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.SORT_PARAM;
 
 @RestController
 @RequestMapping(path = "/",
@@ -467,13 +474,13 @@ public class CaseDetailsEndpoint {
             throw new BadRequestException(String.format("unknown metadata search parameters: %s",
                     String.join((","), MetaData.unknownMetadata(metadataParams))));
         }
-        param(queryParameters, MetaData.SECURITY_CLASSIFICATION_PARAM).ifPresent(sc -> {
+        param(queryParameters, SECURITY_CLASSIFICATION.getParameterName()).ifPresent(sc -> {
             if(!EnumUtils.isValidEnum(SecurityClassification.class, sc.toUpperCase())) {
                 throw new BadRequestException(String.format("unknown security classification '%s'", sc));
             }
         });
 
-        param(queryParameters, MetaData.SORT_DIRECTION_PARAM).ifPresent(sd -> {
+        param(queryParameters, SORT_PARAM).ifPresent(sd -> {
             if (Stream.of("ASC", "DESC").noneMatch(direction -> direction.equalsIgnoreCase(sd))) {
                 throw new BadRequestException(String.format("Unknown sort direction: %s", sd));
             }
@@ -489,13 +496,13 @@ public class CaseDetailsEndpoint {
         validateMetadataSearchParameters(queryParameters);
 
         final MetaData metadata = new MetaData(caseTypeId, jurisdictionId);
-        metadata.setState(param(queryParameters, MetaData.STATE_PARAM));
-        metadata.setCaseReference(param(queryParameters, MetaData.CASE_REFERENCE_PARAM));
-        metadata.setCreatedDate(param(queryParameters, MetaData.CREATED_DATE_PARAM));
-        metadata.setLastModified(param(queryParameters, MetaData.LAST_MODIFIED_PARAM));
-        metadata.setSecurityClassification(param(queryParameters, MetaData.SECURITY_CLASSIFICATION_PARAM));
-        metadata.setPage(param(queryParameters, MetaData.PAGE_PARAM));
-        metadata.setSortDirection(param(queryParameters, MetaData.SORT_DIRECTION_PARAM));
+        metadata.setState(param(queryParameters, STATE.getParameterName()));
+        metadata.setCaseReference(param(queryParameters, CASE_REFERENCE.getParameterName()));
+        metadata.setCreatedDate(param(queryParameters, CREATED_DATE.getParameterName()));
+        metadata.setLastModified(param(queryParameters, LAST_MODIFIED_DATE.getParameterName()));
+        metadata.setSecurityClassification(param(queryParameters, SECURITY_CLASSIFICATION.getParameterName()));
+        metadata.setPage(param(queryParameters, PAGE_PARAM));
+        metadata.setSortDirection(param(queryParameters, SORT_PARAM));
 
         return metadata;
     }
