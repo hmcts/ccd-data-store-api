@@ -1,0 +1,34 @@
+#!groovy
+
+properties([
+    // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
+    pipelineTriggers([cron('H 05 * * *')])
+])
+
+@Library("Infrastructure")
+
+def type = "java"
+def product = "ccd"
+def component = "data-store-api"
+
+List<LinkedHashMap<String, Object>> secrets = [
+    secret('caseworkerAutoTest1Email', 'CCD_CASEWORKER_AUTOTEST_EMAIL'),
+    secret('caseworkerAutoTest1Password', 'CCD_CASEWORKER_AUTOTEST_PASSWORD'),
+    secret('microserviceGatewaySecret', 'CCD_GW_SERVICE_SECRET'),
+    secret('gatewayOAuth2ClientSecret', 'OAUTH2_CLIENT_SECRET'),
+]
+
+static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
+    [ $class: 'AzureKeyVaultSecret',
+      secretType: 'Secret',
+      name: secretName,
+      version: '',
+      envVariable: envVar
+    ]
+}
+
+withNightlyPipeline(type, product, component) {
+    loadVaultSecrets(secrets)
+    enableDbMigration()
+    enableSlackNotifications('#ccd-nightly-builds')
+}
