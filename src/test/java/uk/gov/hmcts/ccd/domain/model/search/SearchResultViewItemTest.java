@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.model.search;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,7 +22,6 @@ class SearchResultViewItemTest {
     private static final String LABEL_FIELD_TEXT = "flabel";
     private Map<String, Object> caseFields;
     private List<CaseField> labelFields;
-    private JsonNodeFactory jnf = JsonNodeFactory.instance;
 
     @BeforeEach
     void setUp() {
