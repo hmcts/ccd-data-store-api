@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.model.search;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.TextNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,14 +21,14 @@ class SearchResultViewItemTest {
     private static final String CASE_FIELD_TEXT = "C1";
     private static final String LABEL_FIELD_ID = "fid";
     private static final String LABEL_FIELD_TEXT = "flabel";
-    private Map<String, JsonNode> caseFields;
+    private Map<String, Object> caseFields;
     private List<CaseField> labelFields;
     private JsonNodeFactory jnf = JsonNodeFactory.instance;
 
     @BeforeEach
     void setUp() {
         caseFields = new HashMap<>();
-        caseFields.put(CASE_FIELD_ID, jnf.textNode(CASE_FIELD_TEXT));
+        caseFields.put(CASE_FIELD_ID, CASE_FIELD_TEXT);
         final CaseField caseField = new CaseField();
         caseField.setId(LABEL_FIELD_ID);
         caseField.setLabel(LABEL_FIELD_TEXT);
@@ -40,9 +40,9 @@ class SearchResultViewItemTest {
     @Test
     void checkLabelFieldsAreAddedToCaseFields() {
         final SearchResultViewItem item = new SearchResultViewItem("TestCase", caseFields, labelFields);
-        final Map<String, JsonNode> map = item.getCaseFields();
+        final Map<String, Object> map = item.getCaseFields();
         assertThat(map.size(), is(2));
-        assertThat(map.get(CASE_FIELD_ID).asText(), is(CASE_FIELD_TEXT));
-        assertThat(map.get(LABEL_FIELD_ID).asText(), is(LABEL_FIELD_TEXT));
+        assertThat(map.get(CASE_FIELD_ID), is(CASE_FIELD_TEXT));
+        assertThat(((TextNode)map.get(LABEL_FIELD_ID)).asText(), is(LABEL_FIELD_TEXT));
     }
 }

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -124,16 +125,14 @@ class MergeDataToSearchResultOperationTest {
                                                                          caseDetailsList,
                                                                          WORKBASKET_VIEW);
         assertAll(
-            () -> assertThat(searchResultView.getSearchResultViewItems().length, is(2)),
-            () -> assertThat(searchResultView.getSearchResultViewColumns().length, is(2)),
-            () -> assertThat(searchResultView.getSearchResultViewItems()[0]
+            () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
+            () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(2)),
+            () -> assertThat(((TextNode)searchResultView.getSearchResultViewItems().get(0)
                 .getCaseFields()
-                .get(LABEL_ID)
-                .asText(), is(LABEL_TEXT)),
-            () -> assertThat(searchResultView.getSearchResultViewItems()[1]
+                .get(LABEL_ID)).asText(), is(LABEL_TEXT)),
+            () -> assertThat(((TextNode)searchResultView.getSearchResultViewItems().get(1)
                 .getCaseFields()
-                .get(LABEL_ID)
-                .asText(), is(LABEL_TEXT)));
+                .get(LABEL_ID)).asText(), is(LABEL_TEXT)));
     }
 
     @Test
@@ -166,14 +165,12 @@ class MergeDataToSearchResultOperationTest {
                                                                          caseDetailsList,
                                                                          SEARCH_VIEW);
         assertAll(
-            () -> assertThat(searchResultView.getSearchResultViewItems().length, is(2)),
-            () -> assertThat(searchResultView.getSearchResultViewColumns().length, is(1)),
-            () -> assertThat(searchResultView.getSearchResultViewItems()[0].getCaseFields()
-                    .get(LABEL_ID)
-                    .asText(), is(LABEL_TEXT)),
-            () -> assertThat(searchResultView.getSearchResultViewItems()[1].getCaseFields()
-                    .get(LABEL_ID)
-                    .asText(), is(LABEL_TEXT)))
+            () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
+            () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(1)),
+            () -> assertThat(((TextNode)searchResultView.getSearchResultViewItems().get(0).getCaseFields()
+                    .get(LABEL_ID)).asText(), is(LABEL_TEXT)),
+            () -> assertThat(((TextNode)searchResultView.getSearchResultViewItems().get(1).getCaseFields()
+                    .get(LABEL_ID)).asText(), is(LABEL_TEXT)))
         ;
     }
 
