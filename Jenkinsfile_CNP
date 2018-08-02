@@ -9,7 +9,7 @@ properties(
     ]
 )
 
-@Library("Infrastructure")
+@Library("Infrastructure@RDM-2575-publish_checkstyle_results")
 
 def type = "java"
 def product = "ccd"
