@@ -1,16 +1,25 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
-
-import java.util.Map;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
+
+import java.time.LocalDateTime;
+import java.util.Map;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CASE_REFERENCE_METADATA;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CASE_TYPE_METADATA;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CREATED_DATE_METADATA;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.JURISDICTION_METADATA;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.LAST_MODIFIED_METADATA;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.SECURITY_CLASSIFICATION_METADATA;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.STATE_METADATA;
 
 class CaseDetailsTest {
 
@@ -54,11 +63,33 @@ class CaseDetailsTest {
         assertThat(caseDetails.existsInData(tabField), equalTo(true));
     }
 
+    @Test
+    void shouldReturnCaseDataAndMetadataFieldMap() {
+        LocalDateTime now = LocalDateTime.now();
+        caseDetails.setJurisdiction("jurisdiction");
+        caseDetails.setCaseTypeId("caseType");
+        caseDetails.setState("state");
+        caseDetails.setReference(1234567L);
+        caseDetails.setCreatedDate(now);
+        caseDetails.setLastModified(now);
+        caseDetails.setSecurityClassification(SecurityClassification.PUBLIC);
+
+        Map<String, Object> allData = caseDetails.getCaseDataAndMetadata();
+
+        assertThat(((JsonNode) allData.get(CASE_DETAIL_FIELD)).asText(), equalTo(CASE_DETAIL_FIELD));
+        assertThat(allData.get(JURISDICTION_METADATA), equalTo(caseDetails.getJurisdiction()));
+        assertThat(allData.get(CASE_TYPE_METADATA), equalTo(caseDetails.getCaseTypeId()));
+        assertThat(allData.get(STATE_METADATA), equalTo(caseDetails.getState()));
+        assertThat(allData.get(CASE_REFERENCE_METADATA), equalTo(caseDetails.getReference()));
+        assertThat(allData.get(CREATED_DATE_METADATA), equalTo(caseDetails.getCreatedDate()));
+        assertThat(allData.get(LAST_MODIFIED_METADATA), equalTo(caseDetails.getLastModified()));
+        assertThat(allData.get(SECURITY_CLASSIFICATION_METADATA), equalTo(caseDetails.getSecurityClassification()));
+    }
+
     private Map<String, JsonNode> buildData(String... dataFieldIds) {
         Map<String, JsonNode> dataMap = Maps.newHashMap();
-        Lists.newArrayList(dataFieldIds).forEach(dataFieldId -> {
-            dataMap.put(dataFieldId, JSON_NODE_FACTORY.textNode(dataFieldId));
-        });
+        Lists.newArrayList(dataFieldIds)
+            .forEach(dataFieldId -> dataMap.put(dataFieldId, JSON_NODE_FACTORY.textNode(dataFieldId)));
         return dataMap;
     }
 
@@ -72,6 +103,5 @@ class CaseDetailsTest {
         tabField.setCaseField(caseField);
         return tabField;
     }
-
 
 }

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
@@ -56,19 +55,15 @@ public abstract class AbstractDefaultGetCaseViewOperation {
                                                               caseReference)));
     }
 
+    CaseViewTab[] getTabs(CaseDetails caseDetails, Map<String, ?> data) {
+        return getTabs(caseDetails, data, getCaseTabCollection(caseDetails.getCaseTypeId()));
+    }
+
     CaseTabCollection getCaseTabCollection(String caseTypeId) {
         return uiDefinitionRepository.getCaseTabCollection(caseTypeId);
     }
 
-    private Predicate<CaseTypeTabField> filterCaseTabFieldsBasedOnSecureData(CaseDetails caseDetails) {
-        return caseDetails::existsInData;
-    }
-
-    CaseViewTab[] getTabs(CaseDetails caseDetails, Map<String, JsonNode> data) {
-        return getTabs(caseDetails, data, getCaseTabCollection(caseDetails.getCaseTypeId()));
-    }
-
-    CaseViewTab[] getTabs(CaseDetails caseDetails, Map<String, JsonNode> data, CaseTabCollection caseTabCollection) {
+    CaseViewTab[] getTabs(CaseDetails caseDetails, Map<String, ?> data, CaseTabCollection caseTabCollection) {
         return caseTabCollection.getTabs().stream().map(tab -> {
             CaseViewField[] caseViewFields = tab.getTabFields().stream()
                 .filter(filterCaseTabFieldsBasedOnSecureData(caseDetails))
@@ -79,6 +74,10 @@ public abstract class AbstractDefaultGetCaseViewOperation {
                                    tab.getShowCondition());
 
         }).toArray(CaseViewTab[]::new);
+    }
+
+    private Predicate<CaseTypeTabField> filterCaseTabFieldsBasedOnSecureData(CaseDetails caseDetails) {
+        return caseDetails::existsInData;
     }
 
 }
