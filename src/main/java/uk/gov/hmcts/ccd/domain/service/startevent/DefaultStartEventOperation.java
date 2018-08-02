@@ -137,6 +137,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
 
         validateEventTrigger(() -> !eventTriggerService.isPreStateEmpty(eventTrigger));
 
+        // TODO: we may need to take care of drafts that are saved for existing case so token needs to include the relevant draft payload
         final String eventToken = eventTokenService.generateToken(uid, eventTrigger, caseType.getJurisdiction(), caseType);
 
         callbackInvoker.invokeAboutToStartCallback(eventTrigger, caseType, caseDetails, ignoreWarning);
