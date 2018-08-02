@@ -104,7 +104,7 @@ class MergeDataToSearchResultOperationTest {
         final SearchResultView searchResultView = classUnderTest.execute(caseType, caseDetailsList, SEARCH_VIEW, TIMEOUT_ERROR);
         assertAll(
             () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
-            () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(1))
+            () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(1)),
             () -> assertThat(searchResultView.getResultError(), is(TIMEOUT_ERROR))
         );
     }

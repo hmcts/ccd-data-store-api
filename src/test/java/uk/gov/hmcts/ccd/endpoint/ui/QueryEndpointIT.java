@@ -162,8 +162,8 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect view items count", 3, searchResultViewItems.size());
 
         assertNotNull(searchResultViewItems.get(0).getCaseId());
-        assertEquals("John", searchResultViewItems.get(0).getCaseFields().get("PersonFirstName").asText());
-        assertEquals("Smith", searchResultViewItems.get(0).getCaseFields().get("PersonLastName").asText());
+        assertEquals("John", searchResultViewItems.get(0).getCaseFields().get("PersonFirstName"));
+        assertEquals("Smith", searchResultViewItems.get(0).getCaseFields().get("PersonLastName"));
         assertEquals(null, searchResultViewItems.get(0).getCaseFields().get("PersonAddress"));
 
         assertNotNull(searchResultViewItems.get(1).getCaseId());
@@ -679,7 +679,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected Field order", 1, firstNameField.getOrder().intValue());
         assertEquals("Unexpected Field show condition", "PersonLastName=\"Jones\"", firstNameField.getShowCondition());
         assertEquals("Unexpected Field field type", "Text", firstNameField.getFieldType().getType());
-        assertEquals("Unexpected Field value", "John", firstNameField.getValue().asText());
+        assertEquals("Unexpected Field value", "John", firstNameField.getValue());
 
         final CaseViewField lastNameField = nameFields[1];
         assertNotNull("Field is null", lastNameField);
@@ -688,7 +688,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected Field order", 2, lastNameField.getOrder().intValue());
         assertEquals("Unexpected Field show condition", "PersonFirstName=\"Tom\"", lastNameField.getShowCondition());
         assertEquals("Unexpected Field field type", "Text", lastNameField.getFieldType().getType());
-        assertEquals("Unexpected Field value", "Smith", lastNameField.getValue().asText());
+        assertEquals("Unexpected Field value", "Smith", lastNameField.getValue());
 
         final CaseViewTab addressTab = caseViewTabs[1];
         assertNotNull("First tab is null", addressTab);
