@@ -114,13 +114,13 @@ public class QueryEndpoint {
                                       @RequestParam java.util.Map<String, String> params) {
         String view = params.get("view");
         MetaData metadata = new MetaData(caseTypeId, jurisdictionId);
-        metadata.setState(param(params, MetaData.STATE_PARAM));
-        metadata.setCaseReference(param(params, MetaData.CASE_REFERENCE_PARAM));
-        metadata.setCreatedDate(param(params, MetaData.CREATED_DATE_PARAM));
-        metadata.setLastModified(param(params, MetaData.LAST_MODIFIED_PARAM));
-        metadata.setSecurityClassification(param(params, MetaData.SECURITY_CLASSIFICATION_PARAM));
-        metadata.setPage(param(params, MetaData.PAGE_PARAM));
-        metadata.setSortDirection(param(params, MetaData.SORT_DIRECTION_PARAM));
+        metadata.setState(param(params, MetaData.STATE_METADATA));
+        metadata.setCaseReference(param(params, MetaData.CASE_REFERENCE_METADATA));
+        metadata.setCreatedDate(param(params, MetaData.CREATED_DATE_METADATA));
+        metadata.setLastModified(param(params, MetaData.LAST_MODIFIED_METADATA));
+        metadata.setSecurityClassification(param(params, MetaData.SECURITY_CLASSIFICATION_METADATA));
+        metadata.setPage(param(params, MetaData.PAGE_METADATA));
+        metadata.setSortDirection(param(params, MetaData.SORT_DIRECTION_METADATA));
 
         Map<String, String> sanitized = fieldMapSanitizeOperation.execute(params);
 
