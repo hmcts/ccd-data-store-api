@@ -38,7 +38,7 @@ public class MergeDataToSearchResultOperation {
                     searchResultField.getLabel(),
                     searchResultField.getDisplayOrder(),
                     searchResultField.isMetadata()))
-                ))
+                )
              .collect(Collectors.toList());
 
         final List<SearchResultViewItem> viewItems = caseDetails.stream()
