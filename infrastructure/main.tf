@@ -56,23 +56,18 @@ module "ccd-data-store-api" {
   source   = "git@github.com:hmcts/moj-module-webapp?ref=master"
   product  = "${local.app_full_name}"
   location = "${var.location}"
-  env = "${var.env}"
-  ilbIp = "${var.ilbIp}"
+  env      = "${var.env}"
+  ilbIp    = "${var.ilbIp}"
   subscription = "${var.subscription}"
   is_frontend = false
-
+  common_tags  = "${var.common_tags}"
+  additional_host_name = "debugparam"
   app_settings = {
-    DATA_STORE_DB_HOST = "${var.use_uk_db != "true" ? module.postgres-data-store.host_name : module.data-store-db.host_name}"
-    DATA_STORE_DB_PORT = "${var.use_uk_db != "true" ? module.postgres-data-store.postgresql_listen_port : module.data-store-db.postgresql_listen_port}"
-    DATA_STORE_DB_NAME = "${var.use_uk_db != "true" ? module.postgres-data-store.postgresql_database : module.data-store-db.postgresql_database}"
-    DATA_STORE_DB_USERNAME = "${var.use_uk_db != "true" ? module.postgres-data-store.user_name : module.data-store-db.user_name}"
-    DATA_STORE_DB_PASSWORD = "${var.use_uk_db != "true" ? module.postgres-data-store.postgresql_password : module.data-store-db.postgresql_password}"
-
-    UK_DB_HOST = "${module.data-store-db.host_name}"
-    UK_DB_PORT = "${module.data-store-db.postgresql_listen_port}"
-    UK_DB_NAME = "${module.data-store-db.postgresql_database}"
-    UK_DB_USERNAME = "${module.data-store-db.user_name}"
-    UK_DB_PASSWORD = "${module.data-store-db.postgresql_password}"
+    DATA_STORE_DB_HOST = "${module.data-store-db.host_name}"
+    DATA_STORE_DB_PORT = "${module.data-store-db.postgresql_listen_port}"
+    DATA_STORE_DB_NAME = "${module.data-store-db.postgresql_database}"
+    DATA_STORE_DB_USERNAME = "${module.data-store-db.user_name}"
+    DATA_STORE_DB_PASSWORD = "${module.data-store-db.postgresql_password}"
 
     ENABLE_DB_MIGRATE = "false"
 
@@ -92,16 +87,8 @@ module "ccd-data-store-api" {
 
 }
 
-module "postgres-data-store" {
-  source              = "git@github.com:hmcts/moj-module-postgres?ref=master"
-  product             = "${local.app_full_name}-data-store"
-  location            = "West Europe"
-  env                 = "${var.env}"
-  postgresql_user     = "ccd"
-}
-
 module "data-store-db" {
-  source = "git@github.com:hmcts/moj-module-postgres?ref=cnp-449-tactical"
+  source = "git@github.com:hmcts/moj-module-postgres?ref=master"
   product = "${local.app_full_name}-postgres-db"
   location = "${var.location}"
   env = "${var.env}"
@@ -110,6 +97,7 @@ module "data-store-db" {
   sku_name = "GP_Gen5_2"
   sku_tier = "GeneralPurpose"
   storage_mb = "51200"
+  common_tags  = "${var.common_tags}"
 }
 
 module "ccd-data-store-vault" {
@@ -129,31 +117,31 @@ module "ccd-data-store-vault" {
 
 resource "azurerm_key_vault_secret" "POSTGRES-USER" {
   name = "${local.app_full_name}-POSTGRES-USER"
-  value = "${var.use_uk_db != "true" ? module.postgres-data-store.user_name : module.data-store-db.user_name}"
+  value = "${module.data-store-db.user_name}"
   vault_uri = "${module.ccd-data-store-vault.key_vault_uri}"
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES-PASS" {
   name = "${local.app_full_name}-POSTGRES-PASS"
-  value = "${var.use_uk_db != "true" ? module.postgres-data-store.postgresql_password : module.data-store-db.postgresql_password}"
+  value = "${module.data-store-db.postgresql_password}"
   vault_uri = "${module.ccd-data-store-vault.key_vault_uri}"
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES_HOST" {
   name = "${local.app_full_name}-POSTGRES-HOST"
-  value = "${var.use_uk_db != "true" ? module.postgres-data-store.host_name : module.data-store-db.host_name}"
+  value = "${module.data-store-db.host_name}"
   vault_uri = "${module.ccd-data-store-vault.key_vault_uri}"
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES_PORT" {
   name = "${local.app_full_name}-POSTGRES-PORT"
-  value = "${var.use_uk_db != "true" ? module.postgres-data-store.postgresql_listen_port : module.data-store-db.postgresql_listen_port}"
+  value = "${module.data-store-db.postgresql_listen_port}"
   vault_uri = "${module.ccd-data-store-vault.key_vault_uri}"
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
   name = "${local.app_full_name}-POSTGRES-DATABASE"
-  value = "${var.use_uk_db != "true" ? module.postgres-data-store.postgresql_database : module.data-store-db.postgresql_database}"
+  value = "${module.data-store-db.postgresql_database}"
   vault_uri = "${module.ccd-data-store-vault.key_vault_uri}"
 }
 

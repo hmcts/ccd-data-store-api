@@ -1,16 +1,18 @@
 {
   "request": {
     "method": "GET",
-    "url": "/api/user-role?role=Y2FzZXdvcmtlci1wcm9iYXRlLXByaXZhdGU%3D"
+    "url": "/api/user-roles/caseworker-probate-private"
   },
   "response": {
     "status": 200,
     "headers": {
       "Content-Type": "application/json"
     },
-    "jsonBody": {
-      "role": "caseworker-probate-private",
-      "security_classification": "PRIVATE"
-    }
+    "jsonBody": [
+      {
+        "role": "caseworker-probate-private",
+        "security_classification": "PRIVATE"
+      }
+    ]
   }
 }

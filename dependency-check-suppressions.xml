@@ -2,44 +2,12 @@
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.1.xsd">
 
     <suppress>
-        <notes><![CDATA[
-     Does not apply as we're not using the XmlMapper.
-     ]]></notes>
-        <gav regex="true">^com\.fasterxml\.jackson\.core:jackson-databind:.*$</gav>
-        <cpe>cpe:/a:fasterxml:jackson-databind</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   Does not apply as we're not using the XmlMapper.
-   ]]></notes>
-        <gav regex="true">^com\.fasterxml\.jackson\.core:jackson-databind:.*$</gav>
-        <cpe>cpe:/a:fasterxml:jackson</cpe>
-    </suppress>
-    <suppress>
         <gav regex="true">^org\.postgresql:postgresql:.*$</gav>
         <cpe>cpe:/a:postgresql:postgresql</cpe>
     </suppress>
     <suppress>
         <notes>See https://github.com/jeremylong/DependencyCheck/issues/1146 for Embedded Tomcat</notes>
         <cve>CVE-2017-12617</cve>
-    </suppress>
-    <suppress>
-        <notes>
-            Introduced by Spring 4.3.13.RELEASE; Upgrade to Spring Boot 1.5.12 or Spring Boot 2 to resolve.
-        </notes>
-        <cve>CVE-2018-1199</cve>
-    </suppress>
-    <suppress>
-        <notes>
-            Spring Boot application that are not installed as a service, or are not using the embedded launch script are not susceptible.
-        </notes>
-        <cve>CVE-2018-1196</cve>
-    </suppress>
-    <suppress>
-        <notes>
-            Only affect PATCH requests, those are not supported by CCD APIs.
-        </notes>
-        <cve>CVE-2017-8046</cve>
     </suppress>
     <suppress>
         <notes>SSL related</notes>
@@ -61,5 +29,24 @@
         <notes>suppress false positives</notes>
         <gav regex="true">^org\.apache\.tomcat:tomcat-annotations-api:.*$</gav>
         <cpe>cpe:/a:apache:tomcat</cpe>
+    </suppress>
+    <suppress>
+        <notes>Dependencies brough in by codacy report; not used in production</notes>
+        <gav regex="true">^org\.scala-lang:scala-compiler:.*$</gav>
+        <cpe>cpe:/a:scala-lang:scala</cpe>
+    </suppress>
+    <suppress>
+        <notes>Dependencies brough in by codacy report; not used in production</notes>
+        <gav regex="true">^org\.scala-lang:scala-reflect:.*$</gav>
+        <cpe>cpe:/a:scala-lang:scala</cpe>
+    </suppress>
+    <suppress>
+        <notes>Dependencies brough in by codacy report; not used in production</notes>
+        <gav regex="true">^com\.jcraft:jsch:.*$</gav>
+        <cpe>cpe:/a:jcraft:jsch</cpe>
+    </suppress>
+    <suppress>
+        <notes>We do not use: Spring Framework 5.0.5.RELEASE + Spring Security (any version), see https://pivotal.io/security/cve-2018-1258</notes>
+        <cve>CVE-2018-1258</cve>
     </suppress>
 </suppressions>

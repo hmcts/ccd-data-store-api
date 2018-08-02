@@ -103,7 +103,7 @@ class DefaultUserRepositoryTest {
                 userRepository.getUserClassifications(JURISDICTION_ID);
 
                 assertAll(
-                    () -> verify(caseDefinitionRepository).getUserRoleClassifications(ROLE_CASEWORKER_CMC),
+                    () -> verify(caseDefinitionRepository).getClassificationsForUserRoleList(Arrays.asList(ROLE_CASEWORKER_CMC)),
                     () -> verifyNoMoreInteractions(caseDefinitionRepository)
                 );
             }
@@ -121,7 +121,7 @@ class DefaultUserRepositoryTest {
                 userRepository.getUserClassifications(JURISDICTION_ID);
 
                 assertAll(
-                    () -> verify(caseDefinitionRepository).getUserRoleClassifications(CITIZEN),
+                    () -> verify(caseDefinitionRepository).getClassificationsForUserRoleList(Arrays.asList(CITIZEN)),
                     () -> verifyNoMoreInteractions(caseDefinitionRepository)
                 );
             }
@@ -134,7 +134,7 @@ class DefaultUserRepositoryTest {
                 userRepository.getUserClassifications(JURISDICTION_ID);
 
                 assertAll(
-                    () -> verify(caseDefinitionRepository).getUserRoleClassifications(LETTER_HOLDER),
+                    () -> verify(caseDefinitionRepository).getClassificationsForUserRoleList(Arrays.asList(LETTER_HOLDER)),
                     () -> verifyNoMoreInteractions(caseDefinitionRepository)
                 );
             }

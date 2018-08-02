@@ -20,6 +20,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.SearchResultBuilder.aSearchResult;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildData;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildSearchResultField;
@@ -51,9 +52,11 @@ class MergeDataToSearchResultOperationTest {
         CaseDetails caseDetails1 = new CaseDetails();
         caseDetails1.setReference(999L);
         caseDetails1.setData(dataMap);
+        caseDetails1.setState("state1");
         CaseDetails caseDetails2 = new CaseDetails();
         caseDetails2.setReference(1000L);
         caseDetails2.setData(dataMap);
+        caseDetails2.setState("state2");
         caseDetailsList = Arrays.asList(caseDetails1, caseDetails2);
 
         caseType = aCaseType()
@@ -80,8 +83,10 @@ class MergeDataToSearchResultOperationTest {
 
         final SearchResultView searchResultView = classUnderTest.execute(caseType, caseDetailsList, WORKBASKET_VIEW);
         assertAll(
-            () -> assertThat(searchResultView.getSearchResultViewItems().length, is(2)),
-            () -> assertThat(searchResultView.getSearchResultViewColumns().length, is(2))
+            () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(2)),
+            () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(0).getCaseFields().get(STATE.getReference()), is("state1")),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getCaseFields().get(STATE.getReference()), is("state2"))
         );
     }
 
@@ -96,8 +101,8 @@ class MergeDataToSearchResultOperationTest {
 
         final SearchResultView searchResultView = classUnderTest.execute(caseType, caseDetailsList, SEARCH_VIEW);
         assertAll(
-            () -> assertThat(searchResultView.getSearchResultViewItems().length, is(2)),
-            () -> assertThat(searchResultView.getSearchResultViewColumns().length, is(1))
+            () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
+            () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(1))
         );
     }
 }

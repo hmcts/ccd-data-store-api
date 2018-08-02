@@ -22,6 +22,7 @@ import javax.persistence.criteria.Subquery;
 
 public abstract class CaseDetailsQueryBuilder<T> {
 
+    private static final String CREATED_DATE = "createdDate";
     protected final EntityManager em;
     protected final CriteriaBuilder cb;
     protected final CriteriaQuery<T> query;
@@ -81,7 +82,7 @@ public abstract class CaseDetailsQueryBuilder<T> {
     }
 
     public CaseDetailsQueryBuilder whereCreatedDate(String createdDate) {
-        predicates.add(whereDate(root.get("createdDate"), createdDate));
+        predicates.add(whereDate(root.get(CREATED_DATE), createdDate));
 
         return this;
     }
@@ -114,9 +115,9 @@ public abstract class CaseDetailsQueryBuilder<T> {
 
     public CaseDetailsQueryBuilder orderByCreatedDate(String sortDirection) {
         if (sortDirection.equalsIgnoreCase("asc")) {
-            orders.add(cb.asc(root.get("createdDate")));
+            orders.add(cb.asc(root.get(CREATED_DATE)));
         } else {
-            orders.add(cb.desc(root.get("createdDate")));
+            orders.add(cb.desc(root.get(CREATED_DATE)));
         }
 
         return this;

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.search;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.Map;
 
@@ -9,14 +8,14 @@ public class SearchResultViewItem {
     @JsonProperty("case_id")
     private String caseId;
     @JsonProperty("case_fields")
-    private Map<String, JsonNode> caseFields;
+    private Map<String, Object> caseFields;
 
     public SearchResultViewItem() {
         // Default constructor for JSON mapper
     }
 
     public SearchResultViewItem(final String caseId,
-                                final Map<String, JsonNode> caseFields) {
+                                final Map<String, Object> caseFields) {
         this.caseId = caseId;
         this.caseFields = caseFields;
     }
@@ -25,7 +24,7 @@ public class SearchResultViewItem {
         return caseId;
     }
 
-    public Map<String, JsonNode> getCaseFields() {
+    public Map<String, Object> getCaseFields() {
         return caseFields;
     }
 }
