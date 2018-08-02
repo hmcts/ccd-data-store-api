@@ -77,7 +77,7 @@ public class CaseDetails implements Cloneable {
     @JsonIgnore
     private final Map<String, Object> metadata = new HashMap<>();
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
