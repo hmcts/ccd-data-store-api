@@ -17,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.AppInsights;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.draft.*;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
@@ -78,6 +79,7 @@ class DefaultDraftGatewayTest {
 
     Map<String, JsonNode> data = Maps.newHashMap();
     Map<String, JsonNode> dataClassification = Maps.newHashMap();
+    String securityClassification = SecurityClassification.PRIVATE.name();
     Event event = anEvent().build();
 
     private CaseDataContent caseDataContent;
@@ -106,7 +108,7 @@ class DefaultDraftGatewayTest {
             .withEvent(event)
             .withIgnoreWarning(true)
             .withDataClassification(dataClassification)
-            .withSecurityClassification(dataClassification)
+            .withSecurityClassification(securityClassification)
             .withToken(TOKEN)
             .build();
         caseDraft = aCaseDraft()

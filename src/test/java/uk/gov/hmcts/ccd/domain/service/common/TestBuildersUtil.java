@@ -612,27 +612,6 @@ public class TestBuildersUtil {
     }
 
     public static class CaseDataBuilder {
-        private final Map<String, JsonNode> data;
-
-        private CaseDataBuilder() {
-            this.data = Maps.newHashMap();
-        }
-
-        public static CaseDataBuilder aCaseData() {
-            return new CaseDataBuilder();
-        }
-
-        public CaseDataBuilder withPair(String key, JsonNode value) {
-            data.put(key, value);
-            return this;
-        }
-
-        public Map<String, JsonNode> build() {
-            return this.data;
-        }
-    }
-
-    public static class CaseDataBuilder {
 
         private final HashMap<String, JsonNode> caseData;
 
@@ -652,7 +631,6 @@ public class TestBuildersUtil {
             caseData.put(key, value);
             return this;
         }
-
 
         public CaseDataFieldBuilder withField(String fieldId) {
             return new CaseDataFieldBuilder(this, putFn(fieldId));
