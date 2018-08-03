@@ -19,13 +19,13 @@ import java.util.Map;
 
 import static java.util.Optional.ofNullable;
 import static org.apache.http.HttpStatus.SC_OK;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CASE_REFERENCE_METADATA;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CASE_TYPE_METADATA;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CREATED_DATE_METADATA;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.JURISDICTION_METADATA;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.LAST_MODIFIED_METADATA;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.SECURITY_CLASSIFICATION_METADATA;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.STATE_METADATA;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CASE_REFERENCE;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CASE_TYPE;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CREATED_DATE;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.JURISDICTION;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.LAST_MODIFIED_DATE;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.SECURITY_CLASSIFICATION;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
 
 public class CaseDetails implements Cloneable {
     private static final Logger LOG = LoggerFactory.getLogger(CaseDetails.class);
@@ -228,15 +228,16 @@ public class CaseDetails implements Cloneable {
         }
     }
 
-    private Map<String, Object> getMetadata() {
+    @JsonIgnore
+    public Map<String, Object> getMetadata() {
         if (metadata.isEmpty()) {
-            metadata.put(JURISDICTION_METADATA, getJurisdiction());
-            metadata.put(CASE_TYPE_METADATA, getCaseTypeId());
-            metadata.put(STATE_METADATA, getState());
-            metadata.put(CASE_REFERENCE_METADATA, getReference());
-            metadata.put(CREATED_DATE_METADATA, getCreatedDate());
-            metadata.put(LAST_MODIFIED_METADATA, getLastModified());
-            metadata.put(SECURITY_CLASSIFICATION_METADATA, getSecurityClassification());
+            metadata.put(JURISDICTION.getReference(), getJurisdiction());
+            metadata.put(CASE_TYPE.getReference(), getCaseTypeId());
+            metadata.put(STATE.getReference(), getState());
+            metadata.put(CASE_REFERENCE.getReference(), getReference());
+            metadata.put(CREATED_DATE.getReference(), getCreatedDate());
+            metadata.put(LAST_MODIFIED_DATE.getReference(), getLastModified());
+            metadata.put(SECURITY_CLASSIFICATION.getReference(), getSecurityClassification());
         }
         return metadata;
     }

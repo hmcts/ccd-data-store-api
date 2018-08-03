@@ -4,6 +4,7 @@ import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
@@ -13,8 +14,10 @@ import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
+import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public abstract class AbstractDefaultGetCaseViewOperation {
 
@@ -59,10 +62,6 @@ public abstract class AbstractDefaultGetCaseViewOperation {
         return getTabs(caseDetails, data, getCaseTabCollection(caseDetails.getCaseTypeId()));
     }
 
-    CaseTabCollection getCaseTabCollection(String caseTypeId) {
-        return uiDefinitionRepository.getCaseTabCollection(caseTypeId);
-    }
-
     CaseViewTab[] getTabs(CaseDetails caseDetails, Map<String, ?> data, CaseTabCollection caseTabCollection) {
         return caseTabCollection.getTabs().stream().map(tab -> {
             CaseViewField[] caseViewFields = tab.getTabFields().stream()
@@ -76,8 +75,17 @@ public abstract class AbstractDefaultGetCaseViewOperation {
         }).toArray(CaseViewTab[]::new);
     }
 
+    CaseTabCollection getCaseTabCollection(String caseTypeId) {
+        return uiDefinitionRepository.getCaseTabCollection(caseTypeId);
+    }
+
     private Predicate<CaseTypeTabField> filterCaseTabFieldsBasedOnSecureData(CaseDetails caseDetails) {
         return caseDetails::existsInData;
+    }
+
+    List<CaseViewField> getMetadataFields(CaseType caseType, CaseDetails caseDetails) {
+        return caseType.getCaseFields().stream().filter(CaseField::isMetadata).map(caseField -> CaseViewField.createFrom(caseField, caseDetails
+            .getCaseDataAndMetadata())).collect(Collectors.toList());
     }
 
 }
