@@ -129,20 +129,21 @@ class DefaultGetDraftViewOperationTest {
                                    hasProperty("description", equalTo(EVENT_DESCRIPTION)),
                                    hasProperty("order", equalTo(1)))),
             () -> assertThat(caseView.getTriggers()[1],
-                             allOf(hasProperty("id", is(nullValue())),
+                             allOf(hasProperty("id", is(DELETE)),
                                    hasProperty("name", equalTo("Delete")),
                                    hasProperty("description", equalTo("Delete draft")),
                                    hasProperty("order", equalTo(2)))),
             () -> assertThat(caseView.getEvents(), is(arrayWithSize(2))),
             () -> assertThat(caseView.getEvents()[0],
                              allOf(hasProperty("eventId", equalTo("Draft updated")),
+                                   hasProperty("eventName", equalTo("Draft updated")),
                                    hasProperty("stateId", equalTo("Draft")),
                                    hasProperty("stateName", equalTo("Draft")))),
             () -> assertThat(caseView.getEvents()[1],
                              allOf(hasProperty("eventId", equalTo("Draft created")),
+                                   hasProperty("eventName", equalTo("Draft created")),
                                    hasProperty("stateId", equalTo("Draft")),
-                                   hasProperty("stateName", equalTo("Draft")),
-                                   hasProperty("eventName", equalTo("Draft created"))))
+                                   hasProperty("stateName", equalTo("Draft"))))
         );
     }
 }
