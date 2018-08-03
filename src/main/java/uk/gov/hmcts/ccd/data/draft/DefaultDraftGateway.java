@@ -156,7 +156,10 @@ public class DefaultDraftGateway implements DraftGateway {
     }
 
     private DraftResponse assembleDraft(Draft getDraft) {
+<<<<<<< RDM-2224
         //TODO whenever a data structure changes we get stcuk here, better ignore corrupt one and move next
+=======
+>>>>>>> 2361-copy
         DraftResponse draftResponse;
         try {
             draftResponse = aDraftResponse()

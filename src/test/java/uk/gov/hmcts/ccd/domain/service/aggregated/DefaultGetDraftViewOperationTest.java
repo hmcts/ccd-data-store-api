@@ -58,6 +58,10 @@ class DefaultGetDraftViewOperationTest {
 
     private GetCaseViewOperation getDraftViewOperation;
 
+    private CaseTabCollection caseTabCollection;
+    private CaseType caseType;
+    private DraftResponse draftResponse;
+
     @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
@@ -104,42 +108,41 @@ class DefaultGetDraftViewOperationTest {
     @Test
     void shouldReturnDraftView() {
         CaseView caseView = getDraftViewOperation.execute(JURISDICTION_ID,
-            CASE_TYPE_ID,
-            DRAFT_ID);
+                                                          CASE_TYPE_ID,
+                                                          DRAFT_ID);
 
         assertAll(() -> verify(getDraftOperation).get(DRAFT_ID),
             () -> assertThat(caseView.getCaseId(), is(String.format(DRAFT_ID_FORMAT, DRAFT_ID))),
             () -> assertThat(caseView.getTabs(), arrayWithSize(1)),
-            () -> assertThat(caseView.getTabs()[0].getFields(), arrayWithSize(2)),
-            () -> assertThat(caseView.getTabs()[0].getFields(),
-                hasItemInArray(allOf(hasProperty("id", equalTo("dataTestField1")),
-                    hasProperty("showCondition",
-                        equalTo("dataTestField1-fieldShowCondition"))))),
-            () -> assertThat(caseView.getTabs()[0].getFields(),
-                hasItemInArray(allOf(hasProperty("id", equalTo("dataTestField2")),
-                    hasProperty("showCondition",
-                        equalTo("dataTestField2-fieldShowCondition"))))),
+                  () -> assertThat(caseView.getTabs()[0].getFields(),
+                                   hasItemInArray(allOf(hasProperty("id", equalTo("dataTestField1")),
+                                                        hasProperty("showCondition",
+                                                                    equalTo("dataTestField1-fieldShowCondition"))))),
+                  () -> assertThat(caseView.getTabs()[0].getFields(),
+                                   hasItemInArray(allOf(hasProperty("id", equalTo("dataTestField2")),
+                                                        hasProperty("showCondition",
+                                                                    equalTo("dataTestField2-fieldShowCondition"))))),
             () -> assertThat(caseView.getTriggers(), arrayWithSize(2)),
             () -> assertThat(caseView.getTriggers()[0],
-                allOf(hasProperty("id", equalTo(EVENT_TRIGGER_ID)),
-                    hasProperty("name", equalTo("Resume")),
-                    hasProperty("description", equalTo(EVENT_DESCRIPTION)),
-                    hasProperty("order", equalTo(1)))),
+                             allOf(hasProperty("id", equalTo(EVENT_TRIGGER_ID)),
+                                   hasProperty("name", equalTo("Resume")),
+                                   hasProperty("description", equalTo(EVENT_DESCRIPTION)),
+                                   hasProperty("order", equalTo(1)))),
             () -> assertThat(caseView.getTriggers()[1],
-                allOf(hasProperty("id", is(DELETE)),
-                    hasProperty("name", equalTo("Delete")),
-                    hasProperty("description", equalTo("Delete draft")),
-                    hasProperty("order", equalTo(2)))),
-            () -> assertThat(caseView.getState(), is(nullValue())),
+                             allOf(hasProperty("id", is(nullValue())),
+                                   hasProperty("name", equalTo("Delete")),
+                                   hasProperty("description", equalTo("Delete draft")),
+                                   hasProperty("order", equalTo(2)))),
             () -> assertThat(caseView.getEvents(), is(arrayWithSize(2))),
-            () -> assertThat(caseView.getEvents()[0].getEventId(), is("Draft updated")),
-            () -> assertThat(caseView.getEvents()[0].getEventName(), is("Draft updated")),
-            () -> assertThat(caseView.getEvents()[0].getStateId(), is("Draft")),
-            () -> assertThat(caseView.getEvents()[0].getStateName(), is("Draft")),
-            () -> assertThat(caseView.getEvents()[1].getEventId(), is("Draft created")),
-            () -> assertThat(caseView.getEvents()[1].getEventName(), is("Draft created")),
-            () -> assertThat(caseView.getEvents()[1].getStateId(), is("Draft")),
-            () -> assertThat(caseView.getEvents()[1].getStateName(), is("Draft"))
+            () -> assertThat(caseView.getEvents()[0],
+                             allOf(hasProperty("eventId", equalTo("Draft updated")),
+                                   hasProperty("stateId", equalTo("Draft")),
+                                   hasProperty("stateName", equalTo("Draft")))),
+            () -> assertThat(caseView.getEvents()[1],
+                             allOf(hasProperty("eventId", equalTo("Draft created")),
+                                   hasProperty("stateId", equalTo("Draft")),
+                                   hasProperty("stateName", equalTo("Draft")),
+                                   hasProperty("eventName", equalTo("Draft created"))))
         );
     }
 }

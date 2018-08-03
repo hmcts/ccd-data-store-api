@@ -73,6 +73,7 @@ public class CaseDetails implements Cloneable {
     @JsonProperty("callback_response_status")
     private String callbackResponseStatus;
 
+
     @JsonIgnore
     private final Map<String, Object> metadata = new HashMap<>();
 
@@ -196,6 +197,10 @@ public class CaseDetails implements Cloneable {
         return isFieldWithNoValue(caseTypeTabField)
             || hasDataForTabField(caseTypeTabField)
             || getMetadata().containsKey(caseTypeTabField.getCaseField().getId());
+    }
+
+    private boolean hasDataForTabField(CaseTypeTabField caseTypeTabField) {
+        return data.keySet().contains(caseTypeTabField.getCaseField().getId());
     }
 
     private boolean hasDataForTabField(CaseTypeTabField caseTypeTabField) {

@@ -106,6 +106,7 @@ class DefaultDraftGatewayTest {
             .withEvent(event)
             .withIgnoreWarning(true)
             .withDataClassification(dataClassification)
+            .withSecurityClassification(dataClassification)
             .withToken(TOKEN)
             .build();
         caseDraft = aCaseDraft()

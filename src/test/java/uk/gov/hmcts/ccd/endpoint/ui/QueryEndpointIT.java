@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.endpoint.ui;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import org.hamcrest.collection.IsArrayWithSize;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -725,7 +726,6 @@ public class QueryEndpointIT extends WireMockBaseTest {
         final CaseViewTrigger[] triggers = caseView.getTriggers();
         assertNotNull("Triggers are null", triggers);
         assertEquals("Should only get resume and delete triggers", 2, triggers.length);
-
 
         assertEquals("Trigger ID", "createCase", triggers[0].getId());
         assertEquals("Trigger Name", "Resume", triggers[0].getName());
