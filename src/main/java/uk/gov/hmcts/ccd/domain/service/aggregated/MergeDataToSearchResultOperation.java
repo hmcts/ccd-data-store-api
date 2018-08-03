@@ -13,6 +13,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetDraftViewOperation.DRAFT_ID;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WORKBASKET;
@@ -28,26 +29,27 @@ public class MergeDataToSearchResultOperation {
 
     public SearchResultView execute(final CaseType caseType, final List<CaseDetails> caseDetails, final String view, final String resultError) {
         final SearchResult searchResult = getSearchResult(caseType, view);
-        final SearchResultViewColumn[] viewColumns = Arrays.stream(searchResult.getFields())
+        final List<SearchResultViewColumn> viewColumns = Arrays.stream(searchResult.getFields())
             .flatMap(searchResultField -> caseType.getCaseFields().stream()
-                .filter(caseField -> caseField.getId().equals(searchResultField.getCaseFieldId()))
-                .map(caseField -> new SearchResultViewColumn(
-                    searchResultField.getCaseFieldId(),
-                    caseField.getFieldType(),
-                    searchResultField.getLabel(),
-                    searchResultField.getDisplayOrder())
-                ))
-            .toArray(SearchResultViewColumn[]::new);
+            .filter(caseField -> caseField.getId().equals(searchResultField.getCaseFieldId()))
+            .map(caseField -> new SearchResultViewColumn(
+                searchResultField.getCaseFieldId(),
+                caseField.getFieldType(),
+                searchResultField.getLabel(),
+                searchResultField.getDisplayOrder(),
+                searchResultField.isMetadata())
+             ))
+            .collect(Collectors.toList());
 
-        final SearchResultViewItem[] viewItems = caseDetails.stream()
+        final List<SearchResultViewItem> viewItems = caseDetails.stream()
             .map(caseData -> buildSearchResultViewItem(caseData))
-            .toArray(SearchResultViewItem[]::new);
+            .collect(Collectors.toList());
         return new SearchResultView(viewColumns, viewItems, resultError);
     }
 
     private SearchResultViewItem buildSearchResultViewItem(CaseDetails caseData) {
         return new SearchResultViewItem(hasCaseReference(caseData) ? getCaseReference(caseData) : getDraftReference(caseData),
-                                        caseData.getData());
+                                        caseData.getCaseDataAndMetadata());
     }
 
     private String getCaseReference(CaseDetails caseData) {
