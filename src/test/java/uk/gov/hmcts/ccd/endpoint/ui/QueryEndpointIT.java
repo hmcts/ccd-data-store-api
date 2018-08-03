@@ -676,7 +676,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected Field order", 1, firstNameField.getOrder().intValue());
         assertEquals("Unexpected Field show condition", "PersonLastName=\"Jones\"", firstNameField.getShowCondition());
         assertEquals("Unexpected Field field type", "Text", firstNameField.getFieldType().getType());
-        assertEquals("Unexpected Field value", "John", firstNameField.getValue().asText());
+        assertEquals("Unexpected Field value", "John", firstNameField.getValue());
 
         final CaseViewField lastNameField = nameFields[1];
         assertNotNull("Field is null", lastNameField);
@@ -685,7 +685,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected Field order", 2, lastNameField.getOrder().intValue());
         assertEquals("Unexpected Field show condition", "PersonFirstName=\"Tom\"", lastNameField.getShowCondition());
         assertEquals("Unexpected Field field type", "Text", lastNameField.getFieldType().getType());
-        assertEquals("Unexpected Field value", "Smith", lastNameField.getValue().asText());
+        assertEquals("Unexpected Field value", "Smith", lastNameField.getValue());
 
         final CaseViewTab addressTab = caseViewTabs[1];
         assertNotNull("First tab is null", addressTab);
