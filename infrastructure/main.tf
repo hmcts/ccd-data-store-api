@@ -23,14 +23,9 @@ locals {
   dm_valid_domain = "${var.document_management_valid_domain != "" ? var.document_management_valid_domain : local.default_dm_valid_domain}"
 
   // Vault name
-  previewVaultName = "${var.product}-data-store"
-  nonPreviewVaultName = "ccd-data-store-${var.env}"
+  previewVaultName = "${var.product}-shared-aat"
+  nonPreviewVaultName = "${var.product}-shared-${var.env}"
   vaultName = "${(var.env == "preview" || var.env == "spreview") ? local.previewVaultName : local.nonPreviewVaultName}"
-
-  // Vault URI
-  previewVaultUri = "https://ccd-data-store-aat.vault.azure.net/"
-  nonPreviewVaultUri = "${module.ccd-data-store-vault.key_vault_uri}"
-  vaultUri = "${(var.env == "preview" || var.env == "spreview") ? local.previewVaultUri : local.nonPreviewVaultUri}"
 
   // S2S
   s2s_url = "http://rpe-service-auth-provider-${local.env_ase_url}"
@@ -38,6 +33,11 @@ locals {
   custom_redirect_uri = "${var.frontend_url}/oauth2redirect"
   default_redirect_uri = "https://ccd-case-management-web-${local.env_ase_url}/oauth2redirect"
   oauth2_redirect_uri = "${var.frontend_url != "" ? local.custom_redirect_uri : local.default_redirect_uri}"
+}
+
+data "azurerm_key_vault" "ccd_shared_key_vault" {
+  name = "${local.vaultName}"
+  resource_group_name = "${local.vaultName}"
 }
 
 data "vault_generic_secret" "ccd_data_s2s_key" {
