@@ -35,24 +35,16 @@ public class CaseDataContent {
         return data;
     }
 
-    public Map<String, JsonNode> getSecurityClassification() {
-        return securityClassification;
-    }
-
-    public void setSecurityClassification(Map<String, JsonNode> securityClassification) {
-        this.securityClassification = securityClassification;
-    }
-
-    public void setData(Map<String, JsonNode> data) {
-        this.data = data;
-    }
-
     public String getSecurityClassification() {
         return securityClassification;
     }
 
     public void setSecurityClassification(String securityClassification) {
         this.securityClassification = securityClassification;
+    }
+
+    public void setData(Map<String, JsonNode> data) {
+        this.data = data;
     }
 
     public Map<String, JsonNode> getDataClassification() {

@@ -21,7 +21,7 @@ public class CaseDataContentBuilder {
         return this;
     }
 
-    public CaseDataContentBuilder withSecurityClassification(Map<String, JsonNode> securityClassification) {
+    public CaseDataContentBuilder withSecurityClassification(String securityClassification) {
         this.caseDataContent.setSecurityClassification(securityClassification);
         return this;
     }
