@@ -145,6 +145,14 @@ resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
   vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
 }
 
+// Copy into Azure Key Vault
+
+resource "azurerm_key_vault_secret" "ccd_data_s2s_key" {
+  name = "ccd-data-s2s-key"
+  value = "${data.vault_generic_secret.ccd_data_s2s_key.data["value"]}"
+  vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
+}
+
 resource "azurerm_key_vault_secret" "gw_s2s_key" {
   name = "microserviceGatewaySecret"
   value = "${data.vault_generic_secret.gateway_idam_key.data["value"]}"
