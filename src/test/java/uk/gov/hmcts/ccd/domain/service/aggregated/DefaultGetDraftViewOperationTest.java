@@ -28,7 +28,7 @@ import static uk.gov.hmcts.ccd.domain.model.draft.DraftResponseBuilder.aDraftRes
 import static uk.gov.hmcts.ccd.domain.model.std.CaseDataContentBuilder.aCaseDataContent;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetDraftViewOperation.DELETE;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataBuilder.caseData;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataBuilder.aCaseData;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTabCollectionBuilder.aCaseTabCollection;
 
 class DefaultGetDraftViewOperationTest {
@@ -71,7 +71,7 @@ class DefaultGetDraftViewOperationTest {
                               .withCaseTypeId(CASE_TYPE_ID)
                               .withEventTriggerId(EVENT_TRIGGER_ID)
                               .withCaseDataContent(aCaseDataContent()
-                                                       .withData(caseData()
+                                                       .withData(aCaseData()
                                                                      .withPair("dataTestField1", JSON_NODE_FACTORY.textNode("dataTestField1"))
                                                                      .withPair("dataTestField2", JSON_NODE_FACTORY.textNode("dataTestField2"))
                                                                      .build())
