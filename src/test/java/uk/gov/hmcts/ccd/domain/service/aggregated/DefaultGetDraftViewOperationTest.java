@@ -81,6 +81,8 @@ class DefaultGetDraftViewOperationTest {
                                                                       .build())
                                                        .build())
                               .build())
+            .withCreated(then)
+            .withUpdated(then)
             .build();
 
         doReturn(draftResponse).when(getDraftOperation).get(DRAFT_ID);
