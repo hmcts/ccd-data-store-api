@@ -28,7 +28,7 @@ import static uk.gov.hmcts.ccd.domain.model.draft.DraftResponseBuilder.aDraftRes
 import static uk.gov.hmcts.ccd.domain.model.std.CaseDataContentBuilder.aCaseDataContent;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetDraftViewOperation.DELETE;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataBuilder.aCaseData;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataBuilder.caseData;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTabCollectionBuilder.aCaseTabCollection;
 
 class DefaultGetDraftViewOperationTest {
@@ -58,10 +58,6 @@ class DefaultGetDraftViewOperationTest {
 
     private GetCaseViewOperation getDraftViewOperation;
 
-    private CaseTabCollection caseTabCollection;
-    private CaseType caseType;
-    private DraftResponse draftResponse;
-
     @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
@@ -72,21 +68,19 @@ class DefaultGetDraftViewOperationTest {
         DraftResponse draftResponse = aDraftResponse()
             .withId(DRAFT_ID)
             .withDocument(aCaseDraft()
-                .withCaseTypeId(CASE_TYPE_ID)
-                .withEventTriggerId(EVENT_TRIGGER_ID)
-                .withCaseDataContent(aCaseDataContent()
-                    .withData(aCaseData()
-                        .withPair("dataTestField1", JSON_NODE_FACTORY.textNode("dataTestField1"))
-                        .withPair("dataTestField2", JSON_NODE_FACTORY.textNode("dataTestField2"))
-                        .build())
-                    .withEvent(anEvent()
-                        .withEventId(EVENT_TRIGGER_ID)
-                        .withDescription(EVENT_DESCRIPTION)
-                        .build())
-                    .build())
-                .build())
-            .withCreated(now)
-            .withUpdated(then)
+                              .withCaseTypeId(CASE_TYPE_ID)
+                              .withEventTriggerId(EVENT_TRIGGER_ID)
+                              .withCaseDataContent(aCaseDataContent()
+                                                       .withData(caseData()
+                                                                     .withPair("dataTestField1", JSON_NODE_FACTORY.textNode("dataTestField1"))
+                                                                     .withPair("dataTestField2", JSON_NODE_FACTORY.textNode("dataTestField2"))
+                                                                     .build())
+                                                       .withEvent(anEvent()
+                                                                      .withEventId(EVENT_TRIGGER_ID)
+                                                                      .withDescription(EVENT_DESCRIPTION)
+                                                                      .build())
+                                                       .build())
+                              .build())
             .build();
 
         doReturn(draftResponse).when(getDraftOperation).get(DRAFT_ID);
@@ -112,8 +106,9 @@ class DefaultGetDraftViewOperationTest {
                                                           DRAFT_ID);
 
         assertAll(() -> verify(getDraftOperation).get(DRAFT_ID),
-            () -> assertThat(caseView.getCaseId(), is(String.format(DRAFT_ID_FORMAT, DRAFT_ID))),
-            () -> assertThat(caseView.getTabs(), arrayWithSize(1)),
+                  () -> assertThat(caseView.getCaseId(), is(String.format(DRAFT_ID_FORMAT, DRAFT_ID))),
+                  () -> assertThat(caseView.getTabs(), arrayWithSize(1)),
+                  () -> assertThat(caseView.getTabs()[0].getFields(), arrayWithSize(2)),
                   () -> assertThat(caseView.getTabs()[0].getFields(),
                                    hasItemInArray(allOf(hasProperty("id", equalTo("dataTestField1")),
                                                         hasProperty("showCondition",
