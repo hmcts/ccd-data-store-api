@@ -123,6 +123,8 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
 
         submittedCallback(eventTrigger, savedCaseDetails);
 
+        
+
         return savedCaseDetails;
     }
 
