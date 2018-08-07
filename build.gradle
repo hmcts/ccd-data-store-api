@@ -83,12 +83,11 @@ mainClassName = 'uk.gov.hmcts.ccd.CoreCaseDataApplication'
 
 // tag::repositories[]
 repositories {
-// https://github.com/hmcts/java-logging/blob/master/java-logging-appinsights/README.md
+    mavenLocal()
+    jcenter()
     maven {
         url  'https://dl.bintray.com/hmcts/hmcts-maven'
     }
-    mavenLocal()
-    jcenter()
 }
 // end::repositories[]
 
