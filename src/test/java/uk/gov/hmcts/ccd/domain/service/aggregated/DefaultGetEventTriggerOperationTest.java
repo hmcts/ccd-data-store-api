@@ -31,6 +31,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.when;
 
 class DefaultGetEventTriggerOperationTest {
