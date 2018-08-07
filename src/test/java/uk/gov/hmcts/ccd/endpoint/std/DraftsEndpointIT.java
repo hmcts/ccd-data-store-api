@@ -21,7 +21,6 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 

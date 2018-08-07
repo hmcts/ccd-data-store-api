@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.endpoint.ui;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import org.hamcrest.collection.IsArrayWithSize;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
