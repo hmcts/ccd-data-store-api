@@ -126,6 +126,6 @@ public class CaseType implements Serializable {
     public boolean hasDraftEnabledEvent() {
         return this.events
             .stream()
-            .anyMatch(caseEvent -> caseEvent.getCanSaveDraft() != null ? caseEvent.getCanSaveDraft():false);
+            .anyMatch(caseEvent -> caseEvent.getCanSaveDraft() != null && caseEvent.getCanSaveDraft());
     }
 }
