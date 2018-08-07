@@ -154,13 +154,13 @@ resource "azurerm_key_vault_secret" "ccd_data_s2s_key" {
 }
 
 resource "azurerm_key_vault_secret" "gw_s2s_key" {
-  name = "microserviceGatewaySecret"
+  name = "ccd-api-gateway-idam-service-key"
   value = "${data.vault_generic_secret.gateway_idam_key.data["value"]}"
   vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
 }
 
 resource "azurerm_key_vault_secret" "gw_oauth2_secret" {
-  name = "gatewayOAuth2ClientSecret"
+  name = "ccd-api-gateway-oauth2-client-secret"
   value = "${data.vault_generic_secret.gateway_oauth2_client_secret.data["value"]}"
   vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
 }
