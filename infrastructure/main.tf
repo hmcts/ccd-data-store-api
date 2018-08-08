@@ -27,6 +27,12 @@ locals {
   nonPreviewVaultName = "${var.raw_product}-shared-${var.env}"
   vaultName = "${(var.env == "preview" || var.env == "spreview") ? local.previewVaultName : local.nonPreviewVaultName}"
 
+  // Old vault info to be removed
+  oldPreviewVaultName = "${var.product}-data-store"
+  oldNonPreviewVaultName = "ccd-data-store-${var.env}"
+  oldVaultName = "${(var.env == "preview" || var.env == "spreview") ? local.oldPreviewVaultName : local.oldNonPreviewVaultName}"
+
+
   // S2S
   s2s_url = "http://rpe-service-auth-provider-${local.env_ase_url}"
 
@@ -102,7 +108,7 @@ module "data-store-db" {
 
 module "ccd-data-store-vault" {
   source              = "git@github.com:hmcts/moj-module-key-vault?ref=master"
-  name                = "${local.vaultName}" // Max 24 characters
+  name                = "${local.oldVaultName}" // Max 24 characters
   product             = "${var.product}"
   env                 = "${var.env}"
   tenant_id           = "${var.tenant_id}"
