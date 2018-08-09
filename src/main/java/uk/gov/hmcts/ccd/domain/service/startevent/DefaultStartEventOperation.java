@@ -15,6 +15,7 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.DraftResponseToCaseDetailsBuilder;
 import uk.gov.hmcts.ccd.domain.model.draft.CaseDraft;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
@@ -30,7 +31,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import java.util.function.Supplier;
 
-import static uk.gov.hmcts.ccd.domain.model.definition.CaseDetailsBuilder.aCaseDetails;
 
 @Service
 @Qualifier("default")
@@ -45,6 +45,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
     private final CaseTypeService caseTypeService;
     private final CallbackInvoker callbackInvoker;
     private final UIDService uidService;
+    private final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder;
 
     @Autowired
     public DefaultStartEventOperation(final EventTokenService eventTokenService,
@@ -55,7 +56,8 @@ public class DefaultStartEventOperation implements StartEventOperation {
                                       final CaseService caseService,
                                       final CaseTypeService caseTypeService,
                                       final CallbackInvoker callbackInvoker,
-                                      final UIDService uidService) {
+                                      final UIDService uidService,
+                                      final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder) {
 
         this.eventTokenService = eventTokenService;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -66,6 +68,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
         this.caseTypeService = caseTypeService;
         this.callbackInvoker = callbackInvoker;
         this.uidService = uidService;
+        this.draftResponseToCaseDetailsBuilder = draftResponseToCaseDetailsBuilder;
     }
 
     @Override
@@ -178,14 +181,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
 
     private CaseDetails getDraftDetails(String jurisdictionId, String caseTypeId, String draftId) {
         final DraftResponse draftResponse = draftGateway.get(Draft.stripId(draftId));
-        CaseDraft document = draftResponse.getDocument();
-        return aCaseDetails()
-            .withCaseTypeId(document.getCaseTypeId())
-            .withJurisdiction(document.getJurisdictionId())
-            .withSecurityClassification(getSecurityClassification(document))
-            .withDataClassification(document.getCaseDataContent().getDataClassification())
-            .withData(document.getCaseDataContent().getData())
-            .build();
+        return draftResponseToCaseDetailsBuilder.build(draftResponse);
     }
 
     private CaseEvent getEventTrigger(String caseTypeId, String eventTriggerId, CaseType caseType) {

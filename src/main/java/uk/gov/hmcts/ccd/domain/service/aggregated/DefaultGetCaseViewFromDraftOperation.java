@@ -29,7 +29,7 @@ import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTriggerBuilder.aC
 public class DefaultGetCaseViewFromDraftOperation extends AbstractDefaultGetCaseViewOperation implements GetCaseViewOperation {
 
     public static final String QUALIFIER = "defaultDraft";
-    static final String DELETE = "DELETE";
+    protected static final String DELETE = "DELETE";
     private static final CaseViewTrigger DELETE_TRIGGER = aCaseViewTrigger()
         .withId(DELETE)
         .withName("Delete")
