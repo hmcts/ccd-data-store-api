@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.datastore.tests.helper.idam;
 
 import feign.Feign;
+import feign.codec.Decoder;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 
