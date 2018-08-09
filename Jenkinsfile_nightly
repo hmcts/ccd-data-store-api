@@ -1,13 +1,9 @@
 #!groovy
-properties(
-    [
-        [
-            $class: 'GithubProjectProperty',
-            projectUrlStr: 'https://github.com/hmcts/ccd-data-store-api'
-        ],
-        pipelineTriggers([[$class: 'GitHubPushTrigger']])
-    ]
-)
+
+properties([
+    // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
+    pipelineTriggers([cron('H 05 * * *')])
+])
 
 @Library("Infrastructure")
 
@@ -18,8 +14,8 @@ def component = "data-store-api"
 List<LinkedHashMap<String, Object>> secrets = [
     secret('caseworkerAutoTest1Email', 'CCD_CASEWORKER_AUTOTEST_EMAIL'),
     secret('caseworkerAutoTest1Password', 'CCD_CASEWORKER_AUTOTEST_PASSWORD'),
-    secret('ccd-api-gateway-idam-service-key', 'CCD_GW_SERVICE_SECRET'),
-    secret('ccd-api-gateway-oauth2-client-secret', 'OAUTH2_CLIENT_SECRET'),
+    secret('microserviceGatewaySecret', 'CCD_GW_SERVICE_SECRET'),
+    secret('gatewayOAuth2ClientSecret', 'OAUTH2_CLIENT_SECRET'),
 ]
 
 static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
@@ -31,7 +27,8 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
     ]
 }
 
-withPipeline(type, product, component) {
+withNightlyPipeline(type, product, component) {
     loadVaultSecrets(secrets)
     enableDbMigration()
+    enableSlackNotifications('#ccd-nightly-builds')
 }
