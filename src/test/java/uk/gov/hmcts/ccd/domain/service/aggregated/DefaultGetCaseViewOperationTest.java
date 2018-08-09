@@ -7,7 +7,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
@@ -56,9 +55,6 @@ class DefaultGetCaseViewOperationTest {
     private GetCaseOperation getCaseOperation;
 
     @Mock
-    private CaseAuditEventRepository auditEventRepository;
-
-    @Mock
     private GetEventsOperation getEventsOperation;
 
     @Mock
@@ -75,12 +71,6 @@ class DefaultGetCaseViewOperationTest {
 
     private DefaultGetCaseViewOperation defaultGetCaseViewOperation;
     private CaseDetails caseDetails;
-    private List<AuditEvent> auditEvents;
-    private AuditEvent event1;
-    private AuditEvent event2;
-    private CaseTabCollection caseTabCollection;
-    private CaseType caseType;
-    private CaseState caseState;
 
     @BeforeEach
     void setUp() {
@@ -94,19 +84,20 @@ class DefaultGetCaseViewOperationTest {
                                                                           CASE_TYPE_ID,
                                                                           CASE_REFERENCE);
 
-        event1 = new AuditEvent();
+        final AuditEvent event1 = new AuditEvent();
         event1.setSummary(EVENT_SUMMARY_1);
-        event2 = new AuditEvent();
+        final AuditEvent event2 = new AuditEvent();
         event2.setSummary(EVENT_SUMMARY_2);
-        auditEvents = asList(event1, event2);
+        final List<AuditEvent> auditEvents = asList(event1, event2);
         doReturn(auditEvents).when(getEventsOperation).getEvents(caseDetails);
 
         doReturn(Boolean.TRUE).when(uidService).validateUID(CASE_REFERENCE);
 
-        caseTabCollection = aCaseTabCollection().withFieldIds("dataTestField1", "dataTestField2").build();
+        final CaseTabCollection caseTabCollection = aCaseTabCollection()
+            .withFieldIds("dataTestField1", "dataTestField2").build();
         doReturn(caseTabCollection).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
 
-        caseType = new CaseType();
+        final CaseType caseType = new CaseType();
         Jurisdiction jurisdiction = new Jurisdiction();
         jurisdiction.setName(JURISDICTION_ID);
         caseType.setJurisdiction(jurisdiction);
@@ -117,10 +108,10 @@ class DefaultGetCaseViewOperationTest {
         caseType.setCaseFields(Collections.singletonList(caseField));
         doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
 
-        caseState = new CaseState();
-        doReturn(caseState).when(caseTypeService).findState(caseType, STATE);
+        doReturn(new CaseState()).when(caseTypeService).findState(caseType, STATE);
 
-        defaultGetCaseViewOperation = new DefaultGetCaseViewOperation(getCaseOperation, getEventsOperation,
+        defaultGetCaseViewOperation = new DefaultGetCaseViewOperation(getCaseOperation,
+                                                                      getEventsOperation,
                                                                       uiDefinitionRepository,
                                                                       caseTypeService,
                                                                       eventTriggerService,
@@ -182,5 +173,4 @@ class DefaultGetCaseViewOperationTest {
         });
         return dataMap;
     }
-
 }

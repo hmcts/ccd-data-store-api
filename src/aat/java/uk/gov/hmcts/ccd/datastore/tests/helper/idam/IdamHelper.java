@@ -16,7 +16,6 @@ public class IdamHelper {
     private static final String BASIC = "Basic ";
 
     private final Map<String, AuthenticatedUser> users = new HashMap<>();
-    private final Decoder.Default defaultDecoder = new Decoder.Default();
 
     private final IdamApi idamApi;
     private final OAuth2 oauth2;

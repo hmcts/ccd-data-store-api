@@ -1677,7 +1677,6 @@ public class AccessControlServiceTest {
                                             .build())
                                .build())
                 .build();
-            List<CaseField> caseFields = newArrayList();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\":{} }\n"
             ), STRING_JSON_MAP);
