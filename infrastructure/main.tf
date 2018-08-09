@@ -94,7 +94,7 @@ module "ccd-data-store-api" {
     DATA_STORE_IDAM_KEY                 = "${data.vault_generic_secret.ccd_data_s2s_key.data["value"]}"
 
     CCD_DRAFT_STORE_URL                 = "${local.draftStoreUrl}"
-    CCD_DRAFT_MAX_STALE_DAYS            = "${var.draft_store_max_stale_days}"
+    CCD_DRAFT_TTL_DAYS                  = "${var.draft_store_ttl_days}"
     CCD_DRAFT_ENCRYPTION_KEY            = "${random_string.draft_encryption_key.result}"
 
     DATA_STORE_S2S_AUTHORISED_SERVICES  = "${var.authorised-services}"

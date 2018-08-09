@@ -13,8 +13,8 @@ import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
-import static uk.gov.hmcts.ccd.domain.model.draft.DraftResponseBuilder.aDraftResponse;
 import static uk.gov.hmcts.ccd.domain.model.std.CaseDataContentBuilder.aCaseDataContent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.aDraftResponse;
 
 class DraftsEndpointTest {
 

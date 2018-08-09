@@ -69,7 +69,7 @@ public class QueryEndpoint {
     @Inject
     public QueryEndpoint(
         @Qualifier(AuthorisedGetCaseViewOperation.QUALIFIER) GetCaseViewOperation getCaseViewOperation,
-        @Qualifier(DefaultGetDraftViewOperation.QUALIFIER) GetCaseViewOperation getDraftViewOperation,
+        @Qualifier(DefaultGetCaseViewFromDraftOperation.QUALIFIER) GetCaseViewOperation getDraftViewOperation,
         @Qualifier(AuthorisedGetCaseHistoryViewOperation.QUALIFIER) GetCaseHistoryViewOperation getCaseHistoryOperation,
         @Qualifier(AuthorisedGetEventTriggerOperation.QUALIFIER) GetEventTriggerOperation getEventTriggerOperation,
         SearchQueryOperation searchQueryOperation, FieldMapSanitizeOperation fieldMapSanitizeOperation,

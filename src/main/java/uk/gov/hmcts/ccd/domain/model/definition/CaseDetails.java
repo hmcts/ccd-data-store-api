@@ -31,6 +31,7 @@ public class CaseDetails implements Cloneable {
     private static final Logger LOG = LoggerFactory.getLogger(CaseDetails.class);
     private static final String LABEL_FIELD_TYPE = "Label";
     private static final String CASE_PAYMENT_HISTORY_VIEWER_FIELD_TYPE = "CasePaymentHistoryViewer";
+    public static final String DRAFT_ID = "DRAFT%s";
 
     private String id;
 
@@ -76,6 +77,7 @@ public class CaseDetails implements Cloneable {
 
     @JsonIgnore
     private final Map<String, Object> metadata = new HashMap<>();
+    private String draftReference;
 
     public String getId() {
         return id;
@@ -88,6 +90,11 @@ public class CaseDetails implements Cloneable {
     @JsonGetter("id")
     public Long getReference() {
         return reference;
+    }
+
+    @JsonIgnore
+    public String getReferenceAsString() {
+        return reference.toString();
     }
 
     @JsonSetter("id")
@@ -255,4 +262,12 @@ public class CaseDetails implements Cloneable {
         return ReflectionToStringBuilder.toString(this);
     }
 
+    @JsonIgnore
+    public boolean hasCaseReference() {
+        return getReference() != null;
+    }
+
+    public String getDraftReference() {
+        return String.format(DRAFT_ID, id);
+    }
 }

@@ -5,17 +5,13 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
+import uk.gov.hmcts.ccd.domain.model.draft.CaseDraft;
 import uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDraftRequest;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDraftRequest;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 
 import javax.inject.Inject;
-
-import static uk.gov.hmcts.ccd.domain.model.draft.CaseDraftBuilder.aCaseDraft;
-import static uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDraftBuilder.aCreateCaseDraft;
-import static uk.gov.hmcts.ccd.domain.model.draft.DraftResponseBuilder.aDraftResponse;
-import static uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDraftBuilder.anUpdateCaseDraft;
 
 @Service
 @Qualifier("default")
@@ -39,9 +35,9 @@ public class DefaultUpsertDraftOperation implements UpsertDraftOperation {
                              final String caseTypeId,
                              final String eventTriggerId,
                              final CaseDataContent caseDataContent) {
-        return aDraftResponse()
-            .withId(draftGateway.save(buildCreateCaseDraft(uid, jurisdictionId, caseTypeId, eventTriggerId, caseDataContent)))
-            .build();
+        final DraftResponse draftResponse = new DraftResponse();
+        draftResponse.setId(draftGateway.save(buildCreateCaseDraft(uid, jurisdictionId, caseTypeId, eventTriggerId, caseDataContent)).toString());
+        return draftResponse;
     }
 
     @Override
@@ -56,30 +52,31 @@ public class DefaultUpsertDraftOperation implements UpsertDraftOperation {
     }
 
     private CreateCaseDraftRequest buildCreateCaseDraft(String uid, String jurisdictionId, String caseTypeId, String eventTriggerId, CaseDataContent caseDataContent) {
-        return aCreateCaseDraft()
-            .withDocument(aCaseDraft()
-                              .withUserId(uid)
-                              .withJurisdictionId(jurisdictionId)
-                              .withCaseTypeId(caseTypeId)
-                              .withEventTriggerId(eventTriggerId)
-                              .withCaseDataContent(caseDataContent)
-                              .build())
-            .withType(CASE_DATA_CONTENT)
-            .withMaxStaleDays(applicationParams.getDraftMaxStaleDays())
-            .build();
+        final CaseDraft caseDraft = new CaseDraft();
+        caseDraft.setUserId(uid);
+        caseDraft.setJurisdictionId(jurisdictionId);
+        caseDraft.setCaseTypeId(caseTypeId);
+        caseDraft.setEventTriggerId(eventTriggerId);
+        caseDraft.setCaseDataContent(caseDataContent);
+
+        final CreateCaseDraftRequest createCaseDraftRequest = new CreateCaseDraftRequest();
+        createCaseDraftRequest.setDocument(caseDraft);
+        createCaseDraftRequest.setType(CASE_DATA_CONTENT);
+        createCaseDraftRequest.setMaxTTLDays(applicationParams.getDraftMaxTTLDays());
+        return createCaseDraftRequest;
     }
 
     private UpdateCaseDraftRequest buildUpdateCaseDraft(String uid, String jurisdictionId, String caseTypeId, String eventTriggerId, CaseDataContent caseDataContent) {
-        return anUpdateCaseDraft()
-            .withDocument(aCaseDraft()
-                              .withUserId(uid)
-                              .withJurisdictionId(jurisdictionId)
-                              .withCaseTypeId(caseTypeId)
-                              .withEventTriggerId(eventTriggerId)
-                              .withCaseDataContent(caseDataContent)
-                              .build())
-            .withType(CASE_DATA_CONTENT)
-            .build();
+        final UpdateCaseDraftRequest updateCaseDraftRequest = new UpdateCaseDraftRequest();
+        updateCaseDraftRequest.setType(CASE_DATA_CONTENT);
+        final CaseDraft caseDraft = new CaseDraft();
+        caseDraft.setUserId(uid);
+        caseDraft.setJurisdictionId(jurisdictionId);
+        caseDraft.setCaseTypeId(caseTypeId);
+        caseDraft.setEventTriggerId(eventTriggerId);
+        caseDraft.setCaseDataContent(caseDataContent);
+        updateCaseDraftRequest.setDocument(caseDraft);
+        return updateCaseDraftRequest;
     }
 
 }

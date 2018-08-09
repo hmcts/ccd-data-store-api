@@ -45,7 +45,7 @@ The following environment variables are required:
 | HTTP_CLIENT_CONNECTION_DRAFTS_TIMEOUT | 200 | 200 milliseconds, Used for Pooling connection manager for draft store; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
 | DRAFT_STORE_URL | - | Base URL for Draft Store API service. `http://localhost:8800` for the dockerised local instance. |
 | DRAFT_ENCRYPTION_KEY | - | Draft encryption key. The encryption key used by draft store to encrypt documents with. |
-| DRAFT_MAX_STALE_DAYS | - | Number of days after which the saved draft will be deleted if unmodified. |
+| DRAFT_TTL_DAYS | - | Number of days after which the saved draft will be deleted if unmodified. |
 
 ### Building
 

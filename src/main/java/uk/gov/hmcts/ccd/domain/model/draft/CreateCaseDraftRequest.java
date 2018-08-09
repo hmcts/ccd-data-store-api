@@ -21,7 +21,7 @@ public class CreateCaseDraftRequest {
     )
     @Min(value = 1L)
     @JsonProperty("max_age")
-    private Integer maxStaleDays;
+    private Integer maxTTLDays;
 
     public CaseDraft getDocument() {
         return document;
@@ -31,8 +31,8 @@ public class CreateCaseDraftRequest {
         return type;
     }
 
-    public Integer getMaxStaleDays() {
-        return maxStaleDays;
+    public Integer getMaxTTLDays() {
+        return maxTTLDays;
     }
 
     public void setDocument(CaseDraft document) {
@@ -43,7 +43,7 @@ public class CreateCaseDraftRequest {
         this.type = type;
     }
 
-    public void setMaxStaleDays(Integer maxStaleDays) {
-        this.maxStaleDays = maxStaleDays;
+    public void setMaxTTLDays(Integer maxTTLDays) {
+        this.maxTTLDays = maxTTLDays;
     }
 }
