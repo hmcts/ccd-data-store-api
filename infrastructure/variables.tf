@@ -67,7 +67,7 @@ variable "idam_api_url" {
   default = "http://betaDevBccidamAppLB.reform.hmcts.net"
 }
 
-variable "draft_store_max_stale_days" {
+variable "draft_store_ttl_days" {
   type = "string"
   default = "180"
 }

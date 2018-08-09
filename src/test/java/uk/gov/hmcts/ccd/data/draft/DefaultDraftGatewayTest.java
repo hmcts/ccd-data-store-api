@@ -38,12 +38,12 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.ccd.domain.model.draft.CaseDraftBuilder.aCaseDraft;
-import static uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDraftBuilder.aCreateCaseDraft;
 import static uk.gov.hmcts.ccd.domain.model.draft.DraftBuilder.aDraft;
-import static uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDraftBuilder.anUpdateCaseDraft;
 import static uk.gov.hmcts.ccd.domain.model.std.CaseDataContentBuilder.aCaseDataContent;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.aCaseDraft;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CreateCaseDraftBuilder.aCreateCaseDraft;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.UpdateCaseDraftBuilder.anUpdateCaseDraft;
 
 class DefaultDraftGatewayTest {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
@@ -98,7 +98,7 @@ class DefaultDraftGatewayTest {
         doReturn(new HttpHeaders()).when(securityUtils).userAuthorizationHeaders();
         when(applicationParams.draftBaseURL()).thenReturn(draftBaseURL);
         when(applicationParams.draftURL(DID)).thenReturn(draftURL5);
-        when(applicationParams.getDraftMaxStaleDays()).thenReturn(7);
+        when(applicationParams.getDraftMaxTTLDays()).thenReturn(7);
 
         data.put(KEY, VALUE);
         dataClassification.put(KEY_CLASS, VALUE_CLASS);
@@ -128,7 +128,7 @@ class DefaultDraftGatewayTest {
         createCaseDraftRequest = aCreateCaseDraft()
             .withDocument(caseDraft)
             .withType(CASE_DATA_CONTENT)
-            .withMaxStaleDays(applicationParams.getDraftMaxStaleDays())
+            .withTTLDays(applicationParams.getDraftMaxTTLDays())
             .build();
         updateCaseDraftRequest = anUpdateCaseDraft()
             .withDocument(caseDraft)

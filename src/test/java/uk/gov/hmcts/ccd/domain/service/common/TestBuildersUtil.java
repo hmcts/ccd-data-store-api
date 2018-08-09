@@ -11,11 +11,17 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.aggregated.*;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.draft.CaseDraft;
+import uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDraftRequest;
+import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
+import uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDraftRequest;
 import uk.gov.hmcts.ccd.domain.model.search.Field;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
+import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -34,10 +40,6 @@ public class TestBuildersUtil {
             callbackResponse = new CallbackResponse();
         }
 
-        public static CallbackResponseBuilder aCallbackResponse() {
-            return new CallbackResponseBuilder();
-        }
-
         public CallbackResponseBuilder withSecurityClassification(SecurityClassification securityClassification) {
             callbackResponse.setSecurityClassification(securityClassification);
             return this;
@@ -50,6 +52,201 @@ public class TestBuildersUtil {
 
         public CallbackResponse build() {
             return callbackResponse;
+        }
+
+        public static CallbackResponseBuilder aCallbackResponse() {
+            return new CallbackResponseBuilder();
+        }
+    }
+
+    public static class DraftResponseBuilder {
+        private final DraftResponse draftResponse;
+
+        private DraftResponseBuilder() {
+            draftResponse = new DraftResponse();
+        }
+
+        public DraftResponseBuilder withId(String id) {
+            this.draftResponse.setId(id);
+            return this;
+        }
+
+        public DraftResponseBuilder withId(Long id) {
+            this.draftResponse.setId(String.valueOf(id));
+            return this;
+        }
+
+        public DraftResponseBuilder withDocument(CaseDraft document) {
+            this.draftResponse.setDocument(document);
+            return this;
+        }
+
+        public DraftResponseBuilder withType(String type) {
+            this.draftResponse.setType(type);
+            return this;
+        }
+
+        public DraftResponseBuilder withCreated(LocalDateTime created) {
+            this.draftResponse.setCreated(created);
+            return this;
+        }
+
+        public DraftResponseBuilder withUpdated(LocalDateTime updated) {
+            this.draftResponse.setUpdated(updated);
+            return this;
+        }
+
+        public static DraftResponseBuilder aDraftResponse() {
+            return new DraftResponseBuilder();
+        }
+
+        public DraftResponse build() {
+            return this.draftResponse;
+        }
+    }
+
+    public static class CaseDraftBuilder {
+        private final CaseDraft caseDraft;
+
+        private CaseDraftBuilder() {
+            this.caseDraft = new CaseDraft();
+        }
+
+        public CaseDraftBuilder withUserId(String userId) {
+            this.caseDraft.setUserId(userId);
+            return this;
+        }
+
+        public CaseDraftBuilder withJurisdictionId(String jurisdictionId) {
+            this.caseDraft.setJurisdictionId(jurisdictionId);
+            return this;
+        }
+
+        public CaseDraftBuilder withCaseTypeId(String caseTypeId) {
+            this.caseDraft.setCaseTypeId(caseTypeId);
+            return this;
+        }
+
+        public CaseDraftBuilder withEventTriggerId(String eventTriggerId) {
+            this.caseDraft.setEventTriggerId(eventTriggerId);
+            return this;
+        }
+
+        public CaseDraftBuilder withCaseDataContent(CaseDataContent caseDataContent) {
+            this.caseDraft.setCaseDataContent(caseDataContent);
+            return this;
+        }
+
+        public static CaseDraftBuilder aCaseDraft() {
+            return new CaseDraftBuilder();
+        }
+
+        public CaseDraft build() {
+            return this.caseDraft;
+        }
+    }
+
+    public static class CreateCaseDraftBuilder {
+
+        private final CreateCaseDraftRequest createCaseDraftRequest;
+
+        private CreateCaseDraftBuilder() {
+            this.createCaseDraftRequest = new CreateCaseDraftRequest();
+        }
+
+        public CreateCaseDraftBuilder withDocument(CaseDraft document) {
+            this.createCaseDraftRequest.setDocument(document);
+            return this;
+        }
+
+        public CreateCaseDraftBuilder withType(String type) {
+            this.createCaseDraftRequest.setType(type);
+            return this;
+        }
+
+        public CreateCaseDraftBuilder withTTLDays(Integer TTLDays) {
+            this.createCaseDraftRequest.setMaxTTLDays(TTLDays);
+            return this;
+        }
+
+        public static CreateCaseDraftBuilder aCreateCaseDraft() {
+            return new CreateCaseDraftBuilder();
+        }
+
+        public CreateCaseDraftRequest build() {
+            return this.createCaseDraftRequest;
+        }
+    }
+
+    public static class UpdateCaseDraftBuilder {
+        private final UpdateCaseDraftRequest updateCaseDraftRequest;
+
+        private UpdateCaseDraftBuilder() {
+            this.updateCaseDraftRequest = new UpdateCaseDraftRequest();
+        }
+
+        public UpdateCaseDraftBuilder withDocument(CaseDraft document) {
+            this.updateCaseDraftRequest.setDocument(document);
+            return this;
+        }
+
+        public UpdateCaseDraftBuilder withType(String type) {
+            this.updateCaseDraftRequest.setType(type);
+            return this;
+        }
+
+        public static UpdateCaseDraftBuilder anUpdateCaseDraft() {
+            return new UpdateCaseDraftBuilder();
+        }
+
+        public UpdateCaseDraftRequest build() {
+            return this.updateCaseDraftRequest;
+        }
+    }
+
+    public static class CaseDetailsBuilder {
+        private final CaseDetails caseDetails;
+
+        public CaseDetailsBuilder() {
+            caseDetails = new CaseDetails();
+        }
+
+        public CaseDetailsBuilder withSecurityClassification(SecurityClassification securityClassification) {
+            caseDetails.setSecurityClassification(securityClassification);
+            return this;
+        }
+
+        public CaseDetailsBuilder withData(Map<String, JsonNode> data) {
+            caseDetails.setData(data);
+            return this;
+        }
+
+        public CaseDetailsBuilder withDataClassification(Map<String, JsonNode> dataClassification) {
+            caseDetails.setDataClassification(dataClassification);
+            return this;
+        }
+
+        public CaseDetailsBuilder withId(String id) {
+            caseDetails.setId(id);
+            return this;
+        }
+
+        public CaseDetailsBuilder withJurisdiction(String jurisdictionId) {
+            caseDetails.setJurisdiction(jurisdictionId);
+            return this;
+        }
+
+        public CaseDetailsBuilder withCaseTypeId(String caseTypeId) {
+            caseDetails.setCaseTypeId(caseTypeId);
+            return this;
+        }
+
+        public CaseDetails build() {
+            return caseDetails;
+        }
+
+        public static CaseDetailsBuilder aCaseDetails() {
+            return new CaseDetailsBuilder();
         }
     }
 

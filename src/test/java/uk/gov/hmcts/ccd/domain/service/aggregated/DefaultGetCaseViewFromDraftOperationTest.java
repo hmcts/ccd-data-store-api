@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,36 +9,36 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
+import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
-import static uk.gov.hmcts.ccd.domain.model.draft.CaseDraftBuilder.aCaseDraft;
-import static uk.gov.hmcts.ccd.domain.model.draft.DraftResponseBuilder.aDraftResponse;
 import static uk.gov.hmcts.ccd.domain.model.std.CaseDataContentBuilder.aCaseDataContent;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
-import static uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetDraftViewOperation.DELETE;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataBuilder.aCaseData;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.aCaseDetails;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.aCaseDraft;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTabCollectionBuilder.aCaseTabCollection;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.aDraftResponse;
 
-class DefaultGetDraftViewOperationTest {
+class DefaultGetCaseViewFromDraftOperationTest {
 
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_TYPE_ID = "Grant";
     private static final String DRAFT_ID_FORMAT = "DRAFT%s";
     private static final String DRAFT_ID = "1";
+    private static final String DRAFT_ID_FOR_UI = "DRAFT1";
     private static final String EVENT_TRIGGER_ID = "createCase";
     private static final String EVENT_DESCRIPTION = "Create case";
 
@@ -54,9 +55,18 @@ class DefaultGetDraftViewOperationTest {
     private UIDService uidService;
 
     @Mock
-    private DraftGateway getDraftOperation;
+    private DraftGateway draftGateway;
+
+    @Mock
+    private DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder;
 
     private GetCaseViewOperation getDraftViewOperation;
+
+    private CaseTabCollection caseTabCollection;
+    private CaseType caseType;
+    private DraftResponse draftResponse;
+    private CaseDetails caseDetails;
+    private Map<String, JsonNode> data;
 
     @BeforeEach
     public void setup() {
@@ -64,6 +74,15 @@ class DefaultGetDraftViewOperationTest {
 
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime then = LocalDateTime.now();
+        data = aCaseData()
+            .withPair("dataTestField1", JSON_NODE_FACTORY.textNode("dataTestField1"))
+            .withPair("dataTestField2", JSON_NODE_FACTORY.textNode("dataTestField2"))
+            .build();
+
+        data = aCaseData()
+            .withPair("dataTestField1", JSON_NODE_FACTORY.textNode("dataTestField1"))
+            .withPair("dataTestField2", JSON_NODE_FACTORY.textNode("dataTestField2"))
+            .build();
 
         DraftResponse draftResponse = aDraftResponse()
             .withId(DRAFT_ID)
@@ -71,10 +90,7 @@ class DefaultGetDraftViewOperationTest {
                               .withCaseTypeId(CASE_TYPE_ID)
                               .withEventTriggerId(EVENT_TRIGGER_ID)
                               .withCaseDataContent(aCaseDataContent()
-                                                       .withData(aCaseData()
-                                                                     .withPair("dataTestField1", JSON_NODE_FACTORY.textNode("dataTestField1"))
-                                                                     .withPair("dataTestField2", JSON_NODE_FACTORY.textNode("dataTestField2"))
-                                                                     .build())
+                                                       .withData(data)
                                                        .withEvent(anEvent()
                                                                       .withEventId(EVENT_TRIGGER_ID)
                                                                       .withDescription(EVENT_DESCRIPTION)
@@ -85,7 +101,14 @@ class DefaultGetDraftViewOperationTest {
             .withUpdated(then)
             .build();
 
-        doReturn(draftResponse).when(getDraftOperation).get(DRAFT_ID);
+        doReturn(draftResponse).when(draftGateway).get(DRAFT_ID);
+        caseDetails = aCaseDetails()
+            .withCaseTypeId(CASE_TYPE_ID)
+            .withJurisdiction(JURISDICTION_ID)
+            .withId(DRAFT_ID_FOR_UI)
+            .withData(data)
+            .build();
+        doReturn(caseDetails).when(draftResponseToCaseDetailsBuilder).build(draftResponse);
 
         CaseTabCollection caseTabCollection = aCaseTabCollection().withFieldIds("dataTestField1", "dataTestField2")
             .build();
@@ -97,8 +120,12 @@ class DefaultGetDraftViewOperationTest {
         caseType.setJurisdiction(jurisdiction);
         doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
 
-        getDraftViewOperation = new DefaultGetDraftViewOperation(getCaseOperation, uiDefinitionRepository,
-            caseTypeService, uidService, getDraftOperation);
+        getDraftViewOperation = new DefaultGetCaseViewFromDraftOperation(getCaseOperation,
+                                                                         uiDefinitionRepository,
+                                                                         caseTypeService,
+                                                                         uidService,
+                                                                         draftGateway,
+                                                                         draftResponseToCaseDetailsBuilder);
     }
 
     @Test
@@ -107,7 +134,7 @@ class DefaultGetDraftViewOperationTest {
                                                           CASE_TYPE_ID,
                                                           DRAFT_ID);
 
-        assertAll(() -> verify(getDraftOperation).get(DRAFT_ID),
+        assertAll(() -> verify(draftGateway).get(DRAFT_ID),
                   () -> assertThat(caseView.getCaseId(), is(String.format(DRAFT_ID_FORMAT, DRAFT_ID))),
                   () -> assertThat(caseView.getTabs(), arrayWithSize(1)),
                   () -> assertThat(caseView.getTabs()[0].getFields(), arrayWithSize(2)),

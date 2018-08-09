@@ -27,8 +27,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.AppInsights.DRAFT_STORE;
-import static uk.gov.hmcts.ccd.domain.model.draft.DraftResponseBuilder.aDraftResponse;
-
 
 @Service
 @Qualifier(DefaultDraftGateway.QUALIFIER)
@@ -92,9 +90,9 @@ public class DefaultDraftGateway implements DraftGateway {
             restTemplate.exchange(applicationParams.draftURL(draftId), HttpMethod.PUT, requestEntity, HttpEntity.class);
             final Duration duration = Duration.between(start, Instant.now());
             appInsights.trackDependency(DRAFT_STORE, "Update", duration.toMillis(), true);
-            return aDraftResponse()
-                .withId(draftId)
-                .build();
+            final DraftResponse draftResponse = new DraftResponse();
+            draftResponse.setId(draftId);
+            return draftResponse;
         } catch (HttpClientErrorException e) {
             LOG.warn("Error while updating draftId={}", draftId, e);
             if (e.getRawStatusCode() == RESOURCE_NOT_FOUND) {
@@ -119,7 +117,7 @@ public class DefaultDraftGateway implements DraftGateway {
             appInsights.trackDependency(DRAFT_STORE, "Get", duration.toMillis(), true);
             return assembleDraft(draft);
         } catch (HttpClientErrorException e) {
-            LOG.warn("Error while getting draftId=" + draftId, e);
+            LOG.warn("Error while getting draftId={}" + draftId, e);
             if (e.getRawStatusCode() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException(String.format(RESOURCE_NOT_FOUND_MSG, draftId));
             }
@@ -156,16 +154,14 @@ public class DefaultDraftGateway implements DraftGateway {
     }
 
     private DraftResponse assembleDraft(Draft getDraft) {
-        //TODO whenever a data structure changes we get stcuk here, better ignore corrupt one and move next
-        DraftResponse draftResponse;
+        //TODO whenever a data structure changes we get stuck here, better ignore corrupt one and move next
+        final DraftResponse draftResponse = new DraftResponse();
         try {
-            draftResponse = aDraftResponse()
-                .withId(getDraft.getId())
-                .withDocument(MAPPER.treeToValue(getDraft.getDocument(), CaseDraft.class))
-                .withType(getDraft.getType())
-                .withCreated(getDraft.getCreated().toLocalDateTime())
-                .withUpdated(getDraft.getUpdated().toLocalDateTime())
-                .build();
+            draftResponse.setId(getDraft.getId());
+            draftResponse.setDocument(MAPPER.treeToValue(getDraft.getDocument(), CaseDraft.class));
+            draftResponse.setType(getDraft.getType());
+            draftResponse.setCreated(getDraft.getCreated().toLocalDateTime());
+            draftResponse.setUpdated(getDraft.getUpdated().toLocalDateTime());
         } catch (IOException e) {
             LOG.warn("Error while deserializing draft data content", e);
             throw new ServiceException(DRAFT_STORE_DESERIALIZATION_ERR_MESSAGE, e);
