@@ -237,6 +237,8 @@ public class DefaultStartEventOperationTest {
             caseDetails.setCaseTypeId(TEST_CASE_TYPE_ID);
             caseDetails.setJurisdiction(TEST_JURISDICTION_ID);
             caseDetails.setData(DATA);
+            caseDetails.setDataClassification(DATA_CLASSIFICATION);
+            caseDetails.setSecurityClassification(SecurityClassification.PRIVATE);
             doReturn(caseDetails).when(draftResponseToCaseDetailsBuilder).build(draftResponse);
         }
 
