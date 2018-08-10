@@ -62,22 +62,27 @@ public class CaseDetails implements Cloneable {
     @ApiModelProperty("Same structure as `case_data` with classification (`PUBLIC`, `PRIVATE`, `RESTRICTED`) as field's value.")
     private Map<String, JsonNode> dataClassification;
 
-    /** Attribute passed to UI layer, does not need persistence */
+    /**
+     * Attribute passed to UI layer, does not need persistence
+     */
     @JsonProperty("after_submit_callback_response")
     private AfterSubmitCallbackResponse afterSubmitCallbackResponse;
 
-    /** Attribute passed to UI layer, does not need persistence */
+    /**
+     * Attribute passed to UI layer, does not need persistence
+     */
     @JsonProperty("callback_response_status_code")
     private Integer callbackResponseStatusCode;
 
-    /** Attribute passed to UI layer, does not need persistence */
+    /**
+     * Attribute passed to UI layer, does not need persistence
+     */
     @JsonProperty("callback_response_status")
     private String callbackResponseStatus;
 
 
     @JsonIgnore
     private final Map<String, Object> metadata = new HashMap<>();
-    private String draftReference;
 
     public String getId() {
         return id;
@@ -167,7 +172,6 @@ public class CaseDetails implements Cloneable {
     }
 
     /**
-     *
      * @deprecated Will be removed in version 2.x. Use {@link CaseDetails#dataClassification} instead.
      */
     @Deprecated
@@ -191,7 +195,7 @@ public class CaseDetails implements Cloneable {
 
     private void setAfterSubmitCallbackResponseEntity(final AfterSubmitCallbackResponse response) {
         this.afterSubmitCallbackResponse = response;
-        this.callbackResponseStatusCode =  SC_OK;
+        this.callbackResponseStatusCode = SC_OK;
         this.callbackResponseStatus = "COMPLETED";
     }
 
@@ -267,6 +271,7 @@ public class CaseDetails implements Cloneable {
         return getReference() != null;
     }
 
+    @JsonIgnore
     public String getDraftReference() {
         return String.format(DRAFT_ID, id);
     }

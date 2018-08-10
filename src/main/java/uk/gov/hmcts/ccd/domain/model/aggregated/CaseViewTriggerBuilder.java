@@ -31,7 +31,7 @@ public class CaseViewTriggerBuilder {
         return caseViewTrigger;
     }
 
-    public static CaseViewTriggerBuilder aCaseViewTrigger() {
+    public static CaseViewTriggerBuilder anCaseViewTrigger() {
         return new CaseViewTriggerBuilder();
     }
 

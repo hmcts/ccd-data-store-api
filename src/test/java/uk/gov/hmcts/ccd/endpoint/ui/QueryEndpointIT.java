@@ -721,7 +721,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Trigger Description", "This event will create a new case", triggers[0].getDescription());
         assertEquals("Trigger Order", Integer.valueOf(1), triggers[0].getOrder());
 
-        assertEquals("Trigger ID", null, triggers[1].getId());
+        assertEquals("Trigger ID", "DELETE", triggers[1].getId());
         assertEquals("Trigger Name", "Delete", triggers[1].getName());
         assertEquals("Trigger Description", "Delete draft", triggers[1].getDescription());
         assertEquals("Trigger Order", Integer.valueOf(2), triggers[1].getOrder());

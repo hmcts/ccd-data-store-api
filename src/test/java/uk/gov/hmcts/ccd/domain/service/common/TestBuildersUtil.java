@@ -11,17 +11,16 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.aggregated.*;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
-import uk.gov.hmcts.ccd.domain.model.draft.CaseDraft;
-import uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDraftRequest;
-import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
-import uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDraftRequest;
+import uk.gov.hmcts.ccd.domain.model.draft.*;
 import uk.gov.hmcts.ccd.domain.model.search.Field;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
+import uk.gov.hmcts.ccd.domain.model.std.Event;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -96,12 +95,99 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public static DraftResponseBuilder aDraftResponse() {
+        public static DraftResponseBuilder anDraftResponse() {
             return new DraftResponseBuilder();
         }
 
         public DraftResponse build() {
             return this.draftResponse;
+        }
+    }
+
+    public static class DraftBuilder {
+        private final Draft draft;
+
+        private DraftBuilder() {
+            draft = new Draft();
+        }
+
+        public DraftBuilder withId(String id) {
+            this.draft.setId(id);
+            return this;
+        }
+
+        public DraftBuilder withId(Long id) {
+            this.draft.setId(String.valueOf(id));
+            return this;
+        }
+
+        public DraftBuilder withDocument(JsonNode document) {
+            this.draft.setDocument(document);
+            return this;
+        }
+
+        public DraftBuilder withType(String type) {
+            this.draft.setType(type);
+            return this;
+        }
+
+        public DraftBuilder withCreated(ZonedDateTime created) {
+            this.draft.setCreated(created);
+            return this;
+        }
+
+        public DraftBuilder withUpdated(ZonedDateTime updated) {
+            this.draft.setUpdated(updated);
+            return this;
+        }
+
+        public static DraftBuilder anDraft() {
+            return new DraftBuilder();
+        }
+
+        public Draft build() {
+            return this.draft;
+        }
+    }
+
+    public static class CaseDataContentBuilder {
+        private final CaseDataContent caseDataContent;
+
+        private CaseDataContentBuilder() {
+            this.caseDataContent = new CaseDataContent();
+        }
+
+        public CaseDataContentBuilder withEvent(Event event) {
+            this.caseDataContent.setEvent(event);
+            return this;
+        }
+
+        public CaseDataContentBuilder withData(Map<String, JsonNode> data) {
+            this.caseDataContent.setData(data);
+            return this;
+        }
+
+        public CaseDataContentBuilder withSecurityClassification(Map<String, JsonNode> securityClassification) {
+            this.caseDataContent.setSecurityClassification(securityClassification);
+            return this;
+        }
+
+        public CaseDataContentBuilder withToken(String token) {
+            this.caseDataContent.setToken(token);
+            return this;
+        }
+
+        public CaseDataContentBuilder withIgnoreWarning(Boolean ignoreWarning) {
+            this.caseDataContent.setIgnoreWarning(ignoreWarning);
+            return this;
+        }
+
+        public static CaseDataContentBuilder anCaseDataContent() {
+            return new CaseDataContentBuilder();
+        }
+
+        public CaseDataContent build() {
+            return this.caseDataContent;
         }
     }
 
@@ -137,7 +223,7 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public static CaseDraftBuilder aCaseDraft() {
+        public static CaseDraftBuilder anCaseDraft() {
             return new CaseDraftBuilder();
         }
 
@@ -245,7 +331,7 @@ public class TestBuildersUtil {
             return caseDetails;
         }
 
-        public static CaseDetailsBuilder aCaseDetails() {
+        public static CaseDetailsBuilder anCaseDetails() {
             return new CaseDetailsBuilder();
         }
     }
@@ -770,7 +856,7 @@ public class TestBuildersUtil {
             this.caseTabCollection = new CaseTabCollection();
         }
 
-        public static CaseTabCollectionBuilder aCaseTabCollection() {
+        public static CaseTabCollectionBuilder anCaseTabCollection() {
             return new CaseTabCollectionBuilder();
         }
 
@@ -814,7 +900,7 @@ public class TestBuildersUtil {
             return (JsonNode node) -> caseData.put(fieldId, node);
         }
 
-        public static CaseDataBuilder caseData() {
+        public static CaseDataBuilder anCaseData() {
             return new CaseDataBuilder();
         }
 

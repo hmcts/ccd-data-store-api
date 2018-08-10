@@ -20,14 +20,16 @@ import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 
-import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTriggerBuilder.aCaseViewTrigger;
+import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTriggerBuilder.anCaseViewTrigger;
 
 @Service
 @Qualifier(DefaultGetCaseViewFromDraftOperation.QUALIFIER)
 public class DefaultGetCaseViewFromDraftOperation extends AbstractDefaultGetCaseViewOperation implements GetCaseViewOperation {
 
     public static final String QUALIFIER = "defaultDraft";
-    private static final CaseViewTrigger DELETE_TRIGGER = aCaseViewTrigger()
+    protected static final String DELETE = "DELETE";
+    private static final CaseViewTrigger DELETE_TRIGGER = anCaseViewTrigger()
+        .withId(DELETE)
         .withName("Delete")
         .withDescription("Delete draft")
         .withOrder(2)
@@ -35,7 +37,7 @@ public class DefaultGetCaseViewFromDraftOperation extends AbstractDefaultGetCase
     private static final String RESUME = "Resume";
 
     private final DraftGateway draftGateway;
-    private DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder;
+    private final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder;
 
     @Autowired
     public DefaultGetCaseViewFromDraftOperation(@Qualifier(CreatorGetCaseOperation.QUALIFIER) final GetCaseOperation getCaseOperation,
@@ -64,7 +66,7 @@ public class DefaultGetCaseViewFromDraftOperation extends AbstractDefaultGetCase
     }
 
     private CaseViewTrigger buildResumeTriggerFromDraft(DraftResponse draftResponse) {
-        return aCaseViewTrigger()
+        return anCaseViewTrigger()
             .withId(draftResponse.getDocument().getEventTriggerId())
             .withName(RESUME)
             .withDescription(draftResponse.getDocument().getCaseDataContent().getEvent().getDescription())

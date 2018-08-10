@@ -22,13 +22,14 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
-import static uk.gov.hmcts.ccd.domain.model.std.CaseDataContentBuilder.aCaseDataContent;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataBuilder.caseData;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.aCaseDetails;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.aCaseDraft;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTabCollectionBuilder.aCaseTabCollection;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.aDraftResponse;
+import static uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetCaseViewFromDraftOperation.DELETE;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataBuilder.anCaseData;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.anCaseDataContent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.anCaseDetails;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.anCaseDraft;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTabCollectionBuilder.anCaseTabCollection;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.anDraftResponse;
 
 class DefaultGetCaseViewFromDraftOperationTest {
 
@@ -71,16 +72,16 @@ class DefaultGetCaseViewFromDraftOperationTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
 
-        data = caseData()
+        data = anCaseData()
             .withPair("dataTestField1", JSON_NODE_FACTORY.textNode("dataTestField1"))
             .withPair("dataTestField2", JSON_NODE_FACTORY.textNode("dataTestField2"))
             .build();
-        draftResponse = aDraftResponse()
+        draftResponse = anDraftResponse()
             .withId(DRAFT_ID)
-            .withDocument(aCaseDraft()
+            .withDocument(anCaseDraft()
                               .withCaseTypeId(CASE_TYPE_ID)
                               .withEventTriggerId(EVENT_TRIGGER_ID)
-                              .withCaseDataContent(aCaseDataContent()
+                              .withCaseDataContent(anCaseDataContent()
                                                        .withData(data)
                                                        .withEvent(anEvent()
                                                                       .withEventId(EVENT_TRIGGER_ID)
@@ -91,7 +92,7 @@ class DefaultGetCaseViewFromDraftOperationTest {
             .build();
 
         doReturn(draftResponse).when(draftGateway).get(DRAFT_ID);
-        caseDetails = aCaseDetails()
+        caseDetails = anCaseDetails()
             .withCaseTypeId(CASE_TYPE_ID)
             .withJurisdiction(JURISDICTION_ID)
             .withId(DRAFT_ID_FOR_UI)
@@ -99,7 +100,7 @@ class DefaultGetCaseViewFromDraftOperationTest {
             .build();
         doReturn(caseDetails).when(draftResponseToCaseDetailsBuilder).build(draftResponse);
 
-        caseTabCollection = aCaseTabCollection().withFieldIds("dataTestField1", "dataTestField2").build();
+        caseTabCollection = anCaseTabCollection().withFieldIds("dataTestField1", "dataTestField2").build();
         doReturn(caseTabCollection).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
 
         caseType = new CaseType();
@@ -141,7 +142,7 @@ class DefaultGetCaseViewFromDraftOperationTest {
                                          hasProperty("description", equalTo(EVENT_DESCRIPTION)),
                                          hasProperty("order", equalTo(1)))),
                   () -> assertThat(caseView.getTriggers()[1],
-                                   allOf(hasProperty("id", is(nullValue())),
+                                   allOf(hasProperty("id", is(DELETE)),
                                          hasProperty("name", equalTo("Delete")),
                                          hasProperty("description", equalTo("Delete draft")),
                                          hasProperty("order", equalTo(2)))),
