@@ -142,7 +142,7 @@ class DefaultDraftGatewayTest {
         ResponseEntity<HttpEntity> response = ResponseEntity.created(new URI("http://localhost:8800/drafts/4")).build();
         doReturn(response).when(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(HttpEntity.class));
 
-        Long result = draftGateway.save(createCaseDraftRequest);
+        Long result = draftGateway.create(createCaseDraftRequest);
 
         assertAll(
             () -> verify(restTemplate).exchange(eq(draftBaseURL), eq(HttpMethod.POST), any(RequestEntity.class), eq(HttpEntity.class)),
@@ -155,7 +155,7 @@ class DefaultDraftGatewayTest {
         Exception exception = new RestClientException("connectivity issue");
         doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(HttpEntity.class));
 
-        final ServiceException actualException = assertThrows(ServiceException.class, () -> draftGateway.save(createCaseDraftRequest));
+        final ServiceException actualException = assertThrows(ServiceException.class, () -> draftGateway.create(createCaseDraftRequest));
         assertThat(actualException.getMessage(), is("The draft service is currently down, please refresh your browser or try again later"));
         assertThat(actualException.getCause(), is(exception));
     }

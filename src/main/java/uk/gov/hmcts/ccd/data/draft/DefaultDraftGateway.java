@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.data.draft;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -41,8 +40,6 @@ public class DefaultDraftGateway implements DraftGateway {
     private static final String RESOURCE_NOT_FOUND_MSG = "No draft found ( draft reference = '%s' )";
     private static final String DRAFT_STORE_DESERIALIZATION_ERR_MESSAGE = "Unable to read from draft service";
 
-    @Qualifier("draftsRestTemplate")
-    @Autowired
     private final RestTemplate restTemplate;
     private final SecurityUtils securityUtils;
     private final ApplicationParams applicationParams;
@@ -50,7 +47,7 @@ public class DefaultDraftGateway implements DraftGateway {
 
     @Inject
     public DefaultDraftGateway(
-        final RestTemplate restTemplate,
+        @Qualifier("draftsRestTemplate") final RestTemplate restTemplate,
         final SecurityUtils securityUtils,
         final ApplicationParams applicationParams,
         final AppInsights appInsights) {
@@ -61,7 +58,7 @@ public class DefaultDraftGateway implements DraftGateway {
     }
 
     @Override
-    public Long save(final CreateCaseDraftRequest draft) {
+    public Long create(final CreateCaseDraftRequest draft) {
         try {
             HttpHeaders headers = securityUtils.authorizationHeaders();
             headers.add(DRAFT_ENCRYPTION_KEY_HEADER, applicationParams.getDraftEncryptionKey());
