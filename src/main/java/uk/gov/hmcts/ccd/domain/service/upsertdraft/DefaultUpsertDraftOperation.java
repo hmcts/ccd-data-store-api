@@ -31,10 +31,10 @@ public class DefaultUpsertDraftOperation implements UpsertDraftOperation {
 
     @Override
     public DraftResponse executeSave(final String uid,
-                             final String jurisdictionId,
-                             final String caseTypeId,
-                             final String eventTriggerId,
-                             final CaseDataContent caseDataContent) {
+                                     final String jurisdictionId,
+                                     final String caseTypeId,
+                                     final String eventTriggerId,
+                                     final CaseDataContent caseDataContent) {
         final DraftResponse draftResponse = new DraftResponse();
         draftResponse.setId(draftGateway.save(buildCreateCaseDraft(uid, jurisdictionId, caseTypeId, eventTriggerId, caseDataContent)).toString());
         return draftResponse;
@@ -42,16 +42,20 @@ public class DefaultUpsertDraftOperation implements UpsertDraftOperation {
 
     @Override
     public DraftResponse executeUpdate(final String uid,
-                               final String jurisdictionId,
-                               final String caseTypeId,
-                               final String eventTriggerId,
-                               final String draftId,
-                               final CaseDataContent caseDataContent) {
+                                       final String jurisdictionId,
+                                       final String caseTypeId,
+                                       final String eventTriggerId,
+                                       final String draftId,
+                                       final CaseDataContent caseDataContent) {
         return draftGateway.update(buildUpdateCaseDraft(uid, jurisdictionId, caseTypeId, eventTriggerId, caseDataContent),
                                    draftId);
     }
 
-    private CreateCaseDraftRequest buildCreateCaseDraft(String uid, String jurisdictionId, String caseTypeId, String eventTriggerId, CaseDataContent caseDataContent) {
+    private CreateCaseDraftRequest buildCreateCaseDraft(String uid,
+                                                        String jurisdictionId,
+                                                        String caseTypeId,
+                                                        String eventTriggerId,
+                                                        CaseDataContent caseDataContent) {
         final CaseDraft caseDraft = new CaseDraft();
         caseDraft.setUserId(uid);
         caseDraft.setJurisdictionId(jurisdictionId);
@@ -66,7 +70,11 @@ public class DefaultUpsertDraftOperation implements UpsertDraftOperation {
         return createCaseDraftRequest;
     }
 
-    private UpdateCaseDraftRequest buildUpdateCaseDraft(String uid, String jurisdictionId, String caseTypeId, String eventTriggerId, CaseDataContent caseDataContent) {
+    private UpdateCaseDraftRequest buildUpdateCaseDraft(String uid,
+                                                        String jurisdictionId,
+                                                        String caseTypeId,
+                                                        String eventTriggerId,
+                                                        CaseDataContent caseDataContent) {
         final UpdateCaseDraftRequest updateCaseDraftRequest = new UpdateCaseDraftRequest();
         updateCaseDraftRequest.setType(CASE_DATA_CONTENT);
         final CaseDraft caseDraft = new CaseDraft();
