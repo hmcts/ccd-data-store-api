@@ -22,8 +22,8 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.aCaseDetails;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.aCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.anCaseDetails;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.anCaseType;
 
 class ClassifiedStartEventOperationTest {
 
@@ -58,10 +58,10 @@ class ClassifiedStartEventOperationTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        caseDetails = aCaseDetails().build();
+        caseDetails = anCaseDetails().build();
         startEvent = new StartEventTrigger();
         startEvent.setCaseDetails(caseDetails);
-        caseType = aCaseType().build();
+        caseType = anCaseType().build();
 
         classifiedDetails = new CaseDetails();
         doReturn(Optional.of(classifiedDetails)).when(classificationService).applyClassification(caseDetails);

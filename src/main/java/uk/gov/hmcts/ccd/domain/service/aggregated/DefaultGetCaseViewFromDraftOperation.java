@@ -22,7 +22,7 @@ import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 
 import java.util.ArrayList;
 
-import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTriggerBuilder.aCaseViewTrigger;
+import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTriggerBuilder.anCaseViewTrigger;
 
 @Service
 @Qualifier(DefaultGetCaseViewFromDraftOperation.QUALIFIER)
@@ -30,7 +30,7 @@ public class DefaultGetCaseViewFromDraftOperation extends AbstractDefaultGetCase
 
     public static final String QUALIFIER = "defaultDraft";
     protected static final String DELETE = "DELETE";
-    private static final CaseViewTrigger DELETE_TRIGGER = aCaseViewTrigger()
+    private static final CaseViewTrigger DELETE_TRIGGER = anCaseViewTrigger()
         .withId(DELETE)
         .withName("Delete")
         .withDescription("Delete draft")
@@ -95,7 +95,7 @@ public class DefaultGetCaseViewFromDraftOperation extends AbstractDefaultGetCase
     }
 
     private CaseViewTrigger buildResumeTriggerFromDraft(DraftResponse draftResponse) {
-        return aCaseViewTrigger()
+        return anCaseViewTrigger()
             .withId(draftResponse.getDocument().getEventTriggerId())
             .withName(RESUME)
             .withDescription(draftResponse.getDocument().getCaseDataContent().getEvent().getDescription())

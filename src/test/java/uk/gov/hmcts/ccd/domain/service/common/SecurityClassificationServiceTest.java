@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.*;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.aCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.aCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.anCaseType;
 
 public class SecurityClassificationServiceTest {
 
@@ -71,7 +71,7 @@ public class SecurityClassificationServiceTest {
         private final String CASE_FIELD_ID_1_2 = "CASE_FIELD_1_2";
         private final CaseField CASE_FIELD_1_1 = aCaseField().withId(CASE_FIELD_ID_1_1).withSC(SC_PUBLIC).build();
         private final CaseField CASE_FIELD_1_2 = aCaseField().withId(CASE_FIELD_ID_1_2).withSC(SC_RESTRICTED).build();
-        private final CaseType testCaseType = aCaseType()
+        private final CaseType testCaseType = anCaseType()
             .withId(CASE_TYPE_ONE)
             .withField(CASE_FIELD_1_1)
             .withField(CASE_FIELD_1_2)

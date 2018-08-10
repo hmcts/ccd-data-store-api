@@ -47,10 +47,10 @@ public class DefaultUpsertDraftOperation implements UpsertDraftOperation {
 
     @Override
     public DraftResponse executeSave(final String uid,
-                             final String jurisdictionId,
-                             final String caseTypeId,
-                             final String eventTriggerId,
-                             final CaseDataContent caseDataContent) {
+                                     final String jurisdictionId,
+                                     final String caseTypeId,
+                                     final String eventTriggerId,
+                                     final CaseDataContent caseDataContent) {
         final DraftResponse draftResponse = new DraftResponse();
         draftResponse.setId(draftGateway.save(buildCreateCaseDraft(uid, jurisdictionId, caseTypeId, eventTriggerId, caseDataContent)).toString());
         return draftResponse;
@@ -67,7 +67,11 @@ public class DefaultUpsertDraftOperation implements UpsertDraftOperation {
                                    draftId);
     }
 
-    private CreateCaseDraftRequest buildCreateCaseDraft(String uid, String jurisdictionId, String caseTypeId, String eventTriggerId, CaseDataContent caseDataContent) {
+    private CreateCaseDraftRequest buildCreateCaseDraft(String uid,
+                                                        String jurisdictionId,
+                                                        String caseTypeId,
+                                                        String eventTriggerId,
+                                                        CaseDataContent caseDataContent) {
         sanitiseData(caseTypeId, caseDataContent);
 
         final CaseDraft caseDraft = new CaseDraft();
@@ -84,7 +88,11 @@ public class DefaultUpsertDraftOperation implements UpsertDraftOperation {
         return createCaseDraftRequest;
     }
 
-    private UpdateCaseDraftRequest buildUpdateCaseDraft(String uid, String jurisdictionId, String caseTypeId, String eventTriggerId, CaseDataContent caseDataContent) {
+    private UpdateCaseDraftRequest buildUpdateCaseDraft(String uid,
+                                                        String jurisdictionId,
+                                                        String caseTypeId,
+                                                        String eventTriggerId,
+                                                        CaseDataContent caseDataContent) {
         sanitiseData(caseTypeId, caseDataContent);
 
         final CaseDraft caseDraft = new CaseDraft();

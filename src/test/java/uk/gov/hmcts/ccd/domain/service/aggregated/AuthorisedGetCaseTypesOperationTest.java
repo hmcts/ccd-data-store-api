@@ -27,10 +27,10 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.*;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.aCaseEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.anCaseEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.aCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseStateBuilder.aState;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.aCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.anCaseType;
 
 class AuthorisedGetCaseTypesOperationTest {
 
@@ -71,49 +71,49 @@ class AuthorisedGetCaseTypesOperationTest {
     private static final CaseState CASE_STATE_2_2 = aState().withId(STATE_ID_2_2).build();
     private static final CaseState CASE_STATE_3_1 = aState().withId(STATE_ID_3_1).build();
     private static final CaseState CASE_STATE_3_2 = aState().withId(STATE_ID_3_2).build();
-    private static final CaseEvent CASE_EVENT_1_1 = aCaseEvent().withId(EVENT_ID_1_1)
+    private static final CaseEvent CASE_EVENT_1_1 = anCaseEvent().withId(EVENT_ID_1_1)
         .withAcl(anAcl()
                      .withRole(ROLE_IN_USER_ROLES)
                      .withCreate(true)
                      .withRead(true)
                      .build())
         .build();
-    private static final CaseEvent CASE_EVENT_1_2 = aCaseEvent().withId(EVENT_ID_1_2)
+    private static final CaseEvent CASE_EVENT_1_2 = anCaseEvent().withId(EVENT_ID_1_2)
         .withAcl(anAcl()
                      .withRole(ROLE_IN_USER_ROLES)
                      .withUpdate(true)
                      .withRead(true)
                      .build())
         .build();
-    private static final CaseEvent CASE_EVENT_1_3 = aCaseEvent().withId(EVENT_ID_1_3)
+    private static final CaseEvent CASE_EVENT_1_3 = anCaseEvent().withId(EVENT_ID_1_3)
         .withAcl(anAcl()
                      .withRole(ROLE_IN_USER_ROLES)
                      .withUpdate(true)
                      .withRead(true)
                      .build())
         .build();
-    private static final CaseEvent CASE_EVENT_2_3 = aCaseEvent().withId(EVENT_ID_2_3)
+    private static final CaseEvent CASE_EVENT_2_3 = anCaseEvent().withId(EVENT_ID_2_3)
         .withAcl(anAcl()
                      .withRole(ROLE_IN_USER_ROLES)
                      .withCreate(true)
                      .withRead(true)
                      .build())
         .build();
-    private static final CaseEvent CASE_EVENT_3_1 = aCaseEvent().withId(EVENT_ID_3_1)
+    private static final CaseEvent CASE_EVENT_3_1 = anCaseEvent().withId(EVENT_ID_3_1)
         .withAcl(anAcl()
                      .withRole(ROLE_IN_USER_ROLES)
                      .withCreate(true)
                      .withRead(true)
                      .build())
         .build();
-    private static final CaseEvent CASE_EVENT_3_2 = aCaseEvent().withId(EVENT_ID_3_2)
+    private static final CaseEvent CASE_EVENT_3_2 = anCaseEvent().withId(EVENT_ID_3_2)
         .withAcl(anAcl()
                      .withRole(ROLE_IN_USER_ROLES)
                      .withUpdate(true)
                      .withRead(true)
                      .build())
         .build();
-    private static final CaseEvent CASE_EVENT_3_3 = aCaseEvent().withId(EVENT_ID_3_3)
+    private static final CaseEvent CASE_EVENT_3_3 = anCaseEvent().withId(EVENT_ID_3_3)
         .withAcl(anAcl()
                      .withRole(ROLE_IN_USER_ROLES)
                      .withCreate(true)
@@ -185,7 +185,7 @@ class AuthorisedGetCaseTypesOperationTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        testCaseType1 = aCaseType()
+        testCaseType1 = anCaseType()
             .withAcl(anAcl()
                          .withRole(ROLE_IN_USER_ROLES)
                          .withRead(true)
@@ -193,7 +193,7 @@ class AuthorisedGetCaseTypesOperationTest {
             .withState(CASE_STATE_1_1)
             .withState(CASE_STATE_1_2)
             .withEvent(CASE_EVENT_1_1)
-            .withEvent(aCaseEvent()
+            .withEvent(anCaseEvent()
                            .withId(EVENT_ID_1_2)
                            .withAcl(anAcl()
                                         .withRole(ROLE_IN_USER_ROLES)
@@ -205,21 +205,21 @@ class AuthorisedGetCaseTypesOperationTest {
             .withField(CASE_FIELD_1_3)
             .build();
 
-        testCaseType2 = aCaseType()
+        testCaseType2 = anCaseType()
             .withAcl(anAcl()
                          .withRole(ROLE_IN_USER_ROLES)
                          .withCreate(true)
                          .build())
             .withState(CASE_STATE_2_1)
             .withState(CASE_STATE_2_2)
-            .withEvent(aCaseEvent()
+            .withEvent(anCaseEvent()
                            .withId(EVENT_ID_2_1)
                            .withAcl(anAcl()
                                         .withRole(ROLE_IN_USER_ROLES)
                                         .withRead(true)
                                         .build())
                            .build())
-            .withEvent(aCaseEvent().withId(EVENT_ID_2_2)
+            .withEvent(anCaseEvent().withId(EVENT_ID_2_2)
                            .withAcl(anAcl()
                                         .withRole(ROLE_IN_USER_ROLES)
                                         .withRead(true)
@@ -240,7 +240,7 @@ class AuthorisedGetCaseTypesOperationTest {
             .withField(CASE_FIELD_2_3)
             .build();
 
-        testCaseType3 = aCaseType()
+        testCaseType3 = anCaseType()
             .withAcl(anAcl()
                          .withRole(ROLE_IN_USER_ROLES)
                          .withCreate(true)
