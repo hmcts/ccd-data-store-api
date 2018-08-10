@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
-import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway;
@@ -16,7 +15,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.DraftResponseToCaseDetailsBuilder;
-import uk.gov.hmcts.ccd.domain.model.draft.CaseDraft;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
@@ -160,11 +158,6 @@ public class DefaultStartEventOperation implements StartEventOperation {
         if (!caseTypeService.isJurisdictionValid(jurisdictionId, caseType)) {
             throw new ValidationException(caseTypeId + " is not defined as a case type for " + jurisdictionId);
         }
-    }
-
-    private SecurityClassification getSecurityClassification(CaseDraft document) {
-        String securityClassification = document.getCaseDataContent().getSecurityClassification();
-        return securityClassification != null ? SecurityClassification.valueOf(securityClassification) : null;
     }
 
     private CaseDetails getCaseDetails(String jurisdictionId, String caseTypeId, String caseReference) {

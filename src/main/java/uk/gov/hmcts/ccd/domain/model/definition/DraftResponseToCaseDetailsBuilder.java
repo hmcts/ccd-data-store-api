@@ -18,7 +18,10 @@ public class DraftResponseToCaseDetailsBuilder {
         newCaseDetails.setId(String.format(DRAFT_ID, draftResponse.getId()));
         newCaseDetails.setCaseTypeId(document.getCaseTypeId());
         newCaseDetails.setJurisdiction(document.getJurisdictionId());
+        newCaseDetails.setSecurityClassification(document.getSecurityClassification());
+        newCaseDetails.setDataClassification(document.getDataClassification());
         newCaseDetails.setData(document.getCaseDataContent().getData());
         return newCaseDetails;
     }
+
 }
