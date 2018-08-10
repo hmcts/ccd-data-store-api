@@ -26,7 +26,7 @@ import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.Search
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildData;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildSearchResultField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.aCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.aCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.anCaseType;
 
 class MergeDataToSearchResultOperationTest {
     private static final String SEARCH_VIEW = "SEARCH";
@@ -61,7 +61,7 @@ class MergeDataToSearchResultOperationTest {
         caseDetails2.setState("state2");
         caseDetailsList = Arrays.asList(caseDetails1, caseDetails2);
 
-        caseType = aCaseType()
+        caseType = anCaseType()
             .withCaseTypeId(CASE_TYPE_ID)
             .withField(aCaseField().withId(CASE_FIELD_1).build())
             .withField(aCaseField().withId(CASE_FIELD_2).build())

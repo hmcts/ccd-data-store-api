@@ -38,11 +38,11 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.ccd.domain.model.draft.DraftBuilder.aDraft;
-import static uk.gov.hmcts.ccd.domain.model.std.CaseDataContentBuilder.aCaseDataContent;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.aCaseDraft;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.anCaseDataContent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.anCaseDraft;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CreateCaseDraftBuilder.aCreateCaseDraft;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftBuilder.anDraft;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.UpdateCaseDraftBuilder.anUpdateCaseDraft;
 
 class DefaultDraftGatewayTest {
@@ -103,7 +103,7 @@ class DefaultDraftGatewayTest {
         data.put(KEY, VALUE);
         dataClassification.put(KEY_CLASS, VALUE_CLASS);
 
-        caseDataContent = aCaseDataContent()
+        caseDataContent = anCaseDataContent()
             .withData(data)
             .withEvent(event)
             .withIgnoreWarning(true)
@@ -111,14 +111,14 @@ class DefaultDraftGatewayTest {
             .withSecurityClassification(securityClassification)
             .withToken(TOKEN)
             .build();
-        caseDraft = aCaseDraft()
+        caseDraft = anCaseDraft()
             .withUserId(UID)
             .withJurisdictionId(JID)
             .withCaseTypeId(CTID)
             .withEventTriggerId(ETID)
             .withCaseDataContent(caseDataContent)
             .build();
-        draft = aDraft()
+        draft = anDraft()
             .withId(DID)
             .withType(TYPE)
             .withDocument(mapper.convertValue(caseDraft, JsonNode.class))
