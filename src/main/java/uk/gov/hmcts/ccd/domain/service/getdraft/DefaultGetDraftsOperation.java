@@ -7,6 +7,7 @@ import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.DraftResponseToCaseDetailsBuilder;
 import uk.gov.hmcts.ccd.domain.model.draft.CaseDraft;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 
@@ -14,18 +15,20 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.ccd.domain.model.definition.CaseDetailsBuilder.aCaseDetails;
-
 @Service
 @Qualifier(DefaultGetDraftsOperation.QUALIFIER)
 public class DefaultGetDraftsOperation implements GetDraftsOperation {
     private static final String PAGE_ONE = "1";
     public static final String QUALIFIER = "default";
+
     private final DraftGateway draftGateway;
+    private DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder;
 
     @Inject
-    public DefaultGetDraftsOperation(@Qualifier(DefaultDraftGateway.QUALIFIER) final DraftGateway draftGateway) {
+    public DefaultGetDraftsOperation(@Qualifier(DefaultDraftGateway.QUALIFIER) final DraftGateway draftGateway,
+                                     DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder) {
         this.draftGateway = draftGateway;
+        this.draftResponseToCaseDetailsBuilder = draftResponseToCaseDetailsBuilder;
     }
 
     @Override
@@ -49,15 +52,7 @@ public class DefaultGetDraftsOperation implements GetDraftsOperation {
 
     private List<CaseDetails> buildCaseDataFromDrafts(List<DraftResponse> drafts) {
         return drafts.stream()
-            .map(d -> {
-                CaseDraft document = d.getDocument();
-                return aCaseDetails()
-                    .withId(d.getId())
-                    .withCaseTypeId(document.getCaseTypeId())
-                    .withJurisdiction(document.getJurisdictionId())
-                    .withData(document.getCaseDataContent().getData())
-                    .build();
-            })
+            .map(draftResponseToCaseDetailsBuilder::build)
             .collect(Collectors.toList());
     }
 }

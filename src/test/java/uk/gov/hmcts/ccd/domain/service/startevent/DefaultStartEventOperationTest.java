@@ -17,6 +17,7 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.DraftResponseToCaseDetailsBuilder;
 import uk.gov.hmcts.ccd.domain.model.draft.CaseDraft;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
@@ -39,12 +40,12 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.ccd.domain.model.definition.CaseDetailsBuilder.aCaseDetails;
-import static uk.gov.hmcts.ccd.domain.model.draft.CaseDraftBuilder.aCaseDraft;
-import static uk.gov.hmcts.ccd.domain.model.draft.DraftResponseBuilder.aDraftResponse;
 import static uk.gov.hmcts.ccd.domain.model.std.CaseDataContentBuilder.aCaseDataContent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.aCaseEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.aCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.anCaseDetails;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.anCaseDraft;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.anCaseEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.anCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.anDraftResponse;
 
 public class DefaultStartEventOperationTest {
 
@@ -88,22 +89,25 @@ public class DefaultStartEventOperationTest {
     @Mock
     private UIDService uidService;
 
+    @Mock
+    private DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder;
+
     private DefaultStartEventOperation defaultStartEventOperation;
 
-    private final CaseDetails caseDetails = aCaseDetails().build();
-    private final CaseType caseType = aCaseType().build();
-    private final CaseEvent eventTrigger = aCaseEvent().build();
+    private final CaseDetails caseDetails = anCaseDetails().build();
+    private final CaseType caseType = anCaseType().build();
+    private final CaseEvent eventTrigger = anCaseEvent().build();
     private final CaseDataContent caseDataContent = aCaseDataContent()
         .withSecurityClassification(PRIVATE)
         .withData(DATA)
         .withDataClassification(DATA_CLASSIFICATION)
         .build();
-    private final CaseDraft caseDraft = aCaseDraft()
+    private final CaseDraft caseDraft = anCaseDraft()
         .withCaseTypeId(TEST_CASE_TYPE_ID)
         .withJurisdictionId(TEST_JURISDICTION_ID)
         .withCaseDataContent(caseDataContent)
         .build();
-    private final DraftResponse draftResponse = aDraftResponse().withDocument(caseDraft).build();
+    private final DraftResponse draftResponse = anDraftResponse().withDocument(caseDraft).build();
 
     @BeforeEach
     void setUp() {
@@ -122,7 +126,8 @@ public class DefaultStartEventOperationTest {
                                                                     caseService,
                                                                     caseTypeService,
                                                                     callbackInvoker,
-                                                                    uidService);
+                                                                    uidService,
+                                                                    draftResponseToCaseDetailsBuilder);
     }
 
     @Nested
@@ -229,6 +234,12 @@ public class DefaultStartEventOperationTest {
             doReturn(true).when(eventTriggerService).isPreStateEmpty(eventTrigger);
             doReturn(TEST_EVENT_TOKEN).when(eventTokenService).generateToken(UID, eventTrigger, caseType.getJurisdiction(), caseType);
             doReturn(draftResponse).when(draftGateway).get(TEST_DRAFT_ID);
+            caseDetails.setCaseTypeId(TEST_CASE_TYPE_ID);
+            caseDetails.setJurisdiction(TEST_JURISDICTION_ID);
+            caseDetails.setData(DATA);
+            caseDetails.setDataClassification(DATA_CLASSIFICATION);
+            caseDetails.setSecurityClassification(SecurityClassification.PRIVATE);
+            doReturn(caseDetails).when(draftResponseToCaseDetailsBuilder).build(draftResponse);
         }
 
         @Test

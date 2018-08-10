@@ -27,13 +27,13 @@ import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway.DRAFT_STORE_DOWN_ERR_MESSAGE;
-import static uk.gov.hmcts.ccd.domain.model.definition.CaseDetailsBuilder.aCaseDetails;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.NO_ERROR;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WORKBASKET;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.aCaseEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.anCaseDetails;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.anCaseEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.aCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.aCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.anCaseType;
 
 public class SearchQueryOperationTest {
     private static final String CASE_TYPE_ID = "GrantOnly";
@@ -76,12 +76,12 @@ public class SearchQueryOperationTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        testCaseType = aCaseType()
+        testCaseType = anCaseType()
             .withId(CASE_TYPE_ID)
             .withField(CASE_FIELD_1_1)
             .withField(CASE_FIELD_1_2)
             .withField(CASE_FIELD_1_3)
-            .withEvent(aCaseEvent().withId(EVENT_ID).withCanSaveDraft(true).build())
+            .withEvent(anCaseEvent().withId(EVENT_ID).withCanSaveDraft(true).build())
             .build();
         List<CaseType> testCaseTypes = Lists.newArrayList(testCaseType);
 
@@ -94,12 +94,12 @@ public class SearchQueryOperationTest {
                                                         caseTypeService);
         metadata = new MetaData(CASE_TYPE_ID, JURISDICTION_ID);
         criteria = new HashMap<>();
-        drafts.add(aCaseDetails()
+        drafts.add(anCaseDetails()
                        .withId(DRAFT_ID)
                        .withJurisdiction(JURISDICTION_ID)
                        .withCaseTypeId(CASE_TYPE_ID)
                        .build());
-        cases.add(aCaseDetails().build());
+        cases.add(anCaseDetails().build());
     }
 
     @Test

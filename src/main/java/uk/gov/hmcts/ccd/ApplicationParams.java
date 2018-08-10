@@ -28,8 +28,8 @@ public class ApplicationParams {
     @Value("${ccd.draft.encryptionKey}")
     private String draftEncryptionKey;
 
-    @Value("${ccd.draft.maxStaleDays}")
-    private Integer draftMaxStaleDays;
+    @Value("${ccd.draft.maxTTLDays}")
+    private Integer draftMaxTTLDays;
 
     @Value("${ccd.ui-definition.host}")
     private String uiDefinitionHost;
@@ -104,8 +104,8 @@ public class ApplicationParams {
         return draftEncryptionKey;
     }
 
-    public Integer getDraftMaxStaleDays() {
-        return draftMaxStaleDays;
+    public Integer getDraftMaxTTLDays() {
+        return draftMaxTTLDays;
     }
 
     public String caseTypeLatestVersionUrl(String caseTypeId) {

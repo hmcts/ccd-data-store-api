@@ -13,15 +13,15 @@ import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
-import static uk.gov.hmcts.ccd.domain.model.draft.DraftResponseBuilder.aDraftResponse;
-import static uk.gov.hmcts.ccd.domain.model.std.CaseDataContentBuilder.aCaseDataContent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.anCaseDataContent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.anDraftResponse;
 
 class DraftsEndpointTest {
 
     private static final String UID = "1231";
     private static final String JURISDICTION_ID = "Test";
     private static final String CASE_TYPE_ID = "TestAddressBookCase";
-    private static final CaseDataContent CASE_DATA_CONTENT = aCaseDataContent().build();
+    private static final CaseDataContent CASE_DATA_CONTENT = anCaseDataContent().build();
     private static final String EVENT_TRIGGER_ID = "createCase";
     private static final String DRAFT_ID = "5";
 
@@ -38,7 +38,7 @@ class DraftsEndpointTest {
 
     @Test
     void shouldSaveDraftForCaseWorker() {
-        final DraftResponse toBeReturned = aDraftResponse().build();
+        final DraftResponse toBeReturned = anDraftResponse().build();
         doReturn(toBeReturned).when(upsertDraftOperation).executeSave(UID,
                                                                       JURISDICTION_ID,
                                                                       CASE_TYPE_ID,
@@ -63,7 +63,7 @@ class DraftsEndpointTest {
 
     @Test
     void shouldUpdateDraftForCaseWorker() {
-        final DraftResponse toBeReturned = aDraftResponse().build();
+        final DraftResponse toBeReturned = anDraftResponse().build();
         doReturn(toBeReturned).when(upsertDraftOperation).executeUpdate(UID,
                                                                         JURISDICTION_ID,
                                                                         CASE_TYPE_ID,

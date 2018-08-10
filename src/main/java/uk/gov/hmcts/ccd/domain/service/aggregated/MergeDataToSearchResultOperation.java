@@ -15,7 +15,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetDraftViewOperation.DRAFT_ID;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WORKBASKET;
 
 @Named
@@ -48,20 +47,8 @@ public class MergeDataToSearchResultOperation {
     }
 
     private SearchResultViewItem buildSearchResultViewItem(CaseDetails caseData) {
-        return new SearchResultViewItem(hasCaseReference(caseData) ? getCaseReference(caseData) : getDraftReference(caseData),
+        return new SearchResultViewItem(caseData.hasCaseReference() ? caseData.getReferenceAsString() : caseData.getDraftReference(),
                                         caseData.getCaseDataAndMetadata());
-    }
-
-    private String getCaseReference(CaseDetails caseData) {
-        return caseData.getReference().toString();
-    }
-
-    private String getDraftReference(CaseDetails caseData) {
-        return String.format(DRAFT_ID, caseData.getId());
-    }
-
-    private boolean hasCaseReference(CaseDetails caseData) {
-        return caseData.getReference() != null;
     }
 
     private SearchResult getSearchResult(final CaseType caseType, final String view) {

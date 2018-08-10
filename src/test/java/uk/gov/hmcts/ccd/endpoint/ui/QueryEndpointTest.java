@@ -30,7 +30,7 @@ class QueryEndpointTest {
     @Mock
     private AuthorisedGetCaseViewOperation getCaseViewOperation;
     @Mock
-    private DefaultGetDraftViewOperation getDraftViewOperation;
+    private DefaultGetCaseViewFromDraftOperation getDraftViewOperation;
     @Mock
     private AuthorisedGetCaseHistoryViewOperation getCaseHistoryViewOperation;
     @Mock

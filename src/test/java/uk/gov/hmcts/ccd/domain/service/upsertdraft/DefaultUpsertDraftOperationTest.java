@@ -27,10 +27,10 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.ccd.domain.model.draft.CaseDraftBuilder.aCaseDraft;
-import static uk.gov.hmcts.ccd.domain.model.draft.DraftResponseBuilder.aDraftResponse;
-import static uk.gov.hmcts.ccd.domain.model.std.CaseDataContentBuilder.aCaseDataContent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.aCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.anCaseDataContent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.anCaseDraft;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.anCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.anDraftResponse;
 import static uk.gov.hmcts.ccd.domain.service.upsertdraft.DefaultUpsertDraftOperation.CASE_DATA_CONTENT;
 
 class DefaultUpsertDraftOperationTest {
@@ -41,7 +41,7 @@ class DefaultUpsertDraftOperationTest {
     private static final String CTID = "TestAddressBookCase";
     private static final String ETID = "createCase";
     private static final String DID = "5";
-    private static final CaseType CASE_TYPE = aCaseType()
+    private static final CaseType CASE_TYPE = anCaseType()
         .withId(CTID)
         .withSecurityClassification(SecurityClassification.PUBLIC)
         .build();
@@ -59,19 +59,20 @@ class DefaultUpsertDraftOperationTest {
 
     private UpsertDraftOperation upsertDraftOperation;
 
-    private CaseDataContent caseDataContent = aCaseDataContent().withData(DATA).build();
+    private CaseDataContent caseDataContent = anCaseDataContent().withData(DATA).build();
     private CaseDraft caseDraft;
-    private DraftResponse draftResponse = aDraftResponse().build();
+    private DraftResponse draftResponse = anDraftResponse().build();
 
     @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        when(applicationParams.getDraftMaxStaleDays()).thenReturn(DRAFT_MAX_STALE_DAYS);
+        when(applicationParams.getDraftMaxTTLDays()).thenReturn(DRAFT_MAX_STALE_DAYS);
         given(caseDefinitionRepository.getCaseType(CTID)).willReturn(CASE_TYPE);
         given(caseSanitiser.sanitise(CASE_TYPE, DATA)).willReturn(SANITISED_DATA);
 
+
         upsertDraftOperation = new DefaultUpsertDraftOperation(draftGateway, caseDefinitionRepository, caseSanitiser, applicationParams);
-        caseDraft = aCaseDraft()
+        caseDraft = anCaseDraft()
             .withUserId(UID)
             .withJurisdictionId(JID)
             .withCaseTypeId(CTID)
@@ -98,7 +99,7 @@ class DefaultUpsertDraftOperationTest {
             () -> assertThat(captor.getValue().getDocument(), hasProperty("eventTriggerId", is(caseDraft.getEventTriggerId()))),
             () -> assertThat(captor.getValue().getDocument(), hasProperty("caseDataContent", is(caseDataContent))),
             () -> assertThat(captor.getValue().getDocument(), hasProperty("caseDataContent", hasProperty("data", is(SANITISED_DATA)))),
-            () -> assertThat(captor.getValue().getMaxStaleDays(), is(DRAFT_MAX_STALE_DAYS)),
+            () -> assertThat(captor.getValue().getMaxTTLDays(), is(DRAFT_MAX_STALE_DAYS)),
             () -> assertThat(captor.getValue().getType(), is(CASE_DATA_CONTENT)),
             () -> assertThat(result, samePropertyValuesAs(draftResponse))
         );

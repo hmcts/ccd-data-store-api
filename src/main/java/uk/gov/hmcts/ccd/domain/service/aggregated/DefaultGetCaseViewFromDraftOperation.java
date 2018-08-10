@@ -13,7 +13,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.draft.CaseDraft;
+import uk.gov.hmcts.ccd.domain.model.definition.DraftResponseToCaseDetailsBuilder;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
@@ -22,17 +22,15 @@ import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 
 import java.util.ArrayList;
 
-import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTriggerBuilder.aCaseViewTrigger;
-import static uk.gov.hmcts.ccd.domain.model.definition.CaseDetailsBuilder.aCaseDetails;
+import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTriggerBuilder.anCaseViewTrigger;
 
 @Service
-@Qualifier(DefaultGetDraftViewOperation.QUALIFIER)
-public class DefaultGetDraftViewOperation extends AbstractDefaultGetCaseViewOperation implements GetCaseViewOperation {
+@Qualifier(DefaultGetCaseViewFromDraftOperation.QUALIFIER)
+public class DefaultGetCaseViewFromDraftOperation extends AbstractDefaultGetCaseViewOperation implements GetCaseViewOperation {
 
     public static final String QUALIFIER = "defaultDraft";
-    static final String DRAFT_ID = "DRAFT%s";
-    static final String DELETE = "DELETE";
-    private static final CaseViewTrigger DELETE_TRIGGER = aCaseViewTrigger()
+    protected static final String DELETE = "DELETE";
+    private static final CaseViewTrigger DELETE_TRIGGER = anCaseViewTrigger()
         .withId(DELETE)
         .withName("Delete")
         .withDescription("Delete draft")
@@ -41,15 +39,18 @@ public class DefaultGetDraftViewOperation extends AbstractDefaultGetCaseViewOper
     private static final String RESUME = "Resume";
 
     private final DraftGateway draftGateway;
+    private final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder;
 
     @Autowired
-    public DefaultGetDraftViewOperation(@Qualifier(CreatorGetCaseOperation.QUALIFIER) final GetCaseOperation getCaseOperation,
-                                        final UIDefinitionRepository uiDefinitionRepository,
-                                        final CaseTypeService caseTypeService,
-                                        final UIDService uidService,
-                                        @Qualifier(DefaultDraftGateway.QUALIFIER) final DraftGateway draftGateway) {
+    public DefaultGetCaseViewFromDraftOperation(@Qualifier(CreatorGetCaseOperation.QUALIFIER) final GetCaseOperation getCaseOperation,
+                                                final UIDefinitionRepository uiDefinitionRepository,
+                                                final CaseTypeService caseTypeService,
+                                                final UIDService uidService,
+                                                @Qualifier(DefaultDraftGateway.QUALIFIER) final DraftGateway draftGateway,
+                                                final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder) {
         super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService);
         this.draftGateway = draftGateway;
+        this.draftResponseToCaseDetailsBuilder = draftResponseToCaseDetailsBuilder;
     }
 
     @Override
@@ -58,10 +59,10 @@ public class DefaultGetDraftViewOperation extends AbstractDefaultGetCaseViewOper
         final CaseType caseType = getCaseType(jurisdictionId, caseTypeId);
         final DraftResponse draftResponse = draftGateway.get(draftId);
 
-        final CaseDetails caseDetails = buildCaseDetailsFromDraft(draftResponse);
+        final CaseDetails caseDetails = draftResponseToCaseDetailsBuilder.build(draftResponse);
         final CaseViewTrigger resumeTrigger = buildResumeTriggerFromDraft(draftResponse);
 
-        final CaseTabCollection caseTabCollection = getCaseTabCollection(getCaseTypeIdFromDraft(draftResponse));
+        final CaseTabCollection caseTabCollection = getCaseTabCollection(draftResponse.getCaseTypeId());
 
         CaseViewEvent[] events = buildEventsFromDraft(draftResponse);
 
@@ -94,16 +95,12 @@ public class DefaultGetDraftViewOperation extends AbstractDefaultGetCaseViewOper
     }
 
     private CaseViewTrigger buildResumeTriggerFromDraft(DraftResponse draftResponse) {
-        return aCaseViewTrigger()
+        return anCaseViewTrigger()
             .withId(draftResponse.getDocument().getEventTriggerId())
             .withName(RESUME)
             .withDescription(draftResponse.getDocument().getCaseDataContent().getEvent().getDescription())
             .withOrder(1)
             .build();
-    }
-
-    private String getCaseTypeIdFromDraft(DraftResponse draftResponse) {
-        return draftResponse.getDocument().getCaseTypeId();
     }
 
     private CaseView merge(CaseDetails caseDetails, CaseViewTrigger resumeTrigger, CaseViewEvent[] events, CaseType caseType, CaseTabCollection caseTabCollection) {
@@ -118,16 +115,6 @@ public class DefaultGetDraftViewOperation extends AbstractDefaultGetCaseViewOper
         caseView.setEvents(events);
 
         return caseView;
-    }
-
-    private CaseDetails buildCaseDetailsFromDraft(DraftResponse draftResponse) {
-        CaseDraft document = draftResponse.getDocument();
-        return aCaseDetails()
-            .withId(String.format(DRAFT_ID, draftResponse.getId()))
-            .withCaseTypeId(document.getCaseTypeId())
-            .withJurisdiction(document.getJurisdictionId())
-            .withData(document.getCaseDataContent().getData())
-            .build();
     }
 
 }
