@@ -47,7 +47,7 @@ public class MergeDataToSearchResultOperation {
     }
 
     private SearchResultViewItem buildSearchResultViewItem(CaseDetails caseData) {
-        return new SearchResultViewItem(caseData.hasCaseReference() ? caseData.getReferenceAsString() : caseData.getDraftReference(),
+        return new SearchResultViewItem(caseData.hasCaseReference() ? caseData.getReferenceAsString() : caseData.getId(),
                                         caseData.getCaseDataAndMetadata());
     }
 

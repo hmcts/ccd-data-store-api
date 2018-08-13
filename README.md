@@ -42,6 +42,7 @@ The following environment variables are required:
 | HTTP_CLIENT_MAX_CLIENT_PER_ROUTE | 20 | Used for Pooling connection manager; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
 | HTTP_CLIENT_VALIDATE_AFTER_INACTIVITY | 0 | Used for Pooling connection manager; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
 | HTTP_CLIENT_CONNECTION_TIMEOUT | 30000 | 30 seconds, Used for Pooling connection manager; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
+| HTTP_CLIENT_CONNECTION_DRAFTS_CREATE_TIMEOUT | 1000 | 1000 milliseconds, Used for Pooling connection manager for create operation for draft store; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
 | HTTP_CLIENT_CONNECTION_DRAFTS_TIMEOUT | 500 | 500 milliseconds, Used for Pooling connection manager for draft store; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
 | DRAFT_STORE_URL | - | Base URL for Draft Store API service. `http://localhost:8800` for the dockerised local instance. |
 | DRAFT_ENCRYPTION_KEY | - | Draft encryption key. The encryption key used by draft store to encrypt documents with. |

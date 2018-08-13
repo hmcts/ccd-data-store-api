@@ -31,7 +31,7 @@ public class CaseDetails implements Cloneable {
     private static final Logger LOG = LoggerFactory.getLogger(CaseDetails.class);
     private static final String LABEL_FIELD_TYPE = "Label";
     private static final String CASE_PAYMENT_HISTORY_VIEWER_FIELD_TYPE = "CasePaymentHistoryViewer";
-    public static final String DRAFT_ID = "DRAFT%s";
+    static final String DRAFT_ID = "DRAFT%s";
 
     private String id;
 
@@ -99,7 +99,7 @@ public class CaseDetails implements Cloneable {
 
     @JsonIgnore
     public String getReferenceAsString() {
-        return reference.toString();
+        return reference != null ? reference.toString() : null;
     }
 
     @JsonSetter("id")
@@ -213,7 +213,7 @@ public class CaseDetails implements Cloneable {
     private boolean hasDataForTabField(CaseTypeTabField caseTypeTabField) {
         return data.keySet().contains(caseTypeTabField.getCaseField().getId());
     }
-    
+
     private boolean isFieldWithNoValue(CaseTypeTabField caseTypeTabField) {
         return caseTypeTabField.getCaseField().getFieldType().getType().equals(LABEL_FIELD_TYPE) ||
             caseTypeTabField.getCaseField().getFieldType().getType().equals(CASE_PAYMENT_HISTORY_VIEWER_FIELD_TYPE);
@@ -245,7 +245,7 @@ public class CaseDetails implements Cloneable {
             metadata.put(JURISDICTION.getReference(), getJurisdiction());
             metadata.put(CASE_TYPE.getReference(), getCaseTypeId());
             metadata.put(STATE.getReference(), getState());
-            metadata.put(CASE_REFERENCE.getReference(), getReference());
+            metadata.put(CASE_REFERENCE.getReference(), getReference() != null ? getReference() : getId());
             metadata.put(CREATED_DATE.getReference(), getCreatedDate());
             metadata.put(LAST_MODIFIED_DATE.getReference(), getLastModified());
             metadata.put(SECURITY_CLASSIFICATION.getReference(), getSecurityClassification());
@@ -271,8 +271,4 @@ public class CaseDetails implements Cloneable {
         return getReference() != null;
     }
 
-    @JsonIgnore
-    public String getDraftReference() {
-        return String.format(DRAFT_ID, id);
-    }
 }

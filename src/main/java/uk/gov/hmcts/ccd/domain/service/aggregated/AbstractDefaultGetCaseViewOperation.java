@@ -84,8 +84,10 @@ public abstract class AbstractDefaultGetCaseViewOperation {
     }
 
     List<CaseViewField> getMetadataFields(CaseType caseType, CaseDetails caseDetails) {
-        return caseType.getCaseFields().stream().filter(CaseField::isMetadata).map(caseField -> CaseViewField.createFrom(caseField, caseDetails
-            .getCaseDataAndMetadata())).collect(Collectors.toList());
+        return caseType.getCaseFields().stream()
+            .filter(CaseField::isMetadata)
+            .map(caseField -> CaseViewField.createFrom(caseField, caseDetails.getCaseDataAndMetadata()))
+            .collect(Collectors.toList());
     }
 
 }

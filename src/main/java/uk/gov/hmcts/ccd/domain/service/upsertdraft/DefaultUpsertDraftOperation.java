@@ -52,7 +52,7 @@ public class DefaultUpsertDraftOperation implements UpsertDraftOperation {
                                      final String eventTriggerId,
                                      final CaseDataContent caseDataContent) {
         final DraftResponse draftResponse = new DraftResponse();
-        draftResponse.setId(draftGateway.save(buildCreateCaseDraft(uid, jurisdictionId, caseTypeId, eventTriggerId, caseDataContent)).toString());
+        draftResponse.setId(draftGateway.create(buildCreateCaseDraft(uid, jurisdictionId, caseTypeId, eventTriggerId, caseDataContent)).toString());
         return draftResponse;
     }
 
