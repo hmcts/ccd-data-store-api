@@ -46,16 +46,9 @@ data "azurerm_key_vault" "ccd_shared_key_vault" {
   resource_group_name = "${local.vaultName}"
 }
 
-data "vault_generic_secret" "ccd_data_s2s_key" {
-  path = "secret/${var.vault_section}/ccidam/service-auth-provider/api/microservice-keys/ccd-data"
-}
-
-data "vault_generic_secret" "gateway_idam_key" {
-  path = "secret/${var.vault_section}/ccidam/service-auth-provider/api/microservice-keys/ccd-gw"
-}
-
-data "vault_generic_secret" "gateway_oauth2_client_secret" {
-  path = "secret/${var.vault_section}/ccidam/idam-api/oauth2/client-secrets/ccd-gateway"
+data "azurerm_key_vault_secret" "ccd_data_s2s_key" {
+  name = "ccd-data-s2s-key"
+  vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
 }
 
 module "ccd-data-store-api" {
@@ -84,7 +77,7 @@ module "ccd-data-store-api" {
 
     IDAM_USER_URL                       = "${var.idam_api_url}"
     IDAM_S2S_URL                        = "${local.s2s_url}"
-    DATA_STORE_IDAM_KEY                 = "${data.vault_generic_secret.ccd_data_s2s_key.data["value"]}"
+    DATA_STORE_IDAM_KEY                 = "${data.azurerm_key_vault_secret.ccd_data_s2s_key.value}"
 
     DATA_STORE_S2S_AUTHORISED_SERVICES  = "${var.authorised-services}"
 
@@ -148,25 +141,5 @@ resource "azurerm_key_vault_secret" "POSTGRES_PORT" {
 resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
   name = "${local.app_full_name}-POSTGRES-DATABASE"
   value = "${module.data-store-db.postgresql_database}"
-  vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
-}
-
-// Copy into Azure Key Vault
-
-resource "azurerm_key_vault_secret" "ccd_data_s2s_key" {
-  name = "ccd-data-s2s-key"
-  value = "${data.vault_generic_secret.ccd_data_s2s_key.data["value"]}"
-  vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
-}
-
-resource "azurerm_key_vault_secret" "gw_s2s_key" {
-  name = "ccd-api-gateway-idam-service-key"
-  value = "${data.vault_generic_secret.gateway_idam_key.data["value"]}"
-  vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
-}
-
-resource "azurerm_key_vault_secret" "gw_oauth2_secret" {
-  name = "ccd-api-gateway-oauth2-client-secret"
-  value = "${data.vault_generic_secret.gateway_oauth2_client_secret.data["value"]}"
   vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
 }
