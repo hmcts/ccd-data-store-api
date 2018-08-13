@@ -11,9 +11,12 @@ import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.fasterxml.jackson.databind.node.JsonNodeFactory.instance;
 import static uk.gov.hmcts.ccd.domain.model.definition.CaseDetails.LABEL_FIELD_TYPE;
 
 @Named
@@ -40,18 +43,20 @@ public class MergeDataToSearchResultOperation {
              ))
             .collect(Collectors.toList());
 
-        final List<SearchResultViewItem>
-            viewItems =
-            caseDetails.stream()
-                       .map(caseData -> new SearchResultViewItem(caseData.getReference().toString(),
-                                                                 caseData.getCaseDataAndMetadata(),
-                                                                 caseType.getCaseFields()
-                                                                         .stream()
-                                                                         .filter(caseField -> LABEL_FIELD_TYPE.equals(
-                                                                             caseField.getFieldType().getType()))
-                                                                         .collect(Collectors.toList())))
-                        .collect(Collectors.toList());
+        final List<SearchResultViewItem> viewItems = caseDetails.stream()
+            .map(caseData -> new SearchResultViewItem(caseData.getReference().toString(),
+                                                      getCaseDataAndMetadata(caseData, caseType)))
+            .collect(Collectors.toList());
         return new SearchResultView(viewColumns, viewItems);
+    }
+
+    private Map<String, Object> getCaseDataAndMetadata(CaseDetails caseDetails, CaseType caseType) {
+        Map map = new HashMap<>(caseDetails.getCaseDataAndMetadata());
+        caseType.getCaseFields()
+            .stream()
+            .filter(caseField -> LABEL_FIELD_TYPE.equals(caseField.getFieldType().getType()))
+            .forEach(f -> map.put(f.getId(), instance.textNode(f.getLabel())));
+        return map;
     }
 
     private SearchResult getSearchResult(final CaseType caseType, final String view) {
