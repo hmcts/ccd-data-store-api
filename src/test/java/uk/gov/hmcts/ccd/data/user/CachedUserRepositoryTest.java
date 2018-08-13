@@ -9,7 +9,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
-import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
 
 import java.util.HashSet;
 import java.util.Set;
