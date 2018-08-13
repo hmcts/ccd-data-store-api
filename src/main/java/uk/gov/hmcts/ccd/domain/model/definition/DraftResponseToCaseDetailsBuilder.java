@@ -21,6 +21,8 @@ public class DraftResponseToCaseDetailsBuilder {
         newCaseDetails.setSecurityClassification(document.getSecurityClassification());
         newCaseDetails.setDataClassification(document.getDataClassification());
         newCaseDetails.setData(document.getCaseDataContent().getData());
+        newCaseDetails.setCreatedDate(draftResponse.getCreated());
+        newCaseDetails.setLastModified(draftResponse.getUpdated());
         return newCaseDetails;
     }
 
