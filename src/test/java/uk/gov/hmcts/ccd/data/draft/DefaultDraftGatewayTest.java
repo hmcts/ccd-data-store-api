@@ -73,6 +73,9 @@ class DefaultDraftGatewayTest {
     private RestTemplate restTemplate;
 
     @Mock
+    private RestTemplate createDraftRestTemplate;
+
+    @Mock
     private AppInsights appInsights;
 
     private DraftGateway draftGateway;
@@ -134,28 +137,29 @@ class DefaultDraftGatewayTest {
             .withDocument(caseDraft)
             .withType(CASE_DATA_CONTENT)
             .build();
-        draftGateway = new DefaultDraftGateway(restTemplate, securityUtils, applicationParams, appInsights);
+        draftGateway = new DefaultDraftGateway(createDraftRestTemplate, restTemplate, securityUtils, applicationParams, appInsights);
     }
 
     @Test
-    void shouldSuccessfullySaveToDraft() throws URISyntaxException {
+    void shouldSuccessfullyCreateToDraft() throws URISyntaxException {
         ResponseEntity<HttpEntity> response = ResponseEntity.created(new URI("http://localhost:8800/drafts/4")).build();
-        doReturn(response).when(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(HttpEntity.class));
+        doReturn(response).when(createDraftRestTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(HttpEntity.class));
 
-        Long result = draftGateway.save(createCaseDraftRequest);
+        Long result = draftGateway.create(createCaseDraftRequest);
 
         assertAll(
-            () -> verify(restTemplate).exchange(eq(draftBaseURL), eq(HttpMethod.POST), any(RequestEntity.class), eq(HttpEntity.class)),
+            () -> verify(createDraftRestTemplate).exchange(eq(draftBaseURL), eq(HttpMethod.POST), any(RequestEntity.class), eq(HttpEntity.class)),
+            () -> verify(restTemplate, never()).exchange(eq(draftBaseURL), eq(HttpMethod.POST), any(RequestEntity.class), eq(HttpEntity.class)),
             () -> assertThat(result, is(4L))
         );
     }
 
     @Test
-    void shouldFailToSaveToDraft() {
+    void shouldFailToCreateDraft() {
         Exception exception = new RestClientException("connectivity issue");
-        doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(HttpEntity.class));
+        doThrow(exception).when(createDraftRestTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(HttpEntity.class));
 
-        final ServiceException actualException = assertThrows(ServiceException.class, () -> draftGateway.save(createCaseDraftRequest));
+        final ServiceException actualException = assertThrows(ServiceException.class, () -> draftGateway.create(createCaseDraftRequest));
         assertThat(actualException.getMessage(), is("The draft service is currently down, please refresh your browser or try again later"));
         assertThat(actualException.getCause(), is(exception));
     }
@@ -168,6 +172,7 @@ class DefaultDraftGatewayTest {
 
         assertAll(
             () -> verify(restTemplate).exchange(eq(draftURL5), eq(HttpMethod.PUT), any(RequestEntity.class), eq(HttpEntity.class)),
+            () -> verify(createDraftRestTemplate, never()).exchange(eq(draftURL5), eq(HttpMethod.PUT), any(RequestEntity.class), eq(HttpEntity.class)),
             () -> assertThat(result, hasProperty("id", is(DID)))
         );
     }
@@ -199,6 +204,7 @@ class DefaultDraftGatewayTest {
 
         assertAll(
             () -> verify(restTemplate).exchange(eq(draftURL5), eq(HttpMethod.GET), any(RequestEntity.class), eq(Draft.class)),
+            () -> verify(createDraftRestTemplate, never()).exchange(eq(draftURL5), eq(HttpMethod.GET), any(RequestEntity.class), eq(Draft.class)),
             () -> assertThat(result, hasProperty("id", is(DID))),
             () -> assertThat(result, hasProperty("type", is(TYPE))),
             () -> assertThat(result, hasProperty("document", hasProperty("userId", is(caseDraft.getUserId())))),
