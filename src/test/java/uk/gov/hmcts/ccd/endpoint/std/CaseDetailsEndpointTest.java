@@ -198,10 +198,8 @@ class CaseDetailsEndpointTest {
         doReturn(toBeReturned).when(createCaseOperation).createCaseDetails(UID,
                                                                            JURISDICTION_ID,
                                                                            CASE_TYPE_ID,
-                                                                           EVENT,
-                                                                           DATA,
-                                                                           IGNORE_WARNING,
-                                                                           TOKEN);
+                                                                           EVENT_DATA,
+                                                                           IGNORE_WARNING);
 
         final CaseDetails output = endpoint.saveCaseDetailsForCaseWorker(UID,
                                                                          JURISDICTION_ID,
@@ -214,10 +212,8 @@ class CaseDetailsEndpointTest {
             () -> verify(createCaseOperation).createCaseDetails(UID,
                                                                 JURISDICTION_ID,
                                                                 CASE_TYPE_ID,
-                                                                EVENT_DATA.getEvent(),
-                                                                EVENT_DATA.getData(),
-                                                                IGNORE_WARNING,
-                                                                EVENT_DATA.getToken())
+                                                                EVENT_DATA,
+                                                                IGNORE_WARNING)
         );
     }
 

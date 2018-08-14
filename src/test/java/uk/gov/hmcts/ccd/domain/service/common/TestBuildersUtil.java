@@ -167,6 +167,11 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public CaseDataContentBuilder withDraftId(String draftId) {
+            this.caseDataContent.setDraftId(draftId);
+            return this;
+        }
+
         public CaseDataContentBuilder withSecurityClassification(String securityClassification) {
             this.caseDataContent.setSecurityClassification(securityClassification);
             return this;
@@ -552,6 +557,11 @@ public class TestBuildersUtil {
 
         public CaseEventBuilder withCanSaveDraft(Boolean canSaveDraft) {
             caseEvent.setCanSaveDraft(canSaveDraft);
+            return this;
+        }
+
+        public CaseEventBuilder withName(String name) {
+            caseEvent.setName(name);
             return this;
         }
     }

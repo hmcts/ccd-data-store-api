@@ -197,7 +197,7 @@ class DefaultCreateEventOperationTest {
             () -> assertThat(caseDetails.getAfterSubmitCallbackResponse().getConfirmationHeader(), is("Header")),
             () -> assertThat(caseDetails.getAfterSubmitCallbackResponse().getConfirmationBody(), is("Body")),
             () -> assertThat(caseDetails.getCallbackResponseStatusCode(), is(SC_OK)),
-            () -> assertThat(caseDetails.getCallbackResponseStatus(), is("COMPLETED"))
+            () -> assertThat(caseDetails.getCallbackResponseStatus(), is("CALLBACK_COMPLETED"))
         );
     }
 
@@ -215,7 +215,7 @@ class DefaultCreateEventOperationTest {
         assertAll(
             () -> assertNull(caseDetails.getAfterSubmitCallbackResponse()),
             () -> assertThat(caseDetails.getCallbackResponseStatusCode(), is(SC_OK)),
-            () -> assertThat(caseDetails.getCallbackResponseStatus(), is("INCOMPLETE"))
+            () -> assertThat(caseDetails.getCallbackResponseStatus(), is("INCOMPLETE_CALLBACK"))
         );
     }
 

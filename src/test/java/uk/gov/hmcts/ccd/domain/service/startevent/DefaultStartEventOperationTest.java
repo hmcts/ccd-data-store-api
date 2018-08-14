@@ -40,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.ccd.domain.model.std.CaseDataContentBuilder.aCaseDataContent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.anCaseDataContent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.anCaseDetails;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.anCaseDraft;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.anCaseEvent;
@@ -97,7 +97,7 @@ public class DefaultStartEventOperationTest {
     private final CaseDetails caseDetails = anCaseDetails().build();
     private final CaseType caseType = anCaseType().build();
     private final CaseEvent eventTrigger = anCaseEvent().build();
-    private final CaseDataContent caseDataContent = aCaseDataContent()
+    private final CaseDataContent caseDataContent = anCaseDataContent()
         .withSecurityClassification(PRIVATE)
         .withData(DATA)
         .withDataClassification(DATA_CLASSIFICATION)
