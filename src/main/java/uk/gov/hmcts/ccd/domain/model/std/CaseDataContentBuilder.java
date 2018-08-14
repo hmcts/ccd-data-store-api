@@ -41,6 +41,11 @@ public class CaseDataContentBuilder {
         return this;
     }
 
+    public CaseDataContentBuilder withDraftId(String draftId) {
+        this.caseDataContent.setDraftId(draftId);
+        return this;
+    }
+
     public static CaseDataContentBuilder aCaseDataContent() {
         return new CaseDataContentBuilder();
     }

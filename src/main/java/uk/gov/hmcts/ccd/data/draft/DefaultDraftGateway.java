@@ -135,7 +135,7 @@ public class DefaultDraftGateway implements DraftGateway {
             headers.add(DRAFT_ENCRYPTION_KEY_HEADER, applicationParams.getDraftEncryptionKey());
             final HttpEntity requestEntity = new HttpEntity(headers);
             final Instant start = Instant.now();
-            restTemplate.exchange(applicationParams.draftURL(draftId), HttpMethod.DELETE, requestEntity, Draft.class).getBody();
+            restTemplate.exchange(applicationParams.draftURL(draftId), HttpMethod.DELETE, requestEntity, Draft.class);
             final Duration duration = Duration.between(start, Instant.now());
             appInsights.trackDependency(DRAFT_STORE, "Delete", duration.toMillis(), true);
         } catch (HttpClientErrorException e) {
