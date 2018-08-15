@@ -39,6 +39,10 @@ public class CaseDetails implements Cloneable {
 
     private String jurisdiction;
 
+    @JsonProperty("assigned")
+    @ApiModelProperty("User indentifier of the judge whom the case is assigned to")
+    private String assignedTo;
+
     @JsonProperty("case_type_id")
     private String caseTypeId;
 
@@ -79,6 +83,17 @@ public class CaseDetails implements Cloneable {
     public Long getId() {
         return id;
     }
+
+    @JsonSetter("assigned")
+    public String setAssignedTo(String assginedTo) {
+	this.assignedTo = assignedTo;
+    }
+
+    @JsonGetter("assigned")
+    public String getAssignedTo() {
+	return this.assignedTo;
+    }
+
 
     public void setId(Long id) {
         this.id = id;
