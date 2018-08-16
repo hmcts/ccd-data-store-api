@@ -8,7 +8,10 @@ import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.BaseTest;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
+
 import java.util.function.Supplier;
+
+import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 
 class ViewCaseTest extends BaseTest {
 
@@ -16,12 +19,12 @@ class ViewCaseTest extends BaseTest {
     private static final String JURISDICTION = "AUTOTEST1";
     private static final String CASE_TYPE = "AAT";
 
-    protected ViewCaseTest(AATHelper aat) { super(aat); }
+    protected ViewCaseTest(AATHelper aat) {
+        super(aat);
+    }
 
     @Test
     @DisplayName("View a case")
-
-
     public void shouldUpdateACase() {
 
         Long caseID = shouldCreateACase();
@@ -32,7 +35,7 @@ class ViewCaseTest extends BaseTest {
             .given()
             .pathParam("jurisdiction", JURISDICTION)
             .pathParam("caseType", CASE_TYPE)
-            .pathParam("caseID",caseID)
+            .pathParam("caseID", caseID)
             .contentType(ContentType.JSON)
             .when()
             .get(
@@ -40,27 +43,27 @@ class ViewCaseTest extends BaseTest {
             .then()
             .statusCode(200);
 
-        }
+    }
 
-        Long shouldCreateACase() {
+    Long shouldCreateACase() {
 
-        Long caseID= aat.getCcdHelper()
+        Long caseID = aat.getCcdHelper()
             .createCase(asAutoTestCaseworker(), JURISDICTION, CASE_TYPE, "CREATE", createEmptyCase())
             .then()
             .extract()
             .path("id");
 
         return caseID;
-        }
+    }
 
-        private CaseDataContent createEmptyCase() {
-            final Event event = new Event();
-            event.setEventId("CREATE");
+    private CaseDataContent createEmptyCase() {
+        final Event event = anEvent().build();
+        event.setEventId("CREATE");
 
-            final CaseDataContent caseData = new CaseDataContent();
-            caseData.setEvent(event);
+        final CaseDataContent caseData = new CaseDataContent();
+        caseData.setEvent(event);
 
         return caseData;
-        }
+    }
 
 }

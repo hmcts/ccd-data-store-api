@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.*;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AuditEventBuilder.anAuditEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.anEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.aCaseEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventTriggerBuilder.anEventTrigger;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.aCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseStateBuilder.aState;
@@ -971,7 +971,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not grant access to event with relevant acl not granting access")
         void shouldNotGrantAccessToEventIfRelevantAclNotGrantingAccess() throws IOException {
             final CaseType caseType = aCaseType()
-                .withEvent(anEvent()
+                .withEvent(aCaseEvent()
                                .withId(EVENT_ID)
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -992,7 +992,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not grant access to event if ACL false and null value")
         void shouldNotGrantAccessToNullValue() throws IOException {
             final CaseType caseType = aCaseType()
-                .withEvent(anEvent()
+                .withEvent(aCaseEvent()
                                .withId(EVENT_ID)
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -1013,7 +1013,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not grant access to event if ACL true and event name not matching")
         void shouldNotGrantAccessWithEventNameNotMatching() throws IOException {
             final CaseType caseType = aCaseType()
-                .withEvent(anEvent()
+                .withEvent(aCaseEvent()
                                .withId(EVENT_ID)
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -1035,7 +1035,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should grant access to event with acl matching")
         void shouldGrantAccessToEventWithAclMatching() throws IOException {
             final CaseType caseType = aCaseType()
-                .withEvent(anEvent()
+                .withEvent(aCaseEvent()
                                .withId(EVENT_ID)
                                .withAcl(anAcl()
                                             .withRole(ROLE_NOT_IN_USER_ROLES)
@@ -1079,7 +1079,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not grant access to case with relevant acl missing")
         void shouldNotGrantAccessToCaseIfRelevantAclMissing() throws IOException {
             final CaseType caseType = aCaseType()
-                .withEvent(anEvent()
+                .withEvent(aCaseEvent()
                                .withId(EVENT_ID)
                                .withAcl(anAcl()
                                             .withRole(ROLE_NOT_IN_USER_ROLES)
@@ -1100,7 +1100,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not grant access to case with relevant acl not granting access")
         void shouldNotGrantAccessToCaseIfRelevantAclNotGrantingAccess() throws IOException {
             final CaseType caseType = aCaseType()
-                .withEvent(anEvent()
+                .withEvent(aCaseEvent()
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
                                             .build())
@@ -1701,7 +1701,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not return event if event is missing")
         void shouldNotReturnEventIfCaseEventIsMissing() throws IOException {
             final CaseType caseType = aCaseType()
-                .withEvent(anEvent()
+                .withEvent(aCaseEvent()
                                .withId(EVENT_ID)
                                .build())
                 .build();
@@ -1722,7 +1722,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not return audit event if event is missing")
         void shouldNotReturnEventIfCaseEventIsMissing() throws IOException {
             final CaseType caseType = aCaseType()
-                .withEvent(anEvent()
+                .withEvent(aCaseEvent()
                                .withId(EVENT_ID)
                                .build())
                 .build();
@@ -1738,7 +1738,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not return audit event if acls are missing")
         void shouldNotReturnEventIfCaseEventIsMissingAcls() throws IOException {
             final CaseType caseType = aCaseType()
-                .withEvent(anEvent()
+                .withEvent(aCaseEvent()
                                .withId(EVENT_ID)
                                .build())
                 .build();
@@ -1756,7 +1756,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not return audit event if relevant acl missing")
         void shouldNotReturnEventIfRelevantAclMissing() throws IOException {
             final CaseType caseType = aCaseType()
-                .withEvent(anEvent()
+                .withEvent(aCaseEvent()
                                .withId(EVENT_ID)
                                .withAcl(anAcl()
                                             .withRole(ROLE_NOT_IN_USER_ROLES)
@@ -1778,7 +1778,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not return audit event if relevant acl not granting access")
         void shouldNotReturnEventIfRelevantAclNotGrantingAccess() throws IOException {
             final CaseType caseType = aCaseType()
-                .withEvent(anEvent()
+                .withEvent(aCaseEvent()
                                .withId(EVENT_ID)
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -1799,7 +1799,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not return audit event if ACL true and event name not matching")
         void shouldNotReturnEventIfRelevantAclGrantingAccessAndEventNameNotMatching() throws IOException {
             final CaseType caseType = aCaseType()
-                .withEvent(anEvent()
+                .withEvent(aCaseEvent()
                                .withId(EVENT_ID)
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -1821,7 +1821,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should return audit event if acl matching")
         void shouldReturnEventWithAclMatching() throws IOException {
             final CaseType caseType = aCaseType()
-                .withEvent(anEvent()
+                .withEvent(aCaseEvent()
                                .withId(EVENT_ID)
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -1844,7 +1844,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should return single audit event if acl matching from a group")
         void shouldReturnEventWithAclMatchingFromGroup() throws IOException {
             final CaseType caseType = aCaseType()
-                .withEvent(anEvent()
+                .withEvent(aCaseEvent()
                                .withId(EVENT_ID)
                                .withAcl(anAcl()
                                             .withRole(ROLE_NOT_IN_USER_ROLES)
@@ -1874,7 +1874,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should return audit events if acls matching")
         void shouldReturnEventsWithAclsMatching() throws IOException {
             final CaseType caseType = aCaseType()
-                .withEvent(anEvent().withId(EVENT_ID_WITH_ACCESS)
+                .withEvent(aCaseEvent().withId(EVENT_ID_WITH_ACCESS)
                                     .withAcl(anAcl()
                                                  .withRole(ROLE_IN_USER_ROLES)
                                                  .withRead(true)
@@ -1883,20 +1883,20 @@ public class AccessControlServiceTest {
                                                  .withRole(ROLE_NOT_IN_USER_ROLES)
                                                  .build())
                            .build())
-                .withEvent(anEvent()
+                .withEvent(aCaseEvent()
                                .withId(EVENT_ID_WITHOUT_ACCESS)
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES_3)
                                             .build())
                             .build())
-                .withEvent(anEvent()
+                .withEvent(aCaseEvent()
                                .withId(EVENT_ID_WITHOUT_ACCESS_2)
                                .withAcl(anAcl()
                                             .withRole(ROLE_NOT_IN_USER_ROLES)
                                             .withRead(true)
                                             .build())
                            .build())
-                .withEvent(anEvent()
+                .withEvent(aCaseEvent()
                                .withId(EVENT_ID_WITH_ACCESS_2)
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES_2)
@@ -2162,7 +2162,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not return case event definition if relevant acl missing")
         void shouldNotReturnCaseEventDefinitionIfRelevantAclMissing() throws IOException {
             final CaseType caseType = aCaseType()
-                .withEvent(anEvent()
+                .withEvent(aCaseEvent()
                                .withId(EVENT_ID)
                                .withAcl(anAcl()
                                             .withRole(ROLE_NOT_IN_USER_ROLES)
@@ -2183,7 +2183,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not return case event definition if relevant acl not granting access")
         void shouldNotReturnCaseEventDefinitionIfRelevantAclNotGrantingAccess() throws IOException {
             final CaseType caseType = aCaseType()
-                .withEvent(anEvent()
+                .withEvent(aCaseEvent()
                                .withId(EVENT_ID)
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -2204,7 +2204,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should return case event definition if acl matching")
         void shouldReturnCaseEventDefinitionWithAclMatching() throws IOException {
             final CaseType caseType = aCaseType()
-                .withEvent(anEvent()
+                .withEvent(aCaseEvent()
                                .withId(EVENT_ID)
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -2227,7 +2227,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should return single case event definition if acl matching from a group")
         void shouldReturnCaseEventDefinitionWithAclMatchingFromGroup() throws IOException {
             final CaseType caseType = aCaseType()
-                .withEvent(anEvent()
+                .withEvent(aCaseEvent()
                                .withId(EVENT_ID)
                                .withAcl(anAcl()
                                             .withRole(ROLE_NOT_IN_USER_ROLES)
@@ -2257,7 +2257,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should return case event definition if acls matching")
         void shouldReturnCaseEventDefinitionWithAclsMatching() throws IOException {
             final CaseType caseType = aCaseType()
-                .withEvent(anEvent()
+                .withEvent(aCaseEvent()
                                .withId(EVENT_ID_WITH_ACCESS)
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -2267,19 +2267,19 @@ public class AccessControlServiceTest {
                                             .withRole(ROLE_NOT_IN_USER_ROLES)
                                             .build())
                            .build())
-                .withEvent(anEvent().withId(EVENT_ID_WITHOUT_ACCESS)
+                .withEvent(aCaseEvent().withId(EVENT_ID_WITHOUT_ACCESS)
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES_3)
                                             .build())
                            .build())
-                .withEvent(anEvent()
+                .withEvent(aCaseEvent()
                                .withId(EVENT_ID_WITHOUT_ACCESS_2)
                                .withAcl(anAcl()
                                             .withRole(ROLE_NOT_IN_USER_ROLES)
                                             .withCreate(true)
                                             .build())
                            .build())
-                .withEvent(anEvent()
+                .withEvent(aCaseEvent()
                                .withId(EVENT_ID_WITH_ACCESS_2)
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES_2)
@@ -2307,7 +2307,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not return case event definition if relevant acl missing")
         void shouldNotReturnCaseEventDefinitionIfRelevantAclMissing() throws IOException {
             final CaseType caseType = aCaseType()
-                .withEvent(anEvent()
+                .withEvent(aCaseEvent()
                                .withId(EVENT_ID)
                                .withAcl(anAcl()
                                             .withRole(ROLE_NOT_IN_USER_ROLES)
@@ -2328,7 +2328,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not return case event definition if relevant acl not granting access")
         void shouldNotReturnCaseEventDefinitionIfRelevantAclNotGrantingAccess() throws IOException {
             final CaseType caseType = aCaseType()
-                .withEvent(anEvent()
+                .withEvent(aCaseEvent()
                                .withId(EVENT_ID)
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -2349,7 +2349,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should return case event definition if acl matching")
         void shouldReturnCaseEventDefinitionWithAclMatching() throws IOException {
             final CaseType caseType = aCaseType()
-                .withEvent(anEvent()
+                .withEvent(aCaseEvent()
                                .withId(EVENT_ID)
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -2372,7 +2372,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should return single case event definition if acl matching from a group")
         void shouldReturnCaseEventDefinitionWithAclMatchingFromGroup() throws IOException {
             final CaseType caseType = aCaseType()
-                .withEvent(anEvent()
+                .withEvent(aCaseEvent()
                                .withId(EVENT_ID)
                                .withAcl(anAcl()
                                             .withRole(ROLE_NOT_IN_USER_ROLES)
@@ -2402,7 +2402,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should return case event definition if acls matching")
         void shouldReturnCaseEventDefinitionWithAclsMatching() throws IOException {
             final CaseType caseType = aCaseType()
-                .withEvent(anEvent()
+                .withEvent(aCaseEvent()
                                .withId(EVENT_ID_WITH_ACCESS)
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -2412,19 +2412,19 @@ public class AccessControlServiceTest {
                                             .withRole(ROLE_NOT_IN_USER_ROLES)
                                             .build())
                            .build())
-                .withEvent(anEvent().withId(EVENT_ID_WITHOUT_ACCESS)
+                .withEvent(aCaseEvent().withId(EVENT_ID_WITHOUT_ACCESS)
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES_3)
                                             .build())
                            .build())
-                .withEvent(anEvent()
+                .withEvent(aCaseEvent()
                                .withId(EVENT_ID_WITHOUT_ACCESS_2)
                                .withAcl(anAcl()
                                             .withRole(ROLE_NOT_IN_USER_ROLES)
                                             .withCreate(true)
                                             .build())
                            .build())
-                .withEvent(anEvent()
+                .withEvent(aCaseEvent()
                                .withId(EVENT_ID_WITH_ACCESS_2)
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES_2)

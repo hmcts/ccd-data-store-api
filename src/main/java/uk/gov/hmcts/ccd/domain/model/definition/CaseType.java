@@ -123,4 +123,9 @@ public class CaseType implements Serializable {
             .getSecurityLabel());
     }
 
+    public boolean hasDraftEnabledEvent() {
+        return this.events
+            .stream()
+            .anyMatch(caseEvent -> caseEvent.getCanSaveDraft() != null && caseEvent.getCanSaveDraft());
+    }
 }
