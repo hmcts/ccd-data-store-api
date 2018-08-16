@@ -34,4 +34,43 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 withPipeline(type, product, component) {
     loadVaultSecrets(secrets)
     enableDbMigration()
-}
+    
+    after('test'){
+        junit 'application/build/test-results/test/**/*.xml'
+        publishHTML([
+            allowMissing         : true,
+            alwaysLinkToLastBuild: true,
+            keepAll              : true,
+            reportDir            : "application/build/reports/tests/test/",
+            reportFiles          : 'index.html',
+            reportName           : 'Unit Test Report'
+        ])
+
+        publishHTML([
+            allowMissing         : true,
+            alwaysLinkToLastBuild: true,
+            keepAll              : true,
+            reportDir            : "application/build/reports/checkstyle/",
+            reportFiles          : 'main.html',
+            reportName           : 'Checkstyle Main Report'
+        ])
+        
+        publishHTML([
+            allowMissing         : true,
+            alwaysLinkToLastBuild: true,
+            keepAll              : true,
+            reportDir            : "application/build/reports/pmd/",
+            reportFiles          : 'main.html',
+            reportName           : 'PMD Main Report'
+        ])
+            
+        publishHTML([
+            allowMissing         : true,
+            alwaysLinkToLastBuild: true,
+            keepAll              : true,
+            reportDir            : "application/build/reports/jacoco/test/html/",
+            reportFiles          : 'index.html',
+            reportName           : 'Jacoco Coverage Report'
+        ])
+        }
+    }
