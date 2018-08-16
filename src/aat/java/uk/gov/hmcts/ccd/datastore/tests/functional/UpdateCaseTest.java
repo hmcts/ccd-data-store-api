@@ -88,7 +88,8 @@ class UpdateCaseTest extends BaseTest {
             event.put("id", EVENT_UPDATE);
             event.put("summary", "Well this is a summary");
             eventBody.put("event", event);
-        } catch (JSONException e) {
+        } catch (JSONException ignored) {
+            // no code needed here
         }
 
         return eventBody;

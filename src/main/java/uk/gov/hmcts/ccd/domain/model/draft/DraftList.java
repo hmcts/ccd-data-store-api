@@ -30,9 +30,6 @@ public class DraftList {
     static class PagingCursors {
         private String after;
 
-        public PagingCursors() {
-        }
-
         public String getAfter() {
             return after;
         }
