@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.upsertdraft;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
@@ -19,7 +17,6 @@ import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import javax.inject.Inject;
-import java.util.HashMap;
 
 @Service
 @Qualifier("default")
