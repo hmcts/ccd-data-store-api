@@ -710,7 +710,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected number of fields", 0, documentFields.length);
 
         final CaseViewEvent[] events = caseView.getEvents();
-        assertThat("Events are not empty", events, arrayWithSize(2));
+        assertThat("Events are not empty", events, arrayWithSize(0));
 
         final CaseViewTrigger[] triggers = caseView.getTriggers();
         assertNotNull("Triggers are null", triggers);
@@ -721,11 +721,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Trigger Description", "This event will create a new case", triggers[0].getDescription());
         assertEquals("Trigger Order", Integer.valueOf(1), triggers[0].getOrder());
 
-<<<<<<< HEAD
-        assertEquals("Trigger ID", DELETE, triggers[1].getId());
-=======
         assertEquals("Trigger ID", "DELETE", triggers[1].getId());
->>>>>>> c2c222f3e4f364c08cabe8039a9d47e270957cc7
         assertEquals("Trigger Name", "Delete", triggers[1].getName());
         assertEquals("Trigger Description", "Delete draft", triggers[1].getDescription());
         assertEquals("Trigger Order", Integer.valueOf(2), triggers[1].getOrder());
