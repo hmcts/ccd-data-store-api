@@ -41,7 +41,7 @@ public class CaseDataContentBuilder {
         return this;
     }
 
-    public static CaseDataContentBuilder aCaseDataContent() {
+    public static CaseDataContentBuilder anCaseDataContent() {
         return new CaseDataContentBuilder();
     }
 

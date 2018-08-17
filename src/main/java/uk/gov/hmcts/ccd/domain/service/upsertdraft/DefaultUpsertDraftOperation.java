@@ -24,7 +24,6 @@ import java.util.HashMap;
 @Service
 @Qualifier("default")
 public class DefaultUpsertDraftOperation implements UpsertDraftOperation {
-    private static final HashMap<String, JsonNode> EMPTY_DATA_CLASSIFICATION = Maps.newHashMap();
 
     private final DraftGateway draftGateway;
     private final ApplicationParams applicationParams;

@@ -80,7 +80,8 @@ public class DefaultGetEventTriggerOperation implements GetEventTriggerOperation
     }
 
     @Override
-    public CaseEventTrigger executeForDraft(String uid, String jurisdictionId, String caseTypeId, String draftReference, String eventTriggerId, Boolean ignoreWarning) {
+    public CaseEventTrigger executeForDraft(String uid, String jurisdictionId, String caseTypeId, String draftReference, String eventTriggerId,
+                                            Boolean ignoreWarning) {
         return merge(startEventOperation.triggerStartForDraft(uid,
                                                              jurisdictionId,
                                                              caseTypeId,

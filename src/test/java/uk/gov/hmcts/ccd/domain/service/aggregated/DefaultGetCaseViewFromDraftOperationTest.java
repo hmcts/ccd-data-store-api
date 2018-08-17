@@ -93,8 +93,9 @@ class DefaultGetCaseViewFromDraftOperationTest {
                                                        .build())
                               .build())
             .withCreated(then)
-            .withUpdated(then)
+            .withUpdated(now)
             .build();
+
 
         doReturn(draftResponse).when(draftGateway).get(DRAFT_ID);
         caseDetails = anCaseDetails()

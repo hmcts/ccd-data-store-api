@@ -71,7 +71,7 @@ public class DefaultGetCaseViewFromDraftOperation extends AbstractDefaultGetCase
 
     private CaseViewEvent[] buildEventsFromDraft(DraftResponse draftResponse) {
         ArrayList<CaseViewEvent> events = new ArrayList<>();
-        if(draftResponse.getUpdated() != null) {
+        if (draftResponse.getUpdated() != null) {
             CaseViewEvent lastUpdatedEvent = new CaseViewEvent();
             lastUpdatedEvent.setEventId("Draft updated");
             lastUpdatedEvent.setEventName("Draft updated");
@@ -103,7 +103,8 @@ public class DefaultGetCaseViewFromDraftOperation extends AbstractDefaultGetCase
             .build();
     }
 
-    private CaseView merge(CaseDetails caseDetails, CaseViewTrigger resumeTrigger, CaseViewEvent[] events, CaseType caseType, CaseTabCollection caseTabCollection) {
+    private CaseView merge(CaseDetails caseDetails, CaseViewTrigger resumeTrigger, CaseViewEvent[] events, CaseType caseType,
+                           CaseTabCollection caseTabCollection) {
         CaseView caseView = new CaseView();
         caseView.setCaseId(caseDetails.getId().toString());
         caseView.setChannels(caseTabCollection.getChannels().toArray(new String[0]));
@@ -112,7 +113,7 @@ public class DefaultGetCaseViewFromDraftOperation extends AbstractDefaultGetCase
         caseView.setTabs(getTabs(caseDetails, caseDetails.getData(), caseTabCollection));
         caseView.setMetadataFields(getMetadataFields(caseType, caseDetails));
 
-        caseView.setTriggers(new CaseViewTrigger[] {resumeTrigger, DELETE_TRIGGER});
+        caseView.setTriggers(new CaseViewTrigger[]{resumeTrigger, DELETE_TRIGGER});
         caseView.setEvents(events);
 
         return caseView;
