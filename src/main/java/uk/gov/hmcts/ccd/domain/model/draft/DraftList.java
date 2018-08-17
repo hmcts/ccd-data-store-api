@@ -11,21 +11,6 @@ public class DraftList {
     @JsonProperty("paging_cursors")
     private PagingCursors paging;
 
-    static class PagingCursors {
-        private String after;
-
-        public PagingCursors() {
-        }
-
-        public String getAfter() {
-            return after;
-        }
-
-        public void setAfter(String after) {
-            this.after = after;
-        }
-    }
-
     public List<Draft> getData() {
         return data;
     }
@@ -40,5 +25,20 @@ public class DraftList {
 
     public void setPaging(PagingCursors paging) {
         this.paging = paging;
+    }
+
+    static class PagingCursors {
+        private String after;
+
+        public PagingCursors() {
+        }
+
+        public String getAfter() {
+            return after;
+        }
+
+        public void setAfter(String after) {
+            this.after = after;
+        }
     }
 }

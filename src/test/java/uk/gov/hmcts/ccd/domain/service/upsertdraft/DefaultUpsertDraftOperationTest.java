@@ -18,9 +18,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.ccd.domain.model.draft.CaseDraftBuilder.aCaseDraft;
-import static uk.gov.hmcts.ccd.domain.model.draft.DraftResponseBuilder.aDraftResponse;
-import static uk.gov.hmcts.ccd.domain.model.std.CaseDataContentBuilder.aCaseDataContent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.anCaseDataContent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.anDraftResponse;
 import static uk.gov.hmcts.ccd.domain.service.upsertdraft.DefaultUpsertDraftOperation.CASE_DATA_CONTENT;
 
 class DefaultUpsertDraftOperationTest {
@@ -39,23 +38,22 @@ class DefaultUpsertDraftOperationTest {
 
     private UpsertDraftOperation upsertDraftOperation;
 
-    private CaseDataContent caseDataContent = aCaseDataContent().build();
+    private CaseDataContent caseDataContent = anCaseDataContent().build();
     private CaseDraft caseDraft;
-    private DraftResponse draftResponse = aDraftResponse().build();
+    private DraftResponse draftResponse = anDraftResponse().build();
 
     @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        when(applicationParams.getDraftMaxStaleDays()).thenReturn(DRAFT_MAX_STALE_DAYS);
+        when(applicationParams.getDraftMaxTTLDays()).thenReturn(DRAFT_MAX_STALE_DAYS);
 
         upsertDraftOperation = new DefaultUpsertDraftOperation(draftGateway, applicationParams);
-        caseDraft = aCaseDraft()
-            .withUserId(UID)
-            .withJurisdictionId(JID)
-            .withCaseTypeId(CTID)
-            .withEventTriggerId(ETID)
-            .withCaseDataContent(caseDataContent)
-            .build();
+        caseDraft = new CaseDraft();
+        caseDraft.setUserId(UID);
+        caseDraft.setJurisdictionId(JID);
+        caseDraft.setCaseTypeId(CTID);
+        caseDraft.setEventTriggerId(ETID);
+        caseDraft.setCaseDataContent(caseDataContent);
     }
 
     @Test
@@ -73,7 +71,7 @@ class DefaultUpsertDraftOperationTest {
             () ->  assertThat(argument.getValue().getDocument(), hasProperty("caseTypeId", is(caseDraft.getCaseTypeId()))),
             () ->  assertThat(argument.getValue().getDocument(), hasProperty("eventTriggerId", is(caseDraft.getEventTriggerId()))),
             () ->  assertThat(argument.getValue().getDocument(), hasProperty("caseDataContent", is(caseDataContent))),
-            () ->  assertThat(argument.getValue().getMaxStaleDays(), is(DRAFT_MAX_STALE_DAYS)),
+            () ->  assertThat(argument.getValue().getMaxTTLDays(), is(DRAFT_MAX_STALE_DAYS)),
             () ->  assertThat(argument.getValue().getType(), is(CASE_DATA_CONTENT)),
             () ->  assertThat(result, samePropertyValuesAs(draftResponse))
         );

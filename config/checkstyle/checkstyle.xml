@@ -15,7 +15,9 @@
 
     <module name="SuppressWarningsFilter" />
     <module name="TreeWalker">
-        <module name="UnusedImports"/>
+        <module name="UnusedImports">
+            <property name="severity" value="error"/>
+        </module>
         <module name="HideUtilityClassConstructor"/>
         <module name="SuppressWarningsHolder" />
         <module name="OuterTypeFilename"/>

@@ -19,18 +19,19 @@ import java.util.Map;
 
 import static java.util.Optional.ofNullable;
 import static org.apache.http.HttpStatus.SC_OK;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CASE_REFERENCE_METADATA;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CASE_TYPE_METADATA;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CREATED_DATE_METADATA;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.JURISDICTION_METADATA;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.LAST_MODIFIED_METADATA;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.SECURITY_CLASSIFICATION_METADATA;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.STATE_METADATA;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CASE_REFERENCE;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CASE_TYPE;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CREATED_DATE;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.JURISDICTION;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.LAST_MODIFIED_DATE;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.SECURITY_CLASSIFICATION;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
 
 public class CaseDetails implements Cloneable {
     private static final Logger LOG = LoggerFactory.getLogger(CaseDetails.class);
     private static final String LABEL_FIELD_TYPE = "Label";
     private static final String CASE_PAYMENT_HISTORY_VIEWER_FIELD_TYPE = "CasePaymentHistoryViewer";
+    public static final String DRAFT_ID = "DRAFT%s";
 
     private String id;
 
@@ -61,15 +62,21 @@ public class CaseDetails implements Cloneable {
     @ApiModelProperty("Same structure as `case_data` with classification (`PUBLIC`, `PRIVATE`, `RESTRICTED`) as field's value.")
     private Map<String, JsonNode> dataClassification;
 
-    /** Attribute passed to UI layer, does not need persistence */
+    /**
+     * Attribute passed to UI layer, does not need persistence
+     */
     @JsonProperty("after_submit_callback_response")
     private AfterSubmitCallbackResponse afterSubmitCallbackResponse;
 
-    /** Attribute passed to UI layer, does not need persistence */
+    /**
+     * Attribute passed to UI layer, does not need persistence
+     */
     @JsonProperty("callback_response_status_code")
     private Integer callbackResponseStatusCode;
 
-    /** Attribute passed to UI layer, does not need persistence */
+    /**
+     * Attribute passed to UI layer, does not need persistence
+     */
     @JsonProperty("callback_response_status")
     private String callbackResponseStatus;
 
@@ -88,6 +95,11 @@ public class CaseDetails implements Cloneable {
     @JsonGetter("id")
     public Long getReference() {
         return reference;
+    }
+
+    @JsonIgnore
+    public String getReferenceAsString() {
+        return reference.toString();
     }
 
     @JsonSetter("id")
@@ -160,7 +172,6 @@ public class CaseDetails implements Cloneable {
     }
 
     /**
-     *
      * @deprecated Will be removed in version 2.x. Use {@link CaseDetails#dataClassification} instead.
      */
     @Deprecated
@@ -184,7 +195,7 @@ public class CaseDetails implements Cloneable {
 
     private void setAfterSubmitCallbackResponseEntity(final AfterSubmitCallbackResponse response) {
         this.afterSubmitCallbackResponse = response;
-        this.callbackResponseStatusCode =  SC_OK;
+        this.callbackResponseStatusCode = SC_OK;
         this.callbackResponseStatus = "COMPLETED";
     }
 
@@ -228,15 +239,16 @@ public class CaseDetails implements Cloneable {
         }
     }
 
-    private Map<String, Object> getMetadata() {
+    @JsonIgnore
+    public Map<String, Object> getMetadata() {
         if (metadata.isEmpty()) {
-            metadata.put(JURISDICTION_METADATA, getJurisdiction());
-            metadata.put(CASE_TYPE_METADATA, getCaseTypeId());
-            metadata.put(STATE_METADATA, getState());
-            metadata.put(CASE_REFERENCE_METADATA, getReference());
-            metadata.put(CREATED_DATE_METADATA, getCreatedDate());
-            metadata.put(LAST_MODIFIED_METADATA, getLastModified());
-            metadata.put(SECURITY_CLASSIFICATION_METADATA, getSecurityClassification());
+            metadata.put(JURISDICTION.getReference(), getJurisdiction());
+            metadata.put(CASE_TYPE.getReference(), getCaseTypeId());
+            metadata.put(STATE.getReference(), getState());
+            metadata.put(CASE_REFERENCE.getReference(), getReference());
+            metadata.put(CREATED_DATE.getReference(), getCreatedDate());
+            metadata.put(LAST_MODIFIED_DATE.getReference(), getLastModified());
+            metadata.put(SECURITY_CLASSIFICATION.getReference(), getSecurityClassification());
         }
         return metadata;
     }
@@ -254,4 +266,13 @@ public class CaseDetails implements Cloneable {
         return ReflectionToStringBuilder.toString(this);
     }
 
+    @JsonIgnore
+    public boolean hasCaseReference() {
+        return getReference() != null;
+    }
+
+    @JsonIgnore
+    public String getDraftReference() {
+        return String.format(DRAFT_ID, id);
+    }
 }

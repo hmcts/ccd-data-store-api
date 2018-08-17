@@ -2,6 +2,10 @@ variable "product" {
   type = "string"
 }
 
+variable "raw_product" {
+  default = "ccd" // jenkins-library overrides product for PRs and adds e.g. pr-118-ccd
+}
+
 variable "component" {
   type = "string"
 }
@@ -67,7 +71,7 @@ variable "idam_api_url" {
   default = "http://betaDevBccidamAppLB.reform.hmcts.net"
 }
 
-variable "draft_store_max_stale_days" {
+variable "draft_store_ttl_days" {
   type = "string"
   default = "180"
 }

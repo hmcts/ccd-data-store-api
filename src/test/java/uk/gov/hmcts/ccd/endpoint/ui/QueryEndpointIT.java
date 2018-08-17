@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.endpoint.ui;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import org.hamcrest.collection.IsArrayWithSize;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -26,7 +25,6 @@ import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewColumn;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
-import uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetDraftViewOperation;
 
 import javax.inject.Inject;
 import java.time.format.DateTimeFormatter;
@@ -43,7 +41,6 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetDraftViewOperation.DELETE;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WORKBASKET;
 
 public class QueryEndpointIT extends WireMockBaseTest {
@@ -724,7 +721,11 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Trigger Description", "This event will create a new case", triggers[0].getDescription());
         assertEquals("Trigger Order", Integer.valueOf(1), triggers[0].getOrder());
 
+<<<<<<< HEAD
         assertEquals("Trigger ID", DELETE, triggers[1].getId());
+=======
+        assertEquals("Trigger ID", "DELETE", triggers[1].getId());
+>>>>>>> c2c222f3e4f364c08cabe8039a9d47e270957cc7
         assertEquals("Trigger Name", "Delete", triggers[1].getName());
         assertEquals("Trigger Description", "Delete draft", triggers[1].getDescription());
         assertEquals("Trigger Order", Integer.valueOf(2), triggers[1].getOrder());
@@ -1473,11 +1474,9 @@ public class QueryEndpointIT extends WireMockBaseTest {
         final int dmApiPort = 10000;
         assertNotNull("Null address value", documentNode);
         assertEquals("Unexpected address value",
-            "http://localhost:" + dmApiPort + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1", documentNode.get
-                ("document_url"));
+                     "http://localhost:" + dmApiPort + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1", documentNode.get("document_url"));
         assertEquals("Unexpected address value",
-            "http://localhost:" + dmApiPort + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary", documentNode
-                         .get("document_binary_url"));
+                     "http://localhost:" + dmApiPort + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary", documentNode.get("document_binary_url"));
         assertEquals("Unexpected address value",
                      "Seagulls_Square.jpg", documentNode.get("document_filename"));
 
