@@ -9,6 +9,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import static org.apache.commons.lang.RandomStringUtils.random;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 
 class EventValidatorTest {
 
@@ -32,14 +33,14 @@ class EventValidatorTest {
     @DisplayName("throws a ValidationException when the event id is null")
     void validateNullEventId() {
         final ValidationException exception = assertThrows(ValidationException.class,
-                                                           () -> underTest.validate(new Event()));
+                                                           () -> underTest.validate(anEvent().build()));
         assertEquals("Cannot create event because event is not specified", exception.getMessage());
     }
 
     @Test
     @DisplayName("throws a ValidationException when the event summary is too long")
     void validateEventWithSummaryTooLong() {
-        Event event = new Event();
+        Event event = anEvent().build();
         event.setEventId("");
         event.setSummary(random(SUMMARY_MAX_LENGTH + 1));
 
@@ -50,7 +51,7 @@ class EventValidatorTest {
     @Test
     @DisplayName("throws a ValidationException when the event description is too long")
     void validateEventWithDescriptionTooLong() {
-        Event event = new Event();
+        Event event = anEvent().build();
         event.setEventId("");
         event.setSummary(random(SUMMARY_MAX_LENGTH));
         event.setDescription(random(DESCRIPTION_MAX_LENGTH + 1));
@@ -62,7 +63,7 @@ class EventValidatorTest {
     @Test
     @DisplayName("validator validates successfully; both summary and description are optional")
     void validateEvent() {
-        Event event = new Event();
+        Event event = anEvent().build();
         event.setEventId("");
         // and both event summary and description are null
 

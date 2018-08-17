@@ -37,10 +37,20 @@ class RestTemplateConfiguration {
     @Value("${http.client.connection.timeout}")
     private int connectionTimeout;
 
-    @Bean
+    @Value("${http.client.connection.drafts.timeout}")
+    private int draftsConnectionTimeout;
+
+    @Bean(name = "restTemplate")
     RestTemplate restTemplate() {
         final RestTemplate restTemplate = new RestTemplate();
         restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(getHttpClient()));
+        return restTemplate;
+    }
+
+    @Bean(name = "draftsRestTemplate")
+    RestTemplate draftsRestTemplate() {
+        final RestTemplate restTemplate = new RestTemplate();
+        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(getHttpClient(draftsConnectionTimeout)));
         return restTemplate;
     }
 

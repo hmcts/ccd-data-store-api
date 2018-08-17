@@ -71,6 +71,11 @@ variable "idam_api_url" {
   default = "http://betaDevBccidamAppLB.reform.hmcts.net"
 }
 
+variable "draft_store_ttl_days" {
+  type = "string"
+  default = "180"
+}
+
 variable "document_management_valid_domain" {
   type = "string"
   default = ""

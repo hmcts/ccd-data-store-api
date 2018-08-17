@@ -1,17 +1,8 @@
 package uk.gov.hmcts.ccd.data.definition;
 
-import static uk.gov.hmcts.ccd.AppInsights.CASE_DEFINITION;
-
-import java.net.URI;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.List;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -20,13 +11,18 @@ import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.ccd.AppInsights;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchInputDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
-import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
-import uk.gov.hmcts.ccd.domain.model.definition.WizardPageCollection;
-import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.net.URI;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.List;
+
+import static uk.gov.hmcts.ccd.AppInsights.CASE_DEFINITION;
 
 /**
  * NOTE: We want to cache definitions, so the only client of this class should be CachedUIDefinitionGateway
@@ -40,6 +36,8 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
 
     private final ApplicationParams applicationParams;
     private final SecurityUtils securityUtils;
+    @Qualifier("restTemplate")
+    @Autowired
     private final RestTemplate restTemplate;
     private final AppInsights appInsights;
 

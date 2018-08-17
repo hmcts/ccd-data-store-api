@@ -30,7 +30,7 @@ public class CaseAccessOperation {
                                                                                       Long.valueOf(caseReference));
 
         final CaseDetails caseDetails = maybeCase.orElseThrow(() -> new CaseNotFoundException(caseReference));
-        caseUserRepository.grantAccess(caseDetails.getId(), userId);
+        caseUserRepository.grantAccess(Long.valueOf(caseDetails.getId()), userId);
     }
 
     @Transactional
@@ -38,7 +38,7 @@ public class CaseAccessOperation {
         final Optional<CaseDetails> maybeCase = caseDetailsRepository.findByReference(jurisdictionId,
                                                                                       Long.valueOf(caseReference));
         final CaseDetails caseDetails = maybeCase.orElseThrow(() -> new CaseNotFoundException(caseReference));
-        caseUserRepository.revokeAccess(caseDetails.getId(), userId);
+        caseUserRepository.revokeAccess(Long.valueOf(caseDetails.getId()), userId);
     }
 
     public List<String> findCasesUserIdHasAccessTo(final String userId) {
