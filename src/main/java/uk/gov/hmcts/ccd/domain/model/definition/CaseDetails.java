@@ -103,7 +103,7 @@ public class CaseDetails implements Cloneable {
         this.assigned = assigned;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
