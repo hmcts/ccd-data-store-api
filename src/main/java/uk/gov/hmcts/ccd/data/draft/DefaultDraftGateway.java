@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.AppInsights.DRAFT_STORE;
@@ -115,14 +116,14 @@ public class DefaultDraftGateway implements DraftGateway {
             Draft draft = restTemplate.exchange(applicationParams.draftURL(draftId), HttpMethod.GET, requestEntity, Draft.class).getBody();
             final Duration duration = Duration.between(start, Instant.now());
             appInsights.trackDependency(DRAFT_STORE, "Get", duration.toMillis(), true);
-            return assembleDraft(draft);
+            return assembleDraft(draft, getDraftExceptionConsumer());
         } catch (HttpClientErrorException e) {
-            LOG.warn("Error while getting draftId={}" + draftId, e);
+            LOG.warn("Error while getting draftId={}", draftId, e);
             if (e.getRawStatusCode() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException(String.format(RESOURCE_NOT_FOUND_MSG, draftId));
             }
         } catch (Exception e) {
-            LOG.warn("Error while getting draftId=" + draftId, e);
+            LOG.warn("Error while getting draftId={}", draftId, e);
             throw new ServiceException(DRAFT_STORE_DOWN_ERR_MESSAGE, e);
         }
         return null;
@@ -140,7 +141,7 @@ public class DefaultDraftGateway implements DraftGateway {
             appInsights.trackDependency(DRAFT_STORE, "GetAll", duration.toMillis(), true);
             return getDrafts.getData()
                 .stream()
-                .map(this::assembleDraftFromList)
+                .map(d -> assembleDraft(d, getDraftsExceptionConsumer()))
                 .collect(Collectors.toList());
         } catch (Exception e) {
             LOG.warn("Error while getting drafts", e);
@@ -148,12 +149,25 @@ public class DefaultDraftGateway implements DraftGateway {
         }
     }
 
+    private Consumer<Exception> getDraftExceptionConsumer() {
+        return (Exception e) -> {
+            LOG.warn("Error while deserializing draft data content", e);
+            throw new ServiceException(DRAFT_STORE_DESERIALIZATION_ERR_MESSAGE, e);
+        };
+    }
+
+    private Consumer<Exception> getDraftsExceptionConsumer() {
+        return (Exception e) -> {
+            LOG.warn("Error while deserializing draft data content", e);
+        };
+    }
+
     private String getUriWithQueryParams() {
         return UriComponentsBuilder.fromUriString(applicationParams.draftBaseURL())
             .queryParam("limit", Integer.MAX_VALUE).toUriString();
     }
 
-    private DraftResponse assembleDraft(Draft getDraft) {
+    private DraftResponse assembleDraft(Draft getDraft, Consumer<Exception> exceptionConsumer) {
         final DraftResponse draftResponse = new DraftResponse();
         try {
             draftResponse.setId(getDraft.getId());
@@ -162,25 +176,11 @@ public class DefaultDraftGateway implements DraftGateway {
             draftResponse.setCreated(getDraft.getCreated().toLocalDateTime());
             draftResponse.setUpdated(getDraft.getUpdated().toLocalDateTime());
         } catch (IOException e) {
-            LOG.warn("Error while deserializing draft data content", e);
-            throw new ServiceException(DRAFT_STORE_DESERIALIZATION_ERR_MESSAGE, e);
+            exceptionConsumer.accept(e);
         }
         return draftResponse;
     }
 
-    private DraftResponse assembleDraftFromList(Draft getDraft) {
-        final DraftResponse draftResponse = new DraftResponse();
-        try {
-            draftResponse.setId(getDraft.getId());
-            draftResponse.setDocument(MAPPER.treeToValue(getDraft.getDocument(), CaseDraft.class));
-            draftResponse.setType(getDraft.getType());
-            draftResponse.setCreated(getDraft.getCreated().toLocalDateTime());
-            draftResponse.setUpdated(getDraft.getUpdated().toLocalDateTime());
-        } catch (IOException e) {
-            LOG.warn("Error while deserializing draft data content", e);
-        }
-        return draftResponse;
-    }
 
     private Long getDraftId(HttpHeaders responseHeaders) {
         String path = responseHeaders.getLocation().getPath();
