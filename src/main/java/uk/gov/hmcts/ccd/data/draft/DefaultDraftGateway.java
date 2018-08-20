@@ -140,7 +140,7 @@ public class DefaultDraftGateway implements DraftGateway {
             appInsights.trackDependency(DRAFT_STORE, "GetAll", duration.toMillis(), true);
             return getDrafts.getData()
                 .stream()
-                .map(this::assembleDraft)
+                .map(this::assembleDraftFromList)
                 .collect(Collectors.toList());
         } catch (Exception e) {
             LOG.warn("Error while getting drafts", e);
@@ -154,7 +154,6 @@ public class DefaultDraftGateway implements DraftGateway {
     }
 
     private DraftResponse assembleDraft(Draft getDraft) {
-        //TODO whenever a data structure changes we get stuck here, better ignore corrupt one and move next
         final DraftResponse draftResponse = new DraftResponse();
         try {
             draftResponse.setId(getDraft.getId());
@@ -165,6 +164,20 @@ public class DefaultDraftGateway implements DraftGateway {
         } catch (IOException e) {
             LOG.warn("Error while deserializing draft data content", e);
             throw new ServiceException(DRAFT_STORE_DESERIALIZATION_ERR_MESSAGE, e);
+        }
+        return draftResponse;
+    }
+
+    private DraftResponse assembleDraftFromList(Draft getDraft) {
+        final DraftResponse draftResponse = new DraftResponse();
+        try {
+            draftResponse.setId(getDraft.getId());
+            draftResponse.setDocument(MAPPER.treeToValue(getDraft.getDocument(), CaseDraft.class));
+            draftResponse.setType(getDraft.getType());
+            draftResponse.setCreated(getDraft.getCreated().toLocalDateTime());
+            draftResponse.setUpdated(getDraft.getUpdated().toLocalDateTime());
+        } catch (IOException e) {
+            LOG.warn("Error while deserializing draft data content", e);
         }
         return draftResponse;
     }
