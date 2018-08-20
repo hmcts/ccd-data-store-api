@@ -27,7 +27,7 @@ import static org.mockito.Mockito.doReturn;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.anCaseEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.anCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewBuilder.aCaseView;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewTriggerBuilder.aViewTrigger;
 
@@ -49,7 +49,7 @@ class AuthorisedGetCaseViewOperationTest {
     private static final CaseViewTrigger CASE_VIEW_TRIGGER = aViewTrigger().withId(EVENT_ID_STRING).build();
     private static final CaseViewTrigger CASE_VIEW_TRIGGER_2 = aViewTrigger().withId("event2").build();
     private static final CaseViewTrigger[] AUTH_CASE_VIEW_TRIGGERS = new CaseViewTrigger[] {CASE_VIEW_TRIGGER};
-    private static final CaseType TEST_CASE_TYPE = anCaseType().withEvent(CASE_EVENT).withEvent(CASE_EVENT_2).build();
+    private static final CaseType TEST_CASE_TYPE = newCaseType().withEvent(CASE_EVENT).withEvent(CASE_EVENT_2).build();
     private static final CaseView TEST_CASE_VIEW = aCaseView().withState(caseState).withCaseViewTrigger(CASE_VIEW_TRIGGER).withCaseViewTrigger(CASE_VIEW_TRIGGER_2).build();
 
     @Mock

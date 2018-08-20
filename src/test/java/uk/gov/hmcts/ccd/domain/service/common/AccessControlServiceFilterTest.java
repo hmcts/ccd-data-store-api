@@ -25,7 +25,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessCont
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.anCaseEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventTriggerBuilder.anEventTrigger;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.aCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.anCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewTriggerBuilder.aViewTrigger;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageBuilder.aWizardPage;
@@ -52,7 +52,7 @@ class AccessControlServiceFilterTest {
     @Test
     @DisplayName("Should filter caseFields if CREATE ACL is missing for some fields")
     void filterCaseFieldsUserHasAccess() {
-        final CaseType caseType = anCaseType()
+        final CaseType caseType = newCaseType()
             .withField(aCaseField()
                 .withId("Name")
                 .withAcl(anAcl()
@@ -103,7 +103,7 @@ class AccessControlServiceFilterTest {
     @Test
     @DisplayName("Should filter all caseFields if CREATE ACL is missing")
     void filterCaseFieldsUserHasNoAccess() {
-        final CaseType caseType = anCaseType()
+        final CaseType caseType = newCaseType()
             .withField(aCaseField()
                 .withId("Name")
                 .withAcl(anAcl()
@@ -152,7 +152,7 @@ class AccessControlServiceFilterTest {
     @Test
     @DisplayName("Should filter caseFields definition is missing for those fields")
     void filterCaseFieldsWithNoDefinition() {
-        final CaseType caseType = anCaseType()
+        final CaseType caseType = newCaseType()
             .withField(aCaseField()
                 .withId("Surname")
                 .withAcl(anAcl()

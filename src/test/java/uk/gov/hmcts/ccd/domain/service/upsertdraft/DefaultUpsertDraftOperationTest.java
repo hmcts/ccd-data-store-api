@@ -29,7 +29,7 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.anCaseDataContent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.anCaseDraft;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.anCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.anDraftResponse;
 import static uk.gov.hmcts.ccd.domain.service.upsertdraft.DefaultUpsertDraftOperation.CASE_DATA_CONTENT;
 
@@ -41,7 +41,7 @@ class DefaultUpsertDraftOperationTest {
     private static final String CTID = "TestAddressBookCase";
     private static final String ETID = "createCase";
     private static final String DID = "5";
-    private static final CaseType CASE_TYPE = anCaseType()
+    private static final CaseType CASE_TYPE = newCaseType()
         .withId(CTID)
         .withSecurityClassification(SecurityClassification.PUBLIC)
         .build();

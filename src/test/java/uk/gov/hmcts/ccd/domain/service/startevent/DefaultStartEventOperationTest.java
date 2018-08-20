@@ -48,7 +48,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataCo
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.anCaseDetails;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.anCaseDraft;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.anCaseEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.anCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.anDraftResponse;
 
 public class DefaultStartEventOperationTest {
@@ -99,7 +99,7 @@ public class DefaultStartEventOperationTest {
     private DefaultStartEventOperation defaultStartEventOperation;
 
     private final CaseDetails caseDetails = anCaseDetails().build();
-    private final CaseType caseType = anCaseType().build();
+    private final CaseType caseType = newCaseType().build();
     private final CaseEvent eventTrigger = anCaseEvent().build();
     private final CaseDataContent caseDataContent = anCaseDataContent()
         .withSecurityClassification(PRIVATE)

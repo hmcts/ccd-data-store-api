@@ -144,7 +144,7 @@ class CaseDataServiceTest {
                                                      .build())
                                .build())
             .build();
-        caseType = TestBuildersUtil.CaseTypeBuilder.anCaseType()
+        caseType = TestBuildersUtil.CaseTypeBuilder.newCaseType()
             .withField(aCaseField()
                            .withId("ClientsAddresses")
                            .withSC(PRIVATE.name())

@@ -33,7 +33,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_RE
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.anCaseDetails;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.anCaseEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.aCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.anCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 
 public class SearchQueryOperationTest {
     private static final String CASE_TYPE_ID = "GrantOnly";
@@ -76,7 +76,7 @@ public class SearchQueryOperationTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        testCaseType = anCaseType()
+        testCaseType = newCaseType()
             .withId(CASE_TYPE_ID)
             .withField(CASE_FIELD_1_1)
             .withField(CASE_FIELD_1_2)

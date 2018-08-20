@@ -380,7 +380,7 @@ public class TestBuildersUtil {
             caseType.setJurisdiction(new Jurisdiction());
         }
 
-        public static CaseTypeBuilder anCaseType() {
+        public static CaseTypeBuilder newCaseType() {
             return new CaseTypeBuilder();
         }
 
