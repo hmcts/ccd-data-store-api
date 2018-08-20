@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.model.draft;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.Maps;
 import lombok.ToString;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
@@ -61,16 +62,16 @@ public class CaseDraft {
     @JsonIgnore
     public SecurityClassification getSecurityClassification() {
         String securityClassification = caseDataContent != null ? caseDataContent.getSecurityClassification() : null;
-        return securityClassification != null ? SecurityClassification.valueOf(securityClassification) : null;
+        return securityClassification != null ? SecurityClassification.valueOf(caseDataContent.getSecurityClassification()) : null;
     }
 
     @JsonIgnore
     public Map<String, JsonNode> getData() {
-        return caseDataContent != null ? caseDataContent.getData() : null;
+        return caseDataContent != null ? caseDataContent.getData() : Maps.newHashMap();
     }
 
     @JsonIgnore
     public Map<String, JsonNode> getDataClassification() {
-        return caseDataContent != null ? caseDataContent.getDataClassification() : null;
+        return caseDataContent != null ? caseDataContent.getDataClassification() : Maps.newHashMap();
     }
 }

@@ -91,7 +91,7 @@ public class DefaultGetCaseViewFromDraftOperation extends AbstractDefaultGetCase
             createEvent.setTimestamp(draftResponse.getCreated());
             events.add(createEvent);
         }
-        return events.toArray(new CaseViewEvent[0]);
+        return events.toArray(new CaseViewEvent[events.size()]);
     }
 
     private CaseViewTrigger buildResumeTriggerFromDraft(DraftResponse draftResponse) {
