@@ -25,7 +25,11 @@
             "PersonFirstName": "John",
             "PersonLastName": "Smith"
           },
-          "security_classification":null,
+          "data_classification": {
+            "PersonFirstName": "PRIVATE",
+            "PersonLastName": "PRIVATE"
+          },
+          "security_classification":"PRIVATE",
           "event_token": "testToken",
           "ignore_warning": true
         }
