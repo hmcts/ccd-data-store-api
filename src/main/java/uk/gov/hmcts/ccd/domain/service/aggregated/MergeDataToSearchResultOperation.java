@@ -30,13 +30,13 @@ public class MergeDataToSearchResultOperation {
         final SearchResult searchResult = getSearchResult(caseType, view);
         final List<SearchResultViewColumn> viewColumns = Arrays.stream(searchResult.getFields())
             .flatMap(searchResultField -> caseType.getCaseFields().stream()
-                .filter(caseField -> caseField.getId().equals(searchResultField.getCaseFieldId()))
-                .map(caseField -> new SearchResultViewColumn(
-                    searchResultField.getCaseFieldId(),
-                    caseField.getFieldType(),
-                    searchResultField.getLabel(),
-                    searchResultField.getDisplayOrder(),
-                    searchResultField.isMetadata()))
+              .filter(caseField -> caseField.getId().equals(searchResultField.getCaseFieldId()))
+              .map(caseField -> new SearchResultViewColumn(
+                  searchResultField.getCaseFieldId(),
+                  caseField.getFieldType(),
+                  searchResultField.getLabel(),
+                  searchResultField.getDisplayOrder(),
+                  searchResultField.isMetadata()))
             )
             .collect(Collectors.toList());
 
@@ -47,7 +47,7 @@ public class MergeDataToSearchResultOperation {
     }
 
     private SearchResultViewItem buildSearchResultViewItem(CaseDetails caseData) {
-        return new SearchResultViewItem(caseData.hasCaseReference() ? caseData.getReferenceAsString() : caseData.getDraftReference(),
+        return new SearchResultViewItem(caseData.hasCaseReference() ? caseData.getReferenceAsString() : caseData.getId(),
                                         caseData.getCaseDataAndMetadata());
     }
 

@@ -95,7 +95,7 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public static DraftResponseBuilder anDraftResponse() {
+        public static DraftResponseBuilder newDraftResponse() {
             return new DraftResponseBuilder();
         }
 
@@ -167,8 +167,13 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public CaseDataContentBuilder withSecurityClassification(Map<String, JsonNode> securityClassification) {
+        public CaseDataContentBuilder withSecurityClassification(String securityClassification) {
             this.caseDataContent.setSecurityClassification(securityClassification);
+            return this;
+        }
+
+        public CaseDataContentBuilder withDataClassification(Map<String, JsonNode> dataClassification) {
+            this.caseDataContent.setDataClassification(dataClassification);
             return this;
         }
 
@@ -182,7 +187,7 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public static CaseDataContentBuilder anCaseDataContent() {
+        public static CaseDataContentBuilder newCaseDataContent() {
             return new CaseDataContentBuilder();
         }
 
@@ -223,7 +228,7 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public static CaseDraftBuilder anCaseDraft() {
+        public static CaseDraftBuilder newCaseDraft() {
             return new CaseDraftBuilder();
         }
 
@@ -331,7 +336,7 @@ public class TestBuildersUtil {
             return caseDetails;
         }
 
-        public static CaseDetailsBuilder anCaseDetails() {
+        public static CaseDetailsBuilder newCaseDetails() {
             return new CaseDetailsBuilder();
         }
     }
@@ -375,7 +380,7 @@ public class TestBuildersUtil {
             caseType.setJurisdiction(new Jurisdiction());
         }
 
-        public static CaseTypeBuilder aCaseType() {
+        public static CaseTypeBuilder newCaseType() {
             return new CaseTypeBuilder();
         }
 
@@ -418,6 +423,11 @@ public class TestBuildersUtil {
         public CaseType build() {
             caseType.setAccessControlLists(this.acls);
             return caseType;
+        }
+
+        public CaseTypeBuilder withSecurityClassification(SecurityClassification securityClassification) {
+            caseType.setSecurityClassification(securityClassification);
+            return this;
         }
     }
 
@@ -521,7 +531,7 @@ public class TestBuildersUtil {
             this.caseEvent = new CaseEvent();
         }
 
-        public static CaseEventBuilder aCaseEvent() {
+        public static CaseEventBuilder anCaseEvent() {
             return new CaseEventBuilder();
         }
 
@@ -856,7 +866,7 @@ public class TestBuildersUtil {
             this.caseTabCollection = new CaseTabCollection();
         }
 
-        public static CaseTabCollectionBuilder anCaseTabCollection() {
+        public static CaseTabCollectionBuilder newCaseTabCollection() {
             return new CaseTabCollectionBuilder();
         }
 
@@ -900,7 +910,7 @@ public class TestBuildersUtil {
             return (JsonNode node) -> caseData.put(fieldId, node);
         }
 
-        public static CaseDataBuilder anCaseData() {
+        public static CaseDataBuilder newCaseData() {
             return new CaseDataBuilder();
         }
 
