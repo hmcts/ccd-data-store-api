@@ -173,12 +173,11 @@ public class DefaultStartEventOperationTest {
         void shouldFailToTriggerIfCaseTypeNotFound() {
             doReturn(null).when(caseDefinitionRepository).getCaseType(TEST_CASE_TYPE_ID);
 
-            final Exception exception = assertThrows(ResourceNotFoundException.class,
-                                                     () -> defaultStartEventOperation.triggerStartForCaseType(UID,
-                                                                                                              TEST_JURISDICTION_ID,
-                                                                                                              TEST_CASE_TYPE_ID,
-                                                                                                              TEST_EVENT_TRIGGER_ID,
-                                                                                                              IGNORE_WARNING)
+            final Exception exception = assertThrows(ResourceNotFoundException.class, () -> defaultStartEventOperation.triggerStartForCaseType(UID,
+                                                                                                                                               TEST_JURISDICTION_ID,
+                                                                                                                                               TEST_CASE_TYPE_ID,
+                                                                                                                                               TEST_EVENT_TRIGGER_ID,
+                                                                                                                                               IGNORE_WARNING)
             );
             assertThat(exception.getMessage(), startsWith("Cannot findCaseEvent case type definition for TestCaseTypeId"));
         }
@@ -278,12 +277,13 @@ public class DefaultStartEventOperationTest {
         void shouldFailToTriggerIfCaseTypeNotFound() {
             doReturn(null).when(caseDefinitionRepository).getCaseType(TEST_CASE_TYPE_ID);
 
-            final Exception exception = assertThrows(ResourceNotFoundException.class, () -> defaultStartEventOperation.triggerStartForDraft(UID,
-                                                                                                                                            TEST_JURISDICTION_ID,
-                                                                                                                                            TEST_CASE_TYPE_ID,
-                                                                                                                                            TEST_DRAFT_ID,
-                                                                                                                                            TEST_EVENT_TRIGGER_ID,
-                                                                                                                                            IGNORE_WARNING)
+            final Exception exception = assertThrows(ResourceNotFoundException.class,
+                                                     () -> defaultStartEventOperation.triggerStartForDraft(UID,
+                                                                                                           TEST_JURISDICTION_ID,
+                                                                                                           TEST_CASE_TYPE_ID,
+                                                                                                           TEST_DRAFT_ID,
+                                                                                                           TEST_EVENT_TRIGGER_ID,
+                                                                                                           IGNORE_WARNING)
             );
             assertThat(exception.getMessage(), startsWith("Cannot findCaseEvent case type definition for TestCaseTypeId"));
         }

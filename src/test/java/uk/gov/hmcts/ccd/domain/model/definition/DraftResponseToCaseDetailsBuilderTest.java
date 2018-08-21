@@ -72,7 +72,7 @@ class DraftResponseToCaseDetailsBuilderTest {
     private final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder = new DraftResponseToCaseDetailsBuilder();
 
     @Test
-    void shouldBuildCaseDetailsFromDraftResponse() {
+    public void shouldBuildCaseDetailsFromDraftResponse() {
         CaseDetails caseDetails = draftResponseToCaseDetailsBuilder.build(draftResponse);
 
         assertAll(
