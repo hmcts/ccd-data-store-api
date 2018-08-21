@@ -81,7 +81,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
                                       caseTypeId,
                                       eventTriggerId,
                                       ignoreWarning,
-                                      () -> caseService.createNewCaseDetails(caseTypeId, jurisdictionId, Maps.newHashMap()));
+            () -> caseService.createNewCaseDetails(caseTypeId, jurisdictionId, Maps.newHashMap()));
     }
 
     @Override
