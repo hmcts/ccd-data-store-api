@@ -63,8 +63,6 @@ class DefaultGetCaseViewFromDraftOperationTest {
 
     private GetCaseViewOperation getDraftViewOperation;
 
-    private CaseTabCollection caseTabCollection;
-    private CaseType caseType;
     private DraftResponse draftResponse;
     private CaseDetails caseDetails;
     private Map<String, JsonNode> data;

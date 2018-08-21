@@ -174,7 +174,7 @@ public class DefaultStartEventOperationTest {
             doReturn(null).when(caseDefinitionRepository).getCaseType(TEST_CASE_TYPE_ID);
 
             final Exception exception = assertThrows(ResourceNotFoundException.class,
-                () -> defaultStartEventOperation.triggerStartForCaseType(UID,
+                                                     () -> defaultStartEventOperation.triggerStartForCaseType(UID,
                                                                                                               TEST_JURISDICTION_ID,
                                                                                                               TEST_CASE_TYPE_ID,
                                                                                                               TEST_EVENT_TRIGGER_ID,
@@ -189,12 +189,11 @@ public class DefaultStartEventOperationTest {
 
             doReturn(null).when(eventTriggerService).findCaseEvent(caseType, TEST_EVENT_TRIGGER_ID);
 
-            Exception exception = assertThrows(ResourceNotFoundException.class,
-                                               () -> defaultStartEventOperation.triggerStartForCaseType(UID,
-                                                                                                        TEST_JURISDICTION_ID,
-                                                                                                        TEST_CASE_TYPE_ID,
-                                                                                                        TEST_EVENT_TRIGGER_ID,
-                                                                                                        IGNORE_WARNING)
+            Exception exception = assertThrows(ResourceNotFoundException.class, () -> defaultStartEventOperation.triggerStartForCaseType(UID,
+                                                                                                                                         TEST_JURISDICTION_ID,
+                                                                                                                                         TEST_CASE_TYPE_ID,
+                                                                                                                                         TEST_EVENT_TRIGGER_ID,
+                                                                                                                                         IGNORE_WARNING)
             );
             assertThat(exception.getMessage(), startsWith("Cannot findCaseEvent event TestEventTriggerId for case type TestCaseTypeId"));
         }
@@ -280,11 +279,11 @@ public class DefaultStartEventOperationTest {
             doReturn(null).when(caseDefinitionRepository).getCaseType(TEST_CASE_TYPE_ID);
 
             final Exception exception = assertThrows(ResourceNotFoundException.class, () -> defaultStartEventOperation.triggerStartForDraft(UID,
-                                                                                                           TEST_JURISDICTION_ID,
-                                                                                                           TEST_CASE_TYPE_ID,
-                                                                                                           TEST_DRAFT_ID,
-                                                                                                           TEST_EVENT_TRIGGER_ID,
-                                                                                                           IGNORE_WARNING)
+                                                                                                                                            TEST_JURISDICTION_ID,
+                                                                                                                                            TEST_CASE_TYPE_ID,
+                                                                                                                                            TEST_DRAFT_ID,
+                                                                                                                                            TEST_EVENT_TRIGGER_ID,
+                                                                                                                                            IGNORE_WARNING)
             );
             assertThat(exception.getMessage(), startsWith("Cannot findCaseEvent case type definition for TestCaseTypeId"));
         }
@@ -296,11 +295,11 @@ public class DefaultStartEventOperationTest {
             doReturn(null).when(eventTriggerService).findCaseEvent(caseType, TEST_EVENT_TRIGGER_ID);
 
             Exception exception = assertThrows(ResourceNotFoundException.class, () -> defaultStartEventOperation.triggerStartForDraft(UID,
-                                                                                                     TEST_JURISDICTION_ID,
-                                                                                                     TEST_CASE_TYPE_ID,
-                                                                                                     TEST_DRAFT_ID,
-                                                                                                     TEST_EVENT_TRIGGER_ID,
-                                                                                                     IGNORE_WARNING)
+                                                                                                                                      TEST_JURISDICTION_ID,
+                                                                                                                                      TEST_CASE_TYPE_ID,
+                                                                                                                                      TEST_DRAFT_ID,
+                                                                                                                                      TEST_EVENT_TRIGGER_ID,
+                                                                                                                                      IGNORE_WARNING)
             );
             assertThat(exception.getMessage(), startsWith("Cannot findCaseEvent event TestEventTriggerId for case type TestCaseTypeId"));
         }
@@ -384,11 +383,11 @@ public class DefaultStartEventOperationTest {
             doReturn(null).when(caseDefinitionRepository).getCaseType(TEST_CASE_TYPE_ID);
 
             final Exception exception = assertThrows(ResourceNotFoundException.class, () -> defaultStartEventOperation.triggerStartForCase(UID,
-                                                                                                          TEST_JURISDICTION_ID,
-                                                                                                          TEST_CASE_TYPE_ID,
-                                                                                                          TEST_CASE_REFERENCE,
-                                                                                                          TEST_EVENT_TRIGGER_ID,
-                                                                                                          IGNORE_WARNING)
+                                                                                                                                           TEST_JURISDICTION_ID,
+                                                                                                                                           TEST_CASE_TYPE_ID,
+                                                                                                                                           TEST_CASE_REFERENCE,
+                                                                                                                                           TEST_EVENT_TRIGGER_ID,
+                                                                                                                                           IGNORE_WARNING)
             );
             assertThat(exception.getMessage(), startsWith("Cannot findCaseEvent case type definition for TestCaseTypeId"));
         }
@@ -399,11 +398,11 @@ public class DefaultStartEventOperationTest {
             doReturn(null).when(eventTriggerService).findCaseEvent(caseType, TEST_EVENT_TRIGGER_ID);
 
             Exception exception = assertThrows(ResourceNotFoundException.class, () -> defaultStartEventOperation.triggerStartForCase(UID,
-                                                                                                    TEST_JURISDICTION_ID,
-                                                                                                    TEST_CASE_TYPE_ID,
-                                                                                                    TEST_CASE_REFERENCE,
-                                                                                                    TEST_EVENT_TRIGGER_ID,
-                                                                                                    IGNORE_WARNING)
+                                                                                                                                     TEST_JURISDICTION_ID,
+                                                                                                                                     TEST_CASE_TYPE_ID,
+                                                                                                                                     TEST_CASE_REFERENCE,
+                                                                                                                                     TEST_EVENT_TRIGGER_ID,
+                                                                                                                                     IGNORE_WARNING)
             );
             assertThat(exception.getMessage(), startsWith("Cannot findCaseEvent event TestEventTriggerId for case type TestCaseTypeId"));
         }
