@@ -27,7 +27,6 @@ import java.util.Map;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
@@ -56,8 +55,6 @@ public class DraftsEndpointIT extends WireMockBaseTest {
     @Before
     public void setUp() throws IOException {
         MockitoAnnotations.initMocks(this);
-
-        doReturn(authentication).when(securityContext).getAuthentication();
         SecurityContextHolder.setContext(securityContext);
 
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
@@ -101,8 +98,7 @@ public class DraftsEndpointIT extends WireMockBaseTest {
         {
             mockMvc.perform(post(URL)
                                 .contentType(JSON_CONTENT_TYPE))
-                .andExpect(status().is(400))
-                .andReturn();
+                .andExpect(status().is(400));
         }
     }
 
@@ -135,8 +131,7 @@ public class DraftsEndpointIT extends WireMockBaseTest {
         {
             mockMvc.perform(put(URL)
                                 .contentType(JSON_CONTENT_TYPE))
-                .andExpect(status().is(400))
-                .andReturn();
+                .andExpect(status().is(400));
         }
     }
 

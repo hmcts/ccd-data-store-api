@@ -964,8 +964,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
                 .contentType(JSON_CONTENT_TYPE)
                 .header(AUTHORIZATION, "Bearer user1")
         )
-            .andExpect(status().is(404))
-            .andReturn();
+            .andExpect(status().is(404));
     }
 
     @Test
@@ -1176,8 +1175,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
             .contentType(JSON_CONTENT_TYPE)
             .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(422))
-            .andExpect(content().string(containsString("The case status did not qualify for the event")))
-            .andReturn();
+            .andExpect(content().string(containsString("The case status did not qualify for the event")));
     }
 
     @Test
@@ -1186,8 +1184,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         mockMvc.perform(get(GET_EVENT_TRIGGER_FOR_CASE_TYPE_INVALID_EVENT)
             .contentType(JSON_CONTENT_TYPE)
             .header(AUTHORIZATION, "Bearer user1"))
-            .andExpect(status().is(404))
-            .andReturn();
+            .andExpect(status().is(404));
     }
 
     @Test
@@ -1246,8 +1243,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
                 .contentType(JSON_CONTENT_TYPE)
                 .header(AUTHORIZATION, "Bearer user1")
         )
-            .andExpect(status().is(404))
-            .andReturn();
+            .andExpect(status().is(404));
     }
 
     @Test
@@ -1256,8 +1252,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         mockMvc.perform(get(GET_EVENT_TRIGGER_FOR_CASE_INVALID_STATE)
             .contentType(JSON_CONTENT_TYPE)
             .header(AUTHORIZATION, "Bearer user1"))
-            .andExpect(status().is(422))
-            .andReturn();
+            .andExpect(status().is(422));
     }
 
     @Test
@@ -1266,8 +1261,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         mockMvc.perform(get(GET_EVENT_TRIGGER_FOR_CASE_INVALID_CASE_REFERENCE)
             .contentType(JSON_CONTENT_TYPE)
             .header(AUTHORIZATION, "Bearer user1"))
-            .andExpect(status().is(400))
-            .andReturn();
+            .andExpect(status().is(400));
     }
 
     @Test
@@ -1276,8 +1270,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         mockMvc.perform(get(GET_EVENT_TRIGGER_FOR_CASE_INVALID_CASE)
             .contentType(JSON_CONTENT_TYPE)
             .header(AUTHORIZATION, "Bearer user1"))
-            .andExpect(status().is(404))
-            .andReturn();
+            .andExpect(status().is(404));
     }
 
     @Test
@@ -1286,8 +1279,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         mockMvc.perform(get(GET_EVENT_TRIGGER_FOR_CASE_INVALID_EVENT)
             .contentType(JSON_CONTENT_TYPE)
             .header(AUTHORIZATION, "Bearer user1"))
-            .andExpect(status().is(404))
-            .andReturn();
+            .andExpect(status().is(404));
     }
 
     @Test
@@ -1296,8 +1288,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         mockMvc.perform(get(GET_CASE_TYPES_NO_ACCESS_PARAM)
             .contentType(JSON_CONTENT_TYPE)
             .header(AUTHORIZATION, "Bearer user1"))
-            .andExpect(status().is(400))
-            .andReturn();
+            .andExpect(status().is(400));
     }
 
     @Test
@@ -1306,8 +1297,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         mockMvc.perform(get(GET_CASE_TYPES_MISNAMED_ACCESS_PARAM)
             .contentType(JSON_CONTENT_TYPE)
             .header(AUTHORIZATION, "Bearer user1"))
-            .andExpect(status().is(404))
-            .andReturn();
+            .andExpect(status().is(404));
     }
 
     @Test
@@ -1316,8 +1306,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         mockMvc.perform(get(GET_CASE_TYPES_INVALID_ACCESS_PARAM)
             .contentType(JSON_CONTENT_TYPE)
             .header(AUTHORIZATION, "Bearer user1"))
-            .andExpect(status().is(404))
-            .andReturn();
+            .andExpect(status().is(404));
     }
 
     @Test

@@ -72,8 +72,7 @@ public class CaseAccessEndpointIT extends BaseTest {
         mockMvc.perform(post(aUrl)
             .contentType(MediaType.APPLICATION_JSON)
             .content(mapper.writeValueAsString(new UserId(USER_ID))))
-            .andExpect(status().isCreated())
-            .andReturn();
+            .andExpect(status().isCreated());
 
         final MvcResult mvcResult = mockMvc.perform(get(url))
             .andExpect(status().isOk())
@@ -146,8 +145,7 @@ public class CaseAccessEndpointIT extends BaseTest {
             CASE_TYPE + "/cases/" + CASE_ID + "/users/" + USER_ID;
 
         mockMvc.perform(delete(url))
-            .andExpect(status().isNoContent())
-            .andReturn();
+            .andExpect(status().isNoContent());
     }
 
     private void grantAccess() throws Exception {
@@ -157,7 +155,6 @@ public class CaseAccessEndpointIT extends BaseTest {
         mockMvc.perform(post(url)
             .contentType(MediaType.APPLICATION_JSON)
             .content(mapper.writeValueAsString(new UserId(USER_ID))))
-            .andExpect(status().isCreated())
-            .andReturn();
+            .andExpect(status().isCreated());
     }
 }
