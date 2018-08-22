@@ -35,14 +35,12 @@ public abstract class PersistenceIT {
 
         @Bean
         public DataSource dataSource() throws IOException, SQLException {
-            System.out.println("AAAAAAAAAAAAAAA");
             final EmbeddedPostgres pg = embeddedPostgres();
 
             final Properties props = new Properties();
             // Instruct JDBC to accept JSON string for JSONB
             props.setProperty("stringtype", "unspecified");
             final Connection connection = DriverManager.getConnection(pg.getJdbcUrl("postgres", "postgres"), props);
-            pg.close();
             return new SingleConnectionDataSource(connection, true);
         }
 
