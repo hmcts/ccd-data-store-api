@@ -39,8 +39,8 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.anCaseDataContent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.anCaseDraft;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.newCaseDraft;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CreateCaseDraftBuilder.aCreateCaseDraft;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftBuilder.anDraft;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.UpdateCaseDraftBuilder.anUpdateCaseDraft;
@@ -80,10 +80,10 @@ class DefaultDraftGatewayTest {
 
     private DraftGateway draftGateway;
 
-    Map<String, JsonNode> data = Maps.newHashMap();
-    Map<String, JsonNode> dataClassification = Maps.newHashMap();
-    String securityClassification = SecurityClassification.PRIVATE.name();
-    Event event = anEvent().build();
+    private Map<String, JsonNode> data = Maps.newHashMap();
+    private Map<String, JsonNode> dataClassification = Maps.newHashMap();
+    private String securityClassification = SecurityClassification.PRIVATE.name();
+    private Event event = anEvent().build();
 
     private CaseDataContent caseDataContent;
 
@@ -95,7 +95,7 @@ class DefaultDraftGatewayTest {
     private String draftURL5 = "draftBaseURL/" + DID;
 
     @BeforeEach
-    public void setup() throws JsonProcessingException {
+    public void setUp() throws JsonProcessingException {
         MockitoAnnotations.initMocks(this);
         doReturn(new HttpHeaders()).when(securityUtils).authorizationHeaders();
         doReturn(new HttpHeaders()).when(securityUtils).userAuthorizationHeaders();
@@ -106,7 +106,7 @@ class DefaultDraftGatewayTest {
         data.put(KEY, VALUE);
         dataClassification.put(KEY_CLASS, VALUE_CLASS);
 
-        caseDataContent = anCaseDataContent()
+        caseDataContent = newCaseDataContent()
             .withData(data)
             .withEvent(event)
             .withIgnoreWarning(true)
@@ -114,7 +114,7 @@ class DefaultDraftGatewayTest {
             .withSecurityClassification(securityClassification)
             .withToken(TOKEN)
             .build();
-        caseDraft = anCaseDraft()
+        caseDraft = newCaseDraft()
             .withUserId(UID)
             .withJurisdictionId(JID)
             .withCaseTypeId(CTID)
@@ -141,7 +141,7 @@ class DefaultDraftGatewayTest {
     }
 
     @Test
-    void shouldSuccessfullyCreateToDraft() throws URISyntaxException {
+    void shouldSuccessfullyCreateDraft() throws URISyntaxException {
         ResponseEntity<HttpEntity> response = ResponseEntity.created(new URI("http://localhost:8800/drafts/4")).build();
         doReturn(response).when(createDraftRestTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(HttpEntity.class));
 
@@ -221,8 +221,10 @@ class DefaultDraftGatewayTest {
                                          hasProperty("caseDataContent",
                                                      hasProperty("dataClassification", is(caseDataContent.getDataClassification()))))),
             () -> assertThat(result, hasProperty("document", hasProperty("caseDataContent", hasProperty("token", is(caseDataContent.getToken()))))),
-            () -> assertThat(result, hasProperty("document", hasProperty("caseDataContent", hasProperty("ignoreWarning", is(caseDataContent.getIgnoreWarning()))))),
-            () -> assertThat(result, hasProperty("document", hasProperty("caseDataContent", hasProperty("event", samePropertyValuesAs(caseDataContent.getEvent()))))),
+            () -> assertThat(result,
+                             hasProperty("document", hasProperty("caseDataContent", hasProperty("ignoreWarning", is(caseDataContent.getIgnoreWarning()))))),
+            () -> assertThat(result,
+                             hasProperty("document", hasProperty("caseDataContent", hasProperty("event", samePropertyValuesAs(caseDataContent.getEvent()))))),
             () -> assertThat(result, hasProperty("created", is(NOW.toLocalDateTime()))),
             () -> assertThat(result, hasProperty("updated", is(NOW_PLUS_5_MIN.toLocalDateTime())))
         );

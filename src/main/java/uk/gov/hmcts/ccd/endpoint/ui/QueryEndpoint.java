@@ -197,8 +197,8 @@ public class QueryEndpoint {
         @ApiResponse(code = 200, message = "A displayable draft")
     })
     public CaseView findDraft(@PathVariable("jid") final String jurisdictionId,
-                             @PathVariable("ctid") final String caseTypeId,
-                             @PathVariable("did") final String did) {
+                              @PathVariable("ctid") final String caseTypeId,
+                              @PathVariable("did") final String did) {
         Instant start = Instant.now();
         CaseView caseView = getDraftViewOperation.execute(jurisdictionId, caseTypeId, did);
         final Duration between = Duration.between(start, Instant.now());
@@ -242,7 +242,7 @@ public class QueryEndpoint {
                                                    @PathVariable("etid") String eventTriggerId,
                                                    @RequestParam(value = "ignore-warning",
                                                        required = false) Boolean ignoreWarning) {
-            return getEventTriggerOperation.executeForCase(userId,
+        return getEventTriggerOperation.executeForCase(userId,
                                                        jurisdictionId,
                                                        caseTypeId,
                                                        caseId,
@@ -259,18 +259,18 @@ public class QueryEndpoint {
         @ApiResponse(code = 200, message = "Valid pre-state conditions")
     })
     public CaseEventTrigger getEventTriggerForDraft(@PathVariable("uid") String userId,
-                                                   @PathVariable("jid") String jurisdictionId,
-                                                   @PathVariable("ctid") String caseTypeId,
-                                                   @PathVariable("did") String draftId,
-                                                   @PathVariable("etid") String eventTriggerId,
-                                                   @RequestParam(value = "ignore-warning",
-                                                       required = false) Boolean ignoreWarning) {
+                                                    @PathVariable("jid") String jurisdictionId,
+                                                    @PathVariable("ctid") String caseTypeId,
+                                                    @PathVariable("did") String draftId,
+                                                    @PathVariable("etid") String eventTriggerId,
+                                                    @RequestParam(value = "ignore-warning",
+                                                        required = false) Boolean ignoreWarning) {
         return getEventTriggerOperation.executeForDraft(userId,
-                                                       jurisdictionId,
-                                                       caseTypeId,
-                                                       draftId,
-                                                       eventTriggerId,
-                                                       ignoreWarning);
+                                                        jurisdictionId,
+                                                        caseTypeId,
+                                                        draftId,
+                                                        eventTriggerId,
+                                                        ignoreWarning);
     }
 
     @Transactional

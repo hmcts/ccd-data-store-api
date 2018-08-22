@@ -30,10 +30,10 @@ import static uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway.DRAFT_STORE_DOWN_E
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.NO_ERROR;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WORKBASKET;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.anCaseDetails;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.anCaseEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.aCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.anCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 
 public class SearchQueryOperationTest {
     private static final String CASE_TYPE_ID = "GrantOnly";
@@ -76,7 +76,7 @@ public class SearchQueryOperationTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        testCaseType = anCaseType()
+        testCaseType = newCaseType()
             .withId(CASE_TYPE_ID)
             .withField(CASE_FIELD_1_1)
             .withField(CASE_FIELD_1_2)
@@ -94,12 +94,12 @@ public class SearchQueryOperationTest {
                                                         caseTypeService);
         metadata = new MetaData(CASE_TYPE_ID, JURISDICTION_ID);
         criteria = new HashMap<>();
-        drafts.add(anCaseDetails()
+        drafts.add(newCaseDetails()
                        .withId(DRAFT_ID)
                        .withJurisdiction(JURISDICTION_ID)
                        .withCaseTypeId(CASE_TYPE_ID)
                        .build());
-        cases.add(anCaseDetails().build());
+        cases.add(newCaseDetails().build());
     }
 
     @Test

@@ -81,7 +81,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
                                       caseTypeId,
                                       eventTriggerId,
                                       ignoreWarning,
-                                      () -> caseService.createNewCaseDetails(caseTypeId, jurisdictionId, Maps.newHashMap()));
+            () -> caseService.createNewCaseDetails(caseTypeId, jurisdictionId, Maps.newHashMap()));
     }
 
     @Override
@@ -120,7 +120,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
                                       caseTypeId,
                                       eventTriggerId,
                                       ignoreWarning,
-                                      () -> getDraftDetails(jurisdictionId, caseTypeId, draftReference));
+            () -> getDraftDetails(draftReference));
     }
 
     private StartEventTrigger buildStartEventTrigger(final String uid,
@@ -172,7 +172,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
         return caseDetails;
     }
 
-    private CaseDetails getDraftDetails(String jurisdictionId, String caseTypeId, String draftId) {
+    private CaseDetails getDraftDetails(String draftId) {
         final DraftResponse draftResponse = draftGateway.get(Draft.stripId(draftId));
         return draftResponseToCaseDetailsBuilder.build(draftResponse);
     }

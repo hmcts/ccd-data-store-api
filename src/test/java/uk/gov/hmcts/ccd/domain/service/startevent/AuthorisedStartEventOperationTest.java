@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,6 +26,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -51,6 +53,7 @@ class AuthorisedStartEventOperationTest {
     private static final String CASEWORKER_PROBATE_LOA1 = "caseworker-probate-loa1";
     private static final String CASEWORKER_PROBATE_LOA3 = "caseworker-probate-loa3";
     private static final String CASEWORKER_DIVORCE = "caseworker-divorce-loa3";
+    private static final Map<String, JsonNode> EMPTY_MAP = Maps.newHashMap();
 
 
     @Mock
@@ -151,6 +154,30 @@ class AuthorisedStartEventOperationTest {
             assertAll(
                 () -> assertThat(output, sameInstance(classifiedStartEvent)),
                 () -> assertThat(output.getCaseDetails(), sameInstance(classifiedCaseDetails)),
+                () -> verify(classifiedStartEventOperation).triggerStartForCaseType(UID,
+                                                                                    JURISDICTION_ID,
+                                                                                    CASE_TYPE_ID,
+                                                                                    EVENT_TRIGGER_ID,
+                                                                                    IGNORE_WARNING)
+            );
+        }
+
+        @Test
+        @DisplayName("should filter out data when no case type read access")
+        void shouldFilterOutDataWhenNoCaseTypeReadAccess() {
+
+            when(accessControlService.canAccessCaseTypeWithCriteria(caseType, userRoles, CAN_READ)).thenReturn(false);
+
+            final StartEventTrigger output = authorisedStartEventOperation.triggerStartForCaseType(UID,
+                                                                                                   JURISDICTION_ID,
+                                                                                                   CASE_TYPE_ID,
+                                                                                                   EVENT_TRIGGER_ID,
+                                                                                                   IGNORE_WARNING);
+
+            assertAll(
+                () -> assertThat(output, sameInstance(classifiedStartEvent)),
+                () -> assertThat(output.getCaseDetails().getData(), is(EMPTY_MAP)),
+                () -> assertThat(output.getCaseDetails().getDataClassification(), is(EMPTY_MAP)),
                 () -> verify(classifiedStartEventOperation).triggerStartForCaseType(UID,
                                                                                     JURISDICTION_ID,
                                                                                     CASE_TYPE_ID,

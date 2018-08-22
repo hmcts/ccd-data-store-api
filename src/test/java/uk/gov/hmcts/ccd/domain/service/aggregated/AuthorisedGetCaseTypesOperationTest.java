@@ -30,7 +30,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessCont
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.anCaseEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.aCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseStateBuilder.aState;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.anCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 
 class AuthorisedGetCaseTypesOperationTest {
 
@@ -185,7 +185,7 @@ class AuthorisedGetCaseTypesOperationTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        testCaseType1 = anCaseType()
+        testCaseType1 = newCaseType()
             .withAcl(anAcl()
                          .withRole(ROLE_IN_USER_ROLES)
                          .withRead(true)
@@ -205,7 +205,7 @@ class AuthorisedGetCaseTypesOperationTest {
             .withField(CASE_FIELD_1_3)
             .build();
 
-        testCaseType2 = anCaseType()
+        testCaseType2 = newCaseType()
             .withAcl(anAcl()
                          .withRole(ROLE_IN_USER_ROLES)
                          .withCreate(true)
@@ -240,7 +240,7 @@ class AuthorisedGetCaseTypesOperationTest {
             .withField(CASE_FIELD_2_3)
             .build();
 
-        testCaseType3 = anCaseType()
+        testCaseType3 = newCaseType()
             .withAcl(anAcl()
                          .withRole(ROLE_IN_USER_ROLES)
                          .withCreate(true)

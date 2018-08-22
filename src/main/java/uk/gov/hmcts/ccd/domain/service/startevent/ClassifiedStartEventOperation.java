@@ -55,7 +55,8 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
     }
 
     @Override
-    public StartEventTrigger triggerStartForDraft(String uid, String jurisdictionId, String caseTypeId, String draftReference, String eventTriggerId, Boolean ignoreWarning) {
+    public StartEventTrigger triggerStartForDraft(String uid, String jurisdictionId, String caseTypeId, String draftReference, String eventTriggerId,
+                                                  Boolean ignoreWarning) {
         return applyClassificationIfCaseDetailsExist(deduceDefaultClassificationsForDraft(startEventOperation.triggerStartForDraft(uid,
                                                                                                                                    jurisdictionId,
                                                                                                                                    caseTypeId,
@@ -67,11 +68,11 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
 
     private StartEventTrigger deduceDefaultClassificationsForDraft(StartEventTrigger startEventTrigger, String caseTypeId) {
         CaseDetails caseDetails = startEventTrigger.getCaseDetails();
-        deduceDefaultClassificaitonIfCaseDetailPresent(caseTypeId, caseDetails);
+        deduceDefaultClassificationIfCaseDetailsPresent(caseTypeId, caseDetails);
         return startEventTrigger;
     }
 
-    private void deduceDefaultClassificaitonIfCaseDetailPresent(String caseTypeId, CaseDetails caseDetails) {
+    private void deduceDefaultClassificationIfCaseDetailsPresent(String caseTypeId, CaseDetails caseDetails) {
         if (null != caseDetails) {
             final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
             if (caseType == null) {
