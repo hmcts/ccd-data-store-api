@@ -1,11 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 
 public class CaseDetailsElastic {
@@ -16,27 +12,19 @@ public class CaseDetailsElastic {
 
     private String jurisdiction;
 
-    @JsonProperty("case_type_id")
     private String caseTypeId;
 
-    @JsonProperty("created_date")
-    private LocalDateTime createdDate;
+    private String createdDate;
 
-    @JsonProperty("last_modified")
-    private LocalDateTime lastModified;
+    private String lastModified;
 
     private String state;
 
-    @JsonProperty("security_classification")
     private SecurityClassification securityClassification;
 
-    @JsonProperty("data")
     private Map<String, Object> data;
 
-    @JsonProperty("data_classification")
     private Map<String, Object> dataClassification;
-
-    public CaseDetailsElastic() {}
 
     public String getId() {
         return id;
@@ -46,7 +34,6 @@ public class CaseDetailsElastic {
         this.id = id;
     }
 
-    @JsonIgnore
     public String getReference() {
         return reference;
     }
@@ -71,19 +58,19 @@ public class CaseDetailsElastic {
         this.jurisdiction = jurisdiction;
     }
 
-    public LocalDateTime getCreatedDate() {
+    public String getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(LocalDateTime createdDate) {
+    public void setCreatedDate(String createdDate) {
         this.createdDate = createdDate;
     }
 
-    public LocalDateTime getLastModified() {
+    public String getLastModified() {
         return lastModified;
     }
 
-    public void setLastModified(LocalDateTime lastModified) {
+    public void setLastModified(String lastModified) {
         this.lastModified = lastModified;
     }
 

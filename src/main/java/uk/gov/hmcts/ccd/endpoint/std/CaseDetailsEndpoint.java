@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -473,18 +474,17 @@ public class CaseDetailsEndpoint {
     public List<CaseDetailsElastic> searchCases(
             @ApiParam(value = "Case type ID", required = true)
             @RequestParam("ctid") String caseTypeId,
-            @RequestBody SearchQuery body) {
-
+            @RequestBody String query) {
         List<String> blackListedQueries = applicationParams.getSearchBlackList();
         Optional<String> blackListedQueryOpt = blackListedQueries.stream().filter(blacklisted ->
-                body.getNativeQuery().contains(blacklisted)
+            query.contains(blacklisted)
         ).findFirst();
 
-        blackListedQueryOpt.ifPresent(query -> {
-            throw new BadRequestException(String.format("Query of type '%s' are not allowed", query));
+        blackListedQueryOpt.ifPresent(blacklisted -> {
+            throw new BadRequestException(String.format("Query of type '%s' are not allowed", blacklisted));
         });
 
-        return newSearchOperation.execute(caseTypeId, body.getNativeQuery());
+        return newSearchOperation.execute(caseTypeId, query);
     }
 
     private PaginatedSearchMetadata searchMetadata(final String jurisdictionId,

@@ -1,5 +1,8 @@
 package uk.gov.hmcts.ccd;
 
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestClientFactory;
 import io.searchbox.client.config.HttpClientConfig;
@@ -11,9 +14,11 @@ public class ElasticSearchConfiguration {
 
     @Bean(name = "jestClient")
     public JestClient jestClient() {
+
         JestClientFactory factory = new JestClientFactory();
+        Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
         factory.setHttpClientConfig(new HttpClientConfig.Builder("http://localhost:9200")
-                .multiThreaded(true).build());
+                .multiThreaded(true).gson(gson).build());
         JestClient client = factory.getObject();
         return client;
     }
