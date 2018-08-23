@@ -64,6 +64,9 @@ public class ApplicationParams {
     @Value("${definition.cache.ttl.secs}")
     private Integer definitionCacheTTLSecs;
 
+    @Value("${search.blacklist}")
+    private List<String> searchBlackList;
+
     private static String encode(final String stringToEncode) {
         try {
             return URLEncoder.encode(stringToEncode, "UTF-8");
@@ -194,5 +197,9 @@ public class ApplicationParams {
 
     public int getDefinitionCacheTTLSecs() {
         return definitionCacheTTLSecs;
+    }
+
+    public List<String> getSearchBlackList() {
+        return searchBlackList;
     }
 }
