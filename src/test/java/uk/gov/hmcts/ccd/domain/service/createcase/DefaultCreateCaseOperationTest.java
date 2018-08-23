@@ -36,6 +36,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 
 class DefaultCreateCaseOperationTest {
 
@@ -360,7 +361,7 @@ class DefaultCreateCaseOperationTest {
     }
 
     private static Event buildEvent() {
-        final Event event = new Event();
+        final Event event = anEvent().build();
         event.setEventId("eid");
         event.setDescription("e-desc");
         event.setSummary("e-summ");

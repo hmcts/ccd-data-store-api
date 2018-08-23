@@ -27,11 +27,11 @@ class CaseAccessServiceTest {
 
     private static final String USER_ID = "69";
 
-    private static final Long CASE_GRANTED_1_ID = 123L;
-    private static final Long CASE_GRANTED_2_ID = 456L;
-    private static final Long CASE_REVOKED_ID = 789L;
+    private static final String CASE_GRANTED_1_ID = "123";
+    private static final String CASE_GRANTED_2_ID = "456";
+    private static final String CASE_REVOKED_ID = "789";
 
-    private static final List<Long> CASES_GRANTED = Arrays.asList(CASE_GRANTED_1_ID, CASE_GRANTED_2_ID);
+    private static final List<Long> CASES_GRANTED = Arrays.asList(Long.valueOf(CASE_GRANTED_1_ID), Long.valueOf(CASE_GRANTED_2_ID));
 
     @Mock
     private UserRepository userRepository;
@@ -261,13 +261,13 @@ class CaseAccessServiceTest {
 
     private CaseDetails caseGranted() {
         final CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setId(CASE_GRANTED_1_ID);
+        caseDetails.setId(String.valueOf(CASE_GRANTED_1_ID));
         return caseDetails;
     }
 
     private CaseDetails caseRevoked() {
         final CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setId(CASE_REVOKED_ID);
+        caseDetails.setId(String.valueOf(CASE_REVOKED_ID));
         return caseDetails;
     }
 

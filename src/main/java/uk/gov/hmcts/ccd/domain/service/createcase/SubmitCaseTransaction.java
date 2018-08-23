@@ -80,7 +80,7 @@ class SubmitCaseTransaction {
 
         final CaseDetails savedCaseDetails = saveAuditEventForCaseDetails(event, caseType, idamUser, eventTrigger, newCaseDetails);
 
-        caseUserRepository.grantAccess(savedCaseDetails.getId(), idamUser.getId());
+        caseUserRepository.grantAccess(Long.valueOf(savedCaseDetails.getId()), idamUser.getId());
 
         return savedCaseDetails;
     }

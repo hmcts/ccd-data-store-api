@@ -21,7 +21,7 @@ public class AuthorisedGetCaseHistoryViewOperation extends AbstractAuthorisedCas
     private final GetCaseHistoryViewOperation getCaseHistoryViewOperation;
 
     public AuthorisedGetCaseHistoryViewOperation(
-        @Qualifier(DefaultGetCaseViewOperation.QUALIFIER) GetCaseHistoryViewOperation getCaseHistoryViewOperation,
+        @Qualifier(DefaultGetCaseHistoryViewOperation.QUALIFIER) GetCaseHistoryViewOperation getCaseHistoryViewOperation,
         @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) CaseDefinitionRepository caseDefinitionRepository,
         AccessControlService accessControlService,
         @Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository) {

@@ -9,15 +9,19 @@ public class SearchResultView {
     private List<SearchResultViewColumn> searchResultViewColumns;
     @JsonProperty("results")
     private List<SearchResultViewItem> searchResultViewItems;
+    @JsonProperty("result_error")
+    private String resultError;
 
     public SearchResultView() {
         // Default constructor for JSON mapper
     }
 
     public SearchResultView(final List<SearchResultViewColumn> searchResultViewColumns,
-                            final List<SearchResultViewItem> searchResultViewItems) {
+                            final List<SearchResultViewItem> searchResultViewItems,
+                            final String resultError) {
         this.searchResultViewColumns = searchResultViewColumns;
         this.searchResultViewItems = searchResultViewItems;
+        this.resultError = resultError;
     }
 
     public List<SearchResultViewColumn> getSearchResultViewColumns() {
@@ -26,5 +30,9 @@ public class SearchResultView {
 
     public List<SearchResultViewItem> getSearchResultViewItems() {
         return searchResultViewItems;
+    }
+
+    public String getResultError() {
+        return resultError;
     }
 }

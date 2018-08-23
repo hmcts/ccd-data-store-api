@@ -46,7 +46,7 @@ public class CaseAuditEventRepositoryTest extends BaseTest {
         setUpCaseEvent(CASE_DATA_ID, "Second Event after Create Event", "2017-09-28 08:46:16.260");
 
         CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setId(CASE_DATA_ID);
+        caseDetails.setId(String.valueOf(CASE_DATA_ID));
 
         Optional<AuditEvent> createEventOptional = classUnderTest.getCreateEvent(caseDetails);
 
@@ -59,7 +59,7 @@ public class CaseAuditEventRepositoryTest extends BaseTest {
     public void databaseContainsNoEventsForCaseDetails_getCreateEventCalled_EmptyOptionalReturned() {
 
         CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setId(CASE_DATA_ID);
+        caseDetails.setId(String.valueOf(CASE_DATA_ID));
 
         assertFalse(classUnderTest.getCreateEvent(caseDetails).isPresent());
     }

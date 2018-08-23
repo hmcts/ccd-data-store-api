@@ -23,14 +23,15 @@ locals {
   dm_valid_domain = "${var.document_management_valid_domain != "" ? var.document_management_valid_domain : local.default_dm_valid_domain}"
 
   // Vault name
-  previewVaultName = "${var.product}-data-store"
-  nonPreviewVaultName = "ccd-data-store-${var.env}"
+  previewVaultName = "${var.raw_product}-shared-aat"
+  nonPreviewVaultName = "${var.raw_product}-shared-${var.env}"
   vaultName = "${(var.env == "preview" || var.env == "spreview") ? local.previewVaultName : local.nonPreviewVaultName}"
 
-  // Vault URI
-  previewVaultUri = "https://ccd-data-store-aat.vault.azure.net/"
-  nonPreviewVaultUri = "${module.ccd-data-store-vault.key_vault_uri}"
-  vaultUri = "${(var.env == "preview" || var.env == "spreview") ? local.previewVaultUri : local.nonPreviewVaultUri}"
+  // Old vault info to be removed
+  oldPreviewVaultName = "${var.product}-data-store"
+  oldNonPreviewVaultName = "ccd-data-store-${var.env}"
+  oldVaultName = "${(var.env == "preview" || var.env == "spreview") ? local.oldPreviewVaultName : local.oldNonPreviewVaultName}"
+
 
   // S2S
   s2s_url = "http://rpe-service-auth-provider-${local.env_ase_url}"
@@ -38,6 +39,13 @@ locals {
   custom_redirect_uri = "${var.frontend_url}/oauth2redirect"
   default_redirect_uri = "https://ccd-case-management-web-${local.env_ase_url}/oauth2redirect"
   oauth2_redirect_uri = "${var.frontend_url != "" ? local.custom_redirect_uri : local.default_redirect_uri}"
+
+  draftStoreUrl = "http://draft-store-service-${local.local_env}.service.${local.local_ase}.internal"
+}
+
+data "azurerm_key_vault" "ccd_shared_key_vault" {
+  name = "${local.vaultName}"
+  resource_group_name = "${local.vaultName}"
 }
 
 data "vault_generic_secret" "ccd_data_s2s_key" {
@@ -50,6 +58,17 @@ data "vault_generic_secret" "gateway_idam_key" {
 
 data "vault_generic_secret" "gateway_oauth2_client_secret" {
   path = "secret/${var.vault_section}/ccidam/idam-api/oauth2/client-secrets/ccd-gateway"
+}
+
+resource "random_string" "draft_encryption_key" {
+  length  = 16
+  special = true
+  upper   = true
+  lower   = true
+  number  = true
+  lifecycle {
+    ignore_changes = ["*"]
+  }
 }
 
 module "ccd-data-store-api" {
@@ -80,6 +99,10 @@ module "ccd-data-store-api" {
     IDAM_S2S_URL                        = "${local.s2s_url}"
     DATA_STORE_IDAM_KEY                 = "${data.vault_generic_secret.ccd_data_s2s_key.data["value"]}"
 
+    CCD_DRAFT_STORE_URL                 = "${local.draftStoreUrl}"
+    CCD_DRAFT_TTL_DAYS                  = "${var.draft_store_ttl_days}"
+    CCD_DRAFT_ENCRYPTION_KEY            = "${random_string.draft_encryption_key.result}"
+
     DATA_STORE_S2S_AUTHORISED_SERVICES  = "${var.authorised-services}"
 
     CCD_DEFAULTPRINTURL                 = "${local.default_print_url}"
@@ -102,7 +125,7 @@ module "data-store-db" {
 
 module "ccd-data-store-vault" {
   source              = "git@github.com:hmcts/moj-module-key-vault?ref=master"
-  name                = "${local.vaultName}" // Max 24 characters
+  name                = "${local.oldVaultName}" // Max 24 characters
   product             = "${var.product}"
   env                 = "${var.env}"
   tenant_id           = "${var.tenant_id}"
@@ -118,41 +141,35 @@ module "ccd-data-store-vault" {
 resource "azurerm_key_vault_secret" "POSTGRES-USER" {
   name = "${local.app_full_name}-POSTGRES-USER"
   value = "${module.data-store-db.user_name}"
-  vault_uri = "${module.ccd-data-store-vault.key_vault_uri}"
+  vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES-PASS" {
   name = "${local.app_full_name}-POSTGRES-PASS"
   value = "${module.data-store-db.postgresql_password}"
-  vault_uri = "${module.ccd-data-store-vault.key_vault_uri}"
+  vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES_HOST" {
   name = "${local.app_full_name}-POSTGRES-HOST"
   value = "${module.data-store-db.host_name}"
-  vault_uri = "${module.ccd-data-store-vault.key_vault_uri}"
+  vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES_PORT" {
   name = "${local.app_full_name}-POSTGRES-PORT"
   value = "${module.data-store-db.postgresql_listen_port}"
-  vault_uri = "${module.ccd-data-store-vault.key_vault_uri}"
+  vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
   name = "${local.app_full_name}-POSTGRES-DATABASE"
   value = "${module.data-store-db.postgresql_database}"
-  vault_uri = "${module.ccd-data-store-vault.key_vault_uri}"
+  vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
 }
 
-resource "azurerm_key_vault_secret" "gw_s2s_key" {
-  name = "microserviceGatewaySecret"
-  value = "${data.vault_generic_secret.gateway_idam_key.data["value"]}"
-  vault_uri = "${module.ccd-data-store-vault.key_vault_uri}"
-}
-
-resource "azurerm_key_vault_secret" "gw_oauth2_secret" {
-  name = "gatewayOAuth2ClientSecret"
-  value = "${data.vault_generic_secret.gateway_oauth2_client_secret.data["value"]}"
+resource "azurerm_key_vault_secret" "ccd_draft_encryption_key" {
+  name = "draftStoreEncryptionSecret"
+  value = "${random_string.draft_encryption_key.result}"
   vault_uri = "${module.ccd-data-store-vault.key_vault_uri}"
 }
