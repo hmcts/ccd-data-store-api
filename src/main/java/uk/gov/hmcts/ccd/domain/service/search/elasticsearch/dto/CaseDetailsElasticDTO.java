@@ -1,10 +1,17 @@
-package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
+package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.dto;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 
-public class CaseDetailsElastic {
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
+public class CaseDetailsElasticDTO {
 
     private String id;
 
@@ -14,17 +21,17 @@ public class CaseDetailsElastic {
 
     private String caseTypeId;
 
-    private String createdDate;
+    private LocalDateTime createdDate;
 
-    private String lastModified;
+    private LocalDateTime lastModified;
 
     private String state;
 
     private SecurityClassification securityClassification;
 
-    private Map<String, Object> data;
+    private Map<String, JsonNode> data;
 
-    private Map<String, Object> dataClassification;
+    private Map<String, JsonNode> dataClassification;
 
     public String getId() {
         return id;
@@ -58,19 +65,19 @@ public class CaseDetailsElastic {
         this.jurisdiction = jurisdiction;
     }
 
-    public String getCreatedDate() {
+    public LocalDateTime getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(String createdDate) {
+    public void setCreatedDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;
     }
 
-    public String getLastModified() {
+    public LocalDateTime getLastModified() {
         return lastModified;
     }
 
-    public void setLastModified(String lastModified) {
+    public void setLastModified(LocalDateTime lastModified) {
         this.lastModified = lastModified;
     }
 
@@ -90,19 +97,19 @@ public class CaseDetailsElastic {
         this.securityClassification = securityClassification;
     }
 
-    public Map<String, Object> getData() {
+    public Map<String, JsonNode> getData() {
         return data;
     }
 
-    public void setData(Map<String, Object> data) {
+    public void setData(Map<String, JsonNode> data) {
         this.data = data;
     }
 
-    public Map<String, Object> getDataClassification() {
+    public Map<String, JsonNode> getDataClassification() {
         return dataClassification;
     }
 
-    public void setDataClassification(Map<String, Object> dataClassification) {
+    public void setDataClassification(Map<String, JsonNode> dataClassification) {
         this.dataClassification = dataClassification;
     }
 }

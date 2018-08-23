@@ -6,6 +6,9 @@ import com.google.gson.GsonBuilder;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestClientFactory;
 import io.searchbox.client.config.HttpClientConfig;
+import org.apache.http.HttpHost;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -21,5 +24,12 @@ public class ElasticSearchConfiguration {
                 .multiThreaded(true).gson(gson).build());
         JestClient client = factory.getObject();
         return client;
+    }
+
+    @Bean
+    public RestHighLevelClient restHighLevelClient() {
+        return new RestHighLevelClient(
+                RestClient.builder(
+                        new HttpHost("localhost", 9200)));
     }
 }
