@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface DraftGateway {
 
-    Long save(CreateCaseDraftRequest draft);
+    Long create(CreateCaseDraftRequest draft);
 
     DraftResponse get(String draftId);
 

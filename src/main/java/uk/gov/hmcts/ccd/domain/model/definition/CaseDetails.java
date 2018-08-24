@@ -99,7 +99,7 @@ public class CaseDetails implements Cloneable {
 
     @JsonIgnore
     public String getReferenceAsString() {
-        return reference.toString();
+        return reference != null ? reference.toString() : null;
     }
 
     @JsonSetter("id")
@@ -206,8 +206,8 @@ public class CaseDetails implements Cloneable {
 
     public boolean existsInData(CaseTypeTabField caseTypeTabField) {
         return isFieldWithNoValue(caseTypeTabField)
-        || hasDataForTabField(caseTypeTabField)
-        || getMetadata().containsKey(caseTypeTabField.getCaseField().getId());
+            || hasDataForTabField(caseTypeTabField)
+            || getMetadata().containsKey(caseTypeTabField.getCaseField().getId());
     }
 
     private boolean hasDataForTabField(CaseTypeTabField caseTypeTabField) {
@@ -245,7 +245,7 @@ public class CaseDetails implements Cloneable {
             metadata.put(JURISDICTION.getReference(), getJurisdiction());
             metadata.put(CASE_TYPE.getReference(), getCaseTypeId());
             metadata.put(STATE.getReference(), getState());
-            metadata.put(CASE_REFERENCE.getReference(), getReference());
+            metadata.put(CASE_REFERENCE.getReference(), getReference() != null ? getReference() : getId());
             metadata.put(CREATED_DATE.getReference(), getCreatedDate());
             metadata.put(LAST_MODIFIED_DATE.getReference(), getLastModified());
             metadata.put(SECURITY_CLASSIFICATION.getReference(), getSecurityClassification());
@@ -271,8 +271,4 @@ public class CaseDetails implements Cloneable {
         return getReference() != null;
     }
 
-    @JsonIgnore
-    public String getDraftReference() {
-        return String.format(DRAFT_ID, id);
-    }
 }

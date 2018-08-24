@@ -15,4 +15,11 @@ public interface GetEventTriggerOperation {
                                     String caseReference,
                                     String eventTriggerId,
                                     Boolean ignoreWarning);
+
+    CaseEventTrigger executeForDraft(String uid,
+                                    String jurisdictionId,
+                                    String caseTypeId,
+                                    String draftReference,
+                                    String eventTriggerId,
+                                    Boolean ignoreWarning);
 }
