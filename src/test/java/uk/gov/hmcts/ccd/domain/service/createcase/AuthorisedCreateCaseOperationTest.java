@@ -38,7 +38,7 @@ import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.anCaseDataContent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
 class AuthorisedCreateCaseOperationTest {
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -54,7 +54,7 @@ class AuthorisedCreateCaseOperationTest {
     private static final String EVENT_ID = "EVENT_ID";
     private static final Map<String, JsonNode> DATA = new HashMap<>();
     private static final String TOKEN = "JwtToken";
-    private static final CaseDataContent EVENT_DATA = anCaseDataContent().withEvent(EVENT).withData(DATA).withToken(TOKEN).build();
+    private static final CaseDataContent EVENT_DATA = newCaseDataContent().withEvent(EVENT).withData(DATA).withToken(TOKEN).build();
     private static final Boolean IGNORE = Boolean.TRUE;
     private static final CaseDataContent NULL_EVENT_DATA = null;
 
@@ -234,7 +234,7 @@ class AuthorisedCreateCaseOperationTest {
         assertThrows(ResourceNotFoundException.class, () -> authorisedCreateCaseOperation.createCaseDetails(UID,
                                                                                                             JURISDICTION_ID,
                                                                                                             CASE_TYPE_ID,
-                                                                                                            anCaseDataContent().build(),
+                                                                                                            newCaseDataContent().build(),
                                                                                                             IGNORE));
     }
 

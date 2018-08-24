@@ -42,7 +42,7 @@ import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.anCaseDataContent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.anCaseEvent;
 
 class DefaultCreateCaseOperationTest {
@@ -84,7 +84,7 @@ class DefaultCreateCaseOperationTest {
     private static final String JURISDICTION_ID = "jid";
     private static final String CASE_TYPE_ID = "cti";
     private Event event = buildEvent();
-    private CaseDataContent eventData = anCaseDataContent().build();
+    private CaseDataContent eventData = newCaseDataContent().build();
 
     private static Map<String, JsonNode> data;
 
@@ -113,7 +113,7 @@ class DefaultCreateCaseOperationTest {
         data = buildJsonNodeData();
         given(userRepository.getUserDetails()).willReturn(IDAM_PROPERTIES);
         eventTrigger = anCaseEvent().withId("eventId").withName("event Name").build();
-        eventData = anCaseDataContent().withEvent(event).withToken(TOKEN).withData(data).withDraftId(DRAFT_ID).build();
+        eventData = newCaseDataContent().withEvent(event).withToken(TOKEN).withData(data).withDraftId(DRAFT_ID).build();
     }
 
     @Test
@@ -200,7 +200,7 @@ class DefaultCreateCaseOperationTest {
     @DisplayName("Should not try to delete draft if no draft id set")
     void shouldNotTryToDeleteDraftIfNoDraftIdSet() {
         final String caseEventStateId = "Some state";
-        eventData = anCaseDataContent().withEvent(event).withToken(TOKEN).withData(data).withDraftId(null).build();
+        eventData = newCaseDataContent().withEvent(event).withToken(TOKEN).withData(data).withDraftId(null).build();
         given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(CASE_TYPE);
         given(caseTypeService.isJurisdictionValid(JURISDICTION_ID, CASE_TYPE)).willReturn(Boolean.TRUE);
         given(eventTriggerService.findCaseEvent(CASE_TYPE, "eid")).willReturn(eventTrigger);

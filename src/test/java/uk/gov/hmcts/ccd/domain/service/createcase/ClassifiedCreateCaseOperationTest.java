@@ -16,14 +16,14 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.anCaseDataContent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
 class ClassifiedCreateCaseOperationTest {
 
     private static final String UID = "123";
     private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_TYPE_ID = "Grant";
-    private static final CaseDataContent EVENT_DATA = anCaseDataContent().build();
+    private static final CaseDataContent EVENT_DATA = newCaseDataContent().build();
 //    private static final Map<String, JsonNode> DATA = new HashMap<>();
     private static final Boolean IGNORE = Boolean.FALSE;
 //    private static final String TOKEN = "eyvcdvsyvcdsyv";
