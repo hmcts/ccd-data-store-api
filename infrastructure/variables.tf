@@ -92,7 +92,7 @@ variable "frontend_url" {
   description = "Optional front end URL to use for building redirect URI"
 }
 
-variable "search-blacklist" {
+variable "search_blacklist" {
   type = "string"
   default = "query_string"
   description = "forbidden elastic search query types"

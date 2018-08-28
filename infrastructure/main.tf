@@ -108,7 +108,7 @@ module "ccd-data-store-api" {
     CCD_DEFAULTPRINTURL                 = "${local.default_print_url}"
 
     ELASTIC_SEARCH_HOSTS                = "${var.elasticsearch_hosts}"
-    SEARCH_BLACKLIST                    = "${var.search-blacklist}"
+    SEARCH_BLACKLIST                    = "${var.search_blacklist}"
   }
 
 }
