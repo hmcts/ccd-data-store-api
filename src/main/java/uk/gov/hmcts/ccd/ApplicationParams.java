@@ -67,7 +67,7 @@ public class ApplicationParams {
     @Value("#{'${search.elastic.hosts}'.split(',')}")
     private List<String> elasticSearchHosts;
 
-    @Value("${search.blacklist}")
+    @Value("#{'${search.blacklist}'.split(',')}")
     private List<String> searchBlackList;
 
     private static String encode(final String stringToEncode) {

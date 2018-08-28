@@ -106,6 +106,9 @@ module "ccd-data-store-api" {
     DATA_STORE_S2S_AUTHORISED_SERVICES  = "${var.authorised-services}"
 
     CCD_DEFAULTPRINTURL                 = "${local.default_print_url}"
+
+    ELASTIC_SEARCH_HOSTS                = "${var.elasticsearch_hosts}"
+    SEARCH_BLACKLIST                    = "${var.search-blacklist}"
   }
 
 }
