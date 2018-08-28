@@ -36,6 +36,7 @@ import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.search.CreatorSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.PaginatedSearchMetaDataOperation;
 import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.QueryElasticSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.startevent.StartEventOperation;
 import uk.gov.hmcts.ccd.domain.service.stdapi.DocumentsOperation;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
@@ -43,6 +44,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
 import javax.transaction.Transactional;
+import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -71,7 +73,7 @@ public class CaseDetailsEndpoint {
     private final StartEventOperation startEventOperation;
     private final DocumentsOperation documentsOperation;
     private final SearchOperation searchOperation;
-    private final uk.gov.hmcts.ccd.domain.service.search.elasticsearch.SearchOperation newSearchOperation;
+    private final QueryElasticSearchOperation queryElasticSearchOperation;
     private final PaginatedSearchMetaDataOperation paginatedSearchMetaDataOperation;
     private final AppInsights appInsights;
     private final FieldMapSanitizeOperation fieldMapSanitizeOperation;
@@ -90,8 +92,8 @@ public class CaseDetailsEndpoint {
                                final PaginatedSearchMetaDataOperation paginatedSearchMetaDataOperation,
                                final AppInsights appinsights,
                                final ApplicationParams applicationParams,
-                               final uk.gov.hmcts.ccd.domain.service.search.elasticsearch.SearchOperation 
-                                           newSearchOperation) {
+                               final QueryElasticSearchOperation
+                                       queryElasticSearchOperation) {
         this.getCaseOperation = getCaseOperation;
         this.createCaseOperation = createCaseOperation;
         this.createEventOperation = createEventOperation;
@@ -103,7 +105,7 @@ public class CaseDetailsEndpoint {
         this.paginatedSearchMetaDataOperation = paginatedSearchMetaDataOperation;
         this.appInsights = appinsights;
         this.applicationParams = applicationParams;
-        this.newSearchOperation = newSearchOperation;
+        this.queryElasticSearchOperation = queryElasticSearchOperation;
     }
 
     @Transactional
@@ -463,25 +465,18 @@ public class CaseDetailsEndpoint {
         return searchMetadata(jurisdictionId, caseTypeId, queryParameters);
     }
 
-    @RequestMapping(value = "/search", method = RequestMethod.POST)
-    @ApiOperation("Search case data for a given case type")
+    @RequestMapping(value = "/searchCases", method = RequestMethod.POST)
+    @ApiOperation("Search case data according to the given ElasticSearch query")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "List of case data for the given search criteria")
+            @ApiResponse(code = 200, message = "List of case data for the given search query")
     })
     public List<CaseDetails> searchCases(
             @ApiParam(value = "Case type ID", required = true)
             @RequestParam("ctid") String caseTypeId,
-            @RequestBody String query) {
-        List<String> blackListedQueries = applicationParams.getSearchBlackList();
-        Optional<String> blackListedQueryOpt = blackListedQueries.stream().filter(blacklisted ->
-            query.contains(blacklisted)
-        ).findFirst();
+            @RequestBody String query) throws IOException {
 
-        blackListedQueryOpt.ifPresent(blacklisted -> {
-            throw new BadRequestException(String.format("Query of type '%s' are not allowed", blacklisted));
-        });
-
-        return newSearchOperation.execute(caseTypeId, query);
+        rejectBlacklistedQueryTypes(query);
+        return queryElasticSearchOperation.execute(caseTypeId, query);
     }
 
     private PaginatedSearchMetadata searchMetadata(final String jurisdictionId,
@@ -534,5 +529,16 @@ public class CaseDetailsEndpoint {
         metadata.setSortDirection(param(queryParameters, SORT_PARAM));
 
         return metadata;
+    }
+
+    private void rejectBlacklistedQueryTypes(String elasticSearchQuery) {
+        List<String> blackListedQueries = applicationParams.getSearchBlackList();
+        Optional<String> blackListedQueryOpt = blackListedQueries.stream().filter(blacklisted ->
+                elasticSearchQuery.contains(blacklisted)
+        ).findFirst();
+
+        blackListedQueryOpt.ifPresent(blacklisted -> {
+            throw new BadRequestException(String.format("Query of type '%s' is not allowed", blacklisted));
+        });
     }
 }
