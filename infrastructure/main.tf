@@ -168,26 +168,6 @@ resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
   vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
 }
 
-// Copy into Azure Key Vault
-
-resource "azurerm_key_vault_secret" "ccd_data_s2s_key" {
-  name = "ccd-data-s2s-key"
-  value = "${data.vault_generic_secret.ccd_data_s2s_key.data["value"]}"
-  vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
-}
-
-resource "azurerm_key_vault_secret" "gw_s2s_key" {
-  name = "ccd-api-gateway-idam-service-key"
-  value = "${data.vault_generic_secret.gateway_idam_key.data["value"]}"
-  vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
-}
-
-resource "azurerm_key_vault_secret" "gw_oauth2_secret" {
-  name = "ccd-api-gateway-oauth2-client-secret"
-  value = "${data.vault_generic_secret.gateway_oauth2_client_secret.data["value"]}"
-  vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
-}
-
 resource "azurerm_key_vault_secret" "ccd_draft_encryption_key" {
   name = "draftStoreEncryptionSecret"
   value = "${random_string.draft_encryption_key.result}"
