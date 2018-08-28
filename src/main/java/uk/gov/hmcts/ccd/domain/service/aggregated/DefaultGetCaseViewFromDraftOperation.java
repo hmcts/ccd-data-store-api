@@ -20,6 +20,8 @@ import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 
+import java.util.ArrayList;
+
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTriggerBuilder.anCaseViewTrigger;
 
 @Service
@@ -62,7 +64,34 @@ public class DefaultGetCaseViewFromDraftOperation extends AbstractDefaultGetCase
 
         final CaseTabCollection caseTabCollection = getCaseTabCollection(draftResponse.getCaseTypeId());
 
-        return merge(caseDetails, resumeTrigger, caseType, caseTabCollection);
+        CaseViewEvent[] events = buildEventsFromDraft(draftResponse);
+
+        return merge(caseDetails, resumeTrigger, events, caseType, caseTabCollection);
+    }
+
+    private CaseViewEvent[] buildEventsFromDraft(DraftResponse draftResponse) {
+        ArrayList<CaseViewEvent> events = new ArrayList<>();
+        if (draftResponse.getUpdated() != null) {
+            CaseViewEvent lastUpdatedEvent = new CaseViewEvent();
+            lastUpdatedEvent.setEventId("Draft updated");
+            lastUpdatedEvent.setEventName("Draft updated");
+            lastUpdatedEvent.setStateId("Draft");
+            lastUpdatedEvent.setStateName("Draft");
+            lastUpdatedEvent.setTimestamp(draftResponse.getUpdated());
+            lastUpdatedEvent.setUserId("");
+            events.add(lastUpdatedEvent);
+        }
+        if (draftResponse.getCreated() != null) {
+            CaseViewEvent createEvent = new CaseViewEvent();
+            createEvent.setEventId("Draft created");
+            createEvent.setEventName("Draft created");
+            createEvent.setStateId("Draft");
+            createEvent.setStateName("Draft");
+            createEvent.setUserId("");
+            createEvent.setTimestamp(draftResponse.getCreated());
+            events.add(createEvent);
+        }
+        return events.toArray(new CaseViewEvent[events.size()]);
     }
 
     private CaseViewTrigger buildResumeTriggerFromDraft(DraftResponse draftResponse) {
@@ -74,16 +103,18 @@ public class DefaultGetCaseViewFromDraftOperation extends AbstractDefaultGetCase
             .build();
     }
 
-    private CaseView merge(CaseDetails caseDetails, CaseViewTrigger resumeTrigger, CaseType caseType, CaseTabCollection caseTabCollection) {
+    private CaseView merge(CaseDetails caseDetails, CaseViewTrigger resumeTrigger, CaseViewEvent[] events, CaseType caseType,
+                           CaseTabCollection caseTabCollection) {
         CaseView caseView = new CaseView();
         caseView.setCaseId(caseDetails.getId().toString());
         caseView.setChannels(caseTabCollection.getChannels().toArray(new String[0]));
 
         caseView.setCaseType(CaseViewType.createFrom(caseType));
         caseView.setTabs(getTabs(caseDetails, caseDetails.getData(), caseTabCollection));
+        caseView.setMetadataFields(getMetadataFields(caseType, caseDetails));
 
-        caseView.setTriggers(new CaseViewTrigger[] {resumeTrigger, DELETE_TRIGGER});
-        caseView.setEvents(new CaseViewEvent[]{});
+        caseView.setTriggers(new CaseViewTrigger[]{resumeTrigger, DELETE_TRIGGER});
+        caseView.setEvents(events);
 
         return caseView;
     }
