@@ -42,6 +42,7 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.DocumentsOperation;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
@@ -92,8 +93,7 @@ public class CaseDetailsEndpoint {
                                final PaginatedSearchMetaDataOperation paginatedSearchMetaDataOperation,
                                final AppInsights appinsights,
                                final ApplicationParams applicationParams,
-                               final CaseDetailsSearchOperation
-                                       caseDetailsSearchOperation) {
+                               final CaseDetailsSearchOperation caseDetailsSearchOperation) {
         this.getCaseOperation = getCaseOperation;
         this.createCaseOperation = createCaseOperation;
         this.createEventOperation = createEventOperation;
@@ -531,14 +531,14 @@ public class CaseDetailsEndpoint {
         return metadata;
     }
 
-    private void validateSearchRequest(String elasticSearchQuery) {
+    private void validateSearchRequest(String searchRequest) {
         List<String> blackListedQueries = applicationParams.getSearchBlackList();
         Optional<String> blackListedQueryOpt = blackListedQueries.stream().filter(blacklisted ->
-                elasticSearchQuery.contains(blacklisted)
+                searchRequest.contains(blacklisted)
         ).findFirst();
 
         blackListedQueryOpt.ifPresent(blacklisted -> {
-            throw new BadRequestException(String.format("Query of type '%s' is not allowed", blacklisted));
+            throw new BadSearchRequest(String.format("Query of type '%s' is not allowed", blacklisted));
         });
     }
 }

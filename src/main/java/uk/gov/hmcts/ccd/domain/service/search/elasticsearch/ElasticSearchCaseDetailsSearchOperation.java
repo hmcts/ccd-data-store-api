@@ -12,7 +12,6 @@ import io.searchbox.core.SearchResult;
 import org.jooq.lambda.Unchecked;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.dto.CaseDetailsMapper;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.dto.ElasticSearchCaseDetailsDTO;
@@ -20,6 +19,8 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
 @Service
 public class ElasticSearchCaseDetailsSearchOperation implements CaseDetailsSearchOperation {
+
+    private static final String INDEX_TYPE = "case";
 
     @Autowired
     private JestClient jestClient;
@@ -45,19 +46,19 @@ public class ElasticSearchCaseDetailsSearchOperation implements CaseDetailsSearc
     private Search createSearchRequest(String caseTypeId, String query) {
         return new Search.Builder(query)
                     .addIndex(caseTypeId)
-                    .addType("case")
+                    .addType(INDEX_TYPE)
                     .build();
     }
 
     private List<CaseDetails> toCaseDetails(SearchResult result) {
-        List<String> casesAsStrings = result.getSourceAsStringList();
-        List<ElasticSearchCaseDetailsDTO> dtos = toElasticSearchCaseDetailsDTOs(casesAsStrings);
+        List<String> casesAsString = result.getSourceAsStringList();
+        List<ElasticSearchCaseDetailsDTO> dtos = toElasticSearchCasesDTO(casesAsString);
         return caseDetailsMapper.dtosToCaseDetailsList(dtos);
     }
 
-    private List<ElasticSearchCaseDetailsDTO> toElasticSearchCaseDetailsDTOs(List<String> casesAsStrings) {
-        return casesAsStrings.stream().map(Unchecked.function((String caseDetailString ) ->
-            objectMapper.readValue(caseDetailString, ElasticSearchCaseDetailsDTO.class)
+    private List<ElasticSearchCaseDetailsDTO> toElasticSearchCasesDTO(List<String> cases) {
+        return cases.stream().map(Unchecked.function(caseDetail ->
+            objectMapper.readValue(caseDetail, ElasticSearchCaseDetailsDTO.class)
         )).collect(toList());
     }
 }
