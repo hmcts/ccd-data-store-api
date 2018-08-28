@@ -12,24 +12,23 @@ import io.searchbox.core.SearchResult;
 import org.jooq.lambda.Unchecked;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.dto.CaseDetailsMapper;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.dto.ElasticSearchCaseDetailsDTO;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 @Service
-public class DefaultQueryElasticSearchOperation implements QueryElasticSearchOperation {
+public class ElasticSearchCaseDetailsSearchOperation implements CaseDetailsSearchOperation {
 
     @Autowired
-    JestClient jestClient;
+    private JestClient jestClient;
 
     @Autowired
-    ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
 
     @Autowired
-    CaseDetailsMapper caseDetailsMapper;
+    private CaseDetailsMapper caseDetailsMapper;
 
     @Override
     public List<CaseDetails> execute(String caseTypeId, String query) throws IOException {

@@ -64,6 +64,9 @@ public class ApplicationParams {
     @Value("${definition.cache.ttl.secs}")
     private Integer definitionCacheTTLSecs;
 
+    @Value("#{'${search.elastic.hosts}'.split(',')}")
+    private List<String> elasticSearchHosts;
+
     @Value("${search.blacklist}")
     private List<String> searchBlackList;
 
@@ -201,5 +204,9 @@ public class ApplicationParams {
 
     public List<String> getSearchBlackList() {
         return searchBlackList;
+    }
+
+    public List<String> getElasticSearchHosts() {
+        return elasticSearchHosts;
     }
 }

@@ -36,7 +36,7 @@ import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.search.CreatorSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.PaginatedSearchMetaDataOperation;
 import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
-import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.QueryElasticSearchOperation;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseDetailsSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.startevent.StartEventOperation;
 import uk.gov.hmcts.ccd.domain.service.stdapi.DocumentsOperation;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
@@ -73,7 +73,7 @@ public class CaseDetailsEndpoint {
     private final StartEventOperation startEventOperation;
     private final DocumentsOperation documentsOperation;
     private final SearchOperation searchOperation;
-    private final QueryElasticSearchOperation queryElasticSearchOperation;
+    private final CaseDetailsSearchOperation caseDetailsSearchOperation;
     private final PaginatedSearchMetaDataOperation paginatedSearchMetaDataOperation;
     private final AppInsights appInsights;
     private final FieldMapSanitizeOperation fieldMapSanitizeOperation;
@@ -92,8 +92,8 @@ public class CaseDetailsEndpoint {
                                final PaginatedSearchMetaDataOperation paginatedSearchMetaDataOperation,
                                final AppInsights appinsights,
                                final ApplicationParams applicationParams,
-                               final QueryElasticSearchOperation
-                                       queryElasticSearchOperation) {
+                               final CaseDetailsSearchOperation
+                                       caseDetailsSearchOperation) {
         this.getCaseOperation = getCaseOperation;
         this.createCaseOperation = createCaseOperation;
         this.createEventOperation = createEventOperation;
@@ -105,7 +105,7 @@ public class CaseDetailsEndpoint {
         this.paginatedSearchMetaDataOperation = paginatedSearchMetaDataOperation;
         this.appInsights = appinsights;
         this.applicationParams = applicationParams;
-        this.queryElasticSearchOperation = queryElasticSearchOperation;
+        this.caseDetailsSearchOperation = caseDetailsSearchOperation;
     }
 
     @Transactional
@@ -473,10 +473,10 @@ public class CaseDetailsEndpoint {
     public List<CaseDetails> searchCases(
             @ApiParam(value = "Case type ID", required = true)
             @RequestParam("ctid") String caseTypeId,
-            @RequestBody String query) throws IOException {
+            @RequestBody String request) throws IOException {
 
-        rejectBlacklistedQueryTypes(query);
-        return queryElasticSearchOperation.execute(caseTypeId, query);
+        validateSearchRequest(request);
+        return caseDetailsSearchOperation.execute(caseTypeId, request);
     }
 
     private PaginatedSearchMetadata searchMetadata(final String jurisdictionId,
@@ -531,7 +531,7 @@ public class CaseDetailsEndpoint {
         return metadata;
     }
 
-    private void rejectBlacklistedQueryTypes(String elasticSearchQuery) {
+    private void validateSearchRequest(String elasticSearchQuery) {
         List<String> blackListedQueries = applicationParams.getSearchBlackList();
         Optional<String> blackListedQueryOpt = blackListedQueries.stream().filter(blacklisted ->
                 elasticSearchQuery.contains(blacklisted)

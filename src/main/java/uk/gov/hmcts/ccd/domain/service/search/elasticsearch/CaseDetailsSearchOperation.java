@@ -5,7 +5,7 @@ import java.util.List;
 
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
-public interface QueryElasticSearchOperation {
+public interface CaseDetailsSearchOperation {
 
     List<CaseDetails> execute(String caseTypeId, String query) throws IOException;
 
