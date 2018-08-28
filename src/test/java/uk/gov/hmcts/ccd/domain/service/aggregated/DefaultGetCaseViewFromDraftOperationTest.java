@@ -15,6 +15,7 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -24,12 +25,12 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetCaseViewFromDraftOperation.DELETE;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataBuilder.anCaseData;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.anCaseDataContent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.anCaseDetails;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.anCaseDraft;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTabCollectionBuilder.anCaseTabCollection;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.anDraftResponse;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataBuilder.newCaseData;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.newCaseDraft;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTabCollectionBuilder.newCaseTabCollection;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.newDraftResponse;
 
 class DefaultGetCaseViewFromDraftOperationTest {
 
@@ -62,8 +63,6 @@ class DefaultGetCaseViewFromDraftOperationTest {
 
     private GetCaseViewOperation getDraftViewOperation;
 
-    private CaseTabCollection caseTabCollection;
-    private CaseType caseType;
     private DraftResponse draftResponse;
     private CaseDetails caseDetails;
     private Map<String, JsonNode> data;
@@ -72,16 +71,18 @@ class DefaultGetCaseViewFromDraftOperationTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
 
-        data = anCaseData()
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime then = LocalDateTime.now();
+        data = newCaseData()
             .withPair("dataTestField1", JSON_NODE_FACTORY.textNode("dataTestField1"))
             .withPair("dataTestField2", JSON_NODE_FACTORY.textNode("dataTestField2"))
             .build();
-        draftResponse = anDraftResponse()
+        draftResponse = newDraftResponse()
             .withId(DRAFT_ID)
-            .withDocument(anCaseDraft()
+            .withDocument(newCaseDraft()
                               .withCaseTypeId(CASE_TYPE_ID)
                               .withEventTriggerId(EVENT_TRIGGER_ID)
-                              .withCaseDataContent(anCaseDataContent()
+                              .withCaseDataContent(newCaseDataContent()
                                                        .withData(data)
                                                        .withEvent(anEvent()
                                                                       .withEventId(EVENT_TRIGGER_ID)
@@ -89,10 +90,13 @@ class DefaultGetCaseViewFromDraftOperationTest {
                                                                       .build())
                                                        .build())
                               .build())
+            .withCreated(then)
+            .withUpdated(now)
             .build();
 
+
         doReturn(draftResponse).when(draftGateway).get(DRAFT_ID);
-        caseDetails = anCaseDetails()
+        caseDetails = newCaseDetails()
             .withCaseTypeId(CASE_TYPE_ID)
             .withJurisdiction(JURISDICTION_ID)
             .withId(DRAFT_ID_FOR_UI)
@@ -100,10 +104,11 @@ class DefaultGetCaseViewFromDraftOperationTest {
             .build();
         doReturn(caseDetails).when(draftResponseToCaseDetailsBuilder).build(draftResponse);
 
-        caseTabCollection = anCaseTabCollection().withFieldIds("dataTestField1", "dataTestField2").build();
+        CaseTabCollection caseTabCollection = newCaseTabCollection().withFieldIds("dataTestField1", "dataTestField2")
+            .build();
         doReturn(caseTabCollection).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
 
-        caseType = new CaseType();
+        CaseType caseType = new CaseType();
         Jurisdiction jurisdiction = new Jurisdiction();
         jurisdiction.setName(JURISDICTION_ID);
         caseType.setJurisdiction(jurisdiction);
@@ -135,19 +140,28 @@ class DefaultGetCaseViewFromDraftOperationTest {
                                    hasItemInArray(allOf(hasProperty("id", equalTo("dataTestField2")),
                                                         hasProperty("showCondition",
                                                                     equalTo("dataTestField2-fieldShowCondition"))))),
-                  () -> assertThat(caseView.getTriggers(), arrayWithSize(2)),
-                  () -> assertThat(caseView.getTriggers()[0],
-                                   allOf(hasProperty("id", equalTo(EVENT_TRIGGER_ID)),
-                                         hasProperty("name", equalTo("Resume")),
-                                         hasProperty("description", equalTo(EVENT_DESCRIPTION)),
-                                         hasProperty("order", equalTo(1)))),
-                  () -> assertThat(caseView.getTriggers()[1],
-                                   allOf(hasProperty("id", is(DELETE)),
-                                         hasProperty("name", equalTo("Delete")),
-                                         hasProperty("description", equalTo("Delete draft")),
-                                         hasProperty("order", equalTo(2)))),
-                  () -> assertThat(caseView.getState(), is(nullValue())),
-                  () -> assertThat(caseView.getEvents(), is(arrayWithSize(0)))
+            () -> assertThat(caseView.getTriggers(), arrayWithSize(2)),
+            () -> assertThat(caseView.getTriggers()[0],
+                             allOf(hasProperty("id", equalTo(EVENT_TRIGGER_ID)),
+                                   hasProperty("name", equalTo("Resume")),
+                                   hasProperty("description", equalTo(EVENT_DESCRIPTION)),
+                                   hasProperty("order", equalTo(1)))),
+            () -> assertThat(caseView.getTriggers()[1],
+                             allOf(hasProperty("id", is(DELETE)),
+                                   hasProperty("name", equalTo("Delete")),
+                                   hasProperty("description", equalTo("Delete draft")),
+                                   hasProperty("order", equalTo(2)))),
+            () -> assertThat(caseView.getEvents(), is(arrayWithSize(2))),
+            () -> assertThat(caseView.getEvents()[0],
+                             allOf(hasProperty("eventId", equalTo("Draft updated")),
+                                   hasProperty("eventName", equalTo("Draft updated")),
+                                   hasProperty("stateId", equalTo("Draft")),
+                                   hasProperty("stateName", equalTo("Draft")))),
+            () -> assertThat(caseView.getEvents()[1],
+                             allOf(hasProperty("eventId", equalTo("Draft created")),
+                                   hasProperty("eventName", equalTo("Draft created")),
+                                   hasProperty("stateId", equalTo("Draft")),
+                                   hasProperty("stateName", equalTo("Draft"))))
         );
     }
 }

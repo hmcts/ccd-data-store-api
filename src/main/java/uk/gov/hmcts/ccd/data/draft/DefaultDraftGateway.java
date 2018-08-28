@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.data.draft;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -24,6 +23,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.AppInsights.DRAFT_STORE;
@@ -41,8 +41,7 @@ public class DefaultDraftGateway implements DraftGateway {
     private static final String RESOURCE_NOT_FOUND_MSG = "No draft found ( draft reference = '%s' )";
     private static final String DRAFT_STORE_DESERIALIZATION_ERR_MESSAGE = "Unable to read from draft service";
 
-    @Qualifier("draftsRestTemplate")
-    @Autowired
+    private final RestTemplate createDraftRestTemplate;
     private final RestTemplate restTemplate;
     private final SecurityUtils securityUtils;
     private final ApplicationParams applicationParams;
@@ -50,10 +49,12 @@ public class DefaultDraftGateway implements DraftGateway {
 
     @Inject
     public DefaultDraftGateway(
-        final RestTemplate restTemplate,
+        @Qualifier("createDraftRestTemplate") final RestTemplate createDraftRestTemplate,
+        @Qualifier("draftsRestTemplate") final RestTemplate restTemplate,
         final SecurityUtils securityUtils,
         final ApplicationParams applicationParams,
         final AppInsights appInsights) {
+        this.createDraftRestTemplate = createDraftRestTemplate;
         this.restTemplate = restTemplate;
         this.securityUtils = securityUtils;
         this.applicationParams = applicationParams;
@@ -61,16 +62,16 @@ public class DefaultDraftGateway implements DraftGateway {
     }
 
     @Override
-    public Long save(final CreateCaseDraftRequest draft) {
+    public Long create(final CreateCaseDraftRequest draft) {
         try {
             HttpHeaders headers = securityUtils.authorizationHeaders();
             headers.add(DRAFT_ENCRYPTION_KEY_HEADER, applicationParams.getDraftEncryptionKey());
             final HttpEntity requestEntity = new HttpEntity(draft, headers);
             final Instant start = Instant.now();
-            HttpHeaders responseHeaders = restTemplate.exchange(applicationParams.draftBaseURL(),
-                                                                HttpMethod.POST,
-                                                                requestEntity,
-                                                                HttpEntity.class).getHeaders();
+            HttpHeaders responseHeaders = createDraftRestTemplate.exchange(applicationParams.draftBaseURL(),
+                                                                           HttpMethod.POST,
+                                                                           requestEntity,
+                                                                           HttpEntity.class).getHeaders();
             final Duration duration = Duration.between(start, Instant.now());
             appInsights.trackDependency(DRAFT_STORE, "Create", duration.toMillis(), true);
             return getDraftId(responseHeaders);
@@ -115,14 +116,14 @@ public class DefaultDraftGateway implements DraftGateway {
             Draft draft = restTemplate.exchange(applicationParams.draftURL(draftId), HttpMethod.GET, requestEntity, Draft.class).getBody();
             final Duration duration = Duration.between(start, Instant.now());
             appInsights.trackDependency(DRAFT_STORE, "Get", duration.toMillis(), true);
-            return assembleDraft(draft);
+            return assembleDraft(draft, getDraftExceptionConsumer());
         } catch (HttpClientErrorException e) {
-            LOG.warn("Error while getting draftId={}" + draftId, e);
+            LOG.warn("Error while getting draftId={}", draftId, e);
             if (e.getRawStatusCode() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException(String.format(RESOURCE_NOT_FOUND_MSG, draftId));
             }
         } catch (Exception e) {
-            LOG.warn("Error while getting draftId=" + draftId, e);
+            LOG.warn("Error while getting draftId={}", draftId, e);
             throw new ServiceException(DRAFT_STORE_DOWN_ERR_MESSAGE, e);
         }
         return null;
@@ -140,7 +141,7 @@ public class DefaultDraftGateway implements DraftGateway {
             appInsights.trackDependency(DRAFT_STORE, "GetAll", duration.toMillis(), true);
             return getDrafts.getData()
                 .stream()
-                .map(this::assembleDraft)
+                .map(d -> assembleDraft(d, getDraftsExceptionConsumer()))
                 .collect(Collectors.toList());
         } catch (Exception e) {
             LOG.warn("Error while getting drafts", e);
@@ -148,12 +149,25 @@ public class DefaultDraftGateway implements DraftGateway {
         }
     }
 
+    private Consumer<Exception> getDraftExceptionConsumer() {
+        return (Exception e) -> {
+            LOG.warn("Error while deserializing draft data content", e);
+            throw new ServiceException(DRAFT_STORE_DESERIALIZATION_ERR_MESSAGE, e);
+        };
+    }
+
+    private Consumer<Exception> getDraftsExceptionConsumer() {
+        return (Exception e) -> {
+            LOG.warn("Error while deserializing draft data content", e);
+        };
+    }
+
     private String getUriWithQueryParams() {
         return UriComponentsBuilder.fromUriString(applicationParams.draftBaseURL())
             .queryParam("limit", Integer.MAX_VALUE).toUriString();
     }
 
-    private DraftResponse assembleDraft(Draft getDraft) {
+    private DraftResponse assembleDraft(Draft getDraft, Consumer<Exception> exceptionConsumer) {
         final DraftResponse draftResponse = new DraftResponse();
         try {
             draftResponse.setId(getDraft.getId());
@@ -162,11 +176,11 @@ public class DefaultDraftGateway implements DraftGateway {
             draftResponse.setCreated(getDraft.getCreated().toLocalDateTime());
             draftResponse.setUpdated(getDraft.getUpdated().toLocalDateTime());
         } catch (IOException e) {
-            LOG.warn("Error while deserializing draft data content", e);
-            throw new ServiceException(DRAFT_STORE_DESERIALIZATION_ERR_MESSAGE, e);
+            exceptionConsumer.accept(e);
         }
         return draftResponse;
     }
+
 
     private Long getDraftId(HttpHeaders responseHeaders) {
         String path = responseHeaders.getLocation().getPath();

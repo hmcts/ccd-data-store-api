@@ -21,9 +21,9 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.anCaseDetails;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.anCaseDraft;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.anDraftResponse;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.newCaseDraft;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.newDraftResponse;
 
 class DefaultGetDraftsOperationTest {
 
@@ -52,9 +52,9 @@ class DefaultGetDraftsOperationTest {
         MockitoAnnotations.initMocks(this);
 
         metadata = new MetaData(CASE_TYPE_ID, JURISDICTION_ID);
-        draft = anDraftResponse()
+        draft = newDraftResponse()
             .withId(DRAFT_ID)
-            .withDocument(anCaseDraft()
+            .withDocument(newCaseDraft()
                               .withJurisdictionId(JURISDICTION_ID)
                               .withCaseTypeId(CASE_TYPE_ID)
                               .withCaseDataContent(CASE_DATA_CONTENT)
@@ -62,7 +62,7 @@ class DefaultGetDraftsOperationTest {
             .build();
         drafts.add(draft);
         doReturn(drafts).when(draftGateway).getAll();
-        caseDetails = anCaseDetails()
+        caseDetails = newCaseDetails()
             .withCaseTypeId(CASE_TYPE_ID)
             .withJurisdiction(JURISDICTION_ID)
             .withId(DRAFT_ID)
@@ -117,9 +117,9 @@ class DefaultGetDraftsOperationTest {
     @DisplayName("should not return drafts that do not match jurisdiction criteria")
     public void shouldNotReturnDraftsThatDoNotMatchJurisdiction() {
         drafts = Lists.newArrayList();
-        drafts.add(anDraftResponse()
+        drafts.add(newDraftResponse()
                        .withId(DRAFT_ID)
-                       .withDocument(anCaseDraft()
+                       .withDocument(newCaseDraft()
                                          .withJurisdictionId(OTHER_JURISDICTION_ID)
                                          .withCaseTypeId(CASE_TYPE_ID)
                                          .withCaseDataContent(CASE_DATA_CONTENT)
@@ -140,9 +140,9 @@ class DefaultGetDraftsOperationTest {
     @DisplayName("should not return drafts that do not match case type criteria")
     public void shouldNotReturnDraftsThatDoNotMatchCaseType() {
         drafts = Lists.newArrayList();
-        drafts.add(anDraftResponse()
+        drafts.add(newDraftResponse()
                        .withId(DRAFT_ID)
-                       .withDocument(anCaseDraft()
+                       .withDocument(newCaseDraft()
                                          .withJurisdictionId(JURISDICTION_ID)
                                          .withCaseTypeId(OTHER_CASE_TYPE_ID)
                                          .withCaseDataContent(CASE_DATA_CONTENT)

@@ -710,7 +710,17 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected number of fields", 0, documentFields.length);
 
         final CaseViewEvent[] events = caseView.getEvents();
-        assertThat("Events are not empty", events, arrayWithSize(0));
+        assertThat("Events are not empty", events, arrayWithSize(2));
+
+        assertEquals("Event ID", "Draft updated", events[0].getEventId());
+        assertEquals("Event Name", "Draft updated", events[0].getEventName());
+        assertEquals("Event State Name", "Draft", events[0].getStateName());
+        assertEquals("Event State ID", "Draft", events[0].getStateId());
+
+        assertEquals("Event ID", "Draft created", events[1].getEventId());
+        assertEquals("Event Name", "Draft created", events[1].getEventName());
+        assertEquals("Event State Name", "Draft", events[1].getStateName());
+        assertEquals("Event State ID", "Draft", events[1].getStateId());
 
         final CaseViewTrigger[] triggers = caseView.getTriggers();
         assertNotNull("Triggers are null", triggers);

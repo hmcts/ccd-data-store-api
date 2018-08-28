@@ -30,7 +30,7 @@ import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.anCaseDataContent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
 public class DraftsEndpointIT extends WireMockBaseTest {
     private static final String CTID = "TestAddressBookCase";
@@ -70,7 +70,7 @@ public class DraftsEndpointIT extends WireMockBaseTest {
     @Test
     public void shouldReturn201WhenSaveDraftForCaseworker() throws Exception {
         final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JID + "/case-types/" + CTID + "/event-trigger/" + ETID + "/drafts";
-        CaseDataContent caseDetailsToSave = anCaseDataContent()
+        CaseDataContent caseDetailsToSave = newCaseDataContent()
             .withData(getData(data))
             .withEvent(anEvent()
                            .withEventId(TEST_EVENT_ID)
@@ -105,7 +105,7 @@ public class DraftsEndpointIT extends WireMockBaseTest {
     @Test
     public void shouldReturn200WhenUpdateDraftForCaseworker() throws Exception {
         final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JID + "/case-types/" + CTID + "/event-trigger/" + ETID + "/drafts/" + DID;
-        CaseDataContent caseDetailsToUpdate = anCaseDataContent()
+        CaseDataContent caseDetailsToUpdate = newCaseDataContent()
             .withData(getData(data))
             .withEvent(anEvent()
                            .withEventId(TEST_EVENT_ID)
@@ -138,7 +138,7 @@ public class DraftsEndpointIT extends WireMockBaseTest {
     @Test
     public void shouldReturn404WhenUpdateDraftForCaseworkerWithDraftIdNotFound() throws Exception {
         final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JID + "/case-types/" + CTID + "/event-trigger/" + ETID + "/drafts/" + WRONG_DID;
-        CaseDataContent caseDetailsToUpdate = anCaseDataContent()
+        CaseDataContent caseDetailsToUpdate = newCaseDataContent()
             .withData(getData(data))
             .withEvent(anEvent()
                            .withEventId(TEST_EVENT_ID)

@@ -7,6 +7,7 @@ import java.time.ZonedDateTime;
 
 @ToString
 public class Draft {
+    public static final String DRAFT = "DRAFT";
 
     private String id;
 
@@ -58,4 +59,11 @@ public class Draft {
         this.updated = updated;
     }
 
+    public static String stripId(String draftId) {
+        if (draftId.startsWith(DRAFT)) {
+            return draftId.substring(DRAFT.length());
+        } else {
+            return draftId;
+        }
+    }
 }
