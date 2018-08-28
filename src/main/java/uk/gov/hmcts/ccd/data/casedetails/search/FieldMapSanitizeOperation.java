@@ -17,14 +17,14 @@ import java.util.stream.Collectors;
 public class FieldMapSanitizeOperation {
 
     private static final String VALID_FIELD_NAME_REGEX = "^[A-Za-z0-9_.-]+$";
-    private static final String CASE_FIELD_PREFIX = "case.";
+    private static final String CASE_FIELD_PREFIX = "case\\.";
 
     public Map<String, String> execute(final Map<String, String> params) {
         checkFieldNames(params.keySet());
         return params.entrySet()
                 .stream()
                 .filter(e -> isCaseFieldParameter(e.getKey()))
-                .map(this::remmoveCaseFieldPrefix)
+                .map(this::removeCaseFieldPrefix)
                 .collect(Collectors.toMap(Entry::getKey, e -> StringUtils.trim(e.getValue())));
     }
 
@@ -36,7 +36,7 @@ public class FieldMapSanitizeOperation {
         }
     }
 
-    private Entry<String, String> remmoveCaseFieldPrefix(Entry<String, String> entry) {
+    private Entry<String, String> removeCaseFieldPrefix(Entry<String, String> entry) {
         return new AbstractMap.SimpleEntry<>(
                 entry.getKey().replaceFirst(CASE_FIELD_PREFIX, ""),
                 entry.getValue());
