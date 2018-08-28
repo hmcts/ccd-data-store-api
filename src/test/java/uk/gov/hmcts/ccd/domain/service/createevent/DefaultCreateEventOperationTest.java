@@ -36,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 
 class DefaultCreateEventOperationTest {
 
@@ -98,7 +99,7 @@ class DefaultCreateEventOperationTest {
     private IDAMProperties user;
 
     private static Event buildEvent() {
-        final Event event = new Event();
+        final Event event = anEvent().build();
         event.setEventId(EVENT_ID);
         event.setSummary("Update case summary");
         event.setDescription("Update case description");

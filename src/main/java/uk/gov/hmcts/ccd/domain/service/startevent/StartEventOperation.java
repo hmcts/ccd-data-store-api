@@ -15,4 +15,11 @@ public interface StartEventOperation {
                                           String caseReference,
                                           String eventTriggerId,
                                           Boolean ignoreWarning);
+
+    StartEventTrigger triggerStartForDraft(String uid,
+                                          String jurisdictionId,
+                                          String caseTypeId,
+                                          String draftReference,
+                                          String eventTriggerId,
+                                          Boolean ignoreWarning);
 }

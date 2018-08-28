@@ -2,16 +2,24 @@ package uk.gov.hmcts.ccd.domain.model.std;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.ToString;
 
 import java.util.Map;
 
+@ToString
 public class CaseDataContent {
     private Event event;
     private Map<String, JsonNode> data;
+
     @JsonProperty("security_classification")
-    private Map<String, JsonNode> securityClassification;
+    private String securityClassification;
+
+    @JsonProperty("data_classification")
+    private Map<String, JsonNode> dataClassification;
+
     @JsonProperty("event_token")
     private String token;
+
     @JsonProperty("ignore_warning")
     private Boolean ignoreWarning;
 
@@ -27,8 +35,24 @@ public class CaseDataContent {
         return data;
     }
 
+    public String getSecurityClassification() {
+        return securityClassification;
+    }
+
+    public void setSecurityClassification(String securityClassification) {
+        this.securityClassification = securityClassification;
+    }
+
     public void setData(Map<String, JsonNode> data) {
         this.data = data;
+    }
+
+    public Map<String, JsonNode> getDataClassification() {
+        return dataClassification;
+    }
+
+    public void setDataClassification(Map<String, JsonNode> dataClassification) {
+        this.dataClassification = dataClassification;
     }
 
     public String getToken() {
@@ -43,8 +67,8 @@ public class CaseDataContent {
         return ignoreWarning;
     }
 
-    public CaseDataContent setIgnoreWarning(Boolean ignoreWarning) {
+    public void setIgnoreWarning(Boolean ignoreWarning) {
         this.ignoreWarning = ignoreWarning;
-        return this;
     }
+
 }

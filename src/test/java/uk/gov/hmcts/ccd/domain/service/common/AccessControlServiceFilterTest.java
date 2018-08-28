@@ -22,10 +22,10 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CR
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.*;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.anEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.anCaseEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventTriggerBuilder.anEventTrigger;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.aCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.aCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewTriggerBuilder.aViewTrigger;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageBuilder.aWizardPage;
@@ -52,7 +52,7 @@ class AccessControlServiceFilterTest {
     @Test
     @DisplayName("Should filter caseFields if CREATE ACL is missing for some fields")
     void filterCaseFieldsUserHasAccess() {
-        final CaseType caseType = aCaseType()
+        final CaseType caseType = newCaseType()
             .withField(aCaseField()
                 .withId("Name")
                 .withAcl(anAcl()
@@ -103,7 +103,7 @@ class AccessControlServiceFilterTest {
     @Test
     @DisplayName("Should filter all caseFields if CREATE ACL is missing")
     void filterCaseFieldsUserHasNoAccess() {
-        final CaseType caseType = aCaseType()
+        final CaseType caseType = newCaseType()
             .withField(aCaseField()
                 .withId("Name")
                 .withAcl(anAcl()
@@ -152,7 +152,7 @@ class AccessControlServiceFilterTest {
     @Test
     @DisplayName("Should filter caseFields definition is missing for those fields")
     void filterCaseFieldsWithNoDefinition() {
-        final CaseType caseType = aCaseType()
+        final CaseType caseType = newCaseType()
             .withField(aCaseField()
                 .withId("Surname")
                 .withAcl(anAcl()
@@ -195,25 +195,25 @@ class AccessControlServiceFilterTest {
     @Test
     @DisplayName("Should not change view trigger when all has required ACL")
     void doNotFilterCaseViewTriggersWhenACLsMatch() {
-        final CaseEvent EVENT_1 = anEvent()
+        final CaseEvent event1 = anCaseEvent()
             .withId(EVENT_ID_1)
             .withAcl(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withCreate(true)
                 .build()).build();
-        final CaseEvent EVENT_2 = anEvent()
+        final CaseEvent event2 = anCaseEvent()
             .withId(EVENT_ID_2)
             .withAcl(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withCreate(true)
                 .build()).build();
-        final CaseEvent EVENT_3 = anEvent()
+        final CaseEvent event3 = anCaseEvent()
             .withId(EVENT_ID_3)
             .withAcl(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withCreate(true)
                 .build()).build();
-        final List<CaseEvent> caseEventDefinitions = Arrays.asList(EVENT_1, EVENT_2, EVENT_3);
+        final List<CaseEvent> caseEventDefinitions = Arrays.asList(event1, event2, event3);
 
         final CaseViewTrigger[] filteredTriggers = accessControlService.filterCaseViewTriggersByCreateAccess(this
             .caseViewTriggers, caseEventDefinitions, USER_ROLES);
@@ -223,25 +223,25 @@ class AccessControlServiceFilterTest {
     @Test
     @DisplayName("Should filter view triggers according to the ACLs")
     void filterCaseViewTriggersWhenCreateACLIsMissing() {
-        final CaseEvent EVENT_1 = anEvent()
+        final CaseEvent event1 = anCaseEvent()
             .withId(EVENT_ID_1)
             .withAcl(anAcl()
                 .withRole(ROLE_NOT_IN_USER_ROLES)
                 .withCreate(true)
                 .build()).build();
-        final CaseEvent EVENT_2 = anEvent()
+        final CaseEvent event2 = anCaseEvent()
             .withId(EVENT_ID_2)
             .withAcl(anAcl()
                 .withRole(ROLE_NOT_IN_USER_ROLES_2)
                 .withCreate(true)
                 .build()).build();
-        final CaseEvent EVENT_3 = anEvent()
+        final CaseEvent event3 = anCaseEvent()
             .withId(EVENT_ID_3)
             .withAcl(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withCreate(true)
                 .build()).build();
-        final List<CaseEvent> caseEventDefinitions = Arrays.asList(EVENT_1, EVENT_2, EVENT_3);
+        final List<CaseEvent> caseEventDefinitions = Arrays.asList(event1, event2, event3);
 
         final CaseViewTrigger[] filteredTriggers = accessControlService.filterCaseViewTriggersByCreateAccess(this
             .caseViewTriggers, caseEventDefinitions, USER_ROLES);
