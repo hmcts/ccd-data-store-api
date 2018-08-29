@@ -92,7 +92,7 @@ variable "frontend_url" {
   default = ""
 }
 
-variable "search_blacklist" {
+variable "elastic_search_blacklist" {
   description = "Forbidden elastic search query types"
   type = "string"
   default = "query_string"
