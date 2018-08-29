@@ -70,6 +70,12 @@ public class ApplicationParams {
     @Value("#{'${search.blacklist}'.split(',')}")
     private List<String> searchBlackList;
 
+    @Value("${search.cases.index.name.format}")
+    private String casesIndexNameFormat;
+
+    @Value("${search.cases.index.name.type}")
+    private String casesIndexType;
+
     private static String encode(final String stringToEncode) {
         try {
             return URLEncoder.encode(stringToEncode, "UTF-8");
@@ -208,5 +214,13 @@ public class ApplicationParams {
 
     public List<String> getElasticSearchHosts() {
         return elasticSearchHosts;
+    }
+
+    public String getCasesIndexNameFormat() {
+        return casesIndexNameFormat;
+    }
+
+    public String getCasesIndexType() {
+        return casesIndexType;
     }
 }

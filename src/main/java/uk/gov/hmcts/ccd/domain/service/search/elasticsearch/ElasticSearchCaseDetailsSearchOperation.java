@@ -12,15 +12,17 @@ import io.searchbox.core.SearchResult;
 import org.jooq.lambda.Unchecked;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.dto.CaseDetailsMapper;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.dto.ElasticSearchCaseDetailsDTO;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.mapper.CaseDetailsMapper;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
 @Service
 public class ElasticSearchCaseDetailsSearchOperation implements CaseDetailsSearchOperation {
 
-    private static final String INDEX_TYPE = "case";
+    @Autowired
+    private ApplicationParams applicationParams;
 
     @Autowired
     private JestClient jestClient;
@@ -44,9 +46,10 @@ public class ElasticSearchCaseDetailsSearchOperation implements CaseDetailsSearc
     }
 
     private Search createSearchRequest(String caseTypeId, String query) {
+        String indexName = String.format(applicationParams.getCasesIndexNameFormat(), caseTypeId);
         return new Search.Builder(query)
-                    .addIndex(caseTypeId)
-                    .addType(INDEX_TYPE)
+                    .addIndex(indexName)
+                    .addType(applicationParams.getCasesIndexType())
                     .build();
     }
 

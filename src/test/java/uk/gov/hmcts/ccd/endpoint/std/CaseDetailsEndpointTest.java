@@ -7,8 +7,10 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.AppInsights;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.search.FieldMapSanitizeOperation;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
@@ -21,15 +23,19 @@ import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.ClassifiedGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.search.PaginatedSearchMetaDataOperation;
 import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseDetailsSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.startevent.StartEventOperation;
 import uk.gov.hmcts.ccd.domain.service.stdapi.DocumentsOperation;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -39,6 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.anCaseDataContent;
@@ -93,6 +100,12 @@ class CaseDetailsEndpointTest {
     @Mock
     private AppInsights appInsights;
 
+    @Mock
+    private ApplicationParams applicationParams;
+
+    @Mock
+    private CaseDetailsSearchOperation caseDetailsSearchOperation;
+
     private CaseDetailsEndpoint endpoint;
     private Map<String,String> params = newHashMap();
 
@@ -112,7 +125,9 @@ class CaseDetailsEndpointTest {
                                     validateCaseFieldsOperation,
                                     documentsOperation,
                                     paginatedSearchMetaDataOperation,
-                                    appInsights);
+                                    appInsights,
+                                    applicationParams,
+                                    caseDetailsSearchOperation);
     }
 
     @Nested
@@ -343,6 +358,27 @@ class CaseDetailsEndpointTest {
         assertThat(argument.getValue().getCaseTypeId(), is(CASE_TYPE_ID));
         assertThat(argument.getValue().getJurisdiction(), is(JURISDICTION_ID));
         assertThat(argument.getValue().getState(), is(Optional.of("STATE")));
+    }
+
+    @Test
+    void searchCaseDetailsRejectsBlockedSearchQueries() throws IOException {
+        given(applicationParams.getSearchBlackList()).willReturn(newArrayList("blockedQuery"));
+        String searchRequest = "{\"query\": {\"blockedQuery\": \"blah blah\"}}";
+
+        assertThrows(BadSearchRequest.class,
+                () -> endpoint.searchCases(CASE_TYPE_ID, searchRequest));
+
+        verify(caseDetailsSearchOperation, never()).execute(CASE_TYPE_ID, searchRequest);
+    }
+
+    @Test
+    void searchCaseDetailsInvokesOperation() throws IOException {
+        given(applicationParams.getSearchBlackList()).willReturn(newArrayList("blockedQuery"));
+        String searchRequest = "{\"query\": {\"match\": \"blah blah\"}}";
+
+        endpoint.searchCases(CASE_TYPE_ID, searchRequest);
+
+        verify(caseDetailsSearchOperation).execute(CASE_TYPE_ID, searchRequest);
     }
 
     private Map<String, String> initParams(final String state) {

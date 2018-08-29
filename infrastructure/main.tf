@@ -109,6 +109,8 @@ module "ccd-data-store-api" {
 
     ELASTIC_SEARCH_HOSTS                = "${var.elasticsearch_hosts}"
     SEARCH_BLACKLIST                    = "${var.search_blacklist}"
+    ELASTIC_SEARCH_CASE_INDEX_NAME_FORMAT = "${var.elastic_search_case_index_name_format}"
+    ELASTIC_SEARCH_CASE_INDEX_TYPE      = "${var.elastic_search_case_index_type}"
   }
 
 }
