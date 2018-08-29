@@ -95,7 +95,7 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public static DraftResponseBuilder anDraftResponse() {
+        public static DraftResponseBuilder newDraftResponse() {
             return new DraftResponseBuilder();
         }
 
@@ -187,7 +187,7 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public static CaseDataContentBuilder anCaseDataContent() {
+        public static CaseDataContentBuilder newCaseDataContent() {
             return new CaseDataContentBuilder();
         }
 
@@ -228,7 +228,7 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public static CaseDraftBuilder anCaseDraft() {
+        public static CaseDraftBuilder newCaseDraft() {
             return new CaseDraftBuilder();
         }
 
@@ -336,7 +336,7 @@ public class TestBuildersUtil {
             return caseDetails;
         }
 
-        public static CaseDetailsBuilder anCaseDetails() {
+        public static CaseDetailsBuilder newCaseDetails() {
             return new CaseDetailsBuilder();
         }
     }
@@ -866,7 +866,7 @@ public class TestBuildersUtil {
             this.caseTabCollection = new CaseTabCollection();
         }
 
-        public static CaseTabCollectionBuilder anCaseTabCollection() {
+        public static CaseTabCollectionBuilder newCaseTabCollection() {
             return new CaseTabCollectionBuilder();
         }
 
@@ -910,7 +910,7 @@ public class TestBuildersUtil {
             return (JsonNode node) -> caseData.put(fieldId, node);
         }
 
-        public static CaseDataBuilder anCaseData() {
+        public static CaseDataBuilder newCaseData() {
             return new CaseDataBuilder();
         }
 

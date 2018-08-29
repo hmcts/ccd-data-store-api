@@ -31,7 +31,7 @@ public class CaseDetails implements Cloneable {
     private static final Logger LOG = LoggerFactory.getLogger(CaseDetails.class);
     private static final String LABEL_FIELD_TYPE = "Label";
     private static final String CASE_PAYMENT_HISTORY_VIEWER_FIELD_TYPE = "CasePaymentHistoryViewer";
-    static final String DRAFT_ID = "DRAFT%s";
+    public static final String DRAFT_ID = "DRAFT%s";
 
     private String id;
 

@@ -48,7 +48,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.anCaseDataContent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
 class CaseDetailsEndpointTest {
 
@@ -58,7 +58,7 @@ class CaseDetailsEndpointTest {
     private static final String CASE_ID = "1234qwer5678tyui";
     private static final String EVENT_TRIGGER_ID = "updateEvent";
     private static final Boolean IGNORE_WARNING = Boolean.TRUE;
-    private static final CaseDataContent EVENT_DATA = anCaseDataContent().build();
+    private static final CaseDataContent EVENT_DATA = newCaseDataContent().build();
     private static final Event EVENT = anEvent().build();
     private static final Map<String, JsonNode> DATA = new HashMap<>();
     private static final String TOKEN = "csdcsdcdscsdcsdcsdcd";

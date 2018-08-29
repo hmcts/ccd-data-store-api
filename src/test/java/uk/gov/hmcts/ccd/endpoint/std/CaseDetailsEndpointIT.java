@@ -54,7 +54,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.anCaseDataContent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
 public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -114,7 +114,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         when(uidService.generateUID()).thenReturn(REFERENCE).thenReturn(REFERENCE).thenReturn(REFERENCE);
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
         final JsonNode DATA = mapper.readTree("{}\n");
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(anEvent().build());
         caseDetailsToSave.getEvent().setEventId(TEST_EVENT_ID);
         caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
@@ -146,7 +146,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         when(uidService.generateUID()).thenReturn(REFERENCE).thenReturn(REFERENCE).thenReturn(REFERENCE);
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
         final JsonNode DATA = mapper.readTree("{}\n");
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(anEvent().build());
         caseDetailsToSave.getEvent().setEventId(TEST_EVENT_ID);
         caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
@@ -178,7 +178,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         when(uidService.generateUID()).thenReturn(REFERENCE).thenReturn(REFERENCE).thenReturn(REFERENCE_2);
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
         final JsonNode DATA = mapper.readTree("{}\n");
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(anEvent().build());
         caseDetailsToSave.getEvent().setEventId(TEST_EVENT_ID);
         caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
@@ -210,7 +210,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         when(uidService.generateUID()).thenReturn(REFERENCE).thenReturn(REFERENCE).thenReturn(REFERENCE_2);
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
         final JsonNode DATA = mapper.readTree("{}\n");
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(anEvent().build());
         caseDetailsToSave.getEvent().setEventId(TEST_EVENT_ID);
         caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
@@ -269,7 +269,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "}\n" +
             "}\n"
         );
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(anEvent().build());
         caseDetailsToSave.getEvent().setEventId(TEST_EVENT_ID);
         Map data = mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
@@ -368,7 +368,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "}\n"
             + "}\n"
         );
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event triggeringEvent = anEvent().build();
         triggeringEvent.setEventId(TEST_EVENT_ID);
         triggeringEvent.setDescription(LONG_COMMENT);
@@ -453,7 +453,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "}\n"
         );
 
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(anEvent().build());
         caseDetailsToSave.getEvent().setEventId(TEST_EVENT_ID);
         Map data = mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
@@ -493,7 +493,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\"}"
             + "}\n"
         );
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event triggeringEvent = anEvent().build();
         triggeringEvent.setEventId(TEST_EVENT_ID);
         triggeringEvent.setDescription(LONG_COMMENT);
@@ -532,7 +532,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "}\n"
         );
 
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(anEvent().build());
         caseDetailsToSave.getEvent().setEventId(TEST_EVENT_ID);
         Map data = mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
@@ -572,7 +572,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "\"document_url\": \"http://incorrect_domain:incorrect_port/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\"}" +
             "}\n"
         );
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event triggeringEvent = anEvent().build();
         triggeringEvent.setEventId(TEST_EVENT_ID);
         triggeringEvent.setDescription(LONG_COMMENT);
@@ -601,7 +601,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
 
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event triggeringEvent = anEvent().build();
         triggeringEvent.setEventId(TEST_EVENT_ID);
         triggeringEvent.setDescription(DESCRIPTION);
@@ -654,7 +654,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
 
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event triggeringEvent = anEvent().build();
         triggeringEvent.setEventId(TEST_EVENT_ID);
         triggeringEvent.setDescription(DESCRIPTION);
@@ -752,7 +752,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     public void shouldReturn404WhenPostCreateCaseWithNoEventForCaseworker() throws Exception {
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
 
         mockMvc.perform(post(URL)
@@ -771,7 +771,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     public void shouldReturn404WhenPostCreateCaseWithNoEventForCitizen() throws Exception {
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
 
         mockMvc.perform(post(URL)
@@ -790,7 +790,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     public void shouldReturn404WhenPostCreateCaseWithNoEventIdForCaseworker() throws Exception {
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
         caseDetailsToSave.setEvent(anEvent().build());
 
@@ -810,7 +810,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     public void shouldReturn404WhenPostCreateCaseWithNoEventIdForCitizen() throws Exception {
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
         caseDetailsToSave.setEvent(anEvent().build());
 
@@ -831,7 +831,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Test
     public void shouldReturn422WhenPostCreateCaseWithInvalidPreStatesForCaseworker() throws Exception {
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(anEvent().build());
         caseDetailsToSave.getEvent().setEventId(PRE_STATES_EVENT_ID);
 
@@ -852,7 +852,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Test
     public void shouldReturn422WhenPostCreateCaseWithInvalidPreStatesForCitizen() throws Exception {
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(anEvent().build());
         caseDetailsToSave.getEvent().setEventId(PRE_STATES_EVENT_ID);
 
@@ -873,7 +873,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Test
     public void shouldReturn404WhenPostCreateCaseWithUnknownEventForCaseworker() throws Exception {
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(anEvent().build());
         caseDetailsToSave.getEvent().setEventId(FAKE_EVENT_ID);
 
@@ -894,7 +894,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Test
     public void shouldReturn404WhenPostCreateCaseWithUnknownEventForCitizen() throws Exception {
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         caseDetailsToSave.setEvent(anEvent().build());
         caseDetailsToSave.getEvent().setEventId(FAKE_EVENT_ID);
 
@@ -1176,7 +1176,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(SUMMARY);
@@ -1261,7 +1261,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(SUMMARY);
@@ -1372,7 +1372,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String description = "Case event description";
         final String url = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + urlPortionForCaseType
             + "/cases/" + caseReference + "/events";
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(TEST_EVENT_ID);
         event.setSummary(summary);
@@ -1445,7 +1445,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String description = "Case event description";
         final String url = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + urlPortionForCaseType
             + "/cases/" + caseReference + "/events";
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(TEST_EVENT_ID);
         event.setSummary(summary);
@@ -1518,7 +1518,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String description = "Case event description";
         final String url = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + caseTypeUrlPortion
             + "/cases/" + caseReference + "/events";
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(TEST_EVENT_ID);
         event.setSummary(summary);
@@ -1592,7 +1592,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String description = "Case event description";
         final String url = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + caseTypeUrlPortion
             + "/cases/" + caseReference + "/events";
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(TEST_EVENT_ID);
         event.setSummary(summary);
@@ -1746,7 +1746,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String CASE_REFERENCE = "1504259907353545";
         final String DESCRIPTION = "Case event description";
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(null);
@@ -1786,7 +1786,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String CASE_REFERENCE = "1504259907353545";
         final String DESCRIPTION = "Case event description";
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(null);
@@ -1827,7 +1827,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "        ";
         final String DESCRIPTION = "Case event summary";
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(SUMMARY);
@@ -1865,7 +1865,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "        ";
         final String DESCRIPTION = "Case event summary";
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(SUMMARY);
@@ -1903,7 +1903,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = new String(new char[1025]).replace("\0", "-");
         final String DESCRIPTION = "Case event description";
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(SUMMARY);
@@ -1944,7 +1944,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = new String(new char[1025]).replace("\0", "-");
         final String DESCRIPTION = "Case event description";
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(SUMMARY);
@@ -1985,7 +1985,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "Valid summary";
         final String DESCRIPTION = new String(new char[65666]).replace("\0", "-");
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(SUMMARY);
@@ -2026,7 +2026,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "Valid summary";
         final String DESCRIPTION = new String(new char[65666]).replace("\0", "-");
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(SUMMARY);
@@ -2067,7 +2067,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(null);
         event.setSummary(SUMMARY);
@@ -2108,7 +2108,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(null);
         event.setSummary(SUMMARY);
@@ -2147,7 +2147,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     public void shouldReturn404WhenPostCreateCaseEventWithNoEventForCaseWorker() throws Exception {
         final String CASE_REFERENCE = "1504259907353545";
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
 
         final String token = generateEventToken(template, UID, JURISDICTION, CASE_TYPE, CASE_REFERENCE, "ANY_EVENT");
         caseDetailsToSave.setToken(token);
@@ -2180,7 +2180,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     public void shouldReturn404WhenPostCreateCaseEventWithNoEventForCitizen() throws Exception {
         final String CASE_REFERENCE = "1504259907353545";
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
 
         final String token = generateEventToken(template, UID, JURISDICTION, CASE_TYPE, CASE_REFERENCE, "ANY_EVENT");
         caseDetailsToSave.setToken(token);
@@ -2215,7 +2215,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(SUMMARY);
@@ -2245,7 +2245,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(SUMMARY);
@@ -2276,7 +2276,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(EVENT);
         event.setSummary(SUMMARY);
@@ -2306,7 +2306,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(EVENT);
         event.setSummary(SUMMARY);
@@ -2335,7 +2335,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(SUMMARY);
@@ -2393,7 +2393,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(SUMMARY);
@@ -2451,7 +2451,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(SUMMARY);
@@ -2483,7 +2483,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(SUMMARY);
@@ -2515,7 +2515,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(SUMMARY);
@@ -2547,7 +2547,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(SUMMARY);
@@ -2660,7 +2660,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_CREATE_FIELD_ACCESS + "/cases";
 
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event triggeringEvent = anEvent().build();
         triggeringEvent.setEventId(TEST_EVENT_ID);
         triggeringEvent.setDescription(DESCRIPTION);
@@ -2691,7 +2691,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private void shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccess(String role) throws Exception {
         final String URL = "/" + role + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_CREATE_CASE_ACCESS + "/cases";
 
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
 
 
         mockMvc.perform(post(URL)
@@ -2707,7 +2707,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_READ_FIELD_ACCESS + "/cases";
 
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event triggeringEvent = anEvent().build();
         triggeringEvent.setEventId(CREATE_EVENT_ID);
         triggeringEvent.setDescription(DESCRIPTION);
@@ -2767,7 +2767,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         final String URL = "/" + role + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_CREATE_EVENT_ACCESS + "/cases";
 
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event triggeringEvent = anEvent().build();
         triggeringEvent.setEventId(TEST_EVENT_ID);
         triggeringEvent.setDescription(DESCRIPTION);
@@ -2788,7 +2788,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         final String URL = "/" + role + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_READ_CASE_TYPE_ACCESS + "/cases";
 
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event triggeringEvent = anEvent().build();
         triggeringEvent.setEventId(CREATE_EVENT_ID);
         triggeringEvent.setDescription(DESCRIPTION);
@@ -2826,7 +2826,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String description = "Case event description";
         final String url = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_READ_CASE_TYPE_ACCESS
             + "/cases/" + caseReference + "/events";
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(TEST_EVENT_ID);
         event.setSummary(summary);
@@ -2863,7 +2863,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String description = "Case event description";
         final String url = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_READ_FIELD_ACCESS
             + "/cases/" + caseReference + "/events";
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(TEST_EVENT_ID);
         event.setSummary(summary);
@@ -2923,7 +2923,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String summary = "Case event summary";
         final String description = "Case event description";
 
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(TEST_EVENT_ID);
         event.setSummary(summary);
@@ -2957,7 +2957,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String summary = "Case event summary";
         final String description = "Case event description";
 
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(TEST_EVENT_ID);
         event.setSummary(summary);
@@ -3062,7 +3062,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String summary = "Case event summary";
         final String description = "Case event description";
 
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(TEST_EVENT_ID);
         event.setSummary(summary);
@@ -3096,7 +3096,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String summary = "Case event summary";
         final String description = "Case event description";
 
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(TEST_EVENT_ID);
         event.setSummary(summary);
@@ -3186,7 +3186,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
         final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(SUMMARY);
@@ -3292,7 +3292,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
         final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(SUMMARY);
@@ -3373,7 +3373,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String DESCRIPTION = "A very long comment.......";
         final String SUMMARY = "Short comment";
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/validate";
-        final CaseDataContent caseDetailsToValidate = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToValidate = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(TEST_EVENT_ID);
         event.setSummary(SUMMARY);
@@ -3412,7 +3412,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String DESCRIPTION = "A very long comment.......";
         final String SUMMARY = "Short comment";
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/validate";
-        final CaseDataContent caseDetailsToValidate = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToValidate = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(TEST_EVENT_ID);
         event.setSummary(SUMMARY);
@@ -3454,7 +3454,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String DESCRIPTION = "A very long comment.......";
         final String SUMMARY = "Short comment";
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/validate";
-        final CaseDataContent caseDetailsToValidate = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToValidate = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(TEST_EVENT_ID);
         event.setSummary(SUMMARY);
@@ -3493,7 +3493,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String DESCRIPTION = "A very long comment.......";
         final String SUMMARY = "Short comment";
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/validate";
-        final CaseDataContent caseDetailsToValidate = anCaseDataContent().build();
+        final CaseDataContent caseDetailsToValidate = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(TEST_EVENT_ID);
         event.setSummary(SUMMARY);

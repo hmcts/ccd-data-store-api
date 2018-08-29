@@ -15,10 +15,10 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataBuilder.anCaseData;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.anCaseDataContent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.anCaseDraft;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.anDraftResponse;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataBuilder.newCaseData;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.newCaseDraft;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.newDraftResponse;
 
 class DraftResponseToCaseDetailsBuilderTest {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
@@ -26,10 +26,10 @@ class DraftResponseToCaseDetailsBuilderTest {
     private static final String FULL_DRAFT_ID = "DRAFT1";
     private static final SecurityClassification SECURITY_CLASSIFICATION = SecurityClassification.PRIVATE;
     private static final String SECURITY_CLASSIFICATION_STRING = SECURITY_CLASSIFICATION.name();
-    private static final Map<String, JsonNode> DATA = anCaseData()
+    private static final Map<String, JsonNode> DATA = newCaseData()
         .withPair("testDataKey", JSON_NODE_FACTORY.textNode("testDataValue"))
         .build();
-    private static final Map<String, JsonNode> DATA_CLASSIFICATION = anCaseData()
+    private static final Map<String, JsonNode> DATA_CLASSIFICATION = newCaseData()
         .withPair("testClassificationKey", JSON_NODE_FACTORY.textNode("testClassificationValue"))
         .build();
     private static final String TOKEN = "testToken";
@@ -44,17 +44,17 @@ class DraftResponseToCaseDetailsBuilderTest {
     private static final String USER_ID = "USER_ID";
     private static final String TYPE = "CaseDataContent";
 
-    private final DraftResponse draftResponse = anDraftResponse()
+    private final DraftResponse draftResponse = newDraftResponse()
         .withId(DRAFT_ID)
         .withCreated(CREATED)
         .withUpdated(UPDATED)
         .withType(TYPE)
-        .withDocument(anCaseDraft()
+        .withDocument(newCaseDraft()
                           .withEventTriggerId(EVENT_TRIGGER_ID)
                           .withCaseTypeId(CASE_TYPE_ID)
                           .withJurisdictionId(JURISDICTION_ID)
                           .withUserId(USER_ID)
-                          .withCaseDataContent(anCaseDataContent()
+                          .withCaseDataContent(newCaseDataContent()
                                                    .withToken(TOKEN)
                                                    .withSecurityClassification(SECURITY_CLASSIFICATION_STRING)
                                                    .withDataClassification(DATA_CLASSIFICATION)
@@ -72,7 +72,7 @@ class DraftResponseToCaseDetailsBuilderTest {
     private final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder = new DraftResponseToCaseDetailsBuilder();
 
     @Test
-    void shouldBuildCaseDetailsFromDraftResponse() {
+    public void shouldBuildCaseDetailsFromDraftResponse() {
         CaseDetails caseDetails = draftResponseToCaseDetailsBuilder.build(draftResponse);
 
         assertAll(

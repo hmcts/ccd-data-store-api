@@ -25,12 +25,12 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetCaseViewFromDraftOperation.DELETE;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataBuilder.anCaseData;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.anCaseDataContent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.anCaseDetails;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.anCaseDraft;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTabCollectionBuilder.anCaseTabCollection;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.anDraftResponse;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataBuilder.newCaseData;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.newCaseDraft;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTabCollectionBuilder.newCaseTabCollection;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.newDraftResponse;
 
 class DefaultGetCaseViewFromDraftOperationTest {
 
@@ -63,8 +63,6 @@ class DefaultGetCaseViewFromDraftOperationTest {
 
     private GetCaseViewOperation getDraftViewOperation;
 
-    private CaseTabCollection caseTabCollection;
-    private CaseType caseType;
     private DraftResponse draftResponse;
     private CaseDetails caseDetails;
     private Map<String, JsonNode> data;
@@ -75,16 +73,16 @@ class DefaultGetCaseViewFromDraftOperationTest {
 
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime then = LocalDateTime.now();
-        data = anCaseData()
+        data = newCaseData()
             .withPair("dataTestField1", JSON_NODE_FACTORY.textNode("dataTestField1"))
             .withPair("dataTestField2", JSON_NODE_FACTORY.textNode("dataTestField2"))
             .build();
-        draftResponse = anDraftResponse()
+        draftResponse = newDraftResponse()
             .withId(DRAFT_ID)
-            .withDocument(anCaseDraft()
+            .withDocument(newCaseDraft()
                               .withCaseTypeId(CASE_TYPE_ID)
                               .withEventTriggerId(EVENT_TRIGGER_ID)
-                              .withCaseDataContent(anCaseDataContent()
+                              .withCaseDataContent(newCaseDataContent()
                                                        .withData(data)
                                                        .withEvent(anEvent()
                                                                       .withEventId(EVENT_TRIGGER_ID)
@@ -98,7 +96,7 @@ class DefaultGetCaseViewFromDraftOperationTest {
 
 
         doReturn(draftResponse).when(draftGateway).get(DRAFT_ID);
-        caseDetails = anCaseDetails()
+        caseDetails = newCaseDetails()
             .withCaseTypeId(CASE_TYPE_ID)
             .withJurisdiction(JURISDICTION_ID)
             .withId(DRAFT_ID_FOR_UI)
@@ -106,7 +104,7 @@ class DefaultGetCaseViewFromDraftOperationTest {
             .build();
         doReturn(caseDetails).when(draftResponseToCaseDetailsBuilder).build(draftResponse);
 
-        CaseTabCollection caseTabCollection = anCaseTabCollection().withFieldIds("dataTestField1", "dataTestField2")
+        CaseTabCollection caseTabCollection = newCaseTabCollection().withFieldIds("dataTestField1", "dataTestField2")
             .build();
         doReturn(caseTabCollection).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
 

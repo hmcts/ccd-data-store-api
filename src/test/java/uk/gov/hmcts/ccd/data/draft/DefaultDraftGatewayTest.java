@@ -39,8 +39,8 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.anCaseDataContent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.anCaseDraft;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.newCaseDraft;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CreateCaseDraftBuilder.aCreateCaseDraft;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftBuilder.anDraft;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.UpdateCaseDraftBuilder.anUpdateCaseDraft;
@@ -106,7 +106,7 @@ class DefaultDraftGatewayTest {
         data.put(KEY, VALUE);
         dataClassification.put(KEY_CLASS, VALUE_CLASS);
 
-        caseDataContent = anCaseDataContent()
+        caseDataContent = newCaseDataContent()
             .withData(data)
             .withEvent(event)
             .withIgnoreWarning(true)
@@ -114,7 +114,7 @@ class DefaultDraftGatewayTest {
             .withSecurityClassification(securityClassification)
             .withToken(TOKEN)
             .build();
-        caseDraft = anCaseDraft()
+        caseDraft = newCaseDraft()
             .withUserId(UID)
             .withJurisdictionId(JID)
             .withCaseTypeId(CTID)
