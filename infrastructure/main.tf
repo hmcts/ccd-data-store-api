@@ -23,15 +23,14 @@ locals {
   dm_valid_domain = "${var.document_management_valid_domain != "" ? var.document_management_valid_domain : local.default_dm_valid_domain}"
 
   // Vault name
-  previewVaultName = "${var.raw_product}-shared-aat"
-  nonPreviewVaultName = "${var.raw_product}-shared-${var.env}"
+  previewVaultName = "${var.product}-data-store"
+  nonPreviewVaultName = "ccd-data-store-${var.env}"
   vaultName = "${(var.env == "preview" || var.env == "spreview") ? local.previewVaultName : local.nonPreviewVaultName}"
 
-  // Old vault info to be removed
-  oldPreviewVaultName = "${var.product}-data-store"
-  oldNonPreviewVaultName = "ccd-data-store-${var.env}"
-  oldVaultName = "${(var.env == "preview" || var.env == "spreview") ? local.oldPreviewVaultName : local.oldNonPreviewVaultName}"
-
+  // Vault URI
+  previewVaultUri = "https://ccd-data-store-aat.vault.azure.net/"
+  nonPreviewVaultUri = "${module.ccd-data-store-vault.key_vault_uri}"
+  vaultUri = "${(var.env == "preview" || var.env == "spreview") ? local.previewVaultUri : local.nonPreviewVaultUri}"
 
   // S2S
   s2s_url = "http://rpe-service-auth-provider-${local.env_ase_url}"
@@ -41,11 +40,6 @@ locals {
   oauth2_redirect_uri = "${var.frontend_url != "" ? local.custom_redirect_uri : local.default_redirect_uri}"
 
   draftStoreUrl = "http://draft-store-service-${local.local_env}.service.${local.local_ase}.internal"
-}
-
-data "azurerm_key_vault" "ccd_shared_key_vault" {
-  name = "${local.vaultName}"
-  resource_group_name = "${local.vaultName}"
 }
 
 data "vault_generic_secret" "ccd_data_s2s_key" {
@@ -125,7 +119,7 @@ module "data-store-db" {
 
 module "ccd-data-store-vault" {
   source              = "git@github.com:hmcts/moj-module-key-vault?ref=master"
-  name                = "${local.oldVaultName}" // Max 24 characters
+  name                = "${local.vaultName}" // Max 24 characters
   product             = "${var.product}"
   env                 = "${var.env}"
   tenant_id           = "${var.tenant_id}"
