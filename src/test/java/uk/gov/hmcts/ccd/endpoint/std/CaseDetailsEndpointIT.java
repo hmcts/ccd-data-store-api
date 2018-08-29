@@ -13,7 +13,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -4032,21 +4031,21 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Test
     public void testSearchCaseDetailsFromElasticSearch() throws Exception {
 
-        String caseDetailElastic = "{\n" +
-                                    "\"reference\": 1535450291607660,\n" +
-                                    "\"last_modified\": \"2018-08-28T09:58:11.643Z\",\n" +
-                                    "\"state\": \"TODO\",\n" +
-                                    "\"@version\": \"1\",\n" +
-                                    "\"data_classification\": {},\n" +
-                                    "\"id\": 18,\n" +
-                                    "\"security_classification\": \"PUBLIC\",\n" +
-                                    "\"jurisdiction\": \"AUTOTEST1\",\n" +
-                                    "\"@timestamp\": \"2018-08-28T09:58:13.044Z\",\n" +
-                                    "\"data\": {},\n" +
-                                    "\"created_date\": \"2018-08-28T09:58:11.627Z\",\n" +
-                                    "\"index_id\": \"autotest1_aat_cases\",\n" +
-                                    "\"case_type_id\": \"AAT\"\n" +
-                                    "}";
+        String caseDetailElastic = "{\n"
+                                    + "\"reference\": 1535450291607660,\n"
+                                    + "\"last_modified\": \"2018-08-28T09:58:11.643Z\",\n"
+                                    + "\"state\": \"TODO\",\n"
+                                    + "\"@version\": \"1\",\n"
+                                    + "\"data_classification\": {},\n"
+                                    + "\"id\": 18,\n"
+                                    + "\"security_classification\": \"PUBLIC\",\n"
+                                    + "\"jurisdiction\": \"AUTOTEST1\",\n"
+                                    + "\"@timestamp\": \"2018-08-28T09:58:13.044Z\",\n"
+                                    + "\"data\": {},\n"
+                                    + "\"created_date\": \"2018-08-28T09:58:11.627Z\",\n"
+                                    + "\"index_id\": \"autotest1_aat_cases\",\n"
+                                    + "\"case_type_id\": \"AAT\"\n"
+                                    + "}";
 
         SearchResult searchResult = mock(SearchResult.class);
         when(searchResult.isSucceeded()).thenReturn(true);

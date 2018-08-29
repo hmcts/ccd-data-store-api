@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -531,14 +533,31 @@ public class CaseDetailsEndpoint {
         return metadata;
     }
 
-    private void validateSearchRequest(String searchRequest) {
-        List<String> blackListedQueries = applicationParams.getSearchBlackList();
-        Optional<String> blackListedQueryOpt = blackListedQueries.stream().filter(blacklisted ->
-                searchRequest.contains(blacklisted)
-        ).findFirst();
+    private void validateSearchRequest(String searchRequest) throws IOException {
+        validateSearchRequestContainsQuery(searchRequest);
+        rejectBlackListedQuery(searchRequest);
+    }
 
-        blackListedQueryOpt.ifPresent(blacklisted -> {
-            throw new BadSearchRequest(String.format("Query of type '%s' is not allowed", blacklisted));
+    private Optional<Map> getQuery(String searchRequest) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        final Map<String, Object> map = mapper.readValue(searchRequest, new TypeReference<Map<String, Object>>(){});
+        return Optional.ofNullable((Map) map.get("query"));
+    }
+
+    private void validateSearchRequestContainsQuery(String searchRequest) throws IOException {
+        getQuery(searchRequest).orElseThrow(() -> new BadSearchRequest("missing required 'query' field"));
+    }
+
+    private void rejectBlackListedQuery(String searchRequest) throws IOException {
+        getQuery(searchRequest).ifPresent((query) -> {
+            List<String> blackListedQueries = applicationParams.getSearchBlackList();
+            Optional<String> blackListedQueryOpt = blackListedQueries.stream().filter(blacklisted ->
+                    query.get(blacklisted) != null
+            ).findFirst();
+
+            blackListedQueryOpt.ifPresent(blacklisted -> {
+                throw new BadSearchRequest(String.format("Query of type '%s' is not allowed", blacklisted));
+            });
         });
     }
 }

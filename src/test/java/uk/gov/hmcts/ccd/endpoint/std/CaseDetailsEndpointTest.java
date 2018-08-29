@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.AppInsights;
 import uk.gov.hmcts.ccd.ApplicationParams;
@@ -361,14 +360,46 @@ class CaseDetailsEndpointTest {
     }
 
     @Test
-    void searchCaseDetailsRejectsBlockedSearchQueries() throws IOException {
-        given(applicationParams.getSearchBlackList()).willReturn(newArrayList("blockedQuery"));
-        String searchRequest = "{\"query\": {\"blockedQuery\": \"blah blah\"}}";
+    void searchCaseDetailsThrowsExceptionWhenNoQueryProvided() throws IOException {
+        String searchRequest = "{\n"
+                + "\"from\" : 0,\n"
+                + "\"size\" : 3\n"
+                + "}";
+        given(applicationParams.getSearchBlackList()).willReturn(newArrayList("query_string"));
 
         assertThrows(BadSearchRequest.class,
                 () -> endpoint.searchCases(CASE_TYPE_ID, searchRequest));
 
         verify(caseDetailsSearchOperation, never()).execute(CASE_TYPE_ID, searchRequest);
+    }
+
+    @Test
+    void searchCaseDetailsRejectsBlacklistedSearchQueries() throws IOException {
+        String searchRequest = "{\n"
+                + "  \"query\": {\n"
+                + "    \"query_string\" : {\"query\": \"\"}\n"
+                + "    }\n"
+                + "}";
+        given(applicationParams.getSearchBlackList()).willReturn(newArrayList("query_string"));
+
+        assertThrows(BadSearchRequest.class,
+                () -> endpoint.searchCases(CASE_TYPE_ID, searchRequest));
+
+        verify(caseDetailsSearchOperation, never()).execute(CASE_TYPE_ID, searchRequest);
+    }
+
+    @Test
+    void searchCaseDetailsAllowsQueriesNotBlacklisted() throws IOException {
+        String query = "{\n"
+                + "  \"query\": {\n"
+                + "    \"simple_query_string\" : {\"query\": \"\"}\n"
+                + "    }\n"
+                + "}";
+        given(applicationParams.getSearchBlackList()).willReturn(newArrayList("query_string"));
+
+        endpoint.searchCases(CASE_TYPE_ID, query);
+
+        verify(caseDetailsSearchOperation).execute(CASE_TYPE_ID, query);
     }
 
     @Test
