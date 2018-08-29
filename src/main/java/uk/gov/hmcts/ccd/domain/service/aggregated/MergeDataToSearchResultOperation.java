@@ -10,7 +10,6 @@ import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.ws.rs.HEAD;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -19,7 +18,6 @@ import java.util.stream.Collectors;
 
 import static com.fasterxml.jackson.databind.node.JsonNodeFactory.instance;
 import static uk.gov.hmcts.ccd.domain.model.definition.CaseDetails.LABEL_FIELD_TYPE;
-import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WORKBASKET;
 
 @Named
 @Singleton
