@@ -547,7 +547,7 @@ public class CaseDetailsEndpoint {
 
     private void validateSearchRequestContainsQuery(String searchRequest) throws IOException {
         if(!getQuery(searchRequest).isPresent()) {
-           throw new BadSearchRequest("missing required field 'query'");
+            throw new BadSearchRequest("missing required field 'query'");
         }
     }
 
