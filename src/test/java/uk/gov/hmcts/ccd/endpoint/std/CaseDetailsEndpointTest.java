@@ -375,7 +375,7 @@ class CaseDetailsEndpointTest {
         given(applicationParams.getSearchBlackList()).willReturn(newArrayList("query_string"));
 
         assertThrows(BadSearchRequest.class,
-                () -> endpoint.searchCases(CASE_TYPES_ID, searchRequest));
+            () -> endpoint.searchCases(CASE_TYPES_ID, searchRequest));
 
         verify(caseDetailsSearchOperation, never()).execute(CASE_TYPES_ID, searchRequest);
     }

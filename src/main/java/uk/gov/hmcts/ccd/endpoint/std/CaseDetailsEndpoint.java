@@ -446,6 +446,20 @@ public class CaseDetailsEndpoint {
         return searchOperation.execute(metadata, sanitizedParams);
     }
 
+    @RequestMapping(value = "/searchCases", method = RequestMethod.POST)
+    @ApiOperation("Search case data according to the given ElasticSearch query")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "List of case data for the given search query")
+    })
+    public CaseDetailsSearchResult searchCases(
+            @ApiParam(value = "Case type ID", required = true)
+            @RequestParam("ctid") List<String> caseTypesId,
+            @RequestBody String request) throws IOException {
+
+        validateSearchRequest(request);
+        return caseDetailsSearchOperation.execute(caseTypesId, request);
+    }
+
     @Transactional
     @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/pagination_metadata", method = RequestMethod.GET)
     @ApiOperation(value = "Get the pagination metadata for a case data search")
@@ -466,20 +480,6 @@ public class CaseDetailsEndpoint {
                                                                   @PathVariable("ctid") final String caseTypeId,
                                                                   @RequestParam Map<String, String> queryParameters) {
         return searchMetadata(jurisdictionId, caseTypeId, queryParameters);
-    }
-
-    @RequestMapping(value = "/searchCases", method = RequestMethod.POST)
-    @ApiOperation("Search case data according to the given ElasticSearch query")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "List of case data for the given search query")
-    })
-    public CaseDetailsSearchResult searchCases(
-            @ApiParam(value = "Case type ID", required = true)
-            @RequestParam("ctid") List<String> caseTypesId,
-            @RequestBody String request) throws IOException {
-
-        validateSearchRequest(request);
-        return caseDetailsSearchOperation.execute(caseTypesId, request);
     }
 
     private PaginatedSearchMetadata searchMetadata(final String jurisdictionId,

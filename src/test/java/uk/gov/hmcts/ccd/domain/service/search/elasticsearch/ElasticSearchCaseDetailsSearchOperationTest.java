@@ -1,19 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang3.StringUtils.*;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.io.IOException;
-import java.util.List;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.searchbox.client.JestClient;
 import io.searchbox.core.Search;
@@ -31,6 +17,20 @@ import uk.gov.hmcts.ccd.domain.model.search.CaseDetailsSearchResult;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.dto.ElasticSearchCaseDetailsDTO;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.mapper.CaseDetailsMapper;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
+
+import java.io.IOException;
+import java.util.List;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.StringUtils.join;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ElasticSearchCaseDetailsSearchOperationTest {
@@ -62,7 +62,7 @@ public class ElasticSearchCaseDetailsSearchOperationTest {
     private CaseDetails caseDetails;
 
     @Before
-    public void setup() {
+    public void setUp() {
         when(applicationParams.getCasesIndexNameFormat()).thenReturn(INDEX_NAME_FORMAT);
         when(applicationParams.getCasesIndexType()).thenReturn(INDEX_TYPE);
     }
@@ -81,12 +81,12 @@ public class ElasticSearchCaseDetailsSearchOperationTest {
 
         CaseDetailsSearchResult caseDetailsSearchResult = searchOperation.execute(CASE_TYPES_ID, "{query}");
 
+        assertThat(caseDetailsSearchResult.getCaseDetails(), equalTo(newArrayList(caseDetails)));
+        assertThat(caseDetailsSearchResult.getTotal(), equalTo(1L));
         verify(jestClient).execute(arg.capture());
         Search searchRequest = arg.getValue();
         assertThat(searchRequest.getIndex(), equalTo(indices(CASE_TYPES_ID)));
         assertThat(searchRequest.getType(), equalTo(INDEX_TYPE));
-        assertThat(caseDetailsSearchResult.getCaseDetails(), equalTo(newArrayList(caseDetails)));
-        assertThat(caseDetailsSearchResult.getTotal(), equalTo(1L));
     }
 
     @Test

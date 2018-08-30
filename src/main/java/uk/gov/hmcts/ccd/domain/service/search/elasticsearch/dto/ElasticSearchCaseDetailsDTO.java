@@ -1,13 +1,13 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.dto;
 
-import java.time.LocalDateTime;
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
+
+import java.time.LocalDateTime;
+import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
