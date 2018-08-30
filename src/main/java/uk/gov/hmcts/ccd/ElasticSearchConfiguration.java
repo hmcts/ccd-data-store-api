@@ -23,7 +23,6 @@ public class ElasticSearchConfiguration {
         Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
         factory.setHttpClientConfig(new HttpClientConfig.Builder(applicationParams.getElasticSearchHosts())
                 .multiThreaded(true).gson(gson).build());
-        JestClient client = factory.getObject();
-        return client;
+        return factory.getObject();
     }
 }

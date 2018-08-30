@@ -13,14 +13,94 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class ElasticSearchCaseDetailsDTO {
 
-    public String id;
-    public String reference;
-    public String jurisdiction;
-    public String caseTypeId;
-    public LocalDateTime createdDate;
-    public LocalDateTime lastModified;
-    public String state;
-    public SecurityClassification securityClassification;
-    public Map<String, JsonNode> data;
-    public Map<String, JsonNode> dataClassification;
+    private String id;
+    private String reference;
+    private String jurisdiction;
+    private String caseTypeId;
+    private LocalDateTime createdDate;
+    private LocalDateTime lastModified;
+    private String state;
+    private SecurityClassification securityClassification;
+    private Map<String, JsonNode> data;
+    private Map<String, JsonNode> dataClassification;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getReference() {
+        return reference;
+    }
+
+    public void setReference(String reference) {
+        this.reference = reference;
+    }
+
+    public String getJurisdiction() {
+        return jurisdiction;
+    }
+
+    public void setJurisdiction(String jurisdiction) {
+        this.jurisdiction = jurisdiction;
+    }
+
+    public String getCaseTypeId() {
+        return caseTypeId;
+    }
+
+    public void setCaseTypeId(String caseTypeId) {
+        this.caseTypeId = caseTypeId;
+    }
+
+    public LocalDateTime getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(LocalDateTime createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public LocalDateTime getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(LocalDateTime lastModified) {
+        this.lastModified = lastModified;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public SecurityClassification getSecurityClassification() {
+        return securityClassification;
+    }
+
+    public void setSecurityClassification(SecurityClassification securityClassification) {
+        this.securityClassification = securityClassification;
+    }
+
+    public Map<String, JsonNode> getData() {
+        return data;
+    }
+
+    public void setData(Map<String, JsonNode> data) {
+        this.data = data;
+    }
+
+    public Map<String, JsonNode> getDataClassification() {
+        return dataClassification;
+    }
+
+    public void setDataClassification(Map<String, JsonNode> dataClassification) {
+        this.dataClassification = dataClassification;
+    }
 }

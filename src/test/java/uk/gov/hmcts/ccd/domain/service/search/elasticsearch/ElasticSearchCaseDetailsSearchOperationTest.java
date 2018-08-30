@@ -82,7 +82,6 @@ public class ElasticSearchCaseDetailsSearchOperationTest {
         CaseDetailsSearchResult caseDetailsSearchResult = searchOperation.execute(CASE_TYPES_ID, "{query}");
 
         verify(jestClient).execute(arg.capture());
-
         Search searchRequest = arg.getValue();
         assertThat(searchRequest.getIndex(), equalTo(indices(CASE_TYPES_ID)));
         assertThat(searchRequest.getType(), equalTo(INDEX_TYPE));
@@ -94,7 +93,6 @@ public class ElasticSearchCaseDetailsSearchOperationTest {
     public void searchShouldReturnBadSearchRequestOnFailure() throws IOException {
         SearchResult searchResult = mock(SearchResult.class);
         when(searchResult.isSucceeded()).thenReturn(false);
-
         when(jestClient.execute(any(Search.class))).thenReturn(searchResult);
 
         assertThrows(BadSearchRequest.class, () -> searchOperation.execute(CASE_TYPES_ID, "{query}"));

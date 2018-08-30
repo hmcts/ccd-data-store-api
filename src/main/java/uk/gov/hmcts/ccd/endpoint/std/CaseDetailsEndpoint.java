@@ -550,7 +550,7 @@ public class CaseDetailsEndpoint {
     }
 
     private void rejectBlackListedQuery(String searchRequest) throws IOException {
-        getQuery(searchRequest).ifPresent((query) -> {
+        getQuery(searchRequest).ifPresent(query -> {
             List<String> blackListedQueries = applicationParams.getSearchBlackList();
             Optional<String> blackListedQueryOpt = blackListedQueries.stream().filter(blacklisted ->
                     query.get(blacklisted) != null

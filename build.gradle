@@ -222,7 +222,10 @@ dependencies {
     // remove me once insights is in
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
 
-    compile 'io.searchbox:jest:6.3.1'
+    //excluding log4j-core which causes a vulnerability issue
+    compile(group: 'io.searchbox', name: 'jest', version: '6.3.1') {
+        exclude group: 'org.apache.logging.log4j', module: 'log4j-core'
+    }
     compile 'org.mapstruct:mapstruct-jdk8:1.2.0.Final'
     apt 'org.mapstruct:mapstruct-processor:1.2.0.Final'
     compile 'org.jooq:jool-java-8:0.9.14'
