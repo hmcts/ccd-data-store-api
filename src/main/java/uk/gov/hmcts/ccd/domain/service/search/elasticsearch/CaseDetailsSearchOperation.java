@@ -7,6 +7,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
 public interface CaseDetailsSearchOperation {
 
-    List<CaseDetails> execute(String caseTypeId, String query) throws IOException;
+    List<CaseDetails> execute(List<String> caseTypesId, String query) throws IOException;
 
 }

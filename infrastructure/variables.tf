@@ -105,7 +105,7 @@ variable "elasticsearch_hosts" {
 variable "elastic_search_case_index_name_format" {
   description = "Format of the elastic search index name for cases"
   type = "string"
-  default = "%s_%s_cases"
+  default = "%s_cases"
 }
 
 variable "elastic_search_case_index_type" {

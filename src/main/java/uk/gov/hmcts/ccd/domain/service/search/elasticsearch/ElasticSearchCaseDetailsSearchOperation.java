@@ -34,9 +34,9 @@ public class ElasticSearchCaseDetailsSearchOperation implements CaseDetailsSearc
     private CaseDetailsMapper caseDetailsMapper;
 
     @Override
-    public List<CaseDetails> execute(String caseTypeId, String query) throws IOException {
+    public List<CaseDetails> execute(List<String> caseTypesId, String query) throws IOException {
 
-        Search search = createSearchRequest(caseTypeId, query);
+        Search search = createSearchRequest(caseTypesId, query);
         SearchResult result = jestClient.execute(search);
         if (result.isSucceeded()) {
             return toCaseDetails(result);
@@ -45,12 +45,17 @@ public class ElasticSearchCaseDetailsSearchOperation implements CaseDetailsSearc
         }
     }
 
-    private Search createSearchRequest(String caseTypeId, String query) {
-        String indexName = String.format(applicationParams.getCasesIndexNameFormat(), caseTypeId);
+    private Search createSearchRequest(List<String> caseTypesId, String query) {
         return new Search.Builder(query)
-                    .addIndex(indexName)
+                    .addIndices(indices(caseTypesId))
                     .addType(applicationParams.getCasesIndexType())
                     .build();
+    }
+
+    private List<String> indices(List<String> caseTypesId) {
+        return caseTypesId.stream().map(caseTypeId ->
+                String.format(applicationParams.getCasesIndexNameFormat(), caseTypeId))
+                .collect(toList());
     }
 
     private List<CaseDetails> toCaseDetails(SearchResult result) {

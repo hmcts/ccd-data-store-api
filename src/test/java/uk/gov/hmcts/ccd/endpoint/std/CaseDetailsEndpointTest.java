@@ -31,6 +31,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -54,6 +55,7 @@ class CaseDetailsEndpointTest {
     private static final String UID = "1231";
     private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_TYPE_ID = "GrantOnly";
+    private static final List<String> CASE_TYPES_ID = newArrayList("GrantOnly");
     private static final String CASE_ID = "1234qwer5678tyui";
     private static final String EVENT_TRIGGER_ID = "updateEvent";
     private static final Boolean IGNORE_WARNING = Boolean.TRUE;
@@ -368,9 +370,9 @@ class CaseDetailsEndpointTest {
         given(applicationParams.getSearchBlackList()).willReturn(newArrayList("query_string"));
 
         assertThrows(BadSearchRequest.class,
-                () -> endpoint.searchCases(CASE_TYPE_ID, searchRequest));
+                () -> endpoint.searchCases(CASE_TYPES_ID, searchRequest));
 
-        verify(caseDetailsSearchOperation, never()).execute(CASE_TYPE_ID, searchRequest);
+        verify(caseDetailsSearchOperation, never()).execute(CASE_TYPES_ID, searchRequest);
     }
 
     @Test
@@ -383,9 +385,9 @@ class CaseDetailsEndpointTest {
         given(applicationParams.getSearchBlackList()).willReturn(newArrayList("query_string"));
 
         assertThrows(BadSearchRequest.class,
-                () -> endpoint.searchCases(CASE_TYPE_ID, searchRequest));
+                () -> endpoint.searchCases(CASE_TYPES_ID, searchRequest));
 
-        verify(caseDetailsSearchOperation, never()).execute(CASE_TYPE_ID, searchRequest);
+        verify(caseDetailsSearchOperation, never()).execute(CASE_TYPES_ID, searchRequest);
     }
 
     @Test
@@ -397,9 +399,9 @@ class CaseDetailsEndpointTest {
                 + "}";
         given(applicationParams.getSearchBlackList()).willReturn(newArrayList("query_string"));
 
-        endpoint.searchCases(CASE_TYPE_ID, query);
+        endpoint.searchCases(CASE_TYPES_ID, query);
 
-        verify(caseDetailsSearchOperation).execute(CASE_TYPE_ID, query);
+        verify(caseDetailsSearchOperation).execute(CASE_TYPES_ID, query);
     }
 
     @Test
@@ -407,9 +409,9 @@ class CaseDetailsEndpointTest {
         given(applicationParams.getSearchBlackList()).willReturn(newArrayList("blockedQuery"));
         String searchRequest = "{\"query\": {\"match\": \"blah blah\"}}";
 
-        endpoint.searchCases(CASE_TYPE_ID, searchRequest);
+        endpoint.searchCases(CASE_TYPES_ID, searchRequest);
 
-        verify(caseDetailsSearchOperation).execute(CASE_TYPE_ID, searchRequest);
+        verify(caseDetailsSearchOperation).execute(CASE_TYPES_ID, searchRequest);
     }
 
     private Map<String, String> initParams(final String state) {

@@ -50,6 +50,7 @@ import javax.transaction.Transactional;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -474,11 +475,11 @@ public class CaseDetailsEndpoint {
     })
     public List<CaseDetails> searchCases(
             @ApiParam(value = "Case type ID", required = true)
-            @RequestParam("ctid") String caseTypeId,
+            @RequestParam("ctid") List<String> caseTypesId,
             @RequestBody String request) throws IOException {
 
         validateSearchRequest(request);
-        return caseDetailsSearchOperation.execute(caseTypeId, request);
+        return caseDetailsSearchOperation.execute(caseTypesId, request);
     }
 
     private PaginatedSearchMetadata searchMetadata(final String jurisdictionId,
@@ -545,7 +546,7 @@ public class CaseDetailsEndpoint {
     }
 
     private void validateSearchRequestContainsQuery(String searchRequest) throws IOException {
-        getQuery(searchRequest).orElseThrow(() -> new BadSearchRequest("missing required 'query' field"));
+        getQuery(searchRequest).orElseThrow(() -> new BadSearchRequest("missing required field 'query'"));
     }
 
     private void rejectBlackListedQuery(String searchRequest) throws IOException {

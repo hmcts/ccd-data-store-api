@@ -4055,7 +4055,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         String searchRequest = "{\"query\": {\"match_all\": {}}}";
         MvcResult result = mockMvc.perform(post(POST_SEARCH_CASES)
                         .contentType(JSON_CONTENT_TYPE)
-                        .param("ctid", "caseTypeId")
+                        .param("ctid", "caseTypeId1")
+                        .param("ctid", "caseTypeId2")
                         .content(searchRequest))
                         .andExpect(status().is(200))
                         .andReturn();
