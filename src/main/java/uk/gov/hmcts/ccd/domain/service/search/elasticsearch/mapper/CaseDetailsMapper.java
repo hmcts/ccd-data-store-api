@@ -10,7 +10,5 @@ import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.dto.ElasticSearchCas
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring")
 public interface CaseDetailsMapper {
 
-    CaseDetails dtoToCaseDetails(ElasticSearchCaseDetailsDTO caseDetailsDTO);
-
     List<CaseDetails> dtosToCaseDetailsList(List<ElasticSearchCaseDetailsDTO> caseDetailsDTOs);
 }

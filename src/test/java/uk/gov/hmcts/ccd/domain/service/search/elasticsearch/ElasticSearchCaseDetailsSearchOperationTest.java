@@ -68,7 +68,7 @@ public class ElasticSearchCaseDetailsSearchOperationTest {
     }
 
     @Test
-    public void searchShouldMapElasticSearchResultSearchResult() throws IOException {
+    public void searchShouldMapElasticSearchResultToSearchResult() throws IOException {
         ArgumentCaptor<Search> arg = ArgumentCaptor.forClass(Search.class);
         SearchResult searchResult = mock(SearchResult.class);
         when(searchResult.isSucceeded()).thenReturn(true);
