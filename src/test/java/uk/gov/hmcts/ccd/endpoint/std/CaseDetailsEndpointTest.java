@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.AppInsights;
 import uk.gov.hmcts.ccd.ApplicationParams;
@@ -14,6 +15,7 @@ import uk.gov.hmcts.ccd.data.casedetails.search.FieldMapSanitizeOperation;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.search.CaseDetailsSearchResult;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.createcase.CreateCaseOperation;
@@ -43,8 +45,12 @@ import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
@@ -407,11 +413,14 @@ class CaseDetailsEndpointTest {
     @Test
     void searchCaseDetailsInvokesOperation() throws IOException {
         given(applicationParams.getSearchBlackList()).willReturn(newArrayList("blockedQuery"));
+        CaseDetailsSearchResult result = mock(CaseDetailsSearchResult.class);
+        Mockito.when(caseDetailsSearchOperation.execute(anyList(), anyString())).thenReturn(result);
         String searchRequest = "{\"query\": {\"match\": \"blah blah\"}}";
 
-        endpoint.searchCases(CASE_TYPES_ID, searchRequest);
+        CaseDetailsSearchResult caseDetailsSearchResult = endpoint.searchCases(CASE_TYPES_ID, searchRequest);
 
         verify(caseDetailsSearchOperation).execute(CASE_TYPES_ID, searchRequest);
+        assertThat(caseDetailsSearchResult, is(result));
     }
 
     private Map<String, String> initParams(final String state) {

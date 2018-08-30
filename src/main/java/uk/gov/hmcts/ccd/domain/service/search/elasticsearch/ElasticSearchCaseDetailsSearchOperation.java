@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.search.CaseDetailsSearchResult;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.dto.ElasticSearchCaseDetailsDTO;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.mapper.CaseDetailsMapper;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
@@ -34,12 +35,12 @@ public class ElasticSearchCaseDetailsSearchOperation implements CaseDetailsSearc
     private CaseDetailsMapper caseDetailsMapper;
 
     @Override
-    public List<CaseDetails> execute(List<String> caseTypesId, String query) throws IOException {
+    public CaseDetailsSearchResult execute(List<String> caseTypesId, String query) throws IOException {
 
         Search search = createSearchRequest(caseTypesId, query);
         SearchResult result = jestClient.execute(search);
         if (result.isSucceeded()) {
-            return toCaseDetails(result);
+            return toCaseDetailsSearchResult(result);
         } else {
             throw new BadSearchRequest(result.getErrorMessage());
         }
@@ -58,10 +59,11 @@ public class ElasticSearchCaseDetailsSearchOperation implements CaseDetailsSearc
                 .collect(toList());
     }
 
-    private List<CaseDetails> toCaseDetails(SearchResult result) {
+    private CaseDetailsSearchResult toCaseDetailsSearchResult(SearchResult result) {
         List<String> casesAsString = result.getSourceAsStringList();
         List<ElasticSearchCaseDetailsDTO> dtos = toElasticSearchCasesDTO(casesAsString);
-        return caseDetailsMapper.dtosToCaseDetailsList(dtos);
+        List<CaseDetails> caseDetails = caseDetailsMapper.dtosToCaseDetailsList(dtos);
+        return new CaseDetailsSearchResult(caseDetails, result.getTotal());
     }
 
     private List<ElasticSearchCaseDetailsDTO> toElasticSearchCasesDTO(List<String> cases) {

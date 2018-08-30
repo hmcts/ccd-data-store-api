@@ -27,6 +27,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.search.CaseDetailsSearchResult;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.dto.ElasticSearchCaseDetailsDTO;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.mapper.CaseDetailsMapper;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
@@ -67,24 +68,26 @@ public class ElasticSearchCaseDetailsSearchOperationTest {
     }
 
     @Test
-    public void searchShouldMapElasticSearchResultToCaseDetails() throws IOException {
+    public void searchShouldMapElasticSearchResultSearchResult() throws IOException {
         ArgumentCaptor<Search> arg = ArgumentCaptor.forClass(Search.class);
         SearchResult searchResult = mock(SearchResult.class);
         when(searchResult.isSucceeded()).thenReturn(true);
+        when(searchResult.getTotal()).thenReturn(1L);
         when(searchResult.getSourceAsStringList()).thenReturn(newArrayList(caseDetailsElastic));
         when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class))
                 .thenReturn(caseDetailsDTO);
         when(mapper.dtosToCaseDetailsList(newArrayList(caseDetailsDTO))).thenReturn(newArrayList(caseDetails));
         when(jestClient.execute(any(Search.class))).thenReturn(searchResult);
 
-        List<CaseDetails> caseDetails = searchOperation.execute(CASE_TYPES_ID, "{query}");
+        CaseDetailsSearchResult caseDetailsSearchResult = searchOperation.execute(CASE_TYPES_ID, "{query}");
 
         verify(jestClient).execute(arg.capture());
 
         Search searchRequest = arg.getValue();
         assertThat(searchRequest.getIndex(), equalTo(indices(CASE_TYPES_ID)));
         assertThat(searchRequest.getType(), equalTo(INDEX_TYPE));
-        assertThat(caseDetails, equalTo(newArrayList(caseDetails)));
+        assertThat(caseDetailsSearchResult.getCaseDetails(), equalTo(newArrayList(caseDetails)));
+        assertThat(caseDetailsSearchResult.getTotal(), equalTo(1L));
     }
 
     @Test

@@ -29,6 +29,7 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.search.CaseDetailsSearchResult;
 import uk.gov.hmcts.ccd.domain.model.std.*;
 
 import javax.inject.Inject;
@@ -4049,6 +4050,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         SearchResult searchResult = mock(SearchResult.class);
         when(searchResult.isSucceeded()).thenReturn(true);
+        when(searchResult.getTotal()).thenReturn(30L);
         when(searchResult.getSourceAsStringList()).thenReturn(newArrayList(caseDetailElastic));
         when(jestClient.execute(anyObject())).thenReturn(searchResult);
 
@@ -4062,9 +4064,12 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                         .andReturn();
 
         String responseAsString = result.getResponse().getContentAsString();
-        List<CaseDetails> caseDetails = Arrays.asList(mapper.readValue(responseAsString, CaseDetails[].class));
+        CaseDetailsSearchResult caseDetailsSearchResults = mapper.readValue(responseAsString,
+                CaseDetailsSearchResult.class);
 
-        assertThat(caseDetails, hasSize(1));
+        assertThat(caseDetailsSearchResults.getTotal(), is(30L));
+        List<CaseDetails> caseDetails = caseDetailsSearchResults.getCaseDetails();
+                assertThat(caseDetails, hasSize(1));
         assertThat(caseDetails, hasItem(hasProperty("reference", equalTo(1535450291607660L))));
         assertThat(caseDetails, hasItem(hasProperty("jurisdiction", equalTo("AUTOTEST1"))));
         assertThat(caseDetails, hasItem(hasProperty("caseTypeId", equalTo("AAT"))));

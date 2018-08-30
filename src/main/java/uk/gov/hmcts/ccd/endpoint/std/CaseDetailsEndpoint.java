@@ -29,6 +29,7 @@ import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.Document;
+import uk.gov.hmcts.ccd.domain.model.search.CaseDetailsSearchResult;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.createcase.CreateCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.createevent.CreateEventOperation;
@@ -50,7 +51,6 @@ import javax.transaction.Transactional;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -473,7 +473,7 @@ public class CaseDetailsEndpoint {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "List of case data for the given search query")
     })
-    public List<CaseDetails> searchCases(
+    public CaseDetailsSearchResult searchCases(
             @ApiParam(value = "Case type ID", required = true)
             @RequestParam("ctid") List<String> caseTypesId,
             @RequestBody String request) throws IOException {
