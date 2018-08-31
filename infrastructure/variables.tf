@@ -100,6 +100,7 @@ variable "elastic_search_blacklist" {
 
 variable "elasticsearch_hosts" {
   type = "string"
+  default = ""
 }
 
 variable "elastic_search_case_index_name_format" {
