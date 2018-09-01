@@ -182,6 +182,7 @@ dependencies {
     compile group: 'com.hazelcast', name: 'hazelcast'
     compile group: 'com.hazelcast', name: 'hazelcast-spring'
 
+    compile group: 'org.springframework.hateoas', name: 'spring-hateoas', version: '0.24.0.RELEASE'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
     compile("org.springframework.boot:spring-boot-starter-web")
     compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.2.RELEASE'
