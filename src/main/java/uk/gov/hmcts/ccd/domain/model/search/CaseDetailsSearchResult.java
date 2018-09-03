@@ -6,19 +6,19 @@ import java.util.List;
 
 public class CaseDetailsSearchResult {
 
-    private List<CaseDetails> caseDetails;
+    private List<CaseDetails> cases;
     private Long total;
 
     public CaseDetailsSearchResult() {
     }
 
-    public CaseDetailsSearchResult(List<CaseDetails> caseDetails, Long total) {
-        this.caseDetails = caseDetails;
+    public CaseDetailsSearchResult(List<CaseDetails> cases, Long total) {
+        this.cases = cases;
         this.total = total;
     }
 
-    public List<CaseDetails> getCaseDetails() {
-        return caseDetails;
+    public List<CaseDetails> getCases() {
+        return cases;
     }
 
     public Long getTotal() {

@@ -81,7 +81,7 @@ public class ElasticSearchCaseDetailsSearchOperationTest {
 
         CaseDetailsSearchResult caseDetailsSearchResult = searchOperation.execute(CASE_TYPES_ID, "{query}");
 
-        assertThat(caseDetailsSearchResult.getCaseDetails(), equalTo(newArrayList(caseDetails)));
+        assertThat(caseDetailsSearchResult.getCases(), equalTo(newArrayList(caseDetails)));
         assertThat(caseDetailsSearchResult.getTotal(), equalTo(1L));
         verify(jestClient).execute(arg.capture());
         Search searchRequest = arg.getValue();

@@ -4068,7 +4068,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 CaseDetailsSearchResult.class);
 
         assertThat(caseDetailsSearchResults.getTotal(), is(30L));
-        List<CaseDetails> caseDetails = caseDetailsSearchResults.getCaseDetails();
+        List<CaseDetails> caseDetails = caseDetailsSearchResults.getCases();
                 assertThat(caseDetails, hasSize(1));
         assertThat(caseDetails, hasItem(hasProperty("reference", equalTo(1535450291607660L))));
         assertThat(caseDetails, hasItem(hasProperty("jurisdiction", equalTo("AUTOTEST1"))));
