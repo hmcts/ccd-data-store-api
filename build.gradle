@@ -85,6 +85,7 @@ mainClassName = 'uk.gov.hmcts.ccd.CoreCaseDataApplication'
 // tag::repositories[]
 repositories {
     mavenLocal()
+    mavenCentral()
     jcenter()
     maven {
         url  'https://dl.bintray.com/hmcts/hmcts-maven'
