@@ -44,6 +44,7 @@ public class CaseDetailsSearchEndpointIT extends WireMockBaseTest {
     private static final String POST_SEARCH_CASES = "/searchCases";
 
     @Inject
+    private WebApplicationContext wac;
     private MockMvc mockMvc;
 
     @Mock
@@ -63,6 +64,8 @@ public class CaseDetailsSearchEndpointIT extends WireMockBaseTest {
         SecurityContextHolder.setContext(securityContext);
 
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
+
+        mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
     }
 
     @Test
