@@ -53,8 +53,9 @@ data "azurerm_key_vault" "ccd_shared_key_vault" {
   resource_group_name = "${local.sharedResourceGroup}"
 }
 
-data "vault_generic_secret" "ccd_data_s2s_key" {
-  path = "secret/${var.vault_section}/ccidam/service-auth-provider/api/microservice-keys/ccd-data"
+data "azurerm_key_vault_secret" "ccd_data_s2s_key" {
+  name = "ccd-data-store-api-s2s-secret"
+  vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
 }
 
 resource "random_string" "draft_encryption_key" {
