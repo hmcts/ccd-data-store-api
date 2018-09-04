@@ -95,7 +95,7 @@ module "ccd-data-store-api" {
 
     IDAM_USER_URL                       = "${var.idam_api_url}"
     IDAM_S2S_URL                        = "${local.s2s_url}"
-    DATA_STORE_IDAM_KEY                 = "${data.vault_generic_secret.ccd_data_s2s_key.data["value"]}"
+    DATA_STORE_IDAM_KEY                 = "${data.azurerm_key_vault_secret.ccd_data_s2s_key.value}"
 
     CCD_DRAFT_STORE_URL                 = "${local.draftStoreUrl}"
     CCD_DRAFT_TTL_DAYS                  = "${var.draft_store_ttl_days}"
