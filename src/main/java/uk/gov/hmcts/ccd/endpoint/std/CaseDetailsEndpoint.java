@@ -1,8 +1,6 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -21,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.AppInsights;
-import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.search.FieldMapSanitizeOperation;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
@@ -29,7 +26,6 @@ import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.Document;
-import uk.gov.hmcts.ccd.domain.model.search.CaseDetailsSearchResult;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.createcase.CreateCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.createevent.CreateEventOperation;
@@ -39,16 +35,13 @@ import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.search.CreatorSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.PaginatedSearchMetaDataOperation;
 import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
-import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseDetailsSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.startevent.StartEventOperation;
 import uk.gov.hmcts.ccd.domain.service.stdapi.DocumentsOperation;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
 import javax.transaction.Transactional;
-import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -77,12 +70,10 @@ public class CaseDetailsEndpoint {
     private final StartEventOperation startEventOperation;
     private final DocumentsOperation documentsOperation;
     private final SearchOperation searchOperation;
-    private final CaseDetailsSearchOperation caseDetailsSearchOperation;
     private final PaginatedSearchMetaDataOperation paginatedSearchMetaDataOperation;
     private final AppInsights appInsights;
     private final FieldMapSanitizeOperation fieldMapSanitizeOperation;
     private final ValidateCaseFieldsOperation validateCaseFieldsOperation;
-    private final ApplicationParams applicationParams;
 
     @Autowired
     public CaseDetailsEndpoint(@Qualifier(CreatorGetCaseOperation.QUALIFIER) final GetCaseOperation getCaseOperation,
@@ -94,9 +85,7 @@ public class CaseDetailsEndpoint {
                                final ValidateCaseFieldsOperation validateCaseFieldsOperation,
                                final DocumentsOperation documentsOperation,
                                final PaginatedSearchMetaDataOperation paginatedSearchMetaDataOperation,
-                               final AppInsights appinsights,
-                               final ApplicationParams applicationParams,
-                               final CaseDetailsSearchOperation caseDetailsSearchOperation) {
+                               final AppInsights appinsights) {
         this.getCaseOperation = getCaseOperation;
         this.createCaseOperation = createCaseOperation;
         this.createEventOperation = createEventOperation;
@@ -107,8 +96,6 @@ public class CaseDetailsEndpoint {
         this.validateCaseFieldsOperation = validateCaseFieldsOperation;
         this.paginatedSearchMetaDataOperation = paginatedSearchMetaDataOperation;
         this.appInsights = appinsights;
-        this.applicationParams = applicationParams;
-        this.caseDetailsSearchOperation = caseDetailsSearchOperation;
     }
 
     @Transactional
@@ -446,20 +433,6 @@ public class CaseDetailsEndpoint {
         return searchOperation.execute(metadata, sanitizedParams);
     }
 
-    @RequestMapping(value = "/searchCases", method = RequestMethod.POST)
-    @ApiOperation("Search case data according to the given ElasticSearch query")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "List of case data for the given search query")
-    })
-    public CaseDetailsSearchResult searchCases(
-            @ApiParam(value = "Case type ID", required = true)
-            @RequestParam("ctid") List<String> caseTypeIds,
-            @RequestBody String request) throws IOException {
-
-        validateSearchRequest(request);
-        return caseDetailsSearchOperation.execute(caseTypeIds, request);
-    }
-
     @Transactional
     @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/pagination_metadata", method = RequestMethod.GET)
     @ApiOperation(value = "Get the pagination metadata for a case data search")
@@ -532,36 +505,5 @@ public class CaseDetailsEndpoint {
         metadata.setSortDirection(param(queryParameters, SORT_PARAM));
 
         return metadata;
-    }
-
-    private void validateSearchRequest(String searchRequest) throws IOException {
-        Optional<Map> query = getQuery(searchRequest);
-        validateSearchRequestContainsQuery(query);
-        rejectBlackListedQuery(query);
-    }
-
-    private Optional<Map> getQuery(String searchRequest) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        final Map<String, Object> map = mapper.readValue(searchRequest, new TypeReference<Map<String, Object>>(){});
-        return Optional.ofNullable((Map) map.get("query"));
-    }
-
-    private void validateSearchRequestContainsQuery(Optional<Map> queryOpt) throws IOException {
-        if (!queryOpt.isPresent()) {
-            throw new BadSearchRequest("missing required field 'query'");
-        }
-    }
-
-    private void rejectBlackListedQuery(Optional<Map> queryOpt) throws IOException {
-        queryOpt.ifPresent(query -> {
-            List<String> blackListedQueries = applicationParams.getSearchBlackList();
-            Optional<String> blackListedQueryOpt = blackListedQueries.stream().filter(blacklisted ->
-                    query.get(blacklisted) != null
-            ).findFirst();
-
-            blackListedQueryOpt.ifPresent(blacklisted -> {
-                throw new BadSearchRequest(String.format("Query of type '%s' is not allowed", blacklisted));
-            });
-        });
     }
 }

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.searchbox.client.JestClient;
-import io.searchbox.core.SearchResult;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,24 +28,34 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.search.CaseDetailsSearchResult;
-import uk.gov.hmcts.ccd.domain.model.std.*;
+import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
+import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
+import uk.gov.hmcts.ccd.domain.model.std.Event;
 
 import javax.inject.Inject;
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isEmptyString;
 import static org.hamcrest.collection.IsIn.isIn;
 import static org.hamcrest.core.Every.everyItem;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -74,7 +83,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private static final String FAKE_EVENT_ID = "FAKE_EVENT";
     private static final String GET_CASES_AS_CASEWORKER = "/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases";
     private static final String GET_PAGINATED_SEARCH_METADATA = "/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/pagination_metadata";
-    private static final String POST_SEARCH_CASES = "/searchCases";
     private static final String TEST_CASE_TYPE = "TestAddressBookCase";
     private static final String TEST_JURISDICTION = "PROBATE";
     private static final String TEST_STATE = "CaseCreated";
@@ -4027,59 +4035,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(caseDetails, hasSize(2));
         assertThat(responseAsString, containsString("Janet"));
         assertThat(responseAsString, containsString("Peter"));
-    }
-
-    @Test
-    public void testSearchCaseDetailsFromElasticSearch() throws Exception {
-
-        String caseDetailElastic = "{\n"
-                                    + "\"reference\": 1535450291607660,\n"
-                                    + "\"last_modified\": \"2018-08-28T09:58:11.643Z\",\n"
-                                    + "\"state\": \"TODO\",\n"
-                                    + "\"@version\": \"1\",\n"
-                                    + "\"data_classification\": {},\n"
-                                    + "\"id\": 18,\n"
-                                    + "\"security_classification\": \"PUBLIC\",\n"
-                                    + "\"jurisdiction\": \"AUTOTEST1\",\n"
-                                    + "\"@timestamp\": \"2018-08-28T09:58:13.044Z\",\n"
-                                    + "\"data\": {},\n"
-                                    + "\"created_date\": \"2018-08-28T09:58:11.627Z\",\n"
-                                    + "\"index_id\": \"autotest1_aat_cases\",\n"
-                                    + "\"case_type_id\": \"AAT\"\n"
-                                    + "}";
-
-        SearchResult searchResult = mock(SearchResult.class);
-        when(searchResult.isSucceeded()).thenReturn(true);
-        when(searchResult.getTotal()).thenReturn(30L);
-        when(searchResult.getSourceAsStringList()).thenReturn(newArrayList(caseDetailElastic));
-        when(jestClient.execute(anyObject())).thenReturn(searchResult);
-
-        String searchRequest = "{\"query\": {\"match_all\": {}}}";
-        MvcResult result = mockMvc.perform(post(POST_SEARCH_CASES)
-                        .contentType(JSON_CONTENT_TYPE)
-                        .param("ctid", "caseTypeId1")
-                        .param("ctid", "caseTypeId2")
-                        .content(searchRequest))
-                        .andExpect(status().is(200))
-                        .andReturn();
-
-        String responseAsString = result.getResponse().getContentAsString();
-        CaseDetailsSearchResult caseDetailsSearchResults = mapper.readValue(responseAsString,
-                CaseDetailsSearchResult.class);
-
-        assertThat(caseDetailsSearchResults.getTotal(), is(30L));
-        List<CaseDetails> caseDetails = caseDetailsSearchResults.getCases();
-                assertThat(caseDetails, hasSize(1));
-        assertThat(caseDetails, hasItem(hasProperty("reference", equalTo(1535450291607660L))));
-        assertThat(caseDetails, hasItem(hasProperty("jurisdiction", equalTo("AUTOTEST1"))));
-        assertThat(caseDetails, hasItem(hasProperty("caseTypeId", equalTo("AAT"))));
-        assertThat(caseDetails, hasItem(hasProperty("lastModified",
-                equalTo(LocalDateTime.parse("2018-08-28T09:58:11.643")))));
-        assertThat(caseDetails, hasItem(hasProperty("createdDate",
-                equalTo(LocalDateTime.parse("2018-08-28T09:58:11.627")))));
-        assertThat(caseDetails, hasItem(hasProperty("state", equalTo("TODO"))));
-        assertThat(caseDetails, hasItem(hasProperty("securityClassification",
-                equalTo(SecurityClassification.PUBLIC))));
     }
 
     /**

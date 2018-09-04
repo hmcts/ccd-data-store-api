@@ -7,15 +7,12 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.AppInsights;
-import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.search.FieldMapSanitizeOperation;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.search.CaseDetailsSearchResult;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.createcase.CreateCaseOperation;
@@ -24,20 +21,15 @@ import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.ClassifiedGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.search.PaginatedSearchMetaDataOperation;
 import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
-import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseDetailsSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.startevent.StartEventOperation;
 import uk.gov.hmcts.ccd.domain.service.stdapi.DocumentsOperation;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -45,12 +37,8 @@ import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
@@ -60,7 +48,6 @@ class CaseDetailsEndpointTest {
     private static final String UID = "1231";
     private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_TYPE_ID = "GrantOnly";
-    private static final List<String> CASE_TYPES_ID = newArrayList("GrantOnly");
     private static final String CASE_ID = "1234qwer5678tyui";
     private static final String EVENT_TRIGGER_ID = "updateEvent";
     private static final Boolean IGNORE_WARNING = Boolean.TRUE;
@@ -106,12 +93,6 @@ class CaseDetailsEndpointTest {
     @Mock
     private AppInsights appInsights;
 
-    @Mock
-    private ApplicationParams applicationParams;
-
-    @Mock
-    private CaseDetailsSearchOperation caseDetailsSearchOperation;
-
     private CaseDetailsEndpoint endpoint;
     private Map<String,String> params = newHashMap();
 
@@ -131,9 +112,7 @@ class CaseDetailsEndpointTest {
                                     validateCaseFieldsOperation,
                                     documentsOperation,
                                     paginatedSearchMetaDataOperation,
-                                    appInsights,
-                                    applicationParams,
-                                    caseDetailsSearchOperation);
+                                    appInsights);
     }
 
     @Nested
@@ -364,62 +343,6 @@ class CaseDetailsEndpointTest {
         assertThat(argument.getValue().getCaseTypeId(), is(CASE_TYPE_ID));
         assertThat(argument.getValue().getJurisdiction(), is(JURISDICTION_ID));
         assertThat(argument.getValue().getState(), is(Optional.of("STATE")));
-    }
-
-    @Test
-    void searchCaseDetailsThrowsExceptionWhenNoQueryProvided() throws IOException {
-        String searchRequest = "{\n"
-                + "\"from\" : 0,\n"
-                + "\"size\" : 3\n"
-                + "}";
-        given(applicationParams.getSearchBlackList()).willReturn(newArrayList("query_string"));
-
-        assertThrows(BadSearchRequest.class,
-            () -> endpoint.searchCases(CASE_TYPES_ID, searchRequest));
-
-        verify(caseDetailsSearchOperation, never()).execute(CASE_TYPES_ID, searchRequest);
-    }
-
-    @Test
-    void searchCaseDetailsRejectsBlacklistedSearchQueries() throws IOException {
-        String searchRequest = "{\n"
-                + "  \"query\": {\n"
-                + "    \"query_string\" : {\"query\": \"\"}\n"
-                + "    }\n"
-                + "}";
-        given(applicationParams.getSearchBlackList()).willReturn(newArrayList("query_string"));
-
-        assertThrows(BadSearchRequest.class,
-            () -> endpoint.searchCases(CASE_TYPES_ID, searchRequest));
-
-        verify(caseDetailsSearchOperation, never()).execute(CASE_TYPES_ID, searchRequest);
-    }
-
-    @Test
-    void searchCaseDetailsAllowsQueriesNotBlacklisted() throws IOException {
-        String query = "{\n"
-                + "  \"query\": {\n"
-                + "    \"simple_query_string\" : {\"query\": \"\"}\n"
-                + "    }\n"
-                + "}";
-        given(applicationParams.getSearchBlackList()).willReturn(newArrayList("query_string"));
-
-        endpoint.searchCases(CASE_TYPES_ID, query);
-
-        verify(caseDetailsSearchOperation).execute(CASE_TYPES_ID, query);
-    }
-
-    @Test
-    void searchCaseDetailsInvokesOperation() throws IOException {
-        given(applicationParams.getSearchBlackList()).willReturn(newArrayList("blockedQuery"));
-        CaseDetailsSearchResult result = mock(CaseDetailsSearchResult.class);
-        Mockito.when(caseDetailsSearchOperation.execute(anyList(), anyString())).thenReturn(result);
-        String searchRequest = "{\"query\": {\"match\": \"blah blah\"}}";
-
-        CaseDetailsSearchResult caseDetailsSearchResult = endpoint.searchCases(CASE_TYPES_ID, searchRequest);
-
-        verify(caseDetailsSearchOperation).execute(CASE_TYPES_ID, searchRequest);
-        assertThat(caseDetailsSearchResult, is(result));
     }
 
     private Map<String, String> initParams(final String state) {
