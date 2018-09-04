@@ -186,7 +186,7 @@ resource "azurerm_key_vault_secret" "gw_oauth2_secret" {
 }
 
 resource "azurerm_key_vault_secret" "ccd_draft_encryption_key" {
-  name = "draftStoreEncryptionSecret"
+  name = "${local.app_full_name}-draftStoreEncryptionSecret"
   value = "${random_string.draft_encryption_key.result}"
-  vault_uri = "${module.ccd-data-store-vault.key_vault_uri}"
+  vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
 }
