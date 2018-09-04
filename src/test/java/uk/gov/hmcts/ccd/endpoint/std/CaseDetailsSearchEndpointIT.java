@@ -44,9 +44,7 @@ public class CaseDetailsSearchEndpointIT extends WireMockBaseTest {
     private static final String POST_SEARCH_CASES = "/searchCases";
 
     @Inject
-    private WebApplicationContext wac;
     private MockMvc mockMvc;
-    private JdbcTemplate template;
 
     @Mock
     private Authentication authentication;
@@ -65,9 +63,6 @@ public class CaseDetailsSearchEndpointIT extends WireMockBaseTest {
         SecurityContextHolder.setContext(securityContext);
 
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
-
-        mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
-        template = new JdbcTemplate(db);
     }
 
     @Test
