@@ -23,8 +23,8 @@ locals {
   dm_valid_domain = "${var.document_management_valid_domain != "" ? var.document_management_valid_domain : local.default_dm_valid_domain}"
 
   // Vault name
-  previewVaultName = "${var.raw_product}-shared-aat"
-  nonPreviewVaultName = "${var.raw_product}-shared-${var.env}"
+  previewVaultName = "${var.raw_product}-aat"
+  nonPreviewVaultName = "${var.raw_product}-${var.env}"
   vaultName = "${(var.env == "preview" || var.env == "spreview") ? local.previewVaultName : local.nonPreviewVaultName}"
 
   // Old vault info to be removed
