@@ -69,7 +69,6 @@ public class ElasticSearchCaseDetailsSearchOperationTest {
 
     @Test
     public void searchShouldMapElasticSearchResultToSearchResult() throws IOException {
-        ArgumentCaptor<Search> arg = ArgumentCaptor.forClass(Search.class);
         SearchResult searchResult = mock(SearchResult.class);
         when(searchResult.isSucceeded()).thenReturn(true);
         when(searchResult.getTotal()).thenReturn(1L);
@@ -83,6 +82,7 @@ public class ElasticSearchCaseDetailsSearchOperationTest {
 
         assertThat(caseDetailsSearchResult.getCases(), equalTo(newArrayList(caseDetails)));
         assertThat(caseDetailsSearchResult.getTotal(), equalTo(1L));
+        ArgumentCaptor<Search> arg = ArgumentCaptor.forClass(Search.class);
         verify(jestClient).execute(arg.capture());
         Search searchRequest = arg.getValue();
         assertThat(searchRequest.getIndex(), equalTo(indices(CASE_TYPES_ID)));

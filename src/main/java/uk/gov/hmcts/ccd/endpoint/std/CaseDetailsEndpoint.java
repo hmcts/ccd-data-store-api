@@ -547,7 +547,7 @@ public class CaseDetailsEndpoint {
     }
 
     private void validateSearchRequestContainsQuery(Optional<Map> queryOpt) throws IOException {
-        if(!queryOpt.isPresent()) {
+        if (!queryOpt.isPresent()) {
             throw new BadSearchRequest("missing required field 'query'");
         }
     }
