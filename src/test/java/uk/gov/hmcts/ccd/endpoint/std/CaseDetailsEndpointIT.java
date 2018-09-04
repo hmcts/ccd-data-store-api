@@ -99,9 +99,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Mock
     private SecurityContext securityContext;
 
-    @MockBean
-    private JestClient jestClient;
-
     private static final String REFERENCE_2 = "1504259907353545";
 
     @Before
