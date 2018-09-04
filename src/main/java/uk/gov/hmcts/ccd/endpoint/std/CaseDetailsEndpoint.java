@@ -453,11 +453,11 @@ public class CaseDetailsEndpoint {
     })
     public CaseDetailsSearchResult searchCases(
             @ApiParam(value = "Case type ID", required = true)
-            @RequestParam("ctid") List<String> caseTypesId,
+            @RequestParam("ctid") List<String> caseTypeIds,
             @RequestBody String request) throws IOException {
 
         validateSearchRequest(request);
-        return caseDetailsSearchOperation.execute(caseTypesId, request);
+        return caseDetailsSearchOperation.execute(caseTypeIds, request);
     }
 
     @Transactional
@@ -535,8 +535,9 @@ public class CaseDetailsEndpoint {
     }
 
     private void validateSearchRequest(String searchRequest) throws IOException {
-        validateSearchRequestContainsQuery(searchRequest);
-        rejectBlackListedQuery(searchRequest);
+        Optional<Map> query = getQuery(searchRequest);
+        validateSearchRequestContainsQuery(query);
+        rejectBlackListedQuery(query);
     }
 
     private Optional<Map> getQuery(String searchRequest) throws IOException {
@@ -545,14 +546,14 @@ public class CaseDetailsEndpoint {
         return Optional.ofNullable((Map) map.get("query"));
     }
 
-    private void validateSearchRequestContainsQuery(String searchRequest) throws IOException {
-        if(!getQuery(searchRequest).isPresent()) {
+    private void validateSearchRequestContainsQuery(Optional<Map> queryOpt) throws IOException {
+        if(!queryOpt.isPresent()) {
             throw new BadSearchRequest("missing required field 'query'");
         }
     }
 
-    private void rejectBlackListedQuery(String searchRequest) throws IOException {
-        getQuery(searchRequest).ifPresent(query -> {
+    private void rejectBlackListedQuery(Optional<Map> queryOpt) throws IOException {
+        queryOpt.ifPresent(query -> {
             List<String> blackListedQueries = applicationParams.getSearchBlackList();
             Optional<String> blackListedQueryOpt = blackListedQueries.stream().filter(blacklisted ->
                     query.get(blacklisted) != null

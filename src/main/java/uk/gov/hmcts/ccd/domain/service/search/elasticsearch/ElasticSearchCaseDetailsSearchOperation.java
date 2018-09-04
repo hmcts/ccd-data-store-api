@@ -35,9 +35,9 @@ public class ElasticSearchCaseDetailsSearchOperation implements CaseDetailsSearc
     private CaseDetailsMapper caseDetailsMapper;
 
     @Override
-    public CaseDetailsSearchResult execute(List<String> caseTypesId, String query) throws IOException {
+    public CaseDetailsSearchResult execute(List<String> caseTypeIds, String query) throws IOException {
 
-        Search search = createSearchRequest(caseTypesId, query);
+        Search search = createSearchRequest(caseTypeIds, query);
         SearchResult result = jestClient.execute(search);
         if (result.isSucceeded()) {
             return toCaseDetailsSearchResult(result);

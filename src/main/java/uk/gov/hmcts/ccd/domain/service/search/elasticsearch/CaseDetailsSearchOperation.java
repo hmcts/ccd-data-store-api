@@ -8,6 +8,6 @@ import java.util.List;
 
 public interface CaseDetailsSearchOperation {
 
-    CaseDetailsSearchResult execute(List<String> caseTypesId, String query) throws IOException;
+    CaseDetailsSearchResult execute(List<String> caseTypeIds, String query) throws IOException;
 
 }
