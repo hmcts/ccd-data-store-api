@@ -69,8 +69,9 @@ public class SearchQueryFactoryOperation {
     }
 
     private String secure(String clauses, MetaData metadata) {
+        String newClauses = clauses;
         if (UserAuthorisation.AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
-            clauses += String.format(
+            newClauses += String.format(
                 " AND id IN (SELECT cu.case_data_id FROM case_users AS cu WHERE user_id = '%s')",
                 userAuthorisation.getUserId()
             );
@@ -81,10 +82,10 @@ public class SearchQueryFactoryOperation {
                                                                                                      metadata.getCaseTypeId(),
                                                                                                      CAN_READ);
         if (CollectionUtils.isNotEmpty(caseStates)) {
-            clauses += String.format(" AND state IN ('%s')", String.join("','", caseStates.stream().map(CaseState::getId).collect(Collectors.toList())));
+            newClauses += String.format(" AND state IN ('%s')", String.join("','", caseStates.stream().map(CaseState::getId).collect(Collectors.toList())));
         }
 
-        return clauses;
+        return newClauses;
     }
 
     private void addParameters(final Query query, List<Criterion> critereon) {

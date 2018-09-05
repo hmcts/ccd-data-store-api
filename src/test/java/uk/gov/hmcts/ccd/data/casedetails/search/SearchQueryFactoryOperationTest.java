@@ -128,7 +128,6 @@ public class SearchQueryFactoryOperationTest {
 
     @Test
     public void shouldAppendStatesClauseToQuery() {
-        MetaData metadata = new MetaData(TEST_CASE_TYPE_VALUE, TEST_JURISDICTION_VALUE);
         CaseState caseState1 = new CaseState();
         caseState1.setId("STATE1");
         CaseState caseState2 = new CaseState();
@@ -136,6 +135,7 @@ public class SearchQueryFactoryOperationTest {
         when(em.createNativeQuery(any(String.class), any(Class.class))).thenReturn(mockQuery);
         when(authorisedCaseDefinitionDataService.getUserAuthorisedCaseStates(TEST_JURISDICTION_VALUE, TEST_CASE_TYPE_VALUE, CAN_READ))
             .thenReturn(asList(caseState1, caseState2));
+        MetaData metadata = new MetaData(TEST_CASE_TYPE_VALUE, TEST_JURISDICTION_VALUE);
 
         subject.build(metadata, params, false);
 

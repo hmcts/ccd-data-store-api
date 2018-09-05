@@ -42,12 +42,12 @@ class CaseStateAuthorisationSecurityTest {
         @Test
         @DisplayName("should secure the builder query with user authorised list of case states")
         void shouldSecureWithAuthorisedCaseStates() {
-            MetaData metaData = new MetaData("CaseType", "Jurisdiction");
             CaseState caseState1 = new CaseState();
             caseState1.setId("state1");
             CaseState caseState2 = new CaseState();
             caseState2.setId("state2");
             List<CaseState> caseStates = asList(caseState1, caseState2);
+            MetaData metaData = new MetaData("CaseType", "Jurisdiction");
             when(authorisedCaseDefinitionDataService.getUserAuthorisedCaseStates(metaData.getJurisdiction(), metaData.getCaseTypeId(), CAN_READ)).thenReturn(
                 caseStates);
 

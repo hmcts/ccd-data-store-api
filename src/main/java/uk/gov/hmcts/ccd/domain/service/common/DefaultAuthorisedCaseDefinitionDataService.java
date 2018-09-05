@@ -14,7 +14,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 /**
- * Service to return authorised case definition data as per user authority
+ * Service to return authorised case definition data as per user authority.
  */
 @Service
 public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCaseDefinitionDataService {
