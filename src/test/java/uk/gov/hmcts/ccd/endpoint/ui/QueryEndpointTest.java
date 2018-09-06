@@ -95,7 +95,7 @@ class QueryEndpointTest {
     void shouldCallFindWorkBasketOperation() {
         List<WorkbasketInput> workBasketResults = new ArrayList<>();
         when(findWorkbasketInputOperation.execute("TEST", "TEST-CASE-TYPE", CAN_READ)).thenReturn(workBasketResults);
-        queryEndpoint.findWorkbasketInputDetails(22, "TEST", "TEST-CASE-TYPE");
+        queryEndpoint.findWorkbasketInputDetails("22", "TEST", "TEST-CASE-TYPE");
         verify(findWorkbasketInputOperation, times(1)).execute("TEST", "TEST-CASE-TYPE", CAN_READ);
     }
 

@@ -146,7 +146,7 @@ public class QueryEndpoint {
         @ApiResponse(code = 200, message = "Search Input data found for the given case type and jurisdiction"),
         @ApiResponse(code = 404, message = "No SearchInput found for the given case type and jurisdiction")
     })
-    public SearchInput[] findSearchInputDetails(@PathVariable("uid") final Integer uid,
+    public SearchInput[] findSearchInputDetails(@PathVariable("uid") final String uid,
                                                 @PathVariable("jid") final String jurisdictionId,
                                                 @PathVariable("ctid") final String caseTypeId) {
         return findSearchInputOperation.execute(jurisdictionId, caseTypeId, CAN_READ).toArray(new SearchInput[0]);
@@ -160,7 +160,7 @@ public class QueryEndpoint {
         @ApiResponse(code = 200, message = "Workbasket Input data found for the given case type and jurisdiction"),
         @ApiResponse(code = 404, message = "No Workbasket Input found for the given case type and jurisdiction")
     })
-    public WorkbasketInput[] findWorkbasketInputDetails(@PathVariable("uid") final Integer uid,
+    public WorkbasketInput[] findWorkbasketInputDetails(@PathVariable("uid") final String uid,
                                                         @PathVariable("jid") final String jurisdictionId,
                                                         @PathVariable("ctid") final String caseTypeId) {
         Instant start = Instant.now();
