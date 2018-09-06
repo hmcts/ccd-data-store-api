@@ -155,4 +155,10 @@ public abstract class CaseDetailsQueryBuilder<T> {
     private LocalDateTime atStartOfDay(String date) {
         return LocalDate.parse(date).atStartOfDay();
     }
+
+    public CaseDetailsQueryBuilder secure(List<CaseDetailsAuthorisationSecurity> caseDetailsAuthorisationSecurities, MetaData metadata) {
+        caseDetailsAuthorisationSecurities.forEach(security -> security.secure(this, metadata));
+
+        return this;
+    }
 }

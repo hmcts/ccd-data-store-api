@@ -21,10 +21,12 @@ public class CaseStateAuthorisationSecurity implements CaseDetailsAuthorisationS
 
     @Override
     public <T> void secure(CaseDetailsQueryBuilder<T> builder, MetaData metadata) {
-        List<String> caseStateIds = authorisedCaseDefinitionDataService
-            .getUserAuthorisedCaseStateIds(metadata.getJurisdiction(), metadata.getCaseTypeId(), CAN_READ);
+        if (metadata != null) {
+            List<String> caseStateIds = authorisedCaseDefinitionDataService
+                .getUserAuthorisedCaseStateIds(metadata.getJurisdiction(), metadata.getCaseTypeId(), CAN_READ);
 
-        builder.whereStates(caseStateIds);
+            builder.whereStates(caseStateIds);
+        }
     }
 
 }

@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.data.casedetails.query.CaseDetailsAuthorisationSecurity;
 import uk.gov.hmcts.ccd.data.casedetails.query.CaseDetailsQueryBuilder;
 import uk.gov.hmcts.ccd.data.casedetails.query.CaseDetailsQueryBuilderFactory;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
@@ -46,17 +47,20 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     private final SearchQueryFactoryOperation queryBuilder;
     private final CaseDetailsQueryBuilderFactory queryBuilderFactory;
     private final ApplicationParams applicationParams;
+    private final List<CaseDetailsAuthorisationSecurity> caseDetailsAuthorisationSecurities;
 
     @Inject
     public DefaultCaseDetailsRepository(
             final CaseDetailsMapper caseDetailsMapper,
             final SearchQueryFactoryOperation queryBuilder,
             final CaseDetailsQueryBuilderFactory queryBuilderFactory,
-            final ApplicationParams applicationParams) {
+            final ApplicationParams applicationParams,
+            final List<CaseDetailsAuthorisationSecurity> caseDetailsAuthorisationSecurities) {
         this.caseDetailsMapper = caseDetailsMapper;
         this.queryBuilder = queryBuilder;
         this.queryBuilderFactory = queryBuilderFactory;
         this.applicationParams = applicationParams;
+        this.caseDetailsAuthorisationSecurities = caseDetailsAuthorisationSecurities;
     }
 
     @Override
@@ -178,6 +182,8 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     private Optional<CaseDetailsEntity> find(String jurisdiction, Long id, String reference) {
         final CaseDetailsQueryBuilder<CaseDetailsEntity> qb = queryBuilderFactory.select(em);
 
+        qb.secure(caseDetailsAuthorisationSecurities, null);
+
         if (null != jurisdiction) {
             qb.whereJurisdiction(jurisdiction);
         }
@@ -207,16 +213,18 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     private Query getCountQueryByMetaData(MetaData metadata) {
-        return queryBuilderFactory.count(em, metadata)
-                                  .whereMetadata(metadata)
-                                  .build();
+        return queryBuilderFactory.count(em)
+            .secure(caseDetailsAuthorisationSecurities, metadata)
+            .whereMetadata(metadata)
+            .build();
     }
 
     private Query getQueryByMetaData(MetaData metadata) {
-        return queryBuilderFactory.select(em, metadata)
-                                  .whereMetadata(metadata)
-                                  .orderByCreatedDate(metadata.getSortDirection().orElse("asc"))
-                                  .build();
+        return queryBuilderFactory.select(em)
+            .secure(caseDetailsAuthorisationSecurities, metadata)
+            .whereMetadata(metadata)
+            .orderByCreatedDate(metadata.getSortDirection().orElse("asc"))
+            .build();
     }
 
     private void paginate(Query query, Optional<String> pageOpt) {

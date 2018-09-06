@@ -53,10 +53,10 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
             CaseType caseType = mock(CaseType.class);
             String caseTypeId = "caseTypeId";
             String jurisdiction = "jusrisdiction";
-            Set<String> userRoles = new HashSet<>();
-            List<CaseState> caseStates = Collections.singletonList(new CaseState());
             when(caseTypeService.getCaseTypeForJurisdiction(caseTypeId, jurisdiction)).thenReturn(caseType);
+            Set<String> userRoles = new HashSet<>();
             when(userRepository.getUserRoles()).thenReturn(userRoles);
+            List<CaseState> caseStates = Collections.singletonList(new CaseState());
             when(accessControlService.filterCaseStatesByAccess(caseType.getStates(), userRoles, CAN_READ)).thenReturn(caseStates);
 
             List<CaseState> result = authorisedCaseDataService.getUserAuthorisedCaseStates(jurisdiction, caseTypeId, CAN_READ);
