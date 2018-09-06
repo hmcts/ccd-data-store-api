@@ -1,10 +1,15 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
-public class CaseTypeDisplayProperties {
-    private String id;
-    private String name;
-    private String description;
-    private CaseStateDisplayProperties[] states;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
+
+/**
+ * A "lite" version of the {@link CaseState} class that contains selected State fields (id, name, and description) for
+ * display purposes.
+ */
+public class CaseStateDisplayProperties {
+    private String id = null;
+    private String name = null;
+    private String description = null;
 
     public String getId() {
         return id;
@@ -28,13 +33,5 @@ public class CaseTypeDisplayProperties {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public CaseStateDisplayProperties[] getStates() {
-        return states;
-    }
-
-    public void setStates(CaseStateDisplayProperties[] states) {
-        this.states = states;
     }
 }
