@@ -72,16 +72,16 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
         @Test
         @DisplayName("Should return list of user authorised case state ids for a jurisdiction and case type")
         void shouldReturnAuthorisedCaseStateIds() {
-            CaseType caseType = mock(CaseType.class);
-            String caseTypeId = "caseTypeId";
-            String jurisdiction = "jusrisdiction";
-            Set<String> userRoles = new HashSet<>();
             CaseState caseState1 = new CaseState();
             caseState1.setId("state1");
             CaseState caseState2 = new CaseState();
             caseState2.setId("state2");
             List<CaseState> caseStates = Arrays.asList(caseState1, caseState2);
+            CaseType caseType = mock(CaseType.class);
+            String caseTypeId = "caseTypeId";
+            String jurisdiction = "jusrisdiction";
             when(caseTypeService.getCaseTypeForJurisdiction(caseTypeId, jurisdiction)).thenReturn(caseType);
+            Set<String> userRoles = new HashSet<>();
             when(userRepository.getUserRoles()).thenReturn(userRoles);
             when(accessControlService.filterCaseStatesByAccess(caseType.getStates(), userRoles, CAN_READ)).thenReturn(caseStates);
 
