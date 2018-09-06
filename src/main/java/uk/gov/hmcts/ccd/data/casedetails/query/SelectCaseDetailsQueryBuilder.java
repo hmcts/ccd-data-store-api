@@ -9,7 +9,7 @@ import javax.persistence.criteria.Predicate;
 
 public class SelectCaseDetailsQueryBuilder extends CaseDetailsQueryBuilder<CaseDetailsEntity> {
 
-    SelectCaseDetailsQueryBuilder(EntityManager em) {
+    public SelectCaseDetailsQueryBuilder(EntityManager em) {
         super(em);
     }
 

@@ -7,7 +7,7 @@ import javax.persistence.criteria.Predicate;
 
 public class CountCaseDetailsQueryBuilder extends CaseDetailsQueryBuilder<Long> {
 
-    CountCaseDetailsQueryBuilder(EntityManager em) {
+    public CountCaseDetailsQueryBuilder(EntityManager em) {
         super(em);
     }
 
