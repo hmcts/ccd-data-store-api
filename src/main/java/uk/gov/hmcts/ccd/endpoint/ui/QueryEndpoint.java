@@ -163,13 +163,20 @@ public class QueryEndpoint {
     public WorkbasketInput[] findWorkbasketInputDetails(@PathVariable("uid") final Integer uid,
                                                         @PathVariable("jid") final String jurisdictionId,
                                                         @PathVariable("ctid") final String caseTypeId) {
-        Instant start = Instant.now();
-        WorkbasketInput[] workbasketInputs = findWorkbasketInputOperation.execute(jurisdictionId, caseTypeId,
-                                                                                  CAN_READ).toArray(
-            new WorkbasketInput[0]);
-        final Duration between = Duration.between(start, Instant.now());
-        LOG.warn("findWorkbasketInputDetails has been completed in {} millisecs...", between.toMillis());
-        return workbasketInputs;
+        try {
+            LOG.info("Retrieving CaseList inputs for {}/{}...", jurisdictionId, caseTypeId);
+            Instant start = Instant.now();
+            WorkbasketInput[] workbasketInputs = findWorkbasketInputOperation.execute(jurisdictionId, caseTypeId,
+                                                                                      CAN_READ).toArray(
+                new WorkbasketInput[0]);
+            final Duration between = Duration.between(start, Instant.now());
+            LOG.info("findWorkbasketInputDetails has been completed in {} millisecs...", between.toMillis());
+            return workbasketInputs;
+        } catch (Exception e) {
+            LOG.error("Retrieving CaseList inputs for {}/{}: ERROR", jurisdictionId, caseTypeId);
+            LOG.error("Retrieving CaseList inputs: ERROR", e);
+            throw e;
+        }
     }
 
     @Transactional
