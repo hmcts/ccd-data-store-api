@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.data.casedetails.search;
 
-import org.apache.commons.collections.CollectionUtils;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
 import uk.gov.hmcts.ccd.domain.service.common.AuthorisedCaseDefinitionDataService;
@@ -68,23 +67,29 @@ public class SearchQueryFactoryOperation {
     }
 
     private String secure(String clauses, MetaData metadata) {
-        String newClauses = clauses;
+        return clauses + addUserCaseAccessClause() + addUserCaseStateAccessClause(metadata);
+    }
+
+    private String addUserCaseAccessClause() {
         if (UserAuthorisation.AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
-            newClauses += String.format(
+            return String.format(
                 " AND id IN (SELECT cu.case_data_id FROM case_users AS cu WHERE user_id = '%s')",
                 userAuthorisation.getUserId()
             );
         }
+        return "";
+    }
 
+    private String addUserCaseStateAccessClause(MetaData metadata) {
         // restrict cases to the case states the user has access to
         List<String> caseStateIds = authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds(metadata.getJurisdiction(),
                                                                                                       metadata.getCaseTypeId(),
                                                                                                       CAN_READ);
-        if (CollectionUtils.isNotEmpty(caseStateIds)) {
-            newClauses += String.format(" AND state IN ('%s')", String.join("','", caseStateIds));
+        if (!caseStateIds.isEmpty()) {
+            return String.format(" AND state IN ('%s')", String.join("','", caseStateIds));
         }
 
-        return newClauses;
+        return "";
     }
 
     private void addParameters(final Query query, List<Criterion> critereon) {
