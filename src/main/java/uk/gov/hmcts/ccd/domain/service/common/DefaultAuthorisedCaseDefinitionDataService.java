@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import static java.util.stream.Collectors.toList;
+
 /**
  * Service to return authorised case definition data as per user authority.
  */
@@ -37,5 +39,10 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
         Set<String> userRoles = userRepository.getUserRoles();
 
         return accessControlService.filterCaseStatesByAccess(caseType.getStates(), userRoles, access);
+    }
+
+    @Override
+    public List<String> getUserAuthorisedCaseStateIds(String jurisdiction, String caseTypeId, Predicate<AccessControlList> access) {
+        return getUserAuthorisedCaseStates(jurisdiction, caseTypeId, access).stream().map(CaseState::getId).collect(toList());
     }
 }

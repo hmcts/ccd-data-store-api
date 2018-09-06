@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.data.casedetails.search;
 import org.apache.commons.collections.CollectionUtils;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
 import uk.gov.hmcts.ccd.domain.service.common.AuthorisedCaseDefinitionDataService;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
@@ -78,11 +77,11 @@ public class SearchQueryFactoryOperation {
         }
 
         // restrict cases to the case states the user has access to
-        List<CaseState> caseStates = authorisedCaseDefinitionDataService.getUserAuthorisedCaseStates(metadata.getJurisdiction(),
-                                                                                                     metadata.getCaseTypeId(),
-                                                                                                     CAN_READ);
-        if (CollectionUtils.isNotEmpty(caseStates)) {
-            newClauses += String.format(" AND state IN ('%s')", String.join("','", caseStates.stream().map(CaseState::getId).collect(Collectors.toList())));
+        List<String> caseStateIds = authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds(metadata.getJurisdiction(),
+                                                                                                      metadata.getCaseTypeId(),
+                                                                                                      CAN_READ);
+        if (CollectionUtils.isNotEmpty(caseStateIds)) {
+            newClauses += String.format(" AND state IN ('%s')", String.join("','", caseStateIds));
         }
 
         return newClauses;

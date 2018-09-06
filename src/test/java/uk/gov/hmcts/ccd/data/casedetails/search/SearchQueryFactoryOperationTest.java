@@ -6,7 +6,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
 import uk.gov.hmcts.ccd.domain.service.common.AuthorisedCaseDefinitionDataService;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
@@ -128,19 +127,15 @@ public class SearchQueryFactoryOperationTest {
 
     @Test
     public void shouldAppendStatesClauseToQuery() {
-        CaseState caseState1 = new CaseState();
-        caseState1.setId("STATE1");
-        CaseState caseState2 = new CaseState();
-        caseState2.setId("STATE2");
         when(em.createNativeQuery(any(String.class), any(Class.class))).thenReturn(mockQuery);
-        when(authorisedCaseDefinitionDataService.getUserAuthorisedCaseStates(TEST_JURISDICTION_VALUE, TEST_CASE_TYPE_VALUE, CAN_READ))
-            .thenReturn(asList(caseState1, caseState2));
+        when(authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds(TEST_JURISDICTION_VALUE, TEST_CASE_TYPE_VALUE, CAN_READ))
+            .thenReturn(asList("STATE1", "STATE2"));
         MetaData metadata = new MetaData(TEST_CASE_TYPE_VALUE, TEST_JURISDICTION_VALUE);
 
         subject.build(metadata, params, false);
 
         assertAll(
-            () -> verify(authorisedCaseDefinitionDataService).getUserAuthorisedCaseStates(TEST_JURISDICTION_VALUE, TEST_CASE_TYPE_VALUE, CAN_READ),
+            () -> verify(authorisedCaseDefinitionDataService).getUserAuthorisedCaseStateIds(TEST_JURISDICTION_VALUE, TEST_CASE_TYPE_VALUE, CAN_READ),
             () -> verify(em).createNativeQuery(
                 "SELECT * FROM case_data WHERE case_type_id = ?0 AND jurisdiction = ?1 AND state IN ('STATE1','STATE2') ORDER BY created_date ASC",
                 CaseDetailsEntity.class));

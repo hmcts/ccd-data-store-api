@@ -8,11 +8,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
 import uk.gov.hmcts.ccd.domain.service.common.AuthorisedCaseDefinitionDataService;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -42,20 +40,16 @@ class CaseStateAuthorisationSecurityTest {
         @Test
         @DisplayName("should secure the builder query with user authorised list of case states")
         void shouldSecureWithAuthorisedCaseStates() {
-            CaseState caseState1 = new CaseState();
-            caseState1.setId("state1");
-            CaseState caseState2 = new CaseState();
-            caseState2.setId("state2");
-            List<CaseState> caseStates = asList(caseState1, caseState2);
+            List<String> caseStates = asList("state1", "state2");
             MetaData metaData = new MetaData("CaseType", "Jurisdiction");
-            when(authorisedCaseDefinitionDataService.getUserAuthorisedCaseStates(metaData.getJurisdiction(), metaData.getCaseTypeId(), CAN_READ)).thenReturn(
+            when(authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds(metaData.getJurisdiction(), metaData.getCaseTypeId(), CAN_READ)).thenReturn(
                 caseStates);
 
             caseStateAuthorisationSecurity.secure(builder, metaData);
 
             assertAll(
-                () -> verify(authorisedCaseDefinitionDataService).getUserAuthorisedCaseStates(metaData.getJurisdiction(), metaData.getCaseTypeId(), CAN_READ),
-                () -> verify(builder).whereStates(caseStates.stream().map(CaseState::getId).collect(Collectors.toList())));
+                () -> verify(authorisedCaseDefinitionDataService).getUserAuthorisedCaseStateIds(metaData.getJurisdiction(), metaData.getCaseTypeId(), CAN_READ),
+                () -> verify(builder).whereStates(caseStates));
         }
     }
 }
