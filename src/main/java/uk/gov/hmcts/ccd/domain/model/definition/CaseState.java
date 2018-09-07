@@ -18,6 +18,7 @@ public class CaseState implements Serializable {
     private String name = null;
     private String description = null;
     private Integer displayOrder = null;
+    private String titleDisplay;
     private List<AccessControlList> accessControlLists;
 
     /**
@@ -64,6 +65,16 @@ public class CaseState implements Serializable {
 
     public void setDisplayOrder(Integer displayOrder) {
         this.displayOrder = displayOrder;
+    }
+
+    @ApiModelProperty(value = "Title label to be displayed for state")
+    @JsonProperty("title_display")
+    public String getTitleDisplay() {
+        return titleDisplay;
+    }
+
+    public void setTitleDisplay(String titleDisplay) {
+        this.titleDisplay = titleDisplay;
     }
 
     @ApiModelProperty(value = "State Access Control Lists")
