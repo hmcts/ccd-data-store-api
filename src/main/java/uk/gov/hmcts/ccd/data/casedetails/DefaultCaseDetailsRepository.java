@@ -5,10 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.data.casedetails.query.CaseDetailsAuthorisationSecurity;
 import uk.gov.hmcts.ccd.data.casedetails.query.CaseDetailsQueryBuilder;
-import uk.gov.hmcts.ccd.data.casedetails.query.CountCaseDetailsQueryBuilder;
-import uk.gov.hmcts.ccd.data.casedetails.query.SelectCaseDetailsQueryBuilder;
+import uk.gov.hmcts.ccd.data.casedetails.query.CaseDetailsQueryBuilderFactory;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.data.casedetails.search.SearchQueryFactoryOperation;
@@ -46,19 +44,19 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     private EntityManager em;
 
     private final SearchQueryFactoryOperation queryBuilder;
+    private final CaseDetailsQueryBuilderFactory queryBuilderFactory;
     private final ApplicationParams applicationParams;
-    private final List<CaseDetailsAuthorisationSecurity> caseDetailsAuthorisationSecurities;
 
     @Inject
     public DefaultCaseDetailsRepository(
-            final CaseDetailsMapper caseDetailsMapper,
-            final SearchQueryFactoryOperation queryBuilder,
-            final ApplicationParams applicationParams,
-            final List<CaseDetailsAuthorisationSecurity> caseDetailsAuthorisationSecurities) {
+        final CaseDetailsMapper caseDetailsMapper,
+        final SearchQueryFactoryOperation queryBuilder,
+        final CaseDetailsQueryBuilderFactory queryBuilderFactory,
+        final ApplicationParams applicationParams) {
         this.caseDetailsMapper = caseDetailsMapper;
         this.queryBuilder = queryBuilder;
+        this.queryBuilderFactory = queryBuilderFactory;
         this.applicationParams = applicationParams;
-        this.caseDetailsAuthorisationSecurities = caseDetailsAuthorisationSecurities;
     }
 
     @Override
@@ -178,9 +176,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     // TODO This accepts null values for backward compatibility. Once deprecated methods are removed, parameters should
     // be annotated with @NotNull
     private Optional<CaseDetailsEntity> find(String jurisdiction, Long id, String reference) {
-        final CaseDetailsQueryBuilder<CaseDetailsEntity> qb = new SelectCaseDetailsQueryBuilder(em);
-
-        qb.secure(caseDetailsAuthorisationSecurities, null);
+        final CaseDetailsQueryBuilder<CaseDetailsEntity> qb = queryBuilderFactory.select(em);
 
         if (null != jurisdiction) {
             qb.whereJurisdiction(jurisdiction);
@@ -211,15 +207,13 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     private Query getCountQueryByMetaData(MetaData metadata) {
-        return new CountCaseDetailsQueryBuilder(em)
-            .secure(caseDetailsAuthorisationSecurities, metadata)
+        return queryBuilderFactory.count(em, metadata)
             .whereMetadata(metadata)
             .build();
     }
 
     private Query getQueryByMetaData(MetaData metadata) {
-        return new SelectCaseDetailsQueryBuilder(em)
-            .secure(caseDetailsAuthorisationSecurities, metadata)
+        return queryBuilderFactory.select(em, metadata)
             .whereMetadata(metadata)
             .orderByCreatedDate(metadata.getSortDirection().orElse("asc"))
             .build();
