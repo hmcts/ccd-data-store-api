@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.datastore.tests.fixture;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,6 +15,7 @@ public interface AATCaseType {
 
     @Data
     @Builder
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     class CaseData {
         @JsonProperty("TextField")
         private String textField;
@@ -76,24 +78,24 @@ public interface AATCaseType {
             return new CCDEventBuilder(JURISDICTION, CASE_TYPE, CREATE);
         }
 
-        static CCDEventBuilder startProgress() {
-            return new CCDEventBuilder(JURISDICTION, CASE_TYPE, START_PROGRESS);
+        static CCDEventBuilder startProgress(Long caseReference) {
+            return new CCDEventBuilder(JURISDICTION, CASE_TYPE, caseReference, START_PROGRESS);
         }
 
-        static CCDEventBuilder stopProgress() {
-            return new CCDEventBuilder(JURISDICTION, CASE_TYPE, STOP_PROGRESS);
+        static CCDEventBuilder stopProgress(Long caseReference) {
+            return new CCDEventBuilder(JURISDICTION, CASE_TYPE, caseReference, STOP_PROGRESS);
         }
 
-        static CCDEventBuilder complete() {
-            return new CCDEventBuilder(JURISDICTION, CASE_TYPE, COMPLETE);
+        static CCDEventBuilder complete(Long caseReference) {
+            return new CCDEventBuilder(JURISDICTION, CASE_TYPE, caseReference, COMPLETE);
         }
 
-        static CCDEventBuilder update() {
-            return new CCDEventBuilder(JURISDICTION, CASE_TYPE, UPDATE);
+        static CCDEventBuilder update(Long caseReference) {
+            return new CCDEventBuilder(JURISDICTION, CASE_TYPE, caseReference, UPDATE);
         }
 
-        static CCDEventBuilder review() {
-            return new CCDEventBuilder(JURISDICTION, CASE_TYPE, REVIEW);
+        static CCDEventBuilder review(Long caseReference) {
+            return new CCDEventBuilder(JURISDICTION, CASE_TYPE, caseReference, REVIEW);
         }
     }
 

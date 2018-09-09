@@ -29,7 +29,7 @@ class GetCaseTest extends BaseTest {
         final Long caseReference = Event.create()
                                         .as(asAutoTestCaseworker())
                                         .withData(FullCase.build())
-                                        .submit();
+                                        .submitAndGetReference();
 
         asAutoTestCaseworker()
             .get()
