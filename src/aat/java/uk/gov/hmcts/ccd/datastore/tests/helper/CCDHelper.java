@@ -33,22 +33,19 @@ public class CCDHelper {
                                           String caseType,
                                           String event) {
 
-        final String eventToken = asUser.get()
+        return asUser
+            .get()
             .given()
             .pathParam("jurisdiction", jurisdiction)
             .pathParam("caseType", caseType)
             .pathParam("event", event)
             .contentType(ContentType.JSON)
             .when()
-            .get(
-                "/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/event-triggers/{event}/token")
+            .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/event-triggers/{event}/token")
             .then()
             .statusCode(200)
             .extract()
             .path("token");
-
-        return eventToken;
-
     }
 
     public String generateTokenUpdateCase(Supplier<RequestSpecification> asUser,
@@ -57,7 +54,8 @@ public class CCDHelper {
                                           String event,
                                           Long caseID) {
 
-        final String eventToken = asUser.get()
+        return asUser
+            .get()
             .given()
             .pathParam("jurisdiction", jurisdiction)
             .pathParam("caseType", caseType)
@@ -70,9 +68,6 @@ public class CCDHelper {
             .statusCode(200)
             .extract()
             .path("token");
-
-        return eventToken;
-
     }
 
 }
