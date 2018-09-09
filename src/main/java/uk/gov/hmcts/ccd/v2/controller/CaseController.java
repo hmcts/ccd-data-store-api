@@ -9,23 +9,29 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.resource.CaseResource;
 
 @RestController
 @RequestMapping(path = "/cases")
 public class CaseController {
+    private static final String ERROR_CASE_ID_INVALID = "Case ID is not valid";
 
     private final GetCaseOperation getCaseOperation;
+    private final UIDService caseReferenceService;
 
     @Autowired
     public CaseController(
-        @Qualifier(CreatorGetCaseOperation.QUALIFIER) final GetCaseOperation getCaseOperation
+        @Qualifier(CreatorGetCaseOperation.QUALIFIER) final GetCaseOperation getCaseOperation,
+        UIDService caseReferenceService
     ) {
         this.getCaseOperation = getCaseOperation;
+        this.caseReferenceService = caseReferenceService;
     }
 
     @RequestMapping(
@@ -50,7 +56,7 @@ public class CaseController {
         ),
         @ApiResponse(
             code = 400,
-            message = "Invalid case ID"
+            message = ERROR_CASE_ID_INVALID
         ),
         @ApiResponse(
             code = 404,
@@ -58,6 +64,9 @@ public class CaseController {
         )
     })
     public ResponseEntity<CaseResource> getCase(@PathVariable("caseId") String caseId) {
+        if (!caseReferenceService.validateUID(caseId)) {
+            throw new BadRequestException(ERROR_CASE_ID_INVALID);
+        }
 
         final CaseDetails caseDetails = this.getCaseOperation.execute(caseId)
                                                              .orElseThrow(() -> new CaseNotFoundException(caseId));

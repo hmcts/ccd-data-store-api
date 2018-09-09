@@ -10,12 +10,16 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.resource.CaseResource;
 
 import java.util.Optional;
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -30,6 +34,9 @@ class CaseControllerTest {
     private GetCaseOperation getCaseOperation;
 
     @Mock
+    private UIDService caseReferenceService;
+
+    @Mock
     private CaseDetails caseDetails;
 
     @InjectMocks
@@ -41,6 +48,7 @@ class CaseControllerTest {
 
         when(caseDetails.getReference()).thenReturn(new Long(CASE_REFERENCE));
 
+        when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(TRUE);
         when(getCaseOperation.execute(CASE_REFERENCE)).thenReturn(Optional.of(caseDetails));
     }
 
@@ -65,6 +73,15 @@ class CaseControllerTest {
             when(getCaseOperation.execute(CASE_REFERENCE)).thenReturn(Optional.empty());
 
             assertThrows(CaseNotFoundException.class,
+                         () -> caseController.getCase(CASE_REFERENCE));
+        }
+
+        @Test
+        @DisplayName("should return 400 when case reference not valid")
+        void caseReferenceNotValid() {
+            when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
+
+            assertThrows(BadRequestException.class,
                          () -> caseController.getCase(CASE_REFERENCE));
         }
     }
