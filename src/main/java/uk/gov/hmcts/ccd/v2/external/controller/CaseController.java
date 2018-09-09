@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.v2.controller;
+package uk.gov.hmcts.ccd.v2.external.controller;
 
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,7 @@ import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.V2;
-import uk.gov.hmcts.ccd.v2.resource.CaseResource;
+import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 
 @RestController
 @RequestMapping(path = "/cases")

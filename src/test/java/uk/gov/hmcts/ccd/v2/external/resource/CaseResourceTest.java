@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.v2.resource;
+package uk.gov.hmcts.ccd.v2.external.resource;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.TextNode;

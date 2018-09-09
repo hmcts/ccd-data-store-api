@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.v2.resource;
+package uk.gov.hmcts.ccd.v2.external.resource;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -9,7 +9,7 @@ import lombok.NonNull;
 import org.springframework.hateoas.ResourceSupport;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.v2.controller.CaseController;
+import uk.gov.hmcts.ccd.v2.external.controller.CaseController;
 
 import java.time.LocalDateTime;
 import java.util.Map;

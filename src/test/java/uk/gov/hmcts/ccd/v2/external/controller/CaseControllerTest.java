@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.v2.controller;
+package uk.gov.hmcts.ccd.v2.external.controller;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,7 +14,7 @@ import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
-import uk.gov.hmcts.ccd.v2.resource.CaseResource;
+import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 
 import java.util.Optional;
 

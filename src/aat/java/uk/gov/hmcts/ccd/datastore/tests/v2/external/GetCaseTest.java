@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.datastore.tests.v2;
+package uk.gov.hmcts.ccd.datastore.tests.v2.external;
 
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.DisplayName;
