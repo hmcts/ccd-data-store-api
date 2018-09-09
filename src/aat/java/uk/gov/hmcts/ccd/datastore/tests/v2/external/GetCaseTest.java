@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.datastore.tests.v2.external;
 
-import io.restassured.http.ContentType;
+import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
@@ -33,14 +33,7 @@ class GetCaseTest extends BaseTest {
                                         .withData(FullCase.build())
                                         .submitAndGetReference();
 
-        asAutoTestCaseworker(FALSE)
-            .get()
-
-            .given()
-            .pathParam("caseReference", caseReference)
-            .header("experimental", "true")
-            .contentType(V2.MediaType.CASE)
-
+        callGetCase(caseReference.toString())
             .when()
             .get("/cases/{caseReference}")
 
@@ -90,13 +83,7 @@ class GetCaseTest extends BaseTest {
     @Test
     @DisplayName("should get 404 when case reference does NOT exist")
     void should404WhenNotExists() {
-        asAutoTestCaseworker(FALSE)
-            .get()
-
-            .given()
-            .pathParam("caseReference", NOT_FOUND_CASE_REFERENCE)
-            .contentType(ContentType.JSON)
-
+        callGetCase(NOT_FOUND_CASE_REFERENCE)
             .when()
             .get("/cases/{caseReference}")
 
@@ -107,17 +94,20 @@ class GetCaseTest extends BaseTest {
     @Test
     @DisplayName("should get 400 when case reference invalid")
     void should400WhenReferenceInvalid() {
-        asAutoTestCaseworker(FALSE)
-            .get()
-
-            .given()
-            .pathParam("caseReference", INVALID_CASE_REFERENCE)
-            .contentType(ContentType.JSON)
-
+        callGetCase(INVALID_CASE_REFERENCE)
             .when()
             .get("/cases/{caseReference}")
 
             .then()
             .statusCode(400);
+    }
+
+    private RequestSpecification callGetCase(String caseReference) {
+        return asAutoTestCaseworker(FALSE)
+            .get()
+            .given()
+            .pathParam("caseReference", caseReference)
+            .accept(V2.MediaType.CASE)
+            .header("experimental", "true");
     }
 }
