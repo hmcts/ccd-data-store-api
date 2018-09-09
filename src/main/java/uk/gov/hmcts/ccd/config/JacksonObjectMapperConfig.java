@@ -22,7 +22,7 @@ public class JacksonObjectMapperConfig {
      */
     class HalObjectMapperPostProcessor implements BeanPostProcessor {
 
-        private static final String HAL_OBJECT_MAPPER = "_halObjectMapper";
+        public static final String HAL_OBJECT_MAPPER = "_halObjectMapper";
 
         @Override
         public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
