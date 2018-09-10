@@ -9,6 +9,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -25,6 +26,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import javax.inject.Inject;
 import java.util.*;
 
+import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.ccd.ApplicationParams.encodeBase64;
 
 @Service
@@ -35,6 +37,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
 
     public static final String QUALIFIER = "default";
     private static final int RESOURCE_NOT_FOUND = 404;
+    private static final ServiceException NULL_RESPONSE_EX = new ServiceException("Null response from definition store");
 
     private final ApplicationParams applicationParams;
     private final SecurityUtils securityUtils;
@@ -55,11 +58,14 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     public List<CaseType> getCaseTypesForJurisdiction(final String jurisdictionId) {
         try {
             final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
-            return Arrays.asList(restTemplate.exchange(applicationParams.jurisdictionCaseTypesDefURL(jurisdictionId), HttpMethod.GET, requestEntity, CaseType[].class).getBody());
+            return Arrays.asList(restTemplate.exchange(applicationParams.jurisdictionCaseTypesDefURL(jurisdictionId),
+                                                       HttpMethod.GET,
+                                                       requestEntity,
+                                                       CaseType[].class).getBody());
         } catch (Exception e) {
             LOG.warn("Error while retrieving base type", e);
             if (e instanceof HttpClientErrorException
-                && ((HttpClientErrorException)e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException("Resource not found when getting case types for Jurisdiction:" + jurisdictionId + " because of " + e.getMessage());
             } else {
                 throw new ServiceException("Problem getting case types for the Jurisdiction:" + jurisdictionId + " because of " + e.getMessage());
@@ -77,7 +83,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         } catch (Exception e) {
             LOG.warn("Error while retrieving case type", e);
             if (e instanceof HttpClientErrorException
-                && ((HttpClientErrorException)e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException("Resource not found when getting case type definition for " + caseTypeId + " because of " + e.getMessage());
             } else {
                 throw new ServiceException("Problem getting case type definition for " + caseTypeId + " because of " + e.getMessage());
@@ -93,7 +99,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         } catch (Exception e) {
             LOG.warn("Error while retrieving base types", e);
             if (e instanceof HttpClientErrorException
-                && ((HttpClientErrorException)e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException("Problem getting base types definition from definition store because of " + e.getMessage());
             } else {
                 throw new ServiceException("Problem getting base types definition from definition store because of " + e.getMessage());
@@ -110,7 +116,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             return restTemplate.exchange(applicationParams.userRoleClassification(), HttpMethod.GET, requestEntity, UserRole.class, queryParams).getBody();
         } catch (Exception e) {
             if (e instanceof HttpClientErrorException
-                && ((HttpClientErrorException)e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
                 LOG.debug("No classification found for user role {} because of ", userRole, e);
                 return null;
             } else {
@@ -129,10 +135,10 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             final HttpEntity requestEntity = new HttpEntity<CaseType>(securityUtils.authorizationHeaders());
             final Map<String, String> queryParams = new HashMap<>();
             queryParams.put("roles", StringUtils.join(userRoles, ","));
-            return Arrays.asList(restTemplate.exchange(applicationParams.userRolesClassificationsURL(), HttpMethod.GET, requestEntity, UserRole[].class, queryParams).getBody());
+            return Arrays.asList(ofNullable(getClassificationForUserRoleList(requestEntity, queryParams)).orElseThrow(() -> NULL_RESPONSE_EX).getBody());
         } catch (Exception e) {
-            LOG.warn("Error while retrieving classification for user roles {} because of ", userRoles, e);
-            throw new ServiceException("Error while retrieving classification for user roles " + userRoles + " because of " + e.getMessage());
+            LOG.warn("Error while retrieving classification for user roles {} because of: ", userRoles, e);
+            throw new ServiceException("Error while retrieving classification for user roles " + userRoles + " because of: " + e.getMessage());
         }
     }
 
@@ -140,17 +146,15 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     public CaseTypeDefinitionVersion getLatestVersion(String caseTypeId) {
         try {
             final HttpEntity requestEntity = new HttpEntity<CaseType>(securityUtils.authorizationHeaders());
-            CaseTypeDefinitionVersion version = restTemplate.exchange(applicationParams.caseTypeLatestVersionUrl
-                    (caseTypeId), HttpMethod.GET, requestEntity, CaseTypeDefinitionVersion.class).getBody();
+            CaseTypeDefinitionVersion version = ofNullable(getLatestVersion(caseTypeId, requestEntity)).orElseThrow(() -> NULL_RESPONSE_EX).getBody();
             LOG.debug("retrieved latest version for case type: {}: {}", caseTypeId, version);
             return version;
-
         } catch (Exception e) {
             LOG.warn("Error while retrieving case type version", e);
-            if (e instanceof HttpClientErrorException && ((HttpClientErrorException)e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
-                throw new ResourceNotFoundException("Resource not found when getting case type version for " + caseTypeId + " because of " + e.getMessage());
+            if (e instanceof HttpClientErrorException && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                throw new ResourceNotFoundException("Resource not found when getting case type version for " + caseTypeId + " because of: " + e.getMessage());
             } else {
-                throw new ServiceException("Problem getting case type version for " + caseTypeId + " because of " + e.getMessage());
+                throw new ServiceException("Problem getting case type version for " + caseTypeId + " because of: " + e.getMessage());
             }
         }
     }
@@ -167,20 +171,41 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             LOG.debug("retrieving jurisdictions definitions for {}", ids);
             HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(applicationParams.jurisdictionDefURL())
-                    .queryParam("ids", String.join(",", ids));
-            List<Jurisdiction> jurisdictionList = restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET,
-                    requestEntity, new ParameterizedTypeReference<List<Jurisdiction>>() {
-                    }).getBody();
+                .queryParam("ids", String.join(",", ids));
+            List<Jurisdiction> jurisdictionList = ofNullable(getJurisdictions(requestEntity, builder)).orElseThrow(() -> NULL_RESPONSE_EX).getBody();
             LOG.debug("retrieved jurisdictions definition: {}", jurisdictionList);
             return jurisdictionList;
         } catch (Exception e) {
             LOG.warn("Error while retrieving jurisdictions definition", e);
-            if (e instanceof HttpClientErrorException && ((HttpClientErrorException)e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
-                throw new ResourceNotFoundException("Resource not found when retrieving jurisdictions definition because of " + e.getMessage());
+            if (e instanceof HttpClientErrorException && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                throw new ResourceNotFoundException("Resource not found when retrieving jurisdictions definition because of: " + e.getMessage());
             } else {
-                throw new ServiceException("Problem retrieving jurisdictions definition because of " + e.getMessage());
+                throw new ServiceException("Problem retrieving jurisdictions definition because of: " + e.getMessage());
             }
         }
+    }
+
+    private ResponseEntity<UserRole[]> getClassificationForUserRoleList(HttpEntity requestEntity, Map<String, String> queryParams) {
+        return restTemplate.exchange(applicationParams.userRolesClassificationsURL(),
+                                     HttpMethod.GET,
+                                     requestEntity,
+                                     UserRole[].class,
+                                     queryParams);
+    }
+
+    private ResponseEntity<CaseTypeDefinitionVersion> getLatestVersion(String caseTypeId, HttpEntity requestEntity) {
+        return restTemplate.exchange(applicationParams.caseTypeLatestVersionUrl(caseTypeId),
+                                     HttpMethod.GET,
+                                     requestEntity,
+                                     CaseTypeDefinitionVersion.class);
+    }
+
+    private ResponseEntity<List<Jurisdiction>> getJurisdictions(HttpEntity requestEntity, UriComponentsBuilder builder) {
+        return restTemplate.exchange(builder.build().encode().toUri(),
+                                     HttpMethod.GET,
+                                     requestEntity,
+                                     new ParameterizedTypeReference<List<Jurisdiction>>() {
+                                     });
     }
 
 }

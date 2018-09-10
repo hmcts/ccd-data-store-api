@@ -17,7 +17,8 @@ import java.util.stream.Collectors;
 public class FieldMapSanitizeOperation {
 
     private static final String VALID_FIELD_NAME_REGEX = "^[A-Za-z0-9_.-]+$";
-    private static final String CASE_FIELD_PREFIX = "case\\.";
+    private static final String CASE_FIELD_PREFIX = "case.";
+    private static final String CASE_FIELD_PREFIX_REGEXP = "case\\.";
 
     public Map<String, String> execute(final Map<String, String> params) {
         checkFieldNames(params.keySet());
@@ -38,7 +39,7 @@ public class FieldMapSanitizeOperation {
 
     private Entry<String, String> removeCaseFieldPrefix(Entry<String, String> entry) {
         return new AbstractMap.SimpleEntry<>(
-                entry.getKey().replaceFirst(CASE_FIELD_PREFIX, ""),
+                entry.getKey().replaceFirst(CASE_FIELD_PREFIX_REGEXP, ""),
                 entry.getValue());
 
     }
