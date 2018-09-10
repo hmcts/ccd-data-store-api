@@ -31,17 +31,20 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
     }
 
     @Override
-    public CaseView execute(String jurisdictionId, String caseTypeId, String caseReference) {
+    public CaseView execute(String caseReference) {
+        CaseView caseView = getCaseViewOperation.execute(caseReference);
 
-        CaseType caseType = getCaseType(caseTypeId);
-
+        CaseType caseType = getCaseType(caseView.getCaseType().getId());
         Set<String> userRoles = getUserRoles();
-
         verifyReadAccess(caseType, userRoles);
 
-        CaseView caseView = getCaseViewOperation.execute(jurisdictionId, caseTypeId, caseReference);
-
         return filterUpsertAccess(caseType, userRoles, caseView);
+    }
+
+    @Override
+    @Deprecated
+    public CaseView execute(String jurisdictionId, String caseTypeId, String caseReference) {
+        return execute(caseReference);
     }
 
     private CaseView filterUpsertAccess(CaseType caseType, Set<String> userRoles, CaseView caseView) {

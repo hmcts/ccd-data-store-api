@@ -3,16 +3,12 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
+import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 import java.util.List;
 import java.util.Map;
@@ -50,12 +46,9 @@ public abstract class AbstractDefaultGetCaseViewOperation {
         return caseTypeService.getCaseTypeForJurisdiction(caseTypeId, jurisdictionId);
     }
 
-    CaseDetails getCaseDetails(String jurisdictionId, String caseTypeId, String caseReference) {
-        return getCaseOperation.execute(jurisdictionId, caseTypeId, caseReference).orElseThrow(
-            () -> new ResourceNotFoundException(String.format(RESOURCE_NOT_FOUND,
-                                                              jurisdictionId,
-                                                              caseTypeId,
-                                                              caseReference)));
+    CaseDetails getCaseDetails(String caseReference) {
+        return getCaseOperation.execute(caseReference)
+                               .orElseThrow(() -> new CaseNotFoundException(caseReference));
     }
 
     CaseViewTab[] getTabs(CaseDetails caseDetails, Map<String, ?> data) {
