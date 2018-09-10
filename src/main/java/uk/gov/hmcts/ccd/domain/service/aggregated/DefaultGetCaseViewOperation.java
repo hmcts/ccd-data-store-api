@@ -65,7 +65,7 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
         caseView.setChannels(caseTabCollection.getChannels().toArray(new String[0]));
 
         CaseState caseState = caseTypeService.findState(caseType, caseDetails.getState());
-        caseView.setState(new ProfileCaseState(caseState.getId(), caseState.getName(), caseState.getDescription()));
+        caseView.setState(new ProfileCaseState(caseState.getId(), caseState.getName(), caseState.getDescription(), caseState.getTitleDisplay()));
 
         caseView.setCaseType(CaseViewType.createFrom(caseType));
         caseView.setTabs(getTabs(caseDetails, caseDetails.getCaseDataAndMetadata(), caseTabCollection));
