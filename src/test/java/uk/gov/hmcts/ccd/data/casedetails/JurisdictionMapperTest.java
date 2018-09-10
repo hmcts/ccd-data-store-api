@@ -16,9 +16,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBu
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.JurisdictionBuilder.newJurisdiction;
 
 class JurisdictionMapperTest {
-    CaseStateMapper caseStateMapper = new CaseStateMapper();
-    CaseTypeMapper caseTypeMapper = new CaseTypeMapper(caseStateMapper);
-    JurisdictionMapper jurisdictionMapper = new JurisdictionMapper(caseTypeMapper);
+    JurisdictionMapper jurisdictionMapper = new JurisdictionMapper();
 
     CaseState caseState1 = newState()
         .withId("ST1")
