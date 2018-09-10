@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
 
+import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,7 +11,7 @@ public class JurisdictionDisplayProperties {
     private String name;
     private String description;
 
-    private List<CaseTypeDisplayProperties> caseTypes = new ArrayList<>();
+    private List<CaseType> caseTypes = new ArrayList<>();
 
     public String getId() {
         return id;
@@ -35,11 +37,11 @@ public class JurisdictionDisplayProperties {
         this.description = description;
     }
 
-    public List<CaseTypeDisplayProperties> getCaseTypes() {
+    public List<CaseType> getCaseTypes() {
         return caseTypes;
     }
 
-    public void setCaseTypes(List<CaseTypeDisplayProperties> caseTypes) {
+    public void setCaseTypes(List<CaseType> caseTypes) {
         this.caseTypes = caseTypes;
     }
 }

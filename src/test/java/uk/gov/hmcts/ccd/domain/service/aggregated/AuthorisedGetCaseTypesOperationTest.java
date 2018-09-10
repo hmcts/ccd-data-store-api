@@ -29,7 +29,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.*;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.anCaseEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.aCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseStateBuilder.aState;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseStateBuilder.newState;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 
 class AuthorisedGetCaseTypesOperationTest {
@@ -65,12 +65,12 @@ class AuthorisedGetCaseTypesOperationTest {
     private static final String CASE_FIELD_ID_3_1 = "CASE_FIELD_3_1";
     private static final String CASE_FIELD_ID_3_2 = "CASE_FIELD_3_2";
     private static final String CASE_FIELD_ID_3_3 = "CASE_FIELD_3_3";
-    private static final CaseState CASE_STATE_1_1 = aState().withId(STATE_ID_1_1).build();
-    private static final CaseState CASE_STATE_1_2 = aState().withId(STATE_ID_1_2).build();
-    private static final CaseState CASE_STATE_2_1 = aState().withId(STATE_ID_2_1).build();
-    private static final CaseState CASE_STATE_2_2 = aState().withId(STATE_ID_2_2).build();
-    private static final CaseState CASE_STATE_3_1 = aState().withId(STATE_ID_3_1).build();
-    private static final CaseState CASE_STATE_3_2 = aState().withId(STATE_ID_3_2).build();
+    private static final CaseState CASE_STATE_1_1 = newState().withId(STATE_ID_1_1).build();
+    private static final CaseState CASE_STATE_1_2 = newState().withId(STATE_ID_1_2).build();
+    private static final CaseState CASE_STATE_2_1 = newState().withId(STATE_ID_2_1).build();
+    private static final CaseState CASE_STATE_2_2 = newState().withId(STATE_ID_2_2).build();
+    private static final CaseState CASE_STATE_3_1 = newState().withId(STATE_ID_3_1).build();
+    private static final CaseState CASE_STATE_3_2 = newState().withId(STATE_ID_3_2).build();
     private static final CaseEvent CASE_EVENT_1_1 = anCaseEvent().withId(EVENT_ID_1_1)
         .withAcl(anAcl()
                      .withRole(ROLE_IN_USER_ROLES)
