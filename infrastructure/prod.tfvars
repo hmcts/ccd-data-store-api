@@ -3,3 +3,5 @@ document_management_valid_domain = "^https?://(?:api-gateway\\.dm\\.reform\\.hmc
 default_print_url = "https://return-case-doc.ccd.platform.hmcts.net/jurisdictions/:jid/case-types/:ctid/cases/:cid"
 capacity = "2"
 frontend_url = "https://www.ccd.platform.hmcts.net"
+asp_name = "ccd-data-store-api-prod"
+asp_rg = "ccd-data-store-api-prod"
