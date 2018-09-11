@@ -33,6 +33,14 @@ variable "common_tags" {
   type = "map"
 }
 
+variable "asp_name" {
+  type = "string"
+}
+
+variable "asp_rg" {
+  type = "string"
+}
+
 variable "tenant_id" {
   description = "(Required) The Azure Active Directory tenant ID that should be used for authenticating requests to the key vault. This is usually sourced from environemnt variables and not normally required to be specified."
 }

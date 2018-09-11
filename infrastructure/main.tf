@@ -63,6 +63,9 @@ module "ccd-data-store-api" {
   is_frontend = false
   common_tags  = "${var.common_tags}"
   additional_host_name = "debugparam"
+  asp_name = "${var.asp_name}"
+  asp_rg = "${var.asp_rg}"
+
   app_settings = {
     DATA_STORE_DB_HOST = "${module.data-store-db.host_name}"
     DATA_STORE_DB_PORT = "${module.data-store-db.postgresql_listen_port}"
