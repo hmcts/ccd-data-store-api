@@ -1,13 +1,3 @@
-provider "vault" {
-  //  # It is strongly recommended to configure this provider through the
-  //  # environment variables described above, so that each user can have
-  //  # separate credentials set in the environment.
-  //  #
-  //  # This will default to using $VAULT_ADDR
-  //  # But can be set explicitly
-  address = "https://vault.reform.hmcts.net:6200"
-}
-
 locals {
   app_full_name = "${var.product}-${var.component}"
 
@@ -31,12 +21,6 @@ locals {
   previewResourceGroup = "${var.raw_product}-shared-aat"
   nonPreviewResourceGroup = "${var.raw_product}-shared-${var.env}"
   sharedResourceGroup = "${(var.env == "preview" || var.env == "spreview") ? local.previewResourceGroup : local.nonPreviewResourceGroup}"
-
-  // Old vault info to be removed
-  oldPreviewVaultName = "${var.product}-data-store"
-  oldNonPreviewVaultName = "ccd-data-store-${var.env}"
-  oldVaultName = "${(var.env == "preview" || var.env == "spreview") ? local.oldPreviewVaultName : local.oldNonPreviewVaultName}"
-
 
   // S2S
   s2s_url = "http://rpe-service-auth-provider-${local.env_ase_url}"
@@ -119,17 +103,6 @@ module "data-store-db" {
   sku_tier = "GeneralPurpose"
   storage_mb = "51200"
   common_tags  = "${var.common_tags}"
-}
-
-module "ccd-data-store-vault" {
-  source              = "git@github.com:hmcts/moj-module-key-vault?ref=master"
-  name                = "${local.oldVaultName}" // Max 24 characters
-  product             = "${var.product}"
-  env                 = "${var.env}"
-  tenant_id           = "${var.tenant_id}"
-  object_id           = "${var.jenkins_AAD_objectId}"
-  resource_group_name = "${module.ccd-data-store-api.resource_group_name}"
-  product_group_object_id = "be8b3850-998a-4a66-8578-da268b8abd6b"
 }
 
 ////////////////////////////////
