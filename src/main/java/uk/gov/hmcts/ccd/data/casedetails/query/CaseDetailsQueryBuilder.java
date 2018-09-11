@@ -1,15 +1,11 @@
 package uk.gov.hmcts.ccd.data.casedetails.query;
 
+import org.apache.commons.collections.CollectionUtils;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserEntity;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -19,6 +15,11 @@ import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 public abstract class CaseDetailsQueryBuilder<T> {
 
@@ -78,6 +79,13 @@ public abstract class CaseDetailsQueryBuilder<T> {
     public CaseDetailsQueryBuilder whereState(String state) {
         predicates.add(cb.equal(root.get("state"), state));
 
+        return this;
+    }
+
+    public CaseDetailsQueryBuilder whereStates(List<String> states) {
+        if (CollectionUtils.isNotEmpty(states)) {
+            predicates.add(cb.in(root.get("state")).value(states));
+        }
         return this;
     }
 
@@ -147,4 +155,5 @@ public abstract class CaseDetailsQueryBuilder<T> {
     private LocalDateTime atStartOfDay(String date) {
         return LocalDate.parse(date).atStartOfDay();
     }
+
 }
