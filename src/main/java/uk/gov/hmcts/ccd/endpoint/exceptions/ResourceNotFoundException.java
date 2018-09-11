@@ -8,4 +8,8 @@ public class ResourceNotFoundException extends ApiException {
     public ResourceNotFoundException(final String message) {
         super(message);
     }
+
+    public ResourceNotFoundException(final String message, final Exception cause) {
+        super(message, cause);
+    }
 }

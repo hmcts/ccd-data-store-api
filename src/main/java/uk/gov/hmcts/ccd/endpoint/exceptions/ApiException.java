@@ -19,6 +19,10 @@ public class ApiException extends RuntimeException {
         super(message);
     }
 
+    public ApiException(final String message, final Exception cause) {
+        super(message, cause);
+    }
+
     public ApiException withDetails(Serializable details) {
         this.details = details;
         return this;
