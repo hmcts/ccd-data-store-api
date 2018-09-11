@@ -68,7 +68,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                 && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException("Resource not found when getting case types for Jurisdiction:" + jurisdictionId + " because of " + e.getMessage());
             } else {
-                throw new ServiceException("Problem getting case types for the Jurisdiction:" + jurisdictionId + " because of " + e.getMessage());
+                throw new ServiceException("Problem getting case types for the Jurisdiction:" + jurisdictionId + " because of " + e.getMessage(), e);
             }
         }
     }
@@ -86,7 +86,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                 && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException("Resource not found when getting case type definition for " + caseTypeId + " because of " + e.getMessage());
             } else {
-                throw new ServiceException("Problem getting case type definition for " + caseTypeId + " because of " + e.getMessage());
+                throw new ServiceException("Problem getting case type definition for " + caseTypeId + " because of " + e.getMessage(), e);
             }
         }
     }
@@ -102,7 +102,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                 && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException("Problem getting base types definition from definition store because of " + e.getMessage());
             } else {
-                throw new ServiceException("Problem getting base types definition from definition store because of " + e.getMessage());
+                throw new ServiceException("Problem getting base types definition from definition store because of " + e.getMessage(), e);
             }
         }
     }
@@ -121,7 +121,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                 return null;
             } else {
                 LOG.warn("Error while retrieving classification for user role {} because of ", userRole, e);
-                throw new ServiceException("Error while retrieving classification for user role " + userRole + " because of " + e.getMessage());
+                throw new ServiceException("Error while retrieving classification for user role " + userRole + " because of " + e.getMessage(), e);
             }
         }
     }
@@ -138,7 +138,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             return Arrays.asList(ofNullable(getClassificationForUserRoleList(requestEntity, queryParams)).orElseThrow(() -> NULL_RESPONSE_EX).getBody());
         } catch (Exception e) {
             LOG.warn("Error while retrieving classification for user roles {} because of: ", userRoles, e);
-            throw new ServiceException("Error while retrieving classification for user roles " + userRoles + " because of: " + e.getMessage());
+            throw new ServiceException("Error while retrieving classification for user roles " + userRoles + " because of: " + e.getMessage(), e);
         }
     }
 
@@ -154,7 +154,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             if (e instanceof HttpClientErrorException && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException("Resource not found when getting case type version for " + caseTypeId + " because of: " + e.getMessage());
             } else {
-                throw new ServiceException("Problem getting case type version for " + caseTypeId + " because of: " + e.getMessage());
+                throw new ServiceException("Problem getting case type version for " + caseTypeId + " because of: " + e.getMessage(), e);
             }
         }
     }
