@@ -7,6 +7,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Example;
+import io.swagger.annotations.ExampleProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,7 +30,7 @@ import java.util.Optional;
 @RequestMapping(path = "/",
         consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE)
-@Api(value = "/", description = "Standard case search API")
+@Api(value = "/", description = "New ElasticSearch based search API")
 public class CaseDetailsSearchEndpoint {
 
     @Autowired
@@ -38,17 +40,18 @@ public class CaseDetailsSearchEndpoint {
     private ApplicationParams applicationParams;
 
     @RequestMapping(value = "/searchCases", method = RequestMethod.POST)
-    @ApiOperation("Search case data according to the given ElasticSearch query")
+    @ApiOperation("Search case data according to the provided ElasticSearch query")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "List of case data for the given search query")
+            @ApiResponse(code = 200, message = "List of case data for the given search request")
     })
     public CaseDetailsSearchResult searchCases(
             @ApiParam(value = "Case type ID", required = true)
             @RequestParam("ctid") List<String> caseTypeIds,
-            @RequestBody String request) throws IOException {
+            @ApiParam(name="native ElasticSearch Search API request. Please refer to the ElasticSearch official documentation", required = true)
+            @RequestBody String jsonSearchRequest) throws IOException {
 
-        validateSearchRequest(request);
-        return caseDetailsSearchOperation.execute(caseTypeIds, request);
+        validateSearchRequest(jsonSearchRequest);
+        return caseDetailsSearchOperation.execute(caseTypeIds, jsonSearchRequest);
     }
 
     private void validateSearchRequest(String searchRequest) throws IOException {
