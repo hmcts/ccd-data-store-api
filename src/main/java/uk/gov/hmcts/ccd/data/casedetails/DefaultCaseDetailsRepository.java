@@ -208,15 +208,15 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
 
     private Query getCountQueryByMetaData(MetaData metadata) {
         return queryBuilderFactory.count(em, metadata)
-            .whereMetadata(metadata)
-            .build();
+                                  .whereMetadata(metadata)
+                                  .build();
     }
 
     private Query getQueryByMetaData(MetaData metadata) {
         return queryBuilderFactory.select(em, metadata)
-            .whereMetadata(metadata)
-            .orderByCreatedDate(metadata.getSortDirection().orElse("asc"))
-            .build();
+                                  .whereMetadata(metadata)
+                                  .orderByCreatedDate(metadata.getSortDirection().orElse("asc"))
+                                  .build();
     }
 
     private void paginate(Query query, Optional<String> pageOpt) {
