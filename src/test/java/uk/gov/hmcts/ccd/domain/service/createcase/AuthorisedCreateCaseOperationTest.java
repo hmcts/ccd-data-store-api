@@ -18,6 +18,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
@@ -37,6 +38,7 @@ import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
 class AuthorisedCreateCaseOperationTest {
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -52,8 +54,9 @@ class AuthorisedCreateCaseOperationTest {
     private static final String EVENT_ID = "EVENT_ID";
     private static final Map<String, JsonNode> DATA = new HashMap<>();
     private static final String TOKEN = "JwtToken";
+    private static final CaseDataContent EVENT_DATA = newCaseDataContent().withEvent(EVENT).withData(DATA).withToken(TOKEN).build();
     private static final Boolean IGNORE = Boolean.TRUE;
-    private static final Event NULL_EVENT = null;
+    private static final CaseDataContent NULL_EVENT_DATA = null;
 
     @Mock
     private CreateCaseOperation classifiedCreateCaseOperation;
@@ -84,12 +87,10 @@ class AuthorisedCreateCaseOperationTest {
         classifiedCase.setData(Maps.newHashMap());
         EVENT.setEventId(EVENT_ID);
         doReturn(classifiedCase).when(classifiedCreateCaseOperation).createCaseDetails(UID,
-            JURISDICTION_ID,
-            CASE_TYPE_ID,
-            EVENT,
-            DATA,
-            IGNORE,
-            TOKEN);
+                                                                                       JURISDICTION_ID,
+                                                                                       CASE_TYPE_ID,
+                                                                                       EVENT_DATA,
+                                                                                       IGNORE);
         JsonNode authorisedCaseNode = MAPPER.createObjectNode();
         caseType.setEvents(events);
         caseType.setCaseFields(caseFields);
@@ -107,45 +108,37 @@ class AuthorisedCreateCaseOperationTest {
     void shouldCallDecoratedOperation() {
 
         authorisedCreateCaseOperation.createCaseDetails(UID,
-                                                       JURISDICTION_ID,
-                                                       CASE_TYPE_ID,
-                                                       EVENT,
-                                                       DATA,
-                                                       IGNORE,
-                                                       TOKEN);
+                                                        JURISDICTION_ID,
+                                                        CASE_TYPE_ID,
+                                                        EVENT_DATA,
+                                                        IGNORE);
 
         verify(classifiedCreateCaseOperation).createCaseDetails(UID,
-                                                         JURISDICTION_ID,
-                                                         CASE_TYPE_ID,
-                                                         EVENT,
-                                                         DATA,
-                                                         IGNORE,
-                                                         TOKEN);
+                                                                JURISDICTION_ID,
+                                                                CASE_TYPE_ID,
+                                                                EVENT_DATA,
+                                                                IGNORE);
     }
 
     @Test
     @DisplayName("should return null when decorated operation returns null")
     void shouldReturnNullWhenOperationReturnsNull() {
         doReturn(null).when(classifiedCreateCaseOperation).createCaseDetails(UID,
-                                                                  JURISDICTION_ID,
-                                                                  CASE_TYPE_ID,
-                                                                  EVENT,
-                                                                  DATA,
-                                                                  IGNORE,
-                                                                  TOKEN);
+                                                                             JURISDICTION_ID,
+                                                                             CASE_TYPE_ID,
+                                                                             EVENT_DATA,
+                                                                             IGNORE);
 
         final CaseDetails output = authorisedCreateCaseOperation.createCaseDetails(UID,
-                                                                                  JURISDICTION_ID,
-                                                                                  CASE_TYPE_ID,
-                                                                                  EVENT,
-                                                                                  DATA,
-                                                                                  IGNORE,
-                                                                                  TOKEN);
+                                                                                   JURISDICTION_ID,
+                                                                                   CASE_TYPE_ID,
+                                                                                   EVENT_DATA,
+                                                                                   IGNORE);
         assertAll(
             () -> assertThat(output, is(nullValue())),
             () -> verify(accessControlService, never()).canAccessCaseTypeWithCriteria(eq(caseType), eq(userRoles), eq(CAN_READ)),
             () -> verify(accessControlService, never()).filterCaseFieldsByAccess(any(JsonNode.class), eq(caseFields), eq(userRoles), eq(CAN_READ))
-            );
+        );
     }
 
     @Test
@@ -153,12 +146,10 @@ class AuthorisedCreateCaseOperationTest {
     void shouldReturnAuthorisedCaseDetailsIfCreateAndReadAccessGranted() {
 
         final CaseDetails output = authorisedCreateCaseOperation.createCaseDetails(UID,
-                                                                                  JURISDICTION_ID,
-                                                                                  CASE_TYPE_ID,
-                                                                                  EVENT,
-                                                                                  DATA,
-                                                                                  IGNORE,
-                                                                                  TOKEN);
+                                                                                   JURISDICTION_ID,
+                                                                                   CASE_TYPE_ID,
+                                                                                   EVENT_DATA,
+                                                                                   IGNORE);
 
         InOrder inOrder = inOrder(caseDefinitionRepository, userRepository, classifiedCreateCaseOperation, accessControlService);
         assertAll(
@@ -168,7 +159,7 @@ class AuthorisedCreateCaseOperationTest {
             () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseType), eq(userRoles), eq(CAN_CREATE)),
             () -> inOrder.verify(accessControlService).canAccessCaseEventWithCriteria(eq(EVENT_ID), eq(events), eq(userRoles), eq(CAN_CREATE)),
             () -> inOrder.verify(accessControlService).canAccessCaseFieldsWithCriteria(any(JsonNode.class), eq(caseFields), eq(userRoles), eq(CAN_CREATE)),
-            () -> inOrder.verify(classifiedCreateCaseOperation).createCaseDetails(UID, JURISDICTION_ID, CASE_TYPE_ID, EVENT, DATA, IGNORE, TOKEN),
+            () -> inOrder.verify(classifiedCreateCaseOperation).createCaseDetails(UID, JURISDICTION_ID, CASE_TYPE_ID, EVENT_DATA, IGNORE),
             () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseType), eq(userRoles), eq(CAN_READ)),
             () -> inOrder.verify(accessControlService, times(2)).filterCaseFieldsByAccess(any(JsonNode.class), eq(caseFields), eq(userRoles), eq(CAN_READ))
         );
@@ -181,12 +172,10 @@ class AuthorisedCreateCaseOperationTest {
         doReturn(null).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
 
         assertThrows(ValidationException.class, () -> authorisedCreateCaseOperation.createCaseDetails(UID,
-                                                                                                            JURISDICTION_ID,
-                                                                                                            CASE_TYPE_ID,
-                                                                                                            EVENT,
-                                                                                                            DATA,
-                                                                                                            IGNORE,
-                                                                                                            TOKEN));
+                                                                                                      JURISDICTION_ID,
+                                                                                                      CASE_TYPE_ID,
+                                                                                                      EVENT_DATA,
+                                                                                                      IGNORE));
     }
 
     @Test
@@ -198,10 +187,8 @@ class AuthorisedCreateCaseOperationTest {
         assertThrows(ResourceNotFoundException.class, () -> authorisedCreateCaseOperation.createCaseDetails(UID,
                                                                                                             JURISDICTION_ID,
                                                                                                             CASE_TYPE_ID,
-                                                                                                            EVENT,
-                                                                                                            DATA,
-                                                                                                            IGNORE,
-                                                                                                            TOKEN));
+                                                                                                            EVENT_DATA,
+                                                                                                            IGNORE));
     }
 
     @Test
@@ -211,12 +198,10 @@ class AuthorisedCreateCaseOperationTest {
         doReturn(null).when(userRepository).getUserRoles();
 
         assertThrows(ValidationException.class, () -> authorisedCreateCaseOperation.createCaseDetails(UID,
-                                                                                                            JURISDICTION_ID,
-                                                                                                            CASE_TYPE_ID,
-                                                                                                            EVENT,
-                                                                                                            DATA,
-                                                                                                            IGNORE,
-                                                                                                            TOKEN));
+                                                                                                      JURISDICTION_ID,
+                                                                                                      CASE_TYPE_ID,
+                                                                                                      EVENT_DATA,
+                                                                                                      IGNORE));
     }
 
     @Test
@@ -228,23 +213,29 @@ class AuthorisedCreateCaseOperationTest {
         assertThrows(ResourceNotFoundException.class, () -> authorisedCreateCaseOperation.createCaseDetails(UID,
                                                                                                             JURISDICTION_ID,
                                                                                                             CASE_TYPE_ID,
-                                                                                                            EVENT,
-                                                                                                            DATA,
-                                                                                                            IGNORE,
-                                                                                                            TOKEN));
+                                                                                                            EVENT_DATA,
+                                                                                                            IGNORE));
+    }
+
+    @Test
+    @DisplayName("should fail if no data provided")
+    void shouldFailIfNoDataProvided() {
+
+        assertThrows(ValidationException.class, () -> authorisedCreateCaseOperation.createCaseDetails(UID,
+                                                                                                            JURISDICTION_ID,
+                                                                                                            CASE_TYPE_ID,
+                                                                                                            NULL_EVENT_DATA,
+                                                                                                            IGNORE));
     }
 
     @Test
     @DisplayName("should fail if no event provided")
     void shouldFailIfNoEventProvided() {
-
         assertThrows(ResourceNotFoundException.class, () -> authorisedCreateCaseOperation.createCaseDetails(UID,
                                                                                                             JURISDICTION_ID,
                                                                                                             CASE_TYPE_ID,
-                                                                                                            NULL_EVENT,
-                                                                                                            DATA,
-                                                                                                            IGNORE,
-                                                                                                            TOKEN));
+                                                                                                            newCaseDataContent().build(),
+                                                                                                            IGNORE));
     }
 
     @Test
@@ -256,10 +247,8 @@ class AuthorisedCreateCaseOperationTest {
         assertThrows(ResourceNotFoundException.class, () -> authorisedCreateCaseOperation.createCaseDetails(UID,
                                                                                                             JURISDICTION_ID,
                                                                                                             CASE_TYPE_ID,
-                                                                                                            EVENT,
-                                                                                                            DATA,
-                                                                                                            IGNORE,
-                                                                                                            TOKEN));
+                                                                                                            EVENT_DATA,
+                                                                                                            IGNORE));
     }
 
     @Test
@@ -271,10 +260,8 @@ class AuthorisedCreateCaseOperationTest {
         assertThrows(ResourceNotFoundException.class, () -> authorisedCreateCaseOperation.createCaseDetails(UID,
                                                                                                             JURISDICTION_ID,
                                                                                                             CASE_TYPE_ID,
-                                                                                                            EVENT,
-                                                                                                            DATA,
-                                                                                                            IGNORE,
-                                                                                                            TOKEN));
+                                                                                                            EVENT_DATA,
+                                                                                                            IGNORE));
     }
 
     @Test
@@ -284,12 +271,10 @@ class AuthorisedCreateCaseOperationTest {
         when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseType), eq(userRoles), eq(CAN_READ))).thenReturn(false);
 
         final CaseDetails caseDetails = authorisedCreateCaseOperation.createCaseDetails(UID,
-                                                                                            JURISDICTION_ID,
-                                                                                            CASE_TYPE_ID,
-                                                                                            EVENT,
-                                                                                            DATA,
-                                                                                            IGNORE,
-                                                                                            TOKEN);
+                                                                                        JURISDICTION_ID,
+                                                                                        CASE_TYPE_ID,
+                                                                                        EVENT_DATA,
+                                                                                        IGNORE);
         assertThat(caseDetails, is(nullValue()));
     }
 

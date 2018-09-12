@@ -85,6 +85,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private static final String TEST_JURISDICTION = "PROBATE";
     private static final String TEST_STATE = "CaseCreated";
     private static final String UID = "0";
+    private static final String DRAFT_ID = "5";
 
     @Inject
     private WebApplicationContext wac;
@@ -281,6 +282,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID
         );
         caseDetailsToSave.setToken(token);
+        caseDetailsToSave.setDraftId(DRAFT_ID);
 
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
