@@ -9,7 +9,14 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
-import uk.gov.hmcts.ccd.domain.service.aggregated.*;
+import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedFindSearchInputOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCaseHistoryViewOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCaseViewOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.DefaultFindWorkbasketInputOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetCaseViewFromDraftOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseTypesOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.GetEventTriggerOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 import java.util.ArrayList;
