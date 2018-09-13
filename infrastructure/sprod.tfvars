@@ -1,1 +1,1 @@
-capacity = "2"
+capacity = "1"
