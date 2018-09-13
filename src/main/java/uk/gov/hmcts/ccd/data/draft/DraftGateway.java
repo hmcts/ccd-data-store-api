@@ -16,4 +16,5 @@ public interface DraftGateway {
 
     DraftResponse update(UpdateCaseDraftRequest draft, String draftId);
 
+    void delete(String draftId);
 }

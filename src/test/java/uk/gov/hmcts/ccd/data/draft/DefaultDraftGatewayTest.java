@@ -250,4 +250,32 @@ class DefaultDraftGatewayTest {
         assertThat(actualException.getMessage(), is("No draft found ( draft reference = '5' )"));
     }
 
+    @Test
+    void shouldSuccessfullyDeleteDraft() throws URISyntaxException {
+        doReturn(ResponseEntity.ok(draft)).when(restTemplate).exchange(eq(draftURL5), eq(HttpMethod.DELETE), any(HttpEntity.class), eq(Draft.class));
+
+        draftGateway.delete(DID);
+
+        verify(restTemplate).exchange(eq(draftURL5), eq(HttpMethod.DELETE), any(RequestEntity.class), eq(Draft.class));
+    }
+
+    @Test
+    void shouldFailToDeleteFromDraftWhenConnectivityIssue() {
+        Exception exception = new RestClientException("connectivity issue");
+        doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.DELETE), any(HttpEntity.class), eq(Draft.class));
+
+        final ServiceException actualException = assertThrows(ServiceException.class, () -> draftGateway.delete(DID));
+        assertThat(actualException.getMessage(), is("The draft service is currently down, please refresh your browser or try again later"));
+        assertThat(actualException.getCause(), is(exception));
+    }
+
+    @Test
+    void shouldFailToDeleteFromDraftWhenNotFound() {
+        Exception exception = new HttpClientErrorException(HttpStatus.NOT_FOUND);
+        doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.DELETE), any(HttpEntity.class), eq(Draft.class));
+
+        final ResourceNotFoundException actualException = assertThrows(ResourceNotFoundException.class, () -> draftGateway.delete(DID));
+        assertThat(actualException.getMessage(), is("No draft found ( draft reference = '5' )"));
+    }
+
 }

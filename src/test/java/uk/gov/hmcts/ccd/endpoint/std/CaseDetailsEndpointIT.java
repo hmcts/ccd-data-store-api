@@ -87,6 +87,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private static final String TEST_JURISDICTION = "PROBATE";
     private static final String TEST_STATE = "CaseCreated";
     private static final String UID = "0";
+    private static final String DRAFT_ID = "5";
 
     @Inject
     private WebApplicationContext wac;
@@ -283,6 +284,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID
         );
         caseDetailsToSave.setToken(token);
+        caseDetailsToSave.setDraftId(DRAFT_ID);
 
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
@@ -3915,7 +3917,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         responseAsString = result.getResponse().getContentAsString();
         List<CaseDetails> caseDetailsPage3 = Arrays.asList(mapper.readValue(responseAsString, CaseDetails[].class));
-        assertThat(caseDetailsPage3, hasSize(1)); //TODO RDM-1455 due to filtering being applied after pagination, to be fixed after EL implementation
+        assertThat(caseDetailsPage3, hasSize(2)); //TODO RDM-1455 due to filtering being applied after pagination, to be fixed after EL implementation
         allPages.addAll(caseDetailsPage3);
 
         result = mockMvc.perform(get(GET_CASES_AS_CASEWORKER)
@@ -3928,10 +3930,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         responseAsString = result.getResponse().getContentAsString();
         List<CaseDetails> caseDetailsPage4 = Arrays.asList(mapper.readValue(responseAsString, CaseDetails[].class));
-        assertThat(caseDetailsPage4, hasSize(1));
+        assertThat(caseDetailsPage4, hasSize(0));
 
         Set<Long> references = allPages.stream().map(cd -> cd.getReference()).collect(Collectors.toSet());
-        assertThat(references, hasSize(5)); //TODO RDM-1455 due to filtering being applied after pagination, to be fixed after EL implementation
+        assertThat(references, hasSize(6)); //TODO RDM-1455 due to filtering being applied after pagination, to be fixed after EL implementation
     }
 
     @Test
@@ -3951,8 +3953,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         String responseAsString = result.getResponse().getContentAsString();
         PaginatedSearchMetadata metadata = mapper.readValue(responseAsString, PaginatedSearchMetadata.class);
 
-        assertThat(metadata.getTotalPagesCount(), is(4));
-        assertThat(metadata.getTotalResultsCount(), is(7));
+        assertThat(metadata.getTotalPagesCount(), is(3));
+        assertThat(metadata.getTotalResultsCount(), is(6));
 
         result = mockMvc.perform(get(GET_PAGINATED_SEARCH_METADATA)
                 .contentType(JSON_CONTENT_TYPE)

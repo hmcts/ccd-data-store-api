@@ -1,13 +1,3 @@
-provider "vault" {
-  //  # It is strongly recommended to configure this provider through the
-  //  # environment variables described above, so that each user can have
-  //  # separate credentials set in the environment.
-  //  #
-  //  # This will default to using $VAULT_ADDR
-  //  # But can be set explicitly
-  address = "https://vault.reform.hmcts.net:6200"
-}
-
 locals {
   app_full_name = "${var.product}-${var.component}"
 
@@ -23,15 +13,14 @@ locals {
   dm_valid_domain = "${var.document_management_valid_domain != "" ? var.document_management_valid_domain : local.default_dm_valid_domain}"
 
   // Vault name
-  previewVaultName = "${var.raw_product}-shared-aat"
-  nonPreviewVaultName = "${var.raw_product}-shared-${var.env}"
+  previewVaultName = "${var.raw_product}-aat"
+  nonPreviewVaultName = "${var.raw_product}-${var.env}"
   vaultName = "${(var.env == "preview" || var.env == "spreview") ? local.previewVaultName : local.nonPreviewVaultName}"
 
-  // Old vault info to be removed
-  oldPreviewVaultName = "${var.product}-data-store"
-  oldNonPreviewVaultName = "ccd-data-store-${var.env}"
-  oldVaultName = "${(var.env == "preview" || var.env == "spreview") ? local.oldPreviewVaultName : local.oldNonPreviewVaultName}"
-
+  // Shared Resource Group
+  previewResourceGroup = "${var.raw_product}-shared-aat"
+  nonPreviewResourceGroup = "${var.raw_product}-shared-${var.env}"
+  sharedResourceGroup = "${(var.env == "preview" || var.env == "spreview") ? local.previewResourceGroup : local.nonPreviewResourceGroup}"
 
   // S2S
   s2s_url = "http://rpe-service-auth-provider-${local.env_ase_url}"
@@ -45,19 +34,12 @@ locals {
 
 data "azurerm_key_vault" "ccd_shared_key_vault" {
   name = "${local.vaultName}"
-  resource_group_name = "${local.vaultName}"
+  resource_group_name = "${local.sharedResourceGroup}"
 }
 
-data "vault_generic_secret" "ccd_data_s2s_key" {
-  path = "secret/${var.vault_section}/ccidam/service-auth-provider/api/microservice-keys/ccd-data"
-}
-
-data "vault_generic_secret" "gateway_idam_key" {
-  path = "secret/${var.vault_section}/ccidam/service-auth-provider/api/microservice-keys/ccd-gw"
-}
-
-data "vault_generic_secret" "gateway_oauth2_client_secret" {
-  path = "secret/${var.vault_section}/ccidam/idam-api/oauth2/client-secrets/ccd-gateway"
+data "azurerm_key_vault_secret" "ccd_data_s2s_key" {
+  name = "ccd-data-store-api-s2s-secret"
+  vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
 }
 
 resource "random_string" "draft_encryption_key" {
@@ -97,7 +79,7 @@ module "ccd-data-store-api" {
 
     IDAM_USER_URL                       = "${var.idam_api_url}"
     IDAM_S2S_URL                        = "${local.s2s_url}"
-    DATA_STORE_IDAM_KEY                 = "${data.vault_generic_secret.ccd_data_s2s_key.data["value"]}"
+    DATA_STORE_IDAM_KEY                 = "${data.azurerm_key_vault_secret.ccd_data_s2s_key.value}"
 
     CCD_DRAFT_STORE_URL                 = "${local.draftStoreUrl}"
     CCD_DRAFT_TTL_DAYS                  = "${var.draft_store_ttl_days}"
@@ -126,17 +108,6 @@ module "data-store-db" {
   sku_tier = "GeneralPurpose"
   storage_mb = "51200"
   common_tags  = "${var.common_tags}"
-}
-
-module "ccd-data-store-vault" {
-  source              = "git@github.com:hmcts/moj-module-key-vault?ref=master"
-  name                = "${local.oldVaultName}" // Max 24 characters
-  product             = "${var.product}"
-  env                 = "${var.env}"
-  tenant_id           = "${var.tenant_id}"
-  object_id           = "${var.jenkins_AAD_objectId}"
-  resource_group_name = "${module.ccd-data-store-api.resource_group_name}"
-  product_group_object_id = "be8b3850-998a-4a66-8578-da268b8abd6b"
 }
 
 ////////////////////////////////
@@ -173,20 +144,8 @@ resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
   vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
 }
 
-resource "azurerm_key_vault_secret" "gw_s2s_key" {
-  name = "ccd-api-gateway-idam-service-key"
-  value = "${data.vault_generic_secret.gateway_idam_key.data["value"]}"
-  vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
-}
-
-resource "azurerm_key_vault_secret" "gw_oauth2_secret" {
-  name = "ccd-api-gateway-oauth2-client-secret"
-  value = "${data.vault_generic_secret.gateway_oauth2_client_secret.data["value"]}"
-  vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
-}
-
 resource "azurerm_key_vault_secret" "ccd_draft_encryption_key" {
-  name = "draftStoreEncryptionSecret"
+  name = "${local.app_full_name}-draftStoreEncryptionSecret"
   value = "${random_string.draft_encryption_key.result}"
-  vault_uri = "${module.ccd-data-store-vault.key_vault_uri}"
+  vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
 }
