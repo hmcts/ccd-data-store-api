@@ -130,6 +130,27 @@ public class DefaultDraftGateway implements DraftGateway {
     }
 
     @Override
+    public void delete(final String draftId) {
+        try {
+            HttpHeaders headers = securityUtils.authorizationHeaders();
+            headers.add(DRAFT_ENCRYPTION_KEY_HEADER, applicationParams.getDraftEncryptionKey());
+            final HttpEntity requestEntity = new HttpEntity(headers);
+            final Instant start = Instant.now();
+            restTemplate.exchange(applicationParams.draftURL(draftId), HttpMethod.DELETE, requestEntity, Draft.class);
+            final Duration duration = Duration.between(start, Instant.now());
+            appInsights.trackDependency(DRAFT_STORE, "Delete", duration.toMillis(), true);
+        } catch (HttpClientErrorException e) {
+            LOG.warn("Error while deleting draftId=" + draftId, e);
+            if (e.getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                throw new ResourceNotFoundException(String.format(RESOURCE_NOT_FOUND_MSG, draftId));
+            }
+        } catch (Exception e) {
+            LOG.warn("Error while getting draftId=" + draftId, e);
+            throw new ServiceException(DRAFT_STORE_DOWN_ERR_MESSAGE, e);
+        }
+    }
+
+    @Override
     public List<DraftResponse> getAll() {
         try {
             HttpHeaders headers = securityUtils.authorizationHeaders();
