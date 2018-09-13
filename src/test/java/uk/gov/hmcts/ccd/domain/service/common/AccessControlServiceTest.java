@@ -27,7 +27,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AuditEvent
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.anCaseEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventTriggerBuilder.anEventTrigger;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.aCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseStateBuilder.aState;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseStateBuilder.newState;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
 
@@ -71,11 +71,11 @@ public class AccessControlServiceTest {
         @DisplayName("Should not grant access to case state with relevant acl missing")
         void shouldNotGrantAccessToStateIfRelevantACLMissing() {
             CaseType caseType = newCaseType()
-                .withState(aState()
+                .withState(newState()
                                .withId(STATE_ID1)
                                .withAcl(anAcl().withRole(ROLE_NOT_IN_USER_ROLES).withCreate(true).withRead(true).build())
                                .build())
-                .withState(aState()
+                .withState(newState()
                                .withId(STATE_ID2)
                                .withAcl(anAcl().withRole(ROLE_NOT_IN_USER_ROLES).withCreate(true).withRead(true).build())
                                .build())
@@ -91,11 +91,11 @@ public class AccessControlServiceTest {
         @DisplayName("Should not grant access to case state with relevant acl not granting access")
         void shouldNotGrantAccessToStateIfRelevantAclNotGrantingAccess() {
             CaseType caseType = newCaseType()
-                .withState(aState()
+                .withState(newState()
                                .withId(STATE_ID1)
                                .withAcl(anAcl().withRole(ROLE_IN_USER_ROLES).build())
                                .build())
-                .withState(aState()
+                .withState(newState()
                                .withId(STATE_ID2)
                                .withAcl(anAcl().withRole(ROLE_IN_USER_ROLES_2).build())
                                .build())
@@ -111,11 +111,11 @@ public class AccessControlServiceTest {
         @DisplayName("Should grant access to case state with acl matching")
         void shouldGrantAccessToStateWithAclMatching() {
             CaseType caseType = newCaseType()
-                .withState(aState()
+                .withState(newState()
                                .withId(STATE_ID1)
                                .withAcl(anAcl().withRole(ROLE_IN_USER_ROLES).withCreate(true).build())
                                .build())
-                .withState(aState()
+                .withState(newState()
                                .withId(STATE_ID2)
                                .withAcl(anAcl().withRole(ROLE_IN_USER_ROLES_2).withCreate(true).build())
                                .build())
@@ -138,14 +138,14 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should filter states according to acls")
         void shouldFilterStatesAccordingToACLs() {
-            CaseState caseState1 = aState()
+            CaseState caseState1 = newState()
                 .withId(STATE_ID1)
                 .withAcl(anAcl()
                              .withRole(ROLE_IN_USER_ROLES)
                              .withRead(true)
                              .build())
                 .build();
-            CaseState caseState2 = aState()
+            CaseState caseState2 = newState()
                 .withId(STATE_ID2)
                 .withAcl(anAcl()
                              .withRole(ROLE_IN_USER_ROLES)
@@ -164,19 +164,19 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should filter states out when no matching ACLs")
         void shouldFilterOutStatesWhenNoMatchingACLSs() {
-            CaseState caseState1 = aState()
+            CaseState caseState1 = newState()
                 .withId(STATE_ID1)
                 .withAcl(anAcl()
                              .withRole(ROLE_IN_USER_ROLES)
                              .build())
                 .build();
-            CaseState caseState2 = aState()
+            CaseState caseState2 = newState()
                 .withId(STATE_ID2)
                 .withAcl(anAcl()
                              .withRole(ROLE_IN_USER_ROLES)
                              .build())
                 .build();
-            CaseState caseState3 = aState()
+            CaseState caseState3 = newState()
                 .withId("Some State")
                 .withAcl(anAcl()
                              .withRole(ROLE_IN_USER_ROLES)

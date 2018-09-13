@@ -472,7 +472,7 @@ public class TestBuildersUtil {
             this.caseState = new CaseState();
         }
 
-        public static CaseStateBuilder aState() {
+        public static CaseStateBuilder newState() {
             return new CaseStateBuilder();
         }
 
@@ -777,6 +777,41 @@ public class TestBuildersUtil {
 
         public AuditEvent build() {
             return auditEvent;
+        }
+    }
+
+    public static class JurisdictionBuilder {
+        private Jurisdiction jurisdiction;
+
+        public static JurisdictionBuilder newJurisdiction() {
+            return new JurisdictionBuilder();
+        }
+        private JurisdictionBuilder() {
+            this.jurisdiction = new Jurisdiction();
+        }
+
+        public JurisdictionBuilder withJurisdictionId(String id) {
+            jurisdiction.setId(id);
+            return this;
+        }
+
+        public JurisdictionBuilder withName(String name) {
+            jurisdiction.setName(name);
+            return this;
+        }
+
+        public JurisdictionBuilder withDescription(String description) {
+            jurisdiction.setDescription(description);
+            return this;
+        }
+
+        public JurisdictionBuilder withCaseType(CaseType caseType) {
+            jurisdiction.getCaseTypes().add(caseType);
+            return this;
+        }
+
+        public Jurisdiction build() {
+            return jurisdiction;
         }
     }
 
