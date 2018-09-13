@@ -7,17 +7,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
-import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
+import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
@@ -32,16 +25,13 @@ import java.util.Map;
 import java.util.Optional;
 
 import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.arrayWithSize;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItemInArray;
-import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTabCollectionBuilder.aCaseTabCollection;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTabCollectionBuilder.newCaseTabCollection;
 
 class DefaultGetCaseViewOperationTest {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
@@ -51,12 +41,10 @@ class DefaultGetCaseViewOperationTest {
     private static final String EVENT_SUMMARY_1 = "some summary";
     private static final String EVENT_SUMMARY_2 = "Another summary";
     private static final String STATE = "Plop";
+    private static final String TITLE_DISPLAY = "titleDisplay";
 
     @Mock
     private GetCaseOperation getCaseOperation;
-
-    @Mock
-    private CaseAuditEventRepository auditEventRepository;
 
     @Mock
     private GetEventsOperation getEventsOperation;
@@ -103,7 +91,7 @@ class DefaultGetCaseViewOperationTest {
 
         doReturn(Boolean.TRUE).when(uidService).validateUID(CASE_REFERENCE);
 
-        caseTabCollection = aCaseTabCollection().withFieldIds("dataTestField1", "dataTestField2").build();
+        caseTabCollection = newCaseTabCollection().withFieldIds("dataTestField1", "dataTestField2").build();
         doReturn(caseTabCollection).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
 
         caseType = new CaseType();
@@ -115,9 +103,12 @@ class DefaultGetCaseViewOperationTest {
         caseField.setMetadata(true);
         caseField.setFieldType(new FieldType());
         caseType.setCaseFields(Collections.singletonList(caseField));
+
         doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
 
         caseState = new CaseState();
+        caseState.setId(STATE);
+        caseState.setTitleDisplay(TITLE_DISPLAY);
         doReturn(caseState).when(caseTypeService).findState(caseType, STATE);
 
         defaultGetCaseViewOperation = new DefaultGetCaseViewOperation(getCaseOperation, getEventsOperation,
@@ -151,7 +142,9 @@ class DefaultGetCaseViewOperationTest {
                   () -> assertThat(caseView.getEvents(),
                                    hasItemInArray(hasProperty("summary", equalTo(EVENT_SUMMARY_1)))),
                   () -> assertThat(caseView.getEvents(),
-                                   hasItemInArray(hasProperty("summary", equalTo(EVENT_SUMMARY_2))))
+                                   hasItemInArray(hasProperty("summary", equalTo(EVENT_SUMMARY_2)))),
+                  () -> assertThat(caseView.getState().getId(), is(STATE)),
+                  () -> assertThat(caseView.getState().getTitleDisplay(), is(TITLE_DISPLAY))
         );
     }
 

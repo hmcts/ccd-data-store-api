@@ -23,6 +23,7 @@ plugins {
     id 'org.owasp.dependencycheck' version '3.2.1'
     id "info.solidsoft.pitest" version '1.3.0'
     id 'com.github.spotbugs' version '1.6.2'
+    id "net.ltgt.apt" version "0.18"
 }
 
 apply plugin: 'java'
@@ -167,7 +168,8 @@ spotbugs {
 dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: reformLogging
     compile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: reformLogging
-    compileOnly 'org.projectlombok:lombok:1.18.0'
+    compile 'org.projectlombok:lombok:1.18.2'
+    apt 'org.projectlombok:lombok:1.18.2'
 
     // Needs to explicitly bring in a different hibernate version as in pom.xml
     compile "org.hibernate:hibernate-core:${hibernateVersion}"

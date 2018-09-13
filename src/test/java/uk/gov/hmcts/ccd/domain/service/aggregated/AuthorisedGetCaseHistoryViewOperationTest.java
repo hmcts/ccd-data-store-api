@@ -24,9 +24,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.anEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.anCaseEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseHistoryViewBuilder.aCaseHistoryView;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.aCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewEventBuilder.aCaseViewEvent;
 
 class AuthorisedGetCaseHistoryViewOperationTest {
@@ -38,9 +38,9 @@ class AuthorisedGetCaseHistoryViewOperationTest {
     private static final String ROLE_IN_USER_ROLES_2 = "caseworker-divorce-loa";
     private static final Set<String> USER_ROLES = newHashSet(ROLE_IN_USER_ROLES, ROLE_IN_USER_ROLES_2);
     private static final String EVENT_ID_STRING = valueOf(EVENT_ID);
-    private static final CaseEvent CASE_EVENT = anEvent().withId(EVENT_ID_STRING).build();
-    private static final CaseEvent CASE_EVENT_2 = anEvent().withId("event2").build();
-    private static final CaseType TEST_CASE_TYPE = aCaseType().withEvent(CASE_EVENT).withEvent(CASE_EVENT_2).build();
+    private static final CaseEvent CASE_EVENT = anCaseEvent().withId(EVENT_ID_STRING).build();
+    private static final CaseEvent CASE_EVENT_2 = anCaseEvent().withId("event2").build();
+    private static final CaseType TEST_CASE_TYPE = newCaseType().withEvent(CASE_EVENT).withEvent(CASE_EVENT_2).build();
     private static final CaseViewEvent CASE_VIEW_EVENT = aCaseViewEvent().withId(EVENT_ID_STRING).build();
     private static final CaseHistoryView TEST_CASE_HISTORY_VIEW = aCaseHistoryView().withEvent(CASE_VIEW_EVENT).build();
 

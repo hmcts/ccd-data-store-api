@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTabCollectionBuilder.aCaseTabCollection;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTabCollectionBuilder.newCaseTabCollection;
 
 class DefaultGetCaseHistoryViewOperationTest {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
@@ -89,8 +89,8 @@ class DefaultGetCaseHistoryViewOperationTest {
         doReturn(Boolean.TRUE).when(uidService).validateUID(CASE_REFERENCE);
 
 
-        CaseTabCollection caseTabCollection = aCaseTabCollection().withFieldIds("dataTestField1",
-            "dataTestField2").build();
+        CaseTabCollection caseTabCollection = newCaseTabCollection().withFieldIds("dataTestField1",
+                                                                                  "dataTestField2").build();
         doReturn(caseTabCollection).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
 
         CaseType caseType = new CaseType();

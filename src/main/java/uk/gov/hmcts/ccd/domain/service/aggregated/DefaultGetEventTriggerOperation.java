@@ -56,9 +56,9 @@ public class DefaultGetEventTriggerOperation implements GetEventTriggerOperation
                                                                  caseTypeId,
                                                                  eventTriggerId,
                                                                  ignoreWarning),
-                     caseTypeId,
-                     eventTriggerId,
-                     null);
+                                                                 caseTypeId,
+                                                                 eventTriggerId,
+                                                                 null);
     }
 
     @Override
@@ -74,9 +74,23 @@ public class DefaultGetEventTriggerOperation implements GetEventTriggerOperation
                                                              caseReference,
                                                              eventTriggerId,
                                                              ignoreWarning),
-                     caseTypeId,
-                     eventTriggerId,
-                     caseReference);
+                                                             caseTypeId,
+                                                             eventTriggerId,
+                                                             caseReference);
+    }
+
+    @Override
+    public CaseEventTrigger executeForDraft(String uid, String jurisdictionId, String caseTypeId, String draftReference, String eventTriggerId,
+                                            Boolean ignoreWarning) {
+        return merge(startEventOperation.triggerStartForDraft(uid,
+                                                             jurisdictionId,
+                                                             caseTypeId,
+                                                             draftReference,
+                                                             eventTriggerId,
+                                                             ignoreWarning),
+                                                             caseTypeId,
+                                                             eventTriggerId,
+                                                             draftReference);
     }
 
     private CaseEventTrigger buildCaseEventTrigger(final CaseEvent eventTrigger) {
@@ -88,6 +102,7 @@ public class DefaultGetEventTriggerOperation implements GetEventTriggerOperation
         caseTrigger.setShowSummary(eventTrigger.getShowSummary());
         caseTrigger.setShowEventNotes(eventTrigger.getShowEventNotes());
         caseTrigger.setEndButtonLabel(eventTrigger.getEndButtonLabel());
+        caseTrigger.setCanSaveDraft(eventTrigger.getCanSaveDraft());
         return caseTrigger;
     }
 

@@ -7,14 +7,15 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @DisplayName("UserAuthorisationSecurity")
 class UserAuthorisationSecurityTest {
@@ -24,7 +25,7 @@ class UserAuthorisationSecurityTest {
     private UserAuthorisation userAuthorisation;
 
     @Mock
-    private CaseDetailsQueryBuilder builder;
+    private CaseDetailsQueryBuilder<CaseDetailsEntity> builder;
 
     @InjectMocks
     private UserAuthorisationSecurity security;
@@ -45,10 +46,9 @@ class UserAuthorisationSecurityTest {
         void accessLevelAll () {
             when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.ALL);
 
-            final CaseDetailsQueryBuilder securedBuilder = security.secure(builder);
+            security.secure(builder, null);
 
             assertAll(
-                () -> assertThat(securedBuilder, sameInstance(builder)),
                 () -> verify(builder, never()).whereGrantedAccessOnly(anyString())
             );
         }
@@ -58,10 +58,9 @@ class UserAuthorisationSecurityTest {
         void accessLevelGranted () {
             when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.GRANTED);
 
-            final CaseDetailsQueryBuilder securedBuilder = security.secure(builder);
+            security.secure(builder, null);
 
             assertAll(
-                () -> assertThat(securedBuilder, sameInstance(builder)),
                 () -> verify(builder).whereGrantedAccessOnly(USER_ID)
             );
         }

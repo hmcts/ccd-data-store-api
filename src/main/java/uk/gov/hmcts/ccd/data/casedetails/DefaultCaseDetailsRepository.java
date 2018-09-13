@@ -14,12 +14,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -28,6 +22,12 @@ import javax.persistence.LockModeType;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 
 @Named
@@ -49,10 +49,10 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
 
     @Inject
     public DefaultCaseDetailsRepository(
-            final CaseDetailsMapper caseDetailsMapper,
-            final SearchQueryFactoryOperation queryBuilder,
-            final CaseDetailsQueryBuilderFactory queryBuilderFactory,
-            final ApplicationParams applicationParams) {
+        final CaseDetailsMapper caseDetailsMapper,
+        final SearchQueryFactoryOperation queryBuilder,
+        final CaseDetailsQueryBuilderFactory queryBuilderFactory,
+        final ApplicationParams applicationParams) {
         this.caseDetailsMapper = caseDetailsMapper;
         this.queryBuilder = queryBuilder;
         this.queryBuilderFactory = queryBuilderFactory;
@@ -207,13 +207,13 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     private Query getCountQueryByMetaData(MetaData metadata) {
-        return queryBuilderFactory.count(em)
+        return queryBuilderFactory.count(em, metadata)
                                   .whereMetadata(metadata)
                                   .build();
     }
 
     private Query getQueryByMetaData(MetaData metadata) {
-        return queryBuilderFactory.select(em)
+        return queryBuilderFactory.select(em, metadata)
                                   .whereMetadata(metadata)
                                   .orderByCreatedDate(metadata.getSortDirection().orElse("asc"))
                                   .build();

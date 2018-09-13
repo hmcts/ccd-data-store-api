@@ -25,7 +25,7 @@ public class CaseDetailsMapper {
 
         final CaseDetails caseDetails = new CaseDetails();
         caseDetails.setReference(caseDetailsEntity.getReference());
-        caseDetails.setId(caseDetailsEntity.getId());
+        caseDetails.setId(String.valueOf(caseDetailsEntity.getId()));
         caseDetails.setCaseTypeId(caseDetailsEntity.getCaseType());
         caseDetails.setJurisdiction(caseDetailsEntity.getJurisdiction());
         caseDetails.setCreatedDate(caseDetailsEntity.getCreatedDate());
@@ -45,7 +45,7 @@ public class CaseDetailsMapper {
         }
 
         final CaseDetailsEntity newCaseDetailsEntity = new CaseDetailsEntity();
-        newCaseDetailsEntity.setId(caseDetails.getId());
+        newCaseDetailsEntity.setId(getLongId(caseDetails));
         newCaseDetailsEntity.setReference(caseDetails.getReference());
         newCaseDetailsEntity.setCreatedDate(caseDetails.getCreatedDate());
         newCaseDetailsEntity.setJurisdiction(caseDetails.getJurisdiction());
@@ -59,6 +59,11 @@ public class CaseDetailsMapper {
             newCaseDetailsEntity.setDataClassification(mapper.convertValue(caseDetails.getDataClassification(), JsonNode.class));
         }
         return newCaseDetailsEntity;
+    }
+
+    private Long getLongId(CaseDetails caseDetails) {
+        String id = caseDetails.getId();
+        return id == null ? null : Long.valueOf(id);
     }
 
     public List<CaseDetails> entityToModel(final List<CaseDetailsEntity> caseDataEntities) {

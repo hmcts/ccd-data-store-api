@@ -31,8 +31,9 @@ public class CaseDetails implements Cloneable {
     private static final Logger LOG = LoggerFactory.getLogger(CaseDetails.class);
     private static final String LABEL_FIELD_TYPE = "Label";
     private static final String CASE_PAYMENT_HISTORY_VIEWER_FIELD_TYPE = "CasePaymentHistoryViewer";
+    public static final String DRAFT_ID = "DRAFT%s";
 
-    private Long id;
+    private String id;
 
     @JsonIgnore
     private Long reference;
@@ -61,32 +62,57 @@ public class CaseDetails implements Cloneable {
     @ApiModelProperty("Same structure as `case_data` with classification (`PUBLIC`, `PRIVATE`, `RESTRICTED`) as field's value.")
     private Map<String, JsonNode> dataClassification;
 
-    /** Attribute passed to UI layer, does not need persistence */
+    /**
+     * Attribute passed to UI layer, does not need persistence
+     */
     @JsonProperty("after_submit_callback_response")
     private AfterSubmitCallbackResponse afterSubmitCallbackResponse;
 
-    /** Attribute passed to UI layer, does not need persistence */
+    /**
+     * Attribute passed to UI layer, does not need persistence
+     */
     @JsonProperty("callback_response_status_code")
     private Integer callbackResponseStatusCode;
 
-    /** Attribute passed to UI layer, does not need persistence */
+    /**
+     * Attribute passed to UI layer, does not need persistence
+     */
     @JsonProperty("callback_response_status")
     private String callbackResponseStatus;
+
+    /**
+     * Attribute passed to UI layer, does not need persistence
+     */
+    @JsonProperty("delete_draft_response_status_code")
+    private Integer deleteDraftResponseStatusCode;
+
+
+    /**
+     * Attribute passed to UI layer, does not need persistence
+     */
+    @JsonProperty("delete_draft_response_status")
+    private String deleteDraftResponseStatus;
+
 
     @JsonIgnore
     private final Map<String, Object> metadata = new HashMap<>();
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
     @JsonGetter("id")
     public Long getReference() {
         return reference;
+    }
+
+    @JsonIgnore
+    public String getReferenceAsString() {
+        return reference != null ? reference.toString() : null;
     }
 
     @JsonSetter("id")
@@ -159,7 +185,6 @@ public class CaseDetails implements Cloneable {
     }
 
     /**
-     *
      * @deprecated Will be removed in version 2.x. Use {@link CaseDetails#dataClassification} instead.
      */
     @Deprecated
@@ -183,19 +208,33 @@ public class CaseDetails implements Cloneable {
 
     private void setAfterSubmitCallbackResponseEntity(final AfterSubmitCallbackResponse response) {
         this.afterSubmitCallbackResponse = response;
-        this.callbackResponseStatusCode =  SC_OK;
-        this.callbackResponseStatus = "COMPLETED";
+        this.callbackResponseStatusCode = SC_OK;
+        this.callbackResponseStatus = "CALLBACK_COMPLETED";
+    }
+
+    private void setDeleteDraftResponseEntity() {
+        this.deleteDraftResponseStatusCode =  SC_OK;
+        this.deleteDraftResponseStatus = "DELETE_DRAFT_COMPLETED";
     }
 
     public void setIncompleteCallbackResponse() {
         this.callbackResponseStatusCode = SC_OK;  // Front end cannot handle anything other than status 200
-        this.callbackResponseStatus = "INCOMPLETE";
+        this.callbackResponseStatus = "INCOMPLETE_CALLBACK";
+    }
+
+    public void setIncompleteDeleteDraftResponse() {
+        this.deleteDraftResponseStatusCode = SC_OK;  // Front end cannot handle anything other than status 200
+        this.deleteDraftResponseStatus = "INCOMPLETE_DELETE_DRAFT";
     }
 
     public boolean existsInData(CaseTypeTabField caseTypeTabField) {
         return isFieldWithNoValue(caseTypeTabField)
-            || data.keySet().contains(caseTypeTabField.getCaseField().getId())
+            || hasDataForTabField(caseTypeTabField)
             || getMetadata().containsKey(caseTypeTabField.getCaseField().getId());
+    }
+
+    private boolean hasDataForTabField(CaseTypeTabField caseTypeTabField) {
+        return data.keySet().contains(caseTypeTabField.getCaseField().getId());
     }
 
     private boolean isFieldWithNoValue(CaseTypeTabField caseTypeTabField) {
@@ -206,6 +245,19 @@ public class CaseDetails implements Cloneable {
     @JsonIgnore
     public CaseDetails shallowClone() throws CloneNotSupportedException {
         return (CaseDetails) super.clone();
+    }
+
+    @JsonIgnore
+    public void setDeleteDraftResponseEntity(final String draftId, final ResponseEntity<Void>
+                                                         draftResponse) {
+        if (SC_OK == draftResponse.getStatusCodeValue()) {
+            setDeleteDraftResponseEntity();
+        } else {
+            LOG.warn("Incomplete delete draft response for draft={}, statusCode={}",
+                     draftId,
+                     draftResponse.getStatusCodeValue());
+            setIncompleteDeleteDraftResponse();
+        }
     }
 
     @JsonIgnore
@@ -229,7 +281,7 @@ public class CaseDetails implements Cloneable {
             metadata.put(JURISDICTION.getReference(), getJurisdiction());
             metadata.put(CASE_TYPE.getReference(), getCaseTypeId());
             metadata.put(STATE.getReference(), getState());
-            metadata.put(CASE_REFERENCE.getReference(), getReference());
+            metadata.put(CASE_REFERENCE.getReference(), getReference() != null ? getReference() : getId());
             metadata.put(CREATED_DATE.getReference(), getCreatedDate());
             metadata.put(LAST_MODIFIED_DATE.getReference(), getLastModified());
             metadata.put(SECURITY_CLASSIFICATION.getReference(), getSecurityClassification());
@@ -248,6 +300,11 @@ public class CaseDetails implements Cloneable {
     @Override
     public String toString() {
         return ReflectionToStringBuilder.toString(this);
+    }
+
+    @JsonIgnore
+    public boolean hasCaseReference() {
+        return getReference() != null;
     }
 
 }

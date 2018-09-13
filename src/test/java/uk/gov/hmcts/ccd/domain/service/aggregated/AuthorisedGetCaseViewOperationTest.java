@@ -26,8 +26,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.anEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.aCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.anCaseEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewBuilder.aCaseView;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewTriggerBuilder.aViewTrigger;
 
@@ -37,19 +37,19 @@ class AuthorisedGetCaseViewOperationTest {
     private static final String CASE_REFERENCE = "1111222233334444";
     private static final Long EVENT_ID = 100L;
     private static final String STATE = "Plop";
-    private static final ProfileCaseState caseState = new ProfileCaseState(STATE, STATE, STATE);
+    private static final ProfileCaseState caseState = new ProfileCaseState(STATE, STATE, STATE, STATE);
 
     private static final String ROLE_IN_USER_ROLES = "caseworker-probate-loa1";
     private static final String ROLE_IN_USER_ROLES_2 = "caseworker-divorce-loa";
     private static final Set<String> USER_ROLES = newHashSet(ROLE_IN_USER_ROLES, ROLE_IN_USER_ROLES_2);
     private static final String EVENT_ID_STRING = valueOf(EVENT_ID);
     private static final CaseViewTrigger[] EMPTY_TRIGGERS = new CaseViewTrigger[]{};
-    private static final CaseEvent CASE_EVENT = anEvent().withId(EVENT_ID_STRING).build();
-    private static final CaseEvent CASE_EVENT_2 = anEvent().withId("event2").build();
+    private static final CaseEvent CASE_EVENT = anCaseEvent().withId(EVENT_ID_STRING).build();
+    private static final CaseEvent CASE_EVENT_2 = anCaseEvent().withId("event2").build();
     private static final CaseViewTrigger CASE_VIEW_TRIGGER = aViewTrigger().withId(EVENT_ID_STRING).build();
     private static final CaseViewTrigger CASE_VIEW_TRIGGER_2 = aViewTrigger().withId("event2").build();
     private static final CaseViewTrigger[] AUTH_CASE_VIEW_TRIGGERS = new CaseViewTrigger[] {CASE_VIEW_TRIGGER};
-    private static final CaseType TEST_CASE_TYPE = aCaseType().withEvent(CASE_EVENT).withEvent(CASE_EVENT_2).build();
+    private static final CaseType TEST_CASE_TYPE = newCaseType().withEvent(CASE_EVENT).withEvent(CASE_EVENT_2).build();
     private static final CaseView TEST_CASE_VIEW = aCaseView().withState(caseState).withCaseViewTrigger(CASE_VIEW_TRIGGER).withCaseViewTrigger(CASE_VIEW_TRIGGER_2).build();
 
     @Mock

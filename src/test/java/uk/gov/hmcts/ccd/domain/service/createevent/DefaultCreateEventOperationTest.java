@@ -36,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 
 class DefaultCreateEventOperationTest {
 
@@ -98,7 +99,7 @@ class DefaultCreateEventOperationTest {
     private IDAMProperties user;
 
     private static Event buildEvent() {
-        final Event event = new Event();
+        final Event event = anEvent().build();
         event.setEventId(EVENT_ID);
         event.setSummary("Update case summary");
         event.setDescription("Update case description");
@@ -196,7 +197,7 @@ class DefaultCreateEventOperationTest {
             () -> assertThat(caseDetails.getAfterSubmitCallbackResponse().getConfirmationHeader(), is("Header")),
             () -> assertThat(caseDetails.getAfterSubmitCallbackResponse().getConfirmationBody(), is("Body")),
             () -> assertThat(caseDetails.getCallbackResponseStatusCode(), is(SC_OK)),
-            () -> assertThat(caseDetails.getCallbackResponseStatus(), is("COMPLETED"))
+            () -> assertThat(caseDetails.getCallbackResponseStatus(), is("CALLBACK_COMPLETED"))
         );
     }
 
@@ -214,7 +215,7 @@ class DefaultCreateEventOperationTest {
         assertAll(
             () -> assertNull(caseDetails.getAfterSubmitCallbackResponse()),
             () -> assertThat(caseDetails.getCallbackResponseStatusCode(), is(SC_OK)),
-            () -> assertThat(caseDetails.getCallbackResponseStatus(), is("INCOMPLETE"))
+            () -> assertThat(caseDetails.getCallbackResponseStatus(), is("INCOMPLETE_CALLBACK"))
         );
     }
 

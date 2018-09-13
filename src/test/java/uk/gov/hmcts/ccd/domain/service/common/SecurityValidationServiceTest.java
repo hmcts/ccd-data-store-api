@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CallbackResponseBuilder.aCallbackResponse;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.aCaseDetails;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DataClassificationBuilder.aClassificationBuilder;
 
 class SecurityValidationServiceTest {
@@ -43,7 +43,7 @@ class SecurityValidationServiceTest {
         @Test
         @DisplayName("should fail if invalid classification level for case")
         void shouldFailIfInvalidClassificationLevelForCase() {
-            final CaseDetails caseDetails = aCaseDetails()
+            final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PRIVATE)
                 .withDataClassification(
                     aClassificationBuilder()
@@ -63,7 +63,7 @@ class SecurityValidationServiceTest {
         @Test
         @DisplayName("should increase security if valid classification level for case")
         void shouldIncreaseSecurityIfValidClassificationLevelForCase() {
-            final CaseDetails caseDetails = aCaseDetails()
+            final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(
                     aClassificationBuilder()
@@ -90,7 +90,7 @@ class SecurityValidationServiceTest {
         @Test
         @DisplayName("should increase security if valid classification level for case and data nodes")
         void shouldIncreaseSecurityIfValidClassificationLevelForCaseAndDataNodes() {
-            final CaseDetails caseDetails = aCaseDetails()
+            final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(
                     aClassificationBuilder()
@@ -117,7 +117,7 @@ class SecurityValidationServiceTest {
         @Test
         @DisplayName("should fail if missing classification for data nodes")
         void shouldFailIfMissingClassificationForDataNodes() {
-            final CaseDetails caseDetails = aCaseDetails()
+            final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(
                     aClassificationBuilder()
@@ -140,7 +140,7 @@ class SecurityValidationServiceTest {
         @Test
         @DisplayName("should fail if extra classification for data nodes")
         void shouldFailIfExtraClassificationForDataNodes() {
-            final CaseDetails caseDetails = aCaseDetails()
+            final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(
                     aClassificationBuilder()
@@ -162,7 +162,7 @@ class SecurityValidationServiceTest {
         @Test
         @DisplayName("should fail if invalid classification value for callback data nodes")
         void shouldFailIfInvalidClassificationValueForCallbackDataNodes() {
-            final CaseDetails caseDetails = aCaseDetails()
+            final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(
                     aClassificationBuilder()
@@ -183,7 +183,7 @@ class SecurityValidationServiceTest {
         @Test
         @DisplayName("should fail if invalid classification level for data nodes")
         void shouldFailIfInvalidClassificationLevelForDataNodes() {
-            final CaseDetails caseDetails = aCaseDetails()
+            final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(
                     aClassificationBuilder()
@@ -209,7 +209,7 @@ class SecurityValidationServiceTest {
         @Test
         @DisplayName("should increase security if valid classification level for case and data nodes")
         void shouldIncreaseSecurityIfValidClassificationLevelForCaseAndDataNodes() {
-            final CaseDetails caseDetails = aCaseDetails()
+            final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(
                     aClassificationBuilder()
@@ -254,7 +254,7 @@ class SecurityValidationServiceTest {
         @Test
         @DisplayName("should fail if missing data classification for complex node")
         void shouldFailIfMissingDataClassificationForComplexNode() {
-            final CaseDetails caseDetails = aCaseDetails()
+            final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(
                     aClassificationBuilder()
@@ -288,7 +288,7 @@ class SecurityValidationServiceTest {
         @Test
         @DisplayName("should fail if missing callback classification for complex node")
         void shouldFailIfMissingCallbackClassificationForComplexNode() {
-            final CaseDetails caseDetails = aCaseDetails()
+            final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(
                     aClassificationBuilder()
@@ -322,7 +322,7 @@ class SecurityValidationServiceTest {
         @Test
         @DisplayName("should fail if missing callback value for complex node")
         void shouldFailIfMissingCallbackValueForComplexNode() {
-            final CaseDetails caseDetails = aCaseDetails()
+            final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(
                     aClassificationBuilder()
@@ -353,7 +353,7 @@ class SecurityValidationServiceTest {
         @Test
         @DisplayName("should fail if missing data value for complex node")
         void shouldFailIfMissingDataValueForComplexNode() {
-            final CaseDetails caseDetails = aCaseDetails()
+            final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(
                     aClassificationBuilder()
@@ -384,7 +384,7 @@ class SecurityValidationServiceTest {
         @Test
         @DisplayName("should fail if missing classification for data nodes")
         void shouldFailIfMissingClassificationForDataNodes() {
-            final CaseDetails caseDetails = aCaseDetails()
+            final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(
                     aClassificationBuilder()
@@ -420,7 +420,7 @@ class SecurityValidationServiceTest {
         @Test
         @DisplayName("should fail if extra classification for data nodes")
         void shouldFailIfExtraClassificationForDataNodes() {
-            final CaseDetails caseDetails = aCaseDetails()
+            final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(
                     aClassificationBuilder()
@@ -456,7 +456,7 @@ class SecurityValidationServiceTest {
         @Test
         @DisplayName("should fail if invalid classification value for callback data")
         void shouldFailIfInvalidClassificationValueForCallbackData() {
-            final CaseDetails caseDetails = aCaseDetails()
+            final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(
                     aClassificationBuilder()
@@ -491,7 +491,7 @@ class SecurityValidationServiceTest {
         @Test
         @DisplayName("should fail if invalid classification value for callback data nodes")
         void shouldFailIfInvalidClassificationValueForCallbackDataNodes() {
-            final CaseDetails caseDetails = aCaseDetails()
+            final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(
                     aClassificationBuilder()
@@ -527,7 +527,7 @@ class SecurityValidationServiceTest {
         @Test
         @DisplayName("should fail if invalid classification level for data")
         void shouldFailIfInvalidClassificationLevelForData() {
-            final CaseDetails caseDetails = aCaseDetails()
+            final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(
                     aClassificationBuilder()
@@ -562,7 +562,7 @@ class SecurityValidationServiceTest {
         @Test
         @DisplayName("should fail if invalid classification level for data nodes")
         void shouldFailIfInvalidClassificationLevelForDataNodes() {
-            final CaseDetails caseDetails = aCaseDetails()
+            final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(
                     aClassificationBuilder()
@@ -602,7 +602,7 @@ class SecurityValidationServiceTest {
         @Test
         @DisplayName("should increase security if valid classification level for case and data nodes")
         void shouldIncreaseSecurityIfValidClassificationLevelForCaseAndDataNodes() {
-            final CaseDetails caseDetails = aCaseDetails()
+            final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(aClassificationBuilder()
                                             .withData("collectionField1", aClassificationBuilder()
@@ -654,7 +654,7 @@ class SecurityValidationServiceTest {
         @Test
         @DisplayName("should fail if missing collection item for data nodes")
         void shouldFailIfMissingCollectionItemForDataNodes() {
-            final CaseDetails caseDetails = aCaseDetails()
+            final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(aClassificationBuilder()
                                             .withData("collectionField1", aClassificationBuilder()
@@ -705,7 +705,7 @@ class SecurityValidationServiceTest {
         @Test
         @DisplayName("should fail if missing classification for data nodes")
         void shouldFailIfMissingClassificationForDataNodes() {
-            final CaseDetails caseDetails = aCaseDetails()
+            final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(aClassificationBuilder()
                                             .withData("collectionField1", aClassificationBuilder()
@@ -747,7 +747,7 @@ class SecurityValidationServiceTest {
         @Test
         @DisplayName("should fail if extra classification for data nodes")
         void shouldFailIfExtraClassificationForDataNodes() {
-            final CaseDetails caseDetails = aCaseDetails()
+            final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(aClassificationBuilder()
                                             .withData("collectionField1", aClassificationBuilder()
@@ -785,7 +785,7 @@ class SecurityValidationServiceTest {
         @Test
         @DisplayName("should fail if extra collection item")
         void shouldFailIfExtraCollectionItem() {
-            final CaseDetails caseDetails = aCaseDetails()
+            final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(aClassificationBuilder()
                                             .withData("collectionField1", aClassificationBuilder()
@@ -831,7 +831,7 @@ class SecurityValidationServiceTest {
         @Test
         @DisplayName("should fail if invalid classification value for callback data")
         void shouldFailIfInvalidClassificationValueForCaseDataNodes() {
-            final CaseDetails caseDetails = aCaseDetails()
+            final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(aClassificationBuilder()
                                             .withData("collectionField1", aClassificationBuilder()
@@ -868,7 +868,7 @@ class SecurityValidationServiceTest {
         @Test
         @DisplayName("should fail if invalid classification value for callback data nodes")
         void shouldFailIfInvalidClassificationValueForCallbackDataNodes() {
-            final CaseDetails caseDetails = aCaseDetails()
+            final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(aClassificationBuilder()
                                             .withData("collectionField1", aClassificationBuilder()
@@ -905,7 +905,7 @@ class SecurityValidationServiceTest {
         @Test
         @DisplayName("should fail if invalid classification level for data nodes")
         void shouldFailIfInvalidClassificationLevelForDataNodes() {
-            final CaseDetails caseDetails = aCaseDetails()
+            final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(aClassificationBuilder()
                                             .withData("collectionField1", aClassificationBuilder()
@@ -942,7 +942,7 @@ class SecurityValidationServiceTest {
         @Test
         @DisplayName("should fail if invalid classification level for data")
         void shouldFailIfInvalidClassificationLevelForData() {
-            final CaseDetails caseDetails = aCaseDetails()
+            final CaseDetails caseDetails = newCaseDetails()
                 .withSecurityClassification(PUBLIC)
                 .withDataClassification(aClassificationBuilder()
                                             .withData("collectionField1", aClassificationBuilder()

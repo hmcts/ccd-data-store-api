@@ -22,7 +22,7 @@ public class AuditEvent extends Event {
     @JsonProperty("event_name")
     private String eventName;
     @JsonIgnore
-    private Long caseDataId;
+    private String caseDataId;
     @JsonProperty("created_date")
     private LocalDateTime createdDate;
     @JsonProperty("case_type_id")
@@ -82,11 +82,11 @@ public class AuditEvent extends Event {
         this.eventName = eventName;
     }
 
-    public Long getCaseDataId() {
+    public String getCaseDataId() {
         return caseDataId;
     }
 
-    public void setCaseDataId(Long caseDataId) {
+    public void setCaseDataId(String caseDataId) {
         this.caseDataId = caseDataId;
     }
 

@@ -46,10 +46,6 @@ variable "jenkins_AAD_objectId" {
   description                 = "(Required) The Azure AD object ID of a user, service principal or security group in the Azure Active Directory tenant for the vault. The object ID must be unique for the list of access policies."
 }
 
-variable "vault_section" {
-  default = "test"
-}
-
 ////////////////////////////////
 // Database
 ////////////////////////////////
@@ -69,6 +65,11 @@ variable "authorised-services" {
 
 variable "idam_api_url" {
   default = "http://betaDevBccidamAppLB.reform.hmcts.net"
+}
+
+variable "draft_store_ttl_days" {
+  type = "string"
+  default = "180"
 }
 
 variable "document_management_valid_domain" {
