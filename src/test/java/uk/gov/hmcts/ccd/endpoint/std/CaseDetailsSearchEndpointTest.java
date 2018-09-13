@@ -59,11 +59,31 @@ public class CaseDetailsSearchEndpointTest {
 
     @Test
     void searchCaseDetailsRejectsBlacklistedSearchQueries() throws IOException {
-        String searchRequest = "{\n"
-                + "  \"query\": {\n"
-                + "    \"query_string\" : {\"query\": \"\"}\n"
-                + "    }\n"
-                + "}";
+        String searchRequest = "{  \n" +
+            "   \"query\":{  \n" +
+            "      \"bool\":{  \n" +
+            "         \"must\":[  \n" +
+            "            {  \n" +
+            "               \"simple_query_string\":{  \n" +
+            "                  \"query\":\"isde~2\"\n" +
+            "               }\n" +
+            "            },\n" +
+            "            {  \n" +
+            "               \"query_string\":{  \n" +
+            "                  \"query\":\"isde~2\"\n" +
+            "               }\n" +
+            "            },\n" +
+            "            {  \n" +
+            "               \"range\":{  \n" +
+            "                  \"data.ComplexField.ComplexNestedField.NestedNumberField\":{  \n" +
+            "                     \"lt\":\"91\"\n" +
+            "                  }\n" +
+            "               }\n" +
+            "            }\n" +
+            "         ]\n" +
+            "      }\n" +
+            "   }\n" +
+            "}";
         given(applicationParams.getSearchBlackList()).willReturn(newArrayList("query_string"));
 
         assertThrows(BadSearchRequest.class,
@@ -74,11 +94,26 @@ public class CaseDetailsSearchEndpointTest {
 
     @Test
     void searchCaseDetailsAllowsQueriesNotBlacklisted() throws IOException {
-        String query = "{\n"
-                + "  \"query\": {\n"
-                + "    \"simple_query_string\" : {\"query\": \"\"}\n"
-                + "    }\n"
-                + "}";
+        String query = "{\n" +
+            "   \"query\":{\n" +
+            "      \"bool\":{\n" +
+            "         \"must\":[\n" +
+            "            {\n" +
+            "               \"simple_query_string\":{\n" +
+            "                  \"query\":\"isde~2\"\n" +
+            "               }\n" +
+            "            },\n" +
+            "            {\n" +
+            "               \"range\":{\n" +
+            "                  \"data.ComplexField.ComplexNestedField.NestedNumberField\":{\n" +
+            "                     \"lt\":\"91\"\n" +
+            "                  }\n" +
+            "               }\n" +
+            "            }\n" +
+            "         ]\n" +
+            "      }\n" +
+            "   }\n" +
+            "}";
         given(applicationParams.getSearchBlackList()).willReturn(newArrayList("query_string"));
 
         endpoint.searchCases(CASE_TYPES_ID, query);

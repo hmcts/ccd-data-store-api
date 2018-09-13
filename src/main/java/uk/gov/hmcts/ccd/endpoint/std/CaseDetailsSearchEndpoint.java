@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @RestController
 @RequestMapping(path = "/",
@@ -55,7 +57,7 @@ public class CaseDetailsSearchEndpoint {
     private void validateSearchRequest(String searchRequest) throws IOException {
         Optional<Map> query = getQuery(searchRequest);
         validateSearchRequestContainsQuery(query);
-        rejectBlackListedQuery(query);
+        rejectBlackListedQuery(searchRequest);
     }
 
     private Optional<Map> getQuery(String searchRequest) throws IOException {
@@ -64,22 +66,23 @@ public class CaseDetailsSearchEndpoint {
         return Optional.ofNullable((Map) map.get("query"));
     }
 
-    private void validateSearchRequestContainsQuery(Optional<Map> queryOpt) throws IOException {
+    private void validateSearchRequestContainsQuery(Optional<Map> queryOpt) {
+
         if (!queryOpt.isPresent()) {
             throw new BadSearchRequest("missing required field 'query'");
         }
     }
 
-    private void rejectBlackListedQuery(Optional<Map> queryOpt) throws IOException {
-        queryOpt.ifPresent(query -> {
-            List<String> blackListedQueries = applicationParams.getSearchBlackList();
-            Optional<String> blackListedQueryOpt = blackListedQueries.stream().filter(blacklisted ->
-                    query.get(blacklisted) != null
-            ).findFirst();
-
-            blackListedQueryOpt.ifPresent(blacklisted -> {
-                throw new BadSearchRequest(String.format("Query of type '%s' is not allowed", blacklisted));
-            });
+    private void rejectBlackListedQuery(String query) {
+        List<String> blackListedQueries = applicationParams.getSearchBlackList();
+        Optional<String> blackListedQueryOpt = blackListedQueries.stream().filter(blacklisted -> {
+                Pattern p = Pattern.compile("\\b" + blacklisted + "\\b");
+                Matcher m = p.matcher(query);
+                return m.find();
+            }
+        ).findFirst();
+        blackListedQueryOpt.ifPresent(blacklisted -> {
+            throw new BadSearchRequest(String.format("Query of type '%s' is not allowed", blacklisted));
         });
     }
 }
