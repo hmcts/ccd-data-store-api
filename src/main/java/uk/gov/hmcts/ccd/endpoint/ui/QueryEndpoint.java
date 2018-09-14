@@ -56,7 +56,6 @@ public class QueryEndpoint {
 
     private static final Logger LOG = LoggerFactory.getLogger(QueryEndpoint.class);
     private final GetCaseViewOperation getCaseViewOperation;
-    private final GetCaseViewOperation getDraftViewOperation;
     private final GetCaseHistoryViewOperation getCaseHistoryViewOperation;
     private final GetEventTriggerOperation getEventTriggerOperation;
     private final SearchQueryOperation searchQueryOperation;
@@ -69,7 +68,6 @@ public class QueryEndpoint {
     @Inject
     public QueryEndpoint(
         @Qualifier(AuthorisedGetCaseViewOperation.QUALIFIER) GetCaseViewOperation getCaseViewOperation,
-        @Qualifier(DefaultGetCaseViewFromDraftOperation.QUALIFIER) GetCaseViewOperation getDraftViewOperation,
         @Qualifier(AuthorisedGetCaseHistoryViewOperation.QUALIFIER) GetCaseHistoryViewOperation getCaseHistoryOperation,
         @Qualifier(AuthorisedGetEventTriggerOperation.QUALIFIER) GetEventTriggerOperation getEventTriggerOperation,
         SearchQueryOperation searchQueryOperation, FieldMapSanitizeOperation fieldMapSanitizeOperation,
@@ -79,7 +77,6 @@ public class QueryEndpoint {
         @Qualifier(AuthorisedGetCaseTypesOperation.QUALIFIER) GetCaseTypesOperation getCaseTypesOperation) {
 
         this.getCaseViewOperation = getCaseViewOperation;
-        this.getDraftViewOperation = getDraftViewOperation;
         this.getCaseHistoryViewOperation = getCaseHistoryOperation;
         this.getEventTriggerOperation = getEventTriggerOperation;
         this.searchQueryOperation = searchQueryOperation;
@@ -186,23 +183,6 @@ public class QueryEndpoint {
         CaseView caseView = getCaseViewOperation.execute(jurisdictionId, caseTypeId, cid);
         final Duration between = Duration.between(start, Instant.now());
         LOG.warn("findCase has been completed in {} millisecs...", between.toMillis());
-        return caseView;
-    }
-
-    @Transactional
-    @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/drafts/{did}",
-        method = RequestMethod.GET)
-    @ApiOperation(value = "Fetch a draft for display")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "A displayable draft")
-    })
-    public CaseView findDraft(@PathVariable("jid") final String jurisdictionId,
-                              @PathVariable("ctid") final String caseTypeId,
-                              @PathVariable("did") final String did) {
-        Instant start = Instant.now();
-        CaseView caseView = getDraftViewOperation.execute(jurisdictionId, caseTypeId, did);
-        final Duration between = Duration.between(start, Instant.now());
-        LOG.warn("findDraft has been completed in {} millisecs...", between.toMillis());
         return caseView;
     }
 
