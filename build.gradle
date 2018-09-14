@@ -603,7 +603,7 @@ task sendCoverageToCodacy(type: JavaExec, dependsOn: jacocoTestReport) {
 }
 
 pitest {
-    targetClasses = ['uk.gov.hmcts.ccd.datastore.*']
+    targetClasses = ['uk.gov.hmcts.ccd.data.*']
     //excludedClasses = ['']
     threads = 10
     outputFormats = ['XML', 'HTML']
