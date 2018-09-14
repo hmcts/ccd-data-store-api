@@ -103,7 +103,7 @@ public class DraftsEndpoint {
         Instant start = Instant.now();
         CaseView caseView = getDraftViewOperation.execute(jurisdictionId, caseTypeId, did);
         final Duration between = Duration.between(start, Instant.now());
-        LOG.warn("findDraft has been completed in {} millisecs...", between.toMillis());
+        LOG.info("findDraft has been completed in {} millisecs...", between.toMillis());
         return caseView;
     }
 
@@ -120,7 +120,7 @@ public class DraftsEndpoint {
         Instant start = Instant.now();
         draftGateway.delete(did);
         final Duration between = Duration.between(start, Instant.now());
-        LOG.warn("deleteDraft has been completed in {} millisecs...", between.toMillis());
+        LOG.info("deleteDraft has been completed in {} millisecs...", between.toMillis());
     }
 
 }

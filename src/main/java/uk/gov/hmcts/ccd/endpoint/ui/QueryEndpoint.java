@@ -165,7 +165,7 @@ public class QueryEndpoint {
                                                                                   CAN_READ).toArray(
             new WorkbasketInput[0]);
         final Duration between = Duration.between(start, Instant.now());
-        LOG.warn("findWorkbasketInputDetails has been completed in {} millisecs...", between.toMillis());
+        LOG.info("findWorkbasketInputDetails has been completed in {} millisecs...", between.toMillis());
         return workbasketInputs;
     }
 
@@ -182,7 +182,7 @@ public class QueryEndpoint {
         Instant start = Instant.now();
         CaseView caseView = getCaseViewOperation.execute(jurisdictionId, caseTypeId, cid);
         final Duration between = Duration.between(start, Instant.now());
-        LOG.warn("findCase has been completed in {} millisecs...", between.toMillis());
+        LOG.info("findCase has been completed in {} millisecs...", between.toMillis());
         return caseView;
     }
 
@@ -270,7 +270,7 @@ public class QueryEndpoint {
         CaseHistoryView caseView = getCaseHistoryViewOperation.execute(jurisdictionId, caseTypeId, caseReference,
                                                                        eventId);
         final Duration between = Duration.between(start, Instant.now());
-        LOG.warn("getCaseHistoryForEvent has been completed in {} millisecs...", between.toMillis());
+        LOG.info("getCaseHistoryForEvent has been completed in {} millisecs...", between.toMillis());
         return caseView;
     }
 
