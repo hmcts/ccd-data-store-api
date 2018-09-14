@@ -1,99 +1,71 @@
 package uk.gov.hmcts.ccd.datastore.tests.functional;
 
-import io.restassured.http.ContentType;
-import io.restassured.specification.RequestSpecification;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.BaseTest;
-import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
-import uk.gov.hmcts.ccd.domain.model.std.Event;
+import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder;
+import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FullCase;
+import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CaseData;
+import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event;
+import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.State;
 
-import java.util.function.Supplier;
+import static org.hamcrest.Matchers.equalTo;
 
-import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
-
+@DisplayName("Update case")
 class UpdateCaseTest extends BaseTest {
 
-
-    private static final String EVENT_UPDATE = "START_PROGRESS";
-    private static final String JURISDICTION = "AUTOTEST1";
-    private static final String CASE_TYPE = "AAT";
+    private static final String UPDATED_NUMBER = "4732";
 
     protected UpdateCaseTest(AATHelper aat) {
         super(aat);
     }
 
     @Test
-    @DisplayName("Update a case")
+    @DisplayName("should progress case state")
+    void shouldProgressCaseState() {
+        // Prepare new case in known state
+        final Long caseReference = Event.create()
+                                        .as(asAutoTestCaseworker())
+                                        .withData(AATCaseBuilder.EmptyCase.build())
+                                        .submitAndGetReference();
 
-
-    public void shouldUpdateACase() {
-
-        Long caseID = shouldCreateACase();
-
-        String eventToken = aat.getCcdHelper()
-            .generateTokenUpdateCase(asAutoTestCaseworker(), JURISDICTION, CASE_TYPE, EVENT_UPDATE, caseID);
-
-        String eventBody = createUpdateBody(eventToken).toString();
-
-
-        Supplier<RequestSpecification> asUser = asAutoTestCaseworker();
-
-
-        asUser.get()
-            .given()
-            .pathParam("jurisdiction", JURISDICTION)
-            .pathParam("caseType", CASE_TYPE)
-            .pathParam("caseID", caseID)
-            .contentType(ContentType.JSON)
-            .body(eventBody)
-            .when()
-            .post(
-                "/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases/{caseID}/events")
-            .then()
-            .statusCode(201);
-
+        Event.startProgress(caseReference)
+             .as(asAutoTestCaseworker())
+             .submit()
+             .then()
+             .statusCode(201)
+             .assertThat()
+             .body("state", equalTo(State.IN_PROGRESS));
     }
 
-    Long shouldCreateACase() {
+    @Test
+    @DisplayName("should update a single case field")
+    void shouldUpdateSingleField() {
+        // Prepare new case in known state
+        final Long caseReference = Event.create()
+                                        .as(asAutoTestCaseworker())
+                                        .withData(FullCase.build())
+                                        .submitAndGetReference();
 
-        Long caseID = aat.getCcdHelper()
-            .createCase(asAutoTestCaseworker(), JURISDICTION, CASE_TYPE, "CREATE", createEmptyCase())
-            .then()
-            .extract()
-            .path("id");
+        Event.update(caseReference)
+             .as(asAutoTestCaseworker())
+             .withData(
+                 CaseData.builder()
+                         .numberField(UPDATED_NUMBER)
+                         .build()
+             )
+             .submit()
 
-        return caseID;
+             .then()
+             .statusCode(201)
+             .assertThat()
+             .rootPath("case_data")
+
+             // Field updated
+             .body("NumberField", equalTo(UPDATED_NUMBER))
+
+             // Other fields not updated
+             .body("TextField", equalTo(FullCase.TEXT));
     }
-
-    private CaseDataContent createEmptyCase() {
-        final Event event = anEvent().build();
-        event.setEventId("CREATE");
-
-        final CaseDataContent caseData = new CaseDataContent();
-        caseData.setEvent(event);
-
-        return caseData;
-    }
-
-    private JSONObject createUpdateBody(String eventToken) {
-        JSONObject eventBody = new JSONObject();
-        try {
-            eventBody.put("event_token", eventToken);
-            JSONObject event = new JSONObject();
-            event.put("description", "This is an update");
-            event.put("id", EVENT_UPDATE);
-            event.put("summary", "Well this is a summary");
-            eventBody.put("event", event);
-        } catch (JSONException ignored) {
-            // no code needed here
-        }
-
-        return eventBody;
-    }
-
-
 }
