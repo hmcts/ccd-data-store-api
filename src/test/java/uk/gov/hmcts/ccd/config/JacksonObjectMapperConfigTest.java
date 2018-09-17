@@ -22,14 +22,13 @@ class JacksonObjectMapperConfigTest {
     @Mock
     private ObjectMapper objectMapper;
 
-    private JacksonObjectMapperConfig mapperConfig;
     private JacksonObjectMapperConfig.HalObjectMapperPostProcessor halProcessor;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        mapperConfig = new JacksonObjectMapperConfig();
+        final JacksonObjectMapperConfig mapperConfig = new JacksonObjectMapperConfig();
         halProcessor = mapperConfig.halObjectMapperPostProcessor();
     }
 

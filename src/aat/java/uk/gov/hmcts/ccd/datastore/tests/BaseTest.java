@@ -38,7 +38,7 @@ public abstract class BaseTest {
                                                                     "Bearer " + caseworker.getAccessToken())
                                                             .header("ServiceAuthorization", s2sToken);
 
-            return withUserParam ? request.pathParam("user", caseworker.getId()): request;
+            return withUserParam ? request.pathParam("user", caseworker.getId()) : request;
         };
     }
 }
