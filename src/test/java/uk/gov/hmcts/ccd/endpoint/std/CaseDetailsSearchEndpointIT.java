@@ -7,7 +7,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -97,7 +96,6 @@ public class CaseDetailsSearchEndpointIT extends WireMockBaseTest {
         MvcResult result = mockMvc.perform(post(POST_SEARCH_CASES)
                 .contentType(JSON_CONTENT_TYPE)
                 .param("ctid", "caseTypeId1")
-                .param("ctid", "caseTypeId2")
                 .content(searchRequest))
                 .andExpect(status().is(200))
                 .andReturn();
