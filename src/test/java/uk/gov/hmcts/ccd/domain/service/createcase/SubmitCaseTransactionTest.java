@@ -3,10 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.createcase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InOrder;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -18,6 +15,8 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
+import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
+import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 
 import java.time.LocalDateTime;
 
@@ -69,6 +68,10 @@ class SubmitCaseTransactionTest {
     @Mock
     private UIDService uidService;
 
+    @Mock
+    private UserAuthorisation userAuthorisation;
+
+    @InjectMocks
     private SubmitCaseTransaction submitCaseTransaction;
 
     private Event event;
@@ -81,29 +84,18 @@ class SubmitCaseTransactionTest {
     void setup() {
         MockitoAnnotations.initMocks(this);
 
-        submitCaseTransaction = new SubmitCaseTransaction(caseDetailsRepository,
-                                                          caseAuditEventRepository,
-                                                          caseTypeService,
-                                                          callbackInvoker,
-                                                          uidService,
-                                                          securityClassificationService,
-                                                          caseUserRepository);
-
         event = buildEvent();
         caseType = buildCaseType();
         idamUser = buildIdamUser();
         eventTrigger = buildEventTrigger();
         state = buildState();
 
-        doReturn(STATE_ID).when(savedCaseDetails).getState();
-
-        doReturn(state).when(caseTypeService).findState(caseType, STATE_ID);
-
-        doReturn(CASE_UID).when(uidService).generateUID();
-
-        doReturn(savedCaseDetails).when(caseDetailsRepository).set(caseDetails);
-
-        doReturn(CASE_ID).when(savedCaseDetails).getId();
+        when(savedCaseDetails.getState()).thenReturn(STATE_ID);
+        when(caseTypeService.findState(caseType, STATE_ID)).thenReturn(state);
+        when(uidService.generateUID()).thenReturn(CASE_UID);
+        when(caseDetailsRepository.set(caseDetails)).thenReturn(savedCaseDetails);
+        when(savedCaseDetails.getId()).thenReturn(CASE_ID);
+        when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.ALL);
     }
 
     private CaseState buildState() {
@@ -151,8 +143,10 @@ class SubmitCaseTransactionTest {
     }
 
     @Test
-    @DisplayName("should grant access to creator")
-    void shouldGrantAccessToCreator() {
+    @DisplayName("when creator has access level GRANTED, then it should grant access to creator")
+    void shouldGrantAccessToAccessLevelGrantedCreator() {
+        when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.GRANTED);
+
         submitCaseTransaction.submitCase(event,
                                          caseType,
                                          idamUser,
@@ -161,6 +155,21 @@ class SubmitCaseTransactionTest {
                                          IGNORE_WARNING);
 
         verify(caseUserRepository).grantAccess(Long.valueOf(CASE_ID), IDAM_ID);
+    }
+
+    @Test
+    @DisplayName("when creator has access level ALL, then it should NOT grant access to creator")
+    void shouldNotGrantAccessToAccessLevelAllCreator() {
+        when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.ALL);
+
+        submitCaseTransaction.submitCase(event,
+                                         caseType,
+                                         idamUser,
+                                         eventTrigger,
+                                         this.caseDetails,
+                                         IGNORE_WARNING);
+
+        verifyZeroInteractions(caseUserRepository);
     }
 
     @Test

@@ -20,6 +20,8 @@ import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException;
+import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
+import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -36,6 +38,7 @@ class SubmitCaseTransaction {
     private final UIDService uidService;
     private final SecurityClassificationService securityClassificationService;
     private final CaseUserRepository caseUserRepository;
+    private final UserAuthorisation userAuthorisation;
 
     @Inject
     public SubmitCaseTransaction(@Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
@@ -44,7 +47,9 @@ class SubmitCaseTransaction {
                                  final CallbackInvoker callbackInvoker,
                                  final UIDService uidService,
                                  final SecurityClassificationService securityClassificationService,
-                                 final CaseUserRepository caseUserRepository) {
+                                 final CaseUserRepository caseUserRepository,
+                                 final UserAuthorisation userAuthorisation
+                                 ) {
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseAuditEventRepository = caseAuditEventRepository;
         this.caseTypeService = caseTypeService;
@@ -52,6 +57,7 @@ class SubmitCaseTransaction {
         this.uidService = uidService;
         this.securityClassificationService = securityClassificationService;
         this.caseUserRepository = caseUserRepository;
+        this.userAuthorisation = userAuthorisation;
     }
 
     @Transactional
@@ -80,7 +86,9 @@ class SubmitCaseTransaction {
 
         final CaseDetails savedCaseDetails = saveAuditEventForCaseDetails(event, caseType, idamUser, eventTrigger, newCaseDetails);
 
-        caseUserRepository.grantAccess(Long.valueOf(savedCaseDetails.getId()), idamUser.getId());
+        if (AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
+            caseUserRepository.grantAccess(Long.valueOf(savedCaseDetails.getId()), idamUser.getId());
+        }
 
         return savedCaseDetails;
     }
