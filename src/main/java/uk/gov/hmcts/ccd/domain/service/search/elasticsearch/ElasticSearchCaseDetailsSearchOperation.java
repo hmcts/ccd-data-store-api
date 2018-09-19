@@ -22,22 +22,26 @@ import static java.util.stream.Collectors.toList;
 @Service
 public class ElasticSearchCaseDetailsSearchOperation implements CaseDetailsSearchOperation {
 
-    @Autowired
-    private ApplicationParams applicationParams;
+    private final ApplicationParams applicationParams;
+
+    private final JestClient jestClient;
+
+    private final ObjectMapper objectMapper;
+
+    private final CaseDetailsMapper caseDetailsMapper;
 
     @Autowired
-    private JestClient jestClient;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private CaseDetailsMapper caseDetailsMapper;
+    public ElasticSearchCaseDetailsSearchOperation(ApplicationParams applicationParams, JestClient jestClient, ObjectMapper objectMapper,
+                                                   CaseDetailsMapper caseDetailsMapper) {
+        this.applicationParams = applicationParams;
+        this.jestClient = jestClient;
+        this.objectMapper = objectMapper;
+        this.caseDetailsMapper = caseDetailsMapper;
+    }
 
     @Override
-    public CaseDetailsSearchResult execute(List<String> caseTypeIds, String query) throws IOException {
-
-        Search search = createSearchRequest(caseTypeIds, query);
+    public CaseDetailsSearchResult execute(String caseTypeId, String query) throws IOException {
+        Search search = createSearchRequest(caseTypeId, query);
         SearchResult result = jestClient.execute(search);
         if (result.isSucceeded()) {
             return toCaseDetailsSearchResult(result);
@@ -46,17 +50,15 @@ public class ElasticSearchCaseDetailsSearchOperation implements CaseDetailsSearc
         }
     }
 
-    private Search createSearchRequest(List<String> caseTypesId, String query) {
+    private Search createSearchRequest(String caseTypeId, String query) {
         return new Search.Builder(query)
-                    .addIndices(indices(caseTypesId))
+            .addIndex(toIndex(caseTypeId))
                     .addType(applicationParams.getCasesIndexType())
                     .build();
     }
 
-    private List<String> indices(List<String> caseTypesId) {
-        return caseTypesId.stream().map(caseTypeId ->
-                String.format(applicationParams.getCasesIndexNameFormat(), caseTypeId))
-                .collect(toList());
+    private String toIndex(String caseTypeId) {
+        return String.format(applicationParams.getCasesIndexNameFormat(), caseTypeId);
     }
 
     private CaseDetailsSearchResult toCaseDetailsSearchResult(SearchResult result) {

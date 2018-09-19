@@ -12,14 +12,12 @@ import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseDetailsSearchOpe
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
 import java.io.IOException;
-import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -27,7 +25,7 @@ import static org.mockito.Mockito.verify;
 
 public class CaseDetailsSearchEndpointTest {
 
-    private static final List<String> CASE_TYPES_ID = newArrayList("GrantOnly");
+    private static final String CASE_TYPE_ID = "GrantOnly";
 
     @Mock
     private ApplicationParams applicationParams;
@@ -52,9 +50,9 @@ public class CaseDetailsSearchEndpointTest {
         given(applicationParams.getSearchBlackList()).willReturn(newArrayList("query_string"));
 
         assertThrows(BadSearchRequest.class,
-                () -> endpoint.searchCases(CASE_TYPES_ID, searchRequest));
+                     () -> endpoint.searchCases(CASE_TYPE_ID, searchRequest));
 
-        verify(caseDetailsSearchOperation, never()).execute(CASE_TYPES_ID, searchRequest);
+            verify(caseDetailsSearchOperation, never()).execute(CASE_TYPE_ID, searchRequest);
     }
 
     @Test
@@ -87,9 +85,9 @@ public class CaseDetailsSearchEndpointTest {
         given(applicationParams.getSearchBlackList()).willReturn(newArrayList("query_string"));
 
         assertThrows(BadSearchRequest.class,
-                () -> endpoint.searchCases(CASE_TYPES_ID, searchRequest));
+                     () -> endpoint.searchCases(CASE_TYPE_ID, searchRequest));
 
-        verify(caseDetailsSearchOperation, never()).execute(CASE_TYPES_ID, searchRequest);
+        verify(caseDetailsSearchOperation, never()).execute(CASE_TYPE_ID, searchRequest);
     }
 
     @Test
@@ -116,21 +114,21 @@ public class CaseDetailsSearchEndpointTest {
             "}";
         given(applicationParams.getSearchBlackList()).willReturn(newArrayList("query_string"));
 
-        endpoint.searchCases(CASE_TYPES_ID, query);
+        endpoint.searchCases(CASE_TYPE_ID, query);
 
-        verify(caseDetailsSearchOperation).execute(CASE_TYPES_ID, query);
+        verify(caseDetailsSearchOperation).execute(CASE_TYPE_ID, query);
     }
 
     @Test
     void searchCaseDetailsInvokesOperation() throws IOException {
         given(applicationParams.getSearchBlackList()).willReturn(newArrayList("blockedQuery"));
         CaseDetailsSearchResult result = mock(CaseDetailsSearchResult.class);
-        Mockito.when(caseDetailsSearchOperation.execute(anyList(), anyString())).thenReturn(result);
+        Mockito.when(caseDetailsSearchOperation.execute(anyString(), anyString())).thenReturn(result);
         String searchRequest = "{\"query\": {\"match\": \"blah blah\"}}";
 
-        CaseDetailsSearchResult caseDetailsSearchResult = endpoint.searchCases(CASE_TYPES_ID, searchRequest);
+        CaseDetailsSearchResult caseDetailsSearchResult = endpoint.searchCases(CASE_TYPE_ID, searchRequest);
 
-        verify(caseDetailsSearchOperation).execute(CASE_TYPES_ID, searchRequest);
+        verify(caseDetailsSearchOperation).execute(CASE_TYPE_ID, searchRequest);
         assertThat(caseDetailsSearchResult, is(result));
     }
 }

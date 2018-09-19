@@ -46,12 +46,12 @@ public class CaseDetailsSearchEndpoint {
     })
     public CaseDetailsSearchResult searchCases(
             @ApiParam(value = "Case type ID", required = true)
-            @RequestParam("ctid") List<String> caseTypeIds,
+            @RequestParam("ctid") String caseTypeId,
             @ApiParam(name="native ElasticSearch Search API request. Please refer to the ElasticSearch official documentation", required = true)
             @RequestBody String jsonSearchRequest) throws IOException {
 
         validateSearchRequest(jsonSearchRequest);
-        return caseDetailsSearchOperation.execute(caseTypeIds, jsonSearchRequest);
+        return caseDetailsSearchOperation.execute(caseTypeId, jsonSearchRequest);
     }
 
     private void validateSearchRequest(String searchRequest) throws IOException {
