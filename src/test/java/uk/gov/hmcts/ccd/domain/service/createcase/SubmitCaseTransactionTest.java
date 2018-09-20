@@ -11,6 +11,8 @@ import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
+import uk.gov.hmcts.ccd.domain.model.callbacks.ItemType;
+import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
@@ -25,6 +27,7 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Matchers.notNull;
 import static org.mockito.Mockito.*;
 
@@ -45,6 +48,9 @@ class SubmitCaseTransactionTest {
     private static final String STATE_NAME = "Created name";
     private static final String CASE_UID = "1234123412341236";
     private static final Long CASE_ID = 45677L;
+    public static final String DESCRIPTION = "Description";
+    public static final String URL = "http://www.yahooo.com";
+    public static final ItemType DOCUMENT = ItemType.DOCUMENT;
 
     @Mock
     private CaseDetailsRepository caseDetailsRepository;
@@ -71,6 +77,7 @@ class SubmitCaseTransactionTest {
     private SubmitCaseTransaction submitCaseTransaction;
 
     private Event event;
+    private CaseEvent eventWithSignificantItem;
     private CaseType caseType;
     private IDAMProperties idamUser;
     private CaseEvent eventTrigger;
@@ -89,6 +96,7 @@ class SubmitCaseTransactionTest {
                                                           caseUserRepository);
 
         event = buildEvent();
+        eventWithSignificantItem = buildEventSignificantItem();
         caseType = buildCaseType();
         idamUser = buildIdamUser();
         eventTrigger = buildEventTrigger();
@@ -150,6 +158,24 @@ class SubmitCaseTransactionTest {
     }
 
     @Test
+    @DisplayName("should persist event with significant document")
+    void shouldPersistEventWithSignificantDocument() {
+        final ArgumentCaptor<AuditEvent> auditEventCaptor = ArgumentCaptor.forClass(AuditEvent.class);
+
+        submitCaseTransaction.submitCase(event,
+            caseType,
+            idamUser,
+            eventWithSignificantItem,
+            this.caseDetails,
+            IGNORE_WARNING);
+
+        assertAll(
+            () -> verify(caseAuditEventRepository).set(auditEventCaptor.capture()),
+            () -> assertAuditEventWithSignificantDocument(auditEventCaptor.getValue())
+        );
+    }
+
+    @Test
     @DisplayName("should grant access to creator")
     void shouldGrantAccessToCreator() {
         submitCaseTransaction.submitCase(event,
@@ -191,11 +217,42 @@ class SubmitCaseTransactionTest {
                   () -> assertThat(auditEvent.getDescription(), is(EVENT_DESC)));
     }
 
+    private void assertAuditEventWithSignificantDocument(final AuditEvent auditEvent) {
+        assertAll("Audit event",
+            () -> assertThat(auditEvent.getCaseDataId(), is(savedCaseDetails.getId())),
+            () -> assertThat(auditEvent.getUserId(), is(IDAM_ID)),
+            () -> assertThat(auditEvent.getUserLastName(), is(IDAM_LNAME)),
+            () -> assertThat(auditEvent.getUserFirstName(), is(IDAM_FNAME)),
+            () -> assertThat(auditEvent.getEventName(), is(EVENT_NAME)),
+            () -> assertThat(auditEvent.getCaseTypeId(), is(CASE_TYPE_ID)),
+            () -> assertThat(auditEvent.getCaseTypeVersion(), is(VERSION)),
+            () -> assertThat(auditEvent.getStateId(), is(STATE_ID)),
+            () -> assertThat(auditEvent.getStateName(), is(STATE_NAME)),
+            () -> assertThat(auditEvent.getEventId(), is(EVENT_ID)),
+            () -> assertThat(auditEvent.getSummary(), is(EVENT_SUMMARY)),
+            () -> assertThat(auditEvent.getDescription(), is(EVENT_DESC)),
+            () -> assertThat(auditEvent.getSignificantItem().getType(), is(DOCUMENT)),
+            () -> assertThat(auditEvent.getSignificantItem().getDescription(), is(DESCRIPTION)),
+            () -> assertThat(auditEvent.getSignificantItem().getUrl(), is(URL)));
+    }
+
     private Event buildEvent() {
         final Event event = new Event();
         event.setEventId(EVENT_ID);
         event.setDescription(EVENT_DESC);
         event.setSummary(EVENT_SUMMARY);
+        return event;
+    }
+
+    private CaseEvent buildEventSignificantItem() {
+        final CaseEvent event = new CaseEvent();
+        event.setId(EVENT_ID);
+        event.setName(EVENT_NAME);
+        SignificantItem significantItem = new SignificantItem();
+        significantItem.setType(DOCUMENT);
+        significantItem.setDescription(DESCRIPTION);
+        significantItem.setUrl(URL);
+        event.setSignificantItem(significantItem);
         return event;
     }
 

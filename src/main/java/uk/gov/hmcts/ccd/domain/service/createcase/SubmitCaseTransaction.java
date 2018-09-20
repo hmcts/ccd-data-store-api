@@ -106,6 +106,9 @@ class SubmitCaseTransaction {
         auditEvent.setSecurityClassification(securityClassificationService.getClassificationForEvent(caseType,
                                                                                                      eventTrigger));
         auditEvent.setDataClassification(savedCaseDetails.getDataClassification());
+        if(eventTrigger.getSignificantItem()!=null) {
+            auditEvent.setSignificantItem(eventTrigger.getSignificantItem());
+        }
         caseAuditEventRepository.set(auditEvent);
         return savedCaseDetails;
     }

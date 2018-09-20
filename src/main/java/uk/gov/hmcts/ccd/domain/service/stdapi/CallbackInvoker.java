@@ -2,11 +2,15 @@ package uk.gov.hmcts.ccd.domain.service.stdapi;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.validator.routines.UrlValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
+import uk.gov.hmcts.ccd.domain.model.callbacks.ItemType;
+import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
@@ -16,9 +20,7 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityValidationService;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static com.google.common.collect.Maps.newHashMap;
 import static java.util.Optional.ofNullable;
@@ -71,7 +73,9 @@ public class CallbackInvoker {
             eventTrigger.getCallBackURLAboutToSubmitEvent(),
             eventTrigger.getRetriesTimeoutURLAboutToSubmitEvent(),
             eventTrigger, caseDetailsBefore, caseDetails);
-        return callbackResponse.flatMap(response -> validateAndSetFromAboutToSubmitCallback(caseType,
+
+        return callbackResponse.flatMap(response -> validateAndSetFromAboutToSubmitCallback(eventTrigger,
+                                                                                            caseType,
                                                                                             caseDetails,
                                                                                             ignoreWarning,
                                                                                             response));
@@ -96,10 +100,11 @@ public class CallbackInvoker {
         }
     }
 
-    private Optional<String> validateAndSetFromAboutToSubmitCallback(final CaseType caseType,
+    private Optional<String> validateAndSetFromAboutToSubmitCallback(final CaseEvent eventTrigger, final CaseType caseType,
                                                                     final CaseDetails caseDetails,
                                                                     final Boolean ignoreWarning,
                                                                     final CallbackResponse callbackResponse) {
+        validateSignificantItem(eventTrigger, callbackResponse);
         callbackService.validateCallbackErrorsAndWarnings(callbackResponse, ignoreWarning);
         if (callbackResponse.getData() != null) {
             validateAndSetData(caseType, caseDetails, callbackResponse.getData());
@@ -112,8 +117,13 @@ public class CallbackInvoker {
             newCaseState.ifPresent(caseDetails::setState);
             return newCaseState;
         }
+
+
+
         return Optional.empty();
     }
+
+
 
     private boolean callbackResponseHasCaseAndDataClassification(CallbackResponse callbackResponse) {
         return (callbackResponse.getSecurityClassification() != null && callbackResponse.getDataClassification() != null) ? true : false;
@@ -147,4 +157,34 @@ public class CallbackInvoker {
         jsonNode.ifPresent(value -> data.remove(CALLBACK_RESPONSE_KEY_STATE));
         return jsonNode.flatMap(value -> value.isTextual() ? Optional.of(value.textValue()) : Optional.empty());
     }
+
+    private void validateSignificantItem(CaseEvent eventTrigger, CallbackResponse callbackResponse) {
+        SignificantItem significantItem = callbackResponse.getSignificantItem();
+        List<String> errors = new ArrayList<>();
+
+        if (significantItem != null){
+            if(significantItem.getType() != ItemType.DOCUMENT){
+
+                errors.add("Significant Item type incorrect");
+            }
+            UrlValidator urlValidator = new UrlValidator();
+            if (!urlValidator.isValid(significantItem.getUrl())){
+                errors.add("Url Invalid");
+            }
+            if(isDescriptionEmptyOrNotWithInSpecifiedRange(significantItem)){
+               errors.add("Description should not be empty but also not more than 64 characters");
+            }
+            if(errors.size() == 0) {
+                eventTrigger.setSignificantDocument(true);
+                eventTrigger.setSignificantItem(significantItem);
+            } else {
+                callbackResponse.setErrors(errors);
+            }
+        }
+    }
+
+    private boolean isDescriptionEmptyOrNotWithInSpecifiedRange(SignificantItem significantItem) {
+        return StringUtils.isEmpty(significantItem.getDescription()) || (StringUtils.isNotEmpty(significantItem.getDescription()) && !(significantItem.getDescription().length() > 0 && significantItem.getDescription().length() < 65));
+    }
+
 }

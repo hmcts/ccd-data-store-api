@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.ToString;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
+import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -44,6 +45,10 @@ public class CaseEvent implements Serializable {
     private String endButtonLabel = null;
     @JsonProperty("acls")
     private List<AccessControlList> accessControlLists;
+    @JsonProperty("significant_document")
+    private Boolean significantDocument = null;
+    @JsonProperty("significant_item")
+    private SignificantItem significantItem;
 
     public String getId() {
         return id;
@@ -189,4 +194,19 @@ public class CaseEvent implements Serializable {
         this.endButtonLabel = endButtonLabel;
     }
 
+    public Boolean getSignificantDocument() {
+        return significantDocument;
+    }
+
+    public void setSignificantDocument(Boolean significantDocument) {
+        this.significantDocument = significantDocument;
+    }
+
+    public SignificantItem getSignificantItem() {
+        return significantItem;
+    }
+
+    public void setSignificantItem(SignificantItem significantItem) {
+        this.significantItem = significantItem;
+    }
 }

@@ -3,10 +3,14 @@ package uk.gov.hmcts.ccd.data.casedetails;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import uk.gov.hmcts.ccd.data.SignificantItemEntity;
+import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,6 +24,7 @@ public class CaseAuditEventMapper {
 
     public AuditEvent entityToModel(final CaseAuditEventEntity caseAuditEventEntity) {
         final AuditEvent auditEvent = new AuditEvent();
+        final SignificantItem significantItem= new SignificantItem();
         auditEvent.setId(caseAuditEventEntity.getId());
         auditEvent.setCaseDataId(caseAuditEventEntity.getCaseDataId());
         auditEvent.setCaseTypeId(caseAuditEventEntity.getCaseTypeId());
@@ -39,11 +44,19 @@ public class CaseAuditEventMapper {
         auditEvent.setEventName(caseAuditEventEntity.getEventName());
         auditEvent.setSummary(caseAuditEventEntity.getSummary());
         auditEvent.setDescription(caseAuditEventEntity.getDescription());
+        if(caseAuditEventEntity.getSignificantItemEntity()!=null) {
+            significantItem.setDescription(caseAuditEventEntity.getSignificantItemEntity().getDescription());
+            significantItem.setType(caseAuditEventEntity.getSignificantItemEntity().getType());
+            significantItem.setUrl(caseAuditEventEntity.getSignificantItemEntity().getUrl().getPath());
+            auditEvent.setSignificantItem(significantItem);
+        }
         return auditEvent;
     }
 
     public CaseAuditEventEntity modelToEntity(final AuditEvent auditEvent) {
         final CaseAuditEventEntity newCaseAuditEventEntity = new CaseAuditEventEntity();
+        final SignificantItemEntity significantItemEntity = new SignificantItemEntity();
+
         newCaseAuditEventEntity.setId(auditEvent.getId());
         newCaseAuditEventEntity.setCaseDataId(auditEvent.getCaseDataId());
         newCaseAuditEventEntity.setCaseTypeId(auditEvent.getCaseTypeId());
@@ -66,6 +79,19 @@ public class CaseAuditEventMapper {
         newCaseAuditEventEntity.setEventName(auditEvent.getEventName());
         newCaseAuditEventEntity.setSummary(auditEvent.getSummary());
         newCaseAuditEventEntity.setDescription(auditEvent.getDescription());
+        if(auditEvent.getSignificantItem()!=null) {
+            significantItemEntity.setType(auditEvent.getSignificantItem().getType());
+            significantItemEntity.setDescription(auditEvent.getSignificantItem().getDescription());
+            significantItemEntity.setCaseEvent(newCaseAuditEventEntity);
+
+            try {
+                significantItemEntity.setUrl(new URL(auditEvent.getSignificantItem().getUrl()));
+            } catch (MalformedURLException e) {
+                // TODO Create a new runtime excpetion
+                new RuntimeException("Malformed URL Exception");
+            }
+            newCaseAuditEventEntity.setSignificantItemEntity(significantItemEntity);
+        }
         return newCaseAuditEventEntity;
     }
 

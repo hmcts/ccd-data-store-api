@@ -1,9 +1,11 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import uk.gov.hmcts.ccd.data.SignificantItemEntity;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventEntity.FIND_BY_CASE_DATA_ID_HQL;
 
@@ -72,6 +74,10 @@ public class CaseAuditEventEntity {
     @Column(name = "data_classification", nullable = false)
     @Convert(converter = uk.gov.hmcts.ccd.data.JSONBConverter.class)
     private JsonNode dataClassification;
+
+    @OneToOne(mappedBy = "caseEvent", cascade = CascadeType.PERSIST,orphanRemoval = true)
+    private SignificantItemEntity significantItemEntity;
+
     public Long getId() {
         return id;
     }
@@ -207,4 +213,13 @@ public class CaseAuditEventEntity {
     public void setDataClassification(JsonNode dataClassification) {
         this.dataClassification = dataClassification;
     }
+
+    public SignificantItemEntity getSignificantItemEntity() {
+        return significantItemEntity;
+    }
+
+    public void setSignificantItemEntity(SignificantItemEntity significantItemEntity) {
+        this.significantItemEntity = significantItemEntity;
+    }
+
 }
