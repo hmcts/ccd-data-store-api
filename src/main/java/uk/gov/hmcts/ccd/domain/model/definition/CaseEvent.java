@@ -43,6 +43,8 @@ public class CaseEvent implements Serializable {
     private Boolean showEventNotes = null;
     @JsonProperty("end_button_label")
     private String endButtonLabel = null;
+    @JsonProperty("can_save_draft")
+    private Boolean canSaveDraft = null;
     @JsonProperty("acls")
     private List<AccessControlList> accessControlLists;
     @JsonProperty("significant_document")
@@ -208,5 +210,12 @@ public class CaseEvent implements Serializable {
 
     public void setSignificantItem(SignificantItem significantItem) {
         this.significantItem = significantItem;
+    }
+    public Boolean getCanSaveDraft() {
+        return canSaveDraft;
+    }
+
+    public void setCanSaveDraft(Boolean canSaveDraft) {
+        this.canSaveDraft = canSaveDraft;
     }
 }

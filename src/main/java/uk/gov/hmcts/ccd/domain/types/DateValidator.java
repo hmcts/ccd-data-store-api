@@ -57,11 +57,11 @@ public class DateValidator implements BaseTypeValidator {
         }
 
         if (!checkRegex(caseFieldDefinition.getFieldType().getRegularExpression(), dataValue.asText())) {
-            return Collections.singletonList(new ValidationResult(dataValue.asText() + " Field Type Regex Failed:" + caseFieldDefinition.getFieldType().getRegularExpression(), dataFieldId));
+            return Collections.singletonList(new ValidationResult(REGEX_GUIDANCE, dataFieldId));
         }
 
         if (!checkRegex(getType().getRegularExpression(), dataValue.asText())) {
-            return Collections.singletonList(new ValidationResult(dataValue.asText() + " Date Type Regex Failed:" + getType().getRegularExpression(), dataFieldId));
+            return Collections.singletonList(new ValidationResult(REGEX_GUIDANCE, dataFieldId));
         }
 
         return Collections.emptyList();

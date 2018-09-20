@@ -3,8 +3,6 @@ package uk.gov.hmcts.ccd;
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.telemetry.Duration;
 import com.microsoft.applicationinsights.telemetry.RequestTelemetry;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.logging.appinsights.AbstractAppInsights;
@@ -14,6 +12,7 @@ public class AppInsights extends AbstractAppInsights {
     private static final String MODULE = "CASE_DATA";
     public static final String CASE_DEFINITION = "CASE_DEFINITION";
     public static final String DOC_MANAGEMENT = "DOCUMENT_MANAGEMENT";
+    public static final String DRAFT_STORE = "DRAFT_STORE";
 
     @Autowired
     public AppInsights(TelemetryClient telemetry) {

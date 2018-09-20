@@ -4,20 +4,23 @@ import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.BaseTest;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
-
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 import javax.inject.Inject;
 import javax.sql.DataSource;
-
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Transactional
 public class CaseAuditEventRepositoryTest extends BaseTest {
@@ -43,13 +46,12 @@ public class CaseAuditEventRepositoryTest extends BaseTest {
         setUpCaseEvent(CASE_DATA_ID, "Second Event after Create Event", "2017-09-28 08:46:16.260");
 
         CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setId(CASE_DATA_ID);
+        caseDetails.setId(String.valueOf(CASE_DATA_ID));
 
         Optional<AuditEvent> createEventOptional = classUnderTest.getCreateEvent(caseDetails);
 
         assertTrue(createEventOptional.isPresent());
         assertEquals(createEventSummary, createEventOptional.get().getSummary());
-
     }
 
     @Test
@@ -57,10 +59,29 @@ public class CaseAuditEventRepositoryTest extends BaseTest {
     public void databaseContainsNoEventsForCaseDetails_getCreateEventCalled_EmptyOptionalReturned() {
 
         CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setId(CASE_DATA_ID);
+        caseDetails.setId(String.valueOf(CASE_DATA_ID));
 
         assertFalse(classUnderTest.getCreateEvent(caseDetails).isPresent());
+    }
 
+    @Test
+    @DisplayName("should return audit event for the event id")
+    public void shouldReturnAuditEventForEventId() {
+        String createEventSummary = "The Create Event";
+
+        setUpCaseData(100L);
+        Long eventId = setUpCaseEvent(100L, "The Create Event", "2017-09-28 08:46:16.258");
+
+        Optional<AuditEvent> createEventOptional = classUnderTest.findByEventId(eventId);
+
+        assertTrue(createEventOptional.isPresent());
+        assertEquals(createEventSummary, createEventOptional.get().getSummary());
+    }
+
+    @Test
+    @DisplayName("should throw exception when audit event is not found")
+    public void shouldThrowExceptionWhenAuditEventNotFound() {
+        assertThrows(ResourceNotFoundException.class, () -> classUnderTest.findByEventId(10000L));
     }
 
     private void setUpCaseData(Long caseDataId) {
@@ -75,20 +96,27 @@ public class CaseAuditEventRepositoryTest extends BaseTest {
         );
     }
 
-    private void setUpCaseEvent(Long caseDataId, String summary, String timestamp) {
-        new JdbcTemplate(db).update(
-            String.format(
-                "INSERT INTO CASE_EVENT "
-                    + "(EVENT_ID, CREATED_DATE, EVENT_NAME, SUMMARY, USER_ID, USER_FIRST_NAME, USER_LAST_NAME, CASE_DATA_ID, "
-                        + "CASE_TYPE_ID, CASE_TYPE_VERSION, STATE_ID, STATE_NAME, DATA, SECURITY_CLASSIFICATION) "
-                + "VALUES "
-                    + "('EVENT_ID', %s, 'EVENT_NAME', '%s', 696969, 'USER_FIRST_NAME', 'USER_LAST_NAME', %s, "
-                        + "'CASE_TYPE_ID', '1', 'STATE_ID', 'STATE_NAME', '{}', 'PUBLIC')",
-                String.format("'%s'::timestamp",timestamp),
-                summary,
-                caseDataId
-            )
-        );
+    private Long setUpCaseEvent(Long caseDataId, String summary, String timestamp) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("EVENT_ID", "EVENT_ID");
+        params.put("CREATED_DATE", timestamp);
+        params.put("EVENT_NAME", "EVENT_NAME");
+        params.put("SUMMARY", summary);
+        params.put("USER_ID", 696969);
+        params.put("USER_FIRST_NAME", "USER_FIRST_NAME");
+        params.put("USER_LAST_NAME", "USER_LAST_NAME");
+        params.put("CASE_DATA_ID", caseDataId);
+        params.put("CASE_TYPE_ID", "CASE_TYPE_ID");
+        params.put("CASE_TYPE_VERSION", "1");
+        params.put("STATE_ID", "STATE_ID");
+        params.put("STATE_NAME", "STATE_NAME");
+        params.put("DATA", "{}");
+        params.put("SECURITY_CLASSIFICATION", "PUBLIC");
+
+        return new SimpleJdbcInsert(db)
+            .withTableName("CASE_EVENT")
+            .usingGeneratedKeyColumns("id")
+            .executeAndReturnKey(params).longValue();
     }
 
 }

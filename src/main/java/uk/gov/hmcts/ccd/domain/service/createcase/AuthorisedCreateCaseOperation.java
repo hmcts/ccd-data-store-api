@@ -11,6 +11,7 @@ import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
@@ -51,10 +52,12 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
     public CaseDetails createCaseDetails(final String uid,
                                          String jurisdictionId,
                                          String caseTypeId,
-                                         Event event,
-                                         Map<String, JsonNode> data,
-                                         Boolean ignoreWarning,
-                                         String token) {
+                                         CaseDataContent caseDataContent,
+                                         Boolean ignoreWarning) {
+        if (caseDataContent == null) {
+            throw new ValidationException("No data provided");
+        }
+
         final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
         if (caseType == null) {
             throw new ValidationException("Cannot find case type definition for  " + caseTypeId);
@@ -65,15 +68,15 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
             throw new ValidationException("Cannot find user roles for the user");
         }
 
+        Event event = caseDataContent.getEvent();
+        Map<String, JsonNode> data = caseDataContent.getData();
         verifyCreateAccess(event, data, caseType, userRoles);
 
         final CaseDetails caseDetails = createCaseOperation.createCaseDetails(uid,
                                                                               jurisdictionId,
                                                                               caseTypeId,
-                                                                              event,
-                                                                              data,
-                                                                              ignoreWarning,
-                                                                              token);
+                                                                              caseDataContent,
+                                                                              ignoreWarning);
         return verifyReadAccess(caseType, userRoles, caseDetails);
     }
 

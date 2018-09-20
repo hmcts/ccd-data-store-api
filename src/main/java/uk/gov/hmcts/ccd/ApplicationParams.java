@@ -22,6 +22,15 @@ public class ApplicationParams {
     @Value("${ccd.case-definition.host}")
     private String caseDefinitionHost;
 
+    @Value("${ccd.draft.host}")
+    private String draftHost;
+
+    @Value("${ccd.draft.encryptionKey}")
+    private String draftEncryptionKey;
+
+    @Value("${ccd.draft.maxTTLDays}")
+    private Integer draftMaxTTLDays;
+
     @Value("${ccd.ui-definition.host}")
     private String uiDefinitionHost;
 
@@ -83,12 +92,32 @@ public class ApplicationParams {
         return caseDefinitionHost + "/api/data/case-type/" + encode(caseTypeId);
     }
 
+    public String draftBaseURL() {
+        return draftHost + "/drafts";
+    }
+
+    public String draftURL(String draftId) {
+        return draftHost + "/drafts/" + draftId;
+    }
+
+    public String getDraftEncryptionKey() {
+        return draftEncryptionKey;
+    }
+
+    public Integer getDraftMaxTTLDays() {
+        return draftMaxTTLDays;
+    }
+
     public String caseTypeLatestVersionUrl(String caseTypeId) {
         return caseDefinitionHost + "/api/data/case-type/" + encode(caseTypeId) + "/version";
     }
 
     public String userRoleClassification() {
         return caseDefinitionHost + "/api/user-role?role={userRole}";
+    }
+
+    public String userRolesClassificationsURL() {
+        return caseDefinitionHost + "/api/user-roles/{roles}";
     }
 
     public String displayWorkbasketDefURL(final String caseTypeId) {

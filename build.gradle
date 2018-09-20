@@ -1,32 +1,28 @@
 buildscript {
     dependencies {
-        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.1.1'
-    }
-    dependencies {
         classpath 'org.jsonschema2pojo:jsonschema2pojo-gradle-plugin:0.5.1'
-    }
-    dependencies {
-        classpath 'gradle.plugin.com.github.spotbugs:gradlePlugin:1.6.0'
     }
     dependencies {
         classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.6.2'
     }
     dependencies {
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.2'
     }
 }
 
 plugins {
     id 'application'
     id 'io.spring.dependency-management' version '1.0.5.RELEASE'
-    id 'org.springframework.boot' version '1.5.13.RELEASE'
-    id 'com.github.ben-manes.versions' version '0.17.0'
+    id 'org.springframework.boot' version '1.5.14.RELEASE'
+    id 'com.github.ben-manes.versions' version '0.20.0'
     id 'org.sonarqube' version '2.6.2'
     id 'jacoco'
     id 'checkstyle'
     id 'com.github.kt3k.coveralls' version '2.8.2'
-    id 'se.patrikerdes.use-latest-versions' version '0.2.1'
-    id 'org.owasp.dependencycheck' version '3.1.2'
+    id 'se.patrikerdes.use-latest-versions' version '0.2.3'
+    id 'org.owasp.dependencycheck' version '3.2.1'
+    id 'com.github.spotbugs' version '1.6.2'
+    id "net.ltgt.apt" version "0.18"
 }
 
 apply plugin: 'java'
@@ -36,7 +32,6 @@ apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'org.sonarqube'
 apply plugin: 'jsonschema2pojo'
-apply plugin: 'org.junit.platform.gradle.plugin'
 apply plugin: 'jacoco'
 apply plugin: 'checkstyle'
 apply plugin: 'pmd'
@@ -89,30 +84,27 @@ mainClassName = 'uk.gov.hmcts.ccd.CoreCaseDataApplication'
 
 // tag::repositories[]
 repositories {
-// https://github.com/hmcts/java-logging/blob/master/java-logging-appinsights/README.md
+    mavenLocal()
+    jcenter()
     maven {
         url  'https://dl.bintray.com/hmcts/hmcts-maven'
     }
-    mavenLocal()
-    jcenter()
 }
 // end::repositories[]
 
 ext {
-    junitVersion = '4.12'
-    junitJupiterVersion = '5.1.1'
-    junitVintageVersion = '5.1.1'
-    junitPlatformVersion = '1.1.1'
+    junitJupiterVersion = '5.2.0'
+    junitVintageVersion = '5.2.0'
     hibernateVersion = '5.2.16.Final'
     reformLogging = '2.2.1'
     swagger2Version = '2.9.0'
     limits = [
-            'instruction': 84,
-            'branch'     : 72,  // TODO needs code update
-            'line'       : 85,
-            'complexity' : 80,
-            'method'     : 88,
-            'class'      : 88
+            'instruction': 90,
+            'branch'     : 85,
+            'line'       : 90,
+            'complexity' : 88,
+            'method'     : 90,
+            'class'      : 98
     ]
     appInsights= '2.0.1'
 }
@@ -146,10 +138,6 @@ configurations {
     aatRuntime.extendsFrom(testRuntime)
 }
 
-junitPlatform {
-    enableStandardTestTask true
-}
-
 checkstyle {
     maxWarnings = 99999  // In the Ideal world this should be 0
     toolVersion = '8.8'
@@ -173,7 +161,8 @@ spotbugs {
 dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: reformLogging
     compile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: reformLogging
-    compileOnly 'org.projectlombok:lombok:1.16.20'
+    compile 'org.projectlombok:lombok:1.18.2'
+    apt 'org.projectlombok:lombok:1.18.2'
 
     // Needs to explicitly bring in a different hibernate version as in pom.xml
     compile "org.hibernate:hibernate-core:${hibernateVersion}"
@@ -202,29 +191,26 @@ dependencies {
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: swagger2Version
     compile group: 'org.liquibase', name: 'liquibase-core', version: '3.5.5'
     compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.5'
-    compile group: 'uk.gov.hmcts.reform.auth', name: 'auth-checker-lib', version: '2.1.2'
+    compile group: 'uk.gov.hmcts.reform.auth', name: 'auth-checker-lib', version: '2.1.3'
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '0.6.0'
     compile group: 'com.sun.mail', name: 'mailapi', version: '1.6.1'
     compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
-
+    compile group: 'commons-validator', name: 'commons-validator', version: '1.6'
 
     // FIXME 0.6 doesn't support jsonb; 0.7 doesn't work on Windows
 //    runtime group: 'com.impossibl.pgjdbc-ng', name: 'pgjdbc-ng', version: '0.6'
     runtime group: 'org.postgresql', name: 'postgresql', version: '42.2.2'
     runtime group: 'com.zaxxer', name: 'HikariCP', version: '2.7.9'
 
-    testCompile "junit:junit"
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
-    testCompile group: 'com.opentable.components', name: 'otj-pg-embedded', version: '0.11.4'
+    testCompile group: 'com.opentable.components', name: 'otj-pg-embedded', version: '0.12.0'
     testCompile group: 'com.github.tomakehurst', name: 'wiremock', version: '2.17.0'
+//    testCompile group: 'com.github.tomakehurst', name: 'wiremock', version: '2.18.0'
     testCompile group: 'org.springframework.cloud', name: 'spring-cloud-contract-wiremock', version: '1.2.4.RELEASE'
     // To avoid compiler warnings about @API annotations in JUnit5 code.
     testCompileOnly 'org.apiguardian:apiguardian-api:1.0.0'
     testCompile "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
     testRuntime "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
-    testCompile "org.junit.platform:junit-platform-suite-api:${junitPlatformVersion}"
-    testCompile "org.junit.platform:junit-platform-runner:${junitPlatformVersion}"
-    testRuntime "org.junit.platform:junit-platform-launcher:${junitPlatformVersion}"
     testRuntime "org.junit.vintage:junit-vintage-engine:${junitVintageVersion}"
     testCompile group: 'org.mockito', name: 'mockito-core', version: '1.10.19'
     testCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.1.0'
@@ -240,7 +226,7 @@ dependencies {
 
 // tag::wrapper[]
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.6'
+    gradleVersion = '4.7'
 }
 // end::wrapper[]
 
@@ -421,22 +407,6 @@ jacoco {
     toolVersion = "0.8.0"
 }
 
-project.afterEvaluate {
-    def junitPlatformTestTask = project.tasks.getByName('junitPlatformTest')
-
-    // configure jacoco to analyze the junitPlatformTest task
-    jacoco {
-        // IDE may give warning but this is required for now, for the world of Junit5, Gradle and sonar
-        applyTo junitPlatformTestTask
-    }
-
-    // create junit platform jacoco task
-    project.task(type: JacocoReport, "junitPlatformJacocoReport",
-            {
-                executionData junitPlatformTestTask
-            })
-}
-
 sonarqube {
     properties {
         property "sonar.exclusions", "build/generated-sources/**/*.java"
@@ -515,23 +485,17 @@ jacocoTestReport {
     }
 }
 
-junitPlatformTest {
-    environment("APPINSIGHTS_INSTRUMENTATIONKEY", "some-key")
-    doFirst {
-        logger.lifecycle("junit platform test cases started {}", timestamp())
-    }
-    doLast {
-        logger.lifecycle("junit platform test cases finished {}", timestamp())
-    }
-}
-
 test {
     environment("APPINSIGHTS_INSTRUMENTATIONKEY", "some-key")
-    doFirst {
-        logger.lifecycle("junit 4 test cases started {}", timestamp())
+
+    useJUnitPlatform()
+
+    testLogging {
+        events "passed", "skipped", "failed"
     }
-    doLast {
-        logger.lifecycle("junit 4 test cases finished {}", timestamp())
+
+    reports {
+        html.enabled = true
     }
 }
 
@@ -550,14 +514,21 @@ sourceSets {
     }
 }
 task smoke(type: Test) {
+    systemProperty "http.proxyHost", System.getProperty('http.proxyHost')
+    systemProperty "http.proxyPort", System.getProperty('http.proxyPort')
+    systemProperty "https.proxyHost", System.getProperty('https.proxyHost')
+    systemProperty "https.proxyPort", System.getProperty('https.proxyPort')
+
     environment("APPINSIGHTS_INSTRUMENTATIONKEY", "some-key")
-    logger.quiet("TODO: Add smoke tests")
-//    group = 'Delivery pipeline'
-//    description = 'Executes functional tests against an AAT CCD Data Store instance'
-//    setTestClassesDirs(sourceSets.aat.output.classesDirs)
-//    setClasspath(sourceSets.aat.runtimeClasspath)
-//    include 'uk.gov.hmcts.ccd.datastore.tests.smoke'
-//    useJUnitPlatform()
+
+    group = 'Delivery pipeline'
+    description = 'Executes smoke tests against an AAT CCD Data Store instance'
+    setTestClassesDirs(sourceSets.aat.output.classesDirs)
+    setClasspath(sourceSets.aat.runtimeClasspath)
+    include "uk/gov/hmcts/ccd/datastore/tests/functional/**"
+    useJUnitPlatform {
+        includeTags 'smoke'
+    }
 
 }
 
@@ -595,4 +566,25 @@ def timestamp() {
 
 // for cnp pipeline
 task dependencyCheck(dependsOn: dependencyCheckAnalyze)
+
+configurations { codacy }
+repositories {
+    maven { url "https://jitpack.io" }
+    maven { url "http://dl.bintray.com/typesafe/maven-releases" }
+}
+dependencies {
+    codacy 'com.github.codacy:codacy-coverage-reporter:-SNAPSHOT'
+}
+task sendCoverageToCodacy(type: JavaExec, dependsOn: jacocoTestReport) {
+    main = "com.codacy.CodacyCoverageReporter"
+    classpath = configurations.codacy
+    args = [
+            "report",
+            "-l",
+            "Java",
+            "-r",
+            "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"
+    ]
+}
+
 

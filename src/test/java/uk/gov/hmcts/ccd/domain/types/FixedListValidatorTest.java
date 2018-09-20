@@ -12,6 +12,7 @@ import javax.inject.Inject;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static uk.gov.hmcts.ccd.domain.types.BaseTypeValidator.REGEX_GUIDANCE;
 
 public class FixedListValidatorTest extends BaseTest {
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -84,7 +85,7 @@ public class FixedListValidatorTest extends BaseTest {
         final List<ValidationResult> result02 = validator.validate("TEST_FIELD_ID", MAPPER.readTree("\"BBBBBB\""),
             caseFieldWithRegEx);
         assertEquals("BBBBBB failed regular expression check", 1, result02.size());
-        assertEquals("BBBBBB fails regex: AAAAAA", result02.get(0).getErrorMessage());
+        assertEquals(REGEX_GUIDANCE, result02.get(0).getErrorMessage());
         assertEquals("TEST_FIELD_ID", result02.get(0).getFieldId());
     }
 

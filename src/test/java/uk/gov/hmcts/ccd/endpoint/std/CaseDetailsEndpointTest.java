@@ -40,6 +40,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
 class CaseDetailsEndpointTest {
 
@@ -49,8 +51,8 @@ class CaseDetailsEndpointTest {
     private static final String CASE_ID = "1234qwer5678tyui";
     private static final String EVENT_TRIGGER_ID = "updateEvent";
     private static final Boolean IGNORE_WARNING = Boolean.TRUE;
-    private static final CaseDataContent EVENT_DATA = new CaseDataContent();
-    private static final Event EVENT = new Event();
+    private static final CaseDataContent EVENT_DATA = newCaseDataContent().build();
+    private static final Event EVENT = anEvent().build();
     private static final Map<String, JsonNode> DATA = new HashMap<>();
     private static final String TOKEN = "csdcsdcdscsdcsdcsdcd";
 
@@ -196,10 +198,8 @@ class CaseDetailsEndpointTest {
         doReturn(toBeReturned).when(createCaseOperation).createCaseDetails(UID,
                                                                            JURISDICTION_ID,
                                                                            CASE_TYPE_ID,
-                                                                           EVENT,
-                                                                           DATA,
-                                                                           IGNORE_WARNING,
-                                                                           TOKEN);
+                                                                           EVENT_DATA,
+                                                                           IGNORE_WARNING);
 
         final CaseDetails output = endpoint.saveCaseDetailsForCaseWorker(UID,
                                                                          JURISDICTION_ID,
@@ -212,10 +212,8 @@ class CaseDetailsEndpointTest {
             () -> verify(createCaseOperation).createCaseDetails(UID,
                                                                 JURISDICTION_ID,
                                                                 CASE_TYPE_ID,
-                                                                EVENT_DATA.getEvent(),
-                                                                EVENT_DATA.getData(),
-                                                                IGNORE_WARNING,
-                                                                EVENT_DATA.getToken())
+                                                                EVENT_DATA,
+                                                                IGNORE_WARNING)
         );
     }
 

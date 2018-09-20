@@ -1,0 +1,14 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="20" author="mpaniccia">
+        <createIndex indexName="idx_jur_case_type"
+                     schemaName="public"
+                     tableName="case_data">
+            <column name="jurisdiction" type="varchar(255)"/>
+            <column name="case_type_id" type="varchar(255)"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

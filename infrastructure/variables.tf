@@ -2,6 +2,10 @@ variable "product" {
   type = "string"
 }
 
+variable "raw_product" {
+  default = "ccd" // jenkins-library overrides product for PRs and adds e.g. pr-118-ccd
+}
+
 variable "component" {
   type = "string"
 }
@@ -25,6 +29,10 @@ variable "capacity" {
   default = "1"
 }
 
+variable "common_tags" {
+  type = "map"
+}
+
 variable "tenant_id" {
   description = "(Required) The Azure Active Directory tenant ID that should be used for authenticating requests to the key vault. This is usually sourced from environemnt variables and not normally required to be specified."
 }
@@ -36,10 +44,6 @@ variable "client_id" {
 variable "jenkins_AAD_objectId" {
   type                        = "string"
   description                 = "(Required) The Azure AD object ID of a user, service principal or security group in the Azure Active Directory tenant for the vault. The object ID must be unique for the list of access policies."
-}
-
-variable "vault_section" {
-  default = "test"
 }
 
 ////////////////////////////////
@@ -54,11 +58,6 @@ variable "database_name" {
   default = "ccd_data_store"
 }
 
-variable "use_uk_db" {
-  type = "string"
-  default = "false"
-}
-
 variable "authorised-services" {
   type    = "string"
   default = "ccd_data,ccd_gw,ccd_ps,probate_backend,divorce_ccd_submission,sscs,cmc,cmc_claim_store,jui_webapp,pui_webapp"
@@ -66,6 +65,11 @@ variable "authorised-services" {
 
 variable "idam_api_url" {
   default = "http://betaDevBccidamAppLB.reform.hmcts.net"
+}
+
+variable "draft_store_ttl_days" {
+  type = "string"
+  default = "180"
 }
 
 variable "document_management_valid_domain" {
