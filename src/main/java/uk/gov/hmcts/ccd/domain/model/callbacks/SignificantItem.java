@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.domain.model.callbacks;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.net.URL;
 
 public class SignificantItem {
 
