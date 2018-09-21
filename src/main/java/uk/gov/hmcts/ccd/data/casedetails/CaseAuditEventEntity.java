@@ -29,8 +29,8 @@ import static uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventEntity.FIND_BY_ID_
     @NamedQuery(name = CaseAuditEventEntity.FIND_CREATE_EVENT, query =
         FIND_BY_CASE_DATA_ID_HQL +
             " AND createdDate = " +
-                "(select min(caeDate.createdDate) from CaseAuditEventEntity caeDate WHERE caeDate.caseDataId = :"
-                    + CaseAuditEventEntity.CASE_DATA_ID + ")"
+            "(select min(caeDate.createdDate) from CaseAuditEventEntity caeDate WHERE caeDate.caseDataId = :"
+            + CaseAuditEventEntity.CASE_DATA_ID + ")"
     ),
     @NamedQuery(name = CaseAuditEventEntity.FIND_BY_ID, query =
         FIND_BY_ID_HQL
@@ -96,7 +96,7 @@ public class CaseAuditEventEntity {
     @Convert(converter = uk.gov.hmcts.ccd.data.JSONBConverter.class)
     private JsonNode dataClassification;
 
-    @OneToOne(mappedBy = "caseEvent", cascade = CascadeType.PERSIST,orphanRemoval = true)
+    @OneToOne(mappedBy = "caseEvent", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private SignificantItemEntity significantItemEntity;
 
     public Long getId() {

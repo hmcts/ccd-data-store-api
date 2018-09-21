@@ -204,13 +204,6 @@ public class CaseEvent implements Serializable {
         this.significantDocument = significantDocument;
     }
 
-    public SignificantItem getSignificantItem() {
-        return significantItem;
-    }
-
-    public void setSignificantItem(SignificantItem significantItem) {
-        this.significantItem = significantItem;
-    }
     public Boolean getCanSaveDraft() {
         return canSaveDraft;
     }

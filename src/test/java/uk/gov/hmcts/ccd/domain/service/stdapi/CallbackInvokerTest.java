@@ -122,7 +122,7 @@ class CallbackInvokerTest {
         @Test
         @DisplayName("should send callback")
         void shouldSendCallback() {
-            final Optional<String>
+            final AboutToSubmitCallbackResponse
                 response =
                 callbackInvoker.invokeAboutToSubmitCallback(caseEvent,
                                                             caseDetailsBefore,
@@ -135,7 +135,7 @@ class CallbackInvokerTest {
                                          caseEvent,
                                          caseDetailsBefore,
                                          caseDetails);
-            assertThat(response.isPresent(), is(false));
+            assertThat(response.getCallBackResponse().isPresent(), is(false));
         }
 
         @Test
@@ -148,8 +148,7 @@ class CallbackInvokerTest {
                                                                             same(caseEvent),
                                                                             same(caseDetailsBefore),
                                                                             same(caseDetails));
-            final Optional<String>
-                response =
+            final AboutToSubmitCallbackResponse response =
                 callbackInvoker.invokeAboutToSubmitCallback(caseEvent,
                                                             caseDetailsBefore,
                                                             caseDetails,
@@ -161,7 +160,7 @@ class CallbackInvokerTest {
                                          caseEvent,
                                          caseDetailsBefore,
                                          caseDetails);
-            assertThat(response.get(), is(expectedState));
+            assertThat(response.getCallBackResponse().get(), is(expectedState));
         }
 
         @Test
@@ -173,8 +172,7 @@ class CallbackInvokerTest {
                                                                             same(caseEvent),
                                                                             same(caseDetailsBefore),
                                                                             same(caseDetails));
-            final Optional<String>
-                response =
+            final AboutToSubmitCallbackResponse response =
                 callbackInvoker.invokeAboutToSubmitCallback(caseEvent,
                                                             caseDetailsBefore,
                                                             caseDetails,
@@ -186,7 +184,7 @@ class CallbackInvokerTest {
                                          caseEvent,
                                          caseDetailsBefore,
                                          caseDetails);
-            assertThat(response.isPresent(), is(false));
+            assertThat(response.getCallBackResponse().isPresent(), is(false));
         }
 
         @Test
@@ -199,8 +197,8 @@ class CallbackInvokerTest {
                     same(caseEvent),
                     same(caseDetailsBefore),
                     same(caseDetails));
-            final Optional<String>
-                response =
+
+            final AboutToSubmitCallbackResponse response =
                 callbackInvoker.invokeAboutToSubmitCallback(caseEvent,
                     caseDetailsBefore,
                     caseDetails,
@@ -212,10 +210,10 @@ class CallbackInvokerTest {
                 caseEvent,
                 caseDetailsBefore,
                 caseDetails);
-            assertThat(response.get(), is(expectedState));
-            assertEquals("description",caseEvent.getSignificantItem().getDescription());
-            assertEquals(ItemType.DOCUMENT,caseEvent.getSignificantItem().getType());
-            assertEquals("http://www.cnn.com",caseEvent.getSignificantItem().getUrl());
+            assertThat(response.getCallBackResponse().get(), is(expectedState));
+            assertEquals("description",response.getSignificantItem().getDescription());
+            assertEquals(ItemType.DOCUMENT,response.getSignificantItem().getType());
+            assertEquals("http://www.cnn.com", response.getSignificantItem().getUrl());
         }
 
         @Test
@@ -229,7 +227,7 @@ class CallbackInvokerTest {
                     same(caseEvent),
                     same(caseDetailsBefore),
                     same(caseDetails));
-            final Optional<String>
+            final AboutToSubmitCallbackResponse
                 response =
                 callbackInvoker.invokeAboutToSubmitCallback(caseEvent,
                     caseDetailsBefore,
@@ -242,8 +240,8 @@ class CallbackInvokerTest {
                 caseEvent,
                 caseDetailsBefore,
                 caseDetails);
-            assertThat(response.get(), is(expectedState));
-            assertNull(caseEvent.getSignificantItem());
+            assertThat(response.getCallBackResponse().get(), is(expectedState));
+            assertNull(response.getSignificantItem());
             assertEquals(3, callbackResponse.getErrors().size());
 
         }

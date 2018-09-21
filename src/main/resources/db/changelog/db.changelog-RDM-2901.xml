@@ -10,7 +10,7 @@
             <column name="id" type="serial" autoIncrement="true">
                 <constraints nullable="false"/>
             </column>
-            <column name="description" type="varchar(128)">
+            <column name="description" type="varchar(64)">
                 <constraints nullable="false"/>
             </column>
             <column name="type" type="significant_item_type">
@@ -19,7 +19,7 @@
             <column name="url" type="text">
                 <constraints nullable="true"/>
             </column>
-            <column name="case_event_id" type="serial" defaultValue="0">
+            <column name="case_event_id" type="serial">
                 <constraints nullable="false"/>
             </column>
         </createTable>

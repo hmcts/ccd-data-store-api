@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.data;
 
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventEntity;
 import uk.gov.hmcts.ccd.domain.model.callbacks.ItemType;
-
 import javax.persistence.*;
 import java.net.URL;
 @Table(name = "case_event_significant_items")

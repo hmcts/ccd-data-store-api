@@ -20,6 +20,7 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityValidationService;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 
+import javax.swing.text.html.Option;
 import java.util.*;
 
 import static com.google.common.collect.Maps.newHashMap;
@@ -59,37 +60,45 @@ public class CallbackInvoker {
             caseEvent, caseDetails);
 
         callbackResponse.ifPresent(response -> validateAndSetFromAboutToStartCallback(caseType,
-                                                                                      caseDetails,
-                                                                                      ignoreWarning,
-                                                                                      response));
+            caseDetails,
+            ignoreWarning,
+            response));
     }
 
-    public Optional<String> invokeAboutToSubmitCallback(final CaseEvent eventTrigger,
-                                                        final CaseDetails caseDetailsBefore,
-                                                        final CaseDetails caseDetails,
-                                                        final CaseType caseType,
-                                                        final Boolean ignoreWarning) {
+    public AboutToSubmitCallbackResponse invokeAboutToSubmitCallback(final CaseEvent eventTrigger,
+                                                                     final CaseDetails caseDetailsBefore,
+                                                                     final CaseDetails caseDetails,
+                                                                     final CaseType caseType,
+                                                                     final Boolean ignoreWarning) {
+
         final Optional<CallbackResponse> callbackResponse = callbackService.send(
             eventTrigger.getCallBackURLAboutToSubmitEvent(),
             eventTrigger.getRetriesTimeoutURLAboutToSubmitEvent(),
             eventTrigger, caseDetailsBefore, caseDetails);
 
-        return callbackResponse.flatMap(response -> validateAndSetFromAboutToSubmitCallback(eventTrigger,
-                                                                                            caseType,
-                                                                                            caseDetails,
-                                                                                            ignoreWarning,
-                                                                                            response));
+        if (callbackResponse.isPresent()) {
+            return validateAndSetFromAboutToSubmitCallback(caseType,
+                caseDetails,
+                ignoreWarning,
+                callbackResponse.get());
+
+        } else {
+            AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = new AboutToSubmitCallbackResponse();
+            aboutToSubmitCallbackResponse.setCallBackResponse(Optional.empty());
+            return aboutToSubmitCallbackResponse;
+        }
+
     }
 
     public ResponseEntity<AfterSubmitCallbackResponse> invokeSubmittedCallback(final CaseEvent eventTrigger,
                                                                                final CaseDetails caseDetailsBefore,
                                                                                final CaseDetails caseDetails) {
         return callbackService.send(eventTrigger.getCallBackURLSubmittedEvent(),
-                                    eventTrigger.getRetriesTimeoutURLSubmittedEvent(),
-                                    eventTrigger,
-                                    caseDetailsBefore,
-                                    caseDetails,
-                                    AfterSubmitCallbackResponse.class);
+            eventTrigger.getRetriesTimeoutURLSubmittedEvent(),
+            eventTrigger,
+            caseDetailsBefore,
+            caseDetails,
+            AfterSubmitCallbackResponse.class);
     }
 
     private void validateAndSetFromAboutToStartCallback(CaseType caseType, CaseDetails caseDetails, Boolean ignoreWarning, CallbackResponse callbackResponse) {
@@ -100,29 +109,31 @@ public class CallbackInvoker {
         }
     }
 
-    private Optional<String> validateAndSetFromAboutToSubmitCallback(final CaseEvent eventTrigger, final CaseType caseType,
-                                                                    final CaseDetails caseDetails,
-                                                                    final Boolean ignoreWarning,
-                                                                    final CallbackResponse callbackResponse) {
-        validateSignificantItem(eventTrigger, callbackResponse);
+    private AboutToSubmitCallbackResponse validateAndSetFromAboutToSubmitCallback(final CaseType caseType,
+                                                                                  final CaseDetails caseDetails,
+                                                                                  final Boolean ignoreWarning,
+                                                                                  final CallbackResponse callbackResponse) {
+
+        final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = new AboutToSubmitCallbackResponse();
+
+        validateSignificantItem(aboutToSubmitCallbackResponse, callbackResponse);
         callbackService.validateCallbackErrorsAndWarnings(callbackResponse, ignoreWarning);
         if (callbackResponse.getData() != null) {
             validateAndSetData(caseType, caseDetails, callbackResponse.getData());
             if (callbackResponseHasCaseAndDataClassification(callbackResponse)) {
                 securityValidationService.setClassificationFromCallbackIfValid(callbackResponse,
-                                                                               caseDetails,
-                                                                               deduceDefaultClassificationForExistingFields(caseType, caseDetails));
+                    caseDetails,
+                    deduceDefaultClassificationForExistingFields(caseType, caseDetails));
             }
             final Optional<String> newCaseState = filterCaseState(callbackResponse.getData());
             newCaseState.ifPresent(caseDetails::setState);
-            return newCaseState;
+            aboutToSubmitCallbackResponse.setCallBackResponse(newCaseState);
+            return aboutToSubmitCallbackResponse;
         }
 
-
-
-        return Optional.empty();
+        aboutToSubmitCallbackResponse.setCallBackResponse(Optional.empty());
+        return aboutToSubmitCallbackResponse;
     }
-
 
 
     private boolean callbackResponseHasCaseAndDataClassification(CallbackResponse callbackResponse) {
@@ -131,8 +142,8 @@ public class CallbackInvoker {
 
     private Map<String, JsonNode> deduceDefaultClassificationForExistingFields(CaseType caseType, CaseDetails caseDetails) {
         Map<String, JsonNode> defaultSecurityClassifications = caseDataService.getDefaultSecurityClassifications(caseType,
-                                                                                                                 caseDetails.getData(),
-                                                                                                                 EMPTY_DATA_CLASSIFICATION);
+            caseDetails.getData(),
+            EMPTY_DATA_CLASSIFICATION);
         return defaultSecurityClassifications;
     }
 
@@ -146,9 +157,9 @@ public class CallbackInvoker {
 
     private void deduceDataClassificationForNewFields(CaseType caseType, CaseDetails caseDetails) {
         Map<String, JsonNode> defaultSecurityClassifications = caseDataService.getDefaultSecurityClassifications(caseType,
-                                                                                                                 caseDetails.getData(),
-                                                                                                                 ofNullable(caseDetails.getDataClassification()).orElse(
-                                                                                                                     newHashMap()));
+            caseDetails.getData(),
+            ofNullable(caseDetails.getDataClassification()).orElse(
+                newHashMap()));
         caseDetails.setDataClassification(defaultSecurityClassifications);
     }
 
@@ -158,25 +169,24 @@ public class CallbackInvoker {
         return jsonNode.flatMap(value -> value.isTextual() ? Optional.of(value.textValue()) : Optional.empty());
     }
 
-    private void validateSignificantItem(CaseEvent eventTrigger, CallbackResponse callbackResponse) {
+    private void validateSignificantItem(AboutToSubmitCallbackResponse response, CallbackResponse callbackResponse) {
         SignificantItem significantItem = callbackResponse.getSignificantItem();
         List<String> errors = new ArrayList<>();
 
-        if (significantItem != null){
-            if(significantItem.getType() != ItemType.DOCUMENT){
+        if (significantItem != null) {
+            if (significantItem.getType() != ItemType.DOCUMENT) {
 
                 errors.add("Significant Item type incorrect");
             }
             UrlValidator urlValidator = new UrlValidator();
-            if (!urlValidator.isValid(significantItem.getUrl())){
+            if (!urlValidator.isValid(significantItem.getUrl())) {
                 errors.add("Url Invalid");
             }
-            if(isDescriptionEmptyOrNotWithInSpecifiedRange(significantItem)){
-               errors.add("Description should not be empty but also not more than 64 characters");
+            if (isDescriptionEmptyOrNotWithInSpecifiedRange(significantItem)) {
+                errors.add("Description should not be empty but also not more than 64 characters");
             }
-            if(errors.size() == 0) {
-                eventTrigger.setSignificantDocument(true);
-                eventTrigger.setSignificantItem(significantItem);
+            if (errors.size() == 0) {
+                response.setSignificantItem(significantItem);
             } else {
                 callbackResponse.setErrors(errors);
             }

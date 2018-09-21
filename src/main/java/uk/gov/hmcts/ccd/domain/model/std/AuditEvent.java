@@ -42,8 +42,6 @@ public class AuditEvent extends Event {
     private Map<String, JsonNode> dataClassification;
     @JsonProperty("security_classification")
     private SecurityClassification securityClassification;
-    @JsonProperty("significant_document")
-    private Boolean significantDocument = null;
     @JsonProperty("significant_item")
     private SignificantItem significantItem;
 
@@ -142,14 +140,6 @@ public class AuditEvent extends Event {
 
     public void setData(Map<String, JsonNode> data) {
         this.data = data;
-    }
-
-    public Boolean getSignificantDocument() {
-        return significantDocument;
-    }
-
-    public void setSignificantDocument(Boolean significantDocument) {
-        this.significantDocument = significantDocument;
     }
 
     public SignificantItem getSignificantItem() {

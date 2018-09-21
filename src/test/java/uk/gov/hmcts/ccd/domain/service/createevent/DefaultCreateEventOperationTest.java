@@ -21,6 +21,7 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.model.std.validator.EventValidator;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.*;
+import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
@@ -98,6 +99,7 @@ class DefaultCreateEventOperationTest {
     private CaseDetails caseDetails;
     private CaseDetails caseDetailsBefore;
     private CaseState postState;
+    private AboutToSubmitCallbackResponse  aboutToSubmitCallbackResponse;
     private IDAMProperties user;
 
     private static Event buildEvent() {
@@ -125,11 +127,13 @@ class DefaultCreateEventOperationTest {
         caseType.setVersion(version);
         eventTrigger = new CaseEvent();
         eventTrigger.setPostState(POST_STATE);
+        aboutToSubmitCallbackResponse = new AboutToSubmitCallbackResponse();
         SignificantItem significantItem = new SignificantItem();
         significantItem.setUrl("http://www.yahoo.com");
         significantItem.setDescription("description");
         significantItem.setType(ItemType.DOCUMENT);
-        eventTrigger.setSignificantItem(significantItem);
+        aboutToSubmitCallbackResponse.setSignificantItem(significantItem);
+        aboutToSubmitCallbackResponse.setCallBackResponse(Optional.empty());
         caseDetails = new CaseDetails();
         caseDetails.setCaseTypeId(CASE_TYPE_ID);
         caseDetails.setState(PRE_STATE_ID);
@@ -154,7 +158,7 @@ class DefaultCreateEventOperationTest {
                                                           any(),
                                                           any(),
                                                           any(),
-                                                          any())).willReturn(Optional.empty());
+                                                          any())).willReturn(aboutToSubmitCallbackResponse);
     }
 
     @Test
