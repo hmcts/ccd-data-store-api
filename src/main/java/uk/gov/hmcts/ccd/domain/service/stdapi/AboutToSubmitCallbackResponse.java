@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.domain.service.stdapi;
 
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 
-import javax.swing.text.html.Option;
 import java.util.Optional;
 
 public class AboutToSubmitCallbackResponse {

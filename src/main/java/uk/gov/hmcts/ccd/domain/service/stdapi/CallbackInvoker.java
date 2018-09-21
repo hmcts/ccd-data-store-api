@@ -19,8 +19,6 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityValidationService;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
-
-import javax.swing.text.html.Option;
 import java.util.*;
 
 import static com.google.common.collect.Maps.newHashMap;
