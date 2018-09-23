@@ -101,8 +101,8 @@ public abstract class BaseTest {
 
         // IDAM
         final SecurityUtils securityUtils = mock(SecurityUtils.class);
-        Mockito.when(securityUtils.authorizationHeaders()).thenReturn( new HttpHeaders());
-        Mockito.when(securityUtils.userAuthorizationHeaders()).thenReturn( new HttpHeaders());
+        Mockito.when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
+        Mockito.when(securityUtils.userAuthorizationHeaders()).thenReturn(new HttpHeaders());
         ReflectionTestUtils.setField(caseDefinitionRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(uiDefinitionRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(userRepository, "securityUtils", securityUtils);

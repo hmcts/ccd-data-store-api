@@ -274,7 +274,7 @@ public class CallbackTest extends WireMockBaseTest {
         assertEquals(mvcResult.getResponse().getContentAsString(), 201, mvcResult.getResponse().getStatus());
         Map expectedSanitizedData = mapper.readValue(EXPECTED_MODIFIED_DATA.toString(), Map.class);
         Map actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").toString(), Map.class);
-        assertThat( "Incorrect Response Content", actualData.entrySet(), equalTo(expectedSanitizedData.entrySet()));
+        assertThat("Incorrect Response Content", actualData.entrySet(), equalTo(expectedSanitizedData.entrySet()));
 
         final List<CaseDetails> caseDetailsList = jdbcTemplate.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
@@ -340,7 +340,7 @@ public class CallbackTest extends WireMockBaseTest {
         assertEquals(mvcResult.getResponse().getContentAsString(), 201, mvcResult.getResponse().getStatus());
         Map expectedSanitizedData = mapper.readValue(EXPECTED_MODIFIED_DATA.toString(), Map.class);
         Map actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").toString(), Map.class);
-        assertThat( "Incorrect Response Content", actualData.entrySet(), equalTo(expectedSanitizedData.entrySet()));
+        assertThat("Incorrect Response Content", actualData.entrySet(), equalTo(expectedSanitizedData.entrySet()));
 
         final List<CaseDetails> caseDetailsList = jdbcTemplate.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
@@ -989,7 +989,7 @@ public class CallbackTest extends WireMockBaseTest {
         assertEquals(mvcResult.getResponse().getContentAsString(), 201, mvcResult.getResponse().getStatus());
         Map expectedSanitizedData = mapper.readValue(EXPECTED_MODIFIED_DATA.toString(), Map.class);
         Map actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").toString(), Map.class);
-        assertThat( "Incorrect Response Content", actualData.entrySet(), equalTo(expectedSanitizedData.entrySet()));
+        assertThat("Incorrect Response Content", actualData.entrySet(), equalTo(expectedSanitizedData.entrySet()));
 
         final List<CaseDetails> caseDetailsList = jdbcTemplate.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
@@ -1054,7 +1054,7 @@ public class CallbackTest extends WireMockBaseTest {
         assertEquals(mvcResult.getResponse().getContentAsString(), 201, mvcResult.getResponse().getStatus());
         Map expectedSanitizedData = mapper.readValue(EXPECTED_MODIFIED_DATA.toString(), Map.class);
         Map actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").toString(), Map.class);
-        assertThat( "Incorrect Response Content", actualData.entrySet(), equalTo(expectedSanitizedData.entrySet()));
+        assertThat("Incorrect Response Content", actualData.entrySet(), equalTo(expectedSanitizedData.entrySet()));
 
         final List<CaseDetails> caseDetailsList = jdbcTemplate.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases", 1, caseDetailsList.size());

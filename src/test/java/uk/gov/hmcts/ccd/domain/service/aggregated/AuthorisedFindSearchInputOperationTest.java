@@ -72,8 +72,7 @@ class AuthorisedFindSearchInputOperationTest {
     void shouldFailWhenWhenNoACLReadAccess() {
         doReturn(Collections.EMPTY_LIST).when(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ);
 
-        assertThrows(ResourceNotFoundException.class, () -> authorisedFindSearchInputOperation.execute
-            (JURISDICTION_ID, CASE_TYPE_ONE, CAN_READ));
+        assertThrows(ResourceNotFoundException.class, () -> authorisedFindSearchInputOperation.execute(JURISDICTION_ID, CASE_TYPE_ONE, CAN_READ));
     }
 
     @Test
