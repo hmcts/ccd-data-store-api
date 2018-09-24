@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.concurrent.TimeUnit;
+
 @Configuration
 public class ElasticSearchConfiguration {
 
@@ -22,7 +24,9 @@ public class ElasticSearchConfiguration {
         JestClientFactory factory = new JestClientFactory();
         Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
         factory.setHttpClientConfig(new HttpClientConfig.Builder(applicationParams.getElasticSearchHosts())
-                .multiThreaded(true).gson(gson).build());
+            .multiThreaded(true)
+            .maxConnectionIdleTime(5, TimeUnit.SECONDS)
+            .gson(gson).build());
         return factory.getObject();
     }
 }
