@@ -35,7 +35,6 @@ apply plugin: 'jsonschema2pojo'
 apply plugin: 'jacoco'
 apply plugin: 'checkstyle'
 apply plugin: 'pmd'
-apply plugin: 'com.github.spotbugs'
 apply plugin: 'com.github.kt3k.coveralls'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'se.patrikerdes.use-latest-versions'
@@ -153,7 +152,6 @@ tasks.withType(com.github.spotbugs.SpotBugsTask) {
     }
 }
 
-// Delete me once there is no more bug
 spotbugs {
     ignoreFailures = true
 }
