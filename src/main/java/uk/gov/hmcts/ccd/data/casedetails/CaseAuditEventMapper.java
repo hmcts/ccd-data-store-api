@@ -87,7 +87,7 @@ public class CaseAuditEventMapper {
             try {
                 significantItemEntity.setUrl(new URL(auditEvent.getSignificantItem().getUrl()));
             } catch (MalformedURLException e) {
-                new RuntimeException("Malformed URL Exception");
+                throw new RuntimeException("Malformed URL Exception");
             }
             newCaseAuditEventEntity.setSignificantItemEntity(significantItemEntity);
         }
