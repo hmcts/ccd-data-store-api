@@ -11,7 +11,7 @@ import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
-import uk.gov.hmcts.ccd.domain.model.callbacks.ItemType;
+import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItemType;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
@@ -52,7 +52,7 @@ class SubmitCaseTransactionTest {
     private static final String CASE_ID = "45677";
     public static final String DESCRIPTION = "Description";
     public static final String URL = "http://www.yahooo.com";
-    public static final ItemType DOCUMENT = ItemType.DOCUMENT;
+    public static final SignificantItemType DOCUMENT = SignificantItemType.DOCUMENT;
 
     @Mock
     private CaseDetailsRepository caseDetailsRepository;
@@ -126,7 +126,7 @@ class SubmitCaseTransactionTest {
         final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = new AboutToSubmitCallbackResponse();
         aboutToSubmitCallbackResponse.setCallBackResponse(Optional.of("somestring"));
         SignificantItem significantItem = new SignificantItem();
-        significantItem.setType(ItemType.DOCUMENT);
+        significantItem.setType(SignificantItemType.DOCUMENT);
         significantItem.setDescription(DESCRIPTION);
         significantItem.setUrl(URL);
         aboutToSubmitCallbackResponse.setSignificantItem(significantItem);

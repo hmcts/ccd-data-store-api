@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.data;
 
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventEntity;
-import uk.gov.hmcts.ccd.domain.model.callbacks.ItemType;
+import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItemType;
 import javax.persistence.*;
 import java.net.URL;
 @Table(name = "case_event_significant_items")
@@ -15,7 +15,7 @@ public class SignificantItemEntity {
 
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
-    private ItemType type;
+    private SignificantItemType type;
 
     @Column(name = "description", nullable = false)
     private String description;
@@ -35,11 +35,11 @@ public class SignificantItemEntity {
         this.id = id;
     }
 
-    public ItemType getType() {
+    public SignificantItemType getType() {
         return type;
     }
 
-    public void setType(ItemType type) {
+    public void setType(SignificantItemType type) {
         this.type = type;
     }
 

@@ -24,7 +24,7 @@ public class CaseAuditEventMapper {
 
     public AuditEvent entityToModel(final CaseAuditEventEntity caseAuditEventEntity) {
         final AuditEvent auditEvent = new AuditEvent();
-        final SignificantItem significantItem= new SignificantItem();
+        final SignificantItem significantItem = new SignificantItem();
         auditEvent.setId(caseAuditEventEntity.getId());
         auditEvent.setCaseDataId(String.valueOf(caseAuditEventEntity.getCaseDataId()));
         auditEvent.setCaseTypeId(caseAuditEventEntity.getCaseTypeId());
@@ -44,7 +44,7 @@ public class CaseAuditEventMapper {
         auditEvent.setEventName(caseAuditEventEntity.getEventName());
         auditEvent.setSummary(caseAuditEventEntity.getSummary());
         auditEvent.setDescription(caseAuditEventEntity.getDescription());
-        if(caseAuditEventEntity.getSignificantItemEntity()!=null) {
+        if (caseAuditEventEntity.getSignificantItemEntity() != null) {
             significantItem.setDescription(caseAuditEventEntity.getSignificantItemEntity().getDescription());
             significantItem.setType(caseAuditEventEntity.getSignificantItemEntity().getType());
             significantItem.setUrl(caseAuditEventEntity.getSignificantItemEntity().getUrl().getPath());
@@ -79,7 +79,7 @@ public class CaseAuditEventMapper {
         newCaseAuditEventEntity.setEventName(auditEvent.getEventName());
         newCaseAuditEventEntity.setSummary(auditEvent.getSummary());
         newCaseAuditEventEntity.setDescription(auditEvent.getDescription());
-        if(auditEvent.getSignificantItem()!=null) {
+        if (auditEvent.getSignificantItem() != null) {
             significantItemEntity.setType(auditEvent.getSignificantItem().getType());
             significantItemEntity.setDescription(auditEvent.getSignificantItem().getDescription());
             significantItemEntity.setCaseEvent(newCaseAuditEventEntity);
@@ -87,7 +87,6 @@ public class CaseAuditEventMapper {
             try {
                 significantItemEntity.setUrl(new URL(auditEvent.getSignificantItem().getUrl()));
             } catch (MalformedURLException e) {
-                // TODO Create a new runtime excpetion
                 new RuntimeException("Malformed URL Exception");
             }
             newCaseAuditEventEntity.setSignificantItemEntity(significantItemEntity);

@@ -2,22 +2,20 @@ package uk.gov.hmcts.ccd.domain.model.callbacks;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
 public class SignificantItem {
 
     @JsonProperty("type")
-    private ItemType type;
+    private SignificantItemType type;
     @JsonProperty("description")
     private String description;
     @JsonProperty("url")
     private String url;
 
-
-    public ItemType getType() {
+    public SignificantItemType getType() {
         return type;
     }
 
-    public void setType(ItemType type) {
+    public void setType(SignificantItemType type) {
         this.type = type;
     }
 

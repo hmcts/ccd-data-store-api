@@ -25,7 +25,7 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
-import uk.gov.hmcts.ccd.domain.model.callbacks.ItemType;
+import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItemType;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -322,7 +322,7 @@ public class CallbackTest extends WireMockBaseTest {
         callbackResponse.setSecurityClassification(PUBLIC);
         final SignificantItem significantItem = new SignificantItem();
         significantItem.setUrl("https://www.npmjs.com/package/supertest");
-        significantItem.setType(ItemType.DOCUMENT);
+        significantItem.setType(SignificantItemType.DOCUMENT);
         significantItem.setDescription("Some description");
         callbackResponse.setSignificantItem(significantItem);
 
@@ -372,7 +372,7 @@ public class CallbackTest extends WireMockBaseTest {
         final List<SignificantItem> significantItemList = jdbcTemplate.query("SELECT * FROM case_event_significant_items where case_event_id = "  + caseAuditEvent.getId(), this::mapSignificantItem);
         assertEquals("https://www.npmjs.com/package/supertest", significantItemList.get(0).getUrl());
         assertEquals("Some description", significantItemList.get(0).getDescription());
-        assertEquals(ItemType.DOCUMENT, significantItemList.get(0).getType());
+        assertEquals(SignificantItemType.DOCUMENT, significantItemList.get(0).getType());
     }
     @Test
     public void shouldReturn400WhenPostCreateCaseWithInvalidSignificantDocument() throws Exception {
@@ -389,7 +389,7 @@ public class CallbackTest extends WireMockBaseTest {
         callbackResponse.setSecurityClassification(PUBLIC);
         final SignificantItem significantItem = new SignificantItem();
         significantItem.setUrl("https://www.npmjs.com/package/supertest");
-        significantItem.setType(ItemType.DOCUMENT);
+        significantItem.setType(SignificantItemType.DOCUMENT);
         callbackResponse.setSignificantItem(significantItem);
 
         wireMockRule.stubFor(WireMock.post(urlMatching("/before-commit.*"))

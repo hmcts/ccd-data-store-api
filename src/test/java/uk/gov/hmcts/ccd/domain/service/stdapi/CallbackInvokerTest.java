@@ -13,7 +13,7 @@ import org.mockito.*;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
-import uk.gov.hmcts.ccd.domain.model.callbacks.ItemType;
+import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItemType;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
@@ -212,7 +212,7 @@ class CallbackInvokerTest {
                 caseDetails);
             assertThat(response.getCallBackResponse().get(), is(expectedState));
             assertEquals("description",response.getSignificantItem().getDescription());
-            assertEquals(ItemType.DOCUMENT,response.getSignificantItem().getType());
+            assertEquals(SignificantItemType.DOCUMENT,response.getSignificantItem().getType());
             assertEquals("http://www.cnn.com", response.getSignificantItem().getUrl());
         }
 
@@ -258,7 +258,7 @@ class CallbackInvokerTest {
             SignificantItem significantItem = new SignificantItem();
             significantItem.setUrl("http://www.cnn.com");
             significantItem.setDescription("description");
-            significantItem.setType(ItemType.DOCUMENT);
+            significantItem.setType(SignificantItemType.DOCUMENT);
             response.setSignificantItem(significantItem);
             final Map<String, JsonNode> data = new HashMap<>();
             data.put("state", JsonNodeFactory.instance.textNode(state));

@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
-import uk.gov.hmcts.ccd.domain.model.callbacks.ItemType;
+import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItemType;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
@@ -172,7 +172,7 @@ public class CallbackInvoker {
         List<String> errors = new ArrayList<>();
 
         if (significantItem != null) {
-            if (significantItem.getType() != ItemType.DOCUMENT) {
+            if (significantItem.getType() != SignificantItemType.DOCUMENT) {
 
                 errors.add("Significant Item type incorrect");
             }
