@@ -212,32 +212,38 @@ public class QueryEndpointIT extends WireMockBaseTest {
 
         assertEquals("Incorrect view items count", 2, searchResultViewItems.size());
 
+        assertEquals("Incorrect view items count", 2, searchResultViewItems.size());
         assertNotNull(searchResultViewItems.get(0).getCaseId());
-        assertThat(searchResultViewItems.get(0).getCaseFields().get("PersonFirstName"), is(nullValue()));
-        assertEquals("Pullen", searchResultViewItems.get(0).getCaseFields().get("PersonLastName"));
-        assertEquals("Governer House", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+
+        SearchResultViewItem getFirstItem = searchResultViewItems.stream().filter(e -> e.getCaseFields().get("PersonLastName").equals("Pullen")).findFirst().get();
+
+        assertThat(getFirstItem.getCaseFields().get("PersonFirstName"), is(nullValue()));
+        assertEquals("Pullen", getFirstItem.getCaseFields().get("PersonLastName"));
+        assertEquals("Governer House", ((Map) getFirstItem.getCaseFields().get("PersonAddress"))
             .get("AddressLine1"));
-        assertEquals("1 Puddle Lane", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+        assertEquals("1 Puddle Lane", ((Map) getFirstItem.getCaseFields().get("PersonAddress"))
             .get("AddressLine2"));
-        assertEquals("London", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+        assertEquals("London", ((Map) getFirstItem.getCaseFields().get("PersonAddress"))
             .get("AddressLine3"));
-        assertEquals("England", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+        assertEquals("England", ((Map) getFirstItem.getCaseFields().get("PersonAddress"))
             .get("Country"));
-        assertEquals("SE1 4EE", ((Map) searchResultViewItems.get(0).getCaseFields().get("PersonAddress"))
+        assertEquals("SE1 4EE", ((Map) getFirstItem.getCaseFields().get("PersonAddress"))
             .get("Postcode"));
 
-        assertNotNull(searchResultViewItems.get(1).getCaseId());
-        assertThat(searchResultViewItems.get(1).getCaseFields().get("PersonFirstName"), is(nullValue()));
-        assertEquals("Parker", searchResultViewItems.get(1).getCaseFields().get("PersonLastName"));
-        assertEquals("123", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+        SearchResultViewItem getSecondtItem = searchResultViewItems.stream().filter(e -> e.getCaseFields().get("PersonLastName").equals("Parker")).findFirst().get();
+
+        assertNotNull(getSecondtItem.getCaseId());
+        assertThat(getSecondtItem.getCaseFields().get("PersonFirstName"), is(nullValue()));
+        assertEquals("Parker", getSecondtItem.getCaseFields().get("PersonLastName"));
+        assertEquals("123", ((Map) getSecondtItem.getCaseFields().get("PersonAddress"))
             .get("AddressLine1"));
-        assertEquals("Fake Street", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+        assertEquals("Fake Street", ((Map) getSecondtItem.getCaseFields().get("PersonAddress"))
             .get("AddressLine2"));
-        assertEquals("Hexton", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+        assertEquals("Hexton", ((Map) getSecondtItem.getCaseFields().get("PersonAddress"))
             .get("AddressLine3"));
-        assertEquals("England", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+        assertEquals("England", ((Map) getSecondtItem.getCaseFields().get("PersonAddress"))
             .get("Country"));
-        assertEquals("HX08 UTG", ((Map) searchResultViewItems.get(1).getCaseFields().get("PersonAddress"))
+        assertEquals("HX08 UTG", ((Map) getSecondtItem.getCaseFields().get("PersonAddress"))
             .get("Postcode"));
     }
 
