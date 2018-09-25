@@ -7,6 +7,8 @@ import uk.gov.hmcts.ccd.datastore.tests.helper.idam.AuthenticatedUser;
 
 import java.util.function.Supplier;
 
+import static java.lang.Boolean.TRUE;
+
 @ExtendWith(AATExtension.class)
 public abstract class BaseTest {
     protected final AATHelper aat;
@@ -18,6 +20,10 @@ public abstract class BaseTest {
     }
 
     protected Supplier<RequestSpecification> asAutoTestCaseworker() {
+        return asAutoTestCaseworker(TRUE);
+    }
+
+    protected Supplier<RequestSpecification> asAutoTestCaseworker(final Boolean withUserParam) {
 
         final AuthenticatedUser caseworker = aat.getIdamHelper()
                                                 .authenticate(aat.getCaseworkerAutoTestEmail(),
@@ -26,9 +32,13 @@ public abstract class BaseTest {
         final String s2sToken = aat.getS2SHelper()
                                    .getToken();
 
-        return () -> RestAssured.given()
-                          .header("Authorization", "Bearer " + caseworker.getAccessToken())
-                          .header("ServiceAuthorization", s2sToken)
-                          .pathParam("user", caseworker.getId());
+        return () -> {
+            final RequestSpecification request = RestAssured.given()
+                                                            .header("Authorization",
+                                                                    "Bearer " + caseworker.getAccessToken())
+                                                            .header("ServiceAuthorization", s2sToken);
+
+            return withUserParam ? request.pathParam("user", caseworker.getId()) : request;
+        };
     }
 }
