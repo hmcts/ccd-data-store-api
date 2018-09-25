@@ -33,6 +33,18 @@ variable "common_tags" {
   type = "map"
 }
 
+variable "asp_name" {
+  type = "string"
+  description = "App Service Plan (ASP) to use for the webapp, 'use_shared' to make use of the shared ASP"
+  default = "use_shared"
+}
+
+variable "asp_rg" {
+  type = "string"
+  description = "App Service Plan (ASP) resource group for 'asp_name', 'use_shared' to make use of the shared resource group"
+  default = "use_shared"
+}
+
 variable "tenant_id" {
   description = "(Required) The Azure Active Directory tenant ID that should be used for authenticating requests to the key vault. This is usually sourced from environemnt variables and not normally required to be specified."
 }
