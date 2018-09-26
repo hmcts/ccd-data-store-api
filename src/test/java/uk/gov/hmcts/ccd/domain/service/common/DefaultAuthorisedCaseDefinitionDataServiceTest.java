@@ -123,7 +123,7 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
         }
 
         @Test
-        @DisplayName("should return case type when user can has read access and user classification is higher or euqal to case type classification")
+        @DisplayName("should return case type when user has read access and user classification is higher or euqal to case type classification")
         void shouldGetAuthorisedCaseType() {
             when(accessControlService.canAccessCaseTypeWithCriteria(caseType, userRoles, CAN_READ)).thenReturn(true);
             when(userRepository.getHighestUserClassification()).thenReturn(SecurityClassification.PRIVATE);
@@ -137,8 +137,8 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
         }
 
         @Test
-        @DisplayName("should return case type when user can has read access and user classification is higher or euqal to case type classification")
-        void shouldGetAuthorisedCaseTypeA() {
+        @DisplayName("should not return case type when user has no read access to the case type")
+        void shouldNotReturnCaseTypeWhenNoAccess() {
             when(accessControlService.canAccessCaseTypeWithCriteria(caseType, userRoles, CAN_READ)).thenReturn(false);
             when(userRepository.getHighestUserClassification()).thenReturn(SecurityClassification.PRIVATE);
 
@@ -150,8 +150,8 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
         }
 
         @Test
-        @DisplayName("should return case type when user can has read access and user classification is higher or euqal to case type classification")
-        void shouldGetAuthorisedCaseTypeB() {
+        @DisplayName("should not return case type when user classification is lower than case type classification")
+        void shouldNotReturnCaseTypeWhenClassificationNotMatched() {
             when(accessControlService.canAccessCaseTypeWithCriteria(caseType, userRoles, CAN_READ)).thenReturn(true);
             when(userRepository.getHighestUserClassification()).thenReturn(SecurityClassification.PUBLIC);
 
