@@ -1,23 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.searchbox.client.JestClient;
-import io.searchbox.core.Search;
-import io.searchbox.core.SearchResult;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.search.CaseDetailsSearchResult;
-import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.dto.ElasticSearchCaseDetailsDTO;
-import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.mapper.CaseDetailsMapper;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
-
 import java.io.IOException;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -29,16 +11,35 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
-public class ElasticSearchCaseDetailsSearchOperationTest {
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.searchbox.client.JestClient;
+import io.searchbox.core.Search;
+import io.searchbox.core.SearchResult;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.internal.util.reflection.Whitebox;
+import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.search.CaseDetailsSearchResult;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.dto.ElasticSearchCaseDetailsDTO;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.mapper.CaseDetailsMapper;
+import uk.gov.hmcts.ccd.domain.service.search.filter.CaseSearchQuerySecurity;
+import uk.gov.hmcts.ccd.domain.service.search.filter.CaseSearchRequestFactory;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
+
+class ElasticsearchCaseDetailsSearchOperationTest {
 
     private static final String INDEX_NAME_FORMAT = "%s_cases";
-    private static final String CASE_TYPE_ID = "caseTypeId";
+    private static final String CASE_TYPE_ID = "casetypeid";
     private static final String INDEX_TYPE = "case";
     private final String caseDetailsElastic = "{some case details}";
 
     @InjectMocks
-    private ElasticSearchCaseDetailsSearchOperation searchOperation;
+    private ElasticsearchCaseDetailsSearchOperation searchOperation;
 
     @Mock
     private ApplicationParams applicationParams;
@@ -58,14 +59,18 @@ public class ElasticSearchCaseDetailsSearchOperationTest {
     @Mock
     private CaseDetails caseDetails;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.initMocks(this);
+        CaseSearchRequestFactory<Search> caseSearchRequestFactory = new ElasticsearchCaseSearchRequestFactory(applicationParams,
+                                                                                                              mock(CaseSearchQuerySecurity.class));
+        Whitebox.setInternalState(searchOperation, "caseSearchRequestFactory", caseSearchRequestFactory);
         when(applicationParams.getCasesIndexNameFormat()).thenReturn(INDEX_NAME_FORMAT);
         when(applicationParams.getCasesIndexType()).thenReturn(INDEX_TYPE);
     }
 
     @Test
-    public void searchShouldMapElasticSearchResultToSearchResult() throws IOException {
+    void searchShouldMapElasticSearchResultToSearchResult() throws IOException {
         SearchResult searchResult = mock(SearchResult.class);
         when(searchResult.isSucceeded()).thenReturn(true);
         when(searchResult.getTotal()).thenReturn(1L);
@@ -87,7 +92,7 @@ public class ElasticSearchCaseDetailsSearchOperationTest {
     }
 
     @Test
-    public void searchShouldReturnBadSearchRequestOnFailure() throws IOException {
+    void searchShouldReturnBadSearchRequestOnFailure() throws IOException {
         SearchResult searchResult = mock(SearchResult.class);
         when(searchResult.isSucceeded()).thenReturn(false);
         when(jestClient.execute(any(Search.class))).thenReturn(searchResult);
