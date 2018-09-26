@@ -1,15 +1,12 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItemType;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.exception.InvalidUrlException;
-
 import java.time.LocalDateTime;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -25,8 +22,6 @@ public class CaseAuditEventMapperTest {
     public static final String DESCRIPTION = "description";
     public static final String INVALID_URL = "htsss://locall.com";
     public static final String USER_ID = "USER_ID";
-
-
     private final LocalDateTime LOCAL_DATE_TIME = LocalDateTime.now();
 
     @Test
@@ -61,8 +56,6 @@ public class CaseAuditEventMapperTest {
         } catch (InvalidUrlException exception) {
             assertEquals("Invalid URL Exception", exception.getMessage());
         }
-
-
     }
 
     private AuditEvent getAuditEventWithInvalidURL() {
@@ -81,7 +74,6 @@ public class CaseAuditEventMapperTest {
         auditEvent.setCreatedDate(LOCAL_DATE_TIME);
         auditEvent.setUserFirstName(FIRST_NAME);
         auditEvent.setUserLastName(LAST_NAME);
-
         return auditEvent;
     }
 
