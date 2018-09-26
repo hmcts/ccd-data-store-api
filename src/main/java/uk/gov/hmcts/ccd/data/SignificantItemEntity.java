@@ -4,6 +4,7 @@ import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventEntity;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItemType;
 import javax.persistence.*;
 import java.net.URL;
+    
 @Table(name = "case_event_significant_items")
 @Entity
 public class SignificantItemEntity {
