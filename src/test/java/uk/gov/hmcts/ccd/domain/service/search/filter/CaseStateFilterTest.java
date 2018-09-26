@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.search.filter;
 
-
 import java.util.Arrays;
 import java.util.List;
 
