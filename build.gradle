@@ -108,6 +108,7 @@ ext {
             'class'      : 98
     ]
     appInsights= '2.0.1'
+    elasticSearchVersion = '6.3.0'
 }
 
 group 'uk.gov.hmcts.ccd'
@@ -198,6 +199,7 @@ dependencies {
     compile group: 'com.sun.mail', name: 'mailapi', version: '1.6.1'
     compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
 
+    compile "org.elasticsearch:elasticsearch:${elasticSearchVersion}"
 
     // FIXME 0.6 doesn't support jsonb; 0.7 doesn't work on Windows
 //    runtime group: 'com.impossibl.pgjdbc-ng', name: 'pgjdbc-ng', version: '0.6'

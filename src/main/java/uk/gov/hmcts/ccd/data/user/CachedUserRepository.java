@@ -25,6 +25,7 @@ public class CachedUserRepository implements UserRepository {
     private final Map<String, Set<SecurityClassification>> jurisdictionToUserClassifications = newHashMap();
     private final Map<String, IDAMProperties> userDetails = newHashMap();
     private final Map<String, Set<String>> userRoles = newHashMap();
+    private final Map<String, SecurityClassification> userHighestSecurityClassification = newHashMap();
 
     @Autowired
     public CachedUserRepository(@Qualifier(DefaultUserRepository.QUALIFIER) UserRepository userRepository) {
@@ -46,7 +47,13 @@ public class CachedUserRepository implements UserRepository {
         return userRoles.computeIfAbsent("userRoles", e -> userRepository.getUserRoles());
     }
 
+    @Override
     public Set<SecurityClassification> getUserClassifications(String jurisdictionId) {
         return jurisdictionToUserClassifications.computeIfAbsent(jurisdictionId, userRepository::getUserClassifications);
+    }
+
+    @Override
+    public SecurityClassification getHighestUserClassification() {
+        return userHighestSecurityClassification.computeIfAbsent("userHighestSecurityClassification", s -> userRepository.getHighestUserClassification());
     }
 }
