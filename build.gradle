@@ -13,7 +13,7 @@ buildscript {
 plugins {
     id 'application'
     id 'io.spring.dependency-management' version '1.0.5.RELEASE'
-    id 'org.springframework.boot' version '1.5.14.RELEASE'
+    id 'org.springframework.boot' version '2.0.3.RELEASE'
     id 'com.github.ben-manes.versions' version '0.20.0'
     id 'org.sonarqube' version '2.6.2'
     id 'jacoco'
@@ -201,13 +201,12 @@ dependencies {
     // FIXME 0.6 doesn't support jsonb; 0.7 doesn't work on Windows
 //    runtime group: 'com.impossibl.pgjdbc-ng', name: 'pgjdbc-ng', version: '0.6'
     runtime group: 'org.postgresql', name: 'postgresql', version: '42.2.2'
-    runtime group: 'com.zaxxer', name: 'HikariCP', version: '2.7.9'
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
     testCompile group: 'com.opentable.components', name: 'otj-pg-embedded', version: '0.12.0'
     testCompile group: 'com.github.tomakehurst', name: 'wiremock', version: '2.17.0'
 //    testCompile group: 'com.github.tomakehurst', name: 'wiremock', version: '2.18.0'
-    testCompile group: 'org.springframework.cloud', name: 'spring-cloud-contract-wiremock', version: '1.2.4.RELEASE'
+    testCompile group: 'org.springframework.cloud', name: 'spring-cloud-contract-wiremock', version: '2.0.0.RELEASE'
     // To avoid compiler warnings about @API annotations in JUnit5 code.
     testCompileOnly 'org.apiguardian:apiguardian-api:1.0.0'
     testCompile "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
@@ -222,6 +221,7 @@ dependencies {
     testCompile group: 'org.openid4java', name: 'openid4java', version: '1.0.0'
     // remove me once insights is in
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+    runtime("org.springframework.boot:spring-boot-properties-migrator")
 }
 // end::dependencies[]
 
