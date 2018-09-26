@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import uk.gov.hmcts.ccd.data.SignificantItemEntity;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
+import uk.gov.hmcts.ccd.exception.InvalidUrlException;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -87,7 +88,7 @@ public class CaseAuditEventMapper {
             try {
                 significantItemEntity.setUrl(new URL(auditEvent.getSignificantItem().getUrl()));
             } catch (MalformedURLException e) {
-                throw new RuntimeException("Malformed URL Exception");
+                throw new InvalidUrlException("Invalid URL Exception");
             }
             newCaseAuditEventEntity.setSignificantItemEntity(significantItemEntity);
         }
