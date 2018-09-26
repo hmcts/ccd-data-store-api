@@ -5,15 +5,12 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
+import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
@@ -29,10 +26,7 @@ import java.util.Optional;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.arrayWithSize;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItemInArray;
-import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
@@ -64,7 +58,9 @@ class DefaultGetCaseHistoryViewOperationTest {
     @Mock
     private UIDService uidService;
 
+    @InjectMocks
     private DefaultGetCaseHistoryViewOperation defaultGetCaseHistoryViewOperation;
+
     private CaseDetails caseDetails;
     private AuditEvent event1;
 
@@ -76,8 +72,7 @@ class DefaultGetCaseHistoryViewOperationTest {
         caseDetails.setCaseTypeId(CASE_TYPE_ID);
         caseDetails.setReference(new Long(CASE_REFERENCE));
         caseDetails.setState(STATE);
-        doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(JURISDICTION_ID, CASE_TYPE_ID,
-            CASE_REFERENCE);
+        doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
 
         event1 = new AuditEvent();
         event1.setSummary(EVENT_SUMMARY_1);
@@ -101,9 +96,6 @@ class DefaultGetCaseHistoryViewOperationTest {
 
         CaseState caseState = new CaseState();
         doReturn(caseState).when(caseTypeService).findState(caseType, STATE);
-
-        defaultGetCaseHistoryViewOperation = new DefaultGetCaseHistoryViewOperation(getCaseOperation,
-            getEventsOperation, uiDefinitionRepository, caseTypeService, uidService);
     }
 
     @Test
@@ -138,7 +130,7 @@ class DefaultGetCaseHistoryViewOperationTest {
     @Test
     @DisplayName("should throw exception when case is not found")
     void shouldThrowExceptionWhenCaseIsNotFound() {
-        doReturn(Optional.empty()).when(getCaseOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+        doReturn(Optional.empty()).when(getCaseOperation).execute(CASE_REFERENCE);
 
         assertThrows(ResourceNotFoundException.class,
             () -> defaultGetCaseHistoryViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, EVENT_ID));
