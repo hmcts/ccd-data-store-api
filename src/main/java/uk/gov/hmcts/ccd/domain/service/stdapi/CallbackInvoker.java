@@ -192,7 +192,10 @@ public class CallbackInvoker {
     }
 
     private boolean isDescriptionEmptyOrNotWithInSpecifiedRange(SignificantItem significantItem) {
-        return StringUtils.isEmpty(significantItem.getDescription()) || (StringUtils.isNotEmpty(significantItem.getDescription()) && !(significantItem.getDescription().length() > 0 && significantItem.getDescription().length() < 65));
+        return StringUtils.isEmpty(significantItem.getDescription())
+            || (StringUtils.isNotEmpty(significantItem.getDescription())
+                && !(significantItem.getDescription().length() > 0
+                && significantItem.getDescription().length() < 65));
     }
 
 }

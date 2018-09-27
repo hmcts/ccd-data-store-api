@@ -77,13 +77,11 @@ class SubmitCaseTransactionTest {
     private UIDService uidService;
 
     private SubmitCaseTransaction submitCaseTransaction;
-
     private Event event;
     private CaseType caseType;
     private IDAMProperties idamUser;
     private CaseEvent eventTrigger;
     private CaseState state;
-    private AboutToSubmitCallbackResponse response;
 
     @BeforeEach
     void setup() {
@@ -102,7 +100,7 @@ class SubmitCaseTransactionTest {
         idamUser = buildIdamUser();
         eventTrigger = buildEventTrigger();
         state = buildState();
-        response = buildResponse();
+        final AboutToSubmitCallbackResponse response = buildResponse();
         doReturn(STATE_ID).when(savedCaseDetails).getState();
 
         doReturn(state).when(caseTypeService).findState(caseType, STATE_ID);
@@ -123,7 +121,7 @@ class SubmitCaseTransactionTest {
     private AboutToSubmitCallbackResponse buildResponse() {
         final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = new AboutToSubmitCallbackResponse();
         aboutToSubmitCallbackResponse.setCallBackResponse(Optional.of("somestring"));
-        SignificantItem significantItem = new SignificantItem();
+        final SignificantItem significantItem = new SignificantItem();
         significantItem.setType(SignificantItemType.DOCUMENT);
         significantItem.setDescription(DESCRIPTION);
         significantItem.setUrl(URL);
@@ -260,17 +258,6 @@ class SubmitCaseTransactionTest {
         event.setEventId(EVENT_ID);
         event.setDescription(EVENT_DESC);
         event.setSummary(EVENT_SUMMARY);
-        return event;
-    }
-
-    private CaseEvent buildEventSignificantItem() {
-        final CaseEvent event = new CaseEvent();
-        event.setId(EVENT_ID);
-        event.setName(EVENT_NAME);
-        SignificantItem significantItem = new SignificantItem();
-        significantItem.setType(DOCUMENT);
-        significantItem.setDescription(DESCRIPTION);
-        significantItem.setUrl(URL);
         return event;
     }
 

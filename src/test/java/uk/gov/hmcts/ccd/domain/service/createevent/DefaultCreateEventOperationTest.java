@@ -115,7 +115,7 @@ class DefaultCreateEventOperationTest {
         event = buildEvent();
         data = buildJsonNodeData();
 
-        Jurisdiction jurisdiction = new Jurisdiction();
+        final Jurisdiction jurisdiction = new Jurisdiction();
         jurisdiction.setId(JURISDICTION_ID);
         final Version version = new Version();
         version.setNumber(VERSION_NUMBER);
@@ -125,11 +125,11 @@ class DefaultCreateEventOperationTest {
         caseType.setVersion(version);
         eventTrigger = new CaseEvent();
         eventTrigger.setPostState(POST_STATE);
-        AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = new AboutToSubmitCallbackResponse();
-        SignificantItem significantItem = new SignificantItem();
+        final SignificantItem significantItem = new SignificantItem();
         significantItem.setUrl("http://www.yahoo.com");
         significantItem.setDescription("description");
         significantItem.setType(SignificantItemType.DOCUMENT);
+        final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = new AboutToSubmitCallbackResponse();
         aboutToSubmitCallbackResponse.setSignificantItem(significantItem);
         aboutToSubmitCallbackResponse.setCallBackResponse(Optional.empty());
         caseDetails = new CaseDetails();

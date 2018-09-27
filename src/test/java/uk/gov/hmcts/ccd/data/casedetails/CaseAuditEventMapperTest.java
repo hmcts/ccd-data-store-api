@@ -27,7 +27,7 @@ public class CaseAuditEventMapperTest {
 
     @Test
     @DisplayName("Should map model to entity ")
-    void modelTo() {
+    public void modelTo() {
         CaseAuditEventMapper caseAuditEventMapper = new CaseAuditEventMapper();
         AuditEvent auditEvent = getAuditEvent();
         CaseAuditEventEntity result = caseAuditEventMapper.modelToEntity(auditEvent);
@@ -48,7 +48,7 @@ public class CaseAuditEventMapperTest {
 
     @Test
     @DisplayName("Should throw Invalid Url exception ")
-    void modelToEntityWithException() {
+    public void modelToEntityWithException() {
         CaseAuditEventMapper caseAuditEventMapper = new CaseAuditEventMapper();
         AuditEvent auditEvent = getAuditEventWithInvalidURL();
         try {
