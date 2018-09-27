@@ -34,7 +34,7 @@ public class ElasticsearchCaseDetailsSearchOperation implements CaseDetailsSearc
 
     @Autowired
     public ElasticsearchCaseDetailsSearchOperation(JestClient jestClient,
-                                                   ObjectMapper objectMapper,
+                                                   @Qualifier("caseDetailsObjectMapper") ObjectMapper objectMapper,
                                                    CaseDetailsMapper caseDetailsMapper,
                                                    CaseSearchRequestFactory<Search> caseSearchRequestFactory) {
         this.jestClient = jestClient;

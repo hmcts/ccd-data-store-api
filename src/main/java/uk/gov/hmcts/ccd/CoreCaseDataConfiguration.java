@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 public class CoreCaseDataConfiguration {
 
     @Bean
+    @Qualifier("caseDetailsObjectMapper")
     public ObjectMapper objectMapper() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
