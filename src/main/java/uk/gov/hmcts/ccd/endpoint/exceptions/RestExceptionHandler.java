@@ -39,6 +39,17 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             .body(error);
     }
 
+    @ExceptionHandler(BadSearchRequest.class)
+    @ResponseBody
+    public ResponseEntity<HttpError> handleSearchRequestException(HttpServletRequest request, Exception exception) {
+        LOG.warn(exception.getMessage(), exception);
+        appInsights.trackException(exception);
+        final HttpError<Serializable> error = new HttpError<>(exception, request);
+        return ResponseEntity
+                .status(error.getStatus())
+                .body(error);
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseBody
     public ResponseEntity<HttpError> handleException(final HttpServletRequest request, final Exception exception) {
