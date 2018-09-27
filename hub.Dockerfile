@@ -1,4 +1,5 @@
 FROM gradle:jdk8 as builder
+LABEL maintainer="https://github.com/hmcts/ccd-data-store-api"
 
 COPY . /home/gradle/src
 USER root
