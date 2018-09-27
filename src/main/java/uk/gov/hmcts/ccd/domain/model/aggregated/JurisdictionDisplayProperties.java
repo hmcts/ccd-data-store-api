@@ -1,10 +1,9 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
-
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 
 public class JurisdictionDisplayProperties {
     private String id;
