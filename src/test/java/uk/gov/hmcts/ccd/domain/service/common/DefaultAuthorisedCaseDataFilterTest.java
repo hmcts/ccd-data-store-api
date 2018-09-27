@@ -46,16 +46,16 @@ class DefaultAuthorisedCaseDataFilterTest {
     @Test
     @DisplayName("should filter fields within case data")
     void shouldFilterFields() {
-        Map<String, JsonNode> unFilteredData = new HashMap<>();
-        Map<String, JsonNode> filteredData = new HashMap<>();
-        CaseType caseType = new CaseType();
         CaseDetails caseDetails = new CaseDetails();
+        Map<String, JsonNode> unFilteredData = new HashMap<>();
         caseDetails.setData(unFilteredData);
         JsonNode jsonNode = mock(JsonNode.class);
         Set<String> userRoles = new HashSet<>();
         when(userRepository.getUserRoles()).thenReturn(userRoles);
         when(objectMapperService.convertObjectToJsonNode(unFilteredData)).thenReturn(jsonNode);
+        CaseType caseType = new CaseType();
         when(accessControlService.filterCaseFieldsByAccess(jsonNode, caseType.getCaseFields(), userRoles, CAN_READ)).thenReturn(jsonNode);
+        Map<String, JsonNode> filteredData = new HashMap<>();
         when(objectMapperService.convertJsonNodeToMap(jsonNode)).thenReturn(filteredData);
 
         authorisedCaseDataFilter.filterFields(caseType, caseDetails);

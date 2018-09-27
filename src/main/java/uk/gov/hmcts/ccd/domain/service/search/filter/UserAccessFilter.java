@@ -9,7 +9,9 @@ public class UserAccessFilter {
 
     private final CaseAccessService caseAccessService;
 
-    public UserAccessFilter(CaseAccessService caseAccessService) {this.caseAccessService = caseAccessService;}
+    public UserAccessFilter(CaseAccessService caseAccessService) {
+        this.caseAccessService = caseAccessService;
+    }
 
     public final Optional<List<Long>> getGrantedCaseIdsForRestrictedRoles() {
         return caseAccessService.getGrantedCaseIdsForRestrictedRoles();

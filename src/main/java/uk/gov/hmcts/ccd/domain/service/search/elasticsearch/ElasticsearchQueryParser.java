@@ -8,7 +8,19 @@ import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 /**
- *
+ * Sample ES query. The parser extracts/sets value for query node.
+ * {
+ * 	"query": {
+ * 		"bool": {
+ * 			"filter": {
+ * 				"match": { "state": "AwaitingPayment"}
+ *                }
+ *            }
+ *       },
+ * 	"sort": {
+ * 		"id": { "order":"asc" }
+ *       }
+ * }
  */
 class ElasticsearchQueryParser {
 

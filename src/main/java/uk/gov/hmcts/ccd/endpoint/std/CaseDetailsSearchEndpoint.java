@@ -51,9 +51,9 @@ public class CaseDetailsSearchEndpoint {
             @ApiResponse(code = 200, message = "List of case data for the given search request")
     })
     public CaseDetailsSearchResult searchCases(
-            @ApiParam(value = "Case type ID", required = true)
+        @ApiParam(value = "Case type ID", required = true)
             @RequestParam("ctid") String caseTypeId,
-            @ApiParam(name="native ElasticSearch Search API request. Please refer to the ElasticSearch official documentation", required = true)
+        @ApiParam(name = "native ElasticSearch Search API request. Please refer to the ElasticSearch official documentation", required = true)
             @RequestBody String jsonSearchRequest) throws IOException {
 
         validateSearchRequest(jsonSearchRequest);

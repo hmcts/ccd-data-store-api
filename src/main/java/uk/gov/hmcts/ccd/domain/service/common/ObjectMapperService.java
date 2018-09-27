@@ -5,7 +5,7 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
- *
+ * Common Object mapper service for serialising/de-serialising objects.
  */
 public interface ObjectMapperService {
 

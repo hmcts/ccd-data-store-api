@@ -2,27 +2,15 @@ package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 
 class ElasticsearchQueryParserFactoryTest {
 
-    @Mock
-    private ObjectMapperService objectMapperService;
-
-    @InjectMocks
-    private ElasticsearchQueryParserFactory factory;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.initMocks(this);
-    }
+    private final ElasticsearchQueryParserFactory factory = new ElasticsearchQueryParserFactory(mock(ObjectMapperService.class));
 
     @Test
     @DisplayName("should create query parser")

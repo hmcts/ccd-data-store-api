@@ -29,7 +29,7 @@ class DefaultObjectMapperServiceTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
-    void setup() {
+    void setUp() {
         objectMapperService = new DefaultObjectMapperService(objectMapper);
     }
 
