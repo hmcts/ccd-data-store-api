@@ -77,16 +77,24 @@ class SubmitCaseTransaction {
             TODO: Ideally, the callback should be outside of the transaction. However, it requires the case UID to have
             been assigned and the UID generation has to be part of a retryable transaction in order to recover from collisions.
          */
-        AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = callbackInvoker.invokeAboutToSubmitCallback(eventTrigger, null, newCaseDetails, caseType, ignoreWarning);
+        AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse =
+            callbackInvoker.invokeAboutToSubmitCallback(eventTrigger, null, newCaseDetails, caseType, ignoreWarning);
 
-        final CaseDetails savedCaseDetails = saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse, event, caseType, idamUser, eventTrigger, newCaseDetails);
+        final CaseDetails savedCaseDetails =
+            saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse, event, caseType, idamUser, eventTrigger, newCaseDetails);
 
         caseUserRepository.grantAccess(Long.valueOf(savedCaseDetails.getId()), idamUser.getId());
 
         return savedCaseDetails;
     }
 
-    private CaseDetails saveAuditEventForCaseDetails(AboutToSubmitCallbackResponse response, Event event, CaseType caseType, IDAMProperties idamUser, CaseEvent eventTrigger, CaseDetails newCaseDetails) {
+    private CaseDetails saveAuditEventForCaseDetails(AboutToSubmitCallbackResponse response,
+                                                     Event event,
+                                                     CaseType caseType,
+                                                     IDAMProperties idamUser,
+                                                     CaseEvent eventTrigger,
+                                                     CaseDetails newCaseDetails) {
+
         final CaseDetails savedCaseDetails = caseDetailsRepository.set(newCaseDetails);
         final AuditEvent auditEvent = new AuditEvent();
         auditEvent.setEventId(event.getEventId());

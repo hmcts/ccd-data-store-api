@@ -215,7 +215,8 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect view items count", 2, searchResultViewItems.size());
         assertNotNull(searchResultViewItems.get(0).getCaseId());
 
-        SearchResultViewItem getFirstItem = searchResultViewItems.stream().filter(e -> e.getCaseFields().get("PersonLastName").equals("Pullen")).findFirst().get();
+        SearchResultViewItem getFirstItem =
+            searchResultViewItems.stream().filter(e -> e.getCaseFields().get("PersonLastName").equals("Pullen")).findFirst().get();
 
         assertThat(getFirstItem.getCaseFields().get("PersonFirstName"), is(nullValue()));
         assertEquals("Pullen", getFirstItem.getCaseFields().get("PersonLastName"));
@@ -230,7 +231,8 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("SE1 4EE", ((Map) getFirstItem.getCaseFields().get("PersonAddress"))
             .get("Postcode"));
 
-        SearchResultViewItem getSecondtItem = searchResultViewItems.stream().filter(e -> e.getCaseFields().get("PersonLastName").equals("Parker")).findFirst().get();
+        SearchResultViewItem getSecondtItem =
+            searchResultViewItems.stream().filter(e -> e.getCaseFields().get("PersonLastName").equals("Parker")).findFirst().get();
 
         assertNotNull(getSecondtItem.getCaseId());
         assertThat(getSecondtItem.getCaseFields().get("PersonFirstName"), is(nullValue()));
@@ -252,7 +254,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
     public void shouldReturnEmptyResultsWhenRelevantCaseTypeAccessNotGranted() throws Exception {
         // Check that we have the expected test data set size, this is to ensure
         // that state filtering is correct
-        final List<CaseDetails> resultList = template.query("SELECT * FROM case_data", this::mapCaseData);
+        final List<CaseDetails> resultList = template.query("SELECT         * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect data initiation", 16, resultList.size());
 
         final MvcResult result = mockMvc.perform(get(GET_CASES_NO_READ_CASE_TYPE_ACCESS)

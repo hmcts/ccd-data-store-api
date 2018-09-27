@@ -252,7 +252,8 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
         auditEvent.setCreatedDate(LocalDateTime.now(ZoneOffset.UTC));
         auditEvent.setSecurityClassification(securityClassificationService.getClassificationForEvent(caseType, eventTrigger));
         auditEvent.setDataClassification(caseDetails.getDataClassification());
-        if(aboutToSubmitCallbackResponse.getSignificantItem()!=null) {
+
+        if (aboutToSubmitCallbackResponse.getSignificantItem() != null) {
             auditEvent.setSignificantItem(aboutToSubmitCallbackResponse.getSignificantItem());
         }
 

@@ -7,22 +7,23 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItemType;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.exception.InvalidUrlException;
 import java.time.LocalDateTime;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 public class CaseAuditEventMapperTest {
-    public static final Long CASE_DATA_ID = 101111l;
-    public static final String CASE_TYPE_ID = "121212";
-    public static final String EVENT_NAME = "eventName";
-    public static final String STATE_NAME = "stateName";
-    public static final Integer CASE_TYPE_VERSION = 111;
-    public static final String FIRST_NAME = "ALI";
-    public static final String LAST_NAME = "ALIF";
-    public static final String URL = "http://www.yahoo.com";
-    public static final String DESCRIPTION = "description";
-    public static final String INVALID_URL = "htsss://locall.com";
-    public static final String USER_ID = "USER_ID";
-    private final LocalDateTime LOCAL_DATE_TIME = LocalDateTime.now();
+    private static final Long CASE_DATA_ID = 101111L;
+    private static final String CASE_TYPE_ID = "121212";
+    private static final String EVENT_NAME = "eventName";
+    private static final String STATE_NAME = "stateName";
+    private static final Integer CASE_TYPE_VERSION = 111;
+    private static final String FIRST_NAME = "ALI";
+    private static final String LAST_NAME = "ALIF";
+    private static final String URL = "http://www.yahoo.com";
+    private static final String DESCRIPTION = "description";
+    private static final String INVALID_URL = "htsss://locall.com";
+    private static final String USER_ID = "USER_ID";
+    private static final LocalDateTime DATE_TIME = LocalDateTime.now();
 
     @Test
     @DisplayName("Should map model to entity ")
@@ -37,7 +38,7 @@ public class CaseAuditEventMapperTest {
         assertEquals(EVENT_NAME, result.getEventName());
         assertEquals(STATE_NAME, result.getStateName());
         assertEquals(CASE_TYPE_VERSION, result.getCaseTypeVersion());
-        assertEquals(LOCAL_DATE_TIME, result.getCreatedDate());
+        assertEquals(DATE_TIME, result.getCreatedDate());
         assertEquals(LAST_NAME, result.getUserLastName());
         assertEquals(FIRST_NAME, result.getUserFirstName());
         assertEquals(DESCRIPTION, result.getSignificantItemEntity().getDescription());
@@ -59,7 +60,7 @@ public class CaseAuditEventMapperTest {
     }
 
     private AuditEvent getAuditEventWithInvalidURL() {
-        AuditEvent auditEvent = new AuditEvent();
+        final AuditEvent auditEvent = new AuditEvent();
         SignificantItem significantItem = new SignificantItem();
         significantItem.setUrl(INVALID_URL);
         significantItem.setDescription(DESCRIPTION);
@@ -71,15 +72,15 @@ public class CaseAuditEventMapperTest {
         auditEvent.setEventName(EVENT_NAME);
         auditEvent.setStateName(STATE_NAME);
         auditEvent.setCaseTypeVersion(CASE_TYPE_VERSION);
-        auditEvent.setCreatedDate(LOCAL_DATE_TIME);
+        auditEvent.setCreatedDate(DATE_TIME);
         auditEvent.setUserFirstName(FIRST_NAME);
         auditEvent.setUserLastName(LAST_NAME);
         return auditEvent;
     }
 
     private AuditEvent getAuditEvent() {
-        AuditEvent auditEvent = new AuditEvent();
-        SignificantItem significantItem = new SignificantItem();
+        final AuditEvent auditEvent = new AuditEvent();
+        final SignificantItem significantItem = new SignificantItem();
         significantItem.setUrl(URL);
         auditEvent.setUserId(USER_ID);
         significantItem.setDescription(DESCRIPTION);
@@ -91,7 +92,7 @@ public class CaseAuditEventMapperTest {
         auditEvent.setEventName(EVENT_NAME);
         auditEvent.setStateName(STATE_NAME);
         auditEvent.setCaseTypeVersion(CASE_TYPE_VERSION);
-        auditEvent.setCreatedDate(LOCAL_DATE_TIME);
+        auditEvent.setCreatedDate(DATE_TIME);
         auditEvent.setUserFirstName(FIRST_NAME);
         auditEvent.setUserLastName(LAST_NAME);
 

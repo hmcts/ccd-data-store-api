@@ -79,7 +79,6 @@ class SubmitCaseTransactionTest {
     private SubmitCaseTransaction submitCaseTransaction;
 
     private Event event;
-    private CaseEvent eventWithSignificantItem;
     private CaseType caseType;
     private IDAMProperties idamUser;
     private CaseEvent eventTrigger;
@@ -99,7 +98,6 @@ class SubmitCaseTransactionTest {
             caseUserRepository);
 
         event = buildEvent();
-        eventWithSignificantItem = buildEventSignificantItem();
         caseType = buildCaseType();
         idamUser = buildIdamUser();
         eventTrigger = buildEventTrigger();

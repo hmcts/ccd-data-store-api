@@ -93,13 +93,11 @@ class DefaultCreateEventOperationTest {
     private Event event;
 
     private Map<String, JsonNode> data;
-    private Jurisdiction jurisdiction;
     private CaseType caseType;
     private CaseEvent eventTrigger;
     private CaseDetails caseDetails;
     private CaseDetails caseDetailsBefore;
     private CaseState postState;
-    private AboutToSubmitCallbackResponse  aboutToSubmitCallbackResponse;
     private IDAMProperties user;
 
     private static Event buildEvent() {
@@ -117,7 +115,7 @@ class DefaultCreateEventOperationTest {
         event = buildEvent();
         data = buildJsonNodeData();
 
-        jurisdiction = new Jurisdiction();
+        Jurisdiction jurisdiction = new Jurisdiction();
         jurisdiction.setId(JURISDICTION_ID);
         final Version version = new Version();
         version.setNumber(VERSION_NUMBER);
@@ -127,7 +125,7 @@ class DefaultCreateEventOperationTest {
         caseType.setVersion(version);
         eventTrigger = new CaseEvent();
         eventTrigger.setPostState(POST_STATE);
-        aboutToSubmitCallbackResponse = new AboutToSubmitCallbackResponse();
+        AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = new AboutToSubmitCallbackResponse();
         SignificantItem significantItem = new SignificantItem();
         significantItem.setUrl("http://www.yahoo.com");
         significantItem.setDescription("description");

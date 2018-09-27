@@ -58,7 +58,7 @@ public class EventsEndpointIT extends WireMockBaseTest {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
         template = new JdbcTemplate(db);
     }
-
+    
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn200_whenSearchWithParamsAsCaseWorker() throws Exception {

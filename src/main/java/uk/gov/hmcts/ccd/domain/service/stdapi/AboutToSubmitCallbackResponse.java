@@ -27,9 +27,9 @@ public class AboutToSubmitCallbackResponse {
 
     @Override
     public String toString() {
-        return "AboutToSubmitCallbackResponse{" +
-            "callBackResponse=" + callBackResponse +
-            ", significantItem=" + significantItem +
-            '}';
+        return "AboutToSubmitCallbackResponse{"
+            + "callBackResponse=" + callBackResponse
+            + ", significantItem=" + significantItem
+            + '}';
     }
 }
