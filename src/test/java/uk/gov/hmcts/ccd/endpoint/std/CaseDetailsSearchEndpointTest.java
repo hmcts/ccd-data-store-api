@@ -42,7 +42,7 @@ class CaseDetailsSearchEndpointTest {
     }
 
         @Test
-    void searchCaseDetailsThrowsExceptionWhenNoQueryProvided() throws IOException {
+        void searchCaseDetailsThrowsExceptionWhenNoQueryProvided() {
         String searchRequest = "{\n"
                 + "\"from\" : 0,\n"
                 + "\"size\" : 3\n"
@@ -56,7 +56,7 @@ class CaseDetailsSearchEndpointTest {
     }
 
     @Test
-    void searchCaseDetailsRejectsBlacklistedSearchQueries() throws IOException {
+    void searchCaseDetailsRejectsBlacklistedSearchQueries() {
         String searchRequest = "{  \n"
             + "   \"query\":{  \n"
             + "      \"bool\":{  \n"
