@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 /**
- * Common Object mapper service for serialising/de-serialising objects
+ * Common Object mapper service for serialising/de-serialising objects.
  */
 @Service
 public class DefaultObjectMapperService implements ObjectMapperService {

@@ -7,7 +7,9 @@ public enum CaseSearchFilter {
 
     private final String filterName;
 
-    CaseSearchFilter(String filterName) {this.filterName = filterName;}
+    CaseSearchFilter(String filterName) {
+        this.filterName = filterName;
+    }
 
     public String filterName() {
         return filterName;

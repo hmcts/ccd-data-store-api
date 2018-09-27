@@ -1,16 +1,5 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.domain.model.search.CaseDetailsSearchResult;
-import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseDetailsSearchOperation;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
-
 import java.io.IOException;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -23,7 +12,18 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-public class CaseDetailsSearchEndpointTest {
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.domain.model.search.CaseDetailsSearchResult;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseDetailsSearchOperation;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
+
+class CaseDetailsSearchEndpointTest {
 
     private static final String CASE_TYPE_ID = "GrantOnly";
 
@@ -57,31 +57,31 @@ public class CaseDetailsSearchEndpointTest {
 
     @Test
     void searchCaseDetailsRejectsBlacklistedSearchQueries() throws IOException {
-        String searchRequest = "{  \n" +
-            "   \"query\":{  \n" +
-            "      \"bool\":{  \n" +
-            "         \"must\":[  \n" +
-            "            {  \n" +
-            "               \"simple_query_string\":{  \n" +
-            "                  \"query\":\"isde~2\"\n" +
-            "               }\n" +
-            "            },\n" +
-            "            {  \n" +
-            "               \"query_string\":{  \n" +
-            "                  \"query\":\"isde~2\"\n" +
-            "               }\n" +
-            "            },\n" +
-            "            {  \n" +
-            "               \"range\":{  \n" +
-            "                  \"data.ComplexField.ComplexNestedField.NestedNumberField\":{  \n" +
-            "                     \"lt\":\"91\"\n" +
-            "                  }\n" +
-            "               }\n" +
-            "            }\n" +
-            "         ]\n" +
-            "      }\n" +
-            "   }\n" +
-            "}";
+        String searchRequest = "{  \n"
+            + "   \"query\":{  \n"
+            + "      \"bool\":{  \n"
+            + "         \"must\":[  \n"
+            + "            {  \n"
+            + "               \"simple_query_string\":{  \n"
+            + "                  \"query\":\"isde~2\"\n"
+            + "               }\n"
+            + "            },\n"
+            + "            {  \n"
+            + "               \"query_string\":{  \n"
+            + "                  \"query\":\"isde~2\"\n"
+            + "               }\n"
+            + "            },\n"
+            + "            {  \n"
+            + "               \"range\":{  \n"
+            + "                  \"data.ComplexField.ComplexNestedField.NestedNumberField\":{  \n"
+            + "                     \"lt\":\"91\"\n"
+            + "                  }\n"
+            + "               }\n"
+            + "            }\n"
+            + "         ]\n"
+            + "      }\n"
+            + "   }\n"
+            + "}";
         given(applicationParams.getSearchBlackList()).willReturn(newArrayList("query_string"));
 
         assertThrows(BadSearchRequest.class,
@@ -92,26 +92,26 @@ public class CaseDetailsSearchEndpointTest {
 
     @Test
     void searchCaseDetailsAllowsQueriesNotBlacklisted() throws IOException {
-        String query = "{\n" +
-            "   \"query\":{\n" +
-            "      \"bool\":{\n" +
-            "         \"must\":[\n" +
-            "            {\n" +
-            "               \"simple_query_string\":{\n" +
-            "                  \"query\":\"isde~2\"\n" +
-            "               }\n" +
-            "            },\n" +
-            "            {\n" +
-            "               \"range\":{\n" +
-            "                  \"data.ComplexField.ComplexNestedField.NestedNumberField\":{\n" +
-            "                     \"lt\":\"91\"\n" +
-            "                  }\n" +
-            "               }\n" +
-            "            }\n" +
-            "         ]\n" +
-            "      }\n" +
-            "   }\n" +
-            "}";
+        String query = "{\n"
+            + "   \"query\":{\n"
+            + "      \"bool\":{\n"
+            + "         \"must\":[\n"
+            + "            {\n"
+            + "               \"simple_query_string\":{\n"
+            + "                  \"query\":\"isde~2\"\n"
+            + "               }\n"
+            + "            },\n"
+            + "            {\n"
+            + "               \"range\":{\n"
+            + "                  \"data.ComplexField.ComplexNestedField.NestedNumberField\":{\n"
+            + "                     \"lt\":\"91\"\n"
+            + "                  }\n"
+            + "               }\n"
+            + "            }\n"
+            + "         ]\n"
+            + "      }\n"
+            + "   }\n"
+            + "}";
         given(applicationParams.getSearchBlackList()).willReturn(newArrayList("query_string"));
 
         endpoint.searchCases(CASE_TYPE_ID, query);
