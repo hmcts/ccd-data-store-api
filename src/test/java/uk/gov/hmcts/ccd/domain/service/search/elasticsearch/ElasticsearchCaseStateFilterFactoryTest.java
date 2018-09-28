@@ -8,8 +8,8 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.STATE_FIELD_COL;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-import static uk.gov.hmcts.ccd.domain.service.search.filter.CaseSearchFilter.CASE_STATE;
 
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.domain.service.common.AuthorisedCaseDefinitionDataService;
+import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 
 class ElasticsearchCaseStateFilterFactoryTest {
 
@@ -44,7 +44,7 @@ class ElasticsearchCaseStateFilterFactoryTest {
         assertThat(optQueryBuilder.isPresent(), is(true));
         assertThat(optQueryBuilder.get(), instanceOf(TermsQueryBuilder.class));
         TermsQueryBuilder queryBuilder = (TermsQueryBuilder) optQueryBuilder.get();
-        assertThat(queryBuilder.fieldName(), is(CASE_STATE.filterName()));
+        assertThat(queryBuilder.fieldName(), is(STATE_FIELD_COL));
         assertThat(queryBuilder.values(), hasItem(state));
     }
 }

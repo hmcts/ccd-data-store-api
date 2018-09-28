@@ -8,7 +8,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ccd.domain.service.search.filter.CaseSearchFilter.CASE_ID;
+import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.STATE_FIELD_COL;
 
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
@@ -43,7 +43,7 @@ class ElasticsearchUserCaseAccessFilterFactoryTest {
         assertThat(optQueryBuilder.isPresent(), is(true));
         assertThat(optQueryBuilder.get(), instanceOf(TermsQueryBuilder.class));
         TermsQueryBuilder queryBuilder = (TermsQueryBuilder) optQueryBuilder.get();
-        assertThat(queryBuilder.fieldName(), is(CASE_ID.filterName()));
+        assertThat(queryBuilder.fieldName(), is(STATE_FIELD_COL));
         assertThat(queryBuilder.values(), hasItem(caseId));
     }
 

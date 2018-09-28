@@ -17,7 +17,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.search.CaseDetailsSearchResult;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.dto.ElasticSearchCaseDetailsDTO;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.mapper.CaseDetailsMapper;
-import uk.gov.hmcts.ccd.domain.service.search.filter.CaseSearchRequestFactory;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
@@ -44,8 +43,8 @@ public class ElasticsearchCaseDetailsSearchOperation implements CaseDetailsSearc
     }
 
     @Override
-    public CaseDetailsSearchResult execute(String caseTypeId, String query) {
-        SearchResult result = search(caseTypeId, query);
+    public CaseDetailsSearchResult execute(String caseTypeId, String jsonQuery) {
+        SearchResult result = search(caseTypeId, jsonQuery);
         if (result.isSucceeded()) {
             return toCaseDetailsSearchResult(result);
         } else {
@@ -53,8 +52,8 @@ public class ElasticsearchCaseDetailsSearchOperation implements CaseDetailsSearc
         }
     }
 
-    private SearchResult search(String caseTypeId, String query) {
-        Search searchRequest = caseSearchRequestFactory.create(caseTypeId, query);
+    private SearchResult search(String caseTypeId, String jsonQuery) {
+        Search searchRequest = caseSearchRequestFactory.create(caseTypeId, jsonQuery);
         try {
             return jestClient.execute(searchRequest);
         } catch (IOException e) {

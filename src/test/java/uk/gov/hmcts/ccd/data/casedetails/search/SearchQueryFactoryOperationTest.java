@@ -1,14 +1,5 @@
 package uk.gov.hmcts.ccd.data.casedetails.search;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
-import uk.gov.hmcts.ccd.domain.service.common.AuthorisedCaseDefinitionDataService;
-import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
-
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.util.HashMap;
@@ -22,6 +13,15 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
+import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
+import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 public class SearchQueryFactoryOperationTest {
 

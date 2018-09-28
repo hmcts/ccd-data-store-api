@@ -23,6 +23,7 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.service.security.DefaultAuthorisedCaseDataFilter;
 
 class DefaultAuthorisedCaseDataFilterTest {
 

@@ -21,8 +21,8 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.search.CaseDetailsSearchResult;
-import uk.gov.hmcts.ccd.domain.service.common.AuthorisedCaseDataFilter;
-import uk.gov.hmcts.ccd.domain.service.common.AuthorisedCaseDefinitionDataService;
+import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDataFilter;
+import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 
 class AuthorisedCaseDetailsSearchOperationTest {
 

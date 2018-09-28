@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.common;
+package uk.gov.hmcts.ccd.domain.service.security;
 
 import java.util.List;
 import java.util.Optional;

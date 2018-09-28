@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.common;
+package uk.gov.hmcts.ccd.domain.service.security;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,6 +15,8 @@ import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 
 /**
  * Service to return authorised case definition data as per user authority.
@@ -37,11 +39,18 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
     @Override
     public Optional<CaseType> getAuthorisedCaseType(String caseTypeId, Predicate<AccessControlList> access) {
         CaseType caseType = caseTypeService.getCaseType(caseTypeId);
-        if (accessControlService.canAccessCaseTypeWithCriteria(caseType, getUserRoles(), access)
-            && userRepository.getHighestUserClassification().higherOrEqualTo(caseType.getSecurityClassification())) {
+        if (verifyAclOnCaseType(caseType, access) && verifySecurityClassificationOnCaseType(caseType)) {
             return Optional.of(caseType);
         }
         return Optional.empty();
+    }
+
+    private boolean verifyAclOnCaseType(CaseType caseType, Predicate<AccessControlList> access) {
+        return accessControlService.canAccessCaseTypeWithCriteria(caseType, getUserRoles(), access);
+    }
+
+    private boolean verifySecurityClassificationOnCaseType(CaseType caseType) {
+        return userRepository.getHighestUserClassification().higherOrEqualTo(caseType.getSecurityClassification());
     }
 
     @Override

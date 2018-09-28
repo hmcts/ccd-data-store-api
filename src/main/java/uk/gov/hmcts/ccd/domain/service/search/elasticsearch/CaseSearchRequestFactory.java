@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.search.filter;
+package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
 import static java.lang.String.format;
 

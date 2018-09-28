@@ -17,7 +17,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.domain.service.search.filter.CaseFilterFactory;
 
 class ElasticsearchQuerySecurityTest {
 
@@ -27,14 +26,14 @@ class ElasticsearchQuerySecurityTest {
     @Mock
     private ElasticsearchQueryParserFactory queryParserFactory;
     @Mock
-    private CaseFilterFactory<QueryBuilder> caseFilterFactory;
+    private CaseSearchFilterFactory caseSearchFilterFactory;
 
     private ElasticsearchQuerySecurity querySecurity;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-        querySecurity = new ElasticsearchQuerySecurity(queryParserFactory, Collections.singletonList(caseFilterFactory));
+        querySecurity = new ElasticsearchQuerySecurity(queryParserFactory, Collections.singletonList(caseSearchFilterFactory));
     }
 
     @Test
@@ -44,14 +43,14 @@ class ElasticsearchQuerySecurityTest {
         when(queryParserFactory.createParser(QUERY)).thenReturn(parser);
         when(parser.extractQueryClause()).thenReturn(QUERY);
         when(parser.getSearchQuery()).thenReturn(QUERY);
-        when(caseFilterFactory.create(CASE_TYPE_ID)).thenReturn(Optional.of(mock(QueryBuilder.class)));
+        when(caseSearchFilterFactory.create(CASE_TYPE_ID)).thenReturn(Optional.of(mock(QueryBuilder.class)));
 
         String result = querySecurity.secureQuery(CASE_TYPE_ID, QUERY);
 
         assertAll(
             () -> assertThat(result, is(QUERY)),
             () -> verify(queryParserFactory).createParser(QUERY),
-            () -> verify(caseFilterFactory).create(CASE_TYPE_ID),
+            () -> verify(caseSearchFilterFactory).create(CASE_TYPE_ID),
             () -> verify(parser).extractQueryClause(),
             () -> verify(parser).setQueryClause(anyString()),
             () -> verify(parser).getSearchQuery());

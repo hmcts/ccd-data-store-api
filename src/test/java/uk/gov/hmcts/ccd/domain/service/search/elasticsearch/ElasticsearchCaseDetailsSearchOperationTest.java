@@ -27,8 +27,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.search.CaseDetailsSearchResult;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.dto.ElasticSearchCaseDetailsDTO;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.mapper.CaseDetailsMapper;
-import uk.gov.hmcts.ccd.domain.service.search.filter.CaseSearchQuerySecurity;
-import uk.gov.hmcts.ccd.domain.service.search.filter.CaseSearchRequestFactory;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
 class ElasticsearchCaseDetailsSearchOperationTest {

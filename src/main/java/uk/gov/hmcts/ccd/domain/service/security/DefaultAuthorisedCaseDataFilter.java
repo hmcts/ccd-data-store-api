@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.common;
+package uk.gov.hmcts.ccd.domain.service.security;
 
 import java.util.Set;
 
@@ -10,6 +10,9 @@ import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
+import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 
 @Component
 public class DefaultAuthorisedCaseDataFilter implements AuthorisedCaseDataFilter {
@@ -32,14 +35,18 @@ public class DefaultAuthorisedCaseDataFilter implements AuthorisedCaseDataFilter
 
     @Override
     public void filterFields(CaseType caseType, CaseDetails caseDetails) {
-        filterCaseFieldsByAccess(caseType, caseDetails);
-        classificationService.applyClassification(caseDetails);
+        filterCaseFieldsByAclAccess(caseType, caseDetails);
+        filterCaseFieldsBySecurityClassification(caseDetails);
     }
 
-    private void filterCaseFieldsByAccess(CaseType caseType, CaseDetails caseDetails) {
+    private void filterCaseFieldsByAclAccess(CaseType caseType, CaseDetails caseDetails) {
         JsonNode data = objectMapperService.convertObjectToJsonNode(caseDetails.getData());
         JsonNode filteredData = accessControlService.filterCaseFieldsByAccess(data, caseType.getCaseFields(), getUserRoles(), AccessControlService.CAN_READ);
         caseDetails.setData(objectMapperService.convertJsonNodeToMap(filteredData));
+    }
+
+    private void filterCaseFieldsBySecurityClassification(CaseDetails caseDetails) {
+        classificationService.applyClassification(caseDetails);
     }
 
     private Set<String> getUserRoles() {

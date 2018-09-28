@@ -9,18 +9,16 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.ccd.domain.service.search.filter.CaseFilterFactory;
-import uk.gov.hmcts.ccd.domain.service.search.filter.CaseSearchQuerySecurity;
 
 @Component
 @Slf4j
 public class ElasticsearchQuerySecurity implements CaseSearchQuerySecurity {
 
     private final ElasticsearchQueryParserFactory queryParserFactory;
-    private final List<CaseFilterFactory<QueryBuilder>> caseFilterFactories;
+    private final List<CaseSearchFilterFactory> caseFilterFactories;
 
     @Autowired
-    public ElasticsearchQuerySecurity(ElasticsearchQueryParserFactory queryParserFactory, List<CaseFilterFactory<QueryBuilder>> caseFilterFactories) {
+    public ElasticsearchQuerySecurity(ElasticsearchQueryParserFactory queryParserFactory, List<CaseSearchFilterFactory> caseFilterFactories) {
         this.queryParserFactory = queryParserFactory;
         this.caseFilterFactories = caseFilterFactories;
     }
