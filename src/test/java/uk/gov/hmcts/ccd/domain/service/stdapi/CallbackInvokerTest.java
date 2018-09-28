@@ -135,7 +135,7 @@ class CallbackInvokerTest {
                                          caseEvent,
                                          caseDetailsBefore,
                                          caseDetails);
-            assertThat(response.getCallBackResponse().isPresent(), is(false));
+            assertThat(response.getState().isPresent(), is(false));
         }
 
         @Test
@@ -160,7 +160,7 @@ class CallbackInvokerTest {
                                          caseEvent,
                                          caseDetailsBefore,
                                          caseDetails);
-            assertThat(response.getCallBackResponse().get(), is(expectedState));
+            assertThat(response.getState().get(), is(expectedState));
         }
 
         @Test
@@ -184,7 +184,7 @@ class CallbackInvokerTest {
                                          caseEvent,
                                          caseDetailsBefore,
                                          caseDetails);
-            assertThat(response.getCallBackResponse().isPresent(), is(false));
+            assertThat(response.getState().isPresent(), is(false));
         }
 
         @Test
@@ -210,7 +210,7 @@ class CallbackInvokerTest {
                 caseEvent,
                 caseDetailsBefore,
                 caseDetails);
-            assertThat(response.getCallBackResponse().get(), is(expectedState));
+            assertThat(response.getState().get(), is(expectedState));
             assertEquals("description",response.getSignificantItem().getDescription());
             assertEquals(SignificantItemType.DOCUMENT,response.getSignificantItem().getType());
             assertEquals("http://www.cnn.com", response.getSignificantItem().getUrl());
@@ -240,7 +240,7 @@ class CallbackInvokerTest {
                 caseEvent,
                 caseDetailsBefore,
                 caseDetails);
-            assertThat(response.getCallBackResponse().get(), is(expectedState));
+            assertThat(response.getState().get(), is(expectedState));
             assertNull(response.getSignificantItem());
             assertEquals(3, callbackResponse.getErrors().size());
 

@@ -131,7 +131,7 @@ class DefaultCreateEventOperationTest {
         significantItem.setType(SignificantItemType.DOCUMENT);
         final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = new AboutToSubmitCallbackResponse();
         aboutToSubmitCallbackResponse.setSignificantItem(significantItem);
-        aboutToSubmitCallbackResponse.setCallBackResponse(Optional.empty());
+        aboutToSubmitCallbackResponse.setState(Optional.empty());
         caseDetails = new CaseDetails();
         caseDetails.setCaseTypeId(CASE_TYPE_ID);
         caseDetails.setState(PRE_STATE_ID);

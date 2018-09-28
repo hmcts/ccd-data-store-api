@@ -129,7 +129,7 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
             ignoreWarning);
 
         final Optional<String>
-            newState = aboutToSubmitCallbackResponse.getCallBackResponse();
+            newState = aboutToSubmitCallbackResponse.getState();
 
         this.validateCaseFieldsOperation.validateCaseDetails(jurisdictionId, caseTypeId, event, caseDetails.getData());
         final CaseDetails savedCaseDetails = saveCaseDetails(caseDetails, eventTrigger, newState);
@@ -252,10 +252,7 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
         auditEvent.setCreatedDate(LocalDateTime.now(ZoneOffset.UTC));
         auditEvent.setSecurityClassification(securityClassificationService.getClassificationForEvent(caseType, eventTrigger));
         auditEvent.setDataClassification(caseDetails.getDataClassification());
-
-        if (aboutToSubmitCallbackResponse.getSignificantItem() != null) {
-            auditEvent.setSignificantItem(aboutToSubmitCallbackResponse.getSignificantItem());
-        }
+        auditEvent.setSignificantItem(aboutToSubmitCallbackResponse.getSignificantItem());
 
         caseAuditEventRepository.set(auditEvent);
     }

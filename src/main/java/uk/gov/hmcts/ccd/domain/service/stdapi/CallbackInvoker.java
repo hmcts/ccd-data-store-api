@@ -34,6 +34,7 @@ public class CallbackInvoker {
     private final CaseDataService caseDataService;
     private final CaseSanitiser caseSanitiser;
     private final SecurityValidationService securityValidationService;
+    private static final UrlValidator URL_VALIDATOR = UrlValidator.getInstance();
 
     @Autowired
     public CallbackInvoker(final CallbackService callbackService,
@@ -79,24 +80,20 @@ public class CallbackInvoker {
                 caseDetails,
                 ignoreWarning,
                 callbackResponse.get());
-
-        } else {
-            AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = new AboutToSubmitCallbackResponse();
-            aboutToSubmitCallbackResponse.setCallBackResponse(Optional.empty());
-            return aboutToSubmitCallbackResponse;
         }
 
+        return new AboutToSubmitCallbackResponse();
     }
 
     public ResponseEntity<AfterSubmitCallbackResponse> invokeSubmittedCallback(final CaseEvent eventTrigger,
                                                                                final CaseDetails caseDetailsBefore,
                                                                                final CaseDetails caseDetails) {
         return callbackService.send(eventTrigger.getCallBackURLSubmittedEvent(),
-            eventTrigger.getRetriesTimeoutURLSubmittedEvent(),
-            eventTrigger,
-            caseDetailsBefore,
-            caseDetails,
-            AfterSubmitCallbackResponse.class);
+                                    eventTrigger.getRetriesTimeoutURLSubmittedEvent(),
+                                    eventTrigger,
+                                    caseDetailsBefore,
+                                    caseDetails,
+                                    AfterSubmitCallbackResponse.class);
     }
 
     private void validateAndSetFromAboutToStartCallback(CaseType caseType, CaseDetails caseDetails, Boolean ignoreWarning, CallbackResponse callbackResponse) {
@@ -125,11 +122,11 @@ public class CallbackInvoker {
             }
             final Optional<String> newCaseState = filterCaseState(callbackResponse.getData());
             newCaseState.ifPresent(caseDetails::setState);
-            aboutToSubmitCallbackResponse.setCallBackResponse(newCaseState);
+            aboutToSubmitCallbackResponse.setState(newCaseState);
             return aboutToSubmitCallbackResponse;
         }
 
-        aboutToSubmitCallbackResponse.setCallBackResponse(Optional.empty());
+        aboutToSubmitCallbackResponse.setState(Optional.empty());
         return aboutToSubmitCallbackResponse;
     }
 
@@ -168,16 +165,15 @@ public class CallbackInvoker {
     }
 
     private void validateSignificantItem(AboutToSubmitCallbackResponse response, CallbackResponse callbackResponse) {
-        SignificantItem significantItem = callbackResponse.getSignificantItem();
-        List<String> errors = new ArrayList<>();
+        final SignificantItem significantItem = callbackResponse.getSignificantItem();
+        final List<String> errors = new ArrayList<>();
 
         if (significantItem != null) {
             if (significantItem.getType() != SignificantItemType.DOCUMENT) {
 
                 errors.add("Significant Item type incorrect");
             }
-            UrlValidator urlValidator = new UrlValidator();
-            if (!urlValidator.isValid(significantItem.getUrl())) {
+            if (!URL_VALIDATOR.isValid(significantItem.getUrl())) {
                 errors.add("Url Invalid");
             }
             if (isDescriptionEmptyOrNotWithInSpecifiedRange(significantItem)) {

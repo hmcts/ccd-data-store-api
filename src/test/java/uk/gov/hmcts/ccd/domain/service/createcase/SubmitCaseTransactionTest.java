@@ -88,12 +88,12 @@ class SubmitCaseTransactionTest {
         MockitoAnnotations.initMocks(this);
 
         submitCaseTransaction = new SubmitCaseTransaction(caseDetailsRepository,
-            caseAuditEventRepository,
-            caseTypeService,
-            callbackInvoker,
-            uidService,
-            securityClassificationService,
-            caseUserRepository);
+                                                            caseAuditEventRepository,
+                                                            caseTypeService,
+                                                            callbackInvoker,
+                                                            uidService,
+                                                            securityClassificationService,
+                                                            caseUserRepository);
 
         event = buildEvent();
         caseType = buildCaseType();
@@ -120,7 +120,7 @@ class SubmitCaseTransactionTest {
 
     private AboutToSubmitCallbackResponse buildResponse() {
         final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = new AboutToSubmitCallbackResponse();
-        aboutToSubmitCallbackResponse.setCallBackResponse(Optional.of("somestring"));
+        aboutToSubmitCallbackResponse.setState(Optional.of("somestring"));
         final SignificantItem significantItem = new SignificantItem();
         significantItem.setType(SignificantItemType.DOCUMENT);
         significantItem.setDescription(DESCRIPTION);
@@ -139,11 +139,11 @@ class SubmitCaseTransactionTest {
     @DisplayName("should persist case")
     void shouldPersistCase() {
         final CaseDetails actualCaseDetails = submitCaseTransaction.submitCase(event,
-            caseType,
-            idamUser,
-            eventTrigger,
-            this.caseDetails,
-            IGNORE_WARNING);
+                                                                                caseType,
+                                                                                idamUser,
+                                                                                eventTrigger,
+                                                                                this.caseDetails,
+                                                                                IGNORE_WARNING);
 
         final InOrder order = inOrder(caseDetails, caseDetails, caseDetailsRepository);
 
@@ -161,11 +161,11 @@ class SubmitCaseTransactionTest {
         final ArgumentCaptor<AuditEvent> auditEventCaptor = ArgumentCaptor.forClass(AuditEvent.class);
 
         submitCaseTransaction.submitCase(event,
-            caseType,
-            idamUser,
-            eventTrigger,
-            this.caseDetails,
-            IGNORE_WARNING);
+                                        caseType,
+                                        idamUser,
+                                        eventTrigger,
+                                        this.caseDetails,
+                                        IGNORE_WARNING);
 
         assertAll(
             () -> verify(caseAuditEventRepository).set(auditEventCaptor.capture()),
@@ -179,11 +179,11 @@ class SubmitCaseTransactionTest {
         final ArgumentCaptor<AuditEvent> auditEventCaptor = ArgumentCaptor.forClass(AuditEvent.class);
 
         submitCaseTransaction.submitCase(event,
-            caseType,
-            idamUser,
-            eventTrigger,
-            this.caseDetails,
-            IGNORE_WARNING);
+                                        caseType,
+                                        idamUser,
+                                        eventTrigger,
+                                        this.caseDetails,
+                                        IGNORE_WARNING);
 
         assertAll(
             () -> verify(caseAuditEventRepository).set(auditEventCaptor.capture()),
@@ -196,11 +196,11 @@ class SubmitCaseTransactionTest {
     void shouldGrantAccessToCreator() {
 
         submitCaseTransaction.submitCase(event,
-            caseType,
-            idamUser,
-            eventTrigger,
-            this.caseDetails,
-            IGNORE_WARNING);
+                                        caseType,
+                                        idamUser,
+                                        eventTrigger,
+                                        this.caseDetails,
+                                        IGNORE_WARNING);
 
         verify(caseUserRepository).grantAccess(Long.valueOf(CASE_ID), IDAM_ID);
     }
@@ -209,11 +209,11 @@ class SubmitCaseTransactionTest {
     @DisplayName("should invoke callback")
     void shouldInvokeCallback() {
         submitCaseTransaction.submitCase(event,
-            caseType,
-            idamUser,
-            eventTrigger,
-            this.caseDetails,
-            IGNORE_WARNING);
+                                        caseType,
+                                        idamUser,
+                                        eventTrigger,
+                                        this.caseDetails,
+                                        IGNORE_WARNING);
 
         verify(callbackInvoker).invokeAboutToSubmitCallback(eventTrigger, null, caseDetails, caseType, IGNORE_WARNING);
     }

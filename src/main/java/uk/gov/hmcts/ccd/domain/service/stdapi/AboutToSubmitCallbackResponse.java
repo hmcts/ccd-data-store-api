@@ -6,15 +6,15 @@ import java.util.Optional;
 
 public class AboutToSubmitCallbackResponse {
 
-    private Optional<String> callBackResponse = Optional.empty();
+    private Optional<String> state = Optional.empty();
     private SignificantItem significantItem;
 
-    public Optional<String> getCallBackResponse() {
-        return callBackResponse;
+    public Optional<String> getState() {
+        return state;
     }
 
-    public void setCallBackResponse(Optional<String> callBackResponse) {
-        this.callBackResponse = callBackResponse;
+    public void setState(Optional<String> state) {
+        this.state = state;
     }
 
     public SignificantItem getSignificantItem() {
@@ -28,7 +28,7 @@ public class AboutToSubmitCallbackResponse {
     @Override
     public String toString() {
         return "AboutToSubmitCallbackResponse{"
-            + "callBackResponse=" + callBackResponse
+            + "state=" + state
             + ", significantItem=" + significantItem
             + '}';
     }

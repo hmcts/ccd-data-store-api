@@ -112,12 +112,10 @@ class SubmitCaseTransaction {
         auditEvent.setUserLastName(idamUser.getSurname());
         auditEvent.setUserFirstName(idamUser.getForename());
         auditEvent.setCreatedDate(newCaseDetails.getCreatedDate());
-        auditEvent.setSecurityClassification(securityClassificationService.getClassificationForEvent(caseType,
-            eventTrigger));
+        auditEvent.setSecurityClassification(securityClassificationService.getClassificationForEvent(caseType, eventTrigger));
         auditEvent.setDataClassification(savedCaseDetails.getDataClassification());
-        if (response.getSignificantItem() != null) {
-            auditEvent.setSignificantItem(response.getSignificantItem());
-        }
+        auditEvent.setSignificantItem(response.getSignificantItem());
+
         caseAuditEventRepository.set(auditEvent);
         return savedCaseDetails;
     }
