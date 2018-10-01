@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 import java.io.IOException;
 import java.util.List;
 
+import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,6 +14,7 @@ import org.jooq.lambda.Unchecked;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.search.CaseDetailsSearchResult;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.dto.ElasticSearchCaseDetailsDTO;
@@ -29,22 +31,25 @@ public class ElasticsearchCaseDetailsSearchOperation implements CaseDetailsSearc
     private final JestClient jestClient;
     private final ObjectMapper objectMapper;
     private final CaseDetailsMapper caseDetailsMapper;
-    private final CaseSearchRequestFactory<Search> caseSearchRequestFactory;
+    private final ApplicationParams applicationParams;
+    private final CaseSearchRequestSecurity caseSearchRequestSecurity;
 
     @Autowired
     public ElasticsearchCaseDetailsSearchOperation(JestClient jestClient,
                                                    @Qualifier("caseDetailsObjectMapper") ObjectMapper objectMapper,
                                                    CaseDetailsMapper caseDetailsMapper,
-                                                   CaseSearchRequestFactory<Search> caseSearchRequestFactory) {
+                                                   ApplicationParams applicationParams,
+                                                   CaseSearchRequestSecurity caseSearchRequestSecurity) {
         this.jestClient = jestClient;
         this.objectMapper = objectMapper;
         this.caseDetailsMapper = caseDetailsMapper;
-        this.caseSearchRequestFactory = caseSearchRequestFactory;
+        this.applicationParams = applicationParams;
+        this.caseSearchRequestSecurity = caseSearchRequestSecurity;
     }
 
     @Override
-    public CaseDetailsSearchResult execute(String caseTypeId, String jsonQuery) {
-        SearchResult result = search(caseTypeId, jsonQuery);
+    public CaseDetailsSearchResult execute(CaseSearchRequest caseSearchRequest) {
+        SearchResult result = search(caseSearchRequest);
         if (result.isSucceeded()) {
             return toCaseDetailsSearchResult(result);
         } else {
@@ -52,13 +57,21 @@ public class ElasticsearchCaseDetailsSearchOperation implements CaseDetailsSearc
         }
     }
 
-    private SearchResult search(String caseTypeId, String jsonQuery) {
-        Search searchRequest = caseSearchRequestFactory.create(caseTypeId, jsonQuery);
+    private SearchResult search(CaseSearchRequest caseSearchRequest) {
+        Search searchRequest = secureAndTransformSearchRequest(caseSearchRequest);
         try {
             return jestClient.execute(searchRequest);
         } catch (IOException e) {
             throw new ServiceException("Exception executing Elasticsearch : " + e.getMessage(), e);
         }
+    }
+
+    private Search secureAndTransformSearchRequest(CaseSearchRequest caseSearchRequest) {
+        caseSearchRequestSecurity.secureRequest(caseSearchRequest);
+        return new Search.Builder(caseSearchRequest.toJsonString())
+            .addIndex(getCaseIndexName(caseSearchRequest.getCaseTypeId()))
+            .addType(getCaseIndexType())
+            .build();
     }
 
     private CaseDetailsSearchResult toCaseDetailsSearchResult(SearchResult result) {
@@ -74,4 +87,13 @@ public class ElasticsearchCaseDetailsSearchOperation implements CaseDetailsSearc
             .map(Unchecked.function(caseDetail -> objectMapper.readValue(caseDetail, ElasticSearchCaseDetailsDTO.class)))
             .collect(toList());
     }
+
+    private String getCaseIndexName(String caseTypeId) {
+        return format(applicationParams.getCasesIndexNameFormat(), caseTypeId.toLowerCase());
+    }
+
+    private String getCaseIndexType() {
+        return applicationParams.getCasesIndexType();
+    }
+
 }

@@ -13,18 +13,18 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 
 @Component
-public class ElasticsearchCaseStateFilterFactory implements CaseSearchFilterFactory {
+public class ElasticsearchCaseStateFilter implements CaseSearchFilter {
 
     private final AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService;
 
     @Autowired
-    public ElasticsearchCaseStateFilterFactory(
+    public ElasticsearchCaseStateFilter(
         AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService) {
         this.authorisedCaseDefinitionDataService = authorisedCaseDefinitionDataService;
     }
 
     @Override
-    public Optional<QueryBuilder> create(String caseTypeId) {
+    public Optional<QueryBuilder> getFilter(String caseTypeId) {
         return Optional.of(QueryBuilders.termsQuery(STATE_FIELD_COL, getCaseStateIdsForUserReadAccess(caseTypeId)));
     }
 

@@ -36,7 +36,7 @@ import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataServ
 
 class AuthorisedCaseDetailsSearchOperationTest {
 
-    private static final String CASE_TYPE = "caseType";
+    private static final String CASE_TYPE_ID = "caseType";
     private static final String QUERY = "{}";
 
     @Mock
@@ -60,16 +60,17 @@ class AuthorisedCaseDetailsSearchOperationTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-        caseType.setId(CASE_TYPE);
+        caseType.setId(CASE_TYPE_ID);
     }
 
     @Test
     @DisplayName("should filter fields and return search results for valid query")
     void shouldFilterFieldsReturnSearchResults() {
+        CaseSearchRequest request = new CaseSearchRequest(objectMapperService, CASE_TYPE_ID, QUERY);
         CaseDetails caseDetails = new CaseDetails();
         CaseDetailsSearchResult searchResult = new CaseDetailsSearchResult(singletonList(caseDetails), 1L);
-        when(authorisedCaseDefinitionDataService.getAuthorisedCaseType(CASE_TYPE, CAN_READ)).thenReturn(Optional.of(caseType));
-        when(caseDetailsSearchOperation.execute(CASE_TYPE, QUERY)).thenReturn(searchResult);
+        when(authorisedCaseDefinitionDataService.getAuthorisedCaseType(CASE_TYPE_ID, CAN_READ)).thenReturn(Optional.of(caseType));
+        when(caseDetailsSearchOperation.execute(request)).thenReturn(searchResult);
 
         Map<String, JsonNode> unFilteredData = new HashMap<>();
         caseDetails.setData(unFilteredData);
@@ -82,14 +83,14 @@ class AuthorisedCaseDetailsSearchOperationTest {
         Map<String, JsonNode> filteredData = new HashMap<>();
         when(objectMapperService.convertJsonNodeToMap(jsonNode)).thenReturn(filteredData);
 
-        CaseDetailsSearchResult result = authorisedCaseDetailsSearchOperation.execute(CASE_TYPE, QUERY);
+        CaseDetailsSearchResult result = authorisedCaseDetailsSearchOperation.execute(request);
 
         assertAll(
             () -> assertThat(result, is(searchResult)),
             () -> assertThat(caseDetails.getData(), Matchers.is(filteredData)),
             () -> assertThat(result.getTotal(), is(1L)),
-            () -> verify(authorisedCaseDefinitionDataService).getAuthorisedCaseType(CASE_TYPE, CAN_READ),
-            () -> verify(caseDetailsSearchOperation).execute(CASE_TYPE, QUERY),
+            () -> verify(authorisedCaseDefinitionDataService).getAuthorisedCaseType(CASE_TYPE_ID, CAN_READ),
+            () -> verify(caseDetailsSearchOperation).execute(request),
             () -> verify(userRepository).getUserRoles(),
             () -> verify(objectMapperService).convertObjectToJsonNode(unFilteredData),
             () -> verify(accessControlService).filterCaseFieldsByAccess(jsonNode, caseType.getCaseFields(), userRoles, CAN_READ),
@@ -101,14 +102,15 @@ class AuthorisedCaseDetailsSearchOperationTest {
     @Test
     @DisplayName("should return empty list of cases when user is not authorised to access case type")
     void shouldReturnEmptyCaseList() {
-        when(authorisedCaseDefinitionDataService.getAuthorisedCaseType(CASE_TYPE, CAN_READ)).thenReturn(Optional.empty());
+        CaseSearchRequest request = new CaseSearchRequest(objectMapperService, CASE_TYPE_ID, QUERY);
+        when(authorisedCaseDefinitionDataService.getAuthorisedCaseType(CASE_TYPE_ID, CAN_READ)).thenReturn(Optional.empty());
 
-        CaseDetailsSearchResult result = authorisedCaseDetailsSearchOperation.execute(CASE_TYPE, QUERY);
+        CaseDetailsSearchResult result = authorisedCaseDetailsSearchOperation.execute(request);
 
         assertAll(
             () -> assertThat(result.getCases(), hasSize(0)),
             () -> assertThat(result.getTotal(), is(0L)),
-            () -> verify(authorisedCaseDefinitionDataService).getAuthorisedCaseType(CASE_TYPE, CAN_READ),
+            () -> verify(authorisedCaseDefinitionDataService).getAuthorisedCaseType(CASE_TYPE_ID, CAN_READ),
             () -> verifyZeroInteractions(caseDetailsSearchOperation),
             () -> verifyZeroInteractions(objectMapperService),
             () -> verifyZeroInteractions(accessControlService),

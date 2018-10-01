@@ -1,14 +1,10 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -24,8 +20,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.search.CaseDetailsSearchResult;
+import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.AuthorisedCaseDetailsSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseDetailsSearchOperation;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
 @RestController
@@ -37,12 +35,14 @@ public class CaseDetailsSearchEndpoint {
 
     private final CaseDetailsSearchOperation caseDetailsSearchOperation;
     private final ApplicationParams applicationParams;
+    private final ObjectMapperService objectMapperService;
 
     @Autowired
     public CaseDetailsSearchEndpoint(@Qualifier(AuthorisedCaseDetailsSearchOperation.QUALIFIER) CaseDetailsSearchOperation caseDetailsSearchOperation,
-                                     ApplicationParams applicationParams) {
+                                     ApplicationParams applicationParams, ObjectMapperService objectMapperService) {
         this.caseDetailsSearchOperation = caseDetailsSearchOperation;
         this.applicationParams = applicationParams;
+        this.objectMapperService = objectMapperService;
     }
 
     @RequestMapping(value = "/searchCases", method = RequestMethod.POST)
@@ -52,37 +52,20 @@ public class CaseDetailsSearchEndpoint {
     })
     public CaseDetailsSearchResult searchCases(
         @ApiParam(value = "Case type ID", required = true)
-            @RequestParam("ctid") String caseTypeId,
+        @RequestParam("ctid") String caseTypeId,
         @ApiParam(name = "native ElasticSearch Search API request. Please refer to the ElasticSearch official documentation", required = true)
-            @RequestBody String jsonSearchRequest) throws IOException {
+        @RequestBody String jsonSearchRequest) {
 
-        validateSearchRequest(jsonSearchRequest);
-        return caseDetailsSearchOperation.execute(caseTypeId, jsonSearchRequest);
+        rejectBlackListedQuery(jsonSearchRequest);
+        CaseSearchRequest caseSearchRequest = new CaseSearchRequest(objectMapperService, caseTypeId, jsonSearchRequest);
+        return caseDetailsSearchOperation.execute(caseSearchRequest);
     }
 
-    private void validateSearchRequest(String searchRequest) throws IOException {
-        Optional<Map> query = getQuery(searchRequest);
-        validateSearchRequestContainsQuery(query);
-        rejectBlackListedQuery(searchRequest);
-    }
-
-    private Optional<Map> getQuery(String searchRequest) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        final Map<String, Object> map = mapper.readValue(searchRequest, new TypeReference<Map<String, Object>>(){});
-        return Optional.ofNullable((Map) map.get("query"));
-    }
-
-    private void validateSearchRequestContainsQuery(Optional<Map> queryOpt) {
-        if (!queryOpt.isPresent()) {
-            throw new BadSearchRequest("missing required field 'query'");
-        }
-    }
-
-    private void rejectBlackListedQuery(String query) {
+    private void rejectBlackListedQuery(String jsonSearchRequest) {
         List<String> blackListedQueries = applicationParams.getSearchBlackList();
         Optional<String> blackListedQueryOpt = blackListedQueries.stream().filter(blacklisted -> {
                 Pattern p = Pattern.compile("\\b" + blacklisted + "\\b");
-                Matcher m = p.matcher(query);
+                Matcher m = p.matcher(jsonSearchRequest);
                 return m.find();
             }
         ).findFirst();

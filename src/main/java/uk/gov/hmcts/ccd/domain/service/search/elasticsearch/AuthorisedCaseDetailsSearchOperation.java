@@ -50,19 +50,17 @@ public class AuthorisedCaseDetailsSearchOperation implements CaseDetailsSearchOp
     }
 
     @Override
-    public CaseDetailsSearchResult execute(String caseTypeId, String jsonQuery) {
+    public CaseDetailsSearchResult execute(CaseSearchRequest caseSearchRequest) {
         return authorisedCaseDefinitionDataService
-            .getAuthorisedCaseType(caseTypeId, CAN_READ)
-            .map(caseType -> {
-                CaseDetailsSearchResult result = search(caseType, jsonQuery);
-                filterFieldsByAccess(caseType, result.getCases());
-                return result;
-            })
+            .getAuthorisedCaseType(caseSearchRequest.getCaseTypeId(), CAN_READ)
+            .map(caseType -> searchCasesAndFilterFieldsByAccess(caseType, caseSearchRequest))
             .orElse(CaseDetailsSearchResult.EMPTY);
     }
 
-    private CaseDetailsSearchResult search(CaseType caseType, String jsonQuery) {
-        return caseDetailsSearchOperation.execute(caseType.getId(), jsonQuery);
+    private CaseDetailsSearchResult searchCasesAndFilterFieldsByAccess(CaseType caseType, CaseSearchRequest caseSearchRequest) {
+        CaseDetailsSearchResult result = caseDetailsSearchOperation.execute(caseSearchRequest);
+        filterFieldsByAccess(caseType, result.getCases());
+        return result;
     }
 
     private void filterFieldsByAccess(CaseType caseType, List<CaseDetails> cases) {

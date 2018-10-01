@@ -21,10 +21,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.internal.util.reflection.Whitebox;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.search.CaseDetailsSearchResult;
+import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.dto.ElasticSearchCaseDetailsDTO;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.mapper.CaseDetailsMapper;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
@@ -35,6 +35,7 @@ class ElasticsearchCaseDetailsSearchOperationTest {
     private static final String CASE_TYPE_ID = "casetypeid";
     private static final String INDEX_TYPE = "case";
     private final String caseDetailsElastic = "{some case details}";
+    private static final String QUERY = "{}";
 
     @InjectMocks
     private ElasticsearchCaseDetailsSearchOperation searchOperation;
@@ -55,14 +56,18 @@ class ElasticsearchCaseDetailsSearchOperationTest {
     private ElasticSearchCaseDetailsDTO caseDetailsDTO;
 
     @Mock
+    private CaseSearchRequestSecurity caseSearchRequestSecurity;
+
+    @Mock
+    private ObjectMapperService objectMapperService;
+
+
+    @Mock
     private CaseDetails caseDetails;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-        CaseSearchRequestFactory<Search> caseSearchRequestFactory = new ElasticsearchCaseSearchRequestFactory(applicationParams,
-                                                                                                              mock(CaseSearchQuerySecurity.class));
-        Whitebox.setInternalState(searchOperation, "caseSearchRequestFactory", caseSearchRequestFactory);
         when(applicationParams.getCasesIndexNameFormat()).thenReturn(INDEX_NAME_FORMAT);
         when(applicationParams.getCasesIndexType()).thenReturn(INDEX_TYPE);
     }
@@ -77,8 +82,9 @@ class ElasticsearchCaseDetailsSearchOperationTest {
             .thenReturn(caseDetailsDTO);
         when(mapper.dtosToCaseDetailsList(newArrayList(caseDetailsDTO))).thenReturn(newArrayList(caseDetails));
         when(jestClient.execute(any(Search.class))).thenReturn(searchResult);
+        CaseSearchRequest request = new CaseSearchRequest(objectMapperService, CASE_TYPE_ID, QUERY);
 
-        CaseDetailsSearchResult caseDetailsSearchResult = searchOperation.execute(CASE_TYPE_ID, "{query}");
+        CaseDetailsSearchResult caseDetailsSearchResult = searchOperation.execute(request);
 
         assertThat(caseDetailsSearchResult.getCases(), equalTo(newArrayList(caseDetails)));
         assertThat(caseDetailsSearchResult.getTotal(), equalTo(1L));
@@ -87,6 +93,7 @@ class ElasticsearchCaseDetailsSearchOperationTest {
         Search searchRequest = arg.getValue();
         assertThat(searchRequest.getIndex(), equalTo(toIndex(CASE_TYPE_ID)));
         assertThat(searchRequest.getType(), equalTo(INDEX_TYPE));
+        verify(caseSearchRequestSecurity).secureRequest(request);
     }
 
     @Test
@@ -94,8 +101,9 @@ class ElasticsearchCaseDetailsSearchOperationTest {
         SearchResult searchResult = mock(SearchResult.class);
         when(searchResult.isSucceeded()).thenReturn(false);
         when(jestClient.execute(any(Search.class))).thenReturn(searchResult);
+        CaseSearchRequest request = new CaseSearchRequest(objectMapperService, CASE_TYPE_ID, QUERY);
 
-        assertThrows(BadSearchRequest.class, () -> searchOperation.execute(CASE_TYPE_ID, "{query}"));
+        assertThrows(BadSearchRequest.class, () -> searchOperation.execute(request));
     }
 
     private String toIndex(String caseTypeId) {

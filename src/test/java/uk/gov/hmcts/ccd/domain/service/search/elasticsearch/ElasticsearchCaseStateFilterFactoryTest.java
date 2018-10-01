@@ -26,7 +26,7 @@ class ElasticsearchCaseStateFilterFactoryTest {
     private AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService;
 
     @InjectMocks
-    private ElasticsearchCaseStateFilterFactory factory;
+    private ElasticsearchCaseStateFilter factory;
 
     @BeforeEach
     void setUp() {
@@ -39,7 +39,7 @@ class ElasticsearchCaseStateFilterFactoryTest {
         String state = "state";
         when(authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds(caseTypeId, CAN_READ)).thenReturn(Collections.singletonList(state));
 
-        Optional<QueryBuilder> optQueryBuilder = factory.create(caseTypeId);
+        Optional<QueryBuilder> optQueryBuilder = factory.getFilter(caseTypeId);
 
         assertThat(optQueryBuilder.isPresent(), is(true));
         assertThat(optQueryBuilder.get(), instanceOf(TermsQueryBuilder.class));

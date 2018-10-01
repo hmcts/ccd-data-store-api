@@ -12,17 +12,17 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 
 @Component
-public class ElasticsearchUserCaseAccessFilterFactory implements CaseSearchFilterFactory {
+public class ElasticsearchUserCaseAccessFilter implements CaseSearchFilter {
 
     private final CaseAccessService caseAccessService;
 
     @Autowired
-    public ElasticsearchUserCaseAccessFilterFactory(CaseAccessService caseAccessService) {
+    public ElasticsearchUserCaseAccessFilter(CaseAccessService caseAccessService) {
         this.caseAccessService = caseAccessService;
     }
 
     @Override
-    public Optional<QueryBuilder> create(String caseTypeId) {
+    public Optional<QueryBuilder> getFilter(String caseTypeId) {
         return getGrantedCaseIdsForRestrictedRoles().map(caseIds -> QueryBuilders.termsQuery(STATE_FIELD_COL, caseIds));
     }
 

@@ -4,8 +4,8 @@ import java.util.Optional;
 
 import org.elasticsearch.index.query.QueryBuilder;
 
-public interface CaseSearchFilterFactory {
+public interface CaseSearchFilter {
 
-    Optional<QueryBuilder> create(String caseTypeId);
+    Optional<QueryBuilder> getFilter(String caseTypeId);
 
 }
