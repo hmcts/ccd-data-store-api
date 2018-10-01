@@ -6,18 +6,17 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
 /**
  * Sample ES json search request.
- * <p>
  * {
- * 	"query": {
- * 		"bool": {
- * 			"filter": {
- * 				"match": { "state": "AwaitingPayment"}
- *                }
- *            }
- *       },
- * 	"sort": {
- * 		"id": { "order":"asc" }
+ *   "query": {
+ *     "bool": {
+ *       "filter": {
+ *         "match": { "state": "AwaitingPayment"}
  *       }
+ *     }
+ *   },
+ *  "sort": {
+ *   "id": { "order":"asc" }
+ *   }
  * }
  */
 @Slf4j

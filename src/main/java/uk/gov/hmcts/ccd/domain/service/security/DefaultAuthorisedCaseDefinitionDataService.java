@@ -45,14 +45,6 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
         return Optional.empty();
     }
 
-    private boolean verifyAclOnCaseType(CaseType caseType, Predicate<AccessControlList> access) {
-        return accessControlService.canAccessCaseTypeWithCriteria(caseType, getUserRoles(), access);
-    }
-
-    private boolean verifySecurityClassificationOnCaseType(CaseType caseType) {
-        return userRepository.getHighestUserClassification().higherOrEqualTo(caseType.getSecurityClassification());
-    }
-
     @Override
     public List<String> getUserAuthorisedCaseStateIds(String jurisdiction, String caseTypeId, Predicate<AccessControlList> access) {
         List<CaseState> caseStates = getUserAuthorisedCaseStates(jurisdiction, caseTypeId, access);
@@ -70,6 +62,14 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
         CaseType caseType = caseTypeService.getCaseType(caseTypeId);
         List<CaseState> caseStates = filterCaseStatesForUser(caseType.getStates(), access);
         return collectCaseStateIds(caseStates);
+    }
+
+    private boolean verifyAclOnCaseType(CaseType caseType, Predicate<AccessControlList> access) {
+        return accessControlService.canAccessCaseTypeWithCriteria(caseType, getUserRoles(), access);
+    }
+
+    private boolean verifySecurityClassificationOnCaseType(CaseType caseType) {
+        return userRepository.getHighestUserClassification().higherOrEqualTo(caseType.getSecurityClassification());
     }
 
     private List<CaseState> filterCaseStatesForUser(List<CaseState> caseStates, Predicate<AccessControlList> access) {

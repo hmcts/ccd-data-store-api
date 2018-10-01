@@ -75,7 +75,7 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
 
     private void filterCaseFieldsByAclAccess(CaseType caseType, CaseDetails caseDetails) {
         JsonNode data = objectMapperService.convertObjectToJsonNode(caseDetails.getData());
-        JsonNode filteredData = accessControlService.filterCaseFieldsByAccess(data, caseType.getCaseFields(), getUserRoles(), AccessControlService.CAN_READ);
+        JsonNode filteredData = accessControlService.filterCaseFieldsByAccess(data, caseType.getCaseFields(), getUserRoles(), CAN_READ);
         caseDetails.setData(objectMapperService.convertJsonNodeToMap(filteredData));
     }
 
