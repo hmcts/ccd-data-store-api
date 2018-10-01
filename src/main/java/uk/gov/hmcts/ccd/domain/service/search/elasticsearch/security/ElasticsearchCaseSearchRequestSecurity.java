@@ -30,7 +30,7 @@ public class ElasticsearchCaseSearchRequestSecurity implements CaseSearchRequest
     }
 
     @Override
-    public CaseSearchRequest createSecureSearchRequest(CaseSearchRequest caseSearchRequest) {
+    public CaseSearchRequest createSecuredSearchRequest(CaseSearchRequest caseSearchRequest) {
         String queryClauseWithSecurityFilters = addFiltersToQuery(caseSearchRequest);
         return createNewCaseSearchRequest(caseSearchRequest, queryClauseWithSecurityFilters);
     }

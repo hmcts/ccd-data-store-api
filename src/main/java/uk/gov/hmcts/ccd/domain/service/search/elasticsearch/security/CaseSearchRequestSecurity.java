@@ -4,6 +4,6 @@ import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest;
 
 public interface CaseSearchRequestSecurity {
 
-    CaseSearchRequest createSecureSearchRequest(CaseSearchRequest caseSearchRequest);
+    CaseSearchRequest createSecuredSearchRequest(CaseSearchRequest caseSearchRequest);
 
 }
