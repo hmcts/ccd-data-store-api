@@ -99,6 +99,22 @@ public interface AATCaseType {
         }
     }
 
+    enum Tab {
+        FIRST("FirstTab", "First tab", 1),
+        SECOND("SecondTab", "Second tab", 2),
+        THIRD("ThirdTab", "Third tab", 3);
+
+        public final String id;
+        public final String name;
+        public final Integer order;
+
+        Tab(String id, String name, Integer order) {
+            this.id = id;
+            this.name = name;
+            this.order = order;
+        }
+    }
+
     @Data
     @AllArgsConstructor
     class CollectionItem {

@@ -5,12 +5,14 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
+import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
-import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
@@ -18,11 +20,7 @@ import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
@@ -61,7 +59,10 @@ class DefaultGetCaseViewOperationTest {
     @Mock
     private UIDService uidService;
 
+    @Spy
+    @InjectMocks
     private DefaultGetCaseViewOperation defaultGetCaseViewOperation;
+
     private CaseDetails caseDetails;
     private List<AuditEvent> auditEvents;
     private AuditEvent event1;
@@ -75,12 +76,13 @@ class DefaultGetCaseViewOperationTest {
         MockitoAnnotations.initMocks(this);
 
         caseDetails = new CaseDetails();
+        caseDetails.setJurisdiction(JURISDICTION_ID);
         caseDetails.setCaseTypeId(CASE_TYPE_ID);
         caseDetails.setReference(new Long(CASE_REFERENCE));
         caseDetails.setState(STATE);
-        doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(JURISDICTION_ID,
-                                                                          CASE_TYPE_ID,
-                                                                          CASE_REFERENCE);
+        Map<String, JsonNode> dataMap = buildData("dataTestField1", "dataTestField2");
+        caseDetails.setData(dataMap);
+        doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
 
         event1 = new AuditEvent();
         event1.setSummary(EVENT_SUMMARY_1);
@@ -110,21 +112,28 @@ class DefaultGetCaseViewOperationTest {
         caseState.setId(STATE);
         caseState.setTitleDisplay(TITLE_DISPLAY);
         doReturn(caseState).when(caseTypeService).findState(caseType, STATE);
+    }
 
-        defaultGetCaseViewOperation = new DefaultGetCaseViewOperation(getCaseOperation, getEventsOperation,
-                                                                      uiDefinitionRepository,
-                                                                      caseTypeService,
-                                                                      eventTriggerService,
-                                                                      uidService);
+    @Test
+    @DisplayName("should call not-deprecated #execute(caseReference)")
+    void shouldCallNotDeprecatedExecute() {
+        final CaseView expectedCaseView = new CaseView();
+        doReturn(expectedCaseView).when(defaultGetCaseViewOperation).execute(CASE_REFERENCE);
+
+        final CaseView actualCaseView = defaultGetCaseViewOperation.execute(JURISDICTION_ID,
+                                                                            CASE_TYPE_ID,
+                                                                            CASE_REFERENCE);
+
+        assertAll(
+            () -> verify(defaultGetCaseViewOperation).execute(CASE_REFERENCE),
+            () -> assertThat(actualCaseView, sameInstance(expectedCaseView))
+        );
     }
 
     @Test
     @DisplayName("should retrieve all authorised audit events and tabs")
     void shouldRetrieveAllAuthorisedAuditEventsAndTabs() {
-        Map<String, JsonNode> dataMap = buildData("dataTestField1", "dataTestField2");
-        caseDetails.setData(dataMap);
-
-        final CaseView caseView = defaultGetCaseViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+        final CaseView caseView = defaultGetCaseViewOperation.execute(CASE_REFERENCE);
 
         assertAll(() -> verify(getEventsOperation).getEvents(caseDetails),
                   () -> assertThat(caseView.getTabs(), arrayWithSize(1)),
@@ -154,7 +163,7 @@ class DefaultGetCaseViewOperationTest {
         Map<String, JsonNode> dataMap = buildData("dataTestField2");
         caseDetails.setData(dataMap);
 
-        final CaseView caseView = defaultGetCaseViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+        final CaseView caseView = defaultGetCaseViewOperation.execute(CASE_REFERENCE);
 
         assertAll(() -> verify(getEventsOperation).getEvents(caseDetails),
                   () -> assertThat(caseView.getTabs()[0].getFields(), arrayWithSize(1)),

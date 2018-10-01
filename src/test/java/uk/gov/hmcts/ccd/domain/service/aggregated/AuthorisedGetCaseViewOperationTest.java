@@ -3,12 +3,15 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
 import uk.gov.hmcts.ccd.domain.model.aggregated.ProfileCaseState;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
@@ -20,10 +23,11 @@ import java.util.Set;
 import static com.google.common.collect.Sets.newHashSet;
 import static java.lang.String.valueOf;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.arrayContaining;
-import static org.hamcrest.Matchers.arrayWithSize;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.anCaseEvent;
@@ -61,6 +65,8 @@ class AuthorisedGetCaseViewOperationTest {
     @Mock
     private UserRepository userRepository;
 
+    @Spy
+    @InjectMocks
     private AuthorisedGetCaseViewOperation authorisedGetCaseViewOperation;
 
     @BeforeEach
@@ -69,14 +75,28 @@ class AuthorisedGetCaseViewOperationTest {
 
         doReturn(TEST_CASE_TYPE).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         doReturn(USER_ROLES).when(userRepository).getUserRoles();
-        doReturn(TEST_CASE_VIEW).when(getCaseViewOperation).execute(JURISDICTION_ID,
-                                                                    CASE_TYPE_ID,
-                                                                    CASE_REFERENCE);
 
-        authorisedGetCaseViewOperation = new AuthorisedGetCaseViewOperation(getCaseViewOperation,
-                                                                            caseDefinitionRepository,
-                                                                            accessControlService,
-                                                                            userRepository);
+        final CaseViewType caseViewType = new CaseViewType();
+        caseViewType.setId(CASE_TYPE_ID);
+        TEST_CASE_VIEW.setCaseType(caseViewType);
+
+        doReturn(TEST_CASE_VIEW).when(getCaseViewOperation).execute(CASE_REFERENCE);
+    }
+
+    @Test
+    @DisplayName("should call not-deprecated #execute(caseReference)")
+    void shouldCallNotDeprecatedExecute() {
+        final CaseView expectedCaseView = new CaseView();
+        doReturn(expectedCaseView).when(authorisedGetCaseViewOperation).execute(CASE_REFERENCE);
+
+        final CaseView actualCaseView = authorisedGetCaseViewOperation.execute(JURISDICTION_ID,
+                                                                               CASE_TYPE_ID,
+                                                                               CASE_REFERENCE);
+
+        assertAll(
+            () -> verify(authorisedGetCaseViewOperation).execute(CASE_REFERENCE),
+            () -> assertThat(actualCaseView, sameInstance(expectedCaseView))
+        );
     }
 
     @Test
@@ -84,7 +104,7 @@ class AuthorisedGetCaseViewOperationTest {
     void shouldFailWhenWhenNoReadAccess() {
         doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES, CAN_READ);
 
-        assertThrows(ResourceNotFoundException.class, () -> authorisedGetCaseViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE));
+        assertThrows(ResourceNotFoundException.class, () -> authorisedGetCaseViewOperation.execute(CASE_REFERENCE));
     }
 
     @Test
@@ -93,7 +113,7 @@ class AuthorisedGetCaseViewOperationTest {
         doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES, CAN_READ);
         doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES, CAN_UPDATE);
 
-        CaseView caseView = authorisedGetCaseViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+        CaseView caseView = authorisedGetCaseViewOperation.execute(CASE_REFERENCE);
 
         assertThat(caseView.getTriggers(), arrayWithSize(0));
     }
@@ -105,7 +125,7 @@ class AuthorisedGetCaseViewOperationTest {
         doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES, CAN_UPDATE);
         doReturn(false).when(accessControlService).canAccessCaseStateWithCriteria(STATE, TEST_CASE_TYPE, USER_ROLES, CAN_UPDATE);
 
-        CaseView caseView = authorisedGetCaseViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+        CaseView caseView = authorisedGetCaseViewOperation.execute(CASE_REFERENCE);
 
         assertThat(caseView.getTriggers(), arrayWithSize(0));
     }
@@ -118,7 +138,7 @@ class AuthorisedGetCaseViewOperationTest {
         doReturn(true).when(accessControlService).canAccessCaseStateWithCriteria(STATE, TEST_CASE_TYPE, USER_ROLES, CAN_UPDATE);
         doReturn(AUTH_CASE_VIEW_TRIGGERS).when(accessControlService).filterCaseViewTriggersByCreateAccess(TEST_CASE_VIEW.getTriggers(), TEST_CASE_TYPE.getEvents(), USER_ROLES);
 
-        CaseView caseView = authorisedGetCaseViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+        CaseView caseView = authorisedGetCaseViewOperation.execute(CASE_REFERENCE);
         assertThat(caseView.getTriggers(), arrayWithSize(1));
         assertThat(caseView.getTriggers(), arrayContaining(CASE_VIEW_TRIGGER));
     }
@@ -130,7 +150,7 @@ class AuthorisedGetCaseViewOperationTest {
         doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES, CAN_UPDATE);
         doReturn(EMPTY_TRIGGERS).when(accessControlService).filterCaseViewTriggersByCreateAccess(TEST_CASE_VIEW.getTriggers(), TEST_CASE_TYPE.getEvents(), USER_ROLES);
 
-        CaseView caseView = authorisedGetCaseViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+        CaseView caseView = authorisedGetCaseViewOperation.execute(CASE_REFERENCE);
 
         assertThat(caseView.getTriggers(), arrayWithSize(0));
     }
