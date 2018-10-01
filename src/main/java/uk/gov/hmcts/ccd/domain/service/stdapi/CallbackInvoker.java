@@ -35,6 +35,9 @@ public class CallbackInvoker {
     private final CaseSanitiser caseSanitiser;
     private final SecurityValidationService securityValidationService;
     private static final UrlValidator URL_VALIDATOR = UrlValidator.getInstance();
+    private static final int MIN_LENGTH_OF_DESCRIPTION = 0;
+    private static final int MAX_LENGTH_OF_DESCRIPTION = 65;
+
 
     @Autowired
     public CallbackInvoker(final CallbackService callbackService,
@@ -187,7 +190,7 @@ public class CallbackInvoker {
             if (isDescriptionEmptyOrNotWithInSpecifiedRange(significantItem)) {
                 errors.add("Description should not be empty but also not more than 64 characters");
             }
-            if (errors.size() == 0) {
+            if (errors.isEmpty()) {
                 response.setSignificantItem(significantItem);
             } else {
                 callbackResponse.setErrors(errors);
@@ -196,10 +199,11 @@ public class CallbackInvoker {
     }
 
     private boolean isDescriptionEmptyOrNotWithInSpecifiedRange(SignificantItem significantItem) {
+
         return StringUtils.isEmpty(significantItem.getDescription())
             || (StringUtils.isNotEmpty(significantItem.getDescription())
-            && !(significantItem.getDescription().length() > 0
-            && significantItem.getDescription().length() < 65));
+            && !(significantItem.getDescription().length() > MIN_LENGTH_OF_DESCRIPTION
+            && significantItem.getDescription().length() < MAX_LENGTH_OF_DESCRIPTION));
     }
 
 }

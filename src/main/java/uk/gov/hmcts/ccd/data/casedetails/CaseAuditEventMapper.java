@@ -39,7 +39,8 @@ public class CaseAuditEventMapper {
         auditEvent.setSecurityClassification(caseAuditEventEntity.getSecurityClassification());
         if (caseAuditEventEntity.getData() != null) {
             auditEvent.setData(mapper.convertValue(caseAuditEventEntity.getData(), STRING_JSON_MAP_TYPE));
-            auditEvent.setDataClassification(mapper.convertValue(caseAuditEventEntity.getDataClassification(), STRING_JSON_MAP_TYPE));
+            auditEvent.setDataClassification(mapper.convertValue(caseAuditEventEntity.getDataClassification(),
+                                                                 STRING_JSON_MAP_TYPE));
         }
         auditEvent.setEventId(caseAuditEventEntity.getEventId());
         auditEvent.setEventName(caseAuditEventEntity.getEventName());
@@ -74,7 +75,8 @@ public class CaseAuditEventMapper {
             newCaseAuditEventEntity.setDataClassification(mapper.createObjectNode());
         } else {
             newCaseAuditEventEntity.setData(mapper.convertValue(auditEvent.getData(), JsonNode.class));
-            newCaseAuditEventEntity.setDataClassification(mapper.convertValue(auditEvent.getDataClassification(), JsonNode.class));
+            newCaseAuditEventEntity.setDataClassification(mapper.convertValue(auditEvent.getDataClassification(),
+                                                                              JsonNode.class));
         }
         newCaseAuditEventEntity.setEventId(auditEvent.getEventId());
         newCaseAuditEventEntity.setEventName(auditEvent.getEventName());
@@ -88,7 +90,7 @@ public class CaseAuditEventMapper {
             try {
                 significantItemEntity.setUrl(new URL(auditEvent.getSignificantItem().getUrl()));
             } catch (MalformedURLException e) {
-                throw new InvalidUrlException("Invalid URL Exception");
+                throw new InvalidUrlException("Invalid URL Exception", e);
             }
             newCaseAuditEventEntity.setSignificantItemEntity(significantItemEntity);
         }
@@ -97,7 +99,7 @@ public class CaseAuditEventMapper {
 
     public List<AuditEvent> entityToModel(final List<CaseAuditEventEntity> caseEventEntities) {
         return caseEventEntities.stream()
-            .map(this::entityToModel)
-            .collect(Collectors.toList());
+                                .map(this::entityToModel)
+                                .collect(Collectors.toList());
     }
 }
