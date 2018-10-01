@@ -23,13 +23,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.domain.model.search.CaseDetailsSearchResult;
+import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
-import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseDetailsSearchOperation;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
-class CaseDetailsSearchEndpointTest {
+class CaseSearchEndpointTest {
 
     private static final String CASE_TYPE_ID = "GrantOnly";
     private static final String QUERY = "{\"query\":{}}";
@@ -38,7 +38,7 @@ class CaseDetailsSearchEndpointTest {
     private ApplicationParams applicationParams;
 
     @Mock
-    private CaseDetailsSearchOperation caseDetailsSearchOperation;
+    private CaseSearchOperation caseSearchOperation;
 
     @Mock
     private ObjectMapperService objectMapperService;
@@ -46,7 +46,7 @@ class CaseDetailsSearchEndpointTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @InjectMocks
-    private CaseDetailsSearchEndpoint endpoint;
+    private CaseSearchEndpoint endpoint;
 
     @BeforeEach
     void setUp() throws IOException {
@@ -64,7 +64,7 @@ class CaseDetailsSearchEndpointTest {
         when(objectMapperService.convertStringToObject(searchRequest, ObjectNode.class)).thenReturn(objectMapper.readValue(searchRequest, ObjectNode.class));
 
         assertThrows(BadSearchRequest.class, () -> endpoint.searchCases(CASE_TYPE_ID, searchRequest));
-        verifyZeroInteractions(caseDetailsSearchOperation);
+        verifyZeroInteractions(caseSearchOperation);
     }
 
     @Test
@@ -97,7 +97,7 @@ class CaseDetailsSearchEndpointTest {
         given(applicationParams.getSearchBlackList()).willReturn(newArrayList("query_string"));
 
         assertThrows(BadSearchRequest.class, () -> endpoint.searchCases(CASE_TYPE_ID, searchRequest));
-        verifyZeroInteractions(caseDetailsSearchOperation);
+        verifyZeroInteractions(caseSearchOperation);
     }
 
     @Test
@@ -126,19 +126,19 @@ class CaseDetailsSearchEndpointTest {
 
         endpoint.searchCases(CASE_TYPE_ID, query);
 
-        verify(caseDetailsSearchOperation).execute(any(CaseSearchRequest.class));
+        verify(caseSearchOperation).execute(any(CaseSearchRequest.class));
     }
 
     @Test
     void searchCaseDetailsInvokesOperation() throws IOException {
         given(applicationParams.getSearchBlackList()).willReturn(newArrayList("blockedQuery"));
-        CaseDetailsSearchResult result = mock(CaseDetailsSearchResult.class);
-        when(caseDetailsSearchOperation.execute(any(CaseSearchRequest.class))).thenReturn(result);
+        CaseSearchResult result = mock(CaseSearchResult.class);
+        when(caseSearchOperation.execute(any(CaseSearchRequest.class))).thenReturn(result);
         String searchRequest = "{\"query\": {\"match\": \"blah blah\"}}";
 
-        CaseDetailsSearchResult caseDetailsSearchResult = endpoint.searchCases(CASE_TYPE_ID, searchRequest);
+        CaseSearchResult caseSearchResult = endpoint.searchCases(CASE_TYPE_ID, searchRequest);
 
-        verify(caseDetailsSearchOperation).execute(any(CaseSearchRequest.class));
-        assertThat(caseDetailsSearchResult, is(result));
+        verify(caseSearchOperation).execute(any(CaseSearchRequest.class));
+        assertThat(caseSearchResult, is(result));
     }
 }

@@ -6,17 +6,17 @@ import static java.util.Collections.emptyList;
 
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
-public class CaseDetailsSearchResult {
+public class CaseSearchResult {
 
-    public static final CaseDetailsSearchResult EMPTY = new CaseDetailsSearchResult(emptyList(), 0L);
+    public static final CaseSearchResult EMPTY = new CaseSearchResult(emptyList(), 0L);
 
     private List<CaseDetails> cases;
     private Long total;
 
-    public CaseDetailsSearchResult() {
+    public CaseSearchResult() {
     }
 
-    public CaseDetailsSearchResult(List<CaseDetails> cases, Long total) {
+    public CaseSearchResult(List<CaseDetails> cases, Long total) {
         this.cases = cases;
         this.total = total;
     }

@@ -18,7 +18,7 @@ import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.search.CaseDetailsSearchResult;
+import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 
 import javax.inject.Inject;
 import java.time.LocalDateTime;
@@ -38,7 +38,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class CaseDetailsSearchEndpointIT extends WireMockBaseTest {
+public class CaseSearchEndpointIT extends WireMockBaseTest {
 
     private static final String POST_SEARCH_CASES = "/searchCases";
 
@@ -101,11 +101,11 @@ public class CaseDetailsSearchEndpointIT extends WireMockBaseTest {
                 .andReturn();
 
         String responseAsString = result.getResponse().getContentAsString();
-        CaseDetailsSearchResult caseDetailsSearchResults = mapper.readValue(responseAsString,
-                CaseDetailsSearchResult.class);
+        CaseSearchResult caseSearchResults = mapper.readValue(responseAsString,
+                                                              CaseSearchResult.class);
 
-        assertThat(caseDetailsSearchResults.getTotal(), is(30L));
-        List<CaseDetails> caseDetails = caseDetailsSearchResults.getCases();
+        assertThat(caseSearchResults.getTotal(), is(30L));
+        List<CaseDetails> caseDetails = caseSearchResults.getCases();
         assertThat(caseDetails, hasSize(1));
         assertThat(caseDetails, hasItem(hasProperty("reference", equalTo(1535450291607660L))));
         assertThat(caseDetails, hasItem(hasProperty("jurisdiction", equalTo("AUTOTEST1"))));

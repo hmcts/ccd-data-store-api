@@ -23,13 +23,13 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.search.CaseDetailsSearchResult;
+import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.dto.ElasticSearchCaseDetailsDTO;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.mapper.CaseDetailsMapper;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
-class ElasticsearchCaseDetailsSearchOperationTest {
+class ElasticsearchCaseSearchOperationTest {
 
     private static final String INDEX_NAME_FORMAT = "%s_cases";
     private static final String CASE_TYPE_ID = "casetypeid";
@@ -38,7 +38,7 @@ class ElasticsearchCaseDetailsSearchOperationTest {
     private static final String QUERY = "{}";
 
     @InjectMocks
-    private ElasticsearchCaseDetailsSearchOperation searchOperation;
+    private ElasticsearchCaseSearchOperation searchOperation;
 
     @Mock
     private ApplicationParams applicationParams;
@@ -84,10 +84,10 @@ class ElasticsearchCaseDetailsSearchOperationTest {
         when(jestClient.execute(any(Search.class))).thenReturn(searchResult);
         CaseSearchRequest request = new CaseSearchRequest(objectMapperService, CASE_TYPE_ID, QUERY);
 
-        CaseDetailsSearchResult caseDetailsSearchResult = searchOperation.execute(request);
+        CaseSearchResult caseSearchResult = searchOperation.execute(request);
 
-        assertThat(caseDetailsSearchResult.getCases(), equalTo(newArrayList(caseDetails)));
-        assertThat(caseDetailsSearchResult.getTotal(), equalTo(1L));
+        assertThat(caseSearchResult.getCases(), equalTo(newArrayList(caseDetails)));
+        assertThat(caseSearchResult.getTotal(), equalTo(1L));
         ArgumentCaptor<Search> arg = ArgumentCaptor.forClass(Search.class);
         verify(jestClient).execute(arg.capture());
         Search searchRequest = arg.getValue();

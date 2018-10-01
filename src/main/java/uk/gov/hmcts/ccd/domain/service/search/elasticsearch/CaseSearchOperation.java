@@ -1,10 +1,10 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
-import uk.gov.hmcts.ccd.domain.model.search.CaseDetailsSearchResult;
+import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 
 
-public interface CaseDetailsSearchOperation {
+public interface CaseSearchOperation {
 
-    CaseDetailsSearchResult execute(CaseSearchRequest caseSearchRequest);
+    CaseSearchResult execute(CaseSearchRequest caseSearchRequest);
 
 }

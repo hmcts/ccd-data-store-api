@@ -16,17 +16,17 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.search.CaseDetailsSearchResult;
+import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.dto.ElasticSearchCaseDetailsDTO;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.mapper.CaseDetailsMapper;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 @Service
-@Qualifier(ElasticsearchCaseDetailsSearchOperation.QUALIFIER)
-public class ElasticsearchCaseDetailsSearchOperation implements CaseDetailsSearchOperation {
+@Qualifier(ElasticsearchCaseSearchOperation.QUALIFIER)
+public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
 
-    public static final String QUALIFIER = "ElasticsearchCaseDetailsSearchOperation";
+    public static final String QUALIFIER = "ElasticsearchCaseSearchOperation";
 
     private final JestClient jestClient;
     private final ObjectMapper objectMapper;
@@ -35,11 +35,11 @@ public class ElasticsearchCaseDetailsSearchOperation implements CaseDetailsSearc
     private final CaseSearchRequestSecurity caseSearchRequestSecurity;
 
     @Autowired
-    public ElasticsearchCaseDetailsSearchOperation(JestClient jestClient,
-                                                   @Qualifier("caseDetailsObjectMapper") ObjectMapper objectMapper,
-                                                   CaseDetailsMapper caseDetailsMapper,
-                                                   ApplicationParams applicationParams,
-                                                   CaseSearchRequestSecurity caseSearchRequestSecurity) {
+    public ElasticsearchCaseSearchOperation(JestClient jestClient,
+                                            @Qualifier("caseDetailsObjectMapper") ObjectMapper objectMapper,
+                                            CaseDetailsMapper caseDetailsMapper,
+                                            ApplicationParams applicationParams,
+                                            CaseSearchRequestSecurity caseSearchRequestSecurity) {
         this.jestClient = jestClient;
         this.objectMapper = objectMapper;
         this.caseDetailsMapper = caseDetailsMapper;
@@ -48,7 +48,7 @@ public class ElasticsearchCaseDetailsSearchOperation implements CaseDetailsSearc
     }
 
     @Override
-    public CaseDetailsSearchResult execute(CaseSearchRequest caseSearchRequest) {
+    public CaseSearchResult execute(CaseSearchRequest caseSearchRequest) {
         SearchResult result = search(caseSearchRequest);
         if (result.isSucceeded()) {
             return toCaseDetailsSearchResult(result);
@@ -74,11 +74,11 @@ public class ElasticsearchCaseDetailsSearchOperation implements CaseDetailsSearc
             .build();
     }
 
-    private CaseDetailsSearchResult toCaseDetailsSearchResult(SearchResult result) {
+    private CaseSearchResult toCaseDetailsSearchResult(SearchResult result) {
         List<String> casesAsString = result.getSourceAsStringList();
         List<ElasticSearchCaseDetailsDTO> dtos = toElasticSearchCasesDTO(casesAsString);
         List<CaseDetails> caseDetails = caseDetailsMapper.dtosToCaseDetailsList(dtos);
-        return new CaseDetailsSearchResult(caseDetails, result.getTotal());
+        return new CaseSearchResult(caseDetails, result.getTotal());
     }
 
     private List<ElasticSearchCaseDetailsDTO> toElasticSearchCasesDTO(List<String> cases) {

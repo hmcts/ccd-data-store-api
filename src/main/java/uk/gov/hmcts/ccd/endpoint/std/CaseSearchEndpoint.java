@@ -19,10 +19,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.domain.model.search.CaseDetailsSearchResult;
+import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
-import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.AuthorisedCaseDetailsSearchOperation;
-import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseDetailsSearchOperation;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.AuthorisedCaseSearchOperation;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
@@ -31,16 +31,16 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
         consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(value = "/", description = "New ElasticSearch based search API")
-public class CaseDetailsSearchEndpoint {
+public class CaseSearchEndpoint {
 
-    private final CaseDetailsSearchOperation caseDetailsSearchOperation;
+    private final CaseSearchOperation caseSearchOperation;
     private final ApplicationParams applicationParams;
     private final ObjectMapperService objectMapperService;
 
     @Autowired
-    public CaseDetailsSearchEndpoint(@Qualifier(AuthorisedCaseDetailsSearchOperation.QUALIFIER) CaseDetailsSearchOperation caseDetailsSearchOperation,
-                                     ApplicationParams applicationParams, ObjectMapperService objectMapperService) {
-        this.caseDetailsSearchOperation = caseDetailsSearchOperation;
+    public CaseSearchEndpoint(@Qualifier(AuthorisedCaseSearchOperation.QUALIFIER) CaseSearchOperation caseSearchOperation,
+                              ApplicationParams applicationParams, ObjectMapperService objectMapperService) {
+        this.caseSearchOperation = caseSearchOperation;
         this.applicationParams = applicationParams;
         this.objectMapperService = objectMapperService;
     }
@@ -50,7 +50,7 @@ public class CaseDetailsSearchEndpoint {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "List of case data for the given search request")
     })
-    public CaseDetailsSearchResult searchCases(
+    public CaseSearchResult searchCases(
         @ApiParam(value = "Case type ID", required = true)
         @RequestParam("ctid") String caseTypeId,
         @ApiParam(name = "native ElasticSearch Search API request. Please refer to the ElasticSearch official documentation", required = true)
@@ -58,7 +58,7 @@ public class CaseDetailsSearchEndpoint {
 
         rejectBlackListedQuery(jsonSearchRequest);
         CaseSearchRequest caseSearchRequest = new CaseSearchRequest(objectMapperService, caseTypeId, jsonSearchRequest);
-        return caseDetailsSearchOperation.execute(caseSearchRequest);
+        return caseSearchOperation.execute(caseSearchRequest);
     }
 
     private void rejectBlackListedQuery(String jsonSearchRequest) {

@@ -13,19 +13,19 @@ import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.search.CaseDetailsSearchResult;
+import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 
 @Service
-@Qualifier(AuthorisedCaseDetailsSearchOperation.QUALIFIER)
-public class AuthorisedCaseDetailsSearchOperation implements CaseDetailsSearchOperation {
+@Qualifier(AuthorisedCaseSearchOperation.QUALIFIER)
+public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
 
-    public static final String QUALIFIER = "AuthorisedCaseDetailsSearchOperation";
+    public static final String QUALIFIER = "AuthorisedCaseSearchOperation";
 
-    private final CaseDetailsSearchOperation caseDetailsSearchOperation;
+    private final CaseSearchOperation caseSearchOperation;
     private final AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService;
     private final AccessControlService accessControlService;
     private final SecurityClassificationService classificationService;
@@ -33,15 +33,15 @@ public class AuthorisedCaseDetailsSearchOperation implements CaseDetailsSearchOp
     private final UserRepository userRepository;
 
     @Autowired
-    public AuthorisedCaseDetailsSearchOperation(
-            @Qualifier(ElasticsearchCaseDetailsSearchOperation.QUALIFIER) CaseDetailsSearchOperation caseDetailsSearchOperation,
+    public AuthorisedCaseSearchOperation(
+        @Qualifier(ElasticsearchCaseSearchOperation.QUALIFIER) CaseSearchOperation caseSearchOperation,
             AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService,
             AccessControlService accessControlService,
             SecurityClassificationService classificationService,
             ObjectMapperService objectMapperService,
             @Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository) {
 
-        this.caseDetailsSearchOperation = caseDetailsSearchOperation;
+        this.caseSearchOperation = caseSearchOperation;
         this.authorisedCaseDefinitionDataService = authorisedCaseDefinitionDataService;
         this.accessControlService = accessControlService;
         this.classificationService = classificationService;
@@ -50,15 +50,15 @@ public class AuthorisedCaseDetailsSearchOperation implements CaseDetailsSearchOp
     }
 
     @Override
-    public CaseDetailsSearchResult execute(CaseSearchRequest caseSearchRequest) {
+    public CaseSearchResult execute(CaseSearchRequest caseSearchRequest) {
         return authorisedCaseDefinitionDataService
             .getAuthorisedCaseType(caseSearchRequest.getCaseTypeId(), CAN_READ)
             .map(caseType -> searchCasesAndFilterFieldsByAccess(caseType, caseSearchRequest))
-            .orElse(CaseDetailsSearchResult.EMPTY);
+            .orElse(CaseSearchResult.EMPTY);
     }
 
-    private CaseDetailsSearchResult searchCasesAndFilterFieldsByAccess(CaseType caseType, CaseSearchRequest caseSearchRequest) {
-        CaseDetailsSearchResult result = caseDetailsSearchOperation.execute(caseSearchRequest);
+    private CaseSearchResult searchCasesAndFilterFieldsByAccess(CaseType caseType, CaseSearchRequest caseSearchRequest) {
+        CaseSearchResult result = caseSearchOperation.execute(caseSearchRequest);
         filterFieldsByAccess(caseType, result.getCases());
         return result;
     }
