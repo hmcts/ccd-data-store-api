@@ -11,7 +11,7 @@ public class CoreCaseDataConfiguration {
 
     @Bean
     @Qualifier("caseDetailsObjectMapper")
-    public ObjectMapper objectMapper() {
+    public ObjectMapper caseDetailsObjectMapper() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         return mapper;
