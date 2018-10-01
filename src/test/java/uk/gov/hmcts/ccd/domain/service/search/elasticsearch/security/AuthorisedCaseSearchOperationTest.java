@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
+package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,8 +16,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import static uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest.QUERY_NAME;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -32,13 +35,13 @@ import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
-import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.AuthorisedCaseSearchOperation;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 
 class AuthorisedCaseSearchOperationTest {
 
     private static final String CASE_TYPE_ID = "caseType";
-    private static final String QUERY = "{}";
 
     @Mock
     private CaseSearchOperation caseSearchOperation;
@@ -53,6 +56,8 @@ class AuthorisedCaseSearchOperationTest {
     @Mock
     private ObjectMapperService objectMapperService;
 
+    private final ObjectNode searchRequestJsonNode = JsonNodeFactory.instance.objectNode();
+
     @InjectMocks
     private AuthorisedCaseSearchOperation authorisedCaseDetailsSearchOperation;
 
@@ -62,12 +67,13 @@ class AuthorisedCaseSearchOperationTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
         caseType.setId(CASE_TYPE_ID);
+        searchRequestJsonNode.set(QUERY_NAME, mock(ObjectNode.class));
     }
 
     @Test
     @DisplayName("should filter fields and return search results for valid query")
     void shouldFilterFieldsReturnSearchResults() {
-        CaseSearchRequest request = new CaseSearchRequest(objectMapperService, CASE_TYPE_ID, QUERY);
+        CaseSearchRequest request = new CaseSearchRequest(CASE_TYPE_ID, searchRequestJsonNode);
         CaseDetails caseDetails = new CaseDetails();
         CaseSearchResult searchResult = new CaseSearchResult(singletonList(caseDetails), 1L);
         when(authorisedCaseDefinitionDataService.getAuthorisedCaseType(CASE_TYPE_ID, CAN_READ)).thenReturn(Optional.of(caseType));
@@ -103,7 +109,7 @@ class AuthorisedCaseSearchOperationTest {
     @Test
     @DisplayName("should return empty list of cases when user is not authorised to access case type")
     void shouldReturnEmptyCaseList() {
-        CaseSearchRequest request = new CaseSearchRequest(objectMapperService, CASE_TYPE_ID, QUERY);
+        CaseSearchRequest request = new CaseSearchRequest(CASE_TYPE_ID, searchRequestJsonNode);
         when(authorisedCaseDefinitionDataService.getAuthorisedCaseType(CASE_TYPE_ID, CAN_READ)).thenReturn(Optional.empty());
 
         CaseSearchResult result = authorisedCaseDetailsSearchOperation.execute(request);
@@ -113,7 +119,6 @@ class AuthorisedCaseSearchOperationTest {
             () -> assertThat(result.getTotal(), is(0L)),
             () -> verify(authorisedCaseDefinitionDataService).getAuthorisedCaseType(CASE_TYPE_ID, CAN_READ),
             () -> verifyZeroInteractions(caseSearchOperation),
-            () -> verifyZeroInteractions(objectMapperService),
             () -> verifyZeroInteractions(accessControlService),
             () -> verifyZeroInteractions(userRepository),
             () -> verifyZeroInteractions(classificationService)

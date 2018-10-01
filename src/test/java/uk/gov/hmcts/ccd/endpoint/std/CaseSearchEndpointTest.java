@@ -15,6 +15,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.BeforeEach;
@@ -61,7 +62,7 @@ class CaseSearchEndpointTest {
             + "\"size\" : 3\n"
             + "}";
         when(applicationParams.getSearchBlackList()).thenReturn(Collections.singletonList("query_string"));
-        when(objectMapperService.convertStringToObject(searchRequest, ObjectNode.class)).thenReturn(objectMapper.readValue(searchRequest, ObjectNode.class));
+        when(objectMapperService.convertStringToObject(searchRequest, JsonNode.class)).thenReturn(objectMapper.readValue(searchRequest, ObjectNode.class));
 
         assertThrows(BadSearchRequest.class, () -> endpoint.searchCases(CASE_TYPE_ID, searchRequest));
         verifyZeroInteractions(caseSearchOperation);

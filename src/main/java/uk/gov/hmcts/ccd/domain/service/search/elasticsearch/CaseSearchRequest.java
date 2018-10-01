@@ -1,8 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
-import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
 /**
@@ -24,17 +23,14 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 @Slf4j
 public class CaseSearchRequest {
 
-    private static final String QUERY_NAME = "query";
+    public static final String QUERY_NAME = "query";
 
-    private final ObjectMapperService objectMapperService;
     private final String caseTypeId;
-    private final ObjectNode searchRequestJsonNode;
+    private final JsonNode searchRequestJsonNode;
 
-
-    public CaseSearchRequest(ObjectMapperService objectMapperService, String caseTypeId, String jsonSearchRequest) {
-        this.objectMapperService = objectMapperService;
+    public CaseSearchRequest(String caseTypeId, JsonNode searchRequestJsonNode) {
         this.caseTypeId = caseTypeId;
-        this.searchRequestJsonNode = this.objectMapperService.convertStringToObject(jsonSearchRequest, ObjectNode.class);
+        this.searchRequestJsonNode = searchRequestJsonNode;
         validateJsonSearchRequest();
     }
 
@@ -50,11 +46,6 @@ public class CaseSearchRequest {
 
     public String getQueryValue() {
         return searchRequestJsonNode.get(QUERY_NAME).toString();
-    }
-
-    public void replaceQuery(String queryClause) {
-        ObjectNode queryClauseNode = objectMapperService.convertStringToObject(queryClause, ObjectNode.class);
-        searchRequestJsonNode.set(QUERY_NAME, queryClauseNode.get(QUERY_NAME));
     }
 
     public String toJsonString() {

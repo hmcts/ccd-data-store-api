@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -39,7 +40,8 @@ public class CaseSearchEndpoint {
 
     @Autowired
     public CaseSearchEndpoint(@Qualifier(AuthorisedCaseSearchOperation.QUALIFIER) CaseSearchOperation caseSearchOperation,
-                              ApplicationParams applicationParams, ObjectMapperService objectMapperService) {
+                              ApplicationParams applicationParams,
+                              ObjectMapperService objectMapperService) {
         this.caseSearchOperation = caseSearchOperation;
         this.applicationParams = applicationParams;
         this.objectMapperService = objectMapperService;
@@ -57,8 +59,12 @@ public class CaseSearchEndpoint {
         @RequestBody String jsonSearchRequest) {
 
         rejectBlackListedQuery(jsonSearchRequest);
-        CaseSearchRequest caseSearchRequest = new CaseSearchRequest(objectMapperService, caseTypeId, jsonSearchRequest);
+        CaseSearchRequest caseSearchRequest = new CaseSearchRequest(caseTypeId, convertJsonStringToJsonNode(jsonSearchRequest));
         return caseSearchOperation.execute(caseSearchRequest);
+    }
+
+    private JsonNode convertJsonStringToJsonNode(String jsonSearchRequest) {
+        return objectMapperService.convertStringToObject(jsonSearchRequest, JsonNode.class);
     }
 
     private void rejectBlackListedQuery(String jsonSearchRequest) {

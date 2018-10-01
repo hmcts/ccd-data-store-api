@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
+package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -18,10 +18,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.ElasticsearchCaseStateFilter;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 
-class ElasticsearchCaseStateFilterFactoryTest {
+class ElasticsearchCaseStateFilterTest {
 
     @Mock
     private AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService;
