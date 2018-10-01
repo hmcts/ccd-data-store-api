@@ -43,7 +43,7 @@ public class DefaultGetCaseHistoryViewOperation extends AbstractDefaultGetCaseVi
         validateCaseReference(caseReference);
 
         CaseType caseType = getCaseType(jurisdictionId, caseTypeId);
-        CaseDetails caseDetails = getCaseDetails(jurisdictionId, caseTypeId, caseReference);
+        CaseDetails caseDetails = getCaseDetails(caseReference);
 
         AuditEvent event = getEventsOperation.getEvent(jurisdictionId, caseTypeId, eventId).orElseThrow(
             () -> new ResourceNotFoundException(EVENT_NOT_FOUND));
