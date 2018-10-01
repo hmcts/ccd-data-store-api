@@ -15,6 +15,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.CaseSearchFilter;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.ElasticsearchCaseSearchRequestSecurity;
 
 class ElasticsearchQuerySecurityTest {
 

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
+package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security;
 
 import java.util.Optional;
 

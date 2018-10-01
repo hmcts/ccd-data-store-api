@@ -48,16 +48,16 @@ public class CaseSearchRequest {
         return caseTypeId;
     }
 
-    String getQueryValue() {
+    public String getQueryValue() {
         return searchRequestJsonNode.get(QUERY_NAME).toString();
     }
 
-    void replaceQuery(String queryClause) {
+    public void replaceQuery(String queryClause) {
         ObjectNode queryClauseNode = objectMapperService.convertStringToObject(queryClause, ObjectNode.class);
         searchRequestJsonNode.set(QUERY_NAME, queryClauseNode.get(QUERY_NAME));
     }
 
-    String toJsonString() {
+    public String toJsonString() {
         String jsonString = searchRequestJsonNode.toString();
         log.debug("json search request: {}", jsonString);
         return jsonString;

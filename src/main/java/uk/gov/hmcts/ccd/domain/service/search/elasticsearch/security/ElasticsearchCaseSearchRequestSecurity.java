@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
+package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security;
 
 import java.util.List;
 
@@ -9,6 +9,7 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest;
 
 @Component
 @Slf4j

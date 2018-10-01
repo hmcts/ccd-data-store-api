@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
+package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security;
 
 import java.util.List;
 import java.util.Set;
@@ -17,6 +17,9 @@ import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchCaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 
 @Service
