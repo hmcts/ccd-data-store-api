@@ -93,7 +93,7 @@ class ElasticsearchCaseSearchOperationTest {
         Search searchRequest = arg.getValue();
         assertThat(searchRequest.getIndex(), equalTo(toIndex(CASE_TYPE_ID)));
         assertThat(searchRequest.getType(), equalTo(INDEX_TYPE));
-        verify(caseSearchRequestSecurity).secureRequest(request);
+        verify(caseSearchRequestSecurity).createSecureSearchRequest(request);
     }
 
     @Test

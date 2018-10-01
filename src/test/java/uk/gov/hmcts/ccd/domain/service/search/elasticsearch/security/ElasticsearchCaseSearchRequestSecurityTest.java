@@ -53,7 +53,7 @@ class ElasticsearchCaseSearchRequestSecurityTest {
         when(caseSearchFilter.getFilter(CASE_TYPE_ID)).thenReturn(Optional.of(mock(QueryBuilder.class)));
         when(objectMapperService.convertStringToObject(anyString(), eq(ObjectNode.class))).thenReturn(searchRequestJsonNode);
 
-        querySecurity.secureRequest(caseSearchRequest);
+        querySecurity.createSecureSearchRequest(caseSearchRequest);
 
         assertAll(
             () -> verify(caseSearchRequest).getQueryValue(),

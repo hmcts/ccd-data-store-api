@@ -68,7 +68,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     }
 
     private Search secureAndTransformSearchRequest(CaseSearchRequest caseSearchRequest) {
-        caseSearchRequestSecurity.secureRequest(caseSearchRequest);
+        caseSearchRequestSecurity.createSecureSearchRequest(caseSearchRequest);
         return new Search.Builder(caseSearchRequest.toJsonString())
             .addIndex(getCaseIndexName(caseSearchRequest.getCaseTypeId()))
             .addType(getCaseIndexType())
