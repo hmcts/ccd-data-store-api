@@ -135,7 +135,7 @@ class SubmitCaseTransactionTest {
         final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = new AboutToSubmitCallbackResponse();
         aboutToSubmitCallbackResponse.setState(Optional.of("somestring"));
         final SignificantItem significantItem = new SignificantItem();
-        significantItem.setType(SignificantItemType.DOCUMENT);
+        significantItem.setType(SignificantItemType.DOCUMENT.name());
         significantItem.setDescription(DESCRIPTION);
         significantItem.setUrl(URL);
         aboutToSubmitCallbackResponse.setSignificantItem(significantItem);
@@ -277,7 +277,7 @@ class SubmitCaseTransactionTest {
                   () -> assertThat(auditEvent.getEventId(), is(EVENT_ID)),
                   () -> assertThat(auditEvent.getSummary(), is(EVENT_SUMMARY)),
                   () -> assertThat(auditEvent.getDescription(), is(EVENT_DESC)),
-                  () -> assertThat(auditEvent.getSignificantItem().getType(), is(DOCUMENT)),
+                  () -> assertThat(auditEvent.getSignificantItem().getType(), is(DOCUMENT.name())),
                   () -> assertThat(auditEvent.getSignificantItem().getDescription(), is(DESCRIPTION)),
                   () -> assertThat(auditEvent.getSignificantItem().getUrl(), is(URL)));
     }

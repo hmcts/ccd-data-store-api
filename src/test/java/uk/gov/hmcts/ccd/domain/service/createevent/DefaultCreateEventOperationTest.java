@@ -128,7 +128,7 @@ class DefaultCreateEventOperationTest {
         final SignificantItem significantItem = new SignificantItem();
         significantItem.setUrl("http://www.yahoo.com");
         significantItem.setDescription("description");
-        significantItem.setType(SignificantItemType.DOCUMENT);
+        significantItem.setType(SignificantItemType.DOCUMENT.name());
         final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = new AboutToSubmitCallbackResponse();
         aboutToSubmitCallbackResponse.setSignificantItem(significantItem);
         aboutToSubmitCallbackResponse.setState(Optional.empty());

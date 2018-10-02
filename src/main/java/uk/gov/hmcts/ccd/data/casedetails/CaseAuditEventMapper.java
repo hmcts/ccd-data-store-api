@@ -5,13 +5,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import uk.gov.hmcts.ccd.data.SignificantItemEntity;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
+import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItemType;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
-import uk.gov.hmcts.ccd.exception.InvalidUrlException;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -48,8 +46,8 @@ public class CaseAuditEventMapper {
         auditEvent.setDescription(caseAuditEventEntity.getDescription());
         if (caseAuditEventEntity.getSignificantItemEntity() != null) {
             significantItem.setDescription(caseAuditEventEntity.getSignificantItemEntity().getDescription());
-            significantItem.setType(caseAuditEventEntity.getSignificantItemEntity().getType());
-            significantItem.setUrl(caseAuditEventEntity.getSignificantItemEntity().getUrl().getPath());
+            significantItem.setType(caseAuditEventEntity.getSignificantItemEntity().getType().name());
+            significantItem.setUrl(caseAuditEventEntity.getSignificantItemEntity().getUrl());
             auditEvent.setSignificantItem(significantItem);
         }
         return auditEvent;
@@ -83,15 +81,10 @@ public class CaseAuditEventMapper {
         newCaseAuditEventEntity.setSummary(auditEvent.getSummary());
         newCaseAuditEventEntity.setDescription(auditEvent.getDescription());
         if (auditEvent.getSignificantItem() != null) {
-            significantItemEntity.setType(auditEvent.getSignificantItem().getType());
+            significantItemEntity.setType(SignificantItemType.valueOf(auditEvent.getSignificantItem().getType()));
             significantItemEntity.setDescription(auditEvent.getSignificantItem().getDescription());
             significantItemEntity.setCaseEvent(newCaseAuditEventEntity);
-
-            try {
-                significantItemEntity.setUrl(new URL(auditEvent.getSignificantItem().getUrl()));
-            } catch (MalformedURLException e) {
-                throw new InvalidUrlException("Invalid URL Exception", e);
-            }
+            significantItemEntity.setUrl(auditEvent.getSignificantItem().getUrl());
             newCaseAuditEventEntity.setSignificantItemEntity(significantItemEntity);
         }
         return newCaseAuditEventEntity;

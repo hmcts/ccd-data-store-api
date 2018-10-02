@@ -322,7 +322,7 @@ public class CallbackTest extends WireMockBaseTest {
         callbackResponse.setSecurityClassification(PUBLIC);
         final SignificantItem significantItem = new SignificantItem();
         significantItem.setUrl("https://www.npmjs.com/package/supertest");
-        significantItem.setType(SignificantItemType.DOCUMENT);
+        significantItem.setType(SignificantItemType.DOCUMENT.name());
         significantItem.setDescription("Some description");
         callbackResponse.setSignificantItem(significantItem);
 
@@ -372,7 +372,7 @@ public class CallbackTest extends WireMockBaseTest {
         final List<SignificantItem> significantItemList = jdbcTemplate.query("SELECT * FROM case_event_significant_items where case_event_id = "  + caseAuditEvent.getId(), this::mapSignificantItem);
         assertEquals("https://www.npmjs.com/package/supertest", significantItemList.get(0).getUrl());
         assertEquals("Some description", significantItemList.get(0).getDescription());
-        assertEquals(SignificantItemType.DOCUMENT, significantItemList.get(0).getType());
+        assertEquals(SignificantItemType.DOCUMENT.name(), significantItemList.get(0).getType());
     }
     @Test
     public void shouldReturn400WhenPostCreateCaseWithInvalidSignificantDocument() throws Exception {
@@ -389,7 +389,7 @@ public class CallbackTest extends WireMockBaseTest {
         callbackResponse.setSecurityClassification(PUBLIC);
         final SignificantItem significantItem = new SignificantItem();
         significantItem.setUrl("https://www.npmjs.com/package/supertest");
-        significantItem.setType(SignificantItemType.DOCUMENT);
+        significantItem.setType(SignificantItemType.DOCUMENT.name());
         callbackResponse.setSignificantItem(significantItem);
 
         wireMockRule.stubFor(WireMock.post(urlMatching("/before-commit.*"))

@@ -14,7 +14,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import java.net.URL;
 
 @Table(name = "case_event_significant_items")
 @Entity
@@ -33,7 +32,7 @@ public class SignificantItemEntity {
     private String description;
 
     @Column(name = "url",  nullable = false)
-    private URL url;
+    private String url;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "case_event_id")
@@ -63,11 +62,11 @@ public class SignificantItemEntity {
         this.description = description;
     }
 
-    public URL getUrl() {
+    public String getUrl() {
         return url;
     }
 
-    public void setUrl(URL url) {
+    public void setUrl(String url) {
         this.url = url;
     }
 

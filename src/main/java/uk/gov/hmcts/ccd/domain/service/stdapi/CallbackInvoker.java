@@ -2,15 +2,11 @@ package uk.gov.hmcts.ccd.domain.service.stdapi;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.validator.routines.UrlValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
-import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItemType;
-import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
@@ -19,10 +15,12 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityValidationService;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
+
 import java.util.*;
 
 import static com.google.common.collect.Maps.newHashMap;
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.ccd.domain.service.validate.ValidateSignificantDocument.validateSignificantItem;
 
 @Service
 public class CallbackInvoker {
@@ -34,9 +32,6 @@ public class CallbackInvoker {
     private final CaseDataService caseDataService;
     private final CaseSanitiser caseSanitiser;
     private final SecurityValidationService securityValidationService;
-    private static final UrlValidator URL_VALIDATOR = UrlValidator.getInstance();
-    private static final int MIN_LENGTH_OF_DESCRIPTION = 0;
-    private static final int MAX_LENGTH_OF_DESCRIPTION = 65;
 
 
     @Autowired
@@ -173,37 +168,6 @@ public class CallbackInvoker {
         final Optional<JsonNode> jsonNode = ofNullable(data.get(CALLBACK_RESPONSE_KEY_STATE));
         jsonNode.ifPresent(value -> data.remove(CALLBACK_RESPONSE_KEY_STATE));
         return jsonNode.flatMap(value -> value.isTextual() ? Optional.of(value.textValue()) : Optional.empty());
-    }
-
-    private void validateSignificantItem(AboutToSubmitCallbackResponse response, CallbackResponse callbackResponse) {
-        final SignificantItem significantItem = callbackResponse.getSignificantItem();
-        final List<String> errors = new ArrayList<>();
-
-        if (significantItem != null) {
-            if (significantItem.getType() != SignificantItemType.DOCUMENT) {
-
-                errors.add("Significant Item type incorrect");
-            }
-            if (!URL_VALIDATOR.isValid(significantItem.getUrl())) {
-                errors.add("Url Invalid");
-            }
-            if (isDescriptionEmptyOrNotWithInSpecifiedRange(significantItem)) {
-                errors.add("Description should not be empty but also not more than 64 characters");
-            }
-            if (errors.isEmpty()) {
-                response.setSignificantItem(significantItem);
-            } else {
-                callbackResponse.setErrors(errors);
-            }
-        }
-    }
-
-    private boolean isDescriptionEmptyOrNotWithInSpecifiedRange(SignificantItem significantItem) {
-
-        return StringUtils.isEmpty(significantItem.getDescription())
-            || (StringUtils.isNotEmpty(significantItem.getDescription())
-            && !(significantItem.getDescription().length() > MIN_LENGTH_OF_DESCRIPTION
-            && significantItem.getDescription().length() < MAX_LENGTH_OF_DESCRIPTION));
     }
 
 }

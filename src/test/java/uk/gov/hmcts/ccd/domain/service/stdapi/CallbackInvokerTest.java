@@ -212,7 +212,36 @@ class CallbackInvokerTest {
                 caseDetails);
             assertThat(response.getState().get(), is(expectedState));
             assertEquals("description",response.getSignificantItem().getDescription());
-            assertEquals(SignificantItemType.DOCUMENT,response.getSignificantItem().getType());
+            assertEquals(SignificantItemType.DOCUMENT.name(),response.getSignificantItem().getType());
+            assertEquals("http://www.cnn.com", response.getSignificantItem().getUrl());
+        }
+
+        @Test
+        @DisplayName("should send callback and get state and significant Item")
+        void sendCallbackAndGetStateAndSignificantDocumentWithInvalidURL() {
+            final String expectedState = "uNiCORn";
+            doReturn(Optional.of(mockCallbackResponseWithSignificantItem(expectedState))).when(callbackService)
+                                                                                         .send(any(),
+                                                                                               any(),
+                                                                                               same(caseEvent),
+                                                                                               same(caseDetailsBefore),
+                                                                                               same(caseDetails));
+
+            final AboutToSubmitCallbackResponse response =
+                callbackInvoker.invokeAboutToSubmitCallback(caseEvent,
+                                                            caseDetailsBefore,
+                                                            caseDetails,
+                                                            caseType,
+                                                            IGNORE_WARNING);
+
+            verify(callbackService).send(URL_ABOUT_TO_SUBMIT,
+                                         RETRIES_ABOUT_TO_SUBMIT,
+                                         caseEvent,
+                                         caseDetailsBefore,
+                                         caseDetails);
+            assertThat(response.getState().get(), is(expectedState));
+            assertEquals("description",response.getSignificantItem().getDescription());
+            assertEquals(SignificantItemType.DOCUMENT.name(),response.getSignificantItem().getType());
             assertEquals("http://www.cnn.com", response.getSignificantItem().getUrl());
         }
 
@@ -258,7 +287,7 @@ class CallbackInvokerTest {
             SignificantItem significantItem = new SignificantItem();
             significantItem.setUrl("http://www.cnn.com");
             significantItem.setDescription("description");
-            significantItem.setType(SignificantItemType.DOCUMENT);
+            significantItem.setType(SignificantItemType.DOCUMENT.name());
             response.setSignificantItem(significantItem);
             final Map<String, JsonNode> data = new HashMap<>();
             data.put("state", JsonNodeFactory.instance.textNode(state));

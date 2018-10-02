@@ -5,17 +5,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class SignificantItem {
 
     @JsonProperty("type")
-    private SignificantItemType type;
+    private String type;
     @JsonProperty("description")
     private String description;
     @JsonProperty("url")
     private String url;
 
-    public SignificantItemType getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(SignificantItemType type) {
+    public void setType(String type) {
         this.type = type;
     }
 
@@ -34,5 +34,7 @@ public class SignificantItem {
     public void setUrl(String url) {
         this.url = url;
     }
+
+
 
 }
