@@ -37,7 +37,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
 
     @Autowired
     public ElasticsearchCaseSearchOperation(JestClient jestClient,
-                                            @Qualifier("caseDetailsObjectMapper") ObjectMapper objectMapper,
+                                            ObjectMapper objectMapper,
                                             CaseDetailsMapper caseDetailsMapper,
                                             ApplicationParams applicationParams,
                                             CaseSearchRequestSecurity caseSearchRequestSecurity) {
@@ -68,8 +68,8 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     }
 
     private Search secureAndTransformSearchRequest(CaseSearchRequest caseSearchRequest) {
-        caseSearchRequestSecurity.createSecuredSearchRequest(caseSearchRequest);
-        return new Search.Builder(caseSearchRequest.toJsonString())
+        CaseSearchRequest securedSearchRequest = caseSearchRequestSecurity.createSecuredSearchRequest(caseSearchRequest);
+        return new Search.Builder(securedSearchRequest.toJsonString())
             .addIndex(getCaseIndexName(caseSearchRequest.getCaseTypeId()))
             .addType(getCaseIndexType())
             .build();

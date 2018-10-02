@@ -36,7 +36,7 @@ class ElasticsearchCaseStateFilterTest {
     @Test
     void shouldCreateTermsQueryBuilder() {
         String caseTypeId = "caseType";
-        String state = "state";
+        String state = "SomeState";
         when(authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds(caseTypeId, CAN_READ)).thenReturn(Collections.singletonList(state));
 
         Optional<QueryBuilder> optQueryBuilder = factory.getFilter(caseTypeId);
@@ -45,6 +45,6 @@ class ElasticsearchCaseStateFilterTest {
         assertThat(optQueryBuilder.get(), instanceOf(TermsQueryBuilder.class));
         TermsQueryBuilder queryBuilder = (TermsQueryBuilder) optQueryBuilder.get();
         assertThat(queryBuilder.fieldName(), is(STATE_FIELD_COL));
-        assertThat(queryBuilder.values(), hasItem(state));
+        assertThat(queryBuilder.values(), hasItem(state.toLowerCase()));
     }
 }

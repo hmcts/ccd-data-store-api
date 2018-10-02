@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.STATE_FIELD_COL;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
@@ -29,6 +30,9 @@ public class ElasticsearchCaseStateFilter implements CaseSearchFilter {
     }
 
     private List<String> getCaseStateIdsForUserReadAccess(String caseTypeId) {
-        return authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds(caseTypeId, CAN_READ);
+        return authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds(caseTypeId, CAN_READ)
+            .stream()
+            .map(String::toLowerCase)
+            .collect(Collectors.toList());
     }
 }
