@@ -83,6 +83,7 @@ class ElasticsearchCaseSearchOperationTest {
         when(mapper.dtosToCaseDetailsList(newArrayList(caseDetailsDTO))).thenReturn(newArrayList(caseDetails));
         when(jestClient.execute(any(Search.class))).thenReturn(searchResult);
         CaseSearchRequest request = new CaseSearchRequest(CASE_TYPE_ID, searchRequestJsonNode);
+        when(caseSearchRequestSecurity.createSecuredSearchRequest(request)).thenReturn(request);
 
         CaseSearchResult caseSearchResult = searchOperation.execute(request);
 
@@ -102,6 +103,7 @@ class ElasticsearchCaseSearchOperationTest {
         when(searchResult.isSucceeded()).thenReturn(false);
         when(jestClient.execute(any(Search.class))).thenReturn(searchResult);
         CaseSearchRequest request = new CaseSearchRequest(CASE_TYPE_ID, searchRequestJsonNode);
+        when(caseSearchRequestSecurity.createSecuredSearchRequest(request)).thenReturn(request);
 
         assertThrows(BadSearchRequest.class, () -> searchOperation.execute(request));
     }
