@@ -8,7 +8,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
@@ -21,7 +20,7 @@ public class DefaultObjectMapperService implements ObjectMapperService {
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public DefaultObjectMapperService(@Qualifier("commonObjectMapper") ObjectMapper objectMapper) {
+    public DefaultObjectMapperService(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 

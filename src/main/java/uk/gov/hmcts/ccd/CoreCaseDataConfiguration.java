@@ -18,8 +18,7 @@ public class CoreCaseDataConfiguration {
     }
 
     @Bean
-    @Qualifier("commonObjectMapper")
-    public ObjectMapper commonObjectMapper() {
+    public ObjectMapper objectMapper() {
         return new ObjectMapper();
     }
 }
