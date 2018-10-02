@@ -16,6 +16,8 @@ public class ValidateSignificantDocument {
     private static final int MIN_LENGTH_OF_DESCRIPTION = 0;
     private static final int MAX_LENGTH_OF_DESCRIPTION = 65;
 
+    private ValidateSignificantDocument(){}
+
     public static void validateSignificantItem(AboutToSubmitCallbackResponse response,
                                                CallbackResponse callbackResponse) {
         final SignificantItem significantItem = callbackResponse.getSignificantItem();

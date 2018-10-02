@@ -22,7 +22,7 @@ class ValidateSignificantDocumentTest {
     public static final String DESCRIPTION_GREATER_THAN_64 = "A DESCRIPTION THAT IS MUCH MUCH MUCH MUCH GREATER THAN 64 CHARACTERS";
 
     @Test
-    void validateSignificantItemHappyPath() {
+    public void validateSignificantItemHappyPath() {
         final CallbackResponse callbackResponse = new CallbackResponse();
         final SignificantItem significantItem = new SignificantItem();
         significantItem.setDescription(SOME_DESCRIPTION);
@@ -41,7 +41,7 @@ class ValidateSignificantDocumentTest {
     }
 
     @Test
-    void validateSignificantItemIncorrectURL() {
+    public void validateSignificantItemIncorrectURL() {
         final CallbackResponse callbackResponse = new CallbackResponse();
         final SignificantItem significantItem = new SignificantItem();
         significantItem.setDescription(SOME_DESCRIPTION);
@@ -52,14 +52,14 @@ class ValidateSignificantDocumentTest {
         callbackResponse.setSignificantItem(significantItem);
 
         ValidateSignificantDocument.validateSignificantItem(aboutToSubmitCallbackResponse, callbackResponse);
-        assertTrue(!callbackResponse.getErrors().isEmpty());
+        assertFalse(callbackResponse.getErrors().isEmpty());
         List<String> errors = callbackResponse.getErrors();
         assertEquals(1, errors.size());
         assertEquals(URL_FROM_SIGNIFICANT_ITEM_INVALID, errors.get(0));
     }
 
     @Test
-    void validateSignificantItemEmptyDescription() {
+    public void validateSignificantItemEmptyDescription() {
         final CallbackResponse callbackResponse = new CallbackResponse();
         final SignificantItem significantItem = new SignificantItem();
         significantItem.setDescription(EMPTY_DESCRIPTION);
@@ -70,7 +70,7 @@ class ValidateSignificantDocumentTest {
         callbackResponse.setSignificantItem(significantItem);
 
         ValidateSignificantDocument.validateSignificantItem(aboutToSubmitCallbackResponse, callbackResponse);
-        assertTrue(!callbackResponse.getErrors().isEmpty());
+        assertFalse(callbackResponse.getErrors().isEmpty());
         List<String> errors = callbackResponse.getErrors();
         assertEquals(1, errors.size());
         assertEquals(DESCRIPTION_ERROR_TEXT, errors.get(0));
@@ -78,7 +78,7 @@ class ValidateSignificantDocumentTest {
 
 
     @Test
-    void validateSignificantItemIncorrectDocumentAndURL() {
+    public void validateSignificantItemIncorrectDocumentAndURL() {
         final CallbackResponse callbackResponse = new CallbackResponse();
         final SignificantItem significantItem = new SignificantItem();
         significantItem.setDescription(SOME_DESCRIPTION);
@@ -89,7 +89,7 @@ class ValidateSignificantDocumentTest {
         callbackResponse.setSignificantItem(significantItem);
 
         ValidateSignificantDocument.validateSignificantItem(aboutToSubmitCallbackResponse, callbackResponse);
-        assertTrue(!callbackResponse.getErrors().isEmpty());
+        assertFalse(callbackResponse.getErrors().isEmpty());
         List<String> errors = callbackResponse.getErrors();
         assertEquals(2, errors.size());
         assertEquals(SIGNIFICANT_ITEM_TYPE_INCORRECT_ERROR_TEXT, errors.get(0));
@@ -97,7 +97,7 @@ class ValidateSignificantDocumentTest {
     }
 
     @Test
-    void validateSignificantItemIncorrectDocumentGreaterThan64() {
+    public void validateSignificantItemIncorrectDocumentGreaterThan64() {
         final CallbackResponse callbackResponse = new CallbackResponse();
         final SignificantItem significantItem = new SignificantItem();
         significantItem.setDescription(DESCRIPTION_GREATER_THAN_64);
@@ -108,7 +108,7 @@ class ValidateSignificantDocumentTest {
         callbackResponse.setSignificantItem(significantItem);
 
         ValidateSignificantDocument.validateSignificantItem(aboutToSubmitCallbackResponse, callbackResponse);
-        assertTrue(!callbackResponse.getErrors().isEmpty());
+        assertFalse(callbackResponse.getErrors().isEmpty());
         List<String> errors = callbackResponse.getErrors();
         assertEquals(3, errors.size());
         assertEquals(SIGNIFICANT_ITEM_TYPE_INCORRECT_ERROR_TEXT, errors.get(0));
@@ -116,7 +116,7 @@ class ValidateSignificantDocumentTest {
     }
 
     @Test
-    void validateSignificantItemAndEmptyTypeIncorrectDocumentGreaterThan64() {
+    public void validateSignificantItemAndEmptyTypeIncorrectDocumentGreaterThan64() {
         final CallbackResponse callbackResponse = new CallbackResponse();
         final SignificantItem significantItem = new SignificantItem();
         significantItem.setDescription(DESCRIPTION_GREATER_THAN_64);
@@ -126,7 +126,7 @@ class ValidateSignificantDocumentTest {
         callbackResponse.setSignificantItem(significantItem);
 
         ValidateSignificantDocument.validateSignificantItem(aboutToSubmitCallbackResponse, callbackResponse);
-        assertTrue(!callbackResponse.getErrors().isEmpty());
+        assertFalse(callbackResponse.getErrors().isEmpty());
         List<String> errors = callbackResponse.getErrors();
         assertEquals(3, errors.size());
         assertEquals(SIGNIFICANT_ITEM_TYPE_INCORRECT_ERROR_TEXT, errors.get(0));

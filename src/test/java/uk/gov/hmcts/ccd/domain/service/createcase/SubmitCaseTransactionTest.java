@@ -249,37 +249,37 @@ class SubmitCaseTransactionTest {
 
     private void assertAuditEvent(final AuditEvent auditEvent) {
         assertAll("Audit event",
-                  () -> assertThat(auditEvent.getCaseDataId(), is(savedCaseDetails.getId())),
-                  () -> assertThat(auditEvent.getUserId(), is(IDAM_ID)),
-                  () -> assertThat(auditEvent.getUserLastName(), is(IDAM_LNAME)),
-                  () -> assertThat(auditEvent.getUserFirstName(), is(IDAM_FNAME)),
-                  () -> assertThat(auditEvent.getEventName(), is(EVENT_NAME)),
-                  () -> assertThat(auditEvent.getCaseTypeId(), is(CASE_TYPE_ID)),
-                  () -> assertThat(auditEvent.getCaseTypeVersion(), is(VERSION)),
-                  () -> assertThat(auditEvent.getStateId(), is(STATE_ID)),
-                  () -> assertThat(auditEvent.getStateName(), is(STATE_NAME)),
-                  () -> assertThat(auditEvent.getEventId(), is(EVENT_ID)),
-                  () -> assertThat(auditEvent.getSummary(), is(EVENT_SUMMARY)),
-                  () -> assertThat(auditEvent.getDescription(), is(EVENT_DESC)));
+            () -> assertThat(auditEvent.getCaseDataId(), is(savedCaseDetails.getId())),
+            () -> assertThat(auditEvent.getUserId(), is(IDAM_ID)),
+            () -> assertThat(auditEvent.getUserLastName(), is(IDAM_LNAME)),
+            () -> assertThat(auditEvent.getUserFirstName(), is(IDAM_FNAME)),
+            () -> assertThat(auditEvent.getEventName(), is(EVENT_NAME)),
+            () -> assertThat(auditEvent.getCaseTypeId(), is(CASE_TYPE_ID)),
+            () -> assertThat(auditEvent.getCaseTypeVersion(), is(VERSION)),
+            () -> assertThat(auditEvent.getStateId(), is(STATE_ID)),
+            () -> assertThat(auditEvent.getStateName(), is(STATE_NAME)),
+            () -> assertThat(auditEvent.getEventId(), is(EVENT_ID)),
+            () -> assertThat(auditEvent.getSummary(), is(EVENT_SUMMARY)),
+            () -> assertThat(auditEvent.getDescription(), is(EVENT_DESC)));
     }
 
     private void assertAuditEventWithSignificantDocument(final AuditEvent auditEvent) {
         assertAll("Audit event",
-                  () -> assertThat(auditEvent.getCaseDataId(), is(savedCaseDetails.getId())),
-                  () -> assertThat(auditEvent.getUserId(), is(IDAM_ID)),
-                  () -> assertThat(auditEvent.getUserLastName(), is(IDAM_LNAME)),
-                  () -> assertThat(auditEvent.getUserFirstName(), is(IDAM_FNAME)),
-                  () -> assertThat(auditEvent.getEventName(), is(EVENT_NAME)),
-                  () -> assertThat(auditEvent.getCaseTypeId(), is(CASE_TYPE_ID)),
-                  () -> assertThat(auditEvent.getCaseTypeVersion(), is(VERSION)),
-                  () -> assertThat(auditEvent.getStateId(), is(STATE_ID)),
-                  () -> assertThat(auditEvent.getStateName(), is(STATE_NAME)),
-                  () -> assertThat(auditEvent.getEventId(), is(EVENT_ID)),
-                  () -> assertThat(auditEvent.getSummary(), is(EVENT_SUMMARY)),
-                  () -> assertThat(auditEvent.getDescription(), is(EVENT_DESC)),
-                  () -> assertThat(auditEvent.getSignificantItem().getType(), is(DOCUMENT.name())),
-                  () -> assertThat(auditEvent.getSignificantItem().getDescription(), is(DESCRIPTION)),
-                  () -> assertThat(auditEvent.getSignificantItem().getUrl(), is(URL)));
+            () -> assertThat(auditEvent.getCaseDataId(), is(savedCaseDetails.getId())),
+            () -> assertThat(auditEvent.getUserId(), is(IDAM_ID)),
+            () -> assertThat(auditEvent.getUserLastName(), is(IDAM_LNAME)),
+            () -> assertThat(auditEvent.getUserFirstName(), is(IDAM_FNAME)),
+            () -> assertThat(auditEvent.getEventName(), is(EVENT_NAME)),
+            () -> assertThat(auditEvent.getCaseTypeId(), is(CASE_TYPE_ID)),
+            () -> assertThat(auditEvent.getCaseTypeVersion(), is(VERSION)),
+            () -> assertThat(auditEvent.getStateId(), is(STATE_ID)),
+            () -> assertThat(auditEvent.getStateName(), is(STATE_NAME)),
+            () -> assertThat(auditEvent.getEventId(), is(EVENT_ID)),
+            () -> assertThat(auditEvent.getSummary(), is(EVENT_SUMMARY)),
+            () -> assertThat(auditEvent.getDescription(), is(EVENT_DESC)),
+            () -> assertThat(auditEvent.getSignificantItem().getType(), is(DOCUMENT.name())),
+            () -> assertThat(auditEvent.getSignificantItem().getDescription(), is(DESCRIPTION)),
+            () -> assertThat(auditEvent.getSignificantItem().getUrl(), is(URL)));
     }
 
     private Event buildEvent() {

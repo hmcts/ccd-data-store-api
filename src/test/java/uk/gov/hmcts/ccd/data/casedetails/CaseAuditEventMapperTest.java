@@ -19,7 +19,6 @@ public class CaseAuditEventMapperTest {
     private static final String LAST_NAME = "ALIF";
     private static final String URL = "http://www.yahoo.com";
     private static final String DESCRIPTION = "description";
-    private static final String INVALID_URL = "htsss://locall.com";
     private static final String USER_ID = "USER_ID";
     private static final LocalDateTime DATE_TIME = LocalDateTime.now();
 
