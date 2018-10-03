@@ -5,7 +5,6 @@ import java.util.List;
 import static uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest.QUERY_NAME;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -16,7 +15,6 @@ import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest;
 
 @Component
-@Slf4j
 public class ElasticsearchCaseSearchRequestSecurity implements CaseSearchRequestSecurity {
 
     private final List<CaseSearchFilter> caseSearchFilters;
@@ -36,10 +34,8 @@ public class ElasticsearchCaseSearchRequestSecurity implements CaseSearchRequest
     }
 
     private String addFiltersToQuery(CaseSearchRequest caseSearchRequest) {
-        String query = caseSearchRequest.getQueryValue();
-        log.debug("wrapping user query: {}", query);
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-        boolQueryBuilder.must(QueryBuilders.wrapperQuery(query));
+        boolQueryBuilder.must(QueryBuilders.wrapperQuery(caseSearchRequest.getQueryValue()));
 
         caseSearchFilters.forEach(filter -> filter.getFilter(caseSearchRequest.getCaseTypeId()).ifPresent(boolQueryBuilder::filter));
 

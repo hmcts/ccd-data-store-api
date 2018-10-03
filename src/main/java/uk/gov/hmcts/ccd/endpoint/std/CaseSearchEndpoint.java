@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -11,6 +13,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
@@ -32,6 +35,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
         consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(value = "/", description = "New ElasticSearch based search API")
+@Slf4j
 public class CaseSearchEndpoint {
 
     private final CaseSearchOperation caseSearchOperation;
@@ -58,9 +62,16 @@ public class CaseSearchEndpoint {
         @ApiParam(name = "native ElasticSearch Search API request. Please refer to the ElasticSearch official documentation", required = true)
         @RequestBody String jsonSearchRequest) {
 
+        Instant start = Instant.now();
+
         rejectBlackListedQuery(jsonSearchRequest);
         CaseSearchRequest caseSearchRequest = new CaseSearchRequest(caseTypeId, convertJsonStringToJsonNode(jsonSearchRequest));
-        return caseSearchOperation.execute(caseSearchRequest);
+        CaseSearchResult result = caseSearchOperation.execute(caseSearchRequest);
+
+        Duration between = Duration.between(start, Instant.now());
+        log.info("searchCases execution completed in {} millisecs...", between.toMillis());
+
+        return result;
     }
 
     private JsonNode convertJsonStringToJsonNode(String jsonSearchRequest) {
