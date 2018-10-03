@@ -18,6 +18,7 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
@@ -82,9 +83,11 @@ class SubmitCaseTransaction {
             TODO: Ideally, the callback should be outside of the transaction. However, it requires the case UID to have
             been assigned and the UID generation has to be part of a retryable transaction in order to recover from collisions.
          */
-        callbackInvoker.invokeAboutToSubmitCallback(eventTrigger, null, newCaseDetails, caseType, ignoreWarning);
+        AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse =
+            callbackInvoker.invokeAboutToSubmitCallback(eventTrigger, null, newCaseDetails, caseType, ignoreWarning);
 
-        final CaseDetails savedCaseDetails = saveAuditEventForCaseDetails(event, caseType, idamUser, eventTrigger, newCaseDetails);
+        final CaseDetails savedCaseDetails =
+            saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse, event, caseType, idamUser, eventTrigger, newCaseDetails);
 
         if (AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
             caseUserRepository.grantAccess(Long.valueOf(savedCaseDetails.getId()), idamUser.getId());
@@ -93,7 +96,13 @@ class SubmitCaseTransaction {
         return savedCaseDetails;
     }
 
-    private CaseDetails saveAuditEventForCaseDetails(Event event, CaseType caseType, IDAMProperties idamUser, CaseEvent eventTrigger, CaseDetails newCaseDetails) {
+    private CaseDetails saveAuditEventForCaseDetails(AboutToSubmitCallbackResponse response,
+                                                     Event event,
+                                                     CaseType caseType,
+                                                     IDAMProperties idamUser,
+                                                     CaseEvent eventTrigger,
+                                                     CaseDetails newCaseDetails) {
+
         final CaseDetails savedCaseDetails = caseDetailsRepository.set(newCaseDetails);
         final AuditEvent auditEvent = new AuditEvent();
         auditEvent.setEventId(event.getEventId());
@@ -111,9 +120,10 @@ class SubmitCaseTransaction {
         auditEvent.setUserLastName(idamUser.getSurname());
         auditEvent.setUserFirstName(idamUser.getForename());
         auditEvent.setCreatedDate(newCaseDetails.getCreatedDate());
-        auditEvent.setSecurityClassification(securityClassificationService.getClassificationForEvent(caseType,
-                                                                                                     eventTrigger));
+        auditEvent.setSecurityClassification(securityClassificationService.getClassificationForEvent(caseType, eventTrigger));
         auditEvent.setDataClassification(savedCaseDetails.getDataClassification());
+        auditEvent.setSignificantItem(response.getSignificantItem());
+
         caseAuditEventRepository.set(auditEvent);
         return savedCaseDetails;
     }

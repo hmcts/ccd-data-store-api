@@ -35,7 +35,6 @@ apply plugin: 'jsonschema2pojo'
 apply plugin: 'jacoco'
 apply plugin: 'checkstyle'
 apply plugin: 'pmd'
-apply plugin: 'com.github.spotbugs'
 apply plugin: 'com.github.kt3k.coveralls'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'se.patrikerdes.use-latest-versions'
@@ -154,7 +153,6 @@ tasks.withType(com.github.spotbugs.SpotBugsTask) {
     }
 }
 
-// Delete me once there is no more bug
 spotbugs {
     ignoreFailures = true
 }
@@ -197,7 +195,7 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '0.6.0'
     compile group: 'com.sun.mail', name: 'mailapi', version: '1.6.1'
     compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
-
+    compile group: 'commons-validator', name: 'commons-validator', version: '1.6'
 
     // FIXME 0.6 doesn't support jsonb; 0.7 doesn't work on Windows
 //    runtime group: 'com.impossibl.pgjdbc-ng', name: 'pgjdbc-ng', version: '0.6'

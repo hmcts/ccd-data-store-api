@@ -12,6 +12,9 @@ import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
+import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItemType;
+import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
+import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
@@ -22,11 +25,13 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -53,6 +58,9 @@ class SubmitCaseTransactionTest {
     private static final String STATE_NAME = "Created name";
     private static final String CASE_UID = "1234123412341236";
     private static final String CASE_ID = "45677";
+    public static final String DESCRIPTION = "Description";
+    public static final String URL = "http://www.yahooo.com";
+    public static final SignificantItemType DOCUMENT = SignificantItemType.DOCUMENT;
 
     @Mock
     private CaseDetailsRepository caseDetailsRepository;
@@ -81,7 +89,6 @@ class SubmitCaseTransactionTest {
 
     @InjectMocks
     private SubmitCaseTransaction submitCaseTransaction;
-
     private Event event;
     private CaseType caseType;
     private IDAMProperties idamUser;
@@ -92,18 +99,47 @@ class SubmitCaseTransactionTest {
     void setup() {
         MockitoAnnotations.initMocks(this);
 
+        submitCaseTransaction = new SubmitCaseTransaction(caseDetailsRepository,
+                                                          caseAuditEventRepository,
+                                                          caseTypeService,
+                                                          callbackInvoker,
+                                                          uidService,
+                                                          securityClassificationService,
+                                                          caseUserRepository,
+                                                          userAuthorisation);
+
         event = buildEvent();
         caseType = buildCaseType();
         idamUser = buildIdamUser();
         eventTrigger = buildEventTrigger();
         state = buildState();
+        final AboutToSubmitCallbackResponse response = buildResponse();
+        doReturn(STATE_ID).when(savedCaseDetails).getState();
 
-        when(savedCaseDetails.getState()).thenReturn(STATE_ID);
-        when(caseTypeService.findState(caseType, STATE_ID)).thenReturn(state);
-        when(uidService.generateUID()).thenReturn(CASE_UID);
-        when(caseDetailsRepository.set(caseDetails)).thenReturn(savedCaseDetails);
-        when(savedCaseDetails.getId()).thenReturn(CASE_ID);
-        when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.ALL);
+        doReturn(state).when(caseTypeService).findState(caseType, STATE_ID);
+
+        doReturn(CASE_UID).when(uidService).generateUID();
+
+        doReturn(savedCaseDetails).when(caseDetailsRepository).set(caseDetails);
+
+        doReturn(CASE_ID).when(savedCaseDetails).getId();
+
+        doReturn(response).when(callbackInvoker).invokeAboutToSubmitCallback(eventTrigger,
+                                                                             null,
+                                                                             this.caseDetails, caseType, IGNORE_WARNING
+        );
+
+    }
+
+    private AboutToSubmitCallbackResponse buildResponse() {
+        final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = new AboutToSubmitCallbackResponse();
+        aboutToSubmitCallbackResponse.setState(Optional.of("somestring"));
+        final SignificantItem significantItem = new SignificantItem();
+        significantItem.setType(SignificantItemType.DOCUMENT.name());
+        significantItem.setDescription(DESCRIPTION);
+        significantItem.setUrl(URL);
+        aboutToSubmitCallbackResponse.setSignificantItem(significantItem);
+        return aboutToSubmitCallbackResponse;
     }
 
     private CaseState buildState() {
@@ -147,6 +183,24 @@ class SubmitCaseTransactionTest {
         assertAll(
             () -> verify(caseAuditEventRepository).set(auditEventCaptor.capture()),
             () -> assertAuditEvent(auditEventCaptor.getValue())
+        );
+    }
+
+    @Test
+    @DisplayName("should persist event with significant document")
+    void shouldPersistEventWithSignificantDocument() {
+        final ArgumentCaptor<AuditEvent> auditEventCaptor = ArgumentCaptor.forClass(AuditEvent.class);
+
+        submitCaseTransaction.submitCase(event,
+                                         caseType,
+                                         idamUser,
+                                         eventTrigger,
+                                         this.caseDetails,
+                                         IGNORE_WARNING);
+
+        assertAll(
+            () -> verify(caseAuditEventRepository).set(auditEventCaptor.capture()),
+            () -> assertAuditEventWithSignificantDocument(auditEventCaptor.getValue())
         );
     }
 
@@ -195,18 +249,37 @@ class SubmitCaseTransactionTest {
 
     private void assertAuditEvent(final AuditEvent auditEvent) {
         assertAll("Audit event",
-                  () -> assertThat(auditEvent.getCaseDataId(), is(savedCaseDetails.getId())),
-                  () -> assertThat(auditEvent.getUserId(), is(IDAM_ID)),
-                  () -> assertThat(auditEvent.getUserLastName(), is(IDAM_LNAME)),
-                  () -> assertThat(auditEvent.getUserFirstName(), is(IDAM_FNAME)),
-                  () -> assertThat(auditEvent.getEventName(), is(EVENT_NAME)),
-                  () -> assertThat(auditEvent.getCaseTypeId(), is(CASE_TYPE_ID)),
-                  () -> assertThat(auditEvent.getCaseTypeVersion(), is(VERSION)),
-                  () -> assertThat(auditEvent.getStateId(), is(STATE_ID)),
-                  () -> assertThat(auditEvent.getStateName(), is(STATE_NAME)),
-                  () -> assertThat(auditEvent.getEventId(), is(EVENT_ID)),
-                  () -> assertThat(auditEvent.getSummary(), is(EVENT_SUMMARY)),
-                  () -> assertThat(auditEvent.getDescription(), is(EVENT_DESC)));
+            () -> assertThat(auditEvent.getCaseDataId(), is(savedCaseDetails.getId())),
+            () -> assertThat(auditEvent.getUserId(), is(IDAM_ID)),
+            () -> assertThat(auditEvent.getUserLastName(), is(IDAM_LNAME)),
+            () -> assertThat(auditEvent.getUserFirstName(), is(IDAM_FNAME)),
+            () -> assertThat(auditEvent.getEventName(), is(EVENT_NAME)),
+            () -> assertThat(auditEvent.getCaseTypeId(), is(CASE_TYPE_ID)),
+            () -> assertThat(auditEvent.getCaseTypeVersion(), is(VERSION)),
+            () -> assertThat(auditEvent.getStateId(), is(STATE_ID)),
+            () -> assertThat(auditEvent.getStateName(), is(STATE_NAME)),
+            () -> assertThat(auditEvent.getEventId(), is(EVENT_ID)),
+            () -> assertThat(auditEvent.getSummary(), is(EVENT_SUMMARY)),
+            () -> assertThat(auditEvent.getDescription(), is(EVENT_DESC)));
+    }
+
+    private void assertAuditEventWithSignificantDocument(final AuditEvent auditEvent) {
+        assertAll("Audit event",
+            () -> assertThat(auditEvent.getCaseDataId(), is(savedCaseDetails.getId())),
+            () -> assertThat(auditEvent.getUserId(), is(IDAM_ID)),
+            () -> assertThat(auditEvent.getUserLastName(), is(IDAM_LNAME)),
+            () -> assertThat(auditEvent.getUserFirstName(), is(IDAM_FNAME)),
+            () -> assertThat(auditEvent.getEventName(), is(EVENT_NAME)),
+            () -> assertThat(auditEvent.getCaseTypeId(), is(CASE_TYPE_ID)),
+            () -> assertThat(auditEvent.getCaseTypeVersion(), is(VERSION)),
+            () -> assertThat(auditEvent.getStateId(), is(STATE_ID)),
+            () -> assertThat(auditEvent.getStateName(), is(STATE_NAME)),
+            () -> assertThat(auditEvent.getEventId(), is(EVENT_ID)),
+            () -> assertThat(auditEvent.getSummary(), is(EVENT_SUMMARY)),
+            () -> assertThat(auditEvent.getDescription(), is(EVENT_DESC)),
+            () -> assertThat(auditEvent.getSignificantItem().getType(), is(DOCUMENT.name())),
+            () -> assertThat(auditEvent.getSignificantItem().getDescription(), is(DESCRIPTION)),
+            () -> assertThat(auditEvent.getSignificantItem().getUrl(), is(URL)));
     }
 
     private Event buildEvent() {

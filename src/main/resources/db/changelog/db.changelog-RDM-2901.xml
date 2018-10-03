@@ -1,0 +1,38 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="20" author="mohammed.khatri">
+        <sql>
+            CREATE TYPE significant_item_type AS ENUM ('DOCUMENT');
+        </sql>
+        <createTable tableName="case_event_significant_items">
+            <column name="id" type="serial" autoIncrement="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="significant_item_type">
+                <constraints nullable="false"/>
+            </column>
+            <column name="url" type="text">
+                <constraints nullable="true"/>
+            </column>
+            <column name="case_event_id" type="serial">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey columnNames="id"
+                       constraintName="pk_case_event_significant_items"
+                       tableName="case_event_significant_items"/>
+
+        <addForeignKeyConstraint baseColumnNames="case_event_id"
+                                 baseTableName="case_event_significant_items"
+                                 constraintName="fk_case_event_items_case_event_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="case_event"/>
+    </changeSet>
+
+</databaseChangeLog>

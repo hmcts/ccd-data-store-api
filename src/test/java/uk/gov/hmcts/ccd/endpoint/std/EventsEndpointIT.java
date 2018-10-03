@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import javax.inject.Inject;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -66,11 +67,11 @@ public class EventsEndpointIT extends WireMockBaseTest {
         assertCaseDataResultSetSize();
 
         final MvcResult result = mockMvc.perform(get(GET_EVENTS_AS_CASEWORKER)
-            .contentType(JSON_CONTENT_TYPE)
-            .param("case.PersonFirstName", "Janet ")
-            .header(AUTHORIZATION, "Bearer user1"))
-            .andExpect(status().is(200))
-            .andReturn();
+                                                     .contentType(JSON_CONTENT_TYPE)
+                                                     .param("case.PersonFirstName", "Janet ")
+                                                     .header(AUTHORIZATION, "Bearer user1"))
+                                        .andExpect(status().is(200))
+                                        .andReturn();
 
         String responseAsString = result.getResponse().getContentAsString();
         List<AuditEvent> events = Arrays.asList(mapper.readValue(responseAsString, AuditEvent[].class));
