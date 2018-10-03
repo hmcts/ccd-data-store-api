@@ -205,3 +205,8 @@ variable "http_client_validate_after_inactivity" {
   type = "string"
   default = "0"
 }
+
+variable "appinsights_instrumentation_key" {
+  description = "Instrumentation key of the App Insights instance this webapp should use. Module will create own App Insights resource if this is not provided"
+  default = ""
+}
