@@ -46,6 +46,7 @@ data "azurerm_key_vault_secret" "ccd_data_s2s_key" {
 }
 
 data "azurerm_key_vault_secret" "ccd_elastic_search_url" {
+  count = "${var.elastic_search_enabled == "false" ? 0 : 1}"
   name = "ccd-ELASTIC-SEARCH-URL"
   vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
 }
@@ -102,7 +103,7 @@ module "ccd-data-store-api" {
 
     CCD_DEFAULTPRINTURL                 = "${local.default_print_url}"
 
-    ELASTIC_SEARCH_HOSTS                = "${format("http://%s:9200", data.azurerm_key_vault_secret.ccd_elastic_search_url.value)}"
+    ELASTIC_SEARCH_HOSTS                = "${var.elastic_search_enabled == "false" ? "" : "${format("http://%s:9200", join("", data.azurerm_key_vault_secret.ccd_elastic_search_url.*.value))}"}"
     ELASTIC_SEARCH_BLACKLIST            = "${var.elastic_search_blacklist}"
     ELASTIC_SEARCH_CASE_INDEX_NAME_FORMAT = "${var.elastic_search_case_index_name_format}"
     ELASTIC_SEARCH_CASE_INDEX_TYPE      = "${var.elastic_search_case_index_type}"
