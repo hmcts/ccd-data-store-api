@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
 import java.time.LocalDateTime;
@@ -34,6 +35,9 @@ public class CaseViewEvent {
 
     @JsonProperty("state_id")
     private String stateId;
+
+    @JsonProperty("significant_item")
+    private SignificantItem significantItem;
 
     public Long getId() {
         return id;
@@ -123,6 +127,14 @@ public class CaseViewEvent {
         this.stateId = stateId;
     }
 
+    public SignificantItem getSignificantItem() {
+        return significantItem;
+    }
+
+    public void setSignificantItem(SignificantItem significantItem) {
+        this.significantItem = significantItem;
+    }
+
     public static CaseViewEvent createFrom(AuditEvent event) {
         CaseViewEvent caseEvent = new CaseViewEvent();
         caseEvent.setId(event.getId());
@@ -136,6 +148,7 @@ public class CaseViewEvent {
         caseEvent.setTimestamp(event.getCreatedDate());
         caseEvent.setStateId(event.getStateId());
         caseEvent.setStateName(event.getStateName());
+        caseEvent.setSignificantItem(event.getSignificantItem());
         return caseEvent;
     }
 }
