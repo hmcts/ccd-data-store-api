@@ -2,8 +2,8 @@ FROM hmcts/cnp-java-base:openjdk-jre-8-alpine-1.4
 LABEL maintainer="https://github.com/hmcts/ccd-data-store-api"
 
 ENV APP core-case-data.jar
-ENV APPLICATION_TOTAL_MEMORY 768M
-ENV APPLICATION_SIZE_ON_DISK_IN_MB 86
+ENV APPLICATION_TOTAL_MEMORY 980M
+ENV APPLICATION_SIZE_ON_DISK_IN_MB 85
 
 ENV JAVA_OPTS "-Dspring.config.location=/application.properties -Djava.security.egd=file:/dev/./urandom"
 
