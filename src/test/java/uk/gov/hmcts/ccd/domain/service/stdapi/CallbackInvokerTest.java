@@ -13,6 +13,8 @@ import org.mockito.*;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
+import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItemType;
+import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
@@ -29,9 +31,11 @@ import static java.lang.Boolean.TRUE;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -118,7 +122,7 @@ class CallbackInvokerTest {
         @Test
         @DisplayName("should send callback")
         void shouldSendCallback() {
-            final Optional<String>
+            final AboutToSubmitCallbackResponse
                 response =
                 callbackInvoker.invokeAboutToSubmitCallback(caseEvent,
                                                             caseDetailsBefore,
@@ -131,7 +135,7 @@ class CallbackInvokerTest {
                                          caseEvent,
                                          caseDetailsBefore,
                                          caseDetails);
-            assertThat(response.isPresent(), is(false));
+            assertThat(response.getState().isPresent(), is(false));
         }
 
         @Test
@@ -144,8 +148,7 @@ class CallbackInvokerTest {
                                                                             same(caseEvent),
                                                                             same(caseDetailsBefore),
                                                                             same(caseDetails));
-            final Optional<String>
-                response =
+            final AboutToSubmitCallbackResponse response =
                 callbackInvoker.invokeAboutToSubmitCallback(caseEvent,
                                                             caseDetailsBefore,
                                                             caseDetails,
@@ -157,7 +160,7 @@ class CallbackInvokerTest {
                                          caseEvent,
                                          caseDetailsBefore,
                                          caseDetails);
-            assertThat(response.get(), is(expectedState));
+            assertThat(response.getState().get(), is(expectedState));
         }
 
         @Test
@@ -169,8 +172,7 @@ class CallbackInvokerTest {
                                                                             same(caseEvent),
                                                                             same(caseDetailsBefore),
                                                                             same(caseDetails));
-            final Optional<String>
-                response =
+            final AboutToSubmitCallbackResponse response =
                 callbackInvoker.invokeAboutToSubmitCallback(caseEvent,
                                                             caseDetailsBefore,
                                                             caseDetails,
@@ -182,9 +184,96 @@ class CallbackInvokerTest {
                                          caseEvent,
                                          caseDetailsBefore,
                                          caseDetails);
-            assertThat(response.isPresent(), is(false));
+            assertThat(response.getState().isPresent(), is(false));
         }
 
+        @Test
+        @DisplayName("should send callback and get state and significant Item")
+        void sendCallbackAndGetStateAndSignificantDocument() {
+            final String expectedState = "uNiCORn";
+            doReturn(Optional.of(mockCallbackResponseWithSignificantItem(expectedState))).when(callbackService)
+                .send(any(),
+                    any(),
+                    same(caseEvent),
+                    same(caseDetailsBefore),
+                    same(caseDetails));
+
+            final AboutToSubmitCallbackResponse response =
+                callbackInvoker.invokeAboutToSubmitCallback(caseEvent,
+                    caseDetailsBefore,
+                    caseDetails,
+                    caseType,
+                    IGNORE_WARNING);
+
+            verify(callbackService).send(URL_ABOUT_TO_SUBMIT,
+                RETRIES_ABOUT_TO_SUBMIT,
+                caseEvent,
+                caseDetailsBefore,
+                caseDetails);
+            assertThat(response.getState().get(), is(expectedState));
+            assertEquals("description",response.getSignificantItem().getDescription());
+            assertEquals(SignificantItemType.DOCUMENT.name(),response.getSignificantItem().getType());
+            assertEquals("http://www.cnn.com", response.getSignificantItem().getUrl());
+        }
+
+        @Test
+        @DisplayName("should send callback and get state and significant Item")
+        void sendCallbackAndGetStateAndSignificantDocumentWithInvalidURL() {
+            final String expectedState = "uNiCORn";
+            doReturn(Optional.of(mockCallbackResponseWithSignificantItem(expectedState))).when(callbackService)
+                                                                                         .send(any(),
+                                                                                               any(),
+                                                                                               same(caseEvent),
+                                                                                               same(caseDetailsBefore),
+                                                                                               same(caseDetails));
+
+            final AboutToSubmitCallbackResponse response =
+                callbackInvoker.invokeAboutToSubmitCallback(caseEvent,
+                                                            caseDetailsBefore,
+                                                            caseDetails,
+                                                            caseType,
+                                                            IGNORE_WARNING);
+
+            verify(callbackService).send(URL_ABOUT_TO_SUBMIT,
+                                         RETRIES_ABOUT_TO_SUBMIT,
+                                         caseEvent,
+                                         caseDetailsBefore,
+                                         caseDetails);
+            assertThat(response.getState().get(), is(expectedState));
+            assertEquals("description",response.getSignificantItem().getDescription());
+            assertEquals(SignificantItemType.DOCUMENT.name(),response.getSignificantItem().getType());
+            assertEquals("http://www.cnn.com", response.getSignificantItem().getUrl());
+        }
+
+        @Test
+        @DisplayName("should send callback with errors of significant item is incorrect")
+        void sendCallbackAndGetStateAndIncorrectSignificantDocument() {
+            final String expectedState = "uNiCORn";
+            CallbackResponse callbackResponse = mockCallbackResponseWithIncorrectSignificantItem(expectedState);
+            doReturn(Optional.of(callbackResponse)).when(callbackService)
+                .send(any(),
+                    any(),
+                    same(caseEvent),
+                    same(caseDetailsBefore),
+                    same(caseDetails));
+            final AboutToSubmitCallbackResponse
+                response =
+                callbackInvoker.invokeAboutToSubmitCallback(caseEvent,
+                    caseDetailsBefore,
+                    caseDetails,
+                    caseType,
+                    IGNORE_WARNING);
+
+            verify(callbackService).send(URL_ABOUT_TO_SUBMIT,
+                RETRIES_ABOUT_TO_SUBMIT,
+                caseEvent,
+                caseDetailsBefore,
+                caseDetails);
+            assertThat(response.getState().get(), is(expectedState));
+            assertNull(response.getSignificantItem());
+            assertEquals(3, callbackResponse.getErrors().size());
+
+        }
         private CallbackResponse mockCallbackResponse(final String state) {
             final CallbackResponse response = new CallbackResponse();
             final Map<String, JsonNode> data = new HashMap<>();
@@ -193,6 +282,31 @@ class CallbackInvokerTest {
             return response;
         }
 
+        private CallbackResponse mockCallbackResponseWithSignificantItem(final String state) {
+            final CallbackResponse response = new CallbackResponse();
+            SignificantItem significantItem = new SignificantItem();
+            significantItem.setUrl("http://www.cnn.com");
+            significantItem.setDescription("description");
+            significantItem.setType(SignificantItemType.DOCUMENT.name());
+            response.setSignificantItem(significantItem);
+            final Map<String, JsonNode> data = new HashMap<>();
+            data.put("state", JsonNodeFactory.instance.textNode(state));
+            response.setData(data);
+            return response;
+        }
+
+        private CallbackResponse mockCallbackResponseWithIncorrectSignificantItem(final String state) {
+            final CallbackResponse response = new CallbackResponse();
+            SignificantItem significantItem = new SignificantItem();
+            significantItem.setUrl("http://www..com");
+            significantItem.setDescription("");
+
+            response.setSignificantItem(significantItem);
+            final Map<String, JsonNode> data = new HashMap<>();
+            data.put("state", JsonNodeFactory.instance.textNode(state));
+            response.setData(data);
+            return response;
+        }
         private CallbackResponse mockCallbackResponseWithNoState() {
             return new CallbackResponse();
         }

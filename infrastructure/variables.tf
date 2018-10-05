@@ -95,7 +95,29 @@ variable "default_print_url" {
 }
 
 variable "frontend_url" {
+  description = "Optional front end URL to use for building redirect URI"
   type = "string"
   default = ""
-  description = "Optional front end URL to use for building redirect URI"
+}
+
+variable "elastic_search_blacklist" {
+  description = "Forbidden elastic search query types"
+  type = "string"
+  default = "query_string"
+}
+
+variable "elastic_search_enabled" {
+  default = "false"
+}
+
+variable "elastic_search_case_index_name_format" {
+  description = "Format of the elastic search index name for cases"
+  type = "string"
+  default = "%s_cases"
+}
+
+variable "elastic_search_case_index_type" {
+  description = "Cases index document type"
+  type = "string"
+  default = "case"
 }
