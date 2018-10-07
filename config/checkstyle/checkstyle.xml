@@ -71,6 +71,7 @@
         <module name="UpperEll"/>
         <module name="ModifierOrder"/>
         <module name="EmptyLineSeparator">
+            <property name="severity" value="error"/>
             <property name="allowNoEmptyLineBetweenFields" value="true"/>
         </module>
         <module name="SeparatorWrap">
