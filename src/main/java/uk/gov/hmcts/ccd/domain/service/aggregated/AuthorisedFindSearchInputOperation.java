@@ -35,7 +35,7 @@ public class AuthorisedFindSearchInputOperation implements FindSearchInputOperat
             .filter(ct -> ct.getId().equalsIgnoreCase(caseTypeId))
             .findFirst();
 
-        if(!caseType.isPresent()){
+        if (!caseType.isPresent()) {
             ResourceNotFoundException resourceNotFoundException = new ResourceNotFoundException(NO_CASE_TYPE_FOUND);
             resourceNotFoundException.withDetails(NO_CASE_TYPE_FOUND_DETAILS);
             throw resourceNotFoundException;

@@ -153,7 +153,7 @@ public abstract class BaseTest {
         caseDetails.setSecurityClassification(SecurityClassification.valueOf(resultSet.getString("security_classification")));
         caseDetails.setCaseTypeId(resultSet.getString("case_type_id"));
         final Timestamp createdAt = resultSet.getTimestamp("created_date");
-        if(null != createdAt) {
+        if (null != createdAt) {
             caseDetails.setCreatedDate(createdAt.toLocalDateTime());
         }
         final Timestamp modifiedAt = resultSet.getTimestamp("last_modified");

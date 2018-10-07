@@ -47,7 +47,7 @@ class AuthorisedFindSearchInputOperationTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        testSearchInputs =Arrays.asList(
+        testSearchInputs = Arrays.asList(
             aSearchInput().withFieldId(CASE_FIELD_ID_1_1).build(),
             aSearchInput().withFieldId(CASE_FIELD_ID_1_2).build(),
             aSearchInput().withFieldId(CASE_FIELD_ID_1_3).build(),

@@ -475,7 +475,7 @@ public class CaseDetailsEndpoint {
                     String.join((","), MetaData.unknownMetadata(metadataParams))));
         }
         param(queryParameters, SECURITY_CLASSIFICATION.getParameterName()).ifPresent(sc -> {
-            if(!EnumUtils.isValidEnum(SecurityClassification.class, sc.toUpperCase())) {
+            if (!EnumUtils.isValidEnum(SecurityClassification.class, sc.toUpperCase())) {
                 throw new BadRequestException(String.format("unknown security classification '%s'", sc));
             }
         });
