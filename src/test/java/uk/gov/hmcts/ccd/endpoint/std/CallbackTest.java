@@ -374,6 +374,7 @@ public class CallbackTest extends WireMockBaseTest {
         assertEquals("Some description", significantItemList.get(0).getDescription());
         assertEquals(SignificantItemType.DOCUMENT.name(), significantItemList.get(0).getType());
     }
+
     @Test
     public void shouldReturn400WhenPostCreateCaseWithInvalidSignificantDocument() throws Exception {
         final String URL = String.format("/caseworkers/%s/jurisdictions/%s/case-types/%s/cases", USER_ID, JURISDICTION_ID, CASE_TYPE_ID);
@@ -606,6 +607,7 @@ public class CallbackTest extends WireMockBaseTest {
 
         assertEquals("Invalid modified content were not caught by validators", 422, mvcResult.getResponse().getStatus());
     }
+
     @Test
     public void shouldReturn422WhenPostCreateCaseWithInvalidModifiedMissingDocumentDataFromBeforeCommitForCaseworker() throws Exception {
         final String URL = String.format("/caseworkers/%s/jurisdictions/%s/case-types/%s/cases", USER_ID, JURISDICTION_ID, CASE_TYPE_ID);

@@ -189,6 +189,7 @@ public abstract class BaseTest {
         significantItem.setUrl(resultSet.getString("URL"));
         return significantItem;
     }
+
     protected AuditEvent mapAuditEvent(ResultSet resultSet, Integer i) throws SQLException {
         final AuditEvent auditEvent = new AuditEvent();
         auditEvent.setId(resultSet.getLong("id"));
