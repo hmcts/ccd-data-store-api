@@ -333,6 +333,7 @@ public class CaseDetailsEndpoint {
         @RequestBody final CaseDataContent content) {
         return validateCaseFieldsOperation.validateCaseDetails(jurisdictionId, caseTypeId, content.getEvent(), content.getData());
     }
+
     @Transactional
     @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)

@@ -28,6 +28,7 @@ public class DefaultFindSearchInputOperation implements FindSearchInputOperation
 
     private final UIDefinitionRepository uiDefinitionRepository;
     private final CaseDefinitionRepository caseDefinitionRepository;
+
     public DefaultFindSearchInputOperation(final UIDefinitionRepository uiDefinitionRepository,
                                               @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository) {
         this.uiDefinitionRepository = uiDefinitionRepository;
