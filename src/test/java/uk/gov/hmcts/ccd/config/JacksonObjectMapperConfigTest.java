@@ -27,9 +27,9 @@ class JacksonObjectMapperConfigTest {
     }
 
     @Test
-    @DisplayName("should configure an ObjectMapper for HAL")
-    void shouldConfigureHalObjectMapper() {
-        final ObjectMapper mapper = mapperConfig.halObjectMapper();
+    @DisplayName("should configure a default ObjectMapper")
+    void shouldConfigureDefaultObjectMapper() {
+        final ObjectMapper mapper = mapperConfig.defaultObjectMapper();
 
         assertAll(
             () -> assertThat(mapper.canSerialize(LocalDateTime.class), is(true)),

@@ -10,13 +10,18 @@ import org.springframework.context.annotation.Primary;
 @Configuration
 public class JacksonObjectMapperConfig {
 
+    /**
+     * An object mapper configured to support java.time and write Date and Times in ISO8601.
+     *
+     * @return Default ObjectMapper, used by Spring and HAL to serialise responses, and deserialise requests.
+     */
     @Primary
-    @Bean(name = "HalObjectMapper")
-    public ObjectMapper halObjectMapper() {
-        ObjectMapper halObjectMapper = new ObjectMapper();
-        halObjectMapper.registerModules(new JavaTimeModule());
-        halObjectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        return halObjectMapper;
+    @Bean(name = "DefaultObjectMapper")
+    public ObjectMapper defaultObjectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModules(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        return mapper;
     }
 
     @Bean(name = "SimpleObjectMapper")
