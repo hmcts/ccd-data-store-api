@@ -25,7 +25,7 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
 
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final Map<String, List<CaseType>> caseTypesForJurisdictions = newHashMap();
-    private final Map<String , CaseTypeDefinitionVersion> versions = newHashMap();
+    private final Map<String, CaseTypeDefinitionVersion> versions = newHashMap();
     private final Map<String, UserRole> userRoleClassifications = newHashMap();
     private final Map<String, List<FieldType>> baseTypes = newHashMap();
 

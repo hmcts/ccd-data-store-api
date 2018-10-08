@@ -38,7 +38,7 @@ public class NumberValidator implements BaseTypeValidator {
                 // dataValue may be a boolean, array or pojo node
                 return Collections.singletonList(new ValidationResult(dataValue + " is not a number", dataFieldId));
             } else {
-                numberValue =new BigDecimal(value);
+                numberValue = new BigDecimal(value);
             }
             if (!checkMax(caseFieldDefinition.getFieldType().getMax(), numberValue)) {
                 return Collections.singletonList(new ValidationResult("Should be less than or equal to " + caseFieldDefinition.getFieldType().getMax(), dataFieldId));
