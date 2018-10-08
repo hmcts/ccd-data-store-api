@@ -47,7 +47,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
     private static final String GET_CASES = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases";
     private static final String GET_CASES_NO_READ_CASE_FIELD_ACCESS = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCaseNoReadFieldAccess/cases";
     private static final String GET_CASES_NO_READ_CASE_TYPE_ACCESS = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase4/cases";
-    private static final String GET_DRAFT = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/drafts/5";
+    private static final String GET_DRAFT = "/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/drafts/5";
     private static final String GET_CASE = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/1504259907353529";
     private static final String GET_CASE_NO_EVENT_READ_ACCESS = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCaseNoReadEventAccess/cases" +
         "/1504259907353636";
