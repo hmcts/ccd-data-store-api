@@ -1,52 +1,51 @@
 package uk.gov.hmcts.ccd.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.mockito.Mock;
+import org.junit.jupiter.api.Test;
+
+import java.time.LocalDateTime;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("JacksonObjectMapperConfig")
 class JacksonObjectMapperConfigTest {
 
-    @Mock
-    private ObjectMapper objectMapper;
+    private static final String DATE_TIME_ISO8601 = "2017-03-01T10:20:30";
+    private static final LocalDateTime DATE_TIME = LocalDateTime.parse(DATE_TIME_ISO8601);
+    private static final String DATE_TIME_ARRAY = "[2017,3,1,10,20,30]";
 
-//    private JacksonObjectMapperConfig.HalObjectMapperPostProcessor halProcessor;
-//
-//    @BeforeEach
-//    void setUp() {
-//        MockitoAnnotations.initMocks(this);
-//
-//        final JacksonObjectMapperConfig mapperConfig = new JacksonObjectMapperConfig();
-//        halProcessor = mapperConfig.halObjectMapperPostProcessor();
-//    }
-//
-//    @Test
-//    @DisplayName("should return bean as is before initialisation")
-//    void postProcessBeforeInitialization() {
-//        final Object bean = halProcessor.postProcessBeforeInitialization(objectMapper, HAL_OBJECT_MAPPER);
-//
-//        assertThat(bean, sameInstance(objectMapper));
-//        verifyNoMoreInteractions(bean);
-//    }
-//
-//    @Test
-//    @DisplayName("should configure HAL Object Mapper after initialisation")
-//    void shouldConfigureHalAfterInit() {
-//        final Object bean = halProcessor.postProcessAfterInitialization(objectMapper, HAL_OBJECT_MAPPER);
-//
-//        assertThat(bean, sameInstance(objectMapper));
-//        verify(objectMapper).registerModules(Mockito.any(JavaTimeModule.class));
-//        verify(objectMapper).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-//        verifyNoMoreInteractions(bean);
-//    }
-//
-//    @Test
-//    @DisplayName("should return other beans as is after initialisation")
-//    void shouldReturnOtherBeansAsIs() {
-//        final Object bean = halProcessor.postProcessAfterInitialization(objectMapper, "otherBean");
-//
-//        assertThat(bean, sameInstance(objectMapper));
-//        verifyNoMoreInteractions(bean);
-//    }
+    private JacksonObjectMapperConfig mapperConfig;
+
+    @BeforeEach
+    void setUp() {
+        mapperConfig = new JacksonObjectMapperConfig();
+    }
+
+    @Test
+    @DisplayName("should configure an ObjectMapper for HAL")
+    void shouldConfigureHalObjectMapper() {
+        final ObjectMapper mapper = mapperConfig.halObjectMapper();
+
+        assertAll(
+            () -> assertThat(mapper.canSerialize(LocalDateTime.class), is(true)),
+            () -> assertThat(mapper.writeValueAsString(DATE_TIME), equalTo("\"" + DATE_TIME_ISO8601 + "\""))
+        );
+    }
+
+    @Test
+    @DisplayName("should configure a simple ObjectMapper")
+    void shouldConfigureSimpleObjectMapper() {
+        final ObjectMapper mapper = mapperConfig.simpleObjectMapper();
+
+        assertAll(
+            () -> assertThat(mapper.canSerialize(LocalDateTime.class), is(true)),
+            () -> assertThat(mapper.writeValueAsString(DATE_TIME), equalTo(DATE_TIME_ARRAY))
+        );
+    }
 
 }
