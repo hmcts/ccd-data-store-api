@@ -69,8 +69,7 @@ class CachedCaseDefinitionRepositoryTest {
 
             doReturn(newArrayList(new CaseType(), new CaseType())).when(caseDefinitionRepository).getCaseTypesForJurisdiction(JURISDICTION_ID);
 
-            final List<CaseType> caseTypes = cachedCaseDefinitionRepository.getCaseTypesForJurisdiction
-                (JURISDICTION_ID);
+            final List<CaseType> caseTypes = cachedCaseDefinitionRepository.getCaseTypesForJurisdiction(JURISDICTION_ID);
 
             assertAll(
                 () -> assertThat(caseTypes, is(expectedCaseTypes)),
@@ -193,8 +192,7 @@ class CachedCaseDefinitionRepositoryTest {
                 aUserRole().withRole(USER_ROLE_4).build());
             doReturn(someOtherUserRolesList).when(caseDefinitionRepository).getClassificationsForUserRoleList(userRoles);
 
-            final List<UserRole> userRolesList = cachedCaseDefinitionRepository.getClassificationsForUserRoleList
-                (userRoles);
+            final List<UserRole> userRolesList = cachedCaseDefinitionRepository.getClassificationsForUserRoleList(userRoles);
 
             assertAll(
                 () -> assertThat(userRolesList, is(expectedUserRolesList)),

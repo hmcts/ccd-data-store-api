@@ -106,9 +106,8 @@ variable "elastic_search_blacklist" {
   default = "query_string"
 }
 
-variable "elasticsearch_hosts" {
-  type = "string"
-  default = ""
+variable "elastic_search_enabled" {
+  default = "false"
 }
 
 variable "elastic_search_case_index_name_format" {

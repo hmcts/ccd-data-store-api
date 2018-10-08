@@ -50,11 +50,6 @@ public class MultiSelectListValidatorTest {
     }
 
     @Test
-    public void getType() {
-        assertThat(validator.getType(), is(BaseType.get("MultiSelectList")));
-    }
-
-    @Test
     public void validate_shouldBeValidWhenNull() {
         final List<ValidationResult> results = validator.validate(FIELD_ID, null, caseField);
 
