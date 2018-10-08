@@ -27,6 +27,7 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.model.std.validator.EventValidator;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.*;
+import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
@@ -121,16 +122,18 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
 
         validatePreState(caseDetails, eventTrigger);
         mergeUpdatedFieldsToCaseDetails(data, caseDetails, eventTrigger, caseType);
+        AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = callbackInvoker.invokeAboutToSubmitCallback(eventTrigger,
+            caseDetailsBefore,
+            caseDetails,
+            caseType,
+            ignoreWarning);
+
         final Optional<String>
-            newState =
-            callbackInvoker.invokeAboutToSubmitCallback(eventTrigger,
-                                                        caseDetailsBefore,
-                                                        caseDetails,
-                                                        caseType,
-                                                        ignoreWarning);
+            newState = aboutToSubmitCallbackResponse.getState();
+
         this.validateCaseFieldsOperation.validateCaseDetails(jurisdictionId, caseTypeId, event, caseDetails.getData());
         final CaseDetails savedCaseDetails = saveCaseDetails(caseDetails, eventTrigger, newState);
-        saveAuditEventForCaseDetails(event, eventTrigger, savedCaseDetails, caseType);
+        saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse, event, eventTrigger, savedCaseDetails, caseType);
 
         if (!isBlank(eventTrigger.getCallBackURLSubmittedEvent())) {
             try { // make a call back
@@ -224,7 +227,8 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
         }
     }
 
-    private void saveAuditEventForCaseDetails(final Event event,
+    private void saveAuditEventForCaseDetails(final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse,
+                                              final Event event,
                                               final CaseEvent eventTrigger,
                                               final CaseDetails caseDetails,
                                               final CaseType caseType) {
@@ -248,6 +252,7 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
         auditEvent.setCreatedDate(LocalDateTime.now(ZoneOffset.UTC));
         auditEvent.setSecurityClassification(securityClassificationService.getClassificationForEvent(caseType, eventTrigger));
         auditEvent.setDataClassification(caseDetails.getDataClassification());
+        auditEvent.setSignificantItem(aboutToSubmitCallbackResponse.getSignificantItem());
 
         caseAuditEventRepository.set(auditEvent);
     }

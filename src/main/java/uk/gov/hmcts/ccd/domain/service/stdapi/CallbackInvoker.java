@@ -16,12 +16,11 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityValidationService;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static com.google.common.collect.Maps.newHashMap;
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.ccd.domain.service.validate.ValidateSignificantDocument.validateSignificantItem;
 
 @Service
 public class CallbackInvoker {
@@ -33,6 +32,7 @@ public class CallbackInvoker {
     private final CaseDataService caseDataService;
     private final CaseSanitiser caseSanitiser;
     private final SecurityValidationService securityValidationService;
+
 
     @Autowired
     public CallbackInvoker(final CallbackService callbackService,
@@ -62,19 +62,25 @@ public class CallbackInvoker {
                                                                                       response));
     }
 
-    public Optional<String> invokeAboutToSubmitCallback(final CaseEvent eventTrigger,
-                                                        final CaseDetails caseDetailsBefore,
-                                                        final CaseDetails caseDetails,
-                                                        final CaseType caseType,
-                                                        final Boolean ignoreWarning) {
+    public AboutToSubmitCallbackResponse invokeAboutToSubmitCallback(final CaseEvent eventTrigger,
+                                                                     final CaseDetails caseDetailsBefore,
+                                                                     final CaseDetails caseDetails,
+                                                                     final CaseType caseType,
+                                                                     final Boolean ignoreWarning) {
+
         final Optional<CallbackResponse> callbackResponse = callbackService.send(
             eventTrigger.getCallBackURLAboutToSubmitEvent(),
             eventTrigger.getRetriesTimeoutURLAboutToSubmitEvent(),
             eventTrigger, caseDetailsBefore, caseDetails);
-        return callbackResponse.flatMap(response -> validateAndSetFromAboutToSubmitCallback(caseType,
-                                                                                            caseDetails,
-                                                                                            ignoreWarning,
-                                                                                            response));
+
+        if (callbackResponse.isPresent()) {
+            return validateAndSetFromAboutToSubmitCallback(caseType,
+                                                           caseDetails,
+                                                           ignoreWarning,
+                                                           callbackResponse.get());
+        }
+
+        return new AboutToSubmitCallbackResponse();
     }
 
     public ResponseEntity<AfterSubmitCallbackResponse> invokeSubmittedCallback(final CaseEvent eventTrigger,
@@ -88,7 +94,10 @@ public class CallbackInvoker {
                                     AfterSubmitCallbackResponse.class);
     }
 
-    private void validateAndSetFromAboutToStartCallback(CaseType caseType, CaseDetails caseDetails, Boolean ignoreWarning, CallbackResponse callbackResponse) {
+    private void validateAndSetFromAboutToStartCallback(CaseType caseType,
+                                                        CaseDetails caseDetails,
+                                                        Boolean ignoreWarning,
+                                                        CallbackResponse callbackResponse) {
         callbackService.validateCallbackErrorsAndWarnings(callbackResponse, ignoreWarning);
 
         if (callbackResponse.getData() != null) {
@@ -96,33 +105,45 @@ public class CallbackInvoker {
         }
     }
 
-    private Optional<String> validateAndSetFromAboutToSubmitCallback(final CaseType caseType,
-                                                                    final CaseDetails caseDetails,
-                                                                    final Boolean ignoreWarning,
-                                                                    final CallbackResponse callbackResponse) {
+    private AboutToSubmitCallbackResponse validateAndSetFromAboutToSubmitCallback(final CaseType caseType,
+                                                                                  final CaseDetails caseDetails,
+                                                                                  final Boolean ignoreWarning,
+                                                                                  final CallbackResponse callbackResponse) {
+
+        final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = new AboutToSubmitCallbackResponse();
+
+        validateSignificantItem(aboutToSubmitCallbackResponse, callbackResponse);
         callbackService.validateCallbackErrorsAndWarnings(callbackResponse, ignoreWarning);
         if (callbackResponse.getData() != null) {
             validateAndSetData(caseType, caseDetails, callbackResponse.getData());
             if (callbackResponseHasCaseAndDataClassification(callbackResponse)) {
                 securityValidationService.setClassificationFromCallbackIfValid(callbackResponse,
                                                                                caseDetails,
-                                                                               deduceDefaultClassificationForExistingFields(caseType, caseDetails));
+                                                                               deduceDefaultClassificationForExistingFields(
+                                                                                   caseType,
+                                                                                   caseDetails));
             }
             final Optional<String> newCaseState = filterCaseState(callbackResponse.getData());
             newCaseState.ifPresent(caseDetails::setState);
-            return newCaseState;
+            aboutToSubmitCallbackResponse.setState(newCaseState);
+            return aboutToSubmitCallbackResponse;
         }
-        return Optional.empty();
+
+        aboutToSubmitCallbackResponse.setState(Optional.empty());
+        return aboutToSubmitCallbackResponse;
     }
+
 
     private boolean callbackResponseHasCaseAndDataClassification(CallbackResponse callbackResponse) {
         return (callbackResponse.getSecurityClassification() != null && callbackResponse.getDataClassification() != null) ? true : false;
     }
 
-    private Map<String, JsonNode> deduceDefaultClassificationForExistingFields(CaseType caseType, CaseDetails caseDetails) {
-        Map<String, JsonNode> defaultSecurityClassifications = caseDataService.getDefaultSecurityClassifications(caseType,
-                                                                                                                 caseDetails.getData(),
-                                                                                                                 EMPTY_DATA_CLASSIFICATION);
+    private Map<String, JsonNode> deduceDefaultClassificationForExistingFields(CaseType caseType,
+                                                                               CaseDetails caseDetails) {
+        Map<String, JsonNode> defaultSecurityClassifications = caseDataService.getDefaultSecurityClassifications(
+            caseType,
+            caseDetails.getData(),
+            EMPTY_DATA_CLASSIFICATION);
         return defaultSecurityClassifications;
     }
 
@@ -135,10 +156,11 @@ public class CallbackInvoker {
     }
 
     private void deduceDataClassificationForNewFields(CaseType caseType, CaseDetails caseDetails) {
-        Map<String, JsonNode> defaultSecurityClassifications = caseDataService.getDefaultSecurityClassifications(caseType,
-                                                                                                                 caseDetails.getData(),
-                                                                                                                 ofNullable(caseDetails.getDataClassification()).orElse(
-                                                                                                                     newHashMap()));
+        Map<String, JsonNode> defaultSecurityClassifications = caseDataService.getDefaultSecurityClassifications(
+            caseType,
+            caseDetails.getData(),
+            ofNullable(caseDetails.getDataClassification()).orElse(
+                newHashMap()));
         caseDetails.setDataClassification(defaultSecurityClassifications);
     }
 
@@ -147,4 +169,5 @@ public class CallbackInvoker {
         jsonNode.ifPresent(value -> data.remove(CALLBACK_RESPONSE_KEY_STATE));
         return jsonNode.flatMap(value -> value.isTextual() ? Optional.of(value.textValue()) : Optional.empty());
     }
+
 }

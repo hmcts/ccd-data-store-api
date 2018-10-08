@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.annotations.ApiModelProperty;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
+import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -41,6 +42,9 @@ public class AuditEvent extends Event {
     private Map<String, JsonNode> dataClassification;
     @JsonProperty("security_classification")
     private SecurityClassification securityClassification;
+    @JsonProperty("significant_item")
+    private SignificantItem significantItem;
+
 
     public Long getId() {
         return id;
@@ -136,6 +140,14 @@ public class AuditEvent extends Event {
 
     public void setData(Map<String, JsonNode> data) {
         this.data = data;
+    }
+
+    public SignificantItem getSignificantItem() {
+        return significantItem;
+    }
+
+    public void setSignificantItem(SignificantItem significantItem) {
+        this.significantItem = significantItem;
     }
 
     /**

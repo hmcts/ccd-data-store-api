@@ -31,6 +31,7 @@ import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.data.user.DefaultUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
+import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackService;
@@ -180,6 +181,14 @@ public abstract class BaseTest {
         return caseDetails;
     }
 
+    protected SignificantItem mapSignificantItem(ResultSet resultSet, Integer i) throws SQLException {
+        final SignificantItem  significantItem = new SignificantItem();
+
+        significantItem.setType(resultSet.getString("type"));
+        significantItem.setDescription(resultSet.getString("description"));
+        significantItem.setUrl(resultSet.getString("URL"));
+        return significantItem;
+    }
     protected AuditEvent mapAuditEvent(ResultSet resultSet, Integer i) throws SQLException {
         final AuditEvent auditEvent = new AuditEvent();
         auditEvent.setId(resultSet.getLong("id"));
