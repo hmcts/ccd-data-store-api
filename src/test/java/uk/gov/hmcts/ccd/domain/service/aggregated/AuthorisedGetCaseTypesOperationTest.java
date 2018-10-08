@@ -337,6 +337,7 @@ class AuthorisedGetCaseTypesOperationTest {
             );
         }
     }
+
         @Nested
     @DisplayName("events tests")
     class ReturnsCaseTypesWithEventsThatMatchAccessCriteria {

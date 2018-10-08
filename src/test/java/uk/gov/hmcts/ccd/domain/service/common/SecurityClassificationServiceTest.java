@@ -85,6 +85,7 @@ public class SecurityClassificationServiceTest {
                 testCaseType,
                 CASE_FIELD_ID_1_1));
         }
+
         @Test
         @DisplayName("should return FALSE when user doesn't have enough SC rank")
         void userDoesNotHaveEnoughSecurityClassificationForField() {

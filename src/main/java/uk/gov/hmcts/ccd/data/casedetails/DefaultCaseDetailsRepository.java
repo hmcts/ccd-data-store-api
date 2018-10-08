@@ -169,7 +169,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
         int pageSize = applicationParams.getPaginationPageSize();
         PaginatedSearchMetadata sr = new PaginatedSearchMetadata();
         sr.setTotalResultsCount(totalResults);
-        sr.setTotalPagesCount((int) Math.ceil((double) sr.getTotalResultsCount()/pageSize));
+        sr.setTotalPagesCount((int) Math.ceil((double) sr.getTotalResultsCount() / pageSize));
         return sr;
     }
 
@@ -194,7 +194,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     private Query getQuery(MetaData metadata, Map<String, String> dataSearchParams, boolean isCountQuery) {
         Query query;
         if (dataSearchParams.isEmpty()) {
-            query = isCountQuery? getCountQueryByMetaData(metadata) : getQueryByMetaData(metadata);
+            query = isCountQuery ? getCountQueryByMetaData(metadata) : getQueryByMetaData(metadata);
         } else {
             query = getQueryByParameters(metadata, dataSearchParams, isCountQuery);
         }

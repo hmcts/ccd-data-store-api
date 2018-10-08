@@ -52,6 +52,7 @@ class AccessControlServiceFilterTest {
     @Test
     @DisplayName("Should filter caseFields if CREATE ACL is missing for some fields")
     void filterCaseFieldsUserHasAccess() {
+
         final CaseType caseType = newCaseType()
             .withField(aCaseField()
                 .withId("Name")

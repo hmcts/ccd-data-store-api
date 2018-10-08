@@ -172,35 +172,28 @@ class CachedCaseDetailsRepositoryTest {
         @Test
         @DisplayName("should initially retrieve case details from decorated repository")
         void findUniqueCase() {
-            doReturn(caseDetails).when(caseDetailsRepository).findUniqueCase(JURISDICTION_ID, CASE_TYPE_ID, valueOf
-                (CASE_REFERENCE));
+            doReturn(caseDetails).when(caseDetailsRepository).findUniqueCase(JURISDICTION_ID, CASE_TYPE_ID, valueOf(CASE_REFERENCE));
 
-            CaseDetails returned = cachedRepository.findUniqueCase(JURISDICTION_ID, CASE_TYPE_ID, valueOf
-                (CASE_REFERENCE));
+            CaseDetails returned = cachedRepository.findUniqueCase(JURISDICTION_ID, CASE_TYPE_ID, valueOf(CASE_REFERENCE));
 
             assertAll(
                 () -> assertThat(returned, is(caseDetails)),
-                () -> verify(caseDetailsRepository, times(1)).findUniqueCase(JURISDICTION_ID, CASE_TYPE_ID, valueOf
-                    (CASE_REFERENCE))
+                () -> verify(caseDetailsRepository, times(1)).findUniqueCase(JURISDICTION_ID, CASE_TYPE_ID, valueOf(CASE_REFERENCE))
             );
         }
 
         @Test
         @DisplayName("should cache case details for subsequent calls")
         void findUniqueCaseAgain() {
-            doReturn(caseDetails).when(caseDetailsRepository).findUniqueCase(JURISDICTION_ID, CASE_TYPE_ID, valueOf
-                (CASE_REFERENCE));
+            doReturn(caseDetails).when(caseDetailsRepository).findUniqueCase(JURISDICTION_ID, CASE_TYPE_ID, valueOf(CASE_REFERENCE));
 
             cachedRepository.findUniqueCase(JURISDICTION_ID, CASE_TYPE_ID, valueOf(CASE_REFERENCE));
 
-            verify(caseDetailsRepository, times(1)).findUniqueCase(JURISDICTION_ID, CASE_TYPE_ID, valueOf
-                (CASE_REFERENCE));
+            verify(caseDetailsRepository, times(1)).findUniqueCase(JURISDICTION_ID, CASE_TYPE_ID, valueOf(CASE_REFERENCE));
 
             doReturn(new CaseDetails()).when(caseDetailsRepository).findUniqueCase(JURISDICTION_ID, CASE_TYPE_ID,
-                                                                                   valueOf
-                                                                                       (CASE_REFERENCE));
-            CaseDetails returned = cachedRepository.findUniqueCase(JURISDICTION_ID, CASE_TYPE_ID, valueOf
-                (CASE_REFERENCE));
+                                                                                   valueOf(CASE_REFERENCE));
+            CaseDetails returned = cachedRepository.findUniqueCase(JURISDICTION_ID, CASE_TYPE_ID, valueOf(CASE_REFERENCE));
 
             assertAll(
                 () -> assertThat(returned, is(caseDetails)),

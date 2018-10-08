@@ -101,8 +101,8 @@ public abstract class BaseTest {
 
         // IDAM
         final SecurityUtils securityUtils = mock(SecurityUtils.class);
-        Mockito.when(securityUtils.authorizationHeaders()).thenReturn( new HttpHeaders());
-        Mockito.when(securityUtils.userAuthorizationHeaders()).thenReturn( new HttpHeaders());
+        Mockito.when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
+        Mockito.when(securityUtils.userAuthorizationHeaders()).thenReturn(new HttpHeaders());
         ReflectionTestUtils.setField(caseDefinitionRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(uiDefinitionRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(userRepository, "securityUtils", securityUtils);
@@ -153,7 +153,7 @@ public abstract class BaseTest {
         caseDetails.setSecurityClassification(SecurityClassification.valueOf(resultSet.getString("security_classification")));
         caseDetails.setCaseTypeId(resultSet.getString("case_type_id"));
         final Timestamp createdAt = resultSet.getTimestamp("created_date");
-        if(null != createdAt) {
+        if (null != createdAt) {
             caseDetails.setCreatedDate(createdAt.toLocalDateTime());
         }
         final Timestamp modifiedAt = resultSet.getTimestamp("last_modified");
@@ -189,6 +189,7 @@ public abstract class BaseTest {
         significantItem.setUrl(resultSet.getString("URL"));
         return significantItem;
     }
+
     protected AuditEvent mapAuditEvent(ResultSet resultSet, Integer i) throws SQLException {
         final AuditEvent auditEvent = new AuditEvent();
         auditEvent.setId(resultSet.getLong("id"));
