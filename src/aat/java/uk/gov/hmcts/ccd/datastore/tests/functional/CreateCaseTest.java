@@ -4,38 +4,34 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.BaseTest;
-import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
-import uk.gov.hmcts.ccd.domain.model.std.Event;
+import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.EmptyCase;
+import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType;
+import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event;
 
-import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
+import static org.hamcrest.Matchers.equalTo;
 
+@DisplayName("Create case")
 class CreateCaseTest extends BaseTest {
-
-    private static final String EVENT_CREATE = "CREATE";
-    private static final String JURISDICTION = "AUTOTEST1";
-    private static final String CASE_TYPE = "AAT";
 
     protected CreateCaseTest(AATHelper aat) {
         super(aat);
     }
 
     @Test
-    @DisplayName("Create a new empty case")
-    void shouldCreateACase() {
-        aat.getCcdHelper()
-           .createCase(asAutoTestCaseworker(), JURISDICTION, CASE_TYPE, EVENT_CREATE, createEmptyCase())
-           .then()
-                .statusCode(201);
+    @DisplayName("should create a new empty case")
+    void shouldCreateEmptyCase() {
+        Event.create()
+             .as(asAutoTestCaseworker())
+             .withData(EmptyCase.build())
+             .submit()
+
+             .then()
+             .log().ifError()
+             .statusCode(201)
+
+             .assertThat()
+             .body("jurisdiction", equalTo(AATCaseType.JURISDICTION))
+             .body("case_type_id", equalTo(AATCaseType.CASE_TYPE))
+             .body("state", equalTo(AATCaseType.State.TODO));
     }
-
-    private CaseDataContent createEmptyCase() {
-        final Event event =  anEvent().build();
-        event.setEventId(EVENT_CREATE);
-
-        final CaseDataContent caseData = new CaseDataContent();
-        caseData.setEvent(event);
-
-        return caseData;
-    }
-
 }

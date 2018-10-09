@@ -16,9 +16,9 @@ def product = "ccd"
 def component = "data-store-api"
 
 List<LinkedHashMap<String, Object>> secrets = [
-    secret('caseworkerAutoTest1Email', 'CCD_CASEWORKER_AUTOTEST_EMAIL'),
-    secret('caseworkerAutoTest1Password', 'CCD_CASEWORKER_AUTOTEST_PASSWORD'),
-    secret('ccd-api-gateway-idam-service-key', 'CCD_GW_SERVICE_SECRET'),
+    secret('ccd-caseworker-autotest-email', 'CCD_CASEWORKER_AUTOTEST_EMAIL'),
+    secret('ccd-caseworker-autotest-password', 'CCD_CASEWORKER_AUTOTEST_PASSWORD'),
+    secret('ccd-api-gateway-s2s-secret', 'CCD_GW_SERVICE_SECRET'),
     secret('ccd-api-gateway-oauth2-client-secret', 'OAUTH2_CLIENT_SECRET'),
 ]
 
@@ -32,6 +32,17 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 }
 
 withPipeline(type, product, component) {
+    onMaster {
+        enableSlackNotifications('#ccd-master-builds')
+    }
+    onDemo {
+        enableSlackNotifications('#ccd-demo-builds')
+    }
+    onPR {
+        enableSlackNotifications('#ccd-pr-builds')
+    }
+
     loadVaultSecrets(secrets)
     enableDbMigration()
+    enableDockerBuild()
 }

@@ -18,10 +18,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.domain.model.callbacks.EventTokenProperties.JURISDICTION_ID;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
@@ -29,8 +26,6 @@ class QueryEndpointTest {
 
     @Mock
     private AuthorisedGetCaseViewOperation getCaseViewOperation;
-    @Mock
-    private DefaultGetCaseViewFromDraftOperation getDraftViewOperation;
     @Mock
     private AuthorisedGetCaseHistoryViewOperation getCaseHistoryViewOperation;
     @Mock
@@ -52,7 +47,8 @@ class QueryEndpointTest {
     @BeforeEach
     void setup() {
         MockitoAnnotations.initMocks(this);
-        queryEndpoint = new QueryEndpoint(getCaseViewOperation, getDraftViewOperation, getCaseHistoryViewOperation,
+        queryEndpoint = new QueryEndpoint(getCaseViewOperation,
+                                          getCaseHistoryViewOperation,
                                           getEventTriggerOperation,
                                           searchQueryOperation,
                                           fieldMapSanitizerOperation,
@@ -76,14 +72,6 @@ class QueryEndpointTest {
     }
 
     @Test
-    void shouldCallGetDraftViewOperation() {
-        CaseView caseView = new CaseView();
-        doReturn(caseView).when(getDraftViewOperation).execute(any(), any(), any());
-        queryEndpoint.findDraft("jurisdictionId", "caseTypeId", "caseId");
-        verify(getDraftViewOperation).execute("jurisdictionId", "caseTypeId", "caseId");
-    }
-
-    @Test
     void shouldCallGetEventTriggerOperationForDraft() {
         CaseEventTrigger caseEventTrigger = new CaseEventTrigger();
         doReturn(caseEventTrigger).when(getEventTriggerOperation).executeForDraft(any(), any(), any(), any(), any(), any());
@@ -95,7 +83,7 @@ class QueryEndpointTest {
     void shouldCallFindWorkBasketOperation() {
         List<WorkbasketInput> workBasketResults = new ArrayList<>();
         when(findWorkbasketInputOperation.execute("TEST", "TEST-CASE-TYPE", CAN_READ)).thenReturn(workBasketResults);
-        queryEndpoint.findWorkbasketInputDetails(22, "TEST", "TEST-CASE-TYPE");
+        queryEndpoint.findWorkbasketInputDetails("22", "TEST", "TEST-CASE-TYPE");
         verify(findWorkbasketInputOperation, times(1)).execute("TEST", "TEST-CASE-TYPE", CAN_READ);
     }
 

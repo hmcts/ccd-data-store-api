@@ -140,8 +140,8 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     public CaseTypeDefinitionVersion getLatestVersion(String caseTypeId) {
         try {
             final HttpEntity requestEntity = new HttpEntity<CaseType>(securityUtils.authorizationHeaders());
-            CaseTypeDefinitionVersion version = restTemplate.exchange(applicationParams.caseTypeLatestVersionUrl
-                    (caseTypeId), HttpMethod.GET, requestEntity, CaseTypeDefinitionVersion.class).getBody();
+            CaseTypeDefinitionVersion version = restTemplate.exchange(applicationParams.caseTypeLatestVersionUrl(caseTypeId),
+                    HttpMethod.GET, requestEntity, CaseTypeDefinitionVersion.class).getBody();
             LOG.debug("retrieved latest version for case type: {}: {}", caseTypeId, version);
             return version;
 

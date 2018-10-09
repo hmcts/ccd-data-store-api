@@ -33,6 +33,18 @@ variable "common_tags" {
   type = "map"
 }
 
+variable "asp_name" {
+  type = "string"
+  description = "App Service Plan (ASP) to use for the webapp, 'use_shared' to make use of the shared ASP"
+  default = "use_shared"
+}
+
+variable "asp_rg" {
+  type = "string"
+  description = "App Service Plan (ASP) resource group for 'asp_name', 'use_shared' to make use of the shared resource group"
+  default = "use_shared"
+}
+
 variable "tenant_id" {
   description = "(Required) The Azure Active Directory tenant ID that should be used for authenticating requests to the key vault. This is usually sourced from environemnt variables and not normally required to be specified."
 }
@@ -44,10 +56,6 @@ variable "client_id" {
 variable "jenkins_AAD_objectId" {
   type                        = "string"
   description                 = "(Required) The Azure AD object ID of a user, service principal or security group in the Azure Active Directory tenant for the vault. The object ID must be unique for the list of access policies."
-}
-
-variable "vault_section" {
-  default = "test"
 }
 
 ////////////////////////////////
@@ -87,7 +95,29 @@ variable "default_print_url" {
 }
 
 variable "frontend_url" {
+  description = "Optional front end URL to use for building redirect URI"
   type = "string"
   default = ""
-  description = "Optional front end URL to use for building redirect URI"
+}
+
+variable "elastic_search_blacklist" {
+  description = "Forbidden elastic search query types"
+  type = "string"
+  default = "query_string"
+}
+
+variable "elastic_search_enabled" {
+  default = "false"
+}
+
+variable "elastic_search_case_index_name_format" {
+  description = "Format of the elastic search index name for cases"
+  type = "string"
+  default = "%s_cases"
+}
+
+variable "elastic_search_case_index_type" {
+  description = "Cases index document type"
+  type = "string"
+  default = "case"
 }

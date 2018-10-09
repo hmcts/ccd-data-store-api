@@ -31,6 +31,7 @@ import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.data.user.DefaultUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
+import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackService;
@@ -100,8 +101,8 @@ public abstract class BaseTest {
 
         // IDAM
         final SecurityUtils securityUtils = mock(SecurityUtils.class);
-        Mockito.when(securityUtils.authorizationHeaders()).thenReturn( new HttpHeaders());
-        Mockito.when(securityUtils.userAuthorizationHeaders()).thenReturn( new HttpHeaders());
+        Mockito.when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
+        Mockito.when(securityUtils.userAuthorizationHeaders()).thenReturn(new HttpHeaders());
         ReflectionTestUtils.setField(caseDefinitionRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(uiDefinitionRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(userRepository, "securityUtils", securityUtils);
@@ -152,7 +153,7 @@ public abstract class BaseTest {
         caseDetails.setSecurityClassification(SecurityClassification.valueOf(resultSet.getString("security_classification")));
         caseDetails.setCaseTypeId(resultSet.getString("case_type_id"));
         final Timestamp createdAt = resultSet.getTimestamp("created_date");
-        if(null != createdAt) {
+        if (null != createdAt) {
             caseDetails.setCreatedDate(createdAt.toLocalDateTime());
         }
         final Timestamp modifiedAt = resultSet.getTimestamp("last_modified");
@@ -178,6 +179,15 @@ public abstract class BaseTest {
             }
         }
         return caseDetails;
+    }
+
+    protected SignificantItem mapSignificantItem(ResultSet resultSet, Integer i) throws SQLException {
+        final SignificantItem  significantItem = new SignificantItem();
+
+        significantItem.setType(resultSet.getString("type"));
+        significantItem.setDescription(resultSet.getString("description"));
+        significantItem.setUrl(resultSet.getString("URL"));
+        return significantItem;
     }
 
     protected AuditEvent mapAuditEvent(ResultSet resultSet, Integer i) throws SQLException {

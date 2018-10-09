@@ -13,7 +13,7 @@ public class MetaDataQueryBuilder {
     @PersistenceContext
     private EntityManager em;
 
-    public  Query  build(final String jurisdiction,final String caseType,String state){
+    public  Query  build(final String jurisdiction,final String caseType,String state) {
         final Query query = em.createNamedQuery(CaseDetailsEntity.FIND_BY_METADATA);
         query.setParameter(CaseDetailsEntity.JURISDICTION_ID_PARAM, jurisdiction == null ? "%" : jurisdiction);
         query.setParameter(CaseDetailsEntity.CASE_TYPE_PARAM, caseType == null ? "%" : caseType);

@@ -31,7 +31,7 @@ public class PostCodeValidator implements BaseTypeValidator {
         }
 
         if (!dataValue.isTextual()) {
-            return Collections.singletonList(new ValidationResult(dataValue + " needs to be a valid "+ TYPE_ID,
+            return Collections.singletonList(new ValidationResult(dataValue + " needs to be a valid " + TYPE_ID,
                                                                   dataFieldId));
         }
 

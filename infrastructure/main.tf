@@ -1,13 +1,3 @@
-provider "vault" {
-  //  # It is strongly recommended to configure this provider through the
-  //  # environment variables described above, so that each user can have
-  //  # separate credentials set in the environment.
-  //  #
-  //  # This will default to using $VAULT_ADDR
-  //  # But can be set explicitly
-  address = "https://vault.reform.hmcts.net:6200"
-}
-
 locals {
   app_full_name = "${var.product}-${var.component}"
 
@@ -23,15 +13,17 @@ locals {
   dm_valid_domain = "${var.document_management_valid_domain != "" ? var.document_management_valid_domain : local.default_dm_valid_domain}"
 
   // Vault name
-  previewVaultName = "${var.raw_product}-shared-aat"
-  nonPreviewVaultName = "${var.raw_product}-shared-${var.env}"
+  previewVaultName = "${var.raw_product}-aat"
+  nonPreviewVaultName = "${var.raw_product}-${var.env}"
   vaultName = "${(var.env == "preview" || var.env == "spreview") ? local.previewVaultName : local.nonPreviewVaultName}"
 
-  // Old vault info to be removed
-  oldPreviewVaultName = "${var.product}-data-store"
-  oldNonPreviewVaultName = "ccd-data-store-${var.env}"
-  oldVaultName = "${(var.env == "preview" || var.env == "spreview") ? local.oldPreviewVaultName : local.oldNonPreviewVaultName}"
+  // Shared Resource Group
+  previewResourceGroup = "${var.raw_product}-shared-aat"
+  nonPreviewResourceGroup = "${var.raw_product}-shared-${var.env}"
+  sharedResourceGroup = "${(var.env == "preview" || var.env == "spreview") ? local.previewResourceGroup : local.nonPreviewResourceGroup}"
 
+  sharedAppServicePlan = "${var.raw_product}-${var.env}"
+  sharedASPResourceGroup = "${var.raw_product}-shared-${var.env}"
 
   // S2S
   s2s_url = "http://rpe-service-auth-provider-${local.env_ase_url}"
@@ -45,19 +37,18 @@ locals {
 
 data "azurerm_key_vault" "ccd_shared_key_vault" {
   name = "${local.vaultName}"
-  resource_group_name = "${local.vaultName}"
+  resource_group_name = "${local.sharedResourceGroup}"
 }
 
-data "vault_generic_secret" "ccd_data_s2s_key" {
-  path = "secret/${var.vault_section}/ccidam/service-auth-provider/api/microservice-keys/ccd-data"
+data "azurerm_key_vault_secret" "ccd_data_s2s_key" {
+  name = "ccd-data-store-api-s2s-secret"
+  vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
 }
 
-data "vault_generic_secret" "gateway_idam_key" {
-  path = "secret/${var.vault_section}/ccidam/service-auth-provider/api/microservice-keys/ccd-gw"
-}
-
-data "vault_generic_secret" "gateway_oauth2_client_secret" {
-  path = "secret/${var.vault_section}/ccidam/idam-api/oauth2/client-secrets/ccd-gateway"
+data "azurerm_key_vault_secret" "ccd_elastic_search_url" {
+  count = "${var.elastic_search_enabled == "false" ? 0 : 1}"
+  name = "ccd-ELASTIC-SEARCH-URL"
+  vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
 }
 
 resource "random_string" "draft_encryption_key" {
@@ -72,7 +63,7 @@ resource "random_string" "draft_encryption_key" {
 }
 
 module "ccd-data-store-api" {
-  source   = "git@github.com:hmcts/moj-module-webapp?ref=master"
+  source   = "git@github.com:hmcts/cnp-module-webapp?ref=master"
   product  = "${local.app_full_name}"
   location = "${var.location}"
   env      = "${var.env}"
@@ -81,6 +72,11 @@ module "ccd-data-store-api" {
   is_frontend = false
   common_tags  = "${var.common_tags}"
   additional_host_name = "debugparam"
+  asp_name = "${(var.asp_name == "use_shared") ? local.sharedAppServicePlan : var.asp_name}"
+  asp_rg = "${(var.asp_rg == "use_shared") ? local.sharedASPResourceGroup : var.asp_rg}"
+  website_local_cache_sizeinmb = 1050
+  capacity = "${var.capacity}"
+
   app_settings = {
     DATA_STORE_DB_HOST = "${module.data-store-db.host_name}"
     DATA_STORE_DB_PORT = "${module.data-store-db.postgresql_listen_port}"
@@ -97,7 +93,7 @@ module "ccd-data-store-api" {
 
     IDAM_USER_URL                       = "${var.idam_api_url}"
     IDAM_S2S_URL                        = "${local.s2s_url}"
-    DATA_STORE_IDAM_KEY                 = "${data.vault_generic_secret.ccd_data_s2s_key.data["value"]}"
+    DATA_STORE_IDAM_KEY                 = "${data.azurerm_key_vault_secret.ccd_data_s2s_key.value}"
 
     CCD_DRAFT_STORE_URL                 = "${local.draftStoreUrl}"
     CCD_DRAFT_TTL_DAYS                  = "${var.draft_store_ttl_days}"
@@ -106,12 +102,17 @@ module "ccd-data-store-api" {
     DATA_STORE_S2S_AUTHORISED_SERVICES  = "${var.authorised-services}"
 
     CCD_DEFAULTPRINTURL                 = "${local.default_print_url}"
+
+    ELASTIC_SEARCH_HOSTS                = "${var.elastic_search_enabled == "false" ? "" : "${format("http://%s:9200", join("", data.azurerm_key_vault_secret.ccd_elastic_search_url.*.value))}"}"
+    ELASTIC_SEARCH_BLACKLIST            = "${var.elastic_search_blacklist}"
+    ELASTIC_SEARCH_CASE_INDEX_NAME_FORMAT = "${var.elastic_search_case_index_name_format}"
+    ELASTIC_SEARCH_CASE_INDEX_TYPE      = "${var.elastic_search_case_index_type}"
   }
 
 }
 
 module "data-store-db" {
-  source = "git@github.com:hmcts/moj-module-postgres?ref=master"
+  source = "git@github.com:hmcts/cnp-module-postgres?ref=master"
   product = "${local.app_full_name}-postgres-db"
   location = "${var.location}"
   env = "${var.env}"
@@ -121,17 +122,6 @@ module "data-store-db" {
   sku_tier = "GeneralPurpose"
   storage_mb = "51200"
   common_tags  = "${var.common_tags}"
-}
-
-module "ccd-data-store-vault" {
-  source              = "git@github.com:hmcts/moj-module-key-vault?ref=master"
-  name                = "${local.oldVaultName}" // Max 24 characters
-  product             = "${var.product}"
-  env                 = "${var.env}"
-  tenant_id           = "${var.tenant_id}"
-  object_id           = "${var.jenkins_AAD_objectId}"
-  resource_group_name = "${module.ccd-data-store-api.resource_group_name}"
-  product_group_object_id = "be8b3850-998a-4a66-8578-da268b8abd6b"
 }
 
 ////////////////////////////////
@@ -169,7 +159,7 @@ resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
 }
 
 resource "azurerm_key_vault_secret" "ccd_draft_encryption_key" {
-  name = "draftStoreEncryptionSecret"
+  name = "${local.app_full_name}-draftStoreEncryptionSecret"
   value = "${random_string.draft_encryption_key.result}"
-  vault_uri = "${module.ccd-data-store-vault.key_vault_uri}"
+  vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
 }

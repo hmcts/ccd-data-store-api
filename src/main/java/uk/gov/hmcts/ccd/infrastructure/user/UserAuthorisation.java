@@ -18,6 +18,14 @@ public class UserAuthorisation {
         return accessLevel;
     }
 
+    /**
+     * User access level, as inferred from the user roles.
+     * <ul>
+     *     <li>ALL: Can see all cases within the limits defined by CRUD</li>
+     *     <li>GRANTED: In addition to CRUD constraints, users can only
+     *     see cases to which they were explicitly granted access</li>
+     * </ul>
+     */
     public enum AccessLevel {
         ALL, GRANTED
     }

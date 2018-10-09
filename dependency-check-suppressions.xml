@@ -26,6 +26,10 @@
         <cve>CVE-2018-10054</cve>
     </suppress>
     <suppress>
+        <notes>h2database is pulled in by liquibase, it is not used in development or production</notes>
+        <cve>CVE-2018-14335</cve>
+    </suppress>
+    <suppress>
         <notes>suppress false positives</notes>
         <gav regex="true">^org\.apache\.tomcat:tomcat-annotations-api:.*$</gav>
         <cpe>cpe:/a:apache:tomcat</cpe>
@@ -48,5 +52,10 @@
     <suppress>
         <notes>We do not use: Spring Framework 5.0.5.RELEASE + Spring Security (any version), see https://pivotal.io/security/cve-2018-1258</notes>
         <cve>CVE-2018-1258</cve>
+    </suppress>
+    <suppress>
+        <notes>CVE-2018-13661: case-app*_2.11-1.2.0.jar is used in codacy for test coverage reporting, thus unimpacted in production</notes>
+        <gav regex="true">^com\.github\.alexarchambault:case-app(-util|-annotations|)_2\.11:.*$</gav>
+        <cpe>cpe:/a:app_project:app</cpe>
     </suppress>
 </suppressions>

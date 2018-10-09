@@ -80,6 +80,19 @@ public class CaseDetails implements Cloneable {
     @JsonProperty("callback_response_status")
     private String callbackResponseStatus;
 
+    /**
+     * Attribute passed to UI layer, does not need persistence
+     */
+    @JsonProperty("delete_draft_response_status_code")
+    private Integer deleteDraftResponseStatusCode;
+
+
+    /**
+     * Attribute passed to UI layer, does not need persistence
+     */
+    @JsonProperty("delete_draft_response_status")
+    private String deleteDraftResponseStatus;
+
 
     @JsonIgnore
     private final Map<String, Object> metadata = new HashMap<>();
@@ -196,12 +209,22 @@ public class CaseDetails implements Cloneable {
     private void setAfterSubmitCallbackResponseEntity(final AfterSubmitCallbackResponse response) {
         this.afterSubmitCallbackResponse = response;
         this.callbackResponseStatusCode = SC_OK;
-        this.callbackResponseStatus = "COMPLETED";
+        this.callbackResponseStatus = "CALLBACK_COMPLETED";
+    }
+
+    private void setDeleteDraftResponseEntity() {
+        this.deleteDraftResponseStatusCode =  SC_OK;
+        this.deleteDraftResponseStatus = "DELETE_DRAFT_COMPLETED";
     }
 
     public void setIncompleteCallbackResponse() {
         this.callbackResponseStatusCode = SC_OK;  // Front end cannot handle anything other than status 200
-        this.callbackResponseStatus = "INCOMPLETE";
+        this.callbackResponseStatus = "INCOMPLETE_CALLBACK";
+    }
+
+    public void setIncompleteDeleteDraftResponse() {
+        this.deleteDraftResponseStatusCode = SC_OK;  // Front end cannot handle anything other than status 200
+        this.deleteDraftResponseStatus = "INCOMPLETE_DELETE_DRAFT";
     }
 
     public boolean existsInData(CaseTypeTabField caseTypeTabField) {
@@ -222,6 +245,19 @@ public class CaseDetails implements Cloneable {
     @JsonIgnore
     public CaseDetails shallowClone() throws CloneNotSupportedException {
         return (CaseDetails) super.clone();
+    }
+
+    @JsonIgnore
+    public void setDeleteDraftResponseEntity(final String draftId, final ResponseEntity<Void>
+                                                         draftResponse) {
+        if (SC_OK == draftResponse.getStatusCodeValue()) {
+            setDeleteDraftResponseEntity();
+        } else {
+            LOG.warn("Incomplete delete draft response for draft={}, statusCode={}",
+                     draftId,
+                     draftResponse.getStatusCodeValue());
+            setIncompleteDeleteDraftResponse();
+        }
     }
 
     @JsonIgnore

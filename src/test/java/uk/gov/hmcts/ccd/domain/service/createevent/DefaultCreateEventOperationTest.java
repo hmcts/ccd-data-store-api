@@ -14,11 +14,14 @@ import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
+import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItemType;
+import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.model.std.validator.EventValidator;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.*;
+import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
@@ -90,7 +93,6 @@ class DefaultCreateEventOperationTest {
     private Event event;
 
     private Map<String, JsonNode> data;
-    private Jurisdiction jurisdiction;
     private CaseType caseType;
     private CaseEvent eventTrigger;
     private CaseDetails caseDetails;
@@ -113,7 +115,7 @@ class DefaultCreateEventOperationTest {
         event = buildEvent();
         data = buildJsonNodeData();
 
-        jurisdiction = new Jurisdiction();
+        final Jurisdiction jurisdiction = new Jurisdiction();
         jurisdiction.setId(JURISDICTION_ID);
         final Version version = new Version();
         version.setNumber(VERSION_NUMBER);
@@ -123,6 +125,13 @@ class DefaultCreateEventOperationTest {
         caseType.setVersion(version);
         eventTrigger = new CaseEvent();
         eventTrigger.setPostState(POST_STATE);
+        final SignificantItem significantItem = new SignificantItem();
+        significantItem.setUrl("http://www.yahoo.com");
+        significantItem.setDescription("description");
+        significantItem.setType(SignificantItemType.DOCUMENT.name());
+        final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = new AboutToSubmitCallbackResponse();
+        aboutToSubmitCallbackResponse.setSignificantItem(significantItem);
+        aboutToSubmitCallbackResponse.setState(Optional.empty());
         caseDetails = new CaseDetails();
         caseDetails.setCaseTypeId(CASE_TYPE_ID);
         caseDetails.setState(PRE_STATE_ID);
@@ -147,7 +156,7 @@ class DefaultCreateEventOperationTest {
                                                           any(),
                                                           any(),
                                                           any(),
-                                                          any())).willReturn(Optional.empty());
+                                                          any())).willReturn(aboutToSubmitCallbackResponse);
     }
 
     @Test
@@ -197,7 +206,7 @@ class DefaultCreateEventOperationTest {
             () -> assertThat(caseDetails.getAfterSubmitCallbackResponse().getConfirmationHeader(), is("Header")),
             () -> assertThat(caseDetails.getAfterSubmitCallbackResponse().getConfirmationBody(), is("Body")),
             () -> assertThat(caseDetails.getCallbackResponseStatusCode(), is(SC_OK)),
-            () -> assertThat(caseDetails.getCallbackResponseStatus(), is("COMPLETED"))
+            () -> assertThat(caseDetails.getCallbackResponseStatus(), is("CALLBACK_COMPLETED"))
         );
     }
 
@@ -215,7 +224,7 @@ class DefaultCreateEventOperationTest {
         assertAll(
             () -> assertNull(caseDetails.getAfterSubmitCallbackResponse()),
             () -> assertThat(caseDetails.getCallbackResponseStatusCode(), is(SC_OK)),
-            () -> assertThat(caseDetails.getCallbackResponseStatus(), is("INCOMPLETE"))
+            () -> assertThat(caseDetails.getCallbackResponseStatus(), is("INCOMPLETE_CALLBACK"))
         );
     }
 

@@ -23,6 +23,9 @@ public class CaseDataContent {
     @JsonProperty("ignore_warning")
     private Boolean ignoreWarning;
 
+    @JsonProperty("draft_id")
+    private String draftId;
+
     public Event getEvent() {
         return event;
     }
@@ -71,4 +74,11 @@ public class CaseDataContent {
         this.ignoreWarning = ignoreWarning;
     }
 
+    public String getDraftId() {
+        return draftId;
+    }
+
+    public void setDraftId(String draftId) {
+        this.draftId = draftId;
+    }
 }
