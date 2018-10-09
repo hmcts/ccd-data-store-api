@@ -43,7 +43,7 @@ class UserAuthorisationSecurityTest {
 
         @Test
         @DisplayName("should not secure when user access level is ALL")
-        void accessLevelAll () {
+        void accessLevelAll() {
             when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.ALL);
 
             security.secure(builder, null);
@@ -55,7 +55,7 @@ class UserAuthorisationSecurityTest {
 
         @Test
         @DisplayName("should secure for user ID when user access level is GRANTED")
-        void accessLevelGranted () {
+        void accessLevelGranted() {
             when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.GRANTED);
 
             security.secure(builder, null);

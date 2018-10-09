@@ -18,6 +18,7 @@ public class AppInsights extends AbstractAppInsights {
     public AppInsights(TelemetryClient telemetry) {
         super(telemetry);
     }
+
     public void trackRequest(String name, long duration, boolean success) {
         RequestTelemetry rt = new RequestTelemetry();
         rt.setSource(MODULE);

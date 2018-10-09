@@ -1,14 +1,25 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
 import io.swagger.annotations.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway;
+import uk.gov.hmcts.ccd.data.draft.DraftGateway;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
+import uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetCaseViewFromDraftOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseViewOperation;
 import uk.gov.hmcts.ccd.domain.service.upsertdraft.UpsertDraftOperation;
+
+import javax.transaction.Transactional;
+import java.time.Duration;
+import java.time.Instant;
 
 @RestController
 @RequestMapping(path = "/",
@@ -16,11 +27,19 @@ import uk.gov.hmcts.ccd.domain.service.upsertdraft.UpsertDraftOperation;
     produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(value = "/", description = "Drafts API")
 public class DraftsEndpoint {
+    private static final Logger LOG = LoggerFactory.getLogger(DraftsEndpoint.class);
+
     private final UpsertDraftOperation upsertDraftOperation;
+    private final GetCaseViewOperation getDraftViewOperation;
+    private final DraftGateway draftGateway;
 
     @Autowired
-    public DraftsEndpoint(@Qualifier("default") final UpsertDraftOperation upsertDraftOperation) {
+    public DraftsEndpoint(@Qualifier("default") final UpsertDraftOperation upsertDraftOperation,
+                          @Qualifier(DefaultGetCaseViewFromDraftOperation.QUALIFIER) GetCaseViewOperation getDraftViewOperation,
+                          @Qualifier(DefaultDraftGateway.QUALIFIER) DraftGateway draftGateway) {
         this.upsertDraftOperation = upsertDraftOperation;
+        this.getDraftViewOperation = getDraftViewOperation;
+        this.draftGateway = draftGateway;
     }
 
     @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-trigger/{etid}/drafts", method = RequestMethod.POST)
@@ -69,6 +88,39 @@ public class DraftsEndpoint {
         @RequestBody final CaseDataContent caseDataContent) {
 
         return upsertDraftOperation.executeUpdate(uid, jurisdictionId, caseTypeId, eventTriggerId, draftId, caseDataContent);
+    }
+
+    @Transactional
+    @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/drafts/{did}",
+        method = RequestMethod.GET)
+    @ApiOperation(value = "Fetch a draft for display")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "A displayable draft")
+    })
+    public CaseView findDraft(@PathVariable("jid") final String jurisdictionId,
+                              @PathVariable("ctid") final String caseTypeId,
+                              @PathVariable("did") final String did) {
+        Instant start = Instant.now();
+        CaseView caseView = getDraftViewOperation.execute(jurisdictionId, caseTypeId, did);
+        final Duration between = Duration.between(start, Instant.now());
+        LOG.info("findDraft has been completed in {} millisecs...", between.toMillis());
+        return caseView;
+    }
+
+    @Transactional
+    @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/drafts/{did}",
+        method = RequestMethod.DELETE)
+    @ApiOperation(value = "Delete a given draft")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "A draft deleted successfully")
+    })
+    public void deleteDraft(@PathVariable("jid") final String jurisdictionId,
+                            @PathVariable("ctid") final String caseTypeId,
+                            @PathVariable("did") final String did) {
+        Instant start = Instant.now();
+        draftGateway.delete(did);
+        final Duration between = Duration.between(start, Instant.now());
+        LOG.info("deleteDraft has been completed in {} millisecs...", between.toMillis());
     }
 
 }
