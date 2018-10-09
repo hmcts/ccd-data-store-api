@@ -168,7 +168,7 @@ public class AccessControlService {
                     .findAny();
 
                 if (caseFieldOpt.isPresent()) {
-                    if(!hasAccessControlList(userRoles, access, caseFieldOpt.get().getAccessControlLists())) {
+                    if (!hasAccessControlList(userRoles, access, caseFieldOpt.get().getAccessControlLists())) {
                         caseViewField.setDisplayContext("READONLY");
                     }
                 } else {

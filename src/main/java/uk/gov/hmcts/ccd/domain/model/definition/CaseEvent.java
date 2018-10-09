@@ -183,6 +183,7 @@ public class CaseEvent implements Serializable {
     public void setShowEventNotes(Boolean showEventNotes) {
         this.showEventNotes = showEventNotes;
     }
+
     public String getEndButtonLabel() {
         return endButtonLabel;
     }

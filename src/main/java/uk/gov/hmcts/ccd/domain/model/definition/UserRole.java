@@ -17,16 +17,16 @@ public class UserRole {
 
     private String createdAt;
 
-    @Pattern(regexp=REGEX_ISO_DATE, message=INVALID_ISO_DATE_FROMAT)
+    @Pattern(regexp = REGEX_ISO_DATE, message = INVALID_ISO_DATE_FROMAT)
     private String liveFrom;
 
-    @Pattern(regexp=REGEX_ISO_DATE, message=INVALID_ISO_DATE_FROMAT)
+    @Pattern(regexp = REGEX_ISO_DATE, message = INVALID_ISO_DATE_FROMAT)
     private String liveTo;
 
     @NotNull
     private String role;
 
-    @Pattern(regexp="^[Public|Private|Restricted]$", message="Invalid security classification")
+    @Pattern(regexp = "^[Public|Private|Restricted]$", message = "Invalid security classification")
     @NotNull
     private String securityClassification;
 

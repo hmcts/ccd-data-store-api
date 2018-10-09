@@ -17,7 +17,7 @@ public class CachingConfiguration {
 
 
     @Bean
-    public Config hazelCastConfig(){
+    public Config hazelCastConfig() {
 
         Config config = new Config();
         NetworkConfig networkConfig = config.setInstanceName("hazelcast-instance-ccd").getNetworkConfig();

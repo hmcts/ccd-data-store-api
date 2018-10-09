@@ -47,7 +47,7 @@ class AuthorisedFindSearchInputOperationTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        testSearchInputs =Arrays.asList(
+        testSearchInputs = Arrays.asList(
             aSearchInput().withFieldId(CASE_FIELD_ID_1_1).build(),
             aSearchInput().withFieldId(CASE_FIELD_ID_1_2).build(),
             aSearchInput().withFieldId(CASE_FIELD_ID_1_3).build(),
@@ -72,8 +72,7 @@ class AuthorisedFindSearchInputOperationTest {
     void shouldFailWhenWhenNoACLReadAccess() {
         doReturn(Collections.EMPTY_LIST).when(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ);
 
-        assertThrows(ResourceNotFoundException.class, () -> authorisedFindSearchInputOperation.execute
-            (JURISDICTION_ID, CASE_TYPE_ONE, CAN_READ));
+        assertThrows(ResourceNotFoundException.class, () -> authorisedFindSearchInputOperation.execute(JURISDICTION_ID, CASE_TYPE_ONE, CAN_READ));
     }
 
     @Test
