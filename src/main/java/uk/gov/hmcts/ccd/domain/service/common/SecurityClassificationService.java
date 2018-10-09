@@ -103,8 +103,7 @@ public class SecurityClassificationService {
 
     public boolean userHasEnoughSecurityClassificationForField(String jurisdictionId, CaseType caseType, String fieldId) {
         final Optional<SecurityClassification> userClassification = getUserClassification(jurisdictionId);
-        return userClassification.map(securityClassification -> securityClassification.higherOrEqualTo
-            (caseType.getClassificationForField(fieldId))).orElse(false);
+        return userClassification.map(securityClassification -> securityClassification.higherOrEqualTo(caseType.getClassificationForField(fieldId))).orElse(false);
     }
 
     private JsonNode filterNestedObject(JsonNode data, JsonNode dataClassification, SecurityClassification userClassification) {

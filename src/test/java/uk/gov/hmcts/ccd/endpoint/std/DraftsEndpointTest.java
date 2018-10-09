@@ -4,13 +4,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.draft.DraftGateway;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
+import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseViewOperation;
 import uk.gov.hmcts.ccd.domain.service.upsertdraft.UpsertDraftOperation;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
@@ -27,13 +32,17 @@ class DraftsEndpointTest {
 
     @Mock
     private UpsertDraftOperation upsertDraftOperation;
+    @Mock
+    private GetCaseViewOperation getDraftViewOperation;
+    @Mock
+    private DraftGateway draftGateway;
 
     private DraftsEndpoint endpoint;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-        endpoint = new DraftsEndpoint(upsertDraftOperation);
+        endpoint = new DraftsEndpoint(upsertDraftOperation, getDraftViewOperation, draftGateway);
     }
 
     @Test
@@ -86,6 +95,32 @@ class DraftsEndpointTest {
                                                              EVENT_TRIGGER_ID,
                                                              DRAFT_ID,
                                                              CASE_DATA_CONTENT)
+        );
+    }
+
+    @Test
+    void shouldFetchDraftForCaseWorker() {
+        CaseView toBeReturned = new CaseView();
+        doReturn(toBeReturned).when(getDraftViewOperation).execute(any(), any(), any());
+        final CaseView output = endpoint.findDraft(JURISDICTION_ID, CASE_TYPE_ID, DRAFT_ID);
+
+        assertAll(
+            () -> assertThat(output, sameInstance(toBeReturned)),
+            () -> verify(getDraftViewOperation).execute(JURISDICTION_ID,
+                                                        CASE_TYPE_ID,
+                                                        DRAFT_ID)
+        );
+    }
+
+
+    @Test
+    void shouldDeleteDraftForCaseWorker() {
+        doNothing().when(draftGateway).delete(DRAFT_ID);
+
+        endpoint.deleteDraft(JURISDICTION_ID, CASE_TYPE_ID, DRAFT_ID);
+
+        assertAll(
+            () -> verify(draftGateway).delete(DRAFT_ID)
         );
     }
 

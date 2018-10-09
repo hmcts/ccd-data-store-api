@@ -49,7 +49,7 @@ public class ComplexSanitiser implements Sanitiser {
 
         final Iterator<Map.Entry<String, JsonNode>> fields = fieldData.fields();
 
-        while(fields.hasNext()) {
+        while (fields.hasNext()) {
             final Map.Entry<String, JsonNode> field = fields.next();
 
             final String key = field.getKey();

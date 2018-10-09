@@ -274,6 +274,7 @@ class CallbackInvokerTest {
             assertEquals(3, callbackResponse.getErrors().size());
 
         }
+
         private CallbackResponse mockCallbackResponse(final String state) {
             final CallbackResponse response = new CallbackResponse();
             final Map<String, JsonNode> data = new HashMap<>();
@@ -307,6 +308,7 @@ class CallbackInvokerTest {
             response.setData(data);
             return response;
         }
+
         private CallbackResponse mockCallbackResponseWithNoState() {
             return new CallbackResponse();
         }
