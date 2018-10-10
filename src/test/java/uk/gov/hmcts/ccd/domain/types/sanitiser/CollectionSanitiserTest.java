@@ -74,7 +74,7 @@ public class CollectionSanitiserTest {
     }
 
     @Test
-    public void shouldGenerateIDsForItemsWithoutID () {
+    public void shouldGenerateIDsForItemsWithoutID() {
         final ArrayNode collectionData = JSON_FACTORY.arrayNode();
         collectionData
             .add(JSON_FACTORY.objectNode().set(CollectionSanitiser.VALUE, ITEM_1_VALUE_INITIAL))
@@ -88,7 +88,7 @@ public class CollectionSanitiserTest {
     }
 
     @Test
-    public void shouldKeepExistingIDsUnaltered () {
+    public void shouldKeepExistingIDsUnaltered() {
         final ArrayNode collectionData = JSON_FACTORY.arrayNode();
         final ObjectNode itemNode = JSON_FACTORY.objectNode();
         itemNode.set(CollectionSanitiser.VALUE, ITEM_1_VALUE_INITIAL);

@@ -52,7 +52,7 @@ The following environment variables are required:
 
 The project uses [Gradle](https://gradle.org/).
 
-To build project please execute the following command:
+To build project please execute the following:
 
 ```bash
 ./gradlew clean build

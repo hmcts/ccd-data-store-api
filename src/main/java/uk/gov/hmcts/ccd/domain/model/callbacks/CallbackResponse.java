@@ -19,6 +19,9 @@ public class CallbackResponse {
     private Map<String, JsonNode> dataClassification;
     @JsonProperty("security_classification")
     private SecurityClassification securityClassification;
+    @JsonProperty("significant_item")
+    private SignificantItem significantItem;
+
     private List<String> errors;
     private List<String> warnings;
 
@@ -66,6 +69,14 @@ public class CallbackResponse {
 
     public void setSecurityClassification(SecurityClassification securityClassification) {
         this.securityClassification = securityClassification;
+    }
+
+    public SignificantItem getSignificantItem() {
+        return significantItem;
+    }
+
+    public void setSignificantItem(SignificantItem significantItem) {
+        this.significantItem = significantItem;
     }
 
     @JsonIgnore

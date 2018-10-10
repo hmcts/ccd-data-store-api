@@ -117,7 +117,7 @@ public class SecurityValidationService {
             LOG.warn("defaultSecurityClassificationValue={} cannot be parsed", defaultClassificationValue);
             throw new ValidationException(VALIDATION_ERR_MSG);
         }
-        if(!callbackSecurityClassification.isPresent()) {
+        if (!callbackSecurityClassification.isPresent()) {
             LOG.warn("callbackSecurityClassificationValue={} cannot be parsed", callbackClassificationValue);
             throw new ValidationException(VALIDATION_ERR_MSG);
         }

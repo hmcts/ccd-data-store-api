@@ -63,8 +63,7 @@ class AuthorisedFindWorkbasketInputOperationTest {
 
         doReturn(testCaseTypes).when(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ);
 
-        authorisedFindWorkbasketInputOperation = new AuthorisedFindWorkbasketInputOperation
-            (findWorkbasketInputOperation, getCaseTypesOperation);
+        authorisedFindWorkbasketInputOperation = new AuthorisedFindWorkbasketInputOperation(findWorkbasketInputOperation, getCaseTypesOperation);
     }
 
 
@@ -73,8 +72,7 @@ class AuthorisedFindWorkbasketInputOperationTest {
     void shouldFailWhenWhenNoReadAccess() {
         doReturn(Collections.EMPTY_LIST).when(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ);
 
-        assertThrows(ResourceNotFoundException.class, () -> authorisedFindWorkbasketInputOperation.execute
-            (JURISDICTION_ID, CASE_TYPE_ONE, CAN_READ));
+        assertThrows(ResourceNotFoundException.class, () -> authorisedFindWorkbasketInputOperation.execute(JURISDICTION_ID, CASE_TYPE_ONE, CAN_READ));
     }
 
     @Test
@@ -82,8 +80,7 @@ class AuthorisedFindWorkbasketInputOperationTest {
     void shouldReturnOnlyAuthorisedCaseFields() {
         doReturn(testWorkbasketInputs).when(findWorkbasketInputOperation).execute(JURISDICTION_ID, CASE_TYPE_ONE, CAN_READ);
 
-        final List<WorkbasketInput> workbasketInputs = authorisedFindWorkbasketInputOperation.execute
-            (JURISDICTION_ID, CASE_TYPE_ONE, CAN_READ);
+        final List<WorkbasketInput> workbasketInputs = authorisedFindWorkbasketInputOperation.execute(JURISDICTION_ID, CASE_TYPE_ONE, CAN_READ);
 
         assertAll(
             () -> assertThat(workbasketInputs.size(), is(3)),
@@ -99,8 +96,7 @@ class AuthorisedFindWorkbasketInputOperationTest {
         doReturn(new ArrayList<>()).when(findWorkbasketInputOperation).execute(JURISDICTION_ID, CASE_TYPE_ONE,
             CAN_READ);
 
-        final List<WorkbasketInput> workbasketInputs = authorisedFindWorkbasketInputOperation.execute
-            (JURISDICTION_ID, CASE_TYPE_ONE, CAN_READ);
+        final List<WorkbasketInput> workbasketInputs = authorisedFindWorkbasketInputOperation.execute(JURISDICTION_ID, CASE_TYPE_ONE, CAN_READ);
 
         assertAll(
             () -> assertThat(workbasketInputs.size(), is(0))
