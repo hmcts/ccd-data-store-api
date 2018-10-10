@@ -28,6 +28,7 @@ public class DefaultFindSearchInputOperation implements FindSearchInputOperation
 
     private final UIDefinitionRepository uiDefinitionRepository;
     private final CaseDefinitionRepository caseDefinitionRepository;
+
     public DefaultFindSearchInputOperation(final UIDefinitionRepository uiDefinitionRepository,
                                               @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository) {
         this.uiDefinitionRepository = uiDefinitionRepository;
@@ -46,11 +47,11 @@ public class DefaultFindSearchInputOperation implements FindSearchInputOperation
             .collect(toList());
     }
 
-    private SearchInput toSearchInput(final SearchInputField in, final CaseType caseType){
+    private SearchInput toSearchInput(final SearchInputField in, final CaseType caseType) {
         final SearchInput result = new SearchInput();
         result.setLabel(in.getLabel());
         result.setOrder(in.getDisplayOrder());
-        final Field field =new Field();
+        final Field field = new Field();
         field.setId(in.getCaseFieldId());
         CaseField caseField = getCaseField(in.getCaseFieldId(), caseType);
         field.setType(caseField.getFieldType());

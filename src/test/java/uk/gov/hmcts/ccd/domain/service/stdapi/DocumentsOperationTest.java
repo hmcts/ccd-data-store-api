@@ -130,7 +130,7 @@ public class DocumentsOperationTest extends BaseTest {
         final List<Document> results = documentsOperation.getPrintableDocumentsForCase(TEST_JURISDICTION, TEST_CASE_TYPE, TEST_CASE_REFERENCE);
         assertEquals("Incorrect number of documents", TEST_DOCUMENTS.size(), results.size());
 
-        for(int i = 0; i < results.size(); i++) {
+        for (int i = 0; i < results.size(); i++) {
             assertEquals("Incorrect description", results.get(i).getDescription(), TEST_DOCUMENTS.get(i).getDescription());
             assertEquals("Incorrect name",results.get(i).getName(), TEST_DOCUMENTS.get(i).getName());
             assertEquals("Incorrect url",results.get(i).getUrl(), TEST_DOCUMENTS.get(i).getUrl());

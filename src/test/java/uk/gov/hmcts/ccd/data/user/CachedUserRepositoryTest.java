@@ -45,7 +45,7 @@ class CachedUserRepositoryTest {
 
         @Test
         @DisplayName("should initially retrieve user details from decorated repository")
-        void shouldRetrieveUserDetailsFromDecorated () {
+        void shouldRetrieveUserDetailsFromDecorated() {
             final IDAMProperties expectedUserDetails = new IDAMProperties();
             doReturn(expectedUserDetails).when(userRepository).getUserDetails();
 
@@ -59,7 +59,7 @@ class CachedUserRepositoryTest {
 
         @Test
         @DisplayName("should cache user details for subsequent calls")
-        void shouldCacheUserDetailsForSubsequentCalls () {
+        void shouldCacheUserDetailsForSubsequentCalls() {
             final IDAMProperties expectedUserDetails = new IDAMProperties();
             doReturn(expectedUserDetails).when(userRepository).getUserDetails();
 
@@ -84,7 +84,7 @@ class CachedUserRepositoryTest {
 
         @Test
         @DisplayName("should initially retrieve user roles from decorated repository")
-        void shouldRetrieveUserRolesFromDecorated () {
+        void shouldRetrieveUserRolesFromDecorated() {
             final HashSet<String> expectedUserRoles = Sets.newHashSet("role1", "role2");
             doReturn(expectedUserRoles).when(userRepository).getUserRoles();
 
@@ -98,7 +98,7 @@ class CachedUserRepositoryTest {
 
         @Test
         @DisplayName("should cache user roles for subsequent calls")
-        void shouldCacheUserRolesForSubsequentCalls () {
+        void shouldCacheUserRolesForSubsequentCalls() {
             final HashSet<String> expectedUserRoles = Sets.newHashSet("role1", "role2");
             doReturn(expectedUserRoles).when(userRepository).getUserRoles();
 
@@ -124,7 +124,7 @@ class CachedUserRepositoryTest {
 
         @Test
         @DisplayName("should initially retrieve classifications from decorated repository")
-        void shouldRetrieveClassificationsFromDecorated () {
+        void shouldRetrieveClassificationsFromDecorated() {
             final HashSet<SecurityClassification> expectedClassifications = Sets.newHashSet(PUBLIC, PRIVATE);
             doReturn(expectedClassifications).when(userRepository).getUserClassifications(JURISDICTION_ID);
 
@@ -139,7 +139,7 @@ class CachedUserRepositoryTest {
 
         @Test
         @DisplayName("should cache classifications for subsequent calls")
-        void shouldCacheClassificationForSubsequentCalls () {
+        void shouldCacheClassificationForSubsequentCalls() {
             final HashSet<SecurityClassification> expectedClassifications = Sets.newHashSet(PUBLIC);
             doReturn(expectedClassifications).when(userRepository).getUserClassifications(JURISDICTION_ID);
 

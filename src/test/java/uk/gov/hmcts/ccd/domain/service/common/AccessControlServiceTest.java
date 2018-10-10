@@ -63,6 +63,7 @@ public class AccessControlServiceTest {
         MockitoAnnotations.initMocks(this);
         accessControlService = new AccessControlService();
     }
+
     @Nested
     @DisplayName("ACL tests - CaseState")
     class CanAccessCaseStateWithCriteria_AclTests {
