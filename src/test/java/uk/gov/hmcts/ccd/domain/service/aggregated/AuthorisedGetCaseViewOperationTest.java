@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
@@ -64,6 +65,8 @@ class AuthorisedGetCaseViewOperationTest {
     private AccessControlService accessControlService;
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private CaseRoleRepository caseRoleRepository;
 
     @Spy
     @InjectMocks

@@ -2,6 +2,8 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseRoleRepository;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
@@ -25,8 +27,9 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
         final @Qualifier(DefaultGetCaseViewOperation.QUALIFIER) GetCaseViewOperation getCaseViewOperation,
         @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
         final AccessControlService accessControlService,
-        final @Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository) {
-        super(caseDefinitionRepository, accessControlService, userRepository);
+        final @Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
+        final @Qualifier(CachedCaseRoleRepository.QUALIFIER)CaseRoleRepository caseRoleRepository) {
+        super(caseDefinitionRepository, accessControlService, userRepository, caseRoleRepository);
         this.getCaseViewOperation = getCaseViewOperation;
     }
 
@@ -35,7 +38,7 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
         CaseView caseView = getCaseViewOperation.execute(caseReference);
 
         CaseType caseType = getCaseType(caseView.getCaseType().getId());
-        Set<String> userRoles = getUserRoles();
+        Set<String> userRoles = getUserRoles(caseView.getCaseType().getId());
         verifyReadAccess(caseType, userRoles);
 
         return filterUpsertAccess(caseType, userRoles, caseView);

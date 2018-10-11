@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
@@ -15,6 +16,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
+import java.util.Collections;
 import java.util.Set;
 
 import static com.google.common.collect.Sets.newHashSet;
@@ -43,6 +45,7 @@ class AuthorisedGetCaseHistoryViewOperationTest {
     private static final CaseType TEST_CASE_TYPE = newCaseType().withEvent(CASE_EVENT).withEvent(CASE_EVENT_2).build();
     private static final CaseViewEvent CASE_VIEW_EVENT = aCaseViewEvent().withId(EVENT_ID_STRING).build();
     private static final CaseHistoryView TEST_CASE_HISTORY_VIEW = aCaseHistoryView().withEvent(CASE_VIEW_EVENT).build();
+    private final Set<String> caseRoles = Collections.emptySet();
 
     @Mock
     private GetCaseHistoryViewOperation getCaseHistoryViewOperation;
@@ -52,6 +55,8 @@ class AuthorisedGetCaseHistoryViewOperationTest {
     private AccessControlService accessControlService;
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private CaseRoleRepository caseRoleRepository;
 
     private AuthorisedGetCaseHistoryViewOperation authorisedGetCaseHistoryViewOperation;
 
@@ -63,9 +68,10 @@ class AuthorisedGetCaseHistoryViewOperationTest {
         doReturn(USER_ROLES).when(userRepository).getUserRoles();
         doReturn(TEST_CASE_HISTORY_VIEW).when(getCaseHistoryViewOperation).execute(JURISDICTION_ID, CASE_TYPE_ID,
             CASE_REFERENCE, EVENT_ID);
+        doReturn(caseRoles).when(caseRoleRepository).getCaseRoles(CASE_TYPE_ID);
 
         authorisedGetCaseHistoryViewOperation = new AuthorisedGetCaseHistoryViewOperation(getCaseHistoryViewOperation,
-            caseDefinitionRepository, accessControlService, userRepository);
+            caseDefinitionRepository, accessControlService, userRepository, caseRoleRepository);
     }
 
     @Test
@@ -80,6 +86,7 @@ class AuthorisedGetCaseHistoryViewOperationTest {
         verify(getCaseHistoryViewOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, EVENT_ID);
         verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         verify(userRepository).getUserRoles();
+        verify(caseRoleRepository).getCaseRoles(CASE_TYPE_ID);
         verify(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES, CAN_READ);
     }
 

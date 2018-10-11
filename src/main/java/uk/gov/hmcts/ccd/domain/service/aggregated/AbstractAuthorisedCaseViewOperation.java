@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import com.google.common.collect.Sets;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
@@ -17,19 +19,22 @@ public abstract class AbstractAuthorisedCaseViewOperation {
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final AccessControlService accessControlService;
     private final UserRepository userRepository;
+    private final CaseRoleRepository caseRoleRepository;
 
     AbstractAuthorisedCaseViewOperation(CaseDefinitionRepository caseDefinitionRepository,
                                         AccessControlService accessControlService,
-                                        UserRepository userRepository) {
+                                        UserRepository userRepository,
+                                        CaseRoleRepository caseRoleRepository) {
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.accessControlService = accessControlService;
         this.userRepository = userRepository;
+        this.caseRoleRepository = caseRoleRepository;
     }
 
     void verifyReadAccess(CaseType caseType, Set<String> userRoles) {
         if (!accessControlService.canAccessCaseTypeWithCriteria(caseType, userRoles, CAN_READ)) {
             ResourceNotFoundException resourceNotFoundException = new ResourceNotFoundException(AccessControlService
-                                                                                                   .NO_CASE_TYPE_FOUND);
+                .NO_CASE_TYPE_FOUND);
             resourceNotFoundException.withDetails(NO_CASE_TYPE_FOUND_DETAILS);
             throw resourceNotFoundException;
         }
@@ -43,8 +48,8 @@ public abstract class AbstractAuthorisedCaseViewOperation {
         return caseType;
     }
 
-    Set<String> getUserRoles() {
-        return userRepository.getUserRoles();
+    Set<String> getUserRoles(String caseTypeId) {
+        return Sets.union(userRepository.getUserRoles(), caseRoleRepository.getCaseRoles(caseTypeId));
     }
 
     AccessControlService getAccessControlService() {
