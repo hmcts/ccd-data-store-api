@@ -307,6 +307,8 @@ A `CaseLink` is a field used to reference another CCD case using its universal 1
 
 ```json
 {
-  "CaseReference": "1521109509643143"
+  "FieldId": {
+    "CaseReference": "1521109509643143"
+  }
 }
 ```
