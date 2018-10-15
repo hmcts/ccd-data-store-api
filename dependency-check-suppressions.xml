@@ -2,10 +2,6 @@
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.1.xsd">
 
     <suppress>
-        <gav regex="true">^org\.postgresql:postgresql:.*$</gav>
-        <cpe>cpe:/a:postgresql:postgresql</cpe>
-    </suppress>
-    <suppress>
         <notes>See https://github.com/jeremylong/DependencyCheck/issues/1146 for Embedded Tomcat</notes>
         <cve>CVE-2017-12617</cve>
     </suppress>
@@ -57,5 +53,9 @@
         <notes>CVE-2018-13661: case-app*_2.11-1.2.0.jar is used in codacy for test coverage reporting, thus unimpacted in production</notes>
         <gav regex="true">^com\.github\.alexarchambault:case-app(-util|-annotations|)_2\.11:.*$</gav>
         <cpe>cpe:/a:app_project:app</cpe>
+    </suppress>
+    <suppress>
+        <notes>CVE-2016-7048: only for Postgres lt 9.6 and we use 9.6 on Azure.  Also only impacts the installer.</notes>
+        <cve>CVE-2016-7048</cve>
     </suppress>
 </suppressions>
