@@ -79,7 +79,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
         List<String> casesAsString = result.getSourceAsStringList();
         List<ElasticSearchCaseDetailsDTO> dtos = toElasticSearchCasesDTO(casesAsString);
         List<CaseDetails> caseDetails = caseDetailsMapper.dtosToCaseDetailsList(dtos);
-        return new CaseSearchResult(caseDetails, result.getTotal());
+        return new CaseSearchResult(result.getTotal(), caseDetails);
     }
 
     private List<ElasticSearchCaseDetailsDTO> toElasticSearchCasesDTO(List<String> cases) {
