@@ -75,7 +75,7 @@ class AuthorisedCaseSearchOperationTest {
     void shouldFilterFieldsReturnSearchResults() {
         CaseSearchRequest request = new CaseSearchRequest(CASE_TYPE_ID, searchRequestJsonNode);
         CaseDetails caseDetails = new CaseDetails();
-        CaseSearchResult searchResult = new CaseSearchResult(singletonList(caseDetails), 1L);
+        CaseSearchResult searchResult = new CaseSearchResult(1L, singletonList(caseDetails));
         when(authorisedCaseDefinitionDataService.getAuthorisedCaseType(CASE_TYPE_ID, CAN_READ)).thenReturn(Optional.of(caseType));
         when(caseSearchOperation.execute(request)).thenReturn(searchResult);
 

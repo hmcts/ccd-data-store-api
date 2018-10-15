@@ -300,3 +300,15 @@ An `OrderSummary` value is a Json `object`. We accept the following structure wi
   "PaymentTotal": "5000"
 }
 ```
+
+### CaseLink
+
+A `CaseLink` is a field used to reference another CCD case using its universal 16-digit ID. It's a complex type composed of a single `CaseReference` field of type `Text`.
+
+```json
+{
+  "FieldId": {
+    "CaseReference": "1521109509643143"
+  }
+}
+```
