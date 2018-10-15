@@ -25,7 +25,7 @@ class ElasticsearchUserCaseAccessFilterTest {
     private CaseAccessService caseAccessService;
 
     @InjectMocks
-    private ElasticsearchUserCaseAccessFilter factory;
+    private ElasticsearchUserCaseAccessFilter filter;
 
     @BeforeEach
     void setUp() {
@@ -38,7 +38,7 @@ class ElasticsearchUserCaseAccessFilterTest {
         Long caseId = 100L;
         when(caseAccessService.getGrantedCaseIdsForRestrictedRoles()).thenReturn(Optional.of(singletonList(caseId)));
 
-        Optional<QueryBuilder> optQueryBuilder = factory.getFilter(caseTypeId);
+        Optional<QueryBuilder> optQueryBuilder = filter.getFilter(caseTypeId);
 
         assertThat(optQueryBuilder.isPresent(), is(true));
         assertThat(optQueryBuilder.get(), instanceOf(TermsQueryBuilder.class));
