@@ -1,5 +1,10 @@
 package uk.gov.hmcts.ccd.data.user;
 
+import java.util.Map;
+import java.util.Set;
+
+import static com.google.common.collect.Maps.newHashMap;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -7,11 +12,6 @@ import org.springframework.web.context.annotation.RequestScope;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserDefault;
-
-import java.util.Map;
-import java.util.Set;
-
-import static com.google.common.collect.Maps.newHashMap;
 
 @Service
 @Qualifier(CachedUserRepository.QUALIFIER)
@@ -53,7 +53,7 @@ public class CachedUserRepository implements UserRepository {
     }
 
     @Override
-    public SecurityClassification getHighestUserClassification() {
-        return userHighestSecurityClassification.computeIfAbsent("userHighestSecurityClassification", s -> userRepository.getHighestUserClassification());
+    public SecurityClassification getHighestUserClassification(String jurisdictionId) {
+        return userHighestSecurityClassification.computeIfAbsent(jurisdictionId, s -> userRepository.getHighestUserClassification(jurisdictionId));
     }
 }

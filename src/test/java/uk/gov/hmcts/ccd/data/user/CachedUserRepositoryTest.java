@@ -165,16 +165,16 @@ class CachedUserRepositoryTest {
         @Test
         @DisplayName("should initially retrieve highest security classification from repository and from cache for subsequent calls")
         void shouldRetrieveUserRolesFromDecorated() {
-            when(userRepository.getHighestUserClassification()).thenReturn(PRIVATE);
+            when(userRepository.getHighestUserClassification(JURISDICTION_ID)).thenReturn(PRIVATE);
 
-            SecurityClassification classification1 = cachedUserRepository.getHighestUserClassification();
+            SecurityClassification classification1 = cachedUserRepository.getHighestUserClassification(JURISDICTION_ID);
 
             assertAll(
                 () -> assertThat(classification1, is(PRIVATE)),
-                () -> verify(userRepository, times(1)).getHighestUserClassification()
+                () -> verify(userRepository, times(1)).getHighestUserClassification(JURISDICTION_ID)
             );
 
-            SecurityClassification classification2 = cachedUserRepository.getHighestUserClassification();
+            SecurityClassification classification2 = cachedUserRepository.getHighestUserClassification(JURISDICTION_ID);
 
             assertAll(
                 () -> assertThat(classification2, is(PRIVATE)),
