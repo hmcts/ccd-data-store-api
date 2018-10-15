@@ -1,5 +1,10 @@
 package uk.gov.hmcts.ccd.endpoint.ui;
 
+import javax.inject.Inject;
+import javax.transaction.Transactional;
+
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -8,13 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
-import uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetUserProfileOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetUserProfileOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetUserProfileOperation;
-
-import javax.inject.Inject;
-import javax.transaction.Transactional;
-
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @RestController
 public class UserProfileEndpoint {
@@ -22,7 +22,7 @@ public class UserProfileEndpoint {
     private final GetUserProfileOperation getUserProfileOperation;
 
     @Inject
-    public UserProfileEndpoint(@Qualifier(DefaultGetUserProfileOperation.QUALIFIER) final GetUserProfileOperation getUserProfileOperation) {
+    public UserProfileEndpoint(@Qualifier(AuthorisedGetUserProfileOperation.QUALIFIER) final GetUserProfileOperation getUserProfileOperation) {
         this.getUserProfileOperation = getUserProfileOperation;
     }
 

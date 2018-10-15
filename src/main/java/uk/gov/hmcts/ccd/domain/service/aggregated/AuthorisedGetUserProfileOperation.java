@@ -6,6 +6,8 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -15,7 +17,6 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 @Service
 @Qualifier(AuthorisedGetUserProfileOperation.QUALIFIER)
@@ -45,7 +46,7 @@ public class AuthorisedGetUserProfileOperation implements GetUserProfileOperatio
             jurisdictions -> jurisdictions.setCaseTypes(
                 jurisdictions.getCaseTypes()
                     .stream()
-                    .map(caseType -> verifyAccess(caseType, userRoles, AccessControlService.CAN_READ))
+                    .map(caseType -> verifyAccess(caseType, userRoles, CAN_READ))
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .collect(Collectors.toList())
@@ -55,30 +56,17 @@ public class AuthorisedGetUserProfileOperation implements GetUserProfileOperatio
     }
 
     private Set<String> getUserRoles() {
-        Set<String> userRoles = userRepository.getUserRoles();
-        if (userRoles == null) {
-            throw new ValidationException("Cannot find user roles for the user");
-        }
-        // TODO Should we add Case Roles as well? RDM-2840 and beyond...
-        return userRoles;
+        return userRepository.getUserRoles();
     }
 
     private Optional<CaseType> verifyAccess(CaseType caseType, Set<String> userRoles, Predicate<AccessControlList> access) {
-
-        if (caseType == null || CollectionUtils.isEmpty(userRoles)) {
+        if (caseType == null || CollectionUtils.isEmpty(userRoles)
+            || !accessControlService.canAccessCaseTypeWithCriteria(caseType, userRoles, access)) {
             return Optional.empty();
         }
+        caseType.setStates(accessControlService.filterCaseStatesByAccess(caseType.getStates(), userRoles, access));
+        caseType.setEvents(accessControlService.filterCaseEventsByAccess(caseType.getEvents(), userRoles, access));
 
-        if (!accessControlService.canAccessCaseTypeWithCriteria(caseType, userRoles, access)) {
-            return Optional.empty();
-        }
-
-        caseType.setStates(accessControlService.filterCaseStatesByAccess(caseType.getStates(),
-            userRoles,
-            access));
-        caseType.setEvents(accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-            userRoles,
-            access));
         return Optional.of(caseType);
     }
 }
