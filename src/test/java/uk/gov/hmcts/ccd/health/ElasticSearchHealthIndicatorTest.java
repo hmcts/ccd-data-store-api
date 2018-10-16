@@ -50,14 +50,15 @@ class ElasticSearchHealthIndicatorTest {
     @Mock
     private DefaultCaseDetailsRepository repository;
 
+    @Spy
+    private ObjectMapper mapper = new ObjectMapper();
+
     @InjectMocks
     private ElasticSearchHealthIndicator healthIndicator;
 
     @Spy
     private Builder builder = new Builder();
 
-    @Spy
-    private ObjectMapper mapper = new ObjectMapper();
 
     @Mock
     private CatResult indicesHealthResult;
