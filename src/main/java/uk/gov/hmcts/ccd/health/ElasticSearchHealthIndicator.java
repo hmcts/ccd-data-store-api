@@ -115,7 +115,7 @@ public class ElasticSearchHealthIndicator extends AbstractHealthIndicator {
         return objectMapper.readTree(jestResult.getJsonString());
     }
 
-    private JestResult getClusterHealth() throws java.io.IOException {
+    private JestResult getClusterHealth() throws IOException {
         Health health = new Health.Builder().build();
         return client.execute(health);
     }
