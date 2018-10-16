@@ -6,8 +6,6 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
-
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -36,17 +34,17 @@ public class AuthorisedGetUserProfileOperation implements GetUserProfileOperatio
     }
 
     @Override
-    public UserProfile execute(final String userToken) {
-        return filterCaseTypes(getUserProfileOperation.execute(userToken));
+    public UserProfile execute(Predicate<AccessControlList> access) {
+        return filterCaseTypes(getUserProfileOperation.execute(access), access);
     }
 
-    private UserProfile filterCaseTypes(UserProfile userProfile) {
+    private UserProfile filterCaseTypes(UserProfile userProfile, Predicate<AccessControlList> access) {
         final Set<String> userRoles = getUserRoles();
         Arrays.stream(userProfile.getJurisdictions()).forEach(
             jurisdiction -> jurisdiction.setCaseTypes(
                 jurisdiction.getCaseTypes()
                     .stream()
-                    .map(caseType -> verifyAccess(caseType, userRoles, CAN_CREATE))
+                    .map(caseType -> verifyAccess(caseType, userRoles, access))
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .collect(Collectors.toList())
