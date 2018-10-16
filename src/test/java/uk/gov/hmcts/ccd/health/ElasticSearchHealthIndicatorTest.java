@@ -30,19 +30,19 @@ class ElasticSearchHealthIndicatorTest {
     private static final String ES_HEALTH_RESPONSE_GREEN = "{\"status\": \"green\"}";
     private static final String ES_HEALTH_RESPONSE_RED = "{\"status\": \"red\"}";
     private static final String ES_HEALTH_RESPONSE_YELLOW = "{\"status\": \"yellow\"}";
-    private static final String ES_INDICES_RESPONSE = "[\n" +
-        "      {\n" +
-        "        \"health\": \"green\",\n" +
-        "        \"index\": \"testcomplexaddressbookcase_cases-000001\",\n" +
-        "        \"docs.count\": \"0\",\n" +
-        "        \"pri.store.size\": \"522b\"\n" +
-        "      },\n" +
-        "      {\n" +
-        "        \"health\": \"green\",\n" +
-        "        \"index\": \"aat_cases-000001\",\n" +
-        "        \"docs.count\": \"1\",\n" +
-        "        \"pri.store.size\": \"6.9kb\"\n" +
-        "      }]";
+    private static final String ES_INDICES_RESPONSE = "[\n"
+        + "      {\n"
+        + "        \"health\": \"green\",\n"
+        + "        \"index\": \"testcomplexaddressbookcase_cases-000001\",\n"
+        + "        \"docs.count\": \"0\",\n"
+        + "        \"pri.store.size\": \"522b\"\n"
+        + "      },\n"
+        + "      {\n"
+        + "        \"health\": \"green\",\n"
+        + "        \"index\": \"aat_cases-000001\",\n"
+        + "        \"docs.count\": \"1\",\n"
+        + "        \"pri.store.size\": \"6.9kb\"\n"
+        + "      }]";
 
     @Mock
     private JestClient client;
@@ -58,7 +58,6 @@ class ElasticSearchHealthIndicatorTest {
 
     @Spy
     private Builder builder = new Builder();
-
 
     @Mock
     private CatResult indicesHealthResult;
