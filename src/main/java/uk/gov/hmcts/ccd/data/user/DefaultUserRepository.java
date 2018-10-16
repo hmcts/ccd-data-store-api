@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.data.user;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -112,8 +111,8 @@ public class DefaultUserRepository implements UserRepository {
     }
 
     @Override
-    public SecurityClassification getHighestUserClassification() {
-        return getClassificationsForUserRoles(new ArrayList<>(getUserRoles()))
+    public SecurityClassification getHighestUserClassification(String jurisdictionId) {
+        return getUserClassifications(jurisdictionId)
             .stream()
             .max(comparingInt(SecurityClassification::getRank))
             .orElseThrow(() -> new ServiceException("No security classification found for user"));

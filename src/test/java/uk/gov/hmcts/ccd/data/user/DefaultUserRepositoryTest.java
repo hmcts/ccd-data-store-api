@@ -177,7 +177,7 @@ class DefaultUserRepositoryTest {
             userRole3.setSecurityClassification(SecurityClassification.RESTRICTED.name());
             when(caseDefinitionRepository.getClassificationsForUserRoleList(anyListOf(String.class))).thenReturn(asList(userRole1, userRole2, userRole3));
 
-            SecurityClassification result = userRepository.getHighestUserClassification();
+            SecurityClassification result = userRepository.getHighestUserClassification(JURISDICTION_ID);
 
             assertThat(result, is(SecurityClassification.RESTRICTED));
         }
@@ -188,7 +188,7 @@ class DefaultUserRepositoryTest {
             asCaseworker();
             when(caseDefinitionRepository.getClassificationsForUserRoleList(anyListOf(String.class))).thenReturn(emptyList());
 
-            assertThrows(ServiceException.class, () -> userRepository.getHighestUserClassification());
+            assertThrows(ServiceException.class, () -> userRepository.getHighestUserClassification(JURISDICTION_ID));
         }
     }
 
