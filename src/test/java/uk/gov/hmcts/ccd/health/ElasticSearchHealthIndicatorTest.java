@@ -81,7 +81,7 @@ class ElasticSearchHealthIndicatorTest {
     }
 
     @Test
-    public void statusIsProblemsWhenException() throws Exception {
+    public void statusIsProblemsWhenException() {
         when(repository.getCasesCountByCaseType()).thenThrow(new RuntimeException("test"));
 
         healthIndicator.doHealthCheck(builder);
@@ -95,8 +95,8 @@ class ElasticSearchHealthIndicatorTest {
         stubESResponse(ES_HEALTH_RESPONSE_GREEN, ES_INDICES_RESPONSE);
 
         stubDatabase(
-            new Object[]{"AAT", 22},
-            new Object[]{"GrantOfRepresentation", 14}
+            new Object[]{"AAT", 22L},
+            new Object[]{"GrantOfRepresentation", 14L}
         );
 
         healthIndicator.doHealthCheck(builder);
@@ -115,8 +115,8 @@ class ElasticSearchHealthIndicatorTest {
         stubESResponse(ES_HEALTH_RESPONSE_GREEN, ES_INDICES_RESPONSE);
 
         stubDatabase(
-            new Object[]{"AAT", 0},
-            new Object[]{"testcomplexaddressbookcase", 0}
+            new Object[]{"AAT", 0L},
+            new Object[]{"testcomplexaddressbookcase", 0L}
         );
 
         healthIndicator.doHealthCheck(builder);
@@ -135,8 +135,8 @@ class ElasticSearchHealthIndicatorTest {
         stubESResponse(ES_HEALTH_RESPONSE_GREEN, ES_INDICES_RESPONSE);
 
         stubDatabase(
-            new Object[]{"AAT", 1},
-            new Object[]{"testcomplexaddressbookcase", 0}
+            new Object[]{"AAT", 1L},
+            new Object[]{"testcomplexaddressbookcase", 0L}
         );
 
         healthIndicator.doHealthCheck(builder);
@@ -155,8 +155,8 @@ class ElasticSearchHealthIndicatorTest {
         stubESResponse(ES_HEALTH_RESPONSE_RED, ES_INDICES_RESPONSE);
 
         stubDatabase(
-            new Object[]{"AAT", 1},
-            new Object[]{"testcomplexaddressbookcase", 0}
+            new Object[]{"AAT", 1L},
+            new Object[]{"testcomplexaddressbookcase", 0L}
         );
 
         healthIndicator.doHealthCheck(builder);
@@ -170,8 +170,8 @@ class ElasticSearchHealthIndicatorTest {
         stubESResponse(ES_HEALTH_RESPONSE_YELLOW, ES_INDICES_RESPONSE);
 
         stubDatabase(
-            new Object[]{"AAT", 1},
-            new Object[]{"testcomplexaddressbookcase", 0}
+            new Object[]{"AAT", 1L},
+            new Object[]{"testcomplexaddressbookcase", 0L}
         );
 
         healthIndicator.doHealthCheck(builder);

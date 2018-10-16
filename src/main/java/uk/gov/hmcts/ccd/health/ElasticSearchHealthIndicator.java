@@ -42,7 +42,7 @@ public class ElasticSearchHealthIndicator extends AbstractHealthIndicator {
     }
 
     @Override
-    protected void doHealthCheck(Builder builder) throws Exception {
+    protected void doHealthCheck(Builder builder) {
         try {
             JestResult healthResult = getClusterHealth();
             builder.withDetail("clusterHealth", asJsonNode(healthResult));
