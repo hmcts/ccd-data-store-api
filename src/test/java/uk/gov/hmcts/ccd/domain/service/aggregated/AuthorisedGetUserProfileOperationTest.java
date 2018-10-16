@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 
 import com.google.common.collect.Sets;
 import org.junit.jupiter.api.BeforeEach;
@@ -73,9 +73,9 @@ class AuthorisedGetUserProfileOperationTest {
     @Test
     @DisplayName("should return only caseTypes the user is allowed to access")
     void execute() {
-        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(eq(notAllowedCaseType), eq(userRoles), eq(CAN_READ));
-        doReturn(caseStates).when(accessControlService).filterCaseStatesByAccess(any(), eq(userRoles), eq(CAN_READ));
-        doReturn(caseEvents).when(accessControlService).filterCaseEventsByAccess(any(), eq(userRoles), eq(CAN_READ));
+        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(eq(notAllowedCaseType), eq(userRoles), eq(CAN_CREATE));
+        doReturn(caseStates).when(accessControlService).filterCaseStatesByAccess(any(), eq(userRoles), eq(CAN_CREATE));
+        doReturn(caseEvents).when(accessControlService).filterCaseEventsByAccess(any(), eq(userRoles), eq(CAN_CREATE));
 
         UserProfile userProfile = classUnderTest.execute(userToken);
 
@@ -92,7 +92,7 @@ class AuthorisedGetUserProfileOperationTest {
     @Test
     @DisplayName("should return empty caseType if the user is not allowed to access any case type")
     void shouldReturnEmptyCaseType() {
-        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(any(), eq(userRoles), eq(CAN_READ));
+        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(any(), eq(userRoles), eq(CAN_CREATE));
 
         UserProfile userProfile = classUnderTest.execute(userToken);
 
