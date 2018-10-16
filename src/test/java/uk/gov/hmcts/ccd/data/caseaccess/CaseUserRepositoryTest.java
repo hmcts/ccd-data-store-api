@@ -15,6 +15,7 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.Mockito.verify;
 
 @Transactional
 public class CaseUserRepositoryTest extends BaseTest {
@@ -46,6 +47,7 @@ public class CaseUserRepositoryTest extends BaseTest {
         repository.grantAccess(CASE_ID, USER_ID);
 
         assertThat(countAccesses(CASE_ID, USER_ID), equalTo(1));
+        verify(auditRepository).auditGrant(CASE_ID, USER_ID);
     }
 
     @Test
@@ -57,6 +59,7 @@ public class CaseUserRepositoryTest extends BaseTest {
         repository.revokeAccess(CASE_ID, USER_ID);
 
         assertThat(countAccesses(CASE_ID, USER_ID), equalTo(0));
+        verify(auditRepository).auditRevoke(CASE_ID, USER_ID);
     }
 
     @Test

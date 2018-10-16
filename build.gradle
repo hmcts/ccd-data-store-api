@@ -20,7 +20,7 @@ plugins {
     id 'checkstyle'
     id 'com.github.kt3k.coveralls' version '2.8.2'
     id 'se.patrikerdes.use-latest-versions' version '0.2.3'
-    id 'org.owasp.dependencycheck' version '3.2.1'
+    id 'org.owasp.dependencycheck' version '3.3.2'
     id 'com.github.spotbugs' version '1.6.2'
     id 'net.ltgt.apt' version '0.8'
 }
@@ -139,7 +139,7 @@ configurations {
 }
 
 checkstyle {
-    maxWarnings = 2942 // In the Ideal world this should be 0
+    maxWarnings = 2934 // In the Ideal world this should be 0
     toolVersion = '8.12'
 }
 
@@ -181,7 +181,7 @@ dependencies {
     compile group: 'com.hazelcast', name: 'hazelcast'
     compile group: 'com.hazelcast', name: 'hazelcast-spring'
 
-    compile group: 'org.springframework.hateoas', name: 'spring-hateoas', version: '0.24.0.RELEASE'
+    compile group: 'org.springframework.hateoas', name: 'spring-hateoas', version: '0.25.0.RELEASE'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
     compile("org.springframework.boot:spring-boot-starter-web")
     compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.2.RELEASE'

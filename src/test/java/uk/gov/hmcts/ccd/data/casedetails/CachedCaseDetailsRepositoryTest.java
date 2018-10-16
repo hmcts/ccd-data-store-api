@@ -21,11 +21,11 @@ import static org.mockito.Mockito.*;
 
 class CachedCaseDetailsRepositoryTest {
 
-    private final static long CASE_ID = 100000L;
-    private final static long CASE_REFERENCE = 999999L;
-    private final static String CASE_REFERENCE_STR = "1234123412341236";
-    private final static String JURISDICTION_ID = "JeyOne";
-    private final static String CASE_TYPE_ID = "CaseTypeOne";
+    private static final long CASE_ID = 100000L;
+    private static final long CASE_REFERENCE = 999999L;
+    private static final String CASE_REFERENCE_STR = "1234123412341236";
+    private static final String JURISDICTION_ID = "JeyOne";
+    private static final String CASE_TYPE_ID = "CaseTypeOne";
 
     @Mock
     private CaseDetailsRepository caseDetailsRepository;
