@@ -54,7 +54,7 @@ class AuthorisedGetUserProfileOperationTest {
     private AuthorisedGetUserProfileOperation classUnderTest;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
         userProfile.setUser(user);
         userProfile.setJurisdictions(new JurisdictionDisplayProperties[]{test1JurisdictionDisplayProperties, test2JurisdictionDisplayProperties});
@@ -73,7 +73,7 @@ class AuthorisedGetUserProfileOperationTest {
 
     @Test
     @DisplayName("should return only caseTypes the user is allowed to access")
-    void execute() {
+    public void execute() {
         doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(eq(notAllowedCaseType), eq(userRoles), eq(CAN_READ));
         doReturn(caseStates).when(accessControlService).filterCaseStatesByAccess(any(), eq(userRoles), eq(CAN_READ));
         doReturn(caseEvents).when(accessControlService).filterCaseEventsByAccess(any(), eq(userRoles), eq(CAN_READ));

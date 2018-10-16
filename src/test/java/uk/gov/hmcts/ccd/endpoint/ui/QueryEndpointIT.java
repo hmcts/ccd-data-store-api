@@ -1394,7 +1394,8 @@ public class QueryEndpointIT extends WireMockBaseTest {
             .andExpect(status().is(200))
             .andReturn();
 
-        final JurisdictionDisplayProperties[] jurisdictions = mapper.readValue(result.getResponse().getContentAsString(), JurisdictionDisplayProperties[].class);
+        final JurisdictionDisplayProperties[] jurisdictions = mapper.readValue(
+            result.getResponse().getContentAsString(), JurisdictionDisplayProperties[].class);
 
         assertAll(
             () -> assertThat(jurisdictions.length, is(equalTo(3))),

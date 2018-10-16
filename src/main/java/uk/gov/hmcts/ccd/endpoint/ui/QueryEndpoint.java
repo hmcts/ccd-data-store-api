@@ -109,8 +109,9 @@ public class QueryEndpoint {
             getUserProfileOperation.execute(accessMap.get(access)).getJurisdictions());
         if (jurisdictions.size() == 0) {
             throw new ResourceNotFoundException("No jurisdictions found");
-        } else
+        } else {
             return jurisdictions;
+        }
     }
 
     @Transactional
