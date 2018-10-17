@@ -26,6 +26,7 @@ import uk.gov.hmcts.ccd.data.casedetails.search.FieldMapSanitizeOperation;
 import uk.gov.hmcts.ccd.domain.model.aggregated.*;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
 import uk.gov.hmcts.ccd.domain.service.aggregated.*;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 class QueryEndpointTest {
@@ -124,5 +125,11 @@ class QueryEndpointTest {
         assertThat(response.get(0), is(j1));
         assertThat(response.get(1), is(j2));
         verify(getUserProfileOperation, times(1)).execute(CAN_CREATE);
+    }
+
+    @Test
+    @DisplayName("Should throw bad request Exception when access is not correct")
+    void shouldThrowBadRequest() {
+        assertThrows(BadRequestException.class, () -> queryEndpoint.getJurisdictions("creat"));
     }
 }

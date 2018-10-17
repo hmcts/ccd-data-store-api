@@ -36,6 +36,7 @@ import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
 import uk.gov.hmcts.ccd.domain.service.aggregated.*;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 @RestController
@@ -105,6 +106,9 @@ public class QueryEndpoint {
         @ApiResponse(code = 200, message = "List of jurisdictions for the given access criteria"),
         @ApiResponse(code = 404, message = "No jurisdictions found for given access criteria")})
     public List<JurisdictionDisplayProperties> getJurisdictions(@RequestParam(value = "access") String access) {
+        if (accessMap.get(access) == null) {
+            throw new BadRequestException("Access can only be 'create', 'read' or 'update'");
+        }
         List<JurisdictionDisplayProperties> jurisdictions = Arrays.asList(
             getUserProfileOperation.execute(accessMap.get(access)).getJurisdictions());
         if (jurisdictions.size() == 0) {
