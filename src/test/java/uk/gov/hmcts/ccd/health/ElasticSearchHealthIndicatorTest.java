@@ -87,7 +87,7 @@ class ElasticSearchHealthIndicatorTest {
         healthIndicator.doHealthCheck(builder);
 
         verify(builder).status(ElasticSearchHealthIndicator.PROBLEM);
-        verify(builder).withDetail("problem checking ES health", "test");
+        verify(builder).withDetail("detail", "test");
     }
 
     @Test

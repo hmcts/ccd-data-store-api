@@ -71,7 +71,7 @@ public class ElasticSearchHealthIndicator extends AbstractHealthIndicator {
             builder.status(PROBLEM);
             log.warn("problem checking ES health: ", e);
             if (e.getMessage() != null) {
-                builder.withDetail("problem checking ES health", e.getMessage());
+                builder.withDetail("detail", e.getMessage());
             }
         }
     }
