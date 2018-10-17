@@ -31,6 +31,11 @@ import java.time.LocalDateTime;
         query = "SELECT cd FROM CaseDetailsEntity cd" +
             " WHERE cd.jurisdiction = :" + CaseDetailsEntity.JURISDICTION_ID_PARAM +
             " AND cd.reference = :" + CaseDetailsEntity.CASE_REFERENCE_PARAM
+    ),
+
+    @NamedQuery(
+        name = CaseDetailsEntity.CASES_COUNT_BY_CASE_TYPE,
+        query = "SELECT cd.caseType, COUNT(cd) FROM CaseDetailsEntity cd GROUP BY cd.caseType"
     )
 })
 @Table(name = "case_data")
@@ -40,6 +45,7 @@ public class CaseDetailsEntity {
     static final String FIND_CASE = "CaseDataEntity_FIND_CASE";
     static final String FIND_BY_REFERENCE = "CaseDataEntity_FIND_BY_REFERENCE";
     static final String FIND_BY_REF_AND_JURISDICTION = "CaseDataEntity_FIND_BY_REFERENCE_AND_JURISDICTION";
+    static final String CASES_COUNT_BY_CASE_TYPE = "CaseDataEntity_CASES_COUNT_BY_CASE_TYPE";
 
     static final String JURISDICTION_ID_PARAM = "JURISDICTION_ID_PARAM";
     static final String CASE_TYPE_PARAM = "CASE_TYPE_PARAM";
