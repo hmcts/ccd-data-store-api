@@ -1,5 +1,13 @@
 package uk.gov.hmcts.ccd.data.casedetails.query;
 
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -8,15 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
-import uk.gov.hmcts.ccd.domain.service.common.AuthorisedCaseDefinitionDataService;
-
-import java.util.List;
-
-import static java.util.Arrays.asList;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 
 class CaseStateAuthorisationSecurityTest {
 

@@ -36,9 +36,9 @@ import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.search.CaseDetailsSearchResult;
+import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 
-public class CaseDetailsSearchEndpointIT extends WireMockBaseTest {
+public class CaseSearchEndpointIT extends WireMockBaseTest {
 
     private static final String POST_SEARCH_CASES = "/searchCases";
 
@@ -95,18 +95,17 @@ public class CaseDetailsSearchEndpointIT extends WireMockBaseTest {
         String searchRequest = "{\"query\": {\"match_all\": {}}}";
         MvcResult result = mockMvc.perform(post(POST_SEARCH_CASES)
                 .contentType(JSON_CONTENT_TYPE)
-                .param("ctid", "caseTypeId1")
-                .param("ctid", "caseTypeId2")
+                .param("ctid", "TestAddressBookCase")
                 .content(searchRequest))
                 .andExpect(status().is(200))
                 .andReturn();
 
         String responseAsString = result.getResponse().getContentAsString();
-        CaseDetailsSearchResult caseDetailsSearchResults = mapper.readValue(responseAsString,
-                CaseDetailsSearchResult.class);
+        CaseSearchResult caseSearchResults = mapper.readValue(responseAsString,
+                                                              CaseSearchResult.class);
 
-        assertThat(caseDetailsSearchResults.getTotal(), is(30L));
-        List<CaseDetails> caseDetails = caseDetailsSearchResults.getCases();
+        assertThat(caseSearchResults.getTotal(), is(30L));
+        List<CaseDetails> caseDetails = caseSearchResults.getCases();
         assertThat(caseDetails, hasSize(1));
         assertThat(caseDetails, hasItem(hasProperty("reference", equalTo(1535450291607660L))));
         assertThat(caseDetails, hasItem(hasProperty("jurisdiction", equalTo("AUTOTEST1"))));

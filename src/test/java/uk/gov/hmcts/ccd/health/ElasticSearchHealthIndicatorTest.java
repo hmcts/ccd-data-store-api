@@ -81,12 +81,13 @@ class ElasticSearchHealthIndicatorTest {
     }
 
     @Test
-    public void statusIsProblemsWhenException() {
-        when(repository.getCasesCountByCaseType()).thenThrow(new RuntimeException("test"));
+    public void statusIsProblemWhenException() throws IOException {
+        when(client.execute(any())).thenThrow(new RuntimeException("test", new RuntimeException("test2")));
 
         healthIndicator.doHealthCheck(builder);
 
-        verify(builder).status(ElasticSearchHealthIndicator.PROBLEMS);
+        verify(builder).status(ElasticSearchHealthIndicator.PROBLEM);
+        verify(builder).withDetail("detail", "test");
     }
 
     @Test
@@ -161,7 +162,7 @@ class ElasticSearchHealthIndicatorTest {
 
         healthIndicator.doHealthCheck(builder);
 
-        verify(builder).status(ElasticSearchHealthIndicator.PROBLEMS);
+        verify(builder).status(ElasticSearchHealthIndicator.PROBLEM);
     }
 
     @Test
