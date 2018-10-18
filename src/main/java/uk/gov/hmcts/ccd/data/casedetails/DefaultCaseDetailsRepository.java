@@ -173,6 +173,10 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
         return sr;
     }
 
+    public List<Object[]> getCasesCountByCaseType() {
+        return em.createNamedQuery(CaseDetailsEntity.CASES_COUNT_BY_CASE_TYPE).getResultList();
+    }
+
     // TODO This accepts null values for backward compatibility. Once deprecated methods are removed, parameters should
     // be annotated with @NotNull
     private Optional<CaseDetailsEntity> find(String jurisdiction, Long id, String reference) {
