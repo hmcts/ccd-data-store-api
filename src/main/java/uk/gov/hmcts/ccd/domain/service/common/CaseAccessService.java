@@ -1,5 +1,10 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
@@ -10,10 +15,6 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
-
-import java.util.List;
-import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
 /**
  * Check access to a case for the current user.
@@ -56,6 +57,15 @@ public class CaseAccessService {
                                     .findFirst()
                                     .map(role -> AccessLevel.GRANTED)
                                     .orElse(AccessLevel.ALL);
+    }
+
+    public Optional<List<Long>> getGrantedCaseIdsForRestrictedRoles() {
+        IDAMProperties currentUser = userRepository.getUserDetails();
+        if (canOnlyViewGrantedCases(currentUser)) {
+            return Optional.of(caseUserRepository.findCasesUserIdHasAccessTo(currentUser.getId()));
+        }
+
+        return Optional.empty();
     }
 
     private Boolean accessGranted(CaseDetails caseDetails, IDAMProperties currentUser) {

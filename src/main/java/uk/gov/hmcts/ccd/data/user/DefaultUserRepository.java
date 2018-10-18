@@ -1,5 +1,15 @@
 package uk.gov.hmcts.ccd.data.user;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static java.util.Comparator.comparingInt;
+import static org.apache.commons.lang.StringUtils.startsWithIgnoreCase;
+
 import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,6 +19,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Repository;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
@@ -23,17 +34,8 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static org.apache.commons.lang.StringUtils.startsWithIgnoreCase;
-
-@Named
+@Repository
 @Qualifier(DefaultUserRepository.QUALIFIER)
-@Singleton
 public class DefaultUserRepository implements UserRepository {
 
     public static final String QUALIFIER = "default";
@@ -44,15 +46,13 @@ public class DefaultUserRepository implements UserRepository {
     private final ApplicationParams applicationParams;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final SecurityUtils securityUtils;
-    @Qualifier("restTemplate")
-    @Autowired
     private final RestTemplate restTemplate;
 
-    @Inject
-    public DefaultUserRepository(final ApplicationParams applicationParams,
-                                 @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
-                                 final SecurityUtils securityUtils,
-                                 final RestTemplate restTemplate) {
+    @Autowired
+    public DefaultUserRepository(ApplicationParams applicationParams,
+                                 @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) CaseDefinitionRepository caseDefinitionRepository,
+                                 SecurityUtils securityUtils,
+                                 @Qualifier("restTemplate") RestTemplate restTemplate) {
         this.applicationParams = applicationParams;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.securityUtils = securityUtils;
@@ -82,11 +82,7 @@ public class DefaultUserRepository implements UserRepository {
             .filter(role -> filterRole(jurisdictionId, role))
             .collect(Collectors.toList());
 
-        return caseDefinitionRepository.getClassificationsForUserRoleList(filteredRoles).stream()
-                    .filter(Objects::nonNull)
-                    .filter(userRole -> Objects.nonNull(userRole.getSecurityClassification()))
-                    .map(userRole -> SecurityClassification.valueOf(userRole.getSecurityClassification()))
-                    .collect(Collectors.toSet());
+        return getClassificationsForUserRoles(filteredRoles);
     }
 
     /**
@@ -107,10 +103,27 @@ public class DefaultUserRepository implements UserRepository {
             LOG.error("Failed to retrieve user profile", e);
             final List<String> headerMessages = e.getResponseHeaders().get("Message");
             final String message = headerMessages != null ? headerMessages.get(0) : e.getMessage();
-            if (message != null)
+            if (message != null) {
                 throw new BadRequestException(message);
+            }
             throw new ServiceException("Problem getting user default settings for " + userId);
         }
+    }
+
+    @Override
+    public SecurityClassification getHighestUserClassification(String jurisdictionId) {
+        return getUserClassifications(jurisdictionId)
+            .stream()
+            .max(comparingInt(SecurityClassification::getRank))
+            .orElseThrow(() -> new ServiceException("No security classification found for user"));
+    }
+
+    private Set<SecurityClassification> getClassificationsForUserRoles(List<String> roles) {
+        return caseDefinitionRepository.getClassificationsForUserRoleList(roles).stream()
+            .filter(Objects::nonNull)
+            .filter(userRole -> Objects.nonNull(userRole.getSecurityClassification()))
+            .map(userRole -> SecurityClassification.valueOf(userRole.getSecurityClassification()))
+            .collect(Collectors.toSet());
     }
 
     private boolean filterRole(final String jurisdictionId, final String role) {
