@@ -107,7 +107,6 @@ ext {
             'class'      : 98
     ]
     appInsights = '2.0.1'
-    elasticSearchVersion = '6.4.0'
 }
 
 group 'uk.gov.hmcts.ccd'
@@ -198,10 +197,6 @@ dependencies {
     compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
     compile group: 'commons-validator', name: 'commons-validator', version: '1.6'
 
-    compile(group: "org.elasticsearch", name: 'elasticsearch', version: '${elasticSearchVersion}') {
-        exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
-    }
-
     // FIXME 0.6 doesn't support jsonb; 0.7 doesn't work on Windows
 //    runtime group: 'com.impossibl.pgjdbc-ng', name: 'pgjdbc-ng', version: '0.6'
     runtime group: 'org.postgresql', name: 'postgresql', version: '42.2.2'
@@ -230,6 +225,9 @@ dependencies {
     //excluding log4j-core which causes a vulnerability issue
     compile(group: 'io.searchbox', name: 'jest', version: '6.3.1') {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-core'
+    }
+    compile(group: 'org.elasticsearch', name: 'elasticsearch', version: '6.4.0') {
+        exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
     }
     compile 'org.mapstruct:mapstruct-jdk8:1.2.0.Final'
     apt 'org.mapstruct:mapstruct-processor:1.2.0.Final'
