@@ -87,7 +87,7 @@ repositories {
     mavenCentral()
     jcenter()
     maven {
-        url  'https://dl.bintray.com/hmcts/hmcts-maven'
+        url 'https://dl.bintray.com/hmcts/hmcts-maven'
     }
 }
 // end::repositories[]
@@ -106,7 +106,7 @@ ext {
             'method'     : 90,
             'class'      : 98
     ]
-    appInsights= '2.0.1'
+    appInsights = '2.0.1'
     elasticSearchVersion = '6.4.0'
 }
 
@@ -198,7 +198,9 @@ dependencies {
     compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
     compile group: 'commons-validator', name: 'commons-validator', version: '1.6'
 
-    compile "org.elasticsearch:elasticsearch:${elasticSearchVersion}"
+    compile(group: "org.elasticsearch", name: 'elasticsearch', version: '${elasticSearchVersion}') {
+        exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
+    }
 
     // FIXME 0.6 doesn't support jsonb; 0.7 doesn't work on Windows
 //    runtime group: 'com.impossibl.pgjdbc-ng', name: 'pgjdbc-ng', version: '0.6'
@@ -228,7 +230,6 @@ dependencies {
     //excluding log4j-core which causes a vulnerability issue
     compile(group: 'io.searchbox', name: 'jest', version: '6.3.1') {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-core'
-        exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
     }
     compile 'org.mapstruct:mapstruct-jdk8:1.2.0.Final'
     apt 'org.mapstruct:mapstruct-processor:1.2.0.Final'
@@ -491,7 +492,7 @@ jacocoTestReport {
             }
             logger.quiet("---------------------------------------------------------------")
             throw new GradleException("Code coverage failed")
-        } else{
+        } else {
             logger.quiet("Passed Code Coverage Checks")
         }
     }
