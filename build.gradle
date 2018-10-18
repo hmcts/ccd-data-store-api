@@ -107,7 +107,7 @@ ext {
             'class'      : 98
     ]
     appInsights= '2.0.1'
-    elasticSearchVersion = '6.3.0'
+    elasticSearchVersion = '6.4.0'
 }
 
 group 'uk.gov.hmcts.ccd'
