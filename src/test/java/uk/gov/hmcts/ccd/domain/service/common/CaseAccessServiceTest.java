@@ -1,5 +1,19 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -13,15 +27,6 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
-
-import java.util.Arrays;
-import java.util.List;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.*;
 
 class CaseAccessServiceTest {
 
@@ -224,6 +229,106 @@ class CaseAccessServiceTest {
         void accessLevel() {
             final AccessLevel accessLevel = caseAccessService.getAccessLevel(serviceAndUserDetails(ROLES));
             assertThat(accessLevel, equalTo(AccessLevel.ALL));
+        }
+    }
+
+    @Nested
+    @DisplayName("getGrantedCaseIdsForRestrictedRoles()")
+    class GetGrantedCaseIdsForRestrictedRoles {
+
+        @Nested
+        @DisplayName("when a solicitor")
+        class WhenSolicitor {
+            private final String[] ROLES = {
+                "judiciary-solicitor"
+            };
+
+            @BeforeEach
+            void setUp() {
+                withRoles(ROLES);
+            }
+
+            @Test
+            @DisplayName("should return granted case ids for user with solicitor role")
+            void shouldReturnCaseIds() {
+                Optional<List<Long>> result = caseAccessService.getGrantedCaseIdsForRestrictedRoles();
+
+                assertThat(result.isPresent(), is(true));
+                assertGrantedCaseIds(result.get());
+            }
+        }
+
+        @Nested
+        @DisplayName("when a citizen")
+        class WhenCitizen {
+            private final String[] ROLES = {
+                "citizen"
+            };
+
+            @BeforeEach
+            void setUp() {
+                withRoles(ROLES);
+            }
+
+            @Test
+            @DisplayName("should return granted case ids for user with citizen role")
+            void shouldReturnCaseIds() {
+                Optional<List<Long>> result = caseAccessService.getGrantedCaseIdsForRestrictedRoles();
+
+                assertThat(result.isPresent(), is(true));
+                assertGrantedCaseIds(result.get());
+            }
+        }
+
+        @Nested
+        @DisplayName("when a letter holder")
+        class WhenLetterHolder {
+            private final String[] ROLES = {
+                "letter-holder"
+            };
+
+            @BeforeEach
+            void setUp() {
+                withRoles(ROLES);
+            }
+
+            @Test
+            @DisplayName("should return granted case ids for user with letter-holder role")
+            void shouldReturnCaseIds() {
+                Optional<List<Long>> result = caseAccessService.getGrantedCaseIdsForRestrictedRoles();
+
+                assertThat(result.isPresent(), is(true));
+                assertGrantedCaseIds(result.get());
+            }
+        }
+
+        @Nested
+        @DisplayName("when a case worker")
+        class WhenCaseWorker {
+            private final String[] ROLES = {
+                "caseworker-divorce"
+            };
+
+            @BeforeEach
+            void setUp() {
+                withRoles(ROLES);
+            }
+
+            @Test
+            @DisplayName("should return no case ids for user with case worker role")
+            void shouldReturnCaseIds() {
+                Optional<List<Long>> result = caseAccessService.getGrantedCaseIdsForRestrictedRoles();
+
+                assertThat(result.isPresent(), is(false));
+            }
+        }
+
+        private void assertGrantedCaseIds(List<Long> result) {
+            assertAll(
+                () -> assertThat(result, hasItems(Long.valueOf(CASE_GRANTED_1_ID), Long.valueOf(CASE_GRANTED_2_ID))),
+                () -> verify(userRepository).getUserDetails(),
+                () -> verify(caseUserRepository).findCasesUserIdHasAccessTo(USER_ID)
+            );
         }
     }
 

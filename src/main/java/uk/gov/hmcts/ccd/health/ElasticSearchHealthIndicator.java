@@ -28,7 +28,7 @@ import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 public class ElasticSearchHealthIndicator extends AbstractHealthIndicator {
 
     protected static final String COULD_NOT_CONNECT = "COULD_NOT_CONNECT";
-    protected static final String PROBLEMS = "PROBLEMS";
+    protected static final String PROBLEM = "PROBLEM";
     protected static final String OUT_OF_SYNC = "OUT_OF_SYNC";
     private JestClient client;
     private DefaultCaseDetailsRepository caseDetailsRepository;
@@ -62,14 +62,17 @@ public class ElasticSearchHealthIndicator extends AbstractHealthIndicator {
                         break;
                     case "red":
                     default:
-                        builder.status(PROBLEMS);
+                        builder.status(PROBLEM);
                 }
             }
         } catch (CouldNotConnectException e) {
             builder.status(COULD_NOT_CONNECT);
         } catch (Exception e) {
-            builder.status(PROBLEMS);
-            log.warn("problems checking ES health", e);
+            builder.status(PROBLEM);
+            log.warn("problem checking ES health: ", e);
+            if (e.getMessage() != null) {
+                builder.withDetail("detail", e.getMessage());
+            }
         }
     }
 

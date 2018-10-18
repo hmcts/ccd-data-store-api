@@ -1,13 +1,13 @@
 package uk.gov.hmcts.ccd.data.casedetails.query;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
-import uk.gov.hmcts.ccd.domain.service.common.AuthorisedCaseDefinitionDataService;
-
 import java.util.List;
 
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
+import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 
 @Component
 public class CaseStateAuthorisationSecurity implements CaseDetailsAuthorisationSecurity {
