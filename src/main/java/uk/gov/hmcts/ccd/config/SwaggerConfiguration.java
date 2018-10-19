@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd;
+package uk.gov.hmcts.ccd.config;
 
 import java.util.Arrays;
 

@@ -1,18 +1,22 @@
 package uk.gov.hmcts.ccd.domain.model.search;
 
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-
 import java.util.List;
 
-public class CaseDetailsSearchResult {
+import static java.util.Collections.emptyList;
 
-    private List<CaseDetails> cases;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+
+public class CaseSearchResult {
+
+    public static final CaseSearchResult EMPTY = new CaseSearchResult(0L, emptyList());
+
     private Long total;
+    private List<CaseDetails> cases;
 
-    public CaseDetailsSearchResult() {
+    public CaseSearchResult() {
     }
 
-    public CaseDetailsSearchResult(List<CaseDetails> cases, Long total) {
+    public CaseSearchResult(Long total, List<CaseDetails> cases) {
         this.cases = cases;
         this.total = total;
     }
