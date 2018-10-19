@@ -1,10 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.is;
