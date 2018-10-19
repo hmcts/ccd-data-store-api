@@ -17,7 +17,6 @@ Store/search cases and provide workbaskets
 - [Docker](https://www.docker.com)
 
 #### Environment variables
-
 The following environment variables are required:
 
 | Name | Default | Description |
