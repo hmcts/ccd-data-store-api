@@ -26,7 +26,7 @@ public class CaseFieldBuilder {
     }
 
     public CaseFieldBuilder withMax(Float max) {
-        return withMax(new BigDecimal(max));
+        return withMax(new BigDecimal(max.toString()));
     }
 
     public CaseFieldBuilder withMax(BigDecimal max) {
@@ -39,7 +39,7 @@ public class CaseFieldBuilder {
     }
 
     public CaseFieldBuilder withMin(Float min) {
-        return withMin(new BigDecimal(min));
+        return withMin(new BigDecimal(min.toString()));
     }
 
     public CaseFieldBuilder withMin(BigDecimal min) {
