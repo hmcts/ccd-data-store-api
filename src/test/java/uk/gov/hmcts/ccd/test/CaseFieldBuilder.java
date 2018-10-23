@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.test;
 
-import org.assertj.core.util.Lists;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.definition.FixedListItem;
@@ -10,7 +9,7 @@ import java.util.ArrayList;
 
 public class CaseFieldBuilder {
 
-    final CaseField caseField = new CaseField();
+    private final CaseField caseField = new CaseField();
 
     public CaseFieldBuilder(final String fieldId) {
         caseField.setId(fieldId);
