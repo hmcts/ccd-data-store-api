@@ -20,10 +20,10 @@ plugins {
     id 'checkstyle'
     id 'com.github.kt3k.coveralls' version '2.8.2'
     id 'se.patrikerdes.use-latest-versions' version '0.2.3'
-    id 'org.owasp.dependencycheck' version '3.2.1'
     id "info.solidsoft.pitest" version '1.3.0'
+    id 'org.owasp.dependencycheck' version '3.3.2'
     id 'com.github.spotbugs' version '1.6.2'
-    id "net.ltgt.apt" version "0.18"
+    id 'net.ltgt.apt' version '0.8'
 }
 
 apply plugin: 'java'
@@ -36,7 +36,6 @@ apply plugin: 'jsonschema2pojo'
 apply plugin: 'jacoco'
 apply plugin: 'checkstyle'
 apply plugin: 'pmd'
-apply plugin: 'com.github.spotbugs'
 apply plugin: 'com.github.kt3k.coveralls'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'se.patrikerdes.use-latest-versions'
@@ -92,9 +91,10 @@ mainClassName = 'uk.gov.hmcts.ccd.CoreCaseDataApplication'
 // tag::repositories[]
 repositories {
     mavenLocal()
+    mavenCentral()
     jcenter()
     maven {
-        url  'https://dl.bintray.com/hmcts/hmcts-maven'
+        url 'https://dl.bintray.com/hmcts/hmcts-maven'
     }
 }
 // end::repositories[]
@@ -113,7 +113,7 @@ ext {
             'method'     : 90,
             'class'      : 98
     ]
-    appInsights= '2.0.1'
+    appInsights = '2.0.1'
 }
 
 group 'uk.gov.hmcts.ccd'
@@ -146,8 +146,8 @@ configurations {
 }
 
 checkstyle {
-    maxWarnings = 99999  // In the Ideal world this should be 0
-    toolVersion = '8.8'
+    maxWarnings = 2934 // In the Ideal world this should be 0
+    toolVersion = '8.12'
 }
 
 checkstyleMain.shouldRunAfter(compileJava)
@@ -160,7 +160,6 @@ tasks.withType(com.github.spotbugs.SpotBugsTask) {
     }
 }
 
-// Delete me once there is no more bug
 spotbugs {
     ignoreFailures = true
 }
@@ -189,11 +188,13 @@ dependencies {
     compile group: 'com.hazelcast', name: 'hazelcast'
     compile group: 'com.hazelcast', name: 'hazelcast-spring'
 
+    compile group: 'org.springframework.hateoas', name: 'spring-hateoas', version: '0.25.0.RELEASE'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
     compile("org.springframework.boot:spring-boot-starter-web")
     compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.2.RELEASE'
     compile group: 'javax.inject', name: 'javax.inject', version: '1'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.1'
     compile group: 'io.springfox', name: 'springfox-swagger2', version: swagger2Version
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: swagger2Version
     compile group: 'org.liquibase', name: 'liquibase-core', version: '3.5.5'
@@ -202,7 +203,7 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '0.6.0'
     compile group: 'com.sun.mail', name: 'mailapi', version: '1.6.1'
     compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
-
+    compile group: 'commons-validator', name: 'commons-validator', version: '1.6'
 
     // FIXME 0.6 doesn't support jsonb; 0.7 doesn't work on Windows
 //    runtime group: 'com.impossibl.pgjdbc-ng', name: 'pgjdbc-ng', version: '0.6'
@@ -233,6 +234,17 @@ dependencies {
     compile group: 'org.pitest', name: 'pitest', version: '1.3.2'
     compile 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.3.0'
     compile 'org.codehaus.sonar-plugins:sonar-pitest-plugin:0.5'
+
+    //excluding log4j-core which causes a vulnerability issue
+    compile(group: 'io.searchbox', name: 'jest', version: '6.3.1') {
+        exclude group: 'org.apache.logging.log4j', module: 'log4j-core'
+    }
+    compile(group: 'org.elasticsearch', name: 'elasticsearch', version: '6.4.0') {
+        exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
+    }
+    compile 'org.mapstruct:mapstruct-jdk8:1.2.0.Final'
+    apt 'org.mapstruct:mapstruct-processor:1.2.0.Final'
+    compile 'org.jooq:jool-java-8:0.9.14'
 }
 // end::dependencies[]
 
@@ -494,7 +506,7 @@ jacocoTestReport {
             }
             logger.quiet("---------------------------------------------------------------")
             throw new GradleException("Code coverage failed")
-        } else{
+        } else {
             logger.quiet("Passed Code Coverage Checks")
         }
     }
@@ -560,6 +572,7 @@ task functional(type: Test) {
     setTestClassesDirs(sourceSets.aat.output.classesDirs)
     setClasspath(sourceSets.aat.runtimeClasspath)
     include "uk/gov/hmcts/ccd/datastore/tests/functional/**"
+    include "uk/gov/hmcts/ccd/datastore/tests/v2/**"
     useJUnitPlatform()
 }
 
@@ -610,5 +623,3 @@ pitest {
     timestampedReports = false
     mutationThreshold = 50
 }
-
-

@@ -1,9 +1,19 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
 import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 @NamedQueries({
     @NamedQuery(name = CaseDetailsEntity.FIND_BY_METADATA, query =
@@ -31,6 +41,11 @@ import java.time.LocalDateTime;
         query = "SELECT cd FROM CaseDetailsEntity cd" +
             " WHERE cd.jurisdiction = :" + CaseDetailsEntity.JURISDICTION_ID_PARAM +
             " AND cd.reference = :" + CaseDetailsEntity.CASE_REFERENCE_PARAM
+    ),
+
+    @NamedQuery(
+        name = CaseDetailsEntity.CASES_COUNT_BY_CASE_TYPE,
+        query = "SELECT cd.caseType, COUNT(cd) FROM CaseDetailsEntity cd GROUP BY cd.caseType"
     )
 })
 @Table(name = "case_data")
@@ -40,11 +55,13 @@ public class CaseDetailsEntity {
     static final String FIND_CASE = "CaseDataEntity_FIND_CASE";
     static final String FIND_BY_REFERENCE = "CaseDataEntity_FIND_BY_REFERENCE";
     static final String FIND_BY_REF_AND_JURISDICTION = "CaseDataEntity_FIND_BY_REFERENCE_AND_JURISDICTION";
+    static final String CASES_COUNT_BY_CASE_TYPE = "CaseDataEntity_CASES_COUNT_BY_CASE_TYPE";
 
     static final String JURISDICTION_ID_PARAM = "JURISDICTION_ID_PARAM";
     static final String CASE_TYPE_PARAM = "CASE_TYPE_PARAM";
     static final String CASE_REFERENCE_PARAM = "CASE_REFERENCE_PARAM";
     static final String STATE_PARAM = "STATE_PARAM";
+    public static final String ID_FIELD_COL = "id";
     public static final String STATE_FIELD_COL = "state";
     public static final String JURISDICTION_FIELD_COL = "jurisdiction";
     public static final String CASE_TYPE_ID_FIELD_COL = "case_type_id";
@@ -77,7 +94,6 @@ public class CaseDetailsEntity {
     private SecurityClassification securityClassification;
     @Column(name = "locked_by_user_id")
     private Integer lockedBy;
-    @SuppressWarnings("JpaAttributeTypeInspection")
     @Column(name = "data", nullable = false)
     @Convert(converter = uk.gov.hmcts.ccd.data.JSONBConverter.class)
     private JsonNode data;

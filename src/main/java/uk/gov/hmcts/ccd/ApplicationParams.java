@@ -64,6 +64,18 @@ public class ApplicationParams {
     @Value("${definition.cache.ttl.secs}")
     private Integer definitionCacheTTLSecs;
 
+    @Value("#{'${search.elastic.hosts}'.split(',')}")
+    private List<String> elasticSearchHosts;
+
+    @Value("#{'${search.blacklist}'.split(',')}")
+    private List<String> searchBlackList;
+
+    @Value("${search.cases.index.name.format}")
+    private String casesIndexNameFormat;
+
+    @Value("${search.cases.index.name.type}")
+    private String casesIndexType;
+
     private static String encode(final String stringToEncode) {
         try {
             return URLEncoder.encode(stringToEncode, "UTF-8");
@@ -133,7 +145,7 @@ public class ApplicationParams {
     }
 
     public String displayWizardPageCollection(final String caseTypeId, final String eventTriggerId) {
-        return uiDefinitionHost + "/api/display/wizard-page-structure/case-types/" + encode(caseTypeId) +"/event-triggers/" + encode(eventTriggerId);
+        return uiDefinitionHost + "/api/display/wizard-page-structure/case-types/" + encode(caseTypeId) + "/event-triggers/" + encode(eventTriggerId);
     }
 
     public String jurisdictionDefURL() {
@@ -194,5 +206,21 @@ public class ApplicationParams {
 
     public int getDefinitionCacheTTLSecs() {
         return definitionCacheTTLSecs;
+    }
+
+    public List<String> getSearchBlackList() {
+        return searchBlackList;
+    }
+
+    public List<String> getElasticSearchHosts() {
+        return elasticSearchHosts;
+    }
+
+    public String getCasesIndexNameFormat() {
+        return casesIndexNameFormat;
+    }
+
+    public String getCasesIndexType() {
+        return casesIndexType;
     }
 }

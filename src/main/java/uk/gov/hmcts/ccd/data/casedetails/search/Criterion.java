@@ -6,9 +6,9 @@ public abstract class Criterion {
 
     protected static final String POSITION_PREFIX = "?";
 
-    final private String field;
+    private final String field;
 
-    final private String soughtValue;
+    private final String soughtValue;
 
     Criterion(String field, String soughtValue) {
         this.field = field;
@@ -23,7 +23,7 @@ public abstract class Criterion {
         return soughtValue;
     }
 
-    abstract public String buildClauseString(int position, String operation);
+    public abstract String buildClauseString(int position, String operation);
 
     protected String makeCaseInsensitive(String in) {
         return "TRIM( UPPER ( " + in + "))";

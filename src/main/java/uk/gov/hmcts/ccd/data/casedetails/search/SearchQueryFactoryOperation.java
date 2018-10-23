@@ -1,10 +1,5 @@
 package uk.gov.hmcts.ccd.data.casedetails.search;
 
-import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
-import uk.gov.hmcts.ccd.domain.service.common.AuthorisedCaseDefinitionDataService;
-import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
@@ -16,6 +11,11 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+
+import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
+import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
+import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 @Named
 @Singleton

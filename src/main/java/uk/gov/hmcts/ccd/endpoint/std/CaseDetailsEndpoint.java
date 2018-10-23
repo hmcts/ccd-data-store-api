@@ -333,6 +333,7 @@ public class CaseDetailsEndpoint {
         @RequestBody final CaseDataContent content) {
         return validateCaseFieldsOperation.validateCaseDetails(jurisdictionId, caseTypeId, content.getEvent(), content.getData());
     }
+
     @Transactional
     @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
@@ -475,7 +476,7 @@ public class CaseDetailsEndpoint {
                     String.join((","), MetaData.unknownMetadata(metadataParams))));
         }
         param(queryParameters, SECURITY_CLASSIFICATION.getParameterName()).ifPresent(sc -> {
-            if(!EnumUtils.isValidEnum(SecurityClassification.class, sc.toUpperCase())) {
+            if (!EnumUtils.isValidEnum(SecurityClassification.class, sc.toUpperCase())) {
                 throw new BadRequestException(String.format("unknown security classification '%s'", sc));
             }
         });

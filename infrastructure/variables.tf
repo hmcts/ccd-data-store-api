@@ -33,6 +33,18 @@ variable "common_tags" {
   type = "map"
 }
 
+variable "asp_name" {
+  type = "string"
+  description = "App Service Plan (ASP) to use for the webapp, 'use_shared' to make use of the shared ASP"
+  default = "use_shared"
+}
+
+variable "asp_rg" {
+  type = "string"
+  description = "App Service Plan (ASP) resource group for 'asp_name', 'use_shared' to make use of the shared resource group"
+  default = "use_shared"
+}
+
 variable "tenant_id" {
   description = "(Required) The Azure Active Directory tenant ID that should be used for authenticating requests to the key vault. This is usually sourced from environemnt variables and not normally required to be specified."
 }
@@ -60,7 +72,7 @@ variable "database_name" {
 
 variable "authorised-services" {
   type    = "string"
-  default = "ccd_data,ccd_gw,ccd_ps,probate_backend,divorce_ccd_submission,sscs,cmc,cmc_claim_store,jui_webapp,pui_webapp"
+  default = "ccd_data,ccd_gw,ccd_ps,probate_backend,divorce_ccd_submission,sscs,cmc,cmc_claim_store,jui_webapp,pui_webapp,bulk_scan_orchestrator"
 }
 
 variable "idam_api_url" {
@@ -83,7 +95,29 @@ variable "default_print_url" {
 }
 
 variable "frontend_url" {
+  description = "Optional front end URL to use for building redirect URI"
   type = "string"
   default = ""
-  description = "Optional front end URL to use for building redirect URI"
+}
+
+variable "elastic_search_blacklist" {
+  description = "Forbidden elastic search query types"
+  type = "string"
+  default = "query_string"
+}
+
+variable "elastic_search_enabled" {
+  default = "false"
+}
+
+variable "elastic_search_case_index_name_format" {
+  description = "Format of the elastic search index name for cases"
+  type = "string"
+  default = "%s_cases"
+}
+
+variable "elastic_search_case_index_type" {
+  description = "Cases index document type"
+  type = "string"
+  default = "case"
 }

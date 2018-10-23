@@ -169,8 +169,12 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
         int pageSize = applicationParams.getPaginationPageSize();
         PaginatedSearchMetadata sr = new PaginatedSearchMetadata();
         sr.setTotalResultsCount(totalResults);
-        sr.setTotalPagesCount((int) Math.ceil((double) sr.getTotalResultsCount()/pageSize));
+        sr.setTotalPagesCount((int) Math.ceil((double) sr.getTotalResultsCount() / pageSize));
         return sr;
+    }
+
+    public List<Object[]> getCasesCountByCaseType() {
+        return em.createNamedQuery(CaseDetailsEntity.CASES_COUNT_BY_CASE_TYPE).getResultList();
     }
 
     // TODO This accepts null values for backward compatibility. Once deprecated methods are removed, parameters should
@@ -194,7 +198,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     private Query getQuery(MetaData metadata, Map<String, String> dataSearchParams, boolean isCountQuery) {
         Query query;
         if (dataSearchParams.isEmpty()) {
-            query = isCountQuery? getCountQueryByMetaData(metadata) : getQueryByMetaData(metadata);
+            query = isCountQuery ? getCountQueryByMetaData(metadata) : getQueryByMetaData(metadata);
         } else {
             query = getQueryByParameters(metadata, dataSearchParams, isCountQuery);
         }

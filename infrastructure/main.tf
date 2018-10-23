@@ -22,6 +22,9 @@ locals {
   nonPreviewResourceGroup = "${var.raw_product}-shared-${var.env}"
   sharedResourceGroup = "${(var.env == "preview" || var.env == "spreview") ? local.previewResourceGroup : local.nonPreviewResourceGroup}"
 
+  sharedAppServicePlan = "${var.raw_product}-${var.env}"
+  sharedASPResourceGroup = "${var.raw_product}-shared-${var.env}"
+
   // S2S
   s2s_url = "http://rpe-service-auth-provider-${local.env_ase_url}"
 
@@ -42,6 +45,18 @@ data "azurerm_key_vault_secret" "ccd_data_s2s_key" {
   vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
 }
 
+data "azurerm_key_vault_secret" "ccd_elastic_search_url" {
+  count = "${var.elastic_search_enabled == "false" ? 0 : 1}"
+  name = "ccd-ELASTIC-SEARCH-URL"
+  vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
+}
+
+data "azurerm_key_vault_secret" "ccd_elastic_search_password" {
+  count = "${var.elastic_search_enabled == "false" ? 0 : 1}"
+  name = "ccd-ELASTIC-SEARCH-PASSWORD"
+  vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
+}
+
 resource "random_string" "draft_encryption_key" {
   length  = 16
   special = true
@@ -54,7 +69,7 @@ resource "random_string" "draft_encryption_key" {
 }
 
 module "ccd-data-store-api" {
-  source   = "git@github.com:hmcts/moj-module-webapp?ref=master"
+  source   = "git@github.com:hmcts/cnp-module-webapp?ref=master"
   product  = "${local.app_full_name}"
   location = "${var.location}"
   env      = "${var.env}"
@@ -63,6 +78,11 @@ module "ccd-data-store-api" {
   is_frontend = false
   common_tags  = "${var.common_tags}"
   additional_host_name = "debugparam"
+  asp_name = "${(var.asp_name == "use_shared") ? local.sharedAppServicePlan : var.asp_name}"
+  asp_rg = "${(var.asp_rg == "use_shared") ? local.sharedASPResourceGroup : var.asp_rg}"
+  website_local_cache_sizeinmb = 1050
+  capacity = "${var.capacity}"
+
   app_settings = {
     DATA_STORE_DB_HOST = "${module.data-store-db.host_name}"
     DATA_STORE_DB_PORT = "${module.data-store-db.postgresql_listen_port}"
@@ -88,12 +108,18 @@ module "ccd-data-store-api" {
     DATA_STORE_S2S_AUTHORISED_SERVICES  = "${var.authorised-services}"
 
     CCD_DEFAULTPRINTURL                 = "${local.default_print_url}"
+
+    ELASTIC_SEARCH_HOSTS                = "${var.elastic_search_enabled == "false" ? "" : "${format("http://%s:9200", join("", data.azurerm_key_vault_secret.ccd_elastic_search_url.*.value))}"}"
+    ELASTIC_SEARCH_PASSWORD             = "${var.elastic_search_enabled == "false" ? "" : "${join("", data.azurerm_key_vault_secret.ccd_elastic_search_password.*.value)}"}"
+    ELASTIC_SEARCH_BLACKLIST            = "${var.elastic_search_blacklist}"
+    ELASTIC_SEARCH_CASE_INDEX_NAME_FORMAT = "${var.elastic_search_case_index_name_format}"
+    ELASTIC_SEARCH_CASE_INDEX_TYPE      = "${var.elastic_search_case_index_type}"
   }
 
 }
 
 module "data-store-db" {
-  source = "git@github.com:hmcts/moj-module-postgres?ref=master"
+  source = "git@github.com:hmcts/cnp-module-postgres?ref=master"
   product = "${local.app_full_name}-postgres-db"
   location = "${var.location}"
   env = "${var.env}"

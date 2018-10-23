@@ -22,7 +22,7 @@ import static java.util.stream.Collectors.toList;
 
 @Service
 @Qualifier(DefaultFindWorkbasketInputOperation.QUALIFIER)
-public class DefaultFindWorkbasketInputOperation implements FindWorkbasketInputOperation{
+public class DefaultFindWorkbasketInputOperation implements FindWorkbasketInputOperation {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultFindWorkbasketInputOperation.class);
 
     public static final String QUALIFIER = "default";

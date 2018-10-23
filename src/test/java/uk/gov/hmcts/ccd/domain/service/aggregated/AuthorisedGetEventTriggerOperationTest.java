@@ -358,7 +358,7 @@ class AuthorisedGetEventTriggerOperationTest {
                 () -> inOrder.verify(accessControlService).setReadOnlyOnCaseViewFieldsIfNoAccess(eq(caseEventTrigger),
                                                                                                  eq(caseFields),
                                                                                                  eq(userRoles),
-                                                                                                 eq(CAN_UPDATE))            );
+                                                                                                 eq(CAN_UPDATE)));
         }
 
         @Test

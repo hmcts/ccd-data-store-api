@@ -4,11 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
-import uk.gov.hmcts.ccd.domain.model.aggregated.ProfileCaseState;
+import uk.gov.hmcts.ccd.domain.model.aggregated.*;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
@@ -47,12 +43,18 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
     }
 
     @Override
+    @Deprecated
     public CaseView execute(String jurisdictionId, String caseTypeId, String caseReference) {
+        return execute(caseReference);
+    }
+
+    @Override
+    public CaseView execute(String caseReference) {
         validateCaseReference(caseReference);
 
-        final CaseType caseType = getCaseType(jurisdictionId, caseTypeId);
-        final CaseDetails caseDetails = getCaseDetails(jurisdictionId, caseTypeId, caseReference);
+        final CaseDetails caseDetails = getCaseDetails(caseReference);
 
+        final CaseType caseType = getCaseType(caseDetails.getJurisdiction(), caseDetails.getCaseTypeId());
         final List<AuditEvent> events = getEventsOperation.getEvents(caseDetails);
         final CaseTabCollection caseTabCollection = getCaseTabCollection(caseDetails.getCaseTypeId());
 
