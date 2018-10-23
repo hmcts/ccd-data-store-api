@@ -1,5 +1,24 @@
 package uk.gov.hmcts.ccd.endpoint.ui;
 
+import javax.inject.Inject;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Map;
+
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.doReturn;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WORKBASKET;
+
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -26,23 +45,6 @@ import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewColumn;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
-import javax.inject.Inject;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Map;
-
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.doReturn;
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WORKBASKET;
-
 public class QueryEndpointIT extends WireMockBaseTest {
     private static final String GET_CASES = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases";
     private static final String GET_CASES_NO_READ_CASE_FIELD_ACCESS = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCaseNoReadFieldAccess/cases";
@@ -60,6 +62,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
     private static final String GET_EVENT_TRIGGER_FOR_CASE_PRIVATE = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/1504259907353545/event" +
         "-triggers/HAS_PRE_STATES_EVENT";
     private static final String GET_CASE_TYPES_READ_ACCESS = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types?access=read";
+    private static final String GET_JURISDICTIONS_READ_ACCESS = "/aggregated/caseworkers/0/jurisdictions?access=read";
 
 
     private static final String GET_CASE_TYPES_NO_ACCESS_PARAM = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types";
@@ -1378,6 +1381,27 @@ public class QueryEndpointIT extends WireMockBaseTest {
             () -> assertThat(caseTypes[2].getCaseFields(), hasSize(2)),
             () -> assertThat(caseTypes[2].getCaseFields(), hasItems(hasProperty("id", equalTo("PersonLastName")),
                                                                     hasProperty("id", equalTo("PersonAddress"))))
+        );
+    }
+
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldGetJurisdictionsForReadAccess() throws Exception {
+        final MvcResult result = mockMvc.perform(get(GET_JURISDICTIONS_READ_ACCESS)
+            .contentType(JSON_CONTENT_TYPE)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(200))
+            .andReturn();
+
+        final JurisdictionDisplayProperties[] jurisdictions = mapper.readValue(
+            result.getResponse().getContentAsString(), JurisdictionDisplayProperties[].class);
+
+        assertAll(
+            () -> assertThat(jurisdictions.length, is(equalTo(3))),
+            () -> assertThat(jurisdictions[0].getCaseTypes().size(), is(equalTo(1))),
+            () -> assertThat(jurisdictions[0].getCaseTypes().get(0).getStates().size(), is(equalTo(2))),
+            () -> assertThat(jurisdictions[0].getCaseTypes().get(0).getEvents().size(), is(equalTo(2)))
         );
     }
 

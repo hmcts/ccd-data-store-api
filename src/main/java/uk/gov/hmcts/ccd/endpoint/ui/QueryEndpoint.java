@@ -1,5 +1,20 @@
 package uk.gov.hmcts.ccd.endpoint.ui;
 
+import javax.inject.Inject;
+import javax.transaction.Transactional;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.*;
+import java.util.function.Predicate;
+
+import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.*;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.PAGE_PARAM;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.SORT_PARAM;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
+
 import com.google.common.collect.Maps;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -8,52 +23,27 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.ccd.data.casedetails.search.FieldMapSanitizeOperation;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
+import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
 import uk.gov.hmcts.ccd.domain.service.aggregated.*;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
-
-import javax.inject.Inject;
-import javax.transaction.Transactional;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Predicate;
-
-import static java.util.Optional.ofNullable;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CASE_REFERENCE;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CREATED_DATE;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.LAST_MODIFIED_DATE;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.SECURITY_CLASSIFICATION;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.PAGE_PARAM;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.SORT_PARAM;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
 
 @RestController
 @RequestMapping(path = "/aggregated",
     consumes = MediaType.APPLICATION_JSON_VALUE,
     produces = MediaType.APPLICATION_JSON_VALUE)
 public class QueryEndpoint {
-
     private static final Logger LOG = LoggerFactory.getLogger(QueryEndpoint.class);
     private final GetCaseViewOperation getCaseViewOperation;
     private final GetCaseHistoryViewOperation getCaseHistoryViewOperation;
@@ -63,6 +53,8 @@ public class QueryEndpoint {
     private final FindSearchInputOperation findSearchInputOperation;
     private final FindWorkbasketInputOperation findWorkbasketInputOperation;
     private final GetCaseTypesOperation getCaseTypesOperation;
+    private final GetUserProfileOperation getUserProfileOperation;
+
     private final HashMap<String, Predicate<AccessControlList>> accessMap;
 
     @Inject
@@ -74,7 +66,8 @@ public class QueryEndpoint {
         @Qualifier(AuthorisedFindSearchInputOperation.QUALIFIER) FindSearchInputOperation findSearchInputOperation,
         @Qualifier(
             AuthorisedFindWorkbasketInputOperation.QUALIFIER) FindWorkbasketInputOperation findWorkbasketInputOperation,
-        @Qualifier(AuthorisedGetCaseTypesOperation.QUALIFIER) GetCaseTypesOperation getCaseTypesOperation) {
+        @Qualifier(AuthorisedGetCaseTypesOperation.QUALIFIER) GetCaseTypesOperation getCaseTypesOperation,
+        @Qualifier(AuthorisedGetUserProfileOperation.QUALIFIER) final GetUserProfileOperation getUserProfileOperation) {
 
         this.getCaseViewOperation = getCaseViewOperation;
         this.getCaseHistoryViewOperation = getCaseHistoryOperation;
@@ -84,6 +77,7 @@ public class QueryEndpoint {
         this.findSearchInputOperation = findSearchInputOperation;
         this.findWorkbasketInputOperation = findWorkbasketInputOperation;
         this.getCaseTypesOperation = getCaseTypesOperation;
+        this.getUserProfileOperation = getUserProfileOperation;
         this.accessMap = Maps.newHashMap();
         accessMap.put("create", CAN_CREATE);
         accessMap.put("update", CAN_UPDATE);
@@ -104,6 +98,24 @@ public class QueryEndpoint {
                                        @RequestParam(value = "access", required = true) String access) {
         return getCaseTypesOperation.execute(jurisdictionId, ofNullable(accessMap.get(access))
             .orElseThrow(() -> new ResourceNotFoundException("No case types found")));
+    }
+
+    @RequestMapping(value = "/caseworkers/{uid}/jurisdictions", method = RequestMethod.GET)
+    @ApiOperation(value = "Get jurisdictions available to the user")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "List of jurisdictions for the given access criteria"),
+        @ApiResponse(code = 404, message = "No jurisdictions found for given access criteria")})
+    public List<JurisdictionDisplayProperties> getJurisdictions(@RequestParam(value = "access") String access) {
+        if (accessMap.get(access) == null) {
+            throw new BadRequestException("Access can only be 'create', 'read' or 'update'");
+        }
+        List<JurisdictionDisplayProperties> jurisdictions = Arrays.asList(
+            getUserProfileOperation.execute(accessMap.get(access)).getJurisdictions());
+        if (jurisdictions.size() == 0) {
+            throw new ResourceNotFoundException("No jurisdictions found");
+        } else {
+            return jurisdictions;
+        }
     }
 
     @Transactional
