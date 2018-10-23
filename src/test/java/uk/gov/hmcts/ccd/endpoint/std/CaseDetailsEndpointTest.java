@@ -17,6 +17,7 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.createcase.CreateCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.createevent.CreateEventOperation;
+import uk.gov.hmcts.ccd.domain.service.createevent.MidEventCallback;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.ClassifiedGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.search.PaginatedSearchMetaDataOperation;
@@ -91,6 +92,9 @@ class CaseDetailsEndpointTest {
     private ValidateCaseFieldsOperation validateCaseFieldsOperation;
 
     @Mock
+    private MidEventCallback midEventCallback;
+
+    @Mock
     private AppInsights appInsights;
 
     private CaseDetailsEndpoint endpoint;
@@ -112,6 +116,7 @@ class CaseDetailsEndpointTest {
                                     validateCaseFieldsOperation,
                                     documentsOperation,
                                     paginatedSearchMetaDataOperation,
+                                    midEventCallback,
                                     appInsights);
     }
 
@@ -253,17 +258,25 @@ class CaseDetailsEndpointTest {
 
     @Test
     void validateCaseFieldsForCaseWorker() {
+        String pageId = "pageId";
         final Map<String, JsonNode> toBeReturned = new HashMap<>();
         doReturn(toBeReturned).when(validateCaseFieldsOperation).validateCaseDetails(
             JURISDICTION_ID,
             CASE_TYPE_ID,
             EVENT,
             DATA);
+        doReturn(toBeReturned).when(midEventCallback).invoke(
+            JURISDICTION_ID,
+            CASE_TYPE_ID,
+            EVENT,
+            DATA,
+            pageId);
 
         final Map<String, JsonNode> output = endpoint.validateCaseDetailsForCaseWorker(
             UID,
             JURISDICTION_ID,
             CASE_TYPE_ID,
+            pageId,
             EVENT_DATA);
 
         assertAll(
@@ -272,8 +285,53 @@ class CaseDetailsEndpointTest {
                 JURISDICTION_ID,
                 CASE_TYPE_ID,
                 EVENT_DATA.getEvent(),
-                DATA)
+                DATA),
+            () -> verify(midEventCallback).invoke(
+                JURISDICTION_ID,
+                CASE_TYPE_ID,
+                EVENT_DATA.getEvent(),
+                DATA,
+                pageId)
         );
+    }
+
+    @Test
+    void validateCaseFieldsForCitizen() {
+        String pageId = "pageId";
+        final Map<String, JsonNode> toBeReturned = new HashMap<>();
+        doReturn(toBeReturned).when(validateCaseFieldsOperation).validateCaseDetails(
+            JURISDICTION_ID,
+            CASE_TYPE_ID,
+            EVENT,
+            DATA);
+        doReturn(toBeReturned).when(midEventCallback).invoke(
+            JURISDICTION_ID,
+            CASE_TYPE_ID,
+            EVENT,
+            DATA,
+            pageId);
+
+        final Map<String, JsonNode> output = endpoint.validateCaseDetailsForCitizen(
+            UID,
+            JURISDICTION_ID,
+            CASE_TYPE_ID,
+            pageId,
+            EVENT_DATA);
+
+        assertAll(
+            () -> assertThat(output, sameInstance(toBeReturned)),
+            () -> verify(validateCaseFieldsOperation).validateCaseDetails(
+                JURISDICTION_ID,
+                CASE_TYPE_ID,
+                EVENT_DATA.getEvent(),
+                DATA),
+            () -> verify(midEventCallback).invoke(
+                JURISDICTION_ID,
+                CASE_TYPE_ID,
+                EVENT_DATA.getEvent(),
+                DATA,
+                pageId)
+                 );
     }
 
     @Test

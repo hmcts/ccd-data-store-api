@@ -29,6 +29,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.Document;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.createcase.CreateCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.createevent.CreateEventOperation;
+import uk.gov.hmcts.ccd.domain.service.createevent.MidEventCallback;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
@@ -42,6 +43,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
 import javax.transaction.Transactional;
+import javax.ws.rs.QueryParam;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -74,6 +76,7 @@ public class CaseDetailsEndpoint {
     private final AppInsights appInsights;
     private final FieldMapSanitizeOperation fieldMapSanitizeOperation;
     private final ValidateCaseFieldsOperation validateCaseFieldsOperation;
+    private final MidEventCallback midEventCallback;
 
     @Autowired
     public CaseDetailsEndpoint(@Qualifier(CreatorGetCaseOperation.QUALIFIER) final GetCaseOperation getCaseOperation,
@@ -85,6 +88,7 @@ public class CaseDetailsEndpoint {
                                final ValidateCaseFieldsOperation validateCaseFieldsOperation,
                                final DocumentsOperation documentsOperation,
                                final PaginatedSearchMetaDataOperation paginatedSearchMetaDataOperation,
+                               final MidEventCallback midEventCallback,
                                final AppInsights appinsights) {
         this.getCaseOperation = getCaseOperation;
         this.createCaseOperation = createCaseOperation;
@@ -95,6 +99,7 @@ public class CaseDetailsEndpoint {
         this.documentsOperation = documentsOperation;
         this.validateCaseFieldsOperation = validateCaseFieldsOperation;
         this.paginatedSearchMetaDataOperation = paginatedSearchMetaDataOperation;
+        this.midEventCallback = midEventCallback;
         this.appInsights = appinsights;
     }
 
@@ -308,8 +313,20 @@ public class CaseDetailsEndpoint {
         @PathVariable("jid") final String jurisdictionId,
         @ApiParam(value = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
+        @ApiParam(value = "Page ID")
+        @RequestParam(required = false) final String pageId,
         @RequestBody final CaseDataContent content) {
-        return validateCaseFieldsOperation.validateCaseDetails(jurisdictionId, caseTypeId, content.getEvent(), content.getData());
+
+        Map<String, JsonNode> data = validateCaseFieldsOperation.validateCaseDetails(jurisdictionId,
+            caseTypeId,
+            content.getEvent(),
+            content.getData());
+
+        return midEventCallback.invoke(jurisdictionId,
+            caseTypeId,
+            content.getEvent(),
+            data,
+            pageId);
     }
 
     @RequestMapping(value = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/validate", method = RequestMethod.POST)
@@ -330,8 +347,20 @@ public class CaseDetailsEndpoint {
         @PathVariable("jid") final String jurisdictionId,
         @ApiParam(value = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
+        @ApiParam(value = "Page ID")
+        @QueryParam("pageId") final String pageId,
         @RequestBody final CaseDataContent content) {
-        return validateCaseFieldsOperation.validateCaseDetails(jurisdictionId, caseTypeId, content.getEvent(), content.getData());
+
+        Map<String, JsonNode> data = validateCaseFieldsOperation.validateCaseDetails(jurisdictionId,
+            caseTypeId,
+            content.getEvent(),
+            content.getData());
+
+        return midEventCallback.invoke(jurisdictionId,
+            caseTypeId,
+            content.getEvent(),
+            data,
+            pageId);
     }
 
     @Transactional

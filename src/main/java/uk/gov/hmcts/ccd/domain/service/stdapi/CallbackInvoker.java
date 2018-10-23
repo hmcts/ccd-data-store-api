@@ -10,13 +10,16 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityValidationService;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 import static com.google.common.collect.Maps.newHashMap;
 import static java.util.Optional.ofNullable;
@@ -92,6 +95,30 @@ public class CallbackInvoker {
                                     caseDetailsBefore,
                                     caseDetails,
                                     AfterSubmitCallbackResponse.class);
+    }
+
+    public CaseDetails invokeMidEventCallback(final WizardPage wizardPage,
+                                              final CaseType caseType,
+                                              final CaseEvent caseEvent,
+                                              final CaseDetails caseDetailsBefore,
+                                              final CaseDetails caseDetails) {
+
+        Optional<CallbackResponse> callbackResponseOptional = callbackService.send(wizardPage.getCallBackURLMidEvent(),
+            wizardPage.getRetriesTimeoutMidEvent(),
+            caseEvent,
+            caseDetailsBefore,
+            caseDetails);
+
+        if (callbackResponseOptional.isPresent()) {
+            CallbackResponse callbackResponse = callbackResponseOptional.get();
+
+            callbackService.validateCallbackErrorsAndWarnings(callbackResponse, false);
+            if (callbackResponse.getData() != null) {
+                validateAndSetData(caseType, caseDetails, callbackResponse.getData());
+            }
+        }
+
+        return caseDetails;
     }
 
     private void validateAndSetFromAboutToStartCallback(CaseType caseType,
