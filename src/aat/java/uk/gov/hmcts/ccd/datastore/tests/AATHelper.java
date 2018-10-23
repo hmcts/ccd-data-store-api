@@ -9,6 +9,8 @@ public enum AATHelper {
 
     INSTANCE;
 
+    private static final long DEFAULT_LOGSTASH_READ_DELAY_MILLIS = 3000;
+
     private final IdamHelper idamHelper;
     private final S2SHelper s2SHelper;
     private final CCDHelper ccdHelper;
@@ -58,4 +60,29 @@ public enum AATHelper {
     public CCDHelper getCcdHelper() {
         return ccdHelper;
     }
+
+    public String getDefinitionImportUrl() {
+        return Env.require("CCD_DEFINITION_STORE_URL");
+    }
+
+    public String getImporterAutoTestEmail() {
+        return Env.require("CCD_IMPORT_AUTOTEST_EMAIL");
+    }
+
+    public String getImporterAutoTestPassword() {
+        return Env.require("CCD_IMPORT_AUTOTEST_PASSWORD");
+    }
+
+    public String getElasticsearchBaseUri() {
+        return Env.require("ELASTIC_SEARCH_SCHEME") + "://" + Env.require("ELASTIC_SEARCH_HOST") + ":" + Env.require("ELASTIC_SEARCH_PORT");
+    }
+
+    public Long getLogstashReadDelay() {
+        try {
+            return Long.valueOf(Env.require("LOGSTASH_READ_DELAY_MILLIS"));
+        } catch (NullPointerException e) {
+            return DEFAULT_LOGSTASH_READ_DELAY_MILLIS;
+        }
+    }
+
 }

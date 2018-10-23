@@ -78,8 +78,16 @@ public interface AATCaseType {
             return new CCDEventBuilder(JURISDICTION, CASE_TYPE, CREATE);
         }
 
+        static CCDEventBuilder create(String caseType) {
+            return new CCDEventBuilder(JURISDICTION, caseType, CREATE);
+        }
+
         static CCDEventBuilder startProgress(Long caseReference) {
             return new CCDEventBuilder(JURISDICTION, CASE_TYPE, caseReference, START_PROGRESS);
+        }
+
+        static CCDEventBuilder startProgress(String caseType, Long caseReference) {
+            return new CCDEventBuilder(JURISDICTION, caseType, caseReference, START_PROGRESS);
         }
 
         static CCDEventBuilder stopProgress(Long caseReference) {

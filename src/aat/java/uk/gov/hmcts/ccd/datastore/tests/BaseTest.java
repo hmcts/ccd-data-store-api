@@ -1,13 +1,14 @@
 package uk.gov.hmcts.ccd.datastore.tests;
 
-import io.restassured.RestAssured;
-import io.restassured.specification.RequestSpecification;
-import org.junit.jupiter.api.extension.ExtendWith;
-import uk.gov.hmcts.ccd.datastore.tests.helper.idam.AuthenticatedUser;
-
 import java.util.function.Supplier;
 
 import static java.lang.Boolean.TRUE;
+
+import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.specification.RequestSpecification;
+import org.junit.jupiter.api.extension.ExtendWith;
+import uk.gov.hmcts.ccd.datastore.tests.helper.idam.AuthenticatedUser;
 
 @ExtendWith(AATExtension.class)
 public abstract class BaseTest {
@@ -40,5 +41,20 @@ public abstract class BaseTest {
 
             return withUserParam ? request.pathParam("user", caseworker.getId()) : request;
         };
+    }
+
+    protected RequestSpecification asAutoTestImporter() {
+
+        AuthenticatedUser caseworker = aat.getIdamHelper()
+            .authenticate(aat.getImporterAutoTestEmail(),
+                          aat.getImporterAutoTestPassword());
+
+        String s2sToken = aat.getS2SHelper().getToken();
+
+        return RestAssured.given(new RequestSpecBuilder()
+                                     .setBaseUri(aat.getDefinitionImportUrl())
+                                     .build())
+            .header("Authorization", "Bearer " + caseworker.getAccessToken())
+            .header("ServiceAuthorization", s2sToken);
     }
 }
