@@ -44,7 +44,6 @@ public abstract class BaseTest {
     }
 
     protected RequestSpecification asAutoTestImporter() {
-
         AuthenticatedUser caseworker = aat.getIdamHelper()
             .authenticate(aat.getImporterAutoTestEmail(),
                           aat.getImporterAutoTestPassword());

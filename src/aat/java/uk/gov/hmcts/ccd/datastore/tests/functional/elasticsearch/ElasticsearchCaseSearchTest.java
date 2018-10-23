@@ -117,7 +117,7 @@ class ElasticsearchCaseSearchTest extends ElasticsearchBaseTest {
 
             @Test
             @DisplayName("should return case matching wildcard expression on a text field")
-            void shouldReturnCaseForExactMatchOnTextField() {
+            void shouldReturnCaseForWildcardMatchOnTextField() {
                 String wildcardExpr = TEXT.substring(0, 3).toLowerCase() + "*";
                 searchCaseByWildcardAndVerifyResponse("TextField", wildcardExpr, TEXT);
             }
