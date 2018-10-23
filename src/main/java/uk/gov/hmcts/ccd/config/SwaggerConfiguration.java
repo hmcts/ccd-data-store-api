@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd;
+package uk.gov.hmcts.ccd.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

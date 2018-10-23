@@ -1,5 +1,23 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -7,26 +25,17 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
+import uk.gov.hmcts.ccd.domain.service.security.DefaultAuthorisedCaseDefinitionDataService;
 
 class DefaultAuthorisedCaseDefinitionDataServiceTest {
+
+    private static final String CASE_TYPE = "caseType";
+    private final CaseType caseType = mock(CaseType.class);
 
     @Mock
     private CaseTypeService caseTypeService;
@@ -41,58 +50,126 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
+        when(caseType.getJurisdiction()).thenReturn(new Jurisdiction());
     }
 
     @Nested
     @DisplayName("Get user authorised case states")
     class GetUserAuthorisedCaseStates {
 
+        private static final String JURISDICTION = "jurisdiction";
+        private static final String STATE1 = "state1";
+        private static final String STATE2 = "state2";
+        private final Set<String> userRoles = new HashSet<>();
+
+        @BeforeEach
+        void setUp() {
+            when(caseTypeService.getCaseTypeForJurisdiction(CASE_TYPE, JURISDICTION)).thenReturn(caseType);
+            when(caseTypeService.getCaseType(CASE_TYPE)).thenReturn(caseType);
+            when(userRepository.getUserRoles()).thenReturn(userRoles);
+            when(accessControlService.filterCaseStatesByAccess(caseType.getStates(), userRoles, CAN_READ)).thenReturn(getCaseStates());
+        }
+
         @Test
         @DisplayName("Should return list of user authorised case states for a jurisdiction and case type")
         void shouldReturnAuthorisedCaseStates() {
-            CaseType caseType = mock(CaseType.class);
-            String caseTypeId = "caseTypeId";
-            String jurisdiction = "jusrisdiction";
-            when(caseTypeService.getCaseTypeForJurisdiction(caseTypeId, jurisdiction)).thenReturn(caseType);
-            Set<String> userRoles = new HashSet<>();
-            when(userRepository.getUserRoles()).thenReturn(userRoles);
-            List<CaseState> caseStates = Collections.singletonList(new CaseState());
-            when(accessControlService.filterCaseStatesByAccess(caseType.getStates(), userRoles, CAN_READ)).thenReturn(caseStates);
+            List<CaseState> result = authorisedCaseDataService.getUserAuthorisedCaseStates(JURISDICTION, CASE_TYPE, CAN_READ);
 
-            List<CaseState> result = authorisedCaseDataService.getUserAuthorisedCaseStates(jurisdiction, caseTypeId, CAN_READ);
-
-            assertAll(
-                () -> assertThat(result, is(caseStates)),
-                () -> verify(caseTypeService).getCaseTypeForJurisdiction(caseTypeId, jurisdiction),
-                () -> verify(userRepository).getUserRoles(),
-                () -> verify(accessControlService).filterCaseStatesByAccess(caseType.getStates(), userRoles, CAN_READ)
-            );
+            verify(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE, JURISDICTION);
+            verifyResult(result.stream().map(CaseState::getId).collect(Collectors.toList()));
         }
 
         @Test
         @DisplayName("Should return list of user authorised case state ids for a jurisdiction and case type")
         void shouldReturnAuthorisedCaseStateIds() {
+            List<String> result = authorisedCaseDataService.getUserAuthorisedCaseStateIds(JURISDICTION, CASE_TYPE, CAN_READ);
+
+            verify(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE, JURISDICTION);
+            verifyResult(result);
+        }
+
+        @Test
+        @DisplayName("Should return list of user authorised case state ids for a case type")
+        void shouldReturnAuthorisedCaseStateIdsForCaseType() {
+            List<String> result = authorisedCaseDataService.getUserAuthorisedCaseStateIds(CASE_TYPE, CAN_READ);
+
+            verify(caseTypeService).getCaseType(CASE_TYPE);
+            verifyResult(result);
+        }
+
+        private List<CaseState> getCaseStates() {
             CaseState caseState1 = new CaseState();
-            caseState1.setId("state1");
+            caseState1.setId(STATE1);
             CaseState caseState2 = new CaseState();
-            caseState2.setId("state2");
-            List<CaseState> caseStates = Arrays.asList(caseState1, caseState2);
-            CaseType caseType = mock(CaseType.class);
-            String caseTypeId = "caseTypeId";
-            String jurisdiction = "jusrisdiction";
-            when(caseTypeService.getCaseTypeForJurisdiction(caseTypeId, jurisdiction)).thenReturn(caseType);
-            Set<String> userRoles = new HashSet<>();
-            when(userRepository.getUserRoles()).thenReturn(userRoles);
-            when(accessControlService.filterCaseStatesByAccess(caseType.getStates(), userRoles, CAN_READ)).thenReturn(caseStates);
+            caseState2.setId(STATE2);
+            return Arrays.asList(caseState1, caseState2);
+        }
 
-            List<String> result = authorisedCaseDataService.getUserAuthorisedCaseStateIds(jurisdiction, caseTypeId, CAN_READ);
-
+        private void verifyResult(List<String> result) {
             assertAll(
-                () -> assertThat(result, containsInAnyOrder(caseState1.getId(), caseState2.getId())),
-                () -> verify(caseTypeService).getCaseTypeForJurisdiction(caseTypeId, jurisdiction),
+                () -> assertThat(result, containsInAnyOrder(STATE1, STATE2)),
                 () -> verify(userRepository).getUserRoles(),
                 () -> verify(accessControlService).filterCaseStatesByAccess(caseType.getStates(), userRoles, CAN_READ)
             );
+        }
+    }
+
+    @Nested
+    @DisplayName("Get user authorised case type")
+    class GetUserAuthorisedCaseType {
+        private final Set<String> userRoles = new HashSet<>();
+
+        @BeforeEach
+        void setUp() {
+            when(caseTypeService.getCaseType(CASE_TYPE)).thenReturn(caseType);
+            when(userRepository.getUserRoles()).thenReturn(userRoles);
+            when(caseType.getSecurityClassification()).thenReturn(SecurityClassification.PRIVATE);
+        }
+
+        @Test
+        @DisplayName("should return case type when user has read access and user classification is higher or euqal to case type classification")
+        void shouldGetAuthorisedCaseType() {
+            when(accessControlService.canAccessCaseTypeWithCriteria(caseType, userRoles, CAN_READ)).thenReturn(true);
+            when(userRepository.getHighestUserClassification(anyString())).thenReturn(SecurityClassification.PRIVATE);
+
+            Optional<CaseType> result = authorisedCaseDataService.getAuthorisedCaseType(CASE_TYPE, CAN_READ);
+
+            assertThat(result.isPresent(), is(true));
+            assertThat(result.get(), is(caseType));
+            verify(userRepository).getHighestUserClassification(anyString());
+            verifyCalls();
+        }
+
+        @Test
+        @DisplayName("should not return case type when user has no read access to the case type")
+        void shouldNotReturnCaseTypeWhenNoAccess() {
+            when(accessControlService.canAccessCaseTypeWithCriteria(caseType, userRoles, CAN_READ)).thenReturn(false);
+            when(userRepository.getHighestUserClassification(anyString())).thenReturn(SecurityClassification.PRIVATE);
+
+            Optional<CaseType> result = authorisedCaseDataService.getAuthorisedCaseType(CASE_TYPE, CAN_READ);
+
+            assertThat(result.isPresent(), is(false));
+            verify(userRepository, never()).getHighestUserClassification(anyString());
+            verifyCalls();
+        }
+
+        @Test
+        @DisplayName("should not return case type when user classification is lower than case type classification")
+        void shouldNotReturnCaseTypeWhenClassificationNotMatched() {
+            when(accessControlService.canAccessCaseTypeWithCriteria(caseType, userRoles, CAN_READ)).thenReturn(true);
+            when(userRepository.getHighestUserClassification(anyString())).thenReturn(SecurityClassification.PUBLIC);
+
+            Optional<CaseType> result = authorisedCaseDataService.getAuthorisedCaseType(CASE_TYPE, CAN_READ);
+
+            assertThat(result.isPresent(), is(false));
+            verify(userRepository).getHighestUserClassification(anyString());
+            verifyCalls();
+        }
+
+        void verifyCalls() {
+            verify(caseTypeService).getCaseType(CASE_TYPE);
+            verify(userRepository).getUserRoles();
+            verify(accessControlService).canAccessCaseTypeWithCriteria(caseType, userRoles, CAN_READ);
         }
     }
 }

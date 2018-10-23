@@ -1,5 +1,26 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
+import javax.inject.Inject;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.ok;
+import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.doReturn;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
+import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -31,38 +52,24 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
-import uk.gov.hmcts.ccd.domain.model.std.*;
+import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
+import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
+import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.endpoint.CallbackTestData;
-
-import javax.inject.Inject;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.doReturn;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
-import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
 public class CallbackTest extends WireMockBaseTest {
 
     private  static final String URL_BEFORE_COMMIT = "/before-commit.*";
 
     private final JsonNode DATA = mapper.readTree(
-        "{\n" +
-        "  \"PersonFirstName\": \"ccd-First Name\",\n" +
-        "  \"PersonLastName\": \"Last Name\",\n" +
-        "  \"PersonAddress\": {\n" +
-        "    \"AddressLine1\": \"Address Line 1\",\n" +
-        "    \"AddressLine2\": \"Address Line 2\"\n" +
-        "  }\n" +
-        "}\n"
+        "{\n"
+            + "  \"PersonFirstName\": \"ccd-First Name\",\n"
+            + "  \"PersonLastName\": \"Last Name\",\n"
+            + "  \"PersonAddress\": {\n"
+            + "    \"AddressLine1\": \"Address Line 1\",\n"
+            + "    \"AddressLine2\": \"Address Line 2\"\n"
+            + "  }\n"
+            + "}\n"
     );
 
     private final JsonNode DATA_CLASSIFICATION = mapper.readTree(

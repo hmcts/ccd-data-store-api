@@ -87,7 +87,7 @@ repositories {
     mavenCentral()
     jcenter()
     maven {
-        url  'https://dl.bintray.com/hmcts/hmcts-maven'
+        url 'https://dl.bintray.com/hmcts/hmcts-maven'
     }
 }
 // end::repositories[]
@@ -106,7 +106,7 @@ ext {
             'method'     : 90,
             'class'      : 98
     ]
-    appInsights= '2.0.1'
+    appInsights = '2.0.1'
 }
 
 group 'uk.gov.hmcts.ccd'
@@ -187,6 +187,7 @@ dependencies {
     compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.2.RELEASE'
     compile group: 'javax.inject', name: 'javax.inject', version: '1'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.1'
     compile group: 'io.springfox', name: 'springfox-swagger2', version: swagger2Version
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: swagger2Version
     compile group: 'org.liquibase', name: 'liquibase-core', version: '3.5.5'
@@ -225,6 +226,9 @@ dependencies {
     //excluding log4j-core which causes a vulnerability issue
     compile(group: 'io.searchbox', name: 'jest', version: '6.3.1') {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-core'
+    }
+    compile(group: 'org.elasticsearch', name: 'elasticsearch', version: '6.4.0') {
+        exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
     }
     compile 'org.mapstruct:mapstruct-jdk8:1.2.0.Final'
     apt 'org.mapstruct:mapstruct-processor:1.2.0.Final'
@@ -487,7 +491,7 @@ jacocoTestReport {
             }
             logger.quiet("---------------------------------------------------------------")
             throw new GradleException("Code coverage failed")
-        } else{
+        } else {
             logger.quiet("Passed Code Coverage Checks")
         }
     }
