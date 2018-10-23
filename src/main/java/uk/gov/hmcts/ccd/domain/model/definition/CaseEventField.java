@@ -72,7 +72,7 @@ public class CaseEventField implements Serializable {
     /**
      * event case field label
      **/
-    @ApiModelProperty(required = true, value = "")
+    @ApiModelProperty(value = "")
     @JsonProperty("label")
     public String getLabel() {
         return label;
