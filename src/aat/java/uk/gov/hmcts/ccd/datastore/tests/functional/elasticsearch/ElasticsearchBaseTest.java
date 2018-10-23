@@ -39,8 +39,12 @@ abstract class ElasticsearchBaseTest extends BaseTest {
             .post("/import");
     }
 
-    ValidatableResponse searchCase(String jsonSearchRequest) {
-        return asAutoTestCaseworker(false).get()
+    ValidatableResponse searchCaseAsAutoTestUser(String jsonSearchRequest) {
+        return searchCase(asAutoTestCaseworker(false).get(), jsonSearchRequest);
+    }
+
+    private ValidatableResponse searchCase(RequestSpecification requestSpecification, String jsonSearchRequest) {
+        return requestSpecification
             .given()
             .log()
             .body()

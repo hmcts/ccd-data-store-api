@@ -50,7 +50,7 @@ class ElasticsearchCaseSearchTest extends ElasticsearchBaseTest {
                 + "  }"
                 + "}";
 
-            ValidatableResponse response = searchCase(jsonSearchRequest);
+            ValidatableResponse response = searchCaseAsAutoTestUser(jsonSearchRequest);
 
             response.body("cases.size()", is(1));
             response.body("cases[0].state", is(State.IN_PROGRESS));
@@ -86,7 +86,7 @@ class ElasticsearchCaseSearchTest extends ElasticsearchBaseTest {
         private void searchCaseForExactMatchAndVerifyResponse(String field, String value) {
             String jsonSearchRequest = createExactMatchSearchRequest(field, value);
 
-            ValidatableResponse response = searchCase(jsonSearchRequest);
+            ValidatableResponse response = searchCaseAsAutoTestUser(jsonSearchRequest);
 
             verifyExactMatchResponse(response, field, value);
         }
@@ -126,7 +126,7 @@ class ElasticsearchCaseSearchTest extends ElasticsearchBaseTest {
         private void searchCaseByWildcardAndVerifyResponse(String field, String wildcardExpr, String expectedValue) {
             String jsonSearchRequest = createWildcardSearchRequest(field, wildcardExpr);
 
-            ValidatableResponse response = searchCase(jsonSearchRequest);
+            ValidatableResponse response = searchCaseAsAutoTestUser(jsonSearchRequest);
 
             verifyWildcardMatchResponse(response, field, expectedValue);
         }
