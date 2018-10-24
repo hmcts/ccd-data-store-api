@@ -36,6 +36,43 @@ class CachedUserRepositoryTest {
     }
 
     @Nested
+    @DisplayName("getUserName()")
+    class getUserName {
+
+        @Test
+        @DisplayName("should initially retrieve user name from decorated repository")
+        void shouldRetrieveUserNameFromDecorated() {
+            String expectedUserName = "26";
+            doReturn(expectedUserName).when(userRepository).getUserName();
+
+            String userName = cachedUserRepository.getUserName();
+
+            assertAll(
+                () -> assertThat(userName, is(expectedUserName)),
+                () -> verify(userRepository, times(1)).getUserName()
+            );
+        }
+
+        @Test
+        @DisplayName("should cache user name for subsequent calls")
+        void shouldCacheUserNameForSubsequentCalls() {
+            String expectedUserName = "26";
+            doReturn(expectedUserName).when(userRepository).getUserName();
+
+            cachedUserRepository.getUserName();
+
+            verify(userRepository, times(1)).getUserName();
+
+            String userName = cachedUserRepository.getUserName();
+
+            assertAll(
+                () -> assertThat(userName, is(expectedUserName)),
+                () -> verifyNoMoreInteractions(userRepository)
+            );
+        }
+    }
+
+    @Nested
     @DisplayName("getUserDetails()")
     class getUserDetails {
 

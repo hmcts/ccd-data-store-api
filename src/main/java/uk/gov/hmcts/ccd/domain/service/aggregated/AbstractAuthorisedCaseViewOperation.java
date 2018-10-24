@@ -1,34 +1,42 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import com.google.common.collect.Sets;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
-import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
-
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CASE_TYPE_FOUND_DETAILS;
+
+import com.google.common.collect.Sets;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
+import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 public abstract class AbstractAuthorisedCaseViewOperation {
 
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final AccessControlService accessControlService;
     private final UserRepository userRepository;
-    private final CaseRoleRepository caseRoleRepository;
+    private final CaseUserRepository caseUserRepository;
+    private final CaseDetailsRepository caseDetailsRepository;
 
     AbstractAuthorisedCaseViewOperation(CaseDefinitionRepository caseDefinitionRepository,
                                         AccessControlService accessControlService,
                                         UserRepository userRepository,
-                                        CaseRoleRepository caseRoleRepository) {
+                                        CaseUserRepository caseUserRepository,
+                                        CaseDetailsRepository caseDetailsRepository) {
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.accessControlService = accessControlService;
         this.userRepository = userRepository;
-        this.caseRoleRepository = caseRoleRepository;
+        this.caseUserRepository = caseUserRepository;
+        this.caseDetailsRepository = caseDetailsRepository;
     }
 
     void verifyReadAccess(CaseType caseType, Set<String> userRoles) {
@@ -48,8 +56,19 @@ public abstract class AbstractAuthorisedCaseViewOperation {
         return caseType;
     }
 
-    Set<String> getUserRoles(String caseTypeId) {
-        return Sets.union(userRepository.getUserRoles(), caseRoleRepository.getCaseRoles(caseTypeId));
+    String getCaseId(String jurisdictionId, String caseReference) {
+        Optional<CaseDetails> caseDetails = this.caseDetailsRepository.findByReference(jurisdictionId, Long.valueOf(caseReference));
+        return caseDetails
+            .orElseThrow(() -> new CaseNotFoundException(caseReference))
+            .getId();
+    }
+
+    Set<String> getUserRoles(String caseId) {
+        return Sets.union(userRepository.getUserRoles(),
+            caseUserRepository
+                .findCaseRolesUserHasForACase(Long.valueOf(caseId), userRepository.getUserName())
+                .stream()
+                .collect(Collectors.toSet()));
     }
 
     AccessControlService getAccessControlService() {

@@ -114,6 +114,12 @@ public class DefaultUserRepository implements UserRepository {
             .orElseThrow(() -> new ServiceException("No security classification found for user"));
     }
 
+    @Override
+    public String getUserName() {
+        final ServiceAndUserDetails serviceAndUser = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return serviceAndUser.getUsername();
+    }
+
     private Set<SecurityClassification> getClassificationsForUserRoles(List<String> roles) {
         return caseDefinitionRepository.getClassificationsForUserRoleList(roles).stream()
             .filter(Objects::nonNull)

@@ -1,9 +1,12 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseRoleRepository;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
+import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
+import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
@@ -12,8 +15,6 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
-
-import java.util.Set;
 
 @Service
 @Qualifier(AuthorisedGetCaseTypesOperation.QUALIFIER)
@@ -28,8 +29,9 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
         @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
         final AccessControlService accessControlService,
         final @Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
-        final @Qualifier(CachedCaseRoleRepository.QUALIFIER)CaseRoleRepository caseRoleRepository) {
-        super(caseDefinitionRepository, accessControlService, userRepository, caseRoleRepository);
+        final CaseUserRepository caseUserRepository,
+        final @Qualifier(CachedCaseDetailsRepository.QUALIFIER) CaseDetailsRepository caseDetailsRepository) {
+        super(caseDefinitionRepository, accessControlService, userRepository, caseUserRepository, caseDetailsRepository);
         this.getCaseViewOperation = getCaseViewOperation;
     }
 
@@ -38,7 +40,8 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
         CaseView caseView = getCaseViewOperation.execute(caseReference);
 
         CaseType caseType = getCaseType(caseView.getCaseType().getId());
-        Set<String> userRoles = getUserRoles(caseView.getCaseType().getId());
+        String caseId = getCaseId(caseView.getCaseType().getJurisdiction().getId(), caseReference);
+        Set<String> userRoles = getUserRoles(caseId);
         verifyReadAccess(caseType, userRoles);
 
         return filterUpsertAccess(caseType, userRoles, caseView);

@@ -4,8 +4,9 @@ import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseRoleRepository;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
+import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
+import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
@@ -27,21 +28,19 @@ public class AuthorisedGetCaseHistoryViewOperation extends AbstractAuthorisedCas
         @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) CaseDefinitionRepository caseDefinitionRepository,
         AccessControlService accessControlService,
         @Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
-        @Qualifier(CachedCaseRoleRepository.QUALIFIER) CaseRoleRepository caseRoleRepository) {
+        CaseUserRepository caseUserRepository,
+        @Qualifier(CachedCaseDetailsRepository.QUALIFIER) CaseDetailsRepository caseDetailsRepository) {
 
-        super(caseDefinitionRepository, accessControlService, userRepository, caseRoleRepository);
+        super(caseDefinitionRepository, accessControlService, userRepository, caseUserRepository, caseDetailsRepository);
         this.getCaseHistoryViewOperation = getCaseHistoryViewOperation;
     }
 
     @Override
     public CaseHistoryView execute(String jurisdictionId, String caseTypeId, String caseReference, Long eventId) {
         CaseType caseType = getCaseType(caseTypeId);
-
-        Set<String> userRoles = getUserRoles(caseTypeId);
-
+        String caseId = getCaseId(jurisdictionId, caseReference);
+        Set<String> userRoles = getUserRoles(caseId);
         verifyReadAccess(caseType, userRoles);
-
         return getCaseHistoryViewOperation.execute(jurisdictionId, caseTypeId, caseReference, eventId);
     }
-
 }
