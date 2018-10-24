@@ -119,5 +119,5 @@ variable "elastic_search_case_index_name_format" {
 variable "elastic_search_case_index_type" {
   description = "Cases index document type"
   type = "string"
-  default = "case"
+  default = "_doc"
 }
