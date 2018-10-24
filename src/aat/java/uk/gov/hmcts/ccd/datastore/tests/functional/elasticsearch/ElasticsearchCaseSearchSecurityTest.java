@@ -19,12 +19,12 @@ import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.State;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ElasticsearchCaseSearchTest extends ElasticsearchBaseTest {
+class ElasticsearchCaseSearchSecurityTest extends ElasticsearchBaseTest {
 
     private static final String CASE_INDEX_NAME = "aat_search_cases-000001";
     private static final String CASE_INDEX_ALIAS = "aat_search_cases";
 
-    ElasticsearchCaseSearchTest(AATHelper aat) {
+    ElasticsearchCaseSearchSecurityTest(AATHelper aat) {
         super(aat);
     }
 
@@ -149,7 +149,7 @@ class ElasticsearchCaseSearchTest extends ElasticsearchBaseTest {
 
     @AfterAll
     void cleanUp() {
-        //deleteIndexAndAlias(CASE_INDEX_NAME, CASE_INDEX_ALIAS);
+        deleteIndexAndAlias(CASE_INDEX_NAME, CASE_INDEX_ALIAS);
     }
 
     private void createCases() {
@@ -172,7 +172,7 @@ class ElasticsearchCaseSearchTest extends ElasticsearchBaseTest {
 
     private Long createCase(CaseData caseData) {
         return Event.create(AAT_SEARCH_CASE_TYPE)
-            .as(asPrivateTestCaseworker())
+            .as(asAutoTestCaseworker())
             .withData(caseData)
             .submitAndGetReference();
     }

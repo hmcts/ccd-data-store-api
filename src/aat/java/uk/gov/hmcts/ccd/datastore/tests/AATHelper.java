@@ -61,7 +61,7 @@ public enum AATHelper {
         return ccdHelper;
     }
 
-    public String getDefinitionImportUrl() {
+    public String getDefinitionStoreUrl() {
         return Env.require("CCD_DEFINITION_STORE_URL");
     }
 
@@ -71,6 +71,14 @@ public enum AATHelper {
 
     public String getImporterAutoTestPassword() {
         return Env.require("CCD_IMPORT_AUTOTEST_PASSWORD");
+    }
+
+    public String getCaseworkerTestPrivateEmail() {
+        return Env.require("CCD_CASEWORKER_TEST_PRIVATE_EMAIL");
+    }
+
+    public String getCaseworkerTestPrivatePassword() {
+        return Env.require("CCD_CASEWORKER_TEST_PRIVATE_PASSWORD");
     }
 
     public String getElasticsearchBaseUri() {

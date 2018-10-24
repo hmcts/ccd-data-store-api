@@ -25,33 +25,41 @@ public abstract class BaseTest {
     }
 
     protected Supplier<RequestSpecification> asAutoTestCaseworker(final Boolean withUserParam) {
+        AuthenticatedUser caseworker = aat.getIdamHelper().authenticate(aat.getCaseworkerAutoTestEmail(),
+                                                                        aat.getCaseworkerAutoTestPassword());
 
-        final AuthenticatedUser caseworker = aat.getIdamHelper()
-                                                .authenticate(aat.getCaseworkerAutoTestEmail(),
-                                                              aat.getCaseworkerAutoTestPassword());
-
-        final String s2sToken = aat.getS2SHelper()
-                                   .getToken();
+        String s2sToken = aat.getS2SHelper().getToken();
 
         return () -> {
-            final RequestSpecification request = RestAssured.given()
-                                                            .header("Authorization",
-                                                                    "Bearer " + caseworker.getAccessToken())
-                                                            .header("ServiceAuthorization", s2sToken);
+            RequestSpecification request = RestAssured.given()
+                .header("Authorization", "Bearer " + caseworker.getAccessToken())
+                .header("ServiceAuthorization", s2sToken);
 
             return withUserParam ? request.pathParam("user", caseworker.getId()) : request;
         };
     }
 
+    protected Supplier<RequestSpecification> asPrivateTestCaseworker() {
+        return asUser(aat.getCaseworkerTestPrivateEmail(), aat.getCaseworkerTestPrivatePassword());
+    }
+
+    private Supplier<RequestSpecification> asUser(String username, String password) {
+        AuthenticatedUser caseworker = aat.getIdamHelper().authenticate(username, password);
+        String s2sToken = aat.getS2SHelper().getToken();
+
+        return () -> RestAssured.given()
+            .header("Authorization", "Bearer " + caseworker.getAccessToken())
+            .header("ServiceAuthorization", s2sToken);
+    }
+
     protected RequestSpecification asAutoTestImporter() {
-        AuthenticatedUser caseworker = aat.getIdamHelper()
-            .authenticate(aat.getImporterAutoTestEmail(),
-                          aat.getImporterAutoTestPassword());
+        AuthenticatedUser caseworker = aat.getIdamHelper().authenticate(aat.getImporterAutoTestEmail(),
+                                                                        aat.getImporterAutoTestPassword());
 
         String s2sToken = aat.getS2SHelper().getToken();
 
         return RestAssured.given(new RequestSpecBuilder()
-                                     .setBaseUri(aat.getDefinitionImportUrl())
+                                     .setBaseUri(aat.getDefinitionStoreUrl())
                                      .build())
             .header("Authorization", "Bearer " + caseworker.getAccessToken())
             .header("ServiceAuthorization", s2sToken);

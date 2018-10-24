@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.datastore.tests.functional.elasticsearch;
 
 import java.io.File;
+import java.util.function.Supplier;
 
 import static java.util.Optional.ofNullable;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -34,17 +35,16 @@ abstract class ElasticsearchBaseTest extends BaseTest {
             .given()
             .multiPart(new File(DEFINITION_FILE))
             .expect()
-            .statusCode(201)
             .when()
             .post("/import");
     }
 
-    ValidatableResponse searchCaseAsAutoTestUser(String jsonSearchRequest) {
-        return searchCase(asAutoTestCaseworker(false).get(), jsonSearchRequest);
+    ValidatableResponse searchCaseAsPrivateCaseWorker(String jsonSearchRequest) {
+        return searchCase(asPrivateTestCaseworker(), jsonSearchRequest);
     }
 
-    private ValidatableResponse searchCase(RequestSpecification requestSpecification, String jsonSearchRequest) {
-        return requestSpecification
+    private ValidatableResponse searchCase(Supplier<RequestSpecification> requestSpecification, String jsonSearchRequest) {
+        return requestSpecification.get()
             .given()
             .log()
             .body()
