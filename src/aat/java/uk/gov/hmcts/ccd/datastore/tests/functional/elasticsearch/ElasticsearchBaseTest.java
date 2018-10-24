@@ -14,10 +14,10 @@ import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.BaseTest;
+import uk.gov.hmcts.ccd.datastore.tests.fixture.AATSearchCaseType;
 
 abstract class ElasticsearchBaseTest extends BaseTest {
 
-    static final String AAT_SEARCH_CASE_TYPE = "AAT_SEARCH";
     private static final String DEFINITION_FILE = "src/aat/resources/CCD_CNP_27.xlsx";
 
     ElasticsearchBaseTest(AATHelper aat) {
@@ -35,12 +35,13 @@ abstract class ElasticsearchBaseTest extends BaseTest {
             .given()
             .multiPart(new File(DEFINITION_FILE))
             .expect()
+            .statusCode(201)
             .when()
             .post("/import");
     }
 
     ValidatableResponse searchCaseAsPrivateCaseWorker(String jsonSearchRequest) {
-        return searchCase(asPrivateTestCaseworker(), jsonSearchRequest);
+        return searchCase(asPrivateTestCaseworker(false), jsonSearchRequest);
     }
 
     private ValidatableResponse searchCase(Supplier<RequestSpecification> requestSpecification, String jsonSearchRequest) {
@@ -48,7 +49,7 @@ abstract class ElasticsearchBaseTest extends BaseTest {
             .given()
             .log()
             .body()
-            .queryParam("ctid", AAT_SEARCH_CASE_TYPE)
+            .queryParam("ctid", AATSearchCaseType.CASE_TYPE)
             .contentType(ContentType.JSON)
             .body(jsonSearchRequest)
             .when()

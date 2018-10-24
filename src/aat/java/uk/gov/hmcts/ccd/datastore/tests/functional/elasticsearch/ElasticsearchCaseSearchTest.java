@@ -13,10 +13,10 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
-import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder;
-import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CaseData;
-import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event;
-import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.State;
+import uk.gov.hmcts.ccd.datastore.tests.fixture.AATSearchCaseBuilder;
+import uk.gov.hmcts.ccd.datastore.tests.fixture.AATSearchCaseType.CaseData;
+import uk.gov.hmcts.ccd.datastore.tests.fixture.AATSearchCaseType.Event;
+import uk.gov.hmcts.ccd.datastore.tests.fixture.AATSearchCaseType.State;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ElasticsearchCaseSearchTest extends ElasticsearchBaseTest {
@@ -31,8 +31,8 @@ class ElasticsearchCaseSearchTest extends ElasticsearchBaseTest {
     @BeforeAll
     void setUp() {
         assertElasticsearchEnabled();
-        importDefinition();
-        createCases();
+        //importDefinition();
+        //createCases();
     }
 
     @Nested
@@ -154,15 +154,15 @@ class ElasticsearchCaseSearchTest extends ElasticsearchBaseTest {
 
     private void createCases() {
         createAndUpdateCase();
-        createCase(AATCaseBuilder.FullCase.build());
+        createCase(AATSearchCaseBuilder.FullCase.build());
         // wait until logstash reads the case data
         sleep(aat.getLogstashReadDelay());
     }
 
     private void createAndUpdateCase() {
-        Long caseReference = createCase(AATCaseBuilder.EmptyCase.build());
-        Event.startProgress(AAT_SEARCH_CASE_TYPE, caseReference)
-            .as(asAutoTestCaseworker())
+        Long caseReference = createCase(AATSearchCaseBuilder.EmptyCase.build());
+        Event.startProgress(caseReference)
+            .as(asPrivateTestCaseworker(true))
             .submit()
             .then()
             .statusCode(201)
@@ -171,8 +171,8 @@ class ElasticsearchCaseSearchTest extends ElasticsearchBaseTest {
     }
 
     private Long createCase(CaseData caseData) {
-        return Event.create(AAT_SEARCH_CASE_TYPE)
-            .as(asPrivateTestCaseworker())
+        return Event.create()
+            .as(asPrivateTestCaseworker(true))
             .withData(caseData)
             .submitAndGetReference();
     }

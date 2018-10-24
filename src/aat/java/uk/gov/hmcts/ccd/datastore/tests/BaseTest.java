@@ -24,10 +24,16 @@ public abstract class BaseTest {
         return asAutoTestCaseworker(TRUE);
     }
 
-    protected Supplier<RequestSpecification> asAutoTestCaseworker(final Boolean withUserParam) {
-        AuthenticatedUser caseworker = aat.getIdamHelper().authenticate(aat.getCaseworkerAutoTestEmail(),
-                                                                        aat.getCaseworkerAutoTestPassword());
+    protected Supplier<RequestSpecification> asAutoTestCaseworker(boolean withUserParam) {
+        return asUser(aat.getCaseworkerAutoTestEmail(), aat.getCaseworkerAutoTestPassword(), withUserParam);
+    }
 
+    protected Supplier<RequestSpecification> asPrivateTestCaseworker(boolean withUserParam) {
+        return asUser(aat.getCaseworkerTestPrivateEmail(), aat.getCaseworkerTestPrivatePassword(), withUserParam);
+    }
+
+    private Supplier<RequestSpecification> asUser(String username, String password, Boolean withUserParam) {
+        AuthenticatedUser caseworker = aat.getIdamHelper().authenticate(username, password);
         String s2sToken = aat.getS2SHelper().getToken();
 
         return () -> {
@@ -37,19 +43,6 @@ public abstract class BaseTest {
 
             return withUserParam ? request.pathParam("user", caseworker.getId()) : request;
         };
-    }
-
-    protected Supplier<RequestSpecification> asPrivateTestCaseworker() {
-        return asUser(aat.getCaseworkerTestPrivateEmail(), aat.getCaseworkerTestPrivatePassword());
-    }
-
-    private Supplier<RequestSpecification> asUser(String username, String password) {
-        AuthenticatedUser caseworker = aat.getIdamHelper().authenticate(username, password);
-        String s2sToken = aat.getS2SHelper().getToken();
-
-        return () -> RestAssured.given()
-            .header("Authorization", "Bearer " + caseworker.getAccessToken())
-            .header("ServiceAuthorization", s2sToken);
     }
 
     protected RequestSpecification asAutoTestImporter() {

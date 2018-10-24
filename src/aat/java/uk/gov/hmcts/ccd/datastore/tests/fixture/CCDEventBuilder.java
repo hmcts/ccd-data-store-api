@@ -1,17 +1,16 @@
 package uk.gov.hmcts.ccd.datastore.tests.fixture;
 
+import java.util.HashMap;
+import java.util.function.Supplier;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
-import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CaseData;
 import uk.gov.hmcts.ccd.datastore.tests.helper.CCDHelper;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
-
-import java.util.HashMap;
-import java.util.function.Supplier;
 
 public class CCDEventBuilder {
     private static final CCDHelper CCD_HELPER = new CCDHelper();
@@ -27,7 +26,7 @@ public class CCDEventBuilder {
     private Long caseReference;
     private String summary;
     private String description;
-    private CaseData data;
+    private Object data;
 
     public CCDEventBuilder(String jurisdictionId, String caseTypeId, String eventId) {
         this.jurisdictionId = jurisdictionId;
@@ -57,7 +56,7 @@ public class CCDEventBuilder {
         return this;
     }
 
-    public CCDEventBuilder withData(CaseData data) {
+    public CCDEventBuilder withData(Object data) {
         this.data = data;
         return this;
     }

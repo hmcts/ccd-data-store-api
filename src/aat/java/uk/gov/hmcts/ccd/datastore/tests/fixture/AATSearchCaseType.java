@@ -7,11 +7,11 @@ import lombok.Builder;
 import lombok.Data;
 
 /**
- * Definition of case type AUTOTEST1/AAT as code.
+ * Definition of case type TEST-PRIVATE/AAT_SEARCH
  */
-public interface AATCaseType {
-    String JURISDICTION = "AUTOTEST1";
-    String CASE_TYPE = "AAT";
+public interface AATSearchCaseType {
+    String JURISDICTION = "TEST-PRIVATE";
+    String CASE_TYPE = "AAT_SEARCH";
 
     @Data
     @Builder

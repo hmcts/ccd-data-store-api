@@ -9,7 +9,7 @@ public enum AATHelper {
 
     INSTANCE;
 
-    private static final long DEFAULT_LOGSTASH_READ_DELAY_MILLIS = 3000;
+    private static final long DEFAULT_LOGSTASH_READ_DELAY_MILLIS = 2000;
 
     private final IdamHelper idamHelper;
     private final S2SHelper s2SHelper;
