@@ -25,7 +25,7 @@ public class ElasticSearchConfiguration {
         Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
         factory.setHttpClientConfig(new HttpClientConfig.Builder(applicationParams.getElasticSearchHosts())
             .multiThreaded(true)
-            .maxConnectionIdleTime(5, TimeUnit.SECONDS)
+            .maxConnectionIdleTime(15, TimeUnit.SECONDS)
             .gson(gson).build());
         return factory.getObject();
     }
