@@ -48,7 +48,7 @@ public abstract class AbstractAuthorisedCaseViewOperation {
         }
     }
 
-    CaseType getCaseType(String caseTypeId) {
+    protected CaseType getCaseType(String caseTypeId) {
         final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
         if (caseType == null) {
             throw new ValidationException("Cannot find case type definition for  " + caseTypeId);
@@ -56,14 +56,14 @@ public abstract class AbstractAuthorisedCaseViewOperation {
         return caseType;
     }
 
-    String getCaseId(String jurisdictionId, String caseReference) {
+    protected String getCaseId(String jurisdictionId, String caseReference) {
         Optional<CaseDetails> caseDetails = this.caseDetailsRepository.findByReference(jurisdictionId, Long.valueOf(caseReference));
         return caseDetails
             .orElseThrow(() -> new CaseNotFoundException(caseReference))
             .getId();
     }
 
-    Set<String> getUserRoles(String caseId) {
+    protected Set<String> getUserRoles(String caseId) {
         return Sets.union(userRepository.getUserRoles(),
             caseUserRepository
                 .findCaseRolesUserHasForACase(Long.valueOf(caseId), userRepository.getUserName())

@@ -13,8 +13,8 @@ import java.io.Serializable;
 })
 public class CaseUserEntity implements Serializable {
 
-    static final String GET_ALL_CASES_USER_HAS_ACCESS_TO = "GET_ALL_CASES";
-    static final String GET_ALL_CASE_ROLES_USER_HAS_ACCESS_FOR_A_CASE = "GET_ALL_CASES_ROLES_FOR_A_CASE";
+    protected static final String GET_ALL_CASES_USER_HAS_ACCESS_TO = "GET_ALL_CASES";
+    protected static final String GET_ALL_CASE_ROLES_USER_HAS_ACCESS_FOR_A_CASE = "GET_ALL_CASES_ROLES_FOR_A_CASE";
 
     public static class CasePrimaryKey implements Serializable {
         @Column(name = "case_data_id")

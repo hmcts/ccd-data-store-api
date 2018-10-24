@@ -37,7 +37,7 @@ class CachedUserRepositoryTest {
 
     @Nested
     @DisplayName("getUserName()")
-    class getUserName {
+    class GetUserName {
 
         @Test
         @DisplayName("should initially retrieve user name from decorated repository")
@@ -74,7 +74,7 @@ class CachedUserRepositoryTest {
 
     @Nested
     @DisplayName("getUserDetails()")
-    class getUserDetails {
+    class GetUserDetails {
 
         @Test
         @DisplayName("should initially retrieve user details from decorated repository")
@@ -113,7 +113,7 @@ class CachedUserRepositoryTest {
 
     @Nested
     @DisplayName("getUserRoles()")
-    class getUserRoles {
+    class GetUserRoles {
 
         @Test
         @DisplayName("should initially retrieve user roles from decorated repository")
@@ -153,7 +153,7 @@ class CachedUserRepositoryTest {
 
     @Nested
     @DisplayName("getUserClassifications()")
-    class getUserClassifications {
+    class GetUserClassifications {
 
         @Test
         @DisplayName("should initially retrieve classifications from decorated repository")
