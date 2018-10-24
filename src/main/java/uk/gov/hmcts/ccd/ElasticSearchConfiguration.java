@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd;
 
+import java.util.concurrent.TimeUnit;
+
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -10,8 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.concurrent.TimeUnit;
-
 @Configuration
 public class ElasticSearchConfiguration {
 
@@ -21,11 +21,14 @@ public class ElasticSearchConfiguration {
     @Bean
     public JestClient jestClient() {
 
+        //ensure maxConnectionIdleTime is less than the ES loadbalancer max idle connection time
         JestClientFactory factory = new JestClientFactory();
         Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
         factory.setHttpClientConfig(new HttpClientConfig.Builder(applicationParams.getElasticSearchHosts())
             .multiThreaded(true)
             .maxConnectionIdleTime(15, TimeUnit.SECONDS)
+            .connTimeout(20000)
+            .readTimeout(20000)
             .gson(gson).build());
         return factory.getObject();
     }
