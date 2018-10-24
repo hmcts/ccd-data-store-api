@@ -111,6 +111,9 @@ public abstract class BaseTest {
         ReflectionTestUtils.setField(documentManagementRestClient, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(draftGateway, "securityUtils", securityUtils);
 
+        // Reset static field `caseDefinitionRepository`
+        ReflectionTestUtils.setField(BaseType.class, "caseDefinitionRepository", caseDefinitionRepository);
+
         setupUIDService();
     }
 
