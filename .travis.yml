@@ -12,7 +12,7 @@ cache:
     - $HOME/.gradle/wrapper/
 
 script:
-  - "./gradlew build"
+  - "./gradlew build --info"
   - "./gradlew dependencyCheckAnalyze || echo 'dependencyCheckAnalyze failed'"
   - "./gradlew sendCoverageToCodacy || echo sendCoverageToCodacy failed"
 
@@ -24,5 +24,5 @@ before_install:
   - curl https://raw.githubusercontent.com/hmcts/reform-api-docs/master/bin/publish-swagger-docs.sh > publish-swagger-docs.sh
 
 after_success:
-  - "bash <(curl -s https://codecov.io/bash) || echo 'Codecov failed to upload'"
-  - [ "$TRAVIS_BRANCH" = "master" -a "$TRAVIS_PULL_REQUEST" = "false" ] && sh ./publish-swagger-docs.sh
+  - 'bash <(curl -s https://codecov.io/bash) || echo "Codecov failed to upload"'
+  - '[ "$TRAVIS_BRANCH" = "master" -a "$TRAVIS_PULL_REQUEST" = "false" ] && sh ./publish-swagger-docs.sh'

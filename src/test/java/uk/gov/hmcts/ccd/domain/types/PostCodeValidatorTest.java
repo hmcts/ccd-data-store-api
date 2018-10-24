@@ -1,207 +1,235 @@
 package uk.gov.hmcts.ccd.domain.types;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.test.util.ReflectionTestUtils;
-import uk.gov.hmcts.ccd.BaseTest;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.test.CaseFieldBuilder;
 
-import javax.inject.Inject;
+import java.util.Collections;
 import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.StringEndsWith.endsWith;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.types.PostCodeValidator.TYPE_ID;
 
-public class PostCodeValidatorTest extends BaseTest implements IVallidatorTest {
-    private static final String CASE_FIELD_STRING =
-        "{\n" +
-        "  \"id\": \"TEST_FIELD_ID\",\n" +
-        "  \"field_type\": {\n" +
-        "    \"type\": \"PostCode\"\n" +
-        "  }\n" +
-        "}";
+@DisplayName("PostcodeValidator")
+class PostCodeValidatorTest {
+    private static final JsonNodeFactory NODE_FACTORY = JsonNodeFactory.instance;
+    private static final String FIELD_ID = "TEST_FIELD_ID";
+    private static final String POSTCODE_REGEX = "^([A-PR-UWYZ0-9][A-HK-Y0-9][AEHMNPRTVXY0-9]?[ABEHMNPRVWXY0-9]? {1,2}[0-9][ABD-HJLN-UW-Z]{2}|GIR 0AA)$";
 
-    private static final String TEST_CASE_FIELD_STRING_MIN_MAX =
-        "{\n" +
-            "  \"id\": \"TEST_FIELD_ID_MINMAX\",\n" +
-            "  \"field_type\": {\n" +
-            "    \"type\": \"PostCode\",\n" +
-            "    \"max\": 6,\n" +
-            "    \"min\": 5\n" +
-            "  }\n" +
-            "}";
+    @Mock
+    private BaseType postcodeBaseType;
 
-    @Inject
+    @Mock
+    private CaseDefinitionRepository definitionRepository;
+
     private PostCodeValidator validator;
     private CaseField caseField;
-    private CaseField caseFieldTestMinMax;
 
-    @Before
-    public void setUp() throws Exception {
-        caseField = MAPPER.readValue(CASE_FIELD_STRING, CaseField.class);
-        caseFieldTestMinMax = MAPPER.readValue(TEST_CASE_FIELD_STRING_MIN_MAX, CaseField.class);
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.initMocks(this);
 
-        final BaseType baseType = validator.getType();
-        ReflectionTestUtils.setField(baseType, "regularExpression",
-            "^([A-PR-UWYZ0-9][A-HK-Y0-9][AEHMNPRTVXY0-9]?[ABEHMNPRVWXY0-9]? {1,2}[0-9][ABD-HJLN-UW-Z]{2}|GIR 0AA)$");
+        when(definitionRepository.getBaseTypes()).thenReturn(Collections.emptyList());
+        BaseType.setCaseDefinitionRepository(definitionRepository);
+        BaseType.initialise();
+
+        when(postcodeBaseType.getType()).thenReturn(PostCodeValidator.TYPE_ID);
+        when(postcodeBaseType.getRegularExpression()).thenReturn(POSTCODE_REGEX);
+        BaseType.register(postcodeBaseType);
+
+        validator = new PostCodeValidator();
+
+        caseField = caseField().build();
     }
 
     @Test
-    public void validPostCodesForBaseRegEx() throws Exception {
-        final List<ValidationResult> result01 = validator.validate("TEST_FIELD_ID", MAPPER.readTree("\"M1 1AA\""), caseField);
-        assertEquals(result01.toString(), 0, result01.size());
+    void validPostCodesForBaseRegEx() {
+        final List<ValidationResult> result01 = validator.validate(FIELD_ID,
+                                                                   NODE_FACTORY.textNode("M1 1AA"),
+                                                                   caseField);
+        final List<ValidationResult> result02 = validator.validate(FIELD_ID,
+                                                                   NODE_FACTORY.textNode("N60 1NW"),
+                                                                   caseField);
+        final List<ValidationResult> result03 = validator.validate(FIELD_ID,
+                                                                   NODE_FACTORY.textNode("CR2 6XH"),
+                                                                   caseField);
+        final List<ValidationResult> result04 = validator.validate(FIELD_ID,
+                                                                   NODE_FACTORY.textNode("DN55 1PT"),
+                                                                   caseField);
+        final List<ValidationResult> result05 = validator.validate(FIELD_ID,
+                                                                   NODE_FACTORY.textNode("W1A 1HQ"),
+                                                                   caseField);
+        final List<ValidationResult> result06 = validator.validate(FIELD_ID,
+                                                                   NODE_FACTORY.textNode("EC1A 1BB"),
+                                                                   caseField);
 
-        final List<ValidationResult> result02 = validator.validate("TEST_FIELD_ID", MAPPER.readTree("\"N60 1NW\""), caseField);
-        assertEquals(result02.toString(), 0, result02.size());
-
-        final List<ValidationResult> result03 = validator.validate("TEST_FIELD_ID", MAPPER.readTree("\"CR2 6XH\""), caseField);
-        assertEquals(result01.toString(), 0, result03.size());
-
-        final List<ValidationResult> result04 = validator.validate("TEST_FIELD_ID", MAPPER.readTree("\"DN55 1PT\""), caseField);
-        assertEquals(result04.toString(), 0, result04.size());
-
-        final List<ValidationResult> result05 = validator.validate("TEST_FIELD_ID", MAPPER.readTree("\"W1A 1HQ\""), caseField);
-        assertEquals(result05.toString(), 0, result05.size());
-
-        final List<ValidationResult> result06 = validator.validate("TEST_FIELD_ID", MAPPER.readTree("\"EC1A 1BB\""), caseField);
-        assertEquals(result06.toString(), 0, result06.size());
+        assertAll(
+            () -> assertEquals(0, result01.size(), result01.toString()),
+            () -> assertEquals(0, result02.size(), result02.toString()),
+            () -> assertEquals(0, result03.size(), result01.toString()),
+            () -> assertEquals(0, result04.size(), result04.toString()),
+            () -> assertEquals(0, result05.size(), result05.toString()),
+            () -> assertEquals(0, result06.size(), result06.toString())
+        );
     }
 
     @Test
-    public void invalidPostCodesForBaseRegEx() throws Exception {
-        final List<ValidationResult> result01 = validator.validate("TEST_FIELD_ID", MAPPER.readTree("\"3321M1 1AA\""), caseField);
-        assertEquals(result01.toString(), 1, result01.size());
+    void invalidPostCodesForBaseRegEx() {
+        final List<ValidationResult> result01 = validator.validate(FIELD_ID,
+                                                                   NODE_FACTORY.textNode("3321M1 1AA"),
+                                                                   caseField);
+        final List<ValidationResult> result02 = validator.validate(FIELD_ID,
+                                                                   NODE_FACTORY.textNode("1m1 1m1"),
+                                                                   caseField);
 
-        final List<ValidationResult> result02 = validator.validate("TEST_FIELD_ID", MAPPER.readTree("\"1m1 1m1\""), caseField);
-        assertEquals(result02.toString(), 1, result01.size());
+        assertAll(
+            () -> assertEquals(1, result01.size(), result01.toString()),
+            () -> assertEquals(1, result01.size(), result02.toString())
+        );
     }
 
 
     @Test
-    public void checkFieldRegex() throws Exception {
-        final String caseFieldString =
-            "{\n" +
-                "  \"id\": \"TEST_FIELD_ID\",\n" +
-                "  \"field_type\": {\n" +
-                "    \"regular_expression\": \"^[0-9]*$\"\n" +
-                "  }\n" +
-                "}";
-        final List<ValidationResult> validResult = validator.validate("TEST_FIELD_ID", MAPPER.readTree("\"123456789\""), MAPPER.readValue(caseFieldString, CaseField.class));
+    void checkFieldRegex() {
+        final CaseField caseField = caseField().withRegExp("^[0-9]*$").build();
+        final List<ValidationResult> validResult = validator.validate(FIELD_ID,
+                                                                      NODE_FACTORY.textNode("123456789"),
+                                                                      caseField);
         assertEquals(0, validResult.size());
 
-        final List<ValidationResult> invalidResult = validator.validate("TEST_FIELD_ID", MAPPER.readTree("\"abc123\""), MAPPER.readValue(caseFieldString, CaseField.class));
-        assertEquals(invalidResult.toString(), 1, invalidResult.size());
+        final List<ValidationResult> invalidResult = validator.validate(FIELD_ID,
+                                                                        NODE_FACTORY.textNode("abc123"),
+                                                                        caseField);
+        assertEquals(1, invalidResult.size(), invalidResult.toString());
     }
 
     @Test
-    public void nullValue() {
-        assertEquals("Did not catch NULL", 0, validator.validate("TEST_FIELD_ID", null, caseField).size());
+    void nullValue() {
+        assertEquals(0, validator.validate(FIELD_ID, null, caseField).size());
     }
 
     @Test
-    public void getType() {
-        assertEquals("Type is incorrect", validator.getType(), BaseType.get("POSTCODE"));
+    void getType() {
+        assertEquals(validator.getType(), BaseType.get("POSTCODE"));
     }
 
     @Test
-    public void testInvalidMin() throws Exception {
-        final JsonNode INVALID_MIN = MAPPER.readTree("\"Test\"");
-        final List<ValidationResult> validationResults = validator.validate("TEST_FIELD_ID", INVALID_MIN, caseFieldTestMinMax);
-        assertEquals("Did not catch min", 1, validationResults.size());
+    void testInvalidMin() {
+        final CaseField caseField = caseField().withMin(5).build();
+        final JsonNode INVALID_MIN = NODE_FACTORY.textNode("Test");
+        final List<ValidationResult> validationResults = validator.validate(FIELD_ID, INVALID_MIN, caseField);
+        assertEquals(1, validationResults.size(), "Did not catch min");
         assertEquals("Post code 'Test' requires minimum length 5", validationResults.get(0).getErrorMessage());
-        assertEquals("TEST_FIELD_ID", validationResults.get(0).getFieldId());
+        assertEquals(FIELD_ID, validationResults.get(0).getFieldId());
     }
 
     @Test
-    public void testInvalidMax() throws Exception {
-        final JsonNode INVALID_MAX = MAPPER.readTree("\"Test Test Test\"");
-        final List<ValidationResult> validationResults = validator.validate("TEST_FIELD_ID", INVALID_MAX, caseFieldTestMinMax);
-        assertEquals("Did not catch max", 1, validationResults.size());
+    void testInvalidMax() {
+        final CaseField caseField = caseField().withMax(6).build();
+        final JsonNode INVALID_MAX = NODE_FACTORY.textNode("Test Test Test");
+        final List<ValidationResult> validationResults = validator.validate(FIELD_ID, INVALID_MAX, caseField);
+        assertEquals(1, validationResults.size(), "Did not catch max");
         assertEquals("Post code 'Test Test Test' exceeds maximum length 6", validationResults.get(0).getErrorMessage());
-        assertEquals("TEST_FIELD_ID", validationResults.get(0).getFieldId());
+        assertEquals(FIELD_ID, validationResults.get(0).getFieldId());
     }
 
     @Test
-    public void testValidMinMaxButNoRegExChecks() throws Exception {
+    void testValidMinMaxButNoRegExChecks() {
+        final CaseField caseField = caseField().withMin(5)
+                                               .withMax(6)
+                                               .build();
         // Disable regular expression checks
-        ReflectionTestUtils.setField(validator.getType(), "regularExpression", "^.*$");
-        final JsonNode DATA = MAPPER.readTree("\"5 & 10\"");
-        final List<ValidationResult> validMinMaxResults = validator.validate("TEST_FIELD_ID", DATA, caseFieldTestMinMax);
-        assertEquals(validMinMaxResults.toString(), 0, validMinMaxResults.size());
+        when(postcodeBaseType.getRegularExpression()).thenReturn("^.*$");
+
+        final JsonNode DATA = NODE_FACTORY.textNode("5 & 10");
+        final List<ValidationResult> validMinMaxResults = validator.validate(FIELD_ID, DATA, caseField);
+        assertEquals(0, validMinMaxResults.size(), validMinMaxResults.toString());
     }
 
     @Test
-    public void shouldFail_whenValidatingBinaryNode() {
+    void shouldFail_whenValidatingBinaryNode() {
         final List<ValidationResult>
             result =
-            validator.validate("TEST_FIELD_ID", NODE_FACTORY.binaryNode("EC1A 1BB".getBytes()), caseField);
+            validator.validate(FIELD_ID, NODE_FACTORY.binaryNode("EC1A 1BB".getBytes()), caseField);
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getErrorMessage(), endsWith(" needs to be a valid " + TYPE_ID));
     }
 
     @Test
-    public void shouldPass_whenValidatingObjectNode() {
+    void shouldPass_whenValidatingObjectNode() {
         final List<ValidationResult>
             result =
-            validator.validate("TEST_FIELD_ID", NODE_FACTORY.objectNode(), caseField);
+            validator.validate(FIELD_ID, NODE_FACTORY.objectNode(), caseField);
         assertThat(result, empty());
     }
 
     @Test
-    public void shouldFail_whenValidatingArrayNode() {
+    void shouldFail_whenValidatingArrayNode() {
         final List<ValidationResult>
             result =
-            validator.validate("TEST_FIELD_ID", NODE_FACTORY.arrayNode(), caseField);
+            validator.validate(FIELD_ID, NODE_FACTORY.arrayNode(), caseField);
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getErrorMessage(), is("[] needs to be a valid " + TYPE_ID));
     }
 
     @Test
-    public void shouldFail_whenValidatingNumberNode() {
+    void shouldFail_whenValidatingNumberNode() {
         final List<ValidationResult>
             result =
-            validator.validate("TEST_FIELD_ID", NODE_FACTORY.numberNode(1), caseField);
+            validator.validate(FIELD_ID, NODE_FACTORY.numberNode(1), caseField);
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getErrorMessage(), is("1 needs to be a valid " + TYPE_ID));
     }
 
     @Test
-    public void shouldFail_whenValidatingBooleanNode() {
+    void shouldFail_whenValidatingBooleanNode() {
         final List<ValidationResult>
             result =
-            validator.validate("TEST_FIELD_ID", NODE_FACTORY.booleanNode(true), caseField);
+            validator.validate(FIELD_ID, NODE_FACTORY.booleanNode(true), caseField);
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getErrorMessage(), is("true needs to be a valid " + TYPE_ID));
     }
 
     @Test
-    public void shouldFail_whenValidatingPojoNode() {
+    void shouldFail_whenValidatingPojoNode() {
         final List<ValidationResult>
             result =
-            validator.validate("TEST_FIELD_ID", NODE_FACTORY.pojoNode("EC1A 1BB"), caseField);
+            validator.validate(FIELD_ID, NODE_FACTORY.pojoNode("EC1A 1BB"), caseField);
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getErrorMessage(), is("EC1A 1BB needs to be a valid " + TYPE_ID));
     }
 
     @Test
-    public void shouldPass_whenValidatingNullNode() {
+    void shouldPass_whenValidatingNullNode() {
         final List<ValidationResult>
             result =
-            validator.validate("TEST_FIELD_ID", NODE_FACTORY.nullNode(), caseField);
+            validator.validate(FIELD_ID, NODE_FACTORY.nullNode(), caseField);
         assertThat(result, empty());
     }
 
     @Test
-    public void shouldPass_whenValidatingNulText() {
+    void shouldPass_whenValidatingNulText() {
         final List<ValidationResult>
             result =
-            validator.validate("TEST_FIELD_ID", NODE_FACTORY.textNode(null), caseField);
+            validator.validate(FIELD_ID, NODE_FACTORY.textNode(null), caseField);
         assertThat(result, empty());
+    }
+
+    private CaseFieldBuilder caseField() {
+        return new CaseFieldBuilder(FIELD_ID).withType(PostCodeValidator.TYPE_ID);
     }
 }
