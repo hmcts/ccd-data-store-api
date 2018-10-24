@@ -12,7 +12,7 @@ cache:
     - $HOME/.gradle/wrapper/
 
 script:
-  - "./gradlew build"
+  - "./gradlew build --info"
   - "./gradlew dependencyCheckAnalyze || echo 'dependencyCheckAnalyze failed'"
   - "./gradlew sendCoverageToCodacy || echo sendCoverageToCodacy failed"
 
