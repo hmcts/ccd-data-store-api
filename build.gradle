@@ -501,7 +501,7 @@ test {
     environment("APPINSIGHTS_INSTRUMENTATIONKEY", "some-key")
 
     useJUnitPlatform()
-    
+
     testLogging {
         // set options for log level LIFECYCLE
         events "failed"
@@ -612,4 +612,7 @@ task sendCoverageToCodacy(type: JavaExec, dependsOn: jacocoTestReport) {
     ]
 }
 
-
+task installDist(overwrite: true) {
+    // This task must be overwritten to do as it's breaking JAR packaging and it's a mandatory step of swagger
+    // documentation publication.
+}
