@@ -20,10 +20,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.health.AbstractHealthIndicator;
 import org.springframework.boot.actuate.health.Health.Builder;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 
 @Component
+@ConditionalOnProperty(name = "search.elastic.enabled")
 @Slf4j
 public class ElasticSearchHealthIndicator extends AbstractHealthIndicator {
 

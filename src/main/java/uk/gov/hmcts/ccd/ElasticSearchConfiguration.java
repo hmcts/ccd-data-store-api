@@ -27,8 +27,8 @@ public class ElasticSearchConfiguration {
         factory.setHttpClientConfig(new HttpClientConfig.Builder(applicationParams.getElasticSearchHosts())
             .multiThreaded(true)
             .maxConnectionIdleTime(15, TimeUnit.SECONDS)
-            .connTimeout(20000)
-            .readTimeout(20000)
+            .connTimeout(4000)
+            .readTimeout(4000)
             .gson(gson).build());
         return factory.getObject();
     }
