@@ -2,8 +2,14 @@ package uk.gov.hmcts.ccd.datastore.tests.functional.elasticsearch;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.equalTo;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.EmptyCase;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FullCase;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FullCase.DATE_TIME;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FullCase.TEXT;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.AAT_PRIVATE_CASE_TYPE;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CaseData;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.State;
 
 import io.restassured.response.ValidatableResponse;
 import org.junit.jupiter.api.AfterAll;
@@ -13,16 +19,12 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
-import uk.gov.hmcts.ccd.datastore.tests.fixture.AATSearchCaseBuilder;
-import uk.gov.hmcts.ccd.datastore.tests.fixture.AATSearchCaseType.CaseData;
-import uk.gov.hmcts.ccd.datastore.tests.fixture.AATSearchCaseType.Event;
-import uk.gov.hmcts.ccd.datastore.tests.fixture.AATSearchCaseType.State;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ElasticsearchCaseSearchTest extends ElasticsearchBaseTest {
 
-    private static final String CASE_INDEX_NAME = "aat_search_cases-000001";
-    private static final String CASE_INDEX_ALIAS = "aat_search_cases";
+    private static final String CASE_INDEX_NAME = "aat_private_cases-000001";
+    private static final String CASE_INDEX_ALIAS = "aat_private_cases";
 
     ElasticsearchCaseSearchTest(AATHelper aat) {
         super(aat);
@@ -31,8 +33,8 @@ class ElasticsearchCaseSearchTest extends ElasticsearchBaseTest {
     @BeforeAll
     void setUp() {
         assertElasticsearchEnabled();
-        //importDefinition();
-        //createCases();
+        importDefinition();
+        createCases();
     }
 
     @Nested
@@ -149,19 +151,19 @@ class ElasticsearchCaseSearchTest extends ElasticsearchBaseTest {
 
     @AfterAll
     void cleanUp() {
-        //deleteIndexAndAlias(CASE_INDEX_NAME, CASE_INDEX_ALIAS);
+        deleteIndexAndAlias(CASE_INDEX_NAME, CASE_INDEX_ALIAS);
     }
 
     private void createCases() {
         createAndUpdateCase();
-        createCase(AATSearchCaseBuilder.FullCase.build());
+        createCase(FullCase.build());
         // wait until logstash reads the case data
         sleep(aat.getLogstashReadDelay());
     }
 
     private void createAndUpdateCase() {
-        Long caseReference = createCase(AATSearchCaseBuilder.EmptyCase.build());
-        Event.startProgress(caseReference)
+        Long caseReference = createCase(EmptyCase.build());
+        Event.startProgress(AAT_PRIVATE_CASE_TYPE, caseReference)
             .as(asPrivateTestCaseworker(true))
             .submit()
             .then()
@@ -171,7 +173,7 @@ class ElasticsearchCaseSearchTest extends ElasticsearchBaseTest {
     }
 
     private Long createCase(CaseData caseData) {
-        return Event.create()
+        return Event.create(AAT_PRIVATE_CASE_TYPE)
             .as(asPrivateTestCaseworker(true))
             .withData(caseData)
             .submitAndGetReference();

@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 import static java.util.Optional.ofNullable;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.AAT_PRIVATE_CASE_TYPE;
 
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
@@ -14,7 +15,6 @@ import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.BaseTest;
-import uk.gov.hmcts.ccd.datastore.tests.fixture.AATSearchCaseType;
 
 abstract class ElasticsearchBaseTest extends BaseTest {
 
@@ -48,8 +48,8 @@ abstract class ElasticsearchBaseTest extends BaseTest {
         return requestSpecification.get()
             .given()
             .log()
-            .body()
-            .queryParam("ctid", AATSearchCaseType.CASE_TYPE)
+            .all()
+            .queryParam("ctid", AAT_PRIVATE_CASE_TYPE)
             .contentType(ContentType.JSON)
             .body(jsonSearchRequest)
             .when()
