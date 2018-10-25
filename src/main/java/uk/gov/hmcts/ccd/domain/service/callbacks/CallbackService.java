@@ -60,23 +60,7 @@ public class CallbackService {
                                            final CaseDetails caseDetailsBefore,
                                            final CaseDetails caseDetails) {
 
-        if (url == null || url.isEmpty()) {
-            return Optional.empty();
-        }
-
-        final CallbackRequest callbackRequest = new CallbackRequest(caseDetails, caseDetailsBefore, caseEvent.getId());
-        final List<Integer> retries = CollectionUtils.isEmpty(callbackRetries) ? defaultRetries : callbackRetries;
-
-        for (Integer timeout : retries) {
-            final Optional<ResponseEntity<CallbackResponse>> responseEntity = sendRequest(url,
-                                                                                          CallbackResponse.class,
-                                                                                          callbackRequest,
-                                                                                          timeout);
-            if (responseEntity.isPresent()) {
-                return Optional.of(responseEntity.get().getBody());
-            }
-        }
-        throw new CallbackException("Unsuccessful callback to " + url);
+        return send(url,callbackRetries,caseEvent,caseDetailsBefore,caseDetails,false);
     }
 
     public Optional<CallbackResponse> send(final String url,
