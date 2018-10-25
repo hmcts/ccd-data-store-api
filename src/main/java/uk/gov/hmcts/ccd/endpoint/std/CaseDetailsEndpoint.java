@@ -43,7 +43,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
 import javax.transaction.Transactional;
-import javax.ws.rs.QueryParam;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -295,7 +294,9 @@ public class CaseDetailsEndpoint {
         return createCaseOperation.createCaseDetails(uid, jurisdictionId, caseTypeId, content, ignoreWarning);
     }
 
-    @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/validate", method = RequestMethod.POST)
+    @RequestMapping(value = {"/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/validate",
+        "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/validate"},
+        method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
         value = "Validate a set of fields as Case worker",
@@ -306,7 +307,7 @@ public class CaseDetailsEndpoint {
         @ApiResponse(code = 422, message = "Field validation failed"),
         @ApiResponse(code = 409, message = "Case reference not unique")
     })
-    public Map<String, JsonNode> validateCaseDetailsForCaseWorker(
+    public JsonNode validateCaseDetails(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
         @ApiParam(value = "Jurisdiction ID", required = true)
@@ -315,40 +316,6 @@ public class CaseDetailsEndpoint {
         @PathVariable("ctid") final String caseTypeId,
         @ApiParam(value = "Page ID")
         @RequestParam(required = false) final String pageId,
-        @RequestBody final CaseDataContent content) {
-
-        Map<String, JsonNode> data = validateCaseFieldsOperation.validateCaseDetails(jurisdictionId,
-            caseTypeId,
-            content.getEvent(),
-            content.getData());
-
-        return midEventCallback.invoke(jurisdictionId,
-            caseTypeId,
-            content.getEvent(),
-            data,
-            pageId);
-    }
-
-    @RequestMapping(value = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/validate", method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(
-        value = "Validate a set of fields as Citizen",
-        notes = "Validate the case data entered during the case/event creation process."
-    )
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Validation OK"),
-        @ApiResponse(code = 422, message = "Field validation failed"),
-        @ApiResponse(code = 409, message = "Case reference not unique")
-    })
-    public Map<String, JsonNode> validateCaseDetailsForCitizen(
-        @ApiParam(value = "Idam user ID", required = true)
-        @PathVariable("uid") final String uid,
-        @ApiParam(value = "Jurisdiction ID", required = true)
-        @PathVariable("jid") final String jurisdictionId,
-        @ApiParam(value = "Case type ID", required = true)
-        @PathVariable("ctid") final String caseTypeId,
-        @ApiParam(value = "Page ID")
-        @QueryParam("pageId") final String pageId,
         @RequestBody final CaseDataContent content) {
 
         Map<String, JsonNode> data = validateCaseFieldsOperation.validateCaseDetails(jurisdictionId,

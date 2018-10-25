@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -43,7 +45,7 @@ public class MidEventCallback {
         this.caseService = caseService;
     }
 
-    public Map<String, JsonNode> invoke(String jurisdictionId, String caseTypeId, Event event,
+    public JsonNode invoke(String jurisdictionId, String caseTypeId, Event event,
                                         Map<String, JsonNode> data,
                                         String pageId) {
         if (!isBlank(pageId)) {
@@ -64,10 +66,16 @@ public class MidEventCallback {
                     caseEvent,
                     null,
                     newCaseDetails);
-                return caseDetails.getData();
+                ObjectMapper mapper = new ObjectMapper();
+                ObjectNode jNode = mapper.createObjectNode();
+                jNode.set("data", mapper.valueToTree(caseDetails.getData()));
+                return jNode;
             }
         }
-        return data;
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode jNode = mapper.createObjectNode();
+        jNode.set("data", mapper.valueToTree(data));
+        return jNode;
     }
 
     private CaseType getCaseType(String caseTypeId) {

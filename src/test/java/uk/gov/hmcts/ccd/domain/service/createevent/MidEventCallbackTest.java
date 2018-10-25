@@ -21,6 +21,7 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,6 +36,7 @@ class MidEventCallbackTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {};
+    private static final TypeReference STRING_JSON = new TypeReference<JsonNode>() {};
     private static final String JURISDICTION_ID = "jurisdictionId";
     private static final String CASE_TYPE_ID = "caseTypeId";
 
@@ -113,35 +115,40 @@ class MidEventCallbackTest {
                 "  \"PersonFirstName\": \"First Name\",\n" +
                 "  \"PersonLastName\": \"Last Name\"\n" +
                 "}"), STRING_JSON_MAP);
-
         CaseDetails updatedCaseDetails = caseDetails(DATA);
-
         given(callbackInvoker.invokeMidEventCallback(wizardPageWithCallback,
             caseType,
             caseEvent,
             null,
             caseDetails)).willReturn(updatedCaseDetails);
 
-        Map<String, JsonNode> result = midEventCallback.invoke(JURISDICTION_ID,
+
+        JsonNode result = midEventCallback.invoke(JURISDICTION_ID,
             CASE_TYPE_ID,
             event,
             data,
             "createCase1");
 
-        assertThat(result, is(DATA));
+        final JsonNode expectedResponse = MAPPER.readTree(
+            "{" +
+                "\"data\": {\n" +
+                "  \"PersonFirstName\": \"First Name\",\n" +
+                "  \"PersonLastName\": \"Last Name\"\n" +
+                "}}");
+        assertThat(result, is(expectedResponse));
     }
 
     @Test
     @DisplayName("test no interaction when pageId not present")
-    void testNoInteractionWhenMidEventCallbackUrlNotPresent() {
-
-        Map<String, JsonNode> result = midEventCallback.invoke(JURISDICTION_ID,
+    void testNoInteractionWhenMidEventCallbackUrlNotPresent() throws IOException {
+        JsonNode result = midEventCallback.invoke(JURISDICTION_ID,
             CASE_TYPE_ID,
             event,
             data,
             "");
 
-        assertThat("Data should stay unchanged", result, is(data));
+        final JsonNode expectedResponse = MAPPER.readTree("{\"data\": {}}");
+        assertThat("Data should stay unchanged", result, is(expectedResponse));
         verifyNoMoreInteractions(callbackInvoker, caseDefinitionRepository, eventTriggerService,
             uiDefinitionRepository, caseService);
     }

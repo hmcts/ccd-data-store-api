@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -259,8 +261,13 @@ class CaseDetailsEndpointTest {
     @Test
     void validateCaseFieldsForCaseWorker() {
         String pageId = "pageId";
-        final Map<String, JsonNode> toBeReturned = new HashMap<>();
-        doReturn(toBeReturned).when(validateCaseFieldsOperation).validateCaseDetails(
+        final Map<String, JsonNode> data = new HashMap<>();
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode jNode = mapper.createObjectNode();
+        jNode.set("data", mapper.valueToTree(data));
+        final JsonNode toBeReturned = jNode;
+
+        doReturn(data).when(validateCaseFieldsOperation).validateCaseDetails(
             JURISDICTION_ID,
             CASE_TYPE_ID,
             EVENT,
@@ -272,7 +279,7 @@ class CaseDetailsEndpointTest {
             DATA,
             pageId);
 
-        final Map<String, JsonNode> output = endpoint.validateCaseDetailsForCaseWorker(
+        final JsonNode output = endpoint.validateCaseDetails(
             UID,
             JURISDICTION_ID,
             CASE_TYPE_ID,
@@ -293,45 +300,6 @@ class CaseDetailsEndpointTest {
                 DATA,
                 pageId)
         );
-    }
-
-    @Test
-    void validateCaseFieldsForCitizen() {
-        String pageId = "pageId";
-        final Map<String, JsonNode> toBeReturned = new HashMap<>();
-        doReturn(toBeReturned).when(validateCaseFieldsOperation).validateCaseDetails(
-            JURISDICTION_ID,
-            CASE_TYPE_ID,
-            EVENT,
-            DATA);
-        doReturn(toBeReturned).when(midEventCallback).invoke(
-            JURISDICTION_ID,
-            CASE_TYPE_ID,
-            EVENT,
-            DATA,
-            pageId);
-
-        final Map<String, JsonNode> output = endpoint.validateCaseDetailsForCitizen(
-            UID,
-            JURISDICTION_ID,
-            CASE_TYPE_ID,
-            pageId,
-            EVENT_DATA);
-
-        assertAll(
-            () -> assertThat(output, sameInstance(toBeReturned)),
-            () -> verify(validateCaseFieldsOperation).validateCaseDetails(
-                JURISDICTION_ID,
-                CASE_TYPE_ID,
-                EVENT_DATA.getEvent(),
-                DATA),
-            () -> verify(midEventCallback).invoke(
-                JURISDICTION_ID,
-                CASE_TYPE_ID,
-                EVENT_DATA.getEvent(),
-                DATA,
-                pageId)
-                 );
     }
 
     @Test
