@@ -23,7 +23,7 @@ import static uk.gov.hmcts.ccd.domain.types.TextValidator.checkRegex;
 @Named
 @Singleton
 public class DateValidator implements BaseTypeValidator {
-    private static final String TYPE_ID = "Date";
+    static final String TYPE_ID = "Date";
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
