@@ -60,9 +60,9 @@ public class CachedUserRepository implements UserRepository {
     }
 
     @Override
-    public String getUserName() {
+    public String getUserId() {
         return userName.orElseGet(() -> {
-            userName = Optional.of(userRepository.getUserName());
+            userName = Optional.of(userRepository.getUserId());
             return userName.get();
         });
     }

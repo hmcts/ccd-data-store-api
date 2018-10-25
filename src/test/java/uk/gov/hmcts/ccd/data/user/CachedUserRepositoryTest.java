@@ -36,20 +36,20 @@ class CachedUserRepositoryTest {
     }
 
     @Nested
-    @DisplayName("getUserName()")
-    class GetUserName {
+    @DisplayName("getUserId()")
+    class GetUserId {
 
         @Test
         @DisplayName("should initially retrieve user name from decorated repository")
         void shouldRetrieveUserNameFromDecorated() {
             String expectedUserName = "26";
-            doReturn(expectedUserName).when(userRepository).getUserName();
+            doReturn(expectedUserName).when(userRepository).getUserId();
 
-            String userName = cachedUserRepository.getUserName();
+            String userName = cachedUserRepository.getUserId();
 
             assertAll(
                 () -> assertThat(userName, is(expectedUserName)),
-                () -> verify(userRepository, times(1)).getUserName()
+                () -> verify(userRepository, times(1)).getUserId()
             );
         }
 
@@ -57,13 +57,13 @@ class CachedUserRepositoryTest {
         @DisplayName("should cache user name for subsequent calls")
         void shouldCacheUserNameForSubsequentCalls() {
             String expectedUserName = "26";
-            doReturn(expectedUserName).when(userRepository).getUserName();
+            doReturn(expectedUserName).when(userRepository).getUserId();
 
-            cachedUserRepository.getUserName();
+            cachedUserRepository.getUserId();
 
-            verify(userRepository, times(1)).getUserName();
+            verify(userRepository, times(1)).getUserId();
 
-            String userName = cachedUserRepository.getUserName();
+            String userName = cachedUserRepository.getUserId();
 
             assertAll(
                 () -> assertThat(userName, is(expectedUserName)),

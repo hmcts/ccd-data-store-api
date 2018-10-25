@@ -40,7 +40,7 @@ class AuthorisedGetCaseHistoryViewOperationTest {
     private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_TYPE_ID = "Grant";
     private static final String CASE_REFERENCE = "1111222233334444";
-    private static final String USER_NAME = "26";
+    private static final String USER_ID = "26";
     private static final Long EVENT_ID = 100L;
     private static final String ROLE_IN_USER_ROLES = "caseworker-probate-loa1";
     private static final String ROLE_IN_USER_ROLES_2 = "caseworker-divorce-loa";
@@ -77,7 +77,7 @@ class AuthorisedGetCaseHistoryViewOperationTest {
         doReturn(USER_ROLES).when(userRepository).getUserRoles();
         doReturn(TEST_CASE_HISTORY_VIEW).when(getCaseHistoryViewOperation).execute(JURISDICTION_ID, CASE_TYPE_ID,
             CASE_REFERENCE, EVENT_ID);
-        doReturn(caseRoles).when(caseUserRepository).findCaseRolesUserHasForACase(Long.valueOf(CASE_REFERENCE), USER_NAME);
+        doReturn(caseRoles).when(caseUserRepository).findCaseRoles(Long.valueOf(CASE_REFERENCE), USER_ID);
         doReturn(Optional.of(CASE_DETAILS)).when(caseDetailsRepository).findByReference(JURISDICTION_ID, Long.valueOf(CASE_REFERENCE));
 
         authorisedGetCaseHistoryViewOperation = new AuthorisedGetCaseHistoryViewOperation(getCaseHistoryViewOperation,
@@ -88,7 +88,7 @@ class AuthorisedGetCaseHistoryViewOperationTest {
     @DisplayName("should return case history view")
     void shouldReturnCaseHistoryView() {
         doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES, CAN_READ);
-        doReturn(USER_NAME).when(userRepository).getUserName();
+        doReturn(USER_ID).when(userRepository).getUserId();
 
         CaseHistoryView caseHistoryView = authorisedGetCaseHistoryViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID,
             CASE_REFERENCE, EVENT_ID);
@@ -98,8 +98,8 @@ class AuthorisedGetCaseHistoryViewOperationTest {
         verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         verify(caseDetailsRepository).findByReference(JURISDICTION_ID, Long.valueOf(CASE_REFERENCE));
         verify(userRepository).getUserRoles();
-        verify(userRepository).getUserName();
-        verify(caseUserRepository).findCaseRolesUserHasForACase(Long.valueOf(CASE_REFERENCE), USER_NAME);
+        verify(userRepository).getUserId();
+        verify(caseUserRepository).findCaseRoles(Long.valueOf(CASE_REFERENCE), USER_ID);
         verify(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES, CAN_READ);
     }
 

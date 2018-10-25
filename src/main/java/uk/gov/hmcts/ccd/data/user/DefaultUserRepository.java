@@ -115,7 +115,7 @@ public class DefaultUserRepository implements UserRepository {
     }
 
     @Override
-    public String getUserName() {
+    public String getUserId() {
         final ServiceAndUserDetails serviceAndUser = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return serviceAndUser.getUsername();
     }

@@ -72,7 +72,7 @@ public class AuthorisedGetCaseOperation implements GetCaseOperation {
     private Set<String> getUserRoles(String caseId) {
         return Sets.union(userRepository.getUserRoles(),
             caseUserRepository
-                .findCaseRolesUserHasForACase(Long.valueOf(caseId), userRepository.getUserName())
+                .findCaseRoles(Long.valueOf(caseId), userRepository.getUserId())
                 .stream()
                 .collect(Collectors.toSet()));
     }

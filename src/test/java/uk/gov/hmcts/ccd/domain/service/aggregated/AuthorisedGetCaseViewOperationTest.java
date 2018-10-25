@@ -56,7 +56,7 @@ class AuthorisedGetCaseViewOperationTest {
     private static final String CASE_REFERENCE = "1111222233334444";
     private static final Long EVENT_ID = 100L;
     private static final String STATE = "Plop";
-    private static final String USERNAME = "26";
+    private static final String USER_ID = "26";
     private static final ProfileCaseState caseState = new ProfileCaseState(STATE, STATE, STATE, STATE);
     private static final String ROLE_IN_USER_ROLES = "caseworker-probate-loa1";
     private static final String ROLE_IN_USER_ROLES_2 = "caseworker-divorce-loa";
@@ -113,7 +113,7 @@ class AuthorisedGetCaseViewOperationTest {
 
         doReturn(TEST_CASE_TYPE).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         doReturn(USER_ROLES).when(userRepository).getUserRoles();
-        doReturn(USERNAME).when(userRepository).getUserName();
+        doReturn(USER_ID).when(userRepository).getUserId();
         doReturn(Optional.of(CASE_DETAILS)).when(caseDetailsRepository).findByReference(JURISDICTION_ID, Long.valueOf(CASE_REFERENCE));
 
         TEST_CASE_VIEW.setCaseType(TEST_CASE_VIEW_TYPE);
@@ -194,7 +194,7 @@ class AuthorisedGetCaseViewOperationTest {
     @Test
     @DisplayName("get User Roles must merge user roles and case roles")
     void shouldMergeRoles() {
-        doReturn(Arrays.asList(ROLE_IN_CASE_ROLES, ROLE_IN_CASE_ROLES_2)).when(caseUserRepository).findCaseRolesUserHasForACase(Long.valueOf(CASE_REFERENCE), USERNAME);
+        doReturn(Arrays.asList(ROLE_IN_CASE_ROLES, ROLE_IN_CASE_ROLES_2)).when(caseUserRepository).findCaseRoles(Long.valueOf(CASE_REFERENCE), USER_ID);
 
         Set<String> userRoles = authorisedGetCaseViewOperation.getUserRoles(CASE_REFERENCE);
 

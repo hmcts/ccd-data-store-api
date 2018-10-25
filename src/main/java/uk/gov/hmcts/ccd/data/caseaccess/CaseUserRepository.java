@@ -44,7 +44,7 @@ public class CaseUserRepository {
         return namedQuery.getResultList();
     }
 
-    public List<String> findCaseRolesUserHasForACase(final Long caseId, final String userId) {
+    public List<String> findCaseRoles(final Long caseId, final String userId) {
         TypedQuery<String> namedQuery = em.createNamedQuery(CaseUserEntity.GET_ALL_CASE_ROLES_USER_HAS_ACCESS_FOR_A_CASE, String.class);
         namedQuery.setParameter("userId", userId);
         namedQuery.setParameter("caseDataId", caseId);
