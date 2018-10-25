@@ -71,7 +71,7 @@ public class CallbackInvoker {
         final Optional<CallbackResponse> callbackResponse = callbackService.send(
             eventTrigger.getCallBackURLAboutToSubmitEvent(),
             eventTrigger.getRetriesTimeoutURLAboutToSubmitEvent(),
-            eventTrigger, caseDetailsBefore, caseDetails);
+            eventTrigger, caseDetailsBefore, caseDetails,ignoreWarning);
 
         if (callbackResponse.isPresent()) {
             return validateAndSetFromAboutToSubmitCallback(caseType,

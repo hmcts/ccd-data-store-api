@@ -79,6 +79,32 @@ public class CallbackService {
         throw new CallbackException("Unsuccessful callback to " + url);
     }
 
+    public Optional<CallbackResponse> send(final String url,
+                                           final List<Integer> callbackRetries,
+                                           final CaseEvent caseEvent,
+                                           final CaseDetails caseDetailsBefore,
+                                           final CaseDetails caseDetails,
+                                           final Boolean ignoreWarning) {
+
+        if (url == null || url.isEmpty()) {
+            return Optional.empty();
+        }
+
+        final CallbackRequest callbackRequest = new CallbackRequest(caseDetails, caseDetailsBefore, caseEvent.getId(),ignoreWarning);
+        final List<Integer> retries = CollectionUtils.isEmpty(callbackRetries) ? defaultRetries : callbackRetries;
+
+        for (Integer timeout : retries) {
+            final Optional<ResponseEntity<CallbackResponse>> responseEntity = sendRequest(url,
+                CallbackResponse.class,
+                callbackRequest,
+                timeout);
+            if (responseEntity.isPresent()) {
+                return Optional.of(responseEntity.get().getBody());
+            }
+        }
+        throw new CallbackException("Unsuccessful callback to " + url);
+    }
+
     public <T> ResponseEntity<T> send(final String url,
                                       final List<Integer> callbackRetries,
                                       final CaseEvent caseEvent,

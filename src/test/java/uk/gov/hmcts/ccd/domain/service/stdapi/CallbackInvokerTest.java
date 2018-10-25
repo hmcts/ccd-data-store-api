@@ -94,6 +94,12 @@ class CallbackInvokerTest {
                                                               same(caseEvent),
                                                               same(caseDetailsBefore),
                                                               same(caseDetails));
+        doReturn(Optional.empty()).when(callbackService).send(any(),
+            any(),
+            same(caseEvent),
+            same(caseDetailsBefore),
+            same(caseDetails),
+            anyBoolean());
 
         inOrder = inOrder(callbackService,
                                   caseTypeService,
@@ -134,7 +140,8 @@ class CallbackInvokerTest {
                                          RETRIES_ABOUT_TO_SUBMIT,
                                          caseEvent,
                                          caseDetailsBefore,
-                                         caseDetails);
+                                         caseDetails,
+                                         IGNORE_WARNING);
             assertThat(response.getState().isPresent(), is(false));
         }
 
