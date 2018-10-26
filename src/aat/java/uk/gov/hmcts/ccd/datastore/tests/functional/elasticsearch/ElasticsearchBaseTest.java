@@ -41,10 +41,10 @@ abstract class ElasticsearchBaseTest extends BaseTest {
     }
 
     ValidatableResponse searchCaseAsPrivateCaseWorker(String jsonSearchRequest) {
-        return searchCase(asPrivateTestCaseworker(false), jsonSearchRequest);
+        return searchCase(asPrivateCaseworker(false), jsonSearchRequest);
     }
 
-    private ValidatableResponse searchCase(Supplier<RequestSpecification> requestSpecification, String jsonSearchRequest) {
+    ValidatableResponse searchCase(Supplier<RequestSpecification> requestSpecification, String jsonSearchRequest) {
         return requestSpecification.get()
             .given()
             .log()

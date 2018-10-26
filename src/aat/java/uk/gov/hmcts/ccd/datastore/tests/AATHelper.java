@@ -33,14 +33,6 @@ public enum AATHelper {
         return Env.require("S2S_URL");
     }
 
-    public String getCaseworkerAutoTestEmail() {
-        return Env.require("CCD_CASEWORKER_AUTOTEST_EMAIL");
-    }
-
-    public String getCaseworkerAutoTestPassword() {
-        return Env.require("CCD_CASEWORKER_AUTOTEST_PASSWORD");
-    }
-
     public String getGatewayServiceName() {
         return Env.require("CCD_GW_SERVICE_NAME");
     }
@@ -61,6 +53,14 @@ public enum AATHelper {
         return ccdHelper;
     }
 
+    public String getCaseworkerAutoTestEmail() {
+        return Env.require("CCD_CASEWORKER_AUTOTEST_EMAIL");
+    }
+
+    public String getCaseworkerAutoTestPassword() {
+        return Env.require("CCD_CASEWORKER_AUTOTEST_PASSWORD");
+    }
+
     public String getDefinitionStoreUrl() {
         return Env.require("CCD_DEFINITION_STORE_URL");
     }
@@ -73,12 +73,32 @@ public enum AATHelper {
         return Env.require("CCD_IMPORT_AUTOTEST_PASSWORD");
     }
 
-    public String getCaseworkerTestPrivateEmail() {
-        return Env.require("CCD_CASEWORKER_TEST_PRIVATE_EMAIL");
+    public String getPrivateCaseworkerEmail() {
+        return Env.require("CCD_PRIVATE_CASEWORKER_EMAIL");
     }
 
-    public String getCaseworkerTestPrivatePassword() {
-        return Env.require("CCD_CASEWORKER_TEST_PRIVATE_PASSWORD");
+    public String getPrivateCaseworkerPassword() {
+        return Env.require("CCD_PRIVATE_CASEWORKER_PASSWORD");
+    }
+
+    public String getRestrictedCaseworkerEmail() {
+        return Env.require("CCD_RESTRICTED_CASEWORKER_EMAIL");
+    }
+
+    public String getRestrictedCaseworkerPassword() {
+        return Env.require("CCD_RESTRICTED_CASEWORKER_PASSWORD");
+    }
+
+    public String getPrivateCaseworkerSolicitorEmail() {
+        return Env.require("CCD_PRIVATE_CASEWORKER_SOLICITOR_EMAIL");
+    }
+
+    public String getPrivateCaseworkerSolicitorPassword() {
+        return Env.require("CCD_PRIVATE_CASEWORKER_SOLICITOR_PASSWORD");
+    }
+
+    public String getCaseworkerTestPrivateSolicitorPassword() {
+        return Env.require("CCD_CASEWORKER_TEST_PRIVATE_SOLICITOR_PASSWORD");
     }
 
     public String getElasticsearchBaseUri() {

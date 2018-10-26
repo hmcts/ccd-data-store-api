@@ -164,7 +164,7 @@ class ElasticsearchCaseSearchTest extends ElasticsearchBaseTest {
     private void createAndUpdateCase() {
         Long caseReference = createCase(EmptyCase.build());
         Event.startProgress(AAT_PRIVATE_CASE_TYPE, caseReference)
-            .as(asPrivateTestCaseworker(true))
+            .as(asPrivateCaseworker(true))
             .submit()
             .then()
             .statusCode(201)
@@ -174,7 +174,7 @@ class ElasticsearchCaseSearchTest extends ElasticsearchBaseTest {
 
     private Long createCase(CaseData caseData) {
         return Event.create(AAT_PRIVATE_CASE_TYPE)
-            .as(asPrivateTestCaseworker(true))
+            .as(asPrivateCaseworker(true))
             .withData(caseData)
             .submitAndGetReference();
     }

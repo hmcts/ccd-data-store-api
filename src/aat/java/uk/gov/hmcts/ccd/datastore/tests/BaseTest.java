@@ -28,8 +28,16 @@ public abstract class BaseTest {
         return asUser(aat.getCaseworkerAutoTestEmail(), aat.getCaseworkerAutoTestPassword(), withUserParam);
     }
 
-    protected Supplier<RequestSpecification> asPrivateTestCaseworker(boolean withUserParam) {
-        return asUser(aat.getCaseworkerTestPrivateEmail(), aat.getCaseworkerTestPrivatePassword(), withUserParam);
+    protected Supplier<RequestSpecification> asPrivateCaseworker(boolean withUserParam) {
+        return asUser(aat.getPrivateCaseworkerEmail(), aat.getPrivateCaseworkerPassword(), withUserParam);
+    }
+
+    protected Supplier<RequestSpecification> asRestrictedCaseworker(boolean withUserParam) {
+        return asUser(aat.getRestrictedCaseworkerEmail(), aat.getRestrictedCaseworkerPassword(), withUserParam);
+    }
+
+    protected Supplier<RequestSpecification> asPrivateCaseworkerSolicitor(boolean withUserParam) {
+        return asUser(aat.getPrivateCaseworkerSolicitorEmail(), aat.getCaseworkerTestPrivateSolicitorPassword(), withUserParam);
     }
 
     private Supplier<RequestSpecification> asUser(String username, String password, Boolean withUserParam) {
