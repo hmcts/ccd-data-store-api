@@ -89,10 +89,10 @@ public class CCDEventBuilder {
 
     public Long submitAndGetReference() {
         return submit().then()
-                       .log().ifError()
-                       .statusCode(201)
-                       .extract()
-                       .path("id");
+            .log().ifError()
+            .statusCode(201)
+            .extract()
+            .path("id");
     }
 
     private Boolean isUpdate() {
