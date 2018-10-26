@@ -18,9 +18,6 @@ import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ElasticsearchCaseSearchTest extends ElasticsearchBaseTest {
 
-    private static final String CASE_INDEX_NAME = "aat_private_cases-000001";
-    private static final String CASE_INDEX_ALIAS = "aat_private_cases";
-
     ElasticsearchCaseSearchTest(AATHelper aat) {
         super(aat);
     }
@@ -146,7 +143,7 @@ class ElasticsearchCaseSearchTest extends ElasticsearchBaseTest {
 
     @AfterAll
     void cleanUp() {
-        deleteIndexAndAlias(CASE_INDEX_NAME, CASE_INDEX_ALIAS);
+        deleteIndexAndAlias();
     }
 
     private void createCases() {

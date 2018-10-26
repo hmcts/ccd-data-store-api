@@ -21,8 +21,6 @@ import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ElasticsearchCaseSearchSecurityTest extends ElasticsearchBaseTest {
 
-    private static final String CASE_INDEX_NAME = "aat_private_cases-000001";
-    private static final String CASE_INDEX_ALIAS = "aat_private_cases";
     private static final String ES_FIELD_CASE_REFERENCE = "reference";
     private static final String ES_FIELD_EMAIL_ID = "EmailField";
     private static final String EMAIL_ID_VALUE = "functional@test.com";
@@ -59,7 +57,7 @@ class ElasticsearchCaseSearchSecurityTest extends ElasticsearchBaseTest {
             searchCaseAndAssertCaseNotReturned(asAutoTestCaseworker(false), ES_FIELD_CASE_REFERENCE, caseRefCaseTypeSecurityClassificationQuery);
         }
 
-        @Test
+        //@Test
         @DisplayName("should NOT return the case for a role with same security classification as case type and no read access on case type")
         void shouldNotReturnCaseForRoleWithoutReadAccessToCaseType() {
             //TODO
@@ -107,7 +105,7 @@ class ElasticsearchCaseSearchSecurityTest extends ElasticsearchBaseTest {
             response.body("cases[0].case_data", not(hasKey(ES_FIELD_EMAIL_ID)));
         }
 
-        @Test
+        //@Test
         @DisplayName("should NOT return the case field where user role does not have read access on the field")
         void shouldNotReturnCaseFieldForNoReadAccess() {
             //TODO
@@ -125,7 +123,7 @@ class ElasticsearchCaseSearchSecurityTest extends ElasticsearchBaseTest {
             //TODO
         }
 
-        @Test
+        //@Test
         @DisplayName("should NOT return the case for a solicitor role if mot granted access to the case")
         void shouldNotReturnCase() {
             //TODO
@@ -163,7 +161,7 @@ class ElasticsearchCaseSearchSecurityTest extends ElasticsearchBaseTest {
 
     @AfterAll
     void cleanUp() {
-        deleteIndexAndAlias(CASE_INDEX_NAME, CASE_INDEX_ALIAS);
+        deleteIndexAndAlias();
     }
 
     private void createCases() {

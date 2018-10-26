@@ -22,6 +22,8 @@ import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType;
 abstract class ElasticsearchBaseTest extends BaseTest {
 
     private static final String DEFINITION_FILE = "src/aat/resources/CCD_CNP_27.xlsx";
+    private static final String CASE_INDEX_NAME = "aat_private_cases-000001";
+    private static final String CASE_INDEX_ALIAS = "aat_private_cases";
 
     ElasticsearchBaseTest(AATHelper aat) {
         super(aat);
@@ -61,9 +63,9 @@ abstract class ElasticsearchBaseTest extends BaseTest {
             .statusCode(200);
     }
 
-    void deleteIndexAndAlias(String indexName, String indexAlias) {
-        deleteIndexAlias(indexName, indexAlias);
-        deleteIndex(indexName);
+    void deleteIndexAndAlias() {
+        deleteIndexAlias(CASE_INDEX_NAME, CASE_INDEX_ALIAS);
+        deleteIndex(CASE_INDEX_NAME);
     }
 
     private void deleteIndexAlias(String indexName, String indexAlias) {
