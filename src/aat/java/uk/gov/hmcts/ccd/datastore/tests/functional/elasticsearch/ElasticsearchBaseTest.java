@@ -13,8 +13,11 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
+import org.hamcrest.Matchers;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.BaseTest;
+import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder;
+import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType;
 
 abstract class ElasticsearchBaseTest extends BaseTest {
 
@@ -48,7 +51,7 @@ abstract class ElasticsearchBaseTest extends BaseTest {
         return requestSpecification.get()
             .given()
             .log()
-            .all()
+            .body()
             .queryParam("ctid", AAT_PRIVATE_CASE_TYPE)
             .contentType(ContentType.JSON)
             .body(jsonSearchRequest)
@@ -87,4 +90,31 @@ abstract class ElasticsearchBaseTest extends BaseTest {
                                      .build());
     }
 
+    Long createCaseAndProgressState(Supplier<RequestSpecification> asUser) {
+        Long caseReference = createCase(asUser, AATCaseBuilder.EmptyCase.build());
+        AATCaseType.Event.startProgress(AAT_PRIVATE_CASE_TYPE, caseReference)
+            .as(asUser)
+            .submit()
+            .then()
+            .statusCode(201)
+            .assertThat()
+            .body("state", Matchers.equalTo(AATCaseType.State.IN_PROGRESS));
+
+        return caseReference;
+    }
+
+    Long createCase(Supplier<RequestSpecification> asUser, AATCaseType.CaseData caseData) {
+        return AATCaseType.Event.create(AAT_PRIVATE_CASE_TYPE)
+            .as(asUser)
+            .withData(caseData)
+            .submitAndGetReference();
+    }
+
+    void sleep(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 }

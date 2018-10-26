@@ -37,7 +37,7 @@ public abstract class BaseTest {
     }
 
     protected Supplier<RequestSpecification> asPrivateCaseworkerSolicitor(boolean withUserParam) {
-        return asUser(aat.getPrivateCaseworkerSolicitorEmail(), aat.getCaseworkerTestPrivateSolicitorPassword(), withUserParam);
+        return asUser(aat.getPrivateCaseworkerSolicitorEmail(), aat.getPrivateCaseworkerSolicitorPassword(), withUserParam);
     }
 
     private Supplier<RequestSpecification> asUser(String username, String password, Boolean withUserParam) {

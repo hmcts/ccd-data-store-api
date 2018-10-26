@@ -3,9 +3,8 @@ package uk.gov.hmcts.ccd.datastore.tests.functional.elasticsearch;
 import java.util.function.Supplier;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.equalTo;
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.AAT_PRIVATE_CASE_TYPE;
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.Matchers.hasKey;
 
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
@@ -25,10 +24,13 @@ class ElasticsearchCaseSearchSecurityTest extends ElasticsearchBaseTest {
     private static final String CASE_INDEX_NAME = "aat_private_cases-000001";
     private static final String CASE_INDEX_ALIAS = "aat_private_cases";
     private static final String ES_FIELD_CASE_REFERENCE = "reference";
-    private static final String ES_FIELD_CASE_STATE = "state";
+    private static final String ES_FIELD_EMAIL_ID = "EmailField";
+    private static final String EMAIL_ID_VALUE = "functional@test.com";
+    private static final String CASE_ID = "id";
 
-    private String caseRefCaseTypeSecurityClassificationQuery;
-    private String caseRefCaseStateQuery;
+    private Long caseRefCaseTypeSecurityClassificationQuery;
+    private Long caseRefCaseStateSecurityQuery;
+    private Long caseRefCaseFieldSecurityQuery;
 
     ElasticsearchCaseSearchSecurityTest(AATHelper aat) {
         super(aat);
@@ -48,7 +50,7 @@ class ElasticsearchCaseSearchSecurityTest extends ElasticsearchBaseTest {
         @Test
         @DisplayName("should return the case for a role with same security classification as case type classification and read access on case type")
         void shouldReturnCaseForPrivateUser() {
-            searchCaseAndAssertCaseReturned(asPrivateCaseworker(false), ES_FIELD_CASE_REFERENCE, caseRefCaseTypeSecurityClassificationQuery);
+            searchCaseAndAssertCaseReference(asPrivateCaseworker(false), ES_FIELD_CASE_REFERENCE, caseRefCaseTypeSecurityClassificationQuery);
         }
 
         @Test
@@ -72,38 +74,88 @@ class ElasticsearchCaseSearchSecurityTest extends ElasticsearchBaseTest {
         @Test
         @DisplayName("should return the case for a role with read access to the case state")
         void shouldReturnCase() {
-            searchCaseAndAssertCaseReturned(asPrivateCaseworker(false), ES_FIELD_CASE_REFERENCE, caseRefCaseStateQuery);
+            searchCaseAndAssertCaseReference(asPrivateCaseworker(false), ES_FIELD_CASE_REFERENCE, caseRefCaseStateSecurityQuery);
         }
 
         @Test
         @DisplayName("should NOT return the case for a role with no read access to a case state")
         void shouldNotReturnCase() {
-            searchCaseAndAssertCaseNotReturned(asAutoTestCaseworker(false), ES_FIELD_CASE_REFERENCE, caseRefCaseStateQuery);
+            searchCaseAndAssertCaseNotReturned(asPrivateCaseworkerSolicitor(false), ES_FIELD_CASE_REFERENCE, caseRefCaseStateSecurityQuery);
         }
 
     }
 
-    private void searchCaseAndAssertCaseReturned(Supplier<RequestSpecification> asUser, String field, String value) {
-        ValidatableResponse response = searchCase(asUser, field, value);
-        response.body("cases.size()", is(1));
-        response.body("cases[0]." + field, is(value));
+    @Nested
+    @DisplayName("Case field security")
+    class CaseFieldSecurity {
+
+        @Test
+        @DisplayName("should return the case field where user role matches ACL and security classification")
+        void shouldReturnCaseField() {
+            ValidatableResponse response = searchCaseAndAssertCaseReference(asRestrictedCaseworker(false),
+                                                                            ES_FIELD_CASE_REFERENCE,
+                                                                            caseRefCaseFieldSecurityQuery);
+            response.body("cases[0].case_data." + ES_FIELD_EMAIL_ID, is(EMAIL_ID_VALUE));
+        }
+
+        @Test
+        @DisplayName("should NOT return the case field where user role has lower security classification than case field")
+        void shouldNotReturnCaseFieldForLowerSecurityClassification() {
+            ValidatableResponse response = searchCaseAndAssertCaseReference(asPrivateCaseworker(false),
+                                                                            ES_FIELD_CASE_REFERENCE,
+                                                                            caseRefCaseFieldSecurityQuery);
+            response.body("cases[0].case_data", not(hasKey(ES_FIELD_EMAIL_ID)));
+        }
+
+        @Test
+        @DisplayName("should NOT return the case field where user role does not have read access on the field")
+        void shouldNotReturnCaseFieldForNoReadAccess() {
+            //TODO
+        }
+
     }
 
-    private void searchCaseAndAssertCaseNotReturned(Supplier<RequestSpecification> asUser, String field, String value) {
+    @Nested
+    @DisplayName("User access security")
+    class UserAccessSecurity {
+
+        @Test
+        @DisplayName("should return the case for a solicitor role if granted access to the case")
+        void shouldReturnCase() {
+            //TODO
+        }
+
+        @Test
+        @DisplayName("should NOT return the case for a solicitor role if mot granted access to the case")
+        void shouldNotReturnCase() {
+            //TODO
+        }
+
+    }
+
+    private ValidatableResponse searchCaseAndAssertCaseReference(Supplier<RequestSpecification> asUser, String field, Object value) {
+        ValidatableResponse response = searchCase(asUser, field, value);
+        response.body("cases.size()", is(1));
+        response.body("cases[0]." + CASE_ID, is(value));
+
+        return response;
+    }
+
+    private void searchCaseAndAssertCaseNotReturned(Supplier<RequestSpecification> asUser, String field, Object value) {
         ValidatableResponse response = searchCase(asUser, field, value);
         response.body("cases.size()", is(0));
     }
 
-    private ValidatableResponse searchCase(Supplier<RequestSpecification> asUser, String field, String value) {
+    private ValidatableResponse searchCase(Supplier<RequestSpecification> asUser, String field, Object value) {
         String jsonSearchRequest = createExactMatchSearchRequest(field, value);
         return searchCase(asUser, jsonSearchRequest);
     }
 
-    private String createExactMatchSearchRequest(String field, String value) {
+    private String createExactMatchSearchRequest(String field, Object value) {
         return "{"
             + "  \"query\": {"
             + "    \"match\": {"
-            + "    \"" + field + "\" : \"" + value + "\""
+            + "    \"" + field + "\" : \"" + String.valueOf(value) + "\""
             + "    }"
             + "  }"
             + "}";
@@ -115,38 +167,13 @@ class ElasticsearchCaseSearchSecurityTest extends ElasticsearchBaseTest {
     }
 
     private void createCases() {
-        caseRefCaseTypeSecurityClassificationQuery = String.valueOf(createCase(asPrivateCaseworker(true)));
-        caseRefCaseStateQuery = String.valueOf(createCaseAndProgressState(asPrivateCaseworker(true)));
+        caseRefCaseTypeSecurityClassificationQuery = createCase(asPrivateCaseworker(true), AATCaseBuilder.EmptyCase.build());
+        caseRefCaseStateSecurityQuery = createCaseAndProgressState(asPrivateCaseworker(true));
+        caseRefCaseFieldSecurityQuery = createCase(asRestrictedCaseworker(true),
+                                                   AATCaseType.CaseData.builder().emailField(EMAIL_ID_VALUE).build());
 
         // wait until logstash reads the case data
         sleep(aat.getLogstashReadDelay());
     }
 
-    private Long createCaseAndProgressState(Supplier<RequestSpecification> asUser) {
-        Long caseReference = createCase(asUser);
-        Event.startProgress(AAT_PRIVATE_CASE_TYPE, caseReference)
-            .as(asPrivateCaseworker(true))
-            .submit()
-            .then()
-            .statusCode(201)
-            .assertThat()
-            .body("state", equalTo(AATCaseType.State.IN_PROGRESS));
-
-        return caseReference;
-    }
-
-    private Long createCase(Supplier<RequestSpecification> asUser) {
-        return Event.create(AAT_PRIVATE_CASE_TYPE)
-            .as(asUser)
-            .withData(AATCaseBuilder.EmptyCase.build())
-            .submitAndGetReference();
-    }
-
-    private void sleep(long millis) {
-        try {
-            Thread.sleep(millis);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
 }

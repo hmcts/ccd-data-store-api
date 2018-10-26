@@ -1,14 +1,9 @@
 package uk.gov.hmcts.ccd.datastore.tests.functional.elasticsearch;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.equalTo;
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.EmptyCase;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FullCase;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FullCase.DATE_TIME;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FullCase.TEXT;
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.AAT_PRIVATE_CASE_TYPE;
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CaseData;
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.State;
 
 import io.restassured.response.ValidatableResponse;
@@ -155,35 +150,11 @@ class ElasticsearchCaseSearchTest extends ElasticsearchBaseTest {
     }
 
     private void createCases() {
-        createAndUpdateCase();
-        createCase(FullCase.build());
+        createCaseAndProgressState(asPrivateCaseworker(true));
+        createCase(asPrivateCaseworker(true), FullCase.build());
+
         // wait until logstash reads the case data
         sleep(aat.getLogstashReadDelay());
     }
 
-    private void createAndUpdateCase() {
-        Long caseReference = createCase(EmptyCase.build());
-        Event.startProgress(AAT_PRIVATE_CASE_TYPE, caseReference)
-            .as(asPrivateCaseworker(true))
-            .submit()
-            .then()
-            .statusCode(201)
-            .assertThat()
-            .body("state", equalTo(State.IN_PROGRESS));
-    }
-
-    private Long createCase(CaseData caseData) {
-        return Event.create(AAT_PRIVATE_CASE_TYPE)
-            .as(asPrivateCaseworker(true))
-            .withData(caseData)
-            .submitAndGetReference();
-    }
-
-    private void sleep(long millis) {
-        try {
-            Thread.sleep(millis);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
 }

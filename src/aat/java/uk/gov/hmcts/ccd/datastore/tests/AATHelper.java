@@ -97,10 +97,6 @@ public enum AATHelper {
         return Env.require("CCD_PRIVATE_CASEWORKER_SOLICITOR_PASSWORD");
     }
 
-    public String getCaseworkerTestPrivateSolicitorPassword() {
-        return Env.require("CCD_CASEWORKER_TEST_PRIVATE_SOLICITOR_PASSWORD");
-    }
-
     public String getElasticsearchBaseUri() {
         return Env.require("ELASTIC_SEARCH_SCHEME") + "://" + Env.require("ELASTIC_SEARCH_HOST") + ":" + Env.require("ELASTIC_SEARCH_PORT");
     }
