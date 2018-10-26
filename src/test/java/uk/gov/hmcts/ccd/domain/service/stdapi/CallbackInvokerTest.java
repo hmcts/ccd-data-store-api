@@ -428,11 +428,10 @@ class CallbackInvokerTest {
                     .when(callbackService).validateCallbackErrorsAndWarnings(any(), any());
 
                 final ApiException apiException =
-                    assertThrows(ApiException.class,
-                                 () -> callbackInvoker.invokeAboutToStartCallback(caseEvent,
-                                                                                  caseType,
-                                                                                  caseDetails,
-                                                                                  TRUE));
+                    assertThrows(ApiException.class, () -> callbackInvoker.invokeAboutToStartCallback(caseEvent,
+                                                                                                      caseType,
+                                                                                                      caseDetails,
+                                                                                                      TRUE));
 
                 assertThat(apiException.getMessage(), is(ErrorMessage));
 
@@ -586,12 +585,11 @@ class CallbackInvokerTest {
                 doThrow(new ApiException(errorMessage))
                     .when(callbackService).validateCallbackErrorsAndWarnings(any(), any());
                 final ApiException apiException =
-                    assertThrows(ApiException.class,
-                                 () -> callbackInvoker.invokeAboutToSubmitCallback(caseEvent,
-                                                                                   caseDetailsBefore,
-                                                                                   caseDetails,
-                                                                                   caseType,
-                                                                                   TRUE));
+                    assertThrows(ApiException.class, () -> callbackInvoker.invokeAboutToSubmitCallback(caseEvent,
+                                                                                                       caseDetailsBefore,
+                                                                                                       caseDetails,
+                                                                                                       caseType,
+                                                                                                       TRUE));
 
                 assertAll(
                     () -> assertThat(apiException.getMessage(), is(errorMessage)),
