@@ -12,7 +12,7 @@ import java.util.List;
 @Named("TextValidator")
 @Singleton
 public class TextValidator implements BaseTypeValidator {
-    private static final String TYPE_ID = "Text";
+    public static final String TYPE_ID = "Text";
 
     @Override
     public BaseType getType() {
