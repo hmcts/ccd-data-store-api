@@ -124,7 +124,7 @@ class ElasticsearchCaseSearchSecurityTest extends ElasticsearchBaseTest {
         }
 
         //@Test
-        @DisplayName("should NOT return the case for a solicitor role if mot granted access to the case")
+        @DisplayName("should NOT return the case for a solicitor role if not granted access to the case")
         void shouldNotReturnCase() {
             //TODO
         }
