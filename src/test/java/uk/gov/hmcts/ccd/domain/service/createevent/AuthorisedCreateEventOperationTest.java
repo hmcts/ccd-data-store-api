@@ -1,5 +1,21 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
+import java.util.*;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,6 +30,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
+import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -22,20 +40,10 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
-
-import java.util.*;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.*;
 
 class AuthorisedCreateEventOperationTest {
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -52,6 +60,7 @@ class AuthorisedCreateEventOperationTest {
     private static final String UID = "123";
     private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_TYPE_ID = "Grant";
+    private static final String CASE_ID = "26";
     private static final String CASE_REFERENCE = "123456789012345";
     private static final String STATE_ID = "STATE_1";
     private static final Event EVENT = anEvent().build();
@@ -76,6 +85,15 @@ class AuthorisedCreateEventOperationTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private CaseUserRepository caseUserRepository;
+
+    @Mock
+    private CaseDetailsRepository caseDetailsRepository;
+
+    @Mock
+    private UIDService uidService;
+
     private AuthorisedCreateEventOperation authorisedCreateEventOperation;
     private CaseDetails classifiedCase;
     private JsonNode authorisedCaseNode;
@@ -88,12 +106,20 @@ class AuthorisedCreateEventOperationTest {
         MockitoAnnotations.initMocks(this);
         EVENT.setEventId(EVENT_ID);
         authorisedCreateEventOperation = new AuthorisedCreateEventOperation(
-            createEventOperation, getCaseOperation, caseDefinitionRepository, accessControlService, userRepository);
+            createEventOperation,
+            getCaseOperation,
+            caseDefinitionRepository,
+            accessControlService,
+            userRepository,
+            caseUserRepository,
+            caseDetailsRepository,
+            uidService);
 
         CaseDetails existingCase = new CaseDetails();
         Map<String, JsonNode> existingData = Maps.newHashMap();
         existingCase.setState(STATE_ID);
         existingCase.setData(existingData);
+        existingCase.setId(CASE_ID);
         when(getCaseOperation.execute(CASE_REFERENCE)).thenReturn(Optional.of(existingCase));
 
         classifiedCase = new CaseDetails();
@@ -110,7 +136,9 @@ class AuthorisedCreateEventOperationTest {
         caseType.setEvents(events);
         caseType.setCaseFields(caseFields);
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseType);
+        when(caseDetailsRepository.findByReference(JURISDICTION_ID, Long.valueOf(CASE_REFERENCE))).thenReturn(Optional.of(existingCase));
         when(userRepository.getUserRoles()).thenReturn(USER_ROLES);
+        doReturn(true).when(uidService).validateUID(CASE_REFERENCE);
         when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseType), eq(USER_ROLES), eq(CAN_UPDATE))).thenReturn(
             true);
         when(accessControlService.canAccessCaseStateWithCriteria(eq(STATE_ID), eq(caseType), eq(USER_ROLES), eq(CAN_UPDATE))).thenReturn(
@@ -290,7 +318,7 @@ class AuthorisedCreateEventOperationTest {
     @DisplayName("should fail if user roles not found")
     void shouldFailIfNoUserRolesFound() {
 
-        doReturn(null).when(userRepository).getUserRoles();
+        doReturn(Collections.EMPTY_SET).when(userRepository).getUserRoles();
 
         assertThrows(ValidationException.class, () -> authorisedCreateEventOperation.createCaseEvent(UID,
                                                                                                      JURISDICTION_ID,
@@ -306,8 +334,7 @@ class AuthorisedCreateEventOperationTest {
     @DisplayName("should fail if no update case access")
     void shouldFailIfNoUpdateCaseAccess() {
 
-        when(accessControlService.canAccessCaseTypeWithCriteria(caseType, USER_ROLES, CAN_UPDATE)).thenReturn(
-            false);
+        when(accessControlService.canAccessCaseTypeWithCriteria(caseType, USER_ROLES, CAN_UPDATE)).thenReturn(false);
 
         assertThrows(ResourceNotFoundException.class, () -> authorisedCreateEventOperation.createCaseEvent(UID,
                                                                                                            JURISDICTION_ID,

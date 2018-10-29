@@ -1,32 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.collect.Sets;
-import org.assertj.core.util.Lists;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.mockito.InOrder;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
-import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
-import uk.gov.hmcts.ccd.domain.model.std.Event;
-import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
-import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
-import uk.gov.hmcts.ccd.domain.service.common.UIDService;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
-
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -40,6 +14,32 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CR
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.Sets;
+import org.assertj.core.util.Lists;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
+import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
+import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+
 class AuthorisedGetEventTriggerOperationTest {
 
     private static final String CASEWORKER_PROBATE_LOA1 = "caseworker-probate-loa1";
@@ -50,23 +50,26 @@ class AuthorisedGetEventTriggerOperationTest {
     private static final String UID = "123";
     private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_REFERENCE = "1234567891012345";
+    private static final String CASE_ID = "26";
     private static final Long CASE_REFERENCE_LONG = 1234567891012345L;
     private static final String CASE_TYPE_ID = "Grant";
     private static final String STATE = "CaseCreated";
-    private static final Map<String, JsonNode> DATA = new HashMap<>();
     private static final Boolean IGNORE = Boolean.TRUE;
-    private static final Event NULL_EVENT = null;
 
     @Mock
     private GetEventTriggerOperation getEventTriggerOperation;
 
     @Mock
     private CaseDefinitionRepository caseDefinitionRepository;
+
     @Mock
     private CaseDetailsRepository caseDetailsRepository;
 
     @Mock
     private AccessControlService accessControlService;
+
+    @Mock
+    private CaseUserRepository caseUserRepository;
 
     @Mock
     private UIDService uidService;
@@ -79,7 +82,6 @@ class AuthorisedGetEventTriggerOperationTest {
 
     private AuthorisedGetEventTriggerOperation authorisedGetEventTriggerOperation;
     private CaseEventTrigger caseEventTrigger;
-    private List<CaseViewField> caseViewFields;
     private final CaseDetails caseDetails = new CaseDetails();
     private final CaseType caseType = new CaseType();
     private final List<CaseField> caseFields = Lists.newArrayList();
@@ -96,6 +98,7 @@ class AuthorisedGetEventTriggerOperationTest {
             getEventTriggerOperation,
             caseDefinitionRepository,
             caseDetailsRepository,
+            caseUserRepository,
             userRepository,
             accessControlService,
             eventTriggerService,
@@ -107,6 +110,7 @@ class AuthorisedGetEventTriggerOperationTest {
         caseType.setCaseFields(caseFields);
         caseDetails.setReference(CASE_REFERENCE_LONG);
         caseDetails.setState(STATE);
+        caseDetails.setId(CASE_ID);
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseType);
         when(userRepository.getUserRoles()).thenReturn(userRoles);
         when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseType),

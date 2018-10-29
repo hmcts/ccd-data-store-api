@@ -1,10 +1,22 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.*;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
+import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
+import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
@@ -13,15 +25,12 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.*;
 
 @Service
 @Qualifier("authorised")
@@ -36,18 +45,27 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
     private final GetCaseOperation getCaseOperation;
     private final AccessControlService accessControlService;
     private final UserRepository userRepository;
+    private final CaseUserRepository caseUserRepository;
+    private final CaseDetailsRepository caseDetailsRepository;
+    private final UIDService uidService;
 
     public AuthorisedCreateEventOperation(@Qualifier("classified") final CreateEventOperation createEventOperation,
                                           @Qualifier("default") final GetCaseOperation getCaseOperation,
                                           @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
                                           final AccessControlService accessControlService,
-                                          @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository) {
+                                          @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
+                                          CaseUserRepository caseUserRepository,
+                                          final @Qualifier(CachedCaseDetailsRepository.QUALIFIER) CaseDetailsRepository caseDetailsRepository,
+                                          UIDService uidService) {
 
         this.createEventOperation = createEventOperation;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.getCaseOperation = getCaseOperation;
         this.accessControlService = accessControlService;
         this.userRepository = userRepository;
+        this.caseUserRepository = caseUserRepository;
+        this.caseDetailsRepository = caseDetailsRepository;
+        this.uidService = uidService;
     }
 
     @Override
@@ -64,8 +82,12 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
             throw new ValidationException("Cannot find case type definition for  " + caseTypeId);
         }
 
-        Set<String> userRoles = userRepository.getUserRoles();
-        if (userRoles == null) {
+        if (!uidService.validateUID(caseReference)) {
+            throw new BadRequestException("Case reference " + caseReference + " is not valid");
+        }
+
+        Set<String> userRoles = Sets.union(userRepository.getUserRoles(), getCaseRoles(getCaseId(jurisdictionId, caseReference)));
+        if (userRoles == null || userRoles.isEmpty()) {
             throw new ValidationException("Cannot find user roles for the user");
         }
 
@@ -111,6 +133,20 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
                 STRING_JSON_MAP));
         }
         return caseDetails;
+    }
+
+    private Set<String> getCaseRoles(String caseId) {
+        return caseUserRepository
+            .findCaseRoles(Long.valueOf(caseId), userRepository.getUserId())
+            .stream()
+            .collect(Collectors.toSet());
+    }
+
+    protected String getCaseId(String jurisdictionId, String caseReference) {
+        Optional<CaseDetails> caseDetails = this.caseDetailsRepository.findByReference(jurisdictionId, Long.valueOf(caseReference));
+        return caseDetails
+            .orElseThrow(() -> new CaseNotFoundException(caseReference))
+            .getId();
     }
 
     private void verifyUpsertAccess(Event event, Map<String, JsonNode> newData, CaseDetails existingCaseDetails, CaseType caseType, Set<String> userRoles) {
