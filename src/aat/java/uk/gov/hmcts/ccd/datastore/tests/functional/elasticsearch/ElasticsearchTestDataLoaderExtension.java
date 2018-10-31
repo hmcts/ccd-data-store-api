@@ -56,11 +56,11 @@ public class ElasticsearchTestDataLoaderExtension extends TestDataLoaderExtensio
     private void createCasesForCaseSearchSecurityTest() {
         TestData testData = TestData.getInstance();
 
-        testData.put(ElasticsearchCaseSearchSecurityTest.CASE_TYPE_SECURITY_TEST,
+        testData.put(ElasticsearchCaseSearchSecurityTest.CASE_TYPE_SECURITY_TEST_REFERENCE,
                      createCase(asPrivateCaseworker(true), AATCaseBuilder.EmptyCase.build()));
-        testData.put(ElasticsearchCaseSearchSecurityTest.CASE_STATE_SECURITY_TEST,
+        testData.put(ElasticsearchCaseSearchSecurityTest.CASE_STATE_SECURITY_TEST_REFERENCE,
                      createCaseAndProgressState(asPrivateCaseworker(true)));
-        testData.put(ElasticsearchCaseSearchSecurityTest.CASE_FIELD_SECURITY_TEST,
+        testData.put(ElasticsearchCaseSearchSecurityTest.CASE_FIELD_SECURITY_TEST_REFERENCE,
                      createCase(asRestrictedCaseworker(true),
                                 AATCaseType.CaseData.builder().emailField(ElasticsearchCaseSearchSecurityTest.EMAIL_ID_VALUE).build()));
     }

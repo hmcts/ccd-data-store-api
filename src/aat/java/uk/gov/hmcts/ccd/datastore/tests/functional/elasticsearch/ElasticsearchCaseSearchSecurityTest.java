@@ -18,9 +18,9 @@ import uk.gov.hmcts.ccd.datastore.tests.TestData;
 @ExtendWith(ElasticsearchTestDataLoaderExtension.class)
 class ElasticsearchCaseSearchSecurityTest extends ElasticsearchBaseTest {
 
-    static final String CASE_TYPE_SECURITY_TEST = TestData.uniqueReference();
-    static final String CASE_STATE_SECURITY_TEST = TestData.uniqueReference();
-    static final String CASE_FIELD_SECURITY_TEST = TestData.uniqueReference();
+    static final String CASE_TYPE_SECURITY_TEST_REFERENCE = TestData.uniqueReference();
+    static final String CASE_STATE_SECURITY_TEST_REFERENCE = TestData.uniqueReference();
+    static final String CASE_FIELD_SECURITY_TEST_REFERENCE = TestData.uniqueReference();
     static final String EMAIL_ID_VALUE = "functional@test.com";
 
     ElasticsearchCaseSearchSecurityTest(AATHelper aat) {
@@ -34,13 +34,13 @@ class ElasticsearchCaseSearchSecurityTest extends ElasticsearchBaseTest {
         @Test
         @DisplayName("should return the case for a role with same security classification as case type classification and read access on case type")
         void shouldReturnCaseForPrivateUser() {
-            searchCaseAndAssertCaseReference(asPrivateCaseworker(false), ES_FIELD_CASE_REFERENCE, testData.get(CASE_TYPE_SECURITY_TEST));
+            searchCaseAndAssertCaseReference(asPrivateCaseworker(false), ES_FIELD_CASE_REFERENCE, testData.get(CASE_TYPE_SECURITY_TEST_REFERENCE));
         }
 
         @Test
         @DisplayName("should NOT return the case for a role with read access on case type and lower security classification than then case type")
         void shouldNotReturnCaseForPublicUser() {
-            searchCaseAndAssertCaseNotReturned(asAutoTestCaseworker(false), ES_FIELD_CASE_REFERENCE, testData.get(CASE_TYPE_SECURITY_TEST));
+            searchCaseAndAssertCaseNotReturned(asAutoTestCaseworker(false), ES_FIELD_CASE_REFERENCE, testData.get(CASE_TYPE_SECURITY_TEST_REFERENCE));
         }
 
         //@Test
@@ -58,13 +58,13 @@ class ElasticsearchCaseSearchSecurityTest extends ElasticsearchBaseTest {
         @Test
         @DisplayName("should return the case for a role with read access to the case state")
         void shouldReturnCase() {
-            searchCaseAndAssertCaseReference(asPrivateCaseworker(false), ES_FIELD_CASE_REFERENCE, testData.get(CASE_STATE_SECURITY_TEST));
+            searchCaseAndAssertCaseReference(asPrivateCaseworker(false), ES_FIELD_CASE_REFERENCE, testData.get(CASE_STATE_SECURITY_TEST_REFERENCE));
         }
 
         @Test
         @DisplayName("should NOT return the case for a role with no read access to a case state")
         void shouldNotReturnCase() {
-            searchCaseAndAssertCaseNotReturned(asPrivateCaseworkerSolicitor(false), ES_FIELD_CASE_REFERENCE, testData.get(CASE_STATE_SECURITY_TEST));
+            searchCaseAndAssertCaseNotReturned(asPrivateCaseworkerSolicitor(false), ES_FIELD_CASE_REFERENCE, testData.get(CASE_STATE_SECURITY_TEST_REFERENCE));
         }
 
     }
@@ -78,7 +78,7 @@ class ElasticsearchCaseSearchSecurityTest extends ElasticsearchBaseTest {
         void shouldReturnCaseField() {
             ValidatableResponse response = searchCaseAndAssertCaseReference(asRestrictedCaseworker(false),
                                                                             ES_FIELD_CASE_REFERENCE,
-                                                                            testData.get(CASE_FIELD_SECURITY_TEST));
+                                                                            testData.get(CASE_FIELD_SECURITY_TEST_REFERENCE));
             response.body("cases[0]." + RESPONSE_CASE_DATA_FIELDS_PREFIX + ES_FIELD_EMAIL_ID, is(EMAIL_ID_VALUE));
         }
 
@@ -87,7 +87,7 @@ class ElasticsearchCaseSearchSecurityTest extends ElasticsearchBaseTest {
         void shouldNotReturnCaseFieldForLowerSecurityClassification() {
             ValidatableResponse response = searchCaseAndAssertCaseReference(asPrivateCaseworker(false),
                                                                             ES_FIELD_CASE_REFERENCE,
-                                                                            testData.get(CASE_FIELD_SECURITY_TEST));
+                                                                            testData.get(CASE_FIELD_SECURITY_TEST_REFERENCE));
             response.body("cases[0].case_data", not(hasKey(ES_FIELD_EMAIL_ID)));
         }
 
