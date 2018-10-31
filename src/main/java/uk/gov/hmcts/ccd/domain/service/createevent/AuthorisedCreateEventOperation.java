@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.*;
 
@@ -14,7 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleService;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
@@ -45,7 +44,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
     private final GetCaseOperation getCaseOperation;
     private final AccessControlService accessControlService;
     private final UserRepository userRepository;
-    private final CaseUserRepository caseUserRepository;
+    private final CaseRoleService caseRoleService;
     private final CaseDetailsRepository caseDetailsRepository;
     private final UIDService uidService;
 
@@ -54,7 +53,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
                                           @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
                                           final AccessControlService accessControlService,
                                           @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
-                                          CaseUserRepository caseUserRepository,
+                                          CaseRoleService caseRoleService,
                                           final @Qualifier(CachedCaseDetailsRepository.QUALIFIER) CaseDetailsRepository caseDetailsRepository,
                                           UIDService uidService) {
 
@@ -63,7 +62,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
         this.getCaseOperation = getCaseOperation;
         this.accessControlService = accessControlService;
         this.userRepository = userRepository;
-        this.caseUserRepository = caseUserRepository;
+        this.caseRoleService = caseRoleService;
         this.caseDetailsRepository = caseDetailsRepository;
         this.uidService = uidService;
     }
@@ -86,7 +85,8 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
             throw new BadRequestException("Case reference " + caseReference + " is not valid");
         }
 
-        Set<String> userRoles = Sets.union(userRepository.getUserRoles(), getCaseRoles(getCaseId(jurisdictionId, caseReference)));
+        Set<String> userRoles = Sets.union(userRepository.getUserRoles(),
+            caseRoleService.getCaseRoles(getCaseId(jurisdictionId, caseReference)));
         if (userRoles == null || userRoles.isEmpty()) {
             throw new ValidationException("Cannot find user roles for the user");
         }
@@ -135,12 +135,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
         return caseDetails;
     }
 
-    private Set<String> getCaseRoles(String caseId) {
-        return caseUserRepository
-            .findCaseRoles(Long.valueOf(caseId), userRepository.getUserId())
-            .stream()
-            .collect(Collectors.toSet());
-    }
+
 
     protected String getCaseId(String jurisdictionId, String caseReference) {
         Optional<CaseDetails> caseDetails = this.caseDetailsRepository.findByReference(jurisdictionId, Long.valueOf(caseReference));

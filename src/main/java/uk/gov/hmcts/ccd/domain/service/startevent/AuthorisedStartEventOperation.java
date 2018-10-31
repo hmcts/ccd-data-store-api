@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.domain.service.startevent;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.google.common.collect.Maps.newHashMap;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
@@ -14,7 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleService;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
@@ -37,19 +36,19 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final AccessControlService accessControlService;
     private final UserRepository userRepository;
-    private final CaseUserRepository caseUserRepository;
+    private final CaseRoleService caseRoleService;
 
     public AuthorisedStartEventOperation(@Qualifier("classified") final StartEventOperation startEventOperation,
                                          @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
                                          final AccessControlService accessControlService,
                                          @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
-                                         CaseUserRepository caseUserRepository) {
+                                         CaseRoleService caseRoleService) {
 
         this.startEventOperation = startEventOperation;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.accessControlService = accessControlService;
         this.userRepository = userRepository;
-        this.caseUserRepository = caseUserRepository;
+        this.caseRoleService = caseRoleService;
     }
 
     @Override
@@ -94,10 +93,7 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
         if (caseDetails == null || caseDetails.getId() == null) {
             return Collections.EMPTY_SET;
         } else {
-            return caseUserRepository
-                .findCaseRoles(Long.valueOf(caseDetails.getId()), userRepository.getUserId())
-                .stream()
-                .collect(Collectors.toSet());
+            return caseRoleService.getCaseRoles(caseDetails.getId());
         }
     }
 

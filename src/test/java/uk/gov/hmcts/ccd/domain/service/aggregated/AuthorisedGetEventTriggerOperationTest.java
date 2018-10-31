@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleService;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
@@ -69,7 +69,7 @@ class AuthorisedGetEventTriggerOperationTest {
     private AccessControlService accessControlService;
 
     @Mock
-    private CaseUserRepository caseUserRepository;
+    private CaseRoleService caseRoleService;
 
     @Mock
     private UIDService uidService;
@@ -98,7 +98,7 @@ class AuthorisedGetEventTriggerOperationTest {
             getEventTriggerOperation,
             caseDefinitionRepository,
             caseDetailsRepository,
-            caseUserRepository,
+            caseRoleService,
             userRepository,
             accessControlService,
             eventTriggerService,
