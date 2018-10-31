@@ -2,15 +2,12 @@ package uk.gov.hmcts.ccd.datastore.tests.functional.elasticsearch;
 
 import java.util.function.Supplier;
 
-import static java.util.Optional.ofNullable;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.AAT_PRIVATE_CASE_TYPE;
 
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
-import org.junit.jupiter.api.BeforeAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
@@ -35,14 +32,6 @@ abstract class ElasticsearchBaseTest extends BaseTest {
 
     ElasticsearchBaseTest(AATHelper aat) {
         super(aat);
-    }
-
-    @BeforeAll
-    static void assertElasticsearchEnabled() {
-        // stop execution of these tests if Elasticsearch is not enabled
-        LOG.info("ELASTIC_SEARCH_ENABLED: {}", System.getenv("ELASTIC_SEARCH_ENABLED"));
-        boolean elasticsearchEnabled = ofNullable(System.getenv("ELASTIC_SEARCH_ENABLED")).map(Boolean::valueOf).orElse(false);
-        assumeTrue(elasticsearchEnabled, () -> "Ignoring Elasticsearch tests, variable ELASTIC_SEARCH_ENABLED not set");
     }
 
     ValidatableResponse searchCase(Supplier<RequestSpecification> requestSpecification, String jsonSearchRequest) {

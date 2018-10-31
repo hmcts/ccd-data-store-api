@@ -11,11 +11,13 @@ import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.TestData;
 
 @ExtendWith(ElasticsearchTestDataLoaderExtension.class)
+@EnabledIfSystemProperty(named = "ELASTIC_SEARCH_ENABLED", matches = "true")
 class ElasticsearchCaseSearchSecurityTest extends ElasticsearchBaseTest {
 
     static final String CASE_TYPE_SECURITY_TEST_REFERENCE = TestData.uniqueReference();
