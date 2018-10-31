@@ -19,10 +19,10 @@ abstract class ElasticsearchBaseTest extends BaseTest {
 
     static final String CASE_DATA_FIELD_PREFIX = "data.";
     static final String RESPONSE_CASE_DATA_FIELDS_PREFIX = "case_data.";
+    static final String CASE_ID = "id";
     static final String ES_FIELD_STATE = "state";
     static final String ES_FIELD_CASE_REFERENCE = "reference";
     static final String ES_FIELD_EMAIL_ID = "EmailField";
-    static final String CASE_ID = "id";
 
     private static final String CASE_TYPE_ID_PARAM = "ctid";
     private static final String CASE_SEARCH_API = "/searchCases";
