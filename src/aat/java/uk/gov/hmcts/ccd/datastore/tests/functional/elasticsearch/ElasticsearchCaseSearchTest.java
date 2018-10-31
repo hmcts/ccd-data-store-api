@@ -1,32 +1,25 @@
 package uk.gov.hmcts.ccd.datastore.tests.functional.elasticsearch;
 
-import static org.hamcrest.CoreMatchers.is;
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FullCase;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FullCase.DATE_TIME;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FullCase.TEXT;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.State;
 
 import io.restassured.response.ValidatableResponse;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
+import uk.gov.hmcts.ccd.datastore.tests.TestData;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ExtendWith(ElasticsearchTestDataLoaderExtension.class)
 class ElasticsearchCaseSearchTest extends ElasticsearchBaseTest {
+
+    static final String SEARCH_UPDATED_CASE_TEST_REFERENCE = TestData.uniqueReference();
+    static final String EXACT_MATCH_TEST_REFERENCE = TestData.uniqueReference();
 
     ElasticsearchCaseSearchTest(AATHelper aat) {
         super(aat);
-    }
-
-    @BeforeAll
-    void setUp() {
-        assertElasticsearchEnabled();
-        importDefinition();
-        createCases();
     }
 
     @Nested
@@ -36,18 +29,14 @@ class ElasticsearchCaseSearchTest extends ElasticsearchBaseTest {
         @Test
         @DisplayName("should return updated case on search")
         void shouldReturnUpdatedCaseOnSearch() {
-            String jsonSearchRequest = "{"
-                + "  \"query\": {"
-                + "    \"match\": {"
-                + "    \"state\" : \"" + State.IN_PROGRESS + "\""
-                + "    }"
-                + "  }"
-                + "}";
+            Long caseReference = (Long) testData.get(SEARCH_UPDATED_CASE_TEST_REFERENCE);
+            String jsonSearchRequest = ElasticsearchSearchRequest.exactMatch(ES_FIELD_CASE_REFERENCE, caseReference);
 
-            ValidatableResponse response = searchCaseAsPrivateCaseWorker(jsonSearchRequest);
+            ValidatableResponse response = searchCase(asPrivateCaseworker(false), jsonSearchRequest);
 
-            response.body("cases.size()", is(1));
-            response.body("cases[0].state", is(State.IN_PROGRESS));
+            assertSingleCaseReturned(response);
+            assertField(response, ES_FIELD_STATE, State.IN_PROGRESS);
+            assertField(response, CASE_ID, caseReference);
         }
     }
 
@@ -78,27 +67,15 @@ class ElasticsearchCaseSearchTest extends ElasticsearchBaseTest {
         }
 
         private void searchCaseForExactMatchAndVerifyResponse(String field, String value) {
-            String jsonSearchRequest = createExactMatchSearchRequest(field, value);
+            String jsonSearchRequest = ElasticsearchSearchRequest.exactMatch(CASE_DATA_FIELD_PREFIX + field, value);
 
-            ValidatableResponse response = searchCaseAsPrivateCaseWorker(jsonSearchRequest);
+            ValidatableResponse response = searchCase(asPrivateCaseworker(false), jsonSearchRequest);
 
-            verifyExactMatchResponse(response, field, value);
+            assertSingleCaseReturned(response);
+            assertField(response, RESPONSE_CASE_DATA_FIELDS_PREFIX + field, value);
+            assertField(response, CASE_ID, testData.get(EXACT_MATCH_TEST_REFERENCE));
         }
 
-        private String createExactMatchSearchRequest(String field, String value) {
-            return "{"
-                + "  \"query\": {"
-                + "    \"match\": {"
-                + "    \"data." + field + "\" : \"" + value + "\""
-                + "    }"
-                + "  }"
-                + "}";
-        }
-
-        private void verifyExactMatchResponse(ValidatableResponse response, String field, String expectedValue) {
-            response.body("cases.size()", is(1));
-            response.body("cases[0].case_data." + field, is(expectedValue));
-        }
     }
 
     @Nested
@@ -118,40 +95,15 @@ class ElasticsearchCaseSearchTest extends ElasticsearchBaseTest {
         }
 
         private void searchCaseByWildcardAndVerifyResponse(String field, String wildcardExpr, String expectedValue) {
-            String jsonSearchRequest = createWildcardSearchRequest(field, wildcardExpr);
+            String jsonSearchRequest = ElasticsearchSearchRequest.wildcardMatch(CASE_DATA_FIELD_PREFIX + field, wildcardExpr);
 
-            ValidatableResponse response = searchCaseAsPrivateCaseWorker(jsonSearchRequest);
+            ValidatableResponse response = searchCase(asPrivateCaseworker(false), jsonSearchRequest);
 
-            verifyWildcardMatchResponse(response, field, expectedValue);
+            assertSingleCaseReturned(response);
+            assertField(response, RESPONSE_CASE_DATA_FIELDS_PREFIX + field, expectedValue);
+            assertField(response, CASE_ID, testData.get(EXACT_MATCH_TEST_REFERENCE));
         }
 
-        private String createWildcardSearchRequest(String field, String wildcardExpr) {
-            return "{"
-                + "  \"query\": {"
-                + "    \"wildcard\": {"
-                + "    \"data." + field + "\" : \"" + wildcardExpr + "\""
-                + "    }"
-                + "  }"
-                + "}";
-        }
-
-        private void verifyWildcardMatchResponse(ValidatableResponse response, String field, String expectedValue) {
-            response.body("cases.size()", is(1));
-            response.body("cases[0].case_data." + field, is(expectedValue));
-        }
-    }
-
-    @AfterAll
-    void cleanUp() {
-        deleteIndexAndAlias();
-    }
-
-    private void createCases() {
-        createCaseAndProgressState(asPrivateCaseworker(true));
-        createCase(asPrivateCaseworker(true), FullCase.build());
-
-        // wait until logstash reads the case data
-        sleep(aat.getLogstashReadDelay());
     }
 
 }

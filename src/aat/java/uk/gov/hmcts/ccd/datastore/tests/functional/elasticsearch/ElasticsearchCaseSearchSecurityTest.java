@@ -8,37 +8,23 @@ import static org.hamcrest.Matchers.hasKey;
 
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
-import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder;
-import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType;
+import uk.gov.hmcts.ccd.datastore.tests.TestData;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ExtendWith(ElasticsearchTestDataLoaderExtension.class)
 class ElasticsearchCaseSearchSecurityTest extends ElasticsearchBaseTest {
 
-    private static final String ES_FIELD_CASE_REFERENCE = "reference";
-    private static final String ES_FIELD_EMAIL_ID = "EmailField";
-    private static final String EMAIL_ID_VALUE = "functional@test.com";
-    private static final String CASE_ID = "id";
-
-    private Long caseRefCaseTypeSecurityClassificationQuery;
-    private Long caseRefCaseStateSecurityQuery;
-    private Long caseRefCaseFieldSecurityQuery;
+    static final String CASE_TYPE_SECURITY_TEST = TestData.uniqueReference();
+    static final String CASE_STATE_SECURITY_TEST = TestData.uniqueReference();
+    static final String CASE_FIELD_SECURITY_TEST = TestData.uniqueReference();
+    static final String EMAIL_ID_VALUE = "functional@test.com";
 
     ElasticsearchCaseSearchSecurityTest(AATHelper aat) {
         super(aat);
-    }
-
-    @BeforeAll
-    void setUp() {
-        assertElasticsearchEnabled();
-        importDefinition();
-        createCases();
     }
 
     @Nested
@@ -48,13 +34,13 @@ class ElasticsearchCaseSearchSecurityTest extends ElasticsearchBaseTest {
         @Test
         @DisplayName("should return the case for a role with same security classification as case type classification and read access on case type")
         void shouldReturnCaseForPrivateUser() {
-            searchCaseAndAssertCaseReference(asPrivateCaseworker(false), ES_FIELD_CASE_REFERENCE, caseRefCaseTypeSecurityClassificationQuery);
+            searchCaseAndAssertCaseReference(asPrivateCaseworker(false), ES_FIELD_CASE_REFERENCE, testData.get(CASE_TYPE_SECURITY_TEST));
         }
 
         @Test
         @DisplayName("should NOT return the case for a role with read access on case type and lower security classification than then case type")
         void shouldNotReturnCaseForPublicUser() {
-            searchCaseAndAssertCaseNotReturned(asAutoTestCaseworker(false), ES_FIELD_CASE_REFERENCE, caseRefCaseTypeSecurityClassificationQuery);
+            searchCaseAndAssertCaseNotReturned(asAutoTestCaseworker(false), ES_FIELD_CASE_REFERENCE, testData.get(CASE_TYPE_SECURITY_TEST));
         }
 
         //@Test
@@ -72,13 +58,13 @@ class ElasticsearchCaseSearchSecurityTest extends ElasticsearchBaseTest {
         @Test
         @DisplayName("should return the case for a role with read access to the case state")
         void shouldReturnCase() {
-            searchCaseAndAssertCaseReference(asPrivateCaseworker(false), ES_FIELD_CASE_REFERENCE, caseRefCaseStateSecurityQuery);
+            searchCaseAndAssertCaseReference(asPrivateCaseworker(false), ES_FIELD_CASE_REFERENCE, testData.get(CASE_STATE_SECURITY_TEST));
         }
 
         @Test
         @DisplayName("should NOT return the case for a role with no read access to a case state")
         void shouldNotReturnCase() {
-            searchCaseAndAssertCaseNotReturned(asPrivateCaseworkerSolicitor(false), ES_FIELD_CASE_REFERENCE, caseRefCaseStateSecurityQuery);
+            searchCaseAndAssertCaseNotReturned(asPrivateCaseworkerSolicitor(false), ES_FIELD_CASE_REFERENCE, testData.get(CASE_STATE_SECURITY_TEST));
         }
 
     }
@@ -92,8 +78,8 @@ class ElasticsearchCaseSearchSecurityTest extends ElasticsearchBaseTest {
         void shouldReturnCaseField() {
             ValidatableResponse response = searchCaseAndAssertCaseReference(asRestrictedCaseworker(false),
                                                                             ES_FIELD_CASE_REFERENCE,
-                                                                            caseRefCaseFieldSecurityQuery);
-            response.body("cases[0].case_data." + ES_FIELD_EMAIL_ID, is(EMAIL_ID_VALUE));
+                                                                            testData.get(CASE_FIELD_SECURITY_TEST));
+            response.body("cases[0]." + RESPONSE_CASE_DATA_FIELDS_PREFIX + ES_FIELD_EMAIL_ID, is(EMAIL_ID_VALUE));
         }
 
         @Test
@@ -101,7 +87,7 @@ class ElasticsearchCaseSearchSecurityTest extends ElasticsearchBaseTest {
         void shouldNotReturnCaseFieldForLowerSecurityClassification() {
             ValidatableResponse response = searchCaseAndAssertCaseReference(asPrivateCaseworker(false),
                                                                             ES_FIELD_CASE_REFERENCE,
-                                                                            caseRefCaseFieldSecurityQuery);
+                                                                            testData.get(CASE_FIELD_SECURITY_TEST));
             response.body("cases[0].case_data", not(hasKey(ES_FIELD_EMAIL_ID)));
         }
 
@@ -133,45 +119,19 @@ class ElasticsearchCaseSearchSecurityTest extends ElasticsearchBaseTest {
 
     private ValidatableResponse searchCaseAndAssertCaseReference(Supplier<RequestSpecification> asUser, String field, Object value) {
         ValidatableResponse response = searchCase(asUser, field, value);
-        response.body("cases.size()", is(1));
-        response.body("cases[0]." + CASE_ID, is(value));
-
+        assertSingleCaseReturned(response);
+        assertField(response, CASE_ID, value);
         return response;
     }
 
     private void searchCaseAndAssertCaseNotReturned(Supplier<RequestSpecification> asUser, String field, Object value) {
         ValidatableResponse response = searchCase(asUser, field, value);
-        response.body("cases.size()", is(0));
+        assertNoCaseReturned(response);
     }
 
     private ValidatableResponse searchCase(Supplier<RequestSpecification> asUser, String field, Object value) {
-        String jsonSearchRequest = createExactMatchSearchRequest(field, value);
+        String jsonSearchRequest = ElasticsearchSearchRequest.exactMatch(field, value);
         return searchCase(asUser, jsonSearchRequest);
-    }
-
-    private String createExactMatchSearchRequest(String field, Object value) {
-        return "{"
-            + "  \"query\": {"
-            + "    \"match\": {"
-            + "    \"" + field + "\" : \"" + String.valueOf(value) + "\""
-            + "    }"
-            + "  }"
-            + "}";
-    }
-
-    @AfterAll
-    void cleanUp() {
-        deleteIndexAndAlias();
-    }
-
-    private void createCases() {
-        caseRefCaseTypeSecurityClassificationQuery = createCase(asPrivateCaseworker(true), AATCaseBuilder.EmptyCase.build());
-        caseRefCaseStateSecurityQuery = createCaseAndProgressState(asPrivateCaseworker(true));
-        caseRefCaseFieldSecurityQuery = createCase(asRestrictedCaseworker(true),
-                                                   AATCaseType.CaseData.builder().emailField(EMAIL_ID_VALUE).build());
-
-        // wait until logstash reads the case data
-        sleep(aat.getLogstashReadDelay());
     }
 
 }

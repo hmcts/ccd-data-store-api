@@ -25,22 +25,22 @@ public abstract class BaseTest {
     }
 
     protected Supplier<RequestSpecification> asAutoTestCaseworker(boolean withUserParam) {
-        return asUser(aat.getCaseworkerAutoTestEmail(), aat.getCaseworkerAutoTestPassword(), withUserParam);
+        return authenticateAndCreateRequestSpecification(aat.getCaseworkerAutoTestEmail(), aat.getCaseworkerAutoTestPassword(), withUserParam);
     }
 
     protected Supplier<RequestSpecification> asPrivateCaseworker(boolean withUserParam) {
-        return asUser(aat.getPrivateCaseworkerEmail(), aat.getPrivateCaseworkerPassword(), withUserParam);
+        return authenticateAndCreateRequestSpecification(aat.getPrivateCaseworkerEmail(), aat.getPrivateCaseworkerPassword(), withUserParam);
     }
 
     protected Supplier<RequestSpecification> asRestrictedCaseworker(boolean withUserParam) {
-        return asUser(aat.getRestrictedCaseworkerEmail(), aat.getRestrictedCaseworkerPassword(), withUserParam);
+        return authenticateAndCreateRequestSpecification(aat.getRestrictedCaseworkerEmail(), aat.getRestrictedCaseworkerPassword(), withUserParam);
     }
 
     protected Supplier<RequestSpecification> asPrivateCaseworkerSolicitor(boolean withUserParam) {
-        return asUser(aat.getPrivateCaseworkerSolicitorEmail(), aat.getPrivateCaseworkerSolicitorPassword(), withUserParam);
+        return authenticateAndCreateRequestSpecification(aat.getPrivateCaseworkerSolicitorEmail(), aat.getPrivateCaseworkerSolicitorPassword(), withUserParam);
     }
 
-    private Supplier<RequestSpecification> asUser(String username, String password, Boolean withUserParam) {
+    private Supplier<RequestSpecification> authenticateAndCreateRequestSpecification(String username, String password, Boolean withUserParam) {
         AuthenticatedUser caseworker = aat.getIdamHelper().authenticate(username, password);
         String s2sToken = aat.getS2SHelper().getToken();
 

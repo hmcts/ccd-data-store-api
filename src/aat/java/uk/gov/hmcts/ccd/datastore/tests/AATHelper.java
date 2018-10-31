@@ -9,8 +9,6 @@ public enum AATHelper {
 
     INSTANCE;
 
-    private static final long DEFAULT_LOGSTASH_READ_DELAY_MILLIS = 5000;
-
     private final IdamHelper idamHelper;
     private final S2SHelper s2SHelper;
     private final CCDHelper ccdHelper;
@@ -95,18 +93,6 @@ public enum AATHelper {
 
     public String getPrivateCaseworkerSolicitorPassword() {
         return Env.require("CCD_PRIVATE_CASEWORKER_SOLICITOR_PASSWORD");
-    }
-
-    public String getElasticsearchBaseUri() {
-        return Env.require("ELASTIC_SEARCH_SCHEME") + "://" + Env.require("ELASTIC_SEARCH_HOST") + ":" + Env.require("ELASTIC_SEARCH_PORT");
-    }
-
-    public Long getLogstashReadDelay() {
-        try {
-            return Long.valueOf(Env.require("LOGSTASH_READ_DELAY_MILLIS"));
-        } catch (NullPointerException e) {
-            return DEFAULT_LOGSTASH_READ_DELAY_MILLIS;
-        }
     }
 
 }
