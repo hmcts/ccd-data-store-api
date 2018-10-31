@@ -11,11 +11,15 @@ import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.BeforeAll;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.BaseTest;
 import uk.gov.hmcts.ccd.datastore.tests.TestData;
 
 abstract class ElasticsearchBaseTest extends BaseTest {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchTestDataLoaderExtension.class);
 
     static final String CASE_DATA_FIELD_PREFIX = "data.";
     static final String RESPONSE_CASE_DATA_FIELDS_PREFIX = "case_data.";
@@ -36,6 +40,7 @@ abstract class ElasticsearchBaseTest extends BaseTest {
     @BeforeAll
     static void assertElasticsearchEnabled() {
         // stop execution of these tests if Elasticsearch is not enabled
+        LOG.info("ELASTIC_SEARCH_ENABLED: {}", System.getenv("ELASTIC_SEARCH_ENABLED"));
         boolean elasticsearchEnabled = ofNullable(System.getenv("ELASTIC_SEARCH_ENABLED")).map(Boolean::valueOf).orElse(false);
         assumeTrue(elasticsearchEnabled, () -> "Ignoring Elasticsearch tests, variable ELASTIC_SEARCH_ENABLED not set");
     }
