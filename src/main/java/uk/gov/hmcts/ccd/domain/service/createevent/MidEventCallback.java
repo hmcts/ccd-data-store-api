@@ -34,7 +34,8 @@ public class MidEventCallback {
     private CaseService caseService;
 
     @Autowired
-    public MidEventCallback(CallbackInvoker callbackInvoker, UIDefinitionRepository uiDefinitionRepository,
+    public MidEventCallback(CallbackInvoker callbackInvoker,
+                            UIDefinitionRepository uiDefinitionRepository,
                             EventTriggerService eventTriggerService,
                             @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) CaseDefinitionRepository caseDefinitionRepository,
                             CaseService caseService) {
@@ -45,9 +46,11 @@ public class MidEventCallback {
         this.caseService = caseService;
     }
 
-    public JsonNode invoke(String jurisdictionId, String caseTypeId, Event event,
-                                        Map<String, JsonNode> data,
-                                        String pageId) {
+    public JsonNode invoke(String jurisdictionId,
+                           String caseTypeId,
+                           Event event,
+                           Map<String, JsonNode> data,
+                           String pageId) {
         if (!isBlank(pageId)) {
             final CaseType caseType = getCaseType(caseTypeId);
             final CaseEvent caseEvent = getCaseEvent(event, caseType);
@@ -66,12 +69,13 @@ public class MidEventCallback {
                     caseEvent,
                     null,
                     newCaseDetails);
-                ObjectMapper mapper = new ObjectMapper();
-                ObjectNode jNode = mapper.createObjectNode();
-                jNode.set("data", mapper.valueToTree(caseDetails.getData()));
-                return jNode;
+                return dataJsonNode(caseDetails.getData());
             }
         }
+        return dataJsonNode(data);
+    }
+
+    private JsonNode dataJsonNode(Map<String, JsonNode> data) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode jNode = mapper.createObjectNode();
         jNode.set("data", mapper.valueToTree(data));
