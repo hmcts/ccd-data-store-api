@@ -20,6 +20,7 @@ import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
@@ -90,8 +91,8 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
     }
 
     private Set<String> getCaseRoles(CaseDetails caseDetails) {
-        if (caseDetails == null || caseDetails.getId() == null) {
-            return Collections.EMPTY_SET;
+        if (caseDetails == null || caseDetails.getId() == null || Draft.isDraft(caseDetails.getId())) {
+            return Collections.emptySet();
         } else {
             return caseAccessService.getCaseRoles(caseDetails.getId());
         }
