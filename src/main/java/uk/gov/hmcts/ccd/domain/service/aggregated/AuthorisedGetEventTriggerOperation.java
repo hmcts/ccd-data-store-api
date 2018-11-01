@@ -9,8 +9,6 @@ import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
-import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
@@ -21,9 +19,8 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
-import uk.gov.hmcts.ccd.domain.service.common.UIDService;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
@@ -33,31 +30,28 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
 
     public static final String QUALIFIER = "authorised";
     private final CaseDefinitionRepository caseDefinitionRepository;
-    private final CaseDetailsRepository caseDetailsRepository;
+    private final CaseService caseService;
     private final CaseAccessService caseAccessService;
     private final UserRepository userRepository;
     private final GetEventTriggerOperation getEventTriggerOperation;
     private final AccessControlService accessControlService;
     private final EventTriggerService eventTriggerService;
-    private final UIDService uidService;
 
     @Autowired
     public AuthorisedGetEventTriggerOperation(@Qualifier("default") final GetEventTriggerOperation getEventTriggerOperation,
                                               @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
-                                              @Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
+                                              CaseService caseService,
                                               CaseAccessService caseAccessService,
                                               @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
                                               final AccessControlService accessControlService,
-                                              final EventTriggerService eventTriggerService,
-                                              final UIDService uidService) {
+                                              final EventTriggerService eventTriggerService) {
         this.caseDefinitionRepository = caseDefinitionRepository;
-        this.caseDetailsRepository = caseDetailsRepository;
+        this.caseService = caseService;
         this.caseAccessService = caseAccessService;
         this.userRepository = userRepository;
         this.getEventTriggerOperation = getEventTriggerOperation;
         this.accessControlService = accessControlService;
         this.eventTriggerService = eventTriggerService;
-        this.uidService = uidService;
     }
 
     public CaseEventTrigger executeForCaseType(String uid,
@@ -87,7 +81,7 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
         final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
         final CaseEvent eventTrigger = getEventTrigger(caseTypeId, eventTriggerId, caseType);
 
-        final CaseDetails caseDetails = getCaseDetails(caseReference);
+        final CaseDetails caseDetails = caseService.getCaseDetails(caseReference);
 
         validateEventTrigger(() -> !eventTriggerService.isPreStateValid(caseDetails.getState(), eventTrigger));
 
@@ -118,17 +112,6 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
             draftReference,
             eventTriggerId,
             ignoreWarning));
-    }
-
-    private CaseDetails getCaseDetails(String caseReference) {
-        if (!uidService.validateUID(caseReference)) {
-            throw new BadRequestException("Case reference is not valid");
-        }
-        final CaseDetails caseDetails = caseDetailsRepository.findByReference(Long.valueOf(caseReference));
-        if (caseDetails == null) {
-            throw new ResourceNotFoundException("No case exist with id=" + caseReference);
-        }
-        return caseDetails;
     }
 
     private Set<String> getUserRoles() {
@@ -212,5 +195,4 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
             throw new ValidationException("The case status did not qualify for the event");
         }
     }
-
 }

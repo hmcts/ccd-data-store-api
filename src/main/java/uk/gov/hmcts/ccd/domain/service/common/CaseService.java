@@ -1,14 +1,19 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import java.util.Map;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
+import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-
-import java.util.Map;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 // TODO CaseService and CaseDataService could probably be merged together.
 @Service
@@ -17,10 +22,16 @@ public class CaseService {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final CaseDataService caseDataService;
+    private final CaseDetailsRepository caseDetailsRepository;
+    private final UIDService uidService;
 
     @Autowired
-    public CaseService(CaseDataService caseDataService) {
+    public CaseService(CaseDataService caseDataService,
+                       @Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
+                       UIDService uidService) {
         this.caseDataService = caseDataService;
+        this.caseDetailsRepository = caseDetailsRepository;
+        this.uidService = uidService;
     }
 
     /**
@@ -62,6 +73,17 @@ public class CaseService {
         clone.setDataClassification(caseDataService.cloneDataMap(source.getDataClassification()));
 
         return clone;
+    }
+
+    public CaseDetails getCaseDetails(String caseReference) {
+        if (!uidService.validateUID(caseReference)) {
+            throw new BadRequestException("Case reference is not valid");
+        }
+        final CaseDetails caseDetails = caseDetailsRepository.findByReference(Long.valueOf(caseReference));
+        if (caseDetails == null) {
+            throw new ResourceNotFoundException("No case exist with id=" + caseReference);
+        }
+        return caseDetails;
     }
 
 }

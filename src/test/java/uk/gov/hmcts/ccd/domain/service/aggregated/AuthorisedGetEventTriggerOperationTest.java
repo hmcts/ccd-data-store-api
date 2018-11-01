@@ -24,7 +24,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
@@ -32,10 +31,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
-import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
-import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
-import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.common.*;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
@@ -63,7 +59,7 @@ class AuthorisedGetEventTriggerOperationTest {
     private CaseDefinitionRepository caseDefinitionRepository;
 
     @Mock
-    private CaseDetailsRepository caseDetailsRepository;
+    private CaseService caseService;
 
     @Mock
     private AccessControlService accessControlService;
@@ -97,12 +93,11 @@ class AuthorisedGetEventTriggerOperationTest {
         authorisedGetEventTriggerOperation = new AuthorisedGetEventTriggerOperation(
             getEventTriggerOperation,
             caseDefinitionRepository,
-            caseDetailsRepository,
+            caseService,
             caseAccessService,
             userRepository,
             accessControlService,
-            eventTriggerService,
-            uidService);
+            eventTriggerService);
         caseEventTrigger = new CaseEventTrigger();
 
         caseType.setId(CASE_TYPE_ID);
@@ -283,7 +278,7 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                                      CASE_REFERENCE,
                                                                                      EVENT_TRIGGER_ID,
                                                                                      IGNORE);
-            doReturn(caseDetails).when(caseDetailsRepository).findByReference(CASE_REFERENCE_LONG);
+            doReturn(caseDetails).when(caseService).getCaseDetails(CASE_REFERENCE);
             doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(caseType,
                                                                                     userRoles,
                                                                                     CAN_READ);
@@ -452,7 +447,8 @@ class AuthorisedGetEventTriggerOperationTest {
         @Test
         @DisplayName("should fail if case reference is invalid")
         void shouldThrowExceptionIfCaseReferenceNotFound() {
-            doReturn(null).when(caseDetailsRepository).findByReference(CASE_REFERENCE_LONG);
+            doThrow(new ResourceNotFoundException("No case exist with id=" + CASE_REFERENCE))
+                .when(caseService).getCaseDetails(CASE_REFERENCE);
             assertThrows(
                 ResourceNotFoundException.class, () -> authorisedGetEventTriggerOperation.executeForCase(UID,
                     JURISDICTION_ID,
@@ -466,7 +462,7 @@ class AuthorisedGetEventTriggerOperationTest {
         @Test
         @DisplayName("should fail if case id is invalid")
         void shouldFailIfCaseIDIsInvalid() {
-            when(uidService.validateUID(anyString())).thenReturn(false);
+            doThrow(new BadRequestException("Case reference is not valid")).when(caseService).getCaseDetails(anyString());
 
             assertThrows(
                 BadRequestException.class, () -> authorisedGetEventTriggerOperation.executeForCase(UID,

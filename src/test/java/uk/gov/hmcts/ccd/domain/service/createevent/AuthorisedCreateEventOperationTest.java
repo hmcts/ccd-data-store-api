@@ -30,7 +30,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -40,7 +39,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
-import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
@@ -88,12 +86,6 @@ class AuthorisedCreateEventOperationTest {
     @Mock
     private CaseAccessService caseAccessService;
 
-    @Mock
-    private CaseDetailsRepository caseDetailsRepository;
-
-    @Mock
-    private UIDService uidService;
-
     private AuthorisedCreateEventOperation authorisedCreateEventOperation;
     private CaseDetails classifiedCase;
     private JsonNode authorisedCaseNode;
@@ -111,9 +103,7 @@ class AuthorisedCreateEventOperationTest {
             caseDefinitionRepository,
             accessControlService,
             userRepository,
-            caseAccessService,
-            caseDetailsRepository,
-            uidService);
+            caseAccessService);
 
         CaseDetails existingCase = new CaseDetails();
         Map<String, JsonNode> existingData = Maps.newHashMap();
@@ -136,9 +126,7 @@ class AuthorisedCreateEventOperationTest {
         caseType.setEvents(events);
         caseType.setCaseFields(caseFields);
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseType);
-        when(caseDetailsRepository.findByReference(JURISDICTION_ID, Long.valueOf(CASE_REFERENCE))).thenReturn(Optional.of(existingCase));
         when(userRepository.getUserRoles()).thenReturn(USER_ROLES);
-        doReturn(true).when(uidService).validateUID(CASE_REFERENCE);
         when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseType), eq(USER_ROLES), eq(CAN_UPDATE))).thenReturn(
             true);
         when(accessControlService.canAccessCaseStateWithCriteria(eq(STATE_ID), eq(caseType), eq(USER_ROLES), eq(CAN_UPDATE))).thenReturn(
@@ -241,8 +229,8 @@ class AuthorisedCreateEventOperationTest {
             () -> assertThat(output, sameInstance(classifiedCase)),
             () -> assertThat(output.getData(), is(equalTo(MAPPER.convertValue(authorisedCaseNode, STRING_JSON_MAP)))),
             () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
-            () -> inOrder.verify(userRepository).getUserRoles(),
             () -> inOrder.verify(getCaseOperation).execute(CASE_REFERENCE),
+            () -> inOrder.verify(userRepository).getUserRoles(),
             () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseType),
                                                                                      eq(USER_ROLES),
                                                                                      eq(CAN_UPDATE)),
