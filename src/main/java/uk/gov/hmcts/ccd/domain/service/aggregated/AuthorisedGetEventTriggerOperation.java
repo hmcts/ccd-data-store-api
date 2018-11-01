@@ -9,7 +9,6 @@ import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleService;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
@@ -21,6 +20,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -34,7 +34,7 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
     public static final String QUALIFIER = "authorised";
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseDetailsRepository caseDetailsRepository;
-    private final CaseRoleService caseRoleService;
+    private final CaseAccessService caseAccessService;
     private final UserRepository userRepository;
     private final GetEventTriggerOperation getEventTriggerOperation;
     private final AccessControlService accessControlService;
@@ -45,14 +45,14 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
     public AuthorisedGetEventTriggerOperation(@Qualifier("default") final GetEventTriggerOperation getEventTriggerOperation,
                                               @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
                                               @Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
-                                              CaseRoleService caseRoleService,
+                                              CaseAccessService caseAccessService,
                                               @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
                                               final AccessControlService accessControlService,
                                               final EventTriggerService eventTriggerService,
                                               final UIDService uidService) {
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.caseDetailsRepository = caseDetailsRepository;
-        this.caseRoleService = caseRoleService;
+        this.caseAccessService = caseAccessService;
         this.userRepository = userRepository;
         this.getEventTriggerOperation = getEventTriggerOperation;
         this.accessControlService = accessControlService;
@@ -91,7 +91,7 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
 
         validateEventTrigger(() -> !eventTriggerService.isPreStateValid(caseDetails.getState(), eventTrigger));
 
-        Set<String> userRoles = Sets.union(getUserRoles(), caseRoleService.getCaseRoles(caseDetails.getId()));
+        Set<String> userRoles = Sets.union(getUserRoles(), caseAccessService.getCaseRoles(caseDetails.getId()));
 
         verifyMandatoryAccessForCase(eventTriggerId, caseDetails, caseType, userRoles);
 

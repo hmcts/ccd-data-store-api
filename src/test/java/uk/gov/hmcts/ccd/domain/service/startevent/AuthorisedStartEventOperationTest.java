@@ -31,7 +31,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleService;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
@@ -39,6 +38,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 class AuthorisedStartEventOperationTest {
@@ -72,7 +72,7 @@ class AuthorisedStartEventOperationTest {
     @Mock
     private UserRepository userRepository;
     @Mock
-    private CaseRoleService caseRoleService;
+    private CaseAccessService caseAccessService;
 
     private CaseDetails classifiedCaseDetails;
     private JsonNode authorisedCaseDetailsNode;
@@ -116,7 +116,7 @@ class AuthorisedStartEventOperationTest {
                                                                           caseDefinitionRepository,
                                                                           accessControlService,
                                                                           userRepository,
-                                                                          caseRoleService);
+                                                                          caseAccessService);
         caseType.setCaseFields(caseFields);
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseType);
         when(userRepository.getUserRoles()).thenReturn(userRoles);

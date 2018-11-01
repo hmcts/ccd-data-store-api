@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.data.caseaccess;
+ package uk.gov.hmcts.ccd.data.caseaccess;
 
 /**
  * Enumerations of reserved global case roles:

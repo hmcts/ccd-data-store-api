@@ -13,7 +13,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleService;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
@@ -24,6 +23,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
@@ -44,7 +44,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
     private final GetCaseOperation getCaseOperation;
     private final AccessControlService accessControlService;
     private final UserRepository userRepository;
-    private final CaseRoleService caseRoleService;
+    private final CaseAccessService caseAccessService;
     private final CaseDetailsRepository caseDetailsRepository;
     private final UIDService uidService;
 
@@ -53,7 +53,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
                                           @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
                                           final AccessControlService accessControlService,
                                           @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
-                                          CaseRoleService caseRoleService,
+                                          CaseAccessService caseAccessService,
                                           final @Qualifier(CachedCaseDetailsRepository.QUALIFIER) CaseDetailsRepository caseDetailsRepository,
                                           UIDService uidService) {
 
@@ -62,7 +62,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
         this.getCaseOperation = getCaseOperation;
         this.accessControlService = accessControlService;
         this.userRepository = userRepository;
-        this.caseRoleService = caseRoleService;
+        this.caseAccessService = caseAccessService;
         this.caseDetailsRepository = caseDetailsRepository;
         this.uidService = uidService;
     }
@@ -86,7 +86,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
         }
 
         Set<String> userRoles = Sets.union(userRepository.getUserRoles(),
-            caseRoleService.getCaseRoles(getCaseId(jurisdictionId, caseReference)));
+            caseAccessService.getCaseRoles(getCaseId(jurisdictionId, caseReference)));
         if (userRoles == null || userRoles.isEmpty()) {
             throw new ValidationException("Cannot find user roles for the user");
         }

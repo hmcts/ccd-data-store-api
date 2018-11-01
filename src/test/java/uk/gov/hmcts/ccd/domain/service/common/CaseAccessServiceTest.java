@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.common;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -14,6 +15,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
+import org.hamcrest.core.Is;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -332,6 +334,30 @@ class CaseAccessServiceTest {
         }
     }
 
+
+    @Nested
+    @DisplayName("case roles")
+    class CaseRoleTest {
+        private final List<String> caseRoles = Arrays.asList("[CASE_ROLE_1]", "[CASE_ROLE_2]");
+
+        @BeforeEach
+        void setUp() {
+            doReturn(USER_ID).when(userRepository).getUserId();
+            doReturn(caseRoles).when(caseUserRepository).findCaseRoles(Long.valueOf(CASE_GRANTED_1_ID), USER_ID);
+        }
+
+        @Test
+        @DisplayName("get case roles for a case Id")
+        void getCaseRoles() {
+            Set<String> caseRoles = caseAccessService.getCaseRoles(CASE_GRANTED_1_ID);
+
+            assertAll(
+                () -> assertThat(caseRoles.size(), Is.is(2)),
+                () -> assertThat(caseRoles, hasItems("[CASE_ROLE_1]", "[CASE_ROLE_2]"))
+            );
+        }
+    }
+
     private void assertAccessGranted(CaseDetails caseDetails) {
         assertAccess(caseDetails, true, true);
     }
@@ -378,7 +404,7 @@ class CaseAccessServiceTest {
 
     private void withRoles(String... roles) {
         doReturn(idamProperties(USER_ID, roles)).when(userRepository)
-                                                .getUserDetails();
+            .getUserDetails();
     }
 
     private ServiceAndUserDetails serviceAndUserDetails(String[] roles) {

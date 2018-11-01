@@ -2,7 +2,9 @@ package uk.gov.hmcts.ccd.domain.service.common;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -66,6 +68,13 @@ public class CaseAccessService {
         }
 
         return Optional.empty();
+    }
+
+    public Set<String> getCaseRoles(String caseId) {
+        return caseUserRepository
+            .findCaseRoles(Long.valueOf(caseId), userRepository.getUserId())
+            .stream()
+            .collect(Collectors.toSet());
     }
 
     private Boolean accessGranted(CaseDetails caseDetails, IDAMProperties currentUser) {
