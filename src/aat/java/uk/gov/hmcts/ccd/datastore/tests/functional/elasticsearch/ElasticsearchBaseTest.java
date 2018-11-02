@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.BaseTest;
 import uk.gov.hmcts.ccd.datastore.tests.TestData;
+import uk.gov.hmcts.ccd.datastore.tests.helper.elastic.ElasticsearchTestDataLoaderExtension;
 
 abstract class ElasticsearchBaseTest extends BaseTest {
 

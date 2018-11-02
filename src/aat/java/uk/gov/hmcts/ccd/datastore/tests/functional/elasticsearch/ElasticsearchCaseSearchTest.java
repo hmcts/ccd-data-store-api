@@ -12,12 +12,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.TestData;
+import uk.gov.hmcts.ccd.datastore.tests.helper.elastic.ElasticsearchTestDataLoaderExtension;
 
 @ExtendWith(ElasticsearchTestDataLoaderExtension.class)
-class ElasticsearchCaseSearchTest extends ElasticsearchBaseTest {
+public class ElasticsearchCaseSearchTest extends ElasticsearchBaseTest {
 
-    static final String SEARCH_UPDATED_CASE_TEST_REFERENCE = TestData.uniqueReference();
-    static final String EXACT_MATCH_TEST_REFERENCE = TestData.uniqueReference();
+    public static final String SEARCH_UPDATED_CASE_TEST_REFERENCE = TestData.uniqueReference();
+    public static final String EXACT_MATCH_TEST_REFERENCE = TestData.uniqueReference();
 
     ElasticsearchCaseSearchTest(AATHelper aat) {
         super(aat);

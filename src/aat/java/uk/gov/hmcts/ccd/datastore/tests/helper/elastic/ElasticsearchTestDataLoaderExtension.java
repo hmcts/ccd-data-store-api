@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.datastore.tests.functional.elasticsearch;
+package uk.gov.hmcts.ccd.datastore.tests.helper.elastic;
 
 import static java.util.Optional.ofNullable;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -10,9 +10,10 @@ import io.restassured.specification.RequestSpecification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.datastore.tests.TestData;
-import uk.gov.hmcts.ccd.datastore.tests.TestDataLoaderExtension;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType;
+import uk.gov.hmcts.ccd.datastore.tests.functional.elasticsearch.ElasticsearchCaseSearchSecurityTest;
+import uk.gov.hmcts.ccd.datastore.tests.functional.elasticsearch.ElasticsearchCaseSearchTest;
 
 public class ElasticsearchTestDataLoaderExtension extends TestDataLoaderExtension {
 
