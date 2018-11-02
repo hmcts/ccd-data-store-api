@@ -1,5 +1,24 @@
 package uk.gov.hmcts.ccd.data.user;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -14,19 +33,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.hasSize;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.*;
 
 class DefaultUserRepositoryTest {
 
@@ -103,7 +114,7 @@ class DefaultUserRepositoryTest {
                 userRepository.getUserClassifications(JURISDICTION_ID);
 
                 assertAll(
-                    () -> verify(caseDefinitionRepository).getClassificationsForUserRoleList(Arrays.asList(ROLE_CASEWORKER_CMC)),
+                    () -> verify(caseDefinitionRepository).getClassificationsForUserRoleList(asList(ROLE_CASEWORKER_CMC)),
                     () -> verifyNoMoreInteractions(caseDefinitionRepository)
                 );
             }
@@ -121,7 +132,7 @@ class DefaultUserRepositoryTest {
                 userRepository.getUserClassifications(JURISDICTION_ID);
 
                 assertAll(
-                    () -> verify(caseDefinitionRepository).getClassificationsForUserRoleList(Arrays.asList(CITIZEN)),
+                    () -> verify(caseDefinitionRepository).getClassificationsForUserRoleList(asList(CITIZEN)),
                     () -> verifyNoMoreInteractions(caseDefinitionRepository)
                 );
             }
@@ -134,7 +145,7 @@ class DefaultUserRepositoryTest {
                 userRepository.getUserClassifications(JURISDICTION_ID);
 
                 assertAll(
-                    () -> verify(caseDefinitionRepository).getClassificationsForUserRoleList(Arrays.asList(LETTER_HOLDER)),
+                    () -> verify(caseDefinitionRepository).getClassificationsForUserRoleList(asList(LETTER_HOLDER)),
                     () -> verifyNoMoreInteractions(caseDefinitionRepository)
                 );
             }
@@ -146,6 +157,38 @@ class DefaultUserRepositoryTest {
             asOtherRoles();
 
             verifyNoMoreInteractions(caseDefinitionRepository);
+        }
+    }
+
+    @Nested
+    @DisplayName("getHighestUserClassification()")
+    class GetHighestUserClassification {
+
+        @Test
+        @DisplayName("should return highest security classification for user")
+        void shouldReturnHighestClassification() {
+            asCaseworker();
+
+            UserRole userRole1 = new UserRole();
+            userRole1.setSecurityClassification(SecurityClassification.PRIVATE.name());
+            UserRole userRole2 = new UserRole();
+            userRole2.setSecurityClassification(SecurityClassification.PUBLIC.name());
+            UserRole userRole3 = new UserRole();
+            userRole3.setSecurityClassification(SecurityClassification.RESTRICTED.name());
+            when(caseDefinitionRepository.getClassificationsForUserRoleList(anyListOf(String.class))).thenReturn(asList(userRole1, userRole2, userRole3));
+
+            SecurityClassification result = userRepository.getHighestUserClassification(JURISDICTION_ID);
+
+            assertThat(result, is(SecurityClassification.RESTRICTED));
+        }
+
+        @Test
+        @DisplayName("should throw exception when no user roles returned")
+        void shouldThrowExceptionWhenNoUserRolesReturned() {
+            asCaseworker();
+            when(caseDefinitionRepository.getClassificationsForUserRoleList(anyListOf(String.class))).thenReturn(emptyList());
+
+            assertThrows(ServiceException.class, () -> userRepository.getHighestUserClassification(JURISDICTION_ID));
         }
     }
 

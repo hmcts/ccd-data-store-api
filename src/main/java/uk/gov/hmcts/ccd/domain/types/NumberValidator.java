@@ -14,7 +14,7 @@ import static uk.gov.hmcts.ccd.domain.types.TextValidator.checkRegex;
 @Named
 @Singleton
 public class NumberValidator implements BaseTypeValidator {
-    private static final String TYPE_ID = "Number";
+    static final String TYPE_ID = "Number";
 
     public BaseType getType() {
         return BaseType.get(TYPE_ID);

@@ -1,6 +1,9 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public enum SecurityClassification implements Serializable {
     PUBLIC(1), PRIVATE(2), RESTRICTED(3);
@@ -17,6 +20,10 @@ public enum SecurityClassification implements Serializable {
 
     public Boolean higherOrEqualTo(SecurityClassification otherClassification) {
         return this.rank >= otherClassification.rank;
+    }
+
+    public List<String> getClassificationsLowerOrEqualTo() {
+        return Stream.of(values()).filter(this::higherOrEqualTo).map(Enum::name).collect(Collectors.toList());
     }
 
 }
