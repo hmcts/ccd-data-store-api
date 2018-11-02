@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ccd.datastore.tests.functional.elasticsearch;
 
+import static java.util.Optional.ofNullable;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
@@ -23,11 +25,20 @@ public class ElasticsearchTestDataLoaderExtension extends TestDataLoaderExtensio
 
     @Override
     protected void loadData() {
+        assertElasticsearchEnabled();
+
         LOG.info("importing definition");
         importDefinition();
 
         LOG.info("creating test case data");
         createCases();
+    }
+
+    private void assertElasticsearchEnabled() {
+        // stop execution of these tests if Elasticsearch is not enabled
+        LOG.info("ELASTIC_SEARCH_ENABLED: {}", System.getenv("ELASTIC_SEARCH_ENABLED"));
+        boolean elasticsearchEnabled = ofNullable(System.getenv("ELASTIC_SEARCH_ENABLED")).map(Boolean::valueOf).orElse(false);
+        assumeTrue(elasticsearchEnabled, () -> "Ignoring Elasticsearch tests, variable ELASTIC_SEARCH_ENABLED not set");
     }
 
     @Override
