@@ -5,16 +5,15 @@ import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FullCase.T
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.State;
 
 import io.restassured.response.ValidatableResponse;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.TestData;
 
 @ExtendWith(ElasticsearchTestDataLoaderExtension.class)
-@EnabledIfSystemProperty(named = "ELASTIC_SEARCH_ENABLED", matches = "true")
 class ElasticsearchCaseSearchTest extends ElasticsearchBaseTest {
 
     static final String SEARCH_UPDATED_CASE_TEST_REFERENCE = TestData.uniqueReference();
@@ -22,6 +21,11 @@ class ElasticsearchCaseSearchTest extends ElasticsearchBaseTest {
 
     ElasticsearchCaseSearchTest(AATHelper aat) {
         super(aat);
+    }
+
+    @BeforeAll
+    static void setUp() {
+        assertElasticsearchEnabled();
     }
 
     @Nested
