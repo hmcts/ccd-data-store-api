@@ -278,7 +278,7 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                                      CASE_REFERENCE,
                                                                                      EVENT_TRIGGER_ID,
                                                                                      IGNORE);
-            doReturn(caseDetails).when(caseService).getCaseDetails(CASE_REFERENCE);
+            doReturn(caseDetails).when(caseService).getCaseDetails(JURISDICTION_ID, CASE_REFERENCE);
             doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(caseType,
                                                                                     userRoles,
                                                                                     CAN_READ);
@@ -448,7 +448,7 @@ class AuthorisedGetEventTriggerOperationTest {
         @DisplayName("should fail if case reference is invalid")
         void shouldThrowExceptionIfCaseReferenceNotFound() {
             doThrow(new ResourceNotFoundException("No case exist with id=" + CASE_REFERENCE))
-                .when(caseService).getCaseDetails(CASE_REFERENCE);
+                .when(caseService).getCaseDetails(JURISDICTION_ID, CASE_REFERENCE);
             assertThrows(
                 ResourceNotFoundException.class, () -> authorisedGetEventTriggerOperation.executeForCase(UID,
                     JURISDICTION_ID,
@@ -462,7 +462,7 @@ class AuthorisedGetEventTriggerOperationTest {
         @Test
         @DisplayName("should fail if case id is invalid")
         void shouldFailIfCaseIDIsInvalid() {
-            doThrow(new BadRequestException("Case reference is not valid")).when(caseService).getCaseDetails(anyString());
+            doThrow(new BadRequestException("Case reference is not valid")).when(caseService).getCaseDetails(JURISDICTION_ID, CASE_REFERENCE);
 
             assertThrows(
                 BadRequestException.class, () -> authorisedGetEventTriggerOperation.executeForCase(UID,

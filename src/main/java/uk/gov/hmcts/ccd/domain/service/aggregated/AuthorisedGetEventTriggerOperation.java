@@ -81,7 +81,7 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
         final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
         final CaseEvent eventTrigger = getEventTrigger(caseTypeId, eventTriggerId, caseType);
 
-        final CaseDetails caseDetails = caseService.getCaseDetails(caseReference);
+        final CaseDetails caseDetails = caseService.getCaseDetails(jurisdictionId, caseReference);
 
         validateEventTrigger(() -> !eventTriggerService.isPreStateValid(caseDetails.getState(), eventTrigger));
 

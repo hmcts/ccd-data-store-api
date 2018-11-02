@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.common;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -59,7 +60,7 @@ class CaseServiceTest {
         doReturn(true).when(uidService).validateUID(CASE_REFERENCE);
         caseDetails = buildCaseDetails();
         caseDetails.setId(CASE_ID);
-        doReturn(caseDetails).when(caseDetailsRepository).findByReference(REFERENCE);
+        doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(JURISDICTION, REFERENCE);
 
         caseDataService = new CaseDataService();
         caseService = new CaseService(caseDataService, caseDetailsRepository, uidService);
@@ -72,10 +73,10 @@ class CaseServiceTest {
         @DisplayName("should return caseDetails")
         void getCaseDetails() {
 
-            CaseDetails result = caseService.getCaseDetails(CASE_REFERENCE);
+            CaseDetails result = caseService.getCaseDetails(JURISDICTION, CASE_REFERENCE);
             assertAll(
                 () -> assertThat(result.getId(), is(caseDetails.getId())),
-                () -> verify(caseDetailsRepository).findByReference(REFERENCE),
+                () -> verify(caseDetailsRepository).findByReference(JURISDICTION, REFERENCE),
                 () -> verify(uidService).validateUID(CASE_REFERENCE)
             );
         }
@@ -85,15 +86,15 @@ class CaseServiceTest {
         void shoudThrowBadRequestException() {
             doThrow(new BadRequestException("...")).when(uidService).validateUID(CASE_REFERENCE);
 
-            assertThrows(BadRequestException.class, () -> caseService.getCaseDetails(CASE_REFERENCE));
+            assertThrows(BadRequestException.class, () -> caseService.getCaseDetails(JURISDICTION, CASE_REFERENCE));
         }
 
         @Test
         @DisplayName("should fail when case isn't found in the DB")
         void shoudThrowResourceNotFoundException() {
-            doThrow(new ResourceNotFoundException("...")).when(caseDetailsRepository).findByReference(REFERENCE);
+            doReturn(Optional.empty()).when(caseDetailsRepository).findByReference(JURISDICTION, REFERENCE);
 
-            assertThrows(ResourceNotFoundException.class, () -> caseService.getCaseDetails(CASE_REFERENCE));
+            assertThrows(ResourceNotFoundException.class, () -> caseService.getCaseDetails(JURISDICTION, CASE_REFERENCE));
         }
     }
 

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
 import java.util.Map;
+import java.util.Optional;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -75,15 +76,12 @@ public class CaseService {
         return clone;
     }
 
-    public CaseDetails getCaseDetails(String caseReference) {
+    public CaseDetails getCaseDetails(String jurisdictionId, String caseReference) {
         if (!uidService.validateUID(caseReference)) {
             throw new BadRequestException("Case reference is not valid");
         }
-        final CaseDetails caseDetails = caseDetailsRepository.findByReference(Long.valueOf(caseReference));
-        if (caseDetails == null) {
-            throw new ResourceNotFoundException("No case exist with id=" + caseReference);
-        }
-        return caseDetails;
+        final Optional<CaseDetails> caseDetails = caseDetailsRepository.findByReference(jurisdictionId, Long.valueOf(caseReference));
+        return caseDetails.orElseThrow(() -> new ResourceNotFoundException("No case exist with id=" + caseReference));
     }
 
 }
