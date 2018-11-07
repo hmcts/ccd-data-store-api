@@ -1,5 +1,23 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.junit.Before;
@@ -8,17 +26,6 @@ import org.mockito.Mockito;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.*;
 
 public class CaseViewFieldBuilderTest {
 
@@ -175,4 +182,18 @@ public class CaseViewFieldBuilderTest {
         verify(fieldBuilder).build(CASE_FIELD, EVENT_FIELD, null);
     }
 
+    @Test
+    public void shouldOverrideCaseFieldLabelAndHintWithEventFieldLabelAndHint() {
+        String overriddenLabel = "overridden label";
+        String overriddenHint = "overridden hint";
+        CaseField caseField = new CaseField();
+        CaseEventField caseEventField = new CaseEventField();
+        caseEventField.setLabel(overriddenLabel);
+        caseEventField.setHintText(overriddenHint);
+
+        CaseViewField caseViewField = fieldBuilder.build(caseField, caseEventField);
+
+        assertThat(caseViewField.getLabel(), is(overriddenLabel));
+        assertThat(caseViewField.getHintText(), is(overriddenHint));
+    }
 }
