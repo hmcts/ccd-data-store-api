@@ -28,8 +28,8 @@ import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.SECURI
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
 
 public class CaseDetails implements Cloneable {
+    public static final String LABEL_FIELD_TYPE = "Label";
     private static final Logger LOG = LoggerFactory.getLogger(CaseDetails.class);
-    private static final String LABEL_FIELD_TYPE = "Label";
     private static final String CASE_PAYMENT_HISTORY_VIEWER_FIELD_TYPE = "CasePaymentHistoryViewer";
     public static final String DRAFT_ID = "DRAFT%s";
 
