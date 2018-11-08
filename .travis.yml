@@ -12,7 +12,7 @@ cache:
     - $HOME/.gradle/wrapper/
 
 script:
-  - "./gradlew build"
+  - "./gradlew build --info"
   - "./gradlew dependencyCheckAnalyze || echo 'dependencyCheckAnalyze failed'"
   - "./gradlew sendCoverageToCodacy || echo sendCoverageToCodacy failed"
 
@@ -21,8 +21,8 @@ env:
     - CODACY_PROJECT_TOKEN=24f7bf62b3fa4328aa3b9bf32c07b0d9
 
 before_install:
-  - curl https://raw.githubusercontent.com/hmcts/reform-api-docs/master/bin/publish-swagger-docs.sh > publish-swagger-docs.sh
+  - curl https://raw.githubusercontent.com/hmcts/reform-api-docs/support-swagger-groups/bin/publish-swagger-group-docs.sh > publish-swagger-group-docs.sh
 
 after_success:
-  - "bash <(curl -s https://codecov.io/bash) || echo 'Codecov failed to upload'"
-  - [ "$TRAVIS_BRANCH" = "master" -a "$TRAVIS_PULL_REQUEST" = "false" ] && sh ./publish-swagger-docs.sh
+  - 'bash <(curl -s https://codecov.io/bash) || echo "Codecov failed to upload"'
+  - '[ "$TRAVIS_BRANCH" = "master" -a "$TRAVIS_PULL_REQUEST" = "false" ] && sh ./publish-swagger-group-docs.sh v1 v2'

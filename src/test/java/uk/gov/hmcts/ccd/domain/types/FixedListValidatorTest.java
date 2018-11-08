@@ -1,110 +1,107 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.test.util.ReflectionTestUtils;
-import uk.gov.hmcts.ccd.BaseTest;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.test.CaseFieldBuilder;
 
-import javax.inject.Inject;
+import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.types.BaseTypeValidator.REGEX_GUIDANCE;
 
-public class FixedListValidatorTest extends BaseTest {
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final String CASE_FIELD_STRING =
-        "{\n" +
-        "  \"id\": \"TEST_FIELD_ID\",\n" +
-        "  \"field_type\": {\n" +
-        "    \"type\": \"FixedList\",\n" +
-        "    \"fixed_list_items\": [\n" +
-        "      {\"code\" : \"AAAAAA\"},\n" +
-        "      {\"code\" : \"BBBBBB\"},\n" +
-        "      {\"code\" : \"CCCCCC\"}\n" +
-        "    ]\n" +
-        "  }\n" +
-        "}";
+@DisplayName("FixedListValidator")
+class FixedListValidatorTest {
+    private static final String FIELD_ID = "TEST_FIELD_ID";
     private static final JsonNodeFactory NODE_FACTORY = JsonNodeFactory.instance;
 
-    @Inject
+    @Mock
+    private BaseType fixedListBaseType;
+
+    @Mock
+    private CaseDefinitionRepository definitionRepository;
+
     private FixedListValidator validator;
     private CaseField caseField;
 
-    @Before
-    public void setUp() throws Exception {
-        caseField = MAPPER.readValue(CASE_FIELD_STRING, CaseField.class);
-        ReflectionTestUtils.setField(validator.getType(), "regularExpression", null);
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.initMocks(this);
+
+        when(definitionRepository.getBaseTypes()).thenReturn(Collections.emptyList());
+        BaseType.setCaseDefinitionRepository(definitionRepository);
+        BaseType.initialise();
+
+        when(fixedListBaseType.getType()).thenReturn(FixedListValidator.TYPE_ID);
+        when(fixedListBaseType.getRegularExpression()).thenReturn(null);
+        BaseType.register(fixedListBaseType);
+
+        validator = new FixedListValidator();
+
+        caseField = caseField().build();
     }
 
     @Test
-    public void validValue() throws Exception {
-        final List<ValidationResult> result01 = validator.validate("TEST_FIELD_ID", MAPPER.readTree("\"AAAAAA\""), caseField);
+    void validValue() {
+        final List<ValidationResult> result01 = validator.validate("TEST_FIELD_ID",
+                                                                   NODE_FACTORY.textNode("AAAAAA"),
+                                                                   caseField);
         assertEquals(0, result01.size());
     }
 
     @Test
-    public void invalidValue() throws Exception {
-        final List<ValidationResult> result01 = validator.validate("TEST_FIELD_ID", MAPPER.readTree("\"DDDD\""), caseField);
-        assertEquals(result01.toString(), 1, result01.size());
+    void invalidValue() {
+        final List<ValidationResult> result01 = validator.validate("TEST_FIELD_ID",
+                                                                   NODE_FACTORY.textNode("DDDD"),
+                                                                   caseField);
+        assertEquals(1, result01.size(), result01.toString());
     }
 
     @Test
-    public void nullValue() {
-        assertEquals("Did not catch NULL", 0, validator.validate("TEST_FIELD_ID", null, null).size());
+    void nullValue() {
+        assertEquals(0, validator.validate("TEST_FIELD_ID", null, null).size(), "Did not catch NULL");
     }
 
     @Test
-    public void getType() {
-        assertEquals("Type is incorrect", validator.getType(), BaseType.get("FixedList"));
+    void getType() {
+        assertEquals(validator.getType(), BaseType.get("FixedList"), "Type is incorrect");
     }
 
     @Test
-    public void fieldTypeRegEx() throws Exception {
-        final CaseField caseFieldWithRegEx = MAPPER.readValue(
-            "{\n" +
-                "  \"id\": \"TEST_FIELD_ID\",\n" +
-                "  \"field_type\": {\n" +
-                "    \"type\": \"FixedList\",\n" +
-                "    \"regular_expression\": \"AAAAAA\",\n" +
-                "    \"fixed_list_items\": [\n" +
-                "      {\"code\" : \"AAAAAA\"},\n" +
-                "      {\"code\" : \"BBBBBB\"},\n" +
-                "      {\"code\" : \"CCCCCC\"}\n" +
-                "    ]\n" +
-                "  }\n" +
-                "}",
-            CaseField.class);
-        final List<ValidationResult> result01 = validator.validate("TEST_FIELD_ID", MAPPER.readTree("\"AAAAAA\""),
-            caseFieldWithRegEx);
+    void fieldTypeRegEx() {
+        final CaseField caseFieldWithRegEx = caseField().withRegExp("AAAAAA").build();
+        final List<ValidationResult> result01 = validator.validate("TEST_FIELD_ID", NODE_FACTORY.textNode("AAAAAA"),
+                                                                   caseFieldWithRegEx);
         assertEquals(0, result01.size());
 
-        final List<ValidationResult> result02 = validator.validate("TEST_FIELD_ID", MAPPER.readTree("\"BBBBBB\""),
-            caseFieldWithRegEx);
-        assertEquals("BBBBBB failed regular expression check", 1, result02.size());
+        final List<ValidationResult> result02 = validator.validate("TEST_FIELD_ID", NODE_FACTORY.textNode("BBBBBB"),
+                                                                   caseFieldWithRegEx);
+        assertEquals(1, result02.size(), "BBBBBB failed regular expression check");
         assertEquals(REGEX_GUIDANCE, result02.get(0).getErrorMessage());
         assertEquals("TEST_FIELD_ID", result02.get(0).getFieldId());
     }
 
     @Test
-    public void baseTypeRegEx() throws Exception {
-        ReflectionTestUtils.setField(validator.getType(), "regularExpression", "InvalidRegEx");
-
-        final CaseField caseField = MAPPER.readValue(
-            "{\n" +
-                "  \"id\": \"DATE_TEST\",\n" +
-                "  \"field_type\": {\n" +
-                "    \"type\": \"DATE\"\n" +
-                "  }\n" +
-                "}", CaseField.class);
+    void baseTypeRegEx() {
+        when(fixedListBaseType.getRegularExpression()).thenReturn("InvalidRegEx");
         final List<ValidationResult> result = validator.validate("TEST_FIELD_ID",
-            NODE_FACTORY.textNode("AA"), caseField);
-        assertEquals("RegEx validation failed", 1, result.size());
+                                                                 NODE_FACTORY.textNode("AA"), caseField);
+        assertEquals(1, result.size(), "RegEx validation failed");
         assertEquals("'AA' failed FixedList Type Regex check: InvalidRegEx", result.get(0).getErrorMessage());
         assertEquals("TEST_FIELD_ID", result.get(0).getFieldId());
     }
 
+    private CaseFieldBuilder caseField() {
+        return new CaseFieldBuilder(FIELD_ID).withType(FixedListValidator.TYPE_ID)
+                                             .withFixedListItem("AAAAAA")
+                                             .withFixedListItem("BBBBBB")
+                                             .withFixedListItem("CCCCCC");
+    }
 }

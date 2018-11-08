@@ -16,7 +16,9 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityValidationService;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 import static com.google.common.collect.Maps.newHashMap;
 import static java.util.Optional.ofNullable;
@@ -71,7 +73,7 @@ public class CallbackInvoker {
         final Optional<CallbackResponse> callbackResponse = callbackService.send(
             eventTrigger.getCallBackURLAboutToSubmitEvent(),
             eventTrigger.getRetriesTimeoutURLAboutToSubmitEvent(),
-            eventTrigger, caseDetailsBefore, caseDetails);
+            eventTrigger, caseDetailsBefore, caseDetails, ignoreWarning);
 
         if (callbackResponse.isPresent()) {
             return validateAndSetFromAboutToSubmitCallback(caseType,

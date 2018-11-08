@@ -1,5 +1,13 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.util.*;
+import java.util.function.Consumer;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Arrays.asList;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -18,14 +26,6 @@ import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
-
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.util.*;
-import java.util.function.Consumer;
-
-import static com.google.common.collect.Lists.newArrayList;
-import static java.util.Arrays.asList;
 
 public class TestBuildersUtil {
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -450,6 +450,16 @@ public class TestBuildersUtil {
 
         public CaseViewBuilder withCaseViewTrigger(CaseViewTrigger caseViewTrigger) {
             this.caseViewTriggers.add(caseViewTrigger);
+            return this;
+        }
+
+        public CaseViewBuilder withCaseId(String caseId) {
+            this.caseView.setCaseId(caseId);
+            return this;
+        }
+
+        public CaseViewBuilder withCaseViewType(CaseViewType caseType) {
+            this.caseView.setCaseType(caseType);
             return this;
         }
 

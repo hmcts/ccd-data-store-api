@@ -6,11 +6,7 @@ import java.util.Set;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.RESTRICTED;
@@ -40,8 +36,45 @@ class CachedUserRepositoryTest {
     }
 
     @Nested
+    @DisplayName("getUserId()")
+    class GetUserId {
+
+        @Test
+        @DisplayName("should initially retrieve user name from decorated repository")
+        void shouldRetrieveUserNameFromDecorated() {
+            String expectedUserName = "26";
+            doReturn(expectedUserName).when(userRepository).getUserId();
+
+            String userName = cachedUserRepository.getUserId();
+
+            assertAll(
+                () -> assertThat(userName, is(expectedUserName)),
+                () -> verify(userRepository, times(1)).getUserId()
+            );
+        }
+
+        @Test
+        @DisplayName("should cache user name for subsequent calls")
+        void shouldCacheUserNameForSubsequentCalls() {
+            String expectedUserName = "26";
+            doReturn(expectedUserName).when(userRepository).getUserId();
+
+            cachedUserRepository.getUserId();
+
+            verify(userRepository, times(1)).getUserId();
+
+            String userName = cachedUserRepository.getUserId();
+
+            assertAll(
+                () -> assertThat(userName, is(expectedUserName)),
+                () -> verifyNoMoreInteractions(userRepository)
+            );
+        }
+    }
+
+    @Nested
     @DisplayName("getUserDetails()")
-    class getUserDetails {
+    class GetUserDetails {
 
         @Test
         @DisplayName("should initially retrieve user details from decorated repository")
@@ -80,7 +113,7 @@ class CachedUserRepositoryTest {
 
     @Nested
     @DisplayName("getUserRoles()")
-    class getUserRoles {
+    class GetUserRoles {
 
         @Test
         @DisplayName("should initially retrieve user roles from decorated repository")
@@ -120,7 +153,7 @@ class CachedUserRepositoryTest {
 
     @Nested
     @DisplayName("getUserClassifications()")
-    class getUserClassifications {
+    class GetUserClassifications {
 
         @Test
         @DisplayName("should initially retrieve classifications from decorated repository")

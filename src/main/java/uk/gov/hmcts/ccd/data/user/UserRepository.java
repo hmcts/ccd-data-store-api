@@ -17,4 +17,6 @@ public interface UserRepository {
     Set<SecurityClassification> getUserClassifications(String jurisdictionId);
 
     SecurityClassification getHighestUserClassification(String jurisdictionId);
+
+    String getUserId();
 }

@@ -14,12 +14,25 @@ public class CallbackRequest {
     @JsonProperty("event_id")
     private String eventId;
 
+    @JsonProperty("ignore_warning")
+    private Boolean ignoreWarning;
+
     public CallbackRequest(final CaseDetails caseDetails,
                            final CaseDetails caseDetailsBefore,
                            final String eventId) {
         this.caseDetails = caseDetails;
         this.caseDetailsBefore = caseDetailsBefore;
         this.eventId = eventId;
+    }
+
+    public CallbackRequest(final CaseDetails caseDetails,
+                           final CaseDetails caseDetailsBefore,
+                           final String eventId,
+                           final Boolean ignoreWarning) {
+        this.caseDetails = caseDetails;
+        this.caseDetailsBefore = caseDetailsBefore;
+        this.eventId = eventId;
+        this.ignoreWarning = ignoreWarning;
     }
 
     public CaseDetails getCaseDetails() {
@@ -32,5 +45,9 @@ public class CallbackRequest {
 
     public String getEventId() {
         return eventId;
+    }
+
+    public Boolean getIgnoreWarning() {
+        return ignoreWarning;
     }
 }

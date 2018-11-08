@@ -1,11 +1,11 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
+import java.io.Serializable;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.ToString;
-
-import java.io.Serializable;
 
 @ToString
 @ApiModel(description = "")
@@ -16,6 +16,8 @@ public class CaseEventField implements Serializable {
     private String showCondition = null;
     private Boolean showSummaryChangeOption = null;
     private Integer showSummaryContentOption = null;
+    private String label = null;
+    private String hintText = null;
 
     @ApiModelProperty(required = true, value = "Foreign key to CaseField.id")
     @JsonProperty("case_field_id")
@@ -65,5 +67,31 @@ public class CaseEventField implements Serializable {
 
     public void setShowSummaryContentOption(Integer showSummaryContentOption) {
         this.showSummaryContentOption = showSummaryContentOption;
+    }
+
+    /**
+     * event case field label
+     **/
+    @ApiModelProperty(value = "")
+    @JsonProperty("label")
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    /**
+     * event case field hint text
+     **/
+    @ApiModelProperty(value = "")
+    @JsonProperty("hint_text")
+    public String getHintText() {
+        return hintText;
+    }
+
+    public void setHintText(String hintText) {
+        this.hintText = hintText;
     }
 }
