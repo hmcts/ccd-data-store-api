@@ -1,20 +1,20 @@
 package uk.gov.hmcts.ccd.data.caseaccess;
 
-import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
 @Table(name = "case_users")
-@NamedQueries({@NamedQuery(name = CaseUserEntity.GET_ALL_CASES_USER_HAS_ACCESS_TO,
-    query = "SELECT casePrimaryKey.caseDataId from CaseUserEntity where casePrimaryKey.userId = :userId")})
+@NamedQueries({
+    @NamedQuery(name = CaseUserEntity.GET_ALL_CASES_USER_HAS_ACCESS_TO,
+        query = "SELECT casePrimaryKey.caseDataId from CaseUserEntity where casePrimaryKey.userId = :userId"),
+    @NamedQuery(name = CaseUserEntity.GET_ALL_CASE_ROLES_USER_HAS_ACCESS_FOR_A_CASE,
+        query = "SELECT casePrimaryKey.caseRole from CaseUserEntity where casePrimaryKey.userId = :userId and casePrimaryKey.caseDataId = :caseDataId")
+})
 public class CaseUserEntity implements Serializable {
 
-    static final String GET_ALL_CASES_USER_HAS_ACCESS_TO = "GET_ALL_CASES";
+    protected static final String GET_ALL_CASES_USER_HAS_ACCESS_TO = "GET_ALL_CASES";
+    protected static final String GET_ALL_CASE_ROLES_USER_HAS_ACCESS_FOR_A_CASE = "GET_ALL_CASES_ROLES_FOR_A_CASE";
 
     public static class CasePrimaryKey implements Serializable {
         @Column(name = "case_data_id")

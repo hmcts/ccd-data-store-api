@@ -60,11 +60,24 @@ public class CallbackService {
                                            final CaseDetails caseDetailsBefore,
                                            final CaseDetails caseDetails) {
 
+        return send(url, callbackRetries, caseEvent, caseDetailsBefore, caseDetails, false);
+    }
+
+    public Optional<CallbackResponse> send(final String url,
+                                           final List<Integer> callbackRetries,
+                                           final CaseEvent caseEvent,
+                                           final CaseDetails caseDetailsBefore,
+                                           final CaseDetails caseDetails,
+                                           final Boolean ignoreWarning) {
+
         if (url == null || url.isEmpty()) {
             return Optional.empty();
         }
 
-        final CallbackRequest callbackRequest = new CallbackRequest(caseDetails, caseDetailsBefore, caseEvent.getId());
+        final CallbackRequest callbackRequest = new CallbackRequest(caseDetails,
+                                                                    caseDetailsBefore,
+                                                                    caseEvent.getId(),
+                                                                    ignoreWarning);
         final List<Integer> retries = CollectionUtils.isEmpty(callbackRetries) ? defaultRetries : callbackRetries;
 
         for (Integer timeout : retries) {

@@ -168,6 +168,10 @@ public class ApplicationParams {
         return idamHost + "/details";
     }
 
+    public String caseRolesURL() {
+        return caseDefinitionHost + "/api/data/caseworkers/uid/jurisdictions/jid/case-types";
+    }
+
     public String userDefaultSettingsURL() {
         return userProfileHost + "/user-profile/users?uid={uid}";
     }
