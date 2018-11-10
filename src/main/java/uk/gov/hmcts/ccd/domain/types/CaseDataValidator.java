@@ -95,7 +95,7 @@ public class CaseDataValidator {
                                                        final CaseField caseFieldDefinition,
                                                        final String fieldIdPrefix,
                                                        final BaseType fieldType) {
-        return validators.stream()
+                return validators.stream()
             .filter(validator -> validator.getType() == fieldType)
             .findAny()
             .map(baseTypeValidator -> baseTypeValidator
