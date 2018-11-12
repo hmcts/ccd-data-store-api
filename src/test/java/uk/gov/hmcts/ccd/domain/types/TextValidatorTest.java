@@ -1,115 +1,112 @@
 package uk.gov.hmcts.ccd.domain.types;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.test.CaseFieldBuilder;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.Mockito.when;
 
-public class TextValidatorTest {
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final String CASE_FIELD_STRING =
-        "{\n" +
-        "  \"id\": \"TEST_FIELD_ID\",\n" +
-        "  \"field_type\": {\n" +
-        "    \"type\": \"Text\",\n" +
-        "    \"max\": 10,\n" +
-        "    \"min\": 5\n" +
-        "  }\n" +
-        "}";
+@DisplayName("TextValidator")
+class TextValidatorTest {
+    private static final JsonNodeFactory NODE_FACTORY = JsonNodeFactory.instance;
+    private static final String FIELD_ID = "TEST_FIELD_ID";
+
+    @Mock
+    private BaseType textBaseType;
+
+    @Mock
+    private CaseDefinitionRepository definitionRepository;
 
     private TextValidator validator;
     private CaseField caseField;
 
     @BeforeEach
-    public void setUp() throws Exception {
-        caseField = MAPPER.readValue(CASE_FIELD_STRING, CaseField.class);
+    void setUp() {
+        MockitoAnnotations.initMocks(this);
+
+        when(definitionRepository.getBaseTypes()).thenReturn(Collections.emptyList());
+        BaseType.setCaseDefinitionRepository(definitionRepository);
+        BaseType.initialise();
+
+        when(textBaseType.getType()).thenReturn(TextValidator.TYPE_ID);
+        BaseType.register(textBaseType);
 
         validator = new TextValidator();
+
+        caseField = caseField().withMin(5)
+                               .withMax(10)
+                               .build();
     }
 
     @Test
     @DisplayName("should be valid when text length between min and max")
-    public void textFieldWithValidMinMax() throws Exception {
-        final JsonNode DATA = MAPPER.readTree("\"5 & 10\"");
-        final List<ValidationResult> validMinMaxResults = validator.validate("TEST_FIELD_ID", DATA, caseField);
+    void textFieldWithValidMinMax() {
+        final JsonNode DATA = NODE_FACTORY.textNode("5 & 10");
+        final List<ValidationResult> validMinMaxResults = validator.validate(FIELD_ID, DATA, caseField);
 
         assertThat(validMinMaxResults.toString(), validMinMaxResults, hasSize(0));
     }
 
     @Test
     @DisplayName("should NOT be valid when text length outside of min and max")
-    public void textFieldWithInvalidMinMax() throws Exception {
-        final JsonNode INVALID_MIN = MAPPER.readTree("\"Test\"");
-        final List<ValidationResult> validMinResults = validator.validate("TEST_FIELD_ID", INVALID_MIN, caseField);
+    void textFieldWithInvalidMinMax() {
+        final JsonNode INVALID_MIN = NODE_FACTORY.textNode("Test");
+        final List<ValidationResult> validMinResults = validator.validate(FIELD_ID, INVALID_MIN, caseField);
 
-        final JsonNode INVALID_MAX = MAPPER.readTree("\"Test Test Test\"");
-        final List<ValidationResult> validMaxResults = validator.validate("TEST_FIELD_ID", INVALID_MAX, caseField);
+        final JsonNode INVALID_MAX = NODE_FACTORY.textNode("Test Test Test");
+        final List<ValidationResult> validMaxResults = validator.validate(FIELD_ID, INVALID_MAX, caseField);
 
         assertAll(
             () -> assertThat("Min not catched", validMinResults, hasSize(1)),
             () -> assertThat("Max not catched", validMaxResults, hasSize(1)),
             () -> assertThat(validMinResults, hasItem(
-                    hasProperty("errorMessage", equalTo("Test require minimum length 5")))),
-            () -> assertThat(validMinResults, hasItem(hasProperty("fieldId", equalTo("TEST_FIELD_ID")))),
+                hasProperty("errorMessage", equalTo("Test require minimum length 5")))),
+            () -> assertThat(validMinResults, hasItem(hasProperty("fieldId", equalTo(FIELD_ID)))),
             () -> assertThat(validMaxResults, hasItem(
-                    hasProperty("errorMessage", equalTo("Test Test Test exceed maximum length 10")))),
-            () -> assertThat(validMaxResults, hasItem(hasProperty("fieldId", equalTo("TEST_FIELD_ID"))))
+                hasProperty("errorMessage", equalTo("Test Test Test exceed maximum length 10")))),
+            () -> assertThat(validMaxResults, hasItem(hasProperty("fieldId", equalTo(FIELD_ID))))
         );
     }
 
     @Test
     @DisplayName("should be valid when no min and max defined")
-    public void textFieldWithNoMinMax() throws Exception {
-        final String NO_MAX_MIN_CASE_FIELD_STRING =
-            "{\n" +
-            "  \"id\": \"TEST_FIELD_ID\",\n" +
-            "  \"field_type\": {\n" +
-            "    \"type\": \"Text\"\n" +
-            "  }\n" +
-            "}";
-        final CaseField noMinMaxCaseField = MAPPER.readValue(NO_MAX_MIN_CASE_FIELD_STRING, CaseField.class);
-        final JsonNode value = MAPPER.readTree("\"Test\"");
-        final List<ValidationResult> validMinMaxResults = validator.validate("TEST_FIELD_ID", value, noMinMaxCaseField);
+    void textFieldWithNoMinMax() {
+        final CaseField caseField = caseField().build();
+        final JsonNode value = NODE_FACTORY.textNode("Test");
+        final List<ValidationResult> validMinMaxResults = validator.validate(FIELD_ID, value, caseField);
         assertThat(validMinMaxResults.toString(), validMinMaxResults, hasSize(0));
     }
 
     @Test
     @DisplayName("should test exact length when min and max are equal")
-    public void textFieldWithSameMinMax() throws Exception {
-        final String SAME_MAX_MIN_CASE_FIELD_STRING =
-            "{\n" +
-            "  \"id\": \"TEST_FIELD_ID\",\n" +
-            "  \"field_type\": {\n" +
-            "    \"type\": \"Text\",\n" +
-            "    \"max\": 5,\n" +
-            "    \"min\": 5\n" +
-            "  }\n" +
-            "}";
-        final CaseField sameMinMaxCaseField = MAPPER.readValue(SAME_MAX_MIN_CASE_FIELD_STRING, CaseField.class);
-        final JsonNode valid_value = MAPPER.readTree("\"12345\"");
-        final List<ValidationResult> validMinMaxResults = validator.validate("TEST_FIELD_ID", valid_value, sameMinMaxCaseField);
+    void textFieldWithSameMinMax() {
+        final CaseField caseField = caseField().withMin(5)
+                                               .withMax(5)
+                                               .build();
+        final JsonNode valid_value = NODE_FACTORY.textNode("12345");
+        final List<ValidationResult> validMinMaxResults = validator.validate(FIELD_ID, valid_value, caseField);
 
         // Test value over
-        final JsonNode over_value = MAPPER.readTree("\"123456\"");
-        final List<ValidationResult> overMinMaxResults = validator.validate("TEST_FIELD_ID", over_value, sameMinMaxCaseField);
+        final JsonNode over_value = NODE_FACTORY.textNode("123456");
+        final List<ValidationResult> overMinMaxResults = validator.validate(FIELD_ID, over_value, caseField);
 
         // Test value under
-        final JsonNode under_value = MAPPER.readTree("\"1234\"");
-        final List<ValidationResult> underMinMaxResults = validator.validate("TEST_FIELD_ID", under_value, sameMinMaxCaseField);
+        final JsonNode under_value = NODE_FACTORY.textNode("1234");
+        final List<ValidationResult> underMinMaxResults = validator.validate(FIELD_ID, under_value, caseField);
 
         assertAll(
             () -> assertThat("Expected valid input", validMinMaxResults, hasSize(0)),
@@ -120,21 +117,13 @@ public class TextValidatorTest {
 
     @Test
     @DisplayName("should test against regular expression")
-    public void textRegex() throws Exception {
-        final String REGEX_CASE_FIELD_STRING =
-            "{\n" +
-            "  \"id\": \"TEST_FIELD_ID\",\n" +
-            "  \"field_type\": {\n" +
-            "    \"type\": \"Text\",\n" +
-            "    \"regular_expression\": \"\\\\d{4}-\\\\d{2}-\\\\d{2}\"\n" +
-            "  }\n" +
-            "}";
-        final CaseField regexCaseField = MAPPER.readValue(REGEX_CASE_FIELD_STRING, CaseField.class);
-        final JsonNode validValue = MAPPER.readTree("\"1234-56-78\"");
-        final List<ValidationResult> validResult = validator.validate("TEST_FIELD_ID", validValue, regexCaseField);
+    void textRegex() {
+        final CaseField caseField = caseField().withRegExp("\\d{4}-\\d{2}-\\d{2}").build();
+        final JsonNode validValue = NODE_FACTORY.textNode("1234-56-78");
+        final List<ValidationResult> validResult = validator.validate(FIELD_ID, validValue, caseField);
 
-        final JsonNode invalidValue = MAPPER.readTree("\"aa-56-78\"");
-        final List<ValidationResult> invalidResult = validator.validate("TEST_FIELD_ID", invalidValue, regexCaseField);
+        final JsonNode invalidValue = NODE_FACTORY.textNode("aa-56-78");
+        final List<ValidationResult> invalidResult = validator.validate(FIELD_ID, invalidValue, caseField);
 
         assertAll(
             () -> assertThat("Expected input to be valid", validResult, hasSize(0)),
@@ -144,22 +133,25 @@ public class TextValidatorTest {
 
     @Test
     @DisplayName("should be linked to base type")
-    @Disabled("Use of static base type is preventing the use of a mock")
-    public void getType() {
-        assertSame(validator.getType(), BaseType.get("TEXT"));
+    void getType() {
+        assertThat(validator.getType(), is(BaseType.get("Text")));
     }
 
     @Test
     @DisplayName("should be valid when input is null value")
-    public void nullValue() {
-        final List<ValidationResult> validationResult = validator.validate("TEST_FIELD_ID", null, caseField);
+    void nullValue() {
+        final List<ValidationResult> validationResult = validator.validate(FIELD_ID, null, caseField);
         assertThat(validationResult, hasSize(0));
     }
 
     @Test
     @DisplayName("should be valid when input is null text node")
-    public void nullTextValue() {
-        final List<ValidationResult> validationResult = validator.validate("TEST_FIELD_ID", new TextNode(null), caseField);
+    void nullTextValue() {
+        final List<ValidationResult> validationResult = validator.validate(FIELD_ID, new TextNode(null), caseField);
         assertThat(validationResult, hasSize(0));
+    }
+
+    private CaseFieldBuilder caseField() {
+        return new CaseFieldBuilder(FIELD_ID).withType(TextValidator.TYPE_ID);
     }
 }

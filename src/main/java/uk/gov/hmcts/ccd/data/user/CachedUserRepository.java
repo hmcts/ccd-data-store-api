@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.data.user;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static com.google.common.collect.Maps.newHashMap;
@@ -26,6 +27,7 @@ public class CachedUserRepository implements UserRepository {
     private final Map<String, IDAMProperties> userDetails = newHashMap();
     private final Map<String, Set<String>> userRoles = newHashMap();
     private final Map<String, SecurityClassification> userHighestSecurityClassification = newHashMap();
+    private Optional<String> userName = Optional.empty();
 
     @Autowired
     public CachedUserRepository(@Qualifier(DefaultUserRepository.QUALIFIER) UserRepository userRepository) {
@@ -55,5 +57,13 @@ public class CachedUserRepository implements UserRepository {
     @Override
     public SecurityClassification getHighestUserClassification(String jurisdictionId) {
         return userHighestSecurityClassification.computeIfAbsent(jurisdictionId, s -> userRepository.getHighestUserClassification(jurisdictionId));
+    }
+
+    @Override
+    public String getUserId() {
+        return userName.orElseGet(() -> {
+            userName = Optional.of(userRepository.getUserId());
+            return userName.get();
+        });
     }
 }
