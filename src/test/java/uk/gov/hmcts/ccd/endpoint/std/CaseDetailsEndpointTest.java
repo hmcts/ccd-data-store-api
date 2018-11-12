@@ -277,7 +277,8 @@ class CaseDetailsEndpointTest {
             CASE_TYPE_ID,
             EVENT,
             DATA,
-            pageId);
+            pageId,
+            IGNORE_WARNING);
 
         final JsonNode output = endpoint.validateCaseDetails(
             UID,
@@ -298,7 +299,8 @@ class CaseDetailsEndpointTest {
                 CASE_TYPE_ID,
                 EVENT_DATA.getEvent(),
                 DATA,
-                pageId)
+                pageId,
+                IGNORE_WARNING)
         );
     }
 

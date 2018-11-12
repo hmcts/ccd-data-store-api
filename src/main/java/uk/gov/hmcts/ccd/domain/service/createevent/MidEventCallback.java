@@ -50,7 +50,8 @@ public class MidEventCallback {
                            String caseTypeId,
                            Event event,
                            Map<String, JsonNode> data,
-                           String pageId) {
+                           String pageId,
+                           Boolean ignoreWarning) {
         if (!isBlank(pageId)) {
             final CaseType caseType = getCaseType(caseTypeId);
             final CaseEvent caseEvent = getCaseEvent(event, caseType);
@@ -68,7 +69,8 @@ public class MidEventCallback {
                     caseType,
                     caseEvent,
                     null,
-                    newCaseDetails);
+                    newCaseDetails,
+                    ignoreWarning);
                 return dataJsonNode(caseDetails.getData());
             }
         }

@@ -101,7 +101,8 @@ public class CallbackInvoker {
                                               final CaseType caseType,
                                               final CaseEvent caseEvent,
                                               final CaseDetails caseDetailsBefore,
-                                              final CaseDetails caseDetails) {
+                                              final CaseDetails caseDetails,
+                                              final Boolean ignoreWarning) {
 
         Optional<CallbackResponse> callbackResponseOptional = callbackService.send(wizardPage.getCallBackURLMidEvent(),
             wizardPage.getRetriesTimeoutMidEvent(),
@@ -112,7 +113,7 @@ public class CallbackInvoker {
         if (callbackResponseOptional.isPresent()) {
             CallbackResponse callbackResponse = callbackResponseOptional.get();
 
-            callbackService.validateCallbackErrorsAndWarnings(callbackResponse, false);
+            callbackService.validateCallbackErrorsAndWarnings(callbackResponse, ignoreWarning);
             if (callbackResponse.getData() != null) {
                 validateAndSetData(caseType, caseDetails, callbackResponse.getData());
             }

@@ -52,6 +52,7 @@ class CallbackInvokerTest {
     private static final List<Integer> RETRIES_ABOUT_TO_SUBMIT = Collections.unmodifiableList(Arrays.asList(4, 5, 6));
     private static final List<Integer> RETRIES_AFTER_SUBMIT = Collections.unmodifiableList(Arrays.asList(7, 8, 9));
     private static final List<Integer> RETRIES_MID_EVENT = Collections.unmodifiableList(Arrays.asList(10, 11, 12));
+    private static final Boolean IGNORE_WARNINGS = Boolean.FALSE;
 
     @Mock
     private CallbackService callbackService;
@@ -347,7 +348,12 @@ class CallbackInvokerTest {
         @Test
         @DisplayName("should send callback")
         void shouldSendCallback() {
-            callbackInvoker.invokeMidEventCallback(wizardPage, caseType, caseEvent, caseDetailsBefore, caseDetails);
+            callbackInvoker.invokeMidEventCallback(wizardPage,
+                caseType,
+                caseEvent,
+                caseDetailsBefore,
+                caseDetails,
+                IGNORE_WARNINGS);
 
             verify(callbackService).send(URL_MID_EVENT, RETRIES_MID_EVENT, caseEvent, caseDetailsBefore, caseDetails);
         }
@@ -593,7 +599,12 @@ class CallbackInvokerTest {
                     caseDetailsBefore,
                     caseDetails)).thenReturn(Optional.of(callbackResponse));
 
-                callbackInvoker.invokeMidEventCallback(wizardPage, caseType, caseEvent, caseDetailsBefore, caseDetails);
+                callbackInvoker.invokeMidEventCallback(wizardPage,
+                    caseType,
+                    caseEvent,
+                    caseDetailsBefore,
+                    caseDetails,
+                    IGNORE_WARNINGS);
 
                 assertAll(
                     () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, FALSE),
@@ -616,7 +627,12 @@ class CallbackInvokerTest {
                     caseDetailsBefore,
                     caseDetails)).thenReturn(Optional.of(callbackResponse));
 
-                callbackInvoker.invokeMidEventCallback(wizardPage, caseType, caseEvent, caseDetailsBefore, caseDetails);
+                callbackInvoker.invokeMidEventCallback(wizardPage,
+                    caseType,
+                    caseEvent,
+                    caseDetailsBefore,
+                    caseDetails,
+                    IGNORE_WARNINGS);
 
                 assertAll(
                     () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, FALSE),
@@ -645,7 +661,12 @@ class CallbackInvokerTest {
 
                 final ApiException apiException =
                     assertThrows(ApiException.class,
-                        () -> callbackInvoker.invokeMidEventCallback(wizardPage, caseType, caseEvent, caseDetailsBefore, caseDetails));
+                        () -> callbackInvoker.invokeMidEventCallback(wizardPage,
+                            caseType,
+                            caseEvent,
+                            caseDetailsBefore,
+                            caseDetails,
+                            IGNORE_WARNINGS));
 
                 assertThat(apiException.getMessage(), is(ErrorMessage));
 

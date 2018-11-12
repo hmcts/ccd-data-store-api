@@ -39,6 +39,7 @@ class MidEventCallbackTest {
     private static final TypeReference STRING_JSON = new TypeReference<JsonNode>() {};
     private static final String JURISDICTION_ID = "jurisdictionId";
     private static final String CASE_TYPE_ID = "caseTypeId";
+    private static final Boolean IGNORE_WARNINGS = Boolean.FALSE;
 
     @InjectMocks
     private MidEventCallback midEventCallback;
@@ -91,19 +92,22 @@ class MidEventCallbackTest {
             caseType,
             caseEvent,
             null,
-            caseDetails)).willReturn(caseDetails);
+            caseDetails,
+            IGNORE_WARNINGS)).willReturn(caseDetails);
 
         midEventCallback.invoke(JURISDICTION_ID,
             CASE_TYPE_ID,
             event,
             data,
-            "createCase1");
+            "createCase1",
+            IGNORE_WARNINGS);
 
         verify(callbackInvoker).invokeMidEventCallback(wizardPageWithCallback,
             caseType,
             caseEvent,
             null,
-            caseDetails);
+            caseDetails,
+            IGNORE_WARNINGS);
     }
 
     @Test
@@ -120,14 +124,16 @@ class MidEventCallbackTest {
             caseType,
             caseEvent,
             null,
-            caseDetails)).willReturn(updatedCaseDetails);
+            caseDetails,
+            IGNORE_WARNINGS)).willReturn(updatedCaseDetails);
 
 
         JsonNode result = midEventCallback.invoke(JURISDICTION_ID,
             CASE_TYPE_ID,
             event,
             data,
-            "createCase1");
+            "createCase1",
+            IGNORE_WARNINGS);
 
         final JsonNode expectedResponse = MAPPER.readTree(
             "{" +
@@ -145,7 +151,8 @@ class MidEventCallbackTest {
             CASE_TYPE_ID,
             event,
             data,
-            "");
+            "",
+            IGNORE_WARNINGS);
 
         final JsonNode expectedResponse = MAPPER.readTree("{\"data\": {}}");
         assertThat("Data should stay unchanged", result, is(expectedResponse));
