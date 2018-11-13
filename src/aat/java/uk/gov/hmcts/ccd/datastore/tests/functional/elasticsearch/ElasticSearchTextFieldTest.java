@@ -15,12 +15,11 @@ import uk.gov.hmcts.ccd.datastore.tests.TestData;
 import uk.gov.hmcts.ccd.datastore.tests.helper.elastic.ElasticsearchTestDataLoaderExtension;
 
 @ExtendWith(ElasticsearchTestDataLoaderExtension.class)
-public class ElasticsearchCaseSearchTest extends ElasticsearchBaseTest {
+public class ElasticSearchTextFieldTest extends ElasticsearchBaseTest {
 
     public static final String SEARCH_UPDATED_CASE_TEST_REFERENCE = TestData.uniqueReference();
-    public static final String EXACT_MATCH_TEST_REFERENCE = TestData.uniqueReference();
 
-    ElasticsearchCaseSearchTest(AATHelper aat) {
+    ElasticSearchTextFieldTest(AATHelper aat) {
         super(aat);
     }
 
@@ -59,17 +58,6 @@ public class ElasticsearchCaseSearchTest extends ElasticsearchBaseTest {
             @DisplayName("should return case for exact match on a text field")
             void shouldReturnCaseForExactMatchOnTextField() {
                 searchCaseForExactMatchAndVerifyResponse("TextField", TEXT);
-            }
-        }
-
-        @Nested
-        @DisplayName("date time field")
-        class DateTimeField {
-
-            @Test
-            @DisplayName("should return case for exact match on a date time field")
-            void shouldReturnCaseForExactMatchOnDateTimeField() {
-                searchCaseForExactMatchAndVerifyResponse("DateTimeField", DATE_TIME);
             }
         }
 

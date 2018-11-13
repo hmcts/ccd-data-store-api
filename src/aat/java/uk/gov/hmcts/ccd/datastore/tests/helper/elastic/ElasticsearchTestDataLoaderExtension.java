@@ -12,8 +12,10 @@ import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.datastore.tests.TestData;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType;
+import uk.gov.hmcts.ccd.datastore.tests.functional.elasticsearch.ElasticSearchTextFieldTest;
 import uk.gov.hmcts.ccd.datastore.tests.functional.elasticsearch.ElasticsearchCaseSearchSecurityTest;
-import uk.gov.hmcts.ccd.datastore.tests.functional.elasticsearch.ElasticsearchCaseSearchTest;
+import uk.gov.hmcts.ccd.datastore.tests.functional.elasticsearch.ElasticsearchDateFieldTest;
+import uk.gov.hmcts.ccd.datastore.tests.helper.TestDataLoaderExtension;
 
 public class ElasticsearchTestDataLoaderExtension extends TestDataLoaderExtension {
 
@@ -51,7 +53,7 @@ public class ElasticsearchTestDataLoaderExtension extends TestDataLoaderExtensio
     private void createCases() {
         // create test cases in the alphabetical order of test class names
         createCasesForCaseSearchSecurityTest();
-        createCasesForCaseSearchTest();
+        createCasesForTextSearchTest();
         waitUntilLogstashIndexesCaseData(elasticsearchHelper.getLogstashReadDelay());
     }
 
@@ -67,12 +69,12 @@ public class ElasticsearchTestDataLoaderExtension extends TestDataLoaderExtensio
                                 AATCaseType.CaseData.builder().emailField(ElasticsearchCaseSearchSecurityTest.EMAIL_ID_VALUE).build()));
     }
 
-    private void createCasesForCaseSearchTest() {
+    private void createCasesForTextSearchTest() {
         TestData testData = TestData.getInstance();
 
-        testData.put(ElasticsearchCaseSearchTest.SEARCH_UPDATED_CASE_TEST_REFERENCE,
+        testData.put(ElasticSearchTextFieldTest.SEARCH_UPDATED_CASE_TEST_REFERENCE,
                      createCaseAndProgressState(asPrivateCaseworker(true)));
-        testData.put(ElasticsearchCaseSearchTest.EXACT_MATCH_TEST_REFERENCE,
+        testData.put(ElasticSearchTextFieldTest.EXACT_MATCH_TEST_REFERENCE,
                      createCase(asPrivateCaseworker(true), AATCaseBuilder.FullCase.build()));
     }
 

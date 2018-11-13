@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.datastore.tests.helper.elastic;
+package uk.gov.hmcts.ccd.datastore.tests.helper;
 
 import java.io.File;
 import java.util.function.Supplier;
