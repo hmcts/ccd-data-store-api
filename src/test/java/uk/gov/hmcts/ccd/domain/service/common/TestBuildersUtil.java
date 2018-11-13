@@ -523,6 +523,11 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public AccessControlListBuilder withDelete(boolean delete) {
+            this.accessControlList.setDelete(delete);
+            return this;
+        }
+
         public AccessControlListBuilder withUpdate(boolean update) {
             this.accessControlList.setUpdate(update);
             return this;

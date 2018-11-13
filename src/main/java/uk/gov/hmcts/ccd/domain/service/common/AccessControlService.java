@@ -1,28 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
-import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
-import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.Spliterator;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -33,6 +11,19 @@ import static java.util.Arrays.stream;
 import static java.util.Objects.nonNull;
 import static java.util.Spliterators.spliteratorUnknownSize;
 import static java.util.stream.Collectors.toList;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.NullNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
+import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
 @Service
 public class AccessControlService {
@@ -43,6 +34,7 @@ public class AccessControlService {
     public static final Predicate<AccessControlList> CAN_CREATE = AccessControlList::isCreate;
     public static final Predicate<AccessControlList> CAN_UPDATE = AccessControlList::isUpdate;
     public static final Predicate<AccessControlList> CAN_READ = AccessControlList::isRead;
+    public static final Predicate<AccessControlList> CAN_DELETE = AccessControlList::isDelete;
     public static final String NO_CASE_TYPE_FOUND = "No case type found";
     public static final String NO_CASE_TYPE_FOUND_DETAILS = "Unable to find the case type, please try a search or return to the case list overview page.";
     public static final String NO_CASE_STATE_FOUND = "Invalid event";
@@ -329,8 +321,64 @@ public class AccessControlService {
     }
 
     private boolean valueDifferentAndHasUpdateAccess(JsonNode newData, JsonNode existingData, String newFieldName, final List<CaseField> caseFieldDefinitions, final Set<String> userRoles) {
-        return existingData.get(newFieldName).equals(newData.get(newFieldName))
-            || hasCaseFieldAccess(caseFieldDefinitions, userRoles, CAN_UPDATE, newFieldName);
+        if (existingData.get(newFieldName).equals(newData.get(newFieldName))) {
+            return true;
+        }
+        Optional<FieldType> fieldType = getCaseFieldType(caseFieldDefinitions, newFieldName);
+        if (!fieldType.isPresent()) {
+            return false;
+        }
+        if (!fieldType.get().getType().equals(COLLECTION)) {
+            return hasCaseFieldAccess(caseFieldDefinitions, userRoles, CAN_UPDATE, newFieldName);
+        } else {
+            if (!itemAddedAndHasCreateAccess(newData, newFieldName, caseFieldDefinitions, userRoles)) return false;
+            if (!itemDeletedAndHasDeleteAccess(existingData, newData, newFieldName, caseFieldDefinitions, userRoles)) return false;
+            return itemUpdatedAndHasUpdateAccess(existingData, newData, newFieldName, caseFieldDefinitions, userRoles);
+        }
+    }
+
+    private boolean itemDeletedAndHasDeleteAccess(JsonNode existingData, JsonNode newData, String newFieldName, List<CaseField> caseFieldDefinitions, Set<String> userRoles) {
+        JsonNode newValue = newData.get(newFieldName);
+        JsonNode oldValue = existingData.get(newFieldName);
+        boolean containsDeletedItem = StreamSupport.stream(spliteratorUnknownSize(oldValue.elements(), Spliterator.ORDERED), false).anyMatch(
+            oldItem -> {
+                boolean itemExists = StreamSupport.stream(spliteratorUnknownSize(newValue.elements(), Spliterator.ORDERED), false)
+                    .anyMatch(newItem -> newItem.get("id").equals(oldItem.get("id")));
+                LOG.debug((itemExists ? "{} exists" : "{} deleted"), oldItem.get("id").asText());
+                return !itemExists;
+            }
+        );
+        return !containsDeletedItem || hasCaseFieldAccess(caseFieldDefinitions, userRoles, CAN_DELETE, newFieldName);
+    }
+    
+    private boolean itemUpdatedAndHasUpdateAccess(JsonNode existingData, JsonNode newData, String newFieldName, List<CaseField> caseFieldDefinitions, Set<String> userRoles) {
+        JsonNode newValue = newData.get(newFieldName);
+        JsonNode oldValue = existingData.get(newFieldName);
+        boolean containsUpdatedItem = StreamSupport.stream(spliteratorUnknownSize(oldValue.elements(), Spliterator.ORDERED), false).anyMatch(
+            oldItem -> {
+                boolean updated = StreamSupport.stream(spliteratorUnknownSize(newValue.elements(), Spliterator.ORDERED), false)
+                    .anyMatch(newItem -> {
+                        boolean exists = newItem.get("id").equals(oldItem.get("id"));
+                        if (exists) {
+                            return !newItem.equals(oldItem);
+                        }
+                        return false;
+                    });
+                LOG.debug((updated ? "{} is updated" : "{} is unchanged"), oldItem.get("id").asText());
+                return updated;
+            }
+        );
+        return !containsUpdatedItem || hasCaseFieldAccess(caseFieldDefinitions, userRoles, CAN_UPDATE, newFieldName);
+    }
+
+    private boolean itemAddedAndHasCreateAccess(JsonNode newData, String newFieldName, List<CaseField> caseFieldDefinitions, Set<String> userRoles) {
+        JsonNode newValue = newData.get(newFieldName);
+        boolean containsNewItem = StreamSupport.stream(spliteratorUnknownSize(newValue.elements(), Spliterator.ORDERED), false)
+            .anyMatch(collectionItem ->
+                collectionItem.get("id").equals(NullNode.getInstance())
+                    || collectionItem.get("id").asText().equalsIgnoreCase("null"));
+        LOG.debug((containsNewItem ? "{} has new item(s)" : "{} has no new items"), newFieldName);
+        return !containsNewItem || hasCreateAccess(newFieldName, caseFieldDefinitions, userRoles);
     }
 
     private Stream<String> getStream(JsonNode newData) {
@@ -368,11 +416,18 @@ public class AccessControlService {
         return false;
     }
 
+    private Optional<FieldType> getCaseFieldType(List<CaseField> caseFieldDefinitions, String fieldName) {
+        return caseFieldDefinitions
+            .stream()
+            .filter(caseField -> nonNull(caseField.getAccessControlLists()) && caseField.getId().equals(fieldName))
+            .map(CaseField::getFieldType)
+            .findAny();
+    }
+
     private List<AccessControlList> getCaseFieldAcls(List<CaseField> caseFieldDefinitions, String fieldName) {
         return caseFieldDefinitions
             .stream()
-            .filter(caseEventDef -> nonNull(caseEventDef.getAccessControlLists()) && caseEventDef.getId().equals(
-                fieldName))
+            .filter(caseField -> nonNull(caseField.getAccessControlLists()) && caseField.getId().equals(fieldName))
             .map(CaseField::getAccessControlLists)
             .findAny().orElse(newArrayList());
     }
