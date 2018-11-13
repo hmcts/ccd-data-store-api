@@ -1,5 +1,13 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
+import java.util.*;
+
+import static java.lang.String.valueOf;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.*;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -10,14 +18,6 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-
-import java.util.*;
-
-import static java.lang.String.valueOf;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.*;
 
 class CachedCaseDetailsRepositoryTest {
 

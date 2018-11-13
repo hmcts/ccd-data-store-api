@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.config;
 
+import java.util.Arrays;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.ApiInfoBuilder;
@@ -14,8 +16,6 @@ import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 import uk.gov.hmcts.ccd.endpoint.std.CaseDetailsEndpoint;
 import uk.gov.hmcts.ccd.v2.external.controller.CaseController;
-
-import java.util.Arrays;
 
 @Configuration
 @EnableSwagger2
