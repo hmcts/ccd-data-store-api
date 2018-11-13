@@ -47,11 +47,11 @@ public class ElasticSearchTextFieldTest extends ElasticsearchBaseTest {
     }
 
     @Nested
-    @DisplayName("Exact match")
+    @DisplayName("Tests to verify cases on Date Field")
     class ExactMatch {
 
         @Nested
-        @DisplayName("text field")
+        @DisplayName("Testing exact search on Text Field")
         class TextField {
 
             @Test
@@ -74,7 +74,7 @@ public class ElasticSearchTextFieldTest extends ElasticsearchBaseTest {
     }
 
     @Nested
-    @DisplayName("Wildcard")
+    @DisplayName("Testing Wildcard on Text Field")
     class Wildcard {
 
         @Nested
