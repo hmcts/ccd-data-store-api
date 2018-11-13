@@ -9,12 +9,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.helper.elastic.ElasticsearchTestDataLoaderExtension;
 
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FullCase.DATE;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FullCase.MONEY_GBP;
 
 @ExtendWith(ElasticsearchTestDataLoaderExtension.class)
-public class ElasticsearchDateFieldTest extends ElasticsearchBaseTest {
+public class ElasticsearchMoneyGBPTest extends ElasticsearchBaseTest {
 
-    ElasticsearchDateFieldTest(AATHelper aat) {
+    ElasticsearchMoneyGBPTest(AATHelper aat) {
         super(aat);
     }
 
@@ -25,13 +25,13 @@ public class ElasticsearchDateFieldTest extends ElasticsearchBaseTest {
 
 
         @Nested
-        @DisplayName("Tests to verify cases on Date  Field")
+        @DisplayName("Tests to verify cases on Money GBP Field")
         class DateTimeField {
 
             @Test
-            @DisplayName("should return case for exact match on a date  field")
+            @DisplayName("should return case for exact match on a Money GBP field")
             void shouldReturnCaseForExactMatchOnDateTimeField() {
-                searchCaseForExactMatchAndVerifyResponse("DateField", DATE);
+                searchCaseForExactMatchAndVerifyResponse("MoneyGBPField", MONEY_GBP);
             }
         }
 

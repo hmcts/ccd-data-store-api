@@ -14,7 +14,6 @@ import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType;
 import uk.gov.hmcts.ccd.datastore.tests.functional.elasticsearch.ElasticSearchTextFieldTest;
 import uk.gov.hmcts.ccd.datastore.tests.functional.elasticsearch.ElasticsearchCaseSearchSecurityTest;
-import uk.gov.hmcts.ccd.datastore.tests.functional.elasticsearch.ElasticsearchDateFieldTest;
 import uk.gov.hmcts.ccd.datastore.tests.helper.TestDataLoaderExtension;
 
 public class ElasticsearchTestDataLoaderExtension extends TestDataLoaderExtension {

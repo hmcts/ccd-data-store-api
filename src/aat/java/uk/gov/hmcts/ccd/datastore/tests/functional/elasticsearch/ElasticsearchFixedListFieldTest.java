@@ -9,12 +9,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.helper.elastic.ElasticsearchTestDataLoaderExtension;
 
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FullCase.DATE;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FullCase.FIXED_LIST;
 
 @ExtendWith(ElasticsearchTestDataLoaderExtension.class)
-public class ElasticsearchDateFieldTest extends ElasticsearchBaseTest {
+public class ElasticsearchFixedListFieldTest extends ElasticsearchBaseTest {
 
-    ElasticsearchDateFieldTest(AATHelper aat) {
+    ElasticsearchFixedListFieldTest(AATHelper aat) {
         super(aat);
     }
 
@@ -31,7 +31,7 @@ public class ElasticsearchDateFieldTest extends ElasticsearchBaseTest {
             @Test
             @DisplayName("should return case for exact match on a date  field")
             void shouldReturnCaseForExactMatchOnDateTimeField() {
-                searchCaseForExactMatchAndVerifyResponse("DateField", DATE);
+                searchCaseForExactMatchAndVerifyResponse("FixedListField", FIXED_LIST);
             }
         }
 

@@ -7,14 +7,17 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
+import uk.gov.hmcts.ccd.datastore.tests.TestData;
 import uk.gov.hmcts.ccd.datastore.tests.helper.elastic.ElasticsearchTestDataLoaderExtension;
 
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FullCase.DATE;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FullCase.DATE_TIME;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FullCase.TEXT;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.State;
 
 @ExtendWith(ElasticsearchTestDataLoaderExtension.class)
-public class ElasticsearchDateFieldTest extends ElasticsearchBaseTest {
+public class ElasticsearchDateTimeFieldTest extends ElasticsearchBaseTest {
 
-    ElasticsearchDateFieldTest(AATHelper aat) {
+    ElasticsearchDateTimeFieldTest(AATHelper aat) {
         super(aat);
     }
 
@@ -25,13 +28,13 @@ public class ElasticsearchDateFieldTest extends ElasticsearchBaseTest {
 
 
         @Nested
-        @DisplayName("Tests to verify cases on Date  Field")
+        @DisplayName("Tests to verify cases on Date Time Field")
         class DateTimeField {
 
             @Test
-            @DisplayName("should return case for exact match on a date  field")
+            @DisplayName("should return case for exact match on a date time field")
             void shouldReturnCaseForExactMatchOnDateTimeField() {
-                searchCaseForExactMatchAndVerifyResponse("DateField", DATE);
+                searchCaseForExactMatchAndVerifyResponse("DateTimeField", DATE_TIME);
             }
         }
 
