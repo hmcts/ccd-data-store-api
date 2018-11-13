@@ -9,12 +9,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.helper.elastic.ElasticsearchTestDataLoaderExtension;
 
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FullCase.YES_OR_NO;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FullCase.EMAIL;
 
 @ExtendWith(ElasticsearchTestDataLoaderExtension.class)
-public class ElasticsearchYesNoFieldTest extends ElasticsearchBaseTest {
+public class ElasticsearchEmailFieldTest extends ElasticsearchBaseTest {
 
-    ElasticsearchYesNoFieldTest(AATHelper aat) {
+    ElasticsearchEmailFieldTest(AATHelper aat) {
         super(aat);
     }
 
@@ -25,20 +25,20 @@ public class ElasticsearchYesNoFieldTest extends ElasticsearchBaseTest {
 
 
         @Nested
-        @DisplayName("Tests to verify cases on YesOrNo Field")
+        @DisplayName("Tests to verify cases on Email Field")
         class DateTimeField {
 
             @Test
-            @DisplayName("should return case for exact match on a yes or no  field")
+            @DisplayName("should return case for exact match on an Email field")
             void shouldReturnCaseForExactMatchOnDateTimeField() {
-                searchCaseForExactMatchAndVerifyResponse("YesOrNoField", YES_OR_NO);
+                searchCaseForExactMatchAndVerifyResponse("EmailField", EMAIL);
             }
         }
 
         private void searchCaseForExactMatchAndVerifyResponse(String field, String value) {
             String jsonSearchRequest = ElasticsearchSearchRequest.exactMatch(CASE_DATA_FIELD_PREFIX + field, value);
 
-            ValidatableResponse response = searchCase(asPrivateCaseworker(false), jsonSearchRequest);
+            ValidatableResponse response = searchCase(asRestrictedCaseworker(false), jsonSearchRequest);
 
             assertSingleCaseReturned(response);
             assertField(response, RESPONSE_CASE_DATA_FIELDS_PREFIX + field, value);
