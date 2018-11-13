@@ -692,6 +692,11 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public CaseFieldBuilder withFieldLabelText(String label) {
+            caseField.setLabel(label);
+            return this;
+        }
+
         public CaseFieldBuilder withAcl(AccessControlList accessControlList) {
             accessControlLists.add(accessControlList);
             return this;
