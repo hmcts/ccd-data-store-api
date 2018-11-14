@@ -2471,7 +2471,7 @@ public class AccessControlServiceTest {
         private JsonNode existingDataNode;
 
         @BeforeEach
-        void setup() throws IOException {
+        void setUp() throws IOException {
             final Map<String, JsonNode> existingData = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\":[  \n" +
                     "         {  \n" +

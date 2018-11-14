@@ -331,13 +331,18 @@ public class AccessControlService {
         if (!fieldType.get().getType().equals(COLLECTION)) {
             return hasCaseFieldAccess(caseFieldDefinitions, userRoles, CAN_UPDATE, newFieldName);
         } else {
-            if (!itemAddedAndHasCreateAccess(newData, newFieldName, caseFieldDefinitions, userRoles)) return false;
-            if (!itemDeletedAndHasDeleteAccess(existingData, newData, newFieldName, caseFieldDefinitions, userRoles)) return false;
+            if (!itemAddedAndHasCreateAccess(newData, newFieldName, caseFieldDefinitions, userRoles)) {
+                return false;
+            }
+            if (!itemDeletedAndHasDeleteAccess(existingData, newData, newFieldName, caseFieldDefinitions, userRoles)) {
+                return false;
+            }
             return itemUpdatedAndHasUpdateAccess(existingData, newData, newFieldName, caseFieldDefinitions, userRoles);
         }
     }
 
-    private boolean itemDeletedAndHasDeleteAccess(JsonNode existingData, JsonNode newData, String newFieldName, List<CaseField> caseFieldDefinitions, Set<String> userRoles) {
+    private boolean itemDeletedAndHasDeleteAccess(JsonNode existingData, JsonNode newData, String newFieldName,
+                                                  List<CaseField> caseFieldDefinitions, Set<String> userRoles) {
         JsonNode newValue = newData.get(newFieldName);
         JsonNode oldValue = existingData.get(newFieldName);
         boolean containsDeletedItem = StreamSupport.stream(spliteratorUnknownSize(oldValue.elements(), Spliterator.ORDERED), false).anyMatch(
@@ -351,7 +356,8 @@ public class AccessControlService {
         return !containsDeletedItem || hasCaseFieldAccess(caseFieldDefinitions, userRoles, CAN_DELETE, newFieldName);
     }
     
-    private boolean itemUpdatedAndHasUpdateAccess(JsonNode existingData, JsonNode newData, String newFieldName, List<CaseField> caseFieldDefinitions, Set<String> userRoles) {
+    private boolean itemUpdatedAndHasUpdateAccess(JsonNode existingData, JsonNode newData, String newFieldName,
+                                                  List<CaseField> caseFieldDefinitions, Set<String> userRoles) {
         JsonNode newValue = newData.get(newFieldName);
         JsonNode oldValue = existingData.get(newFieldName);
         boolean containsUpdatedItem = StreamSupport.stream(spliteratorUnknownSize(oldValue.elements(), Spliterator.ORDERED), false).anyMatch(
