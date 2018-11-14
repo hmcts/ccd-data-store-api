@@ -19,8 +19,10 @@ import uk.gov.hmcts.ccd.test.CaseFieldBuilder;
 
 @DisplayName("FixedRadioListValidator")
 class FixedRadioListValidatorTest {
-    private static final String FIELD_ID = "TEST_FIELD_ID";
+    public static final String TEST_FIELD_ID = "TEST_FIELD_ID";
+    private static final String FIELD_ID = TEST_FIELD_ID;
     private static final JsonNodeFactory NODE_FACTORY = JsonNodeFactory.instance;
+    public static final String FIXED_RADIO_LIST = "FixedRadioList";
 
     @Mock
     private BaseType fixedListBaseType;
@@ -50,7 +52,7 @@ class FixedRadioListValidatorTest {
 
     @Test
     void validValue() {
-        final List<ValidationResult> result01 = validator.validate("TEST_FIELD_ID",
+        final List<ValidationResult> result01 = validator.validate(TEST_FIELD_ID,
                                                                    NODE_FACTORY.textNode("AAAAAA"),
                                                                    caseField);
         assertEquals(0, result01.size());
@@ -58,7 +60,7 @@ class FixedRadioListValidatorTest {
 
     @Test
     void invalidValue() {
-        final List<ValidationResult> result01 = validator.validate("TEST_FIELD_ID",
+        final List<ValidationResult> result01 = validator.validate(TEST_FIELD_ID,
                                                                    NODE_FACTORY.textNode("DDDD"),
                                                                    caseField);
         assertEquals(1, result01.size(), result01.toString());
@@ -66,40 +68,16 @@ class FixedRadioListValidatorTest {
 
     @Test
     void nullValue() {
-        assertEquals(0, validator.validate("TEST_FIELD_ID", null, null).size(), "Did not catch NULL");
+        assertEquals(0, validator.validate(TEST_FIELD_ID, null, null).size(), "Did not catch NULL");
     }
 
     @Test
     void getType() {
-        assertEquals(validator.getType(), BaseType.get("FixedRadioList"), "Type is incorrect");
-    }
-
-    @Test
-    void fieldTypeRegEx() {
-        final CaseField caseFieldWithRegEx = caseField().withRegExp("AAAAAA").build();
-        final List<ValidationResult> result01 = validator.validate("TEST_FIELD_ID", NODE_FACTORY.textNode("AAAAAA"),
-                                                                   caseFieldWithRegEx);
-        assertEquals(0, result01.size());
-
-        final List<ValidationResult> result02 = validator.validate("TEST_FIELD_ID", NODE_FACTORY.textNode("BBBBBB"),
-                                                                   caseFieldWithRegEx);
-        assertEquals(1, result02.size(), "BBBBBB failed regular expression check");
-        assertEquals(REGEX_GUIDANCE, result02.get(0).getErrorMessage());
-        assertEquals("TEST_FIELD_ID", result02.get(0).getFieldId());
-    }
-
-    @Test
-    void baseTypeRegEx() {
-        when(fixedListBaseType.getRegularExpression()).thenReturn("InvalidRegEx");
-        final List<ValidationResult> result = validator.validate("TEST_FIELD_ID",
-                                                                 NODE_FACTORY.textNode("AA"), caseField);
-        assertEquals(1, result.size(), "RegEx validation failed");
-        assertEquals("'AA' failed FixedList Type Regex check: InvalidRegEx", result.get(0).getErrorMessage());
-        assertEquals("TEST_FIELD_ID", result.get(0).getFieldId());
+        assertEquals(validator.getType(), BaseType.get(FIXED_RADIO_LIST), "Type is incorrect");
     }
 
     private CaseFieldBuilder caseField() {
-        return new CaseFieldBuilder(FIELD_ID).withType(FixedListValidator.TYPE_ID)
+        return new CaseFieldBuilder(FIELD_ID).withType(FIXED_RADIO_LIST)
                                              .withFixedListItem("AAAAAA")
                                              .withFixedListItem("BBBBBB")
                                              .withFixedListItem("CCCCCC");
