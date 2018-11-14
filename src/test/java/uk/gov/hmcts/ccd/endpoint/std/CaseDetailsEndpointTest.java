@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -17,6 +19,7 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.createcase.CreateCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.createevent.CreateEventOperation;
+import uk.gov.hmcts.ccd.domain.service.createevent.MidEventCallback;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.ClassifiedGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.search.PaginatedSearchMetaDataOperation;
@@ -91,6 +94,9 @@ class CaseDetailsEndpointTest {
     private ValidateCaseFieldsOperation validateCaseFieldsOperation;
 
     @Mock
+    private MidEventCallback midEventCallback;
+
+    @Mock
     private AppInsights appInsights;
 
     private CaseDetailsEndpoint endpoint;
@@ -112,6 +118,7 @@ class CaseDetailsEndpointTest {
                                     validateCaseFieldsOperation,
                                     documentsOperation,
                                     paginatedSearchMetaDataOperation,
+                                    midEventCallback,
                                     appInsights);
     }
 
@@ -253,17 +260,31 @@ class CaseDetailsEndpointTest {
 
     @Test
     void validateCaseFieldsForCaseWorker() {
-        final Map<String, JsonNode> toBeReturned = new HashMap<>();
-        doReturn(toBeReturned).when(validateCaseFieldsOperation).validateCaseDetails(
+        String pageId = "pageId";
+        final Map<String, JsonNode> data = new HashMap<>();
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode objectNode = mapper.createObjectNode();
+        objectNode.set("data", mapper.valueToTree(data));
+        final JsonNode toBeReturned = objectNode;
+
+        doReturn(data).when(validateCaseFieldsOperation).validateCaseDetails(
             JURISDICTION_ID,
             CASE_TYPE_ID,
             EVENT,
             DATA);
+        doReturn(toBeReturned).when(midEventCallback).invoke(
+            JURISDICTION_ID,
+            CASE_TYPE_ID,
+            EVENT,
+            DATA,
+            pageId,
+            IGNORE_WARNING);
 
-        final Map<String, JsonNode> output = endpoint.validateCaseDetailsForCaseWorker(
+        final JsonNode output = endpoint.validateCaseDetails(
             UID,
             JURISDICTION_ID,
             CASE_TYPE_ID,
+            pageId,
             EVENT_DATA);
 
         assertAll(
@@ -272,7 +293,14 @@ class CaseDetailsEndpointTest {
                 JURISDICTION_ID,
                 CASE_TYPE_ID,
                 EVENT_DATA.getEvent(),
-                DATA)
+                DATA),
+            () -> verify(midEventCallback).invoke(
+                JURISDICTION_ID,
+                CASE_TYPE_ID,
+                EVENT_DATA.getEvent(),
+                DATA,
+                pageId,
+                IGNORE_WARNING)
         );
     }
 
