@@ -15,14 +15,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.TestData;
+import uk.gov.hmcts.ccd.datastore.tests.helper.elastic.ElasticsearchTestDataLoaderExtension;
 
 @ExtendWith(ElasticsearchTestDataLoaderExtension.class)
-class ElasticsearchCaseSearchSecurityTest extends ElasticsearchBaseTest {
+public class ElasticsearchCaseSearchSecurityTest extends ElasticsearchBaseTest {
 
-    static final String CASE_TYPE_SECURITY_TEST_REFERENCE = TestData.uniqueReference();
-    static final String CASE_STATE_SECURITY_TEST_REFERENCE = TestData.uniqueReference();
-    static final String CASE_FIELD_SECURITY_TEST_REFERENCE = TestData.uniqueReference();
-    static final String EMAIL_ID_VALUE = "functional@test.com";
+    public static final String CASE_TYPE_SECURITY_TEST_REFERENCE = TestData.uniqueReference();
+    public static final String CASE_STATE_SECURITY_TEST_REFERENCE = TestData.uniqueReference();
+    public static final String CASE_FIELD_SECURITY_TEST_REFERENCE = TestData.uniqueReference();
+    public static final String EMAIL_ID_VALUE = "functional@test.com";
 
     ElasticsearchCaseSearchSecurityTest(AATHelper aat) {
         super(aat);
