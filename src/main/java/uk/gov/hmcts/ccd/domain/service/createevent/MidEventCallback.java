@@ -79,9 +79,9 @@ public class MidEventCallback {
 
     private JsonNode dataJsonNode(Map<String, JsonNode> data) {
         ObjectMapper mapper = new ObjectMapper();
-        ObjectNode jNode = mapper.createObjectNode();
-        jNode.set("data", mapper.valueToTree(data));
-        return jNode;
+        ObjectNode objectNode = mapper.createObjectNode();
+        objectNode.set("data", mapper.valueToTree(data));
+        return objectNode;
     }
 
     private CaseType getCaseType(String caseTypeId) {

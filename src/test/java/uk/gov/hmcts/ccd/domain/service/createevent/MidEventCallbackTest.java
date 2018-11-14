@@ -36,7 +36,6 @@ class MidEventCallbackTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {};
-    private static final TypeReference STRING_JSON = new TypeReference<JsonNode>() {};
     private static final String JURISDICTION_ID = "jurisdictionId";
     private static final String CASE_TYPE_ID = "caseTypeId";
     private static final Boolean IGNORE_WARNINGS = Boolean.FALSE;
@@ -63,7 +62,6 @@ class MidEventCallbackTest {
     private Map<String, JsonNode> data = new HashMap<>();
     private CaseDetails caseDetails;
     private WizardPage wizardPageWithCallback;
-    private WizardPage wizardPageWithoutCallback;
 
     @BeforeEach
     void setUp() {
@@ -79,7 +77,7 @@ class MidEventCallbackTest {
         given(caseService.createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, data)).willReturn(caseDetails);
 
         wizardPageWithCallback = createWizardPage("createCase1", "http://some-callback-url.com");
-        wizardPageWithoutCallback = createWizardPage("createCase2");
+        WizardPage wizardPageWithoutCallback = createWizardPage("createCase2");
         given(uiDefinitionRepository.getWizardPageCollection(CASE_TYPE_ID, event.getEventId()))
             .willReturn(asList(wizardPageWithCallback, wizardPageWithoutCallback));
     }
@@ -114,12 +112,12 @@ class MidEventCallbackTest {
     @DisplayName("should update data from MidEvent callback")
     void shouldUpdateCaseDetailsFromMidEventCallback() throws Exception {
 
-        final Map<String, JsonNode> DATA = MAPPER.convertValue(MAPPER.readTree(
-            "{\n" +
-                "  \"PersonFirstName\": \"First Name\",\n" +
-                "  \"PersonLastName\": \"Last Name\"\n" +
-                "}"), STRING_JSON_MAP);
-        CaseDetails updatedCaseDetails = caseDetails(DATA);
+        final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+            "{\n"
+                + "  \"PersonFirstName\": \"First Name\",\n"
+                + "  \"PersonLastName\": \"Last Name\"\n"
+                + "}"), STRING_JSON_MAP);
+        CaseDetails updatedCaseDetails = caseDetails(data);
         given(callbackInvoker.invokeMidEventCallback(wizardPageWithCallback,
             caseType,
             caseEvent,
@@ -131,16 +129,16 @@ class MidEventCallbackTest {
         JsonNode result = midEventCallback.invoke(JURISDICTION_ID,
             CASE_TYPE_ID,
             event,
-            data,
+            this.data,
             "createCase1",
             IGNORE_WARNINGS);
 
         final JsonNode expectedResponse = MAPPER.readTree(
-            "{" +
-                "\"data\": {\n" +
-                "  \"PersonFirstName\": \"First Name\",\n" +
-                "  \"PersonLastName\": \"Last Name\"\n" +
-                "}}");
+            "{"
+                + "\"data\": {\n"
+                + "  \"PersonFirstName\": \"First Name\",\n"
+                + "  \"PersonLastName\": \"Last Name\"\n"
+                + "}}");
         assertThat(result, is(expectedResponse));
     }
 

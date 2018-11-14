@@ -52,7 +52,7 @@ class CallbackInvokerTest {
     private static final List<Integer> RETRIES_ABOUT_TO_SUBMIT = Collections.unmodifiableList(Arrays.asList(4, 5, 6));
     private static final List<Integer> RETRIES_AFTER_SUBMIT = Collections.unmodifiableList(Arrays.asList(7, 8, 9));
     private static final List<Integer> RETRIES_MID_EVENT = Collections.unmodifiableList(Arrays.asList(10, 11, 12));
-    private static final Boolean IGNORE_WARNINGS = Boolean.FALSE;
+    private static final Boolean IGNORE_WARNINGS = FALSE;
 
     @Mock
     private CallbackService callbackService;
@@ -668,8 +668,9 @@ class CallbackInvokerTest {
                     () -> inOrder.verify(caseDataService).getDefaultSecurityClassifications(caseType,
                         caseDetails.getData(),
                         caseDetails.getDataClassification()),
-                    () -> inOrder.verify(securityValidationService, never()).setClassificationFromCallbackIfValid(any(), any(), any())
-                         );
+                    () -> inOrder.verify(securityValidationService, never())
+                        .setClassificationFromCallbackIfValid(any(), any(), any())
+                );
             }
 
             @DisplayName("validate call back response and no case details data is updated")

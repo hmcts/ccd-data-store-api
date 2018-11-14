@@ -263,9 +263,9 @@ class CaseDetailsEndpointTest {
         String pageId = "pageId";
         final Map<String, JsonNode> data = new HashMap<>();
         ObjectMapper mapper = new ObjectMapper();
-        ObjectNode jNode = mapper.createObjectNode();
-        jNode.set("data", mapper.valueToTree(data));
-        final JsonNode toBeReturned = jNode;
+        ObjectNode objectNode = mapper.createObjectNode();
+        objectNode.set("data", mapper.valueToTree(data));
+        final JsonNode toBeReturned = objectNode;
 
         doReturn(data).when(validateCaseFieldsOperation).validateCaseDetails(
             JURISDICTION_ID,
