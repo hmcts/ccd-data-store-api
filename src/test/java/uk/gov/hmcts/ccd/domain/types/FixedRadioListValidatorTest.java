@@ -5,7 +5,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ccd.domain.types.BaseTypeValidator.REGEX_GUIDANCE;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,16 +52,16 @@ class FixedRadioListValidatorTest {
     @Test
     void validValue() {
         final List<ValidationResult> result01 = validator.validate(TEST_FIELD_ID,
-                                                                   NODE_FACTORY.textNode("AAAAAA"),
-                                                                   caseField);
+            NODE_FACTORY.textNode("AAAAAA"),
+            caseField);
         assertEquals(0, result01.size());
     }
 
     @Test
     void invalidValue() {
         final List<ValidationResult> result01 = validator.validate(TEST_FIELD_ID,
-                                                                   NODE_FACTORY.textNode("DDDD"),
-                                                                   caseField);
+            NODE_FACTORY.textNode("DDDD"),
+            caseField);
         assertEquals(1, result01.size(), result01.toString());
     }
 
@@ -78,8 +77,8 @@ class FixedRadioListValidatorTest {
 
     private CaseFieldBuilder caseField() {
         return new CaseFieldBuilder(FIELD_ID).withType(FIXED_RADIO_LIST)
-                                             .withFixedListItem("AAAAAA")
-                                             .withFixedListItem("BBBBBB")
-                                             .withFixedListItem("CCCCCC");
+            .withFixedListItem("AAAAAA")
+            .withFixedListItem("BBBBBB")
+            .withFixedListItem("CCCCCC");
     }
 }
