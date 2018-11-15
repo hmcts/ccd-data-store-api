@@ -159,7 +159,9 @@ spotbugs {
 
 dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: reformLogging
-    compile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: reformLogging
+    compile(group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: reformLogging) {
+        exclude group: 'com.google.guava', module: 'guava'
+    }
     compile 'org.projectlombok:lombok:1.18.2'
     apt 'org.projectlombok:lombok:1.18.2'
 
