@@ -63,9 +63,6 @@ configurations.all {
             if (details.requested.group == 'org.eclipse.jetty') {
                 details.useVersion '9.2.24.v20180105'
             }
-            if (details.requested.group == 'com.google.guava') {
-                details.useVersion '25.0-jre'
-            }
         }
     }
 }
