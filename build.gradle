@@ -63,6 +63,9 @@ configurations.all {
             if (details.requested.group == 'org.eclipse.jetty') {
                 details.useVersion '9.2.24.v20180105'
             }
+            if (details.requested.group == 'com.google.guava') {
+                details.useVersion '25.0-jre'
+            }
         }
     }
 }
@@ -159,9 +162,7 @@ spotbugs {
 
 dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: reformLogging
-    compile(group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: reformLogging) {
-        exclude group: 'com.google.guava', module: 'guava'
-    }
+    compile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: reformLogging
     compile 'org.projectlombok:lombok:1.18.2'
     apt 'org.projectlombok:lombok:1.18.2'
 
@@ -199,7 +200,6 @@ dependencies {
     compile group: 'com.sun.mail', name: 'mailapi', version: '1.6.1'
     compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
     compile group: 'commons-validator', name: 'commons-validator', version: '1.6'
-    compile group: 'com.google.guava', name: 'guava', version: '25.0-jre'
 
     // FIXME 0.6 doesn't support jsonb; 0.7 doesn't work on Windows
 //    runtime group: 'com.impossibl.pgjdbc-ng', name: 'pgjdbc-ng', version: '0.6'
