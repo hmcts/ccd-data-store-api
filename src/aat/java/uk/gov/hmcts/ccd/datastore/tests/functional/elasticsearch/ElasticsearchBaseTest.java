@@ -22,8 +22,6 @@ abstract class ElasticsearchBaseTest extends BaseTest {
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchTestDataLoaderExtension.class);
     public static final String EXACT_MATCH_TEST_REFERENCE = TestData.uniqueReference();
 
-
-
     static final String CASE_DATA_FIELD_PREFIX = "data.";
     static final String RESPONSE_CASE_DATA_FIELDS_PREFIX = "case_data.";
     static final String CASE_ID = "id";
