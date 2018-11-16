@@ -196,7 +196,7 @@ public class DefaultStartEventOperationTest {
                                                                                                                                          TEST_EVENT_TRIGGER_ID,
                                                                                                                                          IGNORE_WARNING)
             );
-            assertThat(exception.getMessage(), startsWith("Cannot findCaseEvent event TestEventTriggerId for case type TestCaseTypeId"));
+            assertThat(exception.getMessage(), startsWith("Cannot find event TestEventTriggerId for case type TestCaseTypeId"));
         }
 
         @Test
@@ -288,7 +288,7 @@ public class DefaultStartEventOperationTest {
                                                                                                                                       TEST_EVENT_TRIGGER_ID,
                                                                                                                                       IGNORE_WARNING)
             );
-            assertThat(exception.getMessage(), startsWith("Cannot findCaseEvent event TestEventTriggerId for case type TestCaseTypeId"));
+            assertThat(exception.getMessage(), startsWith("Cannot find event TestEventTriggerId for case type TestCaseTypeId"));
         }
 
         @Test
@@ -376,7 +376,7 @@ public class DefaultStartEventOperationTest {
                                                                                                                                      TEST_EVENT_TRIGGER_ID,
                                                                                                                                      IGNORE_WARNING)
             );
-            assertThat(exception.getMessage(), startsWith("Cannot findCaseEvent event TestEventTriggerId for case type TestCaseTypeId"));
+            assertThat(exception.getMessage(), startsWith("Cannot find event TestEventTriggerId for case type TestCaseTypeId"));
         }
 
         @Test
