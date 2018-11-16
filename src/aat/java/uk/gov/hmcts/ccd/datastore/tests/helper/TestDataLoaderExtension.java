@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.datastore.tests;
+package uk.gov.hmcts.ccd.datastore.tests.helper;
 
 import java.io.File;
 import java.util.function.Supplier;
@@ -12,6 +12,8 @@ import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
+import uk.gov.hmcts.ccd.datastore.tests.BaseTest;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType;
 

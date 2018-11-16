@@ -1,9 +1,5 @@
 package uk.gov.hmcts.ccd.datastore.tests.functional.elasticsearch;
 
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FullCase.DATE_TIME;
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FullCase.TEXT;
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.State;
-
 import io.restassured.response.ValidatableResponse;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -12,14 +8,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.TestData;
+import uk.gov.hmcts.ccd.datastore.tests.helper.elastic.ElasticsearchTestDataLoaderExtension;
+
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FullCase.TEXT;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.State;
 
 @ExtendWith(ElasticsearchTestDataLoaderExtension.class)
-class ElasticsearchCaseSearchTest extends ElasticsearchBaseTest {
+public class ElasticSearchTextFieldTest extends ElasticsearchBaseTest {
 
-    static final String SEARCH_UPDATED_CASE_TEST_REFERENCE = TestData.uniqueReference();
-    static final String EXACT_MATCH_TEST_REFERENCE = TestData.uniqueReference();
+    public static final String SEARCH_UPDATED_CASE_TEST_REFERENCE = TestData.uniqueReference();
 
-    ElasticsearchCaseSearchTest(AATHelper aat) {
+    ElasticSearchTextFieldTest(AATHelper aat) {
         super(aat);
     }
 
@@ -47,28 +46,17 @@ class ElasticsearchCaseSearchTest extends ElasticsearchBaseTest {
     }
 
     @Nested
-    @DisplayName("Exact match")
+    @DisplayName("Tests to verify cases on Date Field")
     class ExactMatch {
 
         @Nested
-        @DisplayName("text field")
+        @DisplayName("Testing exact search on Text Field")
         class TextField {
 
             @Test
             @DisplayName("should return case for exact match on a text field")
             void shouldReturnCaseForExactMatchOnTextField() {
                 searchCaseForExactMatchAndVerifyResponse("TextField", TEXT);
-            }
-        }
-
-        @Nested
-        @DisplayName("date time field")
-        class DateTimeField {
-
-            @Test
-            @DisplayName("should return case for exact match on a date time field")
-            void shouldReturnCaseForExactMatchOnDateTimeField() {
-                searchCaseForExactMatchAndVerifyResponse("DateTimeField", DATE_TIME);
             }
         }
 
@@ -85,7 +73,7 @@ class ElasticsearchCaseSearchTest extends ElasticsearchBaseTest {
     }
 
     @Nested
-    @DisplayName("Wildcard")
+    @DisplayName("Testing Wildcard on Text Field")
     class Wildcard {
 
         @Nested
