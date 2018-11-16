@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.datastore.tests.functional.elasticsearch;
+package uk.gov.hmcts.ccd.datastore.tests.helper.elastic;
 
 import uk.gov.hmcts.ccd.datastore.tests.Env;
 
