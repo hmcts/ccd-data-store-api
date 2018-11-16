@@ -82,7 +82,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
 
         final CaseType caseType = getCaseType(caseTypeId);
 
-        return buildStartEventTrigger(() -> uid,
+        return buildStartEventTrigger(uid,
                                       caseType,
                                       eventTriggerId,
                                       ignoreWarning,
@@ -98,7 +98,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
 
         final CaseType caseType = getCaseType(caseTypeId);
 
-        return buildStartEventTrigger(() -> uid,
+        return buildStartEventTrigger(uid,
                                       caseType,
                                       eventTriggerId,
                                       ignoreWarning,
@@ -138,28 +138,26 @@ public class DefaultStartEventOperation implements StartEventOperation {
                                                   final Boolean ignoreWarning) {
         final CaseType caseType = getCaseType(caseTypeId);
 
-        return buildStartEventTrigger(() -> uid,
+        return buildStartEventTrigger(uid,
                                       caseType,
                                       eventTriggerId,
                                       ignoreWarning,
                                       () -> getDraftDetails(draftReference));
     }
 
-    private StartEventTrigger buildStartEventTrigger(final Supplier<String> uidSupplier,
+    private StartEventTrigger buildStartEventTrigger(final String uid,
                                                      final CaseType caseType,
                                                      final String eventTriggerId,
                                                      final Boolean ignoreWarning,
                                                      final Supplier<CaseDetails> caseDetailsSupplier) {
         final CaseEvent eventTrigger = getEventTrigger(caseType.getId(), eventTriggerId, caseType);
 
-        validateJurisdiction(caseType.getJurisdictionId(), caseType.getId(), caseType);
-
         final CaseDetails caseDetails = caseDetailsSupplier.get();
 
         validateEventTrigger(() -> !eventTriggerService.isPreStateEmpty(eventTrigger));
 
         // TODO: we may need to take care of drafts that are saved for existing case so token needs to include the relevant draft payload
-        final String eventToken = eventTokenService.generateToken(uidSupplier.get(), eventTrigger, caseType.getJurisdiction(), caseType);
+        final String eventToken = eventTokenService.generateToken(uid, eventTrigger, caseType.getJurisdiction(), caseType);
 
         callbackInvoker.invokeAboutToStartCallback(eventTrigger, caseType, caseDetails, ignoreWarning);
 

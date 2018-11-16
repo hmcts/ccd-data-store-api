@@ -20,8 +20,8 @@ class GetStartTriggerTest extends BaseTest {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private static final ObjectNode EMPTY_OBJECT = JSON_NODE_FACTORY.objectNode();
     private static final String EMPTY_OBJECT_STRING = EMPTY_OBJECT.toString();
-    private static final String INVALID_CASE_TYPE_ID = "unkonwnCaseType";
-    private static final String INVALID_EVENT_TRIGGER_ID = "unkonwnEvent";
+    private static final String INVALID_CASE_TYPE_ID = "invalidCaseType";
+    private static final String INVALID_EVENT_TRIGGER_ID = "invalidEvent";
 
     protected GetStartTriggerTest(AATHelper aat) {
         super(aat);

@@ -45,8 +45,4 @@ public class UserProfile {
         this.defaultSettings = defaultSettings;
     }
 
-    @JsonIgnore
-    public String getUserId() {
-        return user.getIdamProperties().getId();
-    }
 }
