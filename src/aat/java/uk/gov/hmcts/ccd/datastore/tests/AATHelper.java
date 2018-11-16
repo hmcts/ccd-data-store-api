@@ -60,7 +60,7 @@ public enum AATHelper {
     }
 
     public String getDefinitionStoreUrl() {
-        return Env.require("CCD_DEFINITION_STORE_URL");
+        return Env.require("DEFINITION_STORE_HOST");
     }
 
     public String getImporterAutoTestEmail() {
