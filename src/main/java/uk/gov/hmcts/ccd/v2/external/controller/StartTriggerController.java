@@ -56,11 +56,11 @@ public class StartTriggerController {
                                                                 @PathVariable("triggerId") String triggerId,
                                                                 @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
 
-        final StartEventTrigger startEventOperation = this.startEventOperation.triggerStartForCaseType(caseTypeId,
+        final StartEventTrigger startEventTrigger = this.startEventOperation.triggerStartForCaseType(caseTypeId,
                                                                                                        triggerId,
                                                                                                        ignoreWarning);
 
-        return ResponseEntity.ok(new StartTriggerResource(startEventOperation, ignoreWarning));
+        return ResponseEntity.ok(new StartTriggerResource(startEventTrigger, ignoreWarning));
     }
 
 }
