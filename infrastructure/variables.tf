@@ -121,3 +121,11 @@ variable "elastic_search_case_index_type" {
   type = "string"
   default = "_doc"
 }
+
+variable "elastic_search_port" {
+  default = "9200"
+}
+
+variable "elastic_search_scheme" {
+  default = "http"
+}
