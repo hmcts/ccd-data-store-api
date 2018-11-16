@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
-@DisplayName("CaseController")
+@DisplayName("StartTriggerController")
 class StartTriggerControllerTest {
     private static final String CASE_TYPE_ID = "TestAddressBookCase";
     private static final String EVENT_TRIGGER_ID = "createCase";

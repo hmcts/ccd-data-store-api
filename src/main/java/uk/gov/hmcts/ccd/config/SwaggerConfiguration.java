@@ -16,6 +16,7 @@ import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 import uk.gov.hmcts.ccd.endpoint.std.CaseDetailsEndpoint;
 import uk.gov.hmcts.ccd.v2.external.controller.CaseController;
+import uk.gov.hmcts.ccd.v2.external.controller.StartTriggerController;
 
 @Configuration
 @EnableSwagger2
@@ -53,6 +54,7 @@ public class SwaggerConfiguration {
             .groupName("v2")
             .select()
             .apis(RequestHandlerSelectors.basePackage(CaseController.class.getPackage().getName()))
+            .apis(RequestHandlerSelectors.basePackage(StartTriggerController.class.getPackage().getName()))
             .build()
             .useDefaultResponseMessages(false)
             .apiInfo(apiV2Info())
