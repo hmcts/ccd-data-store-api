@@ -160,7 +160,6 @@ public class DefaultStartEventOperationTest {
             assertAll(
                 () -> verify(caseDefinitionRepository).getCaseType(TEST_CASE_TYPE_ID),
                 () -> verify(eventTriggerService).findCaseEvent(caseType, TEST_EVENT_TRIGGER_ID),
-                () -> verify(caseTypeService).isJurisdictionValid(TEST_JURISDICTION_ID, caseType),
                 () -> verify(caseService).createNewCaseDetails(eq(TEST_CASE_TYPE_ID), eq(TEST_JURISDICTION_ID), eq(Maps.newHashMap())),
                 () -> verify(eventTriggerService).isPreStateEmpty(eventTrigger),
                 () -> verify(eventTokenService).generateToken(UID, eventTrigger, caseType.getJurisdiction(), caseType),
@@ -198,20 +197,6 @@ public class DefaultStartEventOperationTest {
                                                                                                                                          IGNORE_WARNING)
             );
             assertThat(exception.getMessage(), startsWith("Cannot findCaseEvent event TestEventTriggerId for case type TestCaseTypeId"));
-        }
-
-        @Test
-        @DisplayName("Should fail to trigger if invalid jurisdiction")
-        void shouldFailToTriggerIfInvalidJurisdiction() {
-            doReturn(false).when(caseTypeService).isJurisdictionValid(TEST_JURISDICTION_ID, caseType);
-
-            Exception exception = assertThrows(ValidationException.class, () -> defaultStartEventOperation.triggerStartForCaseType(UID,
-                                                                                                                                   TEST_JURISDICTION_ID,
-                                                                                                                                   TEST_CASE_TYPE_ID,
-                                                                                                                                   TEST_EVENT_TRIGGER_ID,
-                                                                                                                                   IGNORE_WARNING)
-            );
-            assertThat(exception.getMessage(), startsWith("TestCaseTypeId is not defined as a case type for TestJurisdictionId"));
         }
 
         @Test
@@ -260,7 +245,6 @@ public class DefaultStartEventOperationTest {
             assertAll(
                 () -> verify(caseDefinitionRepository).getCaseType(TEST_CASE_TYPE_ID),
                 () -> verify(eventTriggerService).findCaseEvent(caseType, TEST_EVENT_TRIGGER_ID),
-                () -> verify(caseTypeService).isJurisdictionValid(TEST_JURISDICTION_ID, caseType),
                 () -> verify(draftGateway).get(TEST_DRAFT_ID),
                 () -> verify(eventTriggerService).isPreStateEmpty(eventTrigger),
                 () -> verify(eventTokenService).generateToken(UID, eventTrigger, caseType.getJurisdiction(), caseType),
@@ -305,21 +289,6 @@ public class DefaultStartEventOperationTest {
                                                                                                                                       IGNORE_WARNING)
             );
             assertThat(exception.getMessage(), startsWith("Cannot findCaseEvent event TestEventTriggerId for case type TestCaseTypeId"));
-        }
-
-        @Test
-        @DisplayName("Should fail to trigger if invalid jurisdiction")
-        void shouldFailToTriggerIfInvalidJurisdiction() {
-            doReturn(false).when(caseTypeService).isJurisdictionValid(TEST_JURISDICTION_ID, caseType);
-
-            Exception exception = assertThrows(ValidationException.class, () -> defaultStartEventOperation.triggerStartForDraft(UID,
-                                                                                                                                TEST_JURISDICTION_ID,
-                                                                                                                                TEST_CASE_TYPE_ID,
-                                                                                                                                TEST_DRAFT_ID,
-                                                                                                                                TEST_EVENT_TRIGGER_ID,
-                                                                                                                                IGNORE_WARNING)
-            );
-            assertThat(exception.getMessage(), startsWith("TestCaseTypeId is not defined as a case type for TestJurisdictionId"));
         }
 
         @Test
