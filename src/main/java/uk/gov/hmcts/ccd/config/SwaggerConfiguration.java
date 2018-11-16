@@ -54,7 +54,6 @@ public class SwaggerConfiguration {
             .groupName("v2")
             .select()
             .apis(RequestHandlerSelectors.basePackage(CaseController.class.getPackage().getName()))
-            .apis(RequestHandlerSelectors.basePackage(StartTriggerController.class.getPackage().getName()))
             .build()
             .useDefaultResponseMessages(false)
             .apiInfo(apiV2Info())
