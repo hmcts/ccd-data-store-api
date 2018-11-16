@@ -11,5 +11,9 @@ public final class V2 {
 
         // Internal API
         public static final String UI_CASE_VIEW = "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-case-view.v2+json;charset=UTF-8";
+
+        // External API
+        public static final String START_TRIGGER = "application/vnd.uk.gov.hmcts.ccd-data-store-api.start-trigger.v2+json;charset=UTF-8";
+
     }
 }
