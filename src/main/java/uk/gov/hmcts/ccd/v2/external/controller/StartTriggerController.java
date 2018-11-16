@@ -15,7 +15,6 @@ import uk.gov.hmcts.ccd.v2.external.resource.StartTriggerResource;
 @RestController
 @RequestMapping(path = "/")
 public class StartTriggerController {
-    private static final String ERROR_CASE_TYPE_OR_TRIGGER_ID_INVALID = "Case type or Trigger ID is not valid";
 
     private final StartEventOperation startEventOperation;
 
@@ -45,8 +44,8 @@ public class StartTriggerController {
             response = StartTriggerResource.class
         ),
         @ApiResponse(
-            code = 400,
-            message = ERROR_CASE_TYPE_OR_TRIGGER_ID_INVALID
+            code = 422,
+            message = "Process could not be started"
         ),
         @ApiResponse(
             code = 404,

@@ -198,7 +198,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
     private CaseEvent getEventTrigger(String caseTypeId, String eventTriggerId, CaseType caseType) {
         final CaseEvent eventTrigger = eventTriggerService.findCaseEvent(caseType, eventTriggerId);
         if (eventTrigger == null) {
-            throw new ResourceNotFoundException("Cannot findCaseEvent event " + eventTriggerId + " for case type " + caseTypeId);
+            throw new ResourceNotFoundException("Cannot find event " + eventTriggerId + " for case type " + caseTypeId);
         }
         return eventTrigger;
     }
