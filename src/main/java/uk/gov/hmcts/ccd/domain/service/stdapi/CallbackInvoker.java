@@ -10,6 +10,7 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
@@ -94,6 +95,31 @@ public class CallbackInvoker {
                                     caseDetailsBefore,
                                     caseDetails,
                                     AfterSubmitCallbackResponse.class);
+    }
+
+    public CaseDetails invokeMidEventCallback(final WizardPage wizardPage,
+                                              final CaseType caseType,
+                                              final CaseEvent caseEvent,
+                                              final CaseDetails caseDetailsBefore,
+                                              final CaseDetails caseDetails,
+                                              final Boolean ignoreWarning) {
+
+        Optional<CallbackResponse> callbackResponseOptional = callbackService.send(wizardPage.getCallBackURLMidEvent(),
+            wizardPage.getRetriesTimeoutMidEvent(),
+            caseEvent,
+            caseDetailsBefore,
+            caseDetails);
+
+        if (callbackResponseOptional.isPresent()) {
+            CallbackResponse callbackResponse = callbackResponseOptional.get();
+
+            callbackService.validateCallbackErrorsAndWarnings(callbackResponse, ignoreWarning);
+            if (callbackResponse.getData() != null) {
+                validateAndSetData(caseType, caseDetails, callbackResponse.getData());
+            }
+        }
+
+        return caseDetails;
     }
 
     private void validateAndSetFromAboutToStartCallback(CaseType caseType,
