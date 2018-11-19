@@ -38,3 +38,6 @@ output "ELASTIC_SEARCH_HOSTS" {
   value = "${local.elastic_search_hosts}"
 }
 
+output "DEFINITION_STORE_HOST" {
+  value = "${local.definition_store_host}"
+}
