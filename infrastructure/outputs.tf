@@ -29,3 +29,15 @@ output "OAUTH2_CLIENT_ID" {
 output "OAUTH2_REDIRECT_URI" {
   value = "${local.oauth2_redirect_uri}"
 }
+
+output "ELASTIC_SEARCH_ENABLED" {
+  value = "${var.elastic_search_enabled}"
+}
+
+output "ELASTIC_SEARCH_HOSTS" {
+  value = "${local.elastic_search_hosts}"
+}
+
+output "DEFINITION_STORE_HOST" {
+  value = "${local.definition_store_host}"
+}
