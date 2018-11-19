@@ -35,6 +35,7 @@ locals {
   draftStoreUrl = "http://draft-store-service-${local.local_env}.service.${local.local_ase}.internal"
   elastic_search_hosts = "${var.elastic_search_enabled == "false" ? "" : "${format("http://%s:9200", join("", data.azurerm_key_vault_secret.ccd_elastic_search_url.*.value))}"}"
   elastic_search_password = "${var.elastic_search_enabled == "false" ? "" : "${join("", data.azurerm_key_vault_secret.ccd_elastic_search_password.*.value)}"}"
+  definition_store_host = "http://ccd-definition-store-api-${local.env_ase_url}"
 }
 
 data "azurerm_key_vault" "ccd_shared_key_vault" {
@@ -94,7 +95,7 @@ module "ccd-data-store-api" {
 
     ENABLE_DB_MIGRATE = "false"
 
-    DEFINITION_STORE_HOST               = "http://ccd-definition-store-api-${local.env_ase_url}"
+    DEFINITION_STORE_HOST               = "${local.definition_store_host}"
     USER_PROFILE_HOST                   = "http://ccd-user-profile-api-${local.env_ase_url}"
 
     CCD_DM_DOMAIN                       = "${local.dm_valid_domain}"
