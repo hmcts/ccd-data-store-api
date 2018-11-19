@@ -33,6 +33,8 @@ locals {
   oauth2_redirect_uri = "${var.frontend_url != "" ? local.custom_redirect_uri : local.default_redirect_uri}"
 
   draftStoreUrl = "http://draft-store-service-${local.local_env}.service.${local.local_ase}.internal"
+  elastic_search_hosts = "${var.elastic_search_enabled == "false" ? "" : "${format("http://%s:9200", join("", data.azurerm_key_vault_secret.ccd_elastic_search_url.*.value))}"}"
+  elastic_search_password = "${var.elastic_search_enabled == "false" ? "" : "${join("", data.azurerm_key_vault_secret.ccd_elastic_search_password.*.value)}"}"
 }
 
 data "azurerm_key_vault" "ccd_shared_key_vault" {
@@ -110,8 +112,8 @@ module "ccd-data-store-api" {
     CCD_DEFAULTPRINTURL                 = "${local.default_print_url}"
 
     ELASTIC_SEARCH_ENABLED              = "${var.elastic_search_enabled}"
-    ELASTIC_SEARCH_HOSTS                = "${var.elastic_search_enabled == "false" ? "" : "${format("http://%s:9200", join("", data.azurerm_key_vault_secret.ccd_elastic_search_url.*.value))}"}"
-    ELASTIC_SEARCH_PASSWORD             = "${var.elastic_search_enabled == "false" ? "" : "${join("", data.azurerm_key_vault_secret.ccd_elastic_search_password.*.value)}"}"
+    ELASTIC_SEARCH_HOSTS                = "${local.elastic_search_hosts}"
+    ELASTIC_SEARCH_PASSWORD             = "${local.elastic_search_password}"
     ELASTIC_SEARCH_BLACKLIST            = "${var.elastic_search_blacklist}"
     ELASTIC_SEARCH_CASE_INDEX_NAME_FORMAT = "${var.elastic_search_case_index_name_format}"
     ELASTIC_SEARCH_CASE_INDEX_TYPE      = "${var.elastic_search_case_index_type}"
