@@ -15,7 +15,9 @@ public interface StartEventOperation {
      * @param eventTriggerId
      * @param ignoreWarning
      * @return When found, start event trigger for given case type and event trigger id
+     * @deprecated Use {@link #triggerStartForCaseType(String, String, Boolean)} instead
      */
+    @Deprecated //NOSONAR
     StartEventTrigger triggerStartForCaseType(String uid,
                                               String jurisdictionId,
                                               String caseTypeId,
