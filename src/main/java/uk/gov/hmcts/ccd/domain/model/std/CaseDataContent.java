@@ -67,7 +67,7 @@ public class CaseDataContent {
     }
 
     public Boolean getIgnoreWarning() {
-        return ignoreWarning;
+        return ignoreWarning == null ? Boolean.FALSE : ignoreWarning;
     }
 
     public void setIgnoreWarning(Boolean ignoreWarning) {
