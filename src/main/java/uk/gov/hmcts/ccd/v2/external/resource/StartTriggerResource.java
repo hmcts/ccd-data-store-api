@@ -18,35 +18,12 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 @NoArgsConstructor
 public class StartTriggerResource extends ResourceSupport {
 
+    private StartEventTrigger startEventTrigger;
     @JsonProperty("case_details")
     private CaseDetails caseDetails;
     @JsonProperty("event_id")
     private String eventId;
     private String token;
-
-    public CaseDetails getCaseDetails() {
-        return caseDetails;
-    }
-
-    public void setCaseDetails(CaseDetails caseDetails) {
-        this.caseDetails = caseDetails;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public String getEventId() {
-        return eventId;
-    }
-
-    public void setEventId(String eventId) {
-        this.eventId = eventId;
-    }
 
     public StartTriggerResource(@NonNull StartEventTrigger startEventTrigger, Boolean ignoreWarning) {
         copyProperties(startEventTrigger);
