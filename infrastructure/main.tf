@@ -34,7 +34,7 @@ locals {
 
   draftStoreUrl = "http://draft-store-service-${local.local_env}.service.${local.local_ase}.internal"
   elastic_search_hosts = "${var.elastic_search_enabled == "false" ? "" : "${format("http://%s:9200", join("", data.azurerm_key_vault_secret.ccd_elastic_search_url.*.value))}"}"
-  elastic_search_data_node_hosts = "${var.elastic_search_enabled == "false" ? "" : "${format("%s", join("", data.azurerm_key_vault_secret.ccd_elastic_search_data_nodes_url.*.value))}"}"
+  elastic_search_data_node_hosts = "${var.elastic_search_enabled == "false" ? "" : "${join("", data.azurerm_key_vault_secret.ccd_elastic_search_data_nodes_url.*.value)}"}"
   elastic_search_password = "${var.elastic_search_enabled == "false" ? "" : "${join("", data.azurerm_key_vault_secret.ccd_elastic_search_password.*.value)}"}"
   definition_store_host = "http://ccd-definition-store-api-${local.env_ase_url}"
 }
@@ -56,6 +56,7 @@ data "azurerm_key_vault_secret" "ccd_elastic_search_url" {
   vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
 }
 
+// format: "http://ccd-data-1:9200","http://ccd-data-2:9200"
 data "azurerm_key_vault_secret" "ccd_elastic_search_data_nodes_url" {
   count = "${var.elastic_search_enabled == "false" ? 0 : 1}"
   name = "ccd-ELASTIC-SEARCH-DATA-NODES-URL"
