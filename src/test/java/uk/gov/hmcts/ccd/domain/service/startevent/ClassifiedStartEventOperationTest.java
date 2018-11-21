@@ -79,7 +79,7 @@ class ClassifiedStartEventOperationTest {
         @Test
         @DisplayName("should call decorated start event operation as is")
         void shouldCallDecoratedStartEventOperation() {
-            doReturn(startEvent).when(startEventOperation).triggerStartForCaseType(UID, JURISDICTION_ID, CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING);
+            doReturn(startEvent).when(startEventOperation).triggerStartForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING);
 
             final StartEventTrigger output = classifiedStartEventOperation.triggerStartForCaseType(UID,
                                                                                                    JURISDICTION_ID,
@@ -90,7 +90,7 @@ class ClassifiedStartEventOperationTest {
             assertAll(
                 () -> assertThat(output, sameInstance(startEvent)),
                 () -> assertThat(output.getCaseDetails(), sameInstance(caseDetails)),
-                () -> verify(startEventOperation).triggerStartForCaseType(UID, JURISDICTION_ID, CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)
+                () -> verify(startEventOperation).triggerStartForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)
             );
         }
     }
