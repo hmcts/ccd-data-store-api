@@ -331,59 +331,60 @@ public class AccessControlService {
         if (!fieldType.get().getType().equals(COLLECTION)) {
             return hasCaseFieldAccess(caseFieldDefinitions, userRoles, CAN_UPDATE, newFieldName);
         } else {
-            if (!itemAddedAndHasCreateAccess(newData, newFieldName, caseFieldDefinitions, userRoles)) {
-                return false;
-            }
-            if (!itemDeletedAndHasDeleteAccess(existingData, newData, newFieldName, caseFieldDefinitions, userRoles)) {
-                return false;
-            }
-            return itemUpdatedAndHasUpdateAccess(existingData, newData, newFieldName, caseFieldDefinitions, userRoles);
+            return hasAccessForCollectionItemAction(newData, existingData, newFieldName, caseFieldDefinitions, userRoles);
         }
+    }
+
+    private boolean hasAccessForCollectionItemAction(JsonNode newData, JsonNode existingData, String newFieldName, List<CaseField> caseFieldDefinitions, Set<String> userRoles) {
+        if (!itemAddedAndHasCreateAccess(newData, newFieldName, caseFieldDefinitions, userRoles)) {
+            return false;
+        }
+        if (!itemDeletedAndHasDeleteAccess(existingData, newData, newFieldName, caseFieldDefinitions, userRoles)) {
+            return false;
+        }
+        return itemUpdatedAndHasUpdateAccess(existingData, newData, newFieldName, caseFieldDefinitions, userRoles);
     }
 
     private boolean itemDeletedAndHasDeleteAccess(JsonNode existingData, JsonNode newData, String newFieldName,
                                                   List<CaseField> caseFieldDefinitions, Set<String> userRoles) {
-        JsonNode newValue = newData.get(newFieldName);
-        JsonNode oldValue = existingData.get(newFieldName);
-        boolean containsDeletedItem = StreamSupport.stream(spliteratorUnknownSize(oldValue.elements(), Spliterator.ORDERED), false).anyMatch(
-            oldItem -> {
-                boolean itemExists = StreamSupport.stream(spliteratorUnknownSize(newValue.elements(), Spliterator.ORDERED), false)
-                    .anyMatch(newItem -> newItem.get("id").equals(oldItem.get("id")));
-                LOG.debug((itemExists ? "{} exists" : "{} deleted"), oldItem.get("id").asText());
-                return !itemExists;
-            }
-        );
+        boolean containsDeletedItem = StreamSupport
+            .stream(spliteratorUnknownSize(existingData.get(newFieldName).elements(), Spliterator.ORDERED), false)
+            .anyMatch(oldItem -> itemMissing(oldItem, newData.get(newFieldName)));
+
         return !containsDeletedItem || hasCaseFieldAccess(caseFieldDefinitions, userRoles, CAN_DELETE, newFieldName);
+    }
+
+    private boolean itemMissing(JsonNode oldItem, JsonNode newValue) {
+        boolean itemExists = StreamSupport.stream(spliteratorUnknownSize(newValue.elements(), Spliterator.ORDERED), false)
+            .anyMatch(newItem -> newItem.get("id").equals(oldItem.get("id")));
+        return !itemExists;
     }
     
     private boolean itemUpdatedAndHasUpdateAccess(JsonNode existingData, JsonNode newData, String newFieldName,
                                                   List<CaseField> caseFieldDefinitions, Set<String> userRoles) {
-        JsonNode newValue = newData.get(newFieldName);
-        JsonNode oldValue = existingData.get(newFieldName);
-        boolean containsUpdatedItem = StreamSupport.stream(spliteratorUnknownSize(oldValue.elements(), Spliterator.ORDERED), false).anyMatch(
-            oldItem -> {
-                boolean updated = StreamSupport.stream(spliteratorUnknownSize(newValue.elements(), Spliterator.ORDERED), false)
-                    .anyMatch(newItem -> {
-                        boolean exists = newItem.get("id").equals(oldItem.get("id"));
-                        if (exists) {
-                            return !newItem.equals(oldItem);
-                        }
-                        return false;
-                    });
-                LOG.debug((updated ? "{} is updated" : "{} is unchanged"), oldItem.get("id").asText());
-                return updated;
-            }
-        );
+        boolean containsUpdatedItem = StreamSupport
+            .stream(spliteratorUnknownSize(existingData.get(newFieldName).elements(), Spliterator.ORDERED), false)
+            .anyMatch(oldItem -> itemUpdated(oldItem, newData.get(newFieldName)));
+
         return !containsUpdatedItem || hasCaseFieldAccess(caseFieldDefinitions, userRoles, CAN_UPDATE, newFieldName);
+    }
+
+    private boolean itemUpdated(JsonNode oldItem, JsonNode newValue) {
+        boolean itemUpdated = StreamSupport.stream(spliteratorUnknownSize(newValue.elements(), Spliterator.ORDERED), false)
+            .anyMatch(newItem -> {
+                boolean itemExists = newItem.get("id").equals(oldItem.get("id"));
+                if (itemExists) {
+                    return !newItem.equals(oldItem);
+                }
+                return false;
+            });
+        return itemUpdated;
     }
 
     private boolean itemAddedAndHasCreateAccess(JsonNode newData, String newFieldName, List<CaseField> caseFieldDefinitions, Set<String> userRoles) {
         JsonNode newValue = newData.get(newFieldName);
         boolean containsNewItem = StreamSupport.stream(spliteratorUnknownSize(newValue.elements(), Spliterator.ORDERED), false)
-            .anyMatch(collectionItem ->
-                collectionItem.get("id").equals(NullNode.getInstance())
-                    || collectionItem.get("id").asText().equalsIgnoreCase("null"));
-        LOG.debug((containsNewItem ? "{} has new item(s)" : "{} has no new items"), newFieldName);
+            .anyMatch(newItem -> newItem.get("id").equals(NullNode.getInstance()) || newItem.get("id").asText().equalsIgnoreCase("null"));
         return !containsNewItem || hasCreateAccess(newFieldName, caseFieldDefinitions, userRoles);
     }
 
