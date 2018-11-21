@@ -26,6 +26,7 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 import java.util.function.Supplier;
 
@@ -41,6 +42,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
     private final EventTriggerService eventTriggerService;
     private final CaseService caseService;
     private final CaseTypeService caseTypeService;
+    private final UserAuthorisation userAuthorisation;
     private final CallbackInvoker callbackInvoker;
     private final UIDService uidService;
     private final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder;
@@ -53,6 +55,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
                                       final EventTriggerService eventTriggerService,
                                       final CaseService caseService,
                                       final CaseTypeService caseTypeService,
+                                      final UserAuthorisation userAuthorisation,
                                       final CallbackInvoker callbackInvoker,
                                       final UIDService uidService,
                                       final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder) {
@@ -64,9 +67,26 @@ public class DefaultStartEventOperation implements StartEventOperation {
         this.eventTriggerService = eventTriggerService;
         this.caseService = caseService;
         this.caseTypeService = caseTypeService;
+        this.userAuthorisation = userAuthorisation;
         this.callbackInvoker = callbackInvoker;
         this.uidService = uidService;
         this.draftResponseToCaseDetailsBuilder = draftResponseToCaseDetailsBuilder;
+    }
+
+    @Override
+    public StartEventTrigger triggerStartForCaseType(final String caseTypeId,
+                                                     final String eventTriggerId,
+                                                     final Boolean ignoreWarning) {
+
+        String uid = userAuthorisation.getUserId();
+
+        final CaseType caseType = getCaseType(caseTypeId);
+
+        return buildStartEventTrigger(uid,
+                                      caseType,
+                                      eventTriggerId,
+                                      ignoreWarning,
+                                      () -> caseService.createNewCaseDetails(caseTypeId, caseType.getJurisdictionId(), Maps.newHashMap()));
     }
 
     @Override
@@ -76,12 +96,13 @@ public class DefaultStartEventOperation implements StartEventOperation {
                                                      final String eventTriggerId,
                                                      final Boolean ignoreWarning) {
 
+        final CaseType caseType = getCaseType(caseTypeId);
+
         return buildStartEventTrigger(uid,
-                                      jurisdictionId,
-                                      caseTypeId,
+                                      caseType,
                                       eventTriggerId,
                                       ignoreWarning,
-            () -> caseService.createNewCaseDetails(caseTypeId, jurisdictionId, Maps.newHashMap()));
+                                      () -> caseService.createNewCaseDetails(caseTypeId, jurisdictionId, Maps.newHashMap()));
     }
 
     @Override
@@ -115,24 +136,21 @@ public class DefaultStartEventOperation implements StartEventOperation {
                                                   final String draftReference,
                                                   final String eventTriggerId,
                                                   final Boolean ignoreWarning) {
+        final CaseType caseType = getCaseType(caseTypeId);
+
         return buildStartEventTrigger(uid,
-                                      jurisdictionId,
-                                      caseTypeId,
+                                      caseType,
                                       eventTriggerId,
                                       ignoreWarning,
-            () -> getDraftDetails(draftReference));
+                                      () -> getDraftDetails(draftReference));
     }
 
     private StartEventTrigger buildStartEventTrigger(final String uid,
-                                                     final String jurisdictionId,
-                                                     final String caseTypeId,
+                                                     final CaseType caseType,
                                                      final String eventTriggerId,
                                                      final Boolean ignoreWarning,
                                                      final Supplier<CaseDetails> caseDetailsSupplier) {
-        final CaseType caseType = getCaseType(caseTypeId);
-        final CaseEvent eventTrigger = getEventTrigger(caseTypeId, eventTriggerId, caseType);
-
-        validateJurisdiction(jurisdictionId, caseTypeId, caseType);
+        final CaseEvent eventTrigger = getEventTrigger(caseType.getId(), eventTriggerId, caseType);
 
         final CaseDetails caseDetails = caseDetailsSupplier.get();
 
@@ -180,7 +198,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
     private CaseEvent getEventTrigger(String caseTypeId, String eventTriggerId, CaseType caseType) {
         final CaseEvent eventTrigger = eventTriggerService.findCaseEvent(caseType, eventTriggerId);
         if (eventTrigger == null) {
-            throw new ResourceNotFoundException("Cannot findCaseEvent event " + eventTriggerId + " for case type " + caseTypeId);
+            throw new ResourceNotFoundException("Cannot find event " + eventTriggerId + " for case type " + caseTypeId);
         }
         return eventTrigger;
     }
