@@ -2469,37 +2469,56 @@ public class AccessControlServiceTest {
     @DisplayName("CRUD contract on collection")
     class CRUDonCollection {
         private JsonNode existingDataNode;
+        private String comma = ",";
+        private String collStart = "{  \"Addresses\":[  \n";
+        private String child1 = "         {  \n"
+            + "            \"value\":{  \n"
+            + "               \"Address\":\"address1\",\n"
+            + "               \"Notes\": {\n"
+            + "                   \"Note1\": \"someNote11\",\n"
+            + "                   \"Note2\": \"someNote21\"\n"
+            + "                }"
+            + "            },\n"
+            + "            \"id\":\"" + FIRST_CHILD_ID + "\"\n"
+            + "         }\n";
+        private String child1Updated = "         {  \n"
+            + "            \"value\":{  \n"
+            + "               \"Address\":\"address1\",\n"
+            + "               \"Notes\": {\n"
+            + "                   \"Note1\": \"someNote11 Updated\",\n"
+            + "                   \"Note2\": \"someNote21 Updated\"\n"
+            + "                }"
+            + "            },\n"
+            + "            \"id\":\"" + FIRST_CHILD_ID + "\"\n"
+            + "         }\n";
+        private String child2 = "         {  \n"
+            + "            \"value\":{  \n"
+            + "               \"Address\":\"address1\",\n"
+            + "               \"Notes\": {\n"
+            + "                   \"Note1\": \"someNote21\",\n"
+            + "                   \"Note2\": \"someNote22\"\n"
+            + "                }"
+            + "            },\n"
+            + "            \"id\":\"" + SECOND_CHILD_ID + "\"\n"
+            + "         }\n";
+        private String newChild = "         {  \n"
+            + "            \"value\":{  \n"
+            + "               \"Address\":\"address3\",\n"
+            + "               \"Notes\": {\n"
+            + "                   \"Note1\": \"someNote31\",\n"
+            + "                   \"Note2\": \"someNote32\"\n"
+            + "                }"
+            + "            },\n"
+            + "            \"id\":\"null\"\n"
+            + "         }\n";
+
+        private String collEnd = "      ]\n }\n";
 
         @BeforeEach
         void setUp() throws IOException {
-            final Map<String, JsonNode> existingData = MAPPER.convertValue(MAPPER.readTree(
-                "{  \"Addresses\":[  \n" +
-                    "         {  \n" +
-                    "            \"value\":{  \n" +
-                    "               \"Address\":\"address1\",\n" +
-                    "               \"Notes\": {\n" +
-                    "                   \"Note1\": \"someNote11\",\n" +
-                    "                   \"Note2\": \"someNote21\"\n" +
-                    "                }" +
-                    "            },\n" +
-                    "            \"id\":\"" + FIRST_CHILD_ID + "\"\n" +
-                    "         },\n" +
-                    "         {  \n" +
-                    "            \"value\":{  \n" +
-                    "               \"Address\":\"address1\",\n" +
-                    "               \"Notes\": {\n" +
-                    "                   \"Note1\": \"someNote21\",\n" +
-                    "                   \"Note2\": \"someNote22\"\n" +
-                    "                }" +
-                    "            },\n" +
-                    "            \"id\":\"" + SECOND_CHILD_ID + "\"\n" +
-                    "         }\n" +
-                    "      ]\n" +
-                    "    }\n"
-            ), STRING_JSON_MAP);
+            final Map<String, JsonNode> existingData = MAPPER.convertValue(
+                MAPPER.readTree(collStart + child1 + comma + child2 + collEnd), STRING_JSON_MAP);
             existingDataNode = MAPPER.convertValue(existingData, JsonNode.class);
-
-
         }
 
         @Test
@@ -2516,41 +2535,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            final Map<String, JsonNode> newData = MAPPER.convertValue(MAPPER.readTree(
-                "{  \"Addresses\":[  \n" +
-                    "         {  \n" +
-                    "            \"value\":{  \n" +
-                    "               \"Address\":\"address1\",\n" +
-                    "               \"Notes\": {\n" +
-                    "                   \"Note1\": \"someNote11\",\n" +
-                    "                   \"Note2\": \"someNote21\"\n" +
-                    "                }" +
-                    "            },\n" +
-                    "            \"id\":\"" + FIRST_CHILD_ID + "\"\n" +
-                    "         },\n" +
-                    "         {  \n" +
-                    "            \"value\":{  \n" +
-                    "               \"Address\":\"address1\",\n" +
-                    "               \"Notes\": {\n" +
-                    "                   \"Note1\": \"someNote21\",\n" +
-                    "                   \"Note2\": \"someNote22\"\n" +
-                    "                }" +
-                    "            },\n" +
-                    "            \"id\":\"" + SECOND_CHILD_ID + "\"\n" +
-                    "         },\n" +
-                    "         {  \n" +
-                    "            \"value\":{  \n" +
-                    "               \"Address\":\"address3\",\n" +
-                    "               \"Notes\": {\n" +
-                    "                   \"Note1\": \"someNote31\",\n" +
-                    "                   \"Note2\": \"someNote32\"\n" +
-                    "                }" +
-                    "            },\n" +
-                    "            \"id\":\"null\"\n" +
-                    "         }\n" +
-                    "      ]\n" +
-                    "    }\n"
-            ), STRING_JSON_MAP);
+            final Map<String, JsonNode> newData = MAPPER.convertValue(
+                MAPPER.readTree(collStart + child1 + comma + child2 + comma + newChild + collEnd), STRING_JSON_MAP);
             JsonNode newDataNode = MAPPER.convertValue(newData, JsonNode.class);
 
             assertThat(
@@ -2576,42 +2562,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            final Map<String, JsonNode> newData = MAPPER.convertValue(MAPPER.readTree(
-                "{  \"Addresses\":[  \n" +
-                    "         {  \n" +
-                    "            \"value\":{  \n" +
-                    "               \"Address\":\"address1\",\n" +
-                    "               \"Notes\": {\n" +
-                    "                   \"Note1\": \"someNote11\",\n" +
-                    "                   \"Note2\": \"someNote21\"\n" +
-                    "                }" +
-                    "            },\n" +
-                    "            \"id\":\"" + FIRST_CHILD_ID + "\"\n" +
-                    "         },\n" +
-                    "         {  \n" +
-                    "            \"value\":{  \n" +
-                    "               \"Address\":\"address1\",\n" +
-                    "               \"Notes\": {\n" +
-                    "                   \"Note1\": \"someNote21\",\n" +
-                    "                   \"Note2\": \"someNote22\"\n" +
-                    "                }" +
-                    "            },\n" +
-                    "            \"id\":\"" + SECOND_CHILD_ID + "\"\n" +
-                    "         },\n" +
-                    "         {  \n" +
-                    "            \"value\":{  \n" +
-                    "               \"Address\":\"address3\",\n" +
-                    "               \"Notes\": {\n" +
-                    "                   \"Note1\": \"someNote31\",\n" +
-                    "                   \"Note2\": \"someNote32\"\n" +
-                    "                }" +
-                    "            },\n" +
-                    "            \"id\":\"null\"\n" +
-                    "         }\n" +
-                    "      ]\n" +
-                    "    }\n"
-            ), STRING_JSON_MAP);
-            JsonNode newDataNode = MAPPER.convertValue(newData, JsonNode.class);
+            JsonNode newDataNode = MAPPER.convertValue(
+                MAPPER.readTree(collStart + child1 + comma + child2 + comma + newChild + collEnd), JsonNode.class);
 
             assertThat(
                 accessControlService.canAccessCaseFieldsForUpsert(
@@ -2636,42 +2588,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            final Map<String, JsonNode> newData = MAPPER.convertValue(MAPPER.readTree(
-                "{  \"Addresses\":[  \n" +
-                    "         {  \n" +
-                    "            \"value\":{  \n" +
-                    "               \"Address\":\"address1\",\n" +
-                    "               \"Notes\": {\n" +
-                    "                   \"Note1\": \"someNote11\",\n" +
-                    "                   \"Note2\": \"someNote21\"\n" +
-                    "                }" +
-                    "            },\n" +
-                    "            \"id\":\"" + FIRST_CHILD_ID + "\"\n" +
-                    "         },\n" +
-                    "         {  \n" +
-                    "            \"value\":{  \n" +
-                    "               \"Address\":\"address1\",\n" +
-                    "               \"Notes\": {\n" +
-                    "                   \"Note1\": \"someNote21\",\n" +
-                    "                   \"Note2\": \"someNote22\"\n" +
-                    "                }" +
-                    "            },\n" +
-                    "            \"id\":\"" + SECOND_CHILD_ID + "\"\n" +
-                    "         },\n" +
-                    "         {  \n" +
-                    "            \"value\":{  \n" +
-                    "               \"Address\":\"address3\",\n" +
-                    "               \"Notes\": {\n" +
-                    "                   \"Note1\": \"someNote31\",\n" +
-                    "                   \"Note2\": \"someNote32\"\n" +
-                    "                }" +
-                    "            },\n" +
-                    "            \"id\":\"null\"\n" +
-                    "         }\n" +
-                    "      ]\n" +
-                    "    }\n"
-            ), STRING_JSON_MAP);
-            JsonNode newDataNode = MAPPER.convertValue(newData, JsonNode.class);
+            JsonNode newDataNode = MAPPER.convertValue(
+                MAPPER.readTree(collStart + child1 + comma + child2 + comma + newChild + collEnd), JsonNode.class);
 
             assertThat(
                 accessControlService.canAccessCaseFieldsForUpsert(
@@ -2681,6 +2599,7 @@ public class AccessControlServiceTest {
                     USER_ROLES),
                 is(false));
         }
+
 
         @Test
         @DisplayName("Should allow update of items on collection")
@@ -2696,31 +2615,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            final Map<String, JsonNode> newData = MAPPER.convertValue(MAPPER.readTree(
-                "{  \"Addresses\":[  \n" +
-                    "         {  \n" +
-                    "            \"value\":{  \n" +
-                    "               \"Address\":\"address1\",\n" +
-                    "               \"Notes\": {\n" +
-                    "                   \"Note1 of 1\": \"someNote11\",\n" +
-                    "                   \"Note2 of 1\": \"someNote12\"\n" +
-                    "                }" +
-                    "            },\n" +
-                    "            \"id\":\"" + FIRST_CHILD_ID + "\"\n" +
-                    "         },\n" +
-                    "         {  \n" +
-                    "            \"value\":{  \n" +
-                    "               \"Address\":\"address1\",\n" +
-                    "               \"Notes\": {\n" +
-                    "                   \"Note1\": \"someNote21\",\n" +
-                    "                   \"Note2\": \"someNote22\"\n" +
-                    "                }" +
-                    "            },\n" +
-                    "            \"id\":\"" + SECOND_CHILD_ID + "\"\n" +
-                    "         }\n" +
-                    "      ]\n" +
-                    "    }\n"
-            ), STRING_JSON_MAP);
+            final Map<String, JsonNode> newData = MAPPER.convertValue(
+                MAPPER.readTree(collStart + child1Updated + comma + child2 + collEnd), STRING_JSON_MAP);
             JsonNode newDataNode = MAPPER.convertValue(newData, JsonNode.class);
 
             assertThat(
@@ -2746,21 +2642,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            final Map<String, JsonNode> newData = MAPPER.convertValue(MAPPER.readTree(
-                "{  \"Addresses\":[  \n" +
-                    "         {  \n" +
-                    "            \"value\":{  \n" +
-                    "               \"Address\":\"address1\",\n" +
-                    "               \"Notes\": {\n" +
-                    "                   \"Note1 of 1\": \"someNote11\",\n" +
-                    "                   \"Note2 of 1\": \"someNote21\"\n" +
-                    "                }" +
-                    "            },\n" +
-                    "            \"id\":\"" + FIRST_CHILD_ID + "\"\n" +
-                    "         }\n" +
-                    "      ]\n" +
-                    "    }\n"
-            ), STRING_JSON_MAP);
+            final Map<String, JsonNode> newData = MAPPER.convertValue(
+                MAPPER.readTree(collStart + child1Updated + comma + child2 + collEnd), STRING_JSON_MAP);
             JsonNode newDataNode = MAPPER.convertValue(newData, JsonNode.class);
 
             assertThat(
@@ -2786,21 +2669,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            final Map<String, JsonNode> newData = MAPPER.convertValue(MAPPER.readTree(
-                "{  \"Addresses\":[  \n" +
-                    "         {  \n" +
-                    "            \"value\":{  \n" +
-                    "               \"Address\":\"address1\",\n" +
-                    "               \"Notes\": {\n" +
-                    "                   \"Note1\": \"someNote11\",\n" +
-                    "                   \"Note2\": \"someNote21\"\n" +
-                    "                }" +
-                    "            },\n" +
-                    "            \"id\":\"" + FIRST_CHILD_ID + "\"\n" +
-                    "         }\n" +
-                    "      ]\n" +
-                    "    }\n"
-            ), STRING_JSON_MAP);
+            final Map<String, JsonNode> newData = MAPPER.convertValue(
+                MAPPER.readTree(collStart + child1 + collEnd), STRING_JSON_MAP);
             JsonNode newDataNode = MAPPER.convertValue(newData, JsonNode.class);
 
             assertThat(
@@ -2826,21 +2696,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            final Map<String, JsonNode> newData = MAPPER.convertValue(MAPPER.readTree(
-                "{  \"Addresses\":[  \n" +
-                    "         {  \n" +
-                    "            \"value\":{  \n" +
-                    "               \"Address\":\"address1\",\n" +
-                    "               \"Notes\": {\n" +
-                    "                   \"Note1\": \"someNote11\",\n" +
-                    "                   \"Note2\": \"someNote21\"\n" +
-                    "                }" +
-                    "            },\n" +
-                    "            \"id\":\"" + FIRST_CHILD_ID + "\"\n" +
-                    "         }\n" +
-                    "      ]\n" +
-                    "    }\n"
-            ), STRING_JSON_MAP);
+            final Map<String, JsonNode> newData = MAPPER.convertValue(
+                MAPPER.readTree(collStart + child1 + collEnd), STRING_JSON_MAP);
             JsonNode newDataNode = MAPPER.convertValue(newData, JsonNode.class);
 
             assertThat(

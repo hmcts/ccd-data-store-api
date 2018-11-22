@@ -370,7 +370,7 @@ public class AccessControlService {
     }
 
     private boolean itemUpdated(JsonNode oldItem, JsonNode newValue) {
-        boolean itemUpdated = StreamSupport.stream(spliteratorUnknownSize(newValue.elements(), Spliterator.ORDERED), false)
+        return StreamSupport.stream(spliteratorUnknownSize(newValue.elements(), Spliterator.ORDERED), false)
             .anyMatch(newItem -> {
                 boolean itemExists = newItem.get("id").equals(oldItem.get("id"));
                 if (itemExists) {
@@ -378,7 +378,6 @@ public class AccessControlService {
                 }
                 return false;
             });
-        return itemUpdated;
     }
 
     private boolean itemAddedAndHasCreateAccess(JsonNode newData, String newFieldName, List<CaseField> caseFieldDefinitions, Set<String> userRoles) {
