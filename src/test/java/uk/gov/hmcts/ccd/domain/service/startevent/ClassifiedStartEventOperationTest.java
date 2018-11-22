@@ -81,9 +81,7 @@ class ClassifiedStartEventOperationTest {
         void shouldCallDecoratedStartEventOperation() {
             doReturn(startEvent).when(startEventOperation).triggerStartForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING);
 
-            final StartEventTrigger output = classifiedStartEventOperation.triggerStartForCaseType(UID,
-                                                                                                   JURISDICTION_ID,
-                                                                                                   CASE_TYPE_ID,
+            final StartEventTrigger output = classifiedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
                                                                                                    EVENT_TRIGGER_ID,
                                                                                                    IGNORE_WARNING);
 

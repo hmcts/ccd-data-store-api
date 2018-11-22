@@ -47,25 +47,10 @@ public class DefaultGetEventTriggerOperation implements GetEventTriggerOperation
 
     @Override
     public CaseEventTrigger executeForCaseType(String caseTypeId, String eventTriggerId, Boolean ignoreWarning) {
-        return merge(startEventOperation.triggerStartForCaseType(caseTypeId,
-                                                                 eventTriggerId,
-                                                                 ignoreWarning),
-                     caseTypeId,
-                     eventTriggerId,
-                     null);
-    }
-
-    @Override
-    public CaseEventTrigger executeForCaseType(String uid,
-                                               String jurisdictionId,
-                                               String caseTypeId,
-                                               String eventTriggerId,
-                                               Boolean ignoreWarning) {
-        return merge(startEventOperation.triggerStartForCaseType(uid,
-                                                                 jurisdictionId,
-                                                                 caseTypeId,
-                                                                 eventTriggerId,
-                                                                 ignoreWarning),
+        StartEventTrigger startEventTrigger = startEventOperation.triggerStartForCaseType(caseTypeId,
+                                                                                          eventTriggerId,
+                                                                                          ignoreWarning);
+        return merge(startEventTrigger,
                      caseTypeId,
                      eventTriggerId,
                      null);
@@ -78,12 +63,13 @@ public class DefaultGetEventTriggerOperation implements GetEventTriggerOperation
                                            String caseReference,
                                            String eventTriggerId,
                                            Boolean ignoreWarning) {
-        return merge(startEventOperation.triggerStartForCase(uid,
-                                                             jurisdictionId,
-                                                             caseTypeId,
-                                                             caseReference,
-                                                             eventTriggerId,
-                                                             ignoreWarning),
+        StartEventTrigger startEventTrigger = startEventOperation.triggerStartForCase(uid,
+                                                                                      jurisdictionId,
+                                                                                      caseTypeId,
+                                                                                      caseReference,
+                                                                                      eventTriggerId,
+                                                                                      ignoreWarning);
+        return merge(startEventTrigger,
                      caseTypeId,
                      eventTriggerId,
                      caseReference);
@@ -92,12 +78,13 @@ public class DefaultGetEventTriggerOperation implements GetEventTriggerOperation
     @Override
     public CaseEventTrigger executeForDraft(String uid, String jurisdictionId, String caseTypeId, String draftReference, String eventTriggerId,
                                             Boolean ignoreWarning) {
-        return merge(startEventOperation.triggerStartForDraft(uid,
-                                                              jurisdictionId,
-                                                              caseTypeId,
-                                                              draftReference,
-                                                              eventTriggerId,
-                                                              ignoreWarning),
+        StartEventTrigger startEventTrigger = startEventOperation.triggerStartForDraft(uid,
+                                                                                       jurisdictionId,
+                                                                                       caseTypeId,
+                                                                                       draftReference,
+                                                                                       eventTriggerId,
+                                                                                       ignoreWarning);
+        return merge(startEventTrigger,
                      caseTypeId,
                      eventTriggerId,
                      draftReference);

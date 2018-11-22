@@ -69,24 +69,6 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
 
     }
 
-    public CaseEventTrigger executeForCaseType(String uid,
-                                               String jurisdictionId,
-                                               String caseTypeId,
-                                               String eventTriggerId,
-                                               Boolean ignoreWarning) {
-        final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
-
-        Set<String> userRoles = getUserRoles();
-
-        verifyRequiredAccessExistsForCaseType(eventTriggerId, caseType, userRoles);
-
-        return filterCaseFieldsByCreateAccess(caseType, userRoles, getEventTriggerOperation.executeForCaseType(uid,
-                                                                                                               jurisdictionId,
-                                                                                                               caseTypeId,
-                                                                                                               eventTriggerId,
-                                                                                                               ignoreWarning));
-    }
-
     public CaseEventTrigger executeForCase(String uid,
                                            String jurisdictionId,
                                            String caseTypeId,

@@ -13,7 +13,7 @@ import static org.hamcrest.beans.HasPropertyWithValue.hasProperty;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventTriggerBuilder.anEventTrigger;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageBuilder.aWizardPage;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageBuilder.newWizardPage;
 
 @DisplayName("CaseResource")
 class UIStartTriggerResourceTest {
@@ -35,7 +35,7 @@ class UIStartTriggerResourceTest {
 
     @BeforeEach
     void setUp() {
-        caseEventTrigger = aCaseEventTrigger();
+        caseEventTrigger = newCaseEventTrigger();
         ignoreWarning = true;
     }
 
@@ -51,7 +51,8 @@ class UIStartTriggerResourceTest {
             () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getCaseId(), equalTo(CASE_ID)),
             () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getCaseFields(), hasItems(hasProperty("id", is(FIELD_ID)))),
             () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getEventToken(), equalTo(TOKEN)),
-            () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getWizardPages().get(0).getWizardPageFields().get(0), hasProperty("caseFieldId", is(FIELD_ID))),
+            () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getWizardPages().get(0).getWizardPageFields().get(0),
+                             hasProperty("caseFieldId", is(FIELD_ID))),
             () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getShowSummary(), equalTo(IS_SHOW_SUMMARY)),
             () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getShowEventNotes(), equalTo(IS_SHOW_EVENT_NOTES)),
             () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getEndButtonLabel(), equalTo(END_BUTTON_LABEL)),
@@ -67,7 +68,7 @@ class UIStartTriggerResourceTest {
         assertThat(uiStartTriggerResource.getLink("self").getHref(), equalTo(LINK_SELF));
     }
 
-    private CaseEventTrigger aCaseEventTrigger() {
+    private CaseEventTrigger newCaseEventTrigger() {
         return anEventTrigger()
             .withId(ID)
             .withName(NAME)
@@ -76,7 +77,7 @@ class UIStartTriggerResourceTest {
             .withField(aViewField()
                            .withId(FIELD_ID).build())
             .withEventToken(TOKEN)
-            .withWizardPage(aWizardPage()
+            .withWizardPage(newWizardPage()
                                 .withField(aViewField()
                                                .withId(FIELD_ID)
                                                .build())

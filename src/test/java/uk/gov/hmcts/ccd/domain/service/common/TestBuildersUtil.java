@@ -680,7 +680,7 @@ public class TestBuildersUtil {
             this.wizardPage = new WizardPage();
         }
 
-        public static WizardPageBuilder aWizardPage() {
+        public static WizardPageBuilder newWizardPage() {
             return new WizardPageBuilder();
         }
 

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.datastore.tests.v2.internal;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,8 +16,6 @@ import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event.CREATE;
 @DisplayName("Get UI start trigger by case type and event ids")
 class GetUIStartTriggerTest extends BaseTest {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
-    private static final ObjectNode EMPTY_OBJECT = JSON_NODE_FACTORY.objectNode();
-    private static final String EMPTY_OBJECT_STRING = EMPTY_OBJECT.toString();
     private static final String INVALID_CASE_TYPE_ID = "invalidCaseType";
     private static final String INVALID_EVENT_TRIGGER_ID = "invalidEvent";
     private static final String NAME = "Create a new case";
@@ -29,7 +26,7 @@ class GetUIStartTriggerTest extends BaseTest {
 
     @Test
     @DisplayName("should retrieve trigger when the case type and event exists")
-    void shouldRetrieveWhenExists() {
+    public void shouldRetrieveWhenExists() {
         callGetStartTrigger(CASE_TYPE, CREATE)
             .when()
             .get("/internal/case-types/{caseTypeId}/triggers/{triggerId}")

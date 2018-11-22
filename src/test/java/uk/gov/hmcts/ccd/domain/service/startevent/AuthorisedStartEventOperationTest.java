@@ -195,9 +195,7 @@ class AuthorisedStartEventOperationTest {
         @DisplayName("should call decorated start event operation as is")
         void shouldCallDecoratedStartEventOperation() {
 
-            final StartEventTrigger output = authorisedStartEventOperation.triggerStartForCaseType(UID,
-                                                                                                   JURISDICTION_ID,
-                                                                                                   CASE_TYPE_ID,
+            final StartEventTrigger output = authorisedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
                                                                                                    EVENT_TRIGGER_ID,
                                                                                                    IGNORE_WARNING);
 
@@ -216,9 +214,7 @@ class AuthorisedStartEventOperationTest {
 
             when(accessControlService.canAccessCaseTypeWithCriteria(caseType, userRoles, CAN_READ)).thenReturn(false);
 
-            final StartEventTrigger output = authorisedStartEventOperation.triggerStartForCaseType(UID,
-                                                                                                   JURISDICTION_ID,
-                                                                                                   CASE_TYPE_ID,
+            final StartEventTrigger output = authorisedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
                                                                                                    EVENT_TRIGGER_ID,
                                                                                                    IGNORE_WARNING);
 

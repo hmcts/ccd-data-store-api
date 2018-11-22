@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventTriggerBuilder.anEventTrigger;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageBuilder.aWizardPage;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageBuilder.newWizardPage;
 
 class UIStartTriggerControllerTest {
     private static final String NAME = "eventName";
@@ -53,7 +53,7 @@ class UIStartTriggerControllerTest {
         .withField(aViewField()
                        .withId(FIELD_ID).build())
         .withEventToken(TOKEN)
-        .withWizardPage(aWizardPage()
+        .withWizardPage(newWizardPage()
                             .withField(aViewField()
                                            .withId(FIELD_ID)
                                            .build())

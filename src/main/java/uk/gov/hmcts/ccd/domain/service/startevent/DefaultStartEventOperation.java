@@ -90,22 +90,6 @@ public class DefaultStartEventOperation implements StartEventOperation {
     }
 
     @Override
-    public StartEventTrigger triggerStartForCaseType(final String uid,
-                                                     final String jurisdictionId,
-                                                     final String caseTypeId,
-                                                     final String eventTriggerId,
-                                                     final Boolean ignoreWarning) {
-
-        final CaseType caseType = getCaseType(caseTypeId);
-
-        return buildStartEventTrigger(uid,
-                                      caseType,
-                                      eventTriggerId,
-                                      ignoreWarning,
-                                      () -> caseService.createNewCaseDetails(caseTypeId, jurisdictionId, Maps.newHashMap()));
-    }
-
-    @Override
     public StartEventTrigger triggerStartForCase(final String uid,
                                                  final String jurisdictionId,
                                                  final String caseTypeId,
