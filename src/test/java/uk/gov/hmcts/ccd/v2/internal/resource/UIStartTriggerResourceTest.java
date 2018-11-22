@@ -27,8 +27,8 @@ class UIStartTriggerResourceTest {
     private static final String CASE_ID = "1111222233334444";
     private static final String FIELD_ID = "PersonFirstName";
     private static final String CASE_TYPE_ID = "TestAddressBookCase";
-    private static final String EVENT_ID = "createCase";
-    private static final String LINK_SELF = String.format("/internal/case-types/%s/triggers/%s?ignore-warning=true", CASE_TYPE_ID, EVENT_ID);
+    private static final String ID = "createCase";
+    private static final String LINK_SELF = String.format("/internal/case-types/%s/triggers/%s?ignore-warning=true", CASE_TYPE_ID, ID);
 
     private CaseEventTrigger caseEventTrigger;
     private boolean ignoreWarning;
@@ -45,17 +45,17 @@ class UIStartTriggerResourceTest {
         final UIStartTriggerResource uiStartTriggerResource = new UIStartTriggerResource(caseEventTrigger, CASE_TYPE_ID, ignoreWarning);
 
         assertAll(
-            () -> assertThat(uiStartTriggerResource.getEventId(), equalTo(EVENT_ID)),
-            () -> assertThat(uiStartTriggerResource.getName(), equalTo(NAME)),
-            () -> assertThat(uiStartTriggerResource.getDescription(), equalTo(DESCRIPTION)),
-            () -> assertThat(uiStartTriggerResource.getCaseId(), equalTo(CASE_ID)),
-            () -> assertThat(uiStartTriggerResource.getCaseFields(), hasItems(hasProperty("id", is(FIELD_ID)))),
-            () -> assertThat(uiStartTriggerResource.getEventToken(), equalTo(TOKEN)),
-            () -> assertThat(uiStartTriggerResource.getWizardPages().get(0).getWizardPageFields().get(0), hasProperty("caseFieldId", is(FIELD_ID))),
-            () -> assertThat(uiStartTriggerResource.getShowSummary(), equalTo(IS_SHOW_SUMMARY)),
-            () -> assertThat(uiStartTriggerResource.getShowEventNotes(), equalTo(IS_SHOW_EVENT_NOTES)),
-            () -> assertThat(uiStartTriggerResource.getEndButtonLabel(), equalTo(END_BUTTON_LABEL)),
-            () -> assertThat(uiStartTriggerResource.getCanSaveDraft(), equalTo(IS_SAVE_DRAFT))
+            () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getId(), equalTo(ID)),
+            () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getName(), equalTo(NAME)),
+            () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getDescription(), equalTo(DESCRIPTION)),
+            () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getCaseId(), equalTo(CASE_ID)),
+            () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getCaseFields(), hasItems(hasProperty("id", is(FIELD_ID)))),
+            () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getEventToken(), equalTo(TOKEN)),
+            () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getWizardPages().get(0).getWizardPageFields().get(0), hasProperty("caseFieldId", is(FIELD_ID))),
+            () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getShowSummary(), equalTo(IS_SHOW_SUMMARY)),
+            () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getShowEventNotes(), equalTo(IS_SHOW_EVENT_NOTES)),
+            () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getEndButtonLabel(), equalTo(END_BUTTON_LABEL)),
+            () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getCanSaveDraft(), equalTo(IS_SAVE_DRAFT))
         );
     }
 
@@ -69,7 +69,7 @@ class UIStartTriggerResourceTest {
 
     private CaseEventTrigger aCaseEventTrigger() {
         return anEventTrigger()
-            .withId(EVENT_ID)
+            .withId(ID)
             .withName(NAME)
             .withDescription(DESCRIPTION)
             .withCaseId(CASE_ID)

@@ -81,18 +81,18 @@ class UIStartTriggerControllerTest {
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
-                () -> assertThat(response.getBody().getEventId(), is(EVENT_TRIGGER_ID)),
-                () -> assertThat(response.getBody().getName(), is(NAME)),
-                () -> assertThat(response.getBody().getDescription(), is(DESCRIPTION)),
-                () -> assertThat(response.getBody().getCaseId(), is(CASE_ID)),
-                () -> assertThat(response.getBody().getCaseFields(), hasItems(hasProperty("id", CoreMatchers.is(FIELD_ID)))),
-                () -> assertThat(response.getBody().getEventToken(), equalTo(TOKEN)),
-                () -> assertThat(response.getBody().getWizardPages().get(0).getWizardPageFields().get(0),
+                () -> assertThat(response.getBody().getCaseEventTrigger().getId(), is(EVENT_TRIGGER_ID)),
+                () -> assertThat(response.getBody().getCaseEventTrigger().getName(), is(NAME)),
+                () -> assertThat(response.getBody().getCaseEventTrigger().getDescription(), is(DESCRIPTION)),
+                () -> assertThat(response.getBody().getCaseEventTrigger().getCaseId(), is(CASE_ID)),
+                () -> assertThat(response.getBody().getCaseEventTrigger().getCaseFields(), hasItems(hasProperty("id", CoreMatchers.is(FIELD_ID)))),
+                () -> assertThat(response.getBody().getCaseEventTrigger().getEventToken(), equalTo(TOKEN)),
+                () -> assertThat(response.getBody().getCaseEventTrigger().getWizardPages().get(0).getWizardPageFields().get(0),
                                  hasProperty("caseFieldId", CoreMatchers.is(FIELD_ID))),
-                () -> assertThat(response.getBody().getShowSummary(), equalTo(IS_SHOW_SUMMARY)),
-                () -> assertThat(response.getBody().getShowEventNotes(), equalTo(IS_SHOW_EVENT_NOTES)),
-                () -> assertThat(response.getBody().getEndButtonLabel(), equalTo(END_BUTTON_LABEL)),
-                () -> assertThat(response.getBody().getCanSaveDraft(), equalTo(IS_SAVE_DRAFT))
+                () -> assertThat(response.getBody().getCaseEventTrigger().getShowSummary(), equalTo(IS_SHOW_SUMMARY)),
+                () -> assertThat(response.getBody().getCaseEventTrigger().getShowEventNotes(), equalTo(IS_SHOW_EVENT_NOTES)),
+                () -> assertThat(response.getBody().getCaseEventTrigger().getEndButtonLabel(), equalTo(END_BUTTON_LABEL)),
+                () -> assertThat(response.getBody().getCaseEventTrigger().getCanSaveDraft(), equalTo(IS_SAVE_DRAFT))
             );
         }
 
