@@ -26,8 +26,7 @@ public class UIStartTriggerController {
         this.getEventTriggerOperation = getEventTriggerOperation;
     }
 
-    @RequestMapping(
-        method = RequestMethod.GET,
+    @GetMapping(
         path = "/case-types/{caseTypeId}/triggers/{triggerId}",
         headers = {
             V2.EXPERIMENTAL_HEADER
@@ -37,7 +36,7 @@ public class UIStartTriggerController {
         }
     )
     @ApiOperation(
-        value = "Retrieve a start case trigger by ID for dynamic display",
+        value = "Retrieve a trigger by ID for dynamic display",
         notes = V2.EXPERIMENTAL_WARNING
     )
     @ApiResponses({
