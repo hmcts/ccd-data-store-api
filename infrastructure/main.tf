@@ -34,6 +34,7 @@ locals {
 
   draftStoreUrl = "http://draft-store-service-${local.local_env}.service.${local.local_ase}.internal"
   elastic_search_hosts = "${var.elastic_search_enabled == "false" ? "" : "${format("http://%s:9200", join("", data.azurerm_key_vault_secret.ccd_elastic_search_url.*.value))}"}"
+  elastic_search_data_node_hosts = "${var.elastic_search_enabled == "false" ? "" : "${join("", data.azurerm_key_vault_secret.ccd_elastic_search_data_nodes_url.*.value)}"}"
   elastic_search_password = "${var.elastic_search_enabled == "false" ? "" : "${join("", data.azurerm_key_vault_secret.ccd_elastic_search_password.*.value)}"}"
   definition_store_host = "http://ccd-definition-store-api-${local.env_ase_url}"
 }
@@ -48,9 +49,17 @@ data "azurerm_key_vault_secret" "ccd_data_s2s_key" {
   vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
 }
 
+// load balancer url. The load balancer will kill connections when idle for 5 min. Used by functional tests
 data "azurerm_key_vault_secret" "ccd_elastic_search_url" {
   count = "${var.elastic_search_enabled == "false" ? 0 : 1}"
   name = "ccd-ELASTIC-SEARCH-URL"
+  vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
+}
+
+// format: "http://ccd-data-1:9200","http://ccd-data-2:9200"
+data "azurerm_key_vault_secret" "ccd_elastic_search_data_nodes_url" {
+  count = "${var.elastic_search_enabled == "false" ? 0 : 1}"
+  name = "ccd-ELASTIC-SEARCH-DATA-NODES-URL"
   vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
 }
 
@@ -114,6 +123,7 @@ module "ccd-data-store-api" {
 
     ELASTIC_SEARCH_ENABLED              = "${var.elastic_search_enabled}"
     ELASTIC_SEARCH_HOSTS                = "${local.elastic_search_hosts}"
+    ELASTIC_SEARCH_DATA_NODES_HOSTS     = "${local.elastic_search_data_node_hosts}"
     ELASTIC_SEARCH_PASSWORD             = "${local.elastic_search_password}"
     ELASTIC_SEARCH_BLACKLIST            = "${var.elastic_search_blacklist}"
     ELASTIC_SEARCH_CASE_INDEX_NAME_FORMAT = "${var.elastic_search_case_index_name_format}"
