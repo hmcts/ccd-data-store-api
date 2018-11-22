@@ -21,10 +21,9 @@ public class ElasticSearchConfiguration {
     @Bean
     public JestClient jestClient() {
 
-        //ensure maxConnectionIdleTime is less than the ES loadbalancer max idle connection time
         JestClientFactory factory = new JestClientFactory();
         Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
-        factory.setHttpClientConfig(new HttpClientConfig.Builder(applicationParams.getElasticSearchHosts())
+        factory.setHttpClientConfig(new HttpClientConfig.Builder(applicationParams.getElasticSearchDataHosts())
             .multiThreaded(true)
             .maxConnectionIdleTime(15, TimeUnit.SECONDS)
             .connTimeout(4000)
@@ -32,4 +31,5 @@ public class ElasticSearchConfiguration {
             .gson(gson).build());
         return factory.getObject();
     }
+
 }
