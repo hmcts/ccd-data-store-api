@@ -26,7 +26,7 @@ class GetUIStartTriggerTest extends BaseTest {
 
     @Test
     @DisplayName("should retrieve trigger when the case type and event exists")
-    public void shouldRetrieveWhenExists() {
+    void shouldRetrieveWhenExists() {
         callGetStartTrigger(CASE_TYPE, CREATE)
             .when()
             .get("/internal/case-types/{caseTypeId}/triggers/{triggerId}")
