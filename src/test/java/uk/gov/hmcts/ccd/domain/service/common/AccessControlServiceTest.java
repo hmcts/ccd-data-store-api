@@ -2516,9 +2516,7 @@ public class AccessControlServiceTest {
 
         @BeforeEach
         void setUp() throws IOException {
-            final Map<String, JsonNode> existingData = MAPPER.convertValue(
-                MAPPER.readTree(collStart + child1 + comma + child2 + collEnd), STRING_JSON_MAP);
-            existingDataNode = MAPPER.convertValue(existingData, JsonNode.class);
+            existingDataNode = getJsonNode(collStart + child1 + comma + child2 + collEnd);
         }
 
         @Test
@@ -2535,13 +2533,9 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            final Map<String, JsonNode> newData = MAPPER.convertValue(
-                MAPPER.readTree(collStart + child1 + comma + child2 + comma + newChild + collEnd), STRING_JSON_MAP);
-            JsonNode newDataNode = MAPPER.convertValue(newData, JsonNode.class);
-
             assertThat(
                 accessControlService.canAccessCaseFieldsForUpsert(
-                    newDataNode,
+                    getJsonNode(collStart + child1 + comma + child2 + comma + newChild + collEnd),
                     existingDataNode,
                     caseType.getCaseFields(),
                     USER_ROLES),
@@ -2562,12 +2556,9 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            JsonNode newDataNode = MAPPER.convertValue(
-                MAPPER.readTree(collStart + child1 + comma + child2 + comma + newChild + collEnd), JsonNode.class);
-
             assertThat(
                 accessControlService.canAccessCaseFieldsForUpsert(
-                    newDataNode,
+                    getJsonNode(collStart + child1 + comma + child2 + comma + newChild + collEnd),
                     existingDataNode,
                     caseType.getCaseFields(),
                     USER_ROLES),
@@ -2588,12 +2579,9 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            JsonNode newDataNode = MAPPER.convertValue(
-                MAPPER.readTree(collStart + child1 + comma + child2 + comma + newChild + collEnd), JsonNode.class);
-
             assertThat(
                 accessControlService.canAccessCaseFieldsForUpsert(
-                    newDataNode,
+                    getJsonNode(collStart + child1 + comma + child2 + comma + newChild + collEnd),
                     existingDataNode,
                     caseType.getCaseFields(),
                     USER_ROLES),
@@ -2615,13 +2603,9 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            final Map<String, JsonNode> newData = MAPPER.convertValue(
-                MAPPER.readTree(collStart + child1Updated + comma + child2 + collEnd), STRING_JSON_MAP);
-            JsonNode newDataNode = MAPPER.convertValue(newData, JsonNode.class);
-
             assertThat(
                 accessControlService.canAccessCaseFieldsForUpsert(
-                    newDataNode,
+                    getJsonNode(collStart + child1Updated + comma + child2 + collEnd),
                     existingDataNode,
                     caseType.getCaseFields(),
                     USER_ROLES),
@@ -2642,13 +2626,9 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            final Map<String, JsonNode> newData = MAPPER.convertValue(
-                MAPPER.readTree(collStart + child1Updated + comma + child2 + collEnd), STRING_JSON_MAP);
-            JsonNode newDataNode = MAPPER.convertValue(newData, JsonNode.class);
-
             assertThat(
                 accessControlService.canAccessCaseFieldsForUpsert(
-                    newDataNode,
+                    getJsonNode(collStart + child1Updated + comma + child2 + collEnd),
                     existingDataNode,
                     caseType.getCaseFields(),
                     USER_ROLES),
@@ -2669,13 +2649,9 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            final Map<String, JsonNode> newData = MAPPER.convertValue(
-                MAPPER.readTree(collStart + child1 + collEnd), STRING_JSON_MAP);
-            JsonNode newDataNode = MAPPER.convertValue(newData, JsonNode.class);
-
             assertThat(
                 accessControlService.canAccessCaseFieldsForUpsert(
-                    newDataNode,
+                    getJsonNode(collStart + child1 + collEnd),
                     existingDataNode,
                     caseType.getCaseFields(),
                     USER_ROLES),
@@ -2696,13 +2672,9 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            final Map<String, JsonNode> newData = MAPPER.convertValue(
-                MAPPER.readTree(collStart + child1 + collEnd), STRING_JSON_MAP);
-            JsonNode newDataNode = MAPPER.convertValue(newData, JsonNode.class);
-
             assertThat(
                 accessControlService.canAccessCaseFieldsForUpsert(
-                    newDataNode,
+                    getJsonNode(collStart + child1 + collEnd),
                     existingDataNode,
                     caseType.getCaseFields(),
                     USER_ROLES),
