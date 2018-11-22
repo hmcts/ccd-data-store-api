@@ -15,7 +15,10 @@ import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
@@ -36,9 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.*;
 
 class AuthorisedGetEventTriggerOperationTest {
 
@@ -130,8 +131,8 @@ class AuthorisedGetEventTriggerOperationTest {
     }
 
     @Nested
-    @DisplayName("for case type")
-    class ForCaseType {
+    @DisplayName("for case type - deprecated")
+    class ForCaseTypeDeprecated {
 
         @BeforeEach
         void setUp() {
@@ -161,8 +162,8 @@ class AuthorisedGetEventTriggerOperationTest {
         }
 
         @Test
-        @DisplayName("should call decorated get event trigger operation as is")
-        void shouldCallDecoratedGetEventTriggerOperation() {
+        @DisplayName("should call decorated deprecated get event trigger operation as is")
+        void shouldCallDecoratedDeprecatedGetEventTriggerOperation() {
 
             final CaseEventTrigger output = authorisedGetEventTriggerOperation.executeForCaseType(UID,
                                                                                                   JURISDICTION_ID,
@@ -261,6 +262,128 @@ class AuthorisedGetEventTriggerOperationTest {
                 ResourceNotFoundException.class, () -> authorisedGetEventTriggerOperation.executeForCaseType(UID,
                                                                                                              JURISDICTION_ID,
                                                                                                              CASE_TYPE_ID,
+                                                                                                             EVENT_TRIGGER_ID,
+                                                                                                             IGNORE)
+            );
+        }
+    }
+
+    @Nested
+    @DisplayName("for case type")
+    class ForCaseType {
+
+        @BeforeEach
+        void setUp() {
+            doReturn(caseEventTrigger).when(getEventTriggerOperation).executeForCaseType(CASE_TYPE_ID,
+                                                                                         EVENT_TRIGGER_ID,
+                                                                                         IGNORE);
+            doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(caseType,
+                                                                                    userRoles,
+                                                                                    CAN_READ);
+            doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(caseType,
+                                                                                    userRoles,
+                                                                                    CAN_CREATE);
+            doReturn(true).when(accessControlService).canAccessCaseEventWithCriteria(EVENT_TRIGGER_ID,
+                                                                                     events,
+                                                                                     userRoles,
+                                                                                     CAN_CREATE);
+            doReturn(caseEventTrigger).when(accessControlService).setReadOnlyOnCaseViewFieldsIfNoAccess(caseEventTrigger,
+                                                                                                        caseFields,
+                                                                                                        userRoles,
+                                                                                                        CAN_CREATE);
+            doReturn(caseEventTrigger).when(accessControlService).filterCaseViewFieldsByAccess(caseEventTrigger,
+                                                                                               caseFields,
+                                                                                               userRoles,
+                                                                                               CAN_CREATE);
+        }
+
+        @Test
+        @DisplayName("should call decorated get event trigger operation as is")
+        void shouldCallDecoratedGetEventTriggerOperation() {
+
+            final CaseEventTrigger output = authorisedGetEventTriggerOperation.executeForCaseType(CASE_TYPE_ID,
+                                                                                                  EVENT_TRIGGER_ID,
+                                                                                                  IGNORE);
+
+            assertAll(
+                () -> assertThat(output, sameInstance(caseEventTrigger)),
+                () -> verify(getEventTriggerOperation).executeForCaseType(CASE_TYPE_ID,
+                                                                          EVENT_TRIGGER_ID,
+                                                                          IGNORE)
+            );
+        }
+
+        @Test
+        @DisplayName("should return event trigger and perform operations in order")
+        void shouldReturnEventTriggerAndPerformOperationsInOrder() {
+
+            final CaseEventTrigger output = authorisedGetEventTriggerOperation.executeForCaseType(CASE_TYPE_ID,
+                                                                                                  EVENT_TRIGGER_ID,
+                                                                                                  IGNORE);
+
+            InOrder inOrder = inOrder(caseDefinitionRepository,
+                                      userRepository,
+                                      accessControlService,
+                                      getEventTriggerOperation);
+            assertAll(
+                () -> assertThat(output, sameInstance(caseEventTrigger)),
+                () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
+                () -> inOrder.verify(userRepository).getUserRoles(),
+                () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseType),
+                                                                                         eq(userRoles),
+                                                                                         eq(CAN_CREATE)),
+                () -> inOrder.verify(accessControlService).canAccessCaseEventWithCriteria(eq(EVENT_TRIGGER_ID),
+                                                                                          eq(caseType.getEvents()),
+                                                                                          eq(userRoles),
+                                                                                          eq(CAN_CREATE)),
+                () -> inOrder.verify(getEventTriggerOperation).executeForCaseType(CASE_TYPE_ID,
+                                                                                  EVENT_TRIGGER_ID,
+                                                                                  IGNORE),
+                () -> inOrder.verify(accessControlService).filterCaseViewFieldsByAccess(eq(caseEventTrigger),
+                                                                                                 eq(caseFields),
+                                                                                                 eq(userRoles),
+                                                                                                 eq(CAN_CREATE))
+            );
+        }
+
+        @Test
+        @DisplayName("should fail if no read access on case type")
+        void shouldFailIfNoReadAccessOnCaseType() {
+            doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(caseType,
+                                                                                     userRoles,
+                                                                                     CAN_READ);
+
+            assertThrows(
+                ResourceNotFoundException.class, () -> authorisedGetEventTriggerOperation.executeForCaseType(CASE_TYPE_ID,
+                                                                                                             EVENT_TRIGGER_ID,
+                                                                                                             IGNORE)
+            );
+        }
+
+        @Test
+        @DisplayName("should fail if no create access on case type")
+        void shouldFailIfNoCreateAccessOnCaseType() {
+            doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(caseType,
+                                                                                     userRoles,
+                                                                                     CAN_CREATE);
+
+            assertThrows(
+                ResourceNotFoundException.class, () -> authorisedGetEventTriggerOperation.executeForCaseType(CASE_TYPE_ID,
+                                                                                                             EVENT_TRIGGER_ID,
+                                                                                                             IGNORE)
+            );
+        }
+
+        @Test
+        @DisplayName("should fail if no create access on case event")
+        void shouldFailIfNoCreateAccessOnCaseEvent() {
+            doReturn(false).when(accessControlService).canAccessCaseEventWithCriteria(EVENT_TRIGGER_ID,
+                                                                                      events,
+                                                                                      userRoles,
+                                                                                      CAN_CREATE);
+
+            assertThrows(
+                ResourceNotFoundException.class, () -> authorisedGetEventTriggerOperation.executeForCaseType(CASE_TYPE_ID,
                                                                                                              EVENT_TRIGGER_ID,
                                                                                                              IGNORE)
             );
