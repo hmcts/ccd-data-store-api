@@ -15,7 +15,6 @@ import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event.CREATE;
 
 @DisplayName("Get UI start trigger by case type and event ids")
 class GetUIStartTriggerTest extends BaseTest {
-    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private static final String INVALID_CASE_TYPE_ID = "invalidCaseType";
     private static final String INVALID_EVENT_TRIGGER_ID = "invalidEvent";
     private static final String NAME = "Create a new case";
