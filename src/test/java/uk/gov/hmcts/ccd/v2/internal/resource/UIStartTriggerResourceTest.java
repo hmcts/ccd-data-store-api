@@ -28,7 +28,7 @@ class UIStartTriggerResourceTest {
     private static final String FIELD_ID = "PersonFirstName";
     private static final String CASE_TYPE_ID = "TestAddressBookCase";
     private static final String ID = "createCase";
-    private static final String LINK_SELF = String.format("/internal/case-types/%s/triggers/%s?ignore-warning=true", CASE_TYPE_ID, ID);
+    private static final String LINK_SELF = String.format("/internal/case-types/%s/event-triggers/%s?ignore-warning=true", CASE_TYPE_ID, ID);
 
     private CaseEventTrigger caseEventTrigger;
     private boolean ignoreWarning;

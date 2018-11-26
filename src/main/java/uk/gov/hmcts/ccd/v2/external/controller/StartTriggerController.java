@@ -25,7 +25,7 @@ public class StartTriggerController {
     }
 
     @GetMapping(
-        path = "/case-types/{caseTypeId}/triggers/{triggerId}",
+        path = "/case-types/{caseTypeId}/event-triggers/{triggerId}",
         headers = {
             V2.EXPERIMENTAL_HEADER
         },

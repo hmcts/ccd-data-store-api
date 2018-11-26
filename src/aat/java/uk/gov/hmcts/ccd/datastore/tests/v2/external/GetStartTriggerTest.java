@@ -32,7 +32,7 @@ class GetStartTriggerTest extends BaseTest {
     void shouldRetrieveWhenExists() {
         callGetStartTrigger(CASE_TYPE, CREATE)
             .when()
-            .get("/case-types/{caseTypeId}/triggers/{triggerId}")
+            .get("/case-types/{caseTypeId}/event-triggers/{triggerId}")
 
             .then()
             .log().ifError()
@@ -62,7 +62,7 @@ class GetStartTriggerTest extends BaseTest {
             .body("security_classifications", hasToString(EMPTY_OBJECT_STRING))
 
             .rootPath("_links")
-            .body("self.href", equalTo(String.format("%s/case-types/%s/triggers/%s{?ignore-warning}", aat.getTestUrl(), CASE_TYPE, CREATE)))
+            .body("self.href", equalTo(String.format("%s/case-types/%s/event-triggers/%s{?ignore-warning}", aat.getTestUrl(), CASE_TYPE, CREATE)))
         ;
     }
 
@@ -71,7 +71,7 @@ class GetStartTriggerTest extends BaseTest {
     void should404WhenCaseTypeDoesNotExist() {
         callGetStartTrigger(INVALID_CASE_TYPE_ID, CREATE)
             .when()
-            .get("/case-types/{caseTypeId}/triggers/{triggerId}")
+            .get("/case-types/{caseTypeId}/event-triggers/{triggerId}")
 
             .then()
             .statusCode(404);
@@ -82,7 +82,7 @@ class GetStartTriggerTest extends BaseTest {
     void should404WhenEventTriggerDoesNotExist() {
         callGetStartTrigger(CASE_TYPE, INVALID_EVENT_TRIGGER_ID)
             .when()
-            .get("/case-types/{caseTypeId}/triggers/{triggerId}")
+            .get("/case-types/{caseTypeId}/event-triggers/{triggerId}")
 
             .then()
             .statusCode(404);

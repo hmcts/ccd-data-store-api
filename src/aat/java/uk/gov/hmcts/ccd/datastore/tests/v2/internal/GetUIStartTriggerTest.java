@@ -27,7 +27,7 @@ class GetUIStartTriggerTest extends BaseTest {
     void shouldRetrieveWhenExists() {
         callGetStartTrigger(CASE_TYPE, CREATE)
             .when()
-            .get("/internal/case-types/{caseTypeId}/triggers/{triggerId}")
+            .get("/internal/case-types/{caseTypeId}/event-triggers/{triggerId}")
 
             .then()
             .log().ifError()
@@ -50,7 +50,7 @@ class GetUIStartTriggerTest extends BaseTest {
             .body("wizard_pages", hasSize(3))
 
             .rootPath("_links")
-            .body("self.href", equalTo(String.format("%s/internal/case-types/%s/triggers/%s{?ignore-warning}", aat.getTestUrl(), CASE_TYPE, CREATE)))
+            .body("self.href", equalTo(String.format("%s/internal/case-types/%s/event-triggers/%s{?ignore-warning}", aat.getTestUrl(), CASE_TYPE, CREATE)))
         ;
     }
 
@@ -59,7 +59,7 @@ class GetUIStartTriggerTest extends BaseTest {
     void should404WhenCaseTypeDoesNotExist() {
         callGetStartTrigger(INVALID_CASE_TYPE_ID, CREATE)
             .when()
-            .get("/internal/case-types/{caseTypeId}/triggers/{triggerId}")
+            .get("/internal/case-types/{caseTypeId}/event-triggers/{triggerId}")
 
             .then()
             .statusCode(404);
@@ -70,7 +70,7 @@ class GetUIStartTriggerTest extends BaseTest {
     void should404WhenEventTriggerDoesNotExist() {
         callGetStartTrigger(CASE_TYPE, INVALID_EVENT_TRIGGER_ID)
             .when()
-            .get("/internal/case-types/{caseTypeId}/triggers/{triggerId}")
+            .get("/internal/case-types/{caseTypeId}/event-triggers/{triggerId}")
 
             .then()
             .statusCode(404);
