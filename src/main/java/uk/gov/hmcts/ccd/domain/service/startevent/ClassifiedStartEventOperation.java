@@ -43,13 +43,6 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
     }
 
     @Override
-    public StartEventTrigger triggerStartForCaseType(String uid, String jurisdictionId, String caseTypeId, String eventTriggerId, Boolean ignoreWarning) {
-        return startEventOperation.triggerStartForCaseType(caseTypeId,
-                                                           eventTriggerId,
-                                                           ignoreWarning);
-    }
-
-    @Override
     public StartEventTrigger triggerStartForCase(String uid, String jurisdictionId, String caseTypeId, String caseReference, String eventTriggerId, Boolean ignoreWarning) {
         return applyClassificationIfCaseDetailsExist(startEventOperation.triggerStartForCase(uid,
                                                                                              jurisdictionId,

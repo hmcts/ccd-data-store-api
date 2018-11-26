@@ -15,7 +15,7 @@ class StartTriggerResourceTest {
     private static final String TOKEN = "Token";
     private static final String CASE_TYPE_ID = "TestAddressBookCase";
     private static final String EVENT_ID = "createCase";
-    private static final String LINK_SELF = String.format("/case-types/%s/triggers/%s?ignore-warning=true", CASE_TYPE_ID, EVENT_ID);
+    private static final String LINK_SELF = String.format("/case-types/%s/event-triggers/%s?ignore-warning=true", CASE_TYPE_ID, EVENT_ID);
     private static final CaseDetails CASE_DETAILS = new CaseDetails();
 
     private StartEventTrigger startEventTrigger;

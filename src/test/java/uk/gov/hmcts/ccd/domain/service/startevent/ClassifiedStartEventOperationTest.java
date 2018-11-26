@@ -73,6 +73,27 @@ class ClassifiedStartEventOperationTest {
     }
 
     @Nested
+    @DisplayName("for case type - deprecated")
+    class ForCaseTypeDeprecated {
+
+        @Test
+        @DisplayName("should call decorated start event operation as is")
+        void shouldCallDecoratedStartEventOperation() {
+            doReturn(startEvent).when(startEventOperation).triggerStartForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING);
+
+            final StartEventTrigger output = classifiedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
+                                                                                                   EVENT_TRIGGER_ID,
+                                                                                                   IGNORE_WARNING);
+
+            assertAll(
+                () -> assertThat(output, sameInstance(startEvent)),
+                () -> assertThat(output.getCaseDetails(), sameInstance(caseDetails)),
+                () -> verify(startEventOperation).triggerStartForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)
+            );
+        }
+    }
+
+    @Nested
     @DisplayName("for case type")
     class ForCaseType {
 
@@ -81,9 +102,7 @@ class ClassifiedStartEventOperationTest {
         void shouldCallDecoratedStartEventOperation() {
             doReturn(startEvent).when(startEventOperation).triggerStartForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING);
 
-            final StartEventTrigger output = classifiedStartEventOperation.triggerStartForCaseType(UID,
-                                                                                                   JURISDICTION_ID,
-                                                                                                   CASE_TYPE_ID,
+            final StartEventTrigger output = classifiedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
                                                                                                    EVENT_TRIGGER_ID,
                                                                                                    IGNORE_WARNING);
 

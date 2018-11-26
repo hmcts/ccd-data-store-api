@@ -55,24 +55,21 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
         this.uidService = uidService;
     }
 
-    public CaseEventTrigger executeForCaseType(String uid,
-                                               String jurisdictionId,
-                                               String caseTypeId,
-                                               String eventTriggerId,
-                                               Boolean ignoreWarning) {
+    @Override
+    public CaseEventTrigger executeForCaseType(String caseTypeId, String eventTriggerId, Boolean ignoreWarning) {
         final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
 
         Set<String> userRoles = getUserRoles();
 
         verifyRequiredAccessExistsForCaseType(eventTriggerId, caseType, userRoles);
 
-        return filterCaseFieldsByCreateAccess(caseType, userRoles, getEventTriggerOperation.executeForCaseType(uid,
-                                                           jurisdictionId,
-                                                           caseTypeId,
-                                                           eventTriggerId,
-                                                           ignoreWarning));
+        return filterCaseFieldsByCreateAccess(caseType, userRoles, getEventTriggerOperation.executeForCaseType(caseTypeId,
+                                                                                                               eventTriggerId,
+                                                                                                               ignoreWarning));
+
     }
 
+    @Override
     public CaseEventTrigger executeForCase(String uid,
                                            String jurisdictionId,
                                            String caseTypeId,
@@ -91,11 +88,11 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
         verifyMandatoryAccessForCase(eventTriggerId, caseDetails, caseType, userRoles);
 
         return filterUpsertAccessForCase(caseType, userRoles, getEventTriggerOperation.executeForCase(uid,
-                                                       jurisdictionId,
-                                                       caseTypeId,
-                                                       caseReference,
-                                                       eventTriggerId,
-                                                       ignoreWarning));
+                                                                                                      jurisdictionId,
+                                                                                                      caseTypeId,
+                                                                                                      caseReference,
+                                                                                                      eventTriggerId,
+                                                                                                      ignoreWarning));
     }
 
     @Override
@@ -108,11 +105,11 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
         verifyRequiredAccessExistsForCaseType(eventTriggerId, caseType, userRoles);
 
         return filterCaseFieldsByCreateAccess(caseType, userRoles, getEventTriggerOperation.executeForDraft(uid,
-            jurisdictionId,
-            caseTypeId,
-            draftReference,
-            eventTriggerId,
-            ignoreWarning));
+                                                                                                            jurisdictionId,
+                                                                                                            caseTypeId,
+                                                                                                            draftReference,
+                                                                                                            eventTriggerId,
+                                                                                                            ignoreWarning));
     }
 
     private CaseDetails getCaseDetails(String caseReference) {

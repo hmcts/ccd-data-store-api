@@ -145,6 +145,7 @@ public class DefaultStartEventOperationTest {
         void setUp() {
             doReturn(caseDetails).when(caseService).createNewCaseDetails(eq(TEST_CASE_TYPE_ID), eq(TEST_JURISDICTION_ID), eq(Maps.newHashMap()));
             doReturn(true).when(eventTriggerService).isPreStateEmpty(eventTrigger);
+            doReturn(UID).when(userAuthorisation).getUserId();
             doReturn(TEST_EVENT_TOKEN).when(eventTokenService).generateToken(UID, eventTrigger, caseType.getJurisdiction(), caseType);
         }
 
@@ -152,9 +153,7 @@ public class DefaultStartEventOperationTest {
         @DisplayName("Should successfully trigger start")
         void shouldSuccessfullyTriggerStart() {
 
-            StartEventTrigger actual = defaultStartEventOperation.triggerStartForCaseType(UID,
-                                                                                          TEST_JURISDICTION_ID,
-                                                                                          TEST_CASE_TYPE_ID,
+            StartEventTrigger actual = defaultStartEventOperation.triggerStartForCaseType(TEST_CASE_TYPE_ID,
                                                                                           TEST_EVENT_TRIGGER_ID,
                                                                                           IGNORE_WARNING);
             assertAll(
@@ -175,9 +174,8 @@ public class DefaultStartEventOperationTest {
         void shouldFailToTriggerIfCaseTypeNotFound() {
             doReturn(null).when(caseDefinitionRepository).getCaseType(TEST_CASE_TYPE_ID);
 
-            final Exception exception = assertThrows(ResourceNotFoundException.class, () -> defaultStartEventOperation.triggerStartForCaseType(UID,
-                                                                                                                                               TEST_JURISDICTION_ID,
-                                                                                                                                               TEST_CASE_TYPE_ID,
+            final Exception exception = assertThrows(ResourceNotFoundException.class,
+                                                     () -> defaultStartEventOperation.triggerStartForCaseType(TEST_CASE_TYPE_ID,
                                                                                                                                                TEST_EVENT_TRIGGER_ID,
                                                                                                                                                IGNORE_WARNING)
             );
@@ -190,9 +188,7 @@ public class DefaultStartEventOperationTest {
 
             doReturn(null).when(eventTriggerService).findCaseEvent(caseType, TEST_EVENT_TRIGGER_ID);
 
-            Exception exception = assertThrows(ResourceNotFoundException.class, () -> defaultStartEventOperation.triggerStartForCaseType(UID,
-                                                                                                                                         TEST_JURISDICTION_ID,
-                                                                                                                                         TEST_CASE_TYPE_ID,
+            Exception exception = assertThrows(ResourceNotFoundException.class, () -> defaultStartEventOperation.triggerStartForCaseType(TEST_CASE_TYPE_ID,
                                                                                                                                          TEST_EVENT_TRIGGER_ID,
                                                                                                                                          IGNORE_WARNING)
             );
@@ -205,9 +201,7 @@ public class DefaultStartEventOperationTest {
 
             doReturn(false).when(eventTriggerService).isPreStateEmpty(eventTrigger);
 
-            Exception exception = assertThrows(ValidationException.class, () -> defaultStartEventOperation.triggerStartForCaseType(UID,
-                                                                                                                                   TEST_JURISDICTION_ID,
-                                                                                                                                   TEST_CASE_TYPE_ID,
+            Exception exception = assertThrows(ValidationException.class, () -> defaultStartEventOperation.triggerStartForCaseType(TEST_CASE_TYPE_ID,
                                                                                                                                    TEST_EVENT_TRIGGER_ID,
                                                                                                                                    IGNORE_WARNING)
             );
