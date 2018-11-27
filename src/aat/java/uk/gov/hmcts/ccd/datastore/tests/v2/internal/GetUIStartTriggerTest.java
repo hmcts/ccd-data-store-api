@@ -46,7 +46,7 @@ class GetUIStartTriggerTest extends BaseTest {
             .body("can_save_draft", is(nullValue()))
 
             // Flexible data
-            .body("case_fields", hasSize(14))
+            .body("case_fields", hasSize(15))
             .body("wizard_pages", hasSize(3))
 
             .rootPath("_links")
