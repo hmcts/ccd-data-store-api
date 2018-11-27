@@ -15,13 +15,12 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.service.startevent.StartEventOperation;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.v2.external.resource.StartTriggerResource;
 
 import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
@@ -32,8 +31,7 @@ class StartTriggerControllerTest {
     private static final String EVENT_TRIGGER_ID = "createCase";
     private static final boolean IGNORE_WARNING = false;
     private static final String TOKEN = "TOKEN";
-    private static final CaseDetails AUTHORISED_CASE_DETAILS = new CaseDetails();
-    private static final CaseDetails UNAUTHORISED_CASE_DETAILS = new CaseDetails();
+    private static final CaseDetails CASE_DETAILS = new CaseDetails();
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
 
     @Mock
@@ -49,11 +47,11 @@ class StartTriggerControllerTest {
         MockitoAnnotations.initMocks(this);
         Map<String, JsonNode> data = Maps.newHashMap();
         data.put("dataKey1", JSON_NODE_FACTORY.textNode("dataValue1"));
-        AUTHORISED_CASE_DETAILS.setData(data);
+        CASE_DETAILS.setData(data);
         Map<String, JsonNode> dataClassification = Maps.newHashMap();
         dataClassification.put("classKey1", JSON_NODE_FACTORY.textNode("classValue1"));
-        AUTHORISED_CASE_DETAILS.setDataClassification(dataClassification);
-        startEventTrigger.setCaseDetails(AUTHORISED_CASE_DETAILS);
+        CASE_DETAILS.setDataClassification(dataClassification);
+        startEventTrigger.setCaseDetails(CASE_DETAILS);
         startEventTrigger.setToken(TOKEN);
         startEventTrigger.setEventId(EVENT_TRIGGER_ID);
 
@@ -71,36 +69,18 @@ class StartTriggerControllerTest {
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
-                () -> assertThat(response.getBody().getCaseDetails(), is(AUTHORISED_CASE_DETAILS)),
+                () -> assertThat(response.getBody().getCaseDetails(), is(CASE_DETAILS)),
                 () -> assertThat(response.getBody().getEventId(), is(EVENT_TRIGGER_ID)),
                 () -> assertThat(response.getBody().getToken(), is(TOKEN))
             );
         }
 
         @Test
-        @DisplayName("should return empty case details and security classification when resource found but not authorised to view")
-        void startTriggerFoundButFailedSecurityChecks() {
-            startEventTrigger.setCaseDetails(UNAUTHORISED_CASE_DETAILS);
-            when(startEventOperation.triggerStartForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)).thenReturn(startEventTrigger);
+        @DisplayName("should propagate exception")
+        void shouldPropagateExceptionWhenThrown() {
+            when(startEventOperation.triggerStartForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)).thenThrow(Exception.class);
 
-            final ResponseEntity<StartTriggerResource> response = startTriggerController.getStartTrigger(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING);
-
-            assertAll(
-                () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
-                () -> assertThat(response.getBody().getCaseDetails(), not(equalTo(AUTHORISED_CASE_DETAILS))),
-                () -> assertThat(response.getBody().getCaseDetails(), equalTo(UNAUTHORISED_CASE_DETAILS)),
-                () -> assertThat(response.getBody().getEventId(), is(EVENT_TRIGGER_ID)),
-                () -> assertThat(response.getBody().getToken(), is(TOKEN))
-            );
-        }
-
-        @Test
-        @DisplayName("should return 404 when resource NOT found")
-        void startTriggerNotFound() {
-            when(startEventOperation.triggerStartForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)).thenThrow(ResourceNotFoundException.class);
-
-            assertThrows(ResourceNotFoundException.class,
-                         () -> startTriggerController.getStartTrigger(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING));
+            assertThrows(Exception.class, () -> startTriggerController.getStartTrigger(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING));
         }
 
 

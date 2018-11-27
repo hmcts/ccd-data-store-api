@@ -25,7 +25,7 @@ public class StartTriggerController {
     }
 
     @GetMapping(
-        path = "/case-types/{caseTypeId}/triggers/{triggerId}",
+        path = "/case-types/{caseTypeId}/event-triggers/{triggerId}",
         headers = {
             V2.EXPERIMENTAL_HEADER
         },
@@ -45,7 +45,7 @@ public class StartTriggerController {
         ),
         @ApiResponse(
             code = 422,
-            message = "Process could not be started"
+            message = "One of: Case event has no pre states, callback validation errors, unable to sanitize document for case field or missing user roles"
         ),
         @ApiResponse(
             code = 404,

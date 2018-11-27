@@ -103,24 +103,25 @@ class DefaultGetEventTriggerOperationTest {
                                                       DRAFT_ID,
                                                       EVENT_TRIGGER_ID,
                                                       IGNORE)).thenReturn(startEventTrigger);
-        when(startEventOperation.triggerStartForCaseType(UID, JURISDICTION_ID, CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE)).thenReturn(startEventTrigger);
         when(eventTriggerService.findCaseEvent(caseType, EVENT_TRIGGER_ID)).thenReturn(caseEvent);
         when(uiDefinitionRepository.getWizardPageCollection(CASE_TYPE_ID, EVENT_TRIGGER_ID)).thenReturn(wizardPageCollection);
         when(caseViewFieldBuilder.build(caseFields, eventFields, caseDetails.getData())).thenReturn(viewFields);
     }
 
-
     @Nested
     @DisplayName("for case type")
     class ForCaseType {
+
+        @BeforeEach
+        public void setup() {
+            when(startEventOperation.triggerStartForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE)).thenReturn(startEventTrigger);
+        }
 
         @Test
         @DisplayName("should fail if no case details")
         void shouldFailIfNoCaseDetails() {
             startEventTrigger.setCaseDetails(null);
-            assertThrows(ResourceNotFoundException.class, () -> defaultGetEventTriggerOperation.executeForCaseType(UID,
-                                                                                                                   JURISDICTION_ID,
-                                                                                                                   CASE_TYPE_ID,
+            assertThrows(ResourceNotFoundException.class, () -> defaultGetEventTriggerOperation.executeForCaseType(CASE_TYPE_ID,
                                                                                                                    EVENT_TRIGGER_ID,
                                                                                                                    IGNORE));
         }
@@ -130,9 +131,7 @@ class DefaultGetEventTriggerOperationTest {
         void shouldFailIfNoCaseType() {
             when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(null);
 
-            assertThrows(ResourceNotFoundException.class, () -> defaultGetEventTriggerOperation.executeForCaseType(UID,
-                                                                                                                   JURISDICTION_ID,
-                                                                                                                   CASE_TYPE_ID,
+            assertThrows(ResourceNotFoundException.class, () -> defaultGetEventTriggerOperation.executeForCaseType(CASE_TYPE_ID,
                                                                                                                    EVENT_TRIGGER_ID,
                                                                                                                    IGNORE));
         }
@@ -142,9 +141,7 @@ class DefaultGetEventTriggerOperationTest {
         void shouldFailIfNoEventTrigger() {
             when(eventTriggerService.findCaseEvent(caseType, EVENT_TRIGGER_ID)).thenReturn(null);
 
-            assertThrows(ResourceNotFoundException.class, () -> defaultGetEventTriggerOperation.executeForCaseType(UID,
-                                                                                                                   JURISDICTION_ID,
-                                                                                                                   CASE_TYPE_ID,
+            assertThrows(ResourceNotFoundException.class, () -> defaultGetEventTriggerOperation.executeForCaseType(CASE_TYPE_ID,
                                                                                                                    EVENT_TRIGGER_ID,
                                                                                                                    IGNORE));
         }
@@ -160,9 +157,7 @@ class DefaultGetEventTriggerOperationTest {
 
             caseEvent.setCaseFields(eventFields);
 
-            CaseEventTrigger caseEventTrigger = defaultGetEventTriggerOperation.executeForCaseType(UID,
-                                                                                                   JURISDICTION_ID,
-                                                                                                   CASE_TYPE_ID,
+            CaseEventTrigger caseEventTrigger = defaultGetEventTriggerOperation.executeForCaseType(CASE_TYPE_ID,
                                                                                                    EVENT_TRIGGER_ID,
                                                                                                    IGNORE);
             assertAll(

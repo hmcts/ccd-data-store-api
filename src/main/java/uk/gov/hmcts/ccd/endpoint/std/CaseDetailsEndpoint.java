@@ -220,7 +220,7 @@ public class CaseDetailsEndpoint {
         @ApiParam(value = "Should `AboutToStart` callback warnings be ignored")
         @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
 
-        return startEventOperation.triggerStartForCaseType(uid, jurisdictionId, caseTypeId, eventTriggerId, ignoreWarning);
+        return startEventOperation.triggerStartForCaseType(caseTypeId, eventTriggerId, ignoreWarning);
     }
 
     @Transactional
@@ -242,7 +242,7 @@ public class CaseDetailsEndpoint {
         @ApiParam(value = "Should `AboutToStart` callback warnings be ignored")
         @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
 
-        return startEventOperation.triggerStartForCaseType(uid, jurisdictionId, caseTypeId, eventTriggerId, ignoreWarning);
+        return startEventOperation.triggerStartForCaseType(caseTypeId, eventTriggerId, ignoreWarning);
     }
 
     @PostMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases")

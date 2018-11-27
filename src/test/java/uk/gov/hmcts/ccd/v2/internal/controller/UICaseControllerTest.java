@@ -65,11 +65,20 @@ class UICaseControllerTest {
         }
 
         @Test
-        @DisplayName("should return 400 when case reference not valid")
+        @DisplayName("should propagate BadRequestException when case reference not valid")
         void caseReferenceNotValid() {
             when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
 
             assertThrows(BadRequestException.class,
+                         () -> caseController.getCase(CASE_REFERENCE));
+        }
+
+        @Test
+        @DisplayName("should propagate exception")
+        void shouldPropagateExceptionWhenThrown() {
+            when(getCaseViewOperation.execute(CASE_REFERENCE)).thenThrow(Exception.class);
+
+            assertThrows(Exception.class,
                          () -> caseController.getCase(CASE_REFERENCE));
         }
     }

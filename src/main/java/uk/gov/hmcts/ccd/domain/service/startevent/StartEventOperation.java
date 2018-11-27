@@ -7,21 +7,6 @@ public interface StartEventOperation {
                                               String eventTriggerId,
                                               Boolean ignoreWarning);
 
-    /**
-     *
-     * @param uid
-     * @param jurisdictionId
-     * @param caseTypeId
-     * @param eventTriggerId
-     * @param ignoreWarning
-     * @return When found, start event trigger for given case type and event trigger id
-     */
-    StartEventTrigger triggerStartForCaseType(String uid,
-                                              String jurisdictionId,
-                                              String caseTypeId,
-                                              String eventTriggerId,
-                                              Boolean ignoreWarning);
-
     StartEventTrigger triggerStartForCase(String uid,
                                           String jurisdictionId,
                                           String caseTypeId,

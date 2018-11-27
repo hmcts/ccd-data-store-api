@@ -68,7 +68,7 @@ class CaseControllerTest {
         }
 
         @Test
-        @DisplayName("should return 404 when case NOT found")
+        @DisplayName("should propagate CaseNotFoundException when case NOT found")
         void caseNotFound() {
             when(getCaseOperation.execute(CASE_REFERENCE)).thenReturn(Optional.empty());
 
@@ -77,11 +77,20 @@ class CaseControllerTest {
         }
 
         @Test
-        @DisplayName("should return 400 when case reference not valid")
+        @DisplayName("should propagate BadRequestException when case reference not valid")
         void caseReferenceNotValid() {
             when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
 
             assertThrows(BadRequestException.class,
+                         () -> caseController.getCase(CASE_REFERENCE));
+        }
+
+        @Test
+        @DisplayName("should propagate exception")
+        void shouldPropagateExceptionWhenThrown() {
+            when(getCaseOperation.execute(CASE_REFERENCE)).thenThrow(Exception.class);
+
+            assertThrows(Exception.class,
                          () -> caseController.getCase(CASE_REFERENCE));
         }
     }
