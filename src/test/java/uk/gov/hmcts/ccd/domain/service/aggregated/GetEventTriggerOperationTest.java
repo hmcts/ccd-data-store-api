@@ -83,7 +83,7 @@ public class GetEventTriggerOperationTest {
         startEventTrigger.setCaseDetails(caseDetails);
         startEventTrigger.setEventId(TEST_EVENT_TRIGGER_ID);
         startEventTrigger.setToken(TEST_EVENT_TOKEN);
-        doReturn(startEventTrigger).when(startEventOperation).triggerStartForCaseType(UID, TEST_JURISDICTION_ID, TEST_CASE_TYPE_ID, TEST_EVENT_TRIGGER_ID, IGNORE_WARNING);
+        doReturn(startEventTrigger).when(startEventOperation).triggerStartForCaseType(TEST_CASE_TYPE_ID, TEST_EVENT_TRIGGER_ID, IGNORE_WARNING);
         getEventTriggerOperation = new DefaultGetEventTriggerOperation(caseDefinitionRepository,
                                                                        eventTriggerService,
                                                                        caseViewFieldBuilder,
@@ -99,9 +99,7 @@ public class GetEventTriggerOperationTest {
         @DisplayName("Should successfully get event trigger")
         void shouldSuccessfullyGetEventTrigger() {
 
-            CaseEventTrigger caseEventTrigger = getEventTriggerOperation.executeForCaseType(UID,
-                                                                                            TEST_JURISDICTION_ID,
-                                                                                            TEST_CASE_TYPE_ID,
+            CaseEventTrigger caseEventTrigger = getEventTriggerOperation.executeForCaseType(TEST_CASE_TYPE_ID,
                                                                                             TEST_EVENT_TRIGGER_ID,
                                                                                             IGNORE_WARNING);
             assertAll(

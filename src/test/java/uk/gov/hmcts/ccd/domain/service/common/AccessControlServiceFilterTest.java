@@ -28,7 +28,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldB
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewTriggerBuilder.aViewTrigger;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageBuilder.aWizardPage;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageBuilder.newWizardPage;
 
 class AccessControlServiceFilterTest {
     private static final String EVENT_ID_1 = "EVENT_ID_1";
@@ -81,7 +81,7 @@ class AccessControlServiceFilterTest {
         CaseEventTrigger caseEventTrigger = anEventTrigger()
             .withField(caseViewField1)
             .withField(caseViewField2)
-            .withWizardPage(aWizardPage()
+            .withWizardPage(newWizardPage()
                 .withId("Page One")
                 .withField(caseViewField1)
                 .withField(caseViewField2)
@@ -132,7 +132,7 @@ class AccessControlServiceFilterTest {
         CaseEventTrigger caseEventTrigger = anEventTrigger()
             .withField(caseViewField1)
             .withField(caseViewField2)
-            .withWizardPage(aWizardPage()
+            .withWizardPage(newWizardPage()
                 .withId("Page One")
                 .withField(caseViewField1)
                 .withField(caseViewField2)
@@ -173,7 +173,7 @@ class AccessControlServiceFilterTest {
         CaseEventTrigger caseEventTrigger = anEventTrigger()
             .withField(caseViewField1)
             .withField(caseViewField2)
-            .withWizardPage(aWizardPage()
+            .withWizardPage(newWizardPage()
                 .withId("Page One")
                 .withField(caseViewField1)
                 .withField(caseViewField2)

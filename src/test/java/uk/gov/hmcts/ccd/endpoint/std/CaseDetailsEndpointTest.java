@@ -100,7 +100,7 @@ class CaseDetailsEndpointTest {
     private AppInsights appInsights;
 
     private CaseDetailsEndpoint endpoint;
-    private Map<String,String> params = newHashMap();
+    private Map<String, String> params = newHashMap();
 
     @BeforeEach
     void setUp() {
@@ -154,11 +154,11 @@ class CaseDetailsEndpointTest {
     void shouldReturnStartEventTrigger_startEventForCaseworkerForCase() {
         final StartEventTrigger startEventTrigger = new StartEventTrigger();
         doReturn(startEventTrigger).when(startEventOperation).triggerStartForCase(UID,
-                                                                                     JURISDICTION_ID,
-                                                                                     CASE_TYPE_ID,
-                                                                                     CASE_ID,
-                                                                                     EVENT_TRIGGER_ID,
-                                                                                     IGNORE_WARNING);
+                                                                                  JURISDICTION_ID,
+                                                                                  CASE_TYPE_ID,
+                                                                                  CASE_ID,
+                                                                                  EVENT_TRIGGER_ID,
+                                                                                  IGNORE_WARNING);
 
         final StartEventTrigger output = endpoint.startEventForCaseworker(UID,
                                                                           JURISDICTION_ID,
@@ -179,11 +179,9 @@ class CaseDetailsEndpointTest {
     @Test
     void shouldReturnStartEventTrigger_startEventForCaseworkerForCaseType() {
         final StartEventTrigger startEventTrigger = new StartEventTrigger();
-        doReturn(startEventTrigger).when(startEventOperation).triggerStartForCaseType(UID,
-                                                                                         JURISDICTION_ID,
-                                                                                         CASE_TYPE_ID,
-                                                                                         EVENT_TRIGGER_ID,
-                                                                                         IGNORE_WARNING);
+        doReturn(startEventTrigger).when(startEventOperation).triggerStartForCaseType(CASE_TYPE_ID,
+                                                                                      EVENT_TRIGGER_ID,
+                                                                                      IGNORE_WARNING);
 
         final StartEventTrigger output = endpoint.startCaseForCaseworker(UID,
                                                                          JURISDICTION_ID,
@@ -192,9 +190,7 @@ class CaseDetailsEndpointTest {
                                                                          IGNORE_WARNING);
 
         assertThat(output, sameInstance(startEventTrigger));
-        verify(startEventOperation).triggerStartForCaseType(UID,
-                                                            JURISDICTION_ID,
-                                                            CASE_TYPE_ID,
+        verify(startEventOperation).triggerStartForCaseType(CASE_TYPE_ID,
                                                             EVENT_TRIGGER_ID,
                                                             IGNORE_WARNING);
     }
@@ -327,7 +323,7 @@ class CaseDetailsEndpointTest {
         params.put("notExisting2", "y");
         params.put("state", "z");
         BadRequestException badRequestException = assertThrows(BadRequestException.class,
-                () -> endpoint.searchCasesForCaseWorkers(JURISDICTION_ID, "", params));
+                                                               () -> endpoint.searchCasesForCaseWorkers(JURISDICTION_ID, "", params));
 
         assertThat(badRequestException.getMessage(), is("unknown metadata search parameters: notExisting2,notExisting1"));
     }
@@ -338,7 +334,7 @@ class CaseDetailsEndpointTest {
 
         params.put("security_classification", "XX");
         BadRequestException badRequestException = assertThrows(BadRequestException.class,
-                () -> endpoint.searchCasesForCaseWorkers(JURISDICTION_ID, "", params));
+                                                               () -> endpoint.searchCasesForCaseWorkers(JURISDICTION_ID, "", params));
 
         assertThat(badRequestException.getMessage(), is("unknown security classification 'XX'"));
     }
@@ -349,7 +345,7 @@ class CaseDetailsEndpointTest {
 
         params.put("sortDirection", "XX");
         BadRequestException badRequestException = assertThrows(BadRequestException.class,
-            () -> endpoint.searchCasesForCaseWorkers(JURISDICTION_ID, "", params));
+                                                               () -> endpoint.searchCasesForCaseWorkers(JURISDICTION_ID, "", params));
 
         assertThat(badRequestException.getMessage(), is("Unknown sort direction: XX"));
     }
