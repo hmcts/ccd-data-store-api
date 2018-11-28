@@ -620,8 +620,48 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public CaseEventTriggerBuilder withCaseId(String caseId) {
+            this.caseEventTrigger.setCaseId(caseId);
+            return this;
+        }
+
         public CaseEventTriggerBuilder withField(CaseViewField caseField) {
             caseFields.add(caseField);
+            return this;
+        }
+
+        public CaseEventTriggerBuilder withName(String name) {
+            this.caseEventTrigger.setName(name);
+            return this;
+        }
+
+        public CaseEventTriggerBuilder withDescription(String description) {
+            this.caseEventTrigger.setDescription(description);
+            return this;
+        }
+
+        public CaseEventTriggerBuilder withEventToken(String token) {
+            this.caseEventTrigger.setEventToken(token);
+            return this;
+        }
+
+        public CaseEventTriggerBuilder withShowSummary(Boolean isShowSummary) {
+            this.caseEventTrigger.setShowSummary(isShowSummary);
+            return this;
+        }
+
+        public CaseEventTriggerBuilder withShowEventNotes(Boolean isShowEventNotes) {
+            this.caseEventTrigger.setShowEventNotes(isShowEventNotes);
+            return this;
+        }
+
+        public CaseEventTriggerBuilder withEndButtonLabel(String endButtonLabel) {
+            this.caseEventTrigger.setEndButtonLabel(endButtonLabel);
+            return this;
+        }
+
+        public CaseEventTriggerBuilder withCanSaveDraft(boolean isSaveDraft) {
+            this.caseEventTrigger.setCanSaveDraft(isSaveDraft);
             return this;
         }
 
@@ -640,7 +680,7 @@ public class TestBuildersUtil {
             this.wizardPage = new WizardPage();
         }
 
-        static WizardPageBuilder aWizardPage() {
+        public static WizardPageBuilder newWizardPage() {
             return new WizardPageBuilder();
         }
 

@@ -1,12 +1,13 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.ToString;
-import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.ToString;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 
 @ToString
 public class CaseType implements Serializable {
@@ -56,6 +57,11 @@ public class CaseType implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @JsonIgnore
+    public String getJurisdictionId() {
+        return jurisdiction.getId();
     }
 
     public Jurisdiction getJurisdiction() {

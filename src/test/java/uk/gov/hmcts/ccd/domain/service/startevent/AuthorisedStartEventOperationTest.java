@@ -122,27 +122,25 @@ class AuthorisedStartEventOperationTest {
         when(userRepository.getUserRoles()).thenReturn(userRoles);
         when(accessControlService.canAccessCaseTypeWithCriteria(caseType, userRoles, CAN_READ)).thenReturn(true);
         when(accessControlService.filterCaseFieldsByAccess(eq(classifiedCaseDetailsNode),
-                                                               eq(caseFields),
-                                                               eq(userRoles),
-                                                               eq(CAN_READ))).thenReturn(authorisedCaseDetailsNode);
+                                                           eq(caseFields),
+                                                           eq(userRoles),
+                                                           eq(CAN_READ))).thenReturn(authorisedCaseDetailsNode);
         when(accessControlService.filterCaseFieldsByAccess(eq(classifiedCaseDetailsClassificationNode),
-                                                               eq(caseFields),
-                                                               eq(userRoles),
-                                                               eq(CAN_READ))).thenReturn(
+                                                           eq(caseFields),
+                                                           eq(userRoles),
+                                                           eq(CAN_READ))).thenReturn(
             authorisedCaseDetailsClassificationNode);
     }
 
     @Nested
-    @DisplayName("for case type")
-    class ForCaseType {
+    @DisplayName("for case type - deprecated")
+    class ForCaseTypeDeprecated {
 
         @BeforeEach
         void setUp() {
-            doReturn(classifiedStartEvent).when(classifiedStartEventOperation).triggerStartForCaseType(UID,
-                                                                                                          JURISDICTION_ID,
-                                                                                                          CASE_TYPE_ID,
-                                                                                                          EVENT_TRIGGER_ID,
-                                                                                                          IGNORE_WARNING);
+            doReturn(classifiedStartEvent).when(classifiedStartEventOperation).triggerStartForCaseType(CASE_TYPE_ID,
+                                                                                                       EVENT_TRIGGER_ID,
+                                                                                                       IGNORE_WARNING);
             when(accessControlService.canAccessCaseTypeWithCriteria(caseType,
                                                                     userRoles,
                                                                     CAN_CREATE)).thenReturn(true);
@@ -152,18 +150,14 @@ class AuthorisedStartEventOperationTest {
         @DisplayName("should call decorated start event operation as is")
         void shouldCallDecoratedStartEventOperation() {
 
-            final StartEventTrigger output = authorisedStartEventOperation.triggerStartForCaseType(UID,
-                                                                                                   JURISDICTION_ID,
-                                                                                                   CASE_TYPE_ID,
+            final StartEventTrigger output = authorisedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
                                                                                                    EVENT_TRIGGER_ID,
                                                                                                    IGNORE_WARNING);
 
             assertAll(
                 () -> assertThat(output, sameInstance(classifiedStartEvent)),
                 () -> assertThat(output.getCaseDetails(), sameInstance(classifiedCaseDetails)),
-                () -> verify(classifiedStartEventOperation).triggerStartForCaseType(UID,
-                                                                                    JURISDICTION_ID,
-                                                                                    CASE_TYPE_ID,
+                () -> verify(classifiedStartEventOperation).triggerStartForCaseType(CASE_TYPE_ID,
                                                                                     EVENT_TRIGGER_ID,
                                                                                     IGNORE_WARNING)
             );
@@ -175,9 +169,7 @@ class AuthorisedStartEventOperationTest {
 
             when(accessControlService.canAccessCaseTypeWithCriteria(caseType, userRoles, CAN_READ)).thenReturn(false);
 
-            final StartEventTrigger output = authorisedStartEventOperation.triggerStartForCaseType(UID,
-                                                                                                   JURISDICTION_ID,
-                                                                                                   CASE_TYPE_ID,
+            final StartEventTrigger output = authorisedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
                                                                                                    EVENT_TRIGGER_ID,
                                                                                                    IGNORE_WARNING);
 
@@ -185,9 +177,59 @@ class AuthorisedStartEventOperationTest {
                 () -> assertThat(output, sameInstance(classifiedStartEvent)),
                 () -> assertThat(output.getCaseDetails().getData(), is(EMPTY_MAP)),
                 () -> assertThat(output.getCaseDetails().getDataClassification(), is(EMPTY_MAP)),
-                () -> verify(classifiedStartEventOperation).triggerStartForCaseType(UID,
-                                                                                    JURISDICTION_ID,
-                                                                                    CASE_TYPE_ID,
+                () -> verify(classifiedStartEventOperation).triggerStartForCaseType(CASE_TYPE_ID,
+                                                                                    EVENT_TRIGGER_ID,
+                                                                                    IGNORE_WARNING)
+            );
+        }
+    }
+
+    @Nested
+    @DisplayName("for case type")
+    class ForCaseType {
+
+        @BeforeEach
+        void setUp() {
+            doReturn(classifiedStartEvent).when(classifiedStartEventOperation).triggerStartForCaseType(CASE_TYPE_ID,
+                                                                                                       EVENT_TRIGGER_ID,
+                                                                                                       IGNORE_WARNING);
+            when(accessControlService.canAccessCaseTypeWithCriteria(caseType,
+                                                                    userRoles,
+                                                                    CAN_CREATE)).thenReturn(true);
+        }
+
+        @Test
+        @DisplayName("should call decorated start event operation as is")
+        void shouldCallDecoratedStartEventOperation() {
+
+            final StartEventTrigger output = authorisedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
+                                                                                                   EVENT_TRIGGER_ID,
+                                                                                                   IGNORE_WARNING);
+
+            assertAll(
+                () -> assertThat(output, sameInstance(classifiedStartEvent)),
+                () -> assertThat(output.getCaseDetails(), sameInstance(classifiedCaseDetails)),
+                () -> verify(classifiedStartEventOperation).triggerStartForCaseType(CASE_TYPE_ID,
+                                                                                    EVENT_TRIGGER_ID,
+                                                                                    IGNORE_WARNING)
+            );
+        }
+
+        @Test
+        @DisplayName("should filter out data when no case type read access")
+        void shouldFilterOutDataWhenNoCaseTypeReadAccess() {
+
+            when(accessControlService.canAccessCaseTypeWithCriteria(caseType, userRoles, CAN_READ)).thenReturn(false);
+
+            final StartEventTrigger output = authorisedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
+                                                                                                   EVENT_TRIGGER_ID,
+                                                                                                   IGNORE_WARNING);
+
+            assertAll(
+                () -> assertThat(output, sameInstance(classifiedStartEvent)),
+                () -> assertThat(output.getCaseDetails().getData(), is(EMPTY_MAP)),
+                () -> assertThat(output.getCaseDetails().getDataClassification(), is(EMPTY_MAP)),
+                () -> verify(classifiedStartEventOperation).triggerStartForCaseType(CASE_TYPE_ID,
                                                                                     EVENT_TRIGGER_ID,
                                                                                     IGNORE_WARNING)
             );
@@ -201,11 +243,11 @@ class AuthorisedStartEventOperationTest {
         @BeforeEach
         void setUp() {
             doReturn(classifiedStartEvent).when(classifiedStartEventOperation).triggerStartForCase(UID,
-                                                                                                      JURISDICTION_ID,
-                                                                                                      CASE_TYPE_ID,
-                                                                                                      CASE_REFERENCE,
-                                                                                                      EVENT_TRIGGER_ID,
-                                                                                                      IGNORE_WARNING);
+                                                                                                   JURISDICTION_ID,
+                                                                                                   CASE_TYPE_ID,
+                                                                                                   CASE_REFERENCE,
+                                                                                                   EVENT_TRIGGER_ID,
+                                                                                                   IGNORE_WARNING);
         }
 
         @Test
@@ -284,13 +326,13 @@ class AuthorisedStartEventOperationTest {
                                                                                          eq(userRoles),
                                                                                          eq(CAN_READ)),
                 () -> inOrder.verify(accessControlService).filterCaseFieldsByAccess(eq(classifiedCaseDetailsNode),
-                                                                                        eq(caseFields),
-                                                                                        eq(userRoles),
-                                                                                        eq(CAN_READ)),
+                                                                                    eq(caseFields),
+                                                                                    eq(userRoles),
+                                                                                    eq(CAN_READ)),
                 () -> inOrder.verify(accessControlService).filterCaseFieldsByAccess(eq(classifiedCaseDetailsClassificationNode),
-                                                                                        eq(caseFields),
-                                                                                        eq(userRoles),
-                                                                                        eq(CAN_READ))
+                                                                                    eq(caseFields),
+                                                                                    eq(userRoles),
+                                                                                    eq(CAN_READ))
             );
         }
 

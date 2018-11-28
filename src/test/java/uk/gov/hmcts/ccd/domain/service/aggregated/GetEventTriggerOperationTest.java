@@ -1,5 +1,17 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import java.util.List;
+import java.util.Map;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doReturn;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,18 +29,6 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.startevent.StartEventOperation;
-
-import java.util.List;
-import java.util.Map;
-
-import static com.google.common.collect.Lists.newArrayList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doReturn;
 
 public class GetEventTriggerOperationTest {
 
@@ -83,7 +83,7 @@ public class GetEventTriggerOperationTest {
         startEventTrigger.setCaseDetails(caseDetails);
         startEventTrigger.setEventId(TEST_EVENT_TRIGGER_ID);
         startEventTrigger.setToken(TEST_EVENT_TOKEN);
-        doReturn(startEventTrigger).when(startEventOperation).triggerStartForCaseType(UID, TEST_JURISDICTION_ID, TEST_CASE_TYPE_ID, TEST_EVENT_TRIGGER_ID, IGNORE_WARNING);
+        doReturn(startEventTrigger).when(startEventOperation).triggerStartForCaseType(TEST_CASE_TYPE_ID, TEST_EVENT_TRIGGER_ID, IGNORE_WARNING);
         getEventTriggerOperation = new DefaultGetEventTriggerOperation(caseDefinitionRepository,
                                                                        eventTriggerService,
                                                                        caseViewFieldBuilder,
@@ -99,9 +99,7 @@ public class GetEventTriggerOperationTest {
         @DisplayName("Should successfully get event trigger")
         void shouldSuccessfullyGetEventTrigger() {
 
-            CaseEventTrigger caseEventTrigger = getEventTriggerOperation.executeForCaseType(UID,
-                                                                                            TEST_JURISDICTION_ID,
-                                                                                            TEST_CASE_TYPE_ID,
+            CaseEventTrigger caseEventTrigger = getEventTriggerOperation.executeForCaseType(TEST_CASE_TYPE_ID,
                                                                                             TEST_EVENT_TRIGGER_ID,
                                                                                             IGNORE_WARNING);
             assertAll(

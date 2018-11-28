@@ -212,9 +212,7 @@ public class QueryEndpoint {
                                                        @PathVariable("etid") String eventTriggerId,
                                                        @RequestParam(value = "ignore-warning",
                                                            required = false) Boolean ignoreWarning) {
-        return getEventTriggerOperation.executeForCaseType(userId,
-                                                           jurisdictionId,
-                                                           casetTypeId,
+        return getEventTriggerOperation.executeForCaseType(casetTypeId,
                                                            eventTriggerId,
                                                            ignoreWarning);
     }

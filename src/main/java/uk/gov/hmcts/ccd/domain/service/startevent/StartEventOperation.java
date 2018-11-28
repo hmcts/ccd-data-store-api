@@ -3,9 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.startevent;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 
 public interface StartEventOperation {
-    StartEventTrigger triggerStartForCaseType(String uid,
-                                              String jurisdictionId,
-                                              String caseTypeId,
+    StartEventTrigger triggerStartForCaseType(String caseTypeId,
                                               String eventTriggerId,
                                               Boolean ignoreWarning);
 

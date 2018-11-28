@@ -1,14 +1,16 @@
 package uk.gov.hmcts.ccd;
 
-import org.springframework.beans.factory.annotation.Value;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Base64;
 import java.util.List;
+
+import static java.util.stream.Collectors.toList;
+
+import org.springframework.beans.factory.annotation.Value;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 @Named
 @Singleton
@@ -66,6 +68,9 @@ public class ApplicationParams {
 
     @Value("#{'${search.elastic.hosts}'.split(',')}")
     private List<String> elasticSearchHosts;
+
+    @Value("#{'${search.elastic.data.hosts}'.split(',')}")
+    private List<String> elasticSearchDataHosts;
 
     @Value("#{'${search.blacklist}'.split(',')}")
     private List<String> searchBlackList;
@@ -226,5 +231,9 @@ public class ApplicationParams {
 
     public String getCasesIndexType() {
         return casesIndexType;
+    }
+
+    public List<String> getElasticSearchDataHosts() {
+        return elasticSearchDataHosts.stream().map(quotedHost -> quotedHost.replace("\"", "")).collect(toList());
     }
 }
