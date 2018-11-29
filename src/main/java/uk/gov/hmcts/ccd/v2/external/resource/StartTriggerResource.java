@@ -24,10 +24,14 @@ public class StartTriggerResource extends ResourceSupport {
     private String eventId;
     private String token;
 
-    public StartTriggerResource(@NonNull StartEventTrigger startEventTrigger, Boolean ignoreWarning) {
+    public StartTriggerResource(@NonNull StartEventTrigger startEventTrigger, Boolean ignoreWarning, Boolean withCase) {
         copyProperties(startEventTrigger);
 
-        add(linkTo(methodOn(StartTriggerController.class).getStartTrigger(startEventTrigger.getCaseTypeId(), eventId, ignoreWarning)).withSelfRel());
+        if (withCase) {
+            add(linkTo(methodOn(StartTriggerController.class).getStartEventTrigger(startEventTrigger.getCaseReference(), eventId, ignoreWarning)).withSelfRel());
+        } else {
+            add(linkTo(methodOn(StartTriggerController.class).getStartCaseTrigger(startEventTrigger.getCaseTypeId(), eventId, ignoreWarning)).withSelfRel());
+        }
     }
 
     private void copyProperties(StartEventTrigger startEventTrigger) {

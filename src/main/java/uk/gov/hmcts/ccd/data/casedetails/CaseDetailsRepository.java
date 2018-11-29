@@ -17,6 +17,8 @@ public interface CaseDetailsRepository {
 
     Optional<CaseDetails> findByReference(String jurisdiction, String reference);
 
+    Optional<CaseDetails> findByReference(String reference);
+
     Optional<CaseDetails> lockByReference(String jurisdiction, Long reference);
 
     Optional<CaseDetails> lockByReference(String jurisdiction, String reference);
