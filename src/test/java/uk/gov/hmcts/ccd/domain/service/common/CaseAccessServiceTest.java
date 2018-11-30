@@ -92,7 +92,7 @@ class CaseAccessServiceTest {
     class whenLocalAuthority {
 
         private final String[] ROLES = {
-            "caseworker-superdupajurisdiction-localauthority"
+            "caseworker-superdupajurisdiction-localAuthority"
         };
 
         @BeforeEach
@@ -125,7 +125,7 @@ class CaseAccessServiceTest {
     class whenNotLocalAuthority {
 
         private final String[] ROLES = {
-            "not-so-localauthority"
+            "caseworker-publiclaw-localauthority"
         };
 
         @BeforeEach
