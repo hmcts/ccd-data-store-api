@@ -153,10 +153,7 @@ class CaseDetailsEndpointTest {
     @Test
     void shouldReturnStartEventTrigger_startEventForCaseworkerForCase() {
         final StartEventTrigger startEventTrigger = new StartEventTrigger();
-        doReturn(startEventTrigger).when(startEventOperation).triggerStartForCase(UID,
-                                                                                  JURISDICTION_ID,
-                                                                                  CASE_TYPE_ID,
-                                                                                  CASE_ID,
+        doReturn(startEventTrigger).when(startEventOperation).triggerStartForCase(CASE_ID,
                                                                                   EVENT_TRIGGER_ID,
                                                                                   IGNORE_WARNING);
 
@@ -168,10 +165,7 @@ class CaseDetailsEndpointTest {
                                                                           IGNORE_WARNING);
 
         assertThat(output, sameInstance(startEventTrigger));
-        verify(startEventOperation).triggerStartForCase(UID,
-                                                        JURISDICTION_ID,
-                                                        CASE_TYPE_ID,
-                                                        CASE_ID,
+        verify(startEventOperation).triggerStartForCase(CASE_ID,
                                                         EVENT_TRIGGER_ID,
                                                         IGNORE_WARNING);
     }

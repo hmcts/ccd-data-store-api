@@ -8,10 +8,7 @@ public interface GetEventTriggerOperation {
                                         String eventTriggerId,
                                         Boolean ignoreWarning);
 
-    CaseEventTrigger executeForCase(String uid,
-                                    String jurisdictionId,
-                                    String caseTypeId,
-                                    String caseReference,
+    CaseEventTrigger executeForCase(String caseReference,
                                     String eventTriggerId,
                                     Boolean ignoreWarning);
 

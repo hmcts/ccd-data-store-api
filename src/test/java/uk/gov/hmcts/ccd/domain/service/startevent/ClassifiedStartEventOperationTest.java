@@ -120,10 +120,7 @@ class ClassifiedStartEventOperationTest {
 
         @BeforeEach
         void setUp() {
-            doReturn(startEvent).when(startEventOperation).triggerStartForCase(UID,
-                                                                               JURISDICTION_ID,
-                                                                               CASE_TYPE_ID,
-                                                                               CASE_REFERENCE,
+            doReturn(startEvent).when(startEventOperation).triggerStartForCase(CASE_REFERENCE,
                                                                                EVENT_TRIGGER_ID,
                                                                                IGNORE_WARNING);
         }
@@ -132,9 +129,13 @@ class ClassifiedStartEventOperationTest {
         @DisplayName("should call decorated start event operation as is")
         void shouldCallDecoratedStartEventOperation() {
 
-            classifiedStartEventOperation.triggerStartForCase(UID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, EVENT_TRIGGER_ID, IGNORE_WARNING);
+            classifiedStartEventOperation.triggerStartForCase(CASE_REFERENCE,
+                                                              EVENT_TRIGGER_ID,
+                                                              IGNORE_WARNING);
 
-            verify(startEventOperation).triggerStartForCase(UID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, EVENT_TRIGGER_ID, IGNORE_WARNING);
+            verify(startEventOperation).triggerStartForCase(CASE_REFERENCE,
+                                                            EVENT_TRIGGER_ID,
+                                                            IGNORE_WARNING);
         }
 
         @Test
@@ -142,10 +143,7 @@ class ClassifiedStartEventOperationTest {
         void shouldReturnEventTriggerWhenCaseDetailsNull() {
             startEvent.setCaseDetails(null);
 
-            final StartEventTrigger output = classifiedStartEventOperation.triggerStartForCase(UID,
-                                                                                               JURISDICTION_ID,
-                                                                                               CASE_TYPE_ID,
-                                                                                               CASE_REFERENCE,
+            final StartEventTrigger output = classifiedStartEventOperation.triggerStartForCase(CASE_REFERENCE,
                                                                                                EVENT_TRIGGER_ID,
                                                                                                IGNORE_WARNING);
 
@@ -159,10 +157,7 @@ class ClassifiedStartEventOperationTest {
         @DisplayName("should return event trigger with classified case details when not null")
         void shouldReturnEventTriggerWithClassifiedCaseDetails() {
 
-            final StartEventTrigger output = classifiedStartEventOperation.triggerStartForCase(UID,
-                                                                                               JURISDICTION_ID,
-                                                                                               CASE_TYPE_ID,
-                                                                                               CASE_REFERENCE,
+            final StartEventTrigger output = classifiedStartEventOperation.triggerStartForCase(CASE_REFERENCE,
                                                                                                EVENT_TRIGGER_ID,
                                                                                                IGNORE_WARNING);
 

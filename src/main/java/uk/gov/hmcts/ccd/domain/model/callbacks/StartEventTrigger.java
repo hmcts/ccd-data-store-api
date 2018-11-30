@@ -39,4 +39,9 @@ public class StartEventTrigger {
     public String getCaseTypeId() {
         return caseDetails.getCaseTypeId();
     }
+
+    @JsonIgnore
+    public String getCaseReference() {
+        return caseDetails.getReferenceAsString();
+    }
 }
