@@ -1,10 +1,8 @@
 package uk.gov.hmcts.ccd;
 
-import com.hazelcast.config.Config;
-import com.hazelcast.config.EvictionPolicy;
-import com.hazelcast.config.MapConfig;
-import com.hazelcast.config.MaxSizeConfig;
-import com.hazelcast.config.NetworkConfig;
+import com.hazelcast.config.*;
+import com.hazelcast.core.Hazelcast;
+import com.hazelcast.core.HazelcastInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,6 +23,14 @@ public class CachingConfiguration {
         networkConfig.getJoin().getTcpIpConfig().setEnabled(false);
         configCaches(applicationParams.getDefinitionCacheTTLSecs(), config);
         return config;
+    }
+
+    // Attempt to fix issues with hazelcast failing to shutdown reliably spotted in integration tests
+    // https://github.com/hazelcast/hazelcast/issues/6339
+    // https://github.com/spring-projects/spring-boot/issues/7418
+    @Bean
+    public HazelcastInstance hazelcastInstance() {
+        return Hazelcast.newHazelcastInstance(hazelCastConfig());
     }
 
     private void configCaches(int definitionCacheTTL, Config config) {
