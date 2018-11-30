@@ -1,19 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -27,6 +13,20 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 class CaseAccessServiceTest {
 
@@ -84,6 +84,72 @@ class CaseAccessServiceTest {
         void accessLevel() {
             final AccessLevel accessLevel = caseAccessService.getAccessLevel(serviceAndUserDetails(ROLES));
             assertThat(accessLevel, equalTo(AccessLevel.GRANTED));
+        }
+    }
+
+    @Nested
+    @DisplayName("when user is from local authority")
+    class whenLocalAuthority {
+
+        private final String[] ROLES = {
+            "caseworker-superdupajurisdiction-localauthority"
+        };
+
+        @BeforeEach
+        void setUp() {
+            withRoles(ROLES);
+        }
+
+        @Test
+        @DisplayName("should return true if access was granted")
+        void userHasSolicitorRoleAndAccessGranted_caseVisible() {
+            assertAccessGranted(caseGranted());
+        }
+
+        @Test
+        @DisplayName("should return false if access was revoked")
+        void userHasSolicitorRoleAndAccessRevoked_caseNotVisible() {
+            assertAccessRevoked(caseRevoked());
+        }
+
+        @Test
+        @DisplayName("should give GRANTED access level")
+        void accessLevel() {
+            final AccessLevel accessLevel = caseAccessService.getAccessLevel(serviceAndUserDetails(ROLES));
+            assertThat(accessLevel, equalTo(AccessLevel.GRANTED));
+        }
+    }
+
+    @Nested
+    @DisplayName("when user is not from local authority")
+    class whenNotLocalAuthority {
+
+        private final String[] ROLES = {
+            "not-so-localauthority"
+        };
+
+        @BeforeEach
+        void setUp() {
+            withRoles(ROLES);
+        }
+
+        @Test
+        @DisplayName("should return true if access was granted")
+        void shouldGrantAccessToGrantedCase() {
+            assertAccessGrantedWithoutChecks(caseGranted());
+        }
+
+        @Test
+        @DisplayName("should return true if access was revoked")
+        void shouldGrantAccessToRevokedCase() {
+            assertAccessGrantedWithoutChecks(caseRevoked());
+        }
+
+        @Test
+        @DisplayName("should give ALL access level")
+        void accessLevel() {
+            final AccessLevel accessLevel = caseAccessService.getAccessLevel(serviceAndUserDetails(ROLES));
+            assertThat(accessLevel, equalTo(AccessLevel.ALL));
         }
     }
 
