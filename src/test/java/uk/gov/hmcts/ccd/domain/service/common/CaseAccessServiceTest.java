@@ -89,7 +89,7 @@ class CaseAccessServiceTest {
 
     @Nested
     @DisplayName("when user is from local authority")
-    class whenLocalAuthority {
+    class WhenLocalAuthority {
 
         private final String[] ROLES = {
             "caseworker-superdupajurisdiction-localAuthority"
@@ -122,7 +122,7 @@ class CaseAccessServiceTest {
 
     @Nested
     @DisplayName("when user is not from local authority")
-    class whenNotLocalAuthority {
+    class WhenNotLocalAuthority {
 
         private final String[] ROLES = {
             "caseworker-publiclaw-localauthority"
