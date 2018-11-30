@@ -16,6 +16,7 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.startevent.StartEventOperation;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.external.resource.StartTriggerResource;
 
 import java.util.Map;
@@ -112,13 +113,19 @@ class StartTriggerControllerTest {
         }
 
         @Test
-        @DisplayName("should propagate exception")
-        void shouldPropagateExceptionWhenThrown() {
+        @DisplayName("should propagate exception from downstream operation")
+        void shouldPropagateExceptionFromOperationWhenThrown() {
             when(startEventOperation.triggerStartForCase(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)).thenThrow(Exception.class);
 
             assertThrows(Exception.class, () -> startTriggerController.getStartEventTrigger(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING));
         }
 
+        @Test
+        @DisplayName("should fail with bad request exception if case reference invalid")
+        void shouldFailWithBadRequestException() {
+            when(caseReferenceService.validateUID(CASE_ID)).thenReturn(false);
 
+            assertThrows(BadRequestException.class, () -> startTriggerController.getStartEventTrigger(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING));
+        }
     }
 }
