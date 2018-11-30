@@ -25,14 +25,6 @@ public class CachingConfiguration {
         return config;
     }
 
-    // Attempt to fix issues with hazelcast failing to shutdown reliably spotted in integration tests
-    // https://github.com/hazelcast/hazelcast/issues/6339
-    // https://github.com/spring-projects/spring-boot/issues/7418
-    @Bean
-    public HazelcastInstance hazelcastInstance() {
-        return Hazelcast.newHazelcastInstance(hazelCastConfig());
-    }
-
     private void configCaches(int definitionCacheTTL, Config config) {
         config.addMapConfig(newMapConfig("caseTypeDefinitionsCache", definitionCacheTTL));
         config.addMapConfig(newMapConfig("workBasketResultCache", definitionCacheTTL));
