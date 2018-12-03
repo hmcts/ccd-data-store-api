@@ -8,11 +8,14 @@ public final class V2 {
     public final class MediaType {
         // External API
         public static final String CASE = "application/vnd.uk.gov.hmcts.ccd-data-store-api.case.v2+json;charset=UTF-8";
-        public static final String START_TRIGGER = "application/vnd.uk.gov.hmcts.ccd-data-store-api.start-trigger.v2+json;charset=UTF-8";
+        public static final String START_CASE_TRIGGER = "application/vnd.uk.gov.hmcts.ccd-data-store-api.start-case-trigger.v2+json;charset=UTF-8";
+        public static final String START_EVENT_TRIGGER = "application/vnd.uk.gov.hmcts.ccd-data-store-api.start-event-trigger.v2+json;charset=UTF-8";
 
         // Internal API
         public static final String UI_CASE_VIEW = "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-case-view.v2+json;charset=UTF-8";
         public static final String UI_START_TRIGGER = "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-start-trigger.v2+json;charset=UTF-8";
+        public static final String UI_START_CASE_TRIGGER = "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-start-case-trigger.v2+json;charset=UTF-8";
+        public static final String UI_START_EVENT_TRIGGER = "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-start-event-trigger.v2+json;charset=UTF-8";
 
     }
 }

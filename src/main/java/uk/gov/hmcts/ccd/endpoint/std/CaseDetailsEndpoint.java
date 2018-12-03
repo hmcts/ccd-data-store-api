@@ -173,7 +173,7 @@ public class CaseDetailsEndpoint {
         @ApiParam(value = "Should `AboutToStart` callback warnings be ignored")
         @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
 
-        return startEventOperation.triggerStartForCase(uid, jurisdictionId, caseTypeId, caseId, eventTriggerId, ignoreWarning);
+        return startEventOperation.triggerStartForCase(caseId, eventTriggerId, ignoreWarning);
     }
 
     @Transactional
@@ -198,7 +198,7 @@ public class CaseDetailsEndpoint {
         @ApiParam(value = "Should `AboutToStart` callback warnings be ignored")
         @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
 
-        return startEventOperation.triggerStartForCase(uid, jurisdictionId, caseTypeId, caseId, eventTriggerId, ignoreWarning);
+        return startEventOperation.triggerStartForCase(caseId, eventTriggerId, ignoreWarning);
     }
 
     @Transactional

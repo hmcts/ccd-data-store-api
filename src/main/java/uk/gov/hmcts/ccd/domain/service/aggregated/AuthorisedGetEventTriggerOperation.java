@@ -70,16 +70,12 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
     }
 
     @Override
-    public CaseEventTrigger executeForCase(String uid,
-                                           String jurisdictionId,
-                                           String caseTypeId,
-                                           String caseReference,
+    public CaseEventTrigger executeForCase(String caseReference,
                                            String eventTriggerId,
                                            Boolean ignoreWarning) {
-        final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
-        final CaseEvent eventTrigger = getEventTrigger(caseTypeId, eventTriggerId, caseType);
-
         final CaseDetails caseDetails = getCaseDetails(caseReference);
+        final CaseType caseType = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
+        final CaseEvent eventTrigger = getEventTrigger(eventTriggerId, caseType);
 
         validateEventTrigger(() -> !eventTriggerService.isPreStateValid(caseDetails.getState(), eventTrigger));
 
@@ -87,10 +83,7 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
 
         verifyMandatoryAccessForCase(eventTriggerId, caseDetails, caseType, userRoles);
 
-        return filterUpsertAccessForCase(caseType, userRoles, getEventTriggerOperation.executeForCase(uid,
-                                                                                                      jurisdictionId,
-                                                                                                      caseTypeId,
-                                                                                                      caseReference,
+        return filterUpsertAccessForCase(caseType, userRoles, getEventTriggerOperation.executeForCase(caseReference,
                                                                                                       eventTriggerId,
                                                                                                       ignoreWarning));
     }
@@ -191,10 +184,10 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
             CAN_UPDATE);
     }
 
-    private CaseEvent getEventTrigger(String caseTypeId, String eventTriggerId, CaseType caseType) {
+    private CaseEvent getEventTrigger(String eventTriggerId, CaseType caseType) {
         final CaseEvent eventTrigger = eventTriggerService.findCaseEvent(caseType, eventTriggerId);
         if (eventTrigger == null) {
-            throw new ResourceNotFoundException("Cannot findCaseEvent event " + eventTriggerId + " for case type " + caseTypeId);
+            throw new ResourceNotFoundException("Cannot find event " + eventTriggerId + " for case type " + caseType.getId());
         }
         return eventTrigger;
     }
