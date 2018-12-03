@@ -24,7 +24,8 @@ public class UIStartTriggerResource extends ResourceSupport {
         copyProperties(caseEventTrigger);
 
         if (withCase) {
-            add(linkTo(methodOn(UIStartTriggerController.class).getStartEventTrigger(caseEventTrigger.getCaseId(), caseEventTrigger.getId(), ignoreWarning)).withSelfRel());
+            add(linkTo(methodOn(UIStartTriggerController.class).getStartEventTrigger(caseEventTrigger.getCaseId(), caseEventTrigger.getId(), ignoreWarning))
+                    .withSelfRel());
         } else {
             add(linkTo(methodOn(UIStartTriggerController.class).getStartCaseTrigger(caseTypeId, caseEventTrigger.getId(), ignoreWarning)).withSelfRel());
         }

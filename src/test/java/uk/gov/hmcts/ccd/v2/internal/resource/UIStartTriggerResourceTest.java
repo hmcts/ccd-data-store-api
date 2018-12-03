@@ -64,7 +64,7 @@ class UIStartTriggerResourceTest {
     @Nested
     @DisplayName("Start case trigger")
     class StartTriggerForCase {
-        private final String LINK_SELF_FOR_CASE = String.format("/internal/case-types/%s/event-triggers/%s?ignore-warning=true", CASE_TYPE_ID, ID);
+        private final String linkSelfForCase = String.format("/internal/case-types/%s/event-triggers/%s?ignore-warning=true", CASE_TYPE_ID, ID);
 
         @Test
         @DisplayName("should copy case event trigger")
@@ -92,7 +92,7 @@ class UIStartTriggerResourceTest {
         void shouldLinkToSelf() {
             final UIStartTriggerResource uiStartTriggerResource = new UIStartTriggerResource(caseEventTrigger, CASE_TYPE_ID, ignoreWarning, false);
 
-            assertThat(uiStartTriggerResource.getLink("self").getHref(), equalTo(LINK_SELF_FOR_CASE));
+            assertThat(uiStartTriggerResource.getLink("self").getHref(), equalTo(linkSelfForCase));
         }
 
     }
@@ -100,12 +100,12 @@ class UIStartTriggerResourceTest {
     @Nested
     @DisplayName("Start event trigger")
     class StartTriggerForEvent {
-        private final Long CASE_REFERENCE = 1111222233334444L;
-        private final String LINK_SELF_FOR_EVENT = String.format("/internal/cases/%s/event-triggers/%s?ignore-warning=true", CASE_REFERENCE, ID);
+        private final Long caseReference = 1111222233334444L;
+        private final String linkSelfForEvent = String.format("/internal/cases/%s/event-triggers/%s?ignore-warning=true", caseReference, ID);
 
         @BeforeEach
         void setUp() {
-            caseEventTrigger.setCaseId(CASE_REFERENCE.toString());
+            caseEventTrigger.setCaseId(caseReference.toString());
         }
 
         @Test
@@ -134,7 +134,7 @@ class UIStartTriggerResourceTest {
         void shouldLinkToSelf() {
             final UIStartTriggerResource uiStartTriggerResource = new UIStartTriggerResource(caseEventTrigger, CASE_TYPE_ID, ignoreWarning, true);
 
-            assertThat(uiStartTriggerResource.getLink("self").getHref(), equalTo(LINK_SELF_FOR_EVENT));
+            assertThat(uiStartTriggerResource.getLink("self").getHref(), equalTo(linkSelfForEvent));
         }
 
     }

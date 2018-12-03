@@ -12,7 +12,9 @@ import uk.gov.hmcts.ccd.v2.V2;
 import static java.lang.Boolean.FALSE;
 import static org.hamcrest.Matchers.*;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CASE_TYPE;
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event.*;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event.CREATE;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event.UPDATE;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event.create;
 
 @DisplayName("Get UI start trigger by case type and event ids")
 class GetUIStartTriggerTest extends BaseTest {
