@@ -20,10 +20,15 @@ public class UIStartTriggerResource extends ResourceSupport {
     @JsonUnwrapped
     private CaseEventTrigger caseEventTrigger;
 
-    public UIStartTriggerResource(@NonNull CaseEventTrigger caseEventTrigger, String caseTypeId, Boolean ignoreWarning) {
+    public UIStartTriggerResource(@NonNull CaseEventTrigger caseEventTrigger, String caseTypeId, Boolean ignoreWarning, Boolean withCase) {
         copyProperties(caseEventTrigger);
 
-        add(linkTo(methodOn(UIStartTriggerController.class).getStartTrigger(caseTypeId, caseEventTrigger.getId(), ignoreWarning)).withSelfRel());
+        if (withCase) {
+            add(linkTo(methodOn(UIStartTriggerController.class).getStartEventTrigger(caseEventTrigger.getCaseId(), caseEventTrigger.getId(), ignoreWarning))
+                    .withSelfRel());
+        } else {
+            add(linkTo(methodOn(UIStartTriggerController.class).getStartCaseTrigger(caseTypeId, caseEventTrigger.getId(), ignoreWarning)).withSelfRel());
+        }
     }
 
     private void copyProperties(CaseEventTrigger caseEventTrigger) {

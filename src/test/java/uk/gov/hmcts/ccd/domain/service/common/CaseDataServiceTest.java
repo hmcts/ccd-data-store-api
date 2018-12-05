@@ -1,5 +1,22 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
+import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
+import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
+import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.RESTRICTED;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataBuilder.newCaseData;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataClassificationBuilder.dataClassification;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.aCaseField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,20 +29,6 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
-import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.*;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataBuilder.newCaseData;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataClassificationBuilder.dataClassification;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.aCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 class CaseDataServiceTest {
     private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
@@ -149,7 +152,7 @@ class CaseDataServiceTest {
                            .withId("ClientsAddresses")
                            .withSC(PRIVATE.name())
                            .withFieldType(aFieldType()
-                                              .withType("Collection")
+                                              .withType(COLLECTION)
                                               .withCollectionFieldType(aFieldType()
                                                                            .withId("Address")
                                                                            .withType("Complex")
@@ -182,7 +185,7 @@ class CaseDataServiceTest {
                            .build())
             .withField(aCaseField().withId("simple_collection")
                                    .withSC("PUBLIC")
-                                   .withFieldType(aFieldType().withType("Collection")
+                                   .withFieldType(aFieldType().withType(COLLECTION)
                                                               .withCollectionFieldType(textFieldType)
                                                               .build()
                                    )
