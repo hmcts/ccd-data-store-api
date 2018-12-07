@@ -12,13 +12,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
@@ -70,6 +68,12 @@ class AuthorisedGetEventTriggerOperationTest {
     private UIDService uidService;
 
     @Mock
+    private DraftGateway draftGateway;
+
+    @Mock
+    private DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder;
+
+    @Mock
     private EventTriggerService eventTriggerService;
 
     @Mock
@@ -97,7 +101,7 @@ class AuthorisedGetEventTriggerOperationTest {
             userRepository,
             accessControlService,
             eventTriggerService,
-            uidService);
+            uidService, draftGateway, draftResponseToCaseDetailsBuilder);
         caseEventTrigger = new CaseEventTrigger();
 
         caseType.setId(CASE_TYPE_ID);

@@ -17,11 +17,13 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.DraftResponseToCaseDetailsBuilder;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
@@ -67,6 +69,11 @@ class AuthorisedStartEventOperationTest {
     private AuthorisedStartEventOperation authorisedStartEventOperation;
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private DraftGateway draftGateway;
+    @Mock
+    private DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder;
+
     @Mock
     private UIDService uidService;
 
@@ -116,7 +123,9 @@ class AuthorisedStartEventOperationTest {
                                                                           caseDetailsRepository,
                                                                           accessControlService,
                                                                           uidService,
-                                                                          userRepository);
+                                                                          userRepository,
+                                                                          draftGateway,
+                                                                          draftResponseToCaseDetailsBuilder);
         caseType.setCaseFields(caseFields);
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseType);
         when(userRepository.getUserRoles()).thenReturn(userRoles);

@@ -7,12 +7,16 @@ import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.DraftResponseToCaseDetailsBuilder;
+import uk.gov.hmcts.ccd.domain.model.draft.Draft;
+import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
@@ -37,6 +41,9 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
     private final AccessControlService accessControlService;
     private final EventTriggerService eventTriggerService;
     private final UIDService uidService;
+    private final DraftGateway draftGateway;
+    private final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder;
+
 
     @Autowired
     public AuthorisedGetEventTriggerOperation(@Qualifier("default") final GetEventTriggerOperation getEventTriggerOperation,
@@ -45,7 +52,9 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
                                               @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
                                               final AccessControlService accessControlService,
                                               final EventTriggerService eventTriggerService,
-                                              final UIDService uidService) {
+                                              final UIDService uidService,
+                                              final DraftGateway draftGateway,
+                                              final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder) {
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.userRepository = userRepository;
@@ -53,6 +62,8 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
         this.accessControlService = accessControlService;
         this.eventTriggerService = eventTriggerService;
         this.uidService = uidService;
+        this.draftGateway = draftGateway;
+        this.draftResponseToCaseDetailsBuilder = draftResponseToCaseDetailsBuilder;
     }
 
     @Override
@@ -89,20 +100,22 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
     }
 
     @Override
-    public CaseEventTrigger executeForDraft(String uid, String jurisdictionId, String caseTypeId,
-                                            String draftReference, String eventTriggerId, Boolean ignoreWarning) {
-        final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
+    public CaseEventTrigger executeForDraft(String draftReference, String eventTriggerId, Boolean ignoreWarning) {
+        final CaseDetails caseDetails = getDraftDetails(draftReference);
+        final CaseType caseType = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
 
         Set<String> userRoles = getUserRoles();
 
         verifyRequiredAccessExistsForCaseType(eventTriggerId, caseType, userRoles);
 
-        return filterCaseFieldsByCreateAccess(caseType, userRoles, getEventTriggerOperation.executeForDraft(uid,
-                                                                                                            jurisdictionId,
-                                                                                                            caseTypeId,
-                                                                                                            draftReference,
+        return filterCaseFieldsByCreateAccess(caseType, userRoles, getEventTriggerOperation.executeForDraft(draftReference,
                                                                                                             eventTriggerId,
                                                                                                             ignoreWarning));
+    }
+
+    private CaseDetails getDraftDetails(String draftId) {
+        final DraftResponse draftResponse = draftGateway.get(Draft.stripId(draftId));
+        return draftResponseToCaseDetailsBuilder.build(draftResponse);
     }
 
     private CaseDetails getCaseDetails(String caseReference) {

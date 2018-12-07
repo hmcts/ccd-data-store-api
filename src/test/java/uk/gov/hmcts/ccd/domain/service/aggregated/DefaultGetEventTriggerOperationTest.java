@@ -11,11 +11,14 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
+import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewFieldBuilder;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.draft.Draft;
+import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
@@ -43,14 +46,13 @@ class DefaultGetEventTriggerOperationTest {
     private static final String EVENT_TRIGGER_DESCRIPTION = "testEventTriggerDescription";
     private static final Boolean EVENT_TRIGGER_SHOW_SUMMARY = true;
     private static final Boolean EVENT_TRIGGER_SHOW_EVENT_NOTES = false;
-    private static final String UID = "123";
-    private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_REFERENCE = "1234567891012345";
     private static final String DRAFT_ID = "DRAFT1";
     private static final String CASE_TYPE_ID = "Grant";
     private static final Boolean IGNORE = Boolean.TRUE;
     private static final String TOKEN = "testToken";
     private final CaseDetails caseDetails = new CaseDetails();
+    private final DraftResponse draftResponse = new DraftResponse();
     private final CaseType caseType = new CaseType();
     private final CaseEvent caseEvent = new CaseEvent();
     private final List<CaseEvent> events = Lists.newArrayList();
@@ -80,6 +82,12 @@ class DefaultGetEventTriggerOperationTest {
     @Mock
     private UIDService uidService;
 
+    @Mock
+    private DraftGateway draftGateway;
+
+    @Mock
+    private DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder;
+
     private DefaultGetEventTriggerOperation defaultGetEventTriggerOperation;
 
     private StartEventTrigger startEventTrigger = new StartEventTrigger();
@@ -103,7 +111,9 @@ class DefaultGetEventTriggerOperationTest {
             caseViewFieldBuilder,
             uiDefinitionRepository,
             uidService,
-            startEventOperation);
+            startEventOperation,
+            draftGateway,
+            draftResponseToCaseDetailsBuilder);
 
         doReturn(true).when(uidService).validateUID(CASE_REFERENCE);
         doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
@@ -112,10 +122,7 @@ class DefaultGetEventTriggerOperationTest {
         when(startEventOperation.triggerStartForCase(CASE_REFERENCE,
                                                      EVENT_TRIGGER_ID,
                                                      IGNORE)).thenReturn(startEventTrigger);
-        when(startEventOperation.triggerStartForDraft(UID,
-                                                      JURISDICTION_ID,
-                                                      CASE_TYPE_ID,
-                                                      DRAFT_ID,
+        when(startEventOperation.triggerStartForDraft(DRAFT_ID,
                                                       EVENT_TRIGGER_ID,
                                                       IGNORE)).thenReturn(startEventTrigger);
         when(eventTriggerService.findCaseEvent(caseType, EVENT_TRIGGER_ID)).thenReturn(caseEvent);
@@ -298,19 +305,30 @@ class DefaultGetEventTriggerOperationTest {
     @DisplayName("for draft")
     class ForDraft {
 
+        @BeforeEach
+        void setUp() {
+            when(draftGateway.get(Draft.stripId(DRAFT_ID))).thenReturn(draftResponse);
+            when(draftResponseToCaseDetailsBuilder.build(draftResponse)).thenReturn(caseDetails);
+        }
+
+
         @Test
-        @DisplayName("should fail if no draft details")
+        @DisplayName("should fail if no draft")
+        void shouldFailIfNoDraft() {
+            when(draftGateway.get(Draft.stripId(DRAFT_ID))).thenThrow(ResourceNotFoundException.class);
+
+            assertThrows(ResourceNotFoundException.class, () -> defaultGetEventTriggerOperation.executeForDraft(DRAFT_ID,
+                                                                                                                EVENT_TRIGGER_ID,
+                                                                                                                IGNORE));
+        }
+
+        @Test
+        @DisplayName("should fail if downstream fails to get trigger for draft")
         void shouldFailIfNoDraftDetails() {
-            doThrow(ResourceNotFoundException.class).when(startEventOperation).triggerStartForDraft(UID,
-                                                                                                    JURISDICTION_ID,
-                                                                                                    CASE_TYPE_ID,
-                                                                                                    DRAFT_ID,
+            doThrow(ResourceNotFoundException.class).when(startEventOperation).triggerStartForDraft(DRAFT_ID,
                                                                                                     EVENT_TRIGGER_ID,
                                                                                                     IGNORE);
-            assertThrows(ResourceNotFoundException.class, () -> defaultGetEventTriggerOperation.executeForDraft(UID,
-                                                                                                                JURISDICTION_ID,
-                                                                                                                CASE_TYPE_ID,
-                                                                                                                DRAFT_ID,
+            assertThrows(ResourceNotFoundException.class, () -> defaultGetEventTriggerOperation.executeForDraft(DRAFT_ID,
                                                                                                                 EVENT_TRIGGER_ID,
                                                                                                                 IGNORE));
         }
@@ -320,10 +338,7 @@ class DefaultGetEventTriggerOperationTest {
         void shouldFailIfNoCaseType() {
             when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(null);
 
-            assertThrows(ResourceNotFoundException.class, () -> defaultGetEventTriggerOperation.executeForDraft(UID,
-                                                                                                                JURISDICTION_ID,
-                                                                                                                CASE_TYPE_ID,
-                                                                                                                DRAFT_ID,
+            assertThrows(ResourceNotFoundException.class, () -> defaultGetEventTriggerOperation.executeForDraft(DRAFT_ID,
                                                                                                                 EVENT_TRIGGER_ID,
                                                                                                                 IGNORE));
         }
@@ -333,10 +348,7 @@ class DefaultGetEventTriggerOperationTest {
         void shouldFailIfNoEventTrigger() {
             when(eventTriggerService.findCaseEvent(caseType, EVENT_TRIGGER_ID)).thenReturn(null);
 
-            assertThrows(ResourceNotFoundException.class, () -> defaultGetEventTriggerOperation.executeForDraft(UID,
-                                                                                                                JURISDICTION_ID,
-                                                                                                                CASE_TYPE_ID,
-                                                                                                                DRAFT_ID,
+            assertThrows(ResourceNotFoundException.class, () -> defaultGetEventTriggerOperation.executeForDraft(DRAFT_ID,
                                                                                                                 EVENT_TRIGGER_ID,
                                                                                                                 IGNORE));
         }
@@ -352,10 +364,7 @@ class DefaultGetEventTriggerOperationTest {
 
             caseEvent.setCaseFields(eventFields);
 
-            CaseEventTrigger caseEventTrigger = defaultGetEventTriggerOperation.executeForDraft(UID,
-                                                                                                JURISDICTION_ID,
-                                                                                                CASE_TYPE_ID,
-                                                                                                DRAFT_ID,
+            CaseEventTrigger caseEventTrigger = defaultGetEventTriggerOperation.executeForDraft(DRAFT_ID,
                                                                                                 EVENT_TRIGGER_ID,
                                                                                                 IGNORE);
             assertAll(

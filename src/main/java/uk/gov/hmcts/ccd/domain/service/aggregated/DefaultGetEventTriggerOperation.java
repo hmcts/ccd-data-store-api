@@ -8,11 +8,14 @@ import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
+import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewFieldBuilder;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.draft.Draft;
+import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
@@ -33,6 +36,8 @@ public class DefaultGetEventTriggerOperation implements GetEventTriggerOperation
     private final CaseViewFieldBuilder caseViewFieldBuilder;
     private final StartEventOperation startEventOperation;
     private final UIDService uidService;
+    private final DraftGateway draftGateway;
+    private final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder;
 
     @Autowired
     public DefaultGetEventTriggerOperation(@Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
@@ -41,7 +46,9 @@ public class DefaultGetEventTriggerOperation implements GetEventTriggerOperation
                                            final CaseViewFieldBuilder caseViewFieldBuilder,
                                            final UIDefinitionRepository uiDefinitionRepository,
                                            final UIDService uidService,
-                                           @Qualifier("authorised") final StartEventOperation startEventOperation) {
+                                           @Qualifier("authorised") final StartEventOperation startEventOperation,
+                                           final DraftGateway draftGateway,
+                                           final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder) {
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.eventTriggerService = eventTriggerService;
@@ -49,6 +56,8 @@ public class DefaultGetEventTriggerOperation implements GetEventTriggerOperation
         this.uiDefinitionRepository = uiDefinitionRepository;
         this.uidService = uidService;
         this.startEventOperation = startEventOperation;
+        this.draftGateway = draftGateway;
+        this.draftResponseToCaseDetailsBuilder = draftResponseToCaseDetailsBuilder;
     }
 
     @Override
@@ -78,18 +87,23 @@ public class DefaultGetEventTriggerOperation implements GetEventTriggerOperation
     }
 
     @Override
-    public CaseEventTrigger executeForDraft(String uid, String jurisdictionId, String caseTypeId, String draftReference, String eventTriggerId,
+    public CaseEventTrigger executeForDraft(String draftReference,
+                                            String eventTriggerId,
                                             Boolean ignoreWarning) {
-        StartEventTrigger startEventTrigger = startEventOperation.triggerStartForDraft(uid,
-                                                                                       jurisdictionId,
-                                                                                       caseTypeId,
-                                                                                       draftReference,
+        final CaseDetails caseDetails = getDraftDetails(draftReference);
+
+        StartEventTrigger startEventTrigger = startEventOperation.triggerStartForDraft(draftReference,
                                                                                        eventTriggerId,
                                                                                        ignoreWarning);
         return merge(startEventTrigger,
-                     caseTypeId,
+                     caseDetails.getCaseTypeId(),
                      eventTriggerId,
                      draftReference);
+    }
+
+    private CaseDetails getDraftDetails(String draftId) {
+        final DraftResponse draftResponse = draftGateway.get(Draft.stripId(draftId));
+        return draftResponseToCaseDetailsBuilder.build(draftResponse);
     }
 
     private CaseDetails getCaseDetails(String caseReference) {

@@ -93,7 +93,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
 
         final CaseDetails caseDetails = getCaseDetails(caseReference);
 
-        String uid = userAuthorisation.getUserId();
+        final String uid = userAuthorisation.getUserId();
 
         final CaseType caseType = getCaseType(caseDetails.getCaseTypeId());
 
@@ -110,19 +110,21 @@ public class DefaultStartEventOperation implements StartEventOperation {
     }
 
     @Override
-    public StartEventTrigger triggerStartForDraft(final String uid,
-                                                  final String jurisdictionId,
-                                                  final String caseTypeId,
-                                                  final String draftReference,
+    public StartEventTrigger triggerStartForDraft(final String draftReference,
                                                   final String eventTriggerId,
                                                   final Boolean ignoreWarning) {
-        final CaseType caseType = getCaseType(caseTypeId);
+
+        final CaseDetails caseDetails = getDraftDetails(draftReference);
+
+        final String uid = userAuthorisation.getUserId();
+
+        final CaseType caseType = getCaseType(caseDetails.getCaseTypeId());
 
         return buildStartEventTrigger(uid,
                                       caseType,
                                       eventTriggerId,
                                       ignoreWarning,
-                                      () -> getDraftDetails(draftReference));
+                                      () -> caseDetails);
     }
 
     private StartEventTrigger buildStartEventTrigger(final String uid,

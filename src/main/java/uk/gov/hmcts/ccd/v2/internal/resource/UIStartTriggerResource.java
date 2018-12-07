@@ -17,17 +17,37 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 @NoArgsConstructor
 public class UIStartTriggerResource extends ResourceSupport {
 
+    private static enum Origin { DRAFT, CASE, CASE_TYPE }
+
     @JsonUnwrapped
     private CaseEventTrigger caseEventTrigger;
 
-    public UIStartTriggerResource(@NonNull CaseEventTrigger caseEventTrigger, String caseTypeId, Boolean ignoreWarning, Boolean withCase) {
+    public static UIStartTriggerResource forCase(@NonNull CaseEventTrigger caseEventTrigger, String caseId, Boolean ignoreWarning) {
+        return new UIStartTriggerResource(caseEventTrigger, caseId, ignoreWarning, Origin.CASE);
+    }
+
+    public static UIStartTriggerResource forCaseType(@NonNull CaseEventTrigger caseEventTrigger, String caseType, Boolean ignoreWarning) {
+        return new UIStartTriggerResource(caseEventTrigger, caseType, ignoreWarning, Origin.CASE_TYPE);
+    }
+
+    public static UIStartTriggerResource forDraft(@NonNull CaseEventTrigger caseEventTrigger, String draftId, Boolean ignoreWarning) {
+        return new UIStartTriggerResource(caseEventTrigger, draftId, ignoreWarning, Origin.DRAFT);
+    }
+
+    private UIStartTriggerResource(@NonNull CaseEventTrigger caseEventTrigger, String id, Boolean ignoreWarning, Origin origin) {
         copyProperties(caseEventTrigger);
 
-        if (withCase) {
-            add(linkTo(methodOn(UIStartTriggerController.class).getStartEventTrigger(caseEventTrigger.getCaseId(), caseEventTrigger.getId(), ignoreWarning))
-                    .withSelfRel());
-        } else {
-            add(linkTo(methodOn(UIStartTriggerController.class).getStartCaseTrigger(caseTypeId, caseEventTrigger.getId(), ignoreWarning)).withSelfRel());
+        switch (origin) {
+            case CASE_TYPE:
+                add(linkTo(methodOn(UIStartTriggerController.class).getStartCaseTrigger(id, caseEventTrigger.getId(), ignoreWarning)).withSelfRel());
+                break;
+            case CASE:
+                add(linkTo(methodOn(UIStartTriggerController.class).getStartEventTrigger(id, caseEventTrigger.getId(), ignoreWarning)).withSelfRel());
+                break;
+            case DRAFT:
+                add(linkTo(methodOn(UIStartTriggerController.class).getStartDraftTrigger(id, caseEventTrigger.getId(), ignoreWarning)).withSelfRel());
+                break;
+
         }
     }
 
