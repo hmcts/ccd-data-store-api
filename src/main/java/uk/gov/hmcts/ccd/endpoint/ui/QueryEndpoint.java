@@ -100,7 +100,7 @@ public class QueryEndpoint {
             .orElseThrow(() -> new ResourceNotFoundException("No case types found")));
     }
 
-    @GetMapping(value = "/caseworkers/{uid}/jurisdictions")
+    @RequestMapping(value = "/caseworkers/{uid}/jurisdictions", method = RequestMethod.GET)
     @ApiOperation(value = "Get jurisdictions available to the user")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "List of jurisdictions for the given access criteria"),
@@ -111,7 +111,7 @@ public class QueryEndpoint {
         }
         List<JurisdictionDisplayProperties> jurisdictions = Arrays.asList(
             getUserProfileOperation.execute(accessMap.get(access)).getJurisdictions());
-        if (jurisdictions.isEmpty()) {
+        if (jurisdictions.size() == 0) {
             throw new ResourceNotFoundException("No jurisdictions found");
         } else {
             return jurisdictions;
