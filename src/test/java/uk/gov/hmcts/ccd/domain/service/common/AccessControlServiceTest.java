@@ -2511,6 +2511,15 @@ public class AccessControlServiceTest {
             + "            },\n"
             + "            \"id\":\"null\"\n"
             + "         }\n";
+        private String newChildWithNoIdTag = "         {  \n"
+            + "            \"value\":{  \n"
+            + "               \"Address\":\"address3\",\n"
+            + "               \"Notes\": {\n"
+            + "                   \"Note1\": \"someNote31\",\n"
+            + "                   \"Note2\": \"someNote32\"\n"
+            + "                }"
+            + "            }\n"
+            + "         }\n";
 
         private String collEnd = "      ]\n }\n";
 
@@ -2566,6 +2575,29 @@ public class AccessControlServiceTest {
         }
 
         @Test
+        @DisplayName("Should allow creation of new items on collection even when no Id provided")
+        void shouldGrantCreateAccessToCollectionTypeWOutId() throws IOException {
+            CaseType caseType = newCaseType()
+                .withField(aCaseField()
+                    .withId("Addresses")
+                    .withFieldType(aFieldType().withType(COLLECTION).build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build())
+                    .build())
+                .build();
+
+            assertThat(
+                accessControlService.canAccessCaseFieldsForUpsert(
+                    getJsonNode(collStart + child1 + comma + child2 + comma + newChildWithNoIdTag + collEnd),
+                    existingDataNode,
+                    caseType.getCaseFields(),
+                    USER_ROLES),
+                is(true));
+        }
+
+        @Test
         @DisplayName("Should not allow creation of new items on collection")
         void shouldNotGrantCreateAccessToCollectionType() throws IOException {
             CaseType caseType = newCaseType()
@@ -2606,6 +2638,31 @@ public class AccessControlServiceTest {
             assertThat(
                 accessControlService.canAccessCaseFieldsForUpsert(
                     getJsonNode(collStart + child1Updated + comma + child2 + collEnd),
+                    existingDataNode,
+                    caseType.getCaseFields(),
+                    USER_ROLES),
+                is(true));
+        }
+
+        @Test
+        @DisplayName("Should allow update of items on collection along with creation")
+        void shouldGrantUpdateAndCreateAccessToCollectionType() throws IOException {
+            CaseType caseType = newCaseType()
+                .withField(aCaseField()
+                    .withId("Addresses")
+                    .withFieldType(aFieldType().withType(COLLECTION).build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .withCreate(true)
+                        .build())
+                    .build())
+                .build();
+
+            assertThat(
+                accessControlService.canAccessCaseFieldsForUpsert(
+                    getJsonNode(collStart + child1Updated + comma + child2 + comma + newChildWithNoIdTag
+                        + comma + newChild + collEnd),
                     existingDataNode,
                     caseType.getCaseFields(),
                     USER_ROLES),
@@ -2659,6 +2716,30 @@ public class AccessControlServiceTest {
         }
 
         @Test
+        @DisplayName("Should allow deletion of items on collection along with creation")
+        void shouldGrantDeleteAndCreateAccessToCollectionType() throws IOException {
+            CaseType caseType = newCaseType()
+                .withField(aCaseField()
+                    .withId("Addresses")
+                    .withFieldType(aFieldType().withType(COLLECTION).build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withDelete(true)
+                        .withCreate(true)
+                        .build())
+                    .build())
+                .build();
+
+            assertThat(
+                accessControlService.canAccessCaseFieldsForUpsert(
+                    getJsonNode(collStart + child1 + comma + newChildWithNoIdTag + collEnd),
+                    existingDataNode,
+                    caseType.getCaseFields(),
+                    USER_ROLES),
+                is(true));
+        }
+
+        @Test
         @DisplayName("Should not allow deletion of items on collection")
         void shouldNotGrantDeleteAccessToCollectionType() throws IOException {
             CaseType caseType = newCaseType()
@@ -2679,6 +2760,33 @@ public class AccessControlServiceTest {
                     caseType.getCaseFields(),
                     USER_ROLES),
                 is(false));
+        }
+
+
+        @Test
+        @DisplayName("Should allow cretation, updating and deletion of items on collection")
+        void shouldGrantUpdateDeleteAndCreateAccessToCollectionType() throws IOException {
+            CaseType caseType = newCaseType()
+                .withField(aCaseField()
+                    .withId("Addresses")
+                    .withFieldType(aFieldType().withType(COLLECTION).build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withDelete(true)
+                        .withCreate(true)
+                        .withUpdate(true)
+                        .build())
+                    .build())
+                .build();
+
+            assertThat(
+                accessControlService.canAccessCaseFieldsForUpsert(
+                    getJsonNode(collStart + child1Updated + comma + child2 + comma
+                        + newChildWithNoIdTag + collEnd),
+                    existingDataNode,
+                    caseType.getCaseFields(),
+                    USER_ROLES),
+                is(true));
         }
     }
 

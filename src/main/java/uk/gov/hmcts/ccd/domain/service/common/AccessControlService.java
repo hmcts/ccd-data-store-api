@@ -356,7 +356,7 @@ public class AccessControlService {
 
     private boolean itemMissing(JsonNode oldItem, JsonNode newValue) {
         boolean itemExists = StreamSupport.stream(spliteratorUnknownSize(newValue.elements(), Spliterator.ORDERED), false)
-            .anyMatch(newItem -> newItem.get("id").equals(oldItem.get("id")));
+            .anyMatch(newItem -> newItem.get("id") != null && newItem.get("id").equals(oldItem.get("id")));
         return !itemExists;
     }
     
@@ -372,7 +372,7 @@ public class AccessControlService {
     private boolean itemUpdated(JsonNode oldItem, JsonNode newValue) {
         return StreamSupport.stream(spliteratorUnknownSize(newValue.elements(), Spliterator.ORDERED), false)
             .anyMatch(newItem -> {
-                boolean itemExists = newItem.get("id").equals(oldItem.get("id"));
+                boolean itemExists = newItem.get("id") != null && newItem.get("id").equals(oldItem.get("id"));
                 if (itemExists) {
                     return !newItem.equals(oldItem);
                 }
@@ -383,7 +383,9 @@ public class AccessControlService {
     private boolean itemAddedAndHasCreateAccess(JsonNode newData, String newFieldName, List<CaseField> caseFieldDefinitions, Set<String> userRoles) {
         JsonNode newValue = newData.get(newFieldName);
         boolean containsNewItem = StreamSupport.stream(spliteratorUnknownSize(newValue.elements(), Spliterator.ORDERED), false)
-            .anyMatch(newItem -> newItem.get("id").equals(NullNode.getInstance()) || newItem.get("id").asText().equalsIgnoreCase("null"));
+            .anyMatch(newItem -> newItem.get("id") == null
+                || newItem.get("id").equals(NullNode.getInstance())
+                || newItem.get("id").asText().equalsIgnoreCase("null"));
         return !containsNewItem || hasCreateAccess(newFieldName, caseFieldDefinitions, userRoles);
     }
 
