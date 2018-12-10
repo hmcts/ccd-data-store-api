@@ -100,7 +100,7 @@ public class QueryEndpoint {
             .orElseThrow(() -> new ResourceNotFoundException("No case types found")));
     }
 
-    @GetMapping(value = "/caseworkers/{uid}/jurisdictions")
+    @GetMapping(path = "/caseworkers/{uid}/jurisdictions")
     @ApiOperation(value = "Get jurisdictions available to the user")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "List of jurisdictions for the given access criteria"),

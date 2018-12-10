@@ -4,8 +4,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.*;
 
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
@@ -14,13 +12,14 @@ import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 @Named
 @Singleton
 public class CollectionValidator implements BaseTypeValidator {
+    private static final String TYPE_ID = "Collection";
     public static final String VALUE = "value";
     private static final String ID = "id";
     private static final String FIELD_SEPARATOR = ".";
 
     @Override
     public BaseType getType() {
-        return BaseType.get(COLLECTION);
+        return BaseType.get(TYPE_ID);
     }
 
     @Override
@@ -33,10 +32,7 @@ public class CollectionValidator implements BaseTypeValidator {
         }
 
         if (!dataValue.isArray()) {
-            final ValidationResult result = new ValidationResult(
-                "Require value to be an array",
-                dataFieldId);
-            return Collections.singletonList(result);
+            return Collections.singletonList(new ValidationResult("Require value to be an array", dataFieldId));
         }
 
         final ArrayNode arrayValue = (ArrayNode) dataValue;
