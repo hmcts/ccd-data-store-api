@@ -30,6 +30,20 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
+import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.*;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataBuilder.newCaseData;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataClassificationBuilder.dataClassification;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.aCaseField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
+
 class CaseDataServiceTest {
     private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
     };
@@ -152,7 +166,7 @@ class CaseDataServiceTest {
                            .withId("ClientsAddresses")
                            .withSC(PRIVATE.name())
                            .withFieldType(aFieldType()
-                                              .withType(COLLECTION)
+                                              .withType("Collection")
                                               .withCollectionFieldType(aFieldType()
                                                                            .withId("Address")
                                                                            .withType("Complex")
@@ -185,7 +199,7 @@ class CaseDataServiceTest {
                            .build())
             .withField(newCaseField().withId("simple_collection")
                                    .withSC("PUBLIC")
-                                   .withFieldType(aFieldType().withType(COLLECTION)
+                                   .withFieldType(aFieldType().withType("Collection")
                                                               .withCollectionFieldType(textFieldType)
                                                               .build()
                                    )

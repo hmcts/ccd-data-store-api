@@ -1,14 +1,12 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.ToString;
-import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+
+import java.util.Map;
 
 @ToString
 public class CaseViewField {
@@ -34,8 +32,6 @@ public class CaseViewField {
     private Boolean showSummaryChangeOption;
     @JsonProperty("show_summary_content_option")
     private Integer showSummaryContentOption;
-    @JsonProperty("acls")
-    private List<AccessControlList> accessControlLists;
 
     public String getId() {
         return id;
@@ -141,14 +137,6 @@ public class CaseViewField {
         this.showSummaryContentOption = showSummaryContentOption;
     }
 
-    public List<AccessControlList> getAccessControlLists() {
-        return accessControlLists;
-    }
-
-    public void setAccessControlLists(List<AccessControlList> accessControlLists) {
-        this.accessControlLists = accessControlLists;
-    }
-
     public static CaseViewField createFrom(CaseTypeTabField field, Map<String, ?> data) {
         CaseViewField caseViewField = createFrom(field.getCaseField(), data);
         caseViewField.setOrder(field.getDisplayOrder());
@@ -166,7 +154,6 @@ public class CaseViewField {
         caseViewField.setHintText(caseField.getHintText());
         caseViewField.setSecurityLabel(caseField.getSecurityLabel());
         caseViewField.setValidationExpression(caseField.getFieldType().getRegularExpression());
-        caseViewField.setAccessControlLists(caseField.getAccessControlLists());
         caseViewField.setValue(data.get(caseField.getId()));
 
         return caseViewField;
