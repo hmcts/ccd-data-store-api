@@ -1,4 +1,4 @@
-FROM gradle:jdk8 as builder
+FROM gradle:4.10-jdk8 as builder
 LABEL maintainer="https://github.com/hmcts/ccd-data-store-api"
 
 COPY . /home/gradle/src
