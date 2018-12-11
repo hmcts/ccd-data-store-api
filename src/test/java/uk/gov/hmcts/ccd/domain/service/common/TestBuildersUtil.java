@@ -266,7 +266,7 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public static CreateCaseDraftBuilder aCreateCaseDraft() {
+        public static CreateCaseDraftBuilder newCreateCaseDraft() {
             return new CreateCaseDraftBuilder();
         }
 
@@ -292,7 +292,7 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public static UpdateCaseDraftBuilder anUpdateCaseDraft() {
+        public static UpdateCaseDraftBuilder newUpdateCaseDraft() {
             return new UpdateCaseDraftBuilder();
         }
 

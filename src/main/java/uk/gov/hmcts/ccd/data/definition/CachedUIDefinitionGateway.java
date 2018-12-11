@@ -20,7 +20,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputDefinition;
 @Singleton
 public class CachedUIDefinitionGateway implements UIDefinitionGateway {
 
-    private static final Logger LOG = LoggerFactory.getLogger(UIDefinitionRepository.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CachedUIDefinitionGateway.class);
     private UIDefinitionGateway httpUiDefinitionGateway;
 
     @Inject

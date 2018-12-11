@@ -42,9 +42,9 @@ import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.newCaseDraft;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CreateCaseDraftBuilder.aCreateCaseDraft;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CreateCaseDraftBuilder.newCreateCaseDraft;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftBuilder.anDraft;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.UpdateCaseDraftBuilder.anUpdateCaseDraft;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.UpdateCaseDraftBuilder.newUpdateCaseDraft;
 
 class DefaultDraftGatewayTest {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
@@ -132,12 +132,12 @@ class DefaultDraftGatewayTest {
             .withCreated(NOW)
             .withUpdated(NOW_PLUS_5_MIN)
             .build();
-        createCaseDraftRequest = aCreateCaseDraft()
+        createCaseDraftRequest = newCreateCaseDraft()
             .withDocument(caseDraft)
             .withType(CASE_DATA_CONTENT)
             .withTTLDays(applicationParams.getDraftMaxTTLDays())
             .build();
-        updateCaseDraftRequest = anUpdateCaseDraft()
+        updateCaseDraftRequest = newUpdateCaseDraft()
             .withDocument(caseDraft)
             .withType(CASE_DATA_CONTENT)
             .build();

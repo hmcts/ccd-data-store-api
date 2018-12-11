@@ -27,7 +27,7 @@ public class CachedDraftGateway implements DraftGateway {
     private final Map<String, DraftResponse> drafts = newHashMap();
 
     @Autowired
-    public CachedDraftGateway(@Qualifier(DefaultDraftGateway.QUALIFIER) DefaultDraftGateway defaultDraftGateway,
+    public CachedDraftGateway(@Qualifier(DefaultDraftGateway.QUALIFIER) DraftGateway defaultDraftGateway,
                               DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder) {
         this.draftGateway = defaultDraftGateway;
         this.draftResponseToCaseDetailsBuilder = draftResponseToCaseDetailsBuilder;

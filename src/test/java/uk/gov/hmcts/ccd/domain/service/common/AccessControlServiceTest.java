@@ -1,28 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import java.io.IOException;
-import java.util.*;
-
-import static com.google.common.collect.Lists.newArrayList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AuditEventBuilder.anAuditEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventTriggerBuilder.newCaseEventTrigger;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseStateBuilder.newState;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,6 +13,25 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
+
+import java.io.IOException;
+import java.util.*;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.*;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AuditEventBuilder.anAuditEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventTriggerBuilder.newCaseEventTrigger;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseStateBuilder.newState;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 public class AccessControlServiceTest {
 
@@ -2525,7 +2521,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should fail if the caseField not found")
         void shouldFailIfCaseFieldDoesNotExist() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                     .withId("AddressesWhatNot")
                     .withFieldType(aFieldType().withType(COLLECTION).build())
                     .withAcl(anAcl()
@@ -2548,7 +2544,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should allow creation of new items on collection")
         void shouldGrantCreateAccessToCollectionType() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                     .withId("Addresses")
                     .withFieldType(aFieldType().withType(COLLECTION).build())
                     .withAcl(anAcl()
@@ -2571,7 +2567,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not allow creation of new items on collection")
         void shouldNotGrantCreateAccessToCollectionType() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                     .withId("Addresses")
                     .withFieldType(aFieldType().withType(COLLECTION).build())
                     .withAcl(anAcl()
@@ -2595,7 +2591,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should allow update of items on collection")
         void shouldGrantUpdateAccessToCollectionType() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                     .withId("Addresses")
                     .withFieldType(aFieldType().withType(COLLECTION).build())
                     .withAcl(anAcl()
@@ -2618,7 +2614,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not allow update of items on collection")
         void shouldNotGrantUpdateAccessToCollectionType() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                     .withId("Addresses")
                     .withFieldType(aFieldType().withType(COLLECTION).build())
                     .withAcl(anAcl()
@@ -2641,7 +2637,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should allow deletion of items on collection")
         void shouldGrantDeleteAccessToCollectionType() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                     .withId("Addresses")
                     .withFieldType(aFieldType().withType(COLLECTION).build())
                     .withAcl(anAcl()
@@ -2664,7 +2660,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not allow deletion of items on collection")
         void shouldNotGrantDeleteAccessToCollectionType() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                     .withId("Addresses")
                     .withFieldType(aFieldType().withType(COLLECTION).build())
                     .withAcl(anAcl()

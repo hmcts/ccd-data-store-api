@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
-import uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway;
+import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
@@ -30,7 +30,7 @@ public class DefaultGetEventTriggerOperation implements GetEventTriggerOperation
     public DefaultGetEventTriggerOperation(@Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
                                            final UIDService uidService,
                                            @Qualifier("authorised") final StartEventOperation startEventOperation,
-                                           @Qualifier(DefaultDraftGateway.QUALIFIER) final DraftGateway draftGateway,
+                                           @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway,
                                            final CaseEventTriggerBuilder caseEventTriggerBuilder) {
         this.caseDetailsRepository = caseDetailsRepository;
         this.uidService = uidService;

@@ -8,7 +8,7 @@ import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway;
+import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -47,7 +47,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
     public DefaultStartEventOperation(final EventTokenService eventTokenService,
                                       @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
                                       @Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
-                                      @Qualifier(DefaultDraftGateway.QUALIFIER) final DraftGateway draftGateway,
+                                      @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway,
                                       final EventTriggerService eventTriggerService,
                                       final CaseService caseService,
                                       final UserAuthorisation userAuthorisation,
