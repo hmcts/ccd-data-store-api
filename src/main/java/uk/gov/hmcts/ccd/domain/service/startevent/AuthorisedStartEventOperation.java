@@ -9,15 +9,14 @@ import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.DraftResponseToCaseDetailsBuilder;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
-import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
@@ -45,7 +44,6 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
     private final UIDService uidService;
     private final UserRepository userRepository;
     private final DraftGateway draftGateway;
-    private final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder;
 
     public AuthorisedStartEventOperation(@Qualifier("classified") final StartEventOperation startEventOperation,
                                          @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
@@ -53,8 +51,7 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
                                          final AccessControlService accessControlService,
                                          final UIDService uidService,
                                          @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
-                                         final DraftGateway draftGateway,
-                                         final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder) {
+                                         @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway) {
 
         this.startEventOperation = startEventOperation;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -63,7 +60,6 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
         this.uidService = uidService;
         this.userRepository = userRepository;
         this.draftGateway = draftGateway;
-        this.draftResponseToCaseDetailsBuilder = draftResponseToCaseDetailsBuilder;
     }
 
     @Override
@@ -91,15 +87,10 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
     public StartEventTrigger triggerStartForDraft(String draftReference, String eventTriggerId,
                                                   Boolean ignoreWarning) {
 
-        final CaseDetails caseDetails = getDraftDetails(draftReference);
+        final CaseDetails caseDetails = draftGateway.getCaseDetails(Draft.stripId(draftReference));
         return verifyReadAccess(caseDetails.getCaseTypeId(), startEventOperation.triggerStartForDraft(draftReference,
-                                                                                     eventTriggerId,
-                                                                                     ignoreWarning));
-    }
-
-    private CaseDetails getDraftDetails(String draftId) {
-        final DraftResponse draftResponse = draftGateway.get(Draft.stripId(draftId));
-        return draftResponseToCaseDetailsBuilder.build(draftResponse);
+                                                                                                      eventTriggerId,
+                                                                                                      ignoreWarning));
     }
 
     private CaseType getCaseType(String caseTypeId) {

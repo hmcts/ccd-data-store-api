@@ -16,7 +16,6 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.DraftResponseToCaseDetailsBuilder;
 import uk.gov.hmcts.ccd.domain.model.draft.CaseDraft;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
@@ -45,7 +44,7 @@ import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.newCaseDraft;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.anCaseEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.newDraftResponse;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.JurisdictionBuilder.newJurisdiction;
@@ -92,15 +91,12 @@ public class DefaultStartEventOperationTest {
     @Mock
     private UIDService uidService;
 
-    @Mock
-    private DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder;
-
     private DefaultStartEventOperation defaultStartEventOperation;
 
     private final CaseDetails caseDetails = newCaseDetails().build();
     private final CaseType caseType = newCaseType().withCaseTypeId(TEST_CASE_TYPE_ID)
         .withJurisdiction(newJurisdiction().withJurisdictionId(TEST_JURISDICTION_ID).build()).build();
-    private final CaseEvent eventTrigger = anCaseEvent().build();
+    private final CaseEvent eventTrigger = newCaseEvent().build();
     private final CaseDataContent caseDataContent = newCaseDataContent()
         .withSecurityClassification(PRIVATE)
         .withData(DATA)
@@ -129,8 +125,7 @@ public class DefaultStartEventOperationTest {
                                                                     caseService,
                                                                     userAuthorisation,
                                                                     callbackInvoker,
-                                                                    uidService,
-                                                                    draftResponseToCaseDetailsBuilder);
+                                                                    uidService);
     }
 
     @Nested
@@ -213,13 +208,12 @@ public class DefaultStartEventOperationTest {
         void setUp() {
             doReturn(true).when(eventTriggerService).isPreStateEmpty(eventTrigger);
             doReturn(TEST_EVENT_TOKEN).when(eventTokenService).generateToken(UID, eventTrigger, caseType.getJurisdiction(), caseType);
-            doReturn(draftResponse).when(draftGateway).get(TEST_DRAFT_ID);
+            doReturn(caseDetails).when(draftGateway).getCaseDetails(TEST_DRAFT_ID);
             caseDetails.setCaseTypeId(TEST_CASE_TYPE_ID);
             caseDetails.setJurisdiction(TEST_JURISDICTION_ID);
             caseDetails.setData(DATA);
             caseDetails.setDataClassification(DATA_CLASSIFICATION);
             caseDetails.setSecurityClassification(SecurityClassification.PRIVATE);
-            doReturn(caseDetails).when(draftResponseToCaseDetailsBuilder).build(draftResponse);
             doReturn(UID).when(userAuthorisation).getUserId();
         }
 
@@ -233,7 +227,7 @@ public class DefaultStartEventOperationTest {
             assertAll(
                 () -> verify(caseDefinitionRepository).getCaseType(TEST_CASE_TYPE_ID),
                 () -> verify(eventTriggerService).findCaseEvent(caseType, TEST_EVENT_TRIGGER_ID),
-                () -> verify(draftGateway).get(TEST_DRAFT_ID),
+                () -> verify(draftGateway).getCaseDetails(TEST_DRAFT_ID),
                 () -> verify(eventTriggerService).isPreStateEmpty(eventTrigger),
                 () -> verify(eventTokenService).generateToken(UID, eventTrigger, caseType.getJurisdiction(), caseType),
                 () -> verify(callbackInvoker).invokeAboutToStartCallback(eq(eventTrigger), eq(caseType), any(CaseDetails.class), eq(IGNORE_WARNING)),

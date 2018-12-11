@@ -18,6 +18,7 @@ import uk.gov.hmcts.ccd.AppInsights;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
+import uk.gov.hmcts.ccd.domain.model.definition.DraftResponseToCaseDetailsBuilder;
 import uk.gov.hmcts.ccd.domain.model.draft.*;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
@@ -78,6 +79,9 @@ class DefaultDraftGatewayTest {
     @Mock
     private AppInsights appInsights;
 
+    @Mock
+    private DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder;
+
     private DraftGateway draftGateway;
 
     private Map<String, JsonNode> data = Maps.newHashMap();
@@ -137,7 +141,8 @@ class DefaultDraftGatewayTest {
             .withDocument(caseDraft)
             .withType(CASE_DATA_CONTENT)
             .build();
-        draftGateway = new DefaultDraftGateway(createDraftRestTemplate, restTemplate, securityUtils, applicationParams, appInsights);
+        draftGateway = new DefaultDraftGateway(createDraftRestTemplate, restTemplate, securityUtils, applicationParams, appInsights,
+                                               draftResponseToCaseDetailsBuilder);
     }
 
     @Test

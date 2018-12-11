@@ -17,7 +17,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 @NoArgsConstructor
 public class UIStartTriggerResource extends ResourceSupport {
 
-    private static enum Origin { DRAFT, CASE, CASE_TYPE }
+    private enum Origin { DRAFT, CASE, CASE_TYPE }
 
     @JsonUnwrapped
     private CaseEventTrigger caseEventTrigger;

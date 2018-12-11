@@ -12,7 +12,6 @@ import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.DraftResponseToCaseDetailsBuilder;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
@@ -24,9 +23,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.newDraftResponse;
@@ -54,9 +51,6 @@ class ClassifiedStartEventOperationTest {
     @Mock
     private DraftGateway draftGateway;
 
-    @Mock
-    private DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder;
-
     private ClassifiedStartEventOperation classifiedStartEventOperation;
 
     private CaseDetails caseDetails;
@@ -81,7 +75,8 @@ class ClassifiedStartEventOperationTest {
         classifiedStartEventOperation = new ClassifiedStartEventOperation(startEventOperation,
                                                                           classificationService,
                                                                           caseDefinitionRepository,
-                                                                          caseDataService, draftGateway, draftResponseToCaseDetailsBuilder);
+                                                                          caseDataService,
+                                                                          draftGateway);
     }
 
     @Nested
@@ -190,8 +185,7 @@ class ClassifiedStartEventOperationTest {
             doReturn(startEvent).when(startEventOperation).triggerStartForDraft(DRAFT_REFERENCE,
                                                                                 EVENT_TRIGGER_ID,
                                                                                 IGNORE_WARNING);
-            when(draftGateway.get(Draft.stripId(DRAFT_REFERENCE))).thenReturn(draftResponse);
-            when(draftResponseToCaseDetailsBuilder.build(draftResponse)).thenReturn(caseDetails);
+            when(draftGateway.getCaseDetails(Draft.stripId(DRAFT_REFERENCE))).thenReturn(caseDetails);
         }
 
         @Test

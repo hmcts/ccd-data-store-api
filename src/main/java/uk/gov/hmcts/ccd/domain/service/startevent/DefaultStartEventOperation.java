@@ -14,9 +14,7 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.DraftResponseToCaseDetailsBuilder;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
-import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
@@ -44,7 +42,6 @@ public class DefaultStartEventOperation implements StartEventOperation {
     private final UserAuthorisation userAuthorisation;
     private final CallbackInvoker callbackInvoker;
     private final UIDService uidService;
-    private final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder;
 
     @Autowired
     public DefaultStartEventOperation(final EventTokenService eventTokenService,
@@ -55,8 +52,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
                                       final CaseService caseService,
                                       final UserAuthorisation userAuthorisation,
                                       final CallbackInvoker callbackInvoker,
-                                      final UIDService uidService,
-                                      final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder) {
+                                      final UIDService uidService) {
 
         this.eventTokenService = eventTokenService;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -67,7 +63,6 @@ public class DefaultStartEventOperation implements StartEventOperation {
         this.userAuthorisation = userAuthorisation;
         this.callbackInvoker = callbackInvoker;
         this.uidService = uidService;
-        this.draftResponseToCaseDetailsBuilder = draftResponseToCaseDetailsBuilder;
     }
 
     @Override
@@ -114,7 +109,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
                                                   final String eventTriggerId,
                                                   final Boolean ignoreWarning) {
 
-        final CaseDetails caseDetails = getDraftDetails(draftReference);
+        final CaseDetails caseDetails = draftGateway.getCaseDetails(Draft.stripId(draftReference));
 
         final String uid = userAuthorisation.getUserId();
 
@@ -161,11 +156,6 @@ public class DefaultStartEventOperation implements StartEventOperation {
 
         return caseDetailsRepository.findByReference(caseReference).orElseThrow(
             () -> new CaseNotFoundException(caseReference));
-    }
-
-    private CaseDetails getDraftDetails(String draftId) {
-        final DraftResponse draftResponse = draftGateway.get(Draft.stripId(draftId));
-        return draftResponseToCaseDetailsBuilder.build(draftResponse);
     }
 
     private CaseEvent getEventTrigger(String eventTriggerId, CaseType caseType) {

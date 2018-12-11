@@ -17,7 +17,6 @@ import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
-import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
@@ -25,7 +24,9 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.sameInstance;
@@ -43,15 +44,11 @@ class AuthorisedGetEventTriggerOperationTest {
     private static final String CASEWORKER_DIVORCE = "caseworker-divorce-loa3";
 
     private static final String EVENT_TRIGGER_ID = "testEventTriggerId";
-    private static final String UID = "123";
-    private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_REFERENCE = "1234567891012345";
     private static final Long CASE_REFERENCE_LONG = 1234567891012345L;
     private static final String CASE_TYPE_ID = "Grant";
     private static final String STATE = "CaseCreated";
-    private static final Map<String, JsonNode> DATA = new HashMap<>();
     private static final Boolean IGNORE = Boolean.TRUE;
-    private static final Event NULL_EVENT = null;
 
     @Mock
     private GetEventTriggerOperation getEventTriggerOperation;
@@ -69,9 +66,6 @@ class AuthorisedGetEventTriggerOperationTest {
 
     @Mock
     private DraftGateway draftGateway;
-
-    @Mock
-    private DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder;
 
     @Mock
     private EventTriggerService eventTriggerService;
@@ -101,7 +95,8 @@ class AuthorisedGetEventTriggerOperationTest {
             userRepository,
             accessControlService,
             eventTriggerService,
-            uidService, draftGateway, draftResponseToCaseDetailsBuilder);
+            uidService,
+            draftGateway);
         caseEventTrigger = new CaseEventTrigger();
 
         caseType.setId(CASE_TYPE_ID);
