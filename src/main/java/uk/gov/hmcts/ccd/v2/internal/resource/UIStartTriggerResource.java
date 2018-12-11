@@ -47,7 +47,6 @@ public class UIStartTriggerResource extends ResourceSupport {
             case DRAFT:
                 add(linkTo(methodOn(UIStartTriggerController.class).getStartDraftTrigger(id, caseEventTrigger.getId(), ignoreWarning)).withSelfRel());
                 break;
-
         }
     }
 
