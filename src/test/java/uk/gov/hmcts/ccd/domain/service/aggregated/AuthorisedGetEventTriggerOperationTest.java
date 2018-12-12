@@ -16,11 +16,12 @@ import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
-import uk.gov.hmcts.ccd.domain.service.common.UIDService;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
@@ -62,9 +63,6 @@ class AuthorisedGetEventTriggerOperationTest {
     private AccessControlService accessControlService;
 
     @Mock
-    private UIDService uidService;
-
-    @Mock
     private DraftGateway draftGateway;
 
     @Mock
@@ -95,7 +93,6 @@ class AuthorisedGetEventTriggerOperationTest {
             userRepository,
             accessControlService,
             eventTriggerService,
-            uidService,
             draftGateway);
         caseEventTrigger = new CaseEventTrigger();
 
@@ -120,7 +117,6 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                   eq(caseFields),
                                                                   eq(userRoles),
                                                                   eq(CAN_CREATE))).thenReturn(true);
-        when(uidService.validateUID(anyString())).thenReturn(true);
 
         CaseEvent caseEvent = new CaseEvent();
         when(eventTriggerService.findCaseEvent(eq(caseType), eq(EVENT_TRIGGER_ID))).thenReturn(caseEvent);
@@ -255,7 +251,6 @@ class AuthorisedGetEventTriggerOperationTest {
 
         @BeforeEach
         void setUp() {
-            doReturn(true).when(uidService).validateUID(CASE_REFERENCE);
             doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
 
             doReturn(caseEventTrigger).when(getEventTriggerOperation).executeForCase(CASE_REFERENCE,
@@ -410,18 +405,6 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                                                          IGNORE)
             );
         }
-
-        @Test
-        @DisplayName("should fail if case id is invalid")
-        void shouldFailIfCaseIDIsInvalid() {
-            when(uidService.validateUID(anyString())).thenReturn(false);
-
-            assertThrows(
-                BadRequestException.class, () -> authorisedGetEventTriggerOperation.executeForCase(CASE_REFERENCE,
-                                                                                                   EVENT_TRIGGER_ID,
-                                                                                                   IGNORE)
-            );
-        }
-
+        
     }
 }

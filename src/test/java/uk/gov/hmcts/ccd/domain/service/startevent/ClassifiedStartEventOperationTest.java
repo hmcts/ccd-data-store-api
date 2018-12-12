@@ -13,7 +13,6 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
-import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 
@@ -26,7 +25,6 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.newDraftResponse;
 
 class ClassifiedStartEventOperationTest {
 
@@ -54,7 +52,6 @@ class ClassifiedStartEventOperationTest {
     private ClassifiedStartEventOperation classifiedStartEventOperation;
 
     private CaseDetails caseDetails;
-    private DraftResponse draftResponse;
     private CaseDetails classifiedDetails;
     private StartEventTrigger startEvent;
     private CaseType caseType;
@@ -63,7 +60,6 @@ class ClassifiedStartEventOperationTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        draftResponse = newDraftResponse().build();
         caseDetails = newCaseDetails().withCaseTypeId(CASE_TYPE_ID).build();
         startEvent = new StartEventTrigger();
         startEvent.setCaseDetails(caseDetails);
@@ -183,7 +179,6 @@ class ClassifiedStartEventOperationTest {
         void setUp() {
             doReturn(caseType).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
             doReturn(startEvent).when(startEventOperation).triggerStartForDraft(DRAFT_REFERENCE,
-                                                                                EVENT_TRIGGER_ID,
                                                                                 IGNORE_WARNING);
             when(draftGateway.getCaseDetails(Draft.stripId(DRAFT_REFERENCE))).thenReturn(caseDetails);
         }
@@ -192,16 +187,16 @@ class ClassifiedStartEventOperationTest {
         @DisplayName("should call decorated start event operation as is")
         void shouldCallDecoratedStartEventOperation() {
 
-            classifiedStartEventOperation.triggerStartForDraft(DRAFT_REFERENCE, EVENT_TRIGGER_ID, IGNORE_WARNING);
+            classifiedStartEventOperation.triggerStartForDraft(DRAFT_REFERENCE, IGNORE_WARNING);
 
-            verify(startEventOperation).triggerStartForDraft(DRAFT_REFERENCE, EVENT_TRIGGER_ID, IGNORE_WARNING);
+            verify(startEventOperation).triggerStartForDraft(DRAFT_REFERENCE, IGNORE_WARNING);
         }
 
         @Test
         @DisplayName("should derive default classifications from case type")
         void shouldDeriveDefaultClassificationsFromCaseType() {
 
-            classifiedStartEventOperation.triggerStartForDraft(DRAFT_REFERENCE, EVENT_TRIGGER_ID, IGNORE_WARNING);
+            classifiedStartEventOperation.triggerStartForDraft(DRAFT_REFERENCE, IGNORE_WARNING);
 
             assertAll(
                 () -> verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
@@ -215,7 +210,6 @@ class ClassifiedStartEventOperationTest {
             startEvent.setCaseDetails(null);
 
             final StartEventTrigger output = classifiedStartEventOperation.triggerStartForDraft(DRAFT_REFERENCE,
-                                                                                                EVENT_TRIGGER_ID,
                                                                                                 IGNORE_WARNING);
 
             assertAll(
@@ -229,7 +223,6 @@ class ClassifiedStartEventOperationTest {
         void shouldReturnEventTriggerWithClassifiedCaseDetails() {
 
             final StartEventTrigger output = classifiedStartEventOperation.triggerStartForDraft(DRAFT_REFERENCE,
-                                                                                                EVENT_TRIGGER_ID,
                                                                                                 IGNORE_WARNING);
 
             assertAll(

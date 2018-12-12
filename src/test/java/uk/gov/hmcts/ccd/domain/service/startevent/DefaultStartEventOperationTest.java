@@ -104,6 +104,7 @@ public class DefaultStartEventOperationTest {
         .build();
     private final CaseDraft caseDraft = newCaseDraft()
         .withCaseTypeId(TEST_CASE_TYPE_ID)
+        .withEventTriggerId(TEST_EVENT_TRIGGER_ID)
         .withJurisdictionId(TEST_JURISDICTION_ID)
         .withCaseDataContent(caseDataContent)
         .build();
@@ -209,6 +210,7 @@ public class DefaultStartEventOperationTest {
             doReturn(true).when(eventTriggerService).isPreStateEmpty(eventTrigger);
             doReturn(TEST_EVENT_TOKEN).when(eventTokenService).generateToken(UID, eventTrigger, caseType.getJurisdiction(), caseType);
             doReturn(caseDetails).when(draftGateway).getCaseDetails(TEST_DRAFT_ID);
+            doReturn(draftResponse).when(draftGateway).get(TEST_DRAFT_ID);
             caseDetails.setCaseTypeId(TEST_CASE_TYPE_ID);
             caseDetails.setJurisdiction(TEST_JURISDICTION_ID);
             caseDetails.setData(DATA);
@@ -222,7 +224,6 @@ public class DefaultStartEventOperationTest {
         void shouldSuccessfullyTriggerStart() {
 
             StartEventTrigger actual = defaultStartEventOperation.triggerStartForDraft(TEST_DRAFT_ID,
-                                                                                       TEST_EVENT_TRIGGER_ID,
                                                                                        IGNORE_WARNING);
             assertAll(
                 () -> verify(caseDefinitionRepository).getCaseType(TEST_CASE_TYPE_ID),
@@ -248,7 +249,6 @@ public class DefaultStartEventOperationTest {
 
             final Exception exception = assertThrows(ResourceNotFoundException.class,
                                                      () -> defaultStartEventOperation.triggerStartForDraft(TEST_DRAFT_ID,
-                                                                                                           TEST_EVENT_TRIGGER_ID,
                                                                                                            IGNORE_WARNING)
             );
             assertThat(exception.getMessage(), startsWith("Cannot find case type definition for TestCaseTypeId"));
@@ -261,9 +261,7 @@ public class DefaultStartEventOperationTest {
             doReturn(null).when(eventTriggerService).findCaseEvent(caseType, TEST_EVENT_TRIGGER_ID);
 
             Exception exception = assertThrows(ResourceNotFoundException.class, () -> defaultStartEventOperation.triggerStartForDraft(TEST_DRAFT_ID,
-                                                                                                                                      TEST_EVENT_TRIGGER_ID,
-                                                                                                                                      IGNORE_WARNING)
-            );
+                                                                                                                                      IGNORE_WARNING));
             assertThat(exception.getMessage(), startsWith("Cannot find event TestEventTriggerId for case type TestCaseTypeId"));
         }
 
@@ -274,7 +272,6 @@ public class DefaultStartEventOperationTest {
             doReturn(false).when(eventTriggerService).isPreStateEmpty(eventTrigger);
 
             Exception exception = assertThrows(ValidationException.class, () -> defaultStartEventOperation.triggerStartForDraft(TEST_DRAFT_ID,
-                                                                                                                                TEST_EVENT_TRIGGER_ID,
                                                                                                                                 IGNORE_WARNING)
             );
             assertThat(exception.getMessage(), startsWith("The case status did not qualify for the event"));

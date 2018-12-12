@@ -74,7 +74,7 @@ class UIStartTriggerControllerTest {
         MockitoAnnotations.initMocks(this);
         when(getEventTriggerOperation.executeForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)).thenReturn(caseEventTrigger);
         when(getEventTriggerOperation.executeForCase(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)).thenReturn(caseEventTrigger);
-        when(getEventTriggerOperation.executeForDraft(DRAFT_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)).thenReturn(caseEventTrigger);
+        when(getEventTriggerOperation.executeForDraft(DRAFT_ID, IGNORE_WARNING)).thenReturn(caseEventTrigger);
         when(caseReferenceService.validateUID(CASE_ID)).thenReturn(true);
     }
 
@@ -166,7 +166,7 @@ class UIStartTriggerControllerTest {
         @Test
         @DisplayName("should return 200 when start trigger found")
         void startTriggerFound() {
-            final ResponseEntity<UIStartTriggerResource> response = uiStartTriggerController.getStartDraftTrigger(DRAFT_ID, EVENT_TRIGGER_ID, IGNORE_WARNING);
+            final ResponseEntity<UIStartTriggerResource> response = uiStartTriggerController.getStartDraftTrigger(DRAFT_ID, IGNORE_WARNING);
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
@@ -188,9 +188,9 @@ class UIStartTriggerControllerTest {
         @Test
         @DisplayName("should propagate exception from downstream operation")
         void shouldPropagateExceptionFromOperationWhenThrown() {
-            when(getEventTriggerOperation.executeForDraft(DRAFT_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)).thenThrow(Exception.class);
+            when(getEventTriggerOperation.executeForDraft(DRAFT_ID, IGNORE_WARNING)).thenThrow(Exception.class);
 
-            assertThrows(Exception.class, () -> uiStartTriggerController.getStartDraftTrigger(DRAFT_ID, EVENT_TRIGGER_ID, IGNORE_WARNING));
+            assertThrows(Exception.class, () -> uiStartTriggerController.getStartDraftTrigger(DRAFT_ID, IGNORE_WARNING));
         }
 
     }

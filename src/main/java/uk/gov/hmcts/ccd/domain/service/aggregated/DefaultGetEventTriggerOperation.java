@@ -11,6 +11,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
+import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.startevent.StartEventOperation;
@@ -67,12 +68,12 @@ public class DefaultGetEventTriggerOperation implements GetEventTriggerOperation
 
     @Override
     public CaseEventTrigger executeForDraft(String draftReference,
-                                            String eventTriggerId,
                                             Boolean ignoreWarning) {
+        final DraftResponse draftResponse = draftGateway.get(Draft.stripId(draftReference));
         final CaseDetails caseDetails = draftGateway.getCaseDetails(Draft.stripId(draftReference));
 
+        String eventTriggerId = draftResponse.getDocument().getEventTriggerId();
         StartEventTrigger startEventTrigger = startEventOperation.triggerStartForDraft(draftReference,
-                                                                                       eventTriggerId,
                                                                                        ignoreWarning);
         return caseEventTriggerBuilder.build(startEventTrigger,
                                              caseDetails.getCaseTypeId(),

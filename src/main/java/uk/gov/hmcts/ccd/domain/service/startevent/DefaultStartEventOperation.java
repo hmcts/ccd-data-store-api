@@ -15,6 +15,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
+import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
@@ -106,9 +107,8 @@ public class DefaultStartEventOperation implements StartEventOperation {
 
     @Override
     public StartEventTrigger triggerStartForDraft(final String draftReference,
-                                                  final String eventTriggerId,
                                                   final Boolean ignoreWarning) {
-
+        final DraftResponse draftResponse = draftGateway.get(Draft.stripId(draftReference));
         final CaseDetails caseDetails = draftGateway.getCaseDetails(Draft.stripId(draftReference));
 
         final String uid = userAuthorisation.getUserId();
@@ -117,7 +117,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
 
         return buildStartEventTrigger(uid,
                                       caseType,
-                                      eventTriggerId,
+                                      draftResponse.getDocument().getEventTriggerId(),
                                       ignoreWarning,
                                       () -> caseDetails);
     }

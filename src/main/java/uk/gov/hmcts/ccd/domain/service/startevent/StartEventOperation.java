@@ -12,6 +12,5 @@ public interface StartEventOperation {
                                           Boolean ignoreWarning);
 
     StartEventTrigger triggerStartForDraft(String draftReference,
-                                           String eventTriggerId,
                                            Boolean ignoreWarning);
 }

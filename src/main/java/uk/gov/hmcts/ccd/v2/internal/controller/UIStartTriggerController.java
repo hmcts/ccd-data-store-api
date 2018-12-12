@@ -120,7 +120,7 @@ public class UIStartTriggerController {
     }
 
     @GetMapping(
-        path = "/drafts/{draftId}/event-triggers/{triggerId}",
+        path = "/drafts/{draftId}/event-trigger",
         headers = {
             V2.EXPERIMENTAL_HEADER
         },
@@ -148,11 +148,9 @@ public class UIStartTriggerController {
         )
     })
     public ResponseEntity<UIStartTriggerResource> getStartDraftTrigger(@PathVariable("draftId") String draftId,
-                                                                       @PathVariable("triggerId") String triggerId,
                                                                        @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
 
         final CaseEventTrigger caseEventTrigger = getEventTriggerOperation.executeForDraft(draftId,
-                                                                                           triggerId,
                                                                                            ignoreWarning);
 
         return ResponseEntity.ok(forDraft(caseEventTrigger, draftId, ignoreWarning));

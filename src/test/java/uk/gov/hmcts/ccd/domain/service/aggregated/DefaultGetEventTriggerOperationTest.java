@@ -33,7 +33,9 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.newCaseDraft;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventTriggerBuilder.newCaseEventTrigger;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.newDraftResponse;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.StartEventTriggerBuilder.newStartEventTrigger;
 
 class DefaultGetEventTriggerOperationTest {
@@ -48,8 +50,8 @@ class DefaultGetEventTriggerOperationTest {
     private static final String CASE_TYPE_ID = "Grant";
     private static final Boolean IGNORE = Boolean.TRUE;
     private static final String TOKEN = "testToken";
+    private final DraftResponse draftResponse = newDraftResponse().withDocument(newCaseDraft().withEventTriggerId(EVENT_TRIGGER_ID).build()).build();
     private final CaseDetails caseDetails = newCaseDetails().withCaseTypeId(CASE_TYPE_ID).build();
-    private final DraftResponse draftResponse = new DraftResponse();
     private final CaseEvent caseEvent = new CaseEvent();
     private final List<CaseEventField> eventFields = Lists.newArrayList();
     private final StartEventTrigger startEventTrigger = newStartEventTrigger().withEventToken(TOKEN).withCaseDetails(caseDetails).build();
@@ -93,7 +95,6 @@ class DefaultGetEventTriggerOperationTest {
                                                      EVENT_TRIGGER_ID,
                                                      IGNORE)).thenReturn(startEventTrigger);
         when(startEventOperation.triggerStartForDraft(DRAFT_ID,
-                                                      EVENT_TRIGGER_ID,
                                                       IGNORE)).thenReturn(startEventTrigger);
         when(caseEventTriggerBuilder.build(startEventTrigger,
                                            CASE_TYPE_ID,
@@ -195,6 +196,7 @@ class DefaultGetEventTriggerOperationTest {
 
         @BeforeEach
         void setUp() {
+            when(draftGateway.get(Draft.stripId(DRAFT_ID))).thenReturn(draftResponse);
             when(draftGateway.getCaseDetails(Draft.stripId(DRAFT_ID))).thenReturn(caseDetails);
         }
 
@@ -205,7 +207,6 @@ class DefaultGetEventTriggerOperationTest {
             when(draftGateway.getCaseDetails(Draft.stripId(DRAFT_ID))).thenThrow(ResourceNotFoundException.class);
 
             assertThrows(ResourceNotFoundException.class, () -> defaultGetEventTriggerOperation.executeForDraft(DRAFT_ID,
-                                                                                                                EVENT_TRIGGER_ID,
                                                                                                                 IGNORE));
         }
 
@@ -213,10 +214,8 @@ class DefaultGetEventTriggerOperationTest {
         @DisplayName("should fail if downstream fails to get trigger for draft")
         void shouldFailIfNoDraftDetails() {
             doThrow(ResourceNotFoundException.class).when(startEventOperation).triggerStartForDraft(DRAFT_ID,
-                                                                                                    EVENT_TRIGGER_ID,
                                                                                                     IGNORE);
             assertThrows(ResourceNotFoundException.class, () -> defaultGetEventTriggerOperation.executeForDraft(DRAFT_ID,
-                                                                                                                EVENT_TRIGGER_ID,
                                                                                                                 IGNORE));
         }
 
@@ -224,7 +223,6 @@ class DefaultGetEventTriggerOperationTest {
         @DisplayName("should get trigger")
         void shouldGetTrigger() {
             CaseEventTrigger result = defaultGetEventTriggerOperation.executeForDraft(DRAFT_ID,
-                                                                                      EVENT_TRIGGER_ID,
                                                                                       IGNORE);
 
             InOrder inOrder = inOrder(draftGateway,
@@ -235,7 +233,7 @@ class DefaultGetEventTriggerOperationTest {
             assertAll(
                 () -> assertThat(result, sameInstance(caseEventTrigger)),
                 () -> inOrder.verify(draftGateway).getCaseDetails(Draft.stripId(DRAFT_ID)),
-                () -> inOrder.verify(startEventOperation).triggerStartForDraft(DRAFT_ID, EVENT_TRIGGER_ID, IGNORE),
+                () -> inOrder.verify(startEventOperation).triggerStartForDraft(DRAFT_ID, IGNORE),
                 () -> inOrder.verify(caseEventTriggerBuilder).build(startEventTrigger, CASE_TYPE_ID, EVENT_TRIGGER_ID, DRAFT_ID)
             );
         }
