@@ -19,6 +19,7 @@ import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
@@ -105,9 +106,11 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
     }
 
     private CaseDetails getCaseDetails(String caseReference) {
-        final CaseDetails caseDetails = caseDetailsRepository.findByReference(Long.valueOf(caseReference));
-        if (caseDetails == null) {
-            throw new ResourceNotFoundException("No case exist with id=" + caseReference);
+        CaseDetails caseDetails = null;
+        try {
+            caseDetails = caseDetailsRepository.findByReference(Long.valueOf(caseReference));
+        } catch (NumberFormatException nfe) {
+            throw new BadRequestException("Case reference is not valid");
         }
         return caseDetails;
     }

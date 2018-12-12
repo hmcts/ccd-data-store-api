@@ -1294,7 +1294,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         mockMvc.perform(get(GET_EVENT_TRIGGER_FOR_CASE_INVALID_CASE_REFERENCE)
                             .contentType(JSON_CONTENT_TYPE)
                             .header(AUTHORIZATION, "Bearer user1"))
-               .andExpect(status().is(404))
+               .andExpect(status().is(400))
                .andReturn();
     }
 
