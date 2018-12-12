@@ -108,7 +108,8 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
     private CaseDetails getCaseDetails(String caseReference) {
         CaseDetails caseDetails = null;
         try {
-            caseDetails = caseDetailsRepository.findByReference(Long.valueOf(caseReference));
+            caseDetails = caseDetailsRepository.findByReference(caseReference)
+                .orElseThrow(() -> new ResourceNotFoundException("No case exist with id=" + caseReference));
         } catch (NumberFormatException nfe) {
             throw new BadRequestException("Case reference is not valid");
         }
