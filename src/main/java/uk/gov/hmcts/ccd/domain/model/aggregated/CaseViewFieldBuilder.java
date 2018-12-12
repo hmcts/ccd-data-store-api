@@ -29,6 +29,7 @@ public class CaseViewFieldBuilder {
         field.setShowCondition(eventField.getShowCondition());
         field.setShowSummaryChangeOption(eventField.getShowSummaryChangeOption());
         field.setShowSummaryContentOption(eventField.getShowSummaryContentOption());
+        field.setAccessControlLists(caseField.getAccessControlLists());
 
         return field;
     }
