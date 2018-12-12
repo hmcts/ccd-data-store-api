@@ -253,7 +253,6 @@ public class QueryEndpoint {
                                                     @RequestParam(value = "ignore-warning",
                                                         required = false) Boolean ignoreWarning) {
         return getEventTriggerOperation.executeForDraft(draftId,
-                                                        eventTriggerId,
                                                         ignoreWarning);
     }
 

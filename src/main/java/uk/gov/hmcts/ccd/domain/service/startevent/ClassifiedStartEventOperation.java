@@ -55,11 +55,10 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
     }
 
     @Override
-    public StartEventTrigger triggerStartForDraft(String draftReference, String eventTriggerId,
+    public StartEventTrigger triggerStartForDraft(String draftReference,
                                                   Boolean ignoreWarning) {
         final CaseDetails caseDetails = draftGateway.getCaseDetails(Draft.stripId(draftReference));
         return applyClassificationIfCaseDetailsExist(deduceDefaultClassificationsForDraft(startEventOperation.triggerStartForDraft(draftReference,
-                                                                                                                                   eventTriggerId,
                                                                                                                                    ignoreWarning),
                                                                                           caseDetails.getCaseTypeId()));
     }

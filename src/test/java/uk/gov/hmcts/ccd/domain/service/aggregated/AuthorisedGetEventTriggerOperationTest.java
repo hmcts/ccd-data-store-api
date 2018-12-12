@@ -22,6 +22,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
@@ -396,13 +397,24 @@ class AuthorisedGetEventTriggerOperationTest {
         }
 
         @Test
-        @DisplayName("should fail if case reference is invalid")
+        @DisplayName("should fail if case reference is not found")
         void shouldThrowExceptionIfCaseReferenceNotFound() {
             doReturn(Optional.empty()).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
             assertThrows(
                 ResourceNotFoundException.class, () -> authorisedGetEventTriggerOperation.executeForCase(CASE_REFERENCE,
                                                                                                          EVENT_TRIGGER_ID,
                                                                                                          IGNORE)
+            );
+        }
+
+        @Test
+        @DisplayName("should fail if case reference is invalid")
+        void shouldThrowExceptionIfCaseReferenceInvalid() {
+            doThrow(NumberFormatException.class).when(caseDetailsRepository).findByReference("invalidReference");
+            assertThrows(
+                BadRequestException.class, () -> authorisedGetEventTriggerOperation.executeForCase("invalidReference",
+                                                                                                   EVENT_TRIGGER_ID,
+                                                                                                   IGNORE)
             );
         }
 

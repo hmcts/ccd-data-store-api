@@ -84,12 +84,11 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
     }
 
     @Override
-    public StartEventTrigger triggerStartForDraft(String draftReference, String eventTriggerId,
+    public StartEventTrigger triggerStartForDraft(String draftReference,
                                                   Boolean ignoreWarning) {
 
         final CaseDetails caseDetails = draftGateway.getCaseDetails(Draft.stripId(draftReference));
         return verifyReadAccess(caseDetails.getCaseTypeId(), startEventOperation.triggerStartForDraft(draftReference,
-                                                                                                      eventTriggerId,
                                                                                                       ignoreWarning));
     }
 

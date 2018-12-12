@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.hateoas.ResourceSupport;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.v2.internal.controller.UIStartTriggerController;
@@ -16,6 +18,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class UIStartTriggerResource extends ResourceSupport {
+    private static final Logger LOG = LoggerFactory.getLogger(UIStartTriggerResource.class);
 
     private enum Origin { DRAFT, CASE, CASE_TYPE }
 
@@ -45,7 +48,10 @@ public class UIStartTriggerResource extends ResourceSupport {
                 add(linkTo(methodOn(UIStartTriggerController.class).getStartEventTrigger(id, caseEventTrigger.getId(), ignoreWarning)).withSelfRel());
                 break;
             case DRAFT:
-                add(linkTo(methodOn(UIStartTriggerController.class).getStartDraftTrigger(id, caseEventTrigger.getId(), ignoreWarning)).withSelfRel());
+                add(linkTo(methodOn(UIStartTriggerController.class).getStartDraftTrigger(id, ignoreWarning)).withSelfRel());
+                break;
+            default:
+                LOG.warn("Origin={} not supported", origin);
                 break;
         }
     }

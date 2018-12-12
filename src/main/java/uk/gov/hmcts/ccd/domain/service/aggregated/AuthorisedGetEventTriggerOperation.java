@@ -16,8 +16,10 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
+import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
@@ -90,21 +92,28 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
     }
 
     @Override
-    public CaseEventTrigger executeForDraft(String draftReference, String eventTriggerId, Boolean ignoreWarning) {
+    public CaseEventTrigger executeForDraft(String draftReference, Boolean ignoreWarning) {
+        final DraftResponse draftResponse = draftGateway.get(Draft.stripId(draftReference));
         final CaseDetails caseDetails = draftGateway.getCaseDetails(Draft.stripId(draftReference));
         final CaseType caseType = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
 
         Set<String> userRoles = getUserRoles();
 
-        verifyRequiredAccessExistsForCaseType(eventTriggerId, caseType, userRoles);
+        verifyRequiredAccessExistsForCaseType(draftResponse.getDocument().getEventTriggerId(), caseType, userRoles);
 
         return filterCaseFieldsByCreateAccess(caseType, userRoles, getEventTriggerOperation.executeForDraft(draftReference,
-                                                                                                            eventTriggerId,
                                                                                                             ignoreWarning));
     }
 
     private CaseDetails getCaseDetails(String caseReference) {
-        return caseDetailsRepository.findByReference(caseReference).orElseThrow(() -> new ResourceNotFoundException("No case exist with id=" + caseReference));
+        CaseDetails caseDetails = null;
+        try {
+            caseDetails = caseDetailsRepository.findByReference(caseReference)
+                .orElseThrow(() -> new ResourceNotFoundException("No case exist with id=" + caseReference));
+        } catch (NumberFormatException nfe) {
+            throw new BadRequestException("Case reference is not valid");
+        }
+        return caseDetails;
     }
 
     private Set<String> getUserRoles() {

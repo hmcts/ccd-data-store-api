@@ -494,7 +494,7 @@ public class CallbackTest extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
-    public void shouldReturn400WhenGetEventTriggerForCaseWithInvalidCaseId() throws Exception {
+    public void shouldReturn404WhenGetEventTriggerForCaseWithInvalidCaseId() throws Exception {
         final String URL = String.format("/aggregated/caseworkers/%d/jurisdictions/%s/case-types/%s/cases/%s/event-triggers/%s", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, INVALID_CASE_REFERENCE, UPDATE_EVENT_TRIGGER_ID);
 
         final MvcResult mvcResult = mockMvc
@@ -502,7 +502,7 @@ public class CallbackTest extends WireMockBaseTest {
             .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
-        assertEquals(mvcResult.getResponse().getContentAsString(), 400, mvcResult.getResponse().getStatus());
+        assertEquals(mvcResult.getResponse().getContentAsString(), 404, mvcResult.getResponse().getStatus());
 
     }
 

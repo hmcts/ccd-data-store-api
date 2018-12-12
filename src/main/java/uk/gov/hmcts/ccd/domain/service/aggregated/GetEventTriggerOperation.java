@@ -13,6 +13,5 @@ public interface GetEventTriggerOperation {
                                     Boolean ignoreWarning);
 
     CaseEventTrigger executeForDraft(String draftReference,
-                                     String eventTriggerId,
                                      Boolean ignoreWarning);
 }

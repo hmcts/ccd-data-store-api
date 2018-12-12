@@ -138,7 +138,7 @@ class UIStartTriggerResourceTest {
     @DisplayName("Start draft trigger")
     class StartTriggerForD {
         private final String draftReference = "DRAFT127";
-        private final String linkSelfForEvent = String.format("/internal/drafts/%s/event-triggers/%s?ignore-warning=true", draftReference, ID);
+        private final String linkSelfForEvent = String.format("/internal/drafts/%s/event-trigger?ignore-warning=true", draftReference, ID);
 
         @Test
         @DisplayName("should copy case event trigger")
