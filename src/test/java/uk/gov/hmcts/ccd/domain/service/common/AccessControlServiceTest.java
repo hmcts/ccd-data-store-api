@@ -1,5 +1,26 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import java.io.IOException;
+import java.util.*;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AuditEventBuilder.anAuditEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.anCaseEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventTriggerBuilder.anEventTrigger;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.aCaseField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseStateBuilder.newState;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,23 +34,6 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
-
-import java.io.IOException;
-import java.util.*;
-
-import static com.google.common.collect.Lists.newArrayList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.*;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AuditEventBuilder.anAuditEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.anCaseEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventTriggerBuilder.anEventTrigger;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.aCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseStateBuilder.newState;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
 
 public class AccessControlServiceTest {
 
@@ -577,8 +581,9 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToFieldsIfFieldIsMissingAclsForUpdate() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(aCaseField()
-                               .withId("Addresses")
-                               .build())
+                    .withId("Addresses")
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .build())
                 .build();
             JsonNode newDataNode = getJsonNode("{ \"Addresses\" : \"UpdateAddress\" }");
             JsonNode existingDataNode = getJsonNode("{  \"Addresses\": \"SomeText\" }");
@@ -605,14 +610,15 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToFieldsIfFieldIsMissingRelevantAclForUpdate() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(aCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_NOT_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .withRead(true)
-                                            .withUpdate(true)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_NOT_IN_USER_ROLES)
+                        .withCreate(true)
+                        .withRead(true)
+                        .withUpdate(true)
+                        .build())
+                    .build())
                 .build();
             JsonNode newDataNode = getJsonNode("{ \"Addresses\" : \"UpdateAddress\" }");
             JsonNode existingDataNode = getJsonNode("{  \"Addresses\": \"SomeText\" }");
@@ -645,13 +651,14 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToFieldIfRelevantAclNotGrantingAccessForUpdate() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(aCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .withRead(true)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .withRead(true)
+                        .build())
+                    .build())
                 .build();
             JsonNode newDataNode = getJsonNode("{ \"Addresses\" : \"UpdateAddress\" }\n");
             JsonNode existingDataNode = getJsonNode("{ \"Addresses\": \"SomeText\" }\n");
@@ -683,11 +690,12 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToFieldWithNullValueForUpdate() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(aCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .build())
+                    .build())
                 .build();
             JsonNode newDataNode = getJsonNode("{ \"Addresses\" : null }\n");
             JsonNode existingDataNode = getJsonNode("{ \"Addresses\": \"SomeText\" }");
@@ -757,12 +765,13 @@ public class AccessControlServiceTest {
         void shouldGrantAccessToFieldWithAclMatchingForUpdate() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(aCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withUpdate(true)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build())
+                    .build())
                 .build();
             JsonNode newDataNode = getJsonNode("{ \"Addresses\": \"UpdateAddress\" }\n");
             JsonNode existingDataNode = getJsonNode("{ \"Addresses\": \"SomeText\" }");
@@ -810,32 +819,36 @@ public class AccessControlServiceTest {
         void shouldGrantAccessToFieldsIfAllFieldsHaveAccessGranted() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(aCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build())
+                    .build())
                 .withField(aCaseField()
-                               .withId("FirstName")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withUpdate(true)
-                                            .build())
-                               .build())
+                    .withId("FirstName")
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build())
+                    .build())
                 .withField(aCaseField()
-                               .withId("LastName")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .build())
-                               .build())
+                    .withId("LastName")
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .build())
+                    .build())
                 .withField(aCaseField()
-                               .withId("Mobile")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withUpdate(true)
-                                            .build())
-                               .build())
+                    .withId("Mobile")
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build())
+                    .build())
                 .build();
             JsonNode newDataNode = getJsonNode("{ \"Addresses\": \"CreateAddress\"," +
                                                    " \"FirstName\": \"John\"," +
@@ -852,31 +865,35 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToFieldsIfOneFieldDoesNotHaveAccessGranted() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(aCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build())
+                    .build())
                 .withField(aCaseField()
-                               .withId("FirstName")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .build())
-                               .build())
+                    .withId("FirstName")
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .build())
+                    .build())
                 .withField(aCaseField()
-                               .withId("LastName")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .build())
-                               .build())
+                    .withId("LastName")
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .build())
+                    .build())
                 .withField(aCaseField()
-                               .withId("Mobile")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .build())
-                               .build())
+                    .withId("Mobile")
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build())
+                    .build())
                 .build();
             JsonNode newDataNode = getJsonNode("{ \"Addresses\": \"CreateAddress\"," +
                                                    " \"FirstName\": \"John\"," +
@@ -894,24 +911,27 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToFieldsIfOneFieldDoesNotHaveAcls() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(aCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build())
+                    .build())
                 .withField(aCaseField()
-                               .withId("FirstName")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .build())
-                               .build())
+                    .withId("FirstName")
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .build())
+                    .build())
                 .withField(aCaseField()
-                               .withId("LastName")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .build())
-                               .build())
+                    .withId("LastName")
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .build())
+                    .build())
                 .build();
             JsonNode newDataNode = getJsonNode("{ \"Addresses\": \"CreateAddress\"," +
                                                    " \"FirstName\": \"John\"," +
@@ -2442,6 +2462,331 @@ public class AccessControlServiceTest {
                 () -> assertThat(result, hasItem(hasProperty("id", is("EVENT_ID_WITH_ACCESS")))),
                 () -> assertThat(result, hasItem(hasProperty("id", is("EVENT_ID_WITH_ACCESS_2"))))
             );
+        }
+    }
+
+    @Nested
+    @DisplayName("CRUD contract on collection")
+    class CRUDonCollection {
+        private JsonNode existingDataNode;
+        private String comma = ",";
+        private String collStart = "{  \"Addresses\":[  \n";
+        private String child1 = "         {  \n"
+            + "            \"value\":{  \n"
+            + "               \"Address\":\"address1\",\n"
+            + "               \"Notes\": {\n"
+            + "                   \"Note1\": \"someNote11\",\n"
+            + "                   \"Note2\": \"someNote21\"\n"
+            + "                }"
+            + "            },\n"
+            + "            \"id\":\"" + FIRST_CHILD_ID + "\"\n"
+            + "         }\n";
+        private String child1Updated = "         {  \n"
+            + "            \"value\":{  \n"
+            + "               \"Address\":\"address1\",\n"
+            + "               \"Notes\": {\n"
+            + "                   \"Note1\": \"someNote11 Updated\",\n"
+            + "                   \"Note2\": \"someNote21 Updated\"\n"
+            + "                }"
+            + "            },\n"
+            + "            \"id\":\"" + FIRST_CHILD_ID + "\"\n"
+            + "         }\n";
+        private String child2 = "         {  \n"
+            + "            \"value\":{  \n"
+            + "               \"Address\":\"address1\",\n"
+            + "               \"Notes\": {\n"
+            + "                   \"Note1\": \"someNote21\",\n"
+            + "                   \"Note2\": \"someNote22\"\n"
+            + "                }"
+            + "            },\n"
+            + "            \"id\":\"" + SECOND_CHILD_ID + "\"\n"
+            + "         }\n";
+        private String newChild = "         {  \n"
+            + "            \"value\":{  \n"
+            + "               \"Address\":\"address3\",\n"
+            + "               \"Notes\": {\n"
+            + "                   \"Note1\": \"someNote31\",\n"
+            + "                   \"Note2\": \"someNote32\"\n"
+            + "                }"
+            + "            },\n"
+            + "            \"id\":\"null\"\n"
+            + "         }\n";
+        private String newChildWithNoIdTag = "         {  \n"
+            + "            \"value\":{  \n"
+            + "               \"Address\":\"address3\",\n"
+            + "               \"Notes\": {\n"
+            + "                   \"Note1\": \"someNote31\",\n"
+            + "                   \"Note2\": \"someNote32\"\n"
+            + "                }"
+            + "            }\n"
+            + "         }\n";
+
+        private String collEnd = "      ]\n }\n";
+
+        @BeforeEach
+        void setUp() throws IOException {
+            existingDataNode = getJsonNode(collStart + child1 + comma + child2 + collEnd);
+        }
+
+        @Test
+        @DisplayName("Should fail if the caseField not found")
+        void shouldFailIfCaseFieldDoesNotExist() throws IOException {
+            CaseType caseType = newCaseType()
+                .withField(aCaseField()
+                    .withId("AddressesWhatNot")
+                    .withFieldType(aFieldType().withType(COLLECTION).build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build())
+                    .build())
+                .build();
+
+            assertThat(
+                accessControlService.canAccessCaseFieldsForUpsert(
+                    getJsonNode(collStart + child1 + comma + child2 + comma + newChild + collEnd),
+                    existingDataNode,
+                    caseType.getCaseFields(),
+                    USER_ROLES),
+                is(false));
+        }
+
+        @Test
+        @DisplayName("Should allow creation of new items on collection")
+        void shouldGrantCreateAccessToCollectionType() throws IOException {
+            CaseType caseType = newCaseType()
+                .withField(aCaseField()
+                    .withId("Addresses")
+                    .withFieldType(aFieldType().withType(COLLECTION).build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build())
+                    .build())
+                .build();
+
+            assertThat(
+                accessControlService.canAccessCaseFieldsForUpsert(
+                    getJsonNode(collStart + child1 + comma + child2 + comma + newChild + collEnd),
+                    existingDataNode,
+                    caseType.getCaseFields(),
+                    USER_ROLES),
+                is(true));
+        }
+
+        @Test
+        @DisplayName("Should allow creation of new items on collection even when no Id provided")
+        void shouldGrantCreateAccessToCollectionTypeWOutId() throws IOException {
+            CaseType caseType = newCaseType()
+                .withField(aCaseField()
+                    .withId("Addresses")
+                    .withFieldType(aFieldType().withType(COLLECTION).build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build())
+                    .build())
+                .build();
+
+            assertThat(
+                accessControlService.canAccessCaseFieldsForUpsert(
+                    getJsonNode(collStart + child1 + comma + child2 + comma + newChildWithNoIdTag + collEnd),
+                    existingDataNode,
+                    caseType.getCaseFields(),
+                    USER_ROLES),
+                is(true));
+        }
+
+        @Test
+        @DisplayName("Should not allow creation of new items on collection")
+        void shouldNotGrantCreateAccessToCollectionType() throws IOException {
+            CaseType caseType = newCaseType()
+                .withField(aCaseField()
+                    .withId("Addresses")
+                    .withFieldType(aFieldType().withType(COLLECTION).build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(false)
+                        .build())
+                    .build())
+                .build();
+
+            assertThat(
+                accessControlService.canAccessCaseFieldsForUpsert(
+                    getJsonNode(collStart + child1 + comma + child2 + comma + newChild + collEnd),
+                    existingDataNode,
+                    caseType.getCaseFields(),
+                    USER_ROLES),
+                is(false));
+        }
+
+
+        @Test
+        @DisplayName("Should allow update of items on collection")
+        void shouldGrantUpdateAccessToCollectionType() throws IOException {
+            CaseType caseType = newCaseType()
+                .withField(aCaseField()
+                    .withId("Addresses")
+                    .withFieldType(aFieldType().withType(COLLECTION).build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build())
+                    .build())
+                .build();
+
+            assertThat(
+                accessControlService.canAccessCaseFieldsForUpsert(
+                    getJsonNode(collStart + child1Updated + comma + child2 + collEnd),
+                    existingDataNode,
+                    caseType.getCaseFields(),
+                    USER_ROLES),
+                is(true));
+        }
+
+        @Test
+        @DisplayName("Should allow update of items on collection along with creation")
+        void shouldGrantUpdateAndCreateAccessToCollectionType() throws IOException {
+            CaseType caseType = newCaseType()
+                .withField(aCaseField()
+                    .withId("Addresses")
+                    .withFieldType(aFieldType().withType(COLLECTION).build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .withCreate(true)
+                        .build())
+                    .build())
+                .build();
+
+            assertThat(
+                accessControlService.canAccessCaseFieldsForUpsert(
+                    getJsonNode(collStart + child1Updated + comma + child2 + comma + newChildWithNoIdTag
+                        + comma + newChild + collEnd),
+                    existingDataNode,
+                    caseType.getCaseFields(),
+                    USER_ROLES),
+                is(true));
+        }
+
+        @Test
+        @DisplayName("Should not allow update of items on collection")
+        void shouldNotGrantUpdateAccessToCollectionType() throws IOException {
+            CaseType caseType = newCaseType()
+                .withField(aCaseField()
+                    .withId("Addresses")
+                    .withFieldType(aFieldType().withType(COLLECTION).build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(false)
+                        .build())
+                    .build())
+                .build();
+
+            assertThat(
+                accessControlService.canAccessCaseFieldsForUpsert(
+                    getJsonNode(collStart + child1Updated + comma + child2 + collEnd),
+                    existingDataNode,
+                    caseType.getCaseFields(),
+                    USER_ROLES),
+                is(false));
+        }
+
+        @Test
+        @DisplayName("Should allow deletion of items on collection")
+        void shouldGrantDeleteAccessToCollectionType() throws IOException {
+            CaseType caseType = newCaseType()
+                .withField(aCaseField()
+                    .withId("Addresses")
+                    .withFieldType(aFieldType().withType(COLLECTION).build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withDelete(true)
+                        .build())
+                    .build())
+                .build();
+
+            assertThat(
+                accessControlService.canAccessCaseFieldsForUpsert(
+                    getJsonNode(collStart + child1 + collEnd),
+                    existingDataNode,
+                    caseType.getCaseFields(),
+                    USER_ROLES),
+                is(true));
+        }
+
+        @Test
+        @DisplayName("Should allow deletion of items on collection along with creation")
+        void shouldGrantDeleteAndCreateAccessToCollectionType() throws IOException {
+            CaseType caseType = newCaseType()
+                .withField(aCaseField()
+                    .withId("Addresses")
+                    .withFieldType(aFieldType().withType(COLLECTION).build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withDelete(true)
+                        .withCreate(true)
+                        .build())
+                    .build())
+                .build();
+
+            assertThat(
+                accessControlService.canAccessCaseFieldsForUpsert(
+                    getJsonNode(collStart + child1 + comma + newChildWithNoIdTag + collEnd),
+                    existingDataNode,
+                    caseType.getCaseFields(),
+                    USER_ROLES),
+                is(true));
+        }
+
+        @Test
+        @DisplayName("Should not allow deletion of items on collection")
+        void shouldNotGrantDeleteAccessToCollectionType() throws IOException {
+            CaseType caseType = newCaseType()
+                .withField(aCaseField()
+                    .withId("Addresses")
+                    .withFieldType(aFieldType().withType(COLLECTION).build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withDelete(false)
+                        .build())
+                    .build())
+                .build();
+
+            assertThat(
+                accessControlService.canAccessCaseFieldsForUpsert(
+                    getJsonNode(collStart + child1 + collEnd),
+                    existingDataNode,
+                    caseType.getCaseFields(),
+                    USER_ROLES),
+                is(false));
+        }
+
+
+        @Test
+        @DisplayName("Should allow cretation, updating and deletion of items on collection")
+        void shouldGrantUpdateDeleteAndCreateAccessToCollectionType() throws IOException {
+            CaseType caseType = newCaseType()
+                .withField(aCaseField()
+                    .withId("Addresses")
+                    .withFieldType(aFieldType().withType(COLLECTION).build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withDelete(true)
+                        .withCreate(true)
+                        .withUpdate(true)
+                        .build())
+                    .build())
+                .build();
+
+            assertThat(
+                accessControlService.canAccessCaseFieldsForUpsert(
+                    getJsonNode(collStart + child1Updated + comma + child2 + comma
+                        + newChildWithNoIdTag + collEnd),
+                    existingDataNode,
+                    caseType.getCaseFields(),
+                    USER_ROLES),
+                is(true));
         }
     }
 
