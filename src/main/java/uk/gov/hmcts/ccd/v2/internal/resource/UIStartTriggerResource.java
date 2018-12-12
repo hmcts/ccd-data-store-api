@@ -52,6 +52,7 @@ public class UIStartTriggerResource extends ResourceSupport {
                 break;
             default:
                 LOG.warn("Origin={} not supported", origin);
+                break;
         }
     }
 
