@@ -34,7 +34,7 @@ public class CaseViewField {
     private Boolean showSummaryChangeOption;
     @JsonProperty("show_summary_content_option")
     private Integer showSummaryContentOption;
-    @JsonProperty("acls")
+    @JsonIgnore
     private List<AccessControlList> accessControlLists;
 
     public String getId() {
