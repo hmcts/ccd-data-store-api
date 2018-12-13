@@ -66,4 +66,9 @@
         <notes>Temporary suppression to ignore CVE with com.google.guava. See RDM-3372</notes>
         <cve>CVE-2018-10237</cve>
     </suppress>
+    <suppress>
+        <notes>Temporary suppression since there's no 1.8 release of slf4j yet</notes>
+        <gav regex="true">^.*slf4j.*$</gav>
+        <cpe>cpe:/a:slf4j:slf4j:1.7.25</cpe>
+    </suppress>
 </suppressions>
