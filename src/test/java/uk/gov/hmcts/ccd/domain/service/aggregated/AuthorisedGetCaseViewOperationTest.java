@@ -151,7 +151,7 @@ class AuthorisedGetCaseViewOperationTest {
 
     @Test
     @DisplayName("should remove fields from tabs based on CRUD)")
-    void shouldRemoveFieldsByCRUD() {
+    void shouldRemoveFieldsByCrud() {
         doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES, CAN_READ);
 
         final CaseView actualCaseView = authorisedGetCaseViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);

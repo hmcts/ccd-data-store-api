@@ -81,8 +81,8 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
         CaseViewTrigger[] authorisedTriggers;
         if (!getAccessControlService().canAccessCaseTypeWithCriteria(caseType,
                                                                      userRoles,
-                                                                     CAN_UPDATE) ||
-            !getAccessControlService().canAccessCaseStateWithCriteria(caseView.getState().getId(),
+                                                                     CAN_UPDATE)
+            || !getAccessControlService().canAccessCaseStateWithCriteria(caseView.getState().getId(),
                                                                       caseType,
                                                                       userRoles,
                                                                       CAN_UPDATE)) {
