@@ -36,6 +36,10 @@ public class TextValidator implements BaseTypeValidator {
 
         final String value = dataValue.textValue();
 
+        if (!checkRegex(REGEX_WHITESPACES, value)) {
+            return Collections.singletonList(new ValidationResult(REGEX_REQUIRED_DATA, dataFieldId));
+        }
+
         if (!checkMax(caseFieldDefinition.getFieldType().getMax(), value)) {
             return Collections.singletonList(new ValidationResult(value + " exceed maximum length " + caseFieldDefinition.getFieldType().getMax(), dataFieldId));
         }
