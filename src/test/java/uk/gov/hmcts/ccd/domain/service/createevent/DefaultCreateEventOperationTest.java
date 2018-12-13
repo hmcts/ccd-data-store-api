@@ -17,6 +17,7 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItemType;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.model.std.validator.EventValidator;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
@@ -40,6 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
 class DefaultCreateEventOperationTest {
 
@@ -98,6 +100,7 @@ class DefaultCreateEventOperationTest {
     private CaseDetails caseDetails;
     private CaseDetails caseDetailsBefore;
     private CaseState postState;
+    private CaseDataContent caseDataContent;
     private IDAMProperties user;
 
     private static Event buildEvent() {
@@ -114,7 +117,7 @@ class DefaultCreateEventOperationTest {
 
         event = buildEvent();
         data = buildJsonNodeData();
-
+        caseDataContent = newCaseDataContent().withEvent(event).withData(data).withToken(TOKEN).withIgnoreWarning(IGNORE_WARNING).build();
         final Jurisdiction jurisdiction = new Jurisdiction();
         jurisdiction.setId(JURISDICTION_ID);
         final Version version = new Version();
@@ -233,10 +236,7 @@ class DefaultCreateEventOperationTest {
             JURISDICTION_ID,
             CASE_TYPE_ID,
             CASE_REFERENCE,
-            event,
-            data,
-            TOKEN,
-            IGNORE_WARNING);
+            caseDataContent);
     }
 
     private Map<String, JsonNode> buildJsonNodeData() {

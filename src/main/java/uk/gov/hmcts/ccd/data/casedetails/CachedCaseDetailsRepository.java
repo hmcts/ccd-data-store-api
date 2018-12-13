@@ -6,8 +6,6 @@ import org.springframework.web.context.annotation.RequestScope;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.service.common.UIDService;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -36,13 +34,9 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
     private final Map<String, List<CaseDetails>> metaAndFieldDataHashToCaseDetails = newHashMap();
     private final Map<String, PaginatedSearchMetadata> hashToPaginatedSearchMetadata = newHashMap();
 
-    private final UIDService uidService;
-
     @Inject
-    public CachedCaseDetailsRepository(final @Qualifier(DefaultCaseDetailsRepository.QUALIFIER) CaseDetailsRepository caseDetailsRepository,
-                                       final UIDService uidService) {
+    public CachedCaseDetailsRepository(final @Qualifier(DefaultCaseDetailsRepository.QUALIFIER) CaseDetailsRepository caseDetailsRepository) {
         this.caseDetailsRepository = caseDetailsRepository;
-        this.uidService = uidService;
     }
 
     @Override
@@ -63,7 +57,6 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
 
     @Override
     public CaseDetails findByReference(final Long caseReference) {
-        validateUID(caseReference);
         final Function<String, Optional<CaseDetails>> findFunction = key -> Optional.ofNullable(
             caseDetailsRepository.findByReference(caseReference));
         return referenceToCaseDetails.computeIfAbsent(caseReference.toString(), findFunction)
@@ -72,13 +65,11 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
 
     @Override
     public Optional<CaseDetails> findByReference(String jurisdiction, Long reference) {
-        validateUID(reference);
         return findByReference(jurisdiction, reference.toString());
     }
 
     @Override
     public Optional<CaseDetails> findByReference(String jurisdiction, String reference) {
-        validateUID(reference);
         return referenceToCaseDetails.computeIfAbsent(reference,
                                                       key -> caseDetailsRepository.findByReference(jurisdiction,
                                                                                                      reference));
@@ -86,7 +77,6 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
 
     @Override
     public Optional<CaseDetails> findByReference(String reference) {
-        validateUID(reference);
         return referenceToCaseDetails.computeIfAbsent(reference,
                                                       key -> caseDetailsRepository.findByReference(reference));
     }
@@ -110,7 +100,6 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
     public CaseDetails findUniqueCase(final String jurisdictionId,
                                       final String caseTypeId,
                                       final String caseReference) {
-        validateUID(caseReference);
         return findHashToCaseDetails.computeIfAbsent(format(FIND_HASH_FORMAT, jurisdictionId, caseTypeId, caseReference),
                                                             hash -> caseDetailsRepository.findUniqueCase(jurisdictionId, caseTypeId, caseReference));
     }
@@ -134,20 +123,6 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
                                                                  metadata,
                                                                  dataSearchParams
                                                              ));
-    }
-
-    private void validateUID(String id) {
-        try {
-            validateUID(Long.valueOf(id));
-        } catch (NumberFormatException nfe) {
-            throw new BadRequestException("Case reference is not valid");
-        }
-    }
-
-    private void validateUID(Long id) {
-        if (!uidService.validateUID(String.valueOf(id))) {
-            throw new BadRequestException("Case reference is not valid");
-        }
     }
 
     private String getMapHashCode(Map<String, String> dataSearchParams) {

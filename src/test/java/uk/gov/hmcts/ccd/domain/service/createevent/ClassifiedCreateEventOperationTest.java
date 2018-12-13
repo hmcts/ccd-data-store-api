@@ -1,17 +1,14 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.std.Event;
+import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -19,7 +16,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
-import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
 class ClassifiedCreateEventOperationTest {
 
@@ -27,10 +24,7 @@ class ClassifiedCreateEventOperationTest {
     private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_TYPE_ID = "Grant";
     private static final String CASE_REFERENCE = "1234123412341234";
-    private static final Event EVENT = anEvent().build();
-    private static final Map<String, JsonNode> DATA = new HashMap<>();
-    private static final String TOKEN = "JwtToken";
-    private static final Boolean IGNORE = Boolean.TRUE;
+    private static final CaseDataContent CASE_DATA_CONTENT = newCaseDataContent().build();
 
     @Mock
     private CreateEventOperation createEventOperation;
@@ -51,10 +45,7 @@ class ClassifiedCreateEventOperationTest {
                                                                          JURISDICTION_ID,
                                                                          CASE_TYPE_ID,
                                                                          CASE_REFERENCE,
-                                                                         EVENT,
-                                                                         DATA,
-                                                                         TOKEN,
-                                                                         IGNORE);
+                                                                         CASE_DATA_CONTENT);
 
         classifiedCase = new CaseDetails();
         doReturn(Optional.of(classifiedCase)).when(classificationService).applyClassification(caseDetails);
@@ -69,19 +60,13 @@ class ClassifiedCreateEventOperationTest {
                                                        JURISDICTION_ID,
                                                        CASE_TYPE_ID,
                                                        CASE_REFERENCE,
-                                                       EVENT,
-                                                       DATA,
-                                                       TOKEN,
-                                                       IGNORE);
+                                                       CASE_DATA_CONTENT);
 
         verify(createEventOperation).createCaseEvent(UID,
                                                      JURISDICTION_ID,
                                                      CASE_TYPE_ID,
                                                      CASE_REFERENCE,
-                                                     EVENT,
-                                                     DATA,
-                                                     TOKEN,
-                                                     IGNORE);
+                                                     CASE_DATA_CONTENT);
     }
 
     @Test
@@ -91,19 +76,13 @@ class ClassifiedCreateEventOperationTest {
                                                                   JURISDICTION_ID,
                                                                   CASE_TYPE_ID,
                                                                   CASE_REFERENCE,
-                                                                  EVENT,
-                                                                  DATA,
-                                                                  TOKEN,
-                                                                  IGNORE);
+                                                                  CASE_DATA_CONTENT);
 
         final CaseDetails output = classifiedCreateEventOperation.createCaseEvent(UID,
                                                                                   JURISDICTION_ID,
                                                                                   CASE_TYPE_ID,
                                                                                   CASE_REFERENCE,
-                                                                                  EVENT,
-                                                                                  DATA,
-                                                                                  TOKEN,
-                                                                                  IGNORE);
+                                                                                  CASE_DATA_CONTENT);
 
         assertThat(output, is(nullValue()));
     }
@@ -116,10 +95,7 @@ class ClassifiedCreateEventOperationTest {
                                                                                   JURISDICTION_ID,
                                                                                   CASE_TYPE_ID,
                                                                                   CASE_REFERENCE,
-                                                                                  EVENT,
-                                                                                  DATA,
-                                                                                  TOKEN,
-                                                                                  IGNORE);
+                                                                                  CASE_DATA_CONTENT);
 
         assertAll(
             () -> assertThat(output, sameInstance(classifiedCase)),
@@ -137,10 +113,7 @@ class ClassifiedCreateEventOperationTest {
                                                                                   JURISDICTION_ID,
                                                                                   CASE_TYPE_ID,
                                                                                   CASE_REFERENCE,
-                                                                                  EVENT,
-                                                                                  DATA,
-                                                                                  TOKEN,
-                                                                                  IGNORE);
+                                                                                  CASE_DATA_CONTENT);
 
         assertThat(output, is(nullValue()));
     }

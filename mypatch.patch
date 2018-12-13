@@ -1,0 +1,205 @@
+diff --git a/src/main/java/uk/gov/hmcts/ccd/data/casedetails/CachedCaseDetailsRepository.java b/src/main/java/uk/gov/hmcts/ccd/data/casedetails/CachedCaseDetailsRepository.java
+index 1e8cf22b..024e330d 100644
+--- a/src/main/java/uk/gov/hmcts/ccd/data/casedetails/CachedCaseDetailsRepository.java
++++ b/src/main/java/uk/gov/hmcts/ccd/data/casedetails/CachedCaseDetailsRepository.java
+@@ -6,6 +6,8 @@ import org.springframework.web.context.annotation.RequestScope;
+ import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
+ import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
+ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
++import uk.gov.hmcts.ccd.domain.service.common.UIDService;
++import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+ 
+ import javax.inject.Inject;
+ import java.util.List;
+@@ -34,9 +36,13 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
+     private final Map<String, List<CaseDetails>> metaAndFieldDataHashToCaseDetails = newHashMap();
+     private final Map<String, PaginatedSearchMetadata> hashToPaginatedSearchMetadata = newHashMap();
+ 
++    private final UIDService uidService;
++
+     @Inject
+-    public CachedCaseDetailsRepository(@Qualifier(DefaultCaseDetailsRepository.QUALIFIER) CaseDetailsRepository caseDetailsRepository) {
++    public CachedCaseDetailsRepository(final @Qualifier(DefaultCaseDetailsRepository.QUALIFIER) CaseDetailsRepository caseDetailsRepository,
++                                       final UIDService uidService) {
+         this.caseDetailsRepository = caseDetailsRepository;
++        this.uidService = uidService;
+     }
+ 
+     @Override
+@@ -57,6 +63,7 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
+ 
+     @Override
+     public CaseDetails findByReference(final Long caseReference) {
++        validateUID(caseReference);
+         final Function<String, Optional<CaseDetails>> findFunction = key -> Optional.ofNullable(
+             caseDetailsRepository.findByReference(caseReference));
+         return referenceToCaseDetails.computeIfAbsent(caseReference.toString(), findFunction)
+@@ -65,11 +72,13 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
+ 
+     @Override
+     public Optional<CaseDetails> findByReference(String jurisdiction, Long reference) {
++        validateUID(reference);
+         return findByReference(jurisdiction, reference.toString());
+     }
+ 
+     @Override
+     public Optional<CaseDetails> findByReference(String jurisdiction, String reference) {
++        validateUID(reference);
+         return referenceToCaseDetails.computeIfAbsent(reference,
+                                                       key -> caseDetailsRepository.findByReference(jurisdiction,
+                                                                                                      reference));
+@@ -77,6 +86,7 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
+ 
+     @Override
+     public Optional<CaseDetails> findByReference(String reference) {
++        validateUID(reference);
+         return referenceToCaseDetails.computeIfAbsent(reference,
+                                                       key -> caseDetailsRepository.findByReference(reference));
+     }
+@@ -100,6 +110,7 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
+     public CaseDetails findUniqueCase(final String jurisdictionId,
+                                       final String caseTypeId,
+                                       final String caseReference) {
++        validateUID(caseReference);
+         return findHashToCaseDetails.computeIfAbsent(format(FIND_HASH_FORMAT, jurisdictionId, caseTypeId, caseReference),
+                                                             hash -> caseDetailsRepository.findUniqueCase(jurisdictionId, caseTypeId, caseReference));
+     }
+@@ -125,6 +136,20 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
+                                                              ));
+     }
+ 
++    private void validateUID(String id) {
++        try {
++            validateUID(Long.valueOf(id));
++        } catch (NumberFormatException nfe) {
++            throw new BadRequestException("Case reference is not valid");
++        }
++    }
++
++    private void validateUID(Long id) {
++        if (!uidService.validateUID(String.valueOf(id))) {
++            throw new BadRequestException("Case reference is not valid");
++        }
++    }
++
+     private String getMapHashCode(Map<String, String> dataSearchParams) {
+         return dataSearchParams.entrySet()
+             .stream()
+diff --git a/src/main/java/uk/gov/hmcts/ccd/data/casedetails/DefaultCaseDetailsRepository.java b/src/main/java/uk/gov/hmcts/ccd/data/casedetails/DefaultCaseDetailsRepository.java
+index 06024adb..c93fe2ad 100644
+--- a/src/main/java/uk/gov/hmcts/ccd/data/casedetails/DefaultCaseDetailsRepository.java
++++ b/src/main/java/uk/gov/hmcts/ccd/data/casedetails/DefaultCaseDetailsRepository.java
+@@ -17,11 +17,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+ import javax.inject.Inject;
+ import javax.inject.Named;
+ import javax.inject.Singleton;
+-import javax.persistence.EntityManager;
+-import javax.persistence.LockModeType;
+-import javax.persistence.PersistenceContext;
+-import javax.persistence.PersistenceException;
+-import javax.persistence.Query;
++import javax.persistence.*;
+ import java.time.LocalDateTime;
+ import java.time.ZoneOffset;
+ import java.util.HashMap;
+diff --git a/src/test/java/uk/gov/hmcts/ccd/data/casedetails/CachedCaseDetailsRepositoryTest.java b/src/test/java/uk/gov/hmcts/ccd/data/casedetails/CachedCaseDetailsRepositoryTest.java
+index 42dcc356..beb4cbf8 100644
+--- a/src/test/java/uk/gov/hmcts/ccd/data/casedetails/CachedCaseDetailsRepositoryTest.java
++++ b/src/test/java/uk/gov/hmcts/ccd/data/casedetails/CachedCaseDetailsRepositoryTest.java
+@@ -18,6 +18,7 @@ import org.mockito.MockitoAnnotations;
+ import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
+ import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
+ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
++import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+ 
+ class CachedCaseDetailsRepositoryTest {
+ 
+@@ -29,6 +30,8 @@ class CachedCaseDetailsRepositoryTest {
+ 
+     @Mock
+     private CaseDetailsRepository caseDetailsRepository;
++    @Mock
++    private UIDService uidService;
+ 
+     private CaseDetails caseDetails;
+     private List<CaseDetails> caseDetailsList;
+@@ -172,6 +175,7 @@ class CachedCaseDetailsRepositoryTest {
+         @Test
+         @DisplayName("should initially retrieve case details from decorated repository")
+         void findUniqueCase() {
++            doReturn(true).when(uidService).validateUID(String.valueOf(CASE_REFERENCE));
+             doReturn(caseDetails).when(caseDetailsRepository).findUniqueCase(JURISDICTION_ID, CASE_TYPE_ID, valueOf(CASE_REFERENCE));
+ 
+             CaseDetails returned = cachedRepository.findUniqueCase(JURISDICTION_ID, CASE_TYPE_ID, valueOf(CASE_REFERENCE));
+@@ -185,6 +189,7 @@ class CachedCaseDetailsRepositoryTest {
+         @Test
+         @DisplayName("should cache case details for subsequent calls")
+         void findUniqueCaseAgain() {
++            doReturn(true).when(uidService).validateUID(String.valueOf(CASE_REFERENCE));
+             doReturn(caseDetails).when(caseDetailsRepository).findUniqueCase(JURISDICTION_ID, CASE_TYPE_ID, valueOf(CASE_REFERENCE));
+ 
+             cachedRepository.findUniqueCase(JURISDICTION_ID, CASE_TYPE_ID, valueOf(CASE_REFERENCE));
+@@ -208,6 +213,7 @@ class CachedCaseDetailsRepositoryTest {
+         @Test
+         @DisplayName("should initially retrieve case details from decorated repository")
+         void findByReference() {
++            doReturn(true).when(uidService).validateUID(String.valueOf(CASE_REFERENCE));
+             doReturn(caseDetails).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
+ 
+             CaseDetails returned = cachedRepository.findByReference(CASE_REFERENCE);
+@@ -221,6 +227,7 @@ class CachedCaseDetailsRepositoryTest {
+         @Test
+         @DisplayName("should cache case details for subsequent calls")
+         void findByReferenceAgain() {
++            doReturn(true).when(uidService).validateUID(String.valueOf(CASE_REFERENCE));
+             doReturn(caseDetails).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
+ 
+             cachedRepository.findByReference(CASE_REFERENCE);
+@@ -244,6 +251,7 @@ class CachedCaseDetailsRepositoryTest {
+         @Test
+         @DisplayName("should initially retrieve case details from decorated repository")
+         void findById() {
++            doReturn(true).when(uidService).validateUID(String.valueOf(CASE_ID));
+             doReturn(caseDetails).when(caseDetailsRepository).findById(CASE_ID);
+ 
+             CaseDetails returned = cachedRepository.findById(CASE_ID);
+@@ -257,6 +265,7 @@ class CachedCaseDetailsRepositoryTest {
+         @Test
+         @DisplayName("should cache case details for subsequent calls")
+         void findByIdAgain() {
++            doReturn(true).when(uidService).validateUID(String.valueOf(CASE_ID));
+             doReturn(caseDetails).when(caseDetailsRepository).findById(CASE_ID);
+ 
+             cachedRepository.findById(CASE_ID);
+@@ -279,6 +288,7 @@ class CachedCaseDetailsRepositoryTest {
+         @Test
+         @DisplayName("should initially retrieve case details from decorated repository")
+         void findById() {
++            doReturn(true).when(uidService).validateUID(String.valueOf(CASE_ID));
+             doReturn(Optional.of(caseDetails)).when(caseDetailsRepository)
+                                               .findById(JURISDICTION_ID, CASE_ID);
+ 
+@@ -294,6 +304,7 @@ class CachedCaseDetailsRepositoryTest {
+         @Test
+         @DisplayName("should cache case details for subsequent calls")
+         void findByIdAgain() {
++            doReturn(true).when(uidService).validateUID(String.valueOf(CASE_ID));
+             doReturn(Optional.of(caseDetails)).when(caseDetailsRepository)
+                                               .findById(JURISDICTION_ID, CASE_ID);
+ 
+@@ -320,6 +331,7 @@ class CachedCaseDetailsRepositoryTest {
+         @Test
+         @DisplayName("should initially retrieve case details from decorated repository")
+         void findByReference() {
++            doReturn(true).when(uidService).validateUID(CASE_REFERENCE_STR);
+             doReturn(Optional.of(caseDetails)).when(caseDetailsRepository)
+                                               .findByReference(JURISDICTION_ID, CASE_REFERENCE_STR);
+ 
+@@ -335,6 +347,7 @@ class CachedCaseDetailsRepositoryTest {
+         @Test
+         @DisplayName("should cache case details for subsequent calls")
+         void findByReferenceAgain() {
++            doReturn(true).when(uidService).validateUID(CASE_REFERENCE_STR);
+             doReturn(Optional.of(caseDetails)).when(caseDetailsRepository)
+                                               .findByReference(JURISDICTION_ID, CASE_REFERENCE_STR);
+ 

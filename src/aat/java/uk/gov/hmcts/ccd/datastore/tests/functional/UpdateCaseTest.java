@@ -66,6 +66,6 @@ class UpdateCaseTest extends BaseTest {
              .body("NumberField", equalTo(UPDATED_NUMBER))
 
              // Other fields not updated
-             .body("TextField", equalTo(FullCase.TEXT));
+             .body("TextField", equalTo(AATCaseBuilder.TEXT));
     }
 }

@@ -1,13 +1,5 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
-import java.util.*;
-
-import static java.lang.String.valueOf;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.*;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -18,7 +10,14 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+
+import java.util.*;
+
+import static java.lang.String.valueOf;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.*;
 
 class CachedCaseDetailsRepositoryTest {
 
@@ -30,8 +29,6 @@ class CachedCaseDetailsRepositoryTest {
 
     @Mock
     private CaseDetailsRepository caseDetailsRepository;
-    @Mock
-    private UIDService uidService;
 
     private CaseDetails caseDetails;
     private List<CaseDetails> caseDetailsList;
@@ -175,7 +172,6 @@ class CachedCaseDetailsRepositoryTest {
         @Test
         @DisplayName("should initially retrieve case details from decorated repository")
         void findUniqueCase() {
-            doReturn(true).when(uidService).validateUID(String.valueOf(CASE_REFERENCE));
             doReturn(caseDetails).when(caseDetailsRepository).findUniqueCase(JURISDICTION_ID, CASE_TYPE_ID, valueOf(CASE_REFERENCE));
 
             CaseDetails returned = cachedRepository.findUniqueCase(JURISDICTION_ID, CASE_TYPE_ID, valueOf(CASE_REFERENCE));
@@ -189,7 +185,6 @@ class CachedCaseDetailsRepositoryTest {
         @Test
         @DisplayName("should cache case details for subsequent calls")
         void findUniqueCaseAgain() {
-            doReturn(true).when(uidService).validateUID(String.valueOf(CASE_REFERENCE));
             doReturn(caseDetails).when(caseDetailsRepository).findUniqueCase(JURISDICTION_ID, CASE_TYPE_ID, valueOf(CASE_REFERENCE));
 
             cachedRepository.findUniqueCase(JURISDICTION_ID, CASE_TYPE_ID, valueOf(CASE_REFERENCE));
@@ -213,7 +208,6 @@ class CachedCaseDetailsRepositoryTest {
         @Test
         @DisplayName("should initially retrieve case details from decorated repository")
         void findByReference() {
-            doReturn(true).when(uidService).validateUID(String.valueOf(CASE_REFERENCE));
             doReturn(caseDetails).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
 
             CaseDetails returned = cachedRepository.findByReference(CASE_REFERENCE);
@@ -227,7 +221,6 @@ class CachedCaseDetailsRepositoryTest {
         @Test
         @DisplayName("should cache case details for subsequent calls")
         void findByReferenceAgain() {
-            doReturn(true).when(uidService).validateUID(String.valueOf(CASE_REFERENCE));
             doReturn(caseDetails).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
 
             cachedRepository.findByReference(CASE_REFERENCE);
@@ -251,7 +244,6 @@ class CachedCaseDetailsRepositoryTest {
         @Test
         @DisplayName("should initially retrieve case details from decorated repository")
         void findById() {
-            doReturn(true).when(uidService).validateUID(String.valueOf(CASE_ID));
             doReturn(caseDetails).when(caseDetailsRepository).findById(CASE_ID);
 
             CaseDetails returned = cachedRepository.findById(CASE_ID);
@@ -265,7 +257,6 @@ class CachedCaseDetailsRepositoryTest {
         @Test
         @DisplayName("should cache case details for subsequent calls")
         void findByIdAgain() {
-            doReturn(true).when(uidService).validateUID(String.valueOf(CASE_ID));
             doReturn(caseDetails).when(caseDetailsRepository).findById(CASE_ID);
 
             cachedRepository.findById(CASE_ID);
@@ -288,7 +279,6 @@ class CachedCaseDetailsRepositoryTest {
         @Test
         @DisplayName("should initially retrieve case details from decorated repository")
         void findById() {
-            doReturn(true).when(uidService).validateUID(String.valueOf(CASE_ID));
             doReturn(Optional.of(caseDetails)).when(caseDetailsRepository)
                                               .findById(JURISDICTION_ID, CASE_ID);
 
@@ -304,7 +294,6 @@ class CachedCaseDetailsRepositoryTest {
         @Test
         @DisplayName("should cache case details for subsequent calls")
         void findByIdAgain() {
-            doReturn(true).when(uidService).validateUID(String.valueOf(CASE_ID));
             doReturn(Optional.of(caseDetails)).when(caseDetailsRepository)
                                               .findById(JURISDICTION_ID, CASE_ID);
 
@@ -331,7 +320,6 @@ class CachedCaseDetailsRepositoryTest {
         @Test
         @DisplayName("should initially retrieve case details from decorated repository")
         void findByReference() {
-            doReturn(true).when(uidService).validateUID(CASE_REFERENCE_STR);
             doReturn(Optional.of(caseDetails)).when(caseDetailsRepository)
                                               .findByReference(JURISDICTION_ID, CASE_REFERENCE_STR);
 
@@ -347,7 +335,6 @@ class CachedCaseDetailsRepositoryTest {
         @Test
         @DisplayName("should cache case details for subsequent calls")
         void findByReferenceAgain() {
-            doReturn(true).when(uidService).validateUID(CASE_REFERENCE_STR);
             doReturn(Optional.of(caseDetails)).when(caseDetailsRepository)
                                               .findByReference(JURISDICTION_ID, CASE_REFERENCE_STR);
 
