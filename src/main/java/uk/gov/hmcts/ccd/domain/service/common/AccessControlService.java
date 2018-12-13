@@ -106,10 +106,7 @@ public class AccessControlService {
     public boolean canAccessCaseViewFieldWithCriteria(final CaseViewField caseViewField,
                                                       final Set<String> userRoles,
                                                       final Predicate<AccessControlList> criteria) {
-        if (!hasAccessControlList(userRoles, criteria, caseViewField.getAccessControlLists())) {
-            return false;
-        }
-        return true;
+        return hasAccessControlList(userRoles, criteria, caseViewField.getAccessControlLists());
     }
 
     public boolean canAccessCaseFieldsForUpsert(final JsonNode newData,
