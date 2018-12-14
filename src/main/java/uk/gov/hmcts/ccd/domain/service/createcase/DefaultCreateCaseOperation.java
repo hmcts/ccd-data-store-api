@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway;
+import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
@@ -63,7 +63,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
                                       final CaseTypeService caseTypeService,
                                       final CallbackInvoker callbackInvoker,
                                       final ValidateCaseFieldsOperation validateCaseFieldsOperation,
-                                      @Qualifier(DefaultDraftGateway.QUALIFIER) final DraftGateway draftGateway) {
+                                      @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway) {
         this.userRepository = userRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.eventTriggerService = eventTriggerService;

@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
@@ -19,15 +20,15 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
-import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.sameInstance;
@@ -45,15 +46,11 @@ class AuthorisedGetEventTriggerOperationTest {
     private static final String CASEWORKER_DIVORCE = "caseworker-divorce-loa3";
 
     private static final String EVENT_TRIGGER_ID = "testEventTriggerId";
-    private static final String UID = "123";
-    private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_REFERENCE = "1234567891012345";
     private static final Long CASE_REFERENCE_LONG = 1234567891012345L;
     private static final String CASE_TYPE_ID = "Grant";
     private static final String STATE = "CaseCreated";
-    private static final Map<String, JsonNode> DATA = new HashMap<>();
     private static final Boolean IGNORE = Boolean.TRUE;
-    private static final Event NULL_EVENT = null;
 
     @Mock
     private GetEventTriggerOperation getEventTriggerOperation;
@@ -67,7 +64,7 @@ class AuthorisedGetEventTriggerOperationTest {
     private AccessControlService accessControlService;
 
     @Mock
-    private UIDService uidService;
+    private DraftGateway draftGateway;
 
     @Mock
     private EventTriggerService eventTriggerService;
@@ -97,7 +94,7 @@ class AuthorisedGetEventTriggerOperationTest {
             userRepository,
             accessControlService,
             eventTriggerService,
-            uidService);
+            draftGateway);
         caseEventTrigger = new CaseEventTrigger();
 
         caseType.setId(CASE_TYPE_ID);
@@ -121,7 +118,6 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                   eq(caseFields),
                                                                   eq(userRoles),
                                                                   eq(CAN_CREATE))).thenReturn(true);
-        when(uidService.validateUID(anyString())).thenReturn(true);
 
         CaseEvent caseEvent = new CaseEvent();
         when(eventTriggerService.findCaseEvent(eq(caseType), eq(EVENT_TRIGGER_ID))).thenReturn(caseEvent);
@@ -256,7 +252,6 @@ class AuthorisedGetEventTriggerOperationTest {
 
         @BeforeEach
         void setUp() {
-            doReturn(true).when(uidService).validateUID(CASE_REFERENCE);
             doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
 
             doReturn(caseEventTrigger).when(getEventTriggerOperation).executeForCase(CASE_REFERENCE,
@@ -402,9 +397,9 @@ class AuthorisedGetEventTriggerOperationTest {
         }
 
         @Test
-        @DisplayName("should fail if case reference is invalid")
+        @DisplayName("should fail if case reference is not found")
         void shouldThrowExceptionIfCaseReferenceNotFound() {
-            doReturn(null).when(caseDetailsRepository).findByReference(CASE_REFERENCE_LONG);
+            doReturn(Optional.empty()).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
             assertThrows(
                 ResourceNotFoundException.class, () -> authorisedGetEventTriggerOperation.executeForCase(CASE_REFERENCE,
                                                                                                          EVENT_TRIGGER_ID,
@@ -413,12 +408,11 @@ class AuthorisedGetEventTriggerOperationTest {
         }
 
         @Test
-        @DisplayName("should fail if case id is invalid")
-        void shouldFailIfCaseIDIsInvalid() {
-            when(uidService.validateUID(anyString())).thenReturn(false);
-
+        @DisplayName("should fail if case reference is invalid")
+        void shouldThrowExceptionIfCaseReferenceInvalid() {
+            doThrow(NumberFormatException.class).when(caseDetailsRepository).findByReference("invalidReference");
             assertThrows(
-                BadRequestException.class, () -> authorisedGetEventTriggerOperation.executeForCase(CASE_REFERENCE,
+                BadRequestException.class, () -> authorisedGetEventTriggerOperation.executeForCase("invalidReference",
                                                                                                    EVENT_TRIGGER_ID,
                                                                                                    IGNORE)
             );

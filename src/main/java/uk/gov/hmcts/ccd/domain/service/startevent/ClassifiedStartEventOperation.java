@@ -6,9 +6,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
+import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
@@ -23,16 +26,18 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
     private final SecurityClassificationService classificationService;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseDataService caseDataService;
-
+    private final DraftGateway draftGateway;
 
     public ClassifiedStartEventOperation(@Qualifier("default") StartEventOperation startEventOperation,
                                          SecurityClassificationService classificationService,
                                          @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
-                                         final CaseDataService caseDataService) {
+                                         final CaseDataService caseDataService,
+                                         @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway) {
         this.startEventOperation = startEventOperation;
         this.classificationService = classificationService;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.caseDataService = caseDataService;
+        this.draftGateway = draftGateway;
     }
 
     @Override
@@ -50,15 +55,12 @@ public class ClassifiedStartEventOperation implements StartEventOperation {
     }
 
     @Override
-    public StartEventTrigger triggerStartForDraft(String uid, String jurisdictionId, String caseTypeId, String draftReference, String eventTriggerId,
+    public StartEventTrigger triggerStartForDraft(String draftReference,
                                                   Boolean ignoreWarning) {
-        return applyClassificationIfCaseDetailsExist(deduceDefaultClassificationsForDraft(startEventOperation.triggerStartForDraft(uid,
-                                                                                                                                   jurisdictionId,
-                                                                                                                                   caseTypeId,
-                                                                                                                                   draftReference,
-                                                                                                                                   eventTriggerId,
+        final CaseDetails caseDetails = draftGateway.getCaseDetails(Draft.stripId(draftReference));
+        return applyClassificationIfCaseDetailsExist(deduceDefaultClassificationsForDraft(startEventOperation.triggerStartForDraft(draftReference,
                                                                                                                                    ignoreWarning),
-                                                                                          caseTypeId));
+                                                                                          caseDetails.getCaseTypeId()));
     }
 
     private StartEventTrigger deduceDefaultClassificationsForDraft(StartEventTrigger startEventTrigger, String caseTypeId) {

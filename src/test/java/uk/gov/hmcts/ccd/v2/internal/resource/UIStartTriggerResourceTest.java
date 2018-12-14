@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
+import uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -12,7 +13,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.beans.HasPropertyWithValue.hasProperty;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventTriggerBuilder.anEventTrigger;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageBuilder.newWizardPage;
 
@@ -41,7 +41,7 @@ class UIStartTriggerResourceTest {
 
 
     private CaseEventTrigger newCaseEventTrigger() {
-        return anEventTrigger()
+        return TestBuildersUtil.CaseEventTriggerBuilder.newCaseEventTrigger()
             .withId(ID)
             .withName(NAME)
             .withDescription(DESCRIPTION)
@@ -69,7 +69,7 @@ class UIStartTriggerResourceTest {
         @Test
         @DisplayName("should copy case event trigger")
         void shouldCopyCaseDetails() {
-            final UIStartTriggerResource uiStartTriggerResource = new UIStartTriggerResource(caseEventTrigger, CASE_TYPE_ID, ignoreWarning, false);
+            final UIStartTriggerResource uiStartTriggerResource = UIStartTriggerResource.forCaseType(caseEventTrigger, CASE_TYPE_ID, ignoreWarning);
 
             assertAll(
                 () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getId(), equalTo(ID)),
@@ -90,7 +90,7 @@ class UIStartTriggerResourceTest {
         @Test
         @DisplayName("should link to itself")
         void shouldLinkToSelf() {
-            final UIStartTriggerResource uiStartTriggerResource = new UIStartTriggerResource(caseEventTrigger, CASE_TYPE_ID, ignoreWarning, false);
+            final UIStartTriggerResource uiStartTriggerResource = UIStartTriggerResource.forCaseType(caseEventTrigger, CASE_TYPE_ID, ignoreWarning);
 
             assertThat(uiStartTriggerResource.getLink("self").getHref(), equalTo(linkSelfForCase));
         }
@@ -103,15 +103,10 @@ class UIStartTriggerResourceTest {
         private final Long caseReference = 1111222233334444L;
         private final String linkSelfForEvent = String.format("/internal/cases/%s/event-triggers/%s?ignore-warning=true", caseReference, ID);
 
-        @BeforeEach
-        void setUp() {
-            caseEventTrigger.setCaseId(caseReference.toString());
-        }
-
         @Test
         @DisplayName("should copy case event trigger")
         void shouldCopyCaseDetails() {
-            final UIStartTriggerResource uiStartTriggerResource = new UIStartTriggerResource(caseEventTrigger, CASE_TYPE_ID, ignoreWarning, true);
+            final UIStartTriggerResource uiStartTriggerResource = UIStartTriggerResource.forCase(caseEventTrigger, caseReference.toString(), ignoreWarning);
 
             assertAll(
                 () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getId(), equalTo(ID)),
@@ -132,7 +127,44 @@ class UIStartTriggerResourceTest {
         @Test
         @DisplayName("should link to itself")
         void shouldLinkToSelf() {
-            final UIStartTriggerResource uiStartTriggerResource = new UIStartTriggerResource(caseEventTrigger, CASE_TYPE_ID, ignoreWarning, true);
+            final UIStartTriggerResource uiStartTriggerResource = UIStartTriggerResource.forCase(caseEventTrigger, caseReference.toString(), ignoreWarning);
+
+            assertThat(uiStartTriggerResource.getLink("self").getHref(), equalTo(linkSelfForEvent));
+        }
+
+    }
+
+    @Nested
+    @DisplayName("Start draft trigger")
+    class StartTriggerForD {
+        private final String draftReference = "DRAFT127";
+        private final String linkSelfForEvent = String.format("/internal/drafts/%s/event-trigger?ignore-warning=true", draftReference, ID);
+
+        @Test
+        @DisplayName("should copy case event trigger")
+        void shouldCopyCaseDetails() {
+            final UIStartTriggerResource uiStartTriggerResource = UIStartTriggerResource.forDraft(caseEventTrigger, draftReference, ignoreWarning);
+
+            assertAll(
+                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getId(), equalTo(ID)),
+                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getName(), equalTo(NAME)),
+                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getDescription(), equalTo(DESCRIPTION)),
+                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getCaseId(), equalTo(CASE_ID)),
+                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getCaseFields(), hasItems(hasProperty("id", is(FIELD_ID)))),
+                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getEventToken(), equalTo(TOKEN)),
+                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getWizardPages().get(0).getWizardPageFields().get(0),
+                                 hasProperty("caseFieldId", is(FIELD_ID))),
+                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getShowSummary(), equalTo(IS_SHOW_SUMMARY)),
+                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getShowEventNotes(), equalTo(IS_SHOW_EVENT_NOTES)),
+                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getEndButtonLabel(), equalTo(END_BUTTON_LABEL)),
+                () -> assertThat(uiStartTriggerResource.getCaseEventTrigger().getCanSaveDraft(), equalTo(IS_SAVE_DRAFT))
+            );
+        }
+
+        @Test
+        @DisplayName("should link to itself")
+        void shouldLinkToSelf() {
+            final UIStartTriggerResource uiStartTriggerResource = UIStartTriggerResource.forDraft(caseEventTrigger, draftReference, ignoreWarning);
 
             assertThat(uiStartTriggerResource.getLink("self").getHref(), equalTo(linkSelfForEvent));
         }

@@ -8,9 +8,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 
@@ -20,15 +22,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 
 class ClassifiedStartEventOperationTest {
 
-    private static final String UID = "23";
-    private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_TYPE_ID = "GrantOnly";
     private static final String CASE_REFERENCE = "1234123412341234";
     private static final String DRAFT_REFERENCE = "1";
@@ -47,6 +46,9 @@ class ClassifiedStartEventOperationTest {
     @Mock
     private CaseDataService caseDataService;
 
+    @Mock
+    private DraftGateway draftGateway;
+
     private ClassifiedStartEventOperation classifiedStartEventOperation;
 
     private CaseDetails caseDetails;
@@ -58,7 +60,7 @@ class ClassifiedStartEventOperationTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        caseDetails = newCaseDetails().build();
+        caseDetails = newCaseDetails().withCaseTypeId(CASE_TYPE_ID).build();
         startEvent = new StartEventTrigger();
         startEvent.setCaseDetails(caseDetails);
         caseType = newCaseType().build();
@@ -69,7 +71,8 @@ class ClassifiedStartEventOperationTest {
         classifiedStartEventOperation = new ClassifiedStartEventOperation(startEventOperation,
                                                                           classificationService,
                                                                           caseDefinitionRepository,
-                                                                          caseDataService);
+                                                                          caseDataService,
+                                                                          draftGateway);
     }
 
     @Nested
@@ -175,28 +178,25 @@ class ClassifiedStartEventOperationTest {
         @BeforeEach
         void setUp() {
             doReturn(caseType).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
-            doReturn(startEvent).when(startEventOperation).triggerStartForDraft(UID,
-                                                                                JURISDICTION_ID,
-                                                                                CASE_TYPE_ID,
-                                                                                DRAFT_REFERENCE,
-                                                                                EVENT_TRIGGER_ID,
+            doReturn(startEvent).when(startEventOperation).triggerStartForDraft(DRAFT_REFERENCE,
                                                                                 IGNORE_WARNING);
+            when(draftGateway.getCaseDetails(Draft.stripId(DRAFT_REFERENCE))).thenReturn(caseDetails);
         }
 
         @Test
         @DisplayName("should call decorated start event operation as is")
         void shouldCallDecoratedStartEventOperation() {
 
-            classifiedStartEventOperation.triggerStartForDraft(UID, JURISDICTION_ID, CASE_TYPE_ID, DRAFT_REFERENCE, EVENT_TRIGGER_ID, IGNORE_WARNING);
+            classifiedStartEventOperation.triggerStartForDraft(DRAFT_REFERENCE, IGNORE_WARNING);
 
-            verify(startEventOperation).triggerStartForDraft(UID, JURISDICTION_ID, CASE_TYPE_ID, DRAFT_REFERENCE, EVENT_TRIGGER_ID, IGNORE_WARNING);
+            verify(startEventOperation).triggerStartForDraft(DRAFT_REFERENCE, IGNORE_WARNING);
         }
 
         @Test
         @DisplayName("should derive default classifications from case type")
         void shouldDeriveDefaultClassificationsFromCaseType() {
 
-            classifiedStartEventOperation.triggerStartForDraft(UID, JURISDICTION_ID, CASE_TYPE_ID, DRAFT_REFERENCE, EVENT_TRIGGER_ID, IGNORE_WARNING);
+            classifiedStartEventOperation.triggerStartForDraft(DRAFT_REFERENCE, IGNORE_WARNING);
 
             assertAll(
                 () -> verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
@@ -209,11 +209,7 @@ class ClassifiedStartEventOperationTest {
         void shouldReturnEventTriggerWhenCaseDetailsNull() {
             startEvent.setCaseDetails(null);
 
-            final StartEventTrigger output = classifiedStartEventOperation.triggerStartForDraft(UID,
-                                                                                                JURISDICTION_ID,
-                                                                                                CASE_TYPE_ID,
-                                                                                                DRAFT_REFERENCE,
-                                                                                                EVENT_TRIGGER_ID,
+            final StartEventTrigger output = classifiedStartEventOperation.triggerStartForDraft(DRAFT_REFERENCE,
                                                                                                 IGNORE_WARNING);
 
             assertAll(
@@ -226,11 +222,7 @@ class ClassifiedStartEventOperationTest {
         @DisplayName("should return event trigger with classified case details when not null")
         void shouldReturnEventTriggerWithClassifiedCaseDetails() {
 
-            final StartEventTrigger output = classifiedStartEventOperation.triggerStartForDraft(UID,
-                                                                                                JURISDICTION_ID,
-                                                                                                CASE_TYPE_ID,
-                                                                                                DRAFT_REFERENCE,
-                                                                                                EVENT_TRIGGER_ID,
+            final StartEventTrigger output = classifiedStartEventOperation.triggerStartForDraft(DRAFT_REFERENCE,
                                                                                                 IGNORE_WARNING);
 
             assertAll(

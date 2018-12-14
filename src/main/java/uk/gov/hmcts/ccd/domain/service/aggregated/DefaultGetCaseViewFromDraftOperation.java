@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
-import uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway;
+import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
@@ -46,7 +46,7 @@ public class DefaultGetCaseViewFromDraftOperation extends AbstractDefaultGetCase
                                                 final UIDefinitionRepository uiDefinitionRepository,
                                                 final CaseTypeService caseTypeService,
                                                 final UIDService uidService,
-                                                @Qualifier(DefaultDraftGateway.QUALIFIER) final DraftGateway draftGateway,
+                                                @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway,
                                                 final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder) {
         super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService);
         this.draftGateway = draftGateway;

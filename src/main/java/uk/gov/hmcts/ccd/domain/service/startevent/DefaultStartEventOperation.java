@@ -8,13 +8,12 @@ import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway;
+import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.DraftResponseToCaseDetailsBuilder;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
@@ -44,19 +43,17 @@ public class DefaultStartEventOperation implements StartEventOperation {
     private final UserAuthorisation userAuthorisation;
     private final CallbackInvoker callbackInvoker;
     private final UIDService uidService;
-    private final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder;
 
     @Autowired
     public DefaultStartEventOperation(final EventTokenService eventTokenService,
                                       @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
                                       @Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
-                                      @Qualifier(DefaultDraftGateway.QUALIFIER) final DraftGateway draftGateway,
+                                      @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway,
                                       final EventTriggerService eventTriggerService,
                                       final CaseService caseService,
                                       final UserAuthorisation userAuthorisation,
                                       final CallbackInvoker callbackInvoker,
-                                      final UIDService uidService,
-                                      final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder) {
+                                      final UIDService uidService) {
 
         this.eventTokenService = eventTokenService;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -67,7 +64,6 @@ public class DefaultStartEventOperation implements StartEventOperation {
         this.userAuthorisation = userAuthorisation;
         this.callbackInvoker = callbackInvoker;
         this.uidService = uidService;
-        this.draftResponseToCaseDetailsBuilder = draftResponseToCaseDetailsBuilder;
     }
 
     @Override
@@ -93,7 +89,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
 
         final CaseDetails caseDetails = getCaseDetails(caseReference);
 
-        String uid = userAuthorisation.getUserId();
+        final String uid = userAuthorisation.getUserId();
 
         final CaseType caseType = getCaseType(caseDetails.getCaseTypeId());
 
@@ -110,19 +106,20 @@ public class DefaultStartEventOperation implements StartEventOperation {
     }
 
     @Override
-    public StartEventTrigger triggerStartForDraft(final String uid,
-                                                  final String jurisdictionId,
-                                                  final String caseTypeId,
-                                                  final String draftReference,
-                                                  final String eventTriggerId,
+    public StartEventTrigger triggerStartForDraft(final String draftReference,
                                                   final Boolean ignoreWarning) {
-        final CaseType caseType = getCaseType(caseTypeId);
+        final DraftResponse draftResponse = draftGateway.get(Draft.stripId(draftReference));
+        final CaseDetails caseDetails = draftGateway.getCaseDetails(Draft.stripId(draftReference));
+
+        final String uid = userAuthorisation.getUserId();
+
+        final CaseType caseType = getCaseType(caseDetails.getCaseTypeId());
 
         return buildStartEventTrigger(uid,
                                       caseType,
-                                      eventTriggerId,
+                                      draftResponse.getDocument().getEventTriggerId(),
                                       ignoreWarning,
-                                      () -> getDraftDetails(draftReference));
+                                      () -> caseDetails);
     }
 
     private StartEventTrigger buildStartEventTrigger(final String uid,
@@ -159,11 +156,6 @@ public class DefaultStartEventOperation implements StartEventOperation {
 
         return caseDetailsRepository.findByReference(caseReference).orElseThrow(
             () -> new CaseNotFoundException(caseReference));
-    }
-
-    private CaseDetails getDraftDetails(String draftId) {
-        final DraftResponse draftResponse = draftGateway.get(Draft.stripId(draftId));
-        return draftResponseToCaseDetailsBuilder.build(draftResponse);
     }
 
     private CaseEvent getEventTrigger(String eventTriggerId, CaseType caseType) {
