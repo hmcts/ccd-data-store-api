@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -28,6 +29,7 @@ import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataBuilder.newCaseData;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
+@DisplayName("CaseDataValidatorControllerTest")
 class CaseDataValidatorControllerTest {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -62,23 +64,27 @@ class CaseDataValidatorControllerTest {
         when(midEventCallback.invoke(CASE_TYPE_ID, EVENT_DATA, PAGE_ID)).thenReturn(DATA_NODE);
     }
 
-    @Test
-    @DisplayName("should return 200 when case data valid")
-    void shouldPassIfCaseDataValid() {
-        final ResponseEntity<CaseDataResource> response = caseDataValidatorController.validate(CASE_TYPE_ID, PAGE_ID, EVENT_DATA);
+    @Nested
+    @DisplayName("POST /case-types/{caseTypeId}/validate")
+    class PostCaseDataValidate {
 
-        assertAll(
-            () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
-            () -> assertThat(response.getBody().getData(), is(UNWRAPPED_DATA_NODE))
-        );
+        @Test
+        @DisplayName("should return 200 when case data valid")
+        void shouldPassIfCaseDataValid() {
+            final ResponseEntity<CaseDataResource> response = caseDataValidatorController.validate(CASE_TYPE_ID, PAGE_ID, EVENT_DATA);
+
+            assertAll(
+                () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
+                () -> assertThat(response.getBody().getData(), is(UNWRAPPED_DATA_NODE))
+            );
+        }
+
+        @Test
+        @DisplayName("should propagate exception")
+        void shouldPropagateExceptionWhenThrown() {
+            when(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, EVENT_DATA)).thenThrow(Exception.class);
+
+            assertThrows(Exception.class, () -> caseDataValidatorController.validate(CASE_TYPE_ID, PAGE_ID, EVENT_DATA));
+        }
     }
-
-    @Test
-    @DisplayName("should propagate exception")
-    void shouldPropagateExceptionWhenThrown() {
-        when(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, EVENT_DATA)).thenThrow(Exception.class);
-
-        assertThrows(Exception.class, () -> caseDataValidatorController.validate(CASE_TYPE_ID, PAGE_ID, EVENT_DATA));
-    }
-
 }
