@@ -1,7 +1,11 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
@@ -18,7 +22,7 @@ import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
-import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchCaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 
@@ -38,11 +42,11 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
     @Autowired
     public AuthorisedCaseSearchOperation(
         @Qualifier(ElasticsearchCaseSearchOperation.QUALIFIER) CaseSearchOperation caseSearchOperation,
-            AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService,
-            AccessControlService accessControlService,
-            SecurityClassificationService classificationService,
-            ObjectMapperService objectMapperService,
-            @Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository) {
+        AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService,
+        AccessControlService accessControlService,
+        SecurityClassificationService classificationService,
+        ObjectMapperService objectMapperService,
+        @Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository) {
 
         this.caseSearchOperation = caseSearchOperation;
         this.authorisedCaseDefinitionDataService = authorisedCaseDefinitionDataService;
@@ -53,34 +57,58 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
     }
 
     @Override
-    public CaseSearchResult execute(CaseSearchRequest caseSearchRequest) {
-        return authorisedCaseDefinitionDataService
-            .getAuthorisedCaseType(caseSearchRequest.getCaseTypeId(), CAN_READ)
-            .map(caseType -> searchCasesAndFilterFieldsByAccess(caseType, caseSearchRequest))
-            .orElse(CaseSearchResult.EMPTY);
+    public CaseSearchResult execute(CrossCaseTypeSearchRequest searchRequest) {
+        List<CaseType> authorisedCaseTypes = getAuthorisedCaseTypes(searchRequest);
+        CrossCaseTypeSearchRequest authorisedSearchRequest = createAuthorisedSearchRequest(authorisedCaseTypes, searchRequest);
+
+        return searchCasesAndFilterFieldsByAccess(authorisedCaseTypes, authorisedSearchRequest);
     }
 
-    private CaseSearchResult searchCasesAndFilterFieldsByAccess(CaseType caseType, CaseSearchRequest caseSearchRequest) {
-        CaseSearchResult result = caseSearchOperation.execute(caseSearchRequest);
-        filterFieldsByAccess(caseType, result.getCases());
+    private List<CaseType> getAuthorisedCaseTypes(CrossCaseTypeSearchRequest searchRequest) {
+        return searchRequest.getCaseTypeIds()
+            .stream()
+            .map(caseTypeId -> authorisedCaseDefinitionDataService.getAuthorisedCaseType(caseTypeId, CAN_READ).orElse(null))
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
+    }
+
+    private CrossCaseTypeSearchRequest createAuthorisedSearchRequest(List<CaseType> authorisedCaseTypes, CrossCaseTypeSearchRequest originalSearchRequest) {
+        List<String> authorisedCaseTypeIds = authorisedCaseTypes.stream().map(CaseType::getId).collect(Collectors.toList());
+        return new CrossCaseTypeSearchRequest(authorisedCaseTypeIds, originalSearchRequest.getSearchRequestJsonNode());
+    }
+
+    private CaseSearchResult searchCasesAndFilterFieldsByAccess(List<CaseType> authorisedCaseTypes, CrossCaseTypeSearchRequest authorisedSearchRequest) {
+        if (authorisedCaseTypes.isEmpty()) {
+            return CaseSearchResult.EMPTY;
+        }
+
+        CaseSearchResult result = caseSearchOperation.execute(authorisedSearchRequest);
+        filterFieldsByAccess(authorisedCaseTypes, result.getCases());
+
         return result;
     }
 
-    private void filterFieldsByAccess(CaseType caseType, List<CaseDetails> cases) {
-        cases.forEach(caseDetails -> {
-            filterCaseFieldsByAclAccess(caseType, caseDetails);
-            filterCaseFieldsBySecurityClassification(caseDetails);
-        });
-    }
+    private void filterFieldsByAccess(List<CaseType> authorisedCaseTypes, List<CaseDetails> cases) {
+        Map<String, CaseType> caseTypeIdByCaseType = authorisedCaseTypes
+            .stream()
+            .collect(Collectors.toMap(CaseType::getId, Function.identity()));
 
-    private void filterCaseFieldsByAclAccess(CaseType caseType, CaseDetails caseDetails) {
-        JsonNode data = objectMapperService.convertObjectToJsonNode(caseDetails.getData());
-        JsonNode filteredData = accessControlService.filterCaseFieldsByAccess(data, caseType.getCaseFields(), getUserRoles(), CAN_READ);
-        caseDetails.setData(objectMapperService.convertJsonNodeToMap(filteredData));
+        cases.stream()
+            .filter(caseDetails -> caseTypeIdByCaseType.containsKey(caseDetails.getCaseTypeId()))
+            .forEach(caseDetails -> {
+                filterCaseFieldsByAclAccess(caseTypeIdByCaseType.get(caseDetails.getCaseTypeId()), caseDetails);
+                filterCaseFieldsBySecurityClassification(caseDetails);
+            });
     }
 
     private void filterCaseFieldsBySecurityClassification(CaseDetails caseDetails) {
         classificationService.applyClassification(caseDetails);
+    }
+
+    private void filterCaseFieldsByAclAccess(CaseType authorisedCaseType, CaseDetails caseDetails) {
+        JsonNode data = objectMapperService.convertObjectToJsonNode(caseDetails.getData());
+        JsonNode filteredData = accessControlService.filterCaseFieldsByAccess(data, authorisedCaseType.getCaseFields(), getUserRoles(), CAN_READ);
+        caseDetails.setData(objectMapperService.convertJsonNodeToMap(filteredData));
     }
 
     private Set<String> getUserRoles() {
