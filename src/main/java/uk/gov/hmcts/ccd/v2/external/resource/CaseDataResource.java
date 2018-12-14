@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.v2.internal.resource;
+package uk.gov.hmcts.ccd.v2.external.resource;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.springframework.hateoas.ResourceSupport;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
-import uk.gov.hmcts.ccd.v2.internal.controller.UICaseValidatorController;
+import uk.gov.hmcts.ccd.v2.external.controller.CaseDataValidatorController;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
@@ -16,16 +16,16 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class UICaseDataResource extends ResourceSupport {
+public class CaseDataResource extends ResourceSupport {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private JsonNode data;
 
-    public UICaseDataResource(@NonNull CaseDataContent caseData, String caseTypeId, String pageId) {
+    public CaseDataResource(@NonNull CaseDataContent caseData, String caseTypeId, String pageId) {
         copyProperties(caseData);
 
-        add(linkTo(methodOn(UICaseValidatorController.class).validate(caseTypeId, pageId, caseData)).withSelfRel());
+        add(linkTo(methodOn(CaseDataValidatorController.class).validate(caseTypeId, pageId, caseData)).withSelfRel());
     }
 
     private void copyProperties(CaseDataContent caseData) {

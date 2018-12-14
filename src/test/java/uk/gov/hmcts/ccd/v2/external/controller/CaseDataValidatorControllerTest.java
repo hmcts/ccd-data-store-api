@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.v2.internal.controller;
+package uk.gov.hmcts.ccd.v2.external.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,7 +15,7 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.createevent.MidEventCallback;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
-import uk.gov.hmcts.ccd.v2.internal.resource.UICaseDataResource;
+import uk.gov.hmcts.ccd.v2.external.resource.CaseDataResource;
 
 import java.util.Map;
 
@@ -28,7 +28,7 @@ import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataBuilder.newCaseData;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
-class UICaseValidatorControllerTest {
+class CaseDataValidatorControllerTest {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final String CASE_TYPE_ID = "TestAddressBookCase";
@@ -53,7 +53,7 @@ class UICaseValidatorControllerTest {
     private MidEventCallback midEventCallback;
 
     @InjectMocks
-    private UICaseValidatorController uiCaseValidatorController;
+    private CaseDataValidatorController caseDataValidatorController;
 
     @BeforeEach
     void setUp() {
@@ -65,7 +65,7 @@ class UICaseValidatorControllerTest {
     @Test
     @DisplayName("should return 200 when case data valid")
     void shouldPassIfCaseDataValid() {
-        final ResponseEntity<UICaseDataResource> response = uiCaseValidatorController.validate(CASE_TYPE_ID, PAGE_ID, EVENT_DATA);
+        final ResponseEntity<CaseDataResource> response = caseDataValidatorController.validate(CASE_TYPE_ID, PAGE_ID, EVENT_DATA);
 
         assertAll(
             () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
@@ -78,7 +78,7 @@ class UICaseValidatorControllerTest {
     void shouldPropagateExceptionWhenThrown() {
         when(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, EVENT_DATA)).thenThrow(Exception.class);
 
-        assertThrows(Exception.class, () -> uiCaseValidatorController.validate(CASE_TYPE_ID, PAGE_ID, EVENT_DATA));
+        assertThrows(Exception.class, () -> caseDataValidatorController.validate(CASE_TYPE_ID, PAGE_ID, EVENT_DATA));
     }
 
 }
