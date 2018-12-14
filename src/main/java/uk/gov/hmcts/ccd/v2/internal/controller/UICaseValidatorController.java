@@ -35,8 +35,7 @@ public class UICaseValidatorController {
         this.midEventCallback = midEventCallback;
     }
 
-    @RequestMapping(
-        method = RequestMethod.POST,
+    @PostMapping(
         path = "/case-types/{caseTypeId}/validate",
         headers = {
             V2.EXPERIMENTAL_HEADER
