@@ -1,13 +1,18 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.searchbox.client.JestClient;
+import io.searchbox.core.MultiSearch;
+import io.searchbox.core.MultiSearchResult;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
 import org.jooq.lambda.Unchecked;
@@ -49,8 +54,8 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     }
 
     @Override
-    public CaseSearchResult execute(CaseSearchRequest caseSearchRequest) {
-        SearchResult result = search(caseSearchRequest);
+    public CaseSearchResult execute(CrossCaseTypeSearchRequest request) {
+        MultiSearchResult result = search(request);
         if (result.isSucceeded()) {
             return toCaseDetailsSearchResult(result);
         } else {
@@ -58,28 +63,39 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
         }
     }
 
-    private SearchResult search(CaseSearchRequest caseSearchRequest) {
-        Search searchRequest = secureAndTransformSearchRequest(caseSearchRequest);
+    private MultiSearchResult search(CrossCaseTypeSearchRequest request) {
+        MultiSearch multiSearchAction = secureAndTransformSearchRequest(request);
         try {
-            return jestClient.execute(searchRequest);
+            return jestClient.execute(multiSearchAction);
         } catch (IOException e) {
             throw new ServiceException("Exception executing Elasticsearch : " + e.getMessage(), e);
         }
     }
 
-    private Search secureAndTransformSearchRequest(CaseSearchRequest caseSearchRequest) {
-        CaseSearchRequest securedSearchRequest = caseSearchRequestSecurity.createSecuredSearchRequest(caseSearchRequest);
-        return new Search.Builder(securedSearchRequest.toJsonString())
-            .addIndex(getCaseIndexName(caseSearchRequest.getCaseTypeId()))
-            .addType(getCaseIndexType())
-            .build();
+    private MultiSearch secureAndTransformSearchRequest(CrossCaseTypeSearchRequest request) {
+        Collection<Search> searches = request.getCaseSearchRequests().stream().map(caseSearchRequest -> {
+            CaseSearchRequest securedSearchRequest = caseSearchRequestSecurity.createSecuredSearchRequest(caseSearchRequest);
+            return new Search.Builder(securedSearchRequest.toJsonString())
+                .addIndex(getCaseIndexName(caseSearchRequest.getCaseTypeId()))
+                .addType(getCaseIndexType())
+                .build();
+        }).collect(Collectors.toList());
+
+        return new MultiSearch.Builder(searches).build();
     }
 
-    private CaseSearchResult toCaseDetailsSearchResult(SearchResult result) {
-        List<String> casesAsString = result.getSourceAsStringList();
-        List<ElasticSearchCaseDetailsDTO> dtos = toElasticSearchCasesDTO(casesAsString);
-        List<CaseDetails> caseDetails = caseDetailsMapper.dtosToCaseDetailsList(dtos);
-        return new CaseSearchResult(result.getTotal(), caseDetails);
+    private CaseSearchResult toCaseDetailsSearchResult(MultiSearchResult multiSearchResult) {
+        long totalHits = 0;
+        List<CaseDetails> caseDetails = new ArrayList<>();
+        for (MultiSearchResult.MultiSearchResponse response : multiSearchResult.getResponses()) {
+            SearchResult searchResult = response.searchResult;
+            List<String> casesAsString = searchResult.getSourceAsStringList();
+            List<ElasticSearchCaseDetailsDTO> dtos = toElasticSearchCasesDTO(casesAsString);
+            caseDetails.addAll(caseDetailsMapper.dtosToCaseDetailsList(dtos));
+
+            totalHits += searchResult.getTotal();
+        }
+        return new CaseSearchResult(totalHits, caseDetails);
     }
 
     private List<ElasticSearchCaseDetailsDTO> toElasticSearchCasesDTO(List<String> cases) {

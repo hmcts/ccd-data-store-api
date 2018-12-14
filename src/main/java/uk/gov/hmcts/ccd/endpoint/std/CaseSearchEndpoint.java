@@ -8,17 +8,26 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.AuthorisedCaseSearchOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
@@ -50,15 +59,19 @@ public class CaseSearchEndpoint {
     })
     public CaseSearchResult searchCases(
         @ApiParam(value = "Case type ID", required = true)
-        @RequestParam("ctid") String caseTypeId,
+        @RequestParam("ctid") List<String> caseTypeIds,
         @ApiParam(name = "native ElasticSearch Search API request. Please refer to the ElasticSearch official documentation", required = true)
         @RequestBody String jsonSearchRequest) {
 
         Instant start = Instant.now();
 
         rejectBlackListedQuery(jsonSearchRequest);
-        CaseSearchRequest caseSearchRequest = new CaseSearchRequest(caseTypeId, convertJsonStringToJsonNode(jsonSearchRequest));
-        CaseSearchResult result = caseSearchOperation.execute(caseSearchRequest);
+
+        JsonNode jsonSearchRequestNode = convertJsonStringToJsonNode(jsonSearchRequest);
+        CrossCaseTypeSearchRequest request = new CrossCaseTypeSearchRequest();
+        caseTypeIds.forEach(caseTypeId -> request.addRequest(new CaseSearchRequest(caseTypeId, jsonSearchRequestNode)));
+
+        CaseSearchResult result = caseSearchOperation.execute(request);
 
         Duration between = Duration.between(start, Instant.now());
         log.info("searchCases execution completed in {} millisecs...", between.toMillis());
