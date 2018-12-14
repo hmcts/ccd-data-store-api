@@ -9,11 +9,14 @@ import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
+import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
@@ -40,13 +43,15 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
     private final AccessControlService accessControlService;
     private final UIDService uidService;
     private final UserRepository userRepository;
+    private final DraftGateway draftGateway;
 
     public AuthorisedStartEventOperation(@Qualifier("classified") final StartEventOperation startEventOperation,
                                          @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
                                          @Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
                                          final AccessControlService accessControlService,
                                          final UIDService uidService,
-                                         @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository) {
+                                         @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
+                                         @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway) {
 
         this.startEventOperation = startEventOperation;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -54,6 +59,7 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
         this.accessControlService = accessControlService;
         this.uidService = uidService;
         this.userRepository = userRepository;
+        this.draftGateway = draftGateway;
     }
 
     @Override
@@ -78,14 +84,12 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
     }
 
     @Override
-    public StartEventTrigger triggerStartForDraft(String uid, String jurisdictionId, String caseTypeId, String draftReference, String eventTriggerId,
+    public StartEventTrigger triggerStartForDraft(String draftReference,
                                                   Boolean ignoreWarning) {
-        return verifyReadAccess(caseTypeId, startEventOperation.triggerStartForDraft(uid,
-                                                                                     jurisdictionId,
-                                                                                     caseTypeId,
-                                                                                     draftReference,
-                                                                                     eventTriggerId,
-                                                                                     ignoreWarning));
+
+        final CaseDetails caseDetails = draftGateway.getCaseDetails(Draft.stripId(draftReference));
+        return verifyReadAccess(caseDetails.getCaseTypeId(), startEventOperation.triggerStartForDraft(draftReference,
+                                                                                                      ignoreWarning));
     }
 
     private CaseType getCaseType(String caseTypeId) {

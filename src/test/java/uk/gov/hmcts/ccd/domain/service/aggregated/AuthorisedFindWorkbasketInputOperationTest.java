@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.aCaseField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WorkbasketInputBuilder.aWorkbasketInput;
 
@@ -33,9 +33,9 @@ class AuthorisedFindWorkbasketInputOperationTest {
     private static final String CASE_FIELD_ID_1_2 = "CASE_FIELD_1_2";
     private static final String CASE_FIELD_ID_1_3 = "CASE_FIELD_1_3";
     private static final String CASE_FIELD_ID_1_4 = "CASE_FIELD_1_4";
-    private static final CaseField CASE_FIELD_1_1 = aCaseField().withId(CASE_FIELD_ID_1_1).build();
-    private static final CaseField CASE_FIELD_1_2 = aCaseField().withId(CASE_FIELD_ID_1_2).build();
-    private static final CaseField CASE_FIELD_1_3 = aCaseField().withId(CASE_FIELD_ID_1_3).build();
+    private static final CaseField CASE_FIELD_1_1 = newCaseField().withId(CASE_FIELD_ID_1_1).build();
+    private static final CaseField CASE_FIELD_1_2 = newCaseField().withId(CASE_FIELD_ID_1_2).build();
+    private static final CaseField CASE_FIELD_1_3 = newCaseField().withId(CASE_FIELD_ID_1_3).build();
     private static List<WorkbasketInput> testWorkbasketInputs;
     @Mock
     private FindWorkbasketInputOperation findWorkbasketInputOperation;
