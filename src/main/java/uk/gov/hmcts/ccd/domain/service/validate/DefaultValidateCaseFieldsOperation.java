@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
@@ -13,7 +12,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import javax.inject.Inject;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOperation {
@@ -37,15 +35,15 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
         if (caseType == null) {
             throw new ValidationException("Cannot find case type definition for  " + caseTypeId);
         }
-        if (!getEvent(content, caseType).isPresent()) {
+        if (!hasEventId(caseType, content.getEventId())) {
             throw new ValidationException("Cannot validate case field because of event" + content.getEventId() + " is not found in case type definition");
         }
         caseTypeService.validateData(content.getData(), caseType);
         return content.getData();
     }
 
-    private Optional<CaseEvent> getEvent(CaseDataContent content, CaseType caseType) {
-        return caseType.getEvents().stream().filter(event -> event.getId().equals(content.getEventId())).findAny();
+    private boolean hasEventId(CaseType caseType, String eventId) {
+        return caseType.getEvents().stream().filter(event -> event.getId().equals(eventId)).findAny().isPresent();
     }
 
     @Override

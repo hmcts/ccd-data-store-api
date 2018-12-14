@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.v2.internal.resource;
+package uk.gov.hmcts.ccd.v2.external.resource;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataBuilder.newCaseData;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
-class UICaseDataResourceTest {
+class CaseDataResourceTest {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -30,12 +30,12 @@ class UICaseDataResourceTest {
     private static final JsonNode UNWRAPPED_DATA_NODE =  MAPPER.convertValue(UNWRAPPED_DATA, JsonNode.class);
     private static final CaseDataContent CASE_DATA_CONTENT = newCaseDataContent().withData(DATA).build();
 
-    private final String linkSelfForCaseData = String.format("/internal/case-types/%s/validate?pageId=pageId", CASE_TYPE_ID);
+    private final String linkSelfForCaseData = String.format("/case-types/%s/validate?pageId=pageId", CASE_TYPE_ID);
 
     @Test
     @DisplayName("should copy case data unwrapped")
     void shouldCopyUnwrappedCaseDataContent() {
-        final UICaseDataResource uiStartTriggerResource = new UICaseDataResource(CASE_DATA_CONTENT, CASE_TYPE_ID, PAGE_ID);
+        final CaseDataResource uiStartTriggerResource = new CaseDataResource(CASE_DATA_CONTENT, CASE_TYPE_ID, PAGE_ID);
 
         assertAll(
             () -> assertThat(uiStartTriggerResource.getData(), equalTo(UNWRAPPED_DATA_NODE))
@@ -45,7 +45,7 @@ class UICaseDataResourceTest {
     @Test
     @DisplayName("should link to itself")
     void shouldLinkToSelf() {
-        final UICaseDataResource uiStartTriggerResource = new UICaseDataResource(CASE_DATA_CONTENT, CASE_TYPE_ID, PAGE_ID);
+        final CaseDataResource uiStartTriggerResource = new CaseDataResource(CASE_DATA_CONTENT, CASE_TYPE_ID, PAGE_ID);
 
         assertThat(uiStartTriggerResource.getLink("self").getHref(), equalTo(linkSelfForCaseData));
     }

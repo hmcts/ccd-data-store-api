@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.v2.internal.controller;
+package uk.gov.hmcts.ccd.v2.external.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -13,14 +13,14 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.createevent.MidEventCallback;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.v2.V2;
-import uk.gov.hmcts.ccd.v2.internal.resource.UICaseDataResource;
+import uk.gov.hmcts.ccd.v2.external.resource.CaseDataResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.UICaseViewResource;
 
 import java.util.HashMap;
 
 @RestController
-@RequestMapping(path = "/internal")
-public class UICaseValidatorController {
+@RequestMapping(path = "/case-types")
+public class CaseDataValidatorController {
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
     };
@@ -28,7 +28,7 @@ public class UICaseValidatorController {
     private final MidEventCallback midEventCallback;
 
     @Autowired
-    public UICaseValidatorController(
+    public CaseDataValidatorController(
         ValidateCaseFieldsOperation validateCaseFieldsOperation,
         MidEventCallback midEventCallback) {
         this.validateCaseFieldsOperation = validateCaseFieldsOperation;
@@ -36,12 +36,12 @@ public class UICaseValidatorController {
     }
 
     @PostMapping(
-        path = "/case-types/{caseTypeId}/validate",
+        path = "/{caseTypeId}/validate",
         headers = {
             V2.EXPERIMENTAL_HEADER
         },
         produces = {
-            V2.MediaType.UI_CASE_DATA_VALIDATE
+            V2.MediaType.CASE_DATA_VALIDATE
         }
     )
     @ApiOperation(
@@ -63,9 +63,9 @@ public class UICaseValidatorController {
             message = "One of: Event trigger not provided, case type does not exist or case data validation failed"
         )
     })
-    public ResponseEntity<UICaseDataResource> validate(@PathVariable("caseTypeId") String caseTypeId,
-                                                       @RequestParam(required = false) final String pageId,
-                                                       @RequestBody final CaseDataContent content) {
+    public ResponseEntity<CaseDataResource> validate(@PathVariable("caseTypeId") String caseTypeId,
+                                                     @RequestParam(required = false) final String pageId,
+                                                     @RequestBody final CaseDataContent content) {
         validateCaseFieldsOperation.validateCaseDetails(caseTypeId,
                                                         content);
 
@@ -74,6 +74,6 @@ public class UICaseValidatorController {
                                                       pageId);
 
         content.setData(MAPPER.convertValue(data, STRING_JSON_MAP));
-        return ResponseEntity.ok(new UICaseDataResource(content, caseTypeId, pageId));
+        return ResponseEntity.ok(new CaseDataResource(content, caseTypeId, pageId));
     }
 }

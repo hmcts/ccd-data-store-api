@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.datastore.tests.v2.internal;
+package uk.gov.hmcts.ccd.datastore.tests.v2.external;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -25,13 +25,13 @@ import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CASE_TYPE;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event.CREATE;
 
 @DisplayName("Get UI start trigger by case type and event ids")
-class GetUICaseValidatorTest extends BaseTest {
+class GetCaseValidatorTest extends BaseTest {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private static final String INVALID_CASE_TYPE_ID = "invalidCaseType";
     private static final String INVALID_EVENT_TRIGGER_ID = "invalidEvent";
 
-    protected GetUICaseValidatorTest(AATHelper aat) {
+    protected GetCaseValidatorTest(AATHelper aat) {
         super(aat);
     }
 
@@ -44,7 +44,7 @@ class GetUICaseValidatorTest extends BaseTest {
         void shouldRetrieveWhenExists() throws JsonProcessingException {
             callCaseDataValidate(CASE_TYPE, getBody(CREATE))
                 .when()
-                .post("/internal/case-types/{caseTypeId}/validate")
+                .post("/case-types/{caseTypeId}/validate")
 
                 .then()
                 .log().ifError()
@@ -85,7 +85,7 @@ class GetUICaseValidatorTest extends BaseTest {
         void should404WhenCaseTypeDoesNotExist() throws JsonProcessingException {
             callCaseDataValidate(INVALID_CASE_TYPE_ID, getBody(CREATE))
                 .when()
-                .post("/internal/case-types/{caseTypeId}/validate")
+                .post("/case-types/{caseTypeId}/validate")
 
                 .then()
                 .statusCode(404);
@@ -96,7 +96,7 @@ class GetUICaseValidatorTest extends BaseTest {
         void should422WhenEventNotProvided() throws JsonProcessingException {
             callCaseDataValidate(INVALID_CASE_TYPE_ID, getBody(null))
                 .when()
-                .post("/internal/case-types/{caseTypeId}/validate")
+                .post("/case-types/{caseTypeId}/validate")
 
                 .then()
                 .statusCode(422);
@@ -107,7 +107,7 @@ class GetUICaseValidatorTest extends BaseTest {
         void should422WhenEventTriggerDoesNotExist() throws JsonProcessingException {
             callCaseDataValidate(CASE_TYPE, getBody(INVALID_EVENT_TRIGGER_ID))
                 .when()
-                .post("/internal/case-types/{caseTypeId}/validate")
+                .post("/case-types/{caseTypeId}/validate")
 
                 .then()
                 .statusCode(422);
@@ -118,7 +118,7 @@ class GetUICaseValidatorTest extends BaseTest {
         void should422WhenCaseDataInvalid() throws JsonProcessingException {
             callCaseDataValidate(CASE_TYPE, getBody(CREATE, () -> CaseWithInvalidData.build()))
                 .when()
-                .post("/internal/case-types/{caseTypeId}/validate")
+                .post("/case-types/{caseTypeId}/validate")
 
                 .then()
                 .statusCode(422);
@@ -131,7 +131,7 @@ class GetUICaseValidatorTest extends BaseTest {
                 .pathParam("caseTypeId", caseTypeId)
                 .body(supplier.get())
                 .contentType("application/json")
-                .accept(V2.MediaType.UI_CASE_DATA_VALIDATE)
+                .accept(V2.MediaType.CASE_DATA_VALIDATE)
                 .header("experimental", "true");
         }
 
