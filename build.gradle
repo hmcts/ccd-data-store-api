@@ -206,7 +206,7 @@ dependencies {
         // TODO remove when auth-checker-lib upgrades its dependency to spring boot 2.0.x
         exclude group: 'uk.gov.hmcts.reform', module: 'java-logging-spring'
     }
-    compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '0.6.0'
+    compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '1.0.4'
     compile group: 'com.sun.mail', name: 'mailapi', version: '1.6.1'
     compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
     compile group: 'commons-validator', name: 'commons-validator', version: '1.6'
