@@ -1,20 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.TextNode;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
-import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -31,9 +16,20 @@ import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WO
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.SearchResultBuilder.aSearchResult;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildData;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildSearchResultField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.aCaseField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.TextNode;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 
 class MergeDataToSearchResultOperationTest {
     private static final String SEARCH_VIEW = "SEARCH";
@@ -75,17 +71,17 @@ class MergeDataToSearchResultOperationTest {
 
         caseType = newCaseType()
             .withCaseTypeId(CASE_TYPE_ID)
-            .withField(aCaseField().withId(CASE_FIELD_1).withFieldType(ftt).build())
-            .withField(aCaseField().withId(CASE_FIELD_2).withFieldType(ftt).build())
-            .withField(aCaseField().withId(CASE_FIELD_3).withFieldType(ftt).build())
+            .withField(newCaseField().withId(CASE_FIELD_1).withFieldType(ftt).build())
+            .withField(newCaseField().withId(CASE_FIELD_2).withFieldType(ftt).build())
+            .withField(newCaseField().withId(CASE_FIELD_3).withFieldType(ftt).build())
             .build();
 
         final CaseField labelField = buildLabelCaseField(LABEL_ID, LABEL_TEXT);
         caseTypeWithLabels = newCaseType()
             .withCaseTypeId(CASE_TYPE_ID)
-            .withField(aCaseField().withId(CASE_FIELD_1).withFieldType(ftt).build())
-            .withField(aCaseField().withId(CASE_FIELD_2).withFieldType(ftt).build())
-            .withField(aCaseField().withId(CASE_FIELD_3).withFieldType(ftt).build())
+            .withField(newCaseField().withId(CASE_FIELD_1).withFieldType(ftt).build())
+            .withField(newCaseField().withId(CASE_FIELD_2).withFieldType(ftt).build())
+            .withField(newCaseField().withId(CASE_FIELD_3).withFieldType(ftt).build())
             .withField(labelField)
             .build();
         classUnderTest = new MergeDataToSearchResultOperation(uiDefinitionRepository);
@@ -183,7 +179,7 @@ class MergeDataToSearchResultOperationTest {
     }
 
     private CaseField buildLabelCaseField(final String labelId, final String labelText) {
-        final CaseField caseField = aCaseField()
+        final CaseField caseField = newCaseField()
             .withId(labelId)
             .withFieldType(aFieldType()
                 .withType(LABEL_FIELD_TYPE)

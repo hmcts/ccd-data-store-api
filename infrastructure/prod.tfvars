@@ -5,3 +5,5 @@ capacity = "2"
 frontend_url = "https://www.ccd.platform.hmcts.net"
 asp_name = "ccd-data-store-api-prod"
 asp_rg = "ccd-data-store-api-prod"
+elastic_search_enabled = "true"
+

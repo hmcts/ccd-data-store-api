@@ -1,5 +1,28 @@
 package uk.gov.hmcts.ccd.domain.service.startevent;
 
+import java.util.Map;
+import java.util.Optional;
+
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.core.StringStartsWith.startsWith;
+import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.newCaseDraft;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.newDraftResponse;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.JurisdictionBuilder.newJurisdiction;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,7 +39,6 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.DraftResponseToCaseDetailsBuilder;
 import uk.gov.hmcts.ccd.domain.model.draft.CaseDraft;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
@@ -30,25 +52,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
-
-import java.util.Map;
-import java.util.Optional;
-
-import static org.hamcrest.Matchers.*;
-import static org.hamcrest.core.StringStartsWith.startsWith;
-import static org.junit.Assert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.newCaseDraft;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.anCaseEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.newDraftResponse;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.JurisdictionBuilder.newJurisdiction;
 
 public class DefaultStartEventOperationTest {
 
@@ -92,15 +95,12 @@ public class DefaultStartEventOperationTest {
     @Mock
     private UIDService uidService;
 
-    @Mock
-    private DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder;
-
     private DefaultStartEventOperation defaultStartEventOperation;
 
     private final CaseDetails caseDetails = newCaseDetails().build();
     private final CaseType caseType = newCaseType().withCaseTypeId(TEST_CASE_TYPE_ID)
         .withJurisdiction(newJurisdiction().withJurisdictionId(TEST_JURISDICTION_ID).build()).build();
-    private final CaseEvent eventTrigger = anCaseEvent().build();
+    private final CaseEvent eventTrigger = newCaseEvent().build();
     private final CaseDataContent caseDataContent = newCaseDataContent()
         .withSecurityClassification(PRIVATE)
         .withData(DATA)
@@ -108,6 +108,7 @@ public class DefaultStartEventOperationTest {
         .build();
     private final CaseDraft caseDraft = newCaseDraft()
         .withCaseTypeId(TEST_CASE_TYPE_ID)
+        .withEventTriggerId(TEST_EVENT_TRIGGER_ID)
         .withJurisdictionId(TEST_JURISDICTION_ID)
         .withCaseDataContent(caseDataContent)
         .build();
@@ -129,8 +130,7 @@ public class DefaultStartEventOperationTest {
                                                                     caseService,
                                                                     userAuthorisation,
                                                                     callbackInvoker,
-                                                                    uidService,
-                                                                    draftResponseToCaseDetailsBuilder);
+                                                                    uidService);
     }
 
     @Nested
@@ -213,29 +213,26 @@ public class DefaultStartEventOperationTest {
         void setUp() {
             doReturn(true).when(eventTriggerService).isPreStateEmpty(eventTrigger);
             doReturn(TEST_EVENT_TOKEN).when(eventTokenService).generateToken(UID, eventTrigger, caseType.getJurisdiction(), caseType);
+            doReturn(caseDetails).when(draftGateway).getCaseDetails(TEST_DRAFT_ID);
             doReturn(draftResponse).when(draftGateway).get(TEST_DRAFT_ID);
             caseDetails.setCaseTypeId(TEST_CASE_TYPE_ID);
             caseDetails.setJurisdiction(TEST_JURISDICTION_ID);
             caseDetails.setData(DATA);
             caseDetails.setDataClassification(DATA_CLASSIFICATION);
             caseDetails.setSecurityClassification(SecurityClassification.PRIVATE);
-            doReturn(caseDetails).when(draftResponseToCaseDetailsBuilder).build(draftResponse);
+            doReturn(UID).when(userAuthorisation).getUserId();
         }
 
         @Test
         @DisplayName("Should successfully trigger start")
         void shouldSuccessfullyTriggerStart() {
 
-            StartEventTrigger actual = defaultStartEventOperation.triggerStartForDraft(UID,
-                                                                                       TEST_JURISDICTION_ID,
-                                                                                       TEST_CASE_TYPE_ID,
-                                                                                       TEST_DRAFT_ID,
-                                                                                       TEST_EVENT_TRIGGER_ID,
+            StartEventTrigger actual = defaultStartEventOperation.triggerStartForDraft(TEST_DRAFT_ID,
                                                                                        IGNORE_WARNING);
             assertAll(
                 () -> verify(caseDefinitionRepository).getCaseType(TEST_CASE_TYPE_ID),
                 () -> verify(eventTriggerService).findCaseEvent(caseType, TEST_EVENT_TRIGGER_ID),
-                () -> verify(draftGateway).get(TEST_DRAFT_ID),
+                () -> verify(draftGateway).getCaseDetails(TEST_DRAFT_ID),
                 () -> verify(eventTriggerService).isPreStateEmpty(eventTrigger),
                 () -> verify(eventTokenService).generateToken(UID, eventTrigger, caseType.getJurisdiction(), caseType),
                 () -> verify(callbackInvoker).invokeAboutToStartCallback(eq(eventTrigger), eq(caseType), any(CaseDetails.class), eq(IGNORE_WARNING)),
@@ -255,11 +252,7 @@ public class DefaultStartEventOperationTest {
             doReturn(null).when(caseDefinitionRepository).getCaseType(TEST_CASE_TYPE_ID);
 
             final Exception exception = assertThrows(ResourceNotFoundException.class,
-                                                     () -> defaultStartEventOperation.triggerStartForDraft(UID,
-                                                                                                           TEST_JURISDICTION_ID,
-                                                                                                           TEST_CASE_TYPE_ID,
-                                                                                                           TEST_DRAFT_ID,
-                                                                                                           TEST_EVENT_TRIGGER_ID,
+                                                     () -> defaultStartEventOperation.triggerStartForDraft(TEST_DRAFT_ID,
                                                                                                            IGNORE_WARNING)
             );
             assertThat(exception.getMessage(), startsWith("Cannot find case type definition for TestCaseTypeId"));
@@ -271,13 +264,8 @@ public class DefaultStartEventOperationTest {
 
             doReturn(null).when(eventTriggerService).findCaseEvent(caseType, TEST_EVENT_TRIGGER_ID);
 
-            Exception exception = assertThrows(ResourceNotFoundException.class, () -> defaultStartEventOperation.triggerStartForDraft(UID,
-                                                                                                                                      TEST_JURISDICTION_ID,
-                                                                                                                                      TEST_CASE_TYPE_ID,
-                                                                                                                                      TEST_DRAFT_ID,
-                                                                                                                                      TEST_EVENT_TRIGGER_ID,
-                                                                                                                                      IGNORE_WARNING)
-            );
+            Exception exception = assertThrows(ResourceNotFoundException.class, () -> defaultStartEventOperation.triggerStartForDraft(TEST_DRAFT_ID,
+                                                                                                                                      IGNORE_WARNING));
             assertThat(exception.getMessage(), startsWith("Cannot find event TestEventTriggerId for case type TestCaseTypeId"));
         }
 
@@ -287,11 +275,7 @@ public class DefaultStartEventOperationTest {
 
             doReturn(false).when(eventTriggerService).isPreStateEmpty(eventTrigger);
 
-            Exception exception = assertThrows(ValidationException.class, () -> defaultStartEventOperation.triggerStartForDraft(UID,
-                                                                                                                                TEST_JURISDICTION_ID,
-                                                                                                                                TEST_CASE_TYPE_ID,
-                                                                                                                                TEST_DRAFT_ID,
-                                                                                                                                TEST_EVENT_TRIGGER_ID,
+            Exception exception = assertThrows(ValidationException.class, () -> defaultStartEventOperation.triggerStartForDraft(TEST_DRAFT_ID,
                                                                                                                                 IGNORE_WARNING)
             );
             assertThat(exception.getMessage(), startsWith("The case status did not qualify for the event"));
