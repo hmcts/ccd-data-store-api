@@ -31,7 +31,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.*;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.aCaseField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 
 public class SecurityClassificationServiceTest {
@@ -69,8 +69,8 @@ public class SecurityClassificationServiceTest {
         private final String SC_RESTRICTED = "RESTRICTED";
         private final String CASE_FIELD_ID_1_1 = "CASE_FIELD_1_1";
         private final String CASE_FIELD_ID_1_2 = "CASE_FIELD_1_2";
-        private final CaseField CASE_FIELD_1_1 = aCaseField().withId(CASE_FIELD_ID_1_1).withSC(SC_PUBLIC).build();
-        private final CaseField CASE_FIELD_1_2 = aCaseField().withId(CASE_FIELD_ID_1_2).withSC(SC_RESTRICTED).build();
+        private final CaseField CASE_FIELD_1_1 = newCaseField().withId(CASE_FIELD_ID_1_1).withSC(SC_PUBLIC).build();
+        private final CaseField CASE_FIELD_1_2 = newCaseField().withId(CASE_FIELD_ID_1_2).withSC(SC_RESTRICTED).build();
         private final CaseType testCaseType = newCaseType()
             .withId(CASE_TYPE_ONE)
             .withField(CASE_FIELD_1_1)

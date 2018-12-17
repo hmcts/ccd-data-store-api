@@ -18,8 +18,6 @@ import java.util.stream.Collectors;
 public abstract class AbstractDefaultGetCaseViewOperation {
 
     public static final String QUALIFIER = "default";
-    private static final String RESOURCE_NOT_FOUND //
-        = "No case found ( jurisdiction = '%s', case type = '%s', case reference = '%s' )";
 
     private final GetCaseOperation getCaseOperation;
     private final UIDefinitionRepository uiDefinitionRepository;

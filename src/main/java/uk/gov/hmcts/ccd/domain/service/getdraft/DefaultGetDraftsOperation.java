@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
-import uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway;
+import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.DraftResponseToCaseDetailsBuilder;
@@ -25,7 +25,7 @@ public class DefaultGetDraftsOperation implements GetDraftsOperation {
     private DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder;
 
     @Inject
-    public DefaultGetDraftsOperation(@Qualifier(DefaultDraftGateway.QUALIFIER) final DraftGateway draftGateway,
+    public DefaultGetDraftsOperation(@Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway,
                                      DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder) {
         this.draftGateway = draftGateway;
         this.draftResponseToCaseDetailsBuilder = draftResponseToCaseDetailsBuilder;

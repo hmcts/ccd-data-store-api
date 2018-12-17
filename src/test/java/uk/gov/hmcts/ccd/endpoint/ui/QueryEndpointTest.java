@@ -85,9 +85,9 @@ class QueryEndpointTest {
     @Test
     void shouldCallGetEventTriggerOperationForDraft() {
         CaseEventTrigger caseEventTrigger = new CaseEventTrigger();
-        doReturn(caseEventTrigger).when(getEventTriggerOperation).executeForDraft(any(), any(), any(), any(), any(), any());
+        doReturn(caseEventTrigger).when(getEventTriggerOperation).executeForDraft(any(), any());
         queryEndpoint.getEventTriggerForDraft("userId", "jurisdictionId", "caseTypeId", "draftId", "eventTriggerId", false);
-        verify(getEventTriggerOperation).executeForDraft("userId", "jurisdictionId", "caseTypeId", "draftId", "eventTriggerId", false);
+        verify(getEventTriggerOperation).executeForDraft("draftId",false);
     }
 
     @Test

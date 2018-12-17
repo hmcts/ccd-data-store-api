@@ -43,7 +43,7 @@ import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.anCaseEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
 
 class DefaultCreateCaseOperationTest {
 
@@ -112,7 +112,7 @@ class DefaultCreateCaseOperationTest {
                                                                     draftGateway);
         data = buildJsonNodeData();
         given(userRepository.getUserDetails()).willReturn(IDAM_PROPERTIES);
-        eventTrigger = anCaseEvent().withId("eventId").withName("event Name").build();
+        eventTrigger = newCaseEvent().withId("eventId").withName("event Name").build();
         eventData = newCaseDataContent().withEvent(event).withToken(TOKEN).withData(data).withDraftId(DRAFT_ID).build();
     }
 
