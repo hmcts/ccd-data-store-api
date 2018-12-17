@@ -9,7 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.helper.elastic.ElasticsearchTestDataLoaderExtension;
 
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FullCase.FIXED_LIST;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FIXED_LIST;
 
 @ExtendWith(ElasticsearchTestDataLoaderExtension.class)
 public class ElasticsearchFixedListFieldTest extends ElasticsearchBaseTest {
