@@ -77,7 +77,7 @@ class GetCaseValidatorTest extends BaseTest {
                 .body("CollectionField[1].value", equalTo(COLLECTION_VALUE_2))
 
                 .rootPath("_links")
-                .body("self.href", equalTo(String.format("%s/internal/case-types/%s/validate{?pageId}", aat.getTestUrl(), CASE_TYPE)));
+                .body("self.href", equalTo(String.format("%s/case-types/%s/validate{?pageId}", aat.getTestUrl(), CASE_TYPE)));
         }
 
         @Test
