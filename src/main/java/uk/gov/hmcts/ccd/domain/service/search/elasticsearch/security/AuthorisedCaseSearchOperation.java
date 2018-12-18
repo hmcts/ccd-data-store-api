@@ -59,7 +59,6 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
     @Override
     public CaseSearchResult execute(CrossCaseTypeSearchRequest searchRequest) {
         List<CaseType> authorisedCaseTypes = getAuthorisedCaseTypes(searchRequest);
-
         CrossCaseTypeSearchRequest authorisedSearchRequest = createAuthorisedSearchRequest(authorisedCaseTypes, searchRequest);
 
         return searchCasesAndFilterFieldsByAccess(authorisedCaseTypes, authorisedSearchRequest);
@@ -74,14 +73,8 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
     }
 
     private CrossCaseTypeSearchRequest createAuthorisedSearchRequest(List<CaseType> authorisedCaseTypes, CrossCaseTypeSearchRequest originalSearchRequest) {
-        CrossCaseTypeSearchRequest authorisedSearchRequest = new CrossCaseTypeSearchRequest(originalSearchRequest.getSearchRequestJsonNode());
-
-        originalSearchRequest.getCaseTypeIds()
-            .stream()
-            .filter(caseTypeId -> authorisedCaseTypes.stream().anyMatch(caseType -> caseType.getId().equalsIgnoreCase(caseTypeId)))
-            .forEach(authorisedSearchRequest::addCaseTypeId);
-
-        return authorisedSearchRequest;
+        List<String> authorisedCaseTypeIds = authorisedCaseTypes.stream().map(CaseType::getId).collect(Collectors.toList());
+        return new CrossCaseTypeSearchRequest(authorisedCaseTypeIds, originalSearchRequest.getSearchRequestJsonNode());
     }
 
     private CaseSearchResult searchCasesAndFilterFieldsByAccess(List<CaseType> authorisedCaseTypes, CrossCaseTypeSearchRequest authorisedSearchRequest) {
