@@ -6,8 +6,8 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
 import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetUserProfileOperation;
@@ -29,8 +29,7 @@ public class UIUserProfileController {
         this.getUserProfileOperation = getUserProfileOperation;
     }
 
-    @RequestMapping(
-        method = RequestMethod.GET,
+    @GetMapping(
         path = "/profile",
         headers = {
             V2.EXPERIMENTAL_HEADER
