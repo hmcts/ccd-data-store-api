@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -91,15 +92,17 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
 
     private CaseSearchResult toCaseDetailsSearchResult(MultiSearchResult multiSearchResult) {
         List<CaseDetails> caseDetails = new ArrayList<>();
+        AtomicLong totalHits = new AtomicLong(0);
 
-        long totalHits = multiSearchResult.getResponses()
+        multiSearchResult.getResponses()
             .stream()
             .filter(response -> response.searchResult != null)
-            .peek(response -> caseDetails.addAll(searchResultToCaseList(response.searchResult)))
-            .mapToLong(response -> response.searchResult.getTotal())
-            .sum();
+            .forEach(response -> {
+                caseDetails.addAll(searchResultToCaseList(response.searchResult));
+                totalHits.addAndGet(response.searchResult.getTotal());
+            });
 
-        return new CaseSearchResult(totalHits, caseDetails);
+        return new CaseSearchResult(totalHits.get(), caseDetails);
     }
 
     private List<CaseDetails> searchResultToCaseList(SearchResult searchResult) {
