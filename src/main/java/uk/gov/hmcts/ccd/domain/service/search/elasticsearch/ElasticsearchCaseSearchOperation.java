@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.searchbox.client.JestClient;
 import io.searchbox.core.MultiSearch;
@@ -74,18 +75,18 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     }
 
     private MultiSearch secureAndTransformSearchRequest(CrossCaseTypeSearchRequest request) {
-        Collection<Search> securedSearchActions = request.getCaseSearchRequests()
+        Collection<Search> securedSearchActions = request.getCaseTypeIds()
             .stream()
-            .map(this::createSecuredSearchAction)
+            .map(caseTypeId -> createSecuredSearchAction(caseTypeId, request.getSearchRequestJsonNode()))
             .collect(Collectors.toList());
 
         return new MultiSearch.Builder(securedSearchActions).build();
     }
 
-    private Search createSecuredSearchAction(CaseSearchRequest caseSearchRequest) {
-        CaseSearchRequest securedSearchRequest = caseSearchRequestSecurity.createSecuredSearchRequest(caseSearchRequest);
+    private Search createSecuredSearchAction(String caseTypeId, JsonNode searchRequestJsonNode) {
+        CaseSearchRequest securedSearchRequest = caseSearchRequestSecurity.createSecuredSearchRequest(new CaseSearchRequest(caseTypeId, searchRequestJsonNode));
         return new Search.Builder(securedSearchRequest.toJsonString())
-            .addIndex(getCaseIndexName(caseSearchRequest.getCaseTypeId()))
+            .addIndex(getCaseIndexName(caseTypeId))
             .addType(getCaseIndexType())
             .build();
     }

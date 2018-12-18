@@ -102,9 +102,9 @@ class ElasticsearchCaseSearchOperationTest {
             when(jestClient.execute(any(MultiSearch.class))).thenReturn(multiSearchResult);
 
             CaseSearchRequest request = new CaseSearchRequest(CASE_TYPE_ID_1, searchRequestJsonNode);
-            CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest();
-            crossCaseTypeSearchRequest.addRequest(request);
-            when(caseSearchRequestSecurity.createSecuredSearchRequest(request)).thenReturn(request);
+            CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest(searchRequestJsonNode);
+            crossCaseTypeSearchRequest.addCaseTypeId(CASE_TYPE_ID_1);
+            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class))).thenReturn(request);
 
             CaseSearchResult caseSearchResult = searchOperation.execute(crossCaseTypeSearchRequest);
 
@@ -114,7 +114,7 @@ class ElasticsearchCaseSearchOperationTest {
                 () -> verify(jestClient).execute(any(MultiSearch.class)),
                 () -> verify(applicationParams).getCasesIndexNameFormat(),
                 () -> verify(applicationParams).getCasesIndexType(),
-                () -> verify(caseSearchRequestSecurity).createSecuredSearchRequest(request));
+                () -> verify(caseSearchRequestSecurity).createSecuredSearchRequest(any(CaseSearchRequest.class)));
         }
 
     }
@@ -148,11 +148,10 @@ class ElasticsearchCaseSearchOperationTest {
 
             CaseSearchRequest request1 = new CaseSearchRequest(CASE_TYPE_ID_1, searchRequestJsonNode);
             CaseSearchRequest request2 = new CaseSearchRequest(CASE_TYPE_ID_2, searchRequestJsonNode);
-            CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest();
-            crossCaseTypeSearchRequest.addRequest(request1);
-            crossCaseTypeSearchRequest.addRequest(request2);
-            when(caseSearchRequestSecurity.createSecuredSearchRequest(request1)).thenReturn(request1);
-            when(caseSearchRequestSecurity.createSecuredSearchRequest(request2)).thenReturn(request2);
+            CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest(searchRequestJsonNode);
+            crossCaseTypeSearchRequest.addCaseTypeId(CASE_TYPE_ID_1);
+            crossCaseTypeSearchRequest.addCaseTypeId(CASE_TYPE_ID_2);
+            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class))).thenReturn(request1, request2);
 
             CaseSearchResult caseSearchResult = searchOperation.execute(crossCaseTypeSearchRequest);
 
@@ -162,8 +161,7 @@ class ElasticsearchCaseSearchOperationTest {
                 () -> verify(jestClient).execute(any(MultiSearch.class)),
                 () -> verify(applicationParams, times(2)).getCasesIndexNameFormat(),
                 () -> verify(applicationParams, times(2)).getCasesIndexType(),
-                () -> verify(caseSearchRequestSecurity).createSecuredSearchRequest(request1),
-                () -> verify(caseSearchRequestSecurity).createSecuredSearchRequest(request2));
+                () -> verify(caseSearchRequestSecurity, times(2)).createSecuredSearchRequest(any(CaseSearchRequest.class)));
         }
 
     }
@@ -179,9 +177,9 @@ class ElasticsearchCaseSearchOperationTest {
             when(multiSearchResult.isSucceeded()).thenReturn(false);
             when(jestClient.execute(any(MultiSearch.class))).thenReturn(multiSearchResult);
             CaseSearchRequest request = new CaseSearchRequest(CASE_TYPE_ID_1, searchRequestJsonNode);
-            CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest();
-            crossCaseTypeSearchRequest.addRequest(request);
-            when(caseSearchRequestSecurity.createSecuredSearchRequest(request)).thenReturn(request);
+            CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest(searchRequestJsonNode);
+            crossCaseTypeSearchRequest.addCaseTypeId(CASE_TYPE_ID_1);
+            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class))).thenReturn(request);
 
             assertThrows(BadSearchRequest.class, () -> searchOperation.execute(crossCaseTypeSearchRequest));
         }

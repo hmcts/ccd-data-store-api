@@ -37,7 +37,6 @@ import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
-import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 
@@ -76,11 +75,9 @@ class AuthorisedCaseSearchOperationTest {
     @Test
     @DisplayName("should filter fields and return search results for valid query")
     void shouldFilterFieldsReturnSearchResults() {
-        CaseSearchRequest request1 = new CaseSearchRequest(CASE_TYPE_ID_1, searchRequestJsonNode);
-        CaseSearchRequest request2 = new CaseSearchRequest(CASE_TYPE_ID_2, searchRequestJsonNode);
-        CrossCaseTypeSearchRequest searchRequest = new CrossCaseTypeSearchRequest();
-        searchRequest.addRequest(request1);
-        searchRequest.addRequest(request2);
+        CrossCaseTypeSearchRequest searchRequest = new CrossCaseTypeSearchRequest(searchRequestJsonNode);
+        searchRequest.addCaseTypeId(CASE_TYPE_ID_1);
+        searchRequest.addCaseTypeId(CASE_TYPE_ID_2);
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseTypeId(CASE_TYPE_ID_1);
         CaseSearchResult searchResult = new CaseSearchResult(1L, singletonList(caseDetails));
@@ -119,9 +116,8 @@ class AuthorisedCaseSearchOperationTest {
     @Test
     @DisplayName("should return empty list of cases when user is not authorised to access case type")
     void shouldReturnEmptyCaseList() {
-        CaseSearchRequest request = new CaseSearchRequest(CASE_TYPE_ID_1, searchRequestJsonNode);
-        CrossCaseTypeSearchRequest searchRequest = new CrossCaseTypeSearchRequest();
-        searchRequest.addRequest(request);
+        CrossCaseTypeSearchRequest searchRequest = new CrossCaseTypeSearchRequest(searchRequestJsonNode);
+        searchRequest.addCaseTypeId(CASE_TYPE_ID_1);
         when(authorisedCaseDefinitionDataService.getAuthorisedCaseType(CASE_TYPE_ID_1, CAN_READ)).thenReturn(Optional.empty());
 
         CaseSearchResult result = authorisedCaseDetailsSearchOperation.execute(searchRequest);

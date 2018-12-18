@@ -26,7 +26,6 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
-import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.AuthorisedCaseSearchOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
@@ -67,9 +66,7 @@ public class CaseSearchEndpoint {
 
         rejectBlackListedQuery(jsonSearchRequest);
 
-        JsonNode jsonSearchRequestNode = convertJsonStringToJsonNode(jsonSearchRequest);
-        CrossCaseTypeSearchRequest request = new CrossCaseTypeSearchRequest();
-        caseTypeIds.forEach(caseTypeId -> request.addRequest(new CaseSearchRequest(caseTypeId, jsonSearchRequestNode)));
+        CrossCaseTypeSearchRequest request = new CrossCaseTypeSearchRequest(caseTypeIds, convertJsonStringToJsonNode(jsonSearchRequest));
 
         CaseSearchResult result = caseSearchOperation.execute(request);
 

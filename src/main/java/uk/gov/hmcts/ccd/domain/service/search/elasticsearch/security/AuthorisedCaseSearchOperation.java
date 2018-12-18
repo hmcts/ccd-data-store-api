@@ -66,20 +66,20 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
     }
 
     private List<CaseType> getAuthorisedCaseTypes(CrossCaseTypeSearchRequest searchRequest) {
-        return searchRequest.getCaseSearchRequests()
+        return searchRequest.getCaseTypeIds()
             .stream()
-            .map(request -> authorisedCaseDefinitionDataService.getAuthorisedCaseType(request.getCaseTypeId(), CAN_READ).orElse(null))
+            .map(caseTypeId -> authorisedCaseDefinitionDataService.getAuthorisedCaseType(caseTypeId, CAN_READ).orElse(null))
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
     }
 
     private CrossCaseTypeSearchRequest createAuthorisedSearchRequest(List<CaseType> authorisedCaseTypes, CrossCaseTypeSearchRequest originalSearchRequest) {
-        CrossCaseTypeSearchRequest authorisedSearchRequest = new CrossCaseTypeSearchRequest();
+        CrossCaseTypeSearchRequest authorisedSearchRequest = new CrossCaseTypeSearchRequest(originalSearchRequest.getSearchRequestJsonNode());
 
-        originalSearchRequest.getCaseSearchRequests()
+        originalSearchRequest.getCaseTypeIds()
             .stream()
-            .filter(req -> authorisedCaseTypes.stream().anyMatch(caseType -> caseType.getId().equalsIgnoreCase(req.getCaseTypeId())))
-            .forEach(authorisedSearchRequest::addRequest);
+            .filter(caseTypeId -> authorisedCaseTypes.stream().anyMatch(caseType -> caseType.getId().equalsIgnoreCase(caseTypeId)))
+            .forEach(authorisedSearchRequest::addCaseTypeId);
 
         return authorisedSearchRequest;
     }
