@@ -90,15 +90,14 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     }
 
     private CaseSearchResult toCaseDetailsSearchResult(MultiSearchResult multiSearchResult) {
-        long totalHits = 0;
         List<CaseDetails> caseDetails = new ArrayList<>();
 
-        for (MultiSearchResult.MultiSearchResponse response : multiSearchResult.getResponses()) {
-            SearchResult searchResult = response.searchResult;
-            caseDetails.addAll(searchResultToCaseList(searchResult));
-
-            totalHits += searchResult.getTotal();
-        }
+        long totalHits = multiSearchResult.getResponses()
+            .stream()
+            .filter(response -> response.searchResult != null)
+            .peek(response -> caseDetails.addAll(searchResultToCaseList(response.searchResult)))
+            .mapToLong(response -> response.searchResult.getTotal())
+            .sum();
 
         return new CaseSearchResult(totalHits, caseDetails);
     }
