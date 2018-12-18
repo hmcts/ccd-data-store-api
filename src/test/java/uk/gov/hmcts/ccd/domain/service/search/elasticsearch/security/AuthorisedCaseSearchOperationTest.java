@@ -76,7 +76,6 @@ class AuthorisedCaseSearchOperationTest {
     @Test
     @DisplayName("should filter fields and return search results for valid query")
     void shouldFilterFieldsReturnSearchResults() {
-        CrossCaseTypeSearchRequest searchRequest = new CrossCaseTypeSearchRequest(asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2), searchRequestJsonNode);
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseTypeId(CASE_TYPE_ID_1);
         CaseSearchResult searchResult = new CaseSearchResult(1L, singletonList(caseDetails));
@@ -94,6 +93,8 @@ class AuthorisedCaseSearchOperationTest {
         when(accessControlService.filterCaseFieldsByAccess(jsonNode, caseType.getCaseFields(), userRoles, CAN_READ)).thenReturn(jsonNode);
         Map<String, JsonNode> filteredData = new HashMap<>();
         when(objectMapperService.convertJsonNodeToMap(jsonNode)).thenReturn(filteredData);
+
+        CrossCaseTypeSearchRequest searchRequest = new CrossCaseTypeSearchRequest(asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2), searchRequestJsonNode);
 
         CaseSearchResult result = authorisedCaseDetailsSearchOperation.execute(searchRequest);
 
