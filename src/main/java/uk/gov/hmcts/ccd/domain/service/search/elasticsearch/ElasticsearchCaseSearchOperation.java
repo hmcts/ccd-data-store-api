@@ -73,29 +73,40 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     }
 
     private MultiSearch secureAndTransformSearchRequest(CrossCaseTypeSearchRequest request) {
-        Collection<Search> searches = request.getCaseSearchRequests().stream().map(caseSearchRequest -> {
-            CaseSearchRequest securedSearchRequest = caseSearchRequestSecurity.createSecuredSearchRequest(caseSearchRequest);
-            return new Search.Builder(securedSearchRequest.toJsonString())
-                .addIndex(getCaseIndexName(caseSearchRequest.getCaseTypeId()))
-                .addType(getCaseIndexType())
-                .build();
-        }).collect(Collectors.toList());
+        Collection<Search> securedSearchActions = request.getCaseSearchRequests()
+            .stream()
+            .map(this::createSecuredSearchAction)
+            .collect(Collectors.toList());
 
-        return new MultiSearch.Builder(searches).build();
+        return new MultiSearch.Builder(securedSearchActions).build();
+    }
+
+    private Search createSecuredSearchAction(CaseSearchRequest caseSearchRequest) {
+        CaseSearchRequest securedSearchRequest = caseSearchRequestSecurity.createSecuredSearchRequest(caseSearchRequest);
+        return new Search.Builder(securedSearchRequest.toJsonString())
+            .addIndex(getCaseIndexName(caseSearchRequest.getCaseTypeId()))
+            .addType(getCaseIndexType())
+            .build();
     }
 
     private CaseSearchResult toCaseDetailsSearchResult(MultiSearchResult multiSearchResult) {
         long totalHits = 0;
         List<CaseDetails> caseDetails = new ArrayList<>();
+
         for (MultiSearchResult.MultiSearchResponse response : multiSearchResult.getResponses()) {
             SearchResult searchResult = response.searchResult;
-            List<String> casesAsString = searchResult.getSourceAsStringList();
-            List<ElasticSearchCaseDetailsDTO> dtos = toElasticSearchCasesDTO(casesAsString);
-            caseDetails.addAll(caseDetailsMapper.dtosToCaseDetailsList(dtos));
+            caseDetails.addAll(searchResultToCaseList(searchResult));
 
             totalHits += searchResult.getTotal();
         }
+
         return new CaseSearchResult(totalHits, caseDetails);
+    }
+
+    private List<CaseDetails> searchResultToCaseList(SearchResult searchResult) {
+        List<String> casesAsString = searchResult.getSourceAsStringList();
+        List<ElasticSearchCaseDetailsDTO> dtos = toElasticSearchCasesDTO(casesAsString);
+        return caseDetailsMapper.dtosToCaseDetailsList(dtos);
     }
 
     private List<ElasticSearchCaseDetailsDTO> toElasticSearchCasesDTO(List<String> cases) {

@@ -75,6 +75,7 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
 
     private CrossCaseTypeSearchRequest createAuthorisedSearchRequest(List<CaseType> authorisedCaseTypes, CrossCaseTypeSearchRequest originalSearchRequest) {
         CrossCaseTypeSearchRequest authorisedSearchRequest = new CrossCaseTypeSearchRequest();
+
         originalSearchRequest.getCaseSearchRequests()
             .stream()
             .filter(req -> authorisedCaseTypes.stream().anyMatch(caseType -> caseType.getId().equalsIgnoreCase(req.getCaseTypeId())))
