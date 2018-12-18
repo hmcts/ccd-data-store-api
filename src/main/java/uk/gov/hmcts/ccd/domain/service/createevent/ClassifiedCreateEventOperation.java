@@ -1,14 +1,12 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.std.Event;
+import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -30,18 +28,12 @@ public class ClassifiedCreateEventOperation implements CreateEventOperation {
                                        String jurisdictionId,
                                        String caseTypeId,
                                        String caseReference,
-                                       Event event,
-                                       Map<String, JsonNode> data,
-                                       String token,
-                                       Boolean ignoreWarning) {
+                                       CaseDataContent content) {
         final CaseDetails caseDetails = createEventOperation.createCaseEvent(uid,
                                                                            jurisdictionId,
                                                                            caseTypeId,
                                                                            caseReference,
-                                                                           event,
-                                                                           data,
-                                                                           token,
-                                                                           ignoreWarning);
+                                                                           content);
         return Optional.ofNullable(caseDetails)
                        .flatMap(classificationService::applyClassification)
                        .orElse(null);

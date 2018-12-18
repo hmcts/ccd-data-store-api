@@ -10,7 +10,7 @@ import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.TestData;
 import uk.gov.hmcts.ccd.datastore.tests.helper.elastic.ElasticsearchTestDataLoaderExtension;
 
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FullCase.TEXT;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.TEXT;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.State;
 
 @ExtendWith(ElasticsearchTestDataLoaderExtension.class)

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.helper.elastic.ElasticsearchTestDataLoaderExtension;
 
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FullCase.EMAIL;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.EMAIL;
 
 @ExtendWith(ElasticsearchTestDataLoaderExtension.class)
 public class ElasticsearchEmailFieldTest extends ElasticsearchBaseTest {

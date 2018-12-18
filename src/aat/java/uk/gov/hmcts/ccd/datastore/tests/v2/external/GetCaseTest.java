@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.BaseTest;
+import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FullCase;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event;
@@ -51,29 +52,29 @@ class GetCaseTest extends BaseTest {
 
             // Flexible data
             .rootPath("data")
-            .body("TextField", equalTo(FullCase.TEXT))
-            .body("NumberField", equalTo(FullCase.NUMBER))
-            .body("YesOrNoField", equalTo(FullCase.YES_OR_NO))
-            .body("PhoneUKField", equalTo(FullCase.PHONE_UK))
-            .body("EmailField", equalTo(FullCase.EMAIL))
-            .body("MoneyGBPField", equalTo(FullCase.MONEY_GBP))
-            .body("DateField", equalTo(FullCase.DATE))
-            .body("DateTimeField", equalTo(FullCase.DATE_TIME))
-            .body("TextAreaField", equalTo(FullCase.TEXT_AREA))
-            .body("FixedListField", equalTo(FullCase.FIXED_LIST))
-            .body("MultiSelectListField[0]", equalTo(FullCase.MULTI_SELECT_LIST[0]))
-            .body("MultiSelectListField[1]", equalTo(FullCase.MULTI_SELECT_LIST[1]))
-            .body("CollectionField[0].value", equalTo(FullCase.COLLECTION_VALUE_1))
-            .body("CollectionField[1].value", equalTo(FullCase.COLLECTION_VALUE_2))
-            .body("ComplexField.ComplexTextField", equalTo(FullCase.COMPLEX_TEXT))
-            .body("ComplexField.ComplexFixedListField", equalTo(FullCase.COMPLEX_FIXED_LIST))
-            .body("AddressUKField.AddressLine1", equalTo(FullCase.ADDRESS_LINE_1))
-            .body("AddressUKField.AddressLine2", equalTo(FullCase.ADDRESS_LINE_2))
-            .body("AddressUKField.AddressLine3", equalTo(FullCase.ADDRESS_LINE_3))
-            .body("AddressUKField.PostTown", equalTo(FullCase.ADDRESS_POST_TOWN))
-            .body("AddressUKField.County", equalTo(FullCase.ADDRESS_COUNTY))
-            .body("AddressUKField.PostCode", equalTo(FullCase.ADDRESS_POSTCODE))
-            .body("AddressUKField.Country", equalTo(FullCase.ADDRESS_COUNTRY))
+            .body("TextField", equalTo(AATCaseBuilder.TEXT))
+            .body("NumberField", equalTo(AATCaseBuilder.NUMBER))
+            .body("YesOrNoField", equalTo(AATCaseBuilder.YES_OR_NO))
+            .body("PhoneUKField", equalTo(AATCaseBuilder.PHONE_UK))
+            .body("EmailField", equalTo(AATCaseBuilder.EMAIL))
+            .body("MoneyGBPField", equalTo(AATCaseBuilder.MONEY_GBP))
+            .body("DateField", equalTo(AATCaseBuilder.DATE))
+            .body("DateTimeField", equalTo(AATCaseBuilder.DATE_TIME))
+            .body("TextAreaField", equalTo(AATCaseBuilder.TEXT_AREA))
+            .body("FixedListField", equalTo(AATCaseBuilder.FIXED_LIST))
+            .body("MultiSelectListField[0]", equalTo(AATCaseBuilder.MULTI_SELECT_LIST[0]))
+            .body("MultiSelectListField[1]", equalTo(AATCaseBuilder.MULTI_SELECT_LIST[1]))
+            .body("CollectionField[0].value", equalTo(AATCaseBuilder.COLLECTION_VALUE_1))
+            .body("CollectionField[1].value", equalTo(AATCaseBuilder.COLLECTION_VALUE_2))
+            .body("ComplexField.ComplexTextField", equalTo(AATCaseBuilder.COMPLEX_TEXT))
+            .body("ComplexField.ComplexFixedListField", equalTo(AATCaseBuilder.COMPLEX_FIXED_LIST))
+            .body("AddressUKField.AddressLine1", equalTo(AATCaseBuilder.ADDRESS_LINE_1))
+            .body("AddressUKField.AddressLine2", equalTo(AATCaseBuilder.ADDRESS_LINE_2))
+            .body("AddressUKField.AddressLine3", equalTo(AATCaseBuilder.ADDRESS_LINE_3))
+            .body("AddressUKField.PostTown", equalTo(AATCaseBuilder.ADDRESS_POST_TOWN))
+            .body("AddressUKField.County", equalTo(AATCaseBuilder.ADDRESS_COUNTY))
+            .body("AddressUKField.PostCode", equalTo(AATCaseBuilder.ADDRESS_POSTCODE))
+            .body("AddressUKField.Country", equalTo(AATCaseBuilder.ADDRESS_COUNTRY))
 
             .rootPath("_links")
             .body("self.href", equalTo(String.format("%s/cases/%s", aat.getTestUrl(), caseReference)))
