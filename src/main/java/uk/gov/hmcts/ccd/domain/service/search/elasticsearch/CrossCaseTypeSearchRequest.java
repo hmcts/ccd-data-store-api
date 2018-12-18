@@ -36,15 +36,6 @@ public class CrossCaseTypeSearchRequest {
         validateJsonSearchRequest();
     }
 
-    public CrossCaseTypeSearchRequest(JsonNode searchRequestJsonNode) {
-        this.searchRequestJsonNode = searchRequestJsonNode;
-        validateJsonSearchRequest();
-    }
-
-    public void addCaseTypeId(String caseTypeId) {
-        caseTypeIds.add(caseTypeId);
-    }
-
     public List<String> getCaseTypeIds() {
         return Collections.unmodifiableList(caseTypeIds);
     }

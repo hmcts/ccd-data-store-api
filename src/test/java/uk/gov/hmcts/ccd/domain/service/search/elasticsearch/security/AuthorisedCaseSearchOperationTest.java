@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -75,9 +76,7 @@ class AuthorisedCaseSearchOperationTest {
     @Test
     @DisplayName("should filter fields and return search results for valid query")
     void shouldFilterFieldsReturnSearchResults() {
-        CrossCaseTypeSearchRequest searchRequest = new CrossCaseTypeSearchRequest(searchRequestJsonNode);
-        searchRequest.addCaseTypeId(CASE_TYPE_ID_1);
-        searchRequest.addCaseTypeId(CASE_TYPE_ID_2);
+        CrossCaseTypeSearchRequest searchRequest = new CrossCaseTypeSearchRequest(asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2), searchRequestJsonNode);
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseTypeId(CASE_TYPE_ID_1);
         CaseSearchResult searchResult = new CaseSearchResult(1L, singletonList(caseDetails));
@@ -116,8 +115,7 @@ class AuthorisedCaseSearchOperationTest {
     @Test
     @DisplayName("should return empty list of cases when user is not authorised to access case type")
     void shouldReturnEmptyCaseList() {
-        CrossCaseTypeSearchRequest searchRequest = new CrossCaseTypeSearchRequest(searchRequestJsonNode);
-        searchRequest.addCaseTypeId(CASE_TYPE_ID_1);
+        CrossCaseTypeSearchRequest searchRequest = new CrossCaseTypeSearchRequest(singletonList(CASE_TYPE_ID_1), searchRequestJsonNode);
         when(authorisedCaseDefinitionDataService.getAuthorisedCaseType(CASE_TYPE_ID_1, CAN_READ)).thenReturn(Optional.empty());
 
         CaseSearchResult result = authorisedCaseDetailsSearchOperation.execute(searchRequest);
