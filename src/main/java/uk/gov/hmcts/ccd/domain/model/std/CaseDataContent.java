@@ -1,10 +1,11 @@
 package uk.gov.hmcts.ccd.domain.model.std;
 
+import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.ToString;
-
-import java.util.Map;
 
 @ToString
 public class CaseDataContent {
@@ -28,6 +29,11 @@ public class CaseDataContent {
 
     public Event getEvent() {
         return event;
+    }
+
+    @JsonIgnore
+    public String getEventId() {
+        return event.getEventId();
     }
 
     public void setEvent(Event event) {

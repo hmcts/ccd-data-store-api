@@ -1,5 +1,21 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
+import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
+import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
+import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.RESTRICTED;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataBuilder.newCaseData;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataClassificationBuilder.dataClassification;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,20 +28,6 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
-import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.*;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataBuilder.newCaseData;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataClassificationBuilder.dataClassification;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.aCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 class CaseDataServiceTest {
     private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
@@ -43,41 +45,41 @@ class CaseDataServiceTest {
         final FieldType textFieldType = aFieldType().withType("Text")
                                            .build();
 
-        CaseField postalAddress = aCaseField()
+        CaseField postalAddress = newCaseField()
             .withId("PostalAddress")
             .withSC(SecurityClassification.PRIVATE.name())
             .withFieldType(aFieldType()
                                .withType("Complex")
-                               .withComplexField(aCaseField()
+                               .withComplexField(newCaseField()
                                                      .withId("AddressLine1")
                                                      .withFieldType(textFieldType)
                                                      .withSC(securityClassification.name())
                                                      .build())
-                               .withComplexField(aCaseField()
+                               .withComplexField(newCaseField()
                                                      .withId("AddressLine2")
                                                      .withFieldType(textFieldType)
                                                      .withSC(securityClassification.name())
                                                      .build())
-                               .withComplexField(aCaseField()
+                               .withComplexField(newCaseField()
                                                      .withId("AddressLine3")
                                                      .withFieldType(textFieldType)
                                                      .withSC(securityClassification.name())
                                                      .build())
-                               .withComplexField(aCaseField()
+                               .withComplexField(newCaseField()
                                                      .withId("Country")
                                                      .withFieldType(textFieldType)
                                                      .withSC(PRIVATE.name())
                                                      .build())
-                               .withComplexField(aCaseField()
+                               .withComplexField(newCaseField()
                                                      .withId("PostCode")
                                                      .withFieldType(textFieldType)
                                                      .withSC(RESTRICTED.name())
                                                      .build())
-                               .withComplexField(aCaseField()
+                               .withComplexField(newCaseField()
                                                      .withId("Occupant")
                                                      .withFieldType(aFieldType()
                                                                         .withType("Complex")
-                                                                        .withComplexField(aCaseField()
+                                                                        .withComplexField(newCaseField()
                                                                                               .withId(
                                                                                                   "Title")
                                                                                               .withFieldType(
@@ -85,7 +87,7 @@ class CaseDataServiceTest {
                                                                                               .withSC(
                                                                                                   PUBLIC.name())
                                                                                               .build())
-                                                                        .withComplexField(aCaseField()
+                                                                        .withComplexField(newCaseField()
                                                                                               .withId(
                                                                                                   "FirstName")
                                                                                               .withFieldType(
@@ -93,7 +95,7 @@ class CaseDataServiceTest {
                                                                                               .withSC(
                                                                                                   PUBLIC.name())
                                                                                               .build())
-                                                                        .withComplexField(aCaseField()
+                                                                        .withComplexField(newCaseField()
                                                                                               .withId(
                                                                                                   "MiddleName")
                                                                                               .withFieldType(
@@ -101,7 +103,7 @@ class CaseDataServiceTest {
                                                                                               .withSC(
                                                                                                   PRIVATE.name())
                                                                                               .build())
-                                                                        .withComplexField(aCaseField()
+                                                                        .withComplexField(newCaseField()
                                                                                               .withId(
                                                                                                   "LastName")
                                                                                               .withFieldType(
@@ -109,7 +111,7 @@ class CaseDataServiceTest {
                                                                                               .withSC(
                                                                                                   PRIVATE.name())
                                                                                               .build())
-                                                                        .withComplexField(aCaseField()
+                                                                        .withComplexField(newCaseField()
                                                                                               .withId(
                                                                                                   "DateOfBirth")
                                                                                               .withFieldType(
@@ -120,7 +122,7 @@ class CaseDataServiceTest {
                                                                                               .withSC(
                                                                                                   PRIVATE.name())
                                                                                               .build())
-                                                                        .withComplexField(aCaseField()
+                                                                        .withComplexField(newCaseField()
                                                                                               .withId(
                                                                                                   "NationalInsuranceNumber")
                                                                                               .withFieldType(
@@ -128,7 +130,7 @@ class CaseDataServiceTest {
                                                                                               .withSC(
                                                                                                   RESTRICTED.name())
                                                                                               .build())
-                                                                        .withComplexField(aCaseField()
+                                                                        .withComplexField(newCaseField()
                                                                                               .withId(
                                                                                                   "MaritalStatus")
                                                                                               .withFieldType(
@@ -145,7 +147,7 @@ class CaseDataServiceTest {
                                .build())
             .build();
         caseType = TestBuildersUtil.CaseTypeBuilder.newCaseType()
-            .withField(aCaseField()
+            .withField(newCaseField()
                            .withId("ClientsAddresses")
                            .withSC(PRIVATE.name())
                            .withFieldType(aFieldType()
@@ -159,13 +161,13 @@ class CaseDataServiceTest {
                                               .build())
                            .build()
             )
-            .withField(aCaseField()
+            .withField(newCaseField()
                            .withId("Company")
                            .withSC(PUBLIC.name())
                            .withFieldType(
                                aFieldType()
                                    .withType("Complex")
-                                   .withComplexField(aCaseField()
+                                   .withComplexField(newCaseField()
                                                          .withId("Name")
                                                          .withFieldType(textFieldType)
                                                          .withSC(PRIVATE.name())
@@ -175,12 +177,12 @@ class CaseDataServiceTest {
                            )
                            .build()
             )
-            .withField(aCaseField()
+            .withField(newCaseField()
                            .withId("OtherInfo")
                            .withFieldType(textFieldType)
                            .withSC(PRIVATE.name())
                            .build())
-            .withField(aCaseField().withId("simple_collection")
+            .withField(newCaseField().withId("simple_collection")
                                    .withSC("PUBLIC")
                                    .withFieldType(aFieldType().withType("Collection")
                                                               .withCollectionFieldType(textFieldType)

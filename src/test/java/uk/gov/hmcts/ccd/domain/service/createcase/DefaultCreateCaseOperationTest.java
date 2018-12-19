@@ -1,5 +1,27 @@
 package uk.gov.hmcts.ccd.domain.service.createcase;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isNull;
+import static org.mockito.Matchers.same;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.core.IsInstanceOf;
@@ -28,22 +50,6 @@ import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willDoNothing;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.anCaseEvent;
 
 class DefaultCreateCaseOperationTest {
 
@@ -112,7 +118,7 @@ class DefaultCreateCaseOperationTest {
                                                                     draftGateway);
         data = buildJsonNodeData();
         given(userRepository.getUserDetails()).willReturn(IDAM_PROPERTIES);
-        eventTrigger = anCaseEvent().withId("eventId").withName("event Name").build();
+        eventTrigger = newCaseEvent().withId("eventId").withName("event Name").build();
         eventData = newCaseDataContent().withEvent(event).withToken(TOKEN).withData(data).withDraftId(DRAFT_ID).build();
     }
 
@@ -207,7 +213,7 @@ class DefaultCreateCaseOperationTest {
         given(eventTriggerService.isPreStateValid(null, eventTrigger)).willReturn(Boolean.TRUE);
         given(savedCaseType.getState()).willReturn(caseEventStateId);
         given(caseTypeService.findState(CASE_TYPE, caseEventStateId)).willReturn(caseEventState);
-        given(validateCaseFieldsOperation.validateCaseDetails(JURISDICTION_ID, CASE_TYPE_ID, event, data))
+        given(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, eventData))
             .willReturn(data);
         given(submitCaseTransaction.submitCase(same(event),
                                                same(CASE_TYPE),
@@ -236,7 +242,7 @@ class DefaultCreateCaseOperationTest {
         given(eventTriggerService.isPreStateValid(null, eventTrigger)).willReturn(Boolean.TRUE);
         given(savedCaseType.getState()).willReturn(caseEventStateId);
         given(caseTypeService.findState(CASE_TYPE, caseEventStateId)).willReturn(caseEventState);
-        given(validateCaseFieldsOperation.validateCaseDetails(JURISDICTION_ID, CASE_TYPE_ID, event, data))
+        given(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, eventData))
             .willReturn(data);
         given(submitCaseTransaction.submitCase(same(event),
                                                same(CASE_TYPE),
@@ -265,7 +271,7 @@ class DefaultCreateCaseOperationTest {
         assertAll(() -> assertThat(caseDetails, IsInstanceOf.instanceOf(CaseDetails.class)),
                   () -> order.verify(eventTokenService)
                       .validateToken(TOKEN, UID, eventTrigger, CASE_TYPE.getJurisdiction(), CASE_TYPE),
-                  () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(JURISDICTION_ID, CASE_TYPE_ID, event, data),
+                  () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
                   () -> order.verify(submitCaseTransaction).submitCase(same(event),
                                                                        same(CASE_TYPE),
                                                                        same(IDAM_PROPERTIES),
@@ -291,7 +297,7 @@ class DefaultCreateCaseOperationTest {
         eventTrigger.setCallBackURLSubmittedEvent("http://localhost/submittedcallback");
         given(callbackInvoker.invokeSubmittedCallback(eventTrigger, null, savedCaseType)).willThrow(new CallbackException(
             "call back exception"));
-        given(validateCaseFieldsOperation.validateCaseDetails(JURISDICTION_ID, CASE_TYPE_ID, event, data))
+        given(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, eventData))
             .willReturn(data);
         given(submitCaseTransaction.submitCase(same(event),
                                                same(CASE_TYPE),
@@ -318,7 +324,7 @@ class DefaultCreateCaseOperationTest {
         assertAll("case details saved when call back fails",
                   () -> order.verify(eventTokenService)
                       .validateToken(TOKEN, UID, eventTrigger, CASE_TYPE.getJurisdiction(), CASE_TYPE),
-                  () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(JURISDICTION_ID, CASE_TYPE_ID, event, data),
+                  () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
                   () -> order.verify(submitCaseTransaction).submitCase(same(event),
                                                                        same(CASE_TYPE),
                                                                        same(IDAM_PROPERTIES),
@@ -350,7 +356,7 @@ class DefaultCreateCaseOperationTest {
         given(response.getBody()).willReturn(responseBody);
         given(response.getStatusCodeValue()).willReturn(200);
         given(savedCaseType.getCaseTypeId()).willReturn(mockCaseTypeId);
-        given(validateCaseFieldsOperation.validateCaseDetails(JURISDICTION_ID, CASE_TYPE_ID, event, data))
+        given(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, eventData))
             .willReturn(data);
         given(submitCaseTransaction.submitCase(same(event),
                                                same(CASE_TYPE),
@@ -378,7 +384,7 @@ class DefaultCreateCaseOperationTest {
                   () -> assertThat(caseDetails.getCaseTypeId(), is(mockCaseTypeId)),
                   () -> order.verify(eventTokenService)
                       .validateToken(TOKEN, UID, eventTrigger, CASE_TYPE.getJurisdiction(), CASE_TYPE),
-                  () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(JURISDICTION_ID, CASE_TYPE_ID, event, data),
+                  () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
                   () -> order.verify(submitCaseTransaction).submitCase(same(event),
                                                                        same(CASE_TYPE),
                                                                        same(IDAM_PROPERTIES),

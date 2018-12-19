@@ -1,5 +1,22 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
+import static com.google.common.collect.Maps.newHashMap;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -29,23 +46,6 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.DocumentsOperation;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
-import static com.google.common.collect.Maps.newHashMap;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
-import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
-
 class CaseDetailsEndpointTest {
 
     private static final String UID = "1231";
@@ -54,17 +54,15 @@ class CaseDetailsEndpointTest {
     private static final String CASE_ID = "1234qwer5678tyui";
     private static final String EVENT_TRIGGER_ID = "updateEvent";
     private static final Boolean IGNORE_WARNING = Boolean.TRUE;
-    private static final CaseDataContent EVENT_DATA = newCaseDataContent().build();
     private static final Event EVENT = anEvent().build();
     private static final Map<String, JsonNode> DATA = new HashMap<>();
     private static final String TOKEN = "csdcsdcdscsdcsdcsdcd";
-
-    static {
-        EVENT_DATA.setEvent(EVENT);
-        EVENT_DATA.setData(DATA);
-        EVENT_DATA.setToken(TOKEN);
-        EVENT_DATA.setIgnoreWarning(IGNORE_WARNING);
-    }
+    private static final CaseDataContent EVENT_DATA = newCaseDataContent()
+        .withEvent(EVENT)
+        .withData(DATA)
+        .withToken(TOKEN)
+        .withIgnoreWarning(IGNORE_WARNING)
+        .build();
 
     @Mock
     private ClassifiedGetCaseOperation classifiedGetCaseOperation;
@@ -222,10 +220,7 @@ class CaseDetailsEndpointTest {
             JURISDICTION_ID,
             CASE_TYPE_ID,
             CASE_ID,
-            EVENT,
-            DATA,
-            TOKEN,
-            IGNORE_WARNING);
+            EVENT_DATA);
 
         final CaseDetails output = endpoint.createCaseEventForCaseWorker(
             UID,
@@ -241,10 +236,7 @@ class CaseDetailsEndpointTest {
                 JURISDICTION_ID,
                 CASE_TYPE_ID,
                 CASE_ID,
-                EVENT_DATA.getEvent(),
-                EVENT_DATA.getData(),
-                EVENT_DATA.getToken(),
-                IGNORE_WARNING)
+                EVENT_DATA)
         );
     }
 
@@ -258,17 +250,12 @@ class CaseDetailsEndpointTest {
         final JsonNode toBeReturned = objectNode;
 
         doReturn(data).when(validateCaseFieldsOperation).validateCaseDetails(
-            JURISDICTION_ID,
             CASE_TYPE_ID,
-            EVENT,
-            DATA);
+            EVENT_DATA);
         doReturn(toBeReturned).when(midEventCallback).invoke(
-            JURISDICTION_ID,
             CASE_TYPE_ID,
-            EVENT,
-            DATA,
-            pageId,
-            IGNORE_WARNING);
+            EVENT_DATA,
+            pageId);
 
         final JsonNode output = endpoint.validateCaseDetails(
             UID,
@@ -280,17 +267,12 @@ class CaseDetailsEndpointTest {
         assertAll(
             () -> assertThat(output, sameInstance(toBeReturned)),
             () -> verify(validateCaseFieldsOperation).validateCaseDetails(
-                JURISDICTION_ID,
                 CASE_TYPE_ID,
-                EVENT_DATA.getEvent(),
-                DATA),
+                EVENT_DATA),
             () -> verify(midEventCallback).invoke(
-                JURISDICTION_ID,
                 CASE_TYPE_ID,
-                EVENT_DATA.getEvent(),
-                DATA,
-                pageId,
-                IGNORE_WARNING)
+                EVENT_DATA,
+                pageId)
         );
     }
 

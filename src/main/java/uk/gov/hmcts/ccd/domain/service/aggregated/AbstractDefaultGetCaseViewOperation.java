@@ -1,5 +1,10 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
@@ -10,16 +15,9 @@ import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
-import java.util.List;
-import java.util.Map;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
 public abstract class AbstractDefaultGetCaseViewOperation {
 
     public static final String QUALIFIER = "default";
-    private static final String RESOURCE_NOT_FOUND //
-        = "No case found ( jurisdiction = '%s', case type = '%s', case reference = '%s' )";
 
     private final GetCaseOperation getCaseOperation;
     private final UIDefinitionRepository uiDefinitionRepository;
