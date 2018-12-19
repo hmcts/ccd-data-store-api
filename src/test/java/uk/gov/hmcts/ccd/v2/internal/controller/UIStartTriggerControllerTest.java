@@ -26,6 +26,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventT
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageBuilder.newWizardPage;
 
+@DisplayName("UIStartTriggerControllerTest")
 class UIStartTriggerControllerTest {
     private static final String NAME = "eventName";
     private static final String DESCRIPTION = "eventDescription";
