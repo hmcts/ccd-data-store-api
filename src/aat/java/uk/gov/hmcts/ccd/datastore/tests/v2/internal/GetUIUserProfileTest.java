@@ -36,7 +36,7 @@ class GetUIUserProfileTest extends BaseTest {
             .body("jurisdictions.find { it.id == 'AUTOTEST1' }.name", equalTo("Auto Test 1"))
             .body("jurisdictions.find { it.id == 'AUTOTEST1' }.description", equalTo("Content for the Test Jurisdiction."))
             .body("jurisdictions.find { it.id == 'AUTOTEST1' }.caseTypes.find { it.id == 'MAPPER' }.name", equalTo("Case type for Mapper"))
-            .body("jurisdictions.find { it.id == 'AUTOTEST1' }.caseTypes.find { it.id == 'AAT' }.name", equalTo("Case type for AAT"))
+            .body("jurisdictions.find { it.id == 'AUTOTEST1' }.caseTypes.find { it.id == 'AAT' }.name", equalTo("Demo case"))
             .body("default.workbasket.jurisdiction_id", equalTo("AUTOTEST1"))
             .body("default.workbasket.case_type_id", equalTo("AAT"))
             .body("default.workbasket.state_id", equalTo("TODO"))
