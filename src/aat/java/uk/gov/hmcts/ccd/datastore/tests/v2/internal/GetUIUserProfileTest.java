@@ -28,17 +28,9 @@ class GetUIUserProfileTest extends BaseTest {
             .assertThat()
 
             .body("user.idam.defaultService", equalTo("CCD"))
-            .body("user.idam.roles", hasItems(equalTo("caseworker-test"),
-                                              equalTo("caseworker"),
-                                              equalTo("caseworker-divorce-solicitor"),
-                                              equalTo("caseworker-divorce"),
-                                              equalTo("caseworker-autotest1-private"),
+            .body("user.idam.roles", hasItems(equalTo("caseworker"),
                                               equalTo("caseworker-autotest1"),
-                                              equalTo("caseworker-test-loa1"),
                                               equalTo("caseworker-loa1"),
-                                              equalTo("caseworker-divorce-solicitor-loa1"),
-                                              equalTo("caseworker-divorce-loa1"),
-                                              equalTo("caseworker-autotest1-private-loa1"),
                                               equalTo("caseworker-autotest1-loa1")))
             .body("channels.id", is(nullValue()))
             .body("jurisdictions.find { it.id == 'AUTOTEST1' }.name", equalTo("Auto Test 1"))
