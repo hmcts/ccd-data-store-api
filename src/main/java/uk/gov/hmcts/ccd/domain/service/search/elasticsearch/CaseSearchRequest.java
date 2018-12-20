@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
 /**
  * Sample ES json search request.
@@ -29,6 +30,13 @@ public class CaseSearchRequest {
     public CaseSearchRequest(String caseTypeId, JsonNode searchRequestJsonNode) {
         this.caseTypeId = caseTypeId;
         this.searchRequestJsonNode = searchRequestJsonNode;
+        validateJsonSearchRequest();
+    }
+
+    private void validateJsonSearchRequest() {
+        if (!searchRequestJsonNode.has(QUERY_NAME)) {
+            throw new BadSearchRequest("missing required field 'query'");
+        }
     }
 
     public String getCaseTypeId() {

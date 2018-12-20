@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
@@ -65,24 +64,24 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     }
 
     private MultiSearchResult search(CrossCaseTypeSearchRequest request) {
-        MultiSearch multiSearchAction = secureAndTransformSearchRequest(request);
+        MultiSearch multiSearch = secureAndTransformSearchRequest(request);
         try {
-            return jestClient.execute(multiSearchAction);
+            return jestClient.execute(multiSearch);
         } catch (IOException e) {
-            throw new ServiceException("Exception executing Elasticsearch : " + e.getMessage(), e);
+            throw new ServiceException("Exception executing search : " + e.getMessage(), e);
         }
     }
 
     private MultiSearch secureAndTransformSearchRequest(CrossCaseTypeSearchRequest request) {
-        Collection<Search> securedSearchActions = request.getCaseTypeIds()
+        Collection<Search> securedSearches = request.getCaseTypeIds()
             .stream()
-            .map(caseTypeId -> createSecuredSearchAction(caseTypeId, request.getSearchRequestJsonNode()))
+            .map(caseTypeId -> createSecuredSearch(caseTypeId, request.getSearchRequestJsonNode()))
             .collect(toList());
 
-        return new MultiSearch.Builder(securedSearchActions).build();
+        return new MultiSearch.Builder(securedSearches).build();
     }
 
-    private Search createSecuredSearchAction(String caseTypeId, JsonNode searchRequestJsonNode) {
+    private Search createSecuredSearch(String caseTypeId, JsonNode searchRequestJsonNode) {
         CaseSearchRequest securedSearchRequest = caseSearchRequestSecurity.createSecuredSearchRequest(new CaseSearchRequest(caseTypeId, searchRequestJsonNode));
         return new Search.Builder(securedSearchRequest.toJsonString())
             .addIndex(getCaseIndexName(caseTypeId))
@@ -92,17 +91,16 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
 
     private CaseSearchResult toCaseDetailsSearchResult(MultiSearchResult multiSearchResult) {
         List<CaseDetails> caseDetails = new ArrayList<>();
-        AtomicLong totalHits = new AtomicLong(0);
+        long totalHits = 0L;
 
-        multiSearchResult.getResponses()
-            .stream()
-            .filter(response -> response.searchResult != null)
-            .forEach(response -> {
+        for (MultiSearchResult.MultiSearchResponse response : multiSearchResult.getResponses()) {
+            if (response.searchResult != null) {
                 caseDetails.addAll(searchResultToCaseList(response.searchResult));
-                totalHits.addAndGet(response.searchResult.getTotal());
-            });
+                totalHits += response.searchResult.getTotal();
+            }
+        }
 
-        return new CaseSearchResult(totalHits.get(), caseDetails);
+        return new CaseSearchResult(totalHits, caseDetails);
     }
 
     private List<CaseDetails> searchResultToCaseList(SearchResult searchResult) {

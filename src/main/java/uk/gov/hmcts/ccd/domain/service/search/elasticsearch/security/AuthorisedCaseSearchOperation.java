@@ -1,15 +1,15 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -78,23 +78,27 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
     }
 
     private CaseSearchResult searchCasesAndFilterFieldsByAccess(List<CaseType> authorisedCaseTypes, CrossCaseTypeSearchRequest authorisedSearchRequest) {
-        return Optional.of(authorisedCaseTypes)
-            .filter(CollectionUtils::isNotEmpty)
-            .map(caseTypes -> {
-                CaseSearchResult result = caseSearchOperation.execute(authorisedSearchRequest);
-                filterFieldsByAccess(caseTypes, result.getCases());
-                return result;
-            }).orElse(CaseSearchResult.EMPTY);
+        if (authorisedCaseTypes.isEmpty()) {
+            return CaseSearchResult.EMPTY;
+        }
+
+        CaseSearchResult result = caseSearchOperation.execute(authorisedSearchRequest);
+        filterFieldsByAccess(authorisedCaseTypes, result.getCases());
+
+        return result;
     }
 
     private void filterFieldsByAccess(List<CaseType> authorisedCaseTypes, List<CaseDetails> cases) {
-        cases.forEach(caseDetails -> authorisedCaseTypes.stream()
-            .filter(c -> c.getId().equalsIgnoreCase(caseDetails.getCaseTypeId()))
-            .findFirst()
-            .ifPresent(caseType -> {
-                filterCaseFieldsByAclAccess(caseType, caseDetails);
+        Map<String, CaseType> caseTypeIdByCaseType = authorisedCaseTypes
+            .stream()
+            .collect(Collectors.toMap(CaseType::getId, Function.identity()));
+
+        cases.stream()
+            .filter(caseDetails -> caseTypeIdByCaseType.containsKey(caseDetails.getCaseTypeId()))
+            .forEach(caseDetails -> {
+                filterCaseFieldsByAclAccess(caseTypeIdByCaseType.get(caseDetails.getCaseTypeId()), caseDetails);
                 filterCaseFieldsBySecurityClassification(caseDetails);
-            }));
+            });
     }
 
     private void filterCaseFieldsBySecurityClassification(CaseDetails caseDetails) {
