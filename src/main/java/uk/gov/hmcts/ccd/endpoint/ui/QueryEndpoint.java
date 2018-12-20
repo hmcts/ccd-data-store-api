@@ -192,7 +192,7 @@ public class QueryEndpoint {
                              @PathVariable("ctid") final String caseTypeId,
                              @PathVariable("cid") final String cid) {
         Instant start = Instant.now();
-        CaseView caseView = getCaseViewOperation.execute(jurisdictionId, caseTypeId, cid);
+        CaseView caseView = getCaseViewOperation.execute(cid);
         final Duration between = Duration.between(start, Instant.now());
         LOG.info("findCase has been completed in {} millisecs...", between.toMillis());
         return caseView;

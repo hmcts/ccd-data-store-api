@@ -15,9 +15,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.newDraftResponse;
 
@@ -48,10 +46,7 @@ class DraftsEndpointTest {
     @Test
     void shouldSaveDraftForCaseWorker() {
         final DraftResponse toBeReturned = newDraftResponse().build();
-        doReturn(toBeReturned).when(upsertDraftOperation).executeSave(UID,
-                                                                      JURISDICTION_ID,
-                                                                      CASE_TYPE_ID,
-                                                                      EVENT_TRIGGER_ID,
+        doReturn(toBeReturned).when(upsertDraftOperation).executeSave(CASE_TYPE_ID,
                                                                       CASE_DATA_CONTENT);
 
         final DraftResponse output = endpoint.saveDraftForCaseWorker(UID,
@@ -62,10 +57,7 @@ class DraftsEndpointTest {
 
         assertAll(
             () -> assertThat(output, sameInstance(toBeReturned)),
-            () -> verify(upsertDraftOperation).executeSave(UID,
-                                                           JURISDICTION_ID,
-                                                           CASE_TYPE_ID,
-                                                           EVENT_TRIGGER_ID,
+            () -> verify(upsertDraftOperation).executeSave(CASE_TYPE_ID,
                                                            CASE_DATA_CONTENT)
         );
     }
@@ -73,26 +65,20 @@ class DraftsEndpointTest {
     @Test
     void shouldUpdateDraftForCaseWorker() {
         final DraftResponse toBeReturned = newDraftResponse().build();
-        doReturn(toBeReturned).when(upsertDraftOperation).executeUpdate(UID,
-                                                                        JURISDICTION_ID,
-                                                                        CASE_TYPE_ID,
-                                                                        EVENT_TRIGGER_ID,
+        doReturn(toBeReturned).when(upsertDraftOperation).executeUpdate(CASE_TYPE_ID,
                                                                         DRAFT_ID,
                                                                         CASE_DATA_CONTENT);
 
         final DraftResponse output = endpoint.updateDraftForCaseWorker(UID,
-                                                               JURISDICTION_ID,
-                                                               CASE_TYPE_ID,
-                                                               EVENT_TRIGGER_ID,
-                                                               DRAFT_ID,
-                                                               CASE_DATA_CONTENT);
+                                                                       JURISDICTION_ID,
+                                                                       CASE_TYPE_ID,
+                                                                       EVENT_TRIGGER_ID,
+                                                                       DRAFT_ID,
+                                                                       CASE_DATA_CONTENT);
 
         assertAll(
             () -> assertThat(output, sameInstance(toBeReturned)),
-            () -> verify(upsertDraftOperation).executeUpdate(UID,
-                                                             JURISDICTION_ID,
-                                                             CASE_TYPE_ID,
-                                                             EVENT_TRIGGER_ID,
+            () -> verify(upsertDraftOperation).executeUpdate(CASE_TYPE_ID,
                                                              DRAFT_ID,
                                                              CASE_DATA_CONTENT)
         );
@@ -101,14 +87,12 @@ class DraftsEndpointTest {
     @Test
     void shouldFetchDraftForCaseWorker() {
         CaseView toBeReturned = new CaseView();
-        doReturn(toBeReturned).when(getDraftViewOperation).execute(any(), any(), any());
+        doReturn(toBeReturned).when(getDraftViewOperation).execute(any());
         final CaseView output = endpoint.findDraft(JURISDICTION_ID, CASE_TYPE_ID, DRAFT_ID);
 
         assertAll(
             () -> assertThat(output, sameInstance(toBeReturned)),
-            () -> verify(getDraftViewOperation).execute(JURISDICTION_ID,
-                                                        CASE_TYPE_ID,
-                                                        DRAFT_ID)
+            () -> verify(getDraftViewOperation).execute(DRAFT_ID)
         );
     }
 

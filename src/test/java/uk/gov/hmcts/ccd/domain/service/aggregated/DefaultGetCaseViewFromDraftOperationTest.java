@@ -124,9 +124,7 @@ class DefaultGetCaseViewFromDraftOperationTest {
 
     @Test
     void shouldReturnDraftView() {
-        CaseView caseView = getDraftViewOperation.execute(JURISDICTION_ID,
-                                                          CASE_TYPE_ID,
-                                                          DRAFT_ID);
+        CaseView caseView = getDraftViewOperation.execute(DRAFT_ID);
 
         assertAll(() -> verify(draftGateway).get(DRAFT_ID),
                   () -> assertThat(caseView.getCaseId(), is(String.format(DRAFT_ID_FORMAT, DRAFT_ID))),

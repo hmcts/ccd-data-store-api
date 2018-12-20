@@ -15,6 +15,7 @@ import uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDraftRequest;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 import javax.inject.Inject;
 
@@ -26,6 +27,7 @@ public class DefaultUpsertDraftOperation implements UpsertDraftOperation {
     private final ApplicationParams applicationParams;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseSanitiser caseSanitiser;
+    private final UserAuthorisation userAuthorisation;
 
     protected static final String CASE_DATA_CONTENT = "CaseDataContent";
 
@@ -33,34 +35,48 @@ public class DefaultUpsertDraftOperation implements UpsertDraftOperation {
     public DefaultUpsertDraftOperation(@Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway,
                                        @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
                                        final CaseSanitiser caseSanitiser,
-
+                                       final UserAuthorisation userAuthorisation,
                                        ApplicationParams applicationParams) {
         this.draftGateway = draftGateway;
         this.applicationParams = applicationParams;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.caseSanitiser = caseSanitiser;
+        this.userAuthorisation = userAuthorisation;
     }
 
     @Override
-    public DraftResponse executeSave(final String uid,
-                                     final String jurisdictionId,
-                                     final String caseTypeId,
-                                     final String eventTriggerId,
-                                     final CaseDataContent caseDataContent) {
+    public DraftResponse executeSave(final String caseTypeId, final CaseDataContent caseDataContent) {
         final DraftResponse draftResponse = new DraftResponse();
-        draftResponse.setId(draftGateway.create(buildCreateCaseDraft(uid, jurisdictionId, caseTypeId, eventTriggerId, caseDataContent)).toString());
+        CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
+        final String eventId = caseDataContent.getEventId();
+        if (!caseType.hasEventId(eventId)) {
+            throw new ValidationException("Validation error. Event id " + eventId + " is not found in case type definition");
+        }
+        draftResponse.setId(createDraft(caseTypeId, caseDataContent, caseType, eventId));
         return draftResponse;
     }
 
     @Override
-    public DraftResponse executeUpdate(final String uid,
-                                       final String jurisdictionId,
-                                       final String caseTypeId,
-                                       final String eventTriggerId,
-                                       final String draftId,
-                                       final CaseDataContent caseDataContent) {
-        return draftGateway.update(buildUpdateCaseDraft(uid, jurisdictionId, caseTypeId, eventTriggerId, caseDataContent),
+    public DraftResponse executeUpdate(final String caseTypeId, final String draftId, final CaseDataContent caseDataContent) {
+        CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
+        final String eventId = caseDataContent.getEventId();
+        if (!caseType.hasEventId(eventId)) {
+            throw new ValidationException("Validation error. Event id " + eventId + " is not found in case type definition");
+        }
+        return draftGateway.update(buildUpdateCaseDraft(userAuthorisation.getUserId(),
+                                                        caseType.getJurisdictionId(),
+                                                        caseTypeId,
+                                                        eventId,
+                                                        caseDataContent),
                                    draftId);
+    }
+
+    private String createDraft(String caseTypeId, CaseDataContent caseDataContent, CaseType caseType, String eventId) {
+        return draftGateway.create(buildCreateCaseDraft(userAuthorisation.getUserId(),
+                                                        caseType.getJurisdictionId(),
+                                                        caseTypeId,
+                                                        eventId,
+                                                        caseDataContent)).toString();
     }
 
     private CreateCaseDraftRequest buildCreateCaseDraft(String uid,

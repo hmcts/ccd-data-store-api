@@ -47,12 +47,6 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
         return filterUpsertAccess(caseType, userRoles, caseView);
     }
 
-    @Override
-    @Deprecated
-    public CaseView execute(String jurisdictionId, String caseTypeId, String caseReference) {
-        return execute(caseReference);
-    }
-
     private CaseView filterUpsertAccess(CaseType caseType, Set<String> userRoles, CaseView caseView) {
         CaseViewTrigger[] authorisedTriggers;
         if (!getAccessControlService().canAccessCaseTypeWithCriteria(caseType,
