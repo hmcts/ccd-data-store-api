@@ -64,8 +64,7 @@ public class DefaultUpsertDraftOperation implements UpsertDraftOperation {
             throw new ValidationException("Validation error. Event id " + eventId + " is not found in case type definition");
         }
         return draftGateway.update(buildUpdateCaseDraft(userAuthorisation.getUserId(),
-                                                        caseType.getJurisdictionId(),
-                                                        caseTypeId,
+                                                        caseType,
                                                         eventId,
                                                         caseDataContent),
                                    draftId);
@@ -73,23 +72,21 @@ public class DefaultUpsertDraftOperation implements UpsertDraftOperation {
 
     private String createDraft(String caseTypeId, CaseDataContent caseDataContent, CaseType caseType, String eventId) {
         return draftGateway.create(buildCreateCaseDraft(userAuthorisation.getUserId(),
-                                                        caseType.getJurisdictionId(),
-                                                        caseTypeId,
+                                                        caseType,
                                                         eventId,
                                                         caseDataContent)).toString();
     }
 
     private CreateCaseDraftRequest buildCreateCaseDraft(String uid,
-                                                        String jurisdictionId,
-                                                        String caseTypeId,
+                                                        CaseType caseType,
                                                         String eventTriggerId,
                                                         CaseDataContent caseDataContent) {
-        sanitiseData(caseTypeId, caseDataContent);
+        caseDataContent.setData(caseSanitiser.sanitise(caseType, caseDataContent.getData()));
 
         final CaseDraft caseDraft = new CaseDraft();
         caseDraft.setUserId(uid);
-        caseDraft.setJurisdictionId(jurisdictionId);
-        caseDraft.setCaseTypeId(caseTypeId);
+        caseDraft.setJurisdictionId(caseType.getJurisdictionId());
+        caseDraft.setCaseTypeId(caseType.getId());
         caseDraft.setEventTriggerId(eventTriggerId);
         caseDraft.setCaseDataContent(caseDataContent);
 
@@ -101,16 +98,15 @@ public class DefaultUpsertDraftOperation implements UpsertDraftOperation {
     }
 
     private UpdateCaseDraftRequest buildUpdateCaseDraft(String uid,
-                                                        String jurisdictionId,
-                                                        String caseTypeId,
+                                                        CaseType caseType,
                                                         String eventTriggerId,
                                                         CaseDataContent caseDataContent) {
-        sanitiseData(caseTypeId, caseDataContent);
+        caseDataContent.setData(caseSanitiser.sanitise(caseType, caseDataContent.getData()));
 
         final CaseDraft caseDraft = new CaseDraft();
         caseDraft.setUserId(uid);
-        caseDraft.setJurisdictionId(jurisdictionId);
-        caseDraft.setCaseTypeId(caseTypeId);
+        caseDraft.setJurisdictionId(caseType.getJurisdictionId());
+        caseDraft.setCaseTypeId(caseType.getId());
         caseDraft.setEventTriggerId(eventTriggerId);
         caseDraft.setCaseDataContent(caseDataContent);
 
@@ -118,14 +114,6 @@ public class DefaultUpsertDraftOperation implements UpsertDraftOperation {
         updateCaseDraftRequest.setType(CASE_DATA_CONTENT);
         updateCaseDraftRequest.setDocument(caseDraft);
         return updateCaseDraftRequest;
-    }
-
-    private void sanitiseData(String caseTypeId, CaseDataContent caseDataContent) {
-        final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
-        if (caseType == null) {
-            throw new ValidationException("Cannot find case type definition for " + caseTypeId);
-        }
-        caseDataContent.setData(caseSanitiser.sanitise(caseType, caseDataContent.getData()));
     }
 
 }

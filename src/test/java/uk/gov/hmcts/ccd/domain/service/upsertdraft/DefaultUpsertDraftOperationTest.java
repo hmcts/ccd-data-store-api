@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.domain.service.upsertdraft;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
-import org.eclipse.jetty.security.UserAuthentication;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -31,8 +30,11 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.newCaseDraft;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.newDraftResponse;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.EventBuilder.newEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.JurisdictionBuilder.newJurisdiction;
 import static uk.gov.hmcts.ccd.domain.service.upsertdraft.DefaultUpsertDraftOperation.CASE_DATA_CONTENT;
 
 class DefaultUpsertDraftOperationTest {
@@ -45,6 +47,8 @@ class DefaultUpsertDraftOperationTest {
     private static final String DID = "5";
     private static final CaseType CASE_TYPE = newCaseType()
         .withId(CTID)
+        .withJurisdiction(newJurisdiction().withJurisdictionId(JID).build())
+        .withEvent(newCaseEvent().withId(ETID).build())
         .withSecurityClassification(SecurityClassification.PUBLIC)
         .build();
     private static final Map<String, JsonNode> DATA = Maps.newHashMap();
@@ -63,7 +67,7 @@ class DefaultUpsertDraftOperationTest {
 
     private UpsertDraftOperation upsertDraftOperation;
 
-    private CaseDataContent caseDataContent = newCaseDataContent().withData(DATA).build();
+    private CaseDataContent caseDataContent = newCaseDataContent().withData(DATA).withEvent(newEvent().withEventId(ETID).build()).build();
     private CaseDraft caseDraft;
     private DraftResponse draftResponse = newDraftResponse().build();
 
@@ -73,7 +77,7 @@ class DefaultUpsertDraftOperationTest {
         when(applicationParams.getDraftMaxTTLDays()).thenReturn(DRAFT_MAX_STALE_DAYS);
         given(caseDefinitionRepository.getCaseType(CTID)).willReturn(CASE_TYPE);
         given(caseSanitiser.sanitise(CASE_TYPE, DATA)).willReturn(SANITISED_DATA);
-
+        given(userAuthorisation.getUserId()).willReturn(UID);
 
         upsertDraftOperation = new DefaultUpsertDraftOperation(draftGateway, caseDefinitionRepository, caseSanitiser, userAuthorisation, applicationParams);
         caseDraft = newCaseDraft()

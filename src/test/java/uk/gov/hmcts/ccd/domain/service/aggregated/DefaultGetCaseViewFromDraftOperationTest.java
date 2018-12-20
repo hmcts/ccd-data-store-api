@@ -112,7 +112,7 @@ class DefaultGetCaseViewFromDraftOperationTest {
         Jurisdiction jurisdiction = new Jurisdiction();
         jurisdiction.setName(JURISDICTION_ID);
         caseType.setJurisdiction(jurisdiction);
-        doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
+        doReturn(caseType).when(caseTypeService).getCaseType(CASE_TYPE_ID);
 
         getDraftViewOperation = new DefaultGetCaseViewFromDraftOperation(getCaseOperation,
                                                                          uiDefinitionRepository,
