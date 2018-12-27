@@ -17,7 +17,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
 @Service
-@Qualifier(AuthorisedGetCaseTypesOperation.QUALIFIER)
+@Qualifier(AuthorisedGetCaseViewOperation.QUALIFIER)
 public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOperation implements
     GetCaseViewOperation {
 

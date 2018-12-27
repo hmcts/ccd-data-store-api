@@ -28,7 +28,7 @@ public class SearchQueryOperation {
     protected static final String NO_ERROR = null;
     public static final String WORKBASKET = "WORKBASKET";
     private final MergeDataToSearchResultOperation mergeDataToSearchResultOperation;
-    private final GetCaseTypesOperation getCaseTypesOperation;
+    private final GetCaseTypeOperation getCaseTypeOperation;
     private final SearchOperation searchOperation;
     private final GetDraftsOperation getDraftsOperation;
     private final CaseTypeService caseTypeService;
@@ -36,12 +36,12 @@ public class SearchQueryOperation {
     @Autowired
     public SearchQueryOperation(@Qualifier(CreatorSearchOperation.QUALIFIER) final SearchOperation searchOperation,
                                 final MergeDataToSearchResultOperation mergeDataToSearchResultOperation,
-                                @Qualifier(AuthorisedGetCaseTypesOperation.QUALIFIER) final GetCaseTypesOperation getCaseTypesOperation,
+                                @Qualifier(AuthorisedGetCaseTypeOperation.QUALIFIER) final GetCaseTypeOperation getCaseTypeOperation,
                                 @Qualifier(DefaultGetDraftsOperation.QUALIFIER) GetDraftsOperation getDraftsOperation,
                                 final CaseTypeService caseTypeService) {
         this.searchOperation = searchOperation;
         this.mergeDataToSearchResultOperation = mergeDataToSearchResultOperation;
-        this.getCaseTypesOperation = getCaseTypesOperation;
+        this.getCaseTypeOperation = getCaseTypeOperation;
         this.getDraftsOperation = getDraftsOperation;
         this.caseTypeService = caseTypeService;
     }
@@ -49,12 +49,8 @@ public class SearchQueryOperation {
     public SearchResultView execute(final String view,
                                     final MetaData metadata,
                                     final Map<String, String> queryParameters) {
-        CaseType validCaseType = caseTypeService.getCaseTypeForJurisdiction(metadata.getCaseTypeId(),
-                                                                            metadata.getJurisdiction());
-        Optional<CaseType> caseType = this.getCaseTypesOperation.execute(metadata.getJurisdiction(), CAN_READ)
-            .stream()
-            .filter(ct -> ct.getId().equalsIgnoreCase(validCaseType.getId()))
-            .findFirst();
+
+        Optional<CaseType> caseType = this.getCaseTypeOperation.execute(metadata.getCaseTypeId(), CAN_READ);
 
         if (!caseType.isPresent()) {
             return new SearchResultView(Collections.emptyList(), Collections.emptyList(), NO_ERROR);
