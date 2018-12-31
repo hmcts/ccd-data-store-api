@@ -44,7 +44,6 @@ import uk.gov.hmcts.ccd.data.draft.DraftAccessException;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftsOperation;
 import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
 
@@ -79,9 +78,6 @@ public class SearchQueryOperationTest {
     private List<CaseDetails> cases = Lists.newArrayList();
     private CaseType testCaseType;
 
-    @Mock
-    private CaseTypeService caseTypeService;
-
     @Captor
     private ArgumentCaptor<List<CaseDetails>> argument;
 
@@ -99,12 +95,10 @@ public class SearchQueryOperationTest {
         Optional<CaseType> testCaseTypeOpt = Optional.of(testCaseType);
 
         doReturn(testCaseTypeOpt).when(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ);
-        doReturn(testCaseType).when(caseTypeService).getCaseType(CASE_TYPE_ID);
         searchQueryOperation = new SearchQueryOperation(searchOperation,
                                                         mergeDataToSearchResultOperation,
                                                         getCaseTypeOperation,
-                                                        getDraftsOperation,
-                                                        caseTypeService);
+                                                        getDraftsOperation);
         metadata = new MetaData(CASE_TYPE_ID, JURISDICTION_ID);
         criteria = new HashMap<>();
         drafts.add(newCaseDetails()
