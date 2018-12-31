@@ -51,7 +51,7 @@ public class AuthorisedGetCaseTypeOperation implements GetCaseTypeOperation {
 
     private Optional<CaseType> verifyAccess(CaseType caseType, Set<String> userRoles, Predicate<AccessControlList> access) {
 
-        if (caseType == null || CollectionUtils.isEmpty(userRoles)) {
+        if (CollectionUtils.isEmpty(userRoles)) {
             return Optional.empty();
         }
 

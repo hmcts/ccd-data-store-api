@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 /**
  *
- * @deprecated uses an implementation of {@link DefaultGetCaseTypesOperation} with serious performance issues.
+ * @deprecated until {@link DefaultGetCaseTypesOperation} is deprecated
  */
 @Deprecated
 @Service

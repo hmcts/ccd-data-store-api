@@ -51,6 +51,11 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         this.restTemplate = restTemplate;
     }
 
+    /**
+     *
+     * @deprecated current implementation has serious performance issues
+     */
+    @Deprecated
     @Override
     public List<CaseType> getCaseTypesForJurisdiction(final String jurisdictionId) {
         try {

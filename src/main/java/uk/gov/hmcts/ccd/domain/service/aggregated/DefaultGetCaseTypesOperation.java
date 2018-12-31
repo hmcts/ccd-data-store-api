@@ -12,7 +12,7 @@ import java.util.function.Predicate;
 
 /**
  *
- * @deprecated implementation with serious performance issues because bypasses case types cache
+ * @deprecated current implementation has serious performance issues
  */
 @Deprecated
 @Service
