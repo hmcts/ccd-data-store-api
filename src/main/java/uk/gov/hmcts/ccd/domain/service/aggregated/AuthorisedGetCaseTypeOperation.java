@@ -36,9 +36,7 @@ public class AuthorisedGetCaseTypeOperation implements GetCaseTypeOperation {
     public Optional<CaseType> execute(String caseTypeId, Predicate<AccessControlList> access) {
         final Set<String> userRoles = getUserRoles();
         return getCaseTypeOperation.execute(caseTypeId, access)
-            .map(caseType -> verifyAccess(caseType, userRoles, access))
-            .filter(Optional::isPresent)
-            .map(Optional::get);
+            .flatMap(caseType -> verifyAccess(caseType, userRoles, access));
     }
 
     private Set<String> getUserRoles() {
