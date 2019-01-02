@@ -56,6 +56,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
      * @deprecated current implementation has serious performance issues
      */
     @Deprecated
+    @SuppressWarnings("squid:S1133")
     @Override
     public List<CaseType> getCaseTypesForJurisdiction(final String jurisdictionId) {
         try {

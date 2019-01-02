@@ -96,6 +96,7 @@ public class CaseTypeService {
      * @deprecated current implementation has serious performance issues
      */
     @Deprecated
+    @SuppressWarnings("squid:S1133")
     public List<CaseType> getCaseTypesForJurisdiction(final String jurisdictionId) {
         final List<CaseType> caseTypes = caseDefinitionRepository.getCaseTypesForJurisdiction(jurisdictionId);
 

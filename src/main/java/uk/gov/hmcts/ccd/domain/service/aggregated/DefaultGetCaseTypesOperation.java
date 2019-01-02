@@ -16,6 +16,7 @@ import java.util.function.Predicate;
  */
 @Deprecated
 @Service
+@SuppressWarnings("squid:S1133")
 @Qualifier(DefaultGetCaseTypesOperation.QUALIFIER)
 public class DefaultGetCaseTypesOperation implements GetCaseTypesOperation {
     public static final String QUALIFIER = "default";
