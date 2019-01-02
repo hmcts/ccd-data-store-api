@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest.QUERY_NAME;
+import static uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest.QUERY;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
@@ -49,7 +49,7 @@ public class CrossCaseTypeSearchRequest {
     }
 
     private void validateJsonSearchRequest() {
-        if (!searchRequestJsonNode.has(QUERY_NAME)) {
+        if (!searchRequestJsonNode.has(QUERY)) {
             throw new BadSearchRequest("missing required field 'query'");
         }
     }

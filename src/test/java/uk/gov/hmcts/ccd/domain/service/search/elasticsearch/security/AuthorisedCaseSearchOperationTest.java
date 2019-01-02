@@ -18,7 +18,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-import static uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest.QUERY_NAME;
+import static uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest.QUERY;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -70,7 +70,7 @@ class AuthorisedCaseSearchOperationTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
         caseType.setId(CASE_TYPE_ID_1);
-        searchRequestJsonNode.set(QUERY_NAME, mock(ObjectNode.class));
+        searchRequestJsonNode.set(QUERY, mock(ObjectNode.class));
     }
 
     @Test

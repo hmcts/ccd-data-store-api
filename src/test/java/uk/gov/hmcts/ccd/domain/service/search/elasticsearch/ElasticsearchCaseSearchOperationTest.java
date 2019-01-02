@@ -14,7 +14,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest.QUERY_NAME;
+import static uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest.QUERY;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -78,7 +78,7 @@ class ElasticsearchCaseSearchOperationTest {
         MockitoAnnotations.initMocks(this);
         when(applicationParams.getCasesIndexNameFormat()).thenReturn(INDEX_NAME_FORMAT);
         when(applicationParams.getCasesIndexType()).thenReturn(INDEX_TYPE);
-        searchRequestJsonNode.set(QUERY_NAME, mock(ObjectNode.class));
+        searchRequestJsonNode.set(QUERY, mock(ObjectNode.class));
     }
 
     @Nested
