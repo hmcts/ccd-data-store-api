@@ -15,6 +15,7 @@ import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
 
@@ -75,6 +76,14 @@ public class CaseAccessService {
             .findCaseRoles(Long.valueOf(caseId), userRepository.getUserId())
             .stream()
             .collect(Collectors.toSet());
+    }
+
+    public Set<String> getUserRoles() {
+        Set<String> userRoles = userRepository.getUserRoles();
+        if (userRoles == null) {
+            throw new ValidationException("Cannot find user roles for the user");
+        }
+        return userRoles;
     }
 
     private Boolean accessGranted(CaseDetails caseDetails, IDAMProperties currentUser) {

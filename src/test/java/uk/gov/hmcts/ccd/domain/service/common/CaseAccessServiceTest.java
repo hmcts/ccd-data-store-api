@@ -10,11 +10,13 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
+import com.google.common.collect.Sets;
 import org.hamcrest.core.Is;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,6 +29,7 @@ import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
 
@@ -355,6 +358,34 @@ class CaseAccessServiceTest {
                 () -> assertThat(caseRoles.size(), Is.is(2)),
                 () -> assertThat(caseRoles, hasItems("[CASE_ROLE_1]", "[CASE_ROLE_2]"))
             );
+        }
+    }
+
+    @Nested
+    @DisplayName("user roles")
+    class UserRoleTest {
+        @BeforeEach
+        void setUp() {
+            doReturn(Sets.newHashSet(CASE_GRANTED_1_ID, CASE_GRANTED_2_ID)).when(userRepository).getUserRoles();
+        }
+
+        @Test
+        @DisplayName("should return user roles")
+        void getCaseRoles() {
+            Set<String> caseRoles = caseAccessService.getUserRoles();
+
+            assertAll(
+                () -> assertThat(caseRoles.size(), Is.is(2)),
+                () -> assertThat(caseRoles, hasItems(CASE_GRANTED_1_ID, CASE_GRANTED_2_ID))
+            );
+        }
+
+        @Test
+        @DisplayName("should throw exception when no user role found")
+        void getCaseRolesThrows() {
+            doReturn(null).when(userRepository).getUserRoles();
+
+            assertThrows(ValidationException.class, () -> caseAccessService.getUserRoles());
         }
     }
 

@@ -19,8 +19,6 @@ import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
-import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
@@ -45,7 +43,6 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
     private final CaseDetailsRepository caseDetailsRepository;
     private final AccessControlService accessControlService;
     private final UIDService uidService;
-    private final UserRepository userRepository;
     private final CaseAccessService caseAccessService;
     private final DraftGateway draftGateway;
 
@@ -54,7 +51,6 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
                                          @Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
                                          final AccessControlService accessControlService,
                                          final UIDService uidService,
-                                         @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
                                          @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway,
                                          CaseAccessService caseAccessService) {
 
@@ -63,7 +59,6 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
         this.caseDetailsRepository = caseDetailsRepository;
         this.accessControlService = accessControlService;
         this.uidService = uidService;
-        this.userRepository = userRepository;
         this.caseAccessService = caseAccessService;
         this.draftGateway = draftGateway;
     }
@@ -115,19 +110,11 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
     }
 
 
-    private Set<String> getUserRoles() {
-        Set<String> userRoles = userRepository.getUserRoles();
-        if (userRoles == null) {
-            throw new ValidationException("Cannot find user roles for the user");
-        }
-        return userRoles;
-    }
-
     private StartEventTrigger verifyReadAccess(final String caseTypeId, final StartEventTrigger startEventTrigger) {
 
         final CaseType caseType = getCaseType(caseTypeId);
 
-        Set<String> userRoles = Sets.union(getUserRoles(), getCaseRoles(startEventTrigger.getCaseDetails()));
+        Set<String> userRoles = Sets.union(caseAccessService.getUserRoles(), getCaseRoles(startEventTrigger.getCaseDetails()));
 
         CaseDetails caseDetails = startEventTrigger.getCaseDetails();
 

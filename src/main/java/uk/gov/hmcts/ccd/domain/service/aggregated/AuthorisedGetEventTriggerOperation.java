@@ -15,8 +15,6 @@ import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
-import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
@@ -38,7 +36,6 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseDetailsRepository caseDetailsRepository;
     private final CaseAccessService caseAccessService;
-    private final UserRepository userRepository;
     private final GetEventTriggerOperation getEventTriggerOperation;
     private final AccessControlService accessControlService;
     private final EventTriggerService eventTriggerService;
@@ -49,14 +46,12 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
                                               @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
                                               @Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
                                               CaseAccessService caseAccessService,
-                                              @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
                                               final AccessControlService accessControlService,
                                               final EventTriggerService eventTriggerService,
                                               @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway) {
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseAccessService = caseAccessService;
-        this.userRepository = userRepository;
         this.getEventTriggerOperation = getEventTriggerOperation;
         this.accessControlService = accessControlService;
         this.eventTriggerService = eventTriggerService;
@@ -67,7 +62,7 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
     public CaseEventTrigger executeForCaseType(String caseTypeId, String eventTriggerId, Boolean ignoreWarning) {
         final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
 
-        Set<String> userRoles = getUserRoles();
+        Set<String> userRoles = caseAccessService.getUserRoles();
 
         verifyRequiredAccessExistsForCaseType(eventTriggerId, caseType, userRoles);
 
@@ -87,7 +82,7 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
 
         validateEventTrigger(() -> !eventTriggerService.isPreStateValid(caseDetails.getState(), eventTrigger));
 
-        Set<String> userRoles = Sets.union(getUserRoles(), caseAccessService.getCaseRoles(caseDetails.getId()));
+        Set<String> userRoles = Sets.union(caseAccessService.getUserRoles(), caseAccessService.getCaseRoles(caseDetails.getId()));
 
         verifyMandatoryAccessForCase(eventTriggerId, caseDetails, caseType, userRoles);
 
@@ -102,7 +97,7 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
         final CaseDetails caseDetails = draftGateway.getCaseDetails(Draft.stripId(draftReference));
         final CaseType caseType = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
 
-        Set<String> userRoles = getUserRoles();
+        Set<String> userRoles = caseAccessService.getUserRoles();
 
         verifyRequiredAccessExistsForCaseType(draftResponse.getDocument().getEventTriggerId(), caseType, userRoles);
 
@@ -119,14 +114,6 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
             throw new BadRequestException("Case reference is not valid");
         }
         return caseDetails;
-    }
-
-    private Set<String> getUserRoles() {
-        Set<String> userRoles = userRepository.getUserRoles();
-        if (userRoles == null) {
-            throw new ValidationException("Cannot find user roles for the user");
-        }
-        return userRoles;
     }
 
     private void verifyRequiredAccessExistsForCaseType(String eventTriggerId, CaseType caseType, Set<String> userRoles) {
