@@ -9,7 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.helper.elastic.ElasticsearchTestDataLoaderExtension;
 
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FullCase.NUMBER;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.NUMBER;
 
 @ExtendWith(ElasticsearchTestDataLoaderExtension.class)
 public class ElasticsearchNumberFieldTest extends ElasticsearchBaseTest {

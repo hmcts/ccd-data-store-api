@@ -23,6 +23,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
+import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.model.std.validator.EventValidator;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
@@ -107,33 +108,30 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
                                        final String jurisdictionId,
                                        final String caseTypeId,
                                        final String caseReference,
-                                       final Event event,
-                                       final Map<String, JsonNode> data,
-                                       final String token,
-                                       final Boolean ignoreWarning) {
-        eventValidator.validate(event);
+                                       final CaseDataContent content) {
+        eventValidator.validate(content.getEvent());
 
         final CaseType caseType = findAndValidateCaseType(caseTypeId, jurisdictionId);
-        final CaseEvent eventTrigger = findAndValidateCaseEvent(caseType, event);
+        final CaseEvent eventTrigger = findAndValidateCaseEvent(caseType, content.getEvent());
         final CaseDetails caseDetails = lockCaseDetails(caseType, caseReference);
         final CaseDetails caseDetailsBefore = caseService.clone(caseDetails);
 
-        eventTokenService.validateToken(token, uid, caseDetails, eventTrigger, caseType.getJurisdiction(), caseType);
+        eventTokenService.validateToken(content.getToken(), uid, caseDetails, eventTrigger, caseType.getJurisdiction(), caseType);
 
         validatePreState(caseDetails, eventTrigger);
-        mergeUpdatedFieldsToCaseDetails(data, caseDetails, eventTrigger, caseType);
+        mergeUpdatedFieldsToCaseDetails(content.getData(), caseDetails, eventTrigger, caseType);
         AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = callbackInvoker.invokeAboutToSubmitCallback(eventTrigger,
             caseDetailsBefore,
             caseDetails,
             caseType,
-            ignoreWarning);
+            content.getIgnoreWarning());
 
         final Optional<String>
             newState = aboutToSubmitCallbackResponse.getState();
 
-        this.validateCaseFieldsOperation.validateCaseDetails(jurisdictionId, caseTypeId, event, caseDetails.getData());
+        this.validateCaseFieldsOperation.validateCaseDetails(caseTypeId, content);
         final CaseDetails savedCaseDetails = saveCaseDetails(caseDetails, eventTrigger, newState);
-        saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse, event, eventTrigger, savedCaseDetails, caseType);
+        saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse, content.getEvent(), eventTrigger, savedCaseDetails, caseType);
 
         if (!isBlank(eventTrigger.getCallBackURLSubmittedEvent())) {
             try { // make a call back
