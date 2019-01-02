@@ -1,12 +1,12 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
-import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
-import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
+import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
 public interface CaseDetailsRepository {
     CaseDetails set(CaseDetails caseDetails);
@@ -16,6 +16,8 @@ public interface CaseDetailsRepository {
     Optional<CaseDetails> findByReference(String jurisdiction, Long caseReference);
 
     Optional<CaseDetails> findByReference(String jurisdiction, String reference);
+
+    Optional<CaseDetails> findByReference(String reference);
 
     Optional<CaseDetails> lockByReference(String jurisdiction, Long reference);
 

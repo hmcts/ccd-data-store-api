@@ -1,5 +1,23 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import java.io.IOException;
+import java.util.*;
+
+import static com.google.common.collect.Sets.newHashSet;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
+import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
+import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.RESTRICTED;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,19 +38,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
-
-import java.io.IOException;
-import java.util.*;
-
-import static com.google.common.collect.Sets.newHashSet;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.*;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.aCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 
 public class SecurityClassificationServiceTest {
 
@@ -69,8 +74,8 @@ public class SecurityClassificationServiceTest {
         private final String SC_RESTRICTED = "RESTRICTED";
         private final String CASE_FIELD_ID_1_1 = "CASE_FIELD_1_1";
         private final String CASE_FIELD_ID_1_2 = "CASE_FIELD_1_2";
-        private final CaseField CASE_FIELD_1_1 = aCaseField().withId(CASE_FIELD_ID_1_1).withSC(SC_PUBLIC).build();
-        private final CaseField CASE_FIELD_1_2 = aCaseField().withId(CASE_FIELD_ID_1_2).withSC(SC_RESTRICTED).build();
+        private final CaseField CASE_FIELD_1_1 = newCaseField().withId(CASE_FIELD_ID_1_1).withSC(SC_PUBLIC).build();
+        private final CaseField CASE_FIELD_1_2 = newCaseField().withId(CASE_FIELD_ID_1_2).withSC(SC_RESTRICTED).build();
         private final CaseType testCaseType = newCaseType()
             .withId(CASE_TYPE_ONE)
             .withField(CASE_FIELD_1_1)

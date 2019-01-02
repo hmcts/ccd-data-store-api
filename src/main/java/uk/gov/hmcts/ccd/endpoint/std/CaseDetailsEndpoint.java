@@ -108,7 +108,7 @@ public class CaseDetailsEndpoint {
 
         final Instant start = Instant.now();
         final CaseDetails caseDetails = getCaseOperation.execute(jurisdictionId, caseTypeId, caseId)
-                            .orElseThrow(() -> new CaseNotFoundException(jurisdictionId, caseTypeId, caseId));
+            .orElseThrow(() -> new CaseNotFoundException(jurisdictionId, caseTypeId, caseId));
         final Duration duration = Duration.between(start, Instant.now());
         appInsights.trackRequest("findCaseDetailsForCaseworker", duration.toMillis(), true);
         return caseDetails;
@@ -133,7 +133,7 @@ public class CaseDetailsEndpoint {
         @PathVariable("cid") final String caseId) {
 
         return getCaseOperation.execute(jurisdictionId, caseTypeId, caseId)
-                               .orElseThrow(() -> new CaseNotFoundException(caseId));
+            .orElseThrow(() -> new CaseNotFoundException(caseId));
     }
 
     @Transactional
@@ -158,7 +158,7 @@ public class CaseDetailsEndpoint {
         @ApiParam(value = "Should `AboutToStart` callback warnings be ignored")
         @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
 
-        return startEventOperation.triggerStartForCase(uid, jurisdictionId, caseTypeId, caseId, eventTriggerId, ignoreWarning);
+        return startEventOperation.triggerStartForCase(caseId, eventTriggerId, ignoreWarning);
     }
 
     @Transactional
@@ -183,7 +183,7 @@ public class CaseDetailsEndpoint {
         @ApiParam(value = "Should `AboutToStart` callback warnings be ignored")
         @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
 
-        return startEventOperation.triggerStartForCase(uid, jurisdictionId, caseTypeId, caseId, eventTriggerId, ignoreWarning);
+        return startEventOperation.triggerStartForCase(caseId, eventTriggerId, ignoreWarning);
     }
 
     @Transactional
@@ -303,17 +303,12 @@ public class CaseDetailsEndpoint {
         @RequestParam(required = false) final String pageId,
         @RequestBody final CaseDataContent content) {
 
-        Map<String, JsonNode> data = validateCaseFieldsOperation.validateCaseDetails(jurisdictionId,
-            caseTypeId,
-            content.getEvent(),
-            content.getData());
+        validateCaseFieldsOperation.validateCaseDetails(caseTypeId,
+                                                        content);
 
-        return midEventCallback.invoke(jurisdictionId,
-            caseTypeId,
-            content.getEvent(),
-            data,
-            pageId,
-            content.getIgnoreWarning());
+        return midEventCallback.invoke(caseTypeId,
+                                       content,
+                                       pageId);
     }
 
     @Transactional
@@ -338,7 +333,11 @@ public class CaseDetailsEndpoint {
         @ApiParam(value = "Case ID", required = true)
         @PathVariable("cid") final String caseId,
         @RequestBody final CaseDataContent content) {
-        return createEventOperation.createCaseEvent(uid, jurisdictionId, caseTypeId, caseId, content.getEvent(), content.getData(), content.getToken(), content.getIgnoreWarning());
+        return createEventOperation.createCaseEvent(uid,
+                                                    jurisdictionId,
+                                                    caseTypeId,
+                                                    caseId,
+                                                    content);
     }
 
     @Transactional
@@ -363,7 +362,11 @@ public class CaseDetailsEndpoint {
         @ApiParam(value = "Case ID", required = true)
         @PathVariable("cid") final String caseId,
         @RequestBody final CaseDataContent content) {
-        return createEventOperation.createCaseEvent(uid, jurisdictionId, caseTypeId, caseId, content.getEvent(), content.getData(), content.getToken(), content.getIgnoreWarning());
+        return createEventOperation.createCaseEvent(uid,
+                                                    jurisdictionId,
+                                                    caseTypeId,
+                                                    caseId,
+                                                    content);
     }
 
     @Transactional
@@ -389,8 +392,8 @@ public class CaseDetailsEndpoint {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "List of case data for the given search criteria")})
     public List<CaseDetails> searchCasesForCaseWorkers(@PathVariable("jid") final String jurisdictionId,
-                                                      @PathVariable("ctid") final String caseTypeId,
-                                                      @RequestParam Map<String, String> queryParameters) {
+                                                       @PathVariable("ctid") final String caseTypeId,
+                                                       @RequestParam Map<String, String> queryParameters) {
         return searchCases(jurisdictionId, caseTypeId, queryParameters);
     }
 
@@ -420,10 +423,10 @@ public class CaseDetailsEndpoint {
     @GetMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/pagination_metadata")
     @ApiOperation(value = "Get the pagination metadata for a case data search")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Pagination metadata for the given search criteria")})
+        @ApiResponse(code = 200, message = "Pagination metadata for the given search criteria")})
     public PaginatedSearchMetadata searchCasesMetadataForCaseworkers(@PathVariable("jid") final String jurisdictionId,
-                                                                  @PathVariable("ctid") final String caseTypeId,
-                                                                  @RequestParam Map<String, String> queryParameters) {
+                                                                     @PathVariable("ctid") final String caseTypeId,
+                                                                     @RequestParam Map<String, String> queryParameters) {
         return searchMetadata(jurisdictionId, caseTypeId, queryParameters);
     }
 
@@ -431,7 +434,7 @@ public class CaseDetailsEndpoint {
     @GetMapping(value = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/pagination_metadata")
     @ApiOperation(value = "Get the pagination metadata for a case data search")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Pagination metadata for the given search criteria")})
+        @ApiResponse(code = 200, message = "Pagination metadata for the given search criteria")})
     public PaginatedSearchMetadata searchCasesMetadataForCitizens(@PathVariable("jid") final String jurisdictionId,
                                                                   @PathVariable("ctid") final String caseTypeId,
                                                                   @RequestParam Map<String, String> queryParameters) {
@@ -450,12 +453,11 @@ public class CaseDetailsEndpoint {
     }
 
 
-
     private void validateMetadataSearchParameters(Map<String, String> queryParameters) {
         List<String> metadataParams = queryParameters.keySet().stream().filter(p -> !FieldMapSanitizeOperation.isCaseFieldParameter(p)).collect(toList());
         if (!MetaData.unknownMetadata(metadataParams).isEmpty()) {
             throw new BadRequestException(String.format("unknown metadata search parameters: %s",
-                    String.join((","), MetaData.unknownMetadata(metadataParams))));
+                                                        String.join((","), MetaData.unknownMetadata(metadataParams))));
         }
         param(queryParameters, SECURITY_CLASSIFICATION.getParameterName()).ifPresent(sc -> {
             if (!EnumUtils.isValidEnum(SecurityClassification.class, sc.toUpperCase())) {

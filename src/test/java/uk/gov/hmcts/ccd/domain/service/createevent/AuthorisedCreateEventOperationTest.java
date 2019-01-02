@@ -15,6 +15,7 @@ import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -36,6 +37,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
@@ -67,6 +69,18 @@ class AuthorisedCreateEventOperationTest {
     private static final Map<String, JsonNode> NEW_DATA = Maps.newHashMap();
     private static final String TOKEN = "JwtToken";
     private static final Boolean IGNORE = Boolean.TRUE;
+    public static final CaseDataContent INVALID_CASE_DATA_CONTENT = newCaseDataContent()
+        .withEvent(NULL_EVENT)
+        .withData(NEW_DATA)
+        .withToken(TOKEN)
+        .withIgnoreWarning(IGNORE)
+        .build();
+    public static final CaseDataContent CASE_DATA_CONTENT = newCaseDataContent()
+        .withEvent(EVENT)
+        .withData(NEW_DATA)
+        .withToken(TOKEN)
+        .withIgnoreWarning(IGNORE)
+        .build();
 
     @Mock
     private CreateEventOperation createEventOperation;
@@ -119,10 +133,7 @@ class AuthorisedCreateEventOperationTest {
                                                                             JURISDICTION_ID,
                                                                             CASE_TYPE_ID,
                                                                             CASE_REFERENCE,
-                                                                            EVENT,
-                                                                            NEW_DATA,
-                                                                            TOKEN,
-                                                                            IGNORE);
+                                                                            CASE_DATA_CONTENT);
         caseType.setEvents(events);
         caseType.setCaseFields(caseFields);
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseType);
@@ -158,19 +169,13 @@ class AuthorisedCreateEventOperationTest {
                                                        JURISDICTION_ID,
                                                        CASE_TYPE_ID,
                                                        CASE_REFERENCE,
-                                                       EVENT,
-                                                       NEW_DATA,
-                                                       TOKEN,
-                                                       IGNORE);
+                                                       CASE_DATA_CONTENT);
 
         verify(createEventOperation).createCaseEvent(UID,
                                                      JURISDICTION_ID,
                                                      CASE_TYPE_ID,
                                                      CASE_REFERENCE,
-                                                     EVENT,
-                                                     NEW_DATA,
-                                                     TOKEN,
-                                                     IGNORE);
+                                                     CASE_DATA_CONTENT);
     }
 
     @Test
@@ -181,10 +186,7 @@ class AuthorisedCreateEventOperationTest {
                                                                                                            JURISDICTION_ID,
                                                                                                            CASE_TYPE_ID,
                                                                                                            CASE_REFERENCE,
-                                                                                                           EVENT,
-                                                                                                           NEW_DATA,
-                                                                                                           TOKEN,
-                                                                                                           IGNORE));
+                                                                                                           CASE_DATA_CONTENT));
 
     }
 
@@ -195,18 +197,12 @@ class AuthorisedCreateEventOperationTest {
                                                                   JURISDICTION_ID,
                                                                   CASE_TYPE_ID,
                                                                   CASE_REFERENCE,
-                                                                  EVENT,
-                                                                  NEW_DATA,
-                                                                  TOKEN,
-                                                                  IGNORE);
+                                                                  CASE_DATA_CONTENT);
         final CaseDetails output = authorisedCreateEventOperation.createCaseEvent(UID,
                                                                                   JURISDICTION_ID,
                                                                                   CASE_TYPE_ID,
                                                                                   CASE_REFERENCE,
-                                                                                  EVENT,
-                                                                                  NEW_DATA,
-                                                                                  TOKEN,
-                                                                                  IGNORE);
+                                                                                  CASE_DATA_CONTENT);
 
         assertThat(output, is(nullValue()));
     }
@@ -219,10 +215,7 @@ class AuthorisedCreateEventOperationTest {
                                                                                   JURISDICTION_ID,
                                                                                   CASE_TYPE_ID,
                                                                                   CASE_REFERENCE,
-                                                                                  EVENT,
-                                                                                  NEW_DATA,
-                                                                                  TOKEN,
-                                                                                  IGNORE);
+                                                                                  CASE_DATA_CONTENT);
         InOrder inOrder = inOrder(caseDefinitionRepository, userRepository, getCaseOperation,
                                   createEventOperation, accessControlService);
         assertAll(
@@ -246,10 +239,7 @@ class AuthorisedCreateEventOperationTest {
                                                                        JURISDICTION_ID,
                                                                        CASE_TYPE_ID,
                                                                        CASE_REFERENCE,
-                                                                       EVENT,
-                                                                       NEW_DATA,
-                                                                       TOKEN,
-                                                                       IGNORE),
+                                                                       CASE_DATA_CONTENT),
             () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseType),
                                                                                      eq(USER_ROLES),
                                                                                      eq(CAN_READ)),
@@ -268,20 +258,14 @@ class AuthorisedCreateEventOperationTest {
                                                                   JURISDICTION_ID,
                                                                   CASE_TYPE_ID,
                                                                   CASE_REFERENCE,
-                                                                  EVENT,
-                                                                  NEW_DATA,
-                                                                  TOKEN,
-                                                                  IGNORE);
+                                                                  CASE_DATA_CONTENT);
 
 
         final CaseDetails output = authorisedCreateEventOperation.createCaseEvent(UID,
                                                                                   JURISDICTION_ID,
                                                                                   CASE_TYPE_ID,
                                                                                   CASE_REFERENCE,
-                                                                                  EVENT,
-                                                                                  NEW_DATA,
-                                                                                  TOKEN,
-                                                                                  IGNORE);
+                                                                                  CASE_DATA_CONTENT);
 
         assertThat(output, is(nullValue()));
     }
@@ -296,10 +280,7 @@ class AuthorisedCreateEventOperationTest {
                                                                                                      JURISDICTION_ID,
                                                                                                      CASE_TYPE_ID,
                                                                                                      CASE_REFERENCE,
-                                                                                                     EVENT,
-                                                                                                     NEW_DATA,
-                                                                                                     TOKEN,
-                                                                                                     IGNORE));
+                                                                                                     CASE_DATA_CONTENT));
     }
 
     @Test
@@ -312,10 +293,7 @@ class AuthorisedCreateEventOperationTest {
                                                                                                      JURISDICTION_ID,
                                                                                                      CASE_TYPE_ID,
                                                                                                      CASE_REFERENCE,
-                                                                                                     EVENT,
-                                                                                                     NEW_DATA,
-                                                                                                     TOKEN,
-                                                                                                     IGNORE));
+                                                                                                     CASE_DATA_CONTENT));
     }
 
     @Test
@@ -328,10 +306,7 @@ class AuthorisedCreateEventOperationTest {
                                                                                                            JURISDICTION_ID,
                                                                                                            CASE_TYPE_ID,
                                                                                                            CASE_REFERENCE,
-                                                                                                           EVENT,
-                                                                                                           NEW_DATA,
-                                                                                                           TOKEN,
-                                                                                                           IGNORE));
+                                                                                                           CASE_DATA_CONTENT));
     }
 
     @Test
@@ -340,13 +315,10 @@ class AuthorisedCreateEventOperationTest {
         when(accessControlService.canAccessCaseStateWithCriteria(eq(STATE_ID), eq(caseType), eq(USER_ROLES), eq(CAN_UPDATE))).thenReturn(
             false);
         assertThrows(ResourceNotFoundException.class, () -> authorisedCreateEventOperation.createCaseEvent(UID,
-            JURISDICTION_ID,
-            CASE_TYPE_ID,
-            CASE_REFERENCE,
-            EVENT,
-            NEW_DATA,
-            TOKEN,
-            IGNORE));
+                                                                                                           JURISDICTION_ID,
+                                                                                                           CASE_TYPE_ID,
+                                                                                                           CASE_REFERENCE,
+                                                                                                           CASE_DATA_CONTENT));
 
     }
 
@@ -358,10 +330,7 @@ class AuthorisedCreateEventOperationTest {
                                                                                                            JURISDICTION_ID,
                                                                                                            CASE_TYPE_ID,
                                                                                                            CASE_REFERENCE,
-                                                                                                           NULL_EVENT,
-                                                                                                           NEW_DATA,
-                                                                                                           TOKEN,
-                                                                                                           IGNORE));
+                                                                                                           INVALID_CASE_DATA_CONTENT));
     }
 
     @Test
@@ -377,10 +346,7 @@ class AuthorisedCreateEventOperationTest {
                                                                                                            JURISDICTION_ID,
                                                                                                            CASE_TYPE_ID,
                                                                                                            CASE_REFERENCE,
-                                                                                                           EVENT,
-                                                                                                           NEW_DATA,
-                                                                                                           TOKEN,
-                                                                                                           IGNORE));
+                                                                                                           CASE_DATA_CONTENT));
     }
 
     @Test
@@ -396,10 +362,7 @@ class AuthorisedCreateEventOperationTest {
                                                                                                            JURISDICTION_ID,
                                                                                                            CASE_TYPE_ID,
                                                                                                            CASE_REFERENCE,
-                                                                                                           EVENT,
-                                                                                                           NEW_DATA,
-                                                                                                           TOKEN,
-                                                                                                           IGNORE));
+                                                                                                           CASE_DATA_CONTENT));
     }
 
     @Test
@@ -414,10 +377,7 @@ class AuthorisedCreateEventOperationTest {
                                                                                        JURISDICTION_ID,
                                                                                        CASE_TYPE_ID,
                                                                                        CASE_REFERENCE,
-                                                                                       EVENT,
-                                                                                       NEW_DATA,
-                                                                                       TOKEN,
-                                                                                       IGNORE);
+                                                                                       CASE_DATA_CONTENT);
         assertThat(caseDetails, is(nullValue()));
     }
 

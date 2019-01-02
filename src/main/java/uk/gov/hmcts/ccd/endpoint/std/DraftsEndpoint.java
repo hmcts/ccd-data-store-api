@@ -1,5 +1,9 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
+import javax.transaction.Transactional;
+import java.time.Duration;
+import java.time.Instant;
+
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,7 +12,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway;
+import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
@@ -16,10 +20,6 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetCaseViewFromDraftOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseViewOperation;
 import uk.gov.hmcts.ccd.domain.service.upsertdraft.UpsertDraftOperation;
-
-import javax.transaction.Transactional;
-import java.time.Duration;
-import java.time.Instant;
 
 @RestController
 @RequestMapping(path = "/",
@@ -36,7 +36,7 @@ public class DraftsEndpoint {
     @Autowired
     public DraftsEndpoint(@Qualifier("default") final UpsertDraftOperation upsertDraftOperation,
                           @Qualifier(DefaultGetCaseViewFromDraftOperation.QUALIFIER) GetCaseViewOperation getDraftViewOperation,
-                          @Qualifier(DefaultDraftGateway.QUALIFIER) DraftGateway draftGateway) {
+                          @Qualifier(CachedDraftGateway.QUALIFIER) DraftGateway draftGateway) {
         this.upsertDraftOperation = upsertDraftOperation;
         this.getDraftViewOperation = getDraftViewOperation;
         this.draftGateway = draftGateway;

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -24,14 +25,18 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.service.common.*;
+import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
+import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
@@ -43,8 +48,6 @@ class AuthorisedGetEventTriggerOperationTest {
     private static final String CASEWORKER_DIVORCE = "caseworker-divorce-loa3";
 
     private static final String EVENT_TRIGGER_ID = "testEventTriggerId";
-    private static final String UID = "123";
-    private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_REFERENCE = "1234567891012345";
     private static final String CASE_ID = "26";
     private static final Long CASE_REFERENCE_LONG = 1234567891012345L;
@@ -59,7 +62,7 @@ class AuthorisedGetEventTriggerOperationTest {
     private CaseDefinitionRepository caseDefinitionRepository;
 
     @Mock
-    private CaseService caseService;
+    private CaseDetailsRepository caseDetailsRepository;
 
     @Mock
     private AccessControlService accessControlService;
@@ -68,7 +71,7 @@ class AuthorisedGetEventTriggerOperationTest {
     private CaseAccessService caseAccessService;
 
     @Mock
-    private UIDService uidService;
+    private DraftGateway draftGateway;
 
     @Mock
     private EventTriggerService eventTriggerService;
@@ -93,11 +96,12 @@ class AuthorisedGetEventTriggerOperationTest {
         authorisedGetEventTriggerOperation = new AuthorisedGetEventTriggerOperation(
             getEventTriggerOperation,
             caseDefinitionRepository,
-            caseService,
+            caseDetailsRepository,
             caseAccessService,
             userRepository,
             accessControlService,
-            eventTriggerService);
+            eventTriggerService,
+            draftGateway);
         caseEventTrigger = new CaseEventTrigger();
 
         caseType.setId(CASE_TYPE_ID);
@@ -105,6 +109,7 @@ class AuthorisedGetEventTriggerOperationTest {
         caseType.setCaseFields(caseFields);
         caseDetails.setReference(CASE_REFERENCE_LONG);
         caseDetails.setState(STATE);
+        caseDetails.setCaseTypeId(CASE_TYPE_ID);
         caseDetails.setId(CASE_ID);
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseType);
         when(userRepository.getUserRoles()).thenReturn(userRoles);
@@ -121,7 +126,6 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                   eq(caseFields),
                                                                   eq(userRoles),
                                                                   eq(CAN_CREATE))).thenReturn(true);
-        when(uidService.validateUID(anyString())).thenReturn(true);
 
         CaseEvent caseEvent = new CaseEvent();
         when(eventTriggerService.findCaseEvent(eq(caseType), eq(EVENT_TRIGGER_ID))).thenReturn(caseEvent);
@@ -200,9 +204,9 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                                   EVENT_TRIGGER_ID,
                                                                                   IGNORE),
                 () -> inOrder.verify(accessControlService).filterCaseViewFieldsByAccess(eq(caseEventTrigger),
-                                                                                                 eq(caseFields),
-                                                                                                 eq(userRoles),
-                                                                                                 eq(CAN_CREATE))
+                                                                                        eq(caseFields),
+                                                                                        eq(userRoles),
+                                                                                        eq(CAN_CREATE))
             );
         }
 
@@ -256,13 +260,12 @@ class AuthorisedGetEventTriggerOperationTest {
 
         @BeforeEach
         void setUp() {
-            doReturn(caseEventTrigger).when(getEventTriggerOperation).executeForCase(UID,
-                                                                                     JURISDICTION_ID,
-                                                                                     CASE_TYPE_ID,
-                                                                                     CASE_REFERENCE,
+            doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
+
+            doReturn(caseEventTrigger).when(getEventTriggerOperation).executeForCase(CASE_REFERENCE,
                                                                                      EVENT_TRIGGER_ID,
                                                                                      IGNORE);
-            doReturn(caseDetails).when(caseService).getCaseDetails(JURISDICTION_ID, CASE_REFERENCE);
+            doReturn(caseDetails).when(caseDetailsRepository).findByReference(CASE_REFERENCE_LONG);
             doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(caseType,
                                                                                     userRoles,
                                                                                     CAN_READ);
@@ -287,19 +290,13 @@ class AuthorisedGetEventTriggerOperationTest {
         @DisplayName("should call decorated get event trigger operation as is")
         void shouldCallDecoratedGetEventTriggerOperation() {
 
-            final CaseEventTrigger output = authorisedGetEventTriggerOperation.executeForCase(UID,
-                                                                                              JURISDICTION_ID,
-                                                                                              CASE_TYPE_ID,
-                                                                                              CASE_REFERENCE,
+            final CaseEventTrigger output = authorisedGetEventTriggerOperation.executeForCase(CASE_REFERENCE,
                                                                                               EVENT_TRIGGER_ID,
                                                                                               IGNORE);
 
             assertAll(
                 () -> assertThat(output, sameInstance(caseEventTrigger)),
-                () -> verify(getEventTriggerOperation).executeForCase(UID,
-                                                                      JURISDICTION_ID,
-                                                                      CASE_TYPE_ID,
-                                                                      CASE_REFERENCE,
+                () -> verify(getEventTriggerOperation).executeForCase(CASE_REFERENCE,
                                                                       EVENT_TRIGGER_ID,
                                                                       IGNORE)
             );
@@ -309,10 +306,7 @@ class AuthorisedGetEventTriggerOperationTest {
         @DisplayName("should return event trigger and perform operations in order")
         void shouldReturnEventTriggerAndPerformOperationsInOrder() {
 
-            final CaseEventTrigger output = authorisedGetEventTriggerOperation.executeForCase(UID,
-                                                                                              JURISDICTION_ID,
-                                                                                              CASE_TYPE_ID,
-                                                                                              CASE_REFERENCE,
+            final CaseEventTrigger output = authorisedGetEventTriggerOperation.executeForCase(CASE_REFERENCE,
                                                                                               EVENT_TRIGGER_ID,
                                                                                               IGNORE);
 
@@ -332,10 +326,7 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                                           eq(caseType),
                                                                                           eq(userRoles),
                                                                                           eq(CAN_UPDATE)),
-                () -> inOrder.verify(getEventTriggerOperation).executeForCase(UID,
-                                                                              JURISDICTION_ID,
-                                                                              CASE_TYPE_ID,
-                                                                              CASE_REFERENCE,
+                () -> inOrder.verify(getEventTriggerOperation).executeForCase(CASE_REFERENCE,
                                                                               EVENT_TRIGGER_ID,
                                                                               IGNORE),
                 () -> inOrder.verify(accessControlService).setReadOnlyOnCaseViewFieldsIfNoAccess(eq(caseEventTrigger),
@@ -352,10 +343,7 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                                      CAN_READ);
 
             assertThrows(
-                ResourceNotFoundException.class, () -> authorisedGetEventTriggerOperation.executeForCase(UID,
-                                                                                                         JURISDICTION_ID,
-                                                                                                         CASE_TYPE_ID,
-                                                                                                         CASE_REFERENCE,
+                ResourceNotFoundException.class, () -> authorisedGetEventTriggerOperation.executeForCase(CASE_REFERENCE,
                                                                                                          EVENT_TRIGGER_ID,
                                                                                                          IGNORE)
             );
@@ -369,10 +357,7 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                                      CAN_UPDATE);
 
             assertThrows(
-                ResourceNotFoundException.class, () -> authorisedGetEventTriggerOperation.executeForCase(UID,
-                                                                                                         JURISDICTION_ID,
-                                                                                                         CASE_TYPE_ID,
-                                                                                                         CASE_REFERENCE,
+                ResourceNotFoundException.class, () -> authorisedGetEventTriggerOperation.executeForCase(CASE_REFERENCE,
                                                                                                          EVENT_TRIGGER_ID,
                                                                                                          IGNORE)
             );
@@ -387,10 +372,7 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                                       CAN_CREATE);
 
             assertThrows(
-                ResourceNotFoundException.class, () -> authorisedGetEventTriggerOperation.executeForCase(UID,
-                                                                                                         JURISDICTION_ID,
-                                                                                                         CASE_TYPE_ID,
-                                                                                                         CASE_REFERENCE,
+                ResourceNotFoundException.class, () -> authorisedGetEventTriggerOperation.executeForCase(CASE_REFERENCE,
                                                                                                          EVENT_TRIGGER_ID,
                                                                                                          IGNORE)
             );
@@ -405,10 +387,7 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                                       CAN_UPDATE);
 
             assertThrows(
-                ResourceNotFoundException.class, () -> authorisedGetEventTriggerOperation.executeForCase(UID,
-                                                                                                         JURISDICTION_ID,
-                                                                                                         CASE_TYPE_ID,
-                                                                                                         CASE_REFERENCE,
+                ResourceNotFoundException.class, () -> authorisedGetEventTriggerOperation.executeForCase(CASE_REFERENCE,
                                                                                                          EVENT_TRIGGER_ID,
                                                                                                          IGNORE)
             );
@@ -419,42 +398,31 @@ class AuthorisedGetEventTriggerOperationTest {
         void shouldThrowExceptionIfUserRolesNotFound() {
             doReturn(null).when(userRepository).getUserRoles();
             assertThrows(
-                ValidationException.class, () -> authorisedGetEventTriggerOperation.executeForCase(UID,
-                    JURISDICTION_ID,
-                    CASE_TYPE_ID,
-                    CASE_REFERENCE,
-                    EVENT_TRIGGER_ID,
-                    IGNORE)
+                ValidationException.class, () -> authorisedGetEventTriggerOperation.executeForCase(CASE_REFERENCE,
+                                                                                                   EVENT_TRIGGER_ID,
+                                                                                                   IGNORE)
+            );
+        }
+
+        @Test
+        @DisplayName("should fail if case reference is not found")
+        void shouldThrowExceptionIfCaseReferenceNotFound() {
+            doReturn(Optional.empty()).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
+            assertThrows(
+                ResourceNotFoundException.class, () -> authorisedGetEventTriggerOperation.executeForCase(CASE_REFERENCE,
+                                                                                                         EVENT_TRIGGER_ID,
+                                                                                                         IGNORE)
             );
         }
 
         @Test
         @DisplayName("should fail if case reference is invalid")
-        void shouldThrowExceptionIfCaseReferenceNotFound() {
-            doThrow(new ResourceNotFoundException("No case exist with id=" + CASE_REFERENCE))
-                .when(caseService).getCaseDetails(JURISDICTION_ID, CASE_REFERENCE);
+        void shouldThrowExceptionIfCaseReferenceInvalid() {
+            doThrow(NumberFormatException.class).when(caseDetailsRepository).findByReference("invalidReference");
             assertThrows(
-                ResourceNotFoundException.class, () -> authorisedGetEventTriggerOperation.executeForCase(UID,
-                    JURISDICTION_ID,
-                    CASE_TYPE_ID,
-                    CASE_REFERENCE,
-                    EVENT_TRIGGER_ID,
-                    IGNORE)
-            );
-        }
-
-        @Test
-        @DisplayName("should fail if case id is invalid")
-        void shouldFailIfCaseIDIsInvalid() {
-            doThrow(new BadRequestException("Case reference is not valid")).when(caseService).getCaseDetails(JURISDICTION_ID, CASE_REFERENCE);
-
-            assertThrows(
-                BadRequestException.class, () -> authorisedGetEventTriggerOperation.executeForCase(UID,
-                                                                                                         JURISDICTION_ID,
-                                                                                                         CASE_TYPE_ID,
-                                                                                                         CASE_REFERENCE,
-                                                                                                         EVENT_TRIGGER_ID,
-                                                                                                         IGNORE)
+                BadRequestException.class, () -> authorisedGetEventTriggerOperation.executeForCase("invalidReference",
+                                                                                                   EVENT_TRIGGER_ID,
+                                                                                                   IGNORE)
             );
         }
 

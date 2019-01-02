@@ -1,13 +1,13 @@
 package uk.gov.hmcts.ccd.domain.types;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.util.*;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.util.*;
 
 @Named
 @Singleton
@@ -32,10 +32,7 @@ public class CollectionValidator implements BaseTypeValidator {
         }
 
         if (!dataValue.isArray()) {
-            final ValidationResult result = new ValidationResult(
-                "Require value to be an array",
-                dataFieldId);
-            return Collections.singletonList(result);
+            return Collections.singletonList(new ValidationResult("Require value to be an array", dataFieldId));
         }
 
         final ArrayNode arrayValue = (ArrayNode) dataValue;

@@ -1,5 +1,16 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,21 +24,6 @@ import uk.gov.hmcts.ccd.data.casedetails.search.SearchQueryFactoryOperation;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
-import javax.persistence.PersistenceContext;
-import javax.persistence.PersistenceException;
-import javax.persistence.Query;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 
 @Named
@@ -88,6 +84,11 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     @Override
     public Optional<CaseDetails> findByReference(String jurisdiction, String reference) {
         return find(jurisdiction, null, reference).map(this.caseDetailsMapper::entityToModel);
+    }
+
+    @Override
+    public Optional<CaseDetails> findByReference(String reference) {
+        return find(null, reference).map(this.caseDetailsMapper::entityToModel);
     }
 
     @Override
@@ -186,6 +187,18 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
             qb.whereJurisdiction(jurisdiction);
         }
 
+        return getCaseDetailsEntity(id, reference, qb);
+    }
+
+    // See above - This accepts null values for backward compatibility. Once deprecated methods are removed, parameters should
+    // be annotated with @NotNull
+    private Optional<CaseDetailsEntity> find(Long id, String reference) {
+        final CaseDetailsQueryBuilder<CaseDetailsEntity> qb = queryBuilderFactory.select(em);
+
+        return getCaseDetailsEntity(id, reference, qb);
+    }
+
+    private Optional<CaseDetailsEntity> getCaseDetailsEntity(Long id, String reference, CaseDetailsQueryBuilder<CaseDetailsEntity> qb) {
         if (null != reference) {
             qb.whereReference(reference);
         } else {

@@ -1,5 +1,25 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import java.io.IOException;
+import java.util.*;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AuditEventBuilder.anAuditEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventTriggerBuilder.newCaseEventTrigger;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseStateBuilder.newState;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,23 +33,6 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
-
-import java.io.IOException;
-import java.util.*;
-
-import static com.google.common.collect.Lists.newArrayList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.*;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AuditEventBuilder.anAuditEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.anCaseEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventTriggerBuilder.anEventTrigger;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.aCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseStateBuilder.newState;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
 
 public class AccessControlServiceTest {
 
@@ -203,7 +206,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should fail to grant access to fields if acls are missing")
         void shouldFailToGrantCreateAccessForGivenFieldsIfOneFieldIsMissingAcls() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .build())
                 .build();
@@ -225,7 +228,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not grant access to case fields with relevant acl missing")
         void shouldNotGrantAccessToFieldsIfRelevantAclMissing() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .withAcl(anAcl()
                                             .withRole(ROLE_NOT_IN_USER_ROLES)
@@ -252,7 +255,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not grant access to case fields with relevant acl not granting access")
         void shouldNotGrantAccessToFieldsIfRelevantAclNotGrantingAccess() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES_2)
@@ -262,7 +265,7 @@ public class AccessControlServiceTest {
                                             .withCreate(true)
                                             .build())
                                .build())
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses2")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES_2)
@@ -291,7 +294,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not grant access to case fields if ACL false and null value")
         void shouldNotGrantAccessToNullValue() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES_3)
@@ -319,7 +322,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should grant access to case fields with acl matching")
         void shouldGrantAccessToFieldsWithAclMatching() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES_3)
@@ -329,7 +332,7 @@ public class AccessControlServiceTest {
                                             .withCreate(true)
                                             .build())
                                .build())
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses2")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES_3)
@@ -383,7 +386,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should grant access to case fields with text value")
         void shouldGrantAccessToTextValueType() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -409,7 +412,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not grant access to case fields if ACL false and empty text")
         void shouldNotGrantAccessToEmptyTextType() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -439,7 +442,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should grant access to case fields with collection")
         void shouldGrantAccessToCollectionType() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -487,7 +490,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not grant access to case fields if ACL false and empty collection")
         void shouldNotGrantCreateAccessToCollectionTypeIfEmpty() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -517,7 +520,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should grant access to case fields with complex object")
         void shouldGrantAccessToComplexType() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -546,7 +549,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not grant access to case fields if ACL false and empty object")
         void shouldNotGrantAccessToComplexTypeIfEmpty() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -576,8 +579,9 @@ public class AccessControlServiceTest {
         @DisplayName("Should not grant access to field if field acls are missing for update")
         void shouldNotGrantAccessToFieldsIfFieldIsMissingAclsForUpdate() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
+                               .withFieldType(aFieldType().withType("Text").build())
                                .build())
                 .build();
             JsonNode newDataNode = getJsonNode("{ \"Addresses\" : \"UpdateAddress\" }");
@@ -590,7 +594,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not grant access to field if field acls are missing for create")
         void shouldNotGrantAccessToFieldsIfFieldIsMissingAclsForCreate() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .build())
                 .build();
@@ -604,8 +608,9 @@ public class AccessControlServiceTest {
         @DisplayName("Should not grant access to field if field acls are missing relevant acl for update")
         void shouldNotGrantAccessToFieldsIfFieldIsMissingRelevantAclForUpdate() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
+                               .withFieldType(aFieldType().withType("Text").build())
                                .withAcl(anAcl()
                                             .withRole(ROLE_NOT_IN_USER_ROLES)
                                             .withCreate(true)
@@ -624,7 +629,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not grant access to field if field acls are missing relevant acl for create")
         void shouldNotGrantAccessToFieldsIfFieldIsMissingRelevantAclForCreate() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .withAcl(anAcl()
                                             .withRole(ROLE_NOT_IN_USER_ROLES)
@@ -644,8 +649,9 @@ public class AccessControlServiceTest {
         @DisplayName("Should not grant access to case field with relevant acl not granting access for update")
         void shouldNotGrantAccessToFieldIfRelevantAclNotGrantingAccessForUpdate() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
+                               .withFieldType(aFieldType().withType("Text").build())
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
                                             .withCreate(true)
@@ -663,7 +669,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not grant access to case field with relevant acl not granting access for create")
         void shouldNotGrantAccessToFieldIfRelevantAclNotGrantingAccessForCreate() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -682,12 +688,13 @@ public class AccessControlServiceTest {
         @DisplayName("Should not grant access to case field if ACL false and null value for update")
         void shouldNotGrantAccessToFieldWithNullValueForUpdate() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .build())
-                               .build())
+                .withField(newCaseField()
+                    .withId("Addresses")
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .build())
+                    .build())
                 .build();
             JsonNode newDataNode = getJsonNode("{ \"Addresses\" : null }\n");
             JsonNode existingDataNode = getJsonNode("{ \"Addresses\": \"SomeText\" }");
@@ -699,7 +706,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not grant access to case field if ACL false and null value for create")
         void shouldNotGrantAccessToFieldWithNullValueForCreate() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -716,7 +723,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not grant access to case field if ACL true and field name not matching for update")
         void shouldNotGrantAccessToFieldWithAclAccessGrantedAndFieldNameNotMatchingForUpdate() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -736,7 +743,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not grant access to case field if ACL true and field name not matching for create")
         void shouldNotGrantAccessToFieldWithAclAccessGrantedAndFieldNameNotMatchingForCreate() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -756,13 +763,14 @@ public class AccessControlServiceTest {
         @DisplayName("Should grant access to case field with acl matching for update")
         void shouldGrantAccessToFieldWithAclMatchingForUpdate() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withUpdate(true)
-                                            .build())
-                               .build())
+                .withField(newCaseField()
+                    .withId("Addresses")
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build())
+                    .build())
                 .build();
             JsonNode newDataNode = getJsonNode("{ \"Addresses\": \"UpdateAddress\" }\n");
             JsonNode existingDataNode = getJsonNode("{ \"Addresses\": \"SomeText\" }");
@@ -774,7 +782,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should grant access to case field with acl matching for create")
         void shouldGrantAccessToFieldWithAclMatchingForCreate() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -792,7 +800,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not need to grant access to case field if no value change")
         void shouldNotNeedToGrantAccessToFieldIfNoChangeInValue() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -809,33 +817,37 @@ public class AccessControlServiceTest {
         @DisplayName("Should grant access to case fields if all have access granted")
         void shouldGrantAccessToFieldsIfAllFieldsHaveAccessGranted() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .build())
-                               .build())
-                .withField(aCaseField()
-                               .withId("FirstName")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withUpdate(true)
-                                            .build())
-                               .build())
-                .withField(aCaseField()
-                               .withId("LastName")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .build())
-                               .build())
-                .withField(aCaseField()
-                               .withId("Mobile")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withUpdate(true)
-                                            .build())
-                               .build())
+                .withField(newCaseField()
+                    .withId("Addresses")
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build())
+                    .build())
+                .withField(newCaseField()
+                    .withId("FirstName")
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build())
+                    .build())
+                .withField(newCaseField()
+                    .withId("LastName")
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .build())
+                    .build())
+                .withField(newCaseField()
+                    .withId("Mobile")
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build())
+                    .build())
                 .build();
             JsonNode newDataNode = getJsonNode("{ \"Addresses\": \"CreateAddress\"," +
                                                    " \"FirstName\": \"John\"," +
@@ -851,32 +863,36 @@ public class AccessControlServiceTest {
         @DisplayName("Should not grant access to case fields if a field does not have access granted")
         void shouldNotGrantAccessToFieldsIfOneFieldDoesNotHaveAccessGranted() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .build())
-                               .build())
-                .withField(aCaseField()
-                               .withId("FirstName")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .build())
-                               .build())
-                .withField(aCaseField()
-                               .withId("LastName")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .build())
-                               .build())
-                .withField(aCaseField()
-                               .withId("Mobile")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .build())
-                               .build())
+                .withField(newCaseField()
+                    .withId("Addresses")
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build())
+                    .build())
+                .withField(newCaseField()
+                    .withId("FirstName")
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .build())
+                    .build())
+                .withField(newCaseField()
+                    .withId("LastName")
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .build())
+                    .build())
+                .withField(newCaseField()
+                    .withId("Mobile")
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build())
+                    .build())
                 .build();
             JsonNode newDataNode = getJsonNode("{ \"Addresses\": \"CreateAddress\"," +
                                                    " \"FirstName\": \"John\"," +
@@ -893,25 +909,28 @@ public class AccessControlServiceTest {
         @DisplayName("Should not grant access to case fields if a field does not have acls")
         void shouldNotGrantAccessToFieldsIfOneFieldDoesNotHaveAcls() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .build())
-                               .build())
-                .withField(aCaseField()
-                               .withId("FirstName")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .build())
-                               .build())
-                .withField(aCaseField()
-                               .withId("LastName")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .build())
-                               .build())
+                .withField(newCaseField()
+                    .withId("Addresses")
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build())
+                    .build())
+                .withField(newCaseField()
+                    .withId("FirstName")
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .build())
+                    .build())
+                .withField(newCaseField()
+                    .withId("LastName")
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .build())
+                    .build())
                 .build();
             JsonNode newDataNode = getJsonNode("{ \"Addresses\": \"CreateAddress\"," +
                                                    " \"FirstName\": \"John\"," +
@@ -972,7 +991,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not grant access to event with relevant acl not granting access")
         void shouldNotGrantAccessToEventIfRelevantAclNotGrantingAccess() throws IOException {
             final CaseType caseType = newCaseType()
-                .withEvent(anCaseEvent()
+                .withEvent(newCaseEvent()
                                .withId(EVENT_ID)
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -993,7 +1012,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not grant access to event if ACL false and null value")
         void shouldNotGrantAccessToNullValue() throws IOException {
             final CaseType caseType = newCaseType()
-                .withEvent(anCaseEvent()
+                .withEvent(newCaseEvent()
                                .withId(EVENT_ID)
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -1014,7 +1033,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not grant access to event if ACL true and event name not matching")
         void shouldNotGrantAccessWithEventNameNotMatching() throws IOException {
             final CaseType caseType = newCaseType()
-                .withEvent(anCaseEvent()
+                .withEvent(newCaseEvent()
                                .withId(EVENT_ID)
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -1036,7 +1055,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should grant access to event with acl matching")
         void shouldGrantAccessToEventWithAclMatching() throws IOException {
             final CaseType caseType = newCaseType()
-                .withEvent(anCaseEvent()
+                .withEvent(newCaseEvent()
                                .withId(EVENT_ID)
                                .withAcl(anAcl()
                                             .withRole(ROLE_NOT_IN_USER_ROLES)
@@ -1080,7 +1099,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not grant access to case with relevant acl missing")
         void shouldNotGrantAccessToCaseIfRelevantAclMissing() throws IOException {
             final CaseType caseType = newCaseType()
-                .withEvent(anCaseEvent()
+                .withEvent(newCaseEvent()
                                .withId(EVENT_ID)
                                .withAcl(anAcl()
                                             .withRole(ROLE_NOT_IN_USER_ROLES)
@@ -1101,7 +1120,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not grant access to case with relevant acl not granting access")
         void shouldNotGrantAccessToCaseIfRelevantAclNotGrantingAccess() throws IOException {
             final CaseType caseType = newCaseType()
-                .withEvent(anCaseEvent()
+                .withEvent(newCaseEvent()
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
                                             .build())
@@ -1146,7 +1165,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not return data if field acls are missing")
         void shouldNotReturnDataIfCaseFieldIsMissingAcls() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .build())
                 .build();
@@ -1168,7 +1187,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not return data if field with relevant acl missing")
         void shouldNotReturnFieldIfRelevantAclMissing() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .withAcl(anAcl()
                                             .withRole(ROLE_NOT_IN_USER_ROLES)
@@ -1194,7 +1213,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not return data if field with relevant acl not granting access")
         void shouldNotGrantAccessToFieldsIfRelevantAclNotGrantingAccess() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -1219,7 +1238,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not return data if field with acl false and null value")
         void shouldNotReturnDataWithAclFalseAndNullValue() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES_3)
@@ -1247,7 +1266,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not return data if field with acl true and field name not matching")
         void shouldNotReturnDataWithAclTrueAndFieldNameNotMatching() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES_3)
@@ -1276,7 +1295,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should return data if field with acl true and null value")
         void shouldReturnDataWithAclTrueAndNullValue() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES_3)
@@ -1305,7 +1324,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should return data if field with acl true and empty value")
         void shouldReturnDataWithAclTrueAndEmptyValue() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES_3)
@@ -1334,7 +1353,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should return data if field with acl matching")
         void shouldGrantAccessToFieldsWithAclMatching() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES_3)
@@ -1368,7 +1387,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not return data if field ACL false and empty text")
         void shouldNotGrantAccessToEmptyTextType() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -1393,14 +1412,14 @@ public class AccessControlServiceTest {
         @DisplayName("Should return data with null and empty values on root level")
         void shouldReturnDataWithNullAndEmptyValuesOnRootLevel() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
                                             .withRead(true)
                                             .build())
                                .build())
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses2")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -1437,7 +1456,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should return data if field with collection")
         void shouldGrantAccessToCollectionType() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -1487,21 +1506,21 @@ public class AccessControlServiceTest {
         @DisplayName("Should return data with null and empty values on root level")
         void shouldReturnDataWithNullAndEmptyValuesOnRootLevel() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
                                             .withRead(true)
                                             .build())
                                .build())
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses2")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
                                             .withRead(true)
                                             .build())
                                .build())
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses3")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -1572,7 +1591,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not return data if field ACL false and empty collection")
         void shouldNotGrantAccessToCollectionTypeIfEmpty() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -1602,7 +1621,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should return data if field with complex object")
         void shouldGrantAccessToComplexType() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -1631,14 +1650,14 @@ public class AccessControlServiceTest {
         @DisplayName("Should return data with null and empty values on root level")
         void shouldReturnDataWithNullAndEmptyValuesOnRootLevel() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
                                             .withRead(true)
                                             .build())
                                .build())
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses2")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -1671,7 +1690,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not return data if field ACL false and empty object")
         void shouldNotGrantAccessToComplexTypeIfEmpty() throws IOException {
             CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -1702,7 +1721,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not return event if event is missing")
         void shouldNotReturnEventIfCaseEventIsMissing() throws IOException {
             final CaseType caseType = newCaseType()
-                .withEvent(anCaseEvent()
+                .withEvent(newCaseEvent()
                                .withId(EVENT_ID)
                                .build())
                 .build();
@@ -1723,7 +1742,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not return audit event if event is missing")
         void shouldNotReturnEventIfCaseEventIsMissing() throws IOException {
             final CaseType caseType = newCaseType()
-                .withEvent(anCaseEvent()
+                .withEvent(newCaseEvent()
                                .withId(EVENT_ID)
                                .build())
                 .build();
@@ -1739,7 +1758,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not return audit event if acls are missing")
         void shouldNotReturnEventIfCaseEventIsMissingAcls() throws IOException {
             final CaseType caseType = newCaseType()
-                .withEvent(anCaseEvent()
+                .withEvent(newCaseEvent()
                                .withId(EVENT_ID)
                                .build())
                 .build();
@@ -1757,7 +1776,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not return audit event if relevant acl missing")
         void shouldNotReturnEventIfRelevantAclMissing() throws IOException {
             final CaseType caseType = newCaseType()
-                .withEvent(anCaseEvent()
+                .withEvent(newCaseEvent()
                                .withId(EVENT_ID)
                                .withAcl(anAcl()
                                             .withRole(ROLE_NOT_IN_USER_ROLES)
@@ -1779,7 +1798,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not return audit event if relevant acl not granting access")
         void shouldNotReturnEventIfRelevantAclNotGrantingAccess() throws IOException {
             final CaseType caseType = newCaseType()
-                .withEvent(anCaseEvent()
+                .withEvent(newCaseEvent()
                                .withId(EVENT_ID)
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -1800,7 +1819,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not return audit event if ACL true and event name not matching")
         void shouldNotReturnEventIfRelevantAclGrantingAccessAndEventNameNotMatching() throws IOException {
             final CaseType caseType = newCaseType()
-                .withEvent(anCaseEvent()
+                .withEvent(newCaseEvent()
                                .withId(EVENT_ID)
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -1822,7 +1841,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should return audit event if acl matching")
         void shouldReturnEventWithAclMatching() throws IOException {
             final CaseType caseType = newCaseType()
-                .withEvent(anCaseEvent()
+                .withEvent(newCaseEvent()
                                .withId(EVENT_ID)
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -1845,7 +1864,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should return single audit event if acl matching from a group")
         void shouldReturnEventWithAclMatchingFromGroup() throws IOException {
             final CaseType caseType = newCaseType()
-                .withEvent(anCaseEvent()
+                .withEvent(newCaseEvent()
                                .withId(EVENT_ID)
                                .withAcl(anAcl()
                                             .withRole(ROLE_NOT_IN_USER_ROLES)
@@ -1875,7 +1894,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should return audit events if acls matching")
         void shouldReturnEventsWithAclsMatching() throws IOException {
             final CaseType caseType = newCaseType()
-                .withEvent(anCaseEvent().withId(EVENT_ID_WITH_ACCESS)
+                .withEvent(newCaseEvent().withId(EVENT_ID_WITH_ACCESS)
                                     .withAcl(anAcl()
                                                  .withRole(ROLE_IN_USER_ROLES)
                                                  .withRead(true)
@@ -1884,20 +1903,20 @@ public class AccessControlServiceTest {
                                                  .withRole(ROLE_NOT_IN_USER_ROLES)
                                                  .build())
                            .build())
-                .withEvent(anCaseEvent()
+                .withEvent(newCaseEvent()
                                .withId(EVENT_ID_WITHOUT_ACCESS)
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES_3)
                                             .build())
                             .build())
-                .withEvent(anCaseEvent()
+                .withEvent(newCaseEvent()
                                .withId(EVENT_ID_WITHOUT_ACCESS_2)
                                .withAcl(anAcl()
                                             .withRole(ROLE_NOT_IN_USER_ROLES)
                                             .withRead(true)
                                             .build())
                            .build())
-                .withEvent(anCaseEvent()
+                .withEvent(newCaseEvent()
                                .withId(EVENT_ID_WITH_ACCESS_2)
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES_2)
@@ -1937,7 +1956,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should set readonly flag if relevant acl missing")
         void shouldSetReadonlyFlagIfRelevantAclMissing() throws IOException {
             final CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .withAcl(anAcl()
                                             .withRole(ROLE_NOT_IN_USER_ROLES)
@@ -1948,7 +1967,7 @@ public class AccessControlServiceTest {
                                .build())
                 .build();
 
-            CaseEventTrigger caseEventTrigger = anEventTrigger()
+            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
                 .withField(
                     aViewField()
                         .withId("Addresses")
@@ -1968,14 +1987,14 @@ public class AccessControlServiceTest {
         @DisplayName("Should set readonly flag if relevant acl not granting access")
         void shouldSetReadonlyFlagIfRelevantAclNotGrantingAccess() throws IOException {
             final CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
                                             .build())
                                .build())
                 .build();
-            CaseEventTrigger caseEventTrigger = anEventTrigger()
+            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
                 .withField(
                     aViewField()
                         .withId("Addresses")
@@ -1995,7 +2014,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should set readonly flag if ACL true and event name not matching")
         void shouldSetReadonlyFlagIfRelevantAclGrantingAccessAndEventNameNotMatching() throws IOException {
             final CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -2003,7 +2022,7 @@ public class AccessControlServiceTest {
                                             .build())
                                .build())
                 .build();
-            CaseEventTrigger caseEventTrigger = anEventTrigger()
+            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
                 .withField(
                     aViewField()
                         .withId("DifferentAddresses")
@@ -2023,7 +2042,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not set readonly flag if acl matching")
         void shouldNotSetReadonlyFlagIfAclMatching() throws IOException {
             final CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -2031,7 +2050,7 @@ public class AccessControlServiceTest {
                                             .build())
                                .build())
                 .build();
-            CaseEventTrigger caseEventTrigger = anEventTrigger()
+            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
                 .withField(
                     aViewField()
                         .withId("Addresses")
@@ -2051,7 +2070,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not set readonly flag if acl matching in acls group")
         void shouldNotSetReadonlyFlagIfAclMatchingInAclsGroup() throws IOException {
             final CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .withAcl(anAcl()
                                             .withRole(ROLE_NOT_IN_USER_ROLES)
@@ -2067,7 +2086,7 @@ public class AccessControlServiceTest {
                                             .build())
                                .build())
                 .build();
-            CaseEventTrigger caseEventTrigger = anEventTrigger()
+            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
                 .withField(
                     aViewField()
                         .withId("Addresses")
@@ -2087,7 +2106,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not set readonly flags if acls matching in fields group")
         void shouldNotSetReadonlyFlagsIfAclsMatchingInCaseViewFieldsGroup() throws IOException {
             final CaseType caseType = newCaseType()
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses")
                                .withAcl(anAcl()
                                             .withRole(ROLE_NOT_IN_USER_ROLES)
@@ -2097,19 +2116,19 @@ public class AccessControlServiceTest {
                                             .withUpdate(true)
                                             .build())
                                .build())
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("AddressesNoAccess")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES_3)
                                             .build())
                                .build())
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("AddressesNoAccess2")
                                .withAcl(anAcl()
                                             .withRole(ROLE_NOT_IN_USER_ROLES)
                                             .build())
                                .build())
-                .withField(aCaseField()
+                .withField(newCaseField()
                                .withId("Addresses2")
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES_2)
@@ -2118,7 +2137,7 @@ public class AccessControlServiceTest {
                                .build())
                 .build();
 
-            CaseEventTrigger caseEventTrigger = anEventTrigger()
+            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
                 .withField(
                     aViewField()
                         .withId("Addresses")
@@ -2163,7 +2182,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not return case event definition if relevant acl missing")
         void shouldNotReturnCaseEventDefinitionIfRelevantAclMissing() throws IOException {
             final CaseType caseType = newCaseType()
-                .withEvent(anCaseEvent()
+                .withEvent(newCaseEvent()
                                .withId(EVENT_ID)
                                .withAcl(anAcl()
                                             .withRole(ROLE_NOT_IN_USER_ROLES)
@@ -2184,7 +2203,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not return case event definition if relevant acl not granting access")
         void shouldNotReturnCaseEventDefinitionIfRelevantAclNotGrantingAccess() throws IOException {
             final CaseType caseType = newCaseType()
-                .withEvent(anCaseEvent()
+                .withEvent(newCaseEvent()
                                .withId(EVENT_ID)
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -2205,7 +2224,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should return case event definition if acl matching")
         void shouldReturnCaseEventDefinitionWithAclMatching() throws IOException {
             final CaseType caseType = newCaseType()
-                .withEvent(anCaseEvent()
+                .withEvent(newCaseEvent()
                                .withId(EVENT_ID)
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -2228,7 +2247,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should return single case event definition if acl matching from a group")
         void shouldReturnCaseEventDefinitionWithAclMatchingFromGroup() throws IOException {
             final CaseType caseType = newCaseType()
-                .withEvent(anCaseEvent()
+                .withEvent(newCaseEvent()
                                .withId(EVENT_ID)
                                .withAcl(anAcl()
                                             .withRole(ROLE_NOT_IN_USER_ROLES)
@@ -2258,7 +2277,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should return case event definition if acls matching")
         void shouldReturnCaseEventDefinitionWithAclsMatching() throws IOException {
             final CaseType caseType = newCaseType()
-                .withEvent(anCaseEvent()
+                .withEvent(newCaseEvent()
                                .withId(EVENT_ID_WITH_ACCESS)
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -2268,19 +2287,19 @@ public class AccessControlServiceTest {
                                             .withRole(ROLE_NOT_IN_USER_ROLES)
                                             .build())
                            .build())
-                .withEvent(anCaseEvent().withId(EVENT_ID_WITHOUT_ACCESS)
+                .withEvent(newCaseEvent().withId(EVENT_ID_WITHOUT_ACCESS)
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES_3)
                                             .build())
                            .build())
-                .withEvent(anCaseEvent()
+                .withEvent(newCaseEvent()
                                .withId(EVENT_ID_WITHOUT_ACCESS_2)
                                .withAcl(anAcl()
                                             .withRole(ROLE_NOT_IN_USER_ROLES)
                                             .withCreate(true)
                                             .build())
                            .build())
-                .withEvent(anCaseEvent()
+                .withEvent(newCaseEvent()
                                .withId(EVENT_ID_WITH_ACCESS_2)
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES_2)
@@ -2308,7 +2327,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not return case event definition if relevant acl missing")
         void shouldNotReturnCaseEventDefinitionIfRelevantAclMissing() throws IOException {
             final CaseType caseType = newCaseType()
-                .withEvent(anCaseEvent()
+                .withEvent(newCaseEvent()
                                .withId(EVENT_ID)
                                .withAcl(anAcl()
                                             .withRole(ROLE_NOT_IN_USER_ROLES)
@@ -2329,7 +2348,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not return case event definition if relevant acl not granting access")
         void shouldNotReturnCaseEventDefinitionIfRelevantAclNotGrantingAccess() throws IOException {
             final CaseType caseType = newCaseType()
-                .withEvent(anCaseEvent()
+                .withEvent(newCaseEvent()
                                .withId(EVENT_ID)
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -2350,7 +2369,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should return case event definition if acl matching")
         void shouldReturnCaseEventDefinitionWithAclMatching() throws IOException {
             final CaseType caseType = newCaseType()
-                .withEvent(anCaseEvent()
+                .withEvent(newCaseEvent()
                                .withId(EVENT_ID)
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -2373,7 +2392,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should return single case event definition if acl matching from a group")
         void shouldReturnCaseEventDefinitionWithAclMatchingFromGroup() throws IOException {
             final CaseType caseType = newCaseType()
-                .withEvent(anCaseEvent()
+                .withEvent(newCaseEvent()
                                .withId(EVENT_ID)
                                .withAcl(anAcl()
                                             .withRole(ROLE_NOT_IN_USER_ROLES)
@@ -2403,7 +2422,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should return case event definition if acls matching")
         void shouldReturnCaseEventDefinitionWithAclsMatching() throws IOException {
             final CaseType caseType = newCaseType()
-                .withEvent(anCaseEvent()
+                .withEvent(newCaseEvent()
                                .withId(EVENT_ID_WITH_ACCESS)
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES)
@@ -2413,19 +2432,19 @@ public class AccessControlServiceTest {
                                             .withRole(ROLE_NOT_IN_USER_ROLES)
                                             .build())
                            .build())
-                .withEvent(anCaseEvent().withId(EVENT_ID_WITHOUT_ACCESS)
+                .withEvent(newCaseEvent().withId(EVENT_ID_WITHOUT_ACCESS)
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES_3)
                                             .build())
                            .build())
-                .withEvent(anCaseEvent()
+                .withEvent(newCaseEvent()
                                .withId(EVENT_ID_WITHOUT_ACCESS_2)
                                .withAcl(anAcl()
                                             .withRole(ROLE_NOT_IN_USER_ROLES)
                                             .withCreate(true)
                                             .build())
                            .build())
-                .withEvent(anCaseEvent()
+                .withEvent(newCaseEvent()
                                .withId(EVENT_ID_WITH_ACCESS_2)
                                .withAcl(anAcl()
                                             .withRole(ROLE_IN_USER_ROLES_2)

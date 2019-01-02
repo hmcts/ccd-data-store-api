@@ -18,6 +18,7 @@ import com.google.common.collect.Maps;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.aggregated.*;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
+import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.draft.*;
 import uk.gov.hmcts.ccd.domain.model.search.Field;
@@ -265,7 +266,7 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public static CreateCaseDraftBuilder aCreateCaseDraft() {
+        public static CreateCaseDraftBuilder newCreateCaseDraft() {
             return new CreateCaseDraftBuilder();
         }
 
@@ -291,7 +292,7 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public static UpdateCaseDraftBuilder anUpdateCaseDraft() {
+        public static UpdateCaseDraftBuilder newUpdateCaseDraft() {
             return new UpdateCaseDraftBuilder();
         }
 
@@ -407,6 +408,16 @@ public class TestBuildersUtil {
 
         public CaseTypeBuilder withEvent(CaseEvent event) {
             caseType.getEvents().add(event);
+            return this;
+        }
+
+        public CaseTypeBuilder withEvents(List<CaseEvent> event) {
+            caseType.getEvents().addAll(event);
+            return this;
+        }
+
+        public CaseTypeBuilder withCaseFields(List<CaseField> fields) {
+            caseType.getCaseFields().addAll(fields);
             return this;
         }
 
@@ -546,7 +557,7 @@ public class TestBuildersUtil {
             this.caseEvent = new CaseEvent();
         }
 
-        public static CaseEventBuilder anCaseEvent() {
+        public static CaseEventBuilder newCaseEvent() {
             return new CaseEventBuilder();
         }
 
@@ -572,6 +583,21 @@ public class TestBuildersUtil {
 
         public CaseEventBuilder withName(String name) {
             caseEvent.setName(name);
+            return this;
+        }
+
+        public CaseEventBuilder withDescription(String description) {
+            caseEvent.setDescription(description);
+            return this;
+        }
+
+        public CaseEventBuilder withShowSummary(Boolean showSummary) {
+            caseEvent.setShowSummary(showSummary);
+            return this;
+        }
+
+        public CaseEventBuilder withShowEventNotes(Boolean showEventNotes) {
+            caseEvent.setShowEventNotes(showEventNotes);
             return this;
         }
     }
@@ -606,7 +632,7 @@ public class TestBuildersUtil {
             this.caseEventTrigger = new CaseEventTrigger();
         }
 
-        public static CaseEventTriggerBuilder anEventTrigger() {
+        public static CaseEventTriggerBuilder newCaseEventTrigger() {
             return new CaseEventTriggerBuilder();
         }
 
@@ -671,6 +697,32 @@ public class TestBuildersUtil {
             return caseEventTrigger;
         }
     }
+    
+    public static class StartEventTriggerBuilder {
+        private final StartEventTrigger startEventTrigger;
+
+        private StartEventTriggerBuilder() {
+            this.startEventTrigger = new StartEventTrigger();
+        }
+
+        public static StartEventTriggerBuilder newStartEventTrigger() {
+            return new StartEventTriggerBuilder();
+        }
+
+        public StartEventTriggerBuilder withCaseDetails(CaseDetails caseDetails) {
+            this.startEventTrigger.setCaseDetails(caseDetails);
+            return this;
+        }
+
+        public StartEventTriggerBuilder withEventToken(String token) {
+            this.startEventTrigger.setToken(token);
+            return this;
+        }
+
+        public StartEventTrigger build() {
+            return startEventTrigger;
+        }
+    }
 
     public static class WizardPageBuilder {
         private final WizardPage wizardPage;
@@ -713,7 +765,7 @@ public class TestBuildersUtil {
             this.caseField = new CaseField();
         }
 
-        public static CaseFieldBuilder aCaseField() {
+        public static CaseFieldBuilder newCaseField() {
             return new CaseFieldBuilder();
         }
 
@@ -1139,6 +1191,197 @@ public class TestBuildersUtil {
 
         public UserRole build() {
             return this.userRole;
+        }
+    }
+
+    public static class WorkbasketDefaultBuilder {
+        private final WorkbasketDefault workbasketDefault;
+
+        private WorkbasketDefaultBuilder() {
+            this.workbasketDefault = new WorkbasketDefault();
+        }
+
+        public static WorkbasketDefaultBuilder newWorkbasketDefault() {
+            return new WorkbasketDefaultBuilder();
+        }
+
+        public WorkbasketDefaultBuilder withCaseTypeId(String caseTypeId) {
+            this.workbasketDefault.setCaseTypeId(caseTypeId);
+            return this;
+        }
+
+        public WorkbasketDefaultBuilder withJurisdictionId(String jurisdictionId) {
+            this.workbasketDefault.setJurisdictionId(jurisdictionId);
+            return this;
+        }
+
+        public WorkbasketDefaultBuilder withStateId(String stateId) {
+            this.workbasketDefault.setStateId(stateId);
+            return this;
+        }
+
+        public WorkbasketDefault build() {
+            return this.workbasketDefault;
+        }
+    }
+
+    public static class DefaultSettingsBuilder {
+        private final DefaultSettings defaultSettings;
+
+        private DefaultSettingsBuilder() {
+            this.defaultSettings = new DefaultSettings();
+        }
+
+        public static DefaultSettingsBuilder newDefaultSettings() {
+            return new DefaultSettingsBuilder();
+        }
+
+        public DefaultSettingsBuilder withWorkbasketDefault(WorkbasketDefault workbasketDefault) {
+            defaultSettings.setWorkbasketDefault(workbasketDefault);
+            return this;
+        }
+
+        public DefaultSettings build() {
+            return this.defaultSettings;
+        }
+    }
+
+    public static class JurisdictionDisplayPropertiesBuilder {
+        private final JurisdictionDisplayProperties jurisdictionDisplayProperties;
+
+        private JurisdictionDisplayPropertiesBuilder() {
+            this.jurisdictionDisplayProperties = new JurisdictionDisplayProperties();
+        }
+
+        public static JurisdictionDisplayPropertiesBuilder newJurisdictionDisplayProperties() {
+            return new JurisdictionDisplayPropertiesBuilder();
+        }
+
+        public JurisdictionDisplayPropertiesBuilder withCaseType(List<CaseType> caseTypes) {
+            jurisdictionDisplayProperties.setCaseTypes(caseTypes);
+            return this;
+        }
+
+        public JurisdictionDisplayPropertiesBuilder withDescription(String description) {
+            jurisdictionDisplayProperties.setDescription(description);
+            return this;
+        }
+
+        public JurisdictionDisplayPropertiesBuilder withId(String id) {
+            jurisdictionDisplayProperties.setId(id);
+            return this;
+        }
+
+        public JurisdictionDisplayPropertiesBuilder withName(String name) {
+            jurisdictionDisplayProperties.setName(name);
+            return this;
+        }
+
+        public JurisdictionDisplayProperties build() {
+            return this.jurisdictionDisplayProperties;
+        }
+    }
+
+    public static class UserBuilder {
+        private final User user;
+
+        private UserBuilder() {
+            this.user = new User();
+        }
+
+        public static UserBuilder newUser() {
+            return new UserBuilder();
+        }
+
+        public UserBuilder withIdamProperties(IDAMProperties idamProperties) {
+            user.setIdamProperties(idamProperties);
+            return this;
+        }
+
+        public User build() {
+            return this.user;
+        }
+    }
+
+    public static class IDAMPropertiesBuilder {
+        private final IDAMProperties idamProperties;
+
+        private IDAMPropertiesBuilder() {
+            this.idamProperties = new IDAMProperties();
+        }
+
+        public static IDAMPropertiesBuilder newIDAMProperties() {
+            return new IDAMPropertiesBuilder();
+        }
+
+        public IDAMPropertiesBuilder withId(String id) {
+            this.idamProperties.setId(id);
+            return this;
+        }
+
+        public IDAMPropertiesBuilder withEmail(String email) {
+            this.idamProperties.setEmail(email);
+            return this;
+        }
+
+        public IDAMPropertiesBuilder withForename(String forename) {
+            this.idamProperties.setForename(forename);
+            return this;
+        }
+
+        public IDAMPropertiesBuilder withSurname(String surname) {
+            this.idamProperties.setSurname(surname);
+            return this;
+        }
+
+        public IDAMPropertiesBuilder withRoles(String[] roles) {
+            this.idamProperties.setRoles(roles);
+            return this;
+        }
+
+        public IDAMPropertiesBuilder withDefaultService(String defaultService) {
+            this.idamProperties.setDefaultService(defaultService);
+            return this;
+        }
+
+        public IDAMProperties build() {
+            return this.idamProperties;
+        }
+    }
+
+    public static class UserProfileBuilder {
+        private final UserProfile userProfile;
+
+        private UserProfileBuilder() {
+            this.userProfile = new UserProfile();
+        }
+
+        public static UserProfileBuilder newUserProfile() {
+            return new UserProfileBuilder();
+        }
+
+        public UserProfileBuilder withJurisdictionDisplayProperties(JurisdictionDisplayProperties[] jurisdictionDisplayProperties) {
+            userProfile.setJurisdictions(jurisdictionDisplayProperties);
+            return this;
+        }
+
+        public UserProfileBuilder withUser(User user) {
+            userProfile.setUser(user);
+            return this;
+        }
+
+        public UserProfileBuilder withChannels(String[] channels) {
+            userProfile.setChannels(channels);
+            return this;
+        }
+
+        public UserProfileBuilder withDefaultSettings(DefaultSettings defaultSettings) {
+            userProfile.setDefaultSettings(defaultSettings);
+            return this;
+        }
+
+        public UserProfile build() {
+            return this.userProfile;
         }
     }
 }

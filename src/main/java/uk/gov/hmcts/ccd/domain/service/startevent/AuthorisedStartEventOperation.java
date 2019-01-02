@@ -13,8 +13,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
+import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
+import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
@@ -23,6 +27,9 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
+import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 @Service
@@ -35,21 +42,30 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
 
     private final StartEventOperation startEventOperation;
     private final CaseDefinitionRepository caseDefinitionRepository;
+    private final CaseDetailsRepository caseDetailsRepository;
     private final AccessControlService accessControlService;
+    private final UIDService uidService;
     private final UserRepository userRepository;
     private final CaseAccessService caseAccessService;
+    private final DraftGateway draftGateway;
 
     public AuthorisedStartEventOperation(@Qualifier("classified") final StartEventOperation startEventOperation,
                                          @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
+                                         @Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
                                          final AccessControlService accessControlService,
+                                         final UIDService uidService,
                                          @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
+                                         @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway,
                                          CaseAccessService caseAccessService) {
 
         this.startEventOperation = startEventOperation;
         this.caseDefinitionRepository = caseDefinitionRepository;
+        this.caseDetailsRepository = caseDetailsRepository;
         this.accessControlService = accessControlService;
+        this.uidService = uidService;
         this.userRepository = userRepository;
         this.caseAccessService = caseAccessService;
+        this.draftGateway = draftGateway;
     }
 
     @Override
@@ -60,24 +76,26 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
     }
 
     @Override
-    public StartEventTrigger triggerStartForCase(String uid, String jurisdictionId, String caseTypeId, String caseReference, String eventTriggerId, Boolean ignoreWarning) {
-        return verifyReadAccess(caseTypeId, startEventOperation.triggerStartForCase(uid,
-                                                                                    jurisdictionId,
-                                                                                    caseTypeId,
-                                                                                    caseReference,
-                                                                                    eventTriggerId,
-                                                                                    ignoreWarning));
+    public StartEventTrigger triggerStartForCase(String caseReference, String eventTriggerId, Boolean ignoreWarning) {
+
+        if (!uidService.validateUID(caseReference)) {
+            throw new BadRequestException("Case reference is not valid");
+        }
+
+        return caseDetailsRepository.findByReference(caseReference)
+            .map(caseDetails -> verifyReadAccess(caseDetails.getCaseTypeId(), startEventOperation.triggerStartForCase(caseReference,
+                                                                                                                      eventTriggerId,
+                                                                                                                      ignoreWarning)))
+            .orElseThrow(() -> new CaseNotFoundException(caseReference));
     }
 
     @Override
-    public StartEventTrigger triggerStartForDraft(String uid, String jurisdictionId, String caseTypeId, String draftReference, String eventTriggerId,
+    public StartEventTrigger triggerStartForDraft(String draftReference,
                                                   Boolean ignoreWarning) {
-        return verifyReadAccess(caseTypeId, startEventOperation.triggerStartForDraft(uid,
-                                                                                     jurisdictionId,
-                                                                                     caseTypeId,
-                                                                                     draftReference,
-                                                                                     eventTriggerId,
-                                                                                     ignoreWarning));
+
+        final CaseDetails caseDetails = draftGateway.getCaseDetails(Draft.stripId(draftReference));
+        return verifyReadAccess(caseDetails.getCaseTypeId(), startEventOperation.triggerStartForDraft(draftReference,
+                                                                                                      ignoreWarning));
     }
 
     private CaseType getCaseType(String caseTypeId) {

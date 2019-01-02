@@ -54,17 +54,15 @@ class CaseDetailsEndpointTest {
     private static final String CASE_ID = "1234qwer5678tyui";
     private static final String EVENT_TRIGGER_ID = "updateEvent";
     private static final Boolean IGNORE_WARNING = Boolean.TRUE;
-    private static final CaseDataContent EVENT_DATA = newCaseDataContent().build();
     private static final Event EVENT = anEvent().build();
     private static final Map<String, JsonNode> DATA = new HashMap<>();
     private static final String TOKEN = "csdcsdcdscsdcsdcsdcd";
-
-    static {
-        EVENT_DATA.setEvent(EVENT);
-        EVENT_DATA.setData(DATA);
-        EVENT_DATA.setToken(TOKEN);
-        EVENT_DATA.setIgnoreWarning(IGNORE_WARNING);
-    }
+    private static final CaseDataContent EVENT_DATA = newCaseDataContent()
+        .withEvent(EVENT)
+        .withData(DATA)
+        .withToken(TOKEN)
+        .withIgnoreWarning(IGNORE_WARNING)
+        .build();
 
     @Mock
     private ClassifiedGetCaseOperation classifiedGetCaseOperation;
@@ -153,10 +151,7 @@ class CaseDetailsEndpointTest {
     @Test
     void shouldReturnStartEventTrigger_startEventForCaseworkerForCase() {
         final StartEventTrigger startEventTrigger = new StartEventTrigger();
-        doReturn(startEventTrigger).when(startEventOperation).triggerStartForCase(UID,
-                                                                                  JURISDICTION_ID,
-                                                                                  CASE_TYPE_ID,
-                                                                                  CASE_ID,
+        doReturn(startEventTrigger).when(startEventOperation).triggerStartForCase(CASE_ID,
                                                                                   EVENT_TRIGGER_ID,
                                                                                   IGNORE_WARNING);
 
@@ -168,10 +163,7 @@ class CaseDetailsEndpointTest {
                                                                           IGNORE_WARNING);
 
         assertThat(output, sameInstance(startEventTrigger));
-        verify(startEventOperation).triggerStartForCase(UID,
-                                                        JURISDICTION_ID,
-                                                        CASE_TYPE_ID,
-                                                        CASE_ID,
+        verify(startEventOperation).triggerStartForCase(CASE_ID,
                                                         EVENT_TRIGGER_ID,
                                                         IGNORE_WARNING);
     }
@@ -228,10 +220,7 @@ class CaseDetailsEndpointTest {
             JURISDICTION_ID,
             CASE_TYPE_ID,
             CASE_ID,
-            EVENT,
-            DATA,
-            TOKEN,
-            IGNORE_WARNING);
+            EVENT_DATA);
 
         final CaseDetails output = endpoint.createCaseEventForCaseWorker(
             UID,
@@ -247,10 +236,7 @@ class CaseDetailsEndpointTest {
                 JURISDICTION_ID,
                 CASE_TYPE_ID,
                 CASE_ID,
-                EVENT_DATA.getEvent(),
-                EVENT_DATA.getData(),
-                EVENT_DATA.getToken(),
-                IGNORE_WARNING)
+                EVENT_DATA)
         );
     }
 
@@ -264,17 +250,12 @@ class CaseDetailsEndpointTest {
         final JsonNode toBeReturned = objectNode;
 
         doReturn(data).when(validateCaseFieldsOperation).validateCaseDetails(
-            JURISDICTION_ID,
             CASE_TYPE_ID,
-            EVENT,
-            DATA);
+            EVENT_DATA);
         doReturn(toBeReturned).when(midEventCallback).invoke(
-            JURISDICTION_ID,
             CASE_TYPE_ID,
-            EVENT,
-            DATA,
-            pageId,
-            IGNORE_WARNING);
+            EVENT_DATA,
+            pageId);
 
         final JsonNode output = endpoint.validateCaseDetails(
             UID,
@@ -286,17 +267,12 @@ class CaseDetailsEndpointTest {
         assertAll(
             () -> assertThat(output, sameInstance(toBeReturned)),
             () -> verify(validateCaseFieldsOperation).validateCaseDetails(
-                JURISDICTION_ID,
                 CASE_TYPE_ID,
-                EVENT_DATA.getEvent(),
-                DATA),
+                EVENT_DATA),
             () -> verify(midEventCallback).invoke(
-                JURISDICTION_ID,
                 CASE_TYPE_ID,
-                EVENT_DATA.getEvent(),
-                DATA,
-                pageId,
-                IGNORE_WARNING)
+                EVENT_DATA,
+                pageId)
         );
     }
 

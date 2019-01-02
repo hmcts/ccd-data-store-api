@@ -18,6 +18,7 @@ import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
@@ -60,10 +61,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
                                        String jurisdictionId,
                                        String caseTypeId,
                                        String caseReference,
-                                       Event event,
-                                       Map<String, JsonNode> data,
-                                       String token,
-                                       Boolean ignoreWarning) {
+                                       CaseDataContent content) {
         final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
         if (caseType == null) {
             throw new ValidationException("Cannot find case type definition for  " + caseTypeId);
@@ -78,16 +76,13 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
             throw new ValidationException("Cannot find user roles for the user");
         }
 
-        verifyUpsertAccess(event, data, existingCaseDetails, caseType, userRoles);
+        verifyUpsertAccess(content.getEvent(), content.getData(), existingCaseDetails, caseType, userRoles);
 
         final CaseDetails caseDetails = createEventOperation.createCaseEvent(uid,
                                                                              jurisdictionId,
                                                                              caseTypeId,
                                                                              caseReference,
-                                                                             event,
-                                                                             data,
-                                                                             token,
-                                                                             ignoreWarning);
+                                                                             content);
         return verifyReadAccess(caseType, userRoles, caseDetails);
     }
 
