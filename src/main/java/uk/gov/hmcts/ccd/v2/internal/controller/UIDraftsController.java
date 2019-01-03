@@ -62,7 +62,8 @@ public class UIDraftsController {
     )
     @ApiResponses(value = {
         @ApiResponse(code = 201, message = "Draft created"),
-        @ApiResponse(code = 422, message = "Bad request")
+        @ApiResponse(code = 422, message = "One of: cannot find event in requested case type or unable to sanitize document for case field"),
+        @ApiResponse(code = 500, message = "Draft store is down.")
     })
     public ResponseEntity<DraftResponse> saveDraft(
         @ApiParam(value = "Case type ID", required = true)
@@ -88,7 +89,8 @@ public class UIDraftsController {
     )
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Draft updated"),
-        @ApiResponse(code = 400, message = "Bad request")
+        @ApiResponse(code = 422, message = "One of: cannot find event in requested case type or unable to sanitize document for case field"),
+        @ApiResponse(code = 500, message = "Draft store is down.")
     })
     public ResponseEntity<DraftResponse> updateDraft(
         @PathVariable("ctid") final String caseTypeId,
@@ -109,7 +111,8 @@ public class UIDraftsController {
         })
     @ApiOperation(value = "Fetch a draft for display")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "A displayable draft")
+        @ApiResponse(code = 200, message = "A displayable draft"),
+        @ApiResponse(code = 500, message = "Draft store is down.")
     })
     public ResponseEntity<CaseView> findDraft(@PathVariable("did") final String did) {
         Instant start = Instant.now();
@@ -129,7 +132,8 @@ public class UIDraftsController {
         })
     @ApiOperation(value = "Delete a given draft")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "A draft deleted successfully")
+        @ApiResponse(code = 200, message = "A draft deleted successfully"),
+        @ApiResponse(code = 500, message = "Draft store is down.")
     })
     public ResponseEntity<Void> deleteDraft(@PathVariable("did") final String did) {
         Instant start = Instant.now();
