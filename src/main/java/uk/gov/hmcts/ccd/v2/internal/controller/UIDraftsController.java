@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
@@ -23,6 +24,8 @@ import uk.gov.hmcts.ccd.v2.V2;
 import javax.transaction.Transactional;
 import java.time.Duration;
 import java.time.Instant;
+
+import static org.springframework.http.ResponseEntity.status;
 
 @RestController
 @RequestMapping(path = "/internal")
@@ -59,14 +62,15 @@ public class UIDraftsController {
     )
     @ApiResponses(value = {
         @ApiResponse(code = 201, message = "Draft created"),
-        @ApiResponse(code = 400, message = "Bad request")
+        @ApiResponse(code = 422, message = "Bad request")
     })
-    public DraftResponse saveDraft(
+    public ResponseEntity<DraftResponse> saveDraft(
         @ApiParam(value = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
         @RequestBody final CaseDataContent caseDataContent) {
 
-        return upsertDraftOperation.executeSave(caseTypeId, caseDataContent);
+        ResponseEntity.BodyBuilder builder = status(HttpStatus.CREATED);
+        return builder.body(upsertDraftOperation.executeSave(caseTypeId, caseDataContent));
     }
 
     @PutMapping(
@@ -86,12 +90,12 @@ public class UIDraftsController {
         @ApiResponse(code = 200, message = "Draft updated"),
         @ApiResponse(code = 400, message = "Bad request")
     })
-    public DraftResponse updateDraft(
+    public ResponseEntity<DraftResponse> updateDraft(
         @PathVariable("ctid") final String caseTypeId,
         @PathVariable("did") final String draftId,
         @RequestBody final CaseDataContent caseDataContent) {
 
-        return upsertDraftOperation.executeUpdate(caseTypeId, draftId, caseDataContent);
+        return ResponseEntity.ok(upsertDraftOperation.executeUpdate(caseTypeId, draftId, caseDataContent));
     }
 
     @Transactional
@@ -107,12 +111,12 @@ public class UIDraftsController {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "A displayable draft")
     })
-    public CaseView findDraft(@PathVariable("did") final String did) {
+    public ResponseEntity<CaseView> findDraft(@PathVariable("did") final String did) {
         Instant start = Instant.now();
         CaseView caseView = getDraftViewOperation.execute(did);
         final Duration between = Duration.between(start, Instant.now());
         LOG.info("findDraft has been completed in {} millisecs...", between.toMillis());
-        return caseView;
+        return ResponseEntity.ok(caseView);
     }
 
     @Transactional
@@ -127,10 +131,11 @@ public class UIDraftsController {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "A draft deleted successfully")
     })
-    public void deleteDraft(@PathVariable("did") final String did) {
+    public ResponseEntity<Void> deleteDraft(@PathVariable("did") final String did) {
         Instant start = Instant.now();
         draftGateway.delete(did);
         final Duration between = Duration.between(start, Instant.now());
         LOG.info("deleteDraft has been completed in {} millisecs...", between.toMillis());
+        return ResponseEntity.ok().build();
     }
 }

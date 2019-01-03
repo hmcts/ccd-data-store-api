@@ -52,7 +52,7 @@ public class DefaultUpsertDraftOperation implements UpsertDraftOperation {
         if (!caseType.hasEventId(eventId)) {
             throw new ValidationException("Validation error. Event id " + eventId + " is not found in case type definition");
         }
-        draftResponse.setId(createDraft(caseTypeId, caseDataContent, caseType, eventId));
+        draftResponse.setId(createDraft(caseDataContent, caseType, eventId));
         return draftResponse;
     }
 
@@ -70,7 +70,7 @@ public class DefaultUpsertDraftOperation implements UpsertDraftOperation {
                                    draftId);
     }
 
-    private String createDraft(String caseTypeId, CaseDataContent caseDataContent, CaseType caseType, String eventId) {
+    private String createDraft(CaseDataContent caseDataContent, CaseType caseType, String eventId) {
         return draftGateway.create(buildCreateCaseDraft(userAuthorisation.getUserId(),
                                                         caseType,
                                                         eventId,
