@@ -109,6 +109,7 @@ public class UIDraftsController {
         produces = {
             V2.MediaType.UI_DRAFT_READ
         })
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Fetch a draft for display")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "A displayable draft"),
@@ -130,6 +131,7 @@ public class UIDraftsController {
         produces = {
             V2.MediaType.UI_DRAFT_DELETE
         })
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Delete a given draft")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "A draft deleted successfully"),
