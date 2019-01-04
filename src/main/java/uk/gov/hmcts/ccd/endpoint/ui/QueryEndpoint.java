@@ -173,7 +173,7 @@ public class QueryEndpoint {
                                                         @PathVariable("jid") final String jurisdictionId,
                                                         @PathVariable("ctid") final String caseTypeId) {
         Instant start = Instant.now();
-        WorkbasketInput[] workbasketInputs = findWorkbasketInputOperation.execute(jurisdictionId, caseTypeId,
+        WorkbasketInput[] workbasketInputs = findWorkbasketInputOperation.execute(caseTypeId,
                                                                                   CAN_READ).toArray(
             new WorkbasketInput[0]);
         final Duration between = Duration.between(start, Instant.now());
