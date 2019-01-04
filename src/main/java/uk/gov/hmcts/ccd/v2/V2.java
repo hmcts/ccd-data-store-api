@@ -24,4 +24,12 @@ public final class V2 {
         public static final String UI_DRAFT_DELETE = "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-draft-delete.v2+json;charset=UTF-8";
 
     }
+
+    public final class Error {
+        public static final String CASE_NOT_FOUND = "Case not found";
+        public static final String CASE_ID_INVALID = "Case ID is not valid";
+        public static final String CASE_ROLE_REQUIRED = "Case role missing";
+        public static final String CASE_ROLE_INVALID = "Case role does not exist";
+        public static final String GRANT_FORBIDDEN = "Grant action is reserved to users with entire jurisdiction access";
+    }
 }
