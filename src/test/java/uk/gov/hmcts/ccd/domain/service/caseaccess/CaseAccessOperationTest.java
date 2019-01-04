@@ -154,6 +154,58 @@ class CaseAccessOperationTest {
         return caseUser;
     }
 
+    @Nested()
+    @DisplayName("updateUserAccess(reference, caseUser)")
+    class GrantAccessCaseUser {
+        private CaseDetails caseDetails;
+
+        @BeforeEach
+        void setUp() {
+            caseDetails = new CaseDetails();
+            caseDetails.setId(CASE_ID.toString());
+            caseDetails.setCaseTypeId(CASE_TYPE_ID);
+        }
+
+        @Test
+        @DisplayName("should reject update when it contains an unknown case role")
+        void shouldRejectWhenUnknownCaseRoles() {
+            assertThrows(InvalidCaseRoleException.class,
+                         () -> caseAccessOperation.updateUserAccess(caseDetails, caseUser(NOT_CASE_ROLE)));
+            verifyZeroInteractions(caseUserRepository);
+        }
+
+        @Test
+        @DisplayName("should grant access when added case role valid")
+        void shouldGrantAccessForCaseRole() {
+            caseAccessOperation.updateUserAccess(caseDetails, caseUser(CASE_ROLE));
+
+            verify(caseUserRepository).grantAccess(CASE_ID, USER_ID, CASE_ROLE);
+        }
+
+        @Test
+        @DisplayName("should revoke access for removed case roles")
+        void shouldRevokeRemovedCaseRoles() {
+            caseAccessOperation.updateUserAccess(caseDetails, caseUser(CASE_ROLE));
+
+            verify(caseUserRepository).revokeAccess(CASE_ID, USER_ID, CASE_ROLE_GRANTED);
+        }
+
+        @Test
+        @DisplayName("should ignore case roles already granted")
+        void shouldIgnoreGrantedCaseRoles() {
+            caseAccessOperation.updateUserAccess(caseDetails, caseUser(CASE_ROLE_GRANTED));
+
+            verify(caseUserRepository, never()).grantAccess(CASE_ID, USER_ID, CASE_ROLE_GRANTED);
+        }
+    }
+
+    private CaseUser caseUser(String caseRole) {
+        final CaseUser caseUser = new CaseUser();
+        caseUser.setUserId(USER_ID);
+        caseUser.getCaseRoles().add(caseRole);
+        return caseUser;
+    }
+
     @Nested
     @DisplayName("revokeAccess()")
     class RevokeAccess {
