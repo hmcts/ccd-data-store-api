@@ -356,6 +356,47 @@ class CachedCaseDetailsRepositoryTest {
     }
 
     @Nested
+    @DisplayName("findByReference(String)")
+    class findByReferenceString {
+        @Test
+        @DisplayName("should initially retrieve case details from decorated repository")
+        void findByReference() {
+            doReturn(Optional.of(caseDetails)).when(caseDetailsRepository)
+                                              .findByReference(CASE_REFERENCE_STR);
+
+            final CaseDetails returned = cachedRepository.findByReference(CASE_REFERENCE_STR)
+                                                         .orElseThrow(() -> new AssertionError("Not found"));
+
+            assertAll(
+                () -> assertThat(returned, is(caseDetails)),
+                () -> verify(caseDetailsRepository, times(1)).findByReference(CASE_REFERENCE_STR)
+            );
+        }
+
+        @Test
+        @DisplayName("should cache case details for subsequent calls")
+        void findByReferenceAgain() {
+            doReturn(Optional.of(caseDetails)).when(caseDetailsRepository)
+                                              .findByReference(CASE_REFERENCE_STR);
+
+            cachedRepository.findByReference(CASE_REFERENCE_STR);
+
+            verify(caseDetailsRepository, times(1)).findByReference(CASE_REFERENCE_STR);
+
+            doReturn(Optional.of(new CaseDetails())).when(caseDetailsRepository)
+                                                    .findByReference(CASE_REFERENCE_STR);
+
+            final CaseDetails returned = cachedRepository.findByReference(CASE_REFERENCE_STR)
+                                                         .orElseThrow(() -> new AssertionError("Not found"));
+
+            assertAll(
+                () -> assertThat(returned, is(caseDetails)),
+                () -> verifyNoMoreInteractions(caseDetailsRepository)
+            );
+        }
+    }
+
+    @Nested
     @DisplayName("lockByReference(String, String)")
     class lockByReferenceAsString {
         @Test
