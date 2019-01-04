@@ -19,11 +19,11 @@ public class CaseUserAuditRepository {
     @PersistenceContext
     private EntityManager em;
 
-    void auditGrant(Long caseId, String userId, String caseRole) {
+    public void auditGrant(Long caseId, String userId, String caseRole) {
         em.persist(getEntity(caseId, userId, caseRole, GRANT));
     }
 
-    void auditRevoke(Long caseId, String userId, String caseRole) {
+    public void auditRevoke(Long caseId, String userId, String caseRole) {
         em.persist(getEntity(caseId, userId, caseRole, REVOKE));
     }
 
