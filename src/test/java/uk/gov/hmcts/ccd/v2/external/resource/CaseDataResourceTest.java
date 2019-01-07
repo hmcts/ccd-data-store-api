@@ -15,6 +15,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 
+@DisplayName("CaseDataResource")
 class CaseDataResourceTest {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private static final ObjectMapper MAPPER = new ObjectMapper();

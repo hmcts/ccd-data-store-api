@@ -28,6 +28,7 @@ import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.internal.resource.UIStartTriggerResource;
 
+@DisplayName("UIStartTriggerControllerTest")
 class UIStartTriggerControllerTest {
     private static final String NAME = "eventName";
     private static final String DESCRIPTION = "eventDescription";
