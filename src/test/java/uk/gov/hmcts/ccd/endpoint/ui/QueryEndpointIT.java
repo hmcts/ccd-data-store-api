@@ -157,7 +157,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Address", searchResultViewColumns.get(2).getLabel());
         assertEquals(1, searchResultViewColumns.get(2).getOrder().intValue());
         assertEquals("Address", searchResultViewColumns.get(2).getCaseFieldType().getId());
-        assertEquals("Address", searchResultViewColumns.get(2).getCaseFieldType().getType());
+        assertEquals("Complex", searchResultViewColumns.get(2).getCaseFieldType().getType());
 
         assertEquals("Incorrect view items count", 3, searchResultViewItems.size());
 

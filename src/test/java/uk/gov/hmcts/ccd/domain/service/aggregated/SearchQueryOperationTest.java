@@ -1,5 +1,35 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.anyList;
+import static org.mockito.Mockito.anyObject;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway.DRAFT_STORE_DOWN_ERR_MESSAGE;
+import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.NO_ERROR;
+import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WORKBASKET;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
+
 import com.google.common.collect.Lists;
 import org.hamcrest.Matcher;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,26 +44,8 @@ import uk.gov.hmcts.ccd.data.draft.DraftAccessException;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftsOperation;
 import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway.DRAFT_STORE_DOWN_ERR_MESSAGE;
-import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.NO_ERROR;
-import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WORKBASKET;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 
 public class SearchQueryOperationTest {
     private static final String CASE_TYPE_ID = "GrantOnly";
@@ -54,7 +66,7 @@ public class SearchQueryOperationTest {
     private MergeDataToSearchResultOperation mergeDataToSearchResultOperation;
 
     @Mock
-    private GetCaseTypesOperation getCaseTypesOperation;
+    private GetCaseTypeOperation getCaseTypeOperation;
 
     @Mock
     private GetDraftsOperation getDraftsOperation;
@@ -65,9 +77,6 @@ public class SearchQueryOperationTest {
     private List<CaseDetails> drafts = Lists.newArrayList();
     private List<CaseDetails> cases = Lists.newArrayList();
     private CaseType testCaseType;
-
-    @Mock
-    private CaseTypeService caseTypeService;
 
     @Captor
     private ArgumentCaptor<List<CaseDetails>> argument;
@@ -83,15 +92,13 @@ public class SearchQueryOperationTest {
             .withField(CASE_FIELD_1_3)
             .withEvent(newCaseEvent().withId(EVENT_ID).withCanSaveDraft(true).build())
             .build();
-        List<CaseType> testCaseTypes = Lists.newArrayList(testCaseType);
+        Optional<CaseType> testCaseTypeOpt = Optional.of(testCaseType);
 
-        doReturn(testCaseTypes).when(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ);
-        doReturn(testCaseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
+        doReturn(testCaseTypeOpt).when(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ);
         searchQueryOperation = new SearchQueryOperation(searchOperation,
                                                         mergeDataToSearchResultOperation,
-                                                        getCaseTypesOperation,
-                                                        getDraftsOperation,
-                                                        caseTypeService);
+                                                        getCaseTypeOperation,
+                                                        getDraftsOperation);
         metadata = new MetaData(CASE_TYPE_ID, JURISDICTION_ID);
         criteria = new HashMap<>();
         drafts.add(newCaseDetails()
@@ -108,7 +115,7 @@ public class SearchQueryOperationTest {
         searchQueryOperation.execute(WORKBASKET, metadata, criteria);
 
         assertAll(
-            () -> verify(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ),
+            () -> verify(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ),
             () -> verify(searchOperation).execute(metadata, criteria),
             () -> verify(getDraftsOperation).execute(metadata),
             () -> verify(mergeDataToSearchResultOperation).execute(anyObject(), anyList(), anyString(), anyString())
@@ -124,7 +131,7 @@ public class SearchQueryOperationTest {
         searchQueryOperation.execute(WORKBASKET, metadata, criteria);
 
         assertAll(
-            () -> verify(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ),
+            () -> verify(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ),
             () -> verify(searchOperation).execute(metadata, criteria),
             () -> verify(getDraftsOperation).execute(metadata),
             () -> verify(mergeDataToSearchResultOperation).execute(anyObject(), argument.capture(), anyString(), eq(NO_ERROR)),
@@ -143,7 +150,7 @@ public class SearchQueryOperationTest {
         searchQueryOperation.execute(WORKBASKET, metadata, criteria);
 
         assertAll(
-            () -> verify(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ),
+            () -> verify(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ),
             () -> verify(searchOperation).execute(metadata, criteria),
             () -> verifyNoMoreInteractions(getDraftsOperation),
             () -> verify(mergeDataToSearchResultOperation).execute(anyObject(), argument.capture(), anyString(), eq(NO_ERROR)),
@@ -161,7 +168,7 @@ public class SearchQueryOperationTest {
         searchQueryOperation.execute("not a" + WORKBASKET, metadata, criteria);
 
         assertAll(
-            () -> verify(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ),
+            () -> verify(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ),
             () -> verify(searchOperation).execute(metadata, criteria),
             () -> verifyNoMoreInteractions(getDraftsOperation),
             () -> verify(mergeDataToSearchResultOperation).execute(anyObject(), argument.capture(), anyString(), eq(NO_ERROR)),
@@ -179,7 +186,7 @@ public class SearchQueryOperationTest {
         searchQueryOperation.execute(WORKBASKET, metadata, criteria);
 
         assertAll(
-            () -> verify(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ),
+            () -> verify(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ),
             () -> verify(searchOperation).execute(metadata, criteria),
             () -> verify(getDraftsOperation).execute(metadata),
             () -> verify(mergeDataToSearchResultOperation).execute(anyObject(), eq(cases), anyString(), eq(DRAFT_STORE_DOWN_ERR_MESSAGE))
@@ -189,12 +196,11 @@ public class SearchQueryOperationTest {
     @Test
     @DisplayName("should return empty when caseType is not found")
     public void shouldReturnEmptyNoCaseTypeFound() {
-        doReturn(new ArrayList<>()).when(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ);
+        doReturn(Optional.empty()).when(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ);
 
         searchQueryOperation.execute(WORKBASKET, metadata, criteria);
         assertAll(
-            () -> verify(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID),
-            () -> verify(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ),
+            () -> verify(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ),
             () -> verify(searchOperation, never()).execute(metadata, criteria),
             () -> verify(getDraftsOperation, never()).execute(metadata),
             () -> verify(mergeDataToSearchResultOperation, never()).execute(anyObject(), anyList(), anyString(), anyString())

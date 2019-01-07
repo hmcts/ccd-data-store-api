@@ -1,5 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Predicate;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -11,43 +15,28 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
-/**
- *
- * @deprecated until {@link DefaultGetCaseTypesOperation} is deprecated
- */
-@Deprecated
-@SuppressWarnings("squid:S1133")
 @Service
-@Qualifier(AuthorisedGetCaseTypesOperation.QUALIFIER)
-public class AuthorisedGetCaseTypesOperation implements GetCaseTypesOperation {
+@Qualifier(AuthorisedGetCaseTypeOperation.QUALIFIER)
+public class AuthorisedGetCaseTypeOperation implements GetCaseTypeOperation {
     public static final String QUALIFIER = "authorised";
     private final AccessControlService accessControlService;
     private final UserRepository userRepository;
-    private final GetCaseTypesOperation getCaseTypesOperation;
+    private final GetCaseTypeOperation getCaseTypeOperation;
 
     @Autowired
-    public AuthorisedGetCaseTypesOperation(final AccessControlService accessControlService,
-                                           @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
-                                           @Qualifier(DefaultGetCaseTypesOperation.QUALIFIER) final GetCaseTypesOperation getCaseTypesOperation) {
+    public AuthorisedGetCaseTypeOperation(final AccessControlService accessControlService,
+                                          @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
+                                          @Qualifier(DefaultGetCaseTypeOperation.QUALIFIER) final GetCaseTypeOperation getCaseTypeOperation) {
         this.accessControlService = accessControlService;
         this.userRepository = userRepository;
-        this.getCaseTypesOperation = getCaseTypesOperation;
+        this.getCaseTypeOperation = getCaseTypeOperation;
     }
 
     @Override
-    public List<CaseType> execute(String jurisdictionId, Predicate<AccessControlList> access) {
+    public Optional<CaseType> execute(String caseTypeId, Predicate<AccessControlList> access) {
         final Set<String> userRoles = getUserRoles();
-        return getCaseTypesOperation.execute(jurisdictionId, access).stream()
-            .map(caseType -> verifyAccess(caseType, userRoles, access))
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .collect(Collectors.toList());
+        return getCaseTypeOperation.execute(caseTypeId, access)
+            .flatMap(caseType -> verifyAccess(caseType, userRoles, access));
     }
 
     private Set<String> getUserRoles() {
@@ -60,7 +49,7 @@ public class AuthorisedGetCaseTypesOperation implements GetCaseTypesOperation {
 
     private Optional<CaseType> verifyAccess(CaseType caseType, Set<String> userRoles, Predicate<AccessControlList> access) {
 
-        if (caseType == null || CollectionUtils.isEmpty(userRoles)) {
+        if (CollectionUtils.isEmpty(userRoles)) {
             return Optional.empty();
         }
 
