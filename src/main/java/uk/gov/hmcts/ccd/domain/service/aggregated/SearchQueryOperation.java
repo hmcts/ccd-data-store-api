@@ -1,5 +1,12 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,51 +17,36 @@ import uk.gov.hmcts.ccd.data.draft.DraftAccessException;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
-import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.getdraft.DefaultGetDraftsOperation;
 import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftsOperation;
 import uk.gov.hmcts.ccd.domain.service.search.CreatorSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
 @Service
 public class SearchQueryOperation {
     protected static final String NO_ERROR = null;
     public static final String WORKBASKET = "WORKBASKET";
     private final MergeDataToSearchResultOperation mergeDataToSearchResultOperation;
-    private final GetCaseTypesOperation getCaseTypesOperation;
+    private final GetCaseTypeOperation getCaseTypeOperation;
     private final SearchOperation searchOperation;
     private final GetDraftsOperation getDraftsOperation;
-    private final CaseTypeService caseTypeService;
 
     @Autowired
     public SearchQueryOperation(@Qualifier(CreatorSearchOperation.QUALIFIER) final SearchOperation searchOperation,
                                 final MergeDataToSearchResultOperation mergeDataToSearchResultOperation,
-                                @Qualifier(AuthorisedGetCaseTypesOperation.QUALIFIER) final GetCaseTypesOperation getCaseTypesOperation,
-                                @Qualifier(DefaultGetDraftsOperation.QUALIFIER) GetDraftsOperation getDraftsOperation,
-                                final CaseTypeService caseTypeService) {
+                                @Qualifier(AuthorisedGetCaseTypeOperation.QUALIFIER) final GetCaseTypeOperation getCaseTypeOperation,
+                                @Qualifier(DefaultGetDraftsOperation.QUALIFIER) GetDraftsOperation getDraftsOperation) {
         this.searchOperation = searchOperation;
         this.mergeDataToSearchResultOperation = mergeDataToSearchResultOperation;
-        this.getCaseTypesOperation = getCaseTypesOperation;
+        this.getCaseTypeOperation = getCaseTypeOperation;
         this.getDraftsOperation = getDraftsOperation;
-        this.caseTypeService = caseTypeService;
     }
 
     public SearchResultView execute(final String view,
                                     final MetaData metadata,
                                     final Map<String, String> queryParameters) {
-        CaseType validCaseType = caseTypeService.getCaseTypeForJurisdiction(metadata.getCaseTypeId(),
-                                                                            metadata.getJurisdiction());
-        Optional<CaseType> caseType = this.getCaseTypesOperation.execute(metadata.getJurisdiction(), CAN_READ)
-            .stream()
-            .filter(ct -> ct.getId().equalsIgnoreCase(validCaseType.getId()))
-            .findFirst();
+
+        Optional<CaseType> caseType = this.getCaseTypeOperation.execute(metadata.getCaseTypeId(), CAN_READ);
 
         if (!caseType.isPresent()) {
             return new SearchResultView(Collections.emptyList(), Collections.emptyList(), NO_ERROR);
