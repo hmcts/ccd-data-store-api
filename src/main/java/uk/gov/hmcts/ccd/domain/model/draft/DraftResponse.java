@@ -65,5 +65,7 @@ public class DraftResponse {
     }
 
     @JsonIgnore
-    public CaseDataContent getCaseDataContent() { return getDocument() != null ? getDocument().getCaseDataContent() : null;};
+    public CaseDataContent getCaseDataContent() {
+        return getDocument() != null ? getDocument().getCaseDataContent() : null;
+    }
 }
