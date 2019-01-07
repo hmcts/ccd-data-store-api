@@ -26,7 +26,7 @@ class UIDraftResourceTest {
     @Test
     @DisplayName("should copy draft response profile")
     void shouldCopyUserProfile() {
-        final UIDraftResource resource = new UIDraftResource(draftResponse);
+        final UIDraftResource resource = new UIDraftResource(draftResponse, CASE_TYPE_ID);
 
         assertAll(
             () -> assertThat(resource.getDraftResponse(), sameInstance(draftResponse))
@@ -36,7 +36,7 @@ class UIDraftResourceTest {
     @Test
     @DisplayName("should link to itself")
     void shouldLinkToSelf() {
-        final UIDraftResource resource = new UIDraftResource(draftResponse);
+        final UIDraftResource resource = new UIDraftResource(draftResponse, CASE_TYPE_ID);
 
         assertThat(resource.getLink("self").getHref(), equalTo(LINK_SELF));
     }
