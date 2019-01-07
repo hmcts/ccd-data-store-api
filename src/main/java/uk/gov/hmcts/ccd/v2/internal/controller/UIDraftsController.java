@@ -72,7 +72,7 @@ public class UIDraftsController {
         @RequestBody final CaseDataContent caseDataContent) {
 
         ResponseEntity.BodyBuilder builder = status(HttpStatus.CREATED);
-        return builder.body(new UIDraftResource(upsertDraftOperation.executeSave(caseTypeId, caseDataContent)));
+        return builder.body(new UIDraftResource(upsertDraftOperation.executeSave(caseTypeId, caseDataContent), caseTypeId));
     }
 
     @PutMapping(
@@ -98,7 +98,7 @@ public class UIDraftsController {
         @PathVariable("did") final String draftId,
         @RequestBody final CaseDataContent caseDataContent) {
 
-        return ResponseEntity.ok(new UIDraftResource(upsertDraftOperation.executeUpdate(caseTypeId, draftId, caseDataContent)));
+        return ResponseEntity.ok(new UIDraftResource(upsertDraftOperation.executeUpdate(caseTypeId, draftId, caseDataContent), caseTypeId));
     }
 
     @Transactional

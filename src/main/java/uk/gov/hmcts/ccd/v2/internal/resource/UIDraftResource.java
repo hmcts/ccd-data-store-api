@@ -23,10 +23,10 @@ public class UIDraftResource extends ResourceSupport {
     @JsonUnwrapped
     private DraftResponse draftResponse;
 
-    public UIDraftResource(@NonNull DraftResponse draftResponse) {
+    public UIDraftResource(@NonNull DraftResponse draftResponse, String caseTypeId) {
         copyProperties(draftResponse);
 
-        add(linkTo(methodOn(UIDraftsController.class).saveDraft(draftResponse.getCaseTypeId(), draftResponse.getCaseDataContent())).withSelfRel());
+        add(linkTo(methodOn(UIDraftsController.class).saveDraft(caseTypeId, draftResponse.getCaseDataContent())).withSelfRel());
     }
 
     private void copyProperties(DraftResponse draftResponse) {
