@@ -15,6 +15,8 @@ import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseViewOperation;
 import uk.gov.hmcts.ccd.domain.service.upsertdraft.UpsertDraftOperation;
+import uk.gov.hmcts.ccd.v2.internal.resource.UICaseViewResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.UIDraftResource;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -23,15 +25,17 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewBuilder.aCaseView;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.newDraftResponse;
 
 class UIDraftsControllerTest {
+    private static final String CASE_REFERENCE = "1234123412341238";
     private static final String CASE_TYPE_ID = "1234123412341238";
     private static final String DRAFT_ID = "DRAFT128";
     private static final CaseDataContent CASE_DATA_CONTENT = newCaseDataContent().build();
     private static final DraftResponse DRAFT_RESPONSE = newDraftResponse().build();
-    private static final CaseView CASE_VIEW = aCaseView().build();
+
+    @Mock
+    private CaseView caseView;
     @Mock
     private UpsertDraftOperation upsertDraftOperation;
     @Mock
@@ -44,9 +48,10 @@ class UIDraftsControllerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
+        when(caseView.getCaseId()).thenReturn(CASE_REFERENCE);
         when(upsertDraftOperation.executeSave(CASE_TYPE_ID, CASE_DATA_CONTENT)).thenReturn(DRAFT_RESPONSE);
         when(upsertDraftOperation.executeUpdate(CASE_TYPE_ID, DRAFT_ID, CASE_DATA_CONTENT)).thenReturn(DRAFT_RESPONSE);
-        when(getDraftViewOperation.execute(DRAFT_ID)).thenReturn(CASE_VIEW);
+        when(getDraftViewOperation.execute(DRAFT_ID)).thenReturn(caseView);
     }
 
     @Nested
@@ -56,11 +61,11 @@ class UIDraftsControllerTest {
         @Test
         @DisplayName("should return 201 and draft response as body when draft saved")
         void shouldReturn201AndDraftResponseAsBodyWhenDraftSaved() {
-            ResponseEntity<DraftResponse> draftResponse = draftsController.saveDraft(CASE_TYPE_ID, CASE_DATA_CONTENT);
+            ResponseEntity<UIDraftResource> draftResponse = draftsController.saveDraft(CASE_TYPE_ID, CASE_DATA_CONTENT);
 
             assertAll(
                 () -> assertThat(draftResponse.getStatusCode(), is(HttpStatus.CREATED)),
-                () -> assertThat(draftResponse.getBody(), is(DRAFT_RESPONSE))
+                () -> assertThat(draftResponse.getBody().getDraftResponse(), is(DRAFT_RESPONSE))
             );
         }
 
@@ -80,11 +85,11 @@ class UIDraftsControllerTest {
         @Test
         @DisplayName("should return 200 when draft updated")
         void shouldReturn200WhenDraftUpdated() {
-            ResponseEntity<DraftResponse> draftResponse = draftsController.updateDraft(CASE_TYPE_ID, DRAFT_ID, CASE_DATA_CONTENT);
+            ResponseEntity<UIDraftResource> draftResponse = draftsController.updateDraft(CASE_TYPE_ID, DRAFT_ID, CASE_DATA_CONTENT);
 
             assertAll(
                 () -> assertThat(draftResponse.getStatusCode(), is(HttpStatus.OK)),
-                () -> assertThat(draftResponse.getBody(), is(DRAFT_RESPONSE))
+                () -> assertThat(draftResponse.getBody().getDraftResponse(), is(DRAFT_RESPONSE))
             );
         }
 
@@ -104,11 +109,11 @@ class UIDraftsControllerTest {
         @Test
         @DisplayName("should return 200 when draft is retrieved")
         void shouldReturn200WhenDraftIsRetrieved() {
-            ResponseEntity<CaseView> draftResponse = draftsController.findDraft(DRAFT_ID);
+            ResponseEntity<UICaseViewResource> draftResponse = draftsController.findDraft(DRAFT_ID);
 
             assertAll(
                 () -> assertThat(draftResponse.getStatusCode(), is(HttpStatus.OK)),
-                () -> assertThat(draftResponse.getBody(), is(CASE_VIEW))
+                () -> assertThat(draftResponse.getBody().getReference(), is(CASE_REFERENCE))
             );
         }
 
