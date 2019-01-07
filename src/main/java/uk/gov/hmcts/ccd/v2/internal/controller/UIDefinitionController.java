@@ -4,12 +4,14 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
+import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedFindWorkbasketInputOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.FindWorkbasketInputOperation;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.internal.resource.UIWorkbasketInputsResource;
@@ -23,7 +25,7 @@ public class UIDefinitionController {
     private final FindWorkbasketInputOperation findWorkbasketInputOperation;
 
     @Autowired
-    public UIDefinitionController(FindWorkbasketInputOperation findWorkbasketInputOperation) {
+    public UIDefinitionController(@Qualifier(AuthorisedFindWorkbasketInputOperation.QUALIFIER) FindWorkbasketInputOperation findWorkbasketInputOperation) {
         this.findWorkbasketInputOperation = findWorkbasketInputOperation;
     }
 
