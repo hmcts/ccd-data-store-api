@@ -28,10 +28,10 @@ class GetUIDefinitionTest extends BaseTest {
             .statusCode(200)
             .assertThat()
 
-            .body("$[?(@.order == 1)].label", equalTo("[\"Search `Text` field\"]"))
-            .body("$[?(@.order == 1)].field.id", equalTo("[\"TextField\"]"))
-            .body("$[?(@.order == 1)].field.field_type.id", equalTo("[\"Text\"]"))
-            .body("$[?(@.order == 1)].field.field_type.type", equalTo("[\"Text\"]"))
+            .body("workbasketInputs.find  { it.order == 1 }.label", equalTo("Search `Text` field"))
+            .body("workbasketInputs.find  { it.order == 1 }.field.id", equalTo("TextField"))
+            .body("workbasketInputs.find  { it.order == 1 }.field.field_type.id", equalTo("Text"))
+            .body("workbasketInputs.find  { it.order == 1 }.field.field_type.type", equalTo("Text"))
 
             .rootPath("_links")
             .body("self.href", equalTo(String.format("%s/internal/case-types/AAT/work-basket-inputs", aat.getTestUrl())));
