@@ -1,3 +1,7 @@
+provider "azurerm" {
+  version = "1.19.0"
+}
+
 locals {
   app_full_name = "${var.product}-${var.component}"
 
