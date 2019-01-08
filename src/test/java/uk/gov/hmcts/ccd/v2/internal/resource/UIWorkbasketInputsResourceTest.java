@@ -17,7 +17,7 @@ class UIWorkbasketInputsResourceTest {
     private static final String LINK_SELF = String.format("/internal/case-types/%s/work-basket-inputs", CASE_TYPE_ID);
     private WorkbasketInput workbasketInput1 = aWorkbasketInput().withFieldId("field1").build();
     private WorkbasketInput workbasketInput2 = aWorkbasketInput().withFieldId("field2").build();
-    private WorkbasketInput[] workbasketInputs = new WorkbasketInput[] {workbasketInput1, workbasketInput2};
+    private WorkbasketInput[] workbasketInputs = new WorkbasketInput[]{workbasketInput1, workbasketInput2};
 
     @Test
     @DisplayName("should copy workbasket inputs")
@@ -27,8 +27,8 @@ class UIWorkbasketInputsResourceTest {
         List<UIWorkbasketInputsResource.UIWorkbasketInput> workbasketInputs = Lists.newArrayList(resource.getWorkbasketInputs());
         assertAll(
             () -> assertThat(workbasketInputs, not(sameInstance(this.workbasketInputs))),
-            () -> assertThat(workbasketInputs, hasItem(hasProperty("field", hasProperty("id", is("field1"))))),
-            () -> assertThat(workbasketInputs, hasItem(hasProperty("field", hasProperty("id", is("field2")))))
+            () -> assertThat(workbasketInputs, hasItems(hasProperty("field", hasProperty("id", is("field1"))),
+                                                        hasProperty("field", hasProperty("id", is("field2")))))
         );
     }
 
