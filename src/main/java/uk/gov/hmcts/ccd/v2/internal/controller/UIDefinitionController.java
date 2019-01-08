@@ -6,9 +6,9 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
 import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedFindWorkbasketInputOperation;
@@ -30,8 +30,7 @@ public class UIDefinitionController {
     }
 
 
-    @RequestMapping(
-        method = RequestMethod.GET,
+    @GetMapping(
         path = "/case-types/{caseTypeId}/work-basket-inputs",
         headers = {
             V2.EXPERIMENTAL_HEADER

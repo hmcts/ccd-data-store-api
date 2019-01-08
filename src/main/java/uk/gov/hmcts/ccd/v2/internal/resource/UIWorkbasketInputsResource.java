@@ -37,7 +37,7 @@ public class UIWorkbasketInputsResource extends ResourceSupport {
 
     private void copyProperties(WorkbasketInput[] workbasketInputs) {
         this.workbasketInputs = Arrays.stream(workbasketInputs)
-            .map(workbasketInput -> buildUIWorkbasketInput(workbasketInput))
+            .map(this::buildUIWorkbasketInput)
             .collect(Collectors.toList()).toArray(new UIWorkbasketInput[]{});
     }
 
