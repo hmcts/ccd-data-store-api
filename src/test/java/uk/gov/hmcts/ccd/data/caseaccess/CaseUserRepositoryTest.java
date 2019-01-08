@@ -20,7 +20,7 @@ import uk.gov.hmcts.ccd.BaseTest;
 @Transactional
 public class CaseUserRepositoryTest extends BaseTest {
 
-    public static final String COUNT_CASE_USERS = "select count(*) from case_users where case_data_id = ? and user_id = ? and case_role = ?";
+    private static final String COUNT_CASE_USERS = "select count(*) from case_users where case_data_id = ? and user_id = ? and case_role = ?";
 
     private static final Long CASE_ID = 1L;
     private static final Long CASE_ID_GRANTED = 2L;
@@ -46,32 +46,11 @@ public class CaseUserRepositoryTest extends BaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldGrantAccessAsCreator() {
-        repository.grantAccess(CASE_ID, USER_ID);
-
-        assertThat(countAccesses(CASE_ID, USER_ID), equalTo(1));
-        verify(auditRepository).auditGrant(CASE_ID, USER_ID, GlobalCaseRole.CREATOR.getRole());
-    }
-
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldGrantAccessAsCustomCaseRole() {
         repository.grantAccess(CASE_ID, USER_ID, CASE_ROLE);
 
         assertThat(countAccesses(CASE_ID, USER_ID, CASE_ROLE), equalTo(1));
         verify(auditRepository).auditGrant(CASE_ID, USER_ID, CASE_ROLE);
-    }
-
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {
-        "classpath:sql/insert_cases.sql",
-        "classpath:sql/insert_case_users.sql",
-    })
-    public void shouldRevokeAccessAsCreator() {
-        repository.revokeAccess(CASE_ID, USER_ID);
-
-        assertThat(countAccesses(CASE_ID, USER_ID), equalTo(0));
-        verify(auditRepository).auditRevoke(CASE_ID, USER_ID, GlobalCaseRole.CREATOR.getRole());
     }
 
     @Test

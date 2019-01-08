@@ -5,6 +5,7 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
+import uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -28,6 +29,8 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+
+import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
 @Service
 class SubmitCaseTransaction {
@@ -90,7 +93,9 @@ class SubmitCaseTransaction {
             saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse, event, caseType, idamUser, eventTrigger, newCaseDetails);
 
         if (AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
-            caseUserRepository.grantAccess(Long.valueOf(savedCaseDetails.getId()), idamUser.getId());
+            caseUserRepository.grantAccess(Long.valueOf(savedCaseDetails.getId()),
+                                           idamUser.getId(),
+                                           CREATOR.getRole());
         }
 
         return savedCaseDetails;

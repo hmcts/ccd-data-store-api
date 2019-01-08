@@ -9,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
+import uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
@@ -39,6 +40,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Matchers.notNull;
 import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 
 class SubmitCaseTransactionTest {
@@ -216,7 +218,7 @@ class SubmitCaseTransactionTest {
                                          this.caseDetails,
                                          IGNORE_WARNING);
 
-        verify(caseUserRepository).grantAccess(Long.valueOf(CASE_ID), IDAM_ID);
+        verify(caseUserRepository).grantAccess(Long.valueOf(CASE_ID), IDAM_ID, CREATOR.getRole());
     }
 
     @Test

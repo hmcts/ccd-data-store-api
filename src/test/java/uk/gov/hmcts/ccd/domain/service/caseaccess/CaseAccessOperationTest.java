@@ -17,6 +17,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
 class CaseAccessOperationTest {
 
@@ -55,7 +56,7 @@ class CaseAccessOperationTest {
 
             assertAll(
                 () -> verify(caseDetailsRepository).findByReference(JURISDICTION, CASE_REFERENCE),
-                () -> verify(caseUserRepository).grantAccess(CASE_ID, USER_ID)
+                () -> verify(caseUserRepository).grantAccess(CASE_ID, USER_ID, CREATOR.getRole())
             );
         }
 
@@ -67,7 +68,7 @@ class CaseAccessOperationTest {
                     caseAccessOperation.grantAccess(JURISDICTION, CASE_NOT_FOUND.toString(), USER_ID);
                 }),
                 () -> verify(caseDetailsRepository).findByReference(JURISDICTION, CASE_NOT_FOUND),
-                () -> verify(caseUserRepository, never()).grantAccess(CASE_ID, USER_ID)
+                () -> verify(caseUserRepository, never()).grantAccess(CASE_ID, USER_ID, CREATOR.getRole())
             );
         }
 
@@ -79,7 +80,7 @@ class CaseAccessOperationTest {
                     caseAccessOperation.grantAccess(WRONG_JURISDICTION, CASE_REFERENCE.toString(), USER_ID);
                 }),
                 () -> verify(caseDetailsRepository).findByReference(WRONG_JURISDICTION, CASE_REFERENCE),
-                () -> verify(caseUserRepository, never()).grantAccess(CASE_ID, USER_ID)
+                () -> verify(caseUserRepository, never()).grantAccess(CASE_ID, USER_ID, CREATOR.getRole())
             );
         }
     }
@@ -95,7 +96,7 @@ class CaseAccessOperationTest {
 
             assertAll(
                 () -> verify(caseDetailsRepository).findByReference(JURISDICTION, CASE_REFERENCE),
-                () -> verify(caseUserRepository).revokeAccess(CASE_ID, USER_ID)
+                () -> verify(caseUserRepository).revokeAccess(CASE_ID, USER_ID, CREATOR.getRole())
             );
         }
 
@@ -107,7 +108,7 @@ class CaseAccessOperationTest {
                     caseAccessOperation.revokeAccess(JURISDICTION, CASE_NOT_FOUND.toString(), USER_ID);
                 }),
                 () -> verify(caseDetailsRepository).findByReference(JURISDICTION, CASE_NOT_FOUND),
-                () -> verify(caseUserRepository, never()).revokeAccess(CASE_ID, USER_ID)
+                () -> verify(caseUserRepository, never()).revokeAccess(CASE_ID, USER_ID, CREATOR.getRole())
             );
         }
 
@@ -119,7 +120,7 @@ class CaseAccessOperationTest {
                     caseAccessOperation.revokeAccess(WRONG_JURISDICTION, CASE_REFERENCE.toString(), USER_ID);
                 }),
                 () -> verify(caseDetailsRepository).findByReference(WRONG_JURISDICTION, CASE_REFERENCE),
-                () -> verify(caseUserRepository, never()).revokeAccess(CASE_ID, USER_ID)
+                () -> verify(caseUserRepository, never()).revokeAccess(CASE_ID, USER_ID, CREATOR.getRole())
             );
         }
     }
