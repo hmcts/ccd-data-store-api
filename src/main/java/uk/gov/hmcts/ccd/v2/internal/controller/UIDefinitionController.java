@@ -52,11 +52,7 @@ public class UIDefinitionController {
         ),
         @ApiResponse(
             code = 404,
-            message = "Definition could not be found in Definition Store"
-        ),
-        @ApiResponse(
-            code = 500,
-            message = "Definition Store is down"
+            message = "Case type not found"
         )
     })
     public ResponseEntity<UIWorkbasketInputsResource> getWorkbasketInputsDetails(@PathVariable("caseTypeId") String caseTypeId) {
