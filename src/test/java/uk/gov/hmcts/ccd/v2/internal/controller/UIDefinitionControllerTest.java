@@ -17,8 +17,7 @@ import uk.gov.hmcts.ccd.v2.internal.resource.UIWorkbasketInputsResource;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.collection.IsArrayContainingInAnyOrder.arrayContainingInAnyOrder;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
@@ -28,8 +27,8 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.Workbasket
 class UIDefinitionControllerTest {
     private static final String CASE_TYPE_ID = "caseTypeId";
 
-    private WorkbasketInput workbasketInput1 = aWorkbasketInput().build();
-    private WorkbasketInput workbasketInput2 = aWorkbasketInput().build();
+    private WorkbasketInput workbasketInput1 = aWorkbasketInput().withFieldId("field1").build();
+    private WorkbasketInput workbasketInput2 = aWorkbasketInput().withFieldId("field2").build();
 
     private final List<WorkbasketInput> workbasketInputs = Lists.newArrayList(workbasketInput1, workbasketInput2);
 
@@ -56,7 +55,11 @@ class UIDefinitionControllerTest {
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
-                () -> assertThat(response.getBody().getWorkbasketInputs(), arrayContainingInAnyOrder(workbasketInput1, workbasketInput2))
+                () -> {
+                    UIWorkbasketInputsResource.UIWorkbasketInput[] workbasketInputs = response.getBody().getWorkbasketInputs();
+                    assertThat(Lists.newArrayList(workbasketInputs), hasItems(hasProperty("field", hasProperty("id", is("field1"))),
+                                                                              hasProperty("field", hasProperty("id", is("field2")))));
+                }
             );
         }
 
@@ -66,7 +69,7 @@ class UIDefinitionControllerTest {
             when(findWorkbasketInputOperation.execute(CASE_TYPE_ID, CAN_READ)).thenThrow(Exception.class);
 
             assertThrows(Exception.class,
-                () -> uiDefinitionController.getWorkbasketInputsDetails(CASE_TYPE_ID));
+                         () -> uiDefinitionController.getWorkbasketInputsDetails(CASE_TYPE_ID));
         }
     }
 }

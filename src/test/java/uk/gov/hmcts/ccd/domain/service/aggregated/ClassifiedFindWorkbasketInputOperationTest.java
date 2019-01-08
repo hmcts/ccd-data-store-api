@@ -22,6 +22,7 @@ import static org.mockito.Mockito.doReturn;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.JurisdictionBuilder.newJurisdiction;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WorkbasketInputBuilder.aWorkbasketInput;
 
 class ClassifiedFindWorkbasketInputOperationTest {
@@ -59,6 +60,9 @@ class ClassifiedFindWorkbasketInputOperationTest {
 
         MockitoAnnotations.initMocks(this);
         testCaseType = newCaseType()
+            .withJurisdiction(newJurisdiction()
+                                  .withJurisdictionId(JURISDICTION_ID)
+                                  .build())
             .withField(CASE_FIELD_1_1)
             .withField(CASE_FIELD_1_2)
             .withField(CASE_FIELD_1_3)
