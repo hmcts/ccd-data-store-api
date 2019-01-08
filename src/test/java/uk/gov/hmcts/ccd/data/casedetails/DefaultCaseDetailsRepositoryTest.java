@@ -267,7 +267,7 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void findByReference_withoutJurisdiction() {
+    public void findByReferenceWithoutJurisdiction() {
         final Optional<CaseDetails> maybeCase = caseDetailsRepository.findByReference(REFERENCE.toString());
 
         final CaseDetails caseDetails = maybeCase.orElseThrow(() -> new AssertionError("No case found"));

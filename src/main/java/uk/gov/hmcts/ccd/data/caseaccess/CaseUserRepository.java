@@ -24,8 +24,8 @@ public class CaseUserRepository {
 
     /**
      * Grant access to user for given case.
-     * @param caseId
-     * @param userId
+     * @param caseId Internal case ID
+     * @param userId IDAM user ID
      * @deprecated Use {@link CaseUserRepository#grantAccess(Long, String, String)} with explicit case role instead
      */
     @Deprecated
@@ -40,8 +40,8 @@ public class CaseUserRepository {
 
     /**
      * Revoke access to user for given case.
-     * @param caseId
-     * @param userId
+     * @param caseId Internal case ID
+     * @param userId IDAM user ID
      * @deprecated Use {@link CaseUserRepository#revokeAccess(Long, String, String)} with explicit case role instead
      */
     @Deprecated

@@ -90,7 +90,7 @@ class CachedCaseDetailsRepositoryTest {
 
     @Nested
     @DisplayName("Paginated search metadata")
-    class getPaginatedSearchMetadata {
+    class GetPaginatedSearchMetadata {
         @Test
         @DisplayName("should initially retrieve paginated search metadata from decorated repository")
         void getPaginatedSearchMetaData() {
@@ -129,7 +129,7 @@ class CachedCaseDetailsRepositoryTest {
 
     @Nested
     @DisplayName("Case details list by MetaData and FieldData")
-    class getCaseDetailsByMetaDataAndFieldData {
+    class GetCaseDetailsByMetaDataAndFieldData {
         @Test
         @DisplayName("should initially retrieve case details list from decorated repository")
         void findByMetaDataAndFieldData() {
@@ -168,7 +168,7 @@ class CachedCaseDetailsRepositoryTest {
 
     @Nested
     @DisplayName("Case details by jurisdictionId, caseTypeId and caseReference")
-    class getCaseDetailsByUniqueInfo {
+    class GetCaseDetailsByUniqueInfo {
         @Test
         @DisplayName("should initially retrieve case details from decorated repository")
         void findUniqueCase() {
@@ -204,7 +204,7 @@ class CachedCaseDetailsRepositoryTest {
 
     @Nested
     @DisplayName("Case details by Reference")
-    class getCaseDetailsByReference {
+    class GetCaseDetailsByReference {
         @Test
         @DisplayName("should initially retrieve case details from decorated repository")
         void findByReference() {
@@ -239,7 +239,7 @@ class CachedCaseDetailsRepositoryTest {
 
     @Nested
     @DisplayName("Case details by Id")
-    class getCaseDetailsById {
+    class GetCaseDetailsById {
 
         @Test
         @DisplayName("should initially retrieve case details from decorated repository")
@@ -275,7 +275,7 @@ class CachedCaseDetailsRepositoryTest {
 
     @Nested
     @DisplayName("findById(String, Long)")
-    class findByIdWithJurisdiction {
+    class FindByIdWithJurisdiction {
         @Test
         @DisplayName("should initially retrieve case details from decorated repository")
         void findById() {
@@ -316,7 +316,7 @@ class CachedCaseDetailsRepositoryTest {
 
     @Nested
     @DisplayName("findByReference(String, String)")
-    class findByReferenceAsString {
+    class FindByReferenceAsString {
         @Test
         @DisplayName("should initially retrieve case details from decorated repository")
         void findByReference() {
@@ -357,7 +357,7 @@ class CachedCaseDetailsRepositoryTest {
 
     @Nested
     @DisplayName("findByReference(String)")
-    class findByReferenceString {
+    class FindByReferenceString {
         @Test
         @DisplayName("should initially retrieve case details from decorated repository")
         void findByReference() {
@@ -398,7 +398,7 @@ class CachedCaseDetailsRepositoryTest {
 
     @Nested
     @DisplayName("lockByReference(String, String)")
-    class lockByReferenceAsString {
+    class LockByReferenceAsString {
         @Test
         @DisplayName("should delegate to decorated repository")
         void findByReference() {
