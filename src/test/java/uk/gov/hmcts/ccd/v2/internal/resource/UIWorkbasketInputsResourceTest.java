@@ -26,7 +26,7 @@ class UIWorkbasketInputsResourceTest {
 
         List<UIWorkbasketInputsResource.UIWorkbasketInput> workbasketInputs = Lists.newArrayList(resource.getWorkbasketInputs());
         assertAll(
-            () -> assertThat(workbasketInputs, not(sameInstance(this.workbasketInputs))),
+            () -> assertThat(resource.getWorkbasketInputs(), not(sameInstance(this.workbasketInputs))),
             () -> assertThat(workbasketInputs, hasItems(hasProperty("field", hasProperty("id", is("field1"))),
                                                         hasProperty("field", hasProperty("id", is("field2")))))
         );
