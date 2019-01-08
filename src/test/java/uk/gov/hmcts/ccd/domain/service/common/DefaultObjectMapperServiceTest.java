@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.common;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -137,5 +138,17 @@ class DefaultObjectMapperServiceTest {
 
     }
 
+
+    @Nested
+    @DisplayName("createEmptyJsonNode()")
+    class CreateEmptyJsonNode {
+
+        @Test
+        @DisplayName("should create empty json node")
+        void shouldCreateEmptyJsonNode() {
+            assertThat(objectMapperService.createEmptyJsonNode(), is(instanceOf(JsonNode.class)));
+        }
+
+    }
 
 }
