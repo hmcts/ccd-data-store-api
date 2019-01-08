@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
-import java.util.Collections;
-
+import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -18,8 +17,10 @@ class CrossCaseTypeSearchRequestTest {
     @DisplayName("should throw exception when query node not found")
     void shouldThrowExceptionWhenQueryNodeNotFound() {
         String query = "{}";
-        assertThrows(BadSearchRequest.class, () -> new CrossCaseTypeSearchRequest(Collections.singletonList("caseType"),
-                                                                                  objectMapper.readValue(query, JsonNode.class)));
+        assertThrows(BadSearchRequest.class, () -> new CrossCaseTypeSearchRequest.Builder()
+            .withCaseTypes(singletonList("caseType"))
+            .withSearchRequest(objectMapper.readValue(query, JsonNode.class))
+            .build());
     }
 
 }

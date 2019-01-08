@@ -94,7 +94,10 @@ class AuthorisedCaseSearchOperationTest {
         Map<String, JsonNode> filteredData = new HashMap<>();
         when(objectMapperService.convertJsonNodeToMap(jsonNode)).thenReturn(filteredData);
 
-        CrossCaseTypeSearchRequest searchRequest = new CrossCaseTypeSearchRequest(asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2), searchRequestJsonNode);
+        CrossCaseTypeSearchRequest searchRequest = new CrossCaseTypeSearchRequest.Builder()
+            .withCaseTypes(asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2))
+            .withSearchRequest(searchRequestJsonNode)
+            .build();
 
         CaseSearchResult result = authorisedCaseDetailsSearchOperation.execute(searchRequest);
 
@@ -116,7 +119,10 @@ class AuthorisedCaseSearchOperationTest {
     @Test
     @DisplayName("should return empty list of cases when user is not authorised to access case type")
     void shouldReturnEmptyCaseList() {
-        CrossCaseTypeSearchRequest searchRequest = new CrossCaseTypeSearchRequest(singletonList(CASE_TYPE_ID_1), searchRequestJsonNode);
+        CrossCaseTypeSearchRequest searchRequest = new CrossCaseTypeSearchRequest.Builder()
+            .withCaseTypes(singletonList(CASE_TYPE_ID_1))
+            .withSearchRequest(searchRequestJsonNode)
+            .build();
         when(authorisedCaseDefinitionDataService.getAuthorisedCaseType(CASE_TYPE_ID_1, CAN_READ)).thenReturn(Optional.empty());
 
         CaseSearchResult result = authorisedCaseDetailsSearchOperation.execute(searchRequest);

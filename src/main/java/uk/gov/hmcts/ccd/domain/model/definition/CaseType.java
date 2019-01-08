@@ -1,16 +1,17 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.ToString;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
 @ToString
 public class CaseType implements Serializable {
+    private static final long serialVersionUID = 5688786015302840008L;
     private String id;
     private String description;
     private Version version;
@@ -26,6 +27,7 @@ public class CaseType implements Serializable {
     private String printableDocumentsUrl;
     @JsonProperty("acls")
     private List<AccessControlList> accessControlLists;
+    private final List<SearchAliasField> searchAliasFields = new ArrayList<>();
 
     public String getId() {
         return id;
@@ -133,5 +135,15 @@ public class CaseType implements Serializable {
         return this.events
             .stream()
             .anyMatch(caseEvent -> caseEvent.getCanSaveDraft() != null && caseEvent.getCanSaveDraft());
+    }
+
+    public List<SearchAliasField> getSearchAliasFields() {
+        return searchAliasFields;
+    }
+
+    public void setSearchAliasFields(List<SearchAliasField> searchAliasFields) {
+        if (searchAliasFields != null) {
+            this.searchAliasFields.addAll(searchAliasFields);
+        }
     }
 }

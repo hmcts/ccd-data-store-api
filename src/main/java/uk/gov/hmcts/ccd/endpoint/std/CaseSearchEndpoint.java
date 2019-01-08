@@ -66,7 +66,12 @@ public class CaseSearchEndpoint {
 
         rejectBlackListedQuery(jsonSearchRequest);
 
-        CrossCaseTypeSearchRequest request = new CrossCaseTypeSearchRequest(caseTypeIds, convertJsonStringToJsonNode(jsonSearchRequest));
+        CrossCaseTypeSearchRequest request = new CrossCaseTypeSearchRequest.Builder()
+            .withCaseTypes(caseTypeIds)
+            .withSearchRequest(convertJsonStringToJsonNode(jsonSearchRequest))
+            .withMultiCaseTypeSearch(caseTypeIds.size() > 1)
+            .build();
+
         CaseSearchResult result = caseSearchOperation.execute(request);
 
         Duration between = Duration.between(start, Instant.now());
