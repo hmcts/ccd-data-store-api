@@ -43,12 +43,6 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
     }
 
     @Override
-    @Deprecated
-    public CaseView execute(String jurisdictionId, String caseTypeId, String caseReference) {
-        return execute(caseReference);
-    }
-
-    @Override
     public CaseView execute(String caseReference) {
         validateCaseReference(caseReference);
 
