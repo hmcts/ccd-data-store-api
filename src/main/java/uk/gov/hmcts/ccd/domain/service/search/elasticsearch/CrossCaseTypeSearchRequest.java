@@ -69,7 +69,6 @@ public class CrossCaseTypeSearchRequest {
         return sourceFilterAliasFields;
     }
 
-
     public static class Builder {
 
         private final List<String> caseTypeIds = new ArrayList<>();
