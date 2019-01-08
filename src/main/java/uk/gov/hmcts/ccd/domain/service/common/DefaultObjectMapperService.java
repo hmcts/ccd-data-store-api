@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
@@ -16,6 +17,8 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
  */
 @Service
 public class DefaultObjectMapperService implements ObjectMapperService {
+
+    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
 
     private final ObjectMapper objectMapper;
 
@@ -55,5 +58,10 @@ public class DefaultObjectMapperService implements ObjectMapperService {
         } catch (IllegalArgumentException e) {
             throw new ServiceException("Unable to convert JSON node to map", e);
         }
+    }
+
+    @Override
+    public JsonNode createEmptyJsonNode() {
+        return JSON_NODE_FACTORY.objectNode();
     }
 }
