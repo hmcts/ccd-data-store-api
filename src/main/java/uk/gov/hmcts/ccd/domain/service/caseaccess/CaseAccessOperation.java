@@ -65,7 +65,7 @@ public class CaseAccessOperation {
         final Set<String> targetCaseRoles = caseUser.getCaseRoles();
 
         targetCaseRoles.stream()
-                       .filter((role) -> !validCaseRoles.contains(role))
+                       .filter(role -> !validCaseRoles.contains(role))
                        .findFirst()
                        .ifPresent(role -> {
                            throw new InvalidCaseRoleException(role);
@@ -76,12 +76,12 @@ public class CaseAccessOperation {
 
         // Grant added case roles
         targetCaseRoles.stream()
-                       .filter((targetRole) -> !currentCaseRoles.contains(targetRole))
+                       .filter(targetRole -> !currentCaseRoles.contains(targetRole))
                        .forEach(targetRole -> caseUserRepository.grantAccess(caseId, caseUser.getUserId(), targetRole));
 
         // Revoke removed case roles
         currentCaseRoles.stream()
-                        .filter((currentRole) -> !targetCaseRoles.contains(currentRole))
+                        .filter(currentRole -> !targetCaseRoles.contains(currentRole))
                         .forEach(currentRole -> caseUserRepository.revokeAccess(caseId,
                                                                                 caseUser.getUserId(),
                                                                                 currentRole));
