@@ -10,7 +10,6 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
