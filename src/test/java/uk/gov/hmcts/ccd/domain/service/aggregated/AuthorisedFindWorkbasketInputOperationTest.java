@@ -71,15 +71,15 @@ class AuthorisedFindWorkbasketInputOperationTest {
     void shouldFailWhenWhenNoReadAccess() {
         doReturn(Optional.empty()).when(getCaseTypeOperation).execute(CASE_TYPE_ONE, CAN_READ);
 
-        assertThrows(ResourceNotFoundException.class, () -> authorisedFindWorkbasketInputOperation.execute(JURISDICTION_ID, CASE_TYPE_ONE, CAN_READ));
+        assertThrows(ResourceNotFoundException.class, () -> authorisedFindWorkbasketInputOperation.execute(CASE_TYPE_ONE, CAN_READ));
     }
 
     @Test
     @DisplayName("should return only authorised case fields")
     void shouldReturnOnlyAuthorisedCaseFields() {
-        doReturn(testWorkbasketInputs).when(findWorkbasketInputOperation).execute(JURISDICTION_ID, CASE_TYPE_ONE, CAN_READ);
+        doReturn(testWorkbasketInputs).when(findWorkbasketInputOperation).execute(CASE_TYPE_ONE, CAN_READ);
 
-        final List<WorkbasketInput> workbasketInputs = authorisedFindWorkbasketInputOperation.execute(JURISDICTION_ID, CASE_TYPE_ONE, CAN_READ);
+        final List<WorkbasketInput> workbasketInputs = authorisedFindWorkbasketInputOperation.execute(CASE_TYPE_ONE, CAN_READ);
 
         assertAll(
             () -> assertThat(workbasketInputs.size(), is(3)),
@@ -92,10 +92,10 @@ class AuthorisedFindWorkbasketInputOperationTest {
     @Test
     @DisplayName("should return empty workbasket input list when no field is authorised")
     void shouldReturnEmptyWorkbasketInputWhenNoFieldIsAuthorised() {
-        doReturn(new ArrayList<>()).when(findWorkbasketInputOperation).execute(JURISDICTION_ID, CASE_TYPE_ONE,
+        doReturn(new ArrayList<>()).when(findWorkbasketInputOperation).execute(CASE_TYPE_ONE,
             CAN_READ);
 
-        final List<WorkbasketInput> workbasketInputs = authorisedFindWorkbasketInputOperation.execute(JURISDICTION_ID, CASE_TYPE_ONE, CAN_READ);
+        final List<WorkbasketInput> workbasketInputs = authorisedFindWorkbasketInputOperation.execute(CASE_TYPE_ONE, CAN_READ);
 
         assertAll(
             () -> assertThat(workbasketInputs.size(), is(0))

@@ -36,8 +36,8 @@ public class DefaultFindWorkbasketInputOperation implements FindWorkbasketInputO
     }
 
     @Override
-    public List<WorkbasketInput> execute(String jurisdictionId, String caseTypeId, Predicate<AccessControlList> access) {
-        LOG.debug("Finding WorkbasketInput fields for jurisdiction={}, caseType={}", jurisdictionId, caseTypeId);
+    public List<WorkbasketInput> execute(String caseTypeId, Predicate<AccessControlList> access) {
+        LOG.debug("Finding WorkbasketInput fields for caseType={}", caseTypeId);
 
         final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
 

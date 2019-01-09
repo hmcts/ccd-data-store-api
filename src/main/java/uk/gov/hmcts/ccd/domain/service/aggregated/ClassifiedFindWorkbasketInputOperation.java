@@ -33,11 +33,12 @@ public class ClassifiedFindWorkbasketInputOperation implements FindWorkbasketInp
     }
 
     @Override
-    public List<WorkbasketInput> execute(String jurisdictionId, String caseTypeId, Predicate<AccessControlList> access) {
+    public List<WorkbasketInput> execute(String caseTypeId, Predicate<AccessControlList> access) {
         final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
-        return findWorkbasketInputOperation.execute(jurisdictionId, caseTypeId, access).stream()
-            .filter(workbasketInput -> classificationService.userHasEnoughSecurityClassificationForField(jurisdictionId,
-                caseType, workbasketInput.getField().getId())
+        return findWorkbasketInputOperation.execute(caseTypeId, access).stream()
+            .filter(workbasketInput -> classificationService.userHasEnoughSecurityClassificationForField(caseType.getJurisdictionId(),
+                caseType,
+                workbasketInput.getField().getId())
             ).collect(toList());
     }
 }
