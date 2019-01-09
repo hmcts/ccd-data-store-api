@@ -43,7 +43,7 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
     }
 
     private boolean hasEventId(CaseType caseType, String eventId) {
-        return caseType.getEvents().stream().anyMatch(event -> event.getId().equals(eventId));
+        return caseType.hasEventId(eventId);
     }
 
     @Override

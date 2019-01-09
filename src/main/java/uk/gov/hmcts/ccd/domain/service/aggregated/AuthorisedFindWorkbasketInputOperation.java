@@ -21,19 +21,16 @@ public class AuthorisedFindWorkbasketInputOperation implements FindWorkbasketInp
 
     public static final String QUALIFIER = "authorised";
     private final FindWorkbasketInputOperation findWorkbasketInputOperation;
-    private final GetCaseTypesOperation getCaseTypesOperation;
+    private final GetCaseTypeOperation getCaseTypeOperation;
 
     public AuthorisedFindWorkbasketInputOperation(@Qualifier(ClassifiedFindWorkbasketInputOperation.QUALIFIER) final FindWorkbasketInputOperation findWorkbasketInputOperation,
-                                                  @Qualifier(AuthorisedGetCaseTypesOperation.QUALIFIER) final GetCaseTypesOperation getCaseTypesOperation) {
+                                                  @Qualifier(AuthorisedGetCaseTypeOperation.QUALIFIER) final GetCaseTypeOperation getCaseTypeOperation) {
         this.findWorkbasketInputOperation = findWorkbasketInputOperation;
-        this.getCaseTypesOperation = getCaseTypesOperation;
+        this.getCaseTypeOperation = getCaseTypeOperation;
     }
 
-    public List<WorkbasketInput> execute(final String jurisdictionId, final String caseTypeId, Predicate<AccessControlList> access) {
-        Optional<CaseType> caseType = this.getCaseTypesOperation.execute(jurisdictionId, access)
-            .stream()
-            .filter(ct -> ct.getId().equalsIgnoreCase(caseTypeId))
-            .findFirst();
+    public List<WorkbasketInput> execute(final String caseTypeId, Predicate<AccessControlList> access) {
+        Optional<CaseType> caseType = this.getCaseTypeOperation.execute(caseTypeId, access);
 
         if (!caseType.isPresent()) {
             ResourceNotFoundException resourceNotFoundException = new ResourceNotFoundException(NO_CASE_TYPE_FOUND);
@@ -41,7 +38,7 @@ public class AuthorisedFindWorkbasketInputOperation implements FindWorkbasketInp
             throw resourceNotFoundException;
         }
 
-        return findWorkbasketInputOperation.execute(jurisdictionId, caseTypeId, access).stream()
+        return findWorkbasketInputOperation.execute(caseTypeId, access).stream()
             .filter(workbasketInput -> caseType.get().getCaseFields()
                 .stream()
                 .anyMatch(caseField -> caseField.getId().equalsIgnoreCase(workbasketInput.getField().getId())))

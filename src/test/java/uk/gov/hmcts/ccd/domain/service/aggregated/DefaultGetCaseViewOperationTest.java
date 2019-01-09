@@ -120,9 +120,7 @@ class DefaultGetCaseViewOperationTest {
         final CaseView expectedCaseView = new CaseView();
         doReturn(expectedCaseView).when(defaultGetCaseViewOperation).execute(CASE_REFERENCE);
 
-        final CaseView actualCaseView = defaultGetCaseViewOperation.execute(JURISDICTION_ID,
-                                                                            CASE_TYPE_ID,
-                                                                            CASE_REFERENCE);
+        final CaseView actualCaseView = defaultGetCaseViewOperation.execute(CASE_REFERENCE);
 
         assertAll(
             () -> verify(defaultGetCaseViewOperation).execute(CASE_REFERENCE),

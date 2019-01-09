@@ -134,4 +134,8 @@ public class CaseType implements Serializable {
             .stream()
             .anyMatch(caseEvent -> caseEvent.getCanSaveDraft() != null && caseEvent.getCanSaveDraft());
     }
+
+    public boolean hasEventId(String eventId) {
+        return events.stream().anyMatch(event -> event.getId().equals(eventId));
+    }
 }
