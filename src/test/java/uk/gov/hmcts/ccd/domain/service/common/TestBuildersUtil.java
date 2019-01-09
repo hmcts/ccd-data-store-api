@@ -607,6 +607,37 @@ public class TestBuildersUtil {
         }
     }
 
+    public static class EventBuilder {
+        private final Event event;
+
+        private EventBuilder() {
+            this.event = new Event();
+        }
+
+        public static EventBuilder newEvent() {
+            return new EventBuilder();
+        }
+
+        public EventBuilder withEventId(String eventId) {
+            event.setEventId(eventId);
+            return this;
+        }
+
+        public Event build() {
+            return event;
+        }
+
+        public EventBuilder withSummary(String summary) {
+            event.setSummary(summary);
+            return this;
+        }
+
+        public EventBuilder withDescription(String description) {
+            event.setDescription(description);
+            return this;
+        }
+    }
+
     public static class CaseViewTriggerBuilder {
         private final CaseViewTrigger caseViewTrigger;
 

@@ -112,7 +112,7 @@ class DefaultGetCaseViewFromDraftOperationTest {
         Jurisdiction jurisdiction = new Jurisdiction();
         jurisdiction.setName(JURISDICTION_ID);
         caseType.setJurisdiction(jurisdiction);
-        doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
+        doReturn(caseType).when(caseTypeService).getCaseType(CASE_TYPE_ID);
 
         getDraftViewOperation = new DefaultGetCaseViewFromDraftOperation(getCaseOperation,
                                                                          uiDefinitionRepository,
@@ -124,9 +124,7 @@ class DefaultGetCaseViewFromDraftOperationTest {
 
     @Test
     void shouldReturnDraftView() {
-        CaseView caseView = getDraftViewOperation.execute(JURISDICTION_ID,
-                                                          CASE_TYPE_ID,
-                                                          DRAFT_ID);
+        CaseView caseView = getDraftViewOperation.execute(DRAFT_ID);
 
         assertAll(() -> verify(draftGateway).get(DRAFT_ID),
                   () -> assertThat(caseView.getCaseId(), is(String.format(DRAFT_ID_FORMAT, DRAFT_ID))),

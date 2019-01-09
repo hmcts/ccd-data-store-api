@@ -127,7 +127,7 @@ class AuthorisedGetCaseViewOperationTest {
         final CaseView expectedCaseView = new CaseView();
         doReturn(expectedCaseView).when(authorisedGetCaseViewOperation).execute(CASE_REFERENCE);
 
-        final CaseView actualCaseView = authorisedGetCaseViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+        final CaseView actualCaseView = authorisedGetCaseViewOperation.execute(CASE_REFERENCE);
 
         assertAll(
             () -> verify(authorisedGetCaseViewOperation).execute(CASE_REFERENCE),
