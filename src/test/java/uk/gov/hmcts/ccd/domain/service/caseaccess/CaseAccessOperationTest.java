@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -115,8 +116,9 @@ class CaseAccessOperationTest {
         @Test
         @DisplayName("should reject update when it contains an unknown case role")
         void shouldRejectWhenUnknownCaseRoles() {
-            assertThrows(InvalidCaseRoleException.class,
-                         () -> caseAccessOperation.updateUserAccess(caseDetails, caseUser(NOT_CASE_ROLE)));
+            final Executable execAccessUpdate = () -> caseAccessOperation.updateUserAccess(caseDetails,
+                                                                                           caseUser(NOT_CASE_ROLE));
+            assertThrows(InvalidCaseRoleException.class, execAccessUpdate);
             verifyZeroInteractions(caseUserRepository);
         }
 
@@ -212,7 +214,8 @@ class CaseAccessOperationTest {
     }
 
     private void configureCaseUserRepository() {
-        when(caseUserRepository.findCaseRoles(CASE_ID, USER_ID)).thenReturn(Collections.singletonList(CASE_ROLE_GRANTED));
+        when(caseUserRepository.findCaseRoles(CASE_ID,
+                                              USER_ID)).thenReturn(Collections.singletonList(CASE_ROLE_GRANTED));
     }
 
 }
