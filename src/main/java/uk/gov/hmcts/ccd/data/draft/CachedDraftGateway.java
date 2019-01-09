@@ -1,5 +1,10 @@
 package uk.gov.hmcts.ccd.data.draft;
 
+import java.util.List;
+import java.util.Map;
+
+import static com.google.common.collect.Maps.newHashMap;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -9,11 +14,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.DraftResponseToCaseDetailsBuilde
 import uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDraftRequest;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDraftRequest;
-
-import java.util.List;
-import java.util.Map;
-
-import static com.google.common.collect.Maps.newHashMap;
 
 @Service
 @Qualifier(CachedDraftGateway.QUALIFIER)

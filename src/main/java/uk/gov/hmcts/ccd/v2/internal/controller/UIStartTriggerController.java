@@ -1,5 +1,9 @@
 package uk.gov.hmcts.ccd.v2.internal.controller;
 
+import static uk.gov.hmcts.ccd.v2.internal.resource.UIStartTriggerResource.forCase;
+import static uk.gov.hmcts.ccd.v2.internal.resource.UIStartTriggerResource.forCaseType;
+import static uk.gov.hmcts.ccd.v2.internal.resource.UIStartTriggerResource.forDraft;
+
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -14,8 +18,6 @@ import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.internal.resource.UIStartTriggerResource;
-
-import static uk.gov.hmcts.ccd.v2.internal.resource.UIStartTriggerResource.*;
 
 @RestController
 @RequestMapping(path = "/internal")
