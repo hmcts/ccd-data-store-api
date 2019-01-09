@@ -383,7 +383,7 @@ public class AccessControlService {
     private boolean itemAddedAndHasCreateAccess(JsonNode newData, String newFieldName, List<CaseField> caseFieldDefinitions, Set<String> userRoles) {
         JsonNode newValue = newData.get(newFieldName);
         boolean containsNewItem = StreamSupport.stream(spliteratorUnknownSize(newValue.elements(), Spliterator.ORDERED), false)
-            .anyMatch(newItem -> isNullId(newItem));
+            .anyMatch(this::isNullId);
         return !containsNewItem || hasCreateAccess(newFieldName, caseFieldDefinitions, userRoles);
     }
 
