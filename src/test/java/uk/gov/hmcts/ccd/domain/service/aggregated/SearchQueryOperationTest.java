@@ -1,17 +1,13 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import java.util.ArrayList;
-
-import static org.hamcrest.Matchers.*;
-import static org.mockito.Mockito.*;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-
+import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway.DRAFT_STORE_DOWN_ERR_MESSAGE;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.NO_ERROR;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WORKBASKET;
