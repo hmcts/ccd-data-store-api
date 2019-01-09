@@ -1,5 +1,9 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
+import javax.transaction.Transactional;
+import java.time.Duration;
+import java.time.Instant;
+
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,10 +20,6 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetCaseViewFromDraftOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseViewOperation;
 import uk.gov.hmcts.ccd.domain.service.upsertdraft.UpsertDraftOperation;
-
-import javax.transaction.Transactional;
-import java.time.Duration;
-import java.time.Instant;
 
 @RestController
 @RequestMapping(path = "/",

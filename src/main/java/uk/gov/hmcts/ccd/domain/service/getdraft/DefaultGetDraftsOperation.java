@@ -1,5 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.getdraft;
 
+import javax.inject.Inject;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -10,10 +14,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.DraftResponseToCaseDetailsBuilder;
 import uk.gov.hmcts.ccd.domain.model.draft.CaseDraft;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
-
-import javax.inject.Inject;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Qualifier(DefaultGetDraftsOperation.QUALIFIER)
