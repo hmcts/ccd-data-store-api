@@ -40,6 +40,10 @@ public abstract class AbstractDefaultGetCaseViewOperation {
         }
     }
 
+    CaseType getCaseType(String caseTypeId) {
+        return caseTypeService.getCaseType(caseTypeId);
+    }
+
     CaseType getCaseType(String jurisdictionId, String caseTypeId) {
         return caseTypeService.getCaseTypeForJurisdiction(caseTypeId, jurisdictionId);
     }

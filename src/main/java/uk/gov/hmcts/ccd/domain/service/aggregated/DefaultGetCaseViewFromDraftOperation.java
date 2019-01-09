@@ -55,16 +55,12 @@ public class DefaultGetCaseViewFromDraftOperation extends AbstractDefaultGetCase
 
     @Override
     public CaseView execute(String draftId) {
-        throw new UnsupportedOperationException("Method not implemented");
-    }
-
-    @Override
-    public CaseView execute(String jurisdictionId, String caseTypeId, String draftId) {
-
-        final CaseType caseType = getCaseType(jurisdictionId, caseTypeId);
         final DraftResponse draftResponse = draftGateway.get(draftId);
 
         final CaseDetails caseDetails = draftResponseToCaseDetailsBuilder.build(draftResponse);
+
+        CaseType caseType = getCaseType(draftResponse.getCaseTypeId());
+
         final CaseViewTrigger resumeTrigger = buildResumeTriggerFromDraft(draftResponse);
 
         final CaseTabCollection caseTabCollection = getCaseTabCollection(draftResponse.getCaseTypeId());
