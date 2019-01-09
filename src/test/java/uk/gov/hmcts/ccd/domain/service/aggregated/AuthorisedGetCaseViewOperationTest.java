@@ -223,7 +223,7 @@ class AuthorisedGetCaseViewOperationTest {
     @Test
     @DisplayName("should return Case ID")
     void shouldReturnCaseId() {
-        String caseId = authorisedGetCaseViewOperation.getCaseId(JURISDICTION_ID, CASE_REFERENCE);
+        String caseId = authorisedGetCaseViewOperation.getCaseId(CASE_REFERENCE);
 
         assertThat(caseId, is(CASE_ID));
     }
@@ -233,6 +233,6 @@ class AuthorisedGetCaseViewOperationTest {
     void shouldThrowException() {
         doReturn(Optional.empty()).when(caseDetailsRepository).findByReference(JURISDICTION_ID,Long.valueOf(CASE_REFERENCE));
 
-        assertThrows(CaseNotFoundException.class, () -> authorisedGetCaseViewOperation.getCaseId(JURISDICTION_ID, CASE_REFERENCE));
+        assertThrows(CaseNotFoundException.class, () -> authorisedGetCaseViewOperation.getCaseId(CASE_REFERENCE));
     }
 }

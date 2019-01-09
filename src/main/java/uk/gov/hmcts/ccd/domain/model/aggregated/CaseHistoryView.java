@@ -7,8 +7,8 @@ public class CaseHistoryView extends AbstractCaseView {
     private CaseViewEvent event;
 
     @JsonIgnore
-    public String getEventId() {
-        return event.getEventId();
+    public Long getEventId() {
+        return event.getId();
     }
 
     public CaseViewEvent getEvent() {

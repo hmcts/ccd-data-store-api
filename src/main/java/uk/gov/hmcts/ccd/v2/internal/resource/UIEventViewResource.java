@@ -31,7 +31,7 @@ public class UIEventViewResource extends ResourceSupport {
     public UIEventViewResource(@NonNull CaseHistoryView caseHistoryView, String caseId) {
         copyProperties(caseHistoryView);
 
-        add(linkTo(methodOn(UICaseController.class).getCaseEvent(caseId, caseHistoryView.getEventId())).withSelfRel());
+        add(linkTo(methodOn(UICaseController.class).getCaseEvent(caseId, caseHistoryView.getEventId().toString())).withSelfRel());
     }
 
     private void copyProperties(CaseHistoryView caseViewEvent) {

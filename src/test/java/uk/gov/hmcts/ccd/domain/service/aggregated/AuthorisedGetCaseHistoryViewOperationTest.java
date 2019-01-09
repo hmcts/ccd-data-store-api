@@ -75,8 +75,7 @@ class AuthorisedGetCaseHistoryViewOperationTest {
 
         doReturn(TEST_CASE_TYPE).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         doReturn(USER_ROLES).when(userRepository).getUserRoles();
-        doReturn(TEST_CASE_HISTORY_VIEW).when(getCaseHistoryViewOperation).execute(JURISDICTION_ID, CASE_TYPE_ID,
-            CASE_REFERENCE, EVENT_ID);
+        doReturn(TEST_CASE_HISTORY_VIEW).when(getCaseHistoryViewOperation).execute(CASE_REFERENCE, EVENT_ID);
         doReturn(caseRoles).when(caseUserRepository).findCaseRoles(Long.valueOf(CASE_REFERENCE), USER_ID);
         doReturn(Optional.of(CASE_DETAILS)).when(caseDetailsRepository).findByReference(JURISDICTION_ID, Long.valueOf(CASE_REFERENCE));
 
@@ -90,11 +89,10 @@ class AuthorisedGetCaseHistoryViewOperationTest {
         doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES, CAN_READ);
         doReturn(USER_ID).when(userRepository).getUserId();
 
-        CaseHistoryView caseHistoryView = authorisedGetCaseHistoryViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID,
-            CASE_REFERENCE, EVENT_ID);
+        CaseHistoryView caseHistoryView = authorisedGetCaseHistoryViewOperation.execute(CASE_REFERENCE, EVENT_ID);
 
         assertThat(caseHistoryView, CoreMatchers.is(TEST_CASE_HISTORY_VIEW));
-        verify(getCaseHistoryViewOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, EVENT_ID);
+        verify(getCaseHistoryViewOperation).execute(CASE_REFERENCE, EVENT_ID);
         verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         verify(caseDetailsRepository).findByReference(JURISDICTION_ID, Long.valueOf(CASE_REFERENCE));
         verify(userRepository).getUserRoles();
@@ -109,7 +107,6 @@ class AuthorisedGetCaseHistoryViewOperationTest {
         doReturn(null).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
 
         assertThrows(ValidationException.class,
-            () -> authorisedGetCaseHistoryViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE,
-                EVENT_ID));
+            () -> authorisedGetCaseHistoryViewOperation.execute(CASE_REFERENCE, EVENT_ID));
     }
 }
