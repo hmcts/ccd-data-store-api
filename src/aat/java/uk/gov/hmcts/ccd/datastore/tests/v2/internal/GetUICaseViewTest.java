@@ -11,10 +11,15 @@ import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.State;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Tab;
 import uk.gov.hmcts.ccd.v2.V2;
 
+import java.util.List;
+import java.util.Map;
+
 import static java.lang.Boolean.FALSE;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CASE_TYPE;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CaseData.builder;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event.UPDATE;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.JURISDICTION;
 
 @DisplayName("Get UI case view by reference")
@@ -31,9 +36,9 @@ class GetUICaseViewTest extends BaseTest {
     void shouldRetrieveWhenExists() {
         // Prepare new case in known state
         final Long caseReference = Event.create()
-                                        .as(asAutoTestCaseworker())
-                                        .withData(FullCase.build())
-                                        .submitAndGetReference();
+            .as(asAutoTestCaseworker())
+            .withData(FullCase.build())
+            .submitAndGetReference();
 
         whenCallingGetCaseView(caseReference.toString())
             .then()
@@ -58,6 +63,46 @@ class GetUICaseViewTest extends BaseTest {
 
             .rootPath("_links")
             .body("self.href", equalTo(String.format("%s/internal/cases/%s", aat.getTestUrl(), caseReference)))
+        ;
+    }
+
+    @Test
+    @DisplayName("should retrieve case view history when the case reference exists")
+    void shouldRetrieveCaseViewHistoryWhenExists() {
+        // Prepare new case in known state
+        final Long caseReference = Event.create()
+            .as(asAutoTestCaseworker())
+            .withData(FullCase.build())
+            .submitAndGetReference();
+        // Update created case
+        Event.update(caseReference)
+            .as(asAutoTestCaseworker())
+            .withData(builder()
+                          .textField("Other text")
+                          .build())
+            .submit();
+
+        List<Map<String, Object>> events = whenCallingGetCaseView(caseReference.toString()).then().extract().path("events");
+        Object eventId = events.stream().filter(event -> event.get("event_id").equals(UPDATE)).findAny().get().get("id");
+
+        whenCallingGetCaseHistoryView(caseReference.toString(), eventId.toString())
+            .then()
+            .log().ifError()
+            .statusCode(200)
+            .assertThat()
+
+            // Metadata
+            .body("case_id", equalTo(caseReference.toString()))
+            .body("case_type.id", equalTo(CASE_TYPE))
+            .body("case_type.jurisdiction.id", equalTo(JURISDICTION))
+            // Tabs
+            .body("tabs", hasSize(Tab.values().length))
+            // Events
+            .body("event.id", equalTo(eventId))
+            .body("event.event_id", equalTo(Event.UPDATE))
+
+            .rootPath("_links")
+            .body("self.href", equalTo(String.format("%s/internal/cases/%s/events/%s", aat.getTestUrl(), caseReference, Event.UPDATE)))
         ;
     }
 
@@ -87,5 +132,18 @@ class GetUICaseViewTest extends BaseTest {
 
             .when()
             .get("/internal/cases/{caseReference}");
+    }
+
+    private Response whenCallingGetCaseHistoryView(String caseReference, String caseEvent) {
+        return asAutoTestCaseworker(FALSE)
+            .get()
+            .given()
+            .pathParam("caseReference", caseReference)
+            .pathParam("caseEvent", caseEvent)
+            .accept(V2.MediaType.UI_EVENT_VIEW)
+            .header("experimental", "true")
+
+            .when()
+            .get("/internal/cases/{caseReference}/events/{caseEvent}");
     }
 }

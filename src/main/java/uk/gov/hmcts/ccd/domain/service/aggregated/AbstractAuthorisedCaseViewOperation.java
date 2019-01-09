@@ -56,11 +56,17 @@ public abstract class AbstractAuthorisedCaseViewOperation {
         return caseType;
     }
 
-    protected String getCaseId(String jurisdictionId, String caseReference) {
-        Optional<CaseDetails> caseDetails = this.caseDetailsRepository.findByReference(jurisdictionId, Long.valueOf(caseReference));
+    protected String getCaseId(String caseReference) {
+        Optional<CaseDetails> caseDetails = this.caseDetailsRepository.findByReference(caseReference);
         return caseDetails
             .orElseThrow(() -> new CaseNotFoundException(caseReference))
             .getId();
+    }
+
+    protected CaseDetails getCase(String caseReference) {
+        Optional<CaseDetails> caseDetails = this.caseDetailsRepository.findByReference(caseReference);
+        return caseDetails
+            .orElseThrow(() -> new CaseNotFoundException(caseReference));
     }
 
     protected Set<String> getUserRoles(String caseId) {

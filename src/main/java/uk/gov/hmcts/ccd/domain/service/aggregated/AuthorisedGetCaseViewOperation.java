@@ -40,7 +40,7 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
         CaseView caseView = getCaseViewOperation.execute(caseReference);
 
         CaseType caseType = getCaseType(caseView.getCaseType().getId());
-        String caseId = getCaseId(caseView.getCaseType().getJurisdiction().getId(), caseReference);
+        String caseId = getCaseId(caseReference);
         Set<String> userRoles = getUserRoles(caseId);
         verifyReadAccess(caseType, userRoles);
 
