@@ -1,5 +1,10 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import java.util.List;
+import java.util.function.Predicate;
+
+import static java.util.stream.Collectors.toList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -7,18 +12,9 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputField;
+import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.search.Field;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
-
-import java.util.List;
-import java.util.function.Predicate;
-
-import static java.util.stream.Collectors.toList;
 
 @Service
 @Qualifier(DefaultFindWorkbasketInputOperation.QUALIFIER)
@@ -36,8 +32,8 @@ public class DefaultFindWorkbasketInputOperation implements FindWorkbasketInputO
     }
 
     @Override
-    public List<WorkbasketInput> execute(String jurisdictionId, String caseTypeId, Predicate<AccessControlList> access) {
-        LOG.debug("Finding WorkbasketInput fields for jurisdiction={}, caseType={}", jurisdictionId, caseTypeId);
+    public List<WorkbasketInput> execute(String caseTypeId, Predicate<AccessControlList> access) {
+        LOG.debug("Finding WorkbasketInput fields for caseType={}", caseTypeId);
 
         final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
 

@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -16,8 +18,6 @@ import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
-
-import java.util.List;
 
 @Service
 @Qualifier(DefaultGetCaseViewOperation.QUALIFIER)
@@ -40,12 +40,6 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
         this.getEventsOperation = getEventsOperation;
         this.caseTypeService = caseTypeService;
         this.eventTriggerService = eventTriggerService;
-    }
-
-    @Override
-    @Deprecated
-    public CaseView execute(String jurisdictionId, String caseTypeId, String caseReference) {
-        return execute(caseReference);
     }
 
     @Override

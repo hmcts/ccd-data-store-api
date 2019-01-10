@@ -568,6 +568,11 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public AccessControlListBuilder withDelete(boolean delete) {
+            this.accessControlList.setDelete(delete);
+            return this;
+        }
+
         public AccessControlListBuilder withUpdate(boolean update) {
             this.accessControlList.setUpdate(update);
             return this;
@@ -632,6 +637,37 @@ public class TestBuildersUtil {
 
         public CaseEventBuilder withShowEventNotes(Boolean showEventNotes) {
             caseEvent.setShowEventNotes(showEventNotes);
+            return this;
+        }
+    }
+
+    public static class EventBuilder {
+        private final Event event;
+
+        private EventBuilder() {
+            this.event = new Event();
+        }
+
+        public static EventBuilder newEvent() {
+            return new EventBuilder();
+        }
+
+        public EventBuilder withEventId(String eventId) {
+            event.setEventId(eventId);
+            return this;
+        }
+
+        public Event build() {
+            return event;
+        }
+
+        public EventBuilder withSummary(String summary) {
+            event.setSummary(summary);
+            return this;
+        }
+
+        public EventBuilder withDescription(String description) {
+            event.setDescription(description);
             return this;
         }
     }

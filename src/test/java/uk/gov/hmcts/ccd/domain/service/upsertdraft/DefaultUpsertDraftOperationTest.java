@@ -1,5 +1,26 @@
 package uk.gov.hmcts.ccd.domain.service.upsertdraft;
 
+import java.util.Map;
+
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.samePropertyValuesAs;
+import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.newCaseDraft;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.newDraftResponse;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.EventBuilder.newEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.JurisdictionBuilder.newJurisdiction;
+import static uk.gov.hmcts.ccd.domain.service.upsertdraft.DefaultUpsertDraftOperation.CASE_DATA_CONTENT;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,20 +39,7 @@ import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDraftRequest;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
-
-import java.util.Map;
-
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.newCaseDraft;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.newDraftResponse;
-import static uk.gov.hmcts.ccd.domain.service.upsertdraft.DefaultUpsertDraftOperation.CASE_DATA_CONTENT;
+import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 class DefaultUpsertDraftOperationTest {
 
@@ -43,6 +51,8 @@ class DefaultUpsertDraftOperationTest {
     private static final String DID = "5";
     private static final CaseType CASE_TYPE = newCaseType()
         .withId(CTID)
+        .withJurisdiction(newJurisdiction().withJurisdictionId(JID).build())
+        .withEvent(newCaseEvent().withId(ETID).build())
         .withSecurityClassification(SecurityClassification.PUBLIC)
         .build();
     private static final Map<String, JsonNode> DATA = Maps.newHashMap();
@@ -56,10 +66,12 @@ class DefaultUpsertDraftOperationTest {
     private CaseDefinitionRepository caseDefinitionRepository;
     @Mock
     private CaseSanitiser caseSanitiser;
+    @Mock
+    private UserAuthorisation userAuthorisation;
 
     private UpsertDraftOperation upsertDraftOperation;
 
-    private CaseDataContent caseDataContent = newCaseDataContent().withData(DATA).build();
+    private CaseDataContent caseDataContent = newCaseDataContent().withData(DATA).withEvent(newEvent().withEventId(ETID).build()).build();
     private CaseDraft caseDraft;
     private DraftResponse draftResponse = newDraftResponse().build();
 
@@ -69,9 +81,9 @@ class DefaultUpsertDraftOperationTest {
         when(applicationParams.getDraftMaxTTLDays()).thenReturn(DRAFT_MAX_STALE_DAYS);
         given(caseDefinitionRepository.getCaseType(CTID)).willReturn(CASE_TYPE);
         given(caseSanitiser.sanitise(CASE_TYPE, DATA)).willReturn(SANITISED_DATA);
+        given(userAuthorisation.getUserId()).willReturn(UID);
 
-
-        upsertDraftOperation = new DefaultUpsertDraftOperation(draftGateway, caseDefinitionRepository, caseSanitiser, applicationParams);
+        upsertDraftOperation = new DefaultUpsertDraftOperation(draftGateway, caseDefinitionRepository, caseSanitiser, userAuthorisation, applicationParams);
         caseDraft = newCaseDraft()
             .withUserId(UID)
             .withJurisdictionId(JID)
@@ -87,7 +99,7 @@ class DefaultUpsertDraftOperationTest {
         doReturn(Long.valueOf(DID)).when(draftGateway).create(any(CreateCaseDraftRequest.class));
         draftResponse.setId(DID);
 
-        DraftResponse result = upsertDraftOperation.executeSave(UID, JID, CTID, ETID, caseDataContent);
+        DraftResponse result = upsertDraftOperation.executeSave(CTID, caseDataContent);
 
         assertAll(
             () -> verify(draftGateway).create(captor.capture()),
@@ -112,7 +124,7 @@ class DefaultUpsertDraftOperationTest {
         doReturn(draftResponse).when(draftGateway).update(any(UpdateCaseDraftRequest.class), any(String.class));
 
 
-        DraftResponse result = upsertDraftOperation.executeUpdate(UID, JID, CTID, ETID, DID, caseDataContent);
+        DraftResponse result = upsertDraftOperation.executeUpdate(CTID, DID, caseDataContent);
 
         assertAll(
             () -> verify(draftGateway).update(caseDataContentCaptor.capture(), draftIdCaptor.capture()),

@@ -141,7 +141,7 @@ class AuthorisedGetCaseViewOperationTest {
         final CaseView expectedCaseView = new CaseView();
         doReturn(expectedCaseView).when(authorisedGetCaseViewOperation).execute(CASE_REFERENCE);
 
-        final CaseView actualCaseView = authorisedGetCaseViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+        final CaseView actualCaseView = authorisedGetCaseViewOperation.execute(CASE_REFERENCE);
 
         assertAll(
             () -> verify(authorisedGetCaseViewOperation).execute(CASE_REFERENCE),
@@ -154,7 +154,7 @@ class AuthorisedGetCaseViewOperationTest {
     void shouldRemoveFieldsByCrud() {
         doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES, CAN_READ);
 
-        final CaseView actualCaseView = authorisedGetCaseViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+        final CaseView actualCaseView = authorisedGetCaseViewOperation.execute(CASE_REFERENCE);
 
         assertAll(
             () -> verify(authorisedGetCaseViewOperation).execute(CASE_REFERENCE),
@@ -167,7 +167,7 @@ class AuthorisedGetCaseViewOperationTest {
     void shouldRemoveEmptyTabs() {
         doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES, CAN_READ);
 
-        final CaseView actualCaseView = authorisedGetCaseViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+        final CaseView actualCaseView = authorisedGetCaseViewOperation.execute(CASE_REFERENCE);
 
         assertAll(
             () -> verify(authorisedGetCaseViewOperation).execute(CASE_REFERENCE),

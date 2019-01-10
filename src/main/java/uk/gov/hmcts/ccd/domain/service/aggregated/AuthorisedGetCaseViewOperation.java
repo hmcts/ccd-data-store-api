@@ -23,7 +23,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
 @Service
-@Qualifier(AuthorisedGetCaseTypesOperation.QUALIFIER)
+@Qualifier(AuthorisedGetCaseViewOperation.QUALIFIER)
 public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOperation implements
     GetCaseViewOperation {
 
@@ -69,12 +69,6 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
                     .toArray(CaseViewField[]::new));
                 return caseViewTab;
             }).toArray(CaseViewTab[]::new));
-    }
-
-    @Override
-    @Deprecated
-    public CaseView execute(String jurisdictionId, String caseTypeId, String caseReference) {
-        return execute(caseReference);
     }
 
     private CaseView filterUpsertAccess(CaseType caseType, Set<String> userRoles, CaseView caseView) {

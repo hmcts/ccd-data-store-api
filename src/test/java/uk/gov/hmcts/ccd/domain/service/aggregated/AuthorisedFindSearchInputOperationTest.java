@@ -2,8 +2,8 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -15,7 +15,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldB
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.SearchInputBuilder.aSearchInput;
 
-import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,7 +39,7 @@ class AuthorisedFindSearchInputOperationTest {
     @Mock
     private FindSearchInputOperation findSearchInputOperation;
     @Mock
-    private GetCaseTypesOperation getCaseTypesOperation;
+    private GetCaseTypeOperation getCaseTypeOperation;
     private AuthorisedFindSearchInputOperation authorisedFindSearchInputOperation;
 
     @BeforeEach
@@ -59,18 +58,18 @@ class AuthorisedFindSearchInputOperationTest {
             .withField(CASE_FIELD_1_3)
             .build();
         testCaseType.setId(CASE_TYPE_ONE);
-        List<CaseType> testCaseTypes = Lists.newArrayList(testCaseType);
+        Optional<CaseType> testCaseTypeOpt = Optional.of(testCaseType);
 
-        doReturn(testCaseTypes).when(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ);
+        doReturn(testCaseTypeOpt).when(getCaseTypeOperation).execute(CASE_TYPE_ONE, CAN_READ);
 
         authorisedFindSearchInputOperation = new AuthorisedFindSearchInputOperation(findSearchInputOperation,
-            getCaseTypesOperation);
+            getCaseTypeOperation);
     }
 
     @Test
     @DisplayName("should fail when no case type due to no ACL READ access")
     void shouldFailWhenWhenNoACLReadAccess() {
-        doReturn(Collections.EMPTY_LIST).when(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ);
+        doReturn(Optional.empty()).when(getCaseTypeOperation).execute(CASE_TYPE_ONE, CAN_READ);
 
         assertThrows(ResourceNotFoundException.class, () -> authorisedFindSearchInputOperation.execute(JURISDICTION_ID, CASE_TYPE_ONE, CAN_READ));
     }

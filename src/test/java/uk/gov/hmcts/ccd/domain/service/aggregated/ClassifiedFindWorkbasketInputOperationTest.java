@@ -11,6 +11,7 @@ import static org.mockito.Mockito.doReturn;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.JurisdictionBuilder.newJurisdiction;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WorkbasketInputBuilder.aWorkbasketInput;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -59,6 +60,9 @@ class ClassifiedFindWorkbasketInputOperationTest {
 
         MockitoAnnotations.initMocks(this);
         testCaseType = newCaseType()
+            .withJurisdiction(newJurisdiction()
+                                  .withJurisdictionId(JURISDICTION_ID)
+                                  .build())
             .withField(CASE_FIELD_1_1)
             .withField(CASE_FIELD_1_2)
             .withField(CASE_FIELD_1_3)
@@ -76,7 +80,7 @@ class ClassifiedFindWorkbasketInputOperationTest {
     @Test
     @DisplayName("should filter workbasket input fields when user does not have enough SC rank")
     void shouldFilterFieldsWithSC() {
-        doReturn(testWorkbasketInputs).when(findWorkbasketInputOperation).execute(JURISDICTION_ID, CASE_TYPE_ONE,
+        doReturn(testWorkbasketInputs).when(findWorkbasketInputOperation).execute(CASE_TYPE_ONE,
             CAN_READ);
         doReturn(true).when(classificationService).userHasEnoughSecurityClassificationForField(JURISDICTION_ID,
             testCaseType, CASE_FIELD_ID_1_1);
@@ -88,7 +92,7 @@ class ClassifiedFindWorkbasketInputOperationTest {
             testCaseType, CASE_FIELD_ID_1_4);
 
 
-        final List<WorkbasketInput> workbasketInputs = classUnderTest.execute(JURISDICTION_ID, CASE_TYPE_ONE, CAN_READ);
+        final List<WorkbasketInput> workbasketInputs = classUnderTest.execute(CASE_TYPE_ONE, CAN_READ);
         assertAll(
             () -> assertThat(workbasketInputs.size(), is(3)),
             () -> assertThat(workbasketInputs.get(0), is(testWorkbasketInputs.get(0))),
@@ -100,10 +104,10 @@ class ClassifiedFindWorkbasketInputOperationTest {
     @Test
     @DisplayName("should return empty workbasket input list when user does't have enough SC for any field")
     void shouldReturnEmptyWorkbasketInputWhenNoFieldIsAuthorised() {
-        doReturn(new ArrayList<>()).when(findWorkbasketInputOperation).execute(JURISDICTION_ID, CASE_TYPE_ONE,
+        doReturn(new ArrayList<>()).when(findWorkbasketInputOperation).execute(CASE_TYPE_ONE,
             CAN_READ);
 
-        final List<WorkbasketInput> workbasketInputs = classUnderTest.execute(JURISDICTION_ID, CASE_TYPE_ONE, CAN_READ);
+        final List<WorkbasketInput> workbasketInputs = classUnderTest.execute(CASE_TYPE_ONE, CAN_READ);
 
         assertAll(
             () -> assertThat(workbasketInputs.size(), is(0))

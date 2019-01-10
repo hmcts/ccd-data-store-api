@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,27 +10,21 @@ import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 
-/**
- *
- * @deprecated current implementation has serious performance issues
- */
-@Deprecated
 @Service
-@SuppressWarnings("squid:S1133")
-@Qualifier(DefaultGetCaseTypesOperation.QUALIFIER)
-public class DefaultGetCaseTypesOperation implements GetCaseTypesOperation {
+@Qualifier(DefaultGetCaseTypeOperation.QUALIFIER)
+public class DefaultGetCaseTypeOperation implements GetCaseTypeOperation {
     public static final String QUALIFIER = "default";
 
     private final CaseTypeService caseTypeService;
 
     @Autowired
-    public DefaultGetCaseTypesOperation(final CaseTypeService caseTypeService) {
+    public DefaultGetCaseTypeOperation(final CaseTypeService caseTypeService) {
         this.caseTypeService = caseTypeService;
     }
 
     @Override
-    public List<CaseType> execute(String jurisdictionId, Predicate<AccessControlList> access) {
-        return caseTypeService.getCaseTypesForJurisdiction(jurisdictionId);
+    public Optional<CaseType> execute(String caseTypeId, Predicate<AccessControlList> access) {
+        return Optional.ofNullable(caseTypeService.getCaseType(caseTypeId));
     }
 
 }

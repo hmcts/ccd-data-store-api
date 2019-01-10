@@ -1,9 +1,10 @@
 package uk.gov.hmcts.ccd.domain.model.draft;
 
+import java.time.LocalDateTime;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.ToString;
-
-import java.time.LocalDateTime;
+import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 
 @ToString
 public class DraftResponse {
@@ -61,5 +62,10 @@ public class DraftResponse {
     @JsonIgnore
     public String getCaseTypeId() {
         return getDocument() != null ? getDocument().getCaseTypeId() : null;
+    }
+
+    @JsonIgnore
+    public CaseDataContent getCaseDataContent() {
+        return getDocument() != null ? getDocument().getCaseDataContent() : null;
     }
 }

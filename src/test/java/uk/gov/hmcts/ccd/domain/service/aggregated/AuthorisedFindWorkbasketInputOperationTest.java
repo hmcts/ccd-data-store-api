@@ -2,8 +2,8 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -15,7 +15,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldB
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WorkbasketInputBuilder.aWorkbasketInput;
 
-import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,7 +39,7 @@ class AuthorisedFindWorkbasketInputOperationTest {
     @Mock
     private FindWorkbasketInputOperation findWorkbasketInputOperation;
     @Mock
-    private GetCaseTypesOperation getCaseTypesOperation;
+    private GetCaseTypeOperation getCaseTypeOperation;
     private AuthorisedFindWorkbasketInputOperation authorisedFindWorkbasketInputOperation;
 
     @BeforeEach
@@ -59,28 +58,28 @@ class AuthorisedFindWorkbasketInputOperationTest {
             .withField(CASE_FIELD_1_3)
             .build();
         testCaseType.setId(CASE_TYPE_ONE);
-        List<CaseType> testCaseTypes = Lists.newArrayList(testCaseType);
+        Optional<CaseType> testCaseTypeOpt = Optional.of(testCaseType);
 
-        doReturn(testCaseTypes).when(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ);
+        doReturn(testCaseTypeOpt).when(getCaseTypeOperation).execute(CASE_TYPE_ONE, CAN_READ);
 
-        authorisedFindWorkbasketInputOperation = new AuthorisedFindWorkbasketInputOperation(findWorkbasketInputOperation, getCaseTypesOperation);
+        authorisedFindWorkbasketInputOperation = new AuthorisedFindWorkbasketInputOperation(findWorkbasketInputOperation, getCaseTypeOperation);
     }
 
 
     @Test
     @DisplayName("should fail when no case type due to no READ access type")
     void shouldFailWhenWhenNoReadAccess() {
-        doReturn(Collections.EMPTY_LIST).when(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ);
+        doReturn(Optional.empty()).when(getCaseTypeOperation).execute(CASE_TYPE_ONE, CAN_READ);
 
-        assertThrows(ResourceNotFoundException.class, () -> authorisedFindWorkbasketInputOperation.execute(JURISDICTION_ID, CASE_TYPE_ONE, CAN_READ));
+        assertThrows(ResourceNotFoundException.class, () -> authorisedFindWorkbasketInputOperation.execute(CASE_TYPE_ONE, CAN_READ));
     }
 
     @Test
     @DisplayName("should return only authorised case fields")
     void shouldReturnOnlyAuthorisedCaseFields() {
-        doReturn(testWorkbasketInputs).when(findWorkbasketInputOperation).execute(JURISDICTION_ID, CASE_TYPE_ONE, CAN_READ);
+        doReturn(testWorkbasketInputs).when(findWorkbasketInputOperation).execute(CASE_TYPE_ONE, CAN_READ);
 
-        final List<WorkbasketInput> workbasketInputs = authorisedFindWorkbasketInputOperation.execute(JURISDICTION_ID, CASE_TYPE_ONE, CAN_READ);
+        final List<WorkbasketInput> workbasketInputs = authorisedFindWorkbasketInputOperation.execute(CASE_TYPE_ONE, CAN_READ);
 
         assertAll(
             () -> assertThat(workbasketInputs.size(), is(3)),
@@ -93,10 +92,10 @@ class AuthorisedFindWorkbasketInputOperationTest {
     @Test
     @DisplayName("should return empty workbasket input list when no field is authorised")
     void shouldReturnEmptyWorkbasketInputWhenNoFieldIsAuthorised() {
-        doReturn(new ArrayList<>()).when(findWorkbasketInputOperation).execute(JURISDICTION_ID, CASE_TYPE_ONE,
+        doReturn(new ArrayList<>()).when(findWorkbasketInputOperation).execute(CASE_TYPE_ONE,
             CAN_READ);
 
-        final List<WorkbasketInput> workbasketInputs = authorisedFindWorkbasketInputOperation.execute(JURISDICTION_ID, CASE_TYPE_ONE, CAN_READ);
+        final List<WorkbasketInput> workbasketInputs = authorisedFindWorkbasketInputOperation.execute(CASE_TYPE_ONE, CAN_READ);
 
         assertAll(
             () -> assertThat(workbasketInputs.size(), is(0))
