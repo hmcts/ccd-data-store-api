@@ -67,6 +67,7 @@ class UIEventViewResourceTest {
         caseViewEvent.setId(EVENT_ID);
         return caseViewEvent;
     }
+
     private CaseHistoryView newCaseHistoryView() {
         final CaseHistoryView caseHistoryView = new CaseHistoryView();
 
