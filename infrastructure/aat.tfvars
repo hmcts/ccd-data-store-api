@@ -6,5 +6,5 @@ capacity = "2"
 frontend_url = "https://www-ccd.nonprod.platform.hmcts.net"
 asp_name = "ccd-data-store-api-aat"
 asp_rg = "ccd-data-store-api-aat"
-elastic_search_enabled = "false"
+elastic_search_enabled = "true"
 
