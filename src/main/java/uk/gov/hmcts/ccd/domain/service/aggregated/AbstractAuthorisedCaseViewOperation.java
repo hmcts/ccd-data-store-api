@@ -57,10 +57,7 @@ public abstract class AbstractAuthorisedCaseViewOperation {
     }
 
     protected String getCaseId(String caseReference) {
-        Optional<CaseDetails> caseDetails = this.caseDetailsRepository.findByReference(caseReference);
-        return caseDetails
-            .orElseThrow(() -> new CaseNotFoundException(caseReference))
-            .getId();
+        return getCase(caseReference).getId();
     }
 
     protected CaseDetails getCase(String caseReference) {
