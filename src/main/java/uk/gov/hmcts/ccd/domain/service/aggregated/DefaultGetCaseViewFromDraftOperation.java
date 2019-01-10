@@ -1,5 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import java.util.ArrayList;
+
+import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTriggerBuilder.anCaseViewTrigger;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -19,10 +23,6 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
-
-import java.util.ArrayList;
-
-import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTriggerBuilder.anCaseViewTrigger;
 
 @Service
 @Qualifier(DefaultGetCaseViewFromDraftOperation.QUALIFIER)
@@ -55,16 +55,12 @@ public class DefaultGetCaseViewFromDraftOperation extends AbstractDefaultGetCase
 
     @Override
     public CaseView execute(String draftId) {
-        throw new UnsupportedOperationException("Method not implemented");
-    }
-
-    @Override
-    public CaseView execute(String jurisdictionId, String caseTypeId, String draftId) {
-
-        final CaseType caseType = getCaseType(jurisdictionId, caseTypeId);
         final DraftResponse draftResponse = draftGateway.get(draftId);
 
         final CaseDetails caseDetails = draftResponseToCaseDetailsBuilder.build(draftResponse);
+
+        CaseType caseType = getCaseType(draftResponse.getCaseTypeId());
+
         final CaseViewTrigger resumeTrigger = buildResumeTriggerFromDraft(draftResponse);
 
         final CaseTabCollection caseTabCollection = getCaseTabCollection(draftResponse.getCaseTypeId());

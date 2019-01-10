@@ -1,5 +1,10 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
@@ -9,11 +14,6 @@ import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
-
-import java.util.List;
-import java.util.Map;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public abstract class AbstractDefaultGetCaseViewOperation {
 
@@ -38,6 +38,10 @@ public abstract class AbstractDefaultGetCaseViewOperation {
         if (!uidService.validateUID(caseReference)) {
             throw new BadRequestException("Case reference " + caseReference + " is not valid");
         }
+    }
+
+    CaseType getCaseType(String caseTypeId) {
+        return caseTypeService.getCaseType(caseTypeId);
     }
 
     CaseType getCaseType(String jurisdictionId, String caseTypeId) {

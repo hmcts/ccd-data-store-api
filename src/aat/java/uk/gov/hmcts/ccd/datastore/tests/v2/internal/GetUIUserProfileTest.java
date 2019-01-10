@@ -22,7 +22,7 @@ class GetUIUserProfileTest extends BaseTest {
     @DisplayName("should retrieve user profile")
     void shouldRetrieveWhenExists() {
 
-        whenCallingGeUserProfile()
+        whenCallingGetUserProfile()
             .then()
             .log().ifError()
             .statusCode(200)
@@ -46,7 +46,7 @@ class GetUIUserProfileTest extends BaseTest {
             .body("self.href", equalTo(String.format("%s/internal/profile", aat.getTestUrl())));
     }
 
-    private Response whenCallingGeUserProfile() {
+    private Response whenCallingGetUserProfile() {
         return asAutoTestCaseworker(FALSE)
             .get()
             .accept(V2.MediaType.UI_USER_PROFILE)

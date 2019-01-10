@@ -1,5 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
@@ -11,10 +15,6 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.util.List;
 
 @Named
 @Singleton

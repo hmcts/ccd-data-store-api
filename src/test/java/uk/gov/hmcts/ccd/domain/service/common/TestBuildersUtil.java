@@ -1,5 +1,13 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.util.*;
+import java.util.function.Consumer;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Arrays.asList;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -19,14 +27,6 @@ import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
-
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.util.*;
-import java.util.function.Consumer;
-
-import static com.google.common.collect.Lists.newArrayList;
-import static java.util.Arrays.asList;
 
 public class TestBuildersUtil {
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -534,6 +534,11 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public AccessControlListBuilder withDelete(boolean delete) {
+            this.accessControlList.setDelete(delete);
+            return this;
+        }
+
         public AccessControlListBuilder withUpdate(boolean update) {
             this.accessControlList.setUpdate(update);
             return this;
@@ -598,6 +603,37 @@ public class TestBuildersUtil {
 
         public CaseEventBuilder withShowEventNotes(Boolean showEventNotes) {
             caseEvent.setShowEventNotes(showEventNotes);
+            return this;
+        }
+    }
+
+    public static class EventBuilder {
+        private final Event event;
+
+        private EventBuilder() {
+            this.event = new Event();
+        }
+
+        public static EventBuilder newEvent() {
+            return new EventBuilder();
+        }
+
+        public EventBuilder withEventId(String eventId) {
+            event.setEventId(eventId);
+            return this;
+        }
+
+        public Event build() {
+            return event;
+        }
+
+        public EventBuilder withSummary(String summary) {
+            event.setSummary(summary);
+            return this;
+        }
+
+        public EventBuilder withDescription(String description) {
+            event.setDescription(description);
             return this;
         }
     }
