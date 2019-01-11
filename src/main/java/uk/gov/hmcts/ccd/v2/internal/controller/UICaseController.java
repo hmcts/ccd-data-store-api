@@ -117,7 +117,6 @@ public class UICaseController {
 
         final CaseHistoryView caseHistoryView = getCaseHistoryViewOperation.execute(caseId, Long.valueOf(eventId));
 
-
         return ResponseEntity.ok(new UIEventViewResource(caseHistoryView, caseId));
     }
 }
