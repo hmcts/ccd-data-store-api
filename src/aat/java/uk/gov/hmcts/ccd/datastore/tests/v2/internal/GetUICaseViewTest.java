@@ -102,7 +102,7 @@ class GetUICaseViewTest extends BaseTest {
             .body("event.event_id", equalTo(UPDATE))
 
             .rootPath("_links")
-            .body("self.href", equalTo(String.format("%s/internal/cases/%s/events/%s", aat.getTestUrl(), caseReference, UPDATE)))
+            .body("self.href", equalTo(String.format("%s/internal/cases/%s/events/%s", aat.getTestUrl(), caseReference, eventId)))
         ;
     }
 
