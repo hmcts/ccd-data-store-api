@@ -6,9 +6,9 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
@@ -42,8 +42,7 @@ public class UICaseController {
         this.caseReferenceService = caseReferenceService;
     }
 
-    @RequestMapping(
-        method = RequestMethod.GET,
+    @GetMapping(
         path = "/{caseId}",
         headers = {
             V2.EXPERIMENTAL_HEADER
@@ -81,8 +80,7 @@ public class UICaseController {
         return ResponseEntity.ok(new UICaseViewResource(caseView));
     }
 
-    @RequestMapping(
-        method = RequestMethod.GET,
+    @GetMapping(
         path = "/{caseId}/events/{eventId}",
         headers = {
             V2.EXPERIMENTAL_HEADER
