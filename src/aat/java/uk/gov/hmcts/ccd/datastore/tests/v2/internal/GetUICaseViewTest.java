@@ -36,9 +36,9 @@ class GetUICaseViewTest extends BaseTest {
     void shouldRetrieveWhenExists() {
         // Prepare new case in known state
         final Long caseReference = Event.create()
-            .as(asAutoTestCaseworker())
-            .withData(FullCase.build())
-            .submitAndGetReference();
+                                        .as(asAutoTestCaseworker())
+                                        .withData(FullCase.build())
+                                        .submitAndGetReference();
 
         whenCallingGetCaseView(caseReference.toString())
             .then()
@@ -71,16 +71,16 @@ class GetUICaseViewTest extends BaseTest {
     void shouldRetrieveCaseViewHistoryWhenExists() {
         // Prepare new case in known state
         final Long caseReference = Event.create()
-            .as(asAutoTestCaseworker())
-            .withData(FullCase.build())
-            .submitAndGetReference();
+                                        .as(asAutoTestCaseworker())
+                                        .withData(FullCase.build())
+                                        .submitAndGetReference();
         // Update created case
         Event.update(caseReference)
-            .as(asAutoTestCaseworker())
-            .withData(AATCaseType.CaseData.builder()
-                          .textField("Other text")
-                          .build())
-            .submit();
+             .as(asAutoTestCaseworker())
+             .withData(AATCaseType.CaseData.builder()
+                                           .textField("Other text")
+                                           .build())
+             .submit();
 
         List<Map<String, Object>> events = whenCallingGetCaseView(caseReference.toString()).then().extract().path("events");
         Object eventId = events.stream().filter(event -> event.get("event_id").equals(UPDATE)).findAny().get().get("id");
