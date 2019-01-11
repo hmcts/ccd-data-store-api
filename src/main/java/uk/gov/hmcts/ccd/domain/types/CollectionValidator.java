@@ -33,10 +33,7 @@ public class CollectionValidator implements BaseTypeValidator {
         }
 
         if (!dataValue.isArray()) {
-            final ValidationResult result = new ValidationResult(
-                "Require value to be an array",
-                dataFieldId);
-            return Collections.singletonList(result);
+            return Collections.singletonList(new ValidationResult("Require value to be an array", dataFieldId));
         }
 
         final ArrayNode arrayValue = (ArrayNode) dataValue;

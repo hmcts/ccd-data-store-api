@@ -17,6 +17,12 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+/**
+ *
+ * @deprecated until {@link DefaultGetCaseTypesOperation} is deprecated
+ */
+@Deprecated
+@SuppressWarnings("squid:S1133")
 @Service
 @Qualifier(AuthorisedGetCaseTypesOperation.QUALIFIER)
 public class AuthorisedGetCaseTypesOperation implements GetCaseTypesOperation {

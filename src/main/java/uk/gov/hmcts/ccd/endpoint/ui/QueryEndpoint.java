@@ -94,6 +94,7 @@ public class QueryEndpoint {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "List of case types for the given access criteria"),
         @ApiResponse(code = 404, message = "No case types found for given access criteria")})
+    @SuppressWarnings("squid:CallToDeprecatedMethod")
     public List<CaseType> getCaseTypes(@PathVariable("jid") final String jurisdictionId,
                                        @RequestParam(value = "access", required = true) String access) {
         return getCaseTypesOperation.execute(jurisdictionId, ofNullable(accessMap.get(access))
@@ -173,7 +174,7 @@ public class QueryEndpoint {
                                                         @PathVariable("jid") final String jurisdictionId,
                                                         @PathVariable("ctid") final String caseTypeId) {
         Instant start = Instant.now();
-        WorkbasketInput[] workbasketInputs = findWorkbasketInputOperation.execute(jurisdictionId, caseTypeId,
+        WorkbasketInput[] workbasketInputs = findWorkbasketInputOperation.execute(caseTypeId,
                                                                                   CAN_READ).toArray(
             new WorkbasketInput[0]);
         final Duration between = Duration.between(start, Instant.now());
@@ -192,7 +193,7 @@ public class QueryEndpoint {
                              @PathVariable("ctid") final String caseTypeId,
                              @PathVariable("cid") final String cid) {
         Instant start = Instant.now();
-        CaseView caseView = getCaseViewOperation.execute(jurisdictionId, caseTypeId, cid);
+        CaseView caseView = getCaseViewOperation.execute(cid);
         final Duration between = Duration.between(start, Instant.now());
         LOG.info("findCase has been completed in {} millisecs...", between.toMillis());
         return caseView;
@@ -252,11 +253,7 @@ public class QueryEndpoint {
                                                     @PathVariable("etid") String eventTriggerId,
                                                     @RequestParam(value = "ignore-warning",
                                                         required = false) Boolean ignoreWarning) {
-        return getEventTriggerOperation.executeForDraft(userId,
-                                                        jurisdictionId,
-                                                        caseTypeId,
-                                                        draftId,
-                                                        eventTriggerId,
+        return getEventTriggerOperation.executeForDraft(draftId,
                                                         ignoreWarning);
     }
 

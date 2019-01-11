@@ -21,19 +21,16 @@ public class AuthorisedFindSearchInputOperation implements FindSearchInputOperat
 
     public static final String QUALIFIER = "authorised";
     private final FindSearchInputOperation findSearchInputOperation;
-    private final GetCaseTypesOperation getCaseTypesOperation;
+    private final GetCaseTypeOperation getCaseTypeOperation;
 
     public AuthorisedFindSearchInputOperation(@Qualifier(ClassifiedFindSearchInputOperation.QUALIFIER) final FindSearchInputOperation findSearchInputOperation,
-                                              @Qualifier(AuthorisedGetCaseTypesOperation.QUALIFIER) final GetCaseTypesOperation getCaseTypesOperation) {
+                                              @Qualifier(AuthorisedGetCaseTypeOperation.QUALIFIER) final GetCaseTypeOperation getCaseTypeOperation) {
         this.findSearchInputOperation = findSearchInputOperation;
-        this.getCaseTypesOperation = getCaseTypesOperation;
+        this.getCaseTypeOperation = getCaseTypeOperation;
     }
 
     public List<SearchInput> execute(final String jurisdictionId, final String caseTypeId, Predicate<AccessControlList> access) {
-        Optional<CaseType> caseType = this.getCaseTypesOperation.execute(jurisdictionId, access)
-            .stream()
-            .filter(ct -> ct.getId().equalsIgnoreCase(caseTypeId))
-            .findFirst();
+        Optional<CaseType> caseType = this.getCaseTypeOperation.execute(caseTypeId, access);
 
         if (!caseType.isPresent()) {
             ResourceNotFoundException resourceNotFoundException = new ResourceNotFoundException(NO_CASE_TYPE_FOUND);

@@ -1,5 +1,9 @@
 package uk.gov.hmcts.ccd.v2.internal.controller;
 
+import static uk.gov.hmcts.ccd.v2.internal.resource.UIStartTriggerResource.forCase;
+import static uk.gov.hmcts.ccd.v2.internal.resource.UIStartTriggerResource.forCaseType;
+import static uk.gov.hmcts.ccd.v2.internal.resource.UIStartTriggerResource.forDraft;
+
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -38,12 +42,11 @@ public class UIStartTriggerController {
             V2.EXPERIMENTAL_HEADER
         },
         produces = {
-            V2.MediaType.UI_START_TRIGGER,
             V2.MediaType.UI_START_CASE_TRIGGER
         }
     )
     @ApiOperation(
-        value = "Retrieve a trigger by ID for dynamic display",
+        value = "Retrieve a start case trigger by ID for dynamic display",
         notes = V2.EXPERIMENTAL_WARNING
     )
     @ApiResponses({
@@ -69,7 +72,7 @@ public class UIStartTriggerController {
                                                                                                    triggerId,
                                                                                                    ignoreWarning);
 
-        return ResponseEntity.ok(new UIStartTriggerResource(caseEventTrigger, caseTypeId, ignoreWarning, false));
+        return ResponseEntity.ok(forCaseType(caseEventTrigger, caseTypeId, ignoreWarning));
     }
 
     @GetMapping(
@@ -82,7 +85,7 @@ public class UIStartTriggerController {
         }
     )
     @ApiOperation(
-        value = "Retrieve a trigger by ID for dynamic display",
+        value = "Retrieve a start event trigger by ID for dynamic display",
         notes = V2.EXPERIMENTAL_WARNING
     )
     @ApiResponses({
@@ -115,6 +118,43 @@ public class UIStartTriggerController {
                                                                                                triggerId,
                                                                                                ignoreWarning);
 
-        return ResponseEntity.ok(new UIStartTriggerResource(caseEventTrigger, caseId, ignoreWarning, true));
+        return ResponseEntity.ok(forCase(caseEventTrigger, caseId, ignoreWarning));
+    }
+
+    @GetMapping(
+        path = "/drafts/{draftId}/event-trigger",
+        headers = {
+            V2.EXPERIMENTAL_HEADER
+        },
+        produces = {
+            V2.MediaType.UI_START_DRAFT_TRIGGER
+        }
+    )
+    @ApiOperation(
+        value = "Retrieve a start draft trigger by ID for dynamic display",
+        notes = V2.EXPERIMENTAL_WARNING
+    )
+    @ApiResponses({
+        @ApiResponse(
+            code = 200,
+            message = "Success",
+            response = UIStartTriggerResource.class
+        ),
+        @ApiResponse(
+            code = 422,
+            message = "One of: Case event has no pre states, callback validation errors, unable to sanitize document for case field or missing user roles"
+        ),
+        @ApiResponse(
+            code = 404,
+            message = "Trigger not found"
+        )
+    })
+    public ResponseEntity<UIStartTriggerResource> getStartDraftTrigger(@PathVariable("draftId") String draftId,
+                                                                       @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
+
+        final CaseEventTrigger caseEventTrigger = getEventTriggerOperation.executeForDraft(draftId,
+                                                                                           ignoreWarning);
+
+        return ResponseEntity.ok(forDraft(caseEventTrigger, draftId, ignoreWarning));
     }
 }

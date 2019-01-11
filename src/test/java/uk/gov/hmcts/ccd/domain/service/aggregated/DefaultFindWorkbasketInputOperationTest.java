@@ -59,7 +59,7 @@ class DefaultFindWorkbasketInputOperationTest {
 
     @Test
     void shouldReturnWorkbasketInputs() {
-        List<WorkbasketInput> workbasketInputs = findWorkbasketInputOperation.execute("TEST", caseType.getId(), CAN_READ);
+        List<WorkbasketInput> workbasketInputs = findWorkbasketInputOperation.execute(caseType.getId(), CAN_READ);
 
         assertAll(
             () -> assertThat(workbasketInputs.size(), is(4)),

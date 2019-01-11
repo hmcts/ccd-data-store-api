@@ -77,25 +77,25 @@ class QueryEndpointTest {
     @Test
     void shouldCallGetCaseViewOperation() {
         CaseView caseView = new CaseView();
-        doReturn(caseView).when(getCaseViewOperation).execute(any(), any(), any());
+        doReturn(caseView).when(getCaseViewOperation).execute(any());
         queryEndpoint.findCase("jurisdictionId", "caseTypeId", "caseId");
-        verify(getCaseViewOperation, times(1)).execute("jurisdictionId", "caseTypeId", "caseId");
+        verify(getCaseViewOperation, times(1)).execute("caseId");
     }
 
     @Test
     void shouldCallGetEventTriggerOperationForDraft() {
         CaseEventTrigger caseEventTrigger = new CaseEventTrigger();
-        doReturn(caseEventTrigger).when(getEventTriggerOperation).executeForDraft(any(), any(), any(), any(), any(), any());
+        doReturn(caseEventTrigger).when(getEventTriggerOperation).executeForDraft(any(), any());
         queryEndpoint.getEventTriggerForDraft("userId", "jurisdictionId", "caseTypeId", "draftId", "eventTriggerId", false);
-        verify(getEventTriggerOperation).executeForDraft("userId", "jurisdictionId", "caseTypeId", "draftId", "eventTriggerId", false);
+        verify(getEventTriggerOperation).executeForDraft("draftId",false);
     }
 
     @Test
     void shouldCallFindWorkBasketOperation() {
         List<WorkbasketInput> workBasketResults = new ArrayList<>();
-        when(findWorkbasketInputOperation.execute("TEST", "TEST-CASE-TYPE", CAN_READ)).thenReturn(workBasketResults);
+        when(findWorkbasketInputOperation.execute("TEST-CASE-TYPE", CAN_READ)).thenReturn(workBasketResults);
         queryEndpoint.findWorkbasketInputDetails("22", "TEST", "TEST-CASE-TYPE");
-        verify(findWorkbasketInputOperation, times(1)).execute("TEST", "TEST-CASE-TYPE", CAN_READ);
+        verify(findWorkbasketInputOperation, times(1)).execute("TEST-CASE-TYPE", CAN_READ);
     }
 
     @Test
