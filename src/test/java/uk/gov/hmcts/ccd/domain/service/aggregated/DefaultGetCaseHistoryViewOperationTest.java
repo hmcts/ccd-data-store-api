@@ -70,6 +70,7 @@ class DefaultGetCaseHistoryViewOperationTest {
 
         caseDetails = new CaseDetails();
         caseDetails.setCaseTypeId(CASE_TYPE_ID);
+        caseDetails.setJurisdiction(JURISDICTION_ID);
         caseDetails.setReference(new Long(CASE_REFERENCE));
         caseDetails.setState(STATE);
         doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
@@ -106,8 +107,7 @@ class DefaultGetCaseHistoryViewOperationTest {
         event1.setData(dataMap);
         doReturn(Optional.of(event1)).when(getEventsOperation).getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
 
-        CaseHistoryView caseHistoryView = defaultGetCaseHistoryViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID,
-            CASE_REFERENCE, EVENT_ID);
+        CaseHistoryView caseHistoryView = defaultGetCaseHistoryViewOperation.execute(CASE_REFERENCE, EVENT_ID);
 
         assertAll(() -> verify(getEventsOperation).getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID),
                   () -> assertThat(caseHistoryView.getTabs()[0].getFields(), arrayWithSize(1)),
@@ -124,7 +124,7 @@ class DefaultGetCaseHistoryViewOperationTest {
         doReturn(false).when(uidService).validateUID(CASE_REFERENCE);
 
         assertThrows(BadRequestException.class,
-            () -> defaultGetCaseHistoryViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, EVENT_ID));
+            () -> defaultGetCaseHistoryViewOperation.execute(CASE_REFERENCE, EVENT_ID));
     }
 
     @Test
@@ -133,7 +133,7 @@ class DefaultGetCaseHistoryViewOperationTest {
         doReturn(Optional.empty()).when(getCaseOperation).execute(CASE_REFERENCE);
 
         assertThrows(ResourceNotFoundException.class,
-            () -> defaultGetCaseHistoryViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, EVENT_ID));
+            () -> defaultGetCaseHistoryViewOperation.execute(CASE_REFERENCE, EVENT_ID));
     }
 
     @Test
@@ -142,7 +142,7 @@ class DefaultGetCaseHistoryViewOperationTest {
         doReturn(Optional.empty()).when(getEventsOperation).getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
 
         assertThrows(ResourceNotFoundException.class,
-            () -> defaultGetCaseHistoryViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, EVENT_ID));
+            () -> defaultGetCaseHistoryViewOperation.execute(CASE_REFERENCE, EVENT_ID));
     }
 
     private Map<String, JsonNode> buildData(String... dataFieldIds) {

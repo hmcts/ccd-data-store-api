@@ -1,5 +1,10 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import java.util.Set;
+import java.util.function.Supplier;
+
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -22,11 +27,6 @@ import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
-
-import java.util.Set;
-import java.util.function.Supplier;
-
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.*;
 
 @Service
 @Qualifier(AuthorisedGetEventTriggerOperation.QUALIFIER)

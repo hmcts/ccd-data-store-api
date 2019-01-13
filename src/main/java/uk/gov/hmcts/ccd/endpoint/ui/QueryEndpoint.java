@@ -101,7 +101,7 @@ public class QueryEndpoint {
             .orElseThrow(() -> new ResourceNotFoundException("No case types found")));
     }
 
-    @GetMapping(path = "/caseworkers/{uid}/jurisdictions")
+    @GetMapping(value = "/caseworkers/{uid}/jurisdictions")
     @ApiOperation(value = "Get jurisdictions available to the user")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "List of jurisdictions for the given access criteria"),
@@ -174,7 +174,7 @@ public class QueryEndpoint {
                                                         @PathVariable("jid") final String jurisdictionId,
                                                         @PathVariable("ctid") final String caseTypeId) {
         Instant start = Instant.now();
-        WorkbasketInput[] workbasketInputs = findWorkbasketInputOperation.execute(jurisdictionId, caseTypeId,
+        WorkbasketInput[] workbasketInputs = findWorkbasketInputOperation.execute(caseTypeId,
                                                                                   CAN_READ).toArray(
             new WorkbasketInput[0]);
         final Duration between = Duration.between(start, Instant.now());
@@ -271,8 +271,7 @@ public class QueryEndpoint {
                                                   @PathVariable("cid") final String caseReference,
                                                   @PathVariable("eventId") final Long eventId) {
         Instant start = Instant.now();
-        CaseHistoryView caseView = getCaseHistoryViewOperation.execute(jurisdictionId, caseTypeId, caseReference,
-                                                                       eventId);
+        CaseHistoryView caseView = getCaseHistoryViewOperation.execute(caseReference, eventId);
         final Duration between = Duration.between(start, Instant.now());
         LOG.info("getCaseHistoryForEvent has been completed in {} millisecs...", between.toMillis());
         return caseView;

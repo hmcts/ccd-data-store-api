@@ -114,7 +114,7 @@ class AuthorisedGetCaseViewOperationTest {
         doReturn(TEST_CASE_TYPE).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         doReturn(USER_ROLES).when(userRepository).getUserRoles();
         doReturn(USER_ID).when(userRepository).getUserId();
-        doReturn(Optional.of(CASE_DETAILS)).when(caseDetailsRepository).findByReference(JURISDICTION_ID, Long.valueOf(CASE_REFERENCE));
+        doReturn(Optional.of(CASE_DETAILS)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
 
         TEST_CASE_VIEW.setCaseType(TEST_CASE_VIEW_TYPE);
 
@@ -221,9 +221,17 @@ class AuthorisedGetCaseViewOperationTest {
     }
 
     @Test
+    @DisplayName("should return Case")
+    void shouldReturnCase() {
+        CaseDetails caseDetails = authorisedGetCaseViewOperation.getCase(CASE_REFERENCE);
+
+        assertThat(caseDetails, is(CASE_DETAILS));
+    }
+
+    @Test
     @DisplayName("should return Case ID")
     void shouldReturnCaseId() {
-        String caseId = authorisedGetCaseViewOperation.getCaseId(JURISDICTION_ID, CASE_REFERENCE);
+        String caseId = authorisedGetCaseViewOperation.getCaseId(CASE_REFERENCE);
 
         assertThat(caseId, is(CASE_ID));
     }
@@ -231,8 +239,8 @@ class AuthorisedGetCaseViewOperationTest {
     @Test
     @DisplayName("should throw exception when case reference is invalid")
     void shouldThrowException() {
-        doReturn(Optional.empty()).when(caseDetailsRepository).findByReference(JURISDICTION_ID,Long.valueOf(CASE_REFERENCE));
+        doReturn(Optional.empty()).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
 
-        assertThrows(CaseNotFoundException.class, () -> authorisedGetCaseViewOperation.getCaseId(JURISDICTION_ID, CASE_REFERENCE));
+        assertThrows(CaseNotFoundException.class, () -> authorisedGetCaseViewOperation.getCaseId(CASE_REFERENCE));
     }
 }

@@ -29,7 +29,7 @@ public class AuthorisedFindWorkbasketInputOperation implements FindWorkbasketInp
         this.getCaseTypeOperation = getCaseTypeOperation;
     }
 
-    public List<WorkbasketInput> execute(final String jurisdictionId, final String caseTypeId, Predicate<AccessControlList> access) {
+    public List<WorkbasketInput> execute(final String caseTypeId, Predicate<AccessControlList> access) {
         Optional<CaseType> caseType = this.getCaseTypeOperation.execute(caseTypeId, access);
 
         if (!caseType.isPresent()) {
@@ -38,7 +38,7 @@ public class AuthorisedFindWorkbasketInputOperation implements FindWorkbasketInp
             throw resourceNotFoundException;
         }
 
-        return findWorkbasketInputOperation.execute(jurisdictionId, caseTypeId, access).stream()
+        return findWorkbasketInputOperation.execute(caseTypeId, access).stream()
             .filter(workbasketInput -> caseType.get().getCaseFields()
                 .stream()
                 .anyMatch(caseField -> caseField.getId().equalsIgnoreCase(workbasketInput.getField().getId())))
