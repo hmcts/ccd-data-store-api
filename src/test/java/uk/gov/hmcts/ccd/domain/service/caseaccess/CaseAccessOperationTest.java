@@ -147,13 +147,6 @@ class CaseAccessOperationTest {
         }
     }
 
-    private CaseUser caseUser(String caseRole) {
-        final CaseUser caseUser = new CaseUser();
-        caseUser.setUserId(USER_ID);
-        caseUser.getCaseRoles().add(caseRole);
-        return caseUser;
-    }
-
     @Nested
     @DisplayName("revokeAccess()")
     class RevokeAccess {
@@ -216,6 +209,13 @@ class CaseAccessOperationTest {
     private void configureCaseUserRepository() {
         when(caseUserRepository.findCaseRoles(CASE_ID,
                                               USER_ID)).thenReturn(Collections.singletonList(CASE_ROLE_GRANTED));
+    }
+
+    private CaseUser caseUser(String caseRole) {
+        final CaseUser caseUser = new CaseUser();
+        caseUser.setUserId(USER_ID);
+        caseUser.getCaseRoles().add(caseRole);
+        return caseUser;
     }
 
 }
