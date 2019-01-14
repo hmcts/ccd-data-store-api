@@ -17,6 +17,7 @@ import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.InvalidCaseRoleException;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseUser;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -131,6 +132,17 @@ class CaseAccessOperationTest {
         }
 
         @Test
+        @DisplayName("should grant access when added case roles contains global [CREATOR]")
+        void shouldGrantAccessForCaseRoleCreator() {
+            caseAccessOperation.updateUserAccess(caseDetails, caseUser(CASE_ROLE, CREATOR.getRole()));
+
+            assertAll(
+                () -> verify(caseUserRepository).grantAccess(CASE_ID, USER_ID, CASE_ROLE),
+                () -> verify(caseUserRepository).grantAccess(CASE_ID, USER_ID, CREATOR.getRole())
+            );
+        }
+
+        @Test
         @DisplayName("should revoke access for removed case roles")
         void shouldRevokeRemovedCaseRoles() {
             caseAccessOperation.updateUserAccess(caseDetails, caseUser(CASE_ROLE));
@@ -211,10 +223,10 @@ class CaseAccessOperationTest {
                                               USER_ID)).thenReturn(Collections.singletonList(CASE_ROLE_GRANTED));
     }
 
-    private CaseUser caseUser(String caseRole) {
+    private CaseUser caseUser(String ...caseRoles) {
         final CaseUser caseUser = new CaseUser();
         caseUser.setUserId(USER_ID);
-        caseUser.getCaseRoles().add(caseRole);
+        caseUser.getCaseRoles().addAll(Arrays.asList(caseRoles));
         return caseUser;
     }
 

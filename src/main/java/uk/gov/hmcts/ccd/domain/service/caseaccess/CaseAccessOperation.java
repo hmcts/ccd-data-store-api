@@ -1,10 +1,12 @@
 package uk.gov.hmcts.ccd.domain.service.caseaccess;
 
+import org.elasticsearch.common.util.set.Sets;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseRoleRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
+import uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -62,9 +64,10 @@ public class CaseAccessOperation {
     @Transactional
     public void updateUserAccess(CaseDetails caseDetails, CaseUser caseUser) {
         final Set<String> validCaseRoles = caseRoleRepository.getCaseRoles(caseDetails.getCaseTypeId());
+        final Set<String> globalCaseRoles = GlobalCaseRole.all();
         final Set<String> targetCaseRoles = caseUser.getCaseRoles();
 
-        validateCaseRoles(validCaseRoles, targetCaseRoles);
+        validateCaseRoles(Sets.union(globalCaseRoles, validCaseRoles), targetCaseRoles);
 
         final Long caseId = new Long(caseDetails.getId());
         final String userId = caseUser.getUserId();
