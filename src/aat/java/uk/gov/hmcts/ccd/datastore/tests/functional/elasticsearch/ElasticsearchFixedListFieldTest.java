@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.datastore.tests.functional.elasticsearch;
 
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FIXED_LIST;
+
 import io.restassured.response.ValidatableResponse;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -8,8 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.helper.elastic.ElasticsearchTestDataLoaderExtension;
-
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FIXED_LIST;
 
 @ExtendWith(ElasticsearchTestDataLoaderExtension.class)
 public class ElasticsearchFixedListFieldTest extends ElasticsearchBaseTest {

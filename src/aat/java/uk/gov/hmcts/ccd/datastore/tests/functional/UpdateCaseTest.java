@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.datastore.tests.functional;
 
+import static org.hamcrest.Matchers.equalTo;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
@@ -9,8 +11,6 @@ import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FullCase;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CaseData;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.State;
-
-import static org.hamcrest.Matchers.equalTo;
 
 @DisplayName("Update case")
 class UpdateCaseTest extends BaseTest {

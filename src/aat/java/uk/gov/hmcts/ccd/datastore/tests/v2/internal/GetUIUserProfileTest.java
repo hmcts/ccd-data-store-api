@@ -1,5 +1,8 @@
 package uk.gov.hmcts.ccd.datastore.tests.v2.internal;
 
+import static java.lang.Boolean.FALSE;
+import static org.hamcrest.Matchers.*;
+
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -7,9 +10,6 @@ import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.BaseTest;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType;
 import uk.gov.hmcts.ccd.v2.V2;
-
-import static java.lang.Boolean.FALSE;
-import static org.hamcrest.Matchers.*;
 
 @DisplayName("Get UI user profile")
 class GetUIUserProfileTest extends BaseTest {
@@ -39,7 +39,7 @@ class GetUIUserProfileTest extends BaseTest {
             .body("jurisdictions.find { it.id == 'AUTOTEST1' }.caseTypes.find { it.id == 'MAPPER' }.name", equalTo("Case type for Mapper"))
             .body("jurisdictions.find { it.id == 'AUTOTEST1' }.caseTypes.find { it.id == 'AAT' }.name", equalTo("Demo case"))
             .body("default.workbasket.jurisdiction_id", equalTo(AATCaseType.JURISDICTION))
-            .body("default.workbasket.case_type_id", equalTo(AATCaseType.AAT_PRIVATE_CASE_TYPE))
+            .body("default.workbasket.case_type_id", not(nullValue()))
             .body("default.workbasket.state_id", equalTo(AATCaseType.State.TODO))
 
             .rootPath("_links")

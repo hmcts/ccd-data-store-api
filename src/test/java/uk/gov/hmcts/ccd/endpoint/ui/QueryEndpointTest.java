@@ -101,12 +101,12 @@ class QueryEndpointTest {
     @Test
     void shouldCallGetCaseViewOperationWithEvent() {
         CaseHistoryView caseView = new CaseHistoryView();
-        doReturn(caseView).when(getCaseHistoryViewOperation).execute("jurisdictionId", "caseTypeId", "caseId", 11L);
+        doReturn(caseView).when(getCaseHistoryViewOperation).execute("caseId", 11L);
 
         CaseHistoryView response = queryEndpoint.getCaseHistoryForEvent("jurisdictionId", "caseTypeId", "caseId", 11L);
 
         assertSame(caseView, response);
-        verify(getCaseHistoryViewOperation, times(1)).execute("jurisdictionId", "caseTypeId", "caseId", 11L);
+        verify(getCaseHistoryViewOperation, times(1)).execute("caseId", 11L);
     }
 
     @Test

@@ -1,5 +1,10 @@
 package uk.gov.hmcts.ccd.data.definition;
 
+import javax.inject.Inject;
+import java.util.*;
+
+import static uk.gov.hmcts.ccd.ApplicationParams.encodeBase64;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,11 +26,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
-
-import javax.inject.Inject;
-import java.util.*;
-
-import static uk.gov.hmcts.ccd.ApplicationParams.encodeBase64;
 
 @Service
 @Qualifier(DefaultCaseDefinitionRepository.QUALIFIER)
