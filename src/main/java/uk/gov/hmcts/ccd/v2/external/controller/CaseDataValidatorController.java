@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
+import java.util.HashMap;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,8 +17,6 @@ import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseDataResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.UICaseViewResource;
-
-import java.util.HashMap;
 
 @RestController
 @RequestMapping(path = "/case-types")

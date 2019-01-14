@@ -1,5 +1,11 @@
 package uk.gov.hmcts.ccd.v2.internal.resource;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -7,12 +13,6 @@ import org.springframework.hateoas.ResourceSupport;
 import uk.gov.hmcts.ccd.domain.model.search.Field;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
 import uk.gov.hmcts.ccd.v2.internal.controller.UIDefinitionController;
-
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @Data
 @EqualsAndHashCode(callSuper = true)

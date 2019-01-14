@@ -453,6 +453,7 @@ public class TestBuildersUtil {
 
         private CaseViewBuilder() {
             this.caseView = new CaseView();
+            this.caseView.setTabs(new CaseViewTab[0]);
         }
 
         public static CaseViewBuilder aCaseView() {
@@ -479,9 +480,42 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public CaseViewBuilder addCaseViewTab(CaseViewTab caseViewTab) {
+            CaseViewTab[] newTabs = new CaseViewTab[caseView.getTabs().length + 1];
+            System.arraycopy(caseView.getTabs(), 0, newTabs, 0, caseView.getTabs().length);
+            newTabs[newTabs.length - 1] = caseViewTab;
+            caseView.setTabs(newTabs);
+            return this;
+        }
+
         public CaseView build() {
             caseView.setTriggers(caseViewTriggers.toArray(new CaseViewTrigger[]{}));
             return caseView;
+        }
+    }
+
+    public static class CaseViewTabBuilder {
+        private final CaseViewTab caseViewTab;
+
+        private CaseViewTabBuilder() {
+            this.caseViewTab = new CaseViewTab();
+            caseViewTab.setFields(new CaseViewField[0]);
+        }
+
+        public static CaseViewTabBuilder newCaseViewTab() {
+            return new CaseViewTabBuilder();
+        }
+
+        public CaseViewTabBuilder addCaseViewField(CaseViewField caseViewField) {
+            CaseViewField[] newFields = new CaseViewField[caseViewTab.getFields().length + 1];
+            System.arraycopy(caseViewTab.getFields(), 0, newFields, 0, caseViewTab.getFields().length);
+            newFields[newFields.length - 1] = caseViewField;
+            caseViewTab.setFields(newFields);
+            return this;
+        }
+
+        public CaseViewTab build() {
+            return caseViewTab;
         }
     }
 
@@ -883,6 +917,7 @@ public class TestBuildersUtil {
 
     public static class CaseViewFieldBuilder {
         private final CaseViewField caseViewField;
+        private final List<AccessControlList> acls = newArrayList();
 
         private CaseViewFieldBuilder() {
             this.caseViewField = new CaseViewField();
@@ -897,8 +932,14 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public CaseViewFieldBuilder withACL(AccessControlList acl) {
+            acls.add(acl);
+            return this;
+        }
+
         public CaseViewField build() {
-            return caseViewField;
+            this.caseViewField.setAccessControlLists(acls);
+            return this.caseViewField;
         }
     }
 

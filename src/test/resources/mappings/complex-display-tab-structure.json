@@ -197,7 +197,16 @@
             "hidden" : false,
             "security_label" : null,
             "live_from" : null,
-            "live_until" : null
+            "live_until" : null,
+            "acls": [
+              {
+                "role": "caseworker-probate-public",
+                "create": true,
+                "read": true,
+                "update": true,
+                "delete": false
+              }
+            ]
           },
           "order" : 1
         }
@@ -218,7 +227,16 @@
                 "fixed_list_items" : [],
                 "complex_fields" : []
               },
-              "hidden" : false
+              "hidden" : false,
+              "acls": [
+                {
+                  "role": "caseworker-probate-public",
+                  "create": true,
+                  "read": true,
+                  "update": true,
+                  "delete": false
+                }
+              ]
             },
             "order" : 1
           }

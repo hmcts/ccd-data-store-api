@@ -2,11 +2,6 @@
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.1.xsd">
 
     <suppress>
-        <notes>Temporary suppression since there's no 1.8 release of slf4j yet</notes>
-        <gav regex="true">^.*slf4j.*$</gav>
-        <cpe>cpe:/a:slf4j:slf4j:1.7.25</cpe>
-    </suppress>
-    <suppress>
         <notes>See https://github.com/jeremylong/DependencyCheck/issues/1146 for Embedded Tomcat</notes>
         <cve>CVE-2017-12617</cve>
     </suppress>
