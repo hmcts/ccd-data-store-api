@@ -88,6 +88,40 @@ class CaseAccessServiceTest {
     }
 
     @Nested
+    @DisplayName("when user is a panel member")
+    class whenPanelMember {
+
+        private final String[] ROLES = {
+            "other",
+            "some-panelmember"
+        };
+
+        @BeforeEach
+        void setUp() {
+            withRoles(ROLES);
+        }
+
+        @Test
+        @DisplayName("should return true if access was granted")
+        void userHasPanelMemberRoleAndAccessGranted_caseVisible() {
+            assertAccessGranted(caseGranted());
+        }
+
+        @Test
+        @DisplayName("should return false if access was revoked")
+        void userHasPanelMemberRoleAndAccessRevoked_caseNotVisible() {
+            assertAccessRevoked(caseRevoked());
+        }
+
+        @Test
+        @DisplayName("should give GRANTED access level")
+        void accessLevel() {
+            final AccessLevel accessLevel = caseAccessService.getAccessLevel(serviceAndUserDetails(ROLES));
+            assertThat(accessLevel, equalTo(AccessLevel.GRANTED));
+        }
+    }
+
+    @Nested
     @DisplayName("when user is a citizen")
     class whenCitizen {
 
