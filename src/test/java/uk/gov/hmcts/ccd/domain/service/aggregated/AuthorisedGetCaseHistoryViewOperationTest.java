@@ -37,7 +37,6 @@ import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 class AuthorisedGetCaseHistoryViewOperationTest {
-    private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_TYPE_ID = "Grant";
     private static final String CASE_REFERENCE = "1111222233334444";
     private static final String USER_ID = "26";
@@ -47,7 +46,7 @@ class AuthorisedGetCaseHistoryViewOperationTest {
     private static final Set<String> USER_ROLES = newHashSet(ROLE_IN_USER_ROLES, ROLE_IN_USER_ROLES_2);
     private static final String EVENT_ID_STRING = valueOf(EVENT_ID);
     private static final CaseEvent CASE_EVENT = newCaseEvent().withId(EVENT_ID_STRING).build();
-    private static final CaseDetails CASE_DETAILS = newCaseDetails().withId(CASE_REFERENCE).build();
+    private static final CaseDetails CASE_DETAILS = newCaseDetails().withId(CASE_REFERENCE).withCaseTypeId(CASE_TYPE_ID).build();
     private static final CaseEvent CASE_EVENT_2 = newCaseEvent().withId("event2").build();
     private static final CaseType TEST_CASE_TYPE = newCaseType().withEvent(CASE_EVENT).withEvent(CASE_EVENT_2).build();
     private static final CaseViewEvent CASE_VIEW_EVENT = aCaseViewEvent().withId(EVENT_ID_STRING).build();
@@ -75,10 +74,9 @@ class AuthorisedGetCaseHistoryViewOperationTest {
 
         doReturn(TEST_CASE_TYPE).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         doReturn(USER_ROLES).when(userRepository).getUserRoles();
-        doReturn(TEST_CASE_HISTORY_VIEW).when(getCaseHistoryViewOperation).execute(JURISDICTION_ID, CASE_TYPE_ID,
-            CASE_REFERENCE, EVENT_ID);
+        doReturn(TEST_CASE_HISTORY_VIEW).when(getCaseHistoryViewOperation).execute(CASE_REFERENCE, EVENT_ID);
         doReturn(caseRoles).when(caseUserRepository).findCaseRoles(Long.valueOf(CASE_REFERENCE), USER_ID);
-        doReturn(Optional.of(CASE_DETAILS)).when(caseDetailsRepository).findByReference(JURISDICTION_ID, Long.valueOf(CASE_REFERENCE));
+        doReturn(Optional.of(CASE_DETAILS)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
 
         authorisedGetCaseHistoryViewOperation = new AuthorisedGetCaseHistoryViewOperation(getCaseHistoryViewOperation,
             caseDefinitionRepository, accessControlService, userRepository, caseUserRepository, caseDetailsRepository);
@@ -90,13 +88,12 @@ class AuthorisedGetCaseHistoryViewOperationTest {
         doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES, CAN_READ);
         doReturn(USER_ID).when(userRepository).getUserId();
 
-        CaseHistoryView caseHistoryView = authorisedGetCaseHistoryViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID,
-            CASE_REFERENCE, EVENT_ID);
+        CaseHistoryView caseHistoryView = authorisedGetCaseHistoryViewOperation.execute(CASE_REFERENCE, EVENT_ID);
 
         assertThat(caseHistoryView, CoreMatchers.is(TEST_CASE_HISTORY_VIEW));
-        verify(getCaseHistoryViewOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, EVENT_ID);
+        verify(getCaseHistoryViewOperation).execute(CASE_REFERENCE, EVENT_ID);
         verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
-        verify(caseDetailsRepository).findByReference(JURISDICTION_ID, Long.valueOf(CASE_REFERENCE));
+        verify(caseDetailsRepository).findByReference(CASE_REFERENCE);
         verify(userRepository).getUserRoles();
         verify(userRepository).getUserId();
         verify(caseUserRepository).findCaseRoles(Long.valueOf(CASE_REFERENCE), USER_ID);
@@ -109,7 +106,6 @@ class AuthorisedGetCaseHistoryViewOperationTest {
         doReturn(null).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
 
         assertThrows(ValidationException.class,
-            () -> authorisedGetCaseHistoryViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE,
-                EVENT_ID));
+            () -> authorisedGetCaseHistoryViewOperation.execute(CASE_REFERENCE, EVENT_ID));
     }
 }

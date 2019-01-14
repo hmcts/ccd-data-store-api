@@ -1,10 +1,7 @@
 package uk.gov.hmcts.ccd.datastore.tests.v2.internal;
 
 import static java.lang.Boolean.FALSE;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
@@ -42,7 +39,7 @@ class GetUIUserProfileTest extends BaseTest {
             .body("jurisdictions.find { it.id == 'AUTOTEST1' }.caseTypes.find { it.id == 'MAPPER' }.name", equalTo("Case type for Mapper"))
             .body("jurisdictions.find { it.id == 'AUTOTEST1' }.caseTypes.find { it.id == 'AAT' }.name", equalTo("Demo case"))
             .body("default.workbasket.jurisdiction_id", equalTo(AATCaseType.JURISDICTION))
-            .body("default.workbasket.case_type_id", equalTo(AATCaseType.AAT_PRIVATE_CASE_TYPE))
+            .body("default.workbasket.case_type_id", not(nullValue()))
             .body("default.workbasket.state_id", equalTo(AATCaseType.State.TODO))
 
             .rootPath("_links")

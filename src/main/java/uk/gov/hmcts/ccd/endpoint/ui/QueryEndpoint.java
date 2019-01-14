@@ -271,8 +271,7 @@ public class QueryEndpoint {
                                                   @PathVariable("cid") final String caseReference,
                                                   @PathVariable("eventId") final Long eventId) {
         Instant start = Instant.now();
-        CaseHistoryView caseView = getCaseHistoryViewOperation.execute(jurisdictionId, caseTypeId, caseReference,
-                                                                       eventId);
+        CaseHistoryView caseView = getCaseHistoryViewOperation.execute(caseReference, eventId);
         final Duration between = Duration.between(start, Instant.now());
         LOG.info("getCaseHistoryForEvent has been completed in {} millisecs...", between.toMillis());
         return caseView;
