@@ -33,7 +33,7 @@ public class CaseAccessService {
     private final CaseUserRepository caseUserRepository;
 
     private static final Pattern RESTRICT_GRANTED_ROLES_PATTERN
-        = Pattern.compile(".+-solicitor$|^citizen(-.*)?$|^letter-holder$");
+        = Pattern.compile(".+-solicitor$|.+-panelmember$|^citizen(-.*)?$|^letter-holder$");
 
     public CaseAccessService(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
                              CaseUserRepository caseUserRepository) {
