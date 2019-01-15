@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.v2.internal.controller;
 
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -15,8 +17,6 @@ import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedFindWorkbasketInputO
 import uk.gov.hmcts.ccd.domain.service.aggregated.FindWorkbasketInputOperation;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.internal.resource.UIWorkbasketInputsResource;
-
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
 @RestController
 @RequestMapping(path = "/internal")
