@@ -1,16 +1,15 @@
 package uk.gov.hmcts.ccd.data.definition;
 
+import javax.inject.Inject;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-
-import javax.inject.Inject;
 
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
 import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputDefinition;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 public class HttpUIDefinitionGatewayTest extends WireMockBaseTest {
 
