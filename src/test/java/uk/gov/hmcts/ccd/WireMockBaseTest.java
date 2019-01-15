@@ -27,6 +27,7 @@ public abstract class WireMockBaseTest extends BaseTest {
     public void initMock() throws IOException {
         super.initMock();
         final String hostUrl = "http://localhost:" + wiremockPort;
+
         LOG.info("Wire mock test, host url is {}", hostUrl);
 
         ReflectionTestUtils.setField(applicationParams, "caseDefinitionHost", hostUrl);
