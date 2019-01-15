@@ -39,11 +39,13 @@ public class DefaultGetCaseHistoryViewOperation extends AbstractDefaultGetCaseVi
     }
 
     @Override
-    public CaseHistoryView execute(String jurisdictionId, String caseTypeId, String caseReference, Long eventId) {
+    public CaseHistoryView execute(String caseReference, Long eventId) {
         validateCaseReference(caseReference);
 
-        CaseType caseType = getCaseType(jurisdictionId, caseTypeId);
         CaseDetails caseDetails = getCaseDetails(caseReference);
+        String jurisdictionId = caseDetails.getJurisdiction();
+        String caseTypeId = caseDetails.getCaseTypeId();
+        CaseType caseType = getCaseType(jurisdictionId, caseTypeId);
 
         AuditEvent event = getEventsOperation.getEvent(jurisdictionId, caseTypeId, eventId).orElseThrow(
             () -> new ResourceNotFoundException(EVENT_NOT_FOUND));

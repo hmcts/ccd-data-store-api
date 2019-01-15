@@ -1,5 +1,22 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.arrayWithSize;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItemInArray;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTabCollectionBuilder.newCaseTabCollection;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,20 +35,6 @@ import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import static java.util.Arrays.asList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTabCollectionBuilder.newCaseTabCollection;
 
 class DefaultGetCaseHistoryViewOperationTest {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
@@ -70,6 +73,7 @@ class DefaultGetCaseHistoryViewOperationTest {
 
         caseDetails = new CaseDetails();
         caseDetails.setCaseTypeId(CASE_TYPE_ID);
+        caseDetails.setJurisdiction(JURISDICTION_ID);
         caseDetails.setReference(new Long(CASE_REFERENCE));
         caseDetails.setState(STATE);
         doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
@@ -106,8 +110,7 @@ class DefaultGetCaseHistoryViewOperationTest {
         event1.setData(dataMap);
         doReturn(Optional.of(event1)).when(getEventsOperation).getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
 
-        CaseHistoryView caseHistoryView = defaultGetCaseHistoryViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID,
-            CASE_REFERENCE, EVENT_ID);
+        CaseHistoryView caseHistoryView = defaultGetCaseHistoryViewOperation.execute(CASE_REFERENCE, EVENT_ID);
 
         assertAll(() -> verify(getEventsOperation).getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID),
                   () -> assertThat(caseHistoryView.getTabs()[0].getFields(), arrayWithSize(1)),
@@ -124,7 +127,7 @@ class DefaultGetCaseHistoryViewOperationTest {
         doReturn(false).when(uidService).validateUID(CASE_REFERENCE);
 
         assertThrows(BadRequestException.class,
-            () -> defaultGetCaseHistoryViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, EVENT_ID));
+            () -> defaultGetCaseHistoryViewOperation.execute(CASE_REFERENCE, EVENT_ID));
     }
 
     @Test
@@ -133,7 +136,7 @@ class DefaultGetCaseHistoryViewOperationTest {
         doReturn(Optional.empty()).when(getCaseOperation).execute(CASE_REFERENCE);
 
         assertThrows(ResourceNotFoundException.class,
-            () -> defaultGetCaseHistoryViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, EVENT_ID));
+            () -> defaultGetCaseHistoryViewOperation.execute(CASE_REFERENCE, EVENT_ID));
     }
 
     @Test
@@ -142,7 +145,7 @@ class DefaultGetCaseHistoryViewOperationTest {
         doReturn(Optional.empty()).when(getEventsOperation).getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
 
         assertThrows(ResourceNotFoundException.class,
-            () -> defaultGetCaseHistoryViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, EVENT_ID));
+            () -> defaultGetCaseHistoryViewOperation.execute(CASE_REFERENCE, EVENT_ID));
     }
 
     private Map<String, JsonNode> buildData(String... dataFieldIds) {

@@ -1,10 +1,10 @@
 package uk.gov.hmcts.ccd.domain.model.draft;
 
+import java.time.LocalDateTime;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.ToString;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
-
-import java.time.LocalDateTime;
 
 @ToString
 public class DraftResponse {
