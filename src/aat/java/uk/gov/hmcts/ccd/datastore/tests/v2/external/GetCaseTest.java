@@ -1,5 +1,10 @@
 package uk.gov.hmcts.ccd.datastore.tests.v2.external;
 
+import static java.lang.Boolean.FALSE;
+import static org.hamcrest.Matchers.equalTo;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CASE_TYPE;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.JURISDICTION;
+
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,11 +15,6 @@ import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FullCase;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event;
 import uk.gov.hmcts.ccd.v2.V2;
-
-import static java.lang.Boolean.FALSE;
-import static org.hamcrest.Matchers.equalTo;
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CASE_TYPE;
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.JURISDICTION;
 
 @DisplayName("Get case by reference")
 class GetCaseTest extends BaseTest {

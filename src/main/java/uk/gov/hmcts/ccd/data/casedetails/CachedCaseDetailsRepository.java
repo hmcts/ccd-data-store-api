@@ -1,12 +1,5 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
-import org.springframework.web.context.annotation.RequestScope;
-import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
-import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +9,13 @@ import java.util.stream.Collectors;
 
 import static com.google.common.collect.Maps.newHashMap;
 import static java.lang.String.format;
+
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+import org.springframework.web.context.annotation.RequestScope;
+import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
+import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
 @Service
 @Qualifier(CachedCaseDetailsRepository.QUALIFIER)

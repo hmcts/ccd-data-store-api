@@ -1,5 +1,14 @@
 package uk.gov.hmcts.ccd.datastore.tests.v2.external;
 
+import static java.lang.Boolean.FALSE;
+import static org.hamcrest.Matchers.*;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CASE_TYPE;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event.CREATE;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event.START_PROGRESS;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event.create;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.JURISDICTION;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.State.TODO;
+
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.restassured.specification.RequestSpecification;
@@ -11,13 +20,6 @@ import uk.gov.hmcts.ccd.datastore.tests.BaseTest;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FullCase;
 import uk.gov.hmcts.ccd.v2.V2;
-
-import static java.lang.Boolean.FALSE;
-import static org.hamcrest.Matchers.*;
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CASE_TYPE;
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event.*;
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.JURISDICTION;
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.State.TODO;
 
 @DisplayName("Get start trigger by case type and event ids")
 class GetStartTriggerTest extends BaseTest {

@@ -1,5 +1,15 @@
 package uk.gov.hmcts.ccd.datastore.tests.v2.internal;
 
+import java.util.List;
+import java.util.Map;
+
+import static java.lang.Boolean.FALSE;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CASE_TYPE;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event.UPDATE;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.JURISDICTION;
+
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,16 +21,6 @@ import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.State;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Tab;
 import uk.gov.hmcts.ccd.v2.V2;
-
-import java.util.List;
-import java.util.Map;
-
-import static java.lang.Boolean.FALSE;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CASE_TYPE;
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event.UPDATE;
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.JURISDICTION;
 
 @DisplayName("Get UI case view by reference")
 class GetUICaseViewTest extends BaseTest {
@@ -102,7 +102,7 @@ class GetUICaseViewTest extends BaseTest {
             .body("event.event_id", equalTo(UPDATE))
 
             .rootPath("_links")
-            .body("self.href", equalTo(String.format("%s/internal/cases/%s/events/%s", aat.getTestUrl(), caseReference, UPDATE)))
+            .body("self.href", equalTo(String.format("%s/internal/cases/%s/events/%s", aat.getTestUrl(), caseReference, eventId)))
         ;
     }
 
