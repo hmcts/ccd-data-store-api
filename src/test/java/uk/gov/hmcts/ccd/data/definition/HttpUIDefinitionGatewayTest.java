@@ -32,24 +32,4 @@ public class HttpUIDefinitionGatewayTest extends WireMockBaseTest {
             .getWorkbasketInputDefinitions(VERSION, "TestAddressBookCase");
         assertThat(workbasketInputDefinitions.getFields().size(), is(3));
     }
-
-    @Test(expected = ServiceException.class)
-    public void shouldGetServiceExceptionWhenGettingWorkbasketInputDefinitions() {
-            httpUIDefinitionGateway.getWorkbasketInputDefinitions(VERSION, "TestAddressBookCase");
-    }
-
-    @Test(expected = ServiceException.class)
-    public void shouldGetServiceExceptionWhenGettingWorkbasketResults() {
-            httpUIDefinitionGateway.getWorkBasketResult(VERSION, "TestAddressBookCase");
-    }
-
-    @Test(expected = ServiceException.class)
-    public void shouldGetServiceExceptionWhenGettingSearchInputs() {
-        httpUIDefinitionGateway.getWorkbasketInputDefinitions(VERSION, "TestAddressBookCase");
-    }
-
-    @Test(expected = ServiceException.class)
-    public void shouldGetServiceExceptionWhenGettingSearchResults() {
-        httpUIDefinitionGateway.getSearchResult(VERSION, "TestAddressBookCase");
-    }
 }
