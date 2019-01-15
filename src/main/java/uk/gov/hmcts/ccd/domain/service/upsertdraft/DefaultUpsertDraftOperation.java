@@ -17,6 +17,7 @@ import uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDraftRequest;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 @Service
