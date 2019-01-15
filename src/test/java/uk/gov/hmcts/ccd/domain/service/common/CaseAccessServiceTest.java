@@ -93,6 +93,72 @@ class CaseAccessServiceTest {
     }
 
     @Nested
+    @DisplayName("when user is from local authority")
+    class WhenLocalAuthority {
+
+        private final String[] ROLES = {
+            "caseworker-superdupajurisdiction-localAuthority"
+        };
+
+        @BeforeEach
+        void setUp() {
+            withRoles(ROLES);
+        }
+
+        @Test
+        @DisplayName("should return true if access was granted")
+        void userHasSolicitorRoleAndAccessGranted_caseVisible() {
+            assertAccessGranted(caseGranted());
+        }
+
+        @Test
+        @DisplayName("should return false if access was revoked")
+        void userHasSolicitorRoleAndAccessRevoked_caseNotVisible() {
+            assertAccessRevoked(caseRevoked());
+        }
+
+        @Test
+        @DisplayName("should give GRANTED access level")
+        void accessLevel() {
+            final AccessLevel accessLevel = caseAccessService.getAccessLevel(serviceAndUserDetails(ROLES));
+            assertThat(accessLevel, equalTo(AccessLevel.GRANTED));
+        }
+    }
+
+    @Nested
+    @DisplayName("when user is not from local authority")
+    class WhenNotLocalAuthority {
+
+        private final String[] ROLES = {
+            "caseworker-publiclaw-localauthority"
+        };
+
+        @BeforeEach
+        void setUp() {
+            withRoles(ROLES);
+        }
+
+        @Test
+        @DisplayName("should return true if access was granted")
+        void shouldGrantAccessToGrantedCase() {
+            assertAccessGrantedWithoutChecks(caseGranted());
+        }
+
+        @Test
+        @DisplayName("should return true if access was revoked")
+        void shouldGrantAccessToRevokedCase() {
+            assertAccessGrantedWithoutChecks(caseRevoked());
+        }
+
+        @Test
+        @DisplayName("should give ALL access level")
+        void accessLevel() {
+            final AccessLevel accessLevel = caseAccessService.getAccessLevel(serviceAndUserDetails(ROLES));
+            assertThat(accessLevel, equalTo(AccessLevel.ALL));
+        }
+    }
+
+    @Nested
     @DisplayName("when user is a citizen")
     class whenCitizen {
 
