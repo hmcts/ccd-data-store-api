@@ -1,5 +1,12 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
@@ -8,13 +15,9 @@ import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
 /**
  * Check access to a case for the current user.
@@ -66,6 +69,21 @@ public class CaseAccessService {
         }
 
         return Optional.empty();
+    }
+
+    public Set<String> getCaseRoles(String caseId) {
+        return caseUserRepository
+            .findCaseRoles(Long.valueOf(caseId), userRepository.getUserId())
+            .stream()
+            .collect(Collectors.toSet());
+    }
+
+    public Set<String> getUserRoles() {
+        Set<String> userRoles = userRepository.getUserRoles();
+        if (userRoles == null) {
+            throw new ValidationException("Cannot find user roles for the user");
+        }
+        return userRoles;
     }
 
     private Boolean accessGranted(CaseDetails caseDetails, IDAMProperties currentUser) {

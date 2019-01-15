@@ -29,6 +29,8 @@ import uk.gov.hmcts.ccd.domain.service.createevent.MidEventCallback;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseDataResource;
 
+@DisplayName("CaseDataValidatorControllerTest")
+
 class CaseDataValidatorControllerTest {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private static final ObjectMapper MAPPER = new ObjectMapper();
