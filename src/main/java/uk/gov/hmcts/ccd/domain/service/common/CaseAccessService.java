@@ -1,10 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.regex.Pattern;
-import java.util.stream.Stream;
-
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
@@ -15,6 +10,11 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 /**
  * Check access to a case for the current user.
@@ -33,7 +33,7 @@ public class CaseAccessService {
     private final CaseUserRepository caseUserRepository;
 
     private static final Pattern RESTRICT_GRANTED_ROLES_PATTERN
-        = Pattern.compile(".+-solicitor$|^citizen(-.*)?$|^letter-holder$");
+        = Pattern.compile(".+-solicitor$|^citizen(-.*)?$|^letter-holder$|^caseworker-.+-localAuthority$");
 
     public CaseAccessService(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
                              CaseUserRepository caseUserRepository) {
