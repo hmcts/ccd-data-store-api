@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
@@ -103,6 +104,12 @@ public class AccessControlService {
             }
         }
         return true;
+    }
+
+    public boolean canAccessCaseViewFieldWithCriteria(final CaseViewField caseViewField,
+                                                      final Set<String> userRoles,
+                                                      final Predicate<AccessControlList> criteria) {
+        return hasAccessControlList(userRoles, criteria, caseViewField.getAccessControlLists());
     }
 
     public boolean canAccessCaseFieldsForUpsert(final JsonNode newData,

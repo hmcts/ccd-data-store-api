@@ -1,5 +1,14 @@
 package uk.gov.hmcts.ccd.datastore.tests.v2.external;
 
+import java.util.function.Supplier;
+
+import static java.lang.Boolean.FALSE;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.equalTo;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.*;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CASE_TYPE;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event.CREATE;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,15 +23,6 @@ import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CaseData;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.v2.V2;
-
-import java.util.function.Supplier;
-
-import static java.lang.Boolean.FALSE;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.equalTo;
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.*;
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CASE_TYPE;
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event.CREATE;
 
 @DisplayName("Get UI start trigger by case type and event ids")
 class GetCaseValidatorTest extends BaseTest {

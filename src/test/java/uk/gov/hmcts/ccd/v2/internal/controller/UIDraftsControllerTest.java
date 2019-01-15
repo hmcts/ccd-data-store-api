@@ -1,5 +1,14 @@
 package uk.gov.hmcts.ccd.v2.internal.controller;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.newDraftResponse;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -17,15 +26,6 @@ import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseViewOperation;
 import uk.gov.hmcts.ccd.domain.service.upsertdraft.UpsertDraftOperation;
 import uk.gov.hmcts.ccd.v2.internal.resource.UICaseViewResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.UIDraftResource;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.newDraftResponse;
 
 class UIDraftsControllerTest {
     private static final String CASE_REFERENCE = "1234123412341238";

@@ -1,5 +1,8 @@
 package uk.gov.hmcts.ccd.datastore.tests.functional.elasticsearch;
 
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.TEXT;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.State;
+
 import io.restassured.response.ValidatableResponse;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -9,9 +12,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.TestData;
 import uk.gov.hmcts.ccd.datastore.tests.helper.elastic.ElasticsearchTestDataLoaderExtension;
-
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.TEXT;
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.State;
 
 @ExtendWith(ElasticsearchTestDataLoaderExtension.class)
 public class ElasticSearchTextFieldTest extends ElasticsearchBaseTest {

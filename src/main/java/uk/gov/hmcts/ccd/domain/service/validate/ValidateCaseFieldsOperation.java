@@ -1,10 +1,10 @@
 package uk.gov.hmcts.ccd.domain.service.validate;
 
+import java.util.Map;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
-
-import java.util.Map;
 
 public interface ValidateCaseFieldsOperation {
     Map<String, JsonNode> validateCaseDetails(String caseTypeId,
