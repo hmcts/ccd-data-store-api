@@ -60,7 +60,7 @@ class CaseAccessServiceTest {
 
     @Nested
     @DisplayName("when user is a solicitor")
-    class WhenSolicitor {
+    class whenSolicitor {
 
         private final String[] ROLES = {
             "somethingThatIsNotASolicitor",
@@ -74,13 +74,13 @@ class CaseAccessServiceTest {
 
         @Test
         @DisplayName("should return true if access was granted")
-        void userHasSolicitorRoleAndAccessGrantedCaseVisible() {
+        void userHasSolicitorRoleAndAccessGranted_caseVisible() {
             assertAccessGranted(caseGranted());
         }
 
         @Test
         @DisplayName("should return false if access was revoked")
-        void userHasSolicitorRoleAndAccessRevokedCaseNotVisible() {
+        void userHasSolicitorRoleAndAccessRevoked_caseNotVisible() {
             assertAccessRevoked(caseRevoked());
         }
 
@@ -107,13 +107,13 @@ class CaseAccessServiceTest {
 
         @Test
         @DisplayName("should return true if access was granted")
-        void userHasSolicitorRoleAndAccessGrantedCaseVisible() {
+        void userHasSolicitorRoleAndAccessGranted_caseVisible() {
             assertAccessGranted(caseGranted());
         }
 
         @Test
         @DisplayName("should return false if access was revoked")
-        void userHasSolicitorRoleAndAccessRevokedCaseNotVisible() {
+        void userHasSolicitorRoleAndAccessRevoked_caseNotVisible() {
             assertAccessRevoked(caseRevoked());
         }
 
@@ -160,7 +160,7 @@ class CaseAccessServiceTest {
 
     @Nested
     @DisplayName("when user is a panel member")
-    class WhenPanelMember {
+    class whenPanelMember {
 
         private final String[] ROLES = {
             "other",
@@ -174,13 +174,13 @@ class CaseAccessServiceTest {
 
         @Test
         @DisplayName("should return true if access was granted")
-        void userHasPanelMemberRoleAndAccessGrantedCaseVisible() {
+        void userHasPanelMemberRoleAndAccessGranted_caseVisible() {
             assertAccessGranted(caseGranted());
         }
 
         @Test
         @DisplayName("should return false if access was revoked")
-        void userHasPanelMemberRoleAndAccessRevokedCaseNotVisible() {
+        void userHasPanelMemberRoleAndAccessRevoked_caseNotVisible() {
             assertAccessRevoked(caseRevoked());
         }
 
@@ -194,7 +194,7 @@ class CaseAccessServiceTest {
 
     @Nested
     @DisplayName("when user is a citizen")
-    class WhenCitizen {
+    class whenCitizen {
 
         private final String[] ROLES = {
             "citizen",
@@ -208,13 +208,13 @@ class CaseAccessServiceTest {
 
         @Test
         @DisplayName("should return true if access was granted")
-        void userHasCitizenRoleAndAccessGrantedCaseVisible() {
+        void userHasCitizenRoleAndAccessGranted_caseVisible() {
             assertAccessGranted(caseGranted());
         }
 
         @Test
         @DisplayName("should return false if access was revoked")
-        void userHasCitizenRoleAndAccessRevokedCaseNotVisible() {
+        void userHasCitizenRoleAndAccessRevoked_caseNotVisible() {
             assertAccessRevoked(caseRevoked());
         }
 
@@ -236,7 +236,7 @@ class CaseAccessServiceTest {
 
     @Nested
     @DisplayName("when user is a letter-holder")
-    class WhenLetterHolder {
+    class whenLetterHolder {
 
         private final String[] ROLES = {
             "letter-holder"
@@ -249,13 +249,13 @@ class CaseAccessServiceTest {
 
         @Test
         @DisplayName("should return true if access was granted")
-        void userHasLetterHolderRoleAndAccessGrantedCaseVisible() {
+        void userHasLetterHolderRoleAndAccessGranted_caseVisible() {
             assertAccessGranted(caseGranted());
         }
 
         @Test
         @DisplayName("should return false if access was revoked")
-        void userHasLetterHolderRoleAndAccessRevokedCaseNotVisible() {
+        void userHasLetterHolderRoleAndAccessRevoked_caseNotVisible() {
             assertAccessRevoked(caseRevoked());
         }
 
@@ -269,7 +269,7 @@ class CaseAccessServiceTest {
 
     @Nested
     @DisplayName("when user is a citizen-loaX")
-    class WhenCitizenLoaX {
+    class whenCitizenLoaX {
 
         private final String[] ROLES = {
             "citizen-loaX"
@@ -282,13 +282,13 @@ class CaseAccessServiceTest {
 
         @Test
         @DisplayName("should return true if access was granted")
-        void userHasCitizenRoleAndAccessGrantedCaseVisible() {
+        void userHasCitizenRoleAndAccessGranted_caseVisible() {
             assertAccessGranted(caseGranted());
         }
 
         @Test
         @DisplayName("should return false if access was revoked")
-        void userHasCitizenRoleAndAccessRevokedCaseNotVisible() {
+        void userHasCitizenRoleAndAccessRevoked_caseNotVisible() {
             assertAccessRevoked(caseRevoked());
         }
 
@@ -302,7 +302,7 @@ class CaseAccessServiceTest {
 
     @Nested
     @DisplayName("when user is NOT a citizen or a solicitor")
-    class WhenOther {
+    class whenOther {
 
         private final String[] ROLES = {
             "caseworker-divorce",
