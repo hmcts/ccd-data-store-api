@@ -1,5 +1,20 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -8,38 +23,79 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.jupiter.api.Assertions.*;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 class CaseServiceTest {
 
     private static final String JURISDICTION = "SSCS";
     private static final String STATE = "CreatedState";
-    private static final Long REFERENCE = 1234123412341236L;
+    private static final String CASE_REFERENCE = "1234123412341236";
+    private static final Long REFERENCE = Long.valueOf(CASE_REFERENCE);
     private static final String DATA_PERSON = "Person";
     private static final String DATA_NAMES = "Names";
     private static final String DATA_FNAME = "FirstName";
     private static final String PERSON_FNAME = "Jack";
     private static final String OTHER_NAME = "John";
+    private static final String CASE_ID = "299";
 
     private CaseDataService caseDataService;
+
+    @Mock
+    private CaseDetailsRepository caseDetailsRepository;
+
+    @Mock
+    private UIDService uidService;
+
     private CaseService caseService;
+    private CaseDetails caseDetails;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
+        doReturn(true).when(uidService).validateUID(CASE_REFERENCE);
+        caseDetails = buildCaseDetails();
+        caseDetails.setId(CASE_ID);
+        doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(JURISDICTION, REFERENCE);
 
         caseDataService = new CaseDataService();
-        caseService = new CaseService(caseDataService);
+        caseService = new CaseService(caseDataService, caseDetailsRepository, uidService);
+    }
+
+    @Nested
+    @DisplayName("getCaseDetails()")
+    class GetCaseDetails {
+        @Test
+        @DisplayName("should return caseDetails")
+        void getCaseDetails() {
+
+            CaseDetails result = caseService.getCaseDetails(JURISDICTION, CASE_REFERENCE);
+            assertAll(
+                () -> assertThat(result.getId(), is(caseDetails.getId())),
+                () -> verify(caseDetailsRepository).findByReference(JURISDICTION, REFERENCE),
+                () -> verify(uidService).validateUID(CASE_REFERENCE)
+            );
+        }
+
+        @Test
+        @DisplayName("should fail for bad CASE_REFERENCE")
+        void shoudThrowBadRequestException() {
+            doThrow(new BadRequestException("...")).when(uidService).validateUID(CASE_REFERENCE);
+
+            assertThrows(BadRequestException.class, () -> caseService.getCaseDetails(JURISDICTION, CASE_REFERENCE));
+        }
+
+        @Test
+        @DisplayName("should fail when case isn't found in the DB")
+        void shoudThrowResourceNotFoundException() {
+            doReturn(Optional.empty()).when(caseDetailsRepository).findByReference(JURISDICTION, REFERENCE);
+
+            assertThrows(ResourceNotFoundException.class, () -> caseService.getCaseDetails(JURISDICTION, CASE_REFERENCE));
+        }
     }
 
     @Nested
