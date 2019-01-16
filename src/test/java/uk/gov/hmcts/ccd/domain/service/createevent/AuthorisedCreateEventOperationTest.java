@@ -32,7 +32,6 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
@@ -40,6 +39,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
@@ -59,6 +59,7 @@ class AuthorisedCreateEventOperationTest {
     private static final String UID = "123";
     private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_TYPE_ID = "Grant";
+    private static final String CASE_ID = "26";
     private static final String CASE_REFERENCE = "123456789012345";
     private static final String STATE_ID = "STATE_1";
     private static final Event EVENT = anEvent().build();
@@ -93,7 +94,7 @@ class AuthorisedCreateEventOperationTest {
     private AccessControlService accessControlService;
 
     @Mock
-    private UserRepository userRepository;
+    private CaseAccessService caseAccessService;
 
     private AuthorisedCreateEventOperation authorisedCreateEventOperation;
     private CaseDetails classifiedCase;
@@ -107,12 +108,17 @@ class AuthorisedCreateEventOperationTest {
         MockitoAnnotations.initMocks(this);
         EVENT.setEventId(EVENT_ID);
         authorisedCreateEventOperation = new AuthorisedCreateEventOperation(
-            createEventOperation, getCaseOperation, caseDefinitionRepository, accessControlService, userRepository);
+            createEventOperation,
+            getCaseOperation,
+            caseDefinitionRepository,
+            accessControlService,
+            caseAccessService);
 
         CaseDetails existingCase = new CaseDetails();
         Map<String, JsonNode> existingData = Maps.newHashMap();
         existingCase.setState(STATE_ID);
         existingCase.setData(existingData);
+        existingCase.setId(CASE_ID);
         when(getCaseOperation.execute(CASE_REFERENCE)).thenReturn(Optional.of(existingCase));
 
         classifiedCase = new CaseDetails();
@@ -126,7 +132,7 @@ class AuthorisedCreateEventOperationTest {
         caseType.setEvents(events);
         caseType.setCaseFields(caseFields);
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseType);
-        when(userRepository.getUserRoles()).thenReturn(USER_ROLES);
+        when(caseAccessService.getUserRoles()).thenReturn(USER_ROLES);
         when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseType), eq(USER_ROLES), eq(CAN_UPDATE))).thenReturn(
             true);
         when(accessControlService.canAccessCaseStateWithCriteria(eq(STATE_ID), eq(caseType), eq(USER_ROLES), eq(CAN_UPDATE))).thenReturn(
@@ -205,14 +211,14 @@ class AuthorisedCreateEventOperationTest {
                                                                                   CASE_TYPE_ID,
                                                                                   CASE_REFERENCE,
                                                                                   CASE_DATA_CONTENT);
-        InOrder inOrder = inOrder(caseDefinitionRepository, userRepository, getCaseOperation,
+        InOrder inOrder = inOrder(caseDefinitionRepository, caseAccessService, getCaseOperation,
                                   createEventOperation, accessControlService);
         assertAll(
             () -> assertThat(output, sameInstance(classifiedCase)),
             () -> assertThat(output.getData(), is(equalTo(MAPPER.convertValue(authorisedCaseNode, STRING_JSON_MAP)))),
             () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
-            () -> inOrder.verify(userRepository).getUserRoles(),
             () -> inOrder.verify(getCaseOperation).execute(CASE_REFERENCE),
+            () -> inOrder.verify(caseAccessService).getUserRoles(),
             () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseType),
                                                                                      eq(USER_ROLES),
                                                                                      eq(CAN_UPDATE)),
@@ -276,7 +282,7 @@ class AuthorisedCreateEventOperationTest {
     @DisplayName("should fail if user roles not found")
     void shouldFailIfNoUserRolesFound() {
 
-        doReturn(null).when(userRepository).getUserRoles();
+        doReturn(Collections.EMPTY_SET).when(caseAccessService).getUserRoles();
 
         assertThrows(ValidationException.class, () -> authorisedCreateEventOperation.createCaseEvent(UID,
                                                                                                      JURISDICTION_ID,
@@ -289,8 +295,7 @@ class AuthorisedCreateEventOperationTest {
     @DisplayName("should fail if no update case access")
     void shouldFailIfNoUpdateCaseAccess() {
 
-        when(accessControlService.canAccessCaseTypeWithCriteria(caseType, USER_ROLES, CAN_UPDATE)).thenReturn(
-            false);
+        when(accessControlService.canAccessCaseTypeWithCriteria(caseType, USER_ROLES, CAN_UPDATE)).thenReturn(false);
 
         assertThrows(ResourceNotFoundException.class, () -> authorisedCreateEventOperation.createCaseEvent(UID,
                                                                                                            JURISDICTION_ID,
@@ -370,5 +375,4 @@ class AuthorisedCreateEventOperationTest {
                                                                                        CASE_DATA_CONTENT);
         assertThat(caseDetails, is(nullValue()));
     }
-
 }

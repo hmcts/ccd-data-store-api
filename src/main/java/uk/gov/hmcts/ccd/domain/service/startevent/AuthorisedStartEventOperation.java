@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.startevent;
 
+import java.util.Collections;
+
 import java.util.HashMap;
 import java.util.Set;
 
@@ -9,6 +11,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_RE
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
@@ -17,13 +20,12 @@ import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
-import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -42,7 +44,7 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
     private final CaseDetailsRepository caseDetailsRepository;
     private final AccessControlService accessControlService;
     private final UIDService uidService;
-    private final UserRepository userRepository;
+    private final CaseAccessService caseAccessService;
     private final DraftGateway draftGateway;
 
     public AuthorisedStartEventOperation(@Qualifier("classified") final StartEventOperation startEventOperation,
@@ -50,15 +52,15 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
                                          @Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
                                          final AccessControlService accessControlService,
                                          final UIDService uidService,
-                                         @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
-                                         @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway) {
+                                         @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway,
+                                         CaseAccessService caseAccessService) {
 
         this.startEventOperation = startEventOperation;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.accessControlService = accessControlService;
         this.uidService = uidService;
-        this.userRepository = userRepository;
+        this.caseAccessService = caseAccessService;
         this.draftGateway = draftGateway;
     }
 
@@ -100,19 +102,20 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
         return caseType;
     }
 
-    private Set<String> getUserRoles() {
-        Set<String> userRoles = userRepository.getUserRoles();
-        if (userRoles == null) {
-            throw new ValidationException("Cannot find user roles for the user");
+    private Set<String> getCaseRoles(CaseDetails caseDetails) {
+        if (caseDetails == null || caseDetails.getId() == null || Draft.isDraft(caseDetails.getId())) {
+            return Collections.emptySet();
+        } else {
+            return caseAccessService.getCaseRoles(caseDetails.getId());
         }
-        return userRoles;
     }
+
 
     private StartEventTrigger verifyReadAccess(final String caseTypeId, final StartEventTrigger startEventTrigger) {
 
         final CaseType caseType = getCaseType(caseTypeId);
 
-        Set<String> userRoles = getUserRoles();
+        Set<String> userRoles = Sets.union(caseAccessService.getUserRoles(), getCaseRoles(startEventTrigger.getCaseDetails()));
 
         CaseDetails caseDetails = startEventTrigger.getCaseDetails();
 
