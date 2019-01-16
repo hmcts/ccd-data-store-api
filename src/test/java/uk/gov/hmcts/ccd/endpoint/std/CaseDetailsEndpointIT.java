@@ -439,7 +439,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     private int getPort() {
-        return wireMockRule.port();
+        return super.wiremockPort;
     }
 
     @Test
