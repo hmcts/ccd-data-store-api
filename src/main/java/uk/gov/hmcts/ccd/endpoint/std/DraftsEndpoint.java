@@ -1,5 +1,9 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
+import javax.transaction.Transactional;
+import java.time.Duration;
+import java.time.Instant;
+
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,10 +20,6 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetCaseViewFromDraftOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseViewOperation;
 import uk.gov.hmcts.ccd.domain.service.upsertdraft.UpsertDraftOperation;
-
-import javax.transaction.Transactional;
-import java.time.Duration;
-import java.time.Instant;
 
 @RestController
 @RequestMapping(path = "/",
@@ -62,7 +62,7 @@ public class DraftsEndpoint {
         @PathVariable("etid") final String eventTriggerId,
         @RequestBody final CaseDataContent caseDataContent) {
 
-        return upsertDraftOperation.executeSave(uid, jurisdictionId, caseTypeId, eventTriggerId, caseDataContent);
+        return upsertDraftOperation.executeSave(caseTypeId, caseDataContent);
     }
 
     @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-trigger/{etid}/drafts/{did}", method = RequestMethod.PUT)
@@ -87,7 +87,7 @@ public class DraftsEndpoint {
         @PathVariable("did") final String draftId,
         @RequestBody final CaseDataContent caseDataContent) {
 
-        return upsertDraftOperation.executeUpdate(uid, jurisdictionId, caseTypeId, eventTriggerId, draftId, caseDataContent);
+        return upsertDraftOperation.executeUpdate(caseTypeId, draftId, caseDataContent);
     }
 
     @Transactional
@@ -101,7 +101,7 @@ public class DraftsEndpoint {
                               @PathVariable("ctid") final String caseTypeId,
                               @PathVariable("did") final String did) {
         Instant start = Instant.now();
-        CaseView caseView = getDraftViewOperation.execute(jurisdictionId, caseTypeId, did);
+        CaseView caseView = getDraftViewOperation.execute(did);
         final Duration between = Duration.between(start, Instant.now());
         LOG.info("findDraft has been completed in {} millisecs...", between.toMillis());
         return caseView;

@@ -77,9 +77,9 @@ class QueryEndpointTest {
     @Test
     void shouldCallGetCaseViewOperation() {
         CaseView caseView = new CaseView();
-        doReturn(caseView).when(getCaseViewOperation).execute(any(), any(), any());
+        doReturn(caseView).when(getCaseViewOperation).execute(any());
         queryEndpoint.findCase("jurisdictionId", "caseTypeId", "caseId");
-        verify(getCaseViewOperation, times(1)).execute("jurisdictionId", "caseTypeId", "caseId");
+        verify(getCaseViewOperation, times(1)).execute("caseId");
     }
 
     @Test
@@ -93,20 +93,20 @@ class QueryEndpointTest {
     @Test
     void shouldCallFindWorkBasketOperation() {
         List<WorkbasketInput> workBasketResults = new ArrayList<>();
-        when(findWorkbasketInputOperation.execute("TEST", "TEST-CASE-TYPE", CAN_READ)).thenReturn(workBasketResults);
+        when(findWorkbasketInputOperation.execute("TEST-CASE-TYPE", CAN_READ)).thenReturn(workBasketResults);
         queryEndpoint.findWorkbasketInputDetails("22", "TEST", "TEST-CASE-TYPE");
-        verify(findWorkbasketInputOperation, times(1)).execute("TEST", "TEST-CASE-TYPE", CAN_READ);
+        verify(findWorkbasketInputOperation, times(1)).execute("TEST-CASE-TYPE", CAN_READ);
     }
 
     @Test
     void shouldCallGetCaseViewOperationWithEvent() {
         CaseHistoryView caseView = new CaseHistoryView();
-        doReturn(caseView).when(getCaseHistoryViewOperation).execute("jurisdictionId", "caseTypeId", "caseId", 11L);
+        doReturn(caseView).when(getCaseHistoryViewOperation).execute("caseId", 11L);
 
         CaseHistoryView response = queryEndpoint.getCaseHistoryForEvent("jurisdictionId", "caseTypeId", "caseId", 11L);
 
         assertSame(caseView, response);
-        verify(getCaseHistoryViewOperation, times(1)).execute("jurisdictionId", "caseTypeId", "caseId", 11L);
+        verify(getCaseHistoryViewOperation, times(1)).execute("caseId", 11L);
     }
 
     @Test

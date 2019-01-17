@@ -1,13 +1,13 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.ToString;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 @ToString
 public class CaseType implements Serializable {
@@ -133,5 +133,9 @@ public class CaseType implements Serializable {
         return this.events
             .stream()
             .anyMatch(caseEvent -> caseEvent.getCanSaveDraft() != null && caseEvent.getCanSaveDraft());
+    }
+
+    public boolean hasEventId(String eventId) {
+        return events.stream().anyMatch(event -> event.getId().equals(eventId));
     }
 }

@@ -30,7 +30,16 @@
             "validation_expr" : null,
             "security_label" : null,
             "live_from" : null,
-            "live_until" : null
+            "live_until" : null,
+            "acls": [
+              {
+                "role": "caseworker-probate-public",
+                "create": true,
+                "read": true,
+                "update": true,
+                "delete": false
+              }
+            ]
           },
           "order" : 1
         }, {
@@ -47,7 +56,16 @@
             "validation_expr" : null,
             "security_label" : null,
             "live_from" : null,
-            "live_until" : null
+            "live_until" : null,
+            "acls": [
+              {
+                "role": "caseworker-probate-public",
+                "create": true,
+                "read": true,
+                "update": true,
+                "delete": false
+              }
+            ]
           },
           "order" : 2
         }
@@ -72,7 +90,16 @@
               "validation_expr" : null,
               "security_label" : null,
               "live_from" : null,
-              "live_until" : null
+              "live_until" : null,
+              "acls": [
+                {
+                  "role": "caseworker-probate-public",
+                  "create": true,
+                  "read": true,
+                  "update": true,
+                  "delete": false
+                }
+              ]
             },
             "order" : 1
           }
@@ -97,7 +124,16 @@
               "validation_expr" : null,
               "security_label" : null,
               "live_from" : null,
-              "live_until" : null
+              "live_until" : null,
+              "acls": [
+                {
+                  "role": "caseworker-probate-public",
+                  "create": true,
+                  "read": true,
+                  "update": true,
+                  "delete": false
+                }
+              ]
             },
             "order" : 1
           }

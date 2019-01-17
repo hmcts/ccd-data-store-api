@@ -1,5 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.validate;
 
+import javax.inject.Inject;
+import java.util.Map;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -9,9 +12,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
-
-import javax.inject.Inject;
-import java.util.Map;
 
 @Service
 public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOperation {
@@ -43,7 +43,7 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
     }
 
     private boolean hasEventId(CaseType caseType, String eventId) {
-        return caseType.getEvents().stream().anyMatch(event -> event.getId().equals(eventId));
+        return caseType.hasEventId(eventId);
     }
 
     @Override

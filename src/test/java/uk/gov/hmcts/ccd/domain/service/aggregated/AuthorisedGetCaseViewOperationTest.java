@@ -22,6 +22,8 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetail
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewBuilder.aCaseView;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewTabBuilder.newCaseViewTab;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewTriggerBuilder.aViewTrigger;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.JurisdictionBuilder.newJurisdiction;
 
@@ -36,10 +38,7 @@ import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
-import uk.gov.hmcts.ccd.domain.model.aggregated.ProfileCaseState;
+import uk.gov.hmcts.ccd.domain.model.aggregated.*;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
@@ -82,12 +81,24 @@ class AuthorisedGetCaseViewOperationTest {
         .withEvent(CASE_EVENT_2)
         .build();
     private static final CaseViewType TEST_CASE_VIEW_TYPE = CaseViewType.createFrom(TEST_CASE_TYPE);
+    private static final CaseViewField FIELD_1 = aViewField().withId("FIELD_1").build();
+    private static final CaseViewField FIELD_2 = aViewField().withId("FIELD_2").build();
+    public static final CaseViewField FIELD_3 = aViewField().withId("FIELD_3").build();
+    public static final CaseViewField FIELD_4 = aViewField().withId("FIELD_4").build();
+    private static final CaseViewTab CASE_VIEW_TAB_1 = newCaseViewTab()
+        .addCaseViewField(FIELD_1)
+        .addCaseViewField(FIELD_2)
+        .addCaseViewField(FIELD_3)
+        .build();
+    private static final CaseViewTab CASE_VIEW_TAB_2 = newCaseViewTab().addCaseViewField(FIELD_4).build();
     private static final CaseView TEST_CASE_VIEW = aCaseView()
         .withCaseId(CASE_REFERENCE)
         .withState(caseState)
         .withCaseViewType(TEST_CASE_VIEW_TYPE)
         .withCaseViewTrigger(CASE_VIEW_TRIGGER)
         .withCaseViewTrigger(CASE_VIEW_TRIGGER_2)
+        .addCaseViewTab(CASE_VIEW_TAB_1)
+        .addCaseViewTab(CASE_VIEW_TAB_2)
         .build();
 
     @Mock
@@ -114,7 +125,11 @@ class AuthorisedGetCaseViewOperationTest {
         doReturn(TEST_CASE_TYPE).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         doReturn(USER_ROLES).when(userRepository).getUserRoles();
         doReturn(USER_ID).when(userRepository).getUserId();
-        doReturn(Optional.of(CASE_DETAILS)).when(caseDetailsRepository).findByReference(JURISDICTION_ID, Long.valueOf(CASE_REFERENCE));
+        doReturn(true).when(accessControlService).canAccessCaseViewFieldWithCriteria(FIELD_1, USER_ROLES, CAN_READ);
+        doReturn(true).when(accessControlService).canAccessCaseViewFieldWithCriteria(FIELD_2, USER_ROLES, CAN_READ);
+        doReturn(false).when(accessControlService).canAccessCaseViewFieldWithCriteria(FIELD_3, USER_ROLES, CAN_READ);
+        doReturn(false).when(accessControlService).canAccessCaseViewFieldWithCriteria(FIELD_4, USER_ROLES, CAN_READ);
+        doReturn(Optional.of(CASE_DETAILS)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
 
         TEST_CASE_VIEW.setCaseType(TEST_CASE_VIEW_TYPE);
 
@@ -127,11 +142,37 @@ class AuthorisedGetCaseViewOperationTest {
         final CaseView expectedCaseView = new CaseView();
         doReturn(expectedCaseView).when(authorisedGetCaseViewOperation).execute(CASE_REFERENCE);
 
-        final CaseView actualCaseView = authorisedGetCaseViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+        final CaseView actualCaseView = authorisedGetCaseViewOperation.execute(CASE_REFERENCE);
 
         assertAll(
             () -> verify(authorisedGetCaseViewOperation).execute(CASE_REFERENCE),
             () -> assertThat(actualCaseView, sameInstance(expectedCaseView))
+        );
+    }
+
+    @Test
+    @DisplayName("should remove fields from tabs based on CRUD)")
+    void shouldRemoveFieldsByCrud() {
+        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES, CAN_READ);
+
+        final CaseView actualCaseView = authorisedGetCaseViewOperation.execute(CASE_REFERENCE);
+
+        assertAll(
+            () -> verify(authorisedGetCaseViewOperation).execute(CASE_REFERENCE),
+            () -> assertThat(actualCaseView.getTabs()[0].getFields().length, is(2))
+        );
+    }
+
+    @Test
+    @DisplayName("should remove empty tabs)")
+    void shouldRemoveEmptyTabs() {
+        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES, CAN_READ);
+
+        final CaseView actualCaseView = authorisedGetCaseViewOperation.execute(CASE_REFERENCE);
+
+        assertAll(
+            () -> verify(authorisedGetCaseViewOperation).execute(CASE_REFERENCE),
+            () -> assertThat(actualCaseView.getTabs().length, is(1))
         );
     }
 
@@ -221,9 +262,17 @@ class AuthorisedGetCaseViewOperationTest {
     }
 
     @Test
+    @DisplayName("should return Case")
+    void shouldReturnCase() {
+        CaseDetails caseDetails = authorisedGetCaseViewOperation.getCase(CASE_REFERENCE);
+
+        assertThat(caseDetails, is(CASE_DETAILS));
+    }
+
+    @Test
     @DisplayName("should return Case ID")
     void shouldReturnCaseId() {
-        String caseId = authorisedGetCaseViewOperation.getCaseId(JURISDICTION_ID, CASE_REFERENCE);
+        String caseId = authorisedGetCaseViewOperation.getCaseId(CASE_REFERENCE);
 
         assertThat(caseId, is(CASE_ID));
     }
@@ -231,8 +280,8 @@ class AuthorisedGetCaseViewOperationTest {
     @Test
     @DisplayName("should throw exception when case reference is invalid")
     void shouldThrowException() {
-        doReturn(Optional.empty()).when(caseDetailsRepository).findByReference(JURISDICTION_ID,Long.valueOf(CASE_REFERENCE));
+        doReturn(Optional.empty()).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
 
-        assertThrows(CaseNotFoundException.class, () -> authorisedGetCaseViewOperation.getCaseId(JURISDICTION_ID, CASE_REFERENCE));
+        assertThrows(CaseNotFoundException.class, () -> authorisedGetCaseViewOperation.getCaseId(CASE_REFERENCE));
     }
 }

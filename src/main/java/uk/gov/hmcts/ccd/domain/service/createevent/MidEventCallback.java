@@ -1,5 +1,10 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
+import java.util.Map;
+import java.util.Optional;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -19,11 +24,6 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
-
-import java.util.Map;
-import java.util.Optional;
-
-import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Service
 public class MidEventCallback {

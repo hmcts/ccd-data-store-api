@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.startevent;
 
+import java.util.HashMap;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -15,8 +17,6 @@ import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
-
-import java.util.HashMap;
 
 @Service
 @Qualifier("classified")

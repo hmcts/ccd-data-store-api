@@ -1,5 +1,13 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.util.*;
+import java.util.function.Consumer;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Arrays.asList;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -19,14 +27,6 @@ import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
-
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.util.*;
-import java.util.function.Consumer;
-
-import static com.google.common.collect.Lists.newArrayList;
-import static java.util.Arrays.asList;
 
 public class TestBuildersUtil {
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -453,6 +453,7 @@ public class TestBuildersUtil {
 
         private CaseViewBuilder() {
             this.caseView = new CaseView();
+            this.caseView.setTabs(new CaseViewTab[0]);
         }
 
         public static CaseViewBuilder aCaseView() {
@@ -479,9 +480,42 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public CaseViewBuilder addCaseViewTab(CaseViewTab caseViewTab) {
+            CaseViewTab[] newTabs = new CaseViewTab[caseView.getTabs().length + 1];
+            System.arraycopy(caseView.getTabs(), 0, newTabs, 0, caseView.getTabs().length);
+            newTabs[newTabs.length - 1] = caseViewTab;
+            caseView.setTabs(newTabs);
+            return this;
+        }
+
         public CaseView build() {
             caseView.setTriggers(caseViewTriggers.toArray(new CaseViewTrigger[]{}));
             return caseView;
+        }
+    }
+
+    public static class CaseViewTabBuilder {
+        private final CaseViewTab caseViewTab;
+
+        private CaseViewTabBuilder() {
+            this.caseViewTab = new CaseViewTab();
+            caseViewTab.setFields(new CaseViewField[0]);
+        }
+
+        public static CaseViewTabBuilder newCaseViewTab() {
+            return new CaseViewTabBuilder();
+        }
+
+        public CaseViewTabBuilder addCaseViewField(CaseViewField caseViewField) {
+            CaseViewField[] newFields = new CaseViewField[caseViewTab.getFields().length + 1];
+            System.arraycopy(caseViewTab.getFields(), 0, newFields, 0, caseViewTab.getFields().length);
+            newFields[newFields.length - 1] = caseViewField;
+            caseViewTab.setFields(newFields);
+            return this;
+        }
+
+        public CaseViewTab build() {
+            return caseViewTab;
         }
     }
 
@@ -531,6 +565,11 @@ public class TestBuildersUtil {
 
         public AccessControlListBuilder withCreate(boolean create) {
             this.accessControlList.setCreate(create);
+            return this;
+        }
+
+        public AccessControlListBuilder withDelete(boolean delete) {
+            this.accessControlList.setDelete(delete);
             return this;
         }
 
@@ -598,6 +637,37 @@ public class TestBuildersUtil {
 
         public CaseEventBuilder withShowEventNotes(Boolean showEventNotes) {
             caseEvent.setShowEventNotes(showEventNotes);
+            return this;
+        }
+    }
+
+    public static class EventBuilder {
+        private final Event event;
+
+        private EventBuilder() {
+            this.event = new Event();
+        }
+
+        public static EventBuilder newEvent() {
+            return new EventBuilder();
+        }
+
+        public EventBuilder withEventId(String eventId) {
+            event.setEventId(eventId);
+            return this;
+        }
+
+        public Event build() {
+            return event;
+        }
+
+        public EventBuilder withSummary(String summary) {
+            event.setSummary(summary);
+            return this;
+        }
+
+        public EventBuilder withDescription(String description) {
+            event.setDescription(description);
             return this;
         }
     }
@@ -847,6 +917,7 @@ public class TestBuildersUtil {
 
     public static class CaseViewFieldBuilder {
         private final CaseViewField caseViewField;
+        private final List<AccessControlList> acls = newArrayList();
 
         private CaseViewFieldBuilder() {
             this.caseViewField = new CaseViewField();
@@ -861,8 +932,14 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public CaseViewFieldBuilder withACL(AccessControlList acl) {
+            acls.add(acl);
+            return this;
+        }
+
         public CaseViewField build() {
-            return caseViewField;
+            this.caseViewField.setAccessControlLists(acls);
+            return this.caseViewField;
         }
     }
 
