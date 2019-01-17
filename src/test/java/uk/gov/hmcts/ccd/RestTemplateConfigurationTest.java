@@ -33,6 +33,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -48,6 +49,7 @@ import org.springframework.web.client.RestTemplate;
     "http.client.max.client_per_route=2",
     "http.client.validate.after.inactivity=1"})
 @AutoConfigureWireMock(port = 0)
+@DirtiesContext
 public class RestTemplateConfigurationTest {
 
     @Autowired
