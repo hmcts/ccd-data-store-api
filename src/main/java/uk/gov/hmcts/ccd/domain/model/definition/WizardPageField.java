@@ -11,6 +11,8 @@ public class WizardPageField implements Serializable {
     private String caseFieldId = null;
     private Integer order = null;
     private Integer pageColumnNumber;
+    private String displayContext;
+    private String complexFieldMask;
 
     @JsonProperty("case_field_id")
     public String getCaseFieldId() {
@@ -37,5 +39,23 @@ public class WizardPageField implements Serializable {
 
     public void setPageColumnNumber(Integer number) {
         this.pageColumnNumber = number;
+    }
+
+    @JsonProperty("display_context")
+    public String getDisplayContext() {
+        return displayContext;
+    }
+
+    public void setDisplayContext(String displayContext) {
+        this.displayContext = displayContext;
+    }
+
+    @JsonProperty("complex_field_mask")
+    public String getComplexFieldMask() {
+        return complexFieldMask;
+    }
+
+    public void setComplexFieldMask(String complexFieldMask) {
+        this.complexFieldMask = complexFieldMask;
     }
 }
