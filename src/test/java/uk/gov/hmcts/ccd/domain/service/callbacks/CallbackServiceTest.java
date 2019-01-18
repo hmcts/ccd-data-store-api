@@ -33,6 +33,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -54,6 +55,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
         "ccd.callback.timeouts=1,2,3"
     })
 @AutoConfigureWireMock(port = 0)
+@DirtiesContext
 public class CallbackServiceTest {
     private static final ObjectMapper mapper = new ObjectMapper();
     
