@@ -1,12 +1,5 @@
 package uk.gov.hmcts.ccd.v2.external.resource;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
-
 import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -14,6 +7,13 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataBuilder.newCaseData;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 
 @DisplayName("CaseDataResource")
 class CaseDataResourceTest {
