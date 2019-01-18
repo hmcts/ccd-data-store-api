@@ -23,6 +23,12 @@ def secrets = [
         secret('ccd-restricted-caseworker-password', 'CCD_RESTRICTED_CASEWORKER_PASSWORD'),
         secret('ccd-private-caseworker-solicitor-email', 'CCD_PRIVATE_CASEWORKER_SOLICITOR_EMAIL'),
         secret('ccd-private-caseworker-solicitor-password', 'CCD_PRIVATE_CASEWORKER_SOLICITOR_PASSWORD'),
+        secret('ccd-private-cross-case-type-caseworker-email', 'CCD_PRIVATE_CROSS_CASE_TYPE_CASEWORKER_EMAIL'),
+        secret('ccd-private-cross-case-type-caseworker-password', 'CCD_PRIVATE_CROSS_CASE_TYPE_CASEWORKER_PASSWORD'),
+        secret('ccd-private-cross-case-type-solicitor-email', 'CCD_PRIVATE_CROSS_CASE_TYPE_SOLICITOR_EMAIL'),
+        secret('ccd-private-cross-case-type-solicitor-password', 'CCD_PRIVATE_CROSS_CASE_TYPE_SOLICITOR_PASSWORD'),
+        secret('ccd-restricted-cross-case-type-caseworker-email', 'CCD_RESTRICTED_CROSS_CASE_TYPE_CASEWORKER_EMAIL'),
+        secret('ccd-restricted-cross-case-type-caseworker-password', 'CCD_RESTRICTED_CROSS_CASE_TYPE_CASEWORKER_PASSWORD'),
         secret('ccd-api-gateway-oauth2-client-secret', 'OAUTH2_CLIENT_SECRET'),
     ],
     's2s-${env}': [
@@ -31,11 +37,11 @@ def secrets = [
 ]
 
 static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
-    [ $class: 'AzureKeyVaultSecret',
-      secretType: 'Secret',
-      name: secretName,
-      version: '',
-      envVariable: envVar
+    [$class     : 'AzureKeyVaultSecret',
+     secretType : 'Secret',
+     name       : secretName,
+     version    : '',
+     envVariable: envVar
     ]
 }
 
