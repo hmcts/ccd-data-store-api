@@ -1112,6 +1112,7 @@ public class TestBuildersUtil {
                 CaseTypeTabField tabField = new CaseTypeTabField();
                 tabField.setCaseField(caseField);
                 tabField.setShowCondition(caseFieldId + "-fieldShowCondition");
+                tabField.setDisplayContextParameter("#TABLE(Title, FirstName, MiddleName)");
                 tabFields.add(tabField);
             });
             tab.setShowCondition("tabShowCondition");
