@@ -87,8 +87,8 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     @Override
-    public Optional<CaseDetails> findByReference(String reference) {
-        return find(null, reference).map(this.caseDetailsMapper::entityToModel);
+    public Optional<CaseDetails> findByReference(String caseReference) {
+        return findByReference(null, caseReference);
     }
 
     @Override
@@ -186,14 +186,6 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
         if (null != jurisdiction) {
             qb.whereJurisdiction(jurisdiction);
         }
-
-        return getCaseDetailsEntity(id, reference, qb);
-    }
-
-    // See above - This accepts null values for backward compatibility. Once deprecated methods are removed, parameters should
-    // be annotated with @NotNull
-    private Optional<CaseDetailsEntity> find(Long id, String reference) {
-        final CaseDetailsQueryBuilder<CaseDetailsEntity> qb = queryBuilderFactory.select(em);
 
         return getCaseDetailsEntity(id, reference, qb);
     }

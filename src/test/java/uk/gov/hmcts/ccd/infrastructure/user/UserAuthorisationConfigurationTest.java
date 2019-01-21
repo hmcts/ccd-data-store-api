@@ -7,13 +7,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
 
+import java.util.Arrays;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
 
 @DisplayName("UserAuthorisationFactory")
@@ -47,6 +51,10 @@ class UserAuthorisationConfigurationTest {
         when(authentication.getPrincipal()).thenReturn(serviceAndUser);
 
         when(serviceAndUser.getUsername()).thenReturn(USER_ID);
+        when(serviceAndUser.getAuthorities()).thenReturn(Arrays.asList(
+            new SimpleGrantedAuthority("role1"),
+            new SimpleGrantedAuthority("role2")
+        ));
         when(caseAccessService.getAccessLevel(serviceAndUser)).thenReturn(ACCESS_LEVEL);
     }
 
@@ -64,6 +72,14 @@ class UserAuthorisationConfigurationTest {
         final UserAuthorisation userAuthorisation = factory.create();
 
         assertThat(userAuthorisation.getAccessLevel(), equalTo(ACCESS_LEVEL));
+    }
+
+    @Test
+    @DisplayName("should create user authorisation with roles")
+    void shouldCreateAuthorisationWithRoles() {
+        final UserAuthorisation userAuthorisation = factory.create();
+
+        assertThat(userAuthorisation.getRoles(), hasSize(2));
     }
 
 }

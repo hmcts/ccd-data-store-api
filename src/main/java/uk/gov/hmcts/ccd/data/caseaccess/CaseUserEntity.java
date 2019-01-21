@@ -1,6 +1,11 @@
 package uk.gov.hmcts.ccd.data.caseaccess;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
 import java.io.Serializable;
 
 @Entity
@@ -57,10 +62,14 @@ public class CaseUserEntity implements Serializable {
     }
 
     CaseUserEntity(Long caseDataId, String userId) {
+        this(caseDataId, userId, GlobalCaseRole.CREATOR.getRole());
+    }
+
+    CaseUserEntity(Long caseDataId, String userId, String caseRole) {
         CasePrimaryKey casePrimaryKey = new CasePrimaryKey();
         casePrimaryKey.caseDataId = caseDataId;
         casePrimaryKey.userId = userId;
-        casePrimaryKey.caseRole = GlobalCaseRole.CREATOR.getRole();
+        casePrimaryKey.caseRole = caseRole;
 
         this.casePrimaryKey = casePrimaryKey;
     }
