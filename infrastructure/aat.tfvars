@@ -7,4 +7,6 @@ frontend_url = "https://www-ccd.nonprod.platform.hmcts.net"
 asp_name = "ccd-data-store-api-aat"
 asp_rg = "ccd-data-store-api-aat"
 elastic_search_enabled = "true"
+definition_cache_max_size = "30000"
+
 

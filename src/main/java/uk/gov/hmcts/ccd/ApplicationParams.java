@@ -66,6 +66,9 @@ public class ApplicationParams {
     @Value("${definition.cache.ttl.secs}")
     private Integer definitionCacheTTLSecs;
 
+    @Value("${definition.cache.max.size}")
+    private Integer definitionCacheMaxSize;
+
     @Value("#{'${search.elastic.hosts}'.split(',')}")
     private List<String> elasticSearchHosts;
 
@@ -215,6 +218,10 @@ public class ApplicationParams {
 
     public int getDefinitionCacheTTLSecs() {
         return definitionCacheTTLSecs;
+    }
+
+    public int getDefinitionCacheMaxSize() {
+        return definitionCacheMaxSize;
     }
 
     public List<String> getSearchBlackList() {

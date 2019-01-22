@@ -35,7 +35,7 @@ public class CachingConfiguration {
 
     private MapConfig newMapConfig(final String name, int definitionCacheTTL) {
         return new MapConfig().setName(name)
-                .setMaxSizeConfig(new MaxSizeConfig(1000, MaxSizeConfig.MaxSizePolicy.FREE_HEAP_SIZE))
+                .setMaxSizeConfig(new MaxSizeConfig(applicationParams.getDefinitionCacheMaxSize(), MaxSizeConfig.MaxSizePolicy.FREE_HEAP_SIZE))
                 .setEvictionPolicy(EvictionPolicy.LRU)
                 .setMaxIdleSeconds(definitionCacheTTL);
     }

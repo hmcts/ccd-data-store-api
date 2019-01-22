@@ -58,6 +58,16 @@ variable "jenkins_AAD_objectId" {
   description                 = "(Required) The Azure AD object ID of a user, service principal or security group in the Azure Active Directory tenant for the vault. The object ID must be unique for the list of access policies."
 }
 
+variable "definition_cache_ttl_sec" {
+  type = "string"
+  default = "86400"
+}
+
+variable "definition_cache_max_size" {
+  type = "string"
+  default = "1000"
+}
+
 ////////////////////////////////
 // Database
 ////////////////////////////////
