@@ -1,29 +1,24 @@
 package uk.gov.hmcts.ccd;
 
-import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.util.ReflectionTestUtils;
-
 import javax.inject.Inject;
 import java.io.IOException;
 
-import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import org.junit.Before;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @DirtiesContext  // required for Jenkins agent
+@AutoConfigureWireMock(port = 0)
 public abstract class WireMockBaseTest extends BaseTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(WireMockBaseTest.class);
 
-    @ClassRule  // use next available port
-    public static WireMockClassRule wireMockRule = new WireMockClassRule(wireMockConfig().port(0).notifier(slf4jNotifier)
-            .disableRequestJournal());
-    @Rule
-    public WireMockClassRule instanceRule = wireMockRule;
+    @Value("${wiremock.server.port}")
+    protected Integer wiremockPort;
 
     @Inject
     private ApplicationParams applicationParams;
@@ -31,8 +26,8 @@ public abstract class WireMockBaseTest extends BaseTest {
     @Before
     public void initMock() throws IOException {
         super.initMock();
-        final Integer port = instanceRule.port();
-        final String hostUrl = "http://localhost:" + port;
+        final String hostUrl = "http://localhost:" + wiremockPort;
+
         LOG.info("Wire mock test, host url is {}", hostUrl);
 
         ReflectionTestUtils.setField(applicationParams, "caseDefinitionHost", hostUrl);

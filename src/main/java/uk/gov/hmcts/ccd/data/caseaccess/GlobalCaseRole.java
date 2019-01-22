@@ -1,5 +1,9 @@
 package uk.gov.hmcts.ccd.data.caseaccess;
 
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 /**
  * Enumerations of reserved global case roles:
  * <ul>
@@ -13,6 +17,12 @@ public enum GlobalCaseRole {
 
     GlobalCaseRole(String role) {
         this.role = role;
+    }
+
+    public static Set<String> all() {
+        return Arrays.stream(GlobalCaseRole.values())
+                     .map(GlobalCaseRole::getRole)
+                     .collect(Collectors.toSet());
     }
 
     /**

@@ -10,6 +10,7 @@ import java.util.Map;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.ok;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
@@ -129,61 +130,19 @@ public class CallbackTest extends WireMockBaseTest {
         "    \"D8Document\": \"PRIVATE\"" +
         "  }";
 
-    private final String modifiedDataString = "{\n"
-        + "  \"PersonFirstName\": \"ccd-First Name\",\n"
-        + "  \"PersonLastName\": \"Last Name\",\n"
-        + "  \"PersonAddress\": {\n"
-        + "    \"AddressLine1\": \"Address Line 11\",\n"
-        + "    \"AddressLine2\": \"Address Line 12\"\n"
-        + "  },\n"
-        + "  \"D8Document\":{"
-        + "    \"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
-        + "  }\n"
-        + "}\n";
+    private String modifiedDataString;
 
     private static JsonNode MODIFIED_DATA = null;
 
-    private final String expectedModifiedDataAfterAuthString = "{\n"
-        + "  \"PersonLastName\": \"Last Name\",\n"
-        + "  \"PersonAddress\": {\n"
-        + "    \"AddressLine1\": \"Address Line 11\",\n"
-        + "    \"AddressLine2\": \"Address Line 12\"\n"
-        + "  },\n"
-        + "  \"D8Document\":{"
-        + "    \"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
-        + "    \"document_binary_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n"
-        + "    \"document_filename\": \"Seagulls_Square.jpg\""
-        + "  }\n"
-        + "}\n";
+    private String expectedModifiedDataAfterAuthString;
 
     private static JsonNode EXPECTED_SAVED_DATA = null;
 
-    private final String expectedSavedDataString = "{\n"
-        + "  \"PersonFirstName\": \"ccd-First Name\",\n"
-        + "  \"PersonLastName\": \"Last Name\",\n"
-        + "  \"PersonAddress\": {\n"
-        + "    \"AddressLine1\": \"Address Line 11\",\n"
-        + "    \"AddressLine2\": \"Address Line 12\"\n"
-        + "  },\n"
-        + "  \"D8Document\":{"
-        + "    \"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
-        + "    \"document_binary_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n"
-        + "    \"document_filename\": \"Seagulls_Square.jpg\""
-        + "  }\n"
-        + "}\n";
+    private String expectedSavedDataString;
 
     private static JsonNode EXPECTED_MODIFIED_DATA = null;
 
-    private final String sanitizedModifiedDataWithMissingBinaryLinkString = "{\n"
-        + "  \"PersonLastName\": \"Last Name\",\n"
-        + "  \"PersonAddress\": {\n"
-        + "    \"AddressLine1\": \"Address Line 11\",\n"
-        + "    \"AddressLine2\": \"Address Line 12\"\n"
-        + "  },\n"
-        + "  \"D8Document\":{"
-        + "    \"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\"\n"
-        + "  }\n"
-        + "}\n";
+    private String sanitizedModifiedDataWithMissingBinaryLinkString;
 
     private static JsonNode SANITIZED_MODIFIED_DATA_WITH_MISSING_BINARY_LINK = null;
 
@@ -236,6 +195,57 @@ public class CallbackTest extends WireMockBaseTest {
 
     @Before
     public void setUp() throws IOException {
+
+        modifiedDataString = "{\n"
+            + "  \"PersonFirstName\": \"ccd-First Name\",\n"
+            + "  \"PersonLastName\": \"Last Name\",\n"
+            + "  \"PersonAddress\": {\n"
+            + "    \"AddressLine1\": \"Address Line 11\",\n"
+            + "    \"AddressLine2\": \"Address Line 12\"\n"
+            + "  },\n"
+            + "  \"D8Document\":{"
+            + "    \"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "  }\n"
+            + "}\n";
+
+        expectedModifiedDataAfterAuthString = "{\n"
+            + "  \"PersonLastName\": \"Last Name\",\n"
+            + "  \"PersonAddress\": {\n"
+            + "    \"AddressLine1\": \"Address Line 11\",\n"
+            + "    \"AddressLine2\": \"Address Line 12\"\n"
+            + "  },\n"
+            + "  \"D8Document\":{"
+            + "    \"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
+            + "    \"document_binary_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n"
+            + "    \"document_filename\": \"Seagulls_Square.jpg\""
+            + "  }\n"
+            + "}\n";
+
+        expectedSavedDataString = "{\n"
+            + "  \"PersonFirstName\": \"ccd-First Name\",\n"
+            + "  \"PersonLastName\": \"Last Name\",\n"
+            + "  \"PersonAddress\": {\n"
+            + "    \"AddressLine1\": \"Address Line 11\",\n"
+            + "    \"AddressLine2\": \"Address Line 12\"\n"
+            + "  },\n"
+            + "  \"D8Document\":{"
+            + "    \"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
+            + "    \"document_binary_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n"
+            + "    \"document_filename\": \"Seagulls_Square.jpg\""
+            + "  }\n"
+            + "}\n";
+
+        sanitizedModifiedDataWithMissingBinaryLinkString = "{\n"
+            + "  \"PersonLastName\": \"Last Name\",\n"
+            + "  \"PersonAddress\": {\n"
+            + "    \"AddressLine1\": \"Address Line 11\",\n"
+            + "    \"AddressLine2\": \"Address Line 12\"\n"
+            + "  },\n"
+            + "  \"D8Document\":{"
+            + "    \"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\"\n"
+            + "  }\n"
+            + "}\n";
+
         MockitoAnnotations.initMocks(this);
 
         doReturn(authentication).when(securityContext).getAuthentication();
@@ -245,7 +255,7 @@ public class CallbackTest extends WireMockBaseTest {
 
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
         jdbcTemplate = new JdbcTemplate(db);
-        wireMockRule.stubFor(get(urlMatching("/api/data/case-type/CallbackCase"))
+        stubFor(get(urlMatching("/api/data/case-type/CallbackCase"))
             .willReturn(okJson(CallbackTestData.getTestDefinition(getPort())).withStatus(200)));
         MODIFIED_DATA = mapper.readTree(modifiedDataString);
         EXPECTED_MODIFIED_DATA = mapper.readTree(expectedModifiedDataAfterAuthString);
@@ -267,10 +277,10 @@ public class CallbackTest extends WireMockBaseTest {
         callbackResponse.setDataClassification(mapper.convertValue(DATA_CLASSIFICATION, STRING_NODE_TYPE));
         callbackResponse.setSecurityClassification(PUBLIC);
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-commit.*"))
+        stubFor(WireMock.post(urlMatching("/before-commit.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/after-commit.*"))
+        stubFor(WireMock.post(urlMatching("/after-commit.*"))
             .willReturn(ok()));
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
@@ -333,10 +343,10 @@ public class CallbackTest extends WireMockBaseTest {
         significantItem.setDescription("Some description");
         callbackResponse.setSignificantItem(significantItem);
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-commit.*"))
+        stubFor(WireMock.post(urlMatching("/before-commit.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/after-commit.*"))
+        stubFor(WireMock.post(urlMatching("/after-commit.*"))
             .willReturn(ok()));
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
@@ -400,10 +410,10 @@ public class CallbackTest extends WireMockBaseTest {
         significantItem.setType(SignificantItemType.DOCUMENT.name());
         callbackResponse.setSignificantItem(significantItem);
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-commit.*"))
+        stubFor(WireMock.post(urlMatching("/before-commit.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/after-commit.*"))
+        stubFor(WireMock.post(urlMatching("/after-commit.*"))
             .willReturn(ok()));
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
@@ -430,10 +440,10 @@ public class CallbackTest extends WireMockBaseTest {
         callbackResponse.setDataClassification(mapper.convertValue(DATA_CLASSIFICATION, STRING_NODE_TYPE));
         callbackResponse.setSecurityClassification(PUBLIC);
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-commit.*"))
+        stubFor(WireMock.post(urlMatching("/before-commit.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/after-commit.*"))
+        stubFor(WireMock.post(urlMatching("/after-commit.*"))
             .willReturn(ok()));
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
@@ -489,10 +499,10 @@ public class CallbackTest extends WireMockBaseTest {
         callbackResponse.setDataClassification(mapper.convertValue(CALLBACK_DATA_CLASSIFICATION, STRING_NODE_TYPE));
         callbackResponse.setSecurityClassification(PUBLIC);
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-commit.*"))
+        stubFor(WireMock.post(urlMatching("/before-commit.*"))
                                  .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/after-commit.*"))
+        stubFor(WireMock.post(urlMatching("/after-commit.*"))
                                  .willReturn(ok()));
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
@@ -549,10 +559,10 @@ public class CallbackTest extends WireMockBaseTest {
         callbackResponse.setDataClassification(mapper.convertValue(CALLBACK_DATA_WITH_MISSING_CLASSIFICATION, STRING_NODE_TYPE));
         callbackResponse.setSecurityClassification(PUBLIC);
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-commit.*"))
+        stubFor(WireMock.post(urlMatching("/before-commit.*"))
                                  .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/after-commit.*"))
+        stubFor(WireMock.post(urlMatching("/after-commit.*"))
                                  .willReturn(ok()));
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
@@ -577,10 +587,10 @@ public class CallbackTest extends WireMockBaseTest {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setData(mapper.convertValue(MODIFIED_CORRUPTED_DATA, STRING_NODE_TYPE));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-commit.*"))
+        stubFor(WireMock.post(urlMatching("/before-commit.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/after-commit.*"))
+        stubFor(WireMock.post(urlMatching("/after-commit.*"))
             .willReturn(ok()));
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
@@ -603,7 +613,7 @@ public class CallbackTest extends WireMockBaseTest {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setData(mapper.convertValue(MODIFIED_CORRUPTED_DATA, STRING_NODE_TYPE));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-commit.*"))
+        stubFor(WireMock.post(urlMatching("/before-commit.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
 
@@ -627,10 +637,10 @@ public class CallbackTest extends WireMockBaseTest {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setData(mapper.convertValue(SANITIZED_MODIFIED_DATA_WITH_MISSING_BINARY_LINK, STRING_NODE_TYPE));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-commit.*"))
+        stubFor(WireMock.post(urlMatching("/before-commit.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/after-commit.*"))
+        stubFor(WireMock.post(urlMatching("/after-commit.*"))
             .willReturn(ok()));
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
@@ -653,7 +663,7 @@ public class CallbackTest extends WireMockBaseTest {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setData(mapper.convertValue(SANITIZED_MODIFIED_DATA_WITH_MISSING_BINARY_LINK, STRING_NODE_TYPE));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-commit.*"))
+        stubFor(WireMock.post(urlMatching("/before-commit.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
 
@@ -711,7 +721,7 @@ public class CallbackTest extends WireMockBaseTest {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setErrors(Collections.singletonList("Just a test"));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-start.*"))
+        stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
         final MvcResult mvcResult = mockMvc
@@ -729,7 +739,7 @@ public class CallbackTest extends WireMockBaseTest {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setErrors(Collections.singletonList("Just a test"));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-start.*"))
+        stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
 
@@ -748,7 +758,7 @@ public class CallbackTest extends WireMockBaseTest {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setData(mapper.convertValue(MODIFIED_DATA, STRING_NODE_TYPE));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-start.*"))
+        stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
         final MvcResult mvcResult = mockMvc
@@ -770,7 +780,7 @@ public class CallbackTest extends WireMockBaseTest {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setData(mapper.convertValue(INVALID_CALLBACK_DATA, STRING_NODE_TYPE));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-start.*"))
+        stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
         final MvcResult mvcResult = mockMvc
@@ -788,7 +798,7 @@ public class CallbackTest extends WireMockBaseTest {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setData(mapper.convertValue(INVALID_CALLBACK_DATA, STRING_NODE_TYPE));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-start.*"))
+        stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
         final MvcResult mvcResult = mockMvc
@@ -830,7 +840,7 @@ public class CallbackTest extends WireMockBaseTest {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setData(mapper.convertValue(MODIFIED_DATA, STRING_NODE_TYPE));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-start.*"))
+        stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
 
@@ -853,7 +863,7 @@ public class CallbackTest extends WireMockBaseTest {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setErrors(Collections.singletonList("Just a test"));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-start.*"))
+        stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
         final MvcResult mvcResult = mockMvc
@@ -871,7 +881,7 @@ public class CallbackTest extends WireMockBaseTest {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setErrors(Collections.singletonList("Just a test"));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-start.*"))
+        stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
         final MvcResult mvcResult = mockMvc
@@ -889,7 +899,7 @@ public class CallbackTest extends WireMockBaseTest {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setData(mapper.convertValue(MODIFIED_DATA, STRING_NODE_TYPE));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-start.*"))
+        stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
         final MvcResult mvcResult = mockMvc
@@ -911,7 +921,7 @@ public class CallbackTest extends WireMockBaseTest {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setData(mapper.convertValue(MODIFIED_DATA, STRING_NODE_TYPE));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-start.*"))
+        stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
         final MvcResult mvcResult = mockMvc
@@ -933,7 +943,7 @@ public class CallbackTest extends WireMockBaseTest {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setData(mapper.convertValue(INVALID_CALLBACK_DATA, STRING_NODE_TYPE));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-start.*"))
+        stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
         final MvcResult mvcResult = mockMvc
@@ -951,7 +961,7 @@ public class CallbackTest extends WireMockBaseTest {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setData(mapper.convertValue(INVALID_CALLBACK_DATA, STRING_NODE_TYPE));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-start.*"))
+        stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
         final MvcResult mvcResult = mockMvc
@@ -984,10 +994,10 @@ public class CallbackTest extends WireMockBaseTest {
         callbackResponse.setSecurityClassification(PUBLIC);
         callbackResponse.setDataClassification(mapper.convertValue(DATA_CLASSIFICATION, STRING_NODE_TYPE));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-commit.*"))
+        stubFor(WireMock.post(urlMatching("/before-commit.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/after-commit.*"))
+        stubFor(WireMock.post(urlMatching("/after-commit.*"))
             .willReturn(ok()));
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
@@ -1049,10 +1059,10 @@ public class CallbackTest extends WireMockBaseTest {
         callbackResponse.setDataClassification(mapper.convertValue(DATA_CLASSIFICATION, STRING_NODE_TYPE));
         callbackResponse.setSecurityClassification(PUBLIC);
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-commit.*"))
+        stubFor(WireMock.post(urlMatching("/before-commit.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/after-commit.*"))
+        stubFor(WireMock.post(urlMatching("/after-commit.*"))
             .willReturn(ok()));
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
@@ -1183,9 +1193,9 @@ public class CallbackTest extends WireMockBaseTest {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setData(mapper.convertValue(MODIFIED_CORRUPTED_DATA, STRING_NODE_TYPE));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-commit.*"))
+        stubFor(WireMock.post(urlMatching("/before-commit.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-commit.*"))
+        stubFor(WireMock.post(urlMatching("/before-commit.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
@@ -1225,9 +1235,9 @@ public class CallbackTest extends WireMockBaseTest {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setData(mapper.convertValue(MODIFIED_CORRUPTED_DATA, STRING_NODE_TYPE));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-commit.*"))
+        stubFor(WireMock.post(urlMatching("/before-commit.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-commit.*"))
+        stubFor(WireMock.post(urlMatching("/before-commit.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
@@ -1300,11 +1310,11 @@ public class CallbackTest extends WireMockBaseTest {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setErrors(Collections.singletonList("Just a test"));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching(url))
+        stubFor(WireMock.post(urlMatching(url))
                                      .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
     }
 
     private int getPort() {
-        return wireMockRule.port();
+        return super.wiremockPort;
     }
 }

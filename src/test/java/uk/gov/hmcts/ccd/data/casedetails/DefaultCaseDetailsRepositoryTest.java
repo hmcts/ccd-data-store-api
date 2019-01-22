@@ -265,6 +265,16 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
         MatcherAssert.assertThat(maybeCase.isPresent(), is(false));
     }
 
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void findByReferenceWithoutJurisdiction() {
+        final Optional<CaseDetails> maybeCase = caseDetailsRepository.findByReference(REFERENCE.toString());
+
+        final CaseDetails caseDetails = maybeCase.orElseThrow(() -> new AssertionError("No case found"));
+
+        assertCaseDetails(caseDetails, "1", JURISDICTION, REFERENCE);
+    }
+
     private void assertCaseDetails(CaseDetails caseDetails, String id, String jurisdictionId, Long caseReference) {
         MatcherAssert.assertThat(caseDetails.getId(), equalTo(id));
         MatcherAssert.assertThat(caseDetails.getJurisdiction(), equalTo(jurisdictionId));
