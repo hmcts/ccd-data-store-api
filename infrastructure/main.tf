@@ -126,6 +126,10 @@ module "ccd-data-store-api" {
 
     CCD_DEFAULTPRINTURL                 = "${local.default_print_url}"
 
+    DEFINITION_CACHE_TTL_SEC            = "${var.definition_cache_ttl_sec}"
+    DEFINITION_CACHE_MAX_SIZE           = "${var.definition_cache_max_size}"
+    DEFINITION_CACHE_EVICTION_POLICY    = "${var.definition_cache_eviction_policy}"
+
     ELASTIC_SEARCH_ENABLED              = "${var.elastic_search_enabled}"
     ELASTIC_SEARCH_HOSTS                = "${local.elastic_search_hosts}"
     ELASTIC_SEARCH_DATA_NODES_HOSTS     = "${local.elastic_search_data_node_hosts}"
