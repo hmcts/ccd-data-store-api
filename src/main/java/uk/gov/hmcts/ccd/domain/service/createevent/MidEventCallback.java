@@ -28,11 +28,11 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 @Service
 public class MidEventCallback {
 
-    private CallbackInvoker callbackInvoker;
-    private UIDefinitionRepository uiDefinitionRepository;
-    private EventTriggerService eventTriggerService;
-    private CaseDefinitionRepository caseDefinitionRepository;
-    private CaseService caseService;
+    private final CallbackInvoker callbackInvoker;
+    private final UIDefinitionRepository uiDefinitionRepository;
+    private final EventTriggerService eventTriggerService;
+    private final CaseDefinitionRepository caseDefinitionRepository;
+    private final CaseService caseService;
 
     @Autowired
     public MidEventCallback(CallbackInvoker callbackInvoker,
@@ -62,7 +62,8 @@ public class MidEventCallback {
                 .findFirst();
 
             if (wizardPageOptional.isPresent() && !isBlank(wizardPageOptional.get().getCallBackURLMidEvent())) {
-                CaseDetails newCaseDetails = caseService.createNewCaseDetails(caseTypeId, caseType.getJurisdictionId(), content.getData());
+                CaseDetails newCaseDetails = caseService.createNewCaseDetails(caseTypeId, caseType.getJurisdictionId(),
+                                                                              content.getEventData() == null ? content.getData() : content.getEventData());
 
                 CaseDetails caseDetails = callbackInvoker.invokeMidEventCallback(wizardPageOptional.get(),
                                                                                  caseType,

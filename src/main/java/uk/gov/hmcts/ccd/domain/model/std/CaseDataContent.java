@@ -12,6 +12,10 @@ public class CaseDataContent {
     private Event event;
     private Map<String, JsonNode> data;
 
+    // full event data payload
+    @JsonProperty("event_data")
+    private Map<String, JsonNode> eventData;
+
     @JsonProperty("security_classification")
     private String securityClassification;
 
@@ -44,16 +48,24 @@ public class CaseDataContent {
         return data;
     }
 
+    public void setData(Map<String, JsonNode> data) {
+        this.data = data;
+    }
+
+    public Map<String, JsonNode> getEventData() {
+        return eventData;
+    }
+
+    public void setEventData(Map<String, JsonNode> eventData) {
+        this.eventData = eventData;
+    }
+
     public String getSecurityClassification() {
         return securityClassification;
     }
 
     public void setSecurityClassification(String securityClassification) {
         this.securityClassification = securityClassification;
-    }
-
-    public void setData(Map<String, JsonNode> data) {
-        this.data = data;
     }
 
     public Map<String, JsonNode> getDataClassification() {
