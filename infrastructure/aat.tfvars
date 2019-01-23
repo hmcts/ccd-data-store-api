@@ -8,4 +8,3 @@ asp_name = "ccd-data-store-api-aat"
 asp_rg = "ccd-data-store-api-aat"
 elastic_search_enabled = "true"
 
-
