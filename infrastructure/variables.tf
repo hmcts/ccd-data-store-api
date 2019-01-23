@@ -65,7 +65,7 @@ variable "definition_cache_ttl_sec" {
 
 variable "definition_cache_max_size" {
   type = "string"
-  default = "10000"
+  default = "5000"
 }
 
 ////////////////////////////////
