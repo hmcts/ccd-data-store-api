@@ -60,12 +60,17 @@ variable "jenkins_AAD_objectId" {
 
 variable "definition_cache_ttl_sec" {
   type = "string"
-  default = "86400"
+  default = "259200"
 }
 
 variable "definition_cache_max_size" {
   type = "string"
   default = "5000"
+}
+
+variable "definition_cache_eviction_policy" {
+  type = "string"
+  default = "NONE"
 }
 
 ////////////////////////////////
