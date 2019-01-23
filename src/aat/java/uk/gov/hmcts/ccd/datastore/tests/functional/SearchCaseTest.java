@@ -10,7 +10,6 @@ import uk.gov.hmcts.ccd.datastore.tests.BaseTest;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CASE_TYPE;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.JURISDICTION;
 
-@Tag("smoke")
 @DisplayName("Search cases")
 class SearchCaseTest extends BaseTest {
 

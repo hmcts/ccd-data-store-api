@@ -6,6 +6,7 @@ import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.JURISDICTION;
 
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.BaseTest;
@@ -83,6 +84,7 @@ class GetCaseTest extends BaseTest {
             .body("AddressUKField.Country", equalTo(AATCaseBuilder.ADDRESS_COUNTRY));
     }
 
+    @Tag("smoke")
     @Test
     @DisplayName("should get 404 when case reference does NOT exist")
     void should404WhenNotExists() {
