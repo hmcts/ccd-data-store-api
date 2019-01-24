@@ -28,6 +28,8 @@ public class CaseViewField {
     private Object value;
     @JsonProperty("display_context")
     private String displayContext;
+    @JsonProperty("display_context_parameter")
+    private String displayContextParameter;
     @JsonProperty("show_condition")
     private String showCondition;
     @JsonProperty("show_summary_change_option")
@@ -141,6 +143,14 @@ public class CaseViewField {
         this.showSummaryContentOption = showSummaryContentOption;
     }
 
+    public String getDisplayContextParameter() {
+        return displayContextParameter;
+    }
+
+    public void setDisplayContextParameter(String displayContextParameter) {
+        this.displayContextParameter = displayContextParameter;
+    }
+
     public List<AccessControlList> getAccessControlLists() {
         return accessControlLists;
     }
@@ -153,7 +163,7 @@ public class CaseViewField {
         CaseViewField caseViewField = createFrom(field.getCaseField(), data);
         caseViewField.setOrder(field.getDisplayOrder());
         caseViewField.setShowCondition(field.getShowCondition());
-
+        caseViewField.setDisplayContextParameter(field.getDisplayContextParameter());
         return caseViewField;
     }
 

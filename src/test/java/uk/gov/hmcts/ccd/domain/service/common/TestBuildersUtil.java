@@ -168,6 +168,11 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public CaseDataContentBuilder withEventData(Map<String, JsonNode> eventData) {
+            this.caseDataContent.setEventData(eventData);
+            return this;
+        }
+
         public CaseDataContentBuilder withDraftId(String draftId) {
             this.caseDataContent.setDraftId(draftId);
             return this;
@@ -965,7 +970,7 @@ public class TestBuildersUtil {
     }
 
     public static class JurisdictionBuilder {
-        private Jurisdiction jurisdiction;
+        private final Jurisdiction jurisdiction;
 
         public static JurisdictionBuilder newJurisdiction() {
             return new JurisdictionBuilder();
@@ -1112,6 +1117,7 @@ public class TestBuildersUtil {
                 CaseTypeTabField tabField = new CaseTypeTabField();
                 tabField.setCaseField(caseField);
                 tabField.setShowCondition(caseFieldId + "-fieldShowCondition");
+                tabField.setDisplayContextParameter("#TABLE(Title, FirstName, MiddleName)");
                 tabFields.add(tabField);
             });
             tab.setShowCondition("tabShowCondition");

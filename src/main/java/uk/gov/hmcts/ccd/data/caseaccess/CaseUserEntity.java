@@ -57,10 +57,14 @@ public class CaseUserEntity implements Serializable {
     }
 
     CaseUserEntity(Long caseDataId, String userId) {
+        this(caseDataId, userId, GlobalCaseRole.CREATOR.getRole());
+    }
+
+    CaseUserEntity(Long caseDataId, String userId, String caseRole) {
         CasePrimaryKey casePrimaryKey = new CasePrimaryKey();
         casePrimaryKey.caseDataId = caseDataId;
         casePrimaryKey.userId = userId;
-        casePrimaryKey.caseRole = GlobalCaseRole.CREATOR.getRole();
+        casePrimaryKey.caseRole = caseRole;
 
         this.casePrimaryKey = casePrimaryKey;
     }

@@ -62,6 +62,7 @@ public class CaseViewFieldBuilderTest {
 
         EVENT_FIELD.setCaseFieldId("PersonFirstName");
         EVENT_FIELD.setDisplayContext("READONLY");
+        EVENT_FIELD.setDisplayContext("#TABLE(Title, FirstName, MiddleName)");
         EVENT_FIELD.setShowCondition("ShowCondition");
         EVENT_FIELD.setShowSummaryChangeOption(Boolean.TRUE);
         EVENT_FIELD.setShowSummaryContentOption(3);
@@ -84,20 +85,21 @@ public class CaseViewFieldBuilderTest {
 
             final CaseViewField field = fieldBuilder.build(CASE_FIELD, EVENT_FIELD);
 
-            assertThat(field, is(notNullValue()));
-            assertThat(field.getId(), equalTo(CASE_FIELD.getId()));
-            assertThat(field.getFieldType(), equalTo(CASE_FIELD.getFieldType()));
-            assertThat(field.isHidden(), equalTo(CASE_FIELD.getHidden()));
-            assertThat(field.getHintText(), equalTo(CASE_FIELD.getHintText()));
-            assertThat(field.getLabel(), equalTo(CASE_FIELD.getLabel()));
-            assertThat(field.getOrder(), is(nullValue()));
-            assertThat(field.getSecurityLabel(), equalTo(CASE_FIELD.getSecurityLabel()));
-            assertThat(field.getValidationExpression(), is(nullValue()));
-            assertThat(field.getDisplayContext(), is(EVENT_FIELD.getDisplayContext()));
-            assertThat(field.getShowCondition(), is(EVENT_FIELD.getShowCondition()));
-            assertThat(field.getShowSummaryChangeOption(), is(Boolean.TRUE));
-            assertThat(field.getShowSummaryContentOption(), is(3));
-        }
+        assertThat(field, is(notNullValue()));
+        assertThat(field.getId(), equalTo(CASE_FIELD.getId()));
+        assertThat(field.getFieldType(), equalTo(CASE_FIELD.getFieldType()));
+        assertThat(field.isHidden(), equalTo(CASE_FIELD.getHidden()));
+        assertThat(field.getHintText(), equalTo(CASE_FIELD.getHintText()));
+        assertThat(field.getLabel(), equalTo(CASE_FIELD.getLabel()));
+        assertThat(field.getOrder(), is(nullValue()));
+        assertThat(field.getSecurityLabel(), equalTo(CASE_FIELD.getSecurityLabel()));
+        assertThat(field.getValidationExpression(), is(nullValue()));
+        assertThat(field.getDisplayContext(), is(EVENT_FIELD.getDisplayContext()));
+        assertThat(field.getDisplayContextParameter(), is(EVENT_FIELD.getDisplayContextParamter()));
+        assertThat(field.getShowCondition(), is(EVENT_FIELD.getShowCondition()));
+        assertThat(field.getShowSummaryChangeOption(), is(Boolean.TRUE));
+        assertThat(field.getShowSummaryContentOption(), is(3));
+    }
 
         @Test
         public void shouldCreateFieldFromCaseEventFieldWithData() {

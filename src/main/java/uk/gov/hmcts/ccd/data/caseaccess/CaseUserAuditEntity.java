@@ -1,9 +1,9 @@
 package uk.gov.hmcts.ccd.data.caseaccess;
 
-import org.hibernate.annotations.CreationTimestamp;
-
 import javax.persistence.*;
 import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Table(name = "case_users_audit")
@@ -20,6 +20,8 @@ public class CaseUserAuditEntity {
     private long caseDataId;
     @Column(name = "user_id")
     private String userId;
+    @Column(name = "case_role")
+    private String caseRole;
     @Column(name = "changed_by_id")
     private String changedById;
     @Column(name = "changed_at")
@@ -50,6 +52,14 @@ public class CaseUserAuditEntity {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getCaseRole() {
+        return caseRole;
+    }
+
+    public void setCaseRole(String caseRole) {
+        this.caseRole = caseRole;
     }
 
     public String getChangedById() {

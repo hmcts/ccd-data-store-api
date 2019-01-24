@@ -58,6 +58,21 @@ variable "jenkins_AAD_objectId" {
   description                 = "(Required) The Azure AD object ID of a user, service principal or security group in the Azure Active Directory tenant for the vault. The object ID must be unique for the list of access policies."
 }
 
+variable "definition_cache_ttl_sec" {
+  type = "string"
+  default = "259200"
+}
+
+variable "definition_cache_max_size" {
+  type = "string"
+  default = "5000"
+}
+
+variable "definition_cache_eviction_policy" {
+  type = "string"
+  default = "NONE"
+}
+
 ////////////////////////////////
 // Database
 ////////////////////////////////
@@ -72,7 +87,7 @@ variable "database_name" {
 
 variable "authorised-services" {
   type    = "string"
-  default = "ccd_data,ccd_gw,ccd_ps,probate_backend,divorce_ccd_submission,sscs,sscs_bulkscan,cmc,cmc_claim_store,jui_webapp,pui_webapp,bulk_scan_orchestrator,fpl_case_service"
+  default = "ccd_data,ccd_gw,ccd_ps,probate_backend,divorce_ccd_submission,sscs,sscs_bulkscan,cmc,cmc_claim_store,jui_webapp,pui_webapp,bulk_scan_orchestrator,fpl_case_service,iac"
 }
 
 variable "idam_api_url" {

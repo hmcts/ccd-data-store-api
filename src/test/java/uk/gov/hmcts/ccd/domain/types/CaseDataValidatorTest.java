@@ -1,15 +1,5 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.TypeFactory;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import uk.gov.hmcts.ccd.BaseTest;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.HashMap;
@@ -20,7 +10,18 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
-public class CaseDataValidatorTest extends BaseTest {
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import uk.gov.hmcts.ccd.BaseTest;
+import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+
+public class CaseDataValidatorTest extends WireMockBaseTest {
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final TypeReference STRING_NODE_TYPE = new TypeReference<HashMap<String, JsonNode>>() {};
     private static final String CASE_FIELD_JSON = "/tests/CaseDataValidator_CaseField.json";

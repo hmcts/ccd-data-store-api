@@ -5,3 +5,6 @@ insert into case_users (case_data_id, user_id)
 
 insert into case_users (case_data_id, user_id, case_role)
   values (1, 89000, '[CREATOR]');
+
+insert into case_users (case_data_id, user_id, case_role)
+values (2, 89001, '[DEFENDANT]');

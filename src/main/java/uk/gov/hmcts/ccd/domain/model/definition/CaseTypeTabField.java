@@ -11,6 +11,7 @@ public class CaseTypeTabField implements Serializable {
     private CaseField caseField = null;
     private Integer displayOrder = null;
     private String showCondition = null;
+    private String displayContextParameter;
 
     @ApiModelProperty(value = "")
     @JsonProperty("case_field")
@@ -40,5 +41,15 @@ public class CaseTypeTabField implements Serializable {
 
     public void setShowCondition(String showCondition) {
         this.showCondition = showCondition;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("display_context_parameter")
+    public String getDisplayContextParameter() {
+        return displayContextParameter;
+    }
+
+    public void setDisplayContextParameter(String displayContextParameter) {
+        this.displayContextParameter = displayContextParameter;
     }
 }

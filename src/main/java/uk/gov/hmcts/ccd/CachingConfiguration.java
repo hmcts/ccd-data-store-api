@@ -1,6 +1,9 @@
 package uk.gov.hmcts.ccd;
 
-import com.hazelcast.config.*;
+import com.hazelcast.config.Config;
+import com.hazelcast.config.MapConfig;
+import com.hazelcast.config.MaxSizeConfig;
+import com.hazelcast.config.NetworkConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,8 +38,8 @@ public class CachingConfiguration {
 
     private MapConfig newMapConfig(final String name, int definitionCacheTTL) {
         return new MapConfig().setName(name)
-                .setMaxSizeConfig(new MaxSizeConfig(1000, MaxSizeConfig.MaxSizePolicy.FREE_HEAP_SIZE))
-                .setEvictionPolicy(EvictionPolicy.LRU)
+                .setMaxSizeConfig(new MaxSizeConfig(applicationParams.getDefinitionCacheMaxSize(), MaxSizeConfig.MaxSizePolicy.PER_NODE))
+                .setEvictionPolicy(applicationParams.getDefinitionCacheEvictionPolicy())
                 .setMaxIdleSeconds(definitionCacheTTL);
     }
 
