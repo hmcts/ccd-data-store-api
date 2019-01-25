@@ -64,8 +64,6 @@ public class CaseViewFieldBuilder {
                 }
                 fillEmptyNestedFieldACLs(nestedField, acls);
             });
-        } else {
-            return;
         }
     }
 }
