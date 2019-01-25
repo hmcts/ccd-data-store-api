@@ -1,15 +1,14 @@
 package uk.gov.hmcts.ccd.infrastructure.user;
 
-import java.util.Arrays;
-import java.util.HashSet;
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
+
+import java.util.Arrays;
+import java.util.HashSet;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("UserAuthorisation")
 class UserAuthorisationTest {

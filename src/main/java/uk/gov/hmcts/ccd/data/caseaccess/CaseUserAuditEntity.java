@@ -1,9 +1,9 @@
 package uk.gov.hmcts.ccd.data.caseaccess;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
-
-import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Table(name = "case_users_audit")

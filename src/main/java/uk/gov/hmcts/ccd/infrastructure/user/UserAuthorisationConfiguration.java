@@ -1,8 +1,5 @@
 package uk.gov.hmcts.ccd.infrastructure.user;
 
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +9,9 @@ import org.springframework.web.context.annotation.RequestScope;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Configuration
 public class UserAuthorisationConfiguration {

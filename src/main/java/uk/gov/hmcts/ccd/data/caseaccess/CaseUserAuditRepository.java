@@ -1,5 +1,9 @@
 package uk.gov.hmcts.ccd.data.caseaccess;
 
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseUserAuditEntity.Action;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
@@ -7,10 +11,6 @@ import javax.persistence.PersistenceContext;
 
 import static uk.gov.hmcts.ccd.data.caseaccess.CaseUserAuditEntity.Action.GRANT;
 import static uk.gov.hmcts.ccd.data.caseaccess.CaseUserAuditEntity.Action.REVOKE;
-
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseUserAuditEntity.Action;
 
 @Named
 @Singleton
