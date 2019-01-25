@@ -67,6 +67,38 @@
         <cve>CVE-2018-10237</cve>
     </suppress>
     <suppress>
+        <notes>Temporary suppression</notes>
+        <cve>CVE-2018-1000873</cve>
+    </suppress>
+    <suppress>
+        <notes>Temporary suppression</notes>
+        <cve>CVE-2018-14718</cve>
+    </suppress>
+    <suppress>
+        <notes>Temporary suppression</notes>
+        <cve>CVE-2018-14719</cve>
+    </suppress>
+    <suppress>
+        <notes>Temporary suppression</notes>
+        <cve>CVE-2018-14720</cve>
+    </suppress>
+    <suppress>
+        <notes>Temporary suppression</notes>
+        <cve>CVE-2018-14721</cve>
+    </suppress>
+    <suppress>
+        <notes>Temporary suppression</notes>
+        <cve>CVE-2018-19360</cve>
+    </suppress>
+    <suppress>
+        <notes>Temporary suppression</notes>
+        <cve>CVE-2018-19361</cve>
+    </suppress>
+    <suppress>
+        <notes>Temporary suppression</notes>
+        <cve>CVE-2018-19362</cve>
+    </suppress>
+    <suppress>
         <notes>Temporary suppression of an issue related to the current stable slf4j which is brought in by other dependencies.
             CCD don't explicitly declare dependencies on slf4j.
             org.slf4j.ext.EventData in the slf4j-ext module in QOS.CH SLF4J before 1.8.0-beta2 allows remote attackers to bypass intended access restrictions via crafted data.
