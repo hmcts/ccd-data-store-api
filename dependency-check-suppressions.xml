@@ -114,4 +114,10 @@
         <gav regex="true">^com\.fasterxml\.jackson\.core:jackson-databind:.*$</gav>
         <cve>CVE-2018-1000873</cve>
     </suppress>
+    <suppress>
+        <notes>Temporarily suppress spring framework CVE see RDM-3809.  Will be
+            removed with RDM-3796 fixes land.</notes>
+        <gav regex="true">^org\.springframework:spring-.+:.*$</gav>
+        <cve>CVE-2018-15756</cve>
+    </suppress>
 </suppressions>
