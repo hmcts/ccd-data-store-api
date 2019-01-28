@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.BaseTest;
@@ -37,6 +38,7 @@ class GetStartTriggerTest extends BaseTest {
     @DisplayName("Start case trigger")
     class StartCaseTrigger {
 
+        @Tag("smoke")
         @Test
         @DisplayName("should retrieve trigger when the case type and event exists")
         void shouldRetrieveWhenExists() {
