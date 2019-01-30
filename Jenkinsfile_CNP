@@ -63,4 +63,5 @@ withPipeline(type, product, component) {
     loadVaultSecrets(secrets)
     enableDbMigration()
     enableDockerBuild()
+    installCharts()
 }
