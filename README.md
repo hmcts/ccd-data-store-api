@@ -13,7 +13,7 @@ Store/search cases and provide workbaskets
 
 ### Prerequisites
 
-- [JDK 8](https://www.oracle.com/java)
+- [Open JDK 8](https://openjdk.java.net/)
 - [Docker](https://www.docker.com)
 
 #### Environment variables
