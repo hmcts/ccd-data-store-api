@@ -178,8 +178,7 @@ dependencies {
         exclude group: 'org.apache.tomcat', module: 'tomcat-jdbc'
     }
     compile("org.springframework.boot:spring-boot-starter-cache")
-    compile group: 'com.hazelcast', name: 'hazelcast'
-    compile group: 'com.hazelcast', name: 'hazelcast-spring'
+    compile group: 'net.sf.ehcache', name: 'ehcache'
 
     compile group: 'org.springframework.hateoas', name: 'spring-hateoas', version: '0.25.0.RELEASE'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
