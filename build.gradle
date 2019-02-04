@@ -236,12 +236,6 @@ dependencies {
 }
 // end::dependencies[]
 
-// tag::wrapper[]
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.7'
-}
-// end::wrapper[]
-
 task projectVersion {
     description 'Prints the version of this project; used for publishing JAR file'
     doLast {
