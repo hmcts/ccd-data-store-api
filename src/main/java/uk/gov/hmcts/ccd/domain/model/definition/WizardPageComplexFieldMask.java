@@ -6,8 +6,8 @@ import lombok.Builder;
 
 import java.io.Serializable;
 
-@ApiModel(description = "")
 @Builder
+@ApiModel(description = "")
 public class WizardPageComplexFieldMask implements Serializable {
     private String complexFieldId;
     private String displayContext;
