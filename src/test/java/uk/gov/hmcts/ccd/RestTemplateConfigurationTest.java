@@ -45,6 +45,7 @@ import org.springframework.web.client.RestTemplate;
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @TestPropertySource(properties = {"http.client.connection.timeout=1500",
     "http.client.max.total=1",
+    "http.client.read.timeout=1500",
     "http.client.seconds.idle.connection=1",
     "http.client.max.client_per_route=2",
     "http.client.validate.after.inactivity=1"})
