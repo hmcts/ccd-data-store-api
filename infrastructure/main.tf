@@ -137,6 +137,13 @@ module "ccd-data-store-api" {
     ELASTIC_SEARCH_BLACKLIST            = "${var.elastic_search_blacklist}"
     ELASTIC_SEARCH_CASE_INDEX_NAME_FORMAT = "${var.elastic_search_case_index_name_format}"
     ELASTIC_SEARCH_CASE_INDEX_TYPE      = "${var.elastic_search_case_index_type}"
+
+    HTTP_CLIENT_CONNECTION_TIMEOUT        = "${var.http_client_connection_timeout}"
+    HTTP_CLIENT_READ_TIMEOUT              = "${var.http_client_read_timeout}"
+    HTTP_CLIENT_MAX_TOTAL                 = "${var.http_client_max_total}"
+    HTTP_CLIENT_SECONDS_IDLE_CONNECTION   = "${var.http_client_seconds_idle_connection}"
+    HTTP_CLIENT_MAX_CLIENT_PER_ROUTE      = "${var.http_client_max_client_per_route}"
+    HTTP_CLIENT_VALIDATE_AFTER_INACTIVITY = "${var.http_client_validate_after_inactivity}"
   }
 
 }
