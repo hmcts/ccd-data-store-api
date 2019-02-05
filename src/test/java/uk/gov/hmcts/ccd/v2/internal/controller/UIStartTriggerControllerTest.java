@@ -1,17 +1,5 @@
 package uk.gov.hmcts.ccd.v2.internal.controller;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-
-import static org.hamcrest.Matchers.*;
-
-import static org.hamcrest.beans.HasPropertyWithValue.hasProperty;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventTriggerBuilder.newCaseEventTrigger;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageBuilder.newWizardPage;
-
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,10 +11,24 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPageComplexFieldMask;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetEventTriggerOperation;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.internal.resource.UIStartTriggerResource;
+
+import static java.util.Collections.singletonList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.beans.HasPropertyWithValue.hasProperty;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventTriggerBuilder.newCaseEventTrigger;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageBuilder.newWizardPage;
 
 @DisplayName("UIStartTriggerControllerTest")
 
@@ -41,6 +43,8 @@ class UIStartTriggerControllerTest {
     private static final String CASE_ID = "1111222233334444";
     private static final String DRAFT_ID = "DRAFT127";
     private static final String FIELD_ID = "PersonFirstName";
+    private static final String FIELD_LABEL = "Persion Name";
+    private static final String FIELD_HINT_TEXT = "Please provide person name";
     private static final String CASE_TYPE_ID = "TestAddressBookCase";
     private static final String EVENT_ID = "createCase";
     private static final String EVENT_TRIGGER_ID = "createCase";
@@ -60,13 +64,20 @@ class UIStartTriggerControllerTest {
         .withDescription(DESCRIPTION)
         .withCaseId(CASE_ID)
         .withField(aViewField()
-                       .withId(FIELD_ID).build())
+            .withId(FIELD_ID).build())
         .withEventToken(TOKEN)
         .withWizardPage(newWizardPage()
-                            .withField(aViewField()
-                                           .withId(FIELD_ID)
-                                           .build())
-                            .build())
+            .withField(aViewField()
+                    .withId(FIELD_ID)
+                    .build(),
+                singletonList(WizardPageComplexFieldMask.builder()
+                    .complexFieldId(FIELD_ID)
+                    .displayContext("MANDATORY")
+                    .label(FIELD_LABEL)
+                    .hintText(FIELD_HINT_TEXT)
+                    .showCondition(null)
+                    .build()))
+            .build())
         .withShowSummary(IS_SHOW_SUMMARY)
         .withShowEventNotes(IS_SHOW_EVENT_NOTES)
         .withEndButtonLabel(END_BUTTON_LABEL)
@@ -102,6 +113,21 @@ class UIStartTriggerControllerTest {
                 () -> assertThat(response.getBody().getCaseEventTrigger().getEventToken(), equalTo(TOKEN)),
                 () -> assertThat(response.getBody().getCaseEventTrigger().getWizardPages().get(0).getWizardPageFields().get(0),
                                  hasProperty("caseFieldId", CoreMatchers.is(FIELD_ID))),
+                () -> assertThat(response.getBody().getCaseEventTrigger().getWizardPages().get(0).getWizardPageFields().get(0)
+                        .getComplexFieldMaskList().get(0),
+                    hasProperty("complexFieldId", CoreMatchers.is(FIELD_ID))),
+                () -> assertThat(response.getBody().getCaseEventTrigger().getWizardPages().get(0).getWizardPageFields().get(0)
+                        .getComplexFieldMaskList().get(0),
+                    hasProperty("displayContext", CoreMatchers.is("MANDATORY"))),
+                () -> assertThat(response.getBody().getCaseEventTrigger().getWizardPages().get(0).getWizardPageFields().get(0)
+                        .getComplexFieldMaskList().get(0),
+                    hasProperty("label", CoreMatchers.is(FIELD_LABEL))),
+                () -> assertThat(response.getBody().getCaseEventTrigger().getWizardPages().get(0).getWizardPageFields().get(0)
+                        .getComplexFieldMaskList().get(0),
+                    hasProperty("hintText", CoreMatchers.is(FIELD_HINT_TEXT))),
+                () -> assertThat(response.getBody().getCaseEventTrigger().getWizardPages().get(0).getWizardPageFields().get(0)
+                        .getComplexFieldMaskList().get(0),
+                    hasProperty("showCondition", CoreMatchers.nullValue())),
                 () -> assertThat(response.getBody().getCaseEventTrigger().getShowSummary(), equalTo(IS_SHOW_SUMMARY)),
                 () -> assertThat(response.getBody().getCaseEventTrigger().getShowEventNotes(), equalTo(IS_SHOW_EVENT_NOTES)),
                 () -> assertThat(response.getBody().getCaseEventTrigger().getEndButtonLabel(), equalTo(END_BUTTON_LABEL)),
