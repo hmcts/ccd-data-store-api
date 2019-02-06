@@ -22,8 +22,6 @@ import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 @RestController
 @RequestMapping(path = "/cases")
 public class CaseController {
-    private static final String ERROR_CASE_ID_INVALID = "Case ID is not valid";
-
     private final GetCaseOperation getCaseOperation;
     private final UIDService caseReferenceService;
 
@@ -57,16 +55,16 @@ public class CaseController {
         ),
         @ApiResponse(
             code = 400,
-            message = ERROR_CASE_ID_INVALID
+            message = V2.Error.CASE_ID_INVALID
         ),
         @ApiResponse(
             code = 404,
-            message = "Case not found"
+            message = V2.Error.CASE_NOT_FOUND
         )
     })
     public ResponseEntity<CaseResource> getCase(@PathVariable("caseId") String caseId) {
         if (!caseReferenceService.validateUID(caseId)) {
-            throw new BadRequestException(ERROR_CASE_ID_INVALID);
+            throw new BadRequestException(V2.Error.CASE_ID_INVALID);
         }
 
         final CaseDetails caseDetails = this.getCaseOperation.execute(caseId)

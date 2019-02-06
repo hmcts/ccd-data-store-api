@@ -1,3 +1,7 @@
+provider "azurerm" {
+  version = "1.19.0"
+}
+
 locals {
   app_full_name = "${var.product}-${var.component}"
 
@@ -27,6 +31,7 @@ locals {
 
   // S2S
   s2s_url = "http://rpe-service-auth-provider-${local.env_ase_url}"
+  s2s_vault_url = "https://s2s-${local.local_env}.vault.azure.net/"
 
   custom_redirect_uri = "${var.frontend_url}/oauth2redirect"
   default_redirect_uri = "https://ccd-case-management-web-${local.env_ase_url}/oauth2redirect"
@@ -45,8 +50,8 @@ data "azurerm_key_vault" "ccd_shared_key_vault" {
 }
 
 data "azurerm_key_vault_secret" "ccd_data_s2s_key" {
-  name = "ccd-data-store-api-s2s-secret"
-  vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
+  name = "microservicekey-ccd-data"
+  vault_uri = "${local.s2s_vault_url}"
 }
 
 // load balancer url. The load balancer will kill connections when idle for 5 min. Used by functional tests
@@ -121,6 +126,10 @@ module "ccd-data-store-api" {
 
     CCD_DEFAULTPRINTURL                 = "${local.default_print_url}"
 
+    DEFINITION_CACHE_TTL_SEC            = "${var.definition_cache_ttl_sec}"
+    DEFINITION_CACHE_MAX_SIZE           = "${var.definition_cache_max_size}"
+    DEFINITION_CACHE_EVICTION_POLICY    = "${var.definition_cache_eviction_policy}"
+
     ELASTIC_SEARCH_ENABLED              = "${var.elastic_search_enabled}"
     ELASTIC_SEARCH_HOSTS                = "${local.elastic_search_hosts}"
     ELASTIC_SEARCH_DATA_NODES_HOSTS     = "${local.elastic_search_data_node_hosts}"
@@ -128,6 +137,13 @@ module "ccd-data-store-api" {
     ELASTIC_SEARCH_BLACKLIST            = "${var.elastic_search_blacklist}"
     ELASTIC_SEARCH_CASE_INDEX_NAME_FORMAT = "${var.elastic_search_case_index_name_format}"
     ELASTIC_SEARCH_CASE_INDEX_TYPE      = "${var.elastic_search_case_index_type}"
+
+    HTTP_CLIENT_CONNECTION_TIMEOUT        = "${var.http_client_connection_timeout}"
+    HTTP_CLIENT_READ_TIMEOUT              = "${var.http_client_read_timeout}"
+    HTTP_CLIENT_MAX_TOTAL                 = "${var.http_client_max_total}"
+    HTTP_CLIENT_SECONDS_IDLE_CONNECTION   = "${var.http_client_seconds_idle_connection}"
+    HTTP_CLIENT_MAX_CLIENT_PER_ROUTE      = "${var.http_client_max_client_per_route}"
+    HTTP_CLIENT_VALIDATE_AFTER_INACTIVITY = "${var.http_client_validate_after_inactivity}"
   }
 
 }

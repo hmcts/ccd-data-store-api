@@ -1,13 +1,27 @@
 package uk.gov.hmcts.ccd.domain.service.stdapi;
 
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.when;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.tomakehurst.wiremock.common.Slf4jNotifier;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.http.HttpHeaders;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ccd.BaseTest;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
@@ -20,25 +34,14 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.when;
-
+@AutoConfigureWireMock(port = 0)
+@DirtiesContext
 public class DocumentsOperationTest extends BaseTest {
     private static final ObjectMapper mapper = new ObjectMapper();
-    private static Slf4jNotifier slf4jNotifier = new Slf4jNotifier(true);
 
-    @Rule
-    public WireMockRule mockServer = new WireMockRule(wireMockConfig().dynamicPort().notifier(slf4jNotifier));
-
+    @Value("${wiremock.server.port}")
+    protected Integer wiremockPort;
+    
     @Inject
     private DocumentsOperation documentsOperation;
 
@@ -83,12 +86,12 @@ public class DocumentsOperationTest extends BaseTest {
         ReflectionTestUtils.setField(documentsOperation, "caseDetailsRepository", mockCaseDetailsRepository);
 
         final CaseType caseType = new CaseType();
-        caseType.setPrintableDocumentsUrl("http://localhost:" + mockServer.port() + TEST_URL);
+        caseType.setPrintableDocumentsUrl("http://localhost:" + wiremockPort + TEST_URL);
         final CaseTypeService mockCaseTypeService = Mockito.mock(CaseTypeService.class);
         Mockito.when(mockCaseTypeService.getCaseTypeForJurisdiction(TEST_CASE_TYPE, TEST_JURISDICTION)).thenReturn(caseType);
         ReflectionTestUtils.setField(documentsOperation, "caseTypeService", mockCaseTypeService);
 
-        mockServer.stubFor(post(urlMatching(TEST_URL + ".*"))
+        stubFor(post(urlMatching(TEST_URL + ".*"))
             .willReturn(okJson(mapper.writeValueAsString(new ArrayList<>())).withStatus(200)));
         final List<Document> results = documentsOperation.getPrintableDocumentsForCase(TEST_JURISDICTION, TEST_CASE_TYPE, TEST_CASE_REFERENCE);
         assertEquals("Incorrect number of documents", 0, results.size());
@@ -106,7 +109,7 @@ public class DocumentsOperationTest extends BaseTest {
         ReflectionTestUtils.setField(documentsOperation, "caseDetailsRepository", mockCaseDetailsRepository);
 
         final CaseType caseType = new CaseType();
-        caseType.setPrintableDocumentsUrl("http://localhost:" + mockServer.port() + TEST_URL);
+        caseType.setPrintableDocumentsUrl("http://localhost:" + wiremockPort + TEST_URL);
         final CaseTypeService mockCaseTypeService = Mockito.mock(CaseTypeService.class);
         Mockito.when(mockCaseTypeService.getCaseTypeForJurisdiction(TEST_CASE_TYPE, TEST_JURISDICTION)).thenReturn(caseType);
         ReflectionTestUtils.setField(documentsOperation, "caseTypeService", mockCaseTypeService);
@@ -125,7 +128,7 @@ public class DocumentsOperationTest extends BaseTest {
         TEST_DOCUMENTS.add(TEST_DOC_1);
         TEST_DOCUMENTS.add(TEST_DOC_2);
 
-        mockServer.stubFor(post(urlMatching(TEST_URL + ".*"))
+        stubFor(post(urlMatching(TEST_URL + ".*"))
             .willReturn(okJson(mapper.writeValueAsString(TEST_DOCUMENTS)).withStatus(200)));
         final List<Document> results = documentsOperation.getPrintableDocumentsForCase(TEST_JURISDICTION, TEST_CASE_TYPE, TEST_CASE_REFERENCE);
         assertEquals("Incorrect number of documents", TEST_DOCUMENTS.size(), results.size());

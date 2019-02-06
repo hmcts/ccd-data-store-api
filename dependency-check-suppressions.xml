@@ -66,4 +66,75 @@
         <notes>Temporary suppression to ignore CVE with com.google.guava. See RDM-3372</notes>
         <cve>CVE-2018-10237</cve>
     </suppress>
+    <suppress>
+        <notes>Temporary suppression of an issue related to the current stable slf4j which is brought in by other dependencies.
+            CCD don't explicitly declare dependencies on slf4j.
+            org.slf4j.ext.EventData in the slf4j-ext module in QOS.CH SLF4J before 1.8.0-beta2 allows remote attackers to bypass intended access restrictions via crafted data.
+            Investigation notes can be found in RDM-3549.  slf4j may need to be updated when a future stable version is released</notes>
+        <gav regex="true">^.*slf4j.*$</gav>
+        <cpe>cpe:/a:slf4j:slf4j:1.7.25</cpe>
+    </suppress>
+    <suppress>
+        <notes>jackson-databind 2.8.11.3 fixes this CVE. See
+            https://github.com/FasterXML/jackson-databind/issues/2097#issuecomment-457071680
+            and RDM-3796</notes>
+        <gav regex="true">^com\.fasterxml\.jackson\.core:jackson-databind:2\.8\.11\.[3].*$</gav>
+        <cve>CVE-2018-14718</cve>
+    </suppress>
+    <suppress>
+        <notes>jackson-databind 2.8.11.3 fixes this CVE. See
+            https://github.com/FasterXML/jackson-databind/issues/2097#issuecomment-457071680
+            and RDM-3796</notes>
+        <gav regex="true">^com\.fasterxml\.jackson\.core:jackson-databind:2\.8\.11\.[3].*$</gav>
+        <cve>CVE-2018-14719</cve>
+    </suppress>
+    <suppress>
+        <notes>jackson-databind 2.8.11.3 fixes this CVE. See
+            https://github.com/FasterXML/jackson-databind/issues/2097#issuecomment-457071680
+            and RDM-3796</notes>
+        <gav regex="true">^com\.fasterxml\.jackson\.core:jackson-databind:2\.8\.11\.[3].*$</gav>
+        <cve>CVE-2018-14720</cve>
+    </suppress>
+    <suppress>
+        <notes>jackson-databind 2.8.11.3 fixes this CVE. See
+            https://github.com/FasterXML/jackson-databind/issues/2097#issuecomment-457071680
+            and RDM-3796</notes>
+        <gav regex="true">^com\.fasterxml\.jackson\.core:jackson-databind:2\.8\.11\.[3].*$</gav>
+        <cve>CVE-2018-14721</cve>
+    </suppress>
+    <suppress>
+        <notes>jackson-databind 2.8.11.3 fixes this CVE. See
+            https://github.com/FasterXML/jackson-databind/issues/2097#issuecomment-457071680
+            and RDM-3796</notes>
+        <gav regex="true">^com\.fasterxml\.jackson\.core:jackson-databind:2\.8\.11\.[3].*$</gav>
+        <cve>CVE-2018-19360</cve>
+    </suppress>
+    <suppress>
+        <notes>jackson-databind 2.8.11.3 fixes this CVE. See
+            https://github.com/FasterXML/jackson-databind/issues/2097#issuecomment-457071680
+            and RDM-3796</notes>
+        <gav regex="true">^com\.fasterxml\.jackson\.core:jackson-databind:2\.8\.11\.[3].*$</gav>
+        <cve>CVE-2018-19361</cve>
+    </suppress>
+    <suppress>
+        <notes>jackson-databind 2.8.11.3 fixes this CVE. See
+            https://github.com/FasterXML/jackson-databind/issues/2097#issuecomment-457071680
+            and RDM-3796</notes>
+        <gav regex="true">^com\.fasterxml\.jackson\.core:jackson-databind:2\.8\.11\.[3].*$</gav>
+        <cve>CVE-2018-19362</cve>
+    </suppress>
+    <suppress>
+        <notes>jackson-databind 2.8.x will not get a fix for this CVE.  We need
+            to upgrade to 2.9.x. See
+            https://github.com/FasterXML/jackson-modules-java8/issues/90#issuecomment-450544881
+            and RDM-3796</notes>
+        <gav regex="true">^com\.fasterxml\.jackson\.core:jackson-databind:2\.8\.11\.[3].*$</gav>
+        <cve>CVE-2018-1000873</cve>
+    </suppress>
+    <suppress>
+        <notes>Temporarily suppress spring framework CVE see RDM-3809.  Will be
+            removed with RDM-3796 fixes land.</notes>
+        <gav regex="true">^org\.springframework:spring-.+:.*$</gav>
+        <cve>CVE-2018-15756</cve>
+    </suppress>
 </suppressions>

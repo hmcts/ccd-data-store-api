@@ -13,6 +13,7 @@ public class CaseEventField implements Serializable {
 
     private String caseFieldId = null;
     private String displayContext = null;
+    private String displayContextParamter = null;
     private String showCondition = null;
     private Boolean showSummaryChangeOption = null;
     private Integer showSummaryContentOption = null;
@@ -37,6 +38,16 @@ public class CaseEventField implements Serializable {
 
     public void setDisplayContext(String displayContext) {
         this.displayContext = displayContext;
+    }
+
+    @ApiModelProperty(value = "contain names of fields for list or table")
+    @JsonProperty("display_context_parameter")
+    public String getDisplayContextParamter() {
+        return displayContextParamter;
+    }
+
+    public void setDisplayContextParamter(String displayContextParamter) {
+        this.displayContextParamter = displayContextParamter;
     }
 
     @ApiModelProperty(value = "Show Condition expression for this field")
@@ -94,4 +105,5 @@ public class CaseEventField implements Serializable {
     public void setHintText(String hintText) {
         this.hintText = hintText;
     }
+
 }

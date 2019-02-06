@@ -21,7 +21,7 @@ public class CCDEventBuilder {
 
     private final String jurisdictionId;
     private final String caseTypeId;
-    private final String eventId;
+    private String eventId;
 
     private Supplier<RequestSpecification> asUser;
     private Long caseReference;
@@ -60,6 +60,24 @@ public class CCDEventBuilder {
     public CCDEventBuilder withData(CaseData data) {
         this.data = data;
         return this;
+    }
+
+    public CCDEventBuilder withEventId(String eventId) {
+        this.eventId = eventId;
+        return this;
+    }
+
+    public CaseDataContent toCaseDataContent() {
+        final Event event = new Event();
+        event.setEventId(eventId);
+        event.setSummary(summary);
+        event.setDescription(description);
+
+        final CaseDataContent caseDataContent = new CaseDataContent();
+        caseDataContent.setEvent(event);
+        caseDataContent.setData(MAPPER.convertValue(data, STRING_JSON_MAP_TYPE));
+
+        return caseDataContent;
     }
 
     public Response submit() {

@@ -1,8 +1,5 @@
 package uk.gov.hmcts.ccd;
 
-import org.springframework.beans.factory.annotation.Value;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.UnsupportedEncodingException;
@@ -11,6 +8,10 @@ import java.util.Base64;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
+
+import com.hazelcast.config.EvictionPolicy;
+import org.springframework.beans.factory.annotation.Value;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 @Named
 @Singleton
@@ -65,6 +66,12 @@ public class ApplicationParams {
 
     @Value("${definition.cache.ttl.secs}")
     private Integer definitionCacheTTLSecs;
+
+    @Value("${definition.cache.max.size}")
+    private Integer definitionCacheMaxSize;
+
+    @Value("${definition.cache.eviction.policy}")
+    private EvictionPolicy definitionCacheEvictionPolicy;
 
     @Value("#{'${search.elastic.hosts}'.split(',')}")
     private List<String> elasticSearchHosts;
@@ -215,6 +222,14 @@ public class ApplicationParams {
 
     public int getDefinitionCacheTTLSecs() {
         return definitionCacheTTLSecs;
+    }
+
+    public int getDefinitionCacheMaxSize() {
+        return definitionCacheMaxSize;
+    }
+
+    public EvictionPolicy getDefinitionCacheEvictionPolicy() {
+        return definitionCacheEvictionPolicy;
     }
 
     public List<String> getSearchBlackList() {

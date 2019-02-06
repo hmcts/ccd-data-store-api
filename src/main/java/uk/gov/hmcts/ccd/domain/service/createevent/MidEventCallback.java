@@ -1,5 +1,10 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
+import java.util.Map;
+import java.util.Optional;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -13,25 +18,21 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
+import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
-import java.util.Map;
-import java.util.Optional;
-
-import static org.apache.commons.lang3.StringUtils.isBlank;
-
 @Service
 public class MidEventCallback {
 
-    private CallbackInvoker callbackInvoker;
-    private UIDefinitionRepository uiDefinitionRepository;
-    private EventTriggerService eventTriggerService;
-    private CaseDefinitionRepository caseDefinitionRepository;
-    private CaseService caseService;
+    private final CallbackInvoker callbackInvoker;
+    private final UIDefinitionRepository uiDefinitionRepository;
+    private final EventTriggerService eventTriggerService;
+    private final CaseDefinitionRepository caseDefinitionRepository;
+    private final CaseService caseService;
 
     @Autowired
     public MidEventCallback(CallbackInvoker callbackInvoker,
@@ -46,13 +47,11 @@ public class MidEventCallback {
         this.caseService = caseService;
     }
 
-    public JsonNode invoke(String jurisdictionId,
-                           String caseTypeId,
-                           Event event,
-                           Map<String, JsonNode> data,
-                           String pageId,
-                           Boolean ignoreWarning) {
+    public JsonNode invoke(String caseTypeId,
+                           CaseDataContent content,
+                           String pageId) {
         if (!isBlank(pageId)) {
+            Event event = content.getEvent();
             final CaseType caseType = getCaseType(caseTypeId);
             final CaseEvent caseEvent = getCaseEvent(event, caseType);
 
@@ -63,18 +62,19 @@ public class MidEventCallback {
                 .findFirst();
 
             if (wizardPageOptional.isPresent() && !isBlank(wizardPageOptional.get().getCallBackURLMidEvent())) {
-                CaseDetails newCaseDetails = caseService.createNewCaseDetails(caseTypeId, jurisdictionId, data);
+                CaseDetails newCaseDetails = caseService.createNewCaseDetails(caseTypeId, caseType.getJurisdictionId(),
+                                                                              content.getEventData() == null ? content.getData() : content.getEventData());
 
                 CaseDetails caseDetails = callbackInvoker.invokeMidEventCallback(wizardPageOptional.get(),
-                    caseType,
-                    caseEvent,
-                    null,
-                    newCaseDetails,
-                    ignoreWarning);
+                                                                                 caseType,
+                                                                                 caseEvent,
+                                                                                 null,
+                                                                                 newCaseDetails,
+                                                                                 content.getIgnoreWarning());
                 return dataJsonNode(caseDetails.getData());
             }
         }
-        return dataJsonNode(data);
+        return dataJsonNode(content.getData());
     }
 
     private JsonNode dataJsonNode(Map<String, JsonNode> data) {

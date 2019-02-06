@@ -1,5 +1,19 @@
 package uk.gov.hmcts.ccd.domain.service.startevent;
 
+import java.util.*;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,25 +31,15 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
-
-import java.util.*;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
 
 class AuthorisedStartEventOperationTest {
 
@@ -66,7 +70,10 @@ class AuthorisedStartEventOperationTest {
     @Mock
     private AuthorisedStartEventOperation authorisedStartEventOperation;
     @Mock
-    private UserRepository userRepository;
+    private DraftGateway draftGateway;
+    @Mock
+    private CaseAccessService caseAccessService;
+
     @Mock
     private UIDService uidService;
 
@@ -116,10 +123,11 @@ class AuthorisedStartEventOperationTest {
                                                                           caseDetailsRepository,
                                                                           accessControlService,
                                                                           uidService,
-                                                                          userRepository);
+                                                                          draftGateway,
+                                                                          caseAccessService);
         caseType.setCaseFields(caseFields);
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseType);
-        when(userRepository.getUserRoles()).thenReturn(userRoles);
+        when(caseAccessService.getUserRoles()).thenReturn(userRoles);
         when(accessControlService.canAccessCaseTypeWithCriteria(caseType, userRoles, CAN_READ)).thenReturn(true);
         when(accessControlService.filterCaseFieldsByAccess(eq(classifiedCaseDetailsNode),
                                                            eq(caseFields),
@@ -290,7 +298,7 @@ class AuthorisedStartEventOperationTest {
                                                                                                IGNORE_WARNING);
 
             InOrder inOrder = inOrder(caseDefinitionRepository,
-                                      userRepository,
+                                      caseAccessService,
                                       classifiedStartEventOperation,
                                       accessControlService,
                                       uidService,
@@ -309,7 +317,7 @@ class AuthorisedStartEventOperationTest {
                                                                                         EVENT_TRIGGER_ID,
                                                                                         IGNORE_WARNING),
                 () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
-                () -> inOrder.verify(userRepository).getUserRoles(),
+                () -> inOrder.verify(caseAccessService).getUserRoles(),
                 () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseType),
                                                                                          eq(userRoles),
                                                                                          eq(CAN_READ)),
@@ -335,16 +343,5 @@ class AuthorisedStartEventOperationTest {
                                                                                                             IGNORE_WARNING));
         }
 
-        @Test
-        @DisplayName("should fail if user roles not found")
-        void shouldFailIfNoUserRolesFound() {
-
-            doReturn(null).when(userRepository).getUserRoles();
-
-            assertThrows(ValidationException.class, () -> authorisedStartEventOperation.triggerStartForCase(CASE_REFERENCE,
-                                                                                                            EVENT_TRIGGER_ID,
-                                                                                                            IGNORE_WARNING));
-        }
     }
-
 }

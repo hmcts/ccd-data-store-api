@@ -1,27 +1,28 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
-import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.std.Event;
-import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
-import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.*;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Sets;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
+import uk.gov.hmcts.ccd.domain.model.std.Event;
+import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
+import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 @Service
 @Qualifier("authorised")
@@ -35,19 +36,19 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final GetCaseOperation getCaseOperation;
     private final AccessControlService accessControlService;
-    private final UserRepository userRepository;
+    private final CaseAccessService caseAccessService;
 
     public AuthorisedCreateEventOperation(@Qualifier("classified") final CreateEventOperation createEventOperation,
                                           @Qualifier("default") final GetCaseOperation getCaseOperation,
                                           @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
                                           final AccessControlService accessControlService,
-                                          @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository) {
+                                          CaseAccessService caseAccessService) {
 
         this.createEventOperation = createEventOperation;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.getCaseOperation = getCaseOperation;
         this.accessControlService = accessControlService;
-        this.userRepository = userRepository;
+        this.caseAccessService = caseAccessService;
     }
 
     @Override
@@ -55,33 +56,28 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
                                        String jurisdictionId,
                                        String caseTypeId,
                                        String caseReference,
-                                       Event event,
-                                       Map<String, JsonNode> data,
-                                       String token,
-                                       Boolean ignoreWarning) {
+                                       CaseDataContent content) {
         final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
         if (caseType == null) {
             throw new ValidationException("Cannot find case type definition for  " + caseTypeId);
         }
 
-        Set<String> userRoles = userRepository.getUserRoles();
-        if (userRoles == null) {
-            throw new ValidationException("Cannot find user roles for the user");
-        }
-
         CaseDetails existingCaseDetails = getCaseOperation.execute(caseReference)
             .orElseThrow(() -> new ResourceNotFoundException("Case not found"));
 
-        verifyUpsertAccess(event, data, existingCaseDetails, caseType, userRoles);
+        Set<String> userRoles = Sets.union(caseAccessService.getUserRoles(),
+            caseAccessService.getCaseRoles(existingCaseDetails.getId()));
+        if (userRoles == null || userRoles.isEmpty()) {
+            throw new ValidationException("Cannot find user roles for the user");
+        }
+
+        verifyUpsertAccess(content.getEvent(), content.getData(), existingCaseDetails, caseType, userRoles);
 
         final CaseDetails caseDetails = createEventOperation.createCaseEvent(uid,
                                                                              jurisdictionId,
                                                                              caseTypeId,
                                                                              caseReference,
-                                                                             event,
-                                                                             data,
-                                                                             token,
-                                                                             ignoreWarning);
+                                                                             content);
         return verifyReadAccess(caseType, userRoles, caseDetails);
     }
 

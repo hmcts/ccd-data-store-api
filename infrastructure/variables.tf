@@ -58,6 +58,21 @@ variable "jenkins_AAD_objectId" {
   description                 = "(Required) The Azure AD object ID of a user, service principal or security group in the Azure Active Directory tenant for the vault. The object ID must be unique for the list of access policies."
 }
 
+variable "definition_cache_ttl_sec" {
+  type = "string"
+  default = "259200"
+}
+
+variable "definition_cache_max_size" {
+  type = "string"
+  default = "5000"
+}
+
+variable "definition_cache_eviction_policy" {
+  type = "string"
+  default = "NONE"
+}
+
 ////////////////////////////////
 // Database
 ////////////////////////////////
@@ -72,7 +87,7 @@ variable "database_name" {
 
 variable "authorised-services" {
   type    = "string"
-  default = "ccd_data,ccd_gw,ccd_ps,probate_backend,divorce_ccd_submission,sscs,sscs_bulkscan,cmc,cmc_claim_store,jui_webapp,pui_webapp,bulk_scan_orchestrator,fpl_case_service"
+  default = "ccd_data,ccd_gw,ccd_ps,probate_backend,divorce_ccd_submission,sscs,sscs_bulkscan,cmc,cmc_claim_store,jui_webapp,pui_webapp,bulk_scan_orchestrator,fpl_case_service,iac,finrem_ccd_data_migrator"
 }
 
 variable "idam_api_url" {
@@ -120,4 +135,34 @@ variable "elastic_search_case_index_type" {
   description = "Cases index document type"
   type = "string"
   default = "_doc"
+}
+
+variable "http_client_connection_timeout" {
+  type = "string"
+  default = "30000"
+}
+
+variable "http_client_read_timeout" {
+  type = "string"
+  default = "15000"
+}
+
+variable "http_client_max_total" {
+  type = "string"
+  default = "100"
+}
+
+variable "http_client_seconds_idle_connection" {
+  type = "string"
+  default = "120"
+}
+
+variable "http_client_max_client_per_route" {
+  type = "string"
+  default = "20"
+}
+
+variable "http_client_validate_after_inactivity" {
+  type = "string"
+  default = "0"
 }
