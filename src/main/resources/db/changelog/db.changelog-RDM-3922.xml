@@ -1,0 +1,38 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+
+    <changeSet id="rdm-3922-1" author="giri.benadikar@hmcts.net">
+        <createIndex indexName="idx_case_data_created_date"
+                     schemaName="public"
+                     tableName="case_data">
+            <column name="created_date"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="rdm-3922-2" author="giri.benadikar@hmcts.net">
+        <dropIndex indexName="idx_jur_case_type"
+                   schemaName="public"
+                   tableName="case_data"/>
+
+        <createIndex indexName="idx_case_data_jur_case_type_state"
+                     schemaName="public"
+                     tableName="case_data">
+            <column name="jurisdiction" type="varchar(255)"/>
+            <column name="case_type_id" type="varchar(255)"/>
+            <column name="state" type="varchar(255)"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="rdm-3922-3" author="giri.benadikar@hmcts.net">
+        <sql dbms="postgresql"
+             endDelimiter="\nGO"
+             splitStatements="true"
+             stripComments="true">
+            CREATE INDEX idx_case_data_case_reference ON public.case_data USING BTREE ((TRIM(UPPER(data#>>'{caseReference}'))));
+            CREATE INDEX idx_case_data_d8_case_reference ON public.case_data USING BTREE ((TRIM(UPPER(data#>>'{D8caseReference}'))));
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
