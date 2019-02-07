@@ -2,11 +2,9 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
-import lombok.Builder;
 
 import java.io.Serializable;
 
-@Builder
 @ApiModel(description = "")
 public class WizardPageComplexFieldMask implements Serializable {
     private String complexFieldId;

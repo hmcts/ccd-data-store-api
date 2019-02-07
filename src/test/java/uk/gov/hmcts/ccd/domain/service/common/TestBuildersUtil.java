@@ -810,6 +810,52 @@ public class TestBuildersUtil {
         }
     }
 
+    public static class WizardPageComplexFieldMaskBuilder {
+        private final WizardPageComplexFieldMask wizardPageComplexFieldMask;
+
+        private WizardPageComplexFieldMaskBuilder() {
+            this.wizardPageComplexFieldMask = new WizardPageComplexFieldMask();
+        }
+
+        public static WizardPageComplexFieldMaskBuilder newWizardPageComplexFieldMask() {
+            return new WizardPageComplexFieldMaskBuilder();
+        }
+
+        public WizardPageComplexFieldMaskBuilder withComplexFieldId(String complexFieldId) {
+            this.wizardPageComplexFieldMask.setComplexFieldId(complexFieldId);
+            return this;
+        }
+
+        public WizardPageComplexFieldMaskBuilder withDisplayContext(String displayContext) {
+            this.wizardPageComplexFieldMask.setDisplayContext(displayContext);
+            return this;
+        }
+
+        public WizardPageComplexFieldMaskBuilder withOrder(Integer order) {
+            this.wizardPageComplexFieldMask.setOrder(order);
+            return this;
+        }
+
+        public WizardPageComplexFieldMaskBuilder withLabel(String label) {
+            this.wizardPageComplexFieldMask.setLabel(label);
+            return this;
+        }
+
+        public WizardPageComplexFieldMaskBuilder withHintText(String hintText) {
+            this.wizardPageComplexFieldMask.setHintText(hintText);
+            return this;
+        }
+
+        public WizardPageComplexFieldMaskBuilder withShowCondition(String showCondition) {
+            this.wizardPageComplexFieldMask.setShowCondition(showCondition);
+            return this;
+        }
+
+        public WizardPageComplexFieldMask build() {
+            return this.wizardPageComplexFieldMask;
+        }
+    }
+
     public static class StartEventTriggerBuilder {
         private final StartEventTrigger startEventTrigger;
 

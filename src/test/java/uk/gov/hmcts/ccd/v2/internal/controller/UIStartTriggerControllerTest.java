@@ -11,7 +11,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
-import uk.gov.hmcts.ccd.domain.model.definition.WizardPageComplexFieldMask;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetEventTriggerOperation;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -29,6 +28,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventTriggerBuilder.newCaseEventTrigger;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageBuilder.newWizardPage;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageComplexFieldMaskBuilder.newWizardPageComplexFieldMask;
 
 @DisplayName("UIStartTriggerControllerTest")
 
@@ -70,12 +70,13 @@ class UIStartTriggerControllerTest {
             .withField(aViewField()
                     .withId(FIELD_ID)
                     .build(),
-                singletonList(WizardPageComplexFieldMask.builder()
-                    .complexFieldId(FIELD_ID)
-                    .displayContext("MANDATORY")
-                    .label(FIELD_LABEL)
-                    .hintText(FIELD_HINT_TEXT)
-                    .showCondition(null)
+                singletonList(newWizardPageComplexFieldMask()
+                    .withComplexFieldId(FIELD_ID)
+                    .withDisplayContext("MANDATORY")
+                    .withLabel(FIELD_LABEL)
+                    .withHintText(FIELD_HINT_TEXT)
+                    .withOrder(1)
+                    .withShowCondition(null)
                     .build()))
             .build())
         .withShowSummary(IS_SHOW_SUMMARY)
