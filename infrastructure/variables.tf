@@ -121,3 +121,33 @@ variable "elastic_search_case_index_type" {
   type = "string"
   default = "_doc"
 }
+
+variable "http_client_connection_timeout" {
+  type = "string"
+  default = "30000"
+}
+
+variable "http_client_read_timeout" {
+  type = "string"
+  default = "15000"
+}
+
+variable "http_client_max_total" {
+  type = "string"
+  default = "100"
+}
+
+variable "http_client_seconds_idle_connection" {
+  type = "string"
+  default = "120"
+}
+
+variable "http_client_max_client_per_route" {
+  type = "string"
+  default = "20"
+}
+
+variable "http_client_validate_after_inactivity" {
+  type = "string"
+  default = "0"
+}
