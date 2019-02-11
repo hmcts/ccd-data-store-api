@@ -30,8 +30,8 @@
              endDelimiter="\nGO"
              splitStatements="true"
              stripComments="true">
-            CREATE INDEX idx_case_data_case_reference ON public.case_data USING BTREE ((data->>'caseReference'));
-            CREATE INDEX idx_case_data_d8_case_reference ON public.case_data USING BTREE ((data->>'D8caseReference'));
+            CREATE INDEX idx_case_data_case_reference ON public.case_data USING BTREE ((data#>>'{caseReference}'));
+            CREATE INDEX idx_case_data_d8_case_reference ON public.case_data USING BTREE ((data#>>'{D8caseReference}'));
         </sql>
     </changeSet>
 
