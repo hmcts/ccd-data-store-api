@@ -97,7 +97,7 @@ module "ccd-data-store-api" {
   additional_host_name = "debugparam"
   asp_name = "${(var.asp_name == "use_shared") ? local.sharedAppServicePlan : var.asp_name}"
   asp_rg = "${(var.asp_rg == "use_shared") ? local.sharedASPResourceGroup : var.asp_rg}"
-  website_local_cache_sizeinmb = 1400
+  website_local_cache_sizeinmb = 2000
   capacity = "${var.capacity}"
 
   app_settings = {
