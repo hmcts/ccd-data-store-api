@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        springBootVersion = '2.0.6.RELEASE'
+        springBootVersion = '2.1.2.RELEASE'
     }
     dependencies {
         classpath 'org.jsonschema2pojo:jsonschema2pojo-gradle-plugin:0.5.1'
@@ -26,11 +26,12 @@ plugins {
     id 'se.patrikerdes.use-latest-versions' version '0.2.7'
     id 'org.owasp.dependencycheck' version '3.3.2'
     id 'com.github.spotbugs' version '1.6.9'
-    id 'net.ltgt.apt' version '0.19'
+    id 'net.ltgt.apt' version '0.21'
 }
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
+apply plugin: 'net.ltgt.apt-idea'
 apply plugin: 'application'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
@@ -168,22 +169,22 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: reformLogging
     compile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: reformLogging
     compile 'org.projectlombok:lombok:1.18.4'
-    annotationProcessor 'org.projectlombok:lombok:1.18.4'
+    implementation 'org.mapstruct:mapstruct-jdk8:1.3.0.Final'
+//    annotationProcessor 'org.projectlombok:lombok:1.18.4'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.2.0.Final', 'org.projectlombok:lombok:1.18.4'
+    testAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.2.0.Final', 'org.projectlombok:lombok:1.18.4'
 
 //     Needs to explicitly bring in a different hibernate version as in pom.xml
     compile "org.hibernate:hibernate-core:${hibernateVersion}"
     compile "org.hibernate:hibernate-entitymanager:${hibernateVersion}"
 
     compile('org.springframework.boot:spring-boot-starter-actuator')
-    
-//    compile('org.springframework.boot:spring-boot-starter-data-jpa')
+
     compile("org.springframework.boot:spring-boot-starter-data-jpa") {
         exclude group: 'org.hibernate', module: 'hibernate-core'
         exclude group: 'org.hibernate', module: 'hibernate-entitymanager'
     }
-//    compile group: 'org.springframework.hateoas', name: 'spring-hateoas', version: '0.25.0.RELEASE'
     compile('org.springframework.boot:spring-boot-starter-hateoas')
-//    compile('org.springframework.boot:spring-boot-starter-jdbc')
     compile(group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc') {
         exclude group: 'org.apache.tomcat', module: 'tomcat-jdbc'
     }
@@ -199,9 +200,9 @@ dependencies {
     compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.1'
     compile group: 'io.springfox', name: 'springfox-swagger2', version: swagger2Version
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: swagger2Version
-    compile group: 'org.liquibase', name: 'liquibase-core', version: '3.5.5'
+    //interferes with springLiquibase
+//    compile group: 'org.liquibase', name: 'liquibase-core', version: '3.5.5'
     compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.5'
-//    compile group: 'uk.gov.hmcts.reform.auth', name: 'auth-checker-lib', version: '2.1.3'
     compile (group: 'uk.gov.hmcts.reform.auth', name: 'auth-checker-lib', version: '2.1.3') {
         // TODO remove when auth-checker-lib upgrades its dependency to spring boot 2.0.x
         exclude group: 'uk.gov.hmcts.reform', module: 'java-logging-spring'
@@ -220,15 +221,17 @@ dependencies {
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation('org.springframework.cloud:spring-cloud-starter-contract-stub-runner')
     testCompile group: 'com.opentable.components', name: 'otj-pg-embedded', version: '0.12.0'
-    testCompile group: 'com.github.tomakehurst', name: 'wiremock', version: '2.17.0'
+//    testCompile group: 'com.github.tomakehurst', name: 'wiremock', version: '2.17.0'
 //    testCompile group: 'com.github.tomakehurst', name: 'wiremock', version: '2.18.0'
-//    testCompile group: 'org.springframework.cloud', name: 'spring-cloud-contract-wiremock', version: '2.0.2.RELEASE'
+    testCompile "com.github.tomakehurst:wiremock-jre8:2.21.0"
+    testCompile group: 'org.springframework.cloud', name: 'spring-cloud-contract-wiremock', version: '2.1.0.RELEASE'
     // To avoid compiler warnings about @API annotations in JUnit5 code.
     testCompileOnly 'org.apiguardian:apiguardian-api:1.0.0'
     testCompile "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
     testRuntime "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
     testRuntime "org.junit.vintage:junit-vintage-engine:${junitVintageVersion}"
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '1.10.19'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '2.24.0'
+    testCompile group:'org.mockito', name: 'mockito-junit-jupiter', version:'2.24.0'
     testCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.1.0'
     testCompile group: 'com.xebialabs.restito', name: 'restito', version: '0.9.3'
     testCompile 'io.github.openfeign:feign-jackson:9.7.0'
@@ -245,8 +248,6 @@ dependencies {
     compile(group: 'org.elasticsearch', name: 'elasticsearch', version: '6.4.2') {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
     }
-    compile 'org.mapstruct:mapstruct-jdk8:1.2.0.Final'
-    annotationProcessor 'org.mapstruct:mapstruct-processor:1.2.0.Final'
     compile 'org.jooq:jool-java-8:0.9.14'
 
     runtime("org.springframework.boot:spring-boot-properties-migrator")
@@ -269,6 +270,24 @@ task projectVersion {
     description 'Prints the version of this project; used for publishing JAR file'
     doLast {
         print project.version
+    }
+}
+
+idea {
+    project {
+        // experimental: whether annotation processing will be configured in the IDE; only actually used with the 'idea' task.
+        configureAnnotationProcessing = true
+    }
+    module {
+        apt {
+            // whether generated sources dirs are added as generated sources root
+            addGeneratedSourcesDirs = true
+            // whether the annotationProcessor/apt and testAnnotationProcessor/testApt dependencies are added as module dependencies
+            addAptDependencies = true
+
+            // the dependency scope used for apt and/or compileOnly dependencies (when enabled above)
+            mainDependenciesScope = "PROVIDED" // defaults to "COMPILE" when using the Gradle integration in IntelliJ IDEA
+        }
     }
 }
 
