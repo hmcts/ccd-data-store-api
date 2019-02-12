@@ -25,14 +25,4 @@
         </createIndex>
     </changeSet>
 
-    <changeSet id="rdm-3922-3" author="giri.benadikar@hmcts.net">
-        <sql dbms="postgresql"
-             endDelimiter="\nGO"
-             splitStatements="true"
-             stripComments="true">
-            CREATE INDEX idx_case_data_case_reference ON public.case_data USING BTREE ((TRIM(UPPER(data#>>'{caseReference}'))));
-            CREATE INDEX idx_case_data_d8_case_reference ON public.case_data USING BTREE ((TRIM(UPPER(data#>>'{D8caseReference}'))));
-        </sql>
-    </changeSet>
-
 </databaseChangeLog>
