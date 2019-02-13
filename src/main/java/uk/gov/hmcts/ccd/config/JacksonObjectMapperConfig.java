@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.springframework.beans.factory.config.MethodInvokingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -30,4 +31,12 @@ public class JacksonObjectMapperConfig {
         mapper.registerModule(new JavaTimeModule());
         return mapper;
     }
+
+    @Bean
+    public MethodInvokingBean jsonPathParserForJackson() {
+        MethodInvokingBean jsonPathParserForJackson = new MethodInvokingBean();
+        jsonPathParserForJackson.setStaticMethod("uk.gov.hmcts.ccd.config.JaywayJsonPathConfig.configureJsonPathForJackson");
+        return jsonPathParserForJackson;
+    }
+
 }

@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -137,6 +138,10 @@ public class CaseType implements Serializable {
             .anyMatch(caseEvent -> caseEvent.getCanSaveDraft() != null && caseEvent.getCanSaveDraft());
     }
 
+    public boolean hasEventId(String eventId) {
+        return events.stream().anyMatch(event -> event.getId().equals(eventId));
+    }
+
     public List<SearchAliasField> getSearchAliasFields() {
         return searchAliasFields;
     }
@@ -145,5 +150,13 @@ public class CaseType implements Serializable {
         if (searchAliasFields != null) {
             this.searchAliasFields.addAll(searchAliasFields);
         }
+    }
+
+    public Optional<CaseField> lookupCaseField(String caseFieldId) {
+        return caseFields.stream().filter(caseField -> caseField.getId().equalsIgnoreCase(caseFieldId)).findFirst();
+    }
+
+    public boolean caseFieldIsACollection(String caseFieldId) {
+        return lookupCaseField(caseFieldId).map(CaseField::collectionFieldType).orElse(false);
     }
 }

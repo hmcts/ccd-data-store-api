@@ -62,7 +62,8 @@ public class CaseSearchEndpoint {
         @ApiParam(value = "Native ElasticSearch Search API request. Please refer to the ElasticSearch official "
             + "documentation. For cross case type search, "
             + "the search results will contain only metadata by default (no case field data). To get case data in the "
-            + "search results, please state the alias fields to be returned in the _source property for e.g. \"_source\":[\"alias.customer\",\"alias.postcode\"]",
+            + "search results, please state the alias fields to be returned in the _source property for e.g."
+            + " \"_source\":[\"alias.customer\",\"alias.postcode\"]",
                   required = true)
         @RequestBody String jsonSearchRequest) {
 
@@ -89,12 +90,14 @@ public class CaseSearchEndpoint {
 
     private void rejectBlackListedQuery(String jsonSearchRequest) {
         List<String> blackListedQueries = applicationParams.getSearchBlackList();
-        Optional<String> blackListedQueryOpt = blackListedQueries.stream().filter(blacklisted -> {
-                                                                                      Pattern p = Pattern.compile("\\b" + blacklisted + "\\b");
-                                                                                      Matcher m = p.matcher(jsonSearchRequest);
-                                                                                      return m.find();
-                                                                                  }
-        ).findFirst();
+        Optional<String> blackListedQueryOpt = blackListedQueries
+            .stream()
+            .filter(blacklisted -> {
+                Pattern p = Pattern.compile("\\b" + blacklisted + "\\b");
+                Matcher m = p.matcher(jsonSearchRequest);
+                return m.find();
+            })
+            .findFirst();
         blackListedQueryOpt.ifPresent(blacklisted -> {
             throw new BadSearchRequest(String.format("Query of type '%s' is not allowed", blacklisted));
         });
