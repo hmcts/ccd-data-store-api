@@ -23,7 +23,7 @@ import uk.gov.hmcts.ccd.v2.internal.resource.UIUserProfileResource;
 @DisplayName("UIStartTriggerControllerTest")
 class UIUserProfileControllerTest {
 
-    private static final String CASE_REFERENCE = "1234123412341238";
+    private static final String caseReference = "1234123412341238";
 
     @Mock
     private GetUserProfileOperation getUserProfileOperation;
@@ -59,10 +59,10 @@ class UIUserProfileControllerTest {
         @Test
         @DisplayName("should propagate exception")
         void shouldPropagateExceptionWhenThrown() {
-            when(getUserProfileOperation.execute(AccessControlService.CAN_READ)).thenThrow(Exception.class);
+            when(getUserProfileOperation.execute(AccessControlService.CAN_READ)).thenThrow(RuntimeException.class);
 
-            assertThrows(Exception.class,
-                         () -> profileController.getUserProfile());
+            assertThrows(RuntimeException.class,
+                () -> profileController.getUserProfile());
         }
     }
 

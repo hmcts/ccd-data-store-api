@@ -60,7 +60,7 @@ class UIDefinitionControllerTest {
                 () -> {
                     UIWorkbasketInputsResource.UIWorkbasketInput[] workbasketInputs = response.getBody().getWorkbasketInputs();
                     assertThat(Lists.newArrayList(workbasketInputs), hasItems(hasProperty("field", hasProperty("id", is("field1"))),
-                                                                              hasProperty("field", hasProperty("id", is("field2")))));
+                        hasProperty("field", hasProperty("id", is("field2")))));
                 }
             );
         }
@@ -68,10 +68,10 @@ class UIDefinitionControllerTest {
         @Test
         @DisplayName("should propagate exception")
         void shouldPropagateExceptionWhenThrown() {
-            when(findWorkbasketInputOperation.execute(CASE_TYPE_ID, CAN_READ)).thenThrow(Exception.class);
+            when(findWorkbasketInputOperation.execute(CASE_TYPE_ID, CAN_READ)).thenThrow(RuntimeException.class);
 
-            assertThrows(Exception.class,
-                         () -> uiDefinitionController.getWorkbasketInputsDetails(CASE_TYPE_ID));
+            assertThrows(RuntimeException.class,
+                () -> uiDefinitionController.getWorkbasketInputsDetails(CASE_TYPE_ID));
         }
     }
 }

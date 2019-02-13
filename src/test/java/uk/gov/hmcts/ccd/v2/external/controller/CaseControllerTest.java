@@ -73,7 +73,7 @@ class CaseControllerTest {
             when(getCaseOperation.execute(CASE_REFERENCE)).thenReturn(Optional.empty());
 
             assertThrows(CaseNotFoundException.class,
-                         () -> caseController.getCase(CASE_REFERENCE));
+                () -> caseController.getCase(CASE_REFERENCE));
         }
 
         @Test
@@ -82,16 +82,16 @@ class CaseControllerTest {
             when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
 
             assertThrows(BadRequestException.class,
-                         () -> caseController.getCase(CASE_REFERENCE));
+                () -> caseController.getCase(CASE_REFERENCE));
         }
 
         @Test
         @DisplayName("should propagate exception")
         void shouldPropagateExceptionWhenThrown() {
-            when(getCaseOperation.execute(CASE_REFERENCE)).thenThrow(Exception.class);
+            when(getCaseOperation.execute(CASE_REFERENCE)).thenThrow(RuntimeException.class);
 
             assertThrows(Exception.class,
-                         () -> caseController.getCase(CASE_REFERENCE));
+                () -> caseController.getCase(CASE_REFERENCE));
         }
     }
 }

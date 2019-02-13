@@ -26,7 +26,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
+    import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -1482,7 +1482,7 @@ public class SecurityClassificationServiceTest {
             CaseDetails caseDetails = applyClassification(PRIVATE);
 
             JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
-            assertThat(resultNode, is(equalTo(JSON_NODE_FACTORY.objectNode())));
+            assertThat(resultNode, is(equalTo(JSON_NODE_FACTORY.nullNode())));
         }
 
         @Test

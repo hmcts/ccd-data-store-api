@@ -170,7 +170,6 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: reformLogging
     compile 'org.projectlombok:lombok:1.18.4'
     implementation 'org.mapstruct:mapstruct-jdk8:1.3.0.Final'
-//    annotationProcessor 'org.projectlombok:lombok:1.18.4'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.2.0.Final', 'org.projectlombok:lombok:1.18.4'
     testAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.2.0.Final', 'org.projectlombok:lombok:1.18.4'
 
@@ -200,8 +199,7 @@ dependencies {
     compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.1'
     compile group: 'io.springfox', name: 'springfox-swagger2', version: swagger2Version
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: swagger2Version
-    //interferes with springLiquibase
-//    compile group: 'org.liquibase', name: 'liquibase-core', version: '3.5.5'
+    compile group: 'org.liquibase', name: 'liquibase-core', version: '3.6.3'
     compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.5'
     compile (group: 'uk.gov.hmcts.reform.auth', name: 'auth-checker-lib', version: '2.1.3') {
         // TODO remove when auth-checker-lib upgrades its dependency to spring boot 2.0.x
@@ -217,12 +215,9 @@ dependencies {
     runtime group: 'org.postgresql', name: 'postgresql', version: '42.2.2'
     runtime group: 'com.zaxxer', name: 'HikariCP', version: '2.7.9'
 
-//    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation('org.springframework.cloud:spring-cloud-starter-contract-stub-runner')
     testCompile group: 'com.opentable.components', name: 'otj-pg-embedded', version: '0.12.0'
-//    testCompile group: 'com.github.tomakehurst', name: 'wiremock', version: '2.17.0'
-//    testCompile group: 'com.github.tomakehurst', name: 'wiremock', version: '2.18.0'
     testCompile "com.github.tomakehurst:wiremock-jre8:2.21.0"
     testCompile group: 'org.springframework.cloud', name: 'spring-cloud-contract-wiremock', version: '2.1.0.RELEASE'
     // To avoid compiler warnings about @API annotations in JUnit5 code.
@@ -249,8 +244,6 @@ dependencies {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
     }
     compile 'org.jooq:jool-java-8:0.9.14'
-
-    runtime("org.springframework.boot:spring-boot-properties-migrator")
 }
 // end::dependencies[]
 
@@ -259,12 +252,6 @@ dependencyManagement {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
     }
 }
-
-// tag::wrapper[]
-wrapper {
-    gradleVersion = '4.7'
-}
-// end::wrapper[]
 
 task projectVersion {
     description 'Prints the version of this project; used for publishing JAR file'
