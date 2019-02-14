@@ -15,8 +15,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ElasticSearchConfiguration {
 
+    private final ApplicationParams applicationParams;
+
     @Autowired
-    private ApplicationParams applicationParams;
+    public ElasticSearchConfiguration(ApplicationParams applicationParams) {this.applicationParams = applicationParams;}
 
     @Bean
     public JestClient jestClient() {
@@ -24,11 +26,15 @@ public class ElasticSearchConfiguration {
         JestClientFactory factory = new JestClientFactory();
         Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
         factory.setHttpClientConfig(new HttpClientConfig.Builder(applicationParams.getElasticSearchDataHosts())
-            .multiThreaded(true)
-            .maxConnectionIdleTime(15, TimeUnit.SECONDS)
-            .connTimeout(4000)
-            .readTimeout(4000)
-            .gson(gson).build());
+                                        .multiThreaded(true)
+                                        .maxConnectionIdleTime(15, TimeUnit.SECONDS)
+                                        .connTimeout(4000)
+                                        .readTimeout(4000)
+                                        .gson(gson)
+                                        .discoveryEnabled(applicationParams.isElasticsearchNodeDiscoveryEnabled())
+                                        .discoveryFrequency(applicationParams.getElasticsearchNodeDiscoveryFrequencyMillis(), TimeUnit.MILLISECONDS)
+                                        .discoveryFilter(applicationParams.getElasticsearchNodeDiscoveryFilter())
+                                        .build());
         return factory.getObject();
     }
 

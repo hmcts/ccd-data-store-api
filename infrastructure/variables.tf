@@ -137,6 +137,24 @@ variable "elastic_search_case_index_type" {
   default = "_doc"
 }
 
+variable "elastic_search_nodes_discovery_enabled" {
+  description = "Enable Elasticsearch node discovery by Jest client"
+  type = "string"
+  default = "true"
+}
+
+variable "elastic_search_nodes_discovery_frequency_millis" {
+  description = "Elasticsearch node discovery frequency in milliseconds"
+  type = "string"
+  default = "1000"
+}
+
+variable "elastic_search_nodes_discovery_filter" {
+  description = "Elasticsearch node discovery filter"
+  type = "string"
+  default = "_all"
+}
+
 variable "http_client_connection_timeout" {
   type = "string"
   default = "30000"
