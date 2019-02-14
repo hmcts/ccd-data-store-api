@@ -113,25 +113,20 @@ ext {
             'class'      : 98
     ]
     appInsights = '2.0.1'
-    springCloudVersion = 'Finchley.SR2'
+    springCloudVersion = 'Greenwich.RELEASE'
 }
 
 group 'uk.gov.hmcts.ccd'
 version '1.2.0-SNAPSHOT'
 
-// tag::jar[]
-jar {
+bootJar {
     baseName = 'core-case-data'
     manifest {
         attributes 'Implementation-Title': project.name,
                 'Implementation-Version': project.version
     }
-    configurations {
-        jar.archiveName = 'core-case-data.jar'
-    }
+    archiveName = 'core-case-data.jar'
 }
-
-// end::jar[]
 
 // tag::dependencies[]
 sourceCompatibility = 1.8
@@ -217,9 +212,9 @@ dependencies {
 
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation('org.springframework.cloud:spring-cloud-starter-contract-stub-runner')
-    testCompile group: 'com.opentable.components', name: 'otj-pg-embedded', version: '0.12.0'
-    testCompile "com.github.tomakehurst:wiremock-jre8:2.21.0"
-    testCompile group: 'org.springframework.cloud', name: 'spring-cloud-contract-wiremock', version: '2.1.0.RELEASE'
+    testCompile ('com.opentable.components:otj-pg-embedded:0.12.0')
+    testCompile ('com.github.tomakehurst:wiremock-jre8:2.21.0')
+    testCompile ('org.springframework.cloud:spring-cloud-contract-wiremock:2.1.0.RELEASE')
     // To avoid compiler warnings about @API annotations in JUnit5 code.
     testCompileOnly 'org.apiguardian:apiguardian-api:1.0.0'
     testCompile "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
