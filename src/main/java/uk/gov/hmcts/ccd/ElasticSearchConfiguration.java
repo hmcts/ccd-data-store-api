@@ -18,7 +18,9 @@ public class ElasticSearchConfiguration {
     private final ApplicationParams applicationParams;
 
     @Autowired
-    public ElasticSearchConfiguration(ApplicationParams applicationParams) {this.applicationParams = applicationParams;}
+    public ElasticSearchConfiguration(ApplicationParams applicationParams) {
+        this.applicationParams = applicationParams;
+    }
 
     @Bean
     public JestClient jestClient() {
