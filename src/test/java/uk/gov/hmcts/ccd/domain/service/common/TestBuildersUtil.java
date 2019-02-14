@@ -38,7 +38,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
-import uk.gov.hmcts.ccd.domain.model.definition.WizardPageComplexFieldMask;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPageComplexFieldOverride;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPageField;
 import uk.gov.hmcts.ccd.domain.model.draft.CaseDraft;
 import uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDraftRequest;
@@ -810,49 +810,49 @@ public class TestBuildersUtil {
         }
     }
 
-    public static class WizardPageComplexFieldMaskBuilder {
-        private final WizardPageComplexFieldMask wizardPageComplexFieldMask;
+    public static class WizardPageComplexFieldOverrideBuilder {
+        private final WizardPageComplexFieldOverride wizardPageComplexFieldOverride;
 
-        private WizardPageComplexFieldMaskBuilder() {
-            this.wizardPageComplexFieldMask = new WizardPageComplexFieldMask();
+        private WizardPageComplexFieldOverrideBuilder() {
+            this.wizardPageComplexFieldOverride = new WizardPageComplexFieldOverride();
         }
 
-        public static WizardPageComplexFieldMaskBuilder newWizardPageComplexFieldMask() {
-            return new WizardPageComplexFieldMaskBuilder();
+        public static WizardPageComplexFieldOverrideBuilder newWizardPageComplexFieldOverride() {
+            return new WizardPageComplexFieldOverrideBuilder();
         }
 
-        public WizardPageComplexFieldMaskBuilder withComplexFieldId(String complexFieldId) {
-            this.wizardPageComplexFieldMask.setComplexFieldId(complexFieldId);
+        public WizardPageComplexFieldOverrideBuilder withComplexFieldId(String complexFieldId) {
+            this.wizardPageComplexFieldOverride.setComplexFieldElementId(complexFieldId);
             return this;
         }
 
-        public WizardPageComplexFieldMaskBuilder withDisplayContext(String displayContext) {
-            this.wizardPageComplexFieldMask.setDisplayContext(displayContext);
+        public WizardPageComplexFieldOverrideBuilder withDisplayContext(String displayContext) {
+            this.wizardPageComplexFieldOverride.setDisplayContext(displayContext);
             return this;
         }
 
-        public WizardPageComplexFieldMaskBuilder withOrder(Integer order) {
-            this.wizardPageComplexFieldMask.setOrder(order);
+        public WizardPageComplexFieldOverrideBuilder withOrder(Integer order) {
+            this.wizardPageComplexFieldOverride.setOrder(order);
             return this;
         }
 
-        public WizardPageComplexFieldMaskBuilder withLabel(String label) {
-            this.wizardPageComplexFieldMask.setLabel(label);
+        public WizardPageComplexFieldOverrideBuilder withLabel(String label) {
+            this.wizardPageComplexFieldOverride.setLabel(label);
             return this;
         }
 
-        public WizardPageComplexFieldMaskBuilder withHintText(String hintText) {
-            this.wizardPageComplexFieldMask.setHintText(hintText);
+        public WizardPageComplexFieldOverrideBuilder withHintText(String hintText) {
+            this.wizardPageComplexFieldOverride.setHintText(hintText);
             return this;
         }
 
-        public WizardPageComplexFieldMaskBuilder withShowCondition(String showCondition) {
-            this.wizardPageComplexFieldMask.setShowCondition(showCondition);
+        public WizardPageComplexFieldOverrideBuilder withShowCondition(String showCondition) {
+            this.wizardPageComplexFieldOverride.setShowCondition(showCondition);
             return this;
         }
 
-        public WizardPageComplexFieldMask build() {
-            return this.wizardPageComplexFieldMask;
+        public WizardPageComplexFieldOverride build() {
+            return this.wizardPageComplexFieldOverride;
         }
     }
 
@@ -904,17 +904,17 @@ public class TestBuildersUtil {
             wizardPageField.setCaseFieldId(caseField.getId());
             wizardPageField.setPageColumnNumber(1);
             wizardPageField.setOrder(1);
-            wizardPageField.setComplexFieldMaskList(emptyList());
+            wizardPageField.setComplexFieldOverrides(emptyList());
             wizardPageFields.add(wizardPageField);
             return this;
         }
 
-        public WizardPageBuilder withField(CaseViewField caseField, List<WizardPageComplexFieldMask> complexFieldMaskList) {
+        public WizardPageBuilder withField(CaseViewField caseField, List<WizardPageComplexFieldOverride> complexFieldOverrides) {
             WizardPageField wizardPageField = new WizardPageField();
             wizardPageField.setCaseFieldId(caseField.getId());
             wizardPageField.setPageColumnNumber(1);
             wizardPageField.setOrder(1);
-            wizardPageField.setComplexFieldMaskList(complexFieldMaskList);
+            wizardPageField.setComplexFieldOverrides(complexFieldOverrides);
             wizardPageFields.add(wizardPageField);
             return this;
         }

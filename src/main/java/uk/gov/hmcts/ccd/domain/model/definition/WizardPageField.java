@@ -14,7 +14,7 @@ public class WizardPageField implements Serializable {
     private Integer order = null;
     private Integer pageColumnNumber;
     private String displayContext;
-    private List<WizardPageComplexFieldMask> complexFieldMaskList = new ArrayList<>();
+    private List<WizardPageComplexFieldOverride> complexFieldOverrides = new ArrayList<>();
 
     @JsonProperty("case_field_id")
     public String getCaseFieldId() {
@@ -52,12 +52,12 @@ public class WizardPageField implements Serializable {
         this.displayContext = displayContext;
     }
 
-    @JsonProperty("complex_field_mask_list")
-    public List<WizardPageComplexFieldMask> getComplexFieldMaskList() {
-        return complexFieldMaskList;
+    @JsonProperty("complex_field_overrides")
+    public List<WizardPageComplexFieldOverride> getComplexFieldOverrides() {
+        return complexFieldOverrides;
     }
 
-    public void setComplexFieldMaskList(List<WizardPageComplexFieldMask> complexFieldMaskList) {
-        this.complexFieldMaskList = complexFieldMaskList;
+    public void setComplexFieldOverrides(List<WizardPageComplexFieldOverride> complexFieldOverrides) {
+        this.complexFieldOverrides = complexFieldOverrides;
     }
 }

@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventTriggerBuilder.newCaseEventTrigger;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageBuilder.newWizardPage;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageComplexFieldMaskBuilder.newWizardPageComplexFieldMask;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageComplexFieldOverrideBuilder.newWizardPageComplexFieldOverride;
 
 @DisplayName("UIStartTriggerControllerTest")
 
@@ -70,7 +70,7 @@ class UIStartTriggerControllerTest {
             .withField(aViewField()
                     .withId(FIELD_ID)
                     .build(),
-                singletonList(newWizardPageComplexFieldMask()
+                singletonList(newWizardPageComplexFieldOverride()
                     .withComplexFieldId(FIELD_ID)
                     .withDisplayContext("MANDATORY")
                     .withLabel(FIELD_LABEL)
@@ -115,19 +115,19 @@ class UIStartTriggerControllerTest {
                 () -> assertThat(response.getBody().getCaseEventTrigger().getWizardPages().get(0).getWizardPageFields().get(0),
                                  hasProperty("caseFieldId", CoreMatchers.is(FIELD_ID))),
                 () -> assertThat(response.getBody().getCaseEventTrigger().getWizardPages().get(0).getWizardPageFields().get(0)
-                        .getComplexFieldMaskList().get(0),
+                        .getComplexFieldOverrides().get(0),
                     hasProperty("complexFieldId", CoreMatchers.is(FIELD_ID))),
                 () -> assertThat(response.getBody().getCaseEventTrigger().getWizardPages().get(0).getWizardPageFields().get(0)
-                        .getComplexFieldMaskList().get(0),
+                        .getComplexFieldOverrides().get(0),
                     hasProperty("displayContext", CoreMatchers.is("MANDATORY"))),
                 () -> assertThat(response.getBody().getCaseEventTrigger().getWizardPages().get(0).getWizardPageFields().get(0)
-                        .getComplexFieldMaskList().get(0),
+                        .getComplexFieldOverrides().get(0),
                     hasProperty("label", CoreMatchers.is(FIELD_LABEL))),
                 () -> assertThat(response.getBody().getCaseEventTrigger().getWizardPages().get(0).getWizardPageFields().get(0)
-                        .getComplexFieldMaskList().get(0),
+                        .getComplexFieldOverrides().get(0),
                     hasProperty("hintText", CoreMatchers.is(FIELD_HINT_TEXT))),
                 () -> assertThat(response.getBody().getCaseEventTrigger().getWizardPages().get(0).getWizardPageFields().get(0)
-                        .getComplexFieldMaskList().get(0),
+                        .getComplexFieldOverrides().get(0),
                     hasProperty("showCondition", CoreMatchers.nullValue())),
                 () -> assertThat(response.getBody().getCaseEventTrigger().getShowSummary(), equalTo(IS_SHOW_SUMMARY)),
                 () -> assertThat(response.getBody().getCaseEventTrigger().getShowEventNotes(), equalTo(IS_SHOW_EVENT_NOTES)),
