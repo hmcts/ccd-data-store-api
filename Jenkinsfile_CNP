@@ -30,7 +30,8 @@ def secrets = [
         secret('ccd-api-gateway-oauth2-client-secret', 'OAUTH2_CLIENT_SECRET'),
     ],
     's2s-${env}': [
-        secret('microservicekey-ccd-gw', 'CCD_GW_SERVICE_SECRET')
+        secret('microservicekey-ccd-gw', 'CCD_GW_SERVICE_SECRET'),
+        secret('microservicekey-ccd-data', 'CCD_DATA_SERVICE_SECRET')
     ]
 ]
 
