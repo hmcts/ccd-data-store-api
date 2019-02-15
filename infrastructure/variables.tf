@@ -146,7 +146,7 @@ variable "elastic_search_nodes_discovery_enabled" {
 variable "elastic_search_nodes_discovery_frequency_millis" {
   description = "Elasticsearch node discovery frequency in milliseconds"
   type = "string"
-  default = "1000"
+  default = "5000"
 }
 
 variable "elastic_search_nodes_discovery_filter" {
