@@ -116,7 +116,7 @@ class UIStartTriggerControllerTest {
                                  hasProperty("caseFieldId", CoreMatchers.is(FIELD_ID))),
                 () -> assertThat(response.getBody().getCaseEventTrigger().getWizardPages().get(0).getWizardPageFields().get(0)
                         .getComplexFieldOverrides().get(0),
-                    hasProperty("complexFieldId", CoreMatchers.is(FIELD_ID))),
+                    hasProperty("complexFieldElementId", CoreMatchers.is(FIELD_ID))),
                 () -> assertThat(response.getBody().getCaseEventTrigger().getWizardPages().get(0).getWizardPageFields().get(0)
                         .getComplexFieldOverrides().get(0),
                     hasProperty("displayContext", CoreMatchers.is("MANDATORY"))),
