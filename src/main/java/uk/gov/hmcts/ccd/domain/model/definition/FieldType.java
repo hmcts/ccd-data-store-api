@@ -12,6 +12,7 @@ public class FieldType implements Serializable {
 
     public static final String COLLECTION = "Collection";
     public static final String COMPLEX = "Complex";
+    public static final String TEXT = "Text";
 
     private String id = null;
     private String type = null;
