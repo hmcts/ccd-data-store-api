@@ -26,7 +26,6 @@ public interface BaseTypeValidator {
     default Boolean isNull(final JsonNode dataValue) {
         return dataValue == null
             || dataValue.isNull()
-            || (dataValue.isTextual() && (null == dataValue.asText()) )
-            || (dataValue.isObject() && dataValue.toString().equals("{}"));
+            || (dataValue.isTextual() && (null == dataValue.asText()) );
     }
 }
