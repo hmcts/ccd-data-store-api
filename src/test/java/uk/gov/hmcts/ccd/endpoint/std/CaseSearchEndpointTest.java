@@ -1,9 +1,9 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
 import java.io.IOException;
-import java.util.Collections;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -27,7 +27,7 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
-import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
 class CaseSearchEndpointTest {
@@ -61,10 +61,10 @@ class CaseSearchEndpointTest {
             + "\"from\" : 0,\n"
             + "\"size\" : 3\n"
             + "}";
-        when(applicationParams.getSearchBlackList()).thenReturn(Collections.singletonList("query_string"));
+        when(applicationParams.getSearchBlackList()).thenReturn(singletonList("query_string"));
         when(objectMapperService.convertStringToObject(searchRequest, JsonNode.class)).thenReturn(objectMapper.readValue(searchRequest, ObjectNode.class));
 
-        assertThrows(BadSearchRequest.class, () -> endpoint.searchCases(CASE_TYPE_ID, searchRequest));
+        assertThrows(BadSearchRequest.class, () -> endpoint.searchCases(singletonList(CASE_TYPE_ID), searchRequest));
         verifyZeroInteractions(caseSearchOperation);
     }
 
@@ -97,12 +97,12 @@ class CaseSearchEndpointTest {
             + "}";
         given(applicationParams.getSearchBlackList()).willReturn(newArrayList("query_string"));
 
-        assertThrows(BadSearchRequest.class, () -> endpoint.searchCases(CASE_TYPE_ID, searchRequest));
+        assertThrows(BadSearchRequest.class, () -> endpoint.searchCases(singletonList(CASE_TYPE_ID), searchRequest));
         verifyZeroInteractions(caseSearchOperation);
     }
 
     @Test
-    void searchCaseDetailsAllowsQueriesNotBlacklisted() throws IOException {
+    void searchCaseDetailsAllowsQueriesNotBlacklisted() {
         String query = "{\n"
             + "   \"query\":{\n"
             + "      \"bool\":{\n"
@@ -125,21 +125,21 @@ class CaseSearchEndpointTest {
             + "}";
         given(applicationParams.getSearchBlackList()).willReturn(newArrayList("query_string"));
 
-        endpoint.searchCases(CASE_TYPE_ID, query);
+        endpoint.searchCases(singletonList(CASE_TYPE_ID), query);
 
-        verify(caseSearchOperation).execute(any(CaseSearchRequest.class));
+        verify(caseSearchOperation).execute(any(CrossCaseTypeSearchRequest.class));
     }
 
     @Test
-    void searchCaseDetailsInvokesOperation() throws IOException {
+    void searchCaseDetailsInvokesOperation() {
         given(applicationParams.getSearchBlackList()).willReturn(newArrayList("blockedQuery"));
         CaseSearchResult result = mock(CaseSearchResult.class);
-        when(caseSearchOperation.execute(any(CaseSearchRequest.class))).thenReturn(result);
+        when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class))).thenReturn(result);
         String searchRequest = "{\"query\": {\"match\": \"blah blah\"}}";
 
-        CaseSearchResult caseSearchResult = endpoint.searchCases(CASE_TYPE_ID, searchRequest);
+        CaseSearchResult caseSearchResult = endpoint.searchCases(singletonList(CASE_TYPE_ID), searchRequest);
 
-        verify(caseSearchOperation).execute(any(CaseSearchRequest.class));
+        verify(caseSearchOperation).execute(any(CrossCaseTypeSearchRequest.class));
         assertThat(caseSearchResult, is(result));
     }
 }

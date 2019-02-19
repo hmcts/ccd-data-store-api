@@ -5,6 +5,6 @@ import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 
 public interface CaseSearchOperation {
 
-    CaseSearchResult execute(CaseSearchRequest caseSearchRequest);
+    CaseSearchResult execute(CrossCaseTypeSearchRequest request);
 
 }
