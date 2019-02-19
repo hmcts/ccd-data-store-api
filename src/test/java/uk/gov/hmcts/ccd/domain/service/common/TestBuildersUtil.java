@@ -66,7 +66,8 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 public class TestBuildersUtil {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    private TestBuildersUtil() {}
+    private TestBuildersUtil() {
+    }
 
     public static class CallbackResponseBuilder {
         private final CallbackResponse callbackResponse;
@@ -237,6 +238,7 @@ public class TestBuildersUtil {
             this.caseDataContent.setCaseReference(caseReference);
             return this;
         }
+
         public static CaseDataContentBuilder newCaseDataContent() {
             return new CaseDataContentBuilder();
         }
@@ -811,7 +813,7 @@ public class TestBuildersUtil {
             return caseEventTrigger;
         }
     }
-    
+
     public static class StartEventTriggerBuilder {
         private final StartEventTrigger startEventTrigger;
 

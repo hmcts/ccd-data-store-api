@@ -95,25 +95,25 @@ class MidEventCallbackTest {
     void shouldInvokeMidEventCallbackWhenUrlDefined() {
 
         given(callbackInvoker.invokeMidEventCallback(wizardPageWithCallback,
-                                                     caseType,
-                                                     caseEvent,
-                                                     null,
-                                                     caseDetails,
-                                                     IGNORE_WARNINGS)).willReturn(caseDetails);
+            caseType,
+            caseEvent,
+            null,
+            caseDetails,
+            IGNORE_WARNINGS)).willReturn(caseDetails);
         given(caseService.getCaseDetails(JURISDICTION_ID, CASE_REFERENCE)).willThrow(ResourceNotFoundException.class);
 
         midEventCallback.invoke(CASE_TYPE_ID,
-                                newCaseDataContent().withEvent(event).withCaseReference(CASE_REFERENCE)
-                                    .withData(data).withIgnoreWarning(IGNORE_WARNINGS).build(),
-                                "createCase1"
+            newCaseDataContent().withEvent(event).withCaseReference(CASE_REFERENCE)
+                .withData(data).withIgnoreWarning(IGNORE_WARNINGS).build(),
+            "createCase1"
         );
 
         verify(callbackInvoker).invokeMidEventCallback(wizardPageWithCallback,
-                                                       caseType,
-                                                       caseEvent,
-                                                       null,
-                                                       caseDetails,
-                                                       IGNORE_WARNINGS);
+            caseType,
+            caseEvent,
+            null,
+            caseDetails,
+            IGNORE_WARNINGS);
     }
 
     @Test
@@ -127,20 +127,20 @@ class MidEventCallbackTest {
                 + "}"), STRING_JSON_MAP);
         CaseDetails updatedCaseDetails = caseDetails(data);
         given(callbackInvoker.invokeMidEventCallback(wizardPageWithCallback,
-                                                     caseType,
-                                                     caseEvent,
-                                                     null,
-                                                     caseDetails,
-                                                     IGNORE_WARNINGS)).willReturn(updatedCaseDetails);
+            caseType,
+            caseEvent,
+            null,
+            caseDetails,
+            IGNORE_WARNINGS)).willReturn(updatedCaseDetails);
 
         given(caseService.getCaseDetails(JURISDICTION_ID, CASE_REFERENCE)).willThrow(ResourceNotFoundException.class);
         given(caseService.createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, data)).willReturn(caseDetails);
 
         JsonNode result = midEventCallback.invoke(CASE_TYPE_ID,
-                                                  newCaseDataContent().withEvent(event).withData(data).withIgnoreWarning(IGNORE_WARNINGS)
-                                                      .withCaseReference(CASE_REFERENCE)
-                                                      .build(),
-                                                  "createCase1");
+            newCaseDataContent().withEvent(event).withData(data).withIgnoreWarning(IGNORE_WARNINGS)
+                .withCaseReference(CASE_REFERENCE)
+                .build(),
+            "createCase1");
 
         final JsonNode expectedResponse = MAPPER.readTree(
             "{"
@@ -155,13 +155,13 @@ class MidEventCallbackTest {
     @DisplayName("test no interaction when pageId not present")
     void testNoInteractionWhenMidEventCallbackUrlNotPresent() throws IOException {
         JsonNode result = midEventCallback.invoke(CASE_TYPE_ID,
-                                                  newCaseDataContent().withEvent(event).withData(data).withIgnoreWarning(IGNORE_WARNINGS).build(),
-                                                  "");
+            newCaseDataContent().withEvent(event).withData(data).withIgnoreWarning(IGNORE_WARNINGS).build(),
+            "");
 
         final JsonNode expectedResponse = MAPPER.readTree("{\"data\": {}}");
         assertThat("Data should stay unchanged", result, is(expectedResponse));
         verifyNoMoreInteractions(callbackInvoker, caseDefinitionRepository, eventTriggerService,
-                                 uiDefinitionRepository, caseService);
+            uiDefinitionRepository, caseService);
     }
 
     @Test
@@ -175,23 +175,23 @@ class MidEventCallbackTest {
                 + "}"), STRING_JSON_MAP);
         CaseDetails updatedCaseDetails = caseDetails(eventData);
         when(callbackInvoker.invokeMidEventCallback(wizardPageWithCallback,
-                                                    caseType,
-                                                    caseEvent,
-                                                    null,
-                                                    caseDetails,
-                                                    IGNORE_WARNINGS)).thenReturn(updatedCaseDetails);
+            caseType,
+            caseEvent,
+            null,
+            caseDetails,
+            IGNORE_WARNINGS)).thenReturn(updatedCaseDetails);
         when(caseService.createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, eventData)).thenReturn(caseDetails);
         given(caseService.getCaseDetails(JURISDICTION_ID, CASE_REFERENCE)).willThrow(ResourceNotFoundException.class);
 
         JsonNode result = midEventCallback.invoke(CASE_TYPE_ID,
-                                                  newCaseDataContent()
-                                                      .withEvent(event)
-                                                      .withData(data)
-                                                      .withCaseReference(CASE_REFERENCE)
-                                                      .withEventData(eventData)
-                                                      .withIgnoreWarning(IGNORE_WARNINGS)
-                                                      .build(),
-                                                  "createCase1");
+            newCaseDataContent()
+                .withEvent(event)
+                .withData(data)
+                .withCaseReference(CASE_REFERENCE)
+                .withEventData(eventData)
+                .withIgnoreWarning(IGNORE_WARNINGS)
+                .build(),
+            "createCase1");
 
         JsonNode expectedResponse = MAPPER.readTree(
             "{"
