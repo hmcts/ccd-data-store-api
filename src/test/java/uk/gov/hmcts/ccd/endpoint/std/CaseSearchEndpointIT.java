@@ -2,11 +2,16 @@ package uk.gov.hmcts.ccd.endpoint.std;
 
 import javax.inject.Inject;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -15,11 +20,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import io.searchbox.client.JestClient;
+import io.searchbox.core.MultiSearchResult;
 import io.searchbox.core.SearchResult;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.internal.util.reflection.Whitebox;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -82,11 +89,16 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
                 + "\"case_type_id\": \"AAT\"\n"
                 + "}";
 
+        MultiSearchResult multiSearchResult = mock(MultiSearchResult.class);
+        when(multiSearchResult.isSucceeded()).thenReturn(true);
         SearchResult searchResult = mock(SearchResult.class);
-        when(searchResult.isSucceeded()).thenReturn(true);
         when(searchResult.getTotal()).thenReturn(30L);
         when(searchResult.getSourceAsStringList()).thenReturn(newArrayList(caseDetailElastic));
-        when(jestClient.execute(anyObject())).thenReturn(searchResult);
+        MultiSearchResult.MultiSearchResponse response = mock(MultiSearchResult.MultiSearchResponse.class);
+        when(multiSearchResult.getResponses()).thenReturn(Collections.singletonList(response));
+        Whitebox.setInternalState(response, "searchResult", searchResult);
+
+        when(jestClient.execute(anyObject())).thenReturn(multiSearchResult);
 
         String searchRequest = "{\"query\": {\"match_all\": {}}}";
         MvcResult result = mockMvc.perform(post(POST_SEARCH_CASES)
@@ -107,7 +119,7 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
         assertThat(caseDetails, hasItem(hasProperty("jurisdiction", equalTo("AUTOTEST1"))));
         assertThat(caseDetails, hasItem(hasProperty("caseTypeId", equalTo("AAT"))));
         assertThat(caseDetails, hasItem(hasProperty("lastModified",
-                equalTo(LocalDateTime.parse("2018-08-28T09:58:11.643")))));
+                                                    equalTo(LocalDateTime.parse("2018-08-28T09:58:11.643")))));
         assertThat(caseDetails, hasItem(hasProperty("createdDate",
                 equalTo(LocalDateTime.parse("2018-08-28T09:58:11.627")))));
         assertThat(caseDetails, hasItem(hasProperty("state", equalTo("TODO"))));

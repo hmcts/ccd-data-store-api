@@ -133,6 +133,9 @@ module "ccd-data-store-api" {
     ELASTIC_SEARCH_BLACKLIST            = "${var.elastic_search_blacklist}"
     ELASTIC_SEARCH_CASE_INDEX_NAME_FORMAT = "${var.elastic_search_case_index_name_format}"
     ELASTIC_SEARCH_CASE_INDEX_TYPE      = "${var.elastic_search_case_index_type}"
+    ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED = "${var.elastic_search_nodes_discovery_enabled}"
+    ELASTIC_SEARCH_NODES_DISCOVERY_FREQUENCY_MILLIS = "${var.elastic_search_nodes_discovery_frequency_millis}"
+    ELASTIC_SEARCH_NODES_DISCOVERY_FILTER = "${var.elastic_search_nodes_discovery_filter}"
 
     HTTP_CLIENT_CONNECTION_TIMEOUT        = "${var.http_client_connection_timeout}"
     HTTP_CLIENT_READ_TIMEOUT              = "${var.http_client_read_timeout}"

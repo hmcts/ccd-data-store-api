@@ -78,6 +78,15 @@ public class ApplicationParams {
     @Value("${search.cases.index.name.type}")
     private String casesIndexType;
 
+    @Value("${search.elastic.nodes.discovery.enabled}")
+    private Boolean elasticsearchNodeDiscoveryEnabled;
+
+    @Value("${search.elastic.nodes.discovery.frequency.millis}")
+    private Long elasticsearchNodeDiscoveryFrequencyMillis;
+
+    @Value("${search.elastic.nodes.discovery.filter}")
+    private String elasticsearchNodeDiscoveryFilter;
+
     private static String encode(final String stringToEncode) {
         try {
             return URLEncoder.encode(stringToEncode, "UTF-8");
@@ -228,5 +237,17 @@ public class ApplicationParams {
 
     public List<String> getElasticSearchDataHosts() {
         return elasticSearchDataHosts.stream().map(quotedHost -> quotedHost.replace("\"", "")).collect(toList());
+    }
+
+    public Boolean isElasticsearchNodeDiscoveryEnabled() {
+        return elasticsearchNodeDiscoveryEnabled;
+    }
+
+    public Long getElasticsearchNodeDiscoveryFrequencyMillis() {
+        return elasticsearchNodeDiscoveryFrequencyMillis;
+    }
+
+    public String getElasticsearchNodeDiscoveryFilter() {
+        return elasticsearchNodeDiscoveryFilter;
     }
 }
