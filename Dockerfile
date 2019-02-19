@@ -1,3 +1,4 @@
+# Keep hub.Dockerfile aligned to this file as far as possible
 FROM hmcts/cnp-java-base:openjdk-8u191-jre-alpine3.9-1.0
 LABEL maintainer="https://github.com/hmcts/ccd-data-store-api"
 
