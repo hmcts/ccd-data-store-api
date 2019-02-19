@@ -22,7 +22,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 @Slf4j
 public class CaseSearchRequest {
 
-    public static final String QUERY_NAME = "query";
+    public static final String QUERY = "query";
 
     private final String caseTypeId;
     private final JsonNode searchRequestJsonNode;
@@ -34,7 +34,7 @@ public class CaseSearchRequest {
     }
 
     private void validateJsonSearchRequest() {
-        if (!searchRequestJsonNode.has(QUERY_NAME)) {
+        if (!searchRequestJsonNode.has(QUERY)) {
             throw new BadSearchRequest("missing required field 'query'");
         }
     }
@@ -44,7 +44,7 @@ public class CaseSearchRequest {
     }
 
     public String getQueryValue() {
-        return searchRequestJsonNode.get(QUERY_NAME).toString();
+        return searchRequestJsonNode.get(QUERY).toString();
     }
 
     public String toJsonString() {

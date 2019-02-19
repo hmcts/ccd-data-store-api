@@ -2,7 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security;
 
 import java.util.List;
 
-import static uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest.QUERY_NAME;
+import static uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest.QUERY;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -52,7 +52,7 @@ public class ElasticsearchCaseSearchRequestSecurity implements CaseSearchRequest
     private CaseSearchRequest createNewCaseSearchRequest(CaseSearchRequest caseSearchRequest, String queryWithFilters) {
         ObjectNode searchRequestJsonNode = objectMapperService.convertStringToObject(caseSearchRequest.toJsonString(), ObjectNode.class);
         ObjectNode queryNode = objectMapperService.convertStringToObject(queryWithFilters, ObjectNode.class);
-        searchRequestJsonNode.set(QUERY_NAME, queryNode.get(QUERY_NAME));
+        searchRequestJsonNode.set(QUERY, queryNode.get(QUERY));
 
         return new CaseSearchRequest(caseSearchRequest.getCaseTypeId(), searchRequestJsonNode);
     }
