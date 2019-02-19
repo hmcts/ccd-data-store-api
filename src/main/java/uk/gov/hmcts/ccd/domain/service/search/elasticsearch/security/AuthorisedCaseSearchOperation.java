@@ -144,19 +144,14 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
      *     "postcode": "W4"
      *   }
      * }
-     *
      * and the source filter is
      * "_source": ["alias.lastName", "alias.postcode"]
      * where alias.lastName = case_data.PersonLastName and alias.postcode = case_data.PersonAddress.postcode
-     *
-     * <p>
      * the case data will be filtered and transformed to
      * "case_data": {
      *   "lastName": "Baker",
      *   "postcode": "W4",
      * }
-     *
-     * <p>
      * If no source filter was passed then this will remove case data and return only metadata.
      */
     private void filterCaseDataForMultiCaseTypeSearch(CrossCaseTypeSearchRequest searchRequest, CaseType authorisedCaseType, CaseDetails caseDetails) {
