@@ -1,15 +1,22 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.JsonObject;
 import io.searchbox.client.JestClient;
+import io.searchbox.core.MultiSearch;
+import io.searchbox.core.MultiSearchResult;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
+import lombok.extern.slf4j.Slf4j;
 import org.jooq.lambda.Unchecked;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -25,9 +32,11 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 @Service
 @Qualifier(ElasticsearchCaseSearchOperation.QUALIFIER)
+@Slf4j
 public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
 
     public static final String QUALIFIER = "ElasticsearchCaseSearchOperation";
+    static final String MULTI_SEARCH_ERROR_MSG_ROOT_CAUSE = "root_cause";
 
     private final JestClient jestClient;
     private final ObjectMapper objectMapper;
@@ -49,8 +58,8 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     }
 
     @Override
-    public CaseSearchResult execute(CaseSearchRequest caseSearchRequest) {
-        SearchResult result = search(caseSearchRequest);
+    public CaseSearchResult execute(CrossCaseTypeSearchRequest request) {
+        MultiSearchResult result = search(request);
         if (result.isSucceeded()) {
             return toCaseDetailsSearchResult(result);
         } else {
@@ -58,28 +67,59 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
         }
     }
 
-    private SearchResult search(CaseSearchRequest caseSearchRequest) {
-        Search searchRequest = secureAndTransformSearchRequest(caseSearchRequest);
+    private MultiSearchResult search(CrossCaseTypeSearchRequest request) {
+        MultiSearch multiSearch = secureAndTransformSearchRequest(request);
         try {
-            return jestClient.execute(searchRequest);
+            return jestClient.execute(multiSearch);
         } catch (IOException e) {
-            throw new ServiceException("Exception executing Elasticsearch : " + e.getMessage(), e);
+            throw new ServiceException("Exception executing search : " + e.getMessage(), e);
         }
     }
 
-    private Search secureAndTransformSearchRequest(CaseSearchRequest caseSearchRequest) {
-        CaseSearchRequest securedSearchRequest = caseSearchRequestSecurity.createSecuredSearchRequest(caseSearchRequest);
+    private MultiSearch secureAndTransformSearchRequest(CrossCaseTypeSearchRequest request) {
+        Collection<Search> securedSearches = request.getCaseTypeIds()
+            .stream()
+            .map(caseTypeId -> createSecuredSearch(caseTypeId, request.getSearchRequestJsonNode()))
+            .collect(toList());
+
+        return new MultiSearch.Builder(securedSearches).build();
+    }
+
+    private Search createSecuredSearch(String caseTypeId, JsonNode searchRequestJsonNode) {
+        CaseSearchRequest securedSearchRequest = caseSearchRequestSecurity.createSecuredSearchRequest(new CaseSearchRequest(caseTypeId, searchRequestJsonNode));
         return new Search.Builder(securedSearchRequest.toJsonString())
-            .addIndex(getCaseIndexName(caseSearchRequest.getCaseTypeId()))
+            .addIndex(getCaseIndexName(caseTypeId))
             .addType(getCaseIndexType())
             .build();
     }
 
-    private CaseSearchResult toCaseDetailsSearchResult(SearchResult result) {
-        List<String> casesAsString = result.getSourceAsStringList();
+    private CaseSearchResult toCaseDetailsSearchResult(MultiSearchResult multiSearchResult) {
+        List<CaseDetails> caseDetails = new ArrayList<>();
+        long totalHits = 0L;
+
+        for (MultiSearchResult.MultiSearchResponse response : multiSearchResult.getResponses()) {
+            if (response.isError) {
+                JsonObject errorObject = response.error.getAsJsonObject();
+                String errMsg = errorObject.toString();
+                log.error("Elasticsearch query execution error: {}", errMsg);
+                if (errorObject.has(MULTI_SEARCH_ERROR_MSG_ROOT_CAUSE)) {
+                    errMsg = errorObject.get(MULTI_SEARCH_ERROR_MSG_ROOT_CAUSE).toString();
+                }
+                throw new BadSearchRequest(errMsg);
+            }
+            if (response.searchResult != null) {
+                caseDetails.addAll(searchResultToCaseList(response.searchResult));
+                totalHits += response.searchResult.getTotal();
+            }
+        }
+
+        return new CaseSearchResult(totalHits, caseDetails);
+    }
+
+    private List<CaseDetails> searchResultToCaseList(SearchResult searchResult) {
+        List<String> casesAsString = searchResult.getSourceAsStringList();
         List<ElasticSearchCaseDetailsDTO> dtos = toElasticSearchCasesDTO(casesAsString);
-        List<CaseDetails> caseDetails = caseDetailsMapper.dtosToCaseDetailsList(dtos);
-        return new CaseSearchResult(result.getTotal(), caseDetails);
+        return caseDetailsMapper.dtosToCaseDetailsList(dtos);
     }
 
     private List<ElasticSearchCaseDetailsDTO> toElasticSearchCasesDTO(List<String> cases) {

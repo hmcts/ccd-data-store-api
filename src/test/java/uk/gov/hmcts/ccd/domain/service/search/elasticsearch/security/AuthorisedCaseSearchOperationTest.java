@@ -1,18 +1,24 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-import static uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest.QUERY_NAME;
+import static uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest.QUERY;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -32,12 +38,13 @@ import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
-import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 
 class AuthorisedCaseSearchOperationTest {
 
-    private static final String CASE_TYPE_ID = "caseType";
+    private static final String CASE_TYPE_ID_1 = "caseType1";
+    private static final String CASE_TYPE_ID_2 = "caseType2";
 
     @Mock
     private CaseSearchOperation caseSearchOperation;
@@ -62,18 +69,19 @@ class AuthorisedCaseSearchOperationTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-        caseType.setId(CASE_TYPE_ID);
-        searchRequestJsonNode.set(QUERY_NAME, mock(ObjectNode.class));
+        caseType.setId(CASE_TYPE_ID_1);
+        searchRequestJsonNode.set(QUERY, mock(ObjectNode.class));
     }
 
     @Test
     @DisplayName("should filter fields and return search results for valid query")
     void shouldFilterFieldsReturnSearchResults() {
-        CaseSearchRequest request = new CaseSearchRequest(CASE_TYPE_ID, searchRequestJsonNode);
         CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseTypeId(CASE_TYPE_ID_1);
         CaseSearchResult searchResult = new CaseSearchResult(1L, singletonList(caseDetails));
-        when(authorisedCaseDefinitionDataService.getAuthorisedCaseType(CASE_TYPE_ID, CAN_READ)).thenReturn(Optional.of(caseType));
-        when(caseSearchOperation.execute(request)).thenReturn(searchResult);
+        when(authorisedCaseDefinitionDataService.getAuthorisedCaseType(CASE_TYPE_ID_1, CAN_READ)).thenReturn(Optional.of(caseType));
+        when(authorisedCaseDefinitionDataService.getAuthorisedCaseType(CASE_TYPE_ID_2, CAN_READ)).thenReturn(Optional.empty());
+        when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class))).thenReturn(searchResult);
 
         Map<String, JsonNode> unFilteredData = new HashMap<>();
         caseDetails.setData(unFilteredData);
@@ -86,14 +94,17 @@ class AuthorisedCaseSearchOperationTest {
         Map<String, JsonNode> filteredData = new HashMap<>();
         when(objectMapperService.convertJsonNodeToMap(jsonNode)).thenReturn(filteredData);
 
-        CaseSearchResult result = authorisedCaseDetailsSearchOperation.execute(request);
+        CrossCaseTypeSearchRequest searchRequest = new CrossCaseTypeSearchRequest(asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2), searchRequestJsonNode);
+
+        CaseSearchResult result = authorisedCaseDetailsSearchOperation.execute(searchRequest);
 
         assertAll(
             () -> assertThat(result, is(searchResult)),
             () -> assertThat(caseDetails.getData(), Matchers.is(filteredData)),
             () -> assertThat(result.getTotal(), is(1L)),
-            () -> verify(authorisedCaseDefinitionDataService).getAuthorisedCaseType(CASE_TYPE_ID, CAN_READ),
-            () -> verify(caseSearchOperation).execute(request),
+            () -> verify(authorisedCaseDefinitionDataService).getAuthorisedCaseType(CASE_TYPE_ID_1, CAN_READ),
+            () -> verify(authorisedCaseDefinitionDataService).getAuthorisedCaseType(CASE_TYPE_ID_2, CAN_READ),
+            () -> verify(caseSearchOperation).execute(any(CrossCaseTypeSearchRequest.class)),
             () -> verify(userRepository).getUserRoles(),
             () -> verify(objectMapperService).convertObjectToJsonNode(unFilteredData),
             () -> verify(accessControlService).filterCaseFieldsByAccess(jsonNode, caseType.getCaseFields(), userRoles, CAN_READ),
@@ -105,15 +116,15 @@ class AuthorisedCaseSearchOperationTest {
     @Test
     @DisplayName("should return empty list of cases when user is not authorised to access case type")
     void shouldReturnEmptyCaseList() {
-        CaseSearchRequest request = new CaseSearchRequest(CASE_TYPE_ID, searchRequestJsonNode);
-        when(authorisedCaseDefinitionDataService.getAuthorisedCaseType(CASE_TYPE_ID, CAN_READ)).thenReturn(Optional.empty());
+        CrossCaseTypeSearchRequest searchRequest = new CrossCaseTypeSearchRequest(singletonList(CASE_TYPE_ID_1), searchRequestJsonNode);
+        when(authorisedCaseDefinitionDataService.getAuthorisedCaseType(CASE_TYPE_ID_1, CAN_READ)).thenReturn(Optional.empty());
 
-        CaseSearchResult result = authorisedCaseDetailsSearchOperation.execute(request);
+        CaseSearchResult result = authorisedCaseDetailsSearchOperation.execute(searchRequest);
 
         assertAll(
             () -> assertThat(result.getCases(), hasSize(0)),
             () -> assertThat(result.getTotal(), is(0L)),
-            () -> verify(authorisedCaseDefinitionDataService).getAuthorisedCaseType(CASE_TYPE_ID, CAN_READ),
+            () -> verify(authorisedCaseDefinitionDataService).getAuthorisedCaseType(CASE_TYPE_ID_1, CAN_READ),
             () -> verifyZeroInteractions(caseSearchOperation),
             () -> verifyZeroInteractions(accessControlService),
             () -> verifyZeroInteractions(userRepository),
