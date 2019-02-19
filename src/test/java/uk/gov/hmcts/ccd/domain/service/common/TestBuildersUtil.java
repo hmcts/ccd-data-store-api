@@ -233,6 +233,10 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public CaseDataContentBuilder withCaseReference(String caseReference) {
+            this.caseDataContent.setCaseReference(caseReference);
+            return this;
+        }
         public static CaseDataContentBuilder newCaseDataContent() {
             return new CaseDataContentBuilder();
         }

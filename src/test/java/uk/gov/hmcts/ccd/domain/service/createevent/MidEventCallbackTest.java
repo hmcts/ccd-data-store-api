@@ -24,6 +24,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
@@ -35,6 +36,7 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 class MidEventCallbackTest {
 
@@ -44,6 +46,7 @@ class MidEventCallbackTest {
     private static final String JURISDICTION_ID = "jurisdictionId";
     private static final String CASE_TYPE_ID = "caseTypeId";
     private static final Boolean IGNORE_WARNINGS = Boolean.FALSE;
+    private static final String CASE_REFERENCE = "12356878998658";
 
     @InjectMocks
     private MidEventCallback midEventCallback;
@@ -97,9 +100,11 @@ class MidEventCallbackTest {
                                                      null,
                                                      caseDetails,
                                                      IGNORE_WARNINGS)).willReturn(caseDetails);
+        given(caseService.getCaseDetails(JURISDICTION_ID, CASE_REFERENCE)).willThrow(ResourceNotFoundException.class);
 
         midEventCallback.invoke(CASE_TYPE_ID,
-                                newCaseDataContent().withEvent(event).withData(data).withIgnoreWarning(IGNORE_WARNINGS).build(),
+                                newCaseDataContent().withEvent(event).withCaseReference(CASE_REFERENCE)
+                                    .withData(data).withIgnoreWarning(IGNORE_WARNINGS).build(),
                                 "createCase1"
         );
 
@@ -127,10 +132,14 @@ class MidEventCallbackTest {
                                                      null,
                                                      caseDetails,
                                                      IGNORE_WARNINGS)).willReturn(updatedCaseDetails);
+
+        given(caseService.getCaseDetails(JURISDICTION_ID, CASE_REFERENCE)).willThrow(ResourceNotFoundException.class);
         given(caseService.createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, data)).willReturn(caseDetails);
 
         JsonNode result = midEventCallback.invoke(CASE_TYPE_ID,
-                                                  newCaseDataContent().withEvent(event).withData(data).withIgnoreWarning(IGNORE_WARNINGS).build(),
+                                                  newCaseDataContent().withEvent(event).withData(data).withIgnoreWarning(IGNORE_WARNINGS)
+                                                      .withCaseReference(CASE_REFERENCE)
+                                                      .build(),
                                                   "createCase1");
 
         final JsonNode expectedResponse = MAPPER.readTree(
@@ -172,11 +181,13 @@ class MidEventCallbackTest {
                                                     caseDetails,
                                                     IGNORE_WARNINGS)).thenReturn(updatedCaseDetails);
         when(caseService.createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, eventData)).thenReturn(caseDetails);
+        given(caseService.getCaseDetails(JURISDICTION_ID, CASE_REFERENCE)).willThrow(ResourceNotFoundException.class);
 
         JsonNode result = midEventCallback.invoke(CASE_TYPE_ID,
                                                   newCaseDataContent()
                                                       .withEvent(event)
                                                       .withData(data)
+                                                      .withCaseReference(CASE_REFERENCE)
                                                       .withEventData(eventData)
                                                       .withIgnoreWarning(IGNORE_WARNINGS)
                                                       .build(),
@@ -194,6 +205,66 @@ class MidEventCallbackTest {
             () -> verify(callbackInvoker).invokeMidEventCallback(wizardPageWithCallback, caseType, caseEvent, null, caseDetails, IGNORE_WARNINGS),
             () -> verify(caseService, never()).createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, data),
             () -> verify(caseService).createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, eventData));
+    }
+
+    @Test
+    @DisplayName("should include data from existing case reference during a midevent callback")
+    void shouldContainAllDataFromExistingCaseReferenceDuringAMidEventCallback() throws Exception {
+
+        Map<String, JsonNode> eventData = MAPPER.convertValue(MAPPER.readTree(
+            "{\n"
+                + "  \"PersonFirstName\": \"First Name\",\n"
+                + "  \"PersonLastName\": \"Last Name\"\n"
+                + "}"), STRING_JSON_MAP);
+
+        Map<String, JsonNode> existingData = MAPPER.convertValue(MAPPER.readTree(
+            "{\n"
+                + "  \"PersonFirstName\": \"First Name\",\n"
+                + "  \"PersonMiddleName\": \"Middle Name\"\n"
+                + "}"), STRING_JSON_MAP);
+        Map<String, JsonNode> combineData = MAPPER.convertValue(MAPPER.readTree(
+            "{\n"
+                + "  \"PersonFirstName\": \"First Name\",\n"
+                + "  \"PersonLastName\": \"Last Name\",\n"
+                + "  \"PersonMiddleName\": \"Middle Name\"\n"
+                + "}"), STRING_JSON_MAP);
+        CaseDetails updatedCaseDetails = caseDetails(eventData);
+        CaseDetails currentCaseDetails = caseDetails(existingData);
+        CaseDetails combineCaseDetails = caseDetails(combineData);
+
+        when(callbackInvoker.invokeMidEventCallback(wizardPageWithCallback,
+            caseType,
+            caseEvent,
+            null,
+            combineCaseDetails,
+            IGNORE_WARNINGS)).thenReturn(combineCaseDetails);
+        when(caseService.createNewCaseDetails(Mockito.eq(CASE_TYPE_ID), Mockito.eq(JURISDICTION_ID),
+            Mockito.isA(Map.class))).thenReturn(combineCaseDetails);
+        given(caseService.getCaseDetails(JURISDICTION_ID, CASE_REFERENCE)).willReturn(currentCaseDetails);
+
+        JsonNode result = midEventCallback.invoke(CASE_TYPE_ID,
+            newCaseDataContent()
+                .withEvent(event)
+                .withData(data)
+                .withCaseReference(CASE_REFERENCE)
+                .withEventData(eventData)
+                .withIgnoreWarning(IGNORE_WARNINGS)
+                .build(),
+            "createCase1");
+
+        JsonNode expectedResponse = MAPPER.readTree(
+            "{"
+                + "\"data\": {\n"
+                + "  \"PersonFirstName\": \"First Name\",\n"
+                + "  \"PersonLastName\": \"Last Name\",\n"
+                + "  \"PersonMiddleName\": \"Middle Name\"\n"
+                + "}}");
+
+        assertAll(
+            () -> assertThat(result, is(expectedResponse)),
+            () -> verify(callbackInvoker).invokeMidEventCallback(wizardPageWithCallback, caseType, caseEvent, null, combineCaseDetails, IGNORE_WARNINGS),
+            () -> verify(caseService, never()).createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, data),
+            () -> verify(caseService).createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, combineData));
     }
 
     private CaseDetails caseDetails(Map<String, JsonNode> data) {
