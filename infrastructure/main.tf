@@ -97,7 +97,7 @@ module "ccd-data-store-api" {
   additional_host_name = "debugparam"
   asp_name = "${(var.asp_name == "use_shared") ? local.sharedAppServicePlan : var.asp_name}"
   asp_rg = "${(var.asp_rg == "use_shared") ? local.sharedASPResourceGroup : var.asp_rg}"
-  website_local_cache_sizeinmb = 1050
+  website_local_cache_sizeinmb = 2000
   capacity = "${var.capacity}"
 
   app_settings = {
@@ -137,6 +137,16 @@ module "ccd-data-store-api" {
     ELASTIC_SEARCH_BLACKLIST            = "${var.elastic_search_blacklist}"
     ELASTIC_SEARCH_CASE_INDEX_NAME_FORMAT = "${var.elastic_search_case_index_name_format}"
     ELASTIC_SEARCH_CASE_INDEX_TYPE      = "${var.elastic_search_case_index_type}"
+    ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED = "${var.elastic_search_nodes_discovery_enabled}"
+    ELASTIC_SEARCH_NODES_DISCOVERY_FREQUENCY_MILLIS = "${var.elastic_search_nodes_discovery_frequency_millis}"
+    ELASTIC_SEARCH_NODES_DISCOVERY_FILTER = "${var.elastic_search_nodes_discovery_filter}"
+
+    HTTP_CLIENT_CONNECTION_TIMEOUT        = "${var.http_client_connection_timeout}"
+    HTTP_CLIENT_READ_TIMEOUT              = "${var.http_client_read_timeout}"
+    HTTP_CLIENT_MAX_TOTAL                 = "${var.http_client_max_total}"
+    HTTP_CLIENT_SECONDS_IDLE_CONNECTION   = "${var.http_client_seconds_idle_connection}"
+    HTTP_CLIENT_MAX_CLIENT_PER_ROUTE      = "${var.http_client_max_client_per_route}"
+    HTTP_CLIENT_VALIDATE_AFTER_INACTIVITY = "${var.http_client_validate_after_inactivity}"
   }
 
 }
