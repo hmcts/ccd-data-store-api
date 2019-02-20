@@ -63,7 +63,7 @@ public class MidEventCallback {
                 .findFirst();
 
             if (wizardPageOptional.isPresent() && !isBlank(wizardPageOptional.get().getCallBackURLMidEvent())) {
-                Optional<CaseDetails> currentCaseDetails = getCaseDetails(content, caseType);
+                Optional<CaseDetails> currentCaseDetails = populateCurrentCaseDetailsWithUserInputs(content, caseType);
                 CaseDetails newCaseDetails;
                 if (currentCaseDetails.isPresent()) {
                     newCaseDetails = caseService.createNewCaseDetails(caseTypeId, caseType.getJurisdictionId(),
@@ -85,12 +85,11 @@ public class MidEventCallback {
         return dataJsonNode(content.getData());
     }
 
-    private Optional<CaseDetails> getCaseDetails(CaseDataContent content, CaseType caseType) {
+    private Optional<CaseDetails> populateCurrentCaseDetailsWithUserInputs(CaseDataContent content, CaseType caseType) {
         try {
             CaseDetails caseDetails = caseService.getCaseDetails(caseType.getJurisdictionId(), content.getCaseReference());
-            content.getEventData().forEach((key, value) -> {
-                caseDetails.getData().put(key, value);
-            });
+            content.getEventData().forEach((key, value) -> caseDetails.getData().put(key, value));
+
             return Optional.of(caseDetails);
         } catch (ResourceNotFoundException e) {
             return Optional.empty();
