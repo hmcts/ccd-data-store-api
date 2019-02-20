@@ -228,7 +228,6 @@ class MidEventCallbackTest {
                 + "  \"PersonLastName\": \"Last Name\",\n"
                 + "  \"PersonMiddleName\": \"Middle Name\"\n"
                 + "}"), STRING_JSON_MAP);
-        CaseDetails updatedCaseDetails = caseDetails(eventData);
         CaseDetails currentCaseDetails = caseDetails(existingData);
         CaseDetails combineCaseDetails = caseDetails(combineData);
 
