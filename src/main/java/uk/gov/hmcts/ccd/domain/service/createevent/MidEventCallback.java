@@ -23,7 +23,6 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 @Service
@@ -63,7 +62,7 @@ public class MidEventCallback {
                 .findFirst();
 
             if (wizardPageOptional.isPresent() && !isBlank(wizardPageOptional.get().getCallBackURLMidEvent())) {
-                Optional<CaseDetails> currentCaseDetails = populateCurrentCaseDetailsWithUserInputs(content, caseType);
+                Optional<CaseDetails> currentCaseDetails = caseService.populateCurrentCaseDetailsWithUserInputs(content, caseType.getJurisdictionId());
                 CaseDetails newCaseDetails;
                 if (currentCaseDetails.isPresent()) {
                     newCaseDetails = caseService.createNewCaseDetails(caseTypeId, caseType.getJurisdictionId(),
@@ -83,17 +82,6 @@ public class MidEventCallback {
             }
         }
         return dataJsonNode(content.getData());
-    }
-
-    private Optional<CaseDetails> populateCurrentCaseDetailsWithUserInputs(CaseDataContent content, CaseType caseType) {
-        try {
-            CaseDetails caseDetails = caseService.getCaseDetails(caseType.getJurisdictionId(), content.getCaseReference());
-            content.getEventData().forEach((key, value) -> caseDetails.getData().put(key, value));
-
-            return Optional.of(caseDetails);
-        } catch (ResourceNotFoundException e) {
-            return Optional.empty();
-        }
     }
 
     private JsonNode dataJsonNode(Map<String, JsonNode> data) {

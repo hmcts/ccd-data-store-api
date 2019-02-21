@@ -14,7 +14,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -27,6 +29,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
@@ -42,7 +45,10 @@ class CaseServiceTest {
     private static final String PERSON_FNAME = "Jack";
     private static final String OTHER_NAME = "John";
     private static final String CASE_ID = "299";
-
+    private final Map<String, JsonNode> data = new HashMap<>();
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
+    };
     private CaseDataService caseDataService;
 
     @Mock
@@ -179,6 +185,57 @@ class CaseServiceTest {
                 () -> assertThat(cloneFname.asText(), equalTo("PUBLIC")),
                 () -> assertThat(fname.asText(), equalTo("PRIVATE"))
             );
+        }
+    }
+
+    @Nested
+    @DisplayName("populateCurrentCaseDetailsWithUserInputs()")
+    class PopulateCurrentCaseDetailsWithUserInputs {
+        @Test
+        @DisplayName("should return caseDetails")
+        void populateCurrentCaseDetailsWithUserInputs() throws Exception {
+            Map<String, JsonNode> eventData = MAPPER.convertValue(MAPPER.readTree(
+                "{\n"
+                    + "  \"PersonFirstName\": \"First Name\",\n"
+                    + "  \"PersonLastName\": \"Last Name\"\n"
+                    + "}"), STRING_JSON_MAP);
+
+            Map<String, JsonNode> resultData = MAPPER.convertValue(MAPPER.readTree(
+                "{\n"
+                    + "  \"PersonFirstName\": \"First Name\",\n"
+                    + "  \"PersonLastName\": \"Last Name\",\n"
+                    + "  \"Person\":{\"Names\":{\"FirstName\":\"Jack\"}}\n"
+                    + "}"), STRING_JSON_MAP);
+
+            CaseDataContent caseDataContent = newCaseDataContent()
+                .withData(data)
+                .withCaseReference(CASE_REFERENCE)
+                .withEventData(eventData)
+                .build();
+            Optional<CaseDetails> result = caseService.populateCurrentCaseDetailsWithUserInputs(caseDataContent, JURISDICTION);
+
+            assertAll(
+                () -> assertThat(result.get().getId(), is(CaseServiceTest.this.caseDetails.getId())),
+                () -> assertThat(result.get().getData(), is(resultData)),
+                () -> verify(caseDetailsRepository).findByReference(JURISDICTION, REFERENCE),
+                () -> verify(uidService).validateUID(CASE_REFERENCE)
+            );
+        }
+
+        @Test
+        @DisplayName("should fail for bad CASE_REFERENCE")
+        void shoudThrowBadRequestException() {
+            doThrow(new BadRequestException("...")).when(uidService).validateUID(CASE_REFERENCE);
+
+            assertThrows(BadRequestException.class, () -> caseService.getCaseDetails(JURISDICTION, CASE_REFERENCE));
+        }
+
+        @Test
+        @DisplayName("should fail when case isn't found in the DB")
+        void shoudThrowResourceNotFoundException() {
+            doReturn(Optional.empty()).when(caseDetailsRepository).findByReference(JURISDICTION, REFERENCE);
+
+            assertThrows(ResourceNotFoundException.class, () -> caseService.getCaseDetails(JURISDICTION, CASE_REFERENCE));
         }
     }
 

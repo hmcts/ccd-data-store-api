@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
@@ -47,7 +48,7 @@ public class CaseService {
     }
 
     /**
-     * @param caseTypeId     caseTypeId of new case details
+     * @param caseTypeId caseTypeId of new case details
      * @param jurisdictionId jurisdictionId of new case details
      * @return <code>CaseDetails</code> - new case details object
      */
@@ -57,6 +58,24 @@ public class CaseService {
         caseDetails.setJurisdiction(jurisdictionId);
         caseDetails.setData(data == null ? Maps.newHashMap() : data);
         return caseDetails;
+    }
+
+    /**
+     * @param content Data received from the client.
+     * @param jurisdictionId of the case.
+     * @return <code>Optional<CaseDetails><code/> - CaseDetails wrapped in Optional
+     */
+    public Optional<CaseDetails> populateCurrentCaseDetailsWithUserInputs(CaseDataContent content, String jurisdictionId) {
+        try {
+            CaseDetails caseDetails = getCaseDetails(jurisdictionId, content.getCaseReference());
+            content.getEventData().forEach((key, value) -> caseDetails.getData().put(key, value));
+
+            return Optional.of(caseDetails);
+        } catch (BadRequestException e) {
+            return Optional.empty();
+        } catch (ResourceNotFoundException e) {
+            return Optional.empty();
+        }
     }
 
     public CaseDetails clone(CaseDetails source) {
