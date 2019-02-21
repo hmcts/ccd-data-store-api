@@ -2,7 +2,7 @@ package uk.gov.hmcts.ccd;
 
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import uk.gov.hmcts.ccd.config.JaywayJsonPathConfig;
+import uk.gov.hmcts.ccd.config.JaywayJsonPathConfigHelper;
 
 public class JsonPathExtension implements BeforeAllCallback {
 
@@ -12,7 +12,7 @@ public class JsonPathExtension implements BeforeAllCallback {
     public void beforeAll(ExtensionContext context) {
         if (!testExecutionStarted) {
             // one time setup code for all test classes extending this extension
-            JaywayJsonPathConfig.configureJsonPathForJackson();
+            JaywayJsonPathConfigHelper.configureJsonPathForJackson();
             testExecutionStarted = true;
         }
     }

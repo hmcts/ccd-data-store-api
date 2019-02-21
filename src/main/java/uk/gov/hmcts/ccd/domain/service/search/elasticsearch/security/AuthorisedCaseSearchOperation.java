@@ -188,7 +188,7 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
      */
     private String sanitiseCollectionFieldInPath(CaseType caseType, String path) {
         String caseFieldId = getCaseFieldFromPath(path);
-        if (path != null && caseType.caseFieldIsACollection(caseFieldId)) {
+        if (path != null && caseType.isCaseFieldACollection(caseFieldId)) {
             return path.replaceAll(caseFieldId, caseFieldId + JSON_PATH_COLLECTION_FIELD_INDICATOR);
         }
 

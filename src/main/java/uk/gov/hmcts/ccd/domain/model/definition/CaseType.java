@@ -152,11 +152,13 @@ public class CaseType implements Serializable {
         }
     }
 
-    public Optional<CaseField> lookupCaseField(String caseFieldId) {
+    @JsonIgnore
+    public Optional<CaseField> getCaseField(String caseFieldId) {
         return caseFields.stream().filter(caseField -> caseField.getId().equalsIgnoreCase(caseFieldId)).findFirst();
     }
 
-    public boolean caseFieldIsACollection(String caseFieldId) {
-        return lookupCaseField(caseFieldId).map(CaseField::collectionFieldType).orElse(false);
+    @JsonIgnore
+    public boolean isCaseFieldACollection(String caseFieldId) {
+        return getCaseField(caseFieldId).map(CaseField::isCollectionFieldType).orElse(false);
     }
 }
