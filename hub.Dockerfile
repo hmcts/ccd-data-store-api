@@ -9,18 +9,16 @@ USER gradle
 WORKDIR /home/gradle/src
 RUN gradle assemble
 
-FROM hmcts/cnp-java-base:openjdk-jre-8-alpine-1.4
-
-ENV APP core-case-data.jar
-ENV APPLICATION_TOTAL_MEMORY 980M
-ENV APPLICATION_SIZE_ON_DISK_IN_MB 85
+FROM hmcts/cnp-java-base:openjdk-8u191-jre-alpine3.9-1.0
 
 ENV JAVA_OPTS "-Dspring.config.location=/application.properties -Djava.security.egd=file:/dev/./urandom"
 
-COPY --from=builder /home/gradle/src/build/libs/$APP /opt/app/
+COPY --from=builder /home/gradle/src/build/libs/core-case-data.jar /opt/app/
 
 WORKDIR /opt/app
 
 HEALTHCHECK --interval=10s --timeout=10s --retries=10 CMD http_proxy="" curl --silent --fail http://localhost:4452/status/health
 
 EXPOSE 4452
+
+CMD ["core-case-data.jar"]

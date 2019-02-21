@@ -102,6 +102,7 @@ ext {
     junitJupiterVersion = '5.2.0'
     junitVintageVersion = '5.2.0'
     hibernateVersion = '5.2.17.Final'
+    powermockVersion = '2.0.0-beta.5'
     reformLogging = '3.0.2'
     swagger2Version = '2.9.2'
     limits = [
@@ -204,6 +205,7 @@ dependencies {
     compile group: 'com.sun.mail', name: 'mailapi', version: '1.6.1'
     compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
     compile group: 'commons-validator', name: 'commons-validator', version: '1.6'
+    compile group: 'com.jayway.jsonpath', name: 'json-path', version: '2.4.0'
 
     // FIXME 0.6 doesn't support jsonb; 0.7 doesn't work on Windows
 //    runtime group: 'com.impossibl.pgjdbc-ng', name: 'pgjdbc-ng', version: '0.6'
@@ -222,6 +224,8 @@ dependencies {
     testRuntime "org.junit.vintage:junit-vintage-engine:${junitVintageVersion}"
     testCompile group: 'org.mockito', name: 'mockito-core', version: '2.24.0'
     testCompile group:'org.mockito', name: 'mockito-junit-jupiter', version:'2.24.0'
+    testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: powermockVersion
+    testCompile group: 'org.powermock', name: 'powermock-module-junit4', version: powermockVersion
     testCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.1.0'
     testCompile group: 'com.xebialabs.restito', name: 'restito', version: '0.9.3'
     testCompile 'io.github.openfeign:feign-jackson:9.7.0'

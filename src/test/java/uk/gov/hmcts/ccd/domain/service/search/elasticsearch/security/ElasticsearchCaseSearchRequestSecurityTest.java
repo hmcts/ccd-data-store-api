@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest.QUERY_NAME;
+import static uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest.QUERY;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -38,7 +38,7 @@ class ElasticsearchCaseSearchRequestSecurityTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
         querySecurity = new ElasticsearchCaseSearchRequestSecurity(Collections.singletonList(caseSearchFilter), objectMapperService);
-        when(searchRequestJsonNode.has(QUERY_NAME)).thenReturn(true);
+        when(searchRequestJsonNode.has(QUERY)).thenReturn(true);
     }
 
     @Test
