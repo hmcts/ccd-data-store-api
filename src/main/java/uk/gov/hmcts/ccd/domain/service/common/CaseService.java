@@ -63,7 +63,7 @@ public class CaseService {
     /**
      * @param content Data received from the client.
      * @param jurisdictionId of the case.
-     * @return <code>Optional<CaseDetails><code/> - CaseDetails wrapped in Optional
+     * @return <code>Optional&lt;CaseDetails&gt;<code/> - CaseDetails wrapped in Optional
      */
     public Optional<CaseDetails> populateCurrentCaseDetailsWithUserInputs(CaseDataContent content, String jurisdictionId) {
         try {
@@ -71,9 +71,7 @@ public class CaseService {
             content.getEventData().forEach((key, value) -> caseDetails.getData().put(key, value));
 
             return Optional.of(caseDetails);
-        } catch (BadRequestException e) {
-            return Optional.empty();
-        } catch (ResourceNotFoundException e) {
+        } catch (BadRequestException | ResourceNotFoundException e) {
             return Optional.empty();
         }
     }
