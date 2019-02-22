@@ -71,9 +71,7 @@ public class CaseService {
             content.getEventData().forEach((key, value) -> caseDetails.getData().put(key, value));
 
             return Optional.of(caseDetails);
-        } catch (BadRequestException e) {
-            return Optional.empty();
-        } catch (ResourceNotFoundException e) {
+        } catch (BadRequestException | ResourceNotFoundException e) {
             return Optional.empty();
         }
     }
