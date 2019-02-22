@@ -42,6 +42,10 @@ apply plugin: 'org.owasp.dependencycheck'
 
 apply from: 'liquibase.gradle'
 
+pmd {
+    toolVersion = '6.11.0'
+}
+
 dependencyUpdates.resolutionStrategy = {
     componentSelection { rules ->
         rules.all { ComponentSelection selection ->
