@@ -60,4 +60,35 @@ public class UIDefinitionController {
 
         return ResponseEntity.ok(new UIWorkbasketInputsResource(workbasketInputs, caseTypeId));
     }
+
+    @GetMapping(
+        path = "/case-types/{caseTypeId}/inputs",
+        headers = {
+            V2.EXPERIMENTAL_HEADER
+        },
+        produces = {
+            V2.MediaType.UI_WORKBASKET_INPUT_DETAILS
+        }
+    )
+    @ApiOperation(
+        value = "Retrieve workbasket input details for dynamic display",
+        notes = V2.EXPERIMENTAL_WARNING
+    )
+    @ApiResponses({
+        @ApiResponse(
+            code = 200,
+            message = "Success",
+            response = UIWorkbasketInputsResource.class
+        ),
+        @ApiResponse(
+            code = 404,
+            message = "Case type not found"
+        )
+    })
+    public ResponseEntity<UIWorkbasketInputsResource> getSearchInputsDetails(@PathVariable("caseTypeId") String caseTypeId) {
+
+        WorkbasketInput[] workbasketInputs = findWorkbasketInputOperation.execute(caseTypeId, CAN_READ).toArray(new WorkbasketInput[0]);
+
+        return ResponseEntity.ok(new UIWorkbasketInputsResource(workbasketInputs, caseTypeId));
+    }
 }
