@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
@@ -133,7 +134,7 @@ class DefaultGetCaseViewOperationTest {
         caseField.setId(MetaData.CaseField.CASE_TYPE.getReference());
         caseField.setMetadata(true);
         caseField.setFieldType(new FieldType());
-        caseType.setCaseFields(Collections.singletonList(caseField));
+        caseType.setCaseFields(singletonList(caseField));
 
         doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
 
@@ -162,7 +163,7 @@ class DefaultGetCaseViewOperationTest {
                                                                    .build())
                                                       .build();
             doReturn(caseTabCollection).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
-            caseType.setCaseFields(Collections.singletonList(newCaseField().withId(CASE_HISTORY_VIEWER).withFieldType(aFieldType().withType(CASE_HISTORY_VIEWER).build()).build()));
+            caseType.setCaseFields(singletonList(newCaseField().withId(CASE_HISTORY_VIEWER).withFieldType(aFieldType().withType(CASE_HISTORY_VIEWER).build()).build()));
             doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
 
             final CaseView caseView = defaultGetCaseViewOperation.execute(CASE_REFERENCE);
@@ -195,7 +196,12 @@ class DefaultGetCaseViewOperationTest {
                                                                    .build())
                                                       .build();
             doReturn(caseTabCollection).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
-            caseType.setCaseFields(Collections.singletonList(newCaseField().withId(CASE_HISTORY_VIEWER).withFieldType(aFieldType().withType(CASE_HISTORY_VIEWER).build()).build()));
+            caseType.setCaseFields(singletonList(newCaseField()
+                                                     .withId(CASE_HISTORY_VIEWER)
+                                                     .withFieldType(aFieldType()
+                                                                        .withType(CASE_HISTORY_VIEWER)
+                                                                        .build())
+                                                     .build()));
             doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
 
             final CaseView caseView = defaultGetCaseViewOperation.execute(CASE_REFERENCE);

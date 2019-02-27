@@ -1220,7 +1220,7 @@ public class TestBuildersUtil {
         private final List<CaseTypeTabField> caseTypeTabFields;
 
         private CaseTypeTabBuilder() {
-            this.caseTypeTabFields = Lists.newArrayList();
+            this.caseTypeTabFields = newArrayList();
             this.caseTypeTab = new CaseTypeTab();
             this.caseTypeTab.setTabFields(caseTypeTabFields);
         }
@@ -1245,7 +1245,7 @@ public class TestBuildersUtil {
         private final CaseTabCollection caseTabCollection;
 
         private CaseTabCollectionBuilder() {
-            this.tabs = Lists.newArrayList();
+            this.tabs = newArrayList();
             this.caseTabCollection = new CaseTabCollection();
             this.caseTabCollection.setTabs(tabs);
         }
