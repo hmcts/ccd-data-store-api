@@ -1,12 +1,15 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import java.util.List;
-
+import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.aggregated.*;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
+import uk.gov.hmcts.ccd.domain.model.aggregated.ProfileCaseState;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
@@ -18,6 +21,10 @@ import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
+
+import java.util.List;
+
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.CASE_HISTORY_VIEWER;
 
 @Service
 @Qualifier(DefaultGetCaseViewOperation.QUALIFIER)
@@ -64,6 +71,10 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
         caseView.setState(new ProfileCaseState(caseState.getId(), caseState.getName(), caseState.getDescription(), caseState.getTitleDisplay()));
 
         caseView.setCaseType(CaseViewType.createFrom(caseType));
+        final CaseViewEvent[] caseViewEvents = convertToCaseViewEvent(events);
+        if (caseTabCollection.hasTabFieldType(CASE_HISTORY_VIEWER)) {
+            hydrateHistoryField(caseDetails, caseType, Lists.newArrayList(caseViewEvents));
+        }
         caseView.setTabs(getTabs(caseDetails, caseDetails.getCaseDataAndMetadata(), caseTabCollection));
         caseView.setMetadataFields(getMetadataFields(caseType, caseDetails));
 
@@ -81,12 +92,16 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
             .toArray(CaseViewTrigger[]::new);
         caseView.setTriggers(triggers);
 
-        caseView.setEvents(events
-            .stream()
-            .map(CaseViewEvent::createFrom)
-            .toArray(CaseViewEvent[]::new));
+        caseView.setEvents(caseViewEvents);
 
         return caseView;
+    }
+
+    private CaseViewEvent[] convertToCaseViewEvent(List<AuditEvent> events) {
+        return events
+            .stream()
+            .map(CaseViewEvent::createFrom)
+            .toArray(size -> new CaseViewEvent[size]);
     }
 
 }

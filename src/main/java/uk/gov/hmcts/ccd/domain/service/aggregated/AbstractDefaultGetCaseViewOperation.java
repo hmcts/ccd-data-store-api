@@ -1,23 +1,37 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import java.util.List;
-import java.util.Map;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.CASE_HISTORY_VIEWER;
+
 public abstract class AbstractDefaultGetCaseViewOperation {
 
     public static final String QUALIFIER = "default";
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final GetCaseOperation getCaseOperation;
     private final UIDefinitionRepository uiDefinitionRepository;
@@ -32,6 +46,9 @@ public abstract class AbstractDefaultGetCaseViewOperation {
         this.uiDefinitionRepository = uiDefinitionRepository;
         this.caseTypeService = caseTypeService;
         this.uidService = uidService;
+        SimpleModule simpleModule = new SimpleModule();
+        simpleModule.addSerializer(LocalDateTime.class, ToStringSerializer.instance);
+        MAPPER.registerModule(simpleModule);
     }
 
     void validateCaseReference(String caseReference) {
@@ -85,4 +102,18 @@ public abstract class AbstractDefaultGetCaseViewOperation {
             .collect(Collectors.toList());
     }
 
+    void hydrateHistoryField(CaseDetails caseDetails, CaseType caseType, List<CaseViewEvent> events) {
+        final List<CaseField> caseFieldDefinitions = caseType.getCaseFields();
+        final JsonNode data = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
+        if (data != null) {
+            for (CaseField caseField : caseFieldDefinitions) {
+                if (caseField.getFieldType().getType().equals(CASE_HISTORY_VIEWER)) {
+                    ArrayNode eventsNode = MAPPER.convertValue(events, ArrayNode.class);
+                    caseDetails.getData().put(caseField.getId(), eventsNode);
+                    return;
+                }
+            }
+
+        }
+    }
 }

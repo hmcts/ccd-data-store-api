@@ -26,11 +26,11 @@ import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.JURISD
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.LAST_MODIFIED_DATE;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.SECURITY_CLASSIFICATION;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.CASE_PAYMENT_HISTORY_VIEWER;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.LABEL;
 
 public class CaseDetails implements Cloneable {
-    public static final String LABEL_FIELD_TYPE = "Label";
     private static final Logger LOG = LoggerFactory.getLogger(CaseDetails.class);
-    private static final String CASE_PAYMENT_HISTORY_VIEWER_FIELD_TYPE = "CasePaymentHistoryViewer";
     public static final String DRAFT_ID = "DRAFT%s";
 
     private String id;
@@ -238,8 +238,8 @@ public class CaseDetails implements Cloneable {
     }
 
     private boolean isFieldWithNoValue(CaseTypeTabField caseTypeTabField) {
-        return caseTypeTabField.getCaseField().getFieldType().getType().equals(LABEL_FIELD_TYPE) ||
-            caseTypeTabField.getCaseField().getFieldType().getType().equals(CASE_PAYMENT_HISTORY_VIEWER_FIELD_TYPE);
+        return caseTypeTabField.getCaseField().getFieldType().getType().equals(LABEL)
+            || caseTypeTabField.getCaseField().getFieldType().getType().equals(CASE_PAYMENT_HISTORY_VIEWER);
     }
 
     @JsonIgnore
