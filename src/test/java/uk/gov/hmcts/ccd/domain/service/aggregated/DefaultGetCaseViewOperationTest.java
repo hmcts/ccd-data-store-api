@@ -1,11 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -14,12 +10,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
-import org.skyscreamer.jsonassert.JSONAssert;
-import org.skyscreamer.jsonassert.JSONCompareMode;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
@@ -30,11 +23,11 @@ import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
+import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -51,6 +44,7 @@ import static org.hamcrest.Matchers.hasItemInArray;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.CASE_HISTORY_VIEWER;
@@ -69,7 +63,6 @@ class DefaultGetCaseViewOperationTest {
     private static final String EVENT_SUMMARY_2 = "Another summary";
     private static final String STATE = "Plop";
     private static final String TITLE_DISPLAY = "titleDisplay";
-    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Mock
     private GetCaseOperation getCaseOperation;
@@ -89,6 +82,9 @@ class DefaultGetCaseViewOperationTest {
     @Mock
     private UIDService uidService;
 
+    @Mock
+    private ObjectMapperService objectMapperService;
+
     @Spy
     @InjectMocks
     private DefaultGetCaseViewOperation defaultGetCaseViewOperation;
@@ -100,7 +96,7 @@ class DefaultGetCaseViewOperationTest {
     private CaseTabCollection caseTabCollection;
     private CaseType caseType;
     private CaseState caseState;
-    private ArrayNode eventsNode;
+    private JsonNode eventsNode;
 
     @BeforeEach
     void setUp() {
@@ -122,10 +118,7 @@ class DefaultGetCaseViewOperationTest {
         auditEvents = asList(event1, event2);
         doReturn(auditEvents).when(getEventsOperation).getEvents(caseDetails);
 
-        SimpleModule simpleModule = new SimpleModule();
-        simpleModule.addSerializer(LocalDateTime.class, ToStringSerializer.instance);
-        MAPPER.registerModule(simpleModule);
-        eventsNode = MAPPER.convertValue(auditEvents.stream().map(CaseViewEvent::createFrom).toArray(), ArrayNode.class);
+        doReturn(eventsNode).when(objectMapperService).convertJsonNodeToMap(anyObject());
 
         doReturn(Boolean.TRUE).when(uidService).validateUID(CASE_REFERENCE);
 
@@ -177,7 +170,7 @@ class DefaultGetCaseViewOperationTest {
             assertAll(() -> assertThat(caseView.getTabs(), arrayWithSize(1)),
                       () -> assertThat(caseView.getTabs()[0].getFields(), arrayWithSize(1)),
                       () -> assertThat(caseView.getTabs()[0].getFields()[0], hasProperty("id", equalTo(CASE_HISTORY_VIEWER))),
-                      () -> JSONAssert.assertEquals(eventsNode.toString(), caseView.getTabs()[0].getFields()[0].getValue().toString(), JSONCompareMode.LENIENT),
+                      () -> assertThat(caseView.getTabs()[0].getFields()[0], hasProperty("value", equalTo(eventsNode))),
                       () -> assertThat(caseView.getEvents(), arrayWithSize(2)),
                       () -> assertThat(caseView.getEvents(),
                                        hasItemInArray(hasProperty("summary", equalTo(EVENT_SUMMARY_1)))),

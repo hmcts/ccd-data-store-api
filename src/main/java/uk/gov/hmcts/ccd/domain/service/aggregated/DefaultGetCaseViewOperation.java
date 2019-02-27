@@ -17,6 +17,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
+import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
@@ -42,8 +43,9 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
                                        UIDefinitionRepository uiDefinitionRepository,
                                        CaseTypeService caseTypeService,
                                        EventTriggerService eventTriggerService,
-                                       UIDService uidService) {
-        super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService);
+                                       UIDService uidService,
+                                       ObjectMapperService objectMapperService) {
+        super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService, objectMapperService);
         this.getEventsOperation = getEventsOperation;
         this.caseTypeService = caseTypeService;
         this.eventTriggerService = eventTriggerService;

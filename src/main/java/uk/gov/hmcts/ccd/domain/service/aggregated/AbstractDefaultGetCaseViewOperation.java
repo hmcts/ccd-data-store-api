@@ -1,9 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.fasterxml.jackson.databind.JsonNode;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
@@ -14,12 +11,12 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -30,24 +27,23 @@ import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.CASE_HISTORY_VI
 public abstract class AbstractDefaultGetCaseViewOperation {
 
     public static final String QUALIFIER = "default";
-    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final GetCaseOperation getCaseOperation;
     private final UIDefinitionRepository uiDefinitionRepository;
     private final CaseTypeService caseTypeService;
     private final UIDService uidService;
+    private final ObjectMapperService objectMapperService;
 
     AbstractDefaultGetCaseViewOperation(GetCaseOperation getCaseOperation,
                                         UIDefinitionRepository uiDefinitionRepository,
                                         CaseTypeService caseTypeService,
-                                        UIDService uidService) {
+                                        UIDService uidService,
+                                        ObjectMapperService objectMapperService) {
         this.getCaseOperation = getCaseOperation;
         this.uiDefinitionRepository = uiDefinitionRepository;
         this.caseTypeService = caseTypeService;
         this.uidService = uidService;
-        SimpleModule simpleModule = new SimpleModule();
-        simpleModule.addSerializer(LocalDateTime.class, ToStringSerializer.instance);
-        MAPPER.registerModule(simpleModule);
+        this.objectMapperService = objectMapperService;
     }
 
     void validateCaseReference(String caseReference) {
@@ -104,7 +100,7 @@ public abstract class AbstractDefaultGetCaseViewOperation {
     void hydrateHistoryField(CaseDetails caseDetails, CaseType caseType, List<CaseViewEvent> events) {
         for (CaseField caseField : caseType.getCaseFields()) {
             if (caseField.getFieldType().getType().equals(CASE_HISTORY_VIEWER)) {
-                ArrayNode eventsNode = MAPPER.convertValue(events, ArrayNode.class);
+                JsonNode eventsNode = objectMapperService.convertObjectToJsonNode(events);
                 caseDetails.getData().put(caseField.getId(), eventsNode);
                 return;
             }

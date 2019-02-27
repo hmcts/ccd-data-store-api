@@ -1196,8 +1196,7 @@ public class TestBuildersUtil {
     public static class CaseTypeTabFieldBuilder {
         private final CaseTypeTabField caseTypeTabField;
 
-        private CaseTypeTabFieldBuilder()
-        {
+        private CaseTypeTabFieldBuilder() {
             this.caseTypeTabField = new CaseTypeTabField();
         }
 
@@ -1220,8 +1219,7 @@ public class TestBuildersUtil {
         private final CaseTypeTab caseTypeTab;
         private final List<CaseTypeTabField> caseTypeTabFields;
 
-        private CaseTypeTabBuilder()
-        {
+        private CaseTypeTabBuilder() {
             this.caseTypeTabFields = Lists.newArrayList();
             this.caseTypeTab = new CaseTypeTab();
             this.caseTypeTab.setTabFields(caseTypeTabFields);

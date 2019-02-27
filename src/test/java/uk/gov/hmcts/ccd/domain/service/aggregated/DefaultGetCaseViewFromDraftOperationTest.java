@@ -29,6 +29,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.common.DefaultObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 
@@ -60,6 +61,9 @@ class DefaultGetCaseViewFromDraftOperationTest {
 
     @Mock
     private DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder;
+
+    @Mock
+    private DefaultObjectMapperService defaultObjectMapperService;
 
     private GetCaseViewOperation getDraftViewOperation;
 
@@ -119,7 +123,8 @@ class DefaultGetCaseViewFromDraftOperationTest {
                                                                          caseTypeService,
                                                                          uidService,
                                                                          draftGateway,
-                                                                         draftResponseToCaseDetailsBuilder);
+                                                                         draftResponseToCaseDetailsBuilder,
+                                                                         defaultObjectMapperService);
     }
 
     @Test

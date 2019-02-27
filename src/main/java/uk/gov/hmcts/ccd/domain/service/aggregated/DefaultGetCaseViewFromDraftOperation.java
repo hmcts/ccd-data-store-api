@@ -17,6 +17,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.DraftResponseToCaseDetailsBuilder;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
@@ -49,8 +50,9 @@ public class DefaultGetCaseViewFromDraftOperation extends AbstractDefaultGetCase
                                                 final CaseTypeService caseTypeService,
                                                 final UIDService uidService,
                                                 @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway,
-                                                final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder) {
-        super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService);
+                                                final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder,
+                                                final ObjectMapperService objectMapperService) {
+        super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService, objectMapperService);
         this.draftGateway = draftGateway;
         this.draftResponseToCaseDetailsBuilder = draftResponseToCaseDetailsBuilder;
     }
