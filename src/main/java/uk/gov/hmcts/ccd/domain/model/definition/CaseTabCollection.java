@@ -46,7 +46,7 @@ public class CaseTabCollection implements Serializable {
                                        .getCaseField()
                                        .getFieldType()
                                        .getType()
-                                       .equals(CASE_HISTORY_VIEWER)))
+                                       .equals(tabFieldType)))
                  .findAny()
                 .isPresent();
     }
