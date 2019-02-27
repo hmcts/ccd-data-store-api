@@ -17,4 +17,5 @@ public interface ObjectMapperService {
 
     Map<String, JsonNode> convertJsonNodeToMap(JsonNode node);
 
+    JsonNode createEmptyJsonNode();
 }

@@ -95,4 +95,28 @@ public enum AATHelper {
         return Env.require("CCD_PRIVATE_CASEWORKER_SOLICITOR_PASSWORD");
     }
 
+    public String getPrivateCrossCaseTypeCaseworkerEmail() {
+        return Env.require("CCD_PRIVATE_CROSS_CASE_TYPE_CASEWORKER_EMAIL");
+    }
+
+    public String getPrivateCrossCaseTypeCaseworkerPassword() {
+        return Env.require("CCD_PRIVATE_CROSS_CASE_TYPE_CASEWORKER_PASSWORD");
+    }
+
+    public String getPrivateCrossCaseTypeSolicitorEmail() {
+        return Env.require("CCD_PRIVATE_CROSS_CASE_TYPE_SOLICITOR_EMAIL");
+    }
+
+    public String getPrivateCrossCaseTypeSolicitorPassword() {
+        return Env.require("CCD_PRIVATE_CROSS_CASE_TYPE_SOLICITOR_PASSWORD");
+    }
+
+    public String getRestrictedCrossCaseTypeCaseworkerEmail() {
+        return Env.require("CCD_RESTRICTED_CROSS_CASE_TYPE_CASEWORKER_EMAIL");
+    }
+
+    public String getRestrictedCrossCaseTypeCaseworkerPassword() {
+        return Env.require("CCD_RESTRICTED_CROSS_CASE_TYPE_CASEWORKER_PASSWORD");
+    }
+
 }
