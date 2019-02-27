@@ -103,17 +103,12 @@ public abstract class AbstractDefaultGetCaseViewOperation {
     }
 
     void hydrateHistoryField(CaseDetails caseDetails, CaseType caseType, List<CaseViewEvent> events) {
-        final List<CaseField> caseFieldDefinitions = caseType.getCaseFields();
-        final JsonNode data = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
-        if (data != null) {
-            for (CaseField caseField : caseFieldDefinitions) {
-                if (caseField.getFieldType().getType().equals(CASE_HISTORY_VIEWER)) {
-                    ArrayNode eventsNode = MAPPER.convertValue(events, ArrayNode.class);
-                    caseDetails.getData().put(caseField.getId(), eventsNode);
-                    return;
-                }
+        for (CaseField caseField : caseType.getCaseFields()) {
+            if (caseField.getFieldType().getType().equals(CASE_HISTORY_VIEWER)) {
+                ArrayNode eventsNode = MAPPER.convertValue(events, ArrayNode.class);
+                caseDetails.getData().put(caseField.getId(), eventsNode);
+                return;
             }
-
         }
     }
 }
