@@ -62,7 +62,7 @@ public class MidEventCallback {
                 .findFirst();
 
             if (wizardPageOptional.isPresent() && !isBlank(wizardPageOptional.get().getCallBackURLMidEvent())) {
-                Optional<CaseDetails> currentCaseDetails = caseService.populateCurrentCaseDetailsWithUserInputs(content, caseType.getJurisdictionId());
+                Optional<CaseDetails> currentCaseDetails = caseService.populateCurrentCaseDetailsWithEventFields(content, caseType.getJurisdictionId());
                 CaseDetails newCaseDetails;
                 if (currentCaseDetails.isPresent()) {
                     newCaseDetails = caseService.createNewCaseDetails(caseTypeId, caseType.getJurisdictionId(),

@@ -103,7 +103,7 @@ class MidEventCallbackTest {
             null,
             caseDetails,
             IGNORE_WARNINGS)).willReturn(caseDetails);
-        given(caseService.populateCurrentCaseDetailsWithUserInputs(build, JURISDICTION_ID)).willReturn(Optional.empty());
+        given(caseService.populateCurrentCaseDetailsWithEventFields(build, JURISDICTION_ID)).willReturn(Optional.empty());
 
 
         midEventCallback.invoke(CASE_TYPE_ID,
@@ -140,7 +140,7 @@ class MidEventCallbackTest {
             caseDetails,
             IGNORE_WARNINGS)).willReturn(updatedCaseDetails);
 
-        given(caseService.populateCurrentCaseDetailsWithUserInputs(content, JURISDICTION_ID)).willReturn(Optional.empty());
+        given(caseService.populateCurrentCaseDetailsWithEventFields(content, JURISDICTION_ID)).willReturn(Optional.empty());
         given(caseService.createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, data)).willReturn(caseDetails);
 
 
@@ -195,7 +195,7 @@ class MidEventCallbackTest {
             caseDetails,
             IGNORE_WARNINGS)).thenReturn(updatedCaseDetails);
         when(caseService.createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, eventData)).thenReturn(caseDetails);
-        given(caseService.populateCurrentCaseDetailsWithUserInputs(content, JURISDICTION_ID)).willReturn(Optional.empty());
+        given(caseService.populateCurrentCaseDetailsWithEventFields(content, JURISDICTION_ID)).willReturn(Optional.empty());
 
         JsonNode result = midEventCallback.invoke(CASE_TYPE_ID,
             content,
@@ -253,7 +253,7 @@ class MidEventCallbackTest {
             IGNORE_WARNINGS)).thenReturn(combineCaseDetails);
         when(caseService.createNewCaseDetails(Mockito.eq(CASE_TYPE_ID), Mockito.eq(JURISDICTION_ID),
             Mockito.isA(Map.class))).thenReturn(combineCaseDetails);
-        given(caseService.populateCurrentCaseDetailsWithUserInputs(content, JURISDICTION_ID)).willReturn(Optional.of(combineCaseDetails));
+        given(caseService.populateCurrentCaseDetailsWithEventFields(content, JURISDICTION_ID)).willReturn(Optional.of(combineCaseDetails));
 
 
         JsonNode result = midEventCallback.invoke(CASE_TYPE_ID,

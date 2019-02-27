@@ -193,7 +193,7 @@ class CaseServiceTest {
     class PopulateCurrentCaseDetailsWithUserInputs {
         @Test
         @DisplayName("should return caseDetails")
-        void populateCurrentCaseDetailsWithUserInputs() throws Exception {
+        void populateCurrentCaseDetailsWithEventFields() throws Exception {
             Map<String, JsonNode> eventData = MAPPER.convertValue(MAPPER.readTree(
                 "{\n"
                     + "  \"PersonFirstName\": \"First Name\",\n"
@@ -212,7 +212,7 @@ class CaseServiceTest {
                 .withCaseReference(CASE_REFERENCE)
                 .withEventData(eventData)
                 .build();
-            Optional<CaseDetails> result = caseService.populateCurrentCaseDetailsWithUserInputs(caseDataContent, JURISDICTION);
+            Optional<CaseDetails> result = caseService.populateCurrentCaseDetailsWithEventFields(caseDataContent, JURISDICTION);
 
             assertAll(
                 () -> assertThat(result.get().getId(), is(CaseServiceTest.this.caseDetails.getId())),
