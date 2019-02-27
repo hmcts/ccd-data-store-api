@@ -1,5 +1,15 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -14,16 +24,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_RE
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.SearchInputBuilder.aSearchInput;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 class AuthorisedFindSearchInputOperationTest {
     private static final String JURISDICTION_ID = "TEST";

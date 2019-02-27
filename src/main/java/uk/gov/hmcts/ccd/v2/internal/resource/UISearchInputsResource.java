@@ -5,7 +5,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.hateoas.ResourceSupport;
 import uk.gov.hmcts.ccd.domain.model.search.Field;
-import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
 import uk.gov.hmcts.ccd.v2.internal.controller.UIDefinitionController;
 
@@ -20,6 +19,8 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 @NoArgsConstructor
 public class UISearchInputsResource extends ResourceSupport {
 
+    @Data
+    @NoArgsConstructor
     public class UISearchInput {
         private String label;
         private int order;

@@ -1,8 +1,5 @@
 package uk.gov.hmcts.ccd.datastore.tests.v2.internal;
 
-import static java.lang.Boolean.FALSE;
-import static org.hamcrest.Matchers.equalTo;
-
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,6 +7,9 @@ import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.BaseTest;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType;
 import uk.gov.hmcts.ccd.v2.V2;
+
+import static java.lang.Boolean.FALSE;
+import static org.hamcrest.Matchers.equalTo;
 
 @DisplayName("Get UI definition")
 class GetUIDefinitionTest extends BaseTest {
