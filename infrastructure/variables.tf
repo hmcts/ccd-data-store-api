@@ -85,6 +85,10 @@ variable "database_name" {
   default = "ccd_data_store"
 }
 
+variable "data_store_max_pool_size" {
+  default = "16"
+}
+
 variable "authorised-services" {
   type    = "string"
   default = "ccd_data,ccd_gw,ccd_ps,probate_backend,divorce_ccd_submission,sscs,sscs_bulkscan,cmc,cmc_claim_store,jui_webapp,pui_webapp,bulk_scan_orchestrator,fpl_case_service,iac,finrem_ccd_data_migrator"
@@ -135,6 +139,24 @@ variable "elastic_search_case_index_type" {
   description = "Cases index document type"
   type = "string"
   default = "_doc"
+}
+
+variable "elastic_search_nodes_discovery_enabled" {
+  description = "Enable Elasticsearch node discovery by Jest client"
+  type = "string"
+  default = "true"
+}
+
+variable "elastic_search_nodes_discovery_frequency_millis" {
+  description = "Elasticsearch node discovery frequency in milliseconds"
+  type = "string"
+  default = "5000"
+}
+
+variable "elastic_search_nodes_discovery_filter" {
+  description = "Elasticsearch node discovery filter"
+  type = "string"
+  default = "_all"
 }
 
 variable "http_client_connection_timeout" {
