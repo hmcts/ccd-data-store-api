@@ -159,7 +159,7 @@ public class QueryEndpoint {
     public SearchInput[] findSearchInputDetails(@PathVariable("uid") final String uid,
                                                 @PathVariable("jid") final String jurisdictionId,
                                                 @PathVariable("ctid") final String caseTypeId) {
-        return findSearchInputOperation.execute(jurisdictionId, caseTypeId, CAN_READ).toArray(new SearchInput[0]);
+        return findSearchInputOperation.execute(caseTypeId, CAN_READ).toArray(new SearchInput[0]);
     }
 
     @Transactional

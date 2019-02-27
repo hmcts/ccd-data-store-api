@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.hateoas.ResourceSupport;
 import uk.gov.hmcts.ccd.domain.model.search.Field;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
+import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
 import uk.gov.hmcts.ccd.v2.internal.controller.UIDefinitionController;
 
 import java.util.Arrays;
@@ -19,33 +20,31 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 @NoArgsConstructor
 public class UISearchInputsResource extends ResourceSupport {
 
-    @Data
-    @NoArgsConstructor
-    public class UIWorkbasketInput {
+    public class UISearchInput {
         private String label;
         private int order;
         private Field field;
     }
 
-    private UIWorkbasketInput[] workbasketInputs;
+    private UISearchInput[] searchInputs;
 
-    public UISearchInputsResource(WorkbasketInput[] workbasketInputs, String caseTypeId) {
-        copyProperties(workbasketInputs);
+    public UISearchInputsResource(SearchInput[] searchInputs, String caseTypeId) {
+        copyProperties(searchInputs);
 
-        add(linkTo(methodOn(UIDefinitionController.class).getWorkbasketInputsDetails(caseTypeId)).withSelfRel());
+        add(linkTo(methodOn(UIDefinitionController.class).getSearchInputsDetails(caseTypeId)).withSelfRel());
     }
 
-    private void copyProperties(WorkbasketInput[] workbasketInputs) {
-        this.workbasketInputs = Arrays.stream(workbasketInputs)
-            .map(this::buildUIWorkbasketInput)
-            .collect(Collectors.toList()).toArray(new UIWorkbasketInput[]{});
+    private void copyProperties(SearchInput[] searchInputs) {
+        this.searchInputs = Arrays.stream(searchInputs)
+            .map(this::buildUISearchInput)
+            .collect(Collectors.toList()).toArray(new UISearchInput[]{});
     }
 
-    private UIWorkbasketInput buildUIWorkbasketInput(WorkbasketInput workbasketInput) {
-        UIWorkbasketInput uiWorkbasketInput = new UIWorkbasketInput();
-        uiWorkbasketInput.setField(workbasketInput.getField());
-        uiWorkbasketInput.setLabel(workbasketInput.getLabel());
-        uiWorkbasketInput.setOrder(workbasketInput.getOrder());
-        return uiWorkbasketInput;
+    private UISearchInput buildUISearchInput(SearchInput searchInput) {
+        UISearchInput uiSearchInput = new UISearchInput();
+        uiSearchInput.setField(searchInput.getField());
+        uiSearchInput.setLabel(searchInput.getLabel());
+        uiSearchInput.setOrder(searchInput.getOrder());
+        return uiSearchInput;
     }
 }

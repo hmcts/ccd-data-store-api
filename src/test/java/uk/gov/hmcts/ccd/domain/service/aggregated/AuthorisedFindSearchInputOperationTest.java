@@ -71,16 +71,15 @@ class AuthorisedFindSearchInputOperationTest {
     void shouldFailWhenWhenNoACLReadAccess() {
         doReturn(Optional.empty()).when(getCaseTypeOperation).execute(CASE_TYPE_ONE, CAN_READ);
 
-        assertThrows(ResourceNotFoundException.class, () -> authorisedFindSearchInputOperation.execute(JURISDICTION_ID, CASE_TYPE_ONE, CAN_READ));
+        assertThrows(ResourceNotFoundException.class, () -> authorisedFindSearchInputOperation.execute(CASE_TYPE_ONE, CAN_READ));
     }
 
     @Test
     @DisplayName("should return only authorised case fields with ACL READ access")
     void shouldReturnOnlyAuthorisedCaseFields() {
-        doReturn(testSearchInputs).when(findSearchInputOperation).execute(JURISDICTION_ID, CASE_TYPE_ONE, CAN_READ);
+        doReturn(testSearchInputs).when(findSearchInputOperation).execute(CASE_TYPE_ONE, CAN_READ);
 
-        final List<SearchInput> searchInputs = authorisedFindSearchInputOperation.execute(JURISDICTION_ID,
-            CASE_TYPE_ONE, CAN_READ);
+        final List<SearchInput> searchInputs = authorisedFindSearchInputOperation.execute(CASE_TYPE_ONE, CAN_READ);
 
         assertAll(
             () -> assertThat(searchInputs.size(), is(3)),
@@ -93,10 +92,9 @@ class AuthorisedFindSearchInputOperationTest {
     @Test
     @DisplayName("Should return empty search inputs when no case field is authorised with ACL READ access")
     void shouldReturnEmptySearchInputWhenNoFieldIsAuthorised() {
-        doReturn(new ArrayList()).when(findSearchInputOperation).execute(JURISDICTION_ID, CASE_TYPE_ONE, CAN_READ);
+        doReturn(new ArrayList()).when(findSearchInputOperation).execute(CASE_TYPE_ONE, CAN_READ);
 
-        final List<SearchInput> searchInputs = authorisedFindSearchInputOperation.execute(JURISDICTION_ID,
-            CASE_TYPE_ONE, CAN_READ);
+        final List<SearchInput> searchInputs = authorisedFindSearchInputOperation.execute(CASE_TYPE_ONE, CAN_READ);
 
         assertAll(
             () -> assertThat(searchInputs.size(), is(0))

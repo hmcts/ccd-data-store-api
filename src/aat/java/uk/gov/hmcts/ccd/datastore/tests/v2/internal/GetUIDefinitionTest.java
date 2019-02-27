@@ -37,6 +37,25 @@ class GetUIDefinitionTest extends BaseTest {
             .body("self.href", equalTo(String.format("%s/internal/case-types/AAT/work-basket-inputs", aat.getTestUrl())));
     }
 
+    @Test
+    @DisplayName("should retrieve search inputs")
+    void shouldRetrieveSearchInputsWhenExist() {
+
+        whenCallingGetSearchInputs(AATCaseType.CASE_TYPE)
+            .then()
+            .log().ifError()
+            .statusCode(200)
+            .assertThat()
+
+            .body("searchInputs.find  { it.order == 1 }.label", equalTo("Search `Text` field"))
+            .body("searchInputs.find  { it.order == 1 }.field.id", equalTo("TextField"))
+            .body("searchInputs.find  { it.order == 1 }.field.field_type.id", equalTo("Text"))
+            .body("searchInputs.find  { it.order == 1 }.field.field_type.type", equalTo("Text"))
+
+            .rootPath("_links")
+            .body("self.href", equalTo(String.format("%s/internal/case-types/AAT/search-inputs", aat.getTestUrl())));
+    }
+
     private Response whenCallingGetWorkbasketInputs(String caseTypeId) {
         return asAutoTestCaseworker(FALSE)
             .get()
@@ -47,5 +66,17 @@ class GetUIDefinitionTest extends BaseTest {
 
             .when()
             .get("/internal/case-types/{caseTypeId}/work-basket-inputs");
+    }
+
+    private Response whenCallingGetSearchInputs(String caseTypeId) {
+        return asAutoTestCaseworker(FALSE)
+            .get()
+            .given()
+            .pathParam("caseTypeId", caseTypeId)
+            .accept(V2.MediaType.UI_SEARCH_INPUT_DETAILS)
+            .header("experimental", "true")
+
+            .when()
+            .get("/internal/case-types/{caseTypeId}/search-inputs");
     }
 }

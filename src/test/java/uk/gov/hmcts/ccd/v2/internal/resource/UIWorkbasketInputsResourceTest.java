@@ -21,7 +21,7 @@ class UIWorkbasketInputsResourceTest {
 
     @Test
     @DisplayName("should copy workbasket inputs")
-    void shouldCopyUserProfile() {
+    void shouldCopyWorkbasketInputs() {
         final UIWorkbasketInputsResource resource = new UIWorkbasketInputsResource(workbasketInputs, CASE_TYPE_ID);
 
         List<UIWorkbasketInputsResource.UIWorkbasketInput> workbasketInputs = Lists.newArrayList(resource.getWorkbasketInputs());

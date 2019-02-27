@@ -75,7 +75,7 @@ class ClassifiedFindSearchInputOperationTest {
     @Test
     @DisplayName("should filter search input fields when user does not have enough SC rank")
     void shouldFilterSearchInputFieldsWithSC() {
-        doReturn(testSearchInputs).when(findSearchInputOperation).execute(JURISDICTION_ID, CASE_TYPE_ONE, CAN_READ);
+        doReturn(testSearchInputs).when(findSearchInputOperation).execute(CASE_TYPE_ONE, CAN_READ);
         doReturn(true).when(classificationService).userHasEnoughSecurityClassificationForField(JURISDICTION_ID,
             testCaseType, CASE_FIELD_ID_1_1);
         doReturn(true).when(classificationService).userHasEnoughSecurityClassificationForField(JURISDICTION_ID,
@@ -86,7 +86,7 @@ class ClassifiedFindSearchInputOperationTest {
             testCaseType, CASE_FIELD_ID_1_4);
 
 
-        final List<SearchInput> searchInputs = classUnderTest.execute(JURISDICTION_ID, CASE_TYPE_ONE, CAN_READ);
+        final List<SearchInput> searchInputs = classUnderTest.execute(CASE_TYPE_ONE, CAN_READ);
         assertAll(
             () -> assertThat(searchInputs.size(), is(3)),
             () -> assertThat(searchInputs.get(0), is(testSearchInputs.get(0))),
@@ -98,9 +98,9 @@ class ClassifiedFindSearchInputOperationTest {
     @Test
     @DisplayName("should return empty search input list when user does't have enough SC for any field")
     void shouldReturnEmptySearchInputWhenNoFieldIsAuthorised() {
-        doReturn(new ArrayList<>()).when(findSearchInputOperation).execute(JURISDICTION_ID, CASE_TYPE_ONE, CAN_READ);
+        doReturn(new ArrayList<>()).when(findSearchInputOperation).execute(CASE_TYPE_ONE, CAN_READ);
 
-        final List<SearchInput> searchInputs = classUnderTest.execute(JURISDICTION_ID, CASE_TYPE_ONE, CAN_READ);
+        final List<SearchInput> searchInputs = classUnderTest.execute(CASE_TYPE_ONE, CAN_READ);
 
         assertAll(
             () -> assertThat(searchInputs.size(), is(0))

@@ -29,7 +29,7 @@ public class AuthorisedFindSearchInputOperation implements FindSearchInputOperat
         this.getCaseTypeOperation = getCaseTypeOperation;
     }
 
-    public List<SearchInput> execute(final String jurisdictionId, final String caseTypeId, Predicate<AccessControlList> access) {
+    public List<SearchInput> execute(final String caseTypeId, Predicate<AccessControlList> access) {
         Optional<CaseType> caseType = this.getCaseTypeOperation.execute(caseTypeId, access);
 
         if (!caseType.isPresent()) {
@@ -38,7 +38,7 @@ public class AuthorisedFindSearchInputOperation implements FindSearchInputOperat
             throw resourceNotFoundException;
         }
 
-        return findSearchInputOperation.execute(jurisdictionId, caseTypeId, access)
+        return findSearchInputOperation.execute(caseTypeId, access)
             .stream()
             .filter(searchInput -> caseType.get().getCaseFields()
                 .stream()

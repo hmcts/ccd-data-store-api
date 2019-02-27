@@ -21,6 +21,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.JurisdictionBuilder.newJurisdiction;
 
 class DefaultFindSearchInputOperationTest {
     @Mock
@@ -49,6 +50,7 @@ class DefaultFindSearchInputOperationTest {
         caseField4.setFieldType(fieldType);
         caseField4.setMetadata(true);
         caseType.setId("Test case type");
+        caseType.setJurisdiction(newJurisdiction().withJurisdictionId("TEST").build());
         caseType.setCaseFields(Arrays.asList(caseField1, caseField2, caseField3, caseField4));
 
         findSearchInputOperation = new DefaultFindSearchInputOperation(uiDefinitionRepository, caseDefinitionRepository);
@@ -59,7 +61,7 @@ class DefaultFindSearchInputOperationTest {
 
     @Test
     void shouldReturnSearchInputs() {
-        List<SearchInput> searchInputs = findSearchInputOperation.execute("TEST", caseType.getId(), CAN_READ);
+        List<SearchInput> searchInputs = findSearchInputOperation.execute(caseType.getId(), CAN_READ);
 
         assertAll(
             () -> assertThat(searchInputs.size(), is(4)),
