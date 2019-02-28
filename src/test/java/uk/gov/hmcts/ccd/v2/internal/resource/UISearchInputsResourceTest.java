@@ -1,12 +1,5 @@
 package uk.gov.hmcts.ccd.v2.internal.resource;
 
-import java.util.List;
-
-import com.google.common.collect.Lists;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
@@ -16,6 +9,14 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.SearchInputBuilder.aSearchInput;
+
+import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
+
+import java.util.List;
+
+import com.google.common.collect.Lists;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 class UISearchInputsResourceTest {
     private static final String CASE_TYPE_ID = "caseTypeId";
