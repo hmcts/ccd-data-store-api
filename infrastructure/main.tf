@@ -106,6 +106,7 @@ module "ccd-data-store-api" {
     DATA_STORE_DB_NAME = "${module.data-store-db.postgresql_database}"
     DATA_STORE_DB_USERNAME = "${module.data-store-db.user_name}"
     DATA_STORE_DB_PASSWORD = "${module.data-store-db.postgresql_password}"
+    DATA_STORE_DB_MAX_POOL_SIZE = "${var.data_store_max_pool_size}"
 
     ENABLE_DB_MIGRATE = "false"
 
@@ -158,7 +159,7 @@ module "data-store-db" {
   env = "${var.env}"
   postgresql_user = "${var.postgresql_user}"
   database_name = "${var.database_name}"
-  sku_name = "GP_Gen5_2"
+  sku_name = "GP_Gen5_8"
   sku_tier = "GeneralPurpose"
   storage_mb = "51200"
   common_tags  = "${var.common_tags}"

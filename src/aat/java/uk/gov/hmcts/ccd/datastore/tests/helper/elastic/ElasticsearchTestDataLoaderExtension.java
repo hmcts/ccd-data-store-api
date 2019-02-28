@@ -1,8 +1,10 @@
 package uk.gov.hmcts.ccd.datastore.tests.helper.elastic;
 
-import static java.util.Optional.ofNullable;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.AAT_PRIVATE2_CASE_TYPE;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.AAT_PRIVATE_CASE_TYPE;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.JURISDICTION_AUTOTEST2;
+import static uk.gov.hmcts.ccd.datastore.tests.functional.elasticsearch.ElasticsearchBaseTest.assertElasticsearchEnabled;
 
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
@@ -14,14 +16,18 @@ import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType;
 import uk.gov.hmcts.ccd.datastore.tests.functional.elasticsearch.ElasticSearchTextFieldTest;
 import uk.gov.hmcts.ccd.datastore.tests.functional.elasticsearch.ElasticsearchCaseSearchSecurityTest;
+import uk.gov.hmcts.ccd.datastore.tests.functional.elasticsearch.ElasticsearchCrossCaseTypeSearchSecurityTest;
+import uk.gov.hmcts.ccd.datastore.tests.functional.elasticsearch.ElasticsearchCrossCaseTypeSearchTest;
 import uk.gov.hmcts.ccd.datastore.tests.helper.TestDataLoaderExtension;
 
 public class ElasticsearchTestDataLoaderExtension extends TestDataLoaderExtension {
 
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchTestDataLoaderExtension.class);
 
-    private static final String CASE_INDEX_NAME = "aat_private_cases-000001";
-    private static final String CASE_INDEX_ALIAS = "aat_private_cases";
+    private static final String AAT_PRIVATE_INDEX_NAME = "aat_private_cases-000001";
+    private static final String AAT_PRIVATE_INDEX_ALIAS = "aat_private_cases";
+    private static final String AAT_PRIVATE2_INDEX_NAME = "aat_private2_cases-000001";
+    private static final String AAT_PRIVATE2_INDEX_ALIAS = "aat_private2_cases";
 
     private final ElasticsearchHelper elasticsearchHelper = new ElasticsearchHelper();
 
@@ -29,30 +35,26 @@ public class ElasticsearchTestDataLoaderExtension extends TestDataLoaderExtensio
     protected void loadData() {
         assertElasticsearchEnabled();
 
-        LOG.info("importing definition");
-        importDefinition();
+        LOG.info("importing definitions");
+        importDefinitions();
 
         LOG.info("creating test case data");
         createCases();
     }
 
-    private void assertElasticsearchEnabled() {
-        // stop execution of these tests if Elasticsearch is not enabled
-        LOG.info("ELASTIC_SEARCH_ENABLED: {}", System.getenv("ELASTIC_SEARCH_ENABLED"));
-        boolean elasticsearchEnabled = ofNullable(System.getenv("ELASTIC_SEARCH_ENABLED")).map(Boolean::valueOf).orElse(false);
-        assumeTrue(elasticsearchEnabled, () -> "Ignoring Elasticsearch tests, variable ELASTIC_SEARCH_ENABLED not set");
-    }
-
     @Override
     public void close() {
         LOG.info("Deleting index and alias");
-        deleteIndexAndAlias();
+        deleteIndexAndAlias(AAT_PRIVATE_INDEX_NAME, AAT_PRIVATE_INDEX_ALIAS);
+        deleteIndexAndAlias(AAT_PRIVATE2_INDEX_NAME, AAT_PRIVATE2_INDEX_ALIAS);
     }
 
     private void createCases() {
         // create test cases in the alphabetical order of test class names
         createCasesForCaseSearchSecurityTest();
         createCasesForTextSearchTest();
+        createCasesForCrossCaseTypeSearchTest();
+        createCasesForCrossCaseTypeSecurityTest();
         waitUntilLogstashIndexesCaseData(elasticsearchHelper.getLogstashReadDelay());
     }
 
@@ -60,11 +62,12 @@ public class ElasticsearchTestDataLoaderExtension extends TestDataLoaderExtensio
         TestData testData = TestData.getInstance();
 
         testData.put(ElasticsearchCaseSearchSecurityTest.CASE_TYPE_SECURITY_TEST_REFERENCE,
-                     createCase(asPrivateCaseworker(true), AATCaseBuilder.EmptyCase.build()));
+                     createCase(asPrivateCaseworker(true), AAT_PRIVATE_CASE_TYPE, AATCaseBuilder.EmptyCase.build()));
         testData.put(ElasticsearchCaseSearchSecurityTest.CASE_STATE_SECURITY_TEST_REFERENCE,
-                     createCaseAndProgressState(asPrivateCaseworker(true)));
+                     createCase(asPrivateCaseworker(true), AAT_PRIVATE_CASE_TYPE, AATCaseBuilder.EmptyCase.build()));
         testData.put(ElasticsearchCaseSearchSecurityTest.CASE_FIELD_SECURITY_TEST_REFERENCE,
                      createCase(asRestrictedCaseworker(true),
+                                AAT_PRIVATE_CASE_TYPE,
                                 AATCaseType.CaseData.builder().emailField(ElasticsearchCaseSearchSecurityTest.EMAIL_ID_VALUE).build()));
     }
 
@@ -72,14 +75,56 @@ public class ElasticsearchTestDataLoaderExtension extends TestDataLoaderExtensio
         TestData testData = TestData.getInstance();
 
         testData.put(ElasticSearchTextFieldTest.SEARCH_UPDATED_CASE_TEST_REFERENCE,
-                     createCaseAndProgressState(asPrivateCaseworker(true)));
+                     createCaseAndProgressState(asPrivateCaseworker(true), AAT_PRIVATE_CASE_TYPE));
         testData.put(ElasticSearchTextFieldTest.EXACT_MATCH_TEST_REFERENCE,
-                     createCase(asPrivateCaseworker(true), AATCaseBuilder.FullCase.build()));
+                     createCase(asPrivateCaseworker(true), AAT_PRIVATE_CASE_TYPE, AATCaseBuilder.FullCase.build()));
     }
 
-    private void deleteIndexAndAlias() {
-        deleteIndexAlias(CASE_INDEX_NAME, CASE_INDEX_ALIAS);
-        deleteIndex(CASE_INDEX_NAME);
+    private void createCasesForCrossCaseTypeSearchTest() {
+        TestData testData = TestData.getInstance();
+
+        testData.put(ElasticsearchCrossCaseTypeSearchTest.AAT_PRIVATE_CROSS_CASE_TYPE_SEARCH_REFERENCE,
+                     createCase(asPrivateCaseworker(true),
+                                AAT_PRIVATE_CASE_TYPE,
+                                AATCaseType.CaseData.builder()
+                                    .textField(ElasticsearchCrossCaseTypeSearchTest.TEXT_FIELD_VALUE)
+                                    .numberField("1")
+                                    .build()));
+
+        testData.put(ElasticsearchCrossCaseTypeSearchTest.AAT_PRIVATE2_CROSS_CASE_TYPE_SEARCH_REFERENCE,
+                     createCase(asPrivateCrossCaseTypeCaseworker(true),
+                                JURISDICTION_AUTOTEST2,
+                                AAT_PRIVATE2_CASE_TYPE,
+                                AATCaseType.CaseData.builder()
+                                    .textField(ElasticsearchCrossCaseTypeSearchTest.TEXT_FIELD_VALUE)
+                                    .numberField("2")
+                                    .build()));
+    }
+
+    private void createCasesForCrossCaseTypeSecurityTest() {
+        TestData testData = TestData.getInstance();
+
+        testData.put(ElasticsearchCrossCaseTypeSearchSecurityTest.AAT_PRIVATE_SECURITY_TEST_REFERENCE,
+                     createCase(asPrivateCrossCaseTypeCaseworker(true),
+                                AAT_PRIVATE_CASE_TYPE,
+                                AATCaseType.CaseData.builder()
+                                    .numberField(ElasticsearchCrossCaseTypeSearchSecurityTest.NUMBER_FIELD_VALUE)
+                                    .emailField(ElasticsearchCrossCaseTypeSearchSecurityTest.EMAIL_ID_VALUE)
+                                    .build()));
+
+        testData.put(ElasticsearchCrossCaseTypeSearchSecurityTest.AAT_PRIVATE2_SECURITY_TEST_REFERENCE,
+                     createCase(asPrivateCrossCaseTypeCaseworker(true),
+                                JURISDICTION_AUTOTEST2,
+                                AAT_PRIVATE2_CASE_TYPE,
+                                AATCaseType.CaseData.builder()
+                                    .numberField(ElasticsearchCrossCaseTypeSearchSecurityTest.NUMBER_FIELD_VALUE)
+                                    .emailField(ElasticsearchCrossCaseTypeSearchSecurityTest.EMAIL_ID_VALUE)
+                                    .build()));
+    }
+
+    private void deleteIndexAndAlias(String index, String indexAlias) {
+        deleteIndexAlias(index, indexAlias);
+        deleteIndex(index);
     }
 
     private void deleteIndexAlias(String indexName, String indexAlias) {
