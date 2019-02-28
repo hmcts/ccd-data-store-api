@@ -1,11 +1,11 @@
 package uk.gov.hmcts.ccd.v2.internal.resource;
 
+import java.util.List;
+
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
-
-import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;

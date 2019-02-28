@@ -1,5 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -12,9 +15,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchInputDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchInputField;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
-
-import java.util.Arrays;
-import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;

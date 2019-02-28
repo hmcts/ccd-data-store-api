@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.v2.internal.controller;
 
+import java.util.List;
+
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,8 +18,6 @@ import uk.gov.hmcts.ccd.domain.service.aggregated.FindSearchInputOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.FindWorkbasketInputOperation;
 import uk.gov.hmcts.ccd.v2.internal.resource.UISearchInputsResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.UIWorkbasketInputsResource;
-
-import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;

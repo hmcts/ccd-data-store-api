@@ -1,5 +1,16 @@
 package uk.gov.hmcts.ccd.endpoint.ui;
 
+import javax.inject.Inject;
+import javax.transaction.Transactional;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Predicate;
+
 import com.google.common.collect.Maps;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -42,17 +53,6 @@ import uk.gov.hmcts.ccd.domain.service.aggregated.GetUserProfileOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
-
-import javax.inject.Inject;
-import javax.transaction.Transactional;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Predicate;
 
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CASE_REFERENCE;

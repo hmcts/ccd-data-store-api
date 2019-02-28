@@ -1,15 +1,15 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Predicate;
 
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CASE_TYPE_FOUND;
