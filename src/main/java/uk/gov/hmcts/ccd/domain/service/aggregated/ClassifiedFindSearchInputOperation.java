@@ -33,10 +33,10 @@ public class ClassifiedFindSearchInputOperation implements FindSearchInputOperat
     }
 
     @Override
-    public List<SearchInput> execute(String jurisdictionId, String caseTypeId, Predicate<AccessControlList> access) {
+    public List<SearchInput> execute(String caseTypeId, Predicate<AccessControlList> access) {
         final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
-        return findSearchInputOperation.execute(jurisdictionId, caseTypeId, access).stream()
-            .filter(searchInput -> classificationService.userHasEnoughSecurityClassificationForField(jurisdictionId,
+        return findSearchInputOperation.execute(caseTypeId, access).stream()
+            .filter(searchInput -> classificationService.userHasEnoughSecurityClassificationForField(caseType.getJurisdictionId(),
                 caseType, searchInput.getField().getId())
             ).collect(toList());
     }
