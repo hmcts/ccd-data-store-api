@@ -1,10 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -15,15 +10,21 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldB
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.SearchInputBuilder.aSearchInput;
 
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 class AuthorisedFindSearchInputOperationTest {
     private static final String JURISDICTION_ID = "TEST";
@@ -71,16 +72,15 @@ class AuthorisedFindSearchInputOperationTest {
     void shouldFailWhenWhenNoACLReadAccess() {
         doReturn(Optional.empty()).when(getCaseTypeOperation).execute(CASE_TYPE_ONE, CAN_READ);
 
-        assertThrows(ResourceNotFoundException.class, () -> authorisedFindSearchInputOperation.execute(JURISDICTION_ID, CASE_TYPE_ONE, CAN_READ));
+        assertThrows(ResourceNotFoundException.class, () -> authorisedFindSearchInputOperation.execute(CASE_TYPE_ONE, CAN_READ));
     }
 
     @Test
     @DisplayName("should return only authorised case fields with ACL READ access")
     void shouldReturnOnlyAuthorisedCaseFields() {
-        doReturn(testSearchInputs).when(findSearchInputOperation).execute(JURISDICTION_ID, CASE_TYPE_ONE, CAN_READ);
+        doReturn(testSearchInputs).when(findSearchInputOperation).execute(CASE_TYPE_ONE, CAN_READ);
 
-        final List<SearchInput> searchInputs = authorisedFindSearchInputOperation.execute(JURISDICTION_ID,
-            CASE_TYPE_ONE, CAN_READ);
+        final List<SearchInput> searchInputs = authorisedFindSearchInputOperation.execute(CASE_TYPE_ONE, CAN_READ);
 
         assertAll(
             () -> assertThat(searchInputs.size(), is(3)),
@@ -93,10 +93,9 @@ class AuthorisedFindSearchInputOperationTest {
     @Test
     @DisplayName("Should return empty search inputs when no case field is authorised with ACL READ access")
     void shouldReturnEmptySearchInputWhenNoFieldIsAuthorised() {
-        doReturn(new ArrayList()).when(findSearchInputOperation).execute(JURISDICTION_ID, CASE_TYPE_ONE, CAN_READ);
+        doReturn(new ArrayList()).when(findSearchInputOperation).execute(CASE_TYPE_ONE, CAN_READ);
 
-        final List<SearchInput> searchInputs = authorisedFindSearchInputOperation.execute(JURISDICTION_ID,
-            CASE_TYPE_ONE, CAN_READ);
+        final List<SearchInput> searchInputs = authorisedFindSearchInputOperation.execute(CASE_TYPE_ONE, CAN_READ);
 
         assertAll(
             () -> assertThat(searchInputs.size(), is(0))
