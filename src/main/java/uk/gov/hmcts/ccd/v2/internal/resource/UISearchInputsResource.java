@@ -20,6 +20,8 @@ import org.springframework.hateoas.ResourceSupport;
 @NoArgsConstructor
 public class UISearchInputsResource extends ResourceSupport {
 
+    private UISearchInput[] searchInputs;
+
     @Data
     @NoArgsConstructor
     public class UISearchInput {
@@ -27,8 +29,6 @@ public class UISearchInputsResource extends ResourceSupport {
         private int order;
         private Field field;
     }
-
-    private UISearchInput[] searchInputs;
 
     public UISearchInputsResource(SearchInput[] searchInputs, String caseTypeId) {
         copyProperties(searchInputs);
