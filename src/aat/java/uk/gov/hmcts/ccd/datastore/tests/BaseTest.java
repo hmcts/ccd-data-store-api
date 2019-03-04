@@ -40,6 +40,21 @@ public abstract class BaseTest {
         return authenticateAndCreateRequestSpecification(aat.getPrivateCaseworkerSolicitorEmail(), aat.getPrivateCaseworkerSolicitorPassword(), withUserParam);
     }
 
+    protected Supplier<RequestSpecification> asPrivateCrossCaseTypeCaseworker(boolean withUserParam) {
+        return authenticateAndCreateRequestSpecification(aat.getPrivateCrossCaseTypeCaseworkerEmail(), aat.getPrivateCrossCaseTypeCaseworkerPassword(),
+                                                         withUserParam);
+    }
+
+    protected Supplier<RequestSpecification> asPrivateCrossCaseTypeSolicitor(boolean withUserParam) {
+        return authenticateAndCreateRequestSpecification(aat.getPrivateCrossCaseTypeSolicitorEmail(), aat.getPrivateCrossCaseTypeSolicitorPassword(),
+                                                         withUserParam);
+    }
+
+    protected Supplier<RequestSpecification> asRestrictedCrossCaseTypeCaseworker(boolean withUserParam) {
+        return authenticateAndCreateRequestSpecification(aat.getRestrictedCrossCaseTypeCaseworkerEmail(), aat.getRestrictedCrossCaseTypeCaseworkerPassword(),
+                                                         withUserParam);
+    }
+
     private Supplier<RequestSpecification> authenticateAndCreateRequestSpecification(String username, String password, Boolean withUserParam) {
         AuthenticatedUser caseworker = aat.getIdamHelper().authenticate(username, password);
         String s2sToken = aat.getS2SHelper().getToken();

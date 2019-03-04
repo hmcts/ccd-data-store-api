@@ -48,6 +48,10 @@ apply plugin: 'org.owasp.dependencycheck'
 
 apply from: 'liquibase.gradle'
 
+pmd {
+    toolVersion = '6.11.0'
+}
+
 dependencyUpdates.resolutionStrategy = {
     componentSelection { rules ->
         rules.all { ComponentSelection selection ->
@@ -144,7 +148,7 @@ configurations {
 
 checkstyle {
     maxWarnings = 2934 // In the Ideal world this should be 0
-    toolVersion = '8.12'
+    toolVersion = '8.18'
 }
 
 checkstyleMain.shouldRunAfter(compileJava)

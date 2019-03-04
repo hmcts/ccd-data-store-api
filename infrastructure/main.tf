@@ -1,11 +1,11 @@
 provider "azurerm" {
-  version = "1.19.0"
+  version = "1.22.1"
 }
 
 locals {
   app_full_name = "${var.product}-${var.component}"
 
-  aseName = "${data.terraform_remote_state.core_apps_compute.ase_name[0]}"
+  aseName = "core-compute-${var.env}"
   local_env = "${(var.env == "preview" || var.env == "spreview") ? (var.env == "preview" ) ? "aat" : "saat" : var.env}"
   local_ase = "${(var.env == "preview" || var.env == "spreview") ? (var.env == "preview" ) ? "core-compute-aat" : "core-compute-saat" : local.aseName}"
   env_ase_url = "${local.local_env}.service.${local.local_ase}.internal"
@@ -106,6 +106,7 @@ module "ccd-data-store-api" {
     DATA_STORE_DB_NAME = "${module.data-store-db.postgresql_database}"
     DATA_STORE_DB_USERNAME = "${module.data-store-db.user_name}"
     DATA_STORE_DB_PASSWORD = "${module.data-store-db.postgresql_password}"
+    DATA_STORE_DB_MAX_POOL_SIZE = "${var.data_store_max_pool_size}"
 
     ENABLE_DB_MIGRATE = "false"
 
@@ -158,7 +159,7 @@ module "data-store-db" {
   env = "${var.env}"
   postgresql_user = "${var.postgresql_user}"
   database_name = "${var.database_name}"
-  sku_name = "GP_Gen5_2"
+  sku_name = "${var.database_sku_name}"
   sku_tier = "GeneralPurpose"
   storage_mb = "51200"
   common_tags  = "${var.common_tags}"
