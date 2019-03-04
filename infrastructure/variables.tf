@@ -93,6 +93,10 @@ variable "database_sku_name" {
   default = "GP_Gen5_2"
 }
 
+variable "database_sku_capacity" {
+  default = "2"
+}
+
 variable "authorised-services" {
   type    = "string"
   default = "ccd_data,ccd_gw,ccd_ps,probate_backend,divorce_ccd_submission,sscs,sscs_bulkscan,cmc,cmc_claim_store,jui_webapp,pui_webapp,bulk_scan_orchestrator,fpl_case_service,iac,finrem_ccd_data_migrator"
