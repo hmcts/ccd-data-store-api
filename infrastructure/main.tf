@@ -162,7 +162,7 @@ module "data-store-db" {
   sku_name = "${var.database_sku_name}"
   sku_tier = "GeneralPurpose"
   sku_capacity = "${var.database_sku_capacity}"
-  storage_mb = "51200"
+  storage_mb = "${var.database_storage_mb}"
   common_tags  = "${var.common_tags}"
 }
 
