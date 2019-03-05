@@ -1,7 +1,7 @@
 idam_api_url = "https://preprod-idamapi.reform.hmcts.net:3511"
 document_management_valid_domain = "^https?://(?:api-gateway\\.preprod\\.dm\\.reform\\.hmcts\\.net|dm-store-demo\\.service\\.core-compute-demo\\.internal(?::\\d+)?)"
 default_print_url = "https://return-case-doc.ccd.demo.platform.hmcts.net/jurisdictions/:jid/case-types/:ctid/cases/:cid"
-capacity = "2"
+capacity = "4"
 frontend_url = "https://www.ccd.demo.platform.hmcts.net"
 asp_name = "ccd-data-store-api-demo"
 asp_rg = "ccd-data-store-api-demo"
