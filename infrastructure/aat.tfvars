@@ -7,4 +7,9 @@ frontend_url = "https://www-ccd.nonprod.platform.hmcts.net"
 asp_name = "ccd-data-store-api-aat"
 asp_rg = "ccd-data-store-api-aat"
 elastic_search_enabled = "true"
+
+data_store_max_pool_size = 48
+database_sku_name = "GP_Gen5_8"
+database_sku_capacity = "8"
+
 http_client_read_timeout = "180000"
