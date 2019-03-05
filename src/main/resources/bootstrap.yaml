@@ -1,0 +1,6 @@
+spring:
+  cloud:
+    propertiesvolume:
+      paths: /mnt/secrets/s2s
+      aliases:
+        s2s.microservicekey-ccd-data: CCD_DATA_SERVICE_SECRET

@@ -20,7 +20,7 @@ services:
       - USER_PROFILE_HOST
       - IDAM_USER_URL
       - IDAM_S2S_URL
-      - APPINSIGHTS_INSTRUMENTATIONKEY=somekey
+      - AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY=somekey
       - REFORM_SERVICE_NAME=ccd-data-store-api
       - REFORM_TEAM=ccd
       - REFORM_ENVIRONMENT=local
