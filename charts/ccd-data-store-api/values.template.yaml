@@ -14,7 +14,7 @@ java:
   applicationInsightsInstrumentKey: "fake-key"
   keyVaults:
     s2s:
-      resourceGroup: ccd-shared-aat
+      resourceGroup: ccd-shared
       secrets:
         - microservicekey-ccd-data
   environment:
