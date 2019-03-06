@@ -14,7 +14,7 @@ java:
   applicationInsightsInstrumentKey: "fake-key"
   keyVaults:
     s2s:
-      resourceGroup: ccd-shared
+      resourceGroup: rpe-service-auth-provider
       secrets:
         - microservicekey-ccd-data
   environment:
