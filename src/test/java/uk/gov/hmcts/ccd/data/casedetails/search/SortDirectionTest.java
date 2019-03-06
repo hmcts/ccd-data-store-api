@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import org.junit.Assert;
 
-public class SearchDirectionTest {
+public class SortDirectionTest {
 
     @Test
     public void test_from_null_string() {
