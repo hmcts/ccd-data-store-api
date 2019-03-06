@@ -31,8 +31,6 @@ public class SearchQueryFactoryOperation {
     private static final String MAIN_QUERY = "SELECT * FROM case_data WHERE %s ORDER BY created_date %s";
     private static final String MAIN_COUNT_QUERY = "SELECT count(*) FROM case_data WHERE %s";
 
-    private static final String SORT_ASCENDING = "ASC";
-
     private final CriterionFactory criterionFactory;
     private final ApplicationParams applicationParam;
     private final UserAuthorisation userAuthorisation;
