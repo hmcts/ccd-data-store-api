@@ -52,10 +52,13 @@ public class SearchQueryFactoryOperation {
 
     public Query build(MetaData metadata, Map<String, String> params, boolean isCountQuery) {
         final List<Criterion> criteria = criterionFactory.build(metadata, params);
-        String queryString = String.format(isCountQuery ? MAIN_COUNT_QUERY : MAIN_QUERY,
-                                           secure(toClauses(criteria), metadata),
-                                           metadata.getSortDirection().orElse(SORT_ASCENDING).toUpperCase()
-        );
+        
+        String queryToFormat = isCountQuery ? MAIN_COUNT_QUERY : MAIN_QUERY;
+        String whereClausePart = secure(toClauses(criteria), metadata);
+        String sortDirectionPart = metadata.getSortDirection().orElse(SORT_ASCENDING).toUpperCase();
+        
+        String queryString = String.format(queryToFormat, whereClausePart, sortDirectionPart);
+
         Query query;
         if (isCountQuery) {
             query = entityManager.createNativeQuery(queryString);
