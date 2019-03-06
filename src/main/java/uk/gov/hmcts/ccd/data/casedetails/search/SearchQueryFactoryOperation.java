@@ -55,9 +55,10 @@ public class SearchQueryFactoryOperation {
         
         String queryToFormat = isCountQuery ? MAIN_COUNT_QUERY : MAIN_QUERY;
         String whereClausePart = secure(toClauses(criteria), metadata);
-        String sortDirectionPart = metadata.getSortDirection().orElse(SORT_ASCENDING).toUpperCase();
-        
-        String queryString = String.format(queryToFormat, whereClausePart, sortDirectionPart);
+
+        SortDirection direction = SortDirection.fromOptionalString(metadata.getSortDirection());
+
+        String queryString = String.format(queryToFormat, whereClausePart, direction.name());
 
         Query query;
         if (isCountQuery) {
