@@ -109,9 +109,9 @@ class UIDefinitionControllerTest {
         @Test
         @DisplayName("should propagate exception")
         void shouldPropagateExceptionWhenThrown() {
-            when(findSearchInputOperation.execute(CASE_TYPE_ID, CAN_READ)).thenThrow(Exception.class);
+            when(findSearchInputOperation.execute(CASE_TYPE_ID, CAN_READ)).thenThrow(RuntimeException.class);
 
-            assertThrows(Exception.class,
+            assertThrows(RuntimeException.class,
                          () -> uiDefinitionController.getSearchInputsDetails(CASE_TYPE_ID));
         }
     }
