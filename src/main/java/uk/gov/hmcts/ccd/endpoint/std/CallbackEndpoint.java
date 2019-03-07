@@ -8,7 +8,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.Document;
 import uk.gov.hmcts.ccd.domain.service.stdapi.PrintableDocumentListOperation;
 
-import javax.transaction.Transactional;
 import java.util.List;
 
 @RestController
