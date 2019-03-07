@@ -1,20 +1,10 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import java.util.*;
-
-import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTabCollectionBuilder.newCaseTabCollection;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -23,13 +13,46 @@ import org.mockito.Spy;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
+import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.arrayWithSize;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItemInArray;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.CASE_HISTORY_VIEWER;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTabCollectionBuilder.newCaseTabCollection;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeTabBuilder.newCaseTab;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeTabFieldBuilder.newCaseTabField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 class DefaultGetCaseViewOperationTest {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
@@ -59,6 +82,9 @@ class DefaultGetCaseViewOperationTest {
     @Mock
     private UIDService uidService;
 
+    @Mock
+    private ObjectMapperService objectMapperService;
+
     @Spy
     @InjectMocks
     private DefaultGetCaseViewOperation defaultGetCaseViewOperation;
@@ -70,6 +96,7 @@ class DefaultGetCaseViewOperationTest {
     private CaseTabCollection caseTabCollection;
     private CaseType caseType;
     private CaseState caseState;
+    private JsonNode eventsNode;
 
     @BeforeEach
     void setUp() {
@@ -91,6 +118,8 @@ class DefaultGetCaseViewOperationTest {
         auditEvents = asList(event1, event2);
         doReturn(auditEvents).when(getEventsOperation).getEvents(caseDetails);
 
+        doReturn(eventsNode).when(objectMapperService).convertJsonNodeToMap(anyObject());
+
         doReturn(Boolean.TRUE).when(uidService).validateUID(CASE_REFERENCE);
 
         caseTabCollection = newCaseTabCollection().withFieldIds("dataTestField1", "dataTestField2").build();
@@ -104,7 +133,7 @@ class DefaultGetCaseViewOperationTest {
         caseField.setId(MetaData.CaseField.CASE_TYPE.getReference());
         caseField.setMetadata(true);
         caseField.setFieldType(new FieldType());
-        caseType.setCaseFields(Collections.singletonList(caseField));
+        caseType.setCaseFields(singletonList(caseField));
 
         doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
 
@@ -112,6 +141,79 @@ class DefaultGetCaseViewOperationTest {
         caseState.setId(STATE);
         caseState.setTitleDisplay(TITLE_DISPLAY);
         doReturn(caseState).when(caseTypeService).findState(caseType, STATE);
+    }
+
+    @Nested
+    @DisplayName("field of CaseHistoryViewer field type")
+    class CaseHistoryViewer_FieldType {
+        @Test
+        @DisplayName("should hydrate case history viewer if CaseHistoryViewer field type present in tabs")
+        void shouldHydrateCaseHistoryViewerIfFieldPresentInTabs() {
+            caseTabCollection = newCaseTabCollection().withTab(newCaseTab()
+                                                                   .withTabField(newCaseTabField()
+                                                                                     .withCaseField(newCaseField()
+                                                                                                        .withId(CASE_HISTORY_VIEWER)
+                                                                                                        .withFieldType(aFieldType()
+                                                                                                                           .withType(
+                                                                                                                               CASE_HISTORY_VIEWER)
+                                                                                                                           .build())
+                                                                                                        .build())
+                                                                                     .build())
+                                                                   .build())
+                                                      .build();
+            doReturn(caseTabCollection).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
+            caseType.setCaseFields(singletonList(newCaseField().withId(CASE_HISTORY_VIEWER).withFieldType(aFieldType().withType(CASE_HISTORY_VIEWER).build()).build()));
+            doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
+
+            final CaseView caseView = defaultGetCaseViewOperation.execute(CASE_REFERENCE);
+
+            assertAll(() -> assertThat(caseView.getTabs(), arrayWithSize(1)),
+                      () -> assertThat(caseView.getTabs()[0].getFields(), arrayWithSize(1)),
+                      () -> assertThat(caseView.getTabs()[0].getFields()[0], hasProperty("id", equalTo(CASE_HISTORY_VIEWER))),
+                      () -> assertThat(caseView.getTabs()[0].getFields()[0], hasProperty("value", equalTo(eventsNode))),
+                      () -> assertThat(caseView.getEvents(), arrayWithSize(2)),
+                      () -> assertThat(caseView.getEvents(),
+                                       hasItemInArray(hasProperty("summary", equalTo(EVENT_SUMMARY_1)))),
+                      () -> assertThat(caseView.getEvents(),
+                                       hasItemInArray(hasProperty("summary", equalTo(EVENT_SUMMARY_2))))
+            );
+        }
+
+        @Test
+        @DisplayName("should not hydrate case history viewer if CaseHistoryViewer field type is not present in tabs")
+        void shouldNotHydrateCaseHistoryViewerIfFieldIsNotPresentInTabs() {
+            caseTabCollection = newCaseTabCollection().withTab(newCaseTab()
+                                                                   .withTabField(newCaseTabField()
+                                                                                     .withCaseField(newCaseField()
+                                                                                                        .withId("NotACaseHistoryViewer")
+                                                                                                        .withFieldType(aFieldType()
+                                                                                                                           .withType(
+                                                                                                                               "NotACaseHistoryViewer")
+                                                                                                                           .build())
+                                                                                                        .build())
+                                                                                     .build())
+                                                                   .build())
+                                                      .build();
+            doReturn(caseTabCollection).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
+            caseType.setCaseFields(singletonList(newCaseField()
+                                                     .withId(CASE_HISTORY_VIEWER)
+                                                     .withFieldType(aFieldType()
+                                                                        .withType(CASE_HISTORY_VIEWER)
+                                                                        .build())
+                                                     .build()));
+            doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
+
+            final CaseView caseView = defaultGetCaseViewOperation.execute(CASE_REFERENCE);
+
+            assertAll(() -> assertThat(caseView.getTabs(), arrayWithSize(1)),
+                      () -> assertThat(caseView.getTabs()[0].getFields(), arrayWithSize(0)),
+                      () -> assertThat(caseView.getEvents(), arrayWithSize(2)),
+                      () -> assertThat(caseView.getEvents(),
+                                       hasItemInArray(hasProperty("summary", equalTo(EVENT_SUMMARY_1)))),
+                      () -> assertThat(caseView.getEvents(),
+                                       hasItemInArray(hasProperty("summary", equalTo(EVENT_SUMMARY_2))))
+            );
+        }
     }
 
     @Test
