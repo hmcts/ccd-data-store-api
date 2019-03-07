@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.endpoint.ui;
 
 import javax.inject.Inject;
-import javax.transaction.Transactional;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -23,7 +22,6 @@ public class UserProfileEndpoint {
         this.getUserProfileOperation = getUserProfileOperation;
     }
 
-    @Transactional
     @RequestMapping(value = "/caseworkers/{uid}/profile", method = RequestMethod.GET)
     @ApiOperation(value = "Get default setting for user")
     @ApiResponse(code = 200, message = "User default settings")
