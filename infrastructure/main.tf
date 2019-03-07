@@ -107,6 +107,7 @@ module "ccd-data-store-api" {
     DATA_STORE_DB_USERNAME = "${module.data-store-db.user_name}"
     DATA_STORE_DB_PASSWORD = "${module.data-store-db.postgresql_password}"
     DATA_STORE_DB_MAX_POOL_SIZE = "${var.data_store_max_pool_size}"
+    DATA_STORE_DB_OPTIONS = "?stringtype=unspecified&sslmode=require"
 
     ENABLE_DB_MIGRATE = "false"
 
