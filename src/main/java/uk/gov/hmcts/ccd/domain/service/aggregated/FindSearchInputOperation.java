@@ -7,5 +7,5 @@ import java.util.List;
 import java.util.function.Predicate;
 
 public interface FindSearchInputOperation {
-    List<SearchInput> execute(final String jurisdictionId, final String caseTypeId, Predicate<AccessControlList> access);
+    List<SearchInput> execute(final String caseTypeId, Predicate<AccessControlList> access);
 }

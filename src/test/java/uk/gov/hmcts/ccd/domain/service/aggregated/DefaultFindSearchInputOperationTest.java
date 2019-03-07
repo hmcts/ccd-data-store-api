@@ -1,9 +1,12 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.doReturn;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.JurisdictionBuilder.newJurisdiction;
+
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
@@ -16,11 +19,10 @@ import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.doReturn;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 class DefaultFindSearchInputOperationTest {
     @Mock
@@ -49,6 +51,7 @@ class DefaultFindSearchInputOperationTest {
         caseField4.setFieldType(fieldType);
         caseField4.setMetadata(true);
         caseType.setId("Test case type");
+        caseType.setJurisdiction(newJurisdiction().withJurisdictionId("TEST").build());
         caseType.setCaseFields(Arrays.asList(caseField1, caseField2, caseField3, caseField4));
 
         findSearchInputOperation = new DefaultFindSearchInputOperation(uiDefinitionRepository, caseDefinitionRepository);
@@ -59,7 +62,7 @@ class DefaultFindSearchInputOperationTest {
 
     @Test
     void shouldReturnSearchInputs() {
-        List<SearchInput> searchInputs = findSearchInputOperation.execute("TEST", caseType.getId(), CAN_READ);
+        List<SearchInput> searchInputs = findSearchInputOperation.execute(caseType.getId(), CAN_READ);
 
         assertAll(
             () -> assertThat(searchInputs.size(), is(4)),
