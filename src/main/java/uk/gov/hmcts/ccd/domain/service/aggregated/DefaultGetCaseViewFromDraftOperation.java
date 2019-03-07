@@ -1,9 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import java.util.ArrayList;
-
-import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTriggerBuilder.anCaseViewTrigger;
-
+import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -20,9 +17,15 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.DraftResponseToCaseDetailsBuilder;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
+
+import java.util.ArrayList;
+
+import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTriggerBuilder.anCaseViewTrigger;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.CASE_HISTORY_VIEWER;
 
 @Service
 @Qualifier(DefaultGetCaseViewFromDraftOperation.QUALIFIER)
@@ -47,8 +50,9 @@ public class DefaultGetCaseViewFromDraftOperation extends AbstractDefaultGetCase
                                                 final CaseTypeService caseTypeService,
                                                 final UIDService uidService,
                                                 @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway,
-                                                final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder) {
-        super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService);
+                                                final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder,
+                                                final ObjectMapperService objectMapperService) {
+        super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService, objectMapperService);
         this.draftGateway = draftGateway;
         this.draftResponseToCaseDetailsBuilder = draftResponseToCaseDetailsBuilder;
     }
@@ -111,6 +115,9 @@ public class DefaultGetCaseViewFromDraftOperation extends AbstractDefaultGetCase
         caseView.setChannels(caseTabCollection.getChannels().toArray(new String[0]));
 
         caseView.setCaseType(CaseViewType.createFrom(caseType));
+        if (caseTabCollection.hasTabFieldType(CASE_HISTORY_VIEWER)) {
+            hydrateHistoryField(caseDetails, caseType, Lists.newArrayList(events));
+        }
         caseView.setTabs(getTabs(caseDetails, caseDetails.getData(), caseTabCollection));
         caseView.setMetadataFields(getMetadataFields(caseType, caseDetails));
 
