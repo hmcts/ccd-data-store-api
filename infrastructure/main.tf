@@ -205,3 +205,9 @@ resource "azurerm_key_vault_secret" "ccd_draft_encryption_key" {
   value = "${random_string.draft_encryption_key.result}"
   key_vault_id = "${data.azurerm_key_vault.ccd_shared_key_vault.id}"
 }
+
+resource "azurerm_key_vault_secret" "draft-store-key" {
+  name = "${local.app_full_name}-draft-key"
+  value = "${random_string.draft_encryption_key.result}"
+  key_vault_id = "${data.azurerm_key_vault.ccd_shared_key_vault.id}"
+}
