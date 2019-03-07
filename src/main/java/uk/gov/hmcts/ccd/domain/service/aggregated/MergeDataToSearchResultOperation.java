@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.fasterxml.jackson.databind.node.JsonNodeFactory.instance;
-import static uk.gov.hmcts.ccd.domain.model.definition.CaseDetails.LABEL_FIELD_TYPE;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.LABEL;
 
 @Named
 @Singleton
@@ -61,7 +61,7 @@ public class MergeDataToSearchResultOperation {
         Map map = new HashMap<>(caseDetails.getCaseDataAndMetadata());
         caseType.getCaseFields()
             .stream()
-            .filter(caseField -> LABEL_FIELD_TYPE.equals(caseField.getFieldType().getType()))
+            .filter(caseField -> LABEL.equals(caseField.getFieldType().getType()))
             .forEach(f -> map.put(f.getId(), instance.textNode(f.getLabel())));
         return map;
     }

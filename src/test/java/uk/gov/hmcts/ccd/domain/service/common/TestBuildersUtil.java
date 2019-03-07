@@ -1031,6 +1031,11 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public CaseViewFieldBuilder withFieldType(FieldType fieldType) {
+            caseViewField.setFieldType(fieldType);
+            return this;
+        }
+
         public CaseViewFieldBuilder withACL(AccessControlList acl) {
             acls.add(acl);
             return this;
@@ -1188,11 +1193,61 @@ public class TestBuildersUtil {
         }
     }
 
+    public static class CaseTypeTabFieldBuilder {
+        private final CaseTypeTabField caseTypeTabField;
+
+        private CaseTypeTabFieldBuilder() {
+            this.caseTypeTabField = new CaseTypeTabField();
+        }
+
+        public CaseTypeTabFieldBuilder withCaseField(CaseField caseField) {
+            this.caseTypeTabField.setCaseField(caseField);
+            return this;
+        }
+
+        public CaseTypeTabField build() {
+            return this.caseTypeTabField;
+        }
+
+        public static CaseTypeTabFieldBuilder newCaseTabField() {
+            return new CaseTypeTabFieldBuilder();
+        }
+
+    }
+
+    public static class CaseTypeTabBuilder {
+        private final CaseTypeTab caseTypeTab;
+        private final List<CaseTypeTabField> caseTypeTabFields;
+
+        private CaseTypeTabBuilder() {
+            this.caseTypeTabFields = newArrayList();
+            this.caseTypeTab = new CaseTypeTab();
+            this.caseTypeTab.setTabFields(caseTypeTabFields);
+        }
+
+        public CaseTypeTabBuilder withTabField(CaseTypeTabField field) {
+            this.caseTypeTabFields.add(field);
+            return this;
+        }
+
+        public CaseTypeTab build() {
+            return this.caseTypeTab;
+        }
+
+        public static CaseTypeTabBuilder newCaseTab() {
+            return new CaseTypeTabBuilder();
+        }
+
+    }
+
     public static class CaseTabCollectionBuilder {
+        private final List<CaseTypeTab> tabs;
         private final CaseTabCollection caseTabCollection;
 
         private CaseTabCollectionBuilder() {
+            this.tabs = newArrayList();
             this.caseTabCollection = new CaseTabCollection();
+            this.caseTabCollection.setTabs(tabs);
         }
 
         public static CaseTabCollectionBuilder newCaseTabCollection() {
@@ -1220,6 +1275,11 @@ public class TestBuildersUtil {
             tabs.add(tab);
             caseTabCollection.setTabs(tabs);
 
+            return this;
+        }
+
+        public CaseTabCollectionBuilder withTab(CaseTypeTab tab) {
+            tabs.add(tab);
             return this;
         }
 
