@@ -24,7 +24,6 @@ public class CallbackEndpoint {
         this.printableDocumentListOperation = printableDocumentListOperation;
     }
 
-    @Transactional
     @RequestMapping(value = "/jurisdictions/{jid}/case-types/{ctid}/documents", method = RequestMethod.POST)
     @ApiOperation(value = "Get printable documents", notes = "Retrieve a list of printable documents for a case")
     @ApiResponses(value = {
