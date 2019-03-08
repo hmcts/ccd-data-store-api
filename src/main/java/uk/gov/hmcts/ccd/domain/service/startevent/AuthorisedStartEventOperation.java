@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
 
+import javax.transaction.Transactional;
+
 import static com.google.common.collect.Maps.newHashMap;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
@@ -64,6 +66,7 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
         this.draftGateway = draftGateway;
     }
 
+    @Transactional
     @Override
     public StartEventTrigger triggerStartForCaseType(String caseTypeId, String eventTriggerId, Boolean ignoreWarning) {
         return verifyReadAccess(caseTypeId, startEventOperation.triggerStartForCaseType(caseTypeId,
@@ -72,6 +75,7 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
     }
 
     @Override
+    @Transactional
     public StartEventTrigger triggerStartForCase(String caseReference, String eventTriggerId, Boolean ignoreWarning) {
 
         if (!uidService.validateUID(caseReference)) {

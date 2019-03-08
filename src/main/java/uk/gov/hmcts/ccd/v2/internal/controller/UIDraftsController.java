@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.v2.internal.controller;
 
-import javax.transaction.Transactional;
 import java.time.Duration;
 import java.time.Instant;
 
@@ -101,7 +100,6 @@ public class UIDraftsController {
         return ResponseEntity.ok(new UIDraftResource(upsertDraftOperation.executeUpdate(caseTypeId, draftId, caseDataContent), caseTypeId));
     }
 
-    @Transactional
     @GetMapping(
         path = "/drafts/{did}",
         headers = {
@@ -124,7 +122,6 @@ public class UIDraftsController {
         return ResponseEntity.ok(new UICaseViewResource(caseView));
     }
 
-    @Transactional
     @DeleteMapping(path = "/drafts/{did}",
         headers = {
             V2.EXPERIMENTAL_HEADER

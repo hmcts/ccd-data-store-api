@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
 
-import javax.transaction.Transactional;
 import java.util.List;
 
 @RestController
@@ -31,7 +30,6 @@ public class EventsEndpoint {
         this.getEventsOperation = getEventsOperation;
     }
 
-    @Transactional
     @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events", method = RequestMethod.GET)
     @ApiOperation(value = "Get events for case", notes = "Retrieve all events for a case")
     @ApiResponses(value = {

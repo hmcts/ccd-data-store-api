@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import javax.transaction.Transactional;
+
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CASE_TYPE_FOUND;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CASE_TYPE_FOUND_DETAILS;
@@ -29,6 +31,7 @@ public class AuthorisedFindWorkbasketInputOperation implements FindWorkbasketInp
         this.getCaseTypeOperation = getCaseTypeOperation;
     }
 
+    @Transactional
     public List<WorkbasketInput> execute(final String caseTypeId, Predicate<AccessControlList> access) {
         Optional<CaseType> caseType = this.getCaseTypeOperation.execute(caseTypeId, access);
 

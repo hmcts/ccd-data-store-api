@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.transaction.Transactional;
+
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
 import com.google.common.collect.Lists;
@@ -42,6 +44,7 @@ public class SearchQueryOperation {
         this.getDraftsOperation = getDraftsOperation;
     }
 
+    @Transactional
     public SearchResultView execute(final String view,
                                     final MetaData metadata,
                                     final Map<String, String> queryParameters) {

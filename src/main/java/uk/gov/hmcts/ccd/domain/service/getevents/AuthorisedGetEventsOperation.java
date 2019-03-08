@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.transaction.Transactional;
+
 import static java.util.Collections.singletonList;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
@@ -49,6 +51,7 @@ public class AuthorisedGetEventsOperation implements GetEventsOperation {
         return secureEvents(caseDetails.getCaseTypeId(), events);
     }
 
+    @Transactional
     @Override
     public List<AuditEvent> getEvents(String jurisdiction, String caseTypeId, String caseReference) {
         return secureEvents(caseTypeId, getEventsOperation.getEvents(jurisdiction, caseTypeId, caseReference));

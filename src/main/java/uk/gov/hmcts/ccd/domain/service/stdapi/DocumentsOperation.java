@@ -22,6 +22,8 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.transaction.Transactional;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -46,6 +48,7 @@ public class DocumentsOperation {
         this.uidService = uidService;
     }
 
+    @Transactional
     public List<Document> getPrintableDocumentsForCase(final String jurisdictionId,
                                                        final String caseTypeId,
                                                        final String caseReference) {

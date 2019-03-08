@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
-import javax.transaction.Transactional;
 import java.time.Duration;
 import java.time.Instant;
 
@@ -90,7 +89,6 @@ public class DraftsEndpoint {
         return upsertDraftOperation.executeUpdate(caseTypeId, draftId, caseDataContent);
     }
 
-    @Transactional
     @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/drafts/{did}",
         method = RequestMethod.GET)
     @ApiOperation(value = "Fetch a draft for display")
@@ -107,7 +105,6 @@ public class DraftsEndpoint {
         return caseView;
     }
 
-    @Transactional
     @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/drafts/{did}",
         method = RequestMethod.DELETE)
     @ApiOperation(value = "Delete a given draft")

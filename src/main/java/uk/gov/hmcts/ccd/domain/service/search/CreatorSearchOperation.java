@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.transaction.Transactional;
+
 import static uk.gov.hmcts.ccd.domain.service.search.CreatorSearchOperation.QUALIFIER;
 
 @Service
@@ -30,6 +32,7 @@ public class CreatorSearchOperation implements SearchOperation {
         this.caseAccessService = caseAccessService;
     }
 
+    @Transactional
     @Override
     public List<CaseDetails> execute(MetaData metaData, Map<String, String> criteria) {
         final List<CaseDetails> results = searchOperation.execute(metaData, criteria);

@@ -3,6 +3,8 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import javax.transaction.Transactional;
+
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.*;
 
 import com.google.common.collect.Sets;
@@ -60,6 +62,7 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
     }
 
     @Override
+    @Transactional
     public CaseEventTrigger executeForCaseType(String caseTypeId, String eventTriggerId, Boolean ignoreWarning) {
         final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
 
@@ -74,6 +77,7 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
     }
 
     @Override
+    @Transactional
     public CaseEventTrigger executeForCase(String caseReference,
                                            String eventTriggerId,
                                            Boolean ignoreWarning) {
@@ -92,6 +96,7 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
                                                                                                       ignoreWarning));
     }
 
+    @Transactional
     @Override
     public CaseEventTrigger executeForDraft(String draftReference, Boolean ignoreWarning) {
         final DraftResponse draftResponse = draftGateway.get(Draft.stripId(draftReference));

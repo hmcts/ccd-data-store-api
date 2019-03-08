@@ -3,6 +3,8 @@ package uk.gov.hmcts.ccd.data.draft;
 import java.util.List;
 import java.util.Map;
 
+import javax.transaction.Transactional;
+
 import static com.google.common.collect.Maps.newHashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +61,7 @@ public class CachedDraftGateway implements DraftGateway {
         return draftGateway.update(draft, draftId);
     }
 
+    @Transactional
     @Override
     public void delete(String draftId) {
         draftGateway.delete(draftId);

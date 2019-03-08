@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import javax.transaction.Transactional;
+
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.*;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -52,6 +54,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
     }
 
     @Override
+    @Transactional
     public CaseDetails createCaseEvent(String uid,
                                        String jurisdictionId,
                                        String caseTypeId,

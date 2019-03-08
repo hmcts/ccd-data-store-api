@@ -3,6 +3,8 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 import java.util.Arrays;
 import java.util.Set;
 
+import javax.transaction.Transactional;
+
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
 
@@ -41,6 +43,7 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
         this.getCaseViewOperation = getCaseViewOperation;
     }
 
+    @Transactional
     @Override
     public CaseView execute(String caseReference) {
         CaseView caseView = getCaseViewOperation.execute(caseReference);

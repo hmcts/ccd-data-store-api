@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +32,7 @@ public class AuthorisedFindSearchInputOperation implements FindSearchInputOperat
         this.getCaseTypeOperation = getCaseTypeOperation;
     }
 
+    @Transactional
     public List<SearchInput> execute(final String caseTypeId, Predicate<AccessControlList> access) {
         Optional<CaseType> caseType = this.getCaseTypeOperation.execute(caseTypeId, access);
 

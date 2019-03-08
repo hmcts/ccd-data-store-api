@@ -7,6 +7,8 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 
 import java.util.Optional;
 
+import javax.transaction.Transactional;
+
 @Service
 @Qualifier(CreatorGetCaseOperation.QUALIFIER)
 public class CreatorGetCaseOperation implements GetCaseOperation {
@@ -23,6 +25,7 @@ public class CreatorGetCaseOperation implements GetCaseOperation {
         this.caseAccessService = caseAccessService;
     }
 
+    @Transactional
     @Override
     public Optional<CaseDetails> execute(String jurisdictionId, String caseTypeId, String caseReference) {
         return this.getCaseOperation.execute(jurisdictionId, caseTypeId, caseReference)

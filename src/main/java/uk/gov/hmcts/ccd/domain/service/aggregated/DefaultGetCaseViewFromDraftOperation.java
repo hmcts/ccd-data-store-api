@@ -24,6 +24,8 @@ import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 
 import java.util.ArrayList;
 
+import javax.transaction.Transactional;
+
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTriggerBuilder.anCaseViewTrigger;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.CASE_HISTORY_VIEWER;
 
@@ -57,6 +59,7 @@ public class DefaultGetCaseViewFromDraftOperation extends AbstractDefaultGetCase
         this.draftResponseToCaseDetailsBuilder = draftResponseToCaseDetailsBuilder;
     }
 
+    @Transactional
     @Override
     public CaseView execute(String draftId) {
         final DraftResponse draftResponse = draftGateway.get(draftId);

@@ -10,6 +10,8 @@ import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 
 import java.util.Map;
 
+import javax.transaction.Transactional;
+
 @Service
 public class PaginatedSearchMetaDataOperation {
     private final CaseDetailsRepository caseDetailsRepository;
@@ -19,6 +21,7 @@ public class PaginatedSearchMetaDataOperation {
         this.caseDetailsRepository = caseDetailsRepository;
     }
 
+    @Transactional
     public PaginatedSearchMetadata execute(MetaData metaData, Map<String, String> criteria) {
         return caseDetailsRepository.getPaginatedSearchMetadata(metaData, criteria);
     }
