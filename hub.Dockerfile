@@ -11,9 +11,10 @@ RUN gradle assemble
 
 FROM hmcts/cnp-java-base:openjdk-8u191-jre-alpine3.9-1.0
 
-ENV JAVA_OPTS "-Dspring.config.location=/application.properties -Djava.security.egd=file:/dev/./urandom"
+ENV JAVA_OPTS "-Djava.security.egd=file:/dev/./urandom -javaagent:/opt/app/applicationinsights-agent-2.3.1.jar"
 
 COPY --from=builder /home/gradle/src/build/libs/core-case-data.jar /opt/app/
+COPY lib/applicationinsights-agent-2.3.1.jar lib/AI-Agent.xml /opt/app/
 
 WORKDIR /opt/app
 
