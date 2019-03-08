@@ -9,12 +9,12 @@ USER gradle
 WORKDIR /home/gradle/src
 RUN gradle assemble
 
-FROM hmcts/cnp-java-base:openjdk-8u191-jre-alpine3.9-1.0
+ARG JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom"
 
-ENV JAVA_OPTS "-Djava.security.egd=file:/dev/./urandom -javaagent:/opt/app/applicationinsights-agent-2.3.1.jar"
+FROM hmcts/cnp-java-base:openjdk-8u191-jre-alpine3.9-2.0
 
 COPY --from=builder /home/gradle/src/build/libs/core-case-data.jar /opt/app/
-COPY lib/applicationinsights-agent-2.3.1.jar lib/AI-Agent.xml /opt/app/
+COPY lib/AI-Agent.xml /opt/app/
 
 WORKDIR /opt/app
 
