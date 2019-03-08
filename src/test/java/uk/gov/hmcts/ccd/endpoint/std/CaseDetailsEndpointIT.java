@@ -290,8 +290,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .content(mapper.writeValueAsBytes(caseDetailsToSave))
         ).andReturn();
         assertEquals("Incorrect Response Status Code", 201, mvcResult.getResponse().getStatus());
-        Map expectedSanitizedData = mapper.readValue(SANITIZED_DATA.toString(), Map.class);
-        Map actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").toString(), Map.class);
+        Map<Object, Object> expectedSanitizedData = mapper.readValue(SANITIZED_DATA.toString(), Map.class);
+        Map<Object, Object> actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").toString(), Map.class);
         assertThat("Incorrect Response Content", actualData.entrySet(), everyItem(isIn(expectedSanitizedData.entrySet())));
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
@@ -390,8 +390,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .content(mapper.writeValueAsBytes(caseDetailsToSave))
         ).andReturn();
         assertEquals("Incorrect Response Status Code", 201, mvcResult.getResponse().getStatus());
-        Map expectedSanitizedData = mapper.readValue(SANITIZED_DATA.toString(), Map.class);
-        Map actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").toString(), Map.class);
+        Map<Object, Object> expectedSanitizedData = mapper.readValue(SANITIZED_DATA.toString(), Map.class);
+        Map<Object, Object> actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").toString(), Map.class);
         assertThat("Incorrect Response Content", actualData.entrySet(), everyItem(isIn(expectedSanitizedData.entrySet())));
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
@@ -2750,11 +2750,11 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 "  }\n" +
                 "}\n"
         );
-        Map expectedSanitizedData = mapper.readValue(SANITIZED_DATA.toString(), Map.class);
+        Map<Object, Object> expectedSanitizedData = mapper.readValue(SANITIZED_DATA.toString(), Map.class);
         JsonNode case_data = mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data");
         JsonNode data_classification = mapper.readTree(mvcResult.getResponse().getContentAsString())
             .get("data_classification");
-        Map actualData = mapper.readValue(case_data.toString(), Map.class);
+        Map<Object, Object> actualData = mapper.readValue(case_data.toString(), Map.class);
         assertAll(() -> assertThat("Incorrect Response Content",
                                    actualData.entrySet(),
                                    everyItem(isIn(expectedSanitizedData.entrySet()))),
