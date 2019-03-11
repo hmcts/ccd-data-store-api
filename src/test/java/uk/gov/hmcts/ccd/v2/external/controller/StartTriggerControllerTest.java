@@ -86,7 +86,7 @@ class StartTriggerControllerTest {
         @Test
         @DisplayName("should propagate exception")
         void shouldPropagateExceptionWhenThrown() {
-            when(startEventOperation.triggerStartForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)).thenThrow(Exception.class);
+            when(startEventOperation.triggerStartForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)).thenThrow(RuntimeException.class);
 
             assertThrows(Exception.class, () -> startTriggerController.getStartCaseTrigger(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING));
         }
@@ -115,7 +115,7 @@ class StartTriggerControllerTest {
         @Test
         @DisplayName("should propagate exception from downstream operation")
         void shouldPropagateExceptionFromOperationWhenThrown() {
-            when(startEventOperation.triggerStartForCase(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)).thenThrow(Exception.class);
+            when(startEventOperation.triggerStartForCase(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)).thenThrow(RuntimeException.class);
 
             assertThrows(Exception.class, () -> startTriggerController.getStartEventTrigger(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING));
         }

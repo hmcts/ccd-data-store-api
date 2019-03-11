@@ -155,8 +155,8 @@ class DefaultDraftGatewayTest {
         Long result = draftGateway.create(createCaseDraftRequest);
 
         assertAll(
-            () -> verify(createDraftRestTemplate).exchange(eq(draftBaseURL), eq(HttpMethod.POST), any(RequestEntity.class), eq(HttpEntity.class)),
-            () -> verify(restTemplate, never()).exchange(eq(draftBaseURL), eq(HttpMethod.POST), any(RequestEntity.class), eq(HttpEntity.class)),
+            () -> verify(createDraftRestTemplate).exchange(eq(draftBaseURL), eq(HttpMethod.POST), any(HttpEntity.class), eq(HttpEntity.class)),
+            () -> verify(restTemplate, never()).exchange(eq(draftBaseURL), eq(HttpMethod.POST), any(HttpEntity.class), eq(HttpEntity.class)),
             () -> assertThat(result, is(4L))
         );
     }
@@ -178,7 +178,7 @@ class DefaultDraftGatewayTest {
         DraftResponse result = draftGateway.update(updateCaseDraftRequest, DID);
 
         assertAll(
-            () -> verify(restTemplate).exchange(eq(draftURL5), eq(HttpMethod.PUT), any(RequestEntity.class), eq(HttpEntity.class)),
+            () -> verify(restTemplate).exchange(eq(draftURL5), eq(HttpMethod.PUT), any(HttpEntity.class), eq(HttpEntity.class)),
             () -> verify(createDraftRestTemplate, never()).exchange(eq(draftURL5), eq(HttpMethod.PUT), any(RequestEntity.class), eq(HttpEntity.class)),
             () -> assertThat(result, hasProperty("id", is(DID)))
         );
@@ -210,7 +210,7 @@ class DefaultDraftGatewayTest {
         DraftResponse result = draftGateway.get(DID);
 
         assertAll(
-            () -> verify(restTemplate).exchange(eq(draftURL5), eq(HttpMethod.GET), any(RequestEntity.class), eq(Draft.class)),
+            () -> verify(restTemplate).exchange(eq(draftURL5), eq(HttpMethod.GET), any(HttpEntity.class), eq(Draft.class)),
             () -> verify(createDraftRestTemplate, never()).exchange(eq(draftURL5), eq(HttpMethod.GET), any(RequestEntity.class), eq(Draft.class)),
             () -> assertThat(result, hasProperty("id", is(DID))),
             () -> assertThat(result, hasProperty("type", is(TYPE))),
@@ -263,7 +263,7 @@ class DefaultDraftGatewayTest {
 
         draftGateway.delete(DID);
 
-        verify(restTemplate).exchange(eq(draftURL5), eq(HttpMethod.DELETE), any(RequestEntity.class), eq(Draft.class));
+        verify(restTemplate).exchange(eq(draftURL5), eq(HttpMethod.DELETE), any(HttpEntity.class), eq(Draft.class));
     }
 
     @Test
