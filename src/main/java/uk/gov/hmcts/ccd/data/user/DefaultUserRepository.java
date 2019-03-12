@@ -1,6 +1,10 @@
 package uk.gov.hmcts.ccd.data.user;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparingInt;
@@ -11,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.core.GrantedAuthority;
@@ -25,6 +30,7 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
+import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserDefault;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
@@ -59,6 +65,13 @@ public class DefaultUserRepository implements UserRepository {
     public IDAMProperties getUserDetails() {
         final HttpEntity requestEntity = new HttpEntity(securityUtils.userAuthorizationHeaders());
         return restTemplate.exchange(applicationParams.idamUserProfileURL(), HttpMethod.GET, requestEntity, IDAMProperties.class).getBody();
+    }
+
+    @Override
+    @Cacheable(value = "userCache", key = "@securityUtils.getUserToken()")
+    public IdamUser getUser() {
+        HttpEntity requestEntity = new HttpEntity(securityUtils.userAuthorizationHeaders());
+        return restTemplate.exchange(applicationParams.idamUserProfileURL(), HttpMethod.GET, requestEntity, IdamUser.class).getBody();
     }
 
     @Override

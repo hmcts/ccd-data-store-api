@@ -10,10 +10,14 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
-
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isNull;
+import static org.mockito.Matchers.same;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
@@ -32,9 +36,14 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
+import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
+import uk.gov.hmcts.ccd.domain.model.definition.Version;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
@@ -85,7 +94,7 @@ class DefaultCreateCaseOperationTest {
     private static final String UID = "244";
     private static final String JURISDICTION_ID = "jid";
     private static final String CASE_TYPE_ID = "cti";
-    private Event event = buildEvent();
+    private final Event event = buildEvent();
     private CaseDataContent eventData = newCaseDataContent().build();
 
     private static Map<String, JsonNode> data;
@@ -94,7 +103,7 @@ class DefaultCreateCaseOperationTest {
     private static final String TOKEN = "toke";
     private static final String DRAFT_ID = "1";
 
-    private static final IDAMProperties IDAM_PROPERTIES = buildIDAMUser();
+    private static final IdamUser IDAM_USER = buildUser();
     private static final CaseType CASE_TYPE = buildCaseType();
     private CaseEvent eventTrigger;
 
@@ -113,7 +122,7 @@ class DefaultCreateCaseOperationTest {
                                                                     validateCaseFieldsOperation,
                                                                     draftGateway);
         data = buildJsonNodeData();
-        given(userRepository.getUserDetails()).willReturn(IDAM_PROPERTIES);
+        given(userRepository.getUser()).willReturn(IDAM_USER);
         eventTrigger = newCaseEvent().withId("eventId").withName("event Name").build();
         eventData = newCaseDataContent().withEvent(event).withToken(TOKEN).withData(data).withDraftId(DRAFT_ID).build();
     }
@@ -213,7 +222,7 @@ class DefaultCreateCaseOperationTest {
             .willReturn(data);
         given(submitCaseTransaction.submitCase(same(event),
                                                same(CASE_TYPE),
-                                               same(IDAM_PROPERTIES),
+                                               same(IDAM_USER),
                                                same(eventTrigger),
                                                any(CaseDetails.class),
                                                same(IGNORE_WARNING)))
@@ -242,7 +251,7 @@ class DefaultCreateCaseOperationTest {
             .willReturn(data);
         given(submitCaseTransaction.submitCase(same(event),
                                                same(CASE_TYPE),
-                                               same(IDAM_PROPERTIES),
+                                               same(IDAM_USER),
                                                same(eventTrigger),
                                                any(CaseDetails.class),
                                                same(IGNORE_WARNING)))
@@ -270,7 +279,7 @@ class DefaultCreateCaseOperationTest {
                   () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
                   () -> order.verify(submitCaseTransaction).submitCase(same(event),
                                                                        same(CASE_TYPE),
-                                                                       same(IDAM_PROPERTIES),
+                                                                       same(IDAM_USER),
                                                                        same(eventTrigger),
                                                                        caseDetailsArgumentCaptor.capture(),
                                                                        same(IGNORE_WARNING)),
@@ -297,7 +306,7 @@ class DefaultCreateCaseOperationTest {
             .willReturn(data);
         given(submitCaseTransaction.submitCase(same(event),
                                                same(CASE_TYPE),
-                                               same(IDAM_PROPERTIES),
+                                               same(IDAM_USER),
                                                same(eventTrigger),
                                                any(CaseDetails.class),
                                                same(IGNORE_WARNING)))
@@ -323,7 +332,7 @@ class DefaultCreateCaseOperationTest {
                   () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
                   () -> order.verify(submitCaseTransaction).submitCase(same(event),
                                                                        same(CASE_TYPE),
-                                                                       same(IDAM_PROPERTIES),
+                                                                       same(IDAM_USER),
                                                                        same(eventTrigger),
                                                                        any(CaseDetails.class),
                                                                        same(IGNORE_WARNING)),
@@ -356,7 +365,7 @@ class DefaultCreateCaseOperationTest {
             .willReturn(data);
         given(submitCaseTransaction.submitCase(same(event),
                                                same(CASE_TYPE),
-                                               same(IDAM_PROPERTIES),
+                                               same(IDAM_USER),
                                                same(eventTrigger),
                                                any(CaseDetails.class),
                                                same(IGNORE_WARNING)))
@@ -383,7 +392,7 @@ class DefaultCreateCaseOperationTest {
                   () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
                   () -> order.verify(submitCaseTransaction).submitCase(same(event),
                                                                        same(CASE_TYPE),
-                                                                       same(IDAM_PROPERTIES),
+                                                                       same(IDAM_USER),
                                                                        same(eventTrigger),
                                                                        any(CaseDetails.class),
                                                                        same(IGNORE_WARNING)),
@@ -414,14 +423,13 @@ class DefaultCreateCaseOperationTest {
         return map;
     }
 
-    private static IDAMProperties buildIDAMUser() {
-        final IDAMProperties properties = new IDAMProperties();
-        properties.setId("pid");
-        properties.setRoles(new String[]{"role-A", "role-B"});
-        properties.setEmail("ngitb@hmcts.net");
-        properties.setForename("Wo");
-        properties.setSurname("Mata");
-        return properties;
+    private static IdamUser buildUser() {
+        final IdamUser user = new IdamUser();
+        user.setId("pid");
+        user.setEmail("ngitb@hmcts.net");
+        user.setForename("Wo");
+        user.setSurname("Mata");
+        return user;
     }
 
     private static CaseType buildCaseType() {
