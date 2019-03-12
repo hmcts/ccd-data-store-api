@@ -67,6 +67,9 @@ public class ApplicationParams {
     @Value("${definition.cache.ttl.secs}")
     private Integer definitionCacheTTLSecs;
 
+    @Value("${daily.cache.ttl.secs}")
+    private Integer dailyCacheTTLSecs;
+
     @Value("${definition.cache.max.size}")
     private Integer definitionCacheMaxSize;
 
@@ -231,6 +234,10 @@ public class ApplicationParams {
 
     public int getDefinitionCacheTTLSecs() {
         return definitionCacheTTLSecs;
+    }
+
+    public Integer getDailyCacheTTLSecs() {
+        return dailyCacheTTLSecs;
     }
 
     public int getDefinitionCacheMaxSize() {

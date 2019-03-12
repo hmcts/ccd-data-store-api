@@ -11,9 +11,12 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class CachingConfiguration {
 
-    @Autowired
-    ApplicationParams applicationParams;
+    private final ApplicationParams applicationParams;
 
+    @Autowired
+    public CachingConfiguration(ApplicationParams applicationParams) {
+        this.applicationParams = applicationParams;
+    }
 
     @Bean
     public Config hazelCastConfig() {
@@ -35,6 +38,7 @@ public class CachingConfiguration {
         config.addMapConfig(newMapConfig("caseTabCollectionCache", definitionCacheTTL));
         config.addMapConfig(newMapConfig("wizardPageCollectionCache", definitionCacheTTL));
         config.addMapConfig(newMapConfig("userRolesCache", definitionCacheTTL));
+        config.addMapConfig(newMapConfig("userCache", applicationParams.getDailyCacheTTLSecs()));
     }
 
     private MapConfig newMapConfig(final String name, int definitionCacheTTL) {
