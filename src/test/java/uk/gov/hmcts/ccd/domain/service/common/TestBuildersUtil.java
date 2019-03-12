@@ -1,17 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
-
-import static com.google.common.collect.Lists.newArrayList;
-import static java.util.Arrays.asList;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -50,6 +38,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPageComplexFieldOverride;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPageField;
 import uk.gov.hmcts.ccd.domain.model.draft.CaseDraft;
 import uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDraftRequest;
@@ -62,6 +51,19 @@ import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
+
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 
 public class TestBuildersUtil {
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -807,7 +809,53 @@ public class TestBuildersUtil {
             return caseEventTrigger;
         }
     }
-    
+
+    public static class WizardPageComplexFieldOverrideBuilder {
+        private final WizardPageComplexFieldOverride wizardPageComplexFieldOverride;
+
+        private WizardPageComplexFieldOverrideBuilder() {
+            this.wizardPageComplexFieldOverride = new WizardPageComplexFieldOverride();
+        }
+
+        public static WizardPageComplexFieldOverrideBuilder newWizardPageComplexFieldOverride() {
+            return new WizardPageComplexFieldOverrideBuilder();
+        }
+
+        public WizardPageComplexFieldOverrideBuilder withComplexFieldId(String complexFieldId) {
+            this.wizardPageComplexFieldOverride.setComplexFieldElementId(complexFieldId);
+            return this;
+        }
+
+        public WizardPageComplexFieldOverrideBuilder withDisplayContext(String displayContext) {
+            this.wizardPageComplexFieldOverride.setDisplayContext(displayContext);
+            return this;
+        }
+
+        public WizardPageComplexFieldOverrideBuilder withOrder(Integer order) {
+            this.wizardPageComplexFieldOverride.setOrder(order);
+            return this;
+        }
+
+        public WizardPageComplexFieldOverrideBuilder withLabel(String label) {
+            this.wizardPageComplexFieldOverride.setLabel(label);
+            return this;
+        }
+
+        public WizardPageComplexFieldOverrideBuilder withHintText(String hintText) {
+            this.wizardPageComplexFieldOverride.setHintText(hintText);
+            return this;
+        }
+
+        public WizardPageComplexFieldOverrideBuilder withShowCondition(String showCondition) {
+            this.wizardPageComplexFieldOverride.setShowCondition(showCondition);
+            return this;
+        }
+
+        public WizardPageComplexFieldOverride build() {
+            return this.wizardPageComplexFieldOverride;
+        }
+    }
+
     public static class StartEventTriggerBuilder {
         private final StartEventTrigger startEventTrigger;
 
@@ -856,6 +904,17 @@ public class TestBuildersUtil {
             wizardPageField.setCaseFieldId(caseField.getId());
             wizardPageField.setPageColumnNumber(1);
             wizardPageField.setOrder(1);
+            wizardPageField.setComplexFieldOverrides(emptyList());
+            wizardPageFields.add(wizardPageField);
+            return this;
+        }
+
+        public WizardPageBuilder withField(CaseViewField caseField, List<WizardPageComplexFieldOverride> complexFieldOverrides) {
+            WizardPageField wizardPageField = new WizardPageField();
+            wizardPageField.setCaseFieldId(caseField.getId());
+            wizardPageField.setPageColumnNumber(1);
+            wizardPageField.setOrder(1);
+            wizardPageField.setComplexFieldOverrides(complexFieldOverrides);
             wizardPageFields.add(wizardPageField);
             return this;
         }
@@ -969,6 +1028,11 @@ public class TestBuildersUtil {
 
         public CaseViewFieldBuilder withId(String id) {
             caseViewField.setId(id);
+            return this;
+        }
+
+        public CaseViewFieldBuilder withFieldType(FieldType fieldType) {
+            caseViewField.setFieldType(fieldType);
             return this;
         }
 
@@ -1129,11 +1193,61 @@ public class TestBuildersUtil {
         }
     }
 
+    public static class CaseTypeTabFieldBuilder {
+        private final CaseTypeTabField caseTypeTabField;
+
+        private CaseTypeTabFieldBuilder() {
+            this.caseTypeTabField = new CaseTypeTabField();
+        }
+
+        public CaseTypeTabFieldBuilder withCaseField(CaseField caseField) {
+            this.caseTypeTabField.setCaseField(caseField);
+            return this;
+        }
+
+        public CaseTypeTabField build() {
+            return this.caseTypeTabField;
+        }
+
+        public static CaseTypeTabFieldBuilder newCaseTabField() {
+            return new CaseTypeTabFieldBuilder();
+        }
+
+    }
+
+    public static class CaseTypeTabBuilder {
+        private final CaseTypeTab caseTypeTab;
+        private final List<CaseTypeTabField> caseTypeTabFields;
+
+        private CaseTypeTabBuilder() {
+            this.caseTypeTabFields = newArrayList();
+            this.caseTypeTab = new CaseTypeTab();
+            this.caseTypeTab.setTabFields(caseTypeTabFields);
+        }
+
+        public CaseTypeTabBuilder withTabField(CaseTypeTabField field) {
+            this.caseTypeTabFields.add(field);
+            return this;
+        }
+
+        public CaseTypeTab build() {
+            return this.caseTypeTab;
+        }
+
+        public static CaseTypeTabBuilder newCaseTab() {
+            return new CaseTypeTabBuilder();
+        }
+
+    }
+
     public static class CaseTabCollectionBuilder {
+        private final List<CaseTypeTab> tabs;
         private final CaseTabCollection caseTabCollection;
 
         private CaseTabCollectionBuilder() {
+            this.tabs = newArrayList();
             this.caseTabCollection = new CaseTabCollection();
+            this.caseTabCollection.setTabs(tabs);
         }
 
         public static CaseTabCollectionBuilder newCaseTabCollection() {
@@ -1161,6 +1275,11 @@ public class TestBuildersUtil {
             tabs.add(tab);
             caseTabCollection.setTabs(tabs);
 
+            return this;
+        }
+
+        public CaseTabCollectionBuilder withTab(CaseTypeTab tab) {
+            tabs.add(tab);
             return this;
         }
 

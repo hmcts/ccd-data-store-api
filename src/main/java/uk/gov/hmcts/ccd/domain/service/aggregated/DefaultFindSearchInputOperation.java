@@ -36,8 +36,8 @@ public class DefaultFindSearchInputOperation implements FindSearchInputOperation
     }
 
     @Override
-    public List<SearchInput> execute(final String jurisdictionId, final String caseTypeId, Predicate<AccessControlList> access) {
-        LOG.debug("Finding SearchInput fields for jurisdiction={}, caseType={}", jurisdictionId, caseTypeId);
+    public List<SearchInput> execute(final String caseTypeId, Predicate<AccessControlList> access) {
+        LOG.debug("Finding SearchInput fields for caseType={}", caseTypeId);
         final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
         final SearchInputDefinition searchInputDefinition = uiDefinitionRepository.getSearchInputDefinitions(caseTypeId);
 

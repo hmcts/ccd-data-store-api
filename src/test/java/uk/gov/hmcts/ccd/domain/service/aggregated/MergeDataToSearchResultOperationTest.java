@@ -10,7 +10,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
-import static uk.gov.hmcts.ccd.domain.model.definition.CaseDetails.LABEL_FIELD_TYPE;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.LABEL;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.MergeDataToSearchResultOperation.WORKBASKET_VIEW;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WORKBASKET;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.SearchResultBuilder.aSearchResult;
@@ -182,7 +182,7 @@ class MergeDataToSearchResultOperationTest {
         final CaseField caseField = newCaseField()
             .withId(labelId)
             .withFieldType(aFieldType()
-                .withType(LABEL_FIELD_TYPE)
+                .withType(LABEL)
                 .withId(UUID.randomUUID().toString())
                 .build())
             .withFieldLabelText(labelText)

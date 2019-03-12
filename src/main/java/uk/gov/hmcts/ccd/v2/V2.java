@@ -28,6 +28,8 @@ public final class V2 {
         public static final String UI_DRAFT_DELETE = "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-draft-delete.v2+json;charset=UTF-8";
         public static final String UI_WORKBASKET_INPUT_DETAILS =
             "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-workbasket-input-details.v2+json;charset=UTF-8";
+        public static final String UI_SEARCH_INPUT_DETAILS =
+            "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-search-input-details.v2+json;charset=UTF-8";
 
     }
 

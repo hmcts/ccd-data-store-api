@@ -366,7 +366,7 @@ public class AccessControlService {
             .anyMatch(newItem -> !isNullId(newItem) && newItem.get("id").equals(oldItem.get("id")));
         return !itemExists;
     }
-    
+
     private boolean itemUpdatedAndHasUpdateAccess(JsonNode existingData, JsonNode newData, String newFieldName,
                                                   List<CaseField> caseFieldDefinitions, Set<String> userRoles) {
         boolean containsUpdatedItem = StreamSupport
