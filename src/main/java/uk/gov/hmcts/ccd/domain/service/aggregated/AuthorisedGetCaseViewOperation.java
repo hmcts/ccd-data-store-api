@@ -3,13 +3,13 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 import java.util.Arrays;
 import java.util.Set;
 
-import javax.transaction.Transactional;
-
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -43,7 +43,7 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
         this.getCaseViewOperation = getCaseViewOperation;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     @Override
     public CaseView execute(String caseReference) {
         CaseView caseView = getCaseViewOperation.execute(caseReference);

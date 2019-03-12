@@ -4,14 +4,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import javax.transaction.Transactional;
-
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CASE_TYPE_FOUND;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CASE_TYPE_FOUND_DETAILS;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
@@ -31,7 +31,7 @@ public class AuthorisedFindWorkbasketInputOperation implements FindWorkbasketInp
         this.getCaseTypeOperation = getCaseTypeOperation;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<WorkbasketInput> execute(final String caseTypeId, Predicate<AccessControlList> access) {
         Optional<CaseType> caseType = this.getCaseTypeOperation.execute(caseTypeId, access);
 

@@ -2,10 +2,10 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import java.util.Set;
 
-import javax.transaction.Transactional;
-
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -38,7 +38,7 @@ public class AuthorisedGetCaseHistoryViewOperation extends AbstractAuthorisedCas
         this.getCaseHistoryViewOperation = getCaseHistoryViewOperation;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     @Override
     public CaseHistoryView execute(String caseReference, Long eventId) {
         CaseDetails caseDetails = getCase(caseReference);

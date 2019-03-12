@@ -6,11 +6,10 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import javax.transaction.Transactional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
@@ -42,7 +41,7 @@ public class AuthorisedGetCaseTypesOperation implements GetCaseTypesOperation {
         this.getCaseTypesOperation = getCaseTypesOperation;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     @Override
     public List<CaseType> execute(String jurisdictionId, Predicate<AccessControlList> access) {
         final Set<String> userRoles = getUserRoles();

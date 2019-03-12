@@ -4,6 +4,8 @@ import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
@@ -23,8 +25,6 @@ import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 
 import java.util.ArrayList;
-
-import javax.transaction.Transactional;
 
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTriggerBuilder.anCaseViewTrigger;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.CASE_HISTORY_VIEWER;
@@ -59,7 +59,7 @@ public class DefaultGetCaseViewFromDraftOperation extends AbstractDefaultGetCase
         this.draftResponseToCaseDetailsBuilder = draftResponseToCaseDetailsBuilder;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     @Override
     public CaseView execute(String draftId) {
         final DraftResponse draftResponse = draftGateway.get(draftId);

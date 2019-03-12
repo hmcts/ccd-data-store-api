@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.transaction.Transactional;
-
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
 import com.google.common.collect.Lists;
@@ -14,6 +12,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.draft.DraftAccessException;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -44,7 +44,7 @@ public class SearchQueryOperation {
         this.getDraftsOperation = getDraftsOperation;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public SearchResultView execute(final String view,
                                     final MetaData metadata,
                                     final Map<String, String> queryParameters) {
