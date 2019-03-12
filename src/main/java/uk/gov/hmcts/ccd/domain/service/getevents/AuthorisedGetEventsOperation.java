@@ -3,6 +3,8 @@ package uk.gov.hmcts.ccd.domain.service.getevents;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
@@ -16,8 +18,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
-import javax.transaction.Transactional;
 
 import static java.util.Collections.singletonList;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
@@ -51,7 +51,7 @@ public class AuthorisedGetEventsOperation implements GetEventsOperation {
         return secureEvents(caseDetails.getCaseTypeId(), events);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     @Override
     public List<AuditEvent> getEvents(String jurisdiction, String caseTypeId, String caseReference) {
         return secureEvents(caseTypeId, getEventsOperation.getEvents(jurisdiction, caseTypeId, caseReference));

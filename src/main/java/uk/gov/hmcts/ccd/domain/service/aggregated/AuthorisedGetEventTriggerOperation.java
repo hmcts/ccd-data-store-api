@@ -3,8 +3,6 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import javax.transaction.Transactional;
-
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.*;
 
 import com.google.common.collect.Sets;
@@ -12,6 +10,8 @@ import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
@@ -62,7 +62,7 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public CaseEventTrigger executeForCaseType(String caseTypeId, String eventTriggerId, Boolean ignoreWarning) {
         final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
 
@@ -77,7 +77,7 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public CaseEventTrigger executeForCase(String caseReference,
                                            String eventTriggerId,
                                            Boolean ignoreWarning) {
@@ -96,7 +96,7 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
                                                                                                       ignoreWarning));
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     @Override
     public CaseEventTrigger executeForDraft(String draftReference, Boolean ignoreWarning) {
         final DraftResponse draftResponse = draftGateway.get(Draft.stripId(draftReference));

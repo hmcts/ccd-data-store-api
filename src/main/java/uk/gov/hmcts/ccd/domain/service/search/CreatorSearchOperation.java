@@ -4,6 +4,8 @@ import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
@@ -11,8 +13,6 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import javax.transaction.Transactional;
 
 import static uk.gov.hmcts.ccd.domain.service.search.CreatorSearchOperation.QUALIFIER;
 
@@ -32,7 +32,7 @@ public class CreatorSearchOperation implements SearchOperation {
         this.caseAccessService = caseAccessService;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     @Override
     public List<CaseDetails> execute(MetaData metaData, Map<String, String> criteria) {
         final List<CaseDetails> results = searchOperation.execute(metaData, criteria);
