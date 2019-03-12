@@ -7,16 +7,18 @@ public class CaseViewType {
     private String name;
     private String description;
     private CaseViewJurisdiction jurisdiction;
+    private String printableDocumentUrl;
 
     public CaseViewType() {
         // default constructor
     }
 
-    private CaseViewType(String id, String name, String description, CaseViewJurisdiction jurisdiction) {
+    private CaseViewType(String id, String name, String description, CaseViewJurisdiction jurisdiction, String printableDocumentUrl) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.jurisdiction = jurisdiction;
+        this.printableDocumentUrl = printableDocumentUrl;
     }
 
     public String getId() {
@@ -51,10 +53,15 @@ public class CaseViewType {
         this.jurisdiction = jurisdiction;
     }
 
+    public String getPrintableDocumentUrl() { return printableDocumentUrl; }
+
+    public void setPrintableDocumentUrl(String printableDocumentUrl) { this.printableDocumentUrl = printableDocumentUrl; }
+
     public static CaseViewType createFrom(CaseType caseType) {
         return new CaseViewType(caseType.getId(),
-            caseType.getName(),
-            caseType.getDescription(),
-            CaseViewJurisdiction.createFrom(caseType.getJurisdiction()));
+                                caseType.getName(),
+                                caseType.getDescription(),
+                                CaseViewJurisdiction.createFrom(caseType.getJurisdiction()),
+                                caseType.getPrintableDocumentsUrl());
     }
 }
