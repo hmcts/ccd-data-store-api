@@ -11,9 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackRequest;
@@ -47,7 +47,8 @@ public class CallbackService {
         this.defaultRetries = applicationParams.getCallbackRetries();
     }
 
-    @Retryable(value = { CallbackException.class }, maxAttempts = 3, backoff = @Backoff(delay = 1000, multiplier = 3))
+    // The retry will be on seconds T=1 and T=3 of the initial call fails at T=0
+    @Retryable(value = {CallbackException.class}, maxAttempts = 3, backoff = @Backoff(delay = 1000, multiplier = 3))
     public Optional<CallbackResponse> send(final String url,
                                            final List<Integer> callbackRetries,
                                            final CaseEvent caseEvent,
@@ -60,18 +61,18 @@ public class CallbackService {
         }
 
         final CallbackRequest callbackRequest = new CallbackRequest(caseDetails,
-                                                                    caseDetailsBefore,
-                                                                    caseEvent.getId(),
-                                                                    ignoreWarning);
-        final List<Integer> retries = CollectionUtils.isEmpty(callbackRetries) ? defaultRetries : callbackRetries;
+            caseDetailsBefore,
+            caseEvent.getId(),
+            ignoreWarning);
         final Optional<ResponseEntity<CallbackResponse>> responseEntity = sendRequest(url, CallbackResponse.class, callbackRequest);
         if (responseEntity.isPresent()) {
             return Optional.of(responseEntity.get().getBody());
         }
-    throw new CallbackException("Unsuccessful callback to " + url);
+        throw new CallbackException("Unsuccessful callback to " + url);
     }
 
-    @Retryable(value = { CallbackException.class }, maxAttempts = 3, backoff = @Backoff(delay = 1000, multiplier = 3))
+    // The retry will be on seconds T=1 and T=3 of the initial call fails at T=0
+    @Retryable(value = {CallbackException.class}, maxAttempts = 3, backoff = @Backoff(delay = 1000, multiplier = 3))
     public <T> ResponseEntity<T> send(final String url,
                                       final List<Integer> callbackRetries,
                                       final CaseEvent caseEvent,
