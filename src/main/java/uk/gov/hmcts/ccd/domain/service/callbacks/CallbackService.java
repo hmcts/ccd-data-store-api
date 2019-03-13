@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackRequest;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
@@ -23,7 +22,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -36,21 +34,17 @@ public class CallbackService {
 
     private final SecurityUtils securityUtils;
     private final RestTemplate restTemplate;
-    private final List<Integer> defaultRetries;
 
     @Autowired
     public CallbackService(final SecurityUtils securityUtils,
-                           @Qualifier("restTemplate") final RestTemplate restTemplate,
-                           final ApplicationParams applicationParams) {
+                           @Qualifier("restTemplate") final RestTemplate restTemplate) {
         this.securityUtils = securityUtils;
         this.restTemplate = restTemplate;
-        this.defaultRetries = applicationParams.getCallbackRetries();
     }
 
     // The retry will be on seconds T=1 and T=3 if the initial call fails at T=0
     @Retryable(value = {CallbackException.class}, maxAttempts = 3, backoff = @Backoff(delay = 1000, multiplier = 3))
     public Optional<CallbackResponse> send(final String url,
-                                           final List<Integer> callbackRetries,
                                            final CaseEvent caseEvent,
                                            final CaseDetails caseDetailsBefore,
                                            final CaseDetails caseDetails,
@@ -59,34 +53,22 @@ public class CallbackService {
         if (url == null || url.isEmpty()) {
             return Optional.empty();
         }
-
-        final CallbackRequest callbackRequest = new CallbackRequest(caseDetails,
-            caseDetailsBefore,
-            caseEvent.getId(),
-            ignoreWarning);
+        final CallbackRequest callbackRequest = new CallbackRequest(caseDetails, caseDetailsBefore, caseEvent.getId(), ignoreWarning);
         final Optional<ResponseEntity<CallbackResponse>> responseEntity = sendRequest(url, CallbackResponse.class, callbackRequest);
-        if (responseEntity.isPresent()) {
-            return Optional.of(responseEntity.get().getBody());
-        }
-        throw new CallbackException("Unsuccessful callback to " + url);
+        return responseEntity.map(re -> Optional.of(re.getBody())).orElseThrow(() -> new CallbackException("Unsuccessful callback to " + url));
     }
 
     // The retry will be on seconds T=1 and T=3 if the initial call fails at T=0
     @Retryable(value = {CallbackException.class}, maxAttempts = 3, backoff = @Backoff(delay = 1000, multiplier = 3))
     public <T> ResponseEntity<T> send(final String url,
-                                      final List<Integer> callbackRetries,
                                       final CaseEvent caseEvent,
                                       final CaseDetails caseDetailsBefore,
                                       final CaseDetails caseDetails,
                                       final Class<T> clazz) {
 
         final CallbackRequest callbackRequest = new CallbackRequest(caseDetails, caseDetailsBefore, caseEvent.getId());
-        final List<Integer> retries = isEmpty(callbackRetries) ? defaultRetries : callbackRetries;
         final Optional<ResponseEntity<T>> requestEntity = sendRequest(url, clazz, callbackRequest);
-        if (requestEntity.isPresent()) {
-            return requestEntity.get();
-        }
-        throw new CallbackException("Unsuccessful callback to " + url);
+        return requestEntity.orElseThrow(() -> new CallbackException("Unsuccessful callback to " + url));
     }
 
     private <T> Optional<ResponseEntity<T>> sendRequest(final String url,
