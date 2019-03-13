@@ -1,5 +1,15 @@
 package uk.gov.hmcts.ccd.domain.types.sanitiser;
 
+import java.util.Collections;
+
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -7,12 +17,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-
-import java.util.Collections;
-
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
 
 public class CollectionSanitiserTest {
 
@@ -52,7 +56,7 @@ public class CollectionSanitiserTest {
 
     @Test
     public void getType() {
-        assertThat(collectionSanitiser.getType(), equalTo("Collection"));
+        assertThat(collectionSanitiser.getType(), equalTo(COLLECTION));
     }
 
     @Test
@@ -74,7 +78,7 @@ public class CollectionSanitiserTest {
     }
 
     @Test
-    public void shouldGenerateIDsForItemsWithoutID () {
+    public void shouldGenerateIDsForItemsWithoutID() {
         final ArrayNode collectionData = JSON_FACTORY.arrayNode();
         collectionData
             .add(JSON_FACTORY.objectNode().set(CollectionSanitiser.VALUE, ITEM_1_VALUE_INITIAL))
@@ -88,7 +92,7 @@ public class CollectionSanitiserTest {
     }
 
     @Test
-    public void shouldKeepExistingIDsUnaltered () {
+    public void shouldKeepExistingIDsUnaltered() {
         final ArrayNode collectionData = JSON_FACTORY.arrayNode();
         final ObjectNode itemNode = JSON_FACTORY.objectNode();
         itemNode.set(CollectionSanitiser.VALUE, ITEM_1_VALUE_INITIAL);

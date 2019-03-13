@@ -1,21 +1,22 @@
-# case-data-store-app 
-[![API Docs](https://img.shields.io/badge/API%20Docs-site-green.svg?style=flat-square)](https://hmcts.github.io/ccd-data-store-api/api/latest/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+# ccd-data-store-api 
+[![API v1](https://img.shields.io/badge/API%20Docs-v1-e140ad.svg)](https://hmcts.github.io/reform-api-docs/swagger.html?url=https://hmcts.github.io/reform-api-docs/specs/ccd-data-store-api.v1.json)
+[![API v2 (beta)](https://img.shields.io/badge/API%20Docs-v2%20%28beta%29-4286f4.svg)](https://hmcts.github.io/reform-api-docs/swagger.html?url=https://hmcts.github.io/reform-api-docs/specs/ccd-data-store-api.v2.json)
 [![Build Status](https://travis-ci.org/hmcts/ccd-data-store-api.svg?branch=master)](https://travis-ci.org/hmcts/ccd-data-store-api)
-[![codecov](https://codecov.io/gh/hmcts/ccd-user-profile-api/branch/master/graph/badge.svg)](https://codecov.io/gh/hmcts/ccd-data-store-api)
+[![Docker Build Status](https://img.shields.io/docker/build/hmcts/ccd-data-store-api.svg)](https://hub.docker.com/r/hmcts/ccd-data-store-api)
+[![codecov](https://codecov.io/gh/hmcts/ccd-data-store-api/branch/master/graph/badge.svg)](https://codecov.io/gh/hmcts/ccd-data-store-api)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/3038977127484764ad0ae9b81a1a14ad)](https://www.codacy.com/app/adr1ancho/ccd-data-store-api?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=hmcts/ccd-data-store-api&amp;utm_campaign=Badge_Grade)
-[![Codacy Issues](https://api.codacy.com/project/badge/Coverage/3038977127484764ad0ae9b81a1a14ad)](https://www.codacy.com/app/HMCTS/ccd-data-store-api)
 [![Known Vulnerabilities](https://snyk.io/test/github/hmcts/ccd-data-store-api/badge.svg)](https://snyk.io/test/github/hmcts/ccd-data-store-api)
+[![HitCount](http://hits.dwyl.io/SP9gBJ/ccd-data-store-api.svg)](#ccd-data-store-api)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Store/search cases and provide workbaskets
 
 ### Prerequisites
 
-- [JDK 8](https://www.oracle.com/java)
+- [Open JDK 8](https://openjdk.java.net/)
 - [Docker](https://www.docker.com)
 
 #### Environment variables
-
 The following environment variables are required:
 
 | Name | Default | Description |
@@ -40,12 +41,17 @@ The following environment variables are required:
 | HTTP_CLIENT_MAX_CLIENT_PER_ROUTE | 20 | Used for Pooling connection manager; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
 | HTTP_CLIENT_VALIDATE_AFTER_INACTIVITY | 0 | Used for Pooling connection manager; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
 | HTTP_CLIENT_CONNECTION_TIMEOUT | 30000 | 30 seconds, Used for Pooling connection manager; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
+| HTTP_CLIENT_CONNECTION_DRAFTS_CREATE_TIMEOUT | 1000 | 1000 milliseconds, Used for Pooling connection manager for create operation for draft store; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
+| HTTP_CLIENT_CONNECTION_DRAFTS_TIMEOUT | 500 | 500 milliseconds, Used for Pooling connection manager for draft store; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
+| DRAFT_STORE_URL | - | Base URL for Draft Store API service. `http://localhost:8800` for the dockerised local instance. |
+| DRAFT_ENCRYPTION_KEY | - | Draft encryption key. The encryption key used by draft store to encrypt documents with. |
+| DRAFT_TTL_DAYS | - | Number of days after which the saved draft will be deleted if unmodified. |
 
 ### Building
 
 The project uses [Gradle](https://gradle.org/).
 
-To build project please execute the following command:
+To build project please execute the following:
 
 ```bash
 ./gradlew clean build

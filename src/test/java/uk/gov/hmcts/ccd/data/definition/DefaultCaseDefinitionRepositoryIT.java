@@ -1,14 +1,7 @@
 package uk.gov.hmcts.ccd.data.definition;
 
-import org.hamcrest.collection.IsCollectionWithSize;
-import org.junit.Test;
-import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
-import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
-
 import javax.inject.Inject;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -20,6 +13,16 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.beans.HasPropertyWithValue.hasProperty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
+
+import org.hamcrest.collection.IsCollectionWithSize;
+import org.junit.Test;
+import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
+import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 
 public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
     @Inject
@@ -56,10 +59,9 @@ public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
             () -> assertThat(baseTypes, hasItem(hasProperty("type", is("MoneyGBP")))),
             () -> assertThat(baseTypes, hasItem(hasProperty("type", is("PhoneUK")))),
             () -> assertThat(baseTypes, hasItem(hasProperty("type", is("TextArea")))),
-            () -> assertThat(baseTypes, hasItem(hasProperty("type", is("Complex")))),
-            () -> assertThat(baseTypes, hasItem(hasProperty("type", is("Collection")))),
+            () -> assertThat(baseTypes, hasItem(hasProperty("type", is(COLLECTION)))),
             () -> assertThat(baseTypes, hasItem(hasProperty("type", is("MultiSelectList")))),
-            () -> assertThat(baseTypes, hasItem(hasProperty("type", is("Complex")))),
+            () -> assertThat(baseTypes, hasItem(hasProperty("type", is(COMPLEX)))),
             () -> assertThat(baseTypes, hasItem(hasProperty("type", is("Document"))))
         );
     }
@@ -71,6 +73,22 @@ public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
         assertAll(
             () -> assertThat(userRole, hasProperty("securityClassification", is("PUBLIC"))),
             () -> assertThat(userRole, hasProperty("role", is("caseworker-probate")))
+        );
+    }
+
+    @Test
+    public void shouldGetClassificationsForUserRolesList() {
+        List<String> roles = Arrays.asList("caseworker-test", "caseworker-probate", "caseworker-divorce", "caseworker");
+        final List<UserRole> userRoles = caseDefinitionRepository.getClassificationsForUserRoleList(roles);
+
+        assertAll(
+            () -> assertThat(userRoles.size(), is(3)),
+            () -> assertThat(userRoles.get(0), hasProperty("securityClassification", is("PRIVATE"))),
+            () -> assertThat(userRoles.get(0), hasProperty("role", is("caseworker-test"))),
+            () -> assertThat(userRoles.get(1), hasProperty("securityClassification", is("PUBLIC"))),
+            () -> assertThat(userRoles.get(1), hasProperty("role", is("caseworker-probate"))),
+            () -> assertThat(userRoles.get(2), hasProperty("securityClassification", is("RESTRICTED"))),
+            () -> assertThat(userRoles.get(2), hasProperty("role", is("caseworker-divorce")))
         );
     }
 

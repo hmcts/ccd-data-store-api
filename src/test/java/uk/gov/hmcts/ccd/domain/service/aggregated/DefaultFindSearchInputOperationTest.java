@@ -1,22 +1,28 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
-import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
-
-import java.util.Arrays;
-import java.util.List;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.JurisdictionBuilder.newJurisdiction;
+
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchInputDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchInputField;
+import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 class DefaultFindSearchInputOperationTest {
     @Mock
@@ -24,11 +30,12 @@ class DefaultFindSearchInputOperationTest {
     @Mock
     private CaseDefinitionRepository caseDefinitionRepository;
 
-    private CaseType caseType = new CaseType();
+    private final CaseType caseType = new CaseType();
     private DefaultFindSearchInputOperation findSearchInputOperation;
-    private CaseField caseField1 = new CaseField();
-    private CaseField caseField2 = new CaseField();
-    private CaseField caseField3 = new CaseField();
+    private final CaseField caseField1 = new CaseField();
+    private final CaseField caseField2 = new CaseField();
+    private final CaseField caseField3 = new CaseField();
+    private final CaseField caseField4 = new CaseField();
 
     @BeforeEach
     void setup() {
@@ -40,8 +47,12 @@ class DefaultFindSearchInputOperationTest {
         caseField2.setFieldType(fieldType);
         caseField3.setId("field3");
         caseField3.setFieldType(fieldType);
+        caseField4.setId("field4");
+        caseField4.setFieldType(fieldType);
+        caseField4.setMetadata(true);
         caseType.setId("Test case type");
-        caseType.setCaseFields(Arrays.asList(caseField1, caseField2, caseField3));
+        caseType.setJurisdiction(newJurisdiction().withJurisdictionId("TEST").build());
+        caseType.setCaseFields(Arrays.asList(caseField1, caseField2, caseField3, caseField4));
 
         findSearchInputOperation = new DefaultFindSearchInputOperation(uiDefinitionRepository, caseDefinitionRepository);
 
@@ -51,18 +62,22 @@ class DefaultFindSearchInputOperationTest {
 
     @Test
     void shouldReturnSearchInputs() {
-        List<SearchInput> searchInputs = findSearchInputOperation.execute("TEST", caseType.getId(), CAN_READ);
+        List<SearchInput> searchInputs = findSearchInputOperation.execute(caseType.getId(), CAN_READ);
 
         assertAll(
-            () -> assertThat(searchInputs.size(), is(3)),
-            () -> assertThat(searchInputs.get(0).getField().getId(), is("field1"))
+            () -> assertThat(searchInputs.size(), is(4)),
+            () -> assertThat(searchInputs.get(0).getField().getId(), is("field1")),
+            () -> assertThat(searchInputs.get(3).getField().isMetadata(), is(true))
         );
     }
 
     private SearchInputDefinition generateSearchInput() {
         SearchInputDefinition searchInputDefinition = new SearchInputDefinition();
         searchInputDefinition.setCaseTypeId(caseType.getId());
-        searchInputDefinition.setFields(Arrays.asList(getField(caseField1.getId(), 1), getField(caseField2.getId(), 2), getField(caseField3.getId(), 3)));
+        searchInputDefinition.setFields(Arrays.asList(getField(caseField1.getId(), 1),
+                                                      getField(caseField2.getId(), 2),
+                                                      getField(caseField3.getId(), 3),
+                                                      getField(caseField4.getId(), 4)));
         return searchInputDefinition;
 
     }

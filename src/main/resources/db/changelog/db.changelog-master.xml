@@ -15,4 +15,12 @@
     <include file="db/changelog/db.changelog-RDM-2230.xml"/>
     <include file="db/changelog/db.changelog-RDM-2209.xml"/>
     <include file="db/changelog/db.changelog-RDM-2298.xml"/>
+    <include file="db/changelog/db.changelog-RDM-2316.xml"/>
+    <include file="db/changelog/db.changelog-RDM-2839.xml"/>
+    <include file="db/changelog/db.changelog-RDM-2901.xml"/>
+    <include file="db/changelog/db.changelog-RDM-2836.xml"/>
+    <include file="db/changelog/db.changelog-RDM-3532.xml"/>
+    <include file="db/changelog/db.changelog-RDM-3922.xml"/>
+    <include file="db/changelog/db.changelog-RDM-3922-part-2.xml"/>
+    <include file="db/changelog/db.changelog-RDM-4060-part-1.xml"/>
 </databaseChangeLog>

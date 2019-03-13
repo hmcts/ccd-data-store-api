@@ -1,21 +1,5 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
-import org.hamcrest.MatcherAssert;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.transaction.annotation.Transactional;
-import uk.gov.hmcts.ccd.BaseTest;
-import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
-import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
-import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
-
 import javax.inject.Inject;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -28,14 +12,32 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+
+import org.hamcrest.MatcherAssert;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.transaction.annotation.Transactional;
+import uk.gov.hmcts.ccd.BaseTest;
+import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
+import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
+import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
+import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 
 @Transactional
 public class DefaultCaseDetailsRepositoryTest extends BaseTest {
 
-    private final static long CASE_REFERENCE = 999999L;
-    private final static String JURISDICTION_ID = "JeyOne";
-    private final static String CASE_TYPE_ID = "CaseTypeOne";
+    private static final long CASE_REFERENCE = 999999L;
+    private static final String JURISDICTION_ID = "JeyOne";
+    private static final String CASE_TYPE_ID = "CaseTypeOne";
     private static final String JURISDICTION = "PROBATE";
     private static final String WRONG_JURISDICTION = "DIVORCE";
     private static final Long REFERENCE = 1504259907353529L;
@@ -45,6 +47,9 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
 
     @MockBean
     private UserAuthorisation userAuthorisation;
+
+    @MockBean
+    private AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService;
 
     @Inject
     @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
@@ -87,7 +92,7 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
 
         final CaseDetails byId = caseDetailsRepository.findById(1L);
         assertAll(
-            () -> assertThat(byId.getId(), is(1L)),
+            () -> assertThat(byId.getId(), is("1")),
             () -> assertThat(byId.getJurisdiction(), is("PROBATE")),
             () -> assertThat(byId.getState(), is("CaseCreated")),
             () -> assertThat(byId.getCaseTypeId(), is("TestAddressBookCase")),
@@ -108,7 +113,7 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
 
         final CaseDetails byReference = caseDetailsRepository.findByReference(1504259907353529L);
         assertAll(
-            () -> assertThat(byReference.getId(), is(1L)),
+            () -> assertThat(byReference.getId(), is("1")),
             () -> assertThat(byReference.getJurisdiction(), is("PROBATE")),
             () -> assertThat(byReference.getState(), is("CaseCreated")),
             () -> assertThat(byReference.getCaseTypeId(), is("TestAddressBookCase")),
@@ -124,7 +129,7 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
-    public void getfindByMetadataAndFieldDataReturnCorrectRecords() {
+    public void getFindByMetadataAndFieldDataReturnCorrectRecords() {
         assumeDataInitialised();
 
         MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
@@ -134,7 +139,7 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
                                                                                                           searchParams);
         assertAll(
             () -> assertThat(byMetaDataAndFieldData.size(), is(2)),
-            () -> assertThat(byMetaDataAndFieldData.get(0).getId(), is(1L)),
+            () -> assertThat(byMetaDataAndFieldData.get(0).getId(), is("1")),
             () -> assertThat(byMetaDataAndFieldData.get(0).getJurisdiction(), is("PROBATE")),
             () -> assertThat(byMetaDataAndFieldData.get(0).getState(), is("CaseCreated")),
             () -> assertThat(byMetaDataAndFieldData.get(0).getCaseTypeId(), is("TestAddressBookCase")),
@@ -144,7 +149,8 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
             () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonLastName").asText(), is("Parker")),
             () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonAddress").get("AddressLine1").asText(), is("123")),
             () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonAddress").get("AddressLine2").asText(), is("Fake Street")),
-            () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonAddress").get("AddressLine3").asText(), is("Hexton"))
+            () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonAddress").get("AddressLine3").asText(), is("Hexton")),
+            () -> verify(authorisedCaseDefinitionDataService).getUserAuthorisedCaseStateIds("PROBATE", "TestAddressBookCase", CAN_READ)
         );
     }
 
@@ -199,11 +205,11 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
         assertAll(
             () -> assertThat(results, hasSize(2)),
             () -> assertThat(results, hasItem(allOf(
-                hasProperty("id", equalTo(1L)),
+                hasProperty("id", equalTo("1")),
                 hasProperty("reference", equalTo(1504259907353529L))
             ))),
             () -> assertThat(results, hasItem(allOf(
-                hasProperty("id", equalTo(16L)),
+                hasProperty("id", equalTo("16")),
                 hasProperty("reference", equalTo(1504254784737847L))
             )))
         );
@@ -227,7 +233,7 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
         assertAll(
             () -> assertThat(results, hasSize(1)),
             () -> assertThat(results, hasItem(allOf(
-                hasProperty("id", equalTo(16L)),
+                hasProperty("id", equalTo("16")),
                 hasProperty("reference", equalTo(1504254784737847L))
             )))
         );
@@ -240,7 +246,7 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
 
         final CaseDetails caseDetails = maybeCase.orElseThrow(() -> new AssertionError("No case found"));
 
-        assertCaseDetails(caseDetails, 1L, JURISDICTION, REFERENCE);
+        assertCaseDetails(caseDetails, "1", JURISDICTION, REFERENCE);
     }
 
     @Test
@@ -259,7 +265,17 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
         MatcherAssert.assertThat(maybeCase.isPresent(), is(false));
     }
 
-    private void assertCaseDetails(CaseDetails caseDetails, Long id, String jurisdictionId, Long caseReference) {
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void findByReferenceWithoutJurisdiction() {
+        final Optional<CaseDetails> maybeCase = caseDetailsRepository.findByReference(REFERENCE.toString());
+
+        final CaseDetails caseDetails = maybeCase.orElseThrow(() -> new AssertionError("No case found"));
+
+        assertCaseDetails(caseDetails, "1", JURISDICTION, REFERENCE);
+    }
+
+    private void assertCaseDetails(CaseDetails caseDetails, String id, String jurisdictionId, Long caseReference) {
         MatcherAssert.assertThat(caseDetails.getId(), equalTo(id));
         MatcherAssert.assertThat(caseDetails.getJurisdiction(), equalTo(jurisdictionId));
         MatcherAssert.assertThat(caseDetails.getReference(), equalTo(caseReference));

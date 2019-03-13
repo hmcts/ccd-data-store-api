@@ -103,8 +103,7 @@ public class SecurityClassificationService {
 
     public boolean userHasEnoughSecurityClassificationForField(String jurisdictionId, CaseType caseType, String fieldId) {
         final Optional<SecurityClassification> userClassification = getUserClassification(jurisdictionId);
-        return userClassification.map(securityClassification -> securityClassification.higherOrEqualTo
-            (caseType.getClassificationForField(fieldId))).orElse(false);
+        return userClassification.map(securityClassification -> securityClassification.higherOrEqualTo(caseType.getClassificationForField(fieldId))).orElse(false);
     }
 
     private JsonNode filterNestedObject(JsonNode data, JsonNode dataClassification, SecurityClassification userClassification) {
@@ -139,6 +138,11 @@ public class SecurityClassificationService {
     }
 
     private void filterCollection(SecurityClassification userClassification, Iterator<Map.Entry<String, JsonNode>> dataIterator, JsonNode dataClassificationElement, JsonNode dataElementValue) {
+        // Apply collection-level classification
+        filterSimpleField(userClassification,
+                          dataIterator,
+                          dataClassificationElement.get(CLASSIFICATION));
+
         Iterator<JsonNode> dataCollectionIterator = dataElementValue.iterator();
         while (dataCollectionIterator.hasNext()) {
             JsonNode collectionElement = dataCollectionIterator.next();
@@ -156,21 +160,24 @@ public class SecurityClassificationService {
                                        relevantDataClassificationValue,
                                        userClassification);
                 } else {
-                    filterSimpleField(userClassification,
-                                      dataCollectionIterator,
-                                      relevantDataClassificationValue.get(collectionElementValue.textValue()));
+                    LOG.warn("Invalid security classification structure for collection item: {}", relevantDataClassificationValue.toString());
+                    dataCollectionIterator.remove();
                 }
             } else {
-                dataCollectionIterator.remove();
+                // For collection of simple field type, the classification is stored as `classification`, not `value`
+                relevantDataClassificationValue = dataClassificationForData.get(CLASSIFICATION);
+
+                if (null != relevantDataClassificationValue) {
+                    filterSimpleField(userClassification,
+                                      dataCollectionIterator,
+                                      relevantDataClassificationValue);
+                } else {
+                    dataCollectionIterator.remove();
+                }
             }
             if (collectionElementValue.equals(EMPTY_NODE)) {
                 dataCollectionIterator.remove();
             }
-        }
-        if (dataElementValue.equals(EMPTY_ARRAY)) {
-            filterSimpleField(userClassification,
-                              dataIterator,
-                              dataClassificationElement.get(CLASSIFICATION));
         }
     }
 

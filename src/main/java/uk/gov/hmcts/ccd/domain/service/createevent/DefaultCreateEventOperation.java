@@ -1,5 +1,14 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
+import javax.inject.Inject;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.Map;
+import java.util.Optional;
+
+import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,10 +32,12 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
+import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.model.std.validator.EventValidator;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.*;
+import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
@@ -34,15 +45,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
-
-import javax.inject.Inject;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.Map;
-import java.util.Optional;
-
-import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Service
 @Qualifier("default")
@@ -106,31 +108,30 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
                                        final String jurisdictionId,
                                        final String caseTypeId,
                                        final String caseReference,
-                                       final Event event,
-                                       final Map<String, JsonNode> data,
-                                       final String token,
-                                       final Boolean ignoreWarning) {
-        eventValidator.validate(event);
+                                       final CaseDataContent content) {
+        eventValidator.validate(content.getEvent());
 
         final CaseType caseType = findAndValidateCaseType(caseTypeId, jurisdictionId);
-        final CaseEvent eventTrigger = findAndValidateCaseEvent(caseType, event);
+        final CaseEvent eventTrigger = findAndValidateCaseEvent(caseType, content.getEvent());
         final CaseDetails caseDetails = lockCaseDetails(caseType, caseReference);
         final CaseDetails caseDetailsBefore = caseService.clone(caseDetails);
 
-        eventTokenService.validateToken(token, uid, caseDetails, eventTrigger, caseType.getJurisdiction(), caseType);
+        eventTokenService.validateToken(content.getToken(), uid, caseDetails, eventTrigger, caseType.getJurisdiction(), caseType);
 
         validatePreState(caseDetails, eventTrigger);
-        mergeUpdatedFieldsToCaseDetails(data, caseDetails, eventTrigger, caseType);
+        mergeUpdatedFieldsToCaseDetails(content.getData(), caseDetails, eventTrigger, caseType);
+        AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = callbackInvoker.invokeAboutToSubmitCallback(eventTrigger,
+            caseDetailsBefore,
+            caseDetails,
+            caseType,
+            content.getIgnoreWarning());
+
         final Optional<String>
-            newState =
-            callbackInvoker.invokeAboutToSubmitCallback(eventTrigger,
-                                                        caseDetailsBefore,
-                                                        caseDetails,
-                                                        caseType,
-                                                        ignoreWarning);
-        this.validateCaseFieldsOperation.validateCaseDetails(jurisdictionId, caseTypeId, event, caseDetails.getData());
+            newState = aboutToSubmitCallbackResponse.getState();
+
+        this.validateCaseFieldsOperation.validateCaseDetails(caseTypeId, content);
         final CaseDetails savedCaseDetails = saveCaseDetails(caseDetails, eventTrigger, newState);
-        saveAuditEventForCaseDetails(event, eventTrigger, savedCaseDetails, caseType);
+        saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse, content.getEvent(), eventTrigger, savedCaseDetails, caseType);
 
         if (!isBlank(eventTrigger.getCallBackURLSubmittedEvent())) {
             try { // make a call back
@@ -224,7 +225,8 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
         }
     }
 
-    private void saveAuditEventForCaseDetails(final Event event,
+    private void saveAuditEventForCaseDetails(final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse,
+                                              final Event event,
                                               final CaseEvent eventTrigger,
                                               final CaseDetails caseDetails,
                                               final CaseType caseType) {
@@ -248,6 +250,7 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
         auditEvent.setCreatedDate(LocalDateTime.now(ZoneOffset.UTC));
         auditEvent.setSecurityClassification(securityClassificationService.getClassificationForEvent(caseType, eventTrigger));
         auditEvent.setDataClassification(caseDetails.getDataClassification());
+        auditEvent.setSignificantItem(aboutToSubmitCallbackResponse.getSignificantItem());
 
         caseAuditEventRepository.set(auditEvent);
     }

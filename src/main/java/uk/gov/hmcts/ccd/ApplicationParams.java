@@ -1,14 +1,17 @@
 package uk.gov.hmcts.ccd;
 
-import org.springframework.beans.factory.annotation.Value;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Base64;
 import java.util.List;
+
+import static java.util.stream.Collectors.toList;
+
+import com.hazelcast.config.EvictionPolicy;
+import org.springframework.beans.factory.annotation.Value;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 @Named
 @Singleton
@@ -21,6 +24,15 @@ public class ApplicationParams {
 
     @Value("${ccd.case-definition.host}")
     private String caseDefinitionHost;
+
+    @Value("${ccd.draft.host}")
+    private String draftHost;
+
+    @Value("${ccd.draft.encryptionKey}")
+    private String draftEncryptionKey;
+
+    @Value("${ccd.draft.maxTTLDays}")
+    private Integer draftMaxTTLDays;
 
     @Value("${ccd.ui-definition.host}")
     private String uiDefinitionHost;
@@ -55,6 +67,36 @@ public class ApplicationParams {
     @Value("${definition.cache.ttl.secs}")
     private Integer definitionCacheTTLSecs;
 
+    @Value("${definition.cache.max.size}")
+    private Integer definitionCacheMaxSize;
+
+    @Value("${definition.cache.eviction.policy}")
+    private EvictionPolicy definitionCacheEvictionPolicy;
+
+    @Value("#{'${search.elastic.hosts}'.split(',')}")
+    private List<String> elasticSearchHosts;
+
+    @Value("#{'${search.elastic.data.hosts}'.split(',')}")
+    private List<String> elasticSearchDataHosts;
+
+    @Value("#{'${search.blacklist}'.split(',')}")
+    private List<String> searchBlackList;
+
+    @Value("${search.cases.index.name.format}")
+    private String casesIndexNameFormat;
+
+    @Value("${search.cases.index.name.type}")
+    private String casesIndexType;
+
+    @Value("${search.elastic.nodes.discovery.enabled}")
+    private Boolean elasticsearchNodeDiscoveryEnabled;
+
+    @Value("${search.elastic.nodes.discovery.frequency.millis}")
+    private Long elasticsearchNodeDiscoveryFrequencyMillis;
+
+    @Value("${search.elastic.nodes.discovery.filter}")
+    private String elasticsearchNodeDiscoveryFilter;
+
     private static String encode(final String stringToEncode) {
         try {
             return URLEncoder.encode(stringToEncode, "UTF-8");
@@ -83,12 +125,32 @@ public class ApplicationParams {
         return caseDefinitionHost + "/api/data/case-type/" + encode(caseTypeId);
     }
 
+    public String draftBaseURL() {
+        return draftHost + "/drafts";
+    }
+
+    public String draftURL(String draftId) {
+        return draftHost + "/drafts/" + draftId;
+    }
+
+    public String getDraftEncryptionKey() {
+        return draftEncryptionKey;
+    }
+
+    public Integer getDraftMaxTTLDays() {
+        return draftMaxTTLDays;
+    }
+
     public String caseTypeLatestVersionUrl(String caseTypeId) {
         return caseDefinitionHost + "/api/data/case-type/" + encode(caseTypeId) + "/version";
     }
 
     public String userRoleClassification() {
         return caseDefinitionHost + "/api/user-role?role={userRole}";
+    }
+
+    public String userRolesClassificationsURL() {
+        return caseDefinitionHost + "/api/user-roles/{roles}";
     }
 
     public String displayWorkbasketDefURL(final String caseTypeId) {
@@ -104,7 +166,7 @@ public class ApplicationParams {
     }
 
     public String displayWizardPageCollection(final String caseTypeId, final String eventTriggerId) {
-        return uiDefinitionHost + "/api/display/wizard-page-structure/case-types/" + encode(caseTypeId) +"/event-triggers/" + encode(eventTriggerId);
+        return uiDefinitionHost + "/api/display/wizard-page-structure/case-types/" + encode(caseTypeId) + "/event-triggers/" + encode(eventTriggerId);
     }
 
     public String jurisdictionDefURL() {
@@ -125,6 +187,10 @@ public class ApplicationParams {
 
     public String idamUserProfileURL() {
         return idamHost + "/details";
+    }
+
+    public String caseRolesURL() {
+        return caseDefinitionHost + "/api/data/caseworkers/uid/jurisdictions/jid/case-types";
     }
 
     public String userDefaultSettingsURL() {
@@ -165,5 +231,45 @@ public class ApplicationParams {
 
     public int getDefinitionCacheTTLSecs() {
         return definitionCacheTTLSecs;
+    }
+
+    public int getDefinitionCacheMaxSize() {
+        return definitionCacheMaxSize;
+    }
+
+    public EvictionPolicy getDefinitionCacheEvictionPolicy() {
+        return definitionCacheEvictionPolicy;
+    }
+
+    public List<String> getSearchBlackList() {
+        return searchBlackList;
+    }
+
+    public List<String> getElasticSearchHosts() {
+        return elasticSearchHosts;
+    }
+
+    public String getCasesIndexNameFormat() {
+        return casesIndexNameFormat;
+    }
+
+    public String getCasesIndexType() {
+        return casesIndexType;
+    }
+
+    public List<String> getElasticSearchDataHosts() {
+        return elasticSearchDataHosts.stream().map(quotedHost -> quotedHost.replace("\"", "")).collect(toList());
+    }
+
+    public Boolean isElasticsearchNodeDiscoveryEnabled() {
+        return elasticsearchNodeDiscoveryEnabled;
+    }
+
+    public Long getElasticsearchNodeDiscoveryFrequencyMillis() {
+        return elasticsearchNodeDiscoveryFrequencyMillis;
+    }
+
+    public String getElasticsearchNodeDiscoveryFilter() {
+        return elasticsearchNodeDiscoveryFilter;
     }
 }

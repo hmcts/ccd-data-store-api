@@ -76,7 +76,8 @@
               "update": false,
               "delete": false
             }],
-          "show_event_notes": false
+          "show_event_notes": false,
+          "can_save_draft": false
         },
         {
           "id": "NO_PRE_STATES_EVENT",
@@ -105,7 +106,8 @@
               "update": false,
               "delete": false
             }],
-          "show_event_notes": true
+          "show_event_notes": true,
+          "can_save_draft": true
         },
         {
           "id": "TEST_EVENT",
@@ -125,7 +127,8 @@
               "update": false,
               "delete": false
             }],
-          "show_event_notes": true
+          "show_event_notes": true,
+          "can_save_draft": true
         },
         {
           "id": "Goodness",
@@ -146,7 +149,8 @@
               "update": false,
               "delete": false
             }],
-          "show_event_notes": true
+          "show_event_notes": true,
+          "can_save_draft": false
         },
         {
           "id": "Create2",
@@ -165,7 +169,8 @@
               "update": false,
               "delete": false
             }],
-          "show_event_notes": true
+          "show_event_notes": true,
+          "can_save_draft": true
         }
       ],
       "states": [
@@ -377,6 +382,35 @@
                 }
               }
             ]
+          }
+        },
+        {
+          "id": "Aliases",
+          "case_type_id": "TestAddressBookCase",
+          "label": "Aliases",
+          "security_classification": "PUBLIC",
+          "acls": [
+            {
+              "role": "caseworker-probate-public",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-probate-private",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            }],
+          "field_type": {
+            "type": "Collection",
+            "id": "Collection",
+            "collection_field_type": {
+              "type": "Text",
+              "id": "Text"
+            }
           }
         },
         {

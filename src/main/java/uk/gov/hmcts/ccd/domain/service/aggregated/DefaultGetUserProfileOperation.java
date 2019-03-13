@@ -1,13 +1,12 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import java.util.function.Predicate;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.data.user.UserService;
-import uk.gov.hmcts.ccd.domain.model.aggregated.User;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 
 @Service
 @Qualifier(DefaultGetUserProfileOperation.QUALIFIER)
@@ -20,7 +19,7 @@ public class DefaultGetUserProfileOperation implements GetUserProfileOperation {
     }
 
     @Override
-    public UserProfile execute(final String userToken) {
+    public UserProfile execute(Predicate<AccessControlList> access) {
         return userService.getUserProfile();
     }
 }

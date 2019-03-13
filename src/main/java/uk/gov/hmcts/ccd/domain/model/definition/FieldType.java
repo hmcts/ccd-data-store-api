@@ -1,14 +1,20 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+
 public class FieldType implements Serializable {
+
+    public static final String COLLECTION = "Collection";
+    public static final String COMPLEX = "Complex";
+    public static final String LABEL = "Label";
+    public static final String CASE_PAYMENT_HISTORY_VIEWER = "CasePaymentHistoryViewer";
+    public static final String CASE_HISTORY_VIEWER = "CaseHistoryViewer";
 
     private String id = null;
     private String type = null;

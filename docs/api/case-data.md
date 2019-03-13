@@ -100,6 +100,18 @@ For example, the 29th August 2017 would be:
 }
 ```
 
+### DateTime
+
+A `DateTime` value is a valid ISO 8601 `string` with the Hour Minute Second time part.
+
+For example, the 29th August 2017 09:47:01 AM would be:
+
+```json
+{
+  "FieldId": "2017-08-29T09:45:01.000"
+}
+```
+
 ### TextArea
 
 A `TextArea` value is a `string`. It contain `\n` to represent line breaks.
@@ -286,5 +298,17 @@ An `OrderSummary` value is a Json `object`. We accept the following structure wi
     }
   ],
   "PaymentTotal": "5000"
+}
+```
+
+### CaseLink
+
+A `CaseLink` is a field used to reference another CCD case using its universal 16-digit ID. It's a complex type composed of a single `CaseReference` field of type `Text`.
+
+```json
+{
+  "FieldId": {
+    "CaseReference": "1521109509643143"
+  }
 }
 ```

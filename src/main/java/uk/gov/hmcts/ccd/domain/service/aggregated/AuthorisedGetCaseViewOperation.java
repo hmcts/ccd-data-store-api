@@ -1,99 +1,94 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import java.util.Arrays;
+import java.util.Set;
+
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
+import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
+import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
-
-import java.util.Set;
-
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CASE_TYPE_FOUND_DETAILS;
 
 @Service
-@Qualifier(AuthorisedGetCaseTypesOperation.QUALIFIER)
-public class AuthorisedGetCaseViewOperation implements GetCaseViewOperation {
+@Qualifier(AuthorisedGetCaseViewOperation.QUALIFIER)
+public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOperation implements
+    GetCaseViewOperation {
 
     public static final String QUALIFIER = "authorised";
     private final GetCaseViewOperation getCaseViewOperation;
-    private final CaseDefinitionRepository caseDefinitionRepository;
-    private final AccessControlService accessControlService;
-    private final UserRepository userRepository;
 
-    public AuthorisedGetCaseViewOperation(final @Qualifier(DefaultGetCaseViewOperation.QUALIFIER) GetCaseViewOperation getCaseViewOperation,
-                                          @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
-                                          final AccessControlService accessControlService,
-                                          final @Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository) {
+    public AuthorisedGetCaseViewOperation(
+        final @Qualifier(DefaultGetCaseViewOperation.QUALIFIER) GetCaseViewOperation getCaseViewOperation,
+        @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
+        final AccessControlService accessControlService,
+        final @Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
+        final CaseUserRepository caseUserRepository,
+        final @Qualifier(CachedCaseDetailsRepository.QUALIFIER) CaseDetailsRepository caseDetailsRepository) {
+        super(caseDefinitionRepository, accessControlService, userRepository, caseUserRepository, caseDetailsRepository);
         this.getCaseViewOperation = getCaseViewOperation;
-        this.caseDefinitionRepository = caseDefinitionRepository;
-        this.accessControlService = accessControlService;
-        this.userRepository = userRepository;
     }
 
     @Override
-    public CaseView execute(String jurisdictionId, String caseTypeId, String caseReference) {
+    public CaseView execute(String caseReference) {
+        CaseView caseView = getCaseViewOperation.execute(caseReference);
 
-        CaseType caseType = getCaseType(caseTypeId);
-
-        Set<String> userRoles = getUserRoles();
-
+        CaseType caseType = getCaseType(caseView.getCaseType().getId());
+        String caseId = getCaseId(caseReference);
+        Set<String> userRoles = getUserRoles(caseId);
         verifyReadAccess(caseType, userRoles);
-
-        CaseView caseView = getCaseViewOperation.execute(jurisdictionId, caseTypeId, caseReference);
+        filterCaseTabFieldsByReadAccess(caseView, userRoles);
+        filterOutEmptyTabs(caseView);
 
         return filterUpsertAccess(caseType, userRoles, caseView);
     }
 
-    private void verifyReadAccess(CaseType caseType, Set<String> userRoles) {
-        if (!accessControlService.canAccessCaseTypeWithCriteria(
-            caseType,
-            userRoles,
-            CAN_READ)) {
-            ResourceNotFoundException resourceNotFoundException = new ResourceNotFoundException(AccessControlService.NO_CASE_TYPE_FOUND);
-            resourceNotFoundException.withDetails(NO_CASE_TYPE_FOUND_DETAILS);
-            throw resourceNotFoundException;
-        }
+    private void filterOutEmptyTabs(CaseView caseView) {
+        caseView.setTabs(Arrays.stream(caseView.getTabs())
+            .filter(caseViewTab -> caseViewTab.getFields().length > 0)
+            .toArray(CaseViewTab[]::new));
+    }
+
+    private void filterCaseTabFieldsByReadAccess(CaseView caseView, Set<String> userRoles) {
+        caseView.setTabs(Arrays.stream(caseView.getTabs()).map(
+            caseViewTab -> {
+                caseViewTab.setFields(Arrays.stream(caseViewTab.getFields())
+                    .filter(caseViewField -> getAccessControlService().canAccessCaseViewFieldWithCriteria(caseViewField, userRoles, CAN_READ))
+                    .toArray(CaseViewField[]::new));
+                return caseViewTab;
+            }).toArray(CaseViewTab[]::new));
     }
 
     private CaseView filterUpsertAccess(CaseType caseType, Set<String> userRoles, CaseView caseView) {
         CaseViewTrigger[] authorisedTriggers;
-        if (!accessControlService.canAccessCaseTypeWithCriteria(caseType,
-                                                                userRoles,
-                                                                AccessControlService.CAN_UPDATE)||
-            !accessControlService.canAccessCaseStateWithCriteria(caseView.getState().getId(),
-                                                                 caseType,
-                                                                 userRoles,
-                                                                 AccessControlService.CAN_UPDATE)) {
-            authorisedTriggers = new CaseViewTrigger[] {};
+        if (!getAccessControlService().canAccessCaseTypeWithCriteria(caseType,
+                                                                     userRoles,
+                                                                     CAN_UPDATE)
+            || !getAccessControlService().canAccessCaseStateWithCriteria(caseView.getState().getId(),
+                                                                      caseType,
+                                                                      userRoles,
+                                                                      CAN_UPDATE)) {
+            authorisedTriggers = new CaseViewTrigger[]{};
         } else {
-            authorisedTriggers = accessControlService.filterCaseViewTriggersByCreateAccess(caseView.getTriggers(),
-                                                                               caseType.getEvents(),
-                                                                               userRoles);
+            authorisedTriggers = getAccessControlService().filterCaseViewTriggersByCreateAccess(caseView.getTriggers(),
+                                                                                                caseType.getEvents(),
+                                                                                                userRoles);
         }
 
         caseView.setTriggers(authorisedTriggers);
 
         return caseView;
     }
-
-    private CaseType getCaseType(String caseTypeId) {
-        final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
-        if (caseType == null) {
-            throw new ValidationException("Cannot find case type definition for  " + caseTypeId);
-        }
-        return caseType;
-    }
-
-    private Set<String> getUserRoles() {
-        return userRepository.getUserRoles();
-    }
-
 }

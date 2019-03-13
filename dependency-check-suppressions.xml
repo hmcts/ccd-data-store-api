@@ -2,44 +2,8 @@
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.1.xsd">
 
     <suppress>
-        <notes><![CDATA[
-     Does not apply as we're not using the XmlMapper.
-     ]]></notes>
-        <gav regex="true">^com\.fasterxml\.jackson\.core:jackson-databind:.*$</gav>
-        <cpe>cpe:/a:fasterxml:jackson-databind</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   Does not apply as we're not using the XmlMapper.
-   ]]></notes>
-        <gav regex="true">^com\.fasterxml\.jackson\.core:jackson-databind:.*$</gav>
-        <cpe>cpe:/a:fasterxml:jackson</cpe>
-    </suppress>
-    <suppress>
-        <gav regex="true">^org\.postgresql:postgresql:.*$</gav>
-        <cpe>cpe:/a:postgresql:postgresql</cpe>
-    </suppress>
-    <suppress>
         <notes>See https://github.com/jeremylong/DependencyCheck/issues/1146 for Embedded Tomcat</notes>
         <cve>CVE-2017-12617</cve>
-    </suppress>
-    <suppress>
-        <notes>
-            Introduced by Spring 4.3.13.RELEASE; Upgrade to Spring Boot 1.5.12 or Spring Boot 2 to resolve.
-        </notes>
-        <cve>CVE-2018-1199</cve>
-    </suppress>
-    <suppress>
-        <notes>
-            Spring Boot application that are not installed as a service, or are not using the embedded launch script are not susceptible.
-        </notes>
-        <cve>CVE-2018-1196</cve>
-    </suppress>
-    <suppress>
-        <notes>
-            Only affect PATCH requests, those are not supported by CCD APIs.
-        </notes>
-        <cve>CVE-2017-8046</cve>
     </suppress>
     <suppress>
         <notes>SSL related</notes>
@@ -58,8 +22,119 @@
         <cve>CVE-2018-10054</cve>
     </suppress>
     <suppress>
+        <notes>h2database is pulled in by liquibase, it is not used in development or production</notes>
+        <cve>CVE-2018-14335</cve>
+    </suppress>
+    <suppress>
         <notes>suppress false positives</notes>
         <gav regex="true">^org\.apache\.tomcat:tomcat-annotations-api:.*$</gav>
         <cpe>cpe:/a:apache:tomcat</cpe>
+    </suppress>
+    <suppress>
+        <notes>Dependencies brough in by codacy report; not used in production</notes>
+        <gav regex="true">^org\.scala-lang:scala-compiler:.*$</gav>
+        <cpe>cpe:/a:scala-lang:scala</cpe>
+    </suppress>
+    <suppress>
+        <notes>Dependencies brough in by codacy report; not used in production</notes>
+        <gav regex="true">^org\.scala-lang:scala-reflect:.*$</gav>
+        <cpe>cpe:/a:scala-lang:scala</cpe>
+    </suppress>
+    <suppress>
+        <notes>Dependencies brough in by codacy report; not used in production</notes>
+        <gav regex="true">^com\.jcraft:jsch:.*$</gav>
+        <cpe>cpe:/a:jcraft:jsch</cpe>
+    </suppress>
+    <suppress>
+        <notes>We do not use: Spring Framework 5.0.5.RELEASE + Spring Security (any version), see https://pivotal.io/security/cve-2018-1258</notes>
+        <cve>CVE-2018-1258</cve>
+    </suppress>
+    <suppress>
+        <notes>CVE-2018-13661: case-app*_2.11-1.2.0.jar is used in codacy for test coverage reporting, thus unimpacted in production</notes>
+        <gav regex="true">^com\.github\.alexarchambault:case-app(-util|-annotations|)_2\.11:.*$</gav>
+        <cpe>cpe:/a:app_project:app</cpe>
+    </suppress>
+    <suppress>
+        <notes>CVE-2016-7048: only for Postgres lt 9.6 and we use 9.6 on Azure.  Also only impacts the installer.</notes>
+        <cve>CVE-2016-7048</cve>
+    </suppress>
+    <suppress>
+        <notes>Temporary suppression while we investigate. See RDM-3324</notes>
+        <cve>CVE-2018-1000632</cve>
+    </suppress>
+    <suppress>
+        <notes>Temporary suppression to ignore CVE with com.google.guava. See RDM-3372</notes>
+        <cve>CVE-2018-10237</cve>
+    </suppress>
+    <suppress>
+        <notes>Temporary suppression of an issue related to the current stable slf4j which is brought in by other dependencies.
+            CCD don't explicitly declare dependencies on slf4j.
+            org.slf4j.ext.EventData in the slf4j-ext module in QOS.CH SLF4J before 1.8.0-beta2 allows remote attackers to bypass intended access restrictions via crafted data.
+            Investigation notes can be found in RDM-3549.  slf4j may need to be updated when a future stable version is released</notes>
+        <gav regex="true">^.*slf4j.*$</gav>
+        <cpe>cpe:/a:slf4j:slf4j:1.7.25</cpe>
+    </suppress>
+    <suppress>
+        <notes>jackson-databind 2.8.11.3 fixes this CVE. See
+            https://github.com/FasterXML/jackson-databind/issues/2097#issuecomment-457071680
+            and RDM-3796</notes>
+        <gav regex="true">^com\.fasterxml\.jackson\.core:jackson-databind:2\.8\.11\.[3].*$</gav>
+        <cve>CVE-2018-14718</cve>
+    </suppress>
+    <suppress>
+        <notes>jackson-databind 2.8.11.3 fixes this CVE. See
+            https://github.com/FasterXML/jackson-databind/issues/2097#issuecomment-457071680
+            and RDM-3796</notes>
+        <gav regex="true">^com\.fasterxml\.jackson\.core:jackson-databind:2\.8\.11\.[3].*$</gav>
+        <cve>CVE-2018-14719</cve>
+    </suppress>
+    <suppress>
+        <notes>jackson-databind 2.8.11.3 fixes this CVE. See
+            https://github.com/FasterXML/jackson-databind/issues/2097#issuecomment-457071680
+            and RDM-3796</notes>
+        <gav regex="true">^com\.fasterxml\.jackson\.core:jackson-databind:2\.8\.11\.[3].*$</gav>
+        <cve>CVE-2018-14720</cve>
+    </suppress>
+    <suppress>
+        <notes>jackson-databind 2.8.11.3 fixes this CVE. See
+            https://github.com/FasterXML/jackson-databind/issues/2097#issuecomment-457071680
+            and RDM-3796</notes>
+        <gav regex="true">^com\.fasterxml\.jackson\.core:jackson-databind:2\.8\.11\.[3].*$</gav>
+        <cve>CVE-2018-14721</cve>
+    </suppress>
+    <suppress>
+        <notes>jackson-databind 2.8.11.3 fixes this CVE. See
+            https://github.com/FasterXML/jackson-databind/issues/2097#issuecomment-457071680
+            and RDM-3796</notes>
+        <gav regex="true">^com\.fasterxml\.jackson\.core:jackson-databind:2\.8\.11\.[3].*$</gav>
+        <cve>CVE-2018-19360</cve>
+    </suppress>
+    <suppress>
+        <notes>jackson-databind 2.8.11.3 fixes this CVE. See
+            https://github.com/FasterXML/jackson-databind/issues/2097#issuecomment-457071680
+            and RDM-3796</notes>
+        <gav regex="true">^com\.fasterxml\.jackson\.core:jackson-databind:2\.8\.11\.[3].*$</gav>
+        <cve>CVE-2018-19361</cve>
+    </suppress>
+    <suppress>
+        <notes>jackson-databind 2.8.11.3 fixes this CVE. See
+            https://github.com/FasterXML/jackson-databind/issues/2097#issuecomment-457071680
+            and RDM-3796</notes>
+        <gav regex="true">^com\.fasterxml\.jackson\.core:jackson-databind:2\.8\.11\.[3].*$</gav>
+        <cve>CVE-2018-19362</cve>
+    </suppress>
+    <suppress>
+        <notes>jackson-databind 2.8.x will not get a fix for this CVE.  We need
+            to upgrade to 2.9.x. See
+            https://github.com/FasterXML/jackson-modules-java8/issues/90#issuecomment-450544881
+            and RDM-3796</notes>
+        <gav regex="true">^com\.fasterxml\.jackson\.core:jackson-databind:2\.8\.11\.[3].*$</gav>
+        <cve>CVE-2018-1000873</cve>
+    </suppress>
+    <suppress>
+        <notes>Temporarily suppress spring framework CVE see RDM-3809.  Will be
+            removed with RDM-3796 fixes land.</notes>
+        <gav regex="true">^org\.springframework:spring-.+:.*$</gav>
+        <cve>CVE-2018-15756</cve>
     </suppress>
 </suppressions>

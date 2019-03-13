@@ -37,10 +37,36 @@ class RestTemplateConfiguration {
     @Value("${http.client.connection.timeout}")
     private int connectionTimeout;
 
-    @Bean
-    RestTemplate restTemplate() {
+    @Value("${http.client.read.timeout}")
+    private int readTimeout;
+
+    @Value("${http.client.connection.drafts.timeout}")
+    private int draftsConnectionTimeout;
+
+    @Value("${http.client.connection.drafts.create.timeout}")
+    private int draftsCreateConnectionTimeout;
+
+    @Bean(name = "restTemplate")
+    public RestTemplate restTemplate() {
         final RestTemplate restTemplate = new RestTemplate();
-        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(getHttpClient()));
+        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(getHttpClient());
+        requestFactory.setReadTimeout(readTimeout);
+        LOG.info("readTimeout: {}", readTimeout);
+        restTemplate.setRequestFactory(requestFactory);
+        return restTemplate;
+    }
+
+    @Bean(name = "createDraftRestTemplate")
+    public RestTemplate createDraftsRestTemplate() {
+        final RestTemplate restTemplate = new RestTemplate();
+        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(getHttpClient(draftsCreateConnectionTimeout)));
+        return restTemplate;
+    }
+
+    @Bean(name = "draftsRestTemplate")
+    public RestTemplate draftsRestTemplate() {
+        final RestTemplate restTemplate = new RestTemplate();
+        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(getHttpClient(draftsConnectionTimeout)));
         return restTemplate;
     }
 
@@ -70,7 +96,6 @@ class RestTemplateConfiguration {
         cm.closeIdleConnections(maxSecondsIdleConnection, TimeUnit.SECONDS);
         cm.setDefaultMaxPerRoute(maxClientPerRoute);
         cm.setValidateAfterInactivity(validateAfterInactivity);
-
         final RequestConfig
             config =
             RequestConfig.custom()

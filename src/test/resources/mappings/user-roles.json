@@ -1,0 +1,26 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/user-roles/caseworker-test,caseworker-probate,caseworker-divorce,caseworker"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": [
+      {
+        "role": "caseworker-test",
+        "security_classification": "PRIVATE"
+      },
+      {
+        "role": "caseworker-probate",
+        "security_classification": "PUBLIC"
+      },
+      {
+        "role": "caseworker-divorce",
+        "security_classification": "RESTRICTED"
+      }
+    ]
+  }
+}

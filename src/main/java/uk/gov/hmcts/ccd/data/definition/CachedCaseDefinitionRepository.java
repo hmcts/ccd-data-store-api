@@ -1,7 +1,12 @@
 package uk.gov.hmcts.ccd.data.definition;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import static com.google.common.collect.Maps.newHashMap;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -11,11 +16,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 
-import java.util.List;
-import java.util.Map;
-
-import static com.google.common.collect.Maps.newHashMap;
-
 @Service
 @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
 @RequestScope
@@ -23,11 +23,10 @@ import static com.google.common.collect.Maps.newHashMap;
 public class CachedCaseDefinitionRepository implements CaseDefinitionRepository {
 
     public static final String QUALIFIER = "cached";
-    private static final Logger LOG = LoggerFactory.getLogger(CachedCaseDefinitionRepository.class);
 
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final Map<String, List<CaseType>> caseTypesForJurisdictions = newHashMap();
-    private final Map<String , CaseTypeDefinitionVersion> versions = newHashMap();
+    private final Map<String, CaseTypeDefinitionVersion> versions = newHashMap();
     private final Map<String, UserRole> userRoleClassifications = newHashMap();
     private final Map<String, List<FieldType>> baseTypes = newHashMap();
 
@@ -36,17 +35,39 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
         this.caseDefinitionRepository = caseDefinitionRepository;
     }
 
+    @Override
     public List<CaseType> getCaseTypesForJurisdiction(final String jurisdictionId) {
         return caseTypesForJurisdictions.computeIfAbsent(jurisdictionId, caseDefinitionRepository::getCaseTypesForJurisdiction);
     }
 
+    @Override
     public CaseType getCaseType(final String caseTypeId) {
         CaseTypeDefinitionVersion latestVersion = this.getLatestVersion(caseTypeId);
         return caseDefinitionRepository.getCaseType(latestVersion.getVersion(), caseTypeId);
     }
 
+    @Override
     public UserRole getUserRoleClassifications(String userRole) {
         return userRoleClassifications.computeIfAbsent(userRole, caseDefinitionRepository::getUserRoleClassifications);
+    }
+
+    @Override
+    public List<UserRole> getClassificationsForUserRoleList(List<String> userRoles) {
+        List<String> missingRoles = userRoles
+            .stream()
+            .filter(role -> !userRoleClassifications.containsKey(role))
+            .collect(Collectors.toList());
+
+        List<UserRole> missingClassifications = missingRoles
+            .stream()
+            .map(caseDefinitionRepository::getUserRoleClassifications)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
+
+        missingClassifications
+            .forEach(userClassification -> userRoleClassifications.putIfAbsent(userClassification.getRole(), userClassification));
+
+        return userRoles.stream().map(userRoleClassifications::get).collect(Collectors.toList());
     }
 
     @Override
@@ -64,6 +85,7 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
         return caseDefinitionRepository.getCaseType(version, caseTypeId);
     }
 
+    @Override
     public List<FieldType> getBaseTypes() {
         return baseTypes.computeIfAbsent("baseTypes", e -> caseDefinitionRepository.getBaseTypes());
     }

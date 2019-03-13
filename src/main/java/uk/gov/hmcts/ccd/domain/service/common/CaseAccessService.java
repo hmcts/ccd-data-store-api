@@ -1,19 +1,21 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.regex.Pattern;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
-
-import java.util.List;
-import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
 /**
  * Check access to a case for the current user.
@@ -32,7 +34,7 @@ public class CaseAccessService {
     private final CaseUserRepository caseUserRepository;
 
     private static final Pattern RESTRICT_GRANTED_ROLES_PATTERN
-        = Pattern.compile(".+-solicitor$|^citizen(-.*)?$|^letter-holder$");
+        = Pattern.compile(".+-solicitor$|.+-panelmember$|^citizen(-.*)?$|^letter-holder$|^caseworker-.+-localAuthority$");
 
     public CaseAccessService(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
                              CaseUserRepository caseUserRepository) {
@@ -41,11 +43,7 @@ public class CaseAccessService {
     }
 
     public Boolean canUserAccess(CaseDetails caseDetails) {
-
-        IDAMProperties currentUser = userRepository.getUserDetails();
-        return !canOnlyViewGrantedCases(currentUser)
-            || accessGranted(caseDetails, currentUser);
-
+        return !canOnlyViewGrantedCases() || accessGranted(caseDetails);
     }
 
     public AccessLevel getAccessLevel(ServiceAndUserDetails serviceAndUserDetails) {
@@ -58,19 +56,40 @@ public class CaseAccessService {
                                     .orElse(AccessLevel.ALL);
     }
 
-    private Boolean accessGranted(CaseDetails caseDetails, IDAMProperties currentUser) {
-        final List<Long> grantedCases = caseUserRepository.findCasesUserIdHasAccessTo(currentUser.getId());
+    public Optional<List<Long>> getGrantedCaseIdsForRestrictedRoles() {
+        if (canOnlyViewGrantedCases()) {
+            return Optional.of(caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId()));
+        }
 
-        if (null != grantedCases && grantedCases.contains(caseDetails.getId())) {
+        return Optional.empty();
+    }
+
+    public Set<String> getCaseRoles(String caseId) {
+        return new HashSet<>(caseUserRepository.findCaseRoles(Long.valueOf(caseId), userRepository.getUserId()));
+    }
+
+    public Set<String> getUserRoles() {
+        Set<String> userRoles = userRepository.getUserRoles();
+        if (userRoles == null) {
+            throw new ValidationException("Cannot find user roles for the user");
+        }
+        return userRoles;
+    }
+
+    private Boolean accessGranted(CaseDetails caseDetails) {
+        final List<Long> grantedCases = caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId());
+
+        if (null != grantedCases && grantedCases.contains(Long.valueOf(caseDetails.getId()))) {
             return Boolean.TRUE;
         }
 
         return Boolean.FALSE;
     }
 
-    private Boolean canOnlyViewGrantedCases(IDAMProperties currentUser) {
-        return Stream.of(currentUser.getRoles())
-                     .anyMatch(role -> RESTRICT_GRANTED_ROLES_PATTERN.matcher(role).matches());
+    private Boolean canOnlyViewGrantedCases() {
+        return userRepository.getUserRoles()
+            .stream()
+            .anyMatch(role -> RESTRICT_GRANTED_ROLES_PATTERN.matcher(role).matches());
     }
 
 }

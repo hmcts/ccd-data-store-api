@@ -1,5 +1,11 @@
 package uk.gov.hmcts.ccd.data.user;
 
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+import static com.google.common.collect.Maps.newHashMap;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -7,11 +13,6 @@ import org.springframework.web.context.annotation.RequestScope;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserDefault;
-
-import java.util.Map;
-import java.util.Set;
-
-import static com.google.common.collect.Maps.newHashMap;
 
 @Service
 @Qualifier(CachedUserRepository.QUALIFIER)
@@ -25,6 +26,8 @@ public class CachedUserRepository implements UserRepository {
     private final Map<String, Set<SecurityClassification>> jurisdictionToUserClassifications = newHashMap();
     private final Map<String, IDAMProperties> userDetails = newHashMap();
     private final Map<String, Set<String>> userRoles = newHashMap();
+    private final Map<String, SecurityClassification> userHighestSecurityClassification = newHashMap();
+    private Optional<String> userName = Optional.empty();
 
     @Autowired
     public CachedUserRepository(@Qualifier(DefaultUserRepository.QUALIFIER) UserRepository userRepository) {
@@ -46,7 +49,21 @@ public class CachedUserRepository implements UserRepository {
         return userRoles.computeIfAbsent("userRoles", e -> userRepository.getUserRoles());
     }
 
+    @Override
     public Set<SecurityClassification> getUserClassifications(String jurisdictionId) {
         return jurisdictionToUserClassifications.computeIfAbsent(jurisdictionId, userRepository::getUserClassifications);
+    }
+
+    @Override
+    public SecurityClassification getHighestUserClassification(String jurisdictionId) {
+        return userHighestSecurityClassification.computeIfAbsent(jurisdictionId, s -> userRepository.getHighestUserClassification(jurisdictionId));
+    }
+
+    @Override
+    public String getUserId() {
+        return userName.orElseGet(() -> {
+            userName = Optional.of(userRepository.getUserId());
+            return userName.get();
+        });
     }
 }

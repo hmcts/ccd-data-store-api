@@ -1,5 +1,28 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import java.util.List;
+import java.util.Set;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Sets.newHashSet;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.core.IsCollectionContaining.hasItems;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.doReturn;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseStateBuilder.newState;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
+
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,24 +36,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
-
-import java.util.List;
-import java.util.Set;
-
-import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Sets.newHashSet;
-import static org.hamcrest.Matchers.*;
-import static org.hamcrest.core.IsCollectionContaining.hasItems;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.doReturn;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.*;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.anEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.aCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseStateBuilder.aState;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.aCaseType;
 
 class AuthorisedGetCaseTypesOperationTest {
 
@@ -65,55 +70,55 @@ class AuthorisedGetCaseTypesOperationTest {
     private static final String CASE_FIELD_ID_3_1 = "CASE_FIELD_3_1";
     private static final String CASE_FIELD_ID_3_2 = "CASE_FIELD_3_2";
     private static final String CASE_FIELD_ID_3_3 = "CASE_FIELD_3_3";
-    private static final CaseState CASE_STATE_1_1 = aState().withId(STATE_ID_1_1).build();
-    private static final CaseState CASE_STATE_1_2 = aState().withId(STATE_ID_1_2).build();
-    private static final CaseState CASE_STATE_2_1 = aState().withId(STATE_ID_2_1).build();
-    private static final CaseState CASE_STATE_2_2 = aState().withId(STATE_ID_2_2).build();
-    private static final CaseState CASE_STATE_3_1 = aState().withId(STATE_ID_3_1).build();
-    private static final CaseState CASE_STATE_3_2 = aState().withId(STATE_ID_3_2).build();
-    private static final CaseEvent CASE_EVENT_1_1 = anEvent().withId(EVENT_ID_1_1)
+    private static final CaseState CASE_STATE_1_1 = newState().withId(STATE_ID_1_1).build();
+    private static final CaseState CASE_STATE_1_2 = newState().withId(STATE_ID_1_2).build();
+    private static final CaseState CASE_STATE_2_1 = newState().withId(STATE_ID_2_1).build();
+    private static final CaseState CASE_STATE_2_2 = newState().withId(STATE_ID_2_2).build();
+    private static final CaseState CASE_STATE_3_1 = newState().withId(STATE_ID_3_1).build();
+    private static final CaseState CASE_STATE_3_2 = newState().withId(STATE_ID_3_2).build();
+    private static final CaseEvent CASE_EVENT_1_1 = newCaseEvent().withId(EVENT_ID_1_1)
         .withAcl(anAcl()
                      .withRole(ROLE_IN_USER_ROLES)
                      .withCreate(true)
                      .withRead(true)
                      .build())
         .build();
-    private static final CaseEvent CASE_EVENT_1_2 = anEvent().withId(EVENT_ID_1_2)
+    private static final CaseEvent CASE_EVENT_1_2 = newCaseEvent().withId(EVENT_ID_1_2)
         .withAcl(anAcl()
                      .withRole(ROLE_IN_USER_ROLES)
                      .withUpdate(true)
                      .withRead(true)
                      .build())
         .build();
-    private static final CaseEvent CASE_EVENT_1_3 = anEvent().withId(EVENT_ID_1_3)
+    private static final CaseEvent CASE_EVENT_1_3 = newCaseEvent().withId(EVENT_ID_1_3)
         .withAcl(anAcl()
                      .withRole(ROLE_IN_USER_ROLES)
                      .withUpdate(true)
                      .withRead(true)
                      .build())
         .build();
-    private static final CaseEvent CASE_EVENT_2_3 = anEvent().withId(EVENT_ID_2_3)
+    private static final CaseEvent CASE_EVENT_2_3 = newCaseEvent().withId(EVENT_ID_2_3)
         .withAcl(anAcl()
                      .withRole(ROLE_IN_USER_ROLES)
                      .withCreate(true)
                      .withRead(true)
                      .build())
         .build();
-    private static final CaseEvent CASE_EVENT_3_1 = anEvent().withId(EVENT_ID_3_1)
+    private static final CaseEvent CASE_EVENT_3_1 = newCaseEvent().withId(EVENT_ID_3_1)
         .withAcl(anAcl()
                      .withRole(ROLE_IN_USER_ROLES)
                      .withCreate(true)
                      .withRead(true)
                      .build())
         .build();
-    private static final CaseEvent CASE_EVENT_3_2 = anEvent().withId(EVENT_ID_3_2)
+    private static final CaseEvent CASE_EVENT_3_2 = newCaseEvent().withId(EVENT_ID_3_2)
         .withAcl(anAcl()
                      .withRole(ROLE_IN_USER_ROLES)
                      .withUpdate(true)
                      .withRead(true)
                      .build())
         .build();
-    private static final CaseEvent CASE_EVENT_3_3 = anEvent().withId(EVENT_ID_3_3)
+    private static final CaseEvent CASE_EVENT_3_3 = newCaseEvent().withId(EVENT_ID_3_3)
         .withAcl(anAcl()
                      .withRole(ROLE_IN_USER_ROLES)
                      .withCreate(true)
@@ -121,44 +126,44 @@ class AuthorisedGetCaseTypesOperationTest {
                      .build())
         .build();
 
-    private static final CaseField CASE_FIELD_1_1 = aCaseField().withId(CASE_FIELD_ID_1_1)
+    private static final CaseField CASE_FIELD_1_1 = newCaseField().withId(CASE_FIELD_ID_1_1)
         .withAcl(anAcl()
                      .withRole(ROLE_IN_USER_ROLES)
                      .build())
         .build();
-    private static final CaseField CASE_FIELD_1_2 = aCaseField().withId(CASE_FIELD_ID_1_2)
+    private static final CaseField CASE_FIELD_1_2 = newCaseField().withId(CASE_FIELD_ID_1_2)
         .withAcl(anAcl()
                      .withRole(ROLE_IN_USER_ROLES)
                      .withRead(true)
                      .build())
         .build();
-    private static final CaseField CASE_FIELD_1_3 = aCaseField().withId(CASE_FIELD_ID_1_3)
+    private static final CaseField CASE_FIELD_1_3 = newCaseField().withId(CASE_FIELD_ID_1_3)
         .withAcl(anAcl()
                      .withRole(ROLE_IN_USER_ROLES)
                      .build())
         .build();
-    private static final CaseField CASE_FIELD_2_3 = aCaseField().withId(CASE_FIELD_ID_2_3)
+    private static final CaseField CASE_FIELD_2_3 = newCaseField().withId(CASE_FIELD_ID_2_3)
         .withAcl(anAcl()
                      .withRole(ROLE_IN_USER_ROLES)
                      .withCreate(true)
                      .withRead(true)
                      .build())
         .build();
-    private static final CaseField CASE_FIELD_3_1 = aCaseField().withId(CASE_FIELD_ID_3_1)
+    private static final CaseField CASE_FIELD_3_1 = newCaseField().withId(CASE_FIELD_ID_3_1)
         .withAcl(anAcl()
                      .withRole(ROLE_IN_USER_ROLES)
                      .withUpdate(true)
                      .withRead(true)
                      .build())
         .build();
-    private static final CaseField CASE_FIELD_3_2 = aCaseField().withId(CASE_FIELD_ID_3_2)
+    private static final CaseField CASE_FIELD_3_2 = newCaseField().withId(CASE_FIELD_ID_3_2)
         .withAcl(anAcl()
                      .withRole(ROLE_IN_USER_ROLES)
                      .withUpdate(true)
                      .withCreate(true)
                      .build())
         .build();
-    private static final CaseField CASE_FIELD_3_3 = aCaseField().withId(CASE_FIELD_ID_3_3)
+    private static final CaseField CASE_FIELD_3_3 = newCaseField().withId(CASE_FIELD_ID_3_3)
         .withAcl(anAcl()
                      .withRole(ROLE_IN_USER_ROLES)
                      .withRead(true)
@@ -185,7 +190,7 @@ class AuthorisedGetCaseTypesOperationTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        testCaseType1 = aCaseType()
+        testCaseType1 = newCaseType()
             .withAcl(anAcl()
                          .withRole(ROLE_IN_USER_ROLES)
                          .withRead(true)
@@ -193,7 +198,7 @@ class AuthorisedGetCaseTypesOperationTest {
             .withState(CASE_STATE_1_1)
             .withState(CASE_STATE_1_2)
             .withEvent(CASE_EVENT_1_1)
-            .withEvent(anEvent()
+            .withEvent(newCaseEvent()
                            .withId(EVENT_ID_1_2)
                            .withAcl(anAcl()
                                         .withRole(ROLE_IN_USER_ROLES)
@@ -205,34 +210,34 @@ class AuthorisedGetCaseTypesOperationTest {
             .withField(CASE_FIELD_1_3)
             .build();
 
-        testCaseType2 = aCaseType()
+        testCaseType2 = newCaseType()
             .withAcl(anAcl()
                          .withRole(ROLE_IN_USER_ROLES)
                          .withCreate(true)
                          .build())
             .withState(CASE_STATE_2_1)
             .withState(CASE_STATE_2_2)
-            .withEvent(anEvent()
+            .withEvent(newCaseEvent()
                            .withId(EVENT_ID_2_1)
                            .withAcl(anAcl()
                                         .withRole(ROLE_IN_USER_ROLES)
                                         .withRead(true)
                                         .build())
                            .build())
-            .withEvent(anEvent().withId(EVENT_ID_2_2)
+            .withEvent(newCaseEvent().withId(EVENT_ID_2_2)
                            .withAcl(anAcl()
                                         .withRole(ROLE_IN_USER_ROLES)
                                         .withRead(true)
                                         .build())
                            .build())
             .withEvent(CASE_EVENT_2_3)
-            .withField(aCaseField().withId(CASE_FIELD_ID_2_1)
+            .withField(newCaseField().withId(CASE_FIELD_ID_2_1)
                            .withAcl(anAcl()
                                         .withRole(ROLE_IN_USER_ROLES)
                                         .withRead(true)
                                         .build())
                            .build())
-            .withField(aCaseField().withId(CASE_FIELD_ID_2_2)
+            .withField(newCaseField().withId(CASE_FIELD_ID_2_2)
                            .withAcl(anAcl()
                                         .withRole(ROLE_IN_USER_ROLES)
                                         .build())
@@ -240,7 +245,7 @@ class AuthorisedGetCaseTypesOperationTest {
             .withField(CASE_FIELD_2_3)
             .build();
 
-        testCaseType3 = aCaseType()
+        testCaseType3 = newCaseType()
             .withAcl(anAcl()
                          .withRole(ROLE_IN_USER_ROLES)
                          .withCreate(true)
@@ -337,6 +342,7 @@ class AuthorisedGetCaseTypesOperationTest {
             );
         }
     }
+
         @Nested
     @DisplayName("events tests")
     class ReturnsCaseTypesWithEventsThatMatchAccessCriteria {

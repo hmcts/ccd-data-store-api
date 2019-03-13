@@ -1,5 +1,10 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import java.util.List;
+import java.util.function.Predicate;
+
+import static java.util.stream.Collectors.toList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -11,19 +16,14 @@ import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.search.Field;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
 
-import java.util.List;
-import java.util.function.Predicate;
-
-import static java.util.stream.Collectors.toList;
-
 @Service
 @Qualifier(DefaultFindWorkbasketInputOperation.QUALIFIER)
-public class DefaultFindWorkbasketInputOperation implements FindWorkbasketInputOperation{
+public class DefaultFindWorkbasketInputOperation implements FindWorkbasketInputOperation {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultFindWorkbasketInputOperation.class);
 
     public static final String QUALIFIER = "default";
-    private UIDefinitionRepository uiDefinitionRepository;
-    private CaseDefinitionRepository caseDefinitionRepository;
+    private final UIDefinitionRepository uiDefinitionRepository;
+    private final CaseDefinitionRepository caseDefinitionRepository;
 
     public DefaultFindWorkbasketInputOperation(UIDefinitionRepository uiDefinitionRepository,
                                                @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository) {
@@ -31,8 +31,9 @@ public class DefaultFindWorkbasketInputOperation implements FindWorkbasketInputO
         this.caseDefinitionRepository = caseDefinitionRepository;
     }
 
-    public List<WorkbasketInput> execute(String jurisdictionId, String caseTypeId, Predicate<AccessControlList> access) {
-        LOG.debug("Finding WorkbasketInput fields for jurisdiction={}, caseType={}", jurisdictionId, caseTypeId);
+    @Override
+    public List<WorkbasketInput> execute(String caseTypeId, Predicate<AccessControlList> access) {
+        LOG.debug("Finding WorkbasketInput fields for caseType={}", caseTypeId);
 
         final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
 
@@ -50,16 +51,17 @@ public class DefaultFindWorkbasketInputOperation implements FindWorkbasketInputO
         result.setOrder(in.getOrder());
         final Field field = new Field();
         field.setId(in.getCaseFieldId());
-        field.setType(getFieldType(in.getCaseFieldId(), caseType));
+        CaseField caseField = getCaseField(in.getCaseFieldId(), caseType);
+        field.setType(caseField.getFieldType());
+        field.setMetadata(caseField.isMetadata());
         result.setField(field);
         return result;
     }
 
-    private FieldType getFieldType(final String fieldId, final CaseType caseType) {
+    private CaseField getCaseField(final String fieldId, final CaseType caseType) {
         return caseType.getCaseFields().stream()
             .filter(c -> c.getId().equals(fieldId))
             .findFirst()
-            .orElseThrow(() -> new RuntimeException(String.format("FieldId %s not found", fieldId)))
-            .getFieldType();
+            .orElseThrow(() -> new RuntimeException(String.format("FieldId %s not found", fieldId)));
     }
 }

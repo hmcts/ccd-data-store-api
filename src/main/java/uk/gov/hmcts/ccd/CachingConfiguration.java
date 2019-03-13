@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd;
 
 import com.hazelcast.config.Config;
-import com.hazelcast.config.EvictionPolicy;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.config.MaxSizeConfig;
 import com.hazelcast.config.NetworkConfig;
@@ -17,7 +16,7 @@ public class CachingConfiguration {
 
 
     @Bean
-    public Config hazelCastConfig(){
+    public Config hazelCastConfig() {
 
         Config config = new Config();
         NetworkConfig networkConfig = config.setInstanceName("hazelcast-instance-ccd").getNetworkConfig();
@@ -35,13 +34,14 @@ public class CachingConfiguration {
         config.addMapConfig(newMapConfig("workbasketInputDefinitionCache", definitionCacheTTL));
         config.addMapConfig(newMapConfig("caseTabCollectionCache", definitionCacheTTL));
         config.addMapConfig(newMapConfig("wizardPageCollectionCache", definitionCacheTTL));
+        config.addMapConfig(newMapConfig("userRolesCache", definitionCacheTTL));
     }
 
     private MapConfig newMapConfig(final String name, int definitionCacheTTL) {
         return new MapConfig().setName(name)
-                .setMaxSizeConfig(new MaxSizeConfig(200, MaxSizeConfig.MaxSizePolicy.FREE_HEAP_SIZE))
-                .setEvictionPolicy(EvictionPolicy.LRU)
-                .setTimeToLiveSeconds(definitionCacheTTL);
+                .setMaxSizeConfig(new MaxSizeConfig(applicationParams.getDefinitionCacheMaxSize(), MaxSizeConfig.MaxSizePolicy.PER_NODE))
+                .setEvictionPolicy(applicationParams.getDefinitionCacheEvictionPolicy())
+                .setMaxIdleSeconds(definitionCacheTTL);
     }
 
 }

@@ -4,11 +4,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
-import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -34,15 +31,27 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 
 import javax.inject.Inject;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isEmptyString;
 import static org.hamcrest.collection.IsIn.isIn;
 import static org.hamcrest.core.Every.everyItem;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
@@ -51,6 +60,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
+import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
 public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -74,6 +85,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private static final String TEST_JURISDICTION = "PROBATE";
     private static final String TEST_STATE = "CaseCreated";
     private static final String UID = "0";
+    private static final String DRAFT_ID = "5";
 
     @Inject
     private WebApplicationContext wac;
@@ -87,11 +99,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private SecurityContext securityContext;
 
     private static final String REFERENCE_2 = "1504259907353545";
-
-    private static final int WIREMOCK_PORT = 10000;
-
-    @ClassRule
-    public static WireMockClassRule DM_API_RULE = new WireMockClassRule(new WireMockConfiguration().port(WIREMOCK_PORT).notifier(slf4jNotifier));
 
     @Before
     public void setUp() {
@@ -111,8 +118,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         when(uidService.generateUID()).thenReturn(REFERENCE).thenReturn(REFERENCE).thenReturn(REFERENCE);
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
         final JsonNode DATA = mapper.readTree("{}\n");
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        caseDetailsToSave.setEvent(new Event());
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(anEvent().build());
         caseDetailsToSave.getEvent().setEventId(TEST_EVENT_ID);
         caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
         }));
@@ -143,8 +150,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         when(uidService.generateUID()).thenReturn(REFERENCE).thenReturn(REFERENCE).thenReturn(REFERENCE);
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
         final JsonNode DATA = mapper.readTree("{}\n");
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        caseDetailsToSave.setEvent(new Event());
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(anEvent().build());
         caseDetailsToSave.getEvent().setEventId(TEST_EVENT_ID);
         caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
         }));
@@ -175,8 +182,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         when(uidService.generateUID()).thenReturn(REFERENCE).thenReturn(REFERENCE).thenReturn(REFERENCE_2);
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
         final JsonNode DATA = mapper.readTree("{}\n");
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        caseDetailsToSave.setEvent(new Event());
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(anEvent().build());
         caseDetailsToSave.getEvent().setEventId(TEST_EVENT_ID);
         caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
         }));
@@ -207,8 +214,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         when(uidService.generateUID()).thenReturn(REFERENCE).thenReturn(REFERENCE).thenReturn(REFERENCE_2);
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
         final JsonNode DATA = mapper.readTree("{}\n");
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        caseDetailsToSave.setEvent(new Event());
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(anEvent().build());
         caseDetailsToSave.getEvent().setEventId(TEST_EVENT_ID);
         caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
         }));
@@ -245,8 +252,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "    \"AddressLine1\": \"Address Line 1\",\n" +
             "    \"AddressLine2\": \"Address Line 2\"\n" +
             "  },\n" +
-                "\"D8Document\":{" +
-                "\"document_url\": \"http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"}" +
+            "  \"Aliases\": [{\"value\": \"x1\", \"id\": \"1\"}, {\"value\": \"x2\", \"id\": \"2\"}]," +
+            "  \"D8Document\":{" +
+            "    \"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"}" +
             "}\n"
         );
         final JsonNode SANITIZED_DATA = mapper.readTree(
@@ -257,15 +265,16 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "    \"AddressLine1\": \"Address Line 1\",\n" +
             "    \"AddressLine2\": \"Address Line 2\"\n" +
             "  },\n" +
+            "  \"Aliases\": [{\"value\": \"x1\", \"id\": \"1\"}, {\"value\": \"x2\", \"id\": \"2\"}]," +
             "  \"D8Document\":{\n" +
-            "    \"document_url\": \"http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n" +
-            "    \"document_binary_url\": \"http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n" +
+            "    \"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n" +
+            "    \"document_binary_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n" +
             "    \"document_filename\": \"Seagulls_Square.jpg\"" +
             "}\n" +
             "}\n"
         );
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        caseDetailsToSave.setEvent(new Event());
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(anEvent().build());
         caseDetailsToSave.getEvent().setEventId(TEST_EVENT_ID);
         Map data = mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
         });
@@ -273,6 +282,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID
         );
         caseDetailsToSave.setToken(token);
+        caseDetailsToSave.setDraftId(DRAFT_ID);
 
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
@@ -282,7 +292,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect Response Status Code", 201, mvcResult.getResponse().getStatus());
         Map expectedSanitizedData = mapper.readValue(SANITIZED_DATA.toString(), Map.class);
         Map actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").toString(), Map.class);
-        assertThat( "Incorrect Response Content", actualData.entrySet(), everyItem(isIn(expectedSanitizedData.entrySet())));
+        assertThat("Incorrect Response Content", actualData.entrySet(), everyItem(isIn(expectedSanitizedData.entrySet())));
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
@@ -292,8 +302,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect Case Type", CASE_TYPE, savedCaseDetails.getCaseTypeId());
         Map sanitizedData = mapper.convertValue(SANITIZED_DATA, new TypeReference<HashMap<String, JsonNode>>() {
         });
-        assertThat( "Incorrect Data content", savedCaseDetails.getData().entrySet(), everyItem(isIn(sanitizedData.entrySet())));
-        assertEquals("Incorrect security classification size", 4, savedCaseDetails.getDataClassification().size());
+        assertThat("Incorrect Data content", savedCaseDetails.getData().entrySet(), everyItem(isIn(sanitizedData.entrySet())));
+        assertEquals("Incorrect security classification size", 5, savedCaseDetails.getDataClassification().size());
         JsonNode expectedClassification = mapper.readTree("{" +
                                                               "  \"PersonAddress\":{" +
                                                               "    \"classification\": \"PUBLIC\"," +
@@ -304,6 +314,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                                                               "  }," +
                                                               "  \"PersonLastName\":\"PUBLIC\"," +
                                                               "  \"PersonFirstName\":\"PUBLIC\"," +
+                                                              "  \"Aliases\": {\"classification\": \"PUBLIC\", \"value\": [{\"id\": \"1\", \"classification\": \"PUBLIC\"}, {\"id\": \"2\", \"classification\": \"PUBLIC\"}]}," +
                                                               "  \"D8Document\":\"PUBLIC\"" +
                                                               "}");
         JsonNode actualClassification = mapper.convertValue(savedCaseDetails.getDataClassification(), JsonNode.class);
@@ -336,34 +347,34 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases?ignore-warning=true";
         final JsonNode DATA = mapper.readTree(
-            "{\n" +
-            "  \"PersonFirstName\": \"First Name\",\n" +
-            "  \"PersonLastName\": \"Last Name\",\n" +
-            "  \"PersonAddress\": {\n" +
-            "    \"AddressLine1\": \"Address Line 1\",\n" +
-            "    \"AddressLine2\": \"Address Line 2\"\n" +
-            "  },\n" +
-            "\"D8Document\":{" +
-            "\"document_url\": \"http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"}" +
-            "}\n"
+            "{\n"
+            + "  \"PersonFirstName\": \"First Name\",\n"
+            + "  \"PersonLastName\": \"Last Name\",\n"
+            + "  \"PersonAddress\": {\n"
+            + "    \"AddressLine1\": \"Address Line 1\",\n"
+            + "    \"AddressLine2\": \"Address Line 2\"\n"
+            + "  },\n"
+            + "\"D8Document\":{"
+            + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"}"
+            + "}\n"
         );
         final JsonNode SANITIZED_DATA = mapper.readTree(
-        "{\n" +
-            "  \"PersonFirstName\": \"First Name\",\n" +
-            "  \"PersonLastName\": \"Last Name\",\n" +
-            "  \"PersonAddress\": {\n" +
-            "    \"AddressLine1\": \"Address Line 1\",\n" +
-            "    \"AddressLine2\": \"Address Line 2\"\n" +
-            "  },\n" +
-            "  \"D8Document\":{\n" +
-            "    \"document_url\": \"http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n" +
-            "    \"document_binary_url\": \"http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n" +
-            "    \"document_filename\": \"Seagulls_Square.jpg\"" +
-            "}\n" +
-            "}\n"
+            "{\n"
+            + "  \"PersonFirstName\": \"First Name\",\n"
+            + "  \"PersonLastName\": \"Last Name\",\n"
+            + "  \"PersonAddress\": {\n"
+            + "    \"AddressLine1\": \"Address Line 1\",\n"
+            + "    \"AddressLine2\": \"Address Line 2\"\n"
+            + "  },\n"
+            + "  \"D8Document\":{\n"
+            + "    \"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\",\n"
+            + "    \"document_binary_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\",\n"
+            + "    \"document_filename\": \"Seagulls_Square.jpg\""
+            + "}\n"
+            + "}\n"
         );
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event triggeringEvent = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event triggeringEvent = anEvent().build();
         triggeringEvent.setEventId(TEST_EVENT_ID);
         triggeringEvent.setDescription(LONG_COMMENT);
         triggeringEvent.setSummary(SHORT_COMMENT);
@@ -381,7 +392,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect Response Status Code", 201, mvcResult.getResponse().getStatus());
         Map expectedSanitizedData = mapper.readValue(SANITIZED_DATA.toString(), Map.class);
         Map actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").toString(), Map.class);
-        assertThat( "Incorrect Response Content", actualData.entrySet(), everyItem(isIn(expectedSanitizedData.entrySet())));
+        assertThat("Incorrect Response Content", actualData.entrySet(), everyItem(isIn(expectedSanitizedData.entrySet())));
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
@@ -391,7 +402,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect Case Type", CASE_TYPE, savedCaseDetails.getCaseTypeId());
         Map sanitizedData = mapper.convertValue(SANITIZED_DATA, new TypeReference<HashMap<String, JsonNode>>() {
         });
-        assertThat( "Incorrect Data content", savedCaseDetails.getData().entrySet(), everyItem(isIn(sanitizedData.entrySet())));
+        assertThat("Incorrect Data content", savedCaseDetails.getData().entrySet(), everyItem(isIn(sanitizedData.entrySet())));
         assertEquals("Incorrect security classification size", 4, savedCaseDetails.getDataClassification().size());
         JsonNode expectedClassification = mapper.readTree("{" +
                                                               "  \"PersonAddress\":{" +
@@ -427,24 +438,28 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(caseAuditEvent.getSecurityClassification(), equalTo(PRIVATE));
     }
 
+    private int getPort() {
+        return super.wiremockPort;
+    }
+
     @Test
     public void shouldReturn422WhenPostCreateCaseWithMissingDocumentBinaryLinkForCaseworker() throws Exception {
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
         final JsonNode DATA = mapper.readTree(
-            "{\n" +
-            "  \"PersonFirstName\": \"First Name\",\n" +
-            "  \"PersonLastName\": \"Last Name\",\n" +
-            "  \"PersonAddress\": {\n" +
-            "    \"AddressLine1\": \"Address Line 1\",\n" +
-            "    \"AddressLine2\": \"Address Line 2\"\n" +
-            "  },\n" +
-                "\"D8Document\":{" +
-                "\"document_url\": \"http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\"}" +
-            "}\n"
+            "{\n"
+            + "  \"PersonFirstName\": \"First Name\",\n"
+            + "  \"PersonLastName\": \"Last Name\",\n"
+            + "  \"PersonAddress\": {\n"
+            + "    \"AddressLine1\": \"Address Line 1\",\n"
+            + "    \"AddressLine2\": \"Address Line 2\"\n"
+            + "  },\n"
+            +     "\"D8Document\":{"
+            +     "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\"}"
+            + "}\n"
         );
 
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        caseDetailsToSave.setEvent(new Event());
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(anEvent().build());
         caseDetailsToSave.getEvent().setEventId(TEST_EVENT_ID);
         Map data = mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
         });
@@ -472,19 +487,19 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases?ignore-warning=true";
         final JsonNode DATA = mapper.readTree(
-            "{\n" +
-            "  \"PersonFirstName\": \"First Name\",\n" +
-            "  \"PersonLastName\": \"Last Name\",\n" +
-            "  \"PersonAddress\": {\n" +
-            "    \"AddressLine1\": \"Address Line 1\",\n" +
-            "    \"AddressLine2\": \"Address Line 2\"\n" +
-            "  },\n" +
-            "\"D8Document\":{" +
-            "\"document_url\": \"http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\"}" +
-            "}\n"
+            "{\n"
+            + "  \"PersonFirstName\": \"First Name\",\n"
+            + "  \"PersonLastName\": \"Last Name\",\n"
+            + "  \"PersonAddress\": {\n"
+            + "    \"AddressLine1\": \"Address Line 1\",\n"
+            + "    \"AddressLine2\": \"Address Line 2\"\n"
+            + "  },\n"
+            + "\"D8Document\":{"
+            + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\"}"
+            + "}\n"
         );
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event triggeringEvent = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event triggeringEvent = anEvent().build();
         triggeringEvent.setEventId(TEST_EVENT_ID);
         triggeringEvent.setDescription(LONG_COMMENT);
         triggeringEvent.setSummary(SHORT_COMMENT);
@@ -522,8 +537,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "}\n"
         );
 
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        caseDetailsToSave.setEvent(new Event());
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(anEvent().build());
         caseDetailsToSave.getEvent().setEventId(TEST_EVENT_ID);
         Map data = mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
         });
@@ -562,8 +577,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "\"document_url\": \"http://incorrect_domain:incorrect_port/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\"}" +
             "}\n"
         );
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event triggeringEvent = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event triggeringEvent = anEvent().build();
         triggeringEvent.setEventId(TEST_EVENT_ID);
         triggeringEvent.setDescription(LONG_COMMENT);
         triggeringEvent.setSummary(SHORT_COMMENT);
@@ -591,8 +606,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
 
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event triggeringEvent = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event triggeringEvent = anEvent().build();
         triggeringEvent.setEventId(TEST_EVENT_ID);
         triggeringEvent.setDescription(DESCRIPTION);
         triggeringEvent.setSummary(SUMMARY);
@@ -644,8 +659,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
 
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event triggeringEvent = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event triggeringEvent = anEvent().build();
         triggeringEvent.setEventId(TEST_EVENT_ID);
         triggeringEvent.setDescription(DESCRIPTION);
         triggeringEvent.setSummary(SUMMARY);
@@ -742,7 +757,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     public void shouldReturn404WhenPostCreateCaseWithNoEventForCaseworker() throws Exception {
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
 
         mockMvc.perform(post(URL)
@@ -761,7 +776,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     public void shouldReturn404WhenPostCreateCaseWithNoEventForCitizen() throws Exception {
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
 
         mockMvc.perform(post(URL)
@@ -780,9 +795,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     public void shouldReturn404WhenPostCreateCaseWithNoEventIdForCaseworker() throws Exception {
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
-        caseDetailsToSave.setEvent(new Event());
+        caseDetailsToSave.setEvent(anEvent().build());
 
         mockMvc.perform(post(URL)
             .contentType(JSON_CONTENT_TYPE)
@@ -800,9 +815,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     public void shouldReturn404WhenPostCreateCaseWithNoEventIdForCitizen() throws Exception {
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
-        caseDetailsToSave.setEvent(new Event());
+        caseDetailsToSave.setEvent(anEvent().build());
 
         mockMvc.perform(post(URL)
             .contentType(JSON_CONTENT_TYPE)
@@ -821,8 +836,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Test
     public void shouldReturn422WhenPostCreateCaseWithInvalidPreStatesForCaseworker() throws Exception {
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        caseDetailsToSave.setEvent(new Event());
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(anEvent().build());
         caseDetailsToSave.getEvent().setEventId(PRE_STATES_EVENT_ID);
 
         mockMvc.perform(post(URL)
@@ -842,8 +857,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Test
     public void shouldReturn422WhenPostCreateCaseWithInvalidPreStatesForCitizen() throws Exception {
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        caseDetailsToSave.setEvent(new Event());
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(anEvent().build());
         caseDetailsToSave.getEvent().setEventId(PRE_STATES_EVENT_ID);
 
         mockMvc.perform(post(URL)
@@ -863,8 +878,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Test
     public void shouldReturn404WhenPostCreateCaseWithUnknownEventForCaseworker() throws Exception {
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        caseDetailsToSave.setEvent(new Event());
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(anEvent().build());
         caseDetailsToSave.getEvent().setEventId(FAKE_EVENT_ID);
 
         mockMvc.perform(post(URL)
@@ -884,8 +899,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     @Test
     public void shouldReturn404WhenPostCreateCaseWithUnknownEventForCitizen() throws Exception {
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        caseDetailsToSave.setEvent(new Event());
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(anEvent().build());
         caseDetailsToSave.getEvent().setEventId(FAKE_EVENT_ID);
 
         mockMvc.perform(post(URL)
@@ -942,9 +957,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             assertEquals("Hexton", caseDetails.getData().get("PersonAddress").get("AddressLine3").asText());
             assertEquals("England", caseDetails.getData().get("PersonAddress").get("Country").asText());
             assertEquals("HX08 UTG", caseDetails.getData().get("PersonAddress").get("Postcode").asText());
-            assertEquals("http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
+            assertEquals("http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
                 caseDetails.getData().get("D8Document").get("document_url").asText());
-            assertEquals("http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary",
+            assertEquals("http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary",
                 caseDetails.getData().get("D8Document").get("document_binary_url").asText());
             assertEquals("Seagulls_Square.jpg",
                 caseDetails.getData().get("D8Document").get("document_filename").asText());
@@ -1035,9 +1050,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             assertEquals("Hexton", caseDetails.getData().get("PersonAddress").get("AddressLine3").asText());
             assertEquals("England", caseDetails.getData().get("PersonAddress").get("Country").asText());
             assertEquals("HX08 UTG", caseDetails.getData().get("PersonAddress").get("Postcode").asText());
-            assertEquals("http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
+            assertEquals("http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1",
                 caseDetails.getData().get("D8Document").get("document_url").asText());
-            assertEquals("http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary",
+            assertEquals("http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary",
                 caseDetails.getData().get("D8Document").get("document_binary_url").asText());
             assertEquals("Seagulls_Square.jpg",
                 caseDetails.getData().get("D8Document").get("document_filename").asText());
@@ -1166,8 +1181,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event event = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(SUMMARY);
         event.setDescription(DESCRIPTION);
@@ -1251,8 +1266,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event event = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(SUMMARY);
         event.setDescription(DESCRIPTION);
@@ -1362,8 +1377,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String description = "Case event description";
         final String url = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + urlPortionForCaseType
             + "/cases/" + caseReference + "/events";
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event event = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event event = anEvent().build();
         event.setEventId(TEST_EVENT_ID);
         event.setSummary(summary);
         event.setDescription(description);
@@ -1435,8 +1450,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String description = "Case event description";
         final String url = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + urlPortionForCaseType
             + "/cases/" + caseReference + "/events";
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event event = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event event = anEvent().build();
         event.setEventId(TEST_EVENT_ID);
         event.setSummary(summary);
         event.setDescription(description);
@@ -1508,8 +1523,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String description = "Case event description";
         final String url = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + caseTypeUrlPortion
             + "/cases/" + caseReference + "/events";
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event event = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event event = anEvent().build();
         event.setEventId(TEST_EVENT_ID);
         event.setSummary(summary);
         event.setDescription(description);
@@ -1582,8 +1597,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String description = "Case event description";
         final String url = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + caseTypeUrlPortion
             + "/cases/" + caseReference + "/events";
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event event = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event event = anEvent().build();
         event.setEventId(TEST_EVENT_ID);
         event.setSummary(summary);
         event.setDescription(description);
@@ -1736,8 +1751,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String CASE_REFERENCE = "1504259907353545";
         final String DESCRIPTION = "Case event description";
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event event = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(null);
         event.setDescription(DESCRIPTION);
@@ -1776,8 +1791,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String CASE_REFERENCE = "1504259907353545";
         final String DESCRIPTION = "Case event description";
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event event = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(null);
         event.setDescription(DESCRIPTION);
@@ -1817,8 +1832,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "        ";
         final String DESCRIPTION = "Case event summary";
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event event = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(SUMMARY);
         event.setDescription(DESCRIPTION);
@@ -1855,8 +1870,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "        ";
         final String DESCRIPTION = "Case event summary";
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event event = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(SUMMARY);
         event.setDescription(DESCRIPTION);
@@ -1893,8 +1908,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = new String(new char[1025]).replace("\0", "-");
         final String DESCRIPTION = "Case event description";
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event event = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(SUMMARY);
         event.setDescription(DESCRIPTION);
@@ -1934,8 +1949,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = new String(new char[1025]).replace("\0", "-");
         final String DESCRIPTION = "Case event description";
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event event = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(SUMMARY);
         event.setDescription(DESCRIPTION);
@@ -1975,8 +1990,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "Valid summary";
         final String DESCRIPTION = new String(new char[65666]).replace("\0", "-");
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event event = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(SUMMARY);
         event.setDescription(DESCRIPTION);
@@ -2016,8 +2031,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "Valid summary";
         final String DESCRIPTION = new String(new char[65666]).replace("\0", "-");
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event event = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(SUMMARY);
         event.setDescription(DESCRIPTION);
@@ -2057,8 +2072,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event event = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event event = anEvent().build();
         event.setEventId(null);
         event.setSummary(SUMMARY);
         event.setDescription(DESCRIPTION);
@@ -2098,8 +2113,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event event = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event event = anEvent().build();
         event.setEventId(null);
         event.setSummary(SUMMARY);
         event.setDescription(DESCRIPTION);
@@ -2137,7 +2152,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     public void shouldReturn404WhenPostCreateCaseEventWithNoEventForCaseWorker() throws Exception {
         final String CASE_REFERENCE = "1504259907353545";
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
 
         final String token = generateEventToken(template, UID, JURISDICTION, CASE_TYPE, CASE_REFERENCE, "ANY_EVENT");
         caseDetailsToSave.setToken(token);
@@ -2170,7 +2185,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     public void shouldReturn404WhenPostCreateCaseEventWithNoEventForCitizen() throws Exception {
         final String CASE_REFERENCE = "1504259907353545";
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
 
         final String token = generateEventToken(template, UID, JURISDICTION, CASE_TYPE, CASE_REFERENCE, "ANY_EVENT");
         caseDetailsToSave.setToken(token);
@@ -2205,8 +2220,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event event = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(SUMMARY);
         event.setDescription(DESCRIPTION);
@@ -2235,8 +2250,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event event = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(SUMMARY);
         event.setDescription(DESCRIPTION);
@@ -2266,8 +2281,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event event = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event event = anEvent().build();
         event.setEventId(EVENT);
         event.setSummary(SUMMARY);
         event.setDescription(DESCRIPTION);
@@ -2296,8 +2311,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event event = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event event = anEvent().build();
         event.setEventId(EVENT);
         event.setSummary(SUMMARY);
         event.setDescription(DESCRIPTION);
@@ -2325,8 +2340,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event event = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(SUMMARY);
         event.setDescription(DESCRIPTION);
@@ -2383,8 +2398,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event event = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(SUMMARY);
         event.setDescription(DESCRIPTION);
@@ -2441,8 +2456,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event event = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(SUMMARY);
         event.setDescription(DESCRIPTION);
@@ -2473,8 +2488,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event event = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(SUMMARY);
         event.setDescription(DESCRIPTION);
@@ -2505,8 +2520,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event event = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(SUMMARY);
         event.setDescription(DESCRIPTION);
@@ -2537,8 +2552,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event event = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(SUMMARY);
         event.setDescription(DESCRIPTION);
@@ -2650,8 +2665,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_CREATE_FIELD_ACCESS + "/cases";
 
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event triggeringEvent = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event triggeringEvent = anEvent().build();
         triggeringEvent.setEventId(TEST_EVENT_ID);
         triggeringEvent.setDescription(DESCRIPTION);
         triggeringEvent.setSummary(SUMMARY);
@@ -2681,7 +2696,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private void shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccess(String role) throws Exception {
         final String URL = "/" + role + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_CREATE_CASE_ACCESS + "/cases";
 
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
 
 
         mockMvc.perform(post(URL)
@@ -2697,8 +2712,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_READ_FIELD_ACCESS + "/cases";
 
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event triggeringEvent = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event triggeringEvent = anEvent().build();
         triggeringEvent.setEventId(CREATE_EVENT_ID);
         triggeringEvent.setDescription(DESCRIPTION);
         triggeringEvent.setSummary(SUMMARY);
@@ -2757,8 +2772,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         final String URL = "/" + role + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_CREATE_EVENT_ACCESS + "/cases";
 
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event triggeringEvent = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event triggeringEvent = anEvent().build();
         triggeringEvent.setEventId(TEST_EVENT_ID);
         triggeringEvent.setDescription(DESCRIPTION);
         triggeringEvent.setSummary(SUMMARY);
@@ -2778,8 +2793,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         final String URL = "/" + role + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_READ_CASE_TYPE_ACCESS + "/cases";
 
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event triggeringEvent = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event triggeringEvent = anEvent().build();
         triggeringEvent.setEventId(CREATE_EVENT_ID);
         triggeringEvent.setDescription(DESCRIPTION);
         triggeringEvent.setSummary(SUMMARY);
@@ -2816,8 +2831,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String description = "Case event description";
         final String url = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_READ_CASE_TYPE_ACCESS
             + "/cases/" + caseReference + "/events";
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event event = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event event = anEvent().build();
         event.setEventId(TEST_EVENT_ID);
         event.setSummary(summary);
         event.setDescription(description);
@@ -2853,8 +2868,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String description = "Case event description";
         final String url = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_READ_FIELD_ACCESS
             + "/cases/" + caseReference + "/events";
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event event = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event event = anEvent().build();
         event.setEventId(TEST_EVENT_ID);
         event.setSummary(summary);
         event.setDescription(description);
@@ -2913,8 +2928,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String summary = "Case event summary";
         final String description = "Case event description";
 
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event event = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event event = anEvent().build();
         event.setEventId(TEST_EVENT_ID);
         event.setSummary(summary);
         event.setDescription(description);
@@ -2947,8 +2962,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String summary = "Case event summary";
         final String description = "Case event description";
 
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event event = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event event = anEvent().build();
         event.setEventId(TEST_EVENT_ID);
         event.setSummary(summary);
         event.setDescription(description);
@@ -3052,8 +3067,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String summary = "Case event summary";
         final String description = "Case event description";
 
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event event = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event event = anEvent().build();
         event.setEventId(TEST_EVENT_ID);
         event.setSummary(summary);
         event.setDescription(description);
@@ -3086,8 +3101,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String summary = "Case event summary";
         final String description = "Case event description";
 
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event event = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event event = anEvent().build();
         event.setEventId(TEST_EVENT_ID);
         event.setSummary(summary);
         event.setDescription(description);
@@ -3151,8 +3166,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 () -> assertThat(nodeData.get("PersonAddress").get("AddressLine2"), CoreMatchers.is(getTextNode("Fake Street"))),
                 () -> assertThat(nodeData.get("PersonAddress").get("AddressLine3"), CoreMatchers.is(getTextNode("Hexton"))),
                 () -> assertThat(nodeData.has("D8Document"), CoreMatchers.is(true)),
-                () -> assertThat(nodeData.get("D8Document").get("document_url"), CoreMatchers.is(getTextNode("http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1"))),
-                () -> assertThat(nodeData.get("D8Document").get("document_binary_url"), CoreMatchers.is(getTextNode("http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary"))),
+                () -> assertThat(nodeData.get("D8Document").get("document_url"), CoreMatchers.is(getTextNode("http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1"))),
+                () -> assertThat(nodeData.get("D8Document").get("document_binary_url"), CoreMatchers.is(getTextNode("http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary"))),
                 () -> assertThat(nodeData.get("D8Document").get("document_filename"), CoreMatchers.is(getTextNode("Seagulls_Square.jpg")))
             );
             JsonNode nodeClassification = mapper.convertValue(caseDetails.getDataClassification(), JsonNode.class);
@@ -3176,25 +3191,13 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
         final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event event = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(SUMMARY);
         event.setDescription(DESCRIPTION);
         caseDetailsToSave.setEvent(event);
-        final JsonNode DATA = mapper.readTree("{" +
-            "\"PersonAddress\":{" +
-            "\"Country\":\"_ Wales\"," +
-            "\"Postcode\":\"W11 5DF\"," +
-            "\"AddressLine1\":\"_ Flat 9\"," +
-            "\"AddressLine2\":\"_ 2 Hubble Avenue\"," +
-            "\"AddressLine3\":\"_ ButtonVillie\"}," +
-            "\"PersonLastName\":\"_ Roof\"," +
-            "\"PersonFirstName\":\"_ George\"," +
-            "\"D8Document\":{" +
-            "\"document_url\": \"http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"" +
-            "}" +
-            "}");
+        final JsonNode DATA = mapper.readTree(exampleData());
         final JsonNode SANITIZED_DATA = mapper.readTree("{" +
             "\"PersonAddress\":{" +
             "\"Country\":\"_ Wales\"," +
@@ -3205,8 +3208,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "\"PersonLastName\":\"_ Roof\"," +
             "\"PersonFirstName\":\"_ George\"," +
             "\"D8Document\":{" +
-            "    \"document_url\": \"http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"," +
-            "    \"document_binary_url\": \"http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\"," +
+            "    \"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"," +
+            "    \"document_binary_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary\"," +
             "    \"document_filename\": \"Seagulls_Square.jpg\"" +
             "}" +
             "}");
@@ -3282,8 +3285,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
         final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
-        final CaseDataContent caseDetailsToSave = new CaseDataContent();
-        final Event event = new Event();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
         event.setSummary(SUMMARY);
         event.setDescription(DESCRIPTION);
@@ -3308,9 +3311,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             "\"PersonLastName\":\"_ Roof\"," +
             "\"PersonFirstName\":\"_ George\"," +
             "\"D8Document\":{" +
-            "    \"document_url\": \"http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\"," +
+            "    \"document_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1\"," +
             "    \"document_filename\": \"Seagulls_Square.jpg\"," +
-            "    \"document_binary_url\": \"http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary\"" +
+            "    \"document_binary_url\": \"http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1/binary\"" +
             "}" +
             "}");
         caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
@@ -3344,74 +3347,53 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             savedCaseDetails.getData().entrySet(), everyItem(isIn(sanitizedData.entrySet())));
     }
 
-
     @Test
     public void shouldReturn200WhenPostValidateCaseDetailsWithValidDataForCaseworker() throws Exception {
-        final JsonNode DATA = mapper.readTree("{" +
-                                                  "\"PersonAddress\":{" +
-                                                  "\"Country\":\"_ Wales\"," +
-                                                  "\"Postcode\":\"W11 5DF\"," +
-                                                  "\"AddressLine1\":\"_ Flat 9\"," +
-                                                  "\"AddressLine2\":\"_ 2 Hubble Avenue\"," +
-                                                  "\"AddressLine3\":\"_ ButtonVillie\"}," +
-                                                  "\"PersonLastName\":\"_ Roof\"," +
-                                                  "\"PersonFirstName\":\"_ George\"," +
-                                                  "\"D8Document\":{" +
-                                                  "\"document_url\": \"http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"" +
-                                                  "}" +
-                                                  "}");
+        final JsonNode DATA = mapper.readTree(exampleData());
+
         final String DESCRIPTION = "A very long comment.......";
         final String SUMMARY = "Short comment";
-        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/validate";
-        final CaseDataContent caseDetailsToValidate = new CaseDataContent();
-        final Event event = new Event();
-        event.setEventId(TEST_EVENT_ID);
-        event.setSummary(SUMMARY);
-        event.setDescription(DESCRIPTION);
-        caseDetailsToValidate.setEvent(event);
-        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID);
-        caseDetailsToValidate.setToken(token);
-        caseDetailsToValidate.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
+        final CaseDataContent caseDetailsToValidate = newCaseDataContent()
+            .withEvent(anEvent()
+                .withEventId(TEST_EVENT_ID)
+                .withSummary(SUMMARY)
+                .withDescription(DESCRIPTION)
+                .build())
+            .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID))
+            .withData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}))
+            .withIgnoreWarning(Boolean.FALSE)
+            .build();
 
+        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/validate";
         final MvcResult mvcResult = mockMvc.perform(post(URL)
                                                         .contentType(JSON_CONTENT_TYPE)
                                                         .content(mapper.writeValueAsBytes(caseDetailsToValidate))
-        ).andExpect(status().is(200))
-            .andReturn();
+        ).andExpect(status().is(200)).andReturn();
 
+        final JsonNode expectedResponse = MAPPER.readTree("{\"data\": " + exampleData() + "}");
+        final String EXPECTED_RESPONSE = mapper.writeValueAsString(expectedResponse);
         assertEquals("Incorrect Response Content",
-                     DATA.toString(),
+            EXPECTED_RESPONSE,
                      mapper.readTree(mvcResult.getResponse().getContentAsString()).toString());
     }
 
     @Test
     public void shouldReturn422WhenPostValidateCaseDetailsWithInvalidDataForCaseworker() throws Exception {
-        final JsonNode DATA = mapper.readTree("{" +
-                                                  "\"PersonAddress\":{" +
-                                                  "\"Country\":\"_ Wales\"," +
-                                                  "\"Postcode\":\"W11225DF\"," +
-                                                  "\"AddressLine1\":\"_ Flat 9\"," +
-                                                  "\"AddressLine2\":\"_ 2 Hubble Avenue\"," +
-                                                  "\"AddressLine3\":\"_ ButtonVillie\"}," +
-                                                  "\"PersonLastName\":\"_ Roof\"," +
-                                                  "\"PersonFirstName\":\"_ George\"," +
-                                                  "\"D8Document\":{" +
-                                                  "\"document_url\": \"http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"" +
-                                                  "}" +
-                                                  "}");
+        final JsonNode DATA = mapper.readTree(exampleDataWithInvalidPostcode());
         final String DESCRIPTION = "A very long comment.......";
         final String SUMMARY = "Short comment";
-        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/validate";
-        final CaseDataContent caseDetailsToValidate = new CaseDataContent();
-        final Event event = new Event();
-        event.setEventId(TEST_EVENT_ID);
-        event.setSummary(SUMMARY);
-        event.setDescription(DESCRIPTION);
-        caseDetailsToValidate.setEvent(event);
-        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID);
-        caseDetailsToValidate.setToken(token);
-        caseDetailsToValidate.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
+        final CaseDataContent caseDetailsToValidate = newCaseDataContent()
+            .withEvent(anEvent()
+                .withEventId(TEST_EVENT_ID)
+                .withSummary(SUMMARY)
+                .withDescription(DESCRIPTION)
+                .build())
+            .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID))
+            .withData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}))
+            .withIgnoreWarning(Boolean.FALSE)
+            .build();
 
+        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/validate";
         final MvcResult mvcResult = mockMvc.perform(post(URL)
                                                         .contentType(JSON_CONTENT_TYPE)
                                                         .content(mapper.writeValueAsBytes(caseDetailsToValidate))
@@ -3428,71 +3410,51 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     public void shouldReturn200WhenPostValidateCaseDetailsWithValidDataForCitizen() throws Exception {
-        final JsonNode DATA = mapper.readTree("{" +
-                                                  "\"PersonAddress\":{" +
-                                                  "\"Country\":\"_ Wales\"," +
-                                                  "\"Postcode\":\"W11 5DF\"," +
-                                                  "\"AddressLine1\":\"_ Flat 9\"," +
-                                                  "\"AddressLine2\":\"_ 2 Hubble Avenue\"," +
-                                                  "\"AddressLine3\":\"_ ButtonVillie\"}," +
-                                                  "\"PersonLastName\":\"_ Roof\"," +
-                                                  "\"PersonFirstName\":\"_ George\"," +
-                                                  "\"D8Document\":{" +
-                                                  "\"document_url\": \"http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"" +
-                                                  "}" +
-                                                  "}");
+        final JsonNode DATA = mapper.readTree(exampleData());
+
         final String DESCRIPTION = "A very long comment.......";
         final String SUMMARY = "Short comment";
+        final CaseDataContent caseDetailsToValidate = newCaseDataContent()
+            .withEvent(anEvent()
+                .withEventId(TEST_EVENT_ID)
+                .withSummary(SUMMARY)
+                .withDescription(DESCRIPTION)
+                .build())
+            .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID))
+            .withData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}))
+            .withIgnoreWarning(Boolean.FALSE)
+            .build();
+
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/validate";
-        final CaseDataContent caseDetailsToValidate = new CaseDataContent();
-        final Event event = new Event();
-        event.setEventId(TEST_EVENT_ID);
-        event.setSummary(SUMMARY);
-        event.setDescription(DESCRIPTION);
-        caseDetailsToValidate.setEvent(event);
-        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID);
-        caseDetailsToValidate.setToken(token);
-        caseDetailsToValidate.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
-
         final MvcResult mvcResult = mockMvc.perform(post(URL)
-                                                        .contentType(JSON_CONTENT_TYPE)
-                                                        .content(mapper.writeValueAsBytes(caseDetailsToValidate))
-        ).andExpect(status().is(200))
-            .andReturn();
+                .contentType(JSON_CONTENT_TYPE)
+                .content(mapper.writeValueAsBytes(caseDetailsToValidate))
+                                                   ).andExpect(status().is(200)).andReturn();
 
+        final JsonNode expectedResponse = MAPPER.readTree("{\"data\": " + exampleData() + "}");
+        final String EXPECTED_RESPONSE = mapper.writeValueAsString(expectedResponse);
         assertEquals("Incorrect Response Content",
-                     DATA.toString(),
-                     mapper.readTree(mvcResult.getResponse().getContentAsString()).toString());
+            EXPECTED_RESPONSE,
+            mapper.readTree(mvcResult.getResponse().getContentAsString()).toString());
     }
 
     @Test
     public void shouldReturn422WhenPostValidateCaseDetailsWithInvalidDataForCitizen() throws Exception {
-        final JsonNode DATA = mapper.readTree("{" +
-                                                  "\"PersonAddress\":{" +
-                                                  "\"Country\":\"_ Wales\"," +
-                                                  "\"Postcode\":\"W11225DF\"," +
-                                                  "\"AddressLine1\":\"_ Flat 9\"," +
-                                                  "\"AddressLine2\":\"_ 2 Hubble Avenue\"," +
-                                                  "\"AddressLine3\":\"_ ButtonVillie\"}," +
-                                                  "\"PersonLastName\":\"_ Roof\"," +
-                                                  "\"PersonFirstName\":\"_ George\"," +
-                                                  "\"D8Document\":{" +
-                                                  "\"document_url\": \"http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"" +
-                                                  "}" +
-                                                  "}");
+        final JsonNode DATA = mapper.readTree(exampleDataWithInvalidPostcode());
         final String DESCRIPTION = "A very long comment.......";
         final String SUMMARY = "Short comment";
-        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/validate";
-        final CaseDataContent caseDetailsToValidate = new CaseDataContent();
-        final Event event = new Event();
-        event.setEventId(TEST_EVENT_ID);
-        event.setSummary(SUMMARY);
-        event.setDescription(DESCRIPTION);
-        caseDetailsToValidate.setEvent(event);
-        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID);
-        caseDetailsToValidate.setToken(token);
-        caseDetailsToValidate.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
+        final CaseDataContent caseDetailsToValidate = newCaseDataContent()
+            .withEvent(anEvent()
+                .withEventId(TEST_EVENT_ID)
+                .withSummary(SUMMARY)
+                .withDescription(DESCRIPTION)
+                .build())
+            .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID))
+            .withData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}))
+            .withIgnoreWarning(Boolean.FALSE)
+            .build();
 
+        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/validate";
         final MvcResult mvcResult = mockMvc.perform(post(URL)
                                                         .contentType(JSON_CONTENT_TYPE)
                                                         .content(mapper.writeValueAsBytes(caseDetailsToValidate))
@@ -3535,7 +3497,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(responseAsString, containsString("Fake Street"));
         assertThat(responseAsString, containsString("\"PersonLastName\":\"PUBLIC\""));
         assertThat(responseAsString,
-                containsString("http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1"));
+                containsString("http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1"));
 
         assertThat(responseAsString, containsString("George"));
         assertThat(responseAsString, containsString("Roof"));
@@ -3568,7 +3530,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(result.getResponse().getContentAsString(), containsString("Fake Street"));
         assertThat(result.getResponse().getContentAsString(), containsString("Hexton"));
         assertThat(result.getResponse().getContentAsString(), containsString("HX08 UTG"));
-        assertThat(result.getResponse().getContentAsString(), containsString("http://localhost:" + DM_API_RULE.port() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1"));
+        assertThat(result.getResponse().getContentAsString(), containsString("http://localhost:[port]/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d1"));
     }
 
     @Test
@@ -3900,7 +3862,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         responseAsString = result.getResponse().getContentAsString();
         List<CaseDetails> caseDetailsPage3 = Arrays.asList(mapper.readValue(responseAsString, CaseDetails[].class));
-        assertThat(caseDetailsPage3, hasSize(1)); //TODO RDM-1455 due to filtering being applied after pagination, to be fixed after EL implementation
+        assertThat(caseDetailsPage3, hasSize(2)); //TODO RDM-1455 due to filtering being applied after pagination, to be fixed after EL implementation
         allPages.addAll(caseDetailsPage3);
 
         result = mockMvc.perform(get(GET_CASES_AS_CASEWORKER)
@@ -3913,10 +3875,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         responseAsString = result.getResponse().getContentAsString();
         List<CaseDetails> caseDetailsPage4 = Arrays.asList(mapper.readValue(responseAsString, CaseDetails[].class));
-        assertThat(caseDetailsPage4, hasSize(1));
+        assertThat(caseDetailsPage4, hasSize(0));
 
         Set<Long> references = allPages.stream().map(cd -> cd.getReference()).collect(Collectors.toSet());
-        assertThat(references, hasSize(5)); //TODO RDM-1455 due to filtering being applied after pagination, to be fixed after EL implementation
+        assertThat(references, hasSize(6)); //TODO RDM-1455 due to filtering being applied after pagination, to be fixed after EL implementation
     }
 
     @Test
@@ -3936,8 +3898,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         String responseAsString = result.getResponse().getContentAsString();
         PaginatedSearchMetadata metadata = mapper.readValue(responseAsString, PaginatedSearchMetadata.class);
 
-        assertThat(metadata.getTotalPagesCount(), is(4));
-        assertThat(metadata.getTotalResultsCount(), is(7));
+        assertThat(metadata.getTotalPagesCount(), is(3));
+        assertThat(metadata.getTotalResultsCount(), is(6));
 
         result = mockMvc.perform(get(GET_PAGINATED_SEARCH_METADATA)
                 .contentType(JSON_CONTENT_TYPE)
@@ -4030,5 +3992,37 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     private JsonNode getTextNode(String value) {
         return JSON_NODE_FACTORY.textNode(value);
+    }
+
+    private String exampleDataWithInvalidPostcode() {
+        return "{" +
+            "\"PersonAddress\":{" +
+            "\"Country\":\"_ Wales\"," +
+            "\"Postcode\":\"W11225DF\"," +
+            "\"AddressLine1\":\"_ Flat 9\"," +
+            "\"AddressLine2\":\"_ 2 Hubble Avenue\"," +
+            "\"AddressLine3\":\"_ ButtonVillie\"}," +
+            "\"PersonLastName\":\"_ Roof\"," +
+            "\"PersonFirstName\":\"_ George\"," +
+            "\"D8Document\":{" +
+            "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"" +
+            "}" +
+            "}";
+    }
+
+    private String exampleData() {
+        return "{" +
+            "\"PersonAddress\":{" +
+            "\"Country\":\"_ Wales\"," +
+            "\"Postcode\":\"W11 5DF\"," +
+            "\"AddressLine1\":\"_ Flat 9\"," +
+            "\"AddressLine2\":\"_ 2 Hubble Avenue\"," +
+            "\"AddressLine3\":\"_ ButtonVillie\"}," +
+            "\"PersonLastName\":\"_ Roof\"," +
+            "\"PersonFirstName\":\"_ George\"," +
+            "\"D8Document\":{" +
+            "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\"" +
+            "}" +
+            "}";
     }
 }

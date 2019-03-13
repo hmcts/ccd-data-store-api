@@ -1,5 +1,16 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,21 +24,6 @@ import uk.gov.hmcts.ccd.data.casedetails.search.SearchQueryFactoryOperation;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
-
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
-import javax.persistence.PersistenceContext;
-import javax.persistence.PersistenceException;
-import javax.persistence.Query;
 
 
 @Named
@@ -49,10 +45,10 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
 
     @Inject
     public DefaultCaseDetailsRepository(
-            final CaseDetailsMapper caseDetailsMapper,
-            final SearchQueryFactoryOperation queryBuilder,
-            final CaseDetailsQueryBuilderFactory queryBuilderFactory,
-            final ApplicationParams applicationParams) {
+        final CaseDetailsMapper caseDetailsMapper,
+        final SearchQueryFactoryOperation queryBuilder,
+        final CaseDetailsQueryBuilderFactory queryBuilderFactory,
+        final ApplicationParams applicationParams) {
         this.caseDetailsMapper = caseDetailsMapper;
         this.queryBuilder = queryBuilder;
         this.queryBuilderFactory = queryBuilderFactory;
@@ -88,6 +84,11 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     @Override
     public Optional<CaseDetails> findByReference(String jurisdiction, String reference) {
         return find(jurisdiction, null, reference).map(this.caseDetailsMapper::entityToModel);
+    }
+
+    @Override
+    public Optional<CaseDetails> findByReference(String caseReference) {
+        return findByReference(null, caseReference);
     }
 
     @Override
@@ -169,8 +170,12 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
         int pageSize = applicationParams.getPaginationPageSize();
         PaginatedSearchMetadata sr = new PaginatedSearchMetadata();
         sr.setTotalResultsCount(totalResults);
-        sr.setTotalPagesCount((int) Math.ceil((double) sr.getTotalResultsCount()/pageSize));
+        sr.setTotalPagesCount((int) Math.ceil((double) sr.getTotalResultsCount() / pageSize));
         return sr;
+    }
+
+    public List<Object[]> getCasesCountByCaseType() {
+        return em.createNamedQuery(CaseDetailsEntity.CASES_COUNT_BY_CASE_TYPE).getResultList();
     }
 
     // TODO This accepts null values for backward compatibility. Once deprecated methods are removed, parameters should
@@ -182,6 +187,10 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
             qb.whereJurisdiction(jurisdiction);
         }
 
+        return getCaseDetailsEntity(id, reference, qb);
+    }
+
+    private Optional<CaseDetailsEntity> getCaseDetailsEntity(Long id, String reference, CaseDetailsQueryBuilder<CaseDetailsEntity> qb) {
         if (null != reference) {
             qb.whereReference(reference);
         } else {
@@ -194,7 +203,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     private Query getQuery(MetaData metadata, Map<String, String> dataSearchParams, boolean isCountQuery) {
         Query query;
         if (dataSearchParams.isEmpty()) {
-            query = isCountQuery? getCountQueryByMetaData(metadata) : getQueryByMetaData(metadata);
+            query = isCountQuery ? getCountQueryByMetaData(metadata) : getQueryByMetaData(metadata);
         } else {
             query = getQueryByParameters(metadata, dataSearchParams, isCountQuery);
         }
@@ -207,13 +216,13 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     private Query getCountQueryByMetaData(MetaData metadata) {
-        return queryBuilderFactory.count(em)
+        return queryBuilderFactory.count(em, metadata)
                                   .whereMetadata(metadata)
                                   .build();
     }
 
     private Query getQueryByMetaData(MetaData metadata) {
-        return queryBuilderFactory.select(em)
+        return queryBuilderFactory.select(em, metadata)
                                   .whereMetadata(metadata)
                                   .orderByCreatedDate(metadata.getSortDirection().orElse("asc"))
                                   .build();

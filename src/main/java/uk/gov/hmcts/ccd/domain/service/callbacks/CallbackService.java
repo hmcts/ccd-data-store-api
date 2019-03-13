@@ -3,10 +3,12 @@ package uk.gov.hmcts.ccd.domain.service.callbacks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -19,15 +21,12 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.util.List;
 import java.util.Optional;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
 
-@Named
-@Singleton
+@Service
 public class CallbackService {
     private static final Logger LOG = LoggerFactory.getLogger(CallbackService.class);
 
@@ -37,7 +36,7 @@ public class CallbackService {
 
     @Autowired
     public CallbackService(final SecurityUtils securityUtils,
-                           final RestTemplate restTemplate,
+                           @Qualifier("restTemplate") final RestTemplate restTemplate,
                            final ApplicationParams applicationParams) {
         this.securityUtils = securityUtils;
         this.restTemplate = restTemplate;
@@ -57,11 +56,24 @@ public class CallbackService {
                                            final CaseDetails caseDetailsBefore,
                                            final CaseDetails caseDetails) {
 
+        return send(url, callbackRetries, caseEvent, caseDetailsBefore, caseDetails, false);
+    }
+
+    public Optional<CallbackResponse> send(final String url,
+                                           final List<Integer> callbackRetries,
+                                           final CaseEvent caseEvent,
+                                           final CaseDetails caseDetailsBefore,
+                                           final CaseDetails caseDetails,
+                                           final Boolean ignoreWarning) {
+
         if (url == null || url.isEmpty()) {
             return Optional.empty();
         }
 
-        final CallbackRequest callbackRequest = new CallbackRequest(caseDetails, caseDetailsBefore, caseEvent.getId());
+        final CallbackRequest callbackRequest = new CallbackRequest(caseDetails,
+                                                                    caseDetailsBefore,
+                                                                    caseEvent.getId(),
+                                                                    ignoreWarning);
         final List<Integer> retries = CollectionUtils.isEmpty(callbackRetries) ? defaultRetries : callbackRetries;
 
         for (Integer timeout : retries) {

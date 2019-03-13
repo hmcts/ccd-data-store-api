@@ -12,7 +12,7 @@ import java.util.List;
 @Named("TextValidator")
 @Singleton
 public class TextValidator implements BaseTypeValidator {
-    private static final String TYPE_ID = "Text";
+    public static final String TYPE_ID = "Text";
 
     @Override
     public BaseType getType() {
@@ -37,11 +37,11 @@ public class TextValidator implements BaseTypeValidator {
         final String value = dataValue.textValue();
 
         if (!checkMax(caseFieldDefinition.getFieldType().getMax(), value)) {
-            return Collections.singletonList(new ValidationResult(value + " exceed maximum length" + caseFieldDefinition.getFieldType().getMax(), dataFieldId));
+            return Collections.singletonList(new ValidationResult(value + " exceed maximum length " + caseFieldDefinition.getFieldType().getMax(), dataFieldId));
         }
 
         if (!checkMin(caseFieldDefinition.getFieldType().getMin(), value)) {
-            return Collections.singletonList(new ValidationResult(value + " require minimum length" + caseFieldDefinition.getFieldType().getMin(), dataFieldId));
+            return Collections.singletonList(new ValidationResult(value + " require minimum length " + caseFieldDefinition.getFieldType().getMin(), dataFieldId));
         }
 
         if (!checkRegex(caseFieldDefinition.getFieldType().getRegularExpression(), value)) {

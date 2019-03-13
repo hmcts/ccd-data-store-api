@@ -1,11 +1,5 @@
 package uk.gov.hmcts.ccd.domain.types.sanitiser;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -14,11 +8,18 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+
 @Named
 @Singleton
 public class ComplexSanitiser implements Sanitiser {
 
-    public static final String TYPE = "Complex";
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
 
     private Map<String, Sanitiser> sanitisers;
@@ -30,12 +31,12 @@ public class ComplexSanitiser implements Sanitiser {
             this.sanitisers.put(sanitiser.getType(), sanitiser);
         });
         // Include itself for nested complex types
-        this.sanitisers.put(TYPE, this);
+        this.sanitisers.put(COMPLEX, this);
     }
 
     @Override
     public String getType() {
-        return TYPE;
+        return COMPLEX;
     }
 
     @Override
@@ -49,7 +50,7 @@ public class ComplexSanitiser implements Sanitiser {
 
         final Iterator<Map.Entry<String, JsonNode>> fields = fieldData.fields();
 
-        while(fields.hasNext()) {
+        while (fields.hasNext()) {
             final Map.Entry<String, JsonNode> field = fields.next();
 
             final String key = field.getKey();
