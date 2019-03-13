@@ -47,7 +47,7 @@ public class CallbackService {
         this.defaultRetries = applicationParams.getCallbackRetries();
     }
 
-    // The retry will be on seconds T=1 and T=3 of the initial call fails at T=0
+    // The retry will be on seconds T=1 and T=3 if the initial call fails at T=0
     @Retryable(value = {CallbackException.class}, maxAttempts = 3, backoff = @Backoff(delay = 1000, multiplier = 3))
     public Optional<CallbackResponse> send(final String url,
                                            final List<Integer> callbackRetries,
@@ -71,7 +71,7 @@ public class CallbackService {
         throw new CallbackException("Unsuccessful callback to " + url);
     }
 
-    // The retry will be on seconds T=1 and T=3 of the initial call fails at T=0
+    // The retry will be on seconds T=1 and T=3 if the initial call fails at T=0
     @Retryable(value = {CallbackException.class}, maxAttempts = 3, backoff = @Backoff(delay = 1000, multiplier = 3))
     public <T> ResponseEntity<T> send(final String url,
                                       final List<Integer> callbackRetries,
