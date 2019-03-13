@@ -13,8 +13,12 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -24,17 +28,23 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
@@ -189,6 +199,35 @@ class DefaultUserRepositoryTest {
             when(caseDefinitionRepository.getClassificationsForUserRoleList(anyListOf(String.class))).thenReturn(emptyList());
 
             assertThrows(ServiceException.class, () -> userRepository.getHighestUserClassification(JURISDICTION_ID));
+        }
+    }
+
+    @Nested
+    @DisplayName("getUser()")
+    class GetUser {
+
+        @Test
+        @DisplayName("should retrieve user from IDAM")
+        void shouldRetrieveUserFromIdam() {
+            IdamUser idamUser = new IdamUser();
+            when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), Matchers.<Class<IdamUser>>any()))
+                .thenReturn(ResponseEntity.ok(idamUser));
+
+            IdamUser result = userRepository.getUser();
+
+            assertThat(result, is(idamUser));
+            verify(applicationParams).idamUserProfileURL();
+            verify(securityUtils).userAuthorizationHeaders();
+            verify(restTemplate).exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), Matchers.<Class<IdamUser>>any());
+        }
+
+        @Test
+        @DisplayName("should throw exception when rest call fails")
+        void shouldThrowExceptionWhenRestCallFails() {
+            doThrow(new RestClientException("Error")).when(restTemplate).exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class),
+                                                                                  Matchers.<Class<IdamUser>>any());
+
+            assertThrows(ServiceException.class, () -> userRepository.getUser());
         }
     }
 

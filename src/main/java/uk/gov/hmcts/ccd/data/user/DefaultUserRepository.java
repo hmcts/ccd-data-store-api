@@ -22,6 +22,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.AuthCheckerConfiguration;
@@ -70,8 +71,13 @@ public class DefaultUserRepository implements UserRepository {
     @Override
     @Cacheable(value = "userCache", key = "@securityUtils.getUserToken()")
     public IdamUser getUser() {
-        HttpEntity requestEntity = new HttpEntity(securityUtils.userAuthorizationHeaders());
-        return restTemplate.exchange(applicationParams.idamUserProfileURL(), HttpMethod.GET, requestEntity, IdamUser.class).getBody();
+        try {
+            HttpEntity requestEntity = new HttpEntity(securityUtils.userAuthorizationHeaders());
+            return restTemplate.exchange(applicationParams.idamUserProfileURL(), HttpMethod.GET, requestEntity, IdamUser.class).getBody();
+        } catch (RestClientException e) {
+            LOG.error("Failed to retrieve user", e);
+            throw new ServiceException("Problem retrieving user from IDAM: " + securityUtils.getUserId());
+        }
     }
 
     @Override

@@ -38,7 +38,7 @@ public class CachingConfiguration {
         config.addMapConfig(newMapConfig("caseTabCollectionCache", definitionCacheTTL));
         config.addMapConfig(newMapConfig("wizardPageCollectionCache", definitionCacheTTL));
         config.addMapConfig(newMapConfig("userRolesCache", definitionCacheTTL));
-        config.addMapConfig(newMapConfig("userCache", applicationParams.getDailyCacheTTLSecs()));
+        config.addMapConfig(newMapConfig("userCache", applicationParams.getUserCacheTTLSecs()));
     }
 
     private MapConfig newMapConfig(final String name, int definitionCacheTTL) {
