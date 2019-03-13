@@ -1,12 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.callbacks;
 
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
 import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
@@ -15,10 +8,29 @@ import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
+
+import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import javax.inject.Inject;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
@@ -39,13 +51,6 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.data.SecurityUtils;
-import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 
 @ActiveProfiles("test")
 @RunWith(SpringRunner.class)
@@ -179,10 +184,13 @@ public class CallbackServiceTest {
         stubFor(post(urlMatching("/test-callbackGrrrr.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(500)));
 
+        Instant start = Instant.now();
         try {
             callbackService.send(testUrl, caseEvent, null, caseDetails, false);
         } catch (Exception e) {
         }
+        final Duration between = Duration.between(start, Instant.now());
+        assertThat((int) between.toMillis(), greaterThan(4000));
         verify(exactly(3), postRequestedFor(urlMatching("/test-callbackGrrrr.*")));
     }
 
@@ -272,11 +280,14 @@ public class CallbackServiceTest {
         stubFor(post(urlMatching("/test-callback-invaliddd.*")).willReturn(
             okJson(mapper.writeValueAsString(callbackResponse)).withStatus(500)));
 
+        Instant start = Instant.now();
         try {
             callbackService.send(testUrl, caseEvent, null, caseDetails, String.class);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        final Duration between = Duration.between(start, Instant.now());
+        assertThat((int) between.toMillis(), greaterThan(4000));
         verify(exactly(3), postRequestedFor(urlMatching("/test-callback-invaliddd.*")));
     }
 
@@ -288,8 +299,7 @@ public class CallbackServiceTest {
         given(applicationParams.getCallbackRetries()).willReturn(Arrays.asList(3, 5));
 
         // Builds a new callback service to avoid wiremock exception to get in the way
-        final CallbackService underTest = new CallbackService(Mockito.mock(SecurityUtils.class),
-                                                              restTemplate);
+        final CallbackService underTest = new CallbackService(Mockito.mock(SecurityUtils.class), restTemplate);
         final CaseDetails caseDetails = new CaseDetails();
         final CaseEvent caseEvent = new CaseEvent();
         caseEvent.setId("TEST-EVENT");
