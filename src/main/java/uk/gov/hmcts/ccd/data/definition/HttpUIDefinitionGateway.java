@@ -175,7 +175,7 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
                             requestEntity,
                             SearchResult.class).getBody();
             final Duration duration = Duration.between(start, Instant.now());
-            LOG.debug("Rest API getWizardPageCollection called for {}, finished in {}",
+            LOG.debug("Rest API getWorkBasketResultGetHttp called for {}, finished in {}",
                     caseTypeId,
                     duration.toMillis());
             appInsights.trackDependency(CASE_DEFINITION, "WorkbasketResult", duration.toMillis(), true);
