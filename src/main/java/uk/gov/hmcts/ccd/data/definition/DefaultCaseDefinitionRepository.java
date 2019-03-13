@@ -1,7 +1,11 @@
 package uk.gov.hmcts.ccd.data.definition;
 
 import javax.inject.Inject;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static uk.gov.hmcts.ccd.ApplicationParams.encodeBase64;
 
@@ -108,6 +112,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     @Override
+    @Cacheable("userRolesCache")
     public UserRole getUserRoleClassifications(String userRole) {
         try {
             final HttpEntity requestEntity = new HttpEntity<CaseType>(securityUtils.authorizationHeaders());
@@ -130,7 +135,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     public List<UserRole> getClassificationsForUserRoleList(List<String> userRoles) {
         try {
             if (userRoles.isEmpty()) {
-                return Collections.EMPTY_LIST;
+                return Collections.emptyList();
             }
             final HttpEntity requestEntity = new HttpEntity<CaseType>(securityUtils.authorizationHeaders());
             final Map<String, String> queryParams = new HashMap<>();
