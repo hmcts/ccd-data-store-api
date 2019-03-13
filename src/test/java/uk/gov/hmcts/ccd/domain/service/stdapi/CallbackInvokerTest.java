@@ -97,12 +97,7 @@ class CallbackInvokerTest {
         wizardPage.setCallBackURLMidEvent(URL_MID_EVENT);
         wizardPage.setRetriesTimeoutMidEvent(RETRIES_MID_EVENT);
 
-        doReturn(Optional.empty()).when(callbackService).send(any(), any(), same(caseEvent), same(caseDetails));
-        doReturn(Optional.empty()).when(callbackService).send(any(),
-                                                              any(),
-                                                              same(caseEvent),
-                                                              same(caseDetailsBefore),
-                                                              same(caseDetails));
+        doReturn(Optional.empty()).when(callbackService).send(any(), any(), same(caseEvent), any(), same(caseDetails), anyBoolean());
         doReturn(Optional.empty()).when(callbackService).send(any(),
                                                               any(),
                                                               same(caseEvent),
@@ -126,7 +121,7 @@ class CallbackInvokerTest {
         void shouldSendCallback() {
             callbackInvoker.invokeAboutToStartCallback(caseEvent, caseType, caseDetails, IGNORE_WARNING);
 
-            verify(callbackService).send(URL_ABOUT_TO_START, RETRIES_ABOUT_TO_START, caseEvent, caseDetails);
+            verify(callbackService).send(URL_ABOUT_TO_START, RETRIES_ABOUT_TO_START, caseEvent, null, caseDetails, false);
         }
     }
 
@@ -372,7 +367,7 @@ class CallbackInvokerTest {
                 caseDetails,
                 IGNORE_WARNINGS);
 
-            verify(callbackService).send(URL_MID_EVENT, RETRIES_MID_EVENT, caseEvent, caseDetailsBefore, caseDetails);
+            verify(callbackService).send(URL_MID_EVENT, RETRIES_MID_EVENT, caseEvent, caseDetailsBefore, caseDetails, false);
         }
     }
 
@@ -398,7 +393,9 @@ class CallbackInvokerTest {
                 when(callbackService.send(caseEvent.getCallBackURLAboutToStartEvent(),
                                           caseEvent.getRetriesTimeoutAboutToStartEvent(),
                                           caseEvent,
-                                          caseDetails)).thenReturn(Optional.of(callbackResponse));
+                                          null,
+                                          caseDetails,
+                                          false)).thenReturn(Optional.of(callbackResponse));
 
                 callbackInvoker.invokeAboutToStartCallback(caseEvent, caseType, caseDetails, TRUE);
 
@@ -422,7 +419,9 @@ class CallbackInvokerTest {
                 when(callbackService.send(caseEvent.getCallBackURLAboutToStartEvent(),
                                           caseEvent.getRetriesTimeoutAboutToStartEvent(),
                                           caseEvent,
-                                          caseDetails)).thenReturn(Optional.of(callbackResponse));
+                                          null,
+                                          caseDetails,
+                                          false)).thenReturn(Optional.of(callbackResponse));
 
                 callbackInvoker.invokeAboutToStartCallback(caseEvent, caseType, caseDetails, TRUE);
 
@@ -446,7 +445,9 @@ class CallbackInvokerTest {
                 when(callbackService.send(caseEvent.getCallBackURLAboutToStartEvent(),
                                           caseEvent.getRetriesTimeoutAboutToStartEvent(),
                                           caseEvent,
-                                          caseDetails)).thenReturn(Optional.of(callbackResponse));
+                                          null,
+                                          caseDetails,
+                                          false)).thenReturn(Optional.of(callbackResponse));
                 final Map<String, JsonNode> data = new HashMap<>();
                 callbackResponse.setData(data);
 
@@ -652,7 +653,8 @@ class CallbackInvokerTest {
                     wizardPage.getRetriesTimeoutMidEvent(),
                     caseEvent,
                     caseDetailsBefore,
-                    caseDetails)).thenReturn(Optional.of(callbackResponse));
+                    caseDetails,
+                    false)).thenReturn(Optional.of(callbackResponse));
 
                 callbackInvoker.invokeMidEventCallback(wizardPage,
                     caseType,
@@ -681,7 +683,8 @@ class CallbackInvokerTest {
                     wizardPage.getRetriesTimeoutMidEvent(),
                     caseEvent,
                     caseDetailsBefore,
-                    caseDetails)).thenReturn(Optional.of(callbackResponse));
+                    caseDetails,
+                    false)).thenReturn(Optional.of(callbackResponse));
 
                 callbackInvoker.invokeMidEventCallback(wizardPage,
                     caseType,
@@ -707,7 +710,7 @@ class CallbackInvokerTest {
                     wizardPage.getRetriesTimeoutMidEvent(),
                     caseEvent,
                     caseDetailsBefore,
-                    caseDetails)).thenReturn(Optional.of(callbackResponse));
+                    caseDetails, false)).thenReturn(Optional.of(callbackResponse));
                 final Map<String, JsonNode> data = new HashMap<>();
                 callbackResponse.setData(data);
 

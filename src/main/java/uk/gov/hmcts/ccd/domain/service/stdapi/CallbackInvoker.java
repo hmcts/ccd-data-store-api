@@ -57,7 +57,7 @@ public class CallbackInvoker {
         final Optional<CallbackResponse> callbackResponse = callbackService.send(
             caseEvent.getCallBackURLAboutToStartEvent(),
             caseEvent.getRetriesTimeoutAboutToStartEvent(),
-            caseEvent, caseDetails);
+            caseEvent, null, caseDetails, false);
 
         callbackResponse.ifPresent(response -> validateAndSetFromAboutToStartCallback(caseType,
                                                                                       caseDetails,
@@ -108,7 +108,7 @@ public class CallbackInvoker {
             wizardPage.getRetriesTimeoutMidEvent(),
             caseEvent,
             caseDetailsBefore,
-            caseDetails);
+            caseDetails, false);
 
         if (callbackResponseOptional.isPresent()) {
             CallbackResponse callbackResponse = callbackResponseOptional.get();

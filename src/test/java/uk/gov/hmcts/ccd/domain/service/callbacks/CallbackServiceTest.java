@@ -58,7 +58,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 @DirtiesContext
 public class CallbackServiceTest {
     private static final ObjectMapper mapper = new ObjectMapper();
-    
+
     @Inject
     private CallbackService callbackService;
 
@@ -90,7 +90,7 @@ public class CallbackServiceTest {
         stubFor(post(urlMatching("/test-callback.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
-        final Optional<CallbackResponse> result = callbackService.send(testUrl, null, caseEvent, caseDetails);
+        final Optional<CallbackResponse> result = callbackService.send(testUrl, null, caseEvent, null, caseDetails, false);
         final CallbackResponse response = result.orElseThrow(() -> new AssertionError("Missing result"));
 
         assertTrue(response.getErrors().isEmpty());
@@ -114,7 +114,7 @@ public class CallbackServiceTest {
         stubFor(post(urlMatching("/test-callback.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200).withFixedDelay(1500)));
 
-        final Optional<CallbackResponse> result = callbackService.send(testUrl, null, caseEvent, caseDetails);
+        final Optional<CallbackResponse> result = callbackService.send(testUrl, null, caseEvent, null, caseDetails, false);
 
         final CallbackResponse response = result.orElseThrow(() -> new AssertionError("Missing result"));
         verify(exactly(2), postRequestedFor(urlMatching("/test-callback.*")));
@@ -138,7 +138,7 @@ public class CallbackServiceTest {
         stubFor(post(urlMatching("/test-callback.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
-        final Optional<CallbackResponse> result = callbackService.send(testUrl, null, caseEvent, caseDetails);
+        final Optional<CallbackResponse> result = callbackService.send(testUrl, null, caseEvent, null, caseDetails, false);
         final CallbackResponse response = result.orElseThrow(() -> new AssertionError("Missing result"));
 
         assertThat(response.getErrors(), Matchers.contains("Test message"));
@@ -151,7 +151,7 @@ public class CallbackServiceTest {
         final CaseEvent caseEvent = new CaseEvent();
         caseEvent.setId("TEST-EVENT");
 
-        callbackService.send(testUrl, null, caseEvent, caseDetails);
+        callbackService.send(testUrl, null, caseEvent, null, caseDetails, false);
     }
 
     @Test(expected = CallbackException.class)
@@ -165,7 +165,25 @@ public class CallbackServiceTest {
         stubFor(post(urlMatching("/test-callback.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(500)));
 
-        callbackService.send(testUrl, null, caseEvent, caseDetails);
+        callbackService.send(testUrl, null, caseEvent, null, caseDetails, false);
+    }
+
+    @Test
+    public void retryOnServerError() throws Exception {
+        final String testUrl = "http://localhost:" + wiremockPort + "/test-callbackGrrrr";
+        final CallbackResponse callbackResponse = new CallbackResponse();
+        final CaseDetails caseDetails = new CaseDetails();
+        final CaseEvent caseEvent = new CaseEvent();
+        caseEvent.setId("TEST-EVENT");
+
+        stubFor(post(urlMatching("/test-callbackGrrrr.*"))
+            .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(500)));
+
+        try {
+            callbackService.send(testUrl, null, caseEvent, null, caseDetails, false);
+        } catch (Exception e) {
+        }
+        verify(exactly(3), postRequestedFor(urlMatching("/test-callbackGrrrr.*")));
     }
 
     @Test(expected = CallbackException.class)
@@ -179,7 +197,7 @@ public class CallbackServiceTest {
         stubFor(post(urlMatching("/test-callback.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(401)));
 
-        callbackService.send(testUrl, null, caseEvent, caseDetails);
+        callbackService.send(testUrl, null, caseEvent, null, caseDetails, false);
     }
 
     @Test
@@ -241,6 +259,25 @@ public class CallbackServiceTest {
                 result.getBody(),
                 JSONCompareMode.LENIENT)
         );
+    }
+
+    @Test
+    public void shouldRetryOnError() throws Exception {
+        final String testUrl = "http://localhost:" + wiremockPort + "/test-callback-invaliddd";
+        final CallbackResponse callbackResponse = new CallbackResponse();
+        final CaseDetails caseDetails = new CaseDetails();
+        final CaseEvent caseEvent = new CaseEvent();
+        caseEvent.setId("TEST-EVENT");
+
+        stubFor(post(urlMatching("/test-callback-invaliddd.*")).willReturn(
+            okJson(mapper.writeValueAsString(callbackResponse)).withStatus(500)));
+
+        try {
+            callbackService.send(testUrl, Arrays.asList(3, 5), caseEvent, null, caseDetails, String.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        verify(exactly(3), postRequestedFor(urlMatching("/test-callback-invaliddd.*")));
     }
 
     @Test(expected = CallbackException.class)

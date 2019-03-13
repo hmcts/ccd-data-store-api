@@ -8,6 +8,8 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestClientException;
@@ -26,6 +28,8 @@ import java.util.Optional;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
 
+// RDM-4316 discarded timeout/backoff value in case event definition until requirements are cleared
+
 @Service
 public class CallbackService {
     private static final Logger LOG = LoggerFactory.getLogger(CallbackService.class);
@@ -43,22 +47,7 @@ public class CallbackService {
         this.defaultRetries = applicationParams.getCallbackRetries();
     }
 
-    public Optional<CallbackResponse> send(final String url,
-                                           final List<Integer> callbackRetries,
-                                           final CaseEvent caseEvent,
-                                           final CaseDetails caseDetails) {
-        return send(url, callbackRetries, caseEvent, null, caseDetails);
-    }
-
-    public Optional<CallbackResponse> send(final String url,
-                                           final List<Integer> callbackRetries,
-                                           final CaseEvent caseEvent,
-                                           final CaseDetails caseDetailsBefore,
-                                           final CaseDetails caseDetails) {
-
-        return send(url, callbackRetries, caseEvent, caseDetailsBefore, caseDetails, false);
-    }
-
+    @Retryable(value = { CallbackException.class }, maxAttempts = 3, backoff = @Backoff(delay = 1000, multiplier = 3))
     public Optional<CallbackResponse> send(final String url,
                                            final List<Integer> callbackRetries,
                                            final CaseEvent caseEvent,
@@ -75,19 +64,14 @@ public class CallbackService {
                                                                     caseEvent.getId(),
                                                                     ignoreWarning);
         final List<Integer> retries = CollectionUtils.isEmpty(callbackRetries) ? defaultRetries : callbackRetries;
-
-        for (Integer timeout : retries) {
-            final Optional<ResponseEntity<CallbackResponse>> responseEntity = sendRequest(url,
-                                                                                          CallbackResponse.class,
-                                                                                          callbackRequest,
-                                                                                          timeout);
-            if (responseEntity.isPresent()) {
-                return Optional.of(responseEntity.get().getBody());
-            }
+        final Optional<ResponseEntity<CallbackResponse>> responseEntity = sendRequest(url, CallbackResponse.class, callbackRequest);
+        if (responseEntity.isPresent()) {
+            return Optional.of(responseEntity.get().getBody());
         }
-        throw new CallbackException("Unsuccessful callback to " + url);
+    throw new CallbackException("Unsuccessful callback to " + url);
     }
 
+    @Retryable(value = { CallbackException.class }, maxAttempts = 3, backoff = @Backoff(delay = 1000, multiplier = 3))
     public <T> ResponseEntity<T> send(final String url,
                                       final List<Integer> callbackRetries,
                                       final CaseEvent caseEvent,
@@ -97,49 +81,28 @@ public class CallbackService {
 
         final CallbackRequest callbackRequest = new CallbackRequest(caseDetails, caseDetailsBefore, caseEvent.getId());
         final List<Integer> retries = isEmpty(callbackRetries) ? defaultRetries : callbackRetries;
-
-        for (Integer timeout : retries) {
-            final Optional<ResponseEntity<T>> requestEntity = sendRequest(url, clazz, callbackRequest, timeout);
-            if (requestEntity.isPresent()) {
-                return requestEntity.get();
-            }
+        final Optional<ResponseEntity<T>> requestEntity = sendRequest(url, clazz, callbackRequest);
+        if (requestEntity.isPresent()) {
+            return requestEntity.get();
         }
-        // Sent so many requests and still got nothing, throw exception here
         throw new CallbackException("Unsuccessful callback to " + url);
     }
 
     private <T> Optional<ResponseEntity<T>> sendRequest(final String url,
                                                         final Class<T> clazz,
-                                                        final CallbackRequest callbackRequest,
-                                                        final Integer timeout) {
+                                                        final CallbackRequest callbackRequest) {
         try {
-            LOG.debug("Trying {} with timeout interval {}", url, timeout);
-
+            LOG.info("Trying {}", url);
             final HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.add("Content-Type", "application/json");
-
             final HttpHeaders securityHeaders = securityUtils.authorizationHeaders();
             if (null != securityHeaders) {
                 securityHeaders.forEach((key, values) -> httpHeaders.put(key, values));
             }
-
             final HttpEntity requestEntity = new HttpEntity(callbackRequest, httpHeaders);
-
-            //TODO Disable the following code for now; TO INVESTIAGE WHETHER TIMOUT WORKS, IN RELATION TO OTHERS CALLS
-            // and socket issues in Azure
-//            final HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
-//
-//            requestFactory.setConnectionRequestTimeout(secondsToMilliseconds(timeout));
-//            requestFactory.setReadTimeout(secondsToMilliseconds(timeout));
-//            requestFactory.setConnectTimeout(secondsToMilliseconds(timeout));
-//            restTemplate.setRequestFactory(requestFactory);
-            return Optional.ofNullable(
-                restTemplate.exchange(url, HttpMethod.POST, requestEntity, clazz));
+            return Optional.ofNullable(restTemplate.exchange(url, HttpMethod.POST, requestEntity, clazz));
         } catch (RestClientException e) {
-            LOG.info("Unable to connect to callback service {} because of {} {}",
-                     url,
-                     e.getClass().getSimpleName(),
-                     e.getMessage());
+            LOG.info("Unable to connect to callback service {} because of {} {}", url, e.getClass().getSimpleName(), e.getMessage());
             LOG.debug("", e);  // debug stack trace
             return Optional.empty();
         }
