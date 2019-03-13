@@ -8,7 +8,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import uk.gov.hmcts.ccd.AppInsights;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
@@ -21,8 +20,6 @@ import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
-
-import static uk.gov.hmcts.ccd.AppInsights.CASE_DEFINITION;
 
 /**
  * NOTE: We want to cache definitions, so the only client of this class should be CachedUIDefinitionGateway
@@ -39,17 +36,14 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
     @Qualifier("restTemplate")
     @Autowired
     private final RestTemplate restTemplate;
-    private final AppInsights appInsights;
 
     @Inject
     HttpUIDefinitionGateway(final ApplicationParams applicationParams,
                             final SecurityUtils securityUtils,
-                            final RestTemplate restTemplate,
-                            final AppInsights appInsights) {
+                            final RestTemplate restTemplate) {
         this.applicationParams = applicationParams;
         this.securityUtils = securityUtils;
         this.restTemplate = restTemplate;
-        this.appInsights = appInsights;
     }
 
     @Override
@@ -67,7 +61,6 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
             LOG.debug("Rest API getSearchResultGetHttp called for {}, finished in {}",
                     caseTypeId,
                     duration.toMillis());
-            appInsights.trackDependency(CASE_DEFINITION, "SearchResult", duration.toMillis(), true);
             return searchResult;
         } catch (final Exception e) {
             throw new ServiceException(String.format(
@@ -92,7 +85,6 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
             LOG.debug("Rest API getSearchInputDefinitionsGetHttp called for {}, finished in {}",
                     caseTypeId,
                     duration.toMillis());
-            appInsights.trackDependency(CASE_DEFINITION, "SearchInputDefinitions", duration.toMillis(), true);
             return definition;
         } catch (final Exception e) {
             throw new ServiceException(String.format(
@@ -117,7 +109,6 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
             LOG.debug("Rest API getWorkbasketInputDefinitionsGetHttp called for {}, finished in {}",
                     caseTypeId,
                     duration.toMillis());
-            appInsights.trackDependency(CASE_DEFINITION, "WorkbasketInputDefinitions", duration.toMillis(), true);
             return definition;
         } catch (final Exception e) {
             throw new ServiceException(String.format(
@@ -141,7 +132,6 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
         LOG.debug("Rest API getCaseTabCollectionGetHttp called for {}, finished in {}",
                 caseTypeId,
                 duration.toMillis());
-        appInsights.trackDependency(CASE_DEFINITION, "CaseTabCollection", duration.toMillis(), true);
         return collection;
     }
 
@@ -159,7 +149,6 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
         LOG.debug("Rest API getWizardPageCollectionGetHttp called for {}, finished in {}",
                 caseTypeId,
                 duration.toMillis());
-        appInsights.trackDependency(CASE_DEFINITION, "WizardPageCollection", duration.toMillis(), true);
         return wpc.getWizardPages();
     }
 
@@ -178,7 +167,6 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
             LOG.debug("Rest API getWorkBasketResultGetHttp called for {}, finished in {}",
                     caseTypeId,
                     duration.toMillis());
-            appInsights.trackDependency(CASE_DEFINITION, "WorkbasketResult", duration.toMillis(), true);
             return searchResult;
         } catch (final Exception e) {
             throw new ServiceException(String.format(
