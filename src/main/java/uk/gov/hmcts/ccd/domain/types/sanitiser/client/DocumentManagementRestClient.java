@@ -11,7 +11,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.hmcts.ccd.AppInsights;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.document.Document;
@@ -25,8 +24,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static uk.gov.hmcts.ccd.AppInsights.DOC_MANAGEMENT;
-
 @Named
 @Singleton
 public class DocumentManagementRestClient {
@@ -37,14 +34,11 @@ public class DocumentManagementRestClient {
     @Qualifier("restTemplate")
     @Autowired
     private final RestTemplate restTemplate;
-    private final AppInsights appInsights;
 
     public DocumentManagementRestClient(final SecurityUtils securityUtils,
-                                        final RestTemplate restTemplate,
-                                        final AppInsights appInsights) {
+                                        final RestTemplate restTemplate) {
         this.securityUtils = securityUtils;
         this.restTemplate = restTemplate;
-        this.appInsights = appInsights;
     }
 
     public Document getDocument(FieldType fieldType, String url) {
@@ -69,7 +63,6 @@ public class DocumentManagementRestClient {
             LOG.info("Requesting from Document management: {}", url);
             document = restTemplate.exchange(url, HttpMethod.GET, requestEntity, Document.class).getBody();
             final Duration duration = Duration.between(start, Instant.now());
-            appInsights.trackDependency(DOC_MANAGEMENT, "WorkbasketResult", duration.toMillis(), true);
 
         } catch (Exception e) {
             LOG.error("Cannot sanitize document for the Case Field Type:{}, Case Field Type Id:{} because of unreachable url",
