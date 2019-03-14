@@ -56,5 +56,12 @@
             <Method name="getWizardPageCollection"/>
             <Method name="getCaseTabCollection"/>
         </Class>
+        <Class name="uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway">
+            <Method name="create"/>
+            <Method name="update"/>
+            <Method name="get"/>
+            <Method name="delete"/>
+            <Method name="getAll"/>
+        </Class>
     </Instrumentation>
 </ApplicationInsightsAgent>
