@@ -27,7 +27,7 @@ public class SecurityClassificationUtils {
     }
 
     public static Optional<SecurityClassification> getSecurityClassification(JsonNode dataNode) {
-        if (dataNode == null || dataNode.isNull()) {
+        if (dataNode == null || dataNode.isNull() || dataNode == "") {
             return Optional.empty();
         }
         SecurityClassification securityClassification;
