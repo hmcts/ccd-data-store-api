@@ -16,7 +16,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.hmcts.ccd.AppInsights;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
@@ -60,7 +59,6 @@ public class DocumentManagementRestClientTest extends StubServerDependent {
     @Mock
     private SecurityUtils securityUtils;
     @Mock
-    private AppInsights appInsights;
     private Document document;
     private DocumentManagementRestClient subject;
 
@@ -92,7 +90,7 @@ public class DocumentManagementRestClientTest extends StubServerDependent {
         links.setBinary(binary);
         document.set_links(links);
         document.setOriginalDocumentName(FILENAME);
-        subject = new DocumentManagementRestClient(securityUtils, restTemplate, appInsights);
+        subject = new DocumentManagementRestClient(securityUtils, restTemplate);
     }
 
     @Test

@@ -63,5 +63,8 @@
             <Method name="delete"/>
             <Method name="getAll"/>
         </Class>
+        <Class name="uk.gov.hmcts.ccd.domain.types.sanitiser.client.DocumentManagementRestClient">
+            <Method name="getDocument"/>
+        </Class>
     </Instrumentation>
 </ApplicationInsightsAgent>
