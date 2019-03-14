@@ -1,6 +1,9 @@
 package uk.gov.hmcts.ccd;
 
-import com.hazelcast.config.*;
+import com.hazelcast.config.Config;
+import com.hazelcast.config.MapConfig;
+import com.hazelcast.config.MaxSizeConfig;
+import com.hazelcast.config.NetworkConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,6 +34,7 @@ public class CachingConfiguration {
         config.addMapConfig(newMapConfig("workbasketInputDefinitionCache", definitionCacheTTL));
         config.addMapConfig(newMapConfig("caseTabCollectionCache", definitionCacheTTL));
         config.addMapConfig(newMapConfig("wizardPageCollectionCache", definitionCacheTTL));
+        config.addMapConfig(newMapConfig("userRolesCache", definitionCacheTTL));
     }
 
     private MapConfig newMapConfig(final String name, int definitionCacheTTL) {
