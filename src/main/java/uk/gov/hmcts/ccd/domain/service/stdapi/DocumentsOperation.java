@@ -7,7 +7,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
@@ -48,7 +47,6 @@ public class DocumentsOperation {
         this.uidService = uidService;
     }
 
-    @Transactional(readOnly = true)
     public List<Document> getPrintableDocumentsForCase(final String jurisdictionId,
                                                        final String caseTypeId,
                                                        final String caseReference) {
