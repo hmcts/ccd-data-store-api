@@ -117,7 +117,8 @@ public interface AATCaseType {
     enum Tab {
         FIRST("FirstTab", "First tab", 1),
         SECOND("SecondTab", "Second tab", 2),
-        THIRD("ThirdTab", "Third tab", 3);
+        THIRD("ThirdTab", "Third tab", 3),
+        FOURTH("HistoryTab", "History Tab", 4);
 
         public final String id;
         public final String name;

@@ -1,9 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -11,18 +7,24 @@ import static org.mockito.Mockito.doReturn;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.JurisdictionBuilder.newJurisdiction;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.SearchInputBuilder.aSearchInput;
+
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
+import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
-import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 
 class ClassifiedFindSearchInputOperationTest {
     private static final String JURISDICTION_ID = "TEST";
@@ -64,6 +66,7 @@ class ClassifiedFindSearchInputOperationTest {
             .withField(CASE_FIELD_1_4)
             .build();
         testCaseType.setId(CASE_TYPE_ONE);
+        testCaseType.setJurisdiction(newJurisdiction().withJurisdictionId(JURISDICTION_ID).build());
 
         doReturn(testCaseType).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ONE);
 
@@ -75,7 +78,7 @@ class ClassifiedFindSearchInputOperationTest {
     @Test
     @DisplayName("should filter search input fields when user does not have enough SC rank")
     void shouldFilterSearchInputFieldsWithSC() {
-        doReturn(testSearchInputs).when(findSearchInputOperation).execute(JURISDICTION_ID, CASE_TYPE_ONE, CAN_READ);
+        doReturn(testSearchInputs).when(findSearchInputOperation).execute(CASE_TYPE_ONE, CAN_READ);
         doReturn(true).when(classificationService).userHasEnoughSecurityClassificationForField(JURISDICTION_ID,
             testCaseType, CASE_FIELD_ID_1_1);
         doReturn(true).when(classificationService).userHasEnoughSecurityClassificationForField(JURISDICTION_ID,
@@ -86,7 +89,7 @@ class ClassifiedFindSearchInputOperationTest {
             testCaseType, CASE_FIELD_ID_1_4);
 
 
-        final List<SearchInput> searchInputs = classUnderTest.execute(JURISDICTION_ID, CASE_TYPE_ONE, CAN_READ);
+        final List<SearchInput> searchInputs = classUnderTest.execute(CASE_TYPE_ONE, CAN_READ);
         assertAll(
             () -> assertThat(searchInputs.size(), is(3)),
             () -> assertThat(searchInputs.get(0), is(testSearchInputs.get(0))),
@@ -98,9 +101,9 @@ class ClassifiedFindSearchInputOperationTest {
     @Test
     @DisplayName("should return empty search input list when user does't have enough SC for any field")
     void shouldReturnEmptySearchInputWhenNoFieldIsAuthorised() {
-        doReturn(new ArrayList<>()).when(findSearchInputOperation).execute(JURISDICTION_ID, CASE_TYPE_ONE, CAN_READ);
+        doReturn(new ArrayList<>()).when(findSearchInputOperation).execute(CASE_TYPE_ONE, CAN_READ);
 
-        final List<SearchInput> searchInputs = classUnderTest.execute(JURISDICTION_ID, CASE_TYPE_ONE, CAN_READ);
+        final List<SearchInput> searchInputs = classUnderTest.execute(CASE_TYPE_ONE, CAN_READ);
 
         assertAll(
             () -> assertThat(searchInputs.size(), is(0))
