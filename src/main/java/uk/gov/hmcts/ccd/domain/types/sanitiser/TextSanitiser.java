@@ -14,8 +14,6 @@ import javax.inject.Singleton;
 @Singleton
 public class TextSanitiser implements Sanitiser {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TextSanitiser.class);
-
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
 
     @Override

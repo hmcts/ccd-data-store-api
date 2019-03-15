@@ -19,8 +19,6 @@ import static org.junit.Assert.assertThat;
 @DisplayName("TextSanitiser")
 class TextSanitiserTest {
 
-    private static final JsonNodeFactory JSON_FACTORY = new JsonNodeFactory(false);
-
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private static final CaseType CASE_TYPE = new CaseType();
     private static final String TYPE_TEXT = "Text";
