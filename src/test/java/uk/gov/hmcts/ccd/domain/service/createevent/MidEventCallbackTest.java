@@ -271,8 +271,7 @@ class MidEventCallbackTest {
         assertAll(
             () -> assertThat(result, is(expectedResponse)),
             () -> verify(callbackInvoker).invokeMidEventCallback(wizardPageWithCallback, caseType, caseEvent, null, combineCaseDetails, IGNORE_WARNINGS),
-            () -> verify(caseService, never()).createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, data),
-            () -> verify(caseService).createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, combineData));
+            () -> verify(caseService, never()).createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, combineData));
     }
 
     private CaseDetails caseDetails(Map<String, JsonNode> data) {

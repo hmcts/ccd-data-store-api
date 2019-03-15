@@ -62,22 +62,18 @@ public class MidEventCallback {
                 .findFirst();
 
             if (wizardPageOptional.isPresent() && !isBlank(wizardPageOptional.get().getCallBackURLMidEvent())) {
-                Optional<CaseDetails> currentCaseDetails = caseService.populateCurrentCaseDetailsWithEventFields(content, caseType.getJurisdictionId());
-                CaseDetails newCaseDetails;
-                if (currentCaseDetails.isPresent()) {
-                    newCaseDetails = caseService.createNewCaseDetails(caseTypeId, caseType.getJurisdictionId(),
-                        currentCaseDetails.get().getData());
+                CaseDetails currentOrNewCaseDetails = caseService.populateCurrentCaseDetailsWithEventFields(content,
+                    caseType.getJurisdictionId()).orElseGet(
+                        () -> caseService.createNewCaseDetails(caseTypeId, caseType.getJurisdictionId(),
+                    content.getEventData() == null ? content.getData() : content.getEventData()));
 
-                } else {
-                    newCaseDetails = caseService.createNewCaseDetails(caseTypeId, caseType.getJurisdictionId(),
-                        content.getEventData() == null ? content.getData() : content.getEventData());
-                }
                 CaseDetails caseDetails = callbackInvoker.invokeMidEventCallback(wizardPageOptional.get(),
                     caseType,
                     caseEvent,
                     null,
-                    newCaseDetails,
+                    currentOrNewCaseDetails,
                     content.getIgnoreWarning());
+
                 return dataJsonNode(caseDetails.getData());
             }
         }
