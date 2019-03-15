@@ -12,7 +12,11 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
+import static org.hamcrest.core.StringStartsWith.startsWith;
+import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
@@ -54,5 +58,14 @@ public class DefaultCaseDefinitionRepositoryTest {
         HttpClientErrorException exception = new HttpClientErrorException(HttpStatus.NOT_FOUND);
         doThrow(exception).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class));
         caseDefinitionRepository.getBaseTypes();
+    }
+
+    @Test
+    public void shouldFailToGetClassificationForUserRole() {
+        HttpClientErrorException httpException = new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
+        doThrow(httpException).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class));
+
+        ServiceException exception = assertThrows(ServiceException.class, () -> caseDefinitionRepository.getUserRoleClassifications("nor_defined"));
+        assertThat(exception.getMessage(), startsWith("Error while retrieving classification for user role nor_defined because of "));
     }
 }
