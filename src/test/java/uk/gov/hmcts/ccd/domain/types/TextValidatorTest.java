@@ -160,7 +160,7 @@ class TextValidatorTest {
 
         final JsonNode trailingwhitespaces = NODE_FACTORY.textNode("   Testing   ");
         final List<ValidationResult> trailingwhitespacesResult = validator.validate(FIELD_ID, trailingwhitespaces, caseField);
-        assertThat(trailingwhitespacesResult, hasSize(1));
+        assertThat(trailingwhitespacesResult, hasSize(0));
     }
 
     private CaseFieldBuilder caseField() {
