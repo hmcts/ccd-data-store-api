@@ -56,8 +56,7 @@ public class CallbackInvoker {
                                            final Boolean ignoreWarning) {
         final Optional<CallbackResponse> callbackResponse = callbackService.send(
             caseEvent.getCallBackURLAboutToStartEvent(),
-            caseEvent.getRetriesTimeoutAboutToStartEvent(),
-            caseEvent, caseDetails);
+            caseEvent, null, caseDetails, false);
 
         callbackResponse.ifPresent(response -> validateAndSetFromAboutToStartCallback(caseType,
                                                                                       caseDetails,
@@ -73,7 +72,6 @@ public class CallbackInvoker {
 
         final Optional<CallbackResponse> callbackResponse = callbackService.send(
             eventTrigger.getCallBackURLAboutToSubmitEvent(),
-            eventTrigger.getRetriesTimeoutURLAboutToSubmitEvent(),
             eventTrigger, caseDetailsBefore, caseDetails, ignoreWarning);
 
         if (callbackResponse.isPresent()) {
@@ -90,7 +88,6 @@ public class CallbackInvoker {
                                                                                final CaseDetails caseDetailsBefore,
                                                                                final CaseDetails caseDetails) {
         return callbackService.send(eventTrigger.getCallBackURLSubmittedEvent(),
-                                    eventTrigger.getRetriesTimeoutURLSubmittedEvent(),
                                     eventTrigger,
                                     caseDetailsBefore,
                                     caseDetails,
@@ -105,10 +102,9 @@ public class CallbackInvoker {
                                               final Boolean ignoreWarning) {
 
         Optional<CallbackResponse> callbackResponseOptional = callbackService.send(wizardPage.getCallBackURLMidEvent(),
-            wizardPage.getRetriesTimeoutMidEvent(),
             caseEvent,
             caseDetailsBefore,
-            caseDetails);
+            caseDetails, false);
 
         if (callbackResponseOptional.isPresent()) {
             CallbackResponse callbackResponse = callbackResponseOptional.get();
