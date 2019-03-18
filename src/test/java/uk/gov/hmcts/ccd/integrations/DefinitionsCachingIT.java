@@ -66,8 +66,7 @@ public class DefinitionsCachingIT {
 
     @Before
     public void setup() {
-
-        doReturn(aCaseTypeDefVersion(VERSION)).when(this.caseDefinitionRepository).getLatestVersion(ID);
+        doReturn(aCaseTypeDefVersion(VERSION)).when(this.caseDefinitionRepository).doGetLatestVersion(ID);
         doReturn(mockCaseType).when(this.caseDefinitionRepository).getCaseType(ID);
     }
 
