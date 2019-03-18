@@ -103,7 +103,7 @@ class DefaultCreateCaseOperationTest {
     private static final String TOKEN = "toke";
     private static final String DRAFT_ID = "1";
 
-    private static final IdamUser IDAM_USER = buildIDAMUser();
+    private static final IdamUser IDAM_USER = buildIdamUser();
     private static final CaseType CASE_TYPE = buildCaseType();
     private CaseEvent eventTrigger;
 
@@ -431,7 +431,7 @@ class DefaultCreateCaseOperationTest {
         return map;
     }
 
-    private static IdamUser buildIDAMUser() {
+    private static IdamUser buildIdamUser() {
         final IdamUser properties = new IdamUser();
         properties.setId("pid");
         properties.setEmail("ngitb@hmcts.net");
