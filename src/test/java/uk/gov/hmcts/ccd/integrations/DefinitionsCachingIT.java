@@ -71,6 +71,16 @@ public class DefinitionsCachingIT {
     }
 
     @Test
+    public void testCaseDefinitionLatestVersionsAreCached() {
+
+        cachedCaseDefinitionRepository.getLatestVersion(ID);
+        cachedCaseDefinitionRepository.getLatestVersion(ID);
+        cachedCaseDefinitionRepository.getLatestVersion(ID);
+
+        verify(caseDefinitionRepository, times(1)).getLatestVersion(ID);
+    }
+
+    @Test
     public void testCaseDefinitionAreCached() {
 
         cachedCaseDefinitionRepository.getCaseType(ID);
