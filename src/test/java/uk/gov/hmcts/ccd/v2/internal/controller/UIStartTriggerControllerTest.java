@@ -139,7 +139,7 @@ class UIStartTriggerControllerTest {
         @Test
         @DisplayName("should propagate exception")
         void shouldPropagateExceptionWhenThrown() {
-            when(getEventTriggerOperation.executeForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)).thenThrow(Exception.class);
+            when(getEventTriggerOperation.executeForCaseType(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)).thenThrow(RuntimeException.class);
 
             assertThrows(Exception.class, () -> uiStartTriggerController.getStartCaseTrigger(CASE_TYPE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING));
         }
@@ -175,7 +175,7 @@ class UIStartTriggerControllerTest {
         @Test
         @DisplayName("should propagate exception from downstream operation")
         void shouldPropagateExceptionFromOperationWhenThrown() {
-            when(getEventTriggerOperation.executeForCase(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)).thenThrow(Exception.class);
+            when(getEventTriggerOperation.executeForCase(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING)).thenThrow(RuntimeException.class);
 
             assertThrows(Exception.class, () -> uiStartTriggerController.getStartEventTrigger(CASE_ID, EVENT_TRIGGER_ID, IGNORE_WARNING));
         }
@@ -219,7 +219,7 @@ class UIStartTriggerControllerTest {
         @Test
         @DisplayName("should propagate exception from downstream operation")
         void shouldPropagateExceptionFromOperationWhenThrown() {
-            when(getEventTriggerOperation.executeForDraft(DRAFT_ID, IGNORE_WARNING)).thenThrow(Exception.class);
+            when(getEventTriggerOperation.executeForDraft(DRAFT_ID, IGNORE_WARNING)).thenThrow(RuntimeException.class);
 
             assertThrows(Exception.class, () -> uiStartTriggerController.getStartDraftTrigger(DRAFT_ID, IGNORE_WARNING));
         }

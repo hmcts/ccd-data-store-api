@@ -72,7 +72,7 @@ class UIDraftsControllerTest {
         @Test
         @DisplayName("should propagate exception")
         void shouldPropagateExceptionWhenThrown() {
-            when(upsertDraftOperation.executeSave(CASE_TYPE_ID, CASE_DATA_CONTENT)).thenThrow(Exception.class);
+            when(upsertDraftOperation.executeSave(CASE_TYPE_ID, CASE_DATA_CONTENT)).thenThrow(RuntimeException.class);
 
             assertThrows(Exception.class, () -> draftsController.saveDraft(CASE_TYPE_ID, CASE_DATA_CONTENT));
         }
@@ -96,7 +96,7 @@ class UIDraftsControllerTest {
         @Test
         @DisplayName("should propagate exception")
         void shouldPropagateExceptionWhenThrown() {
-            when(upsertDraftOperation.executeUpdate(CASE_TYPE_ID, DRAFT_ID, CASE_DATA_CONTENT)).thenThrow(Exception.class);
+            when(upsertDraftOperation.executeUpdate(CASE_TYPE_ID, DRAFT_ID, CASE_DATA_CONTENT)).thenThrow(RuntimeException.class);
 
             assertThrows(Exception.class, () -> draftsController.updateDraft(CASE_TYPE_ID, DRAFT_ID, CASE_DATA_CONTENT));
         }
@@ -120,7 +120,7 @@ class UIDraftsControllerTest {
         @Test
         @DisplayName("should propagate exception")
         void shouldPropagateExceptionWhenThrown() {
-            when(getDraftViewOperation.execute(DRAFT_ID)).thenThrow(Exception.class);
+            when(getDraftViewOperation.execute(DRAFT_ID)).thenThrow(RuntimeException.class);
 
             assertThrows(Exception.class, () -> draftsController.findDraft(DRAFT_ID));
         }
@@ -143,7 +143,7 @@ class UIDraftsControllerTest {
         @Test
         @DisplayName("should propagate exception")
         void shouldPropagateExceptionWhenThrown() {
-            doThrow(Exception.class).when(draftGateway).delete(DRAFT_ID);
+            doThrow(RuntimeException.class).when(draftGateway).delete(DRAFT_ID);
 
             assertThrows(Exception.class, () -> draftsController.deleteDraft(DRAFT_ID));
         }
