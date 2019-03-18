@@ -67,17 +67,18 @@ public class DefinitionsCachingIT {
     @Before
     public void setup() {
         doReturn(aCaseTypeDefVersion(VERSION)).when(this.caseDefinitionRepository).doGetLatestVersion(ID);
+        doReturn(aCaseTypeDefVersion(VERSION + 11)).when(this.caseDefinitionRepository).doGetLatestVersion(ID + 11);
         doReturn(mockCaseType).when(this.caseDefinitionRepository).getCaseType(ID);
     }
 
     @Test
     public void testCaseDefinitionLatestVersionsAreCached() {
 
-        cachedCaseDefinitionRepository.getLatestVersion(ID);
-        cachedCaseDefinitionRepository.getLatestVersion(ID);
-        cachedCaseDefinitionRepository.getLatestVersion(ID);
+        cachedCaseDefinitionRepository.getLatestVersion(ID + 11);
+        cachedCaseDefinitionRepository.getLatestVersion(ID + 11);
+        cachedCaseDefinitionRepository.getLatestVersion(ID + 11);
 
-        verify(caseDefinitionRepository, times(1)).getLatestVersion(ID);
+        verify(caseDefinitionRepository, times(1)).getLatestVersion(ID + 11);
     }
 
     @Test
