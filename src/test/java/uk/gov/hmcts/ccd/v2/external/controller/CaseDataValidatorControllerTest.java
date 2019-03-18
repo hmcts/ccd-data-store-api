@@ -83,7 +83,7 @@ class CaseDataValidatorControllerTest {
         @Test
         @DisplayName("should propagate exception")
         void shouldPropagateExceptionWhenThrown() {
-            when(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, EVENT_DATA)).thenThrow(Exception.class);
+            when(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, EVENT_DATA)).thenThrow(RuntimeException.class);
 
             assertThrows(Exception.class, () -> caseDataValidatorController.validate(CASE_TYPE_ID, PAGE_ID, EVENT_DATA));
         }
