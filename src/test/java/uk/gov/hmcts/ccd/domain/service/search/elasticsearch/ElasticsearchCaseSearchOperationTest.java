@@ -14,7 +14,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.internal.util.reflection.Whitebox.setInternalState;
 import static uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest.QUERY;
 import static uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchCaseSearchOperation.MULTI_SEARCH_ERROR_MSG_ROOT_CAUSE;
 
@@ -34,6 +33,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.powermock.reflect.Whitebox;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
@@ -98,7 +98,7 @@ class ElasticsearchCaseSearchOperationTest {
             when(searchResult.getSourceAsStringList()).thenReturn(newArrayList(caseDetailsElastic));
             MultiSearchResult.MultiSearchResponse response = mock(MultiSearchResult.MultiSearchResponse.class);
             when(multiSearchResult.getResponses()).thenReturn(Collections.singletonList(response));
-            setInternalState(response, "searchResult", searchResult);
+            Whitebox.setInternalState(response, "searchResult", searchResult);
 
             when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class)).thenReturn(caseDetailsDTO);
             when(mapper.dtosToCaseDetailsList(newArrayList(caseDetailsDTO))).thenReturn(newArrayList(caseDetails));
@@ -138,13 +138,13 @@ class ElasticsearchCaseSearchOperationTest {
             when(searchResult1.getTotal()).thenReturn(10L);
             when(searchResult1.getSourceAsStringList()).thenReturn(newArrayList(caseDetailsElastic));
             MultiSearchResult.MultiSearchResponse response1 = mock(MultiSearchResult.MultiSearchResponse.class);
-            setInternalState(response1, "searchResult", searchResult1);
+            Whitebox.setInternalState(response1, "searchResult", searchResult1);
 
             SearchResult searchResult2 = mock(SearchResult.class);
             when(searchResult2.getTotal()).thenReturn(10L);
             when(searchResult2.getSourceAsStringList()).thenReturn(newArrayList(caseDetailsElastic));
             MultiSearchResult.MultiSearchResponse response2 = mock(MultiSearchResult.MultiSearchResponse.class);
-            setInternalState(response2, "searchResult", searchResult2);
+            Whitebox.setInternalState(response2, "searchResult", searchResult2);
             when(multiSearchResult.getResponses()).thenReturn(asList(response1, response2));
 
             when(objectMapper.readValue(caseDetailsElastic, ElasticSearchCaseDetailsDTO.class)).thenReturn(caseDetailsDTO);
@@ -197,8 +197,8 @@ class ElasticsearchCaseSearchOperationTest {
         void searchShouldReturnBadSearchRequestOnResponseError() throws IOException {
             MultiSearchResult.MultiSearchResponse response = mock(MultiSearchResult.MultiSearchResponse.class);
             JsonElement error = mock(JsonElement.class);
-            setInternalState(response, "isError", true);
-            setInternalState(response, "error", error);
+            Whitebox.setInternalState(response, "isError", true);
+            Whitebox.setInternalState(response, "error", error);
 
             JsonObject errorObject = new JsonObject();
             errorObject.addProperty(MULTI_SEARCH_ERROR_MSG_ROOT_CAUSE, "error msg");

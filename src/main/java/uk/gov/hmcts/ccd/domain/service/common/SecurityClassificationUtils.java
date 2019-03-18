@@ -30,6 +30,9 @@ public class SecurityClassificationUtils {
         if (dataNode == null || dataNode.isNull()) {
             return Optional.empty();
         }
+        if (dataNode.textValue().isEmpty()) {
+            return Optional.empty();
+        }
         SecurityClassification securityClassification;
         try {
             securityClassification = valueOf(dataNode.textValue());
