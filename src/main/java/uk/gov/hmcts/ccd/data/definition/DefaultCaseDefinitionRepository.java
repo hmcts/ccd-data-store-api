@@ -148,6 +148,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     @Override
+    @Cacheable("caseTypeDefinitionLatestVersionCache")
     public CaseTypeDefinitionVersion getLatestVersion(String caseTypeId) {
         try {
             final HttpEntity requestEntity = new HttpEntity<CaseType>(securityUtils.authorizationHeaders());
