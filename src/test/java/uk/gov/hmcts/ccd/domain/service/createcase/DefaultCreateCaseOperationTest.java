@@ -1,4 +1,4 @@
-    package uk.gov.hmcts.ccd.domain.service.createcase;
+package uk.gov.hmcts.ccd.domain.service.createcase;
 
 import java.io.IOException;
 import java.util.HashMap;
