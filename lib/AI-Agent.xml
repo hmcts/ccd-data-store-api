@@ -56,6 +56,14 @@
             <Method name="getWizardPageCollection"/>
             <Method name="getCaseTabCollection"/>
         </Class>
+        <Class name="uk.gov.hmcts.ccd.data.definition.HttpUIDefinitionGateway">
+            <Method name="getSearchResult"/>
+            <Method name="getSearchInputDefinitions"/>
+            <Method name="getWorkbasketInputDefinitions"/>
+            <Method name="getCaseTabCollection"/>
+            <Method name="getWizardPageCollection"/>
+            <Method name="getWorkBasketResult"/>
+        </Class>
         <Class name="uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway">
             <Method name="create"/>
             <Method name="update"/>
