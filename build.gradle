@@ -222,7 +222,7 @@ dependencies {
     testImplementation('org.springframework.cloud:spring-cloud-starter-contract-stub-runner')
     testCompile ('com.opentable.components:otj-pg-embedded:0.12.0')
     testCompile ('com.github.tomakehurst:wiremock-jre8:2.21.0')
-    testCompile ('org.springframework.cloud:spring-cloud-contract-wiremock:2.1.0.RELEASE')
+    testCompile ('org.springframework.cloud:spring-cloud-contract-wiremock:2.1.1.RELEASE')
     // To avoid compiler warnings about @API annotations in JUnit5 code.
     testCompileOnly 'org.apiguardian:apiguardian-api:1.0.0'
     testCompile "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
