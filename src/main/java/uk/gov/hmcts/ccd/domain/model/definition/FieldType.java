@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
@@ -79,6 +80,7 @@ public class FieldType implements Serializable {
         this.complexFields = complexFields;
     }
 
+    @JsonIgnore
     public List<CaseField> getChildren() {
         if (type.equalsIgnoreCase(COMPLEX)) {
             return complexFields;
