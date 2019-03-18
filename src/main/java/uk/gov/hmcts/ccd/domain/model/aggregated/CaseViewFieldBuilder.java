@@ -58,7 +58,7 @@ public class CaseViewFieldBuilder {
 
     private static void fillEmptyNestedFieldACLs(CaseField field, List<AccessControlList> acls) {
         if (field.getFieldType().getType().equalsIgnoreCase(COMPLEX) || field.getFieldType().getType().equalsIgnoreCase(COLLECTION)) {
-            field.getFieldType().getComplexFields().forEach(nestedField -> {
+            field.getFieldType().getChildren().forEach(nestedField -> {
                 if (nestedField.getAccessControlLists() == null || nestedField.getAccessControlLists().isEmpty()) {
                     nestedField.setAccessControlLists(acls);
                 }
