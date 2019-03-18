@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.data.definition;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.ccd.BaseTest;
@@ -45,17 +44,6 @@ public class CaseDefinitionRepositoryWireMockNotRunningTest extends BaseTest {
             assertThrows(ServiceException.class, () -> caseDefinitionRepository.getBaseTypes());
         assertThat(exception.getMessage(),
                    startsWith("Problem getting base types definition from definition store because of "));
-    }
-
-    @Test
-    @Ignore("temporarily. Will be fixed in RDM-4358")
-    public void shouldFailToGetClassificationForUserRole() {
-        final ServiceException
-            exception =
-            assertThrows(ServiceException.class,
-                         () -> caseDefinitionRepository.getUserRoleClassifications("nor_defined"));
-        assertThat(exception.getMessage(),
-                   startsWith("Error while retrieving classification for user role nor_defined because of "));
     }
 
     @Test
