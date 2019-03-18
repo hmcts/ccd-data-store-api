@@ -18,6 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.AuthCheckerConfiguration;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
@@ -91,13 +92,17 @@ public class DefaultUserRepository implements UserRepository {
         try {
             LOG.debug("retrieving default user settings for user {}", userId);
             final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
-            final Map<String, String> queryParams = new HashMap<>();
+            final Map<String, Object> queryParams = new HashMap<>();
             queryParams.put("uid", userId);
-            return restTemplate.exchange(applicationParams.userDefaultSettingsURL(),
-                HttpMethod.GET, requestEntity, UserDefault.class, queryParams).getBody();
+            // The toUriString() method ensures the whole URL is encoded, including the query string variables
+            final String encodedUrl = UriComponentsBuilder.fromHttpUrl(applicationParams.userDefaultSettingsURL())
+                .uriVariables(queryParams)
+                .toUriString();
+            return restTemplate.exchange(encodedUrl, HttpMethod.GET, requestEntity, UserDefault.class).getBody();
         } catch (HttpStatusCodeException e) {
             LOG.error("Failed to retrieve user profile", e);
-            final List<String> headerMessages = e.getResponseHeaders().get("Message");
+            final List<String> headerMessages = Optional.ofNullable(e.getResponseHeaders())
+                .map(headers -> headers.get("Message")).orElse(null);
             final String message = headerMessages != null ? headerMessages.get(0) : e.getMessage();
             if (message != null) {
                 throw new BadRequestException(message);

@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.data.user;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -13,8 +14,11 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -23,9 +27,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
@@ -35,6 +44,8 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.aggregated.UserDefault;
+import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
@@ -157,6 +168,36 @@ class DefaultUserRepositoryTest {
             asOtherRoles();
 
             verifyNoMoreInteractions(caseDefinitionRepository);
+        }
+    }
+
+    @Nested
+    @DisplayName("getUserDefaultSettings()")
+    class GetUserDefaultSettings {
+
+        @Test
+        @DisplayName("should return the User Profile defaults for the user")
+        void shouldReturnUserProfileDefaultsForUser() {
+            when(applicationParams.userDefaultSettingsURL()).thenReturn("http://test.hmcts.net/users?uid={uid}");
+            final Jurisdiction jurisdiction = new Jurisdiction();
+            jurisdiction.setId("TEST");
+            jurisdiction.setName("Test");
+            jurisdiction.setDescription("Test Jurisdiction");
+            final UserDefault userDefault = new UserDefault();
+            userDefault.setJurisdictions(Collections.singletonList(jurisdiction));
+            final ResponseEntity<UserDefault> responseEntity = new ResponseEntity<>(userDefault, HttpStatus.OK);
+            when(restTemplate
+                .exchange(any(String.class), eq(HttpMethod.GET), any(HttpEntity.class), eq(UserDefault.class)))
+                .thenReturn(responseEntity);
+
+            final UserDefault result = userRepository.getUserDefaultSettings("ccd+test@hmcts.net");
+            assertThat(result, is(userDefault));
+
+            // Check that the URL used in the request is encoded correctly, specifically the query string
+            ArgumentCaptor<String> requestUrl = ArgumentCaptor.forClass(String.class);
+            verify(restTemplate).exchange(
+                requestUrl.capture(), same(HttpMethod.GET), any(HttpEntity.class), (Class<?>)any(Class.class));
+            assertThat(requestUrl.getValue(), is("http://test.hmcts.net/users?uid=ccd%2Btest%40hmcts.net"));
         }
     }
 
