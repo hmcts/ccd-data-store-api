@@ -4,13 +4,7 @@ import java.util.Collections;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest.QUERY;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -19,11 +13,14 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest;
 
+@ExtendWith(MockitoExtension.class)
 class ElasticsearchCaseSearchRequestSecurityTest {
 
     private static final String CASE_TYPE_ID = "caseType";
@@ -48,10 +45,12 @@ class ElasticsearchCaseSearchRequestSecurityTest {
     @DisplayName("should parse and secure request with filters")
     void shouldSecureRequest() {
         CaseSearchRequest caseSearchRequest = mock(CaseSearchRequest.class);
-        when(caseSearchRequest.getCaseTypeId()).thenReturn(CASE_TYPE_ID);
-        when(caseSearchRequest.getQueryValue()).thenReturn("{}");
-        when(caseSearchFilter.getFilter(CASE_TYPE_ID)).thenReturn(Optional.of(mock(QueryBuilder.class)));
-        when(objectMapperService.convertStringToObject(anyString(), eq(ObjectNode.class))).thenReturn(searchRequestJsonNode);
+        doReturn(CASE_TYPE_ID).when(caseSearchRequest).getCaseTypeId();
+        doReturn("{}").when(caseSearchRequest).getQueryValue();
+        doReturn("").when(caseSearchRequest).toJsonString();
+        doReturn(Optional.of(mock(QueryBuilder.class))).when(caseSearchFilter).getFilter(CASE_TYPE_ID);
+        doReturn(searchRequestJsonNode).when(objectMapperService).convertStringToObject(anyString(), eq(ObjectNode.class));
+        doReturn(searchRequestJsonNode).when(searchRequestJsonNode).get(anyString());
 
         querySecurity.createSecuredSearchRequest(caseSearchRequest);
 

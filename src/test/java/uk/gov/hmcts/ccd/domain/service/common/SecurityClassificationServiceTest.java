@@ -1482,7 +1482,7 @@ public class SecurityClassificationServiceTest {
             CaseDetails caseDetails = applyClassification(PRIVATE);
 
             JsonNode resultNode = MAPPER.convertValue(caseDetails.getData(), JsonNode.class);
-            assertThat(resultNode, is(equalTo(JSON_NODE_FACTORY.objectNode())));
+            assertThat(resultNode, is(equalTo(JSON_NODE_FACTORY.nullNode())));
         }
 
         @Test
