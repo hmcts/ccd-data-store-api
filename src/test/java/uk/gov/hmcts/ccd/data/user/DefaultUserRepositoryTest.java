@@ -28,7 +28,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpEntity;
@@ -205,12 +204,18 @@ class DefaultUserRepositoryTest {
     @Nested
     @DisplayName("getUser()")
     class GetUser {
+        private static final String URL = "url";
+
+        @BeforeEach
+        void setUp() {
+            when(applicationParams.idamUserProfileURL()).thenReturn(URL);
+        }
 
         @Test
         @DisplayName("should retrieve user from IDAM")
         void shouldRetrieveUserFromIdam() {
             IdamUser idamUser = new IdamUser();
-            when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), Matchers.<Class<IdamUser>>any()))
+            when(restTemplate.exchange(eq(URL), eq(HttpMethod.GET), any(HttpEntity.class), eq(IdamUser.class)))
                 .thenReturn(ResponseEntity.ok(idamUser));
 
             IdamUser result = userRepository.getUser();
@@ -218,14 +223,15 @@ class DefaultUserRepositoryTest {
             assertThat(result, is(idamUser));
             verify(applicationParams).idamUserProfileURL();
             verify(securityUtils).userAuthorizationHeaders();
-            verify(restTemplate).exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), Matchers.<Class<IdamUser>>any());
+            verify(applicationParams).idamUserProfileURL();
+            verify(restTemplate).exchange(eq(URL), eq(HttpMethod.GET), any(HttpEntity.class), eq(IdamUser.class));
         }
 
         @Test
         @DisplayName("should throw exception when rest call fails")
         void shouldThrowExceptionWhenRestCallFails() {
-            doThrow(new RestClientException("Error")).when(restTemplate).exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class),
-                                                                                  Matchers.<Class<IdamUser>>any());
+            when(applicationParams.idamUserProfileURL()).thenReturn("url");
+            doThrow(new RestClientException("Error")).when(restTemplate).exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(IdamUser.class));
 
             assertThrows(ServiceException.class, () -> userRepository.getUser());
         }
