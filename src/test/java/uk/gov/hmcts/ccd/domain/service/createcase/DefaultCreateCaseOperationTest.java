@@ -198,12 +198,11 @@ class DefaultCreateCaseOperationTest {
     void shouldThrowValidationException_whenPreStateIsInvalid() {
         given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(CASE_TYPE);
         given(caseTypeService.isJurisdictionValid(JURISDICTION_ID, CASE_TYPE)).willReturn(Boolean.FALSE);
-        assertThrows(ValidationException.class,
-                     () -> defaultCreateCaseOperation.createCaseDetails(UID,
-                                                                        JURISDICTION_ID,
-                                                                        CASE_TYPE_ID,
-                                                                        eventData,
-                                                                        IGNORE_WARNING),
+        assertThrows(ValidationException.class, () -> defaultCreateCaseOperation.createCaseDetails(UID,
+                                                                                                   JURISDICTION_ID,
+                                                                                                   CASE_TYPE_ID,
+                                                                                                   eventData,
+                                                                                                   IGNORE_WARNING),
                      "Cannot create case because of eventId has pre-states defined");
     }
 
@@ -218,8 +217,7 @@ class DefaultCreateCaseOperationTest {
         given(eventTriggerService.isPreStateValid(null, eventTrigger)).willReturn(Boolean.TRUE);
         given(savedCaseType.getState()).willReturn(caseEventStateId);
         given(caseTypeService.findState(CASE_TYPE, caseEventStateId)).willReturn(caseEventState);
-        given(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, eventData))
-            .willReturn(data);
+        given(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, eventData)).willReturn(data);
         given(submitCaseTransaction.submitCase(same(event),
                                                same(CASE_TYPE),
                                                same(IDAM_USER),
@@ -275,8 +273,7 @@ class DefaultCreateCaseOperationTest {
 
 
         assertAll(() -> assertThat(caseDetails, IsInstanceOf.instanceOf(CaseDetails.class)),
-                  () -> order.verify(eventTokenService)
-                      .validateToken(TOKEN, UID, eventTrigger, CASE_TYPE.getJurisdiction(), CASE_TYPE),
+                  () -> order.verify(eventTokenService).validateToken(TOKEN, UID, eventTrigger, CASE_TYPE.getJurisdiction(), CASE_TYPE),
                   () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
                   () -> order.verify(submitCaseTransaction).submitCase(same(event),
                                                                        same(CASE_TYPE),
@@ -333,8 +330,7 @@ class DefaultCreateCaseOperationTest {
             draftGateway);
 
         assertAll("case details saved when call back fails",
-                  () -> order.verify(eventTokenService)
-                      .validateToken(TOKEN, UID, eventTrigger, CASE_TYPE.getJurisdiction(), CASE_TYPE),
+                  () -> order.verify(eventTokenService).validateToken(TOKEN, UID, eventTrigger, CASE_TYPE.getJurisdiction(), CASE_TYPE),
                   () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
                   () -> order.verify(submitCaseTransaction).submitCase(same(event),
                                                                        same(CASE_TYPE),
@@ -342,8 +338,7 @@ class DefaultCreateCaseOperationTest {
                                                                        same(eventTrigger),
                                                                        any(CaseDetails.class),
                                                                        same(IGNORE_WARNING)),
-                  () -> order.verify(callbackInvoker)
-                      .invokeSubmittedCallback(eq(eventTrigger), isNull(CaseDetails.class), same(savedCaseType)),
+                  () -> order.verify(callbackInvoker).invokeSubmittedCallback(eq(eventTrigger), isNull(CaseDetails.class), same(savedCaseType)),
                   () -> order.verify(savedCaseType).setIncompleteCallbackResponse(),
                   () -> order.verify(draftGateway).delete(DRAFT_ID));
     }
@@ -395,8 +390,7 @@ class DefaultCreateCaseOperationTest {
 
         assertAll("Call back response returned successfully",
                   () -> assertThat(caseDetails.getCaseTypeId(), is(mockCaseTypeId)),
-                  () -> order.verify(eventTokenService)
-                      .validateToken(TOKEN, UID, eventTrigger, CASE_TYPE.getJurisdiction(), CASE_TYPE),
+                  () -> order.verify(eventTokenService).validateToken(TOKEN, UID, eventTrigger, CASE_TYPE.getJurisdiction(), CASE_TYPE),
                   () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
                   () -> order.verify(submitCaseTransaction).submitCase(same(event),
                                                                        same(CASE_TYPE),
@@ -404,9 +398,7 @@ class DefaultCreateCaseOperationTest {
                                                                        same(eventTrigger),
                                                                        any(CaseDetails.class),
                                                                        same(IGNORE_WARNING)),
-                  () -> order.verify(callbackInvoker)
-                      .invokeSubmittedCallback(eq(eventTrigger),
-                                               isNull(CaseDetails.class), same(savedCaseType)),
+                  () -> order.verify(callbackInvoker).invokeSubmittedCallback(eq(eventTrigger), isNull(CaseDetails.class), same(savedCaseType)),
                   () -> order.verify(savedCaseType).setAfterSubmitCallbackResponseEntity(response),
                   () -> order.verify(draftGateway).delete(DRAFT_ID));
     }
