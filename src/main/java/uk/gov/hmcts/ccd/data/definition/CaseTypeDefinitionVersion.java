@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-public class CaseTypeDefinitionVersion implements Serializable{
+public class CaseTypeDefinitionVersion implements Serializable {
 
     private static final long serialVersionUID = 3792842101045258030L;
 
