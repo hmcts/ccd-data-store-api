@@ -64,6 +64,9 @@ public class ApplicationParams {
     @Value("${pagination.page.size}")
     private Integer paginationPageSize;
 
+    @Value("${definition.cache.max-idle.secs}")
+    private Integer definitionCacheMaxIdleSecs;
+
     @Value("${definition.cache.ttl.secs}")
     private Integer definitionCacheTTLSecs;
 
@@ -227,6 +230,10 @@ public class ApplicationParams {
 
     public int getPaginationPageSize() {
         return paginationPageSize;
+    }
+
+    public int getDefinitionCacheMaxIdleSecs() {
+        return definitionCacheMaxIdleSecs;
     }
 
     public int getDefinitionCacheTTLSecs() {
