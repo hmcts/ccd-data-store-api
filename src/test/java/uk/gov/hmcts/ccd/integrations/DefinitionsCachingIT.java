@@ -100,7 +100,7 @@ public class DefinitionsCachingIT {
     }
 
     @Test
-    public void testCaseDefinitionLatestVersionsAreExpiring() throws InterruptedException {
+    public void testTtlBasedEvictionOfCaseDefinitionLatestVersion() throws InterruptedException {
         verify(caseDefinitionRepository, times(0)).getLatestVersion(ID_3);
         caseDefinitionRepository.getLatestVersion(ID_3);
         verify(caseDefinitionRepository, times(1)).getLatestVersion(ID_3);
