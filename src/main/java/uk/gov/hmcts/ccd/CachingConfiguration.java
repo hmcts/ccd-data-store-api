@@ -39,11 +39,11 @@ public class CachingConfiguration {
         config.addMapConfig(newMapConfigWithTtl("caseTypeDefinitionLatestVersionCache", latestVersionTTL));  
     }
 
-    private MapConfig newMapConfigWithMaxIdle(final String name, Integer maxIdle) {
+    private MapConfig newMapConfigWithMaxIdle(final String name, final Integer maxIdle) {
         return newMapConfig(name).setMaxIdleSeconds(maxIdle);
     }
 
-    private MapConfig newMapConfigWithTtl(final String name, Integer ttl) {
+    private MapConfig newMapConfigWithTtl(final String name, final Integer ttl) {
         return newMapConfig(name).setTimeToLiveSeconds(ttl);
     }
 
