@@ -38,20 +38,20 @@ public class CachingConfiguration {
         config.addMapConfig(newMapConfig("caseTabCollectionCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfig("wizardPageCollectionCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfig("userRolesCache", definitionCacheMaxIdle));
-        config.addMapConfig(newMapConfig("caseTypeDefinitionLatestVersionCache", definitionCacheMaxIdle, definitionCacheTTL));
+        config.addMapConfig(newMapConfig("caseTypeDefinitionLatestVersionCache", definitionCacheMaxIdle, Optional.of(definitionCacheTTL)));
         
     }
 
     private MapConfig newMapConfig(final String name, Integer definitionCacheMaxIdle) {
-        return newMapConfig(name, definitionCacheMaxIdle, null);
+        return newMapConfig(name, definitionCacheMaxIdle, Optional.empty());
     }
 
-    private MapConfig newMapConfig(final String name, Integer definitionCacheMaxIdle, Integer definitionCacheTTL) {
+    private MapConfig newMapConfig(final String name, Integer definitionCacheMaxIdle, Optional<Integer> definitionCacheTTL) {
         MapConfig mapConfig = new MapConfig().setName(name)
                 .setMaxSizeConfig(new MaxSizeConfig(applicationParams.getDefinitionCacheMaxSize(), MaxSizeConfig.MaxSizePolicy.PER_NODE))
                 .setEvictionPolicy(applicationParams.getDefinitionCacheEvictionPolicy())
                 .setMaxIdleSeconds(definitionCacheMaxIdle);
-        Optional.ofNullable(definitionCacheTTL).ifPresent(value -> mapConfig.setTimeToLiveSeconds(value));
+        definitionCacheTTL.ifPresent(value -> mapConfig.setTimeToLiveSeconds(value));
         return mapConfig;
     }
 
