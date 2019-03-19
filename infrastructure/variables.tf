@@ -65,7 +65,7 @@ variable "definition_cache_max_idle_sec" {
 
 variable "definition_latest_version_ttl_sec" {
   type = "string"
-  default = "30"
+  default = "0"
 }
 
 variable "definition_cache_max_size" {
