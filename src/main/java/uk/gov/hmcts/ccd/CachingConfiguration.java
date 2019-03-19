@@ -25,11 +25,11 @@ public class CachingConfiguration {
         NetworkConfig networkConfig = config.setInstanceName("hazelcast-instance-ccd").getNetworkConfig();
         networkConfig.getJoin().getMulticastConfig().setEnabled(false);
         networkConfig.getJoin().getTcpIpConfig().setEnabled(false);
-        configCaches(applicationParams.getDefinitionCacheMaxIdleSecs(), applicationParams.getDefinitionCacheTTLSecs(), config);
+        configCaches(applicationParams.getDefinitionCacheMaxIdleSecs(), applicationParams.getLatestVersionTTLSecs(), config);
         return config;
     }
 
-    private void configCaches(int definitionCacheMaxIdle, int definitionCacheTTL, Config config) {
+    private void configCaches(int definitionCacheMaxIdle, int latestVersionTTL, Config config) {
         config.addMapConfig(newMapConfig("caseTypeDefinitionsCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfig("workBasketResultCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfig("searchResultCache", definitionCacheMaxIdle));
@@ -38,7 +38,7 @@ public class CachingConfiguration {
         config.addMapConfig(newMapConfig("caseTabCollectionCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfig("wizardPageCollectionCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfig("userRolesCache", definitionCacheMaxIdle));
-        config.addMapConfig(newMapConfig("caseTypeDefinitionLatestVersionCache", definitionCacheMaxIdle, Optional.of(definitionCacheTTL)));
+        config.addMapConfig(newMapConfig("caseTypeDefinitionLatestVersionCache", definitionCacheMaxIdle, Optional.of(latestVersionTTL)));
         
     }
 
@@ -46,12 +46,12 @@ public class CachingConfiguration {
         return newMapConfig(name, definitionCacheMaxIdle, Optional.empty());
     }
 
-    private MapConfig newMapConfig(final String name, Integer definitionCacheMaxIdle, Optional<Integer> definitionCacheTTL) {
+    private MapConfig newMapConfig(final String name, Integer definitionCacheMaxIdle, Optional<Integer> latestVersionTTL) {
         MapConfig mapConfig = new MapConfig().setName(name)
                 .setMaxSizeConfig(new MaxSizeConfig(applicationParams.getDefinitionCacheMaxSize(), MaxSizeConfig.MaxSizePolicy.PER_NODE))
                 .setEvictionPolicy(applicationParams.getDefinitionCacheEvictionPolicy())
                 .setMaxIdleSeconds(definitionCacheMaxIdle);
-        definitionCacheTTL.ifPresent(value -> mapConfig.setTimeToLiveSeconds(value));
+        latestVersionTTL.ifPresent(value -> mapConfig.setTimeToLiveSeconds(value));
         return mapConfig;
     }
 
