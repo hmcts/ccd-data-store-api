@@ -58,20 +58,20 @@ data "azurerm_key_vault_secret" "ccd_data_s2s_key" {
 data "azurerm_key_vault_secret" "ccd_elastic_search_url" {
   count = "${var.elastic_search_enabled == "false" ? 0 : 1}"
   name = "ccd-ELASTIC-SEARCH-URL"
-  vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
+  key_vault_id = "${data.azurerm_key_vault.ccd_shared_key_vault.id}"
 }
 
 // format: "http://ccd-data-1:9200","http://ccd-data-2:9200"
 data "azurerm_key_vault_secret" "ccd_elastic_search_data_nodes_url" {
   count = "${var.elastic_search_enabled == "false" ? 0 : 1}"
   name = "ccd-ELASTIC-SEARCH-DATA-NODES-URL"
-  vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
+  key_vault_id = "${data.azurerm_key_vault.ccd_shared_key_vault.id}"
 }
 
 data "azurerm_key_vault_secret" "ccd_elastic_search_password" {
   count = "${var.elastic_search_enabled == "false" ? 0 : 1}"
   name = "ccd-ELASTIC-SEARCH-PASSWORD"
-  vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
+  key_vault_id = "${data.azurerm_key_vault.ccd_shared_key_vault.id}"
 }
 
 resource "random_string" "draft_encryption_key" {
