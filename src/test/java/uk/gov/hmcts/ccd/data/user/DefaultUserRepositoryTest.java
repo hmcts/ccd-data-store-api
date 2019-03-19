@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.data.user;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -31,7 +30,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -242,12 +240,6 @@ class DefaultUserRepositoryTest {
                     () -> userRepository.getUserDefaultSettings(userId),
                     "Expected getUserDefaultSettings() to throw, but it didn't");
             assertThat(serviceException.getMessage(), is("Problem getting user default settings for " + userId));
-
-            // Check that the URL used in the request is encoded correctly, specifically the query string
-            ArgumentCaptor<String> requestUrl = ArgumentCaptor.forClass(String.class);
-            verify(restTemplate).exchange(
-                requestUrl.capture(), same(HttpMethod.GET), any(HttpEntity.class), (Class<?>)any(Class.class));
-            assertThat(requestUrl.getValue(), is("http://test.hmcts.net/users?uid=ccd%2Btest%40hmcts.net"));
         }
     }
 
