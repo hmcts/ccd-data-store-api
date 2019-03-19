@@ -5,8 +5,6 @@ import com.hazelcast.config.MapConfig;
 import com.hazelcast.config.MaxSizeConfig;
 import com.hazelcast.config.NetworkConfig;
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,28 +28,29 @@ public class CachingConfiguration {
     }
 
     private void configCaches(int definitionCacheMaxIdle, int latestVersionTTL, Config config) {
-        config.addMapConfig(newMapConfig("caseTypeDefinitionsCache", definitionCacheMaxIdle));
-        config.addMapConfig(newMapConfig("workBasketResultCache", definitionCacheMaxIdle));
-        config.addMapConfig(newMapConfig("searchResultCache", definitionCacheMaxIdle));
-        config.addMapConfig(newMapConfig("searchInputDefinitionCache", definitionCacheMaxIdle));
-        config.addMapConfig(newMapConfig("workbasketInputDefinitionCache", definitionCacheMaxIdle));
-        config.addMapConfig(newMapConfig("caseTabCollectionCache", definitionCacheMaxIdle));
-        config.addMapConfig(newMapConfig("wizardPageCollectionCache", definitionCacheMaxIdle));
-        config.addMapConfig(newMapConfig("userRolesCache", definitionCacheMaxIdle));
-        config.addMapConfig(newMapConfig("caseTypeDefinitionLatestVersionCache", definitionCacheMaxIdle, Optional.of(latestVersionTTL)));
-        
+        config.addMapConfig(newMapConfigWithMaxIdle("caseTypeDefinitionsCache", definitionCacheMaxIdle));
+        config.addMapConfig(newMapConfigWithMaxIdle("workBasketResultCache", definitionCacheMaxIdle));
+        config.addMapConfig(newMapConfigWithMaxIdle("searchResultCache", definitionCacheMaxIdle));
+        config.addMapConfig(newMapConfigWithMaxIdle("searchInputDefinitionCache", definitionCacheMaxIdle));
+        config.addMapConfig(newMapConfigWithMaxIdle("workbasketInputDefinitionCache", definitionCacheMaxIdle));
+        config.addMapConfig(newMapConfigWithMaxIdle("caseTabCollectionCache", definitionCacheMaxIdle));
+        config.addMapConfig(newMapConfigWithMaxIdle("wizardPageCollectionCache", definitionCacheMaxIdle));
+        config.addMapConfig(newMapConfigWithMaxIdle("userRolesCache", definitionCacheMaxIdle));
+        config.addMapConfig(newMapConfigWithTtl("caseTypeDefinitionLatestVersionCache", latestVersionTTL));  
     }
 
-    private MapConfig newMapConfig(final String name, Integer definitionCacheMaxIdle) {
-        return newMapConfig(name, definitionCacheMaxIdle, Optional.empty());
+    private MapConfig newMapConfigWithMaxIdle(final String name, Integer maxIdle) {
+        return newMapConfig(name).setMaxIdleSeconds(maxIdle);
     }
 
-    private MapConfig newMapConfig(final String name, Integer definitionCacheMaxIdle, Optional<Integer> latestVersionTTL) {
+    private MapConfig newMapConfigWithTtl(final String name, Integer ttl) {
+        return newMapConfig(name).setTimeToLiveSeconds(ttl);
+    }
+
+    private MapConfig newMapConfig(final String name) {
         MapConfig mapConfig = new MapConfig().setName(name)
                 .setMaxSizeConfig(new MaxSizeConfig(applicationParams.getDefinitionCacheMaxSize(), MaxSizeConfig.MaxSizePolicy.PER_NODE))
-                .setEvictionPolicy(applicationParams.getDefinitionCacheEvictionPolicy())
-                .setMaxIdleSeconds(definitionCacheMaxIdle);
-        latestVersionTTL.ifPresent(value -> mapConfig.setTimeToLiveSeconds(value));
+                .setEvictionPolicy(applicationParams.getDefinitionCacheEvictionPolicy());
         return mapConfig;
     }
 
