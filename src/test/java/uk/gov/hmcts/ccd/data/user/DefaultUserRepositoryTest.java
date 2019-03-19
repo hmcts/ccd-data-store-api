@@ -2,20 +2,22 @@ package uk.gov.hmcts.ccd.data.user;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.same;
@@ -27,7 +29,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -125,7 +126,8 @@ class DefaultUserRepositoryTest {
                 userRepository.getUserClassifications(JURISDICTION_ID);
 
                 assertAll(
-                    () -> verify(caseDefinitionRepository).getClassificationsForUserRoleList(asList(ROLE_CASEWORKER_CMC)),
+                    () -> verify(caseDefinitionRepository).getClassificationsForUserRoleList(
+                        singletonList(ROLE_CASEWORKER_CMC)),
                     () -> verifyNoMoreInteractions(caseDefinitionRepository)
                 );
             }
@@ -143,7 +145,7 @@ class DefaultUserRepositoryTest {
                 userRepository.getUserClassifications(JURISDICTION_ID);
 
                 assertAll(
-                    () -> verify(caseDefinitionRepository).getClassificationsForUserRoleList(asList(CITIZEN)),
+                    () -> verify(caseDefinitionRepository).getClassificationsForUserRoleList(singletonList(CITIZEN)),
                     () -> verifyNoMoreInteractions(caseDefinitionRepository)
                 );
             }
@@ -156,7 +158,8 @@ class DefaultUserRepositoryTest {
                 userRepository.getUserClassifications(JURISDICTION_ID);
 
                 assertAll(
-                    () -> verify(caseDefinitionRepository).getClassificationsForUserRoleList(asList(LETTER_HOLDER)),
+                    () -> verify(caseDefinitionRepository).getClassificationsForUserRoleList(
+                        singletonList(LETTER_HOLDER)),
                     () -> verifyNoMoreInteractions(caseDefinitionRepository)
                 );
             }
@@ -184,20 +187,16 @@ class DefaultUserRepositoryTest {
             jurisdiction.setName("Test");
             jurisdiction.setDescription("Test Jurisdiction");
             final UserDefault userDefault = new UserDefault();
-            userDefault.setJurisdictions(Collections.singletonList(jurisdiction));
+            userDefault.setJurisdictions(singletonList(jurisdiction));
             final ResponseEntity<UserDefault> responseEntity = new ResponseEntity<>(userDefault, HttpStatus.OK);
             when(restTemplate
-                .exchange(any(String.class), eq(HttpMethod.GET), any(HttpEntity.class), eq(UserDefault.class)))
+                .exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(UserDefault.class), anyMap()))
                 .thenReturn(responseEntity);
 
             final UserDefault result = userRepository.getUserDefaultSettings("ccd+test@hmcts.net");
             assertThat(result, is(userDefault));
-
-            // Check that the URL used in the request is encoded correctly, specifically the query string
-            ArgumentCaptor<String> requestUrl = ArgumentCaptor.forClass(String.class);
             verify(restTemplate).exchange(
-                requestUrl.capture(), same(HttpMethod.GET), any(HttpEntity.class), (Class<?>)any(Class.class));
-            assertThat(requestUrl.getValue(), is("http://test.hmcts.net/users?uid=ccd%2Btest%40hmcts.net"));
+                anyString(), same(HttpMethod.GET), any(HttpEntity.class), (Class<?>)any(Class.class), anyMap());
         }
     }
 
@@ -216,7 +215,8 @@ class DefaultUserRepositoryTest {
             userRole2.setSecurityClassification(SecurityClassification.PUBLIC.name());
             UserRole userRole3 = new UserRole();
             userRole3.setSecurityClassification(SecurityClassification.RESTRICTED.name());
-            when(caseDefinitionRepository.getClassificationsForUserRoleList(anyListOf(String.class))).thenReturn(asList(userRole1, userRole2, userRole3));
+            when(caseDefinitionRepository.getClassificationsForUserRoleList(anyList()))
+                .thenReturn(asList(userRole1, userRole2, userRole3));
 
             SecurityClassification result = userRepository.getHighestUserClassification(JURISDICTION_ID);
 
@@ -227,7 +227,7 @@ class DefaultUserRepositoryTest {
         @DisplayName("should throw exception when no user roles returned")
         void shouldThrowExceptionWhenNoUserRolesReturned() {
             asCaseworker();
-            when(caseDefinitionRepository.getClassificationsForUserRoleList(anyListOf(String.class))).thenReturn(emptyList());
+            when(caseDefinitionRepository.getClassificationsForUserRoleList(anyList())).thenReturn(emptyList());
 
             assertThrows(ServiceException.class, () -> userRepository.getHighestUserClassification(JURISDICTION_ID));
         }

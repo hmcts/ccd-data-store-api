@@ -18,7 +18,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.util.DefaultUriBuilderFactory;
+import org.springframework.web.util.DefaultUriBuilderFactory.EncodingMode;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.AuthCheckerConfiguration;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
@@ -92,13 +93,14 @@ public class DefaultUserRepository implements UserRepository {
         try {
             LOG.debug("retrieving default user settings for user {}", userId);
             final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
-            final Map<String, Object> queryParams = new HashMap<>();
+            final Map<String, String> queryParams = new HashMap<>();
             queryParams.put("uid", userId);
-            // The toUriString() method ensures the whole URL is encoded, including the query string variables
-            final String encodedUrl = UriComponentsBuilder.fromHttpUrl(applicationParams.userDefaultSettingsURL())
-                .uriVariables(queryParams)
-                .toUriString();
-            return restTemplate.exchange(encodedUrl, HttpMethod.GET, requestEntity, UserDefault.class).getBody();
+            final DefaultUriBuilderFactory builderFactory = new DefaultUriBuilderFactory();
+            // The EncodingMode.VALUES_ONLY mode ensures the query string variables are encoded
+            builderFactory.setEncodingMode(EncodingMode.VALUES_ONLY);
+            restTemplate.setUriTemplateHandler(builderFactory);
+            return restTemplate.exchange(applicationParams.userDefaultSettingsURL(),
+                HttpMethod.GET, requestEntity, UserDefault.class, queryParams).getBody();
         } catch (HttpStatusCodeException e) {
             LOG.error("Failed to retrieve user profile", e);
             final List<String> headerMessages = Optional.ofNullable(e.getResponseHeaders())
