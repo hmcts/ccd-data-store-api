@@ -52,15 +52,8 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
     }
 
     @Override
-    public CaseDetails createCaseEvent(String uid,
-                                       String jurisdictionId,
-                                       String caseTypeId,
-                                       String caseReference,
+    public CaseDetails createCaseEvent(String caseReference,
                                        CaseDataContent content) {
-        final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
-        if (caseType == null) {
-            throw new ValidationException("Cannot find case type definition for  " + caseTypeId);
-        }
 
         CaseDetails existingCaseDetails = getCaseOperation.execute(caseReference)
             .orElseThrow(() -> new ResourceNotFoundException("Case not found"));
@@ -71,12 +64,15 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
             throw new ValidationException("Cannot find user roles for the user");
         }
 
+        String caseTypeId = existingCaseDetails.getCaseTypeId();
+        final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
+        if (caseType == null) {
+            throw new ValidationException("Cannot find case type definition for  " + caseTypeId);
+        }
+
         verifyUpsertAccess(content.getEvent(), content.getData(), existingCaseDetails, caseType, userRoles);
 
-        final CaseDetails caseDetails = createEventOperation.createCaseEvent(uid,
-                                                                             jurisdictionId,
-                                                                             caseTypeId,
-                                                                             caseReference,
+        final CaseDetails caseDetails = createEventOperation.createCaseEvent(caseReference,
                                                                              content);
         return verifyReadAccess(caseType, userRoles, caseDetails);
     }

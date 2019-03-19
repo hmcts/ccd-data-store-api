@@ -232,10 +232,7 @@ class DefaultCreateEventOperationTest {
     }
 
     private CaseDetails createCaseEvent() {
-        return createEventOperation.createCaseEvent(USER_ID,
-            JURISDICTION_ID,
-            CASE_TYPE_ID,
-            CASE_REFERENCE,
+        return createEventOperation.createCaseEvent(CASE_REFERENCE,
             caseDataContent);
     }
 

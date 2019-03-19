@@ -124,10 +124,7 @@ class AuthorisedCreateEventOperationTest {
         classifiedCase = new CaseDetails();
         Map<String, JsonNode> classifiedData = Maps.newHashMap();
         classifiedCase.setData(classifiedData);
-        doReturn(classifiedCase).when(createEventOperation).createCaseEvent(UID,
-                                                                            JURISDICTION_ID,
-                                                                            CASE_TYPE_ID,
-                                                                            CASE_REFERENCE,
+        doReturn(classifiedCase).when(createEventOperation).createCaseEvent(CASE_REFERENCE,
                                                                             CASE_DATA_CONTENT);
         caseType.setEvents(events);
         caseType.setCaseFields(caseFields);
@@ -160,16 +157,10 @@ class AuthorisedCreateEventOperationTest {
     @DisplayName("should call decorated operation")
     void shouldCallDecoratedOperation() {
 
-        authorisedCreateEventOperation.createCaseEvent(UID,
-                                                       JURISDICTION_ID,
-                                                       CASE_TYPE_ID,
-                                                       CASE_REFERENCE,
+        authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
                                                        CASE_DATA_CONTENT);
 
-        verify(createEventOperation).createCaseEvent(UID,
-                                                     JURISDICTION_ID,
-                                                     CASE_TYPE_ID,
-                                                     CASE_REFERENCE,
+        verify(createEventOperation).createCaseEvent(CASE_REFERENCE,
                                                      CASE_DATA_CONTENT);
     }
 
@@ -177,10 +168,7 @@ class AuthorisedCreateEventOperationTest {
     @DisplayName("should fail when no case found")
     void shouldFailWhenCaseNotFound() {
         doReturn(Optional.empty()).when(getCaseOperation).execute(CASE_REFERENCE);
-        assertThrows(ResourceNotFoundException.class, () -> authorisedCreateEventOperation.createCaseEvent(UID,
-                                                                                                           JURISDICTION_ID,
-                                                                                                           CASE_TYPE_ID,
-                                                                                                           CASE_REFERENCE,
+        assertThrows(ResourceNotFoundException.class, () -> authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
                                                                                                            CASE_DATA_CONTENT));
 
     }
@@ -188,15 +176,9 @@ class AuthorisedCreateEventOperationTest {
     @Test
     @DisplayName("should return null when decorated operation returns null")
     void shouldReturnNullWhenOperationReturnsNull() {
-        doReturn(null).when(createEventOperation).createCaseEvent(UID,
-                                                                  JURISDICTION_ID,
-                                                                  CASE_TYPE_ID,
-                                                                  CASE_REFERENCE,
+        doReturn(null).when(createEventOperation).createCaseEvent(CASE_REFERENCE,
                                                                   CASE_DATA_CONTENT);
-        final CaseDetails output = authorisedCreateEventOperation.createCaseEvent(UID,
-                                                                                  JURISDICTION_ID,
-                                                                                  CASE_TYPE_ID,
-                                                                                  CASE_REFERENCE,
+        final CaseDetails output = authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
                                                                                   CASE_DATA_CONTENT);
 
         assertThat(output, is(nullValue()));
@@ -206,10 +188,7 @@ class AuthorisedCreateEventOperationTest {
     @DisplayName("should return authorised case detail if relevant create, update and read access granted")
     void shouldReturnAuthorisedCaseDetailsIfCreateEventAndCreateUpdateAndReadAccessGranted() {
 
-        final CaseDetails output = authorisedCreateEventOperation.createCaseEvent(UID,
-                                                                                  JURISDICTION_ID,
-                                                                                  CASE_TYPE_ID,
-                                                                                  CASE_REFERENCE,
+        final CaseDetails output = authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
                                                                                   CASE_DATA_CONTENT);
         InOrder inOrder = inOrder(caseDefinitionRepository, caseAccessService, getCaseOperation,
                                   createEventOperation, accessControlService);
@@ -230,10 +209,7 @@ class AuthorisedCreateEventOperationTest {
                                                                                     any(JsonNode.class),
                                                                                     eq(caseFields),
                                                                                     eq(USER_ROLES)),
-            () -> inOrder.verify(createEventOperation).createCaseEvent(UID,
-                                                                       JURISDICTION_ID,
-                                                                       CASE_TYPE_ID,
-                                                                       CASE_REFERENCE,
+            () -> inOrder.verify(createEventOperation).createCaseEvent(CASE_REFERENCE,
                                                                        CASE_DATA_CONTENT),
             () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseType),
                                                                                      eq(USER_ROLES),
@@ -249,17 +225,11 @@ class AuthorisedCreateEventOperationTest {
     @DisplayName("should return null when no classified case")
     void shouldReturnNullCaseDetailsWhenNoCaseTypeAccess() {
 
-        doReturn(null).when(createEventOperation).createCaseEvent(UID,
-                                                                  JURISDICTION_ID,
-                                                                  CASE_TYPE_ID,
-                                                                  CASE_REFERENCE,
+        doReturn(null).when(createEventOperation).createCaseEvent(CASE_REFERENCE,
                                                                   CASE_DATA_CONTENT);
 
 
-        final CaseDetails output = authorisedCreateEventOperation.createCaseEvent(UID,
-                                                                                  JURISDICTION_ID,
-                                                                                  CASE_TYPE_ID,
-                                                                                  CASE_REFERENCE,
+        final CaseDetails output = authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
                                                                                   CASE_DATA_CONTENT);
 
         assertThat(output, is(nullValue()));
@@ -271,10 +241,7 @@ class AuthorisedCreateEventOperationTest {
 
         doReturn(null).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
 
-        assertThrows(ValidationException.class, () -> authorisedCreateEventOperation.createCaseEvent(UID,
-                                                                                                     JURISDICTION_ID,
-                                                                                                     CASE_TYPE_ID,
-                                                                                                     CASE_REFERENCE,
+        assertThrows(ValidationException.class, () -> authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
                                                                                                      CASE_DATA_CONTENT));
     }
 
@@ -284,10 +251,7 @@ class AuthorisedCreateEventOperationTest {
 
         doReturn(Collections.EMPTY_SET).when(caseAccessService).getUserRoles();
 
-        assertThrows(ValidationException.class, () -> authorisedCreateEventOperation.createCaseEvent(UID,
-                                                                                                     JURISDICTION_ID,
-                                                                                                     CASE_TYPE_ID,
-                                                                                                     CASE_REFERENCE,
+        assertThrows(ValidationException.class, () -> authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
                                                                                                      CASE_DATA_CONTENT));
     }
 
@@ -297,10 +261,7 @@ class AuthorisedCreateEventOperationTest {
 
         when(accessControlService.canAccessCaseTypeWithCriteria(caseType, USER_ROLES, CAN_UPDATE)).thenReturn(false);
 
-        assertThrows(ResourceNotFoundException.class, () -> authorisedCreateEventOperation.createCaseEvent(UID,
-                                                                                                           JURISDICTION_ID,
-                                                                                                           CASE_TYPE_ID,
-                                                                                                           CASE_REFERENCE,
+        assertThrows(ResourceNotFoundException.class, () -> authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
                                                                                                            CASE_DATA_CONTENT));
     }
 
@@ -309,10 +270,7 @@ class AuthorisedCreateEventOperationTest {
     void shouldFailWhenUserCannotUpdateState() {
         when(accessControlService.canAccessCaseStateWithCriteria(eq(STATE_ID), eq(caseType), eq(USER_ROLES), eq(CAN_UPDATE))).thenReturn(
             false);
-        assertThrows(ResourceNotFoundException.class, () -> authorisedCreateEventOperation.createCaseEvent(UID,
-                                                                                                           JURISDICTION_ID,
-                                                                                                           CASE_TYPE_ID,
-                                                                                                           CASE_REFERENCE,
+        assertThrows(ResourceNotFoundException.class, () -> authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
                                                                                                            CASE_DATA_CONTENT));
 
     }
@@ -321,10 +279,7 @@ class AuthorisedCreateEventOperationTest {
     @DisplayName("should fail if no event provided")
     void shouldFailIfNoEventProvided() {
 
-        assertThrows(ResourceNotFoundException.class, () -> authorisedCreateEventOperation.createCaseEvent(UID,
-                                                                                                           JURISDICTION_ID,
-                                                                                                           CASE_TYPE_ID,
-                                                                                                           CASE_REFERENCE,
+        assertThrows(ResourceNotFoundException.class, () -> authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
                                                                                                            INVALID_CASE_DATA_CONTENT));
     }
 
@@ -337,10 +292,7 @@ class AuthorisedCreateEventOperationTest {
                                                                  eq(USER_ROLES),
                                                                  eq(CAN_CREATE))).thenReturn(false);
 
-        assertThrows(ResourceNotFoundException.class, () -> authorisedCreateEventOperation.createCaseEvent(UID,
-                                                                                                           JURISDICTION_ID,
-                                                                                                           CASE_TYPE_ID,
-                                                                                                           CASE_REFERENCE,
+        assertThrows(ResourceNotFoundException.class, () -> authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
                                                                                                            CASE_DATA_CONTENT));
     }
 
@@ -353,10 +305,7 @@ class AuthorisedCreateEventOperationTest {
                                                                eq(caseFields),
                                                                eq(USER_ROLES))).thenReturn(false);
 
-        assertThrows(ResourceNotFoundException.class, () -> authorisedCreateEventOperation.createCaseEvent(UID,
-                                                                                                           JURISDICTION_ID,
-                                                                                                           CASE_TYPE_ID,
-                                                                                                           CASE_REFERENCE,
+        assertThrows(ResourceNotFoundException.class, () -> authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
                                                                                                            CASE_DATA_CONTENT));
     }
 
@@ -368,10 +317,7 @@ class AuthorisedCreateEventOperationTest {
                                                                 eq(USER_ROLES),
                                                                 eq(CAN_READ))).thenReturn(false);
 
-        final CaseDetails caseDetails = authorisedCreateEventOperation.createCaseEvent(UID,
-                                                                                       JURISDICTION_ID,
-                                                                                       CASE_TYPE_ID,
-                                                                                       CASE_REFERENCE,
+        final CaseDetails caseDetails = authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
                                                                                        CASE_DATA_CONTENT);
         assertThat(caseDetails, is(nullValue()));
     }

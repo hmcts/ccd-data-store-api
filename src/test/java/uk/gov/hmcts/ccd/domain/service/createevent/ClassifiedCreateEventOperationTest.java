@@ -43,10 +43,7 @@ class ClassifiedCreateEventOperationTest {
         MockitoAnnotations.initMocks(this);
 
         caseDetails = new CaseDetails();
-        doReturn(caseDetails).when(createEventOperation).createCaseEvent(UID,
-                                                                         JURISDICTION_ID,
-                                                                         CASE_TYPE_ID,
-                                                                         CASE_REFERENCE,
+        doReturn(caseDetails).when(createEventOperation).createCaseEvent(CASE_REFERENCE,
                                                                          CASE_DATA_CONTENT);
 
         classifiedCase = new CaseDetails();
@@ -58,32 +55,20 @@ class ClassifiedCreateEventOperationTest {
     @Test
     @DisplayName("should call decorated operation")
     void shouldCallDecoratedOperation() {
-        classifiedCreateEventOperation.createCaseEvent(UID,
-                                                       JURISDICTION_ID,
-                                                       CASE_TYPE_ID,
-                                                       CASE_REFERENCE,
+        classifiedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
                                                        CASE_DATA_CONTENT);
 
-        verify(createEventOperation).createCaseEvent(UID,
-                                                     JURISDICTION_ID,
-                                                     CASE_TYPE_ID,
-                                                     CASE_REFERENCE,
+        verify(createEventOperation).createCaseEvent(CASE_REFERENCE,
                                                      CASE_DATA_CONTENT);
     }
 
     @Test
     @DisplayName("should return null when decorated operation returns null")
     void shouldReturnNullWhenOperationReturnsNull() {
-        doReturn(null).when(createEventOperation).createCaseEvent(UID,
-                                                                  JURISDICTION_ID,
-                                                                  CASE_TYPE_ID,
-                                                                  CASE_REFERENCE,
+        doReturn(null).when(createEventOperation).createCaseEvent(CASE_REFERENCE,
                                                                   CASE_DATA_CONTENT);
 
-        final CaseDetails output = classifiedCreateEventOperation.createCaseEvent(UID,
-                                                                                  JURISDICTION_ID,
-                                                                                  CASE_TYPE_ID,
-                                                                                  CASE_REFERENCE,
+        final CaseDetails output = classifiedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
                                                                                   CASE_DATA_CONTENT);
 
         assertThat(output, is(nullValue()));
@@ -93,10 +78,7 @@ class ClassifiedCreateEventOperationTest {
     @DisplayName("should return classified case detail")
     void shouldReturnClassifiedCaseDetails() {
 
-        final CaseDetails output = classifiedCreateEventOperation.createCaseEvent(UID,
-                                                                                  JURISDICTION_ID,
-                                                                                  CASE_TYPE_ID,
-                                                                                  CASE_REFERENCE,
+        final CaseDetails output = classifiedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
                                                                                   CASE_DATA_CONTENT);
 
         assertAll(
@@ -111,10 +93,7 @@ class ClassifiedCreateEventOperationTest {
 
         doReturn(Optional.empty()).when(classificationService).applyClassification(caseDetails);
 
-        final CaseDetails output = classifiedCreateEventOperation.createCaseEvent(UID,
-                                                                                  JURISDICTION_ID,
-                                                                                  CASE_TYPE_ID,
-                                                                                  CASE_REFERENCE,
+        final CaseDetails output = classifiedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
                                                                                   CASE_DATA_CONTENT);
 
         assertThat(output, is(nullValue()));
