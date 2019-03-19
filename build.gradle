@@ -103,7 +103,7 @@ repositories {
 // end::repositories[]
 
 ext {
-    junitJupiterVersion = '5.2.0'
+    junitJupiterVersion = '5.4.1'
     junitVintageVersion = '5.2.0'
     hibernateVersion = '5.2.17.Final'
     powermockVersion = '2.0.0-beta.5'
