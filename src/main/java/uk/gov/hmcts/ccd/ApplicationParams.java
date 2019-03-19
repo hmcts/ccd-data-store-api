@@ -67,8 +67,8 @@ public class ApplicationParams {
     @Value("${definition.cache.max-idle.secs}")
     private Integer definitionCacheMaxIdleSecs;
 
-    @Value("${definition.cache.ttl.secs}")
-    private Integer definitionCacheTTLSecs;
+    @Value("${definition.cache.latest-version-ttl.secs}")
+    private Integer latestVersionTTLSecs;
 
     @Value("${definition.cache.max.size}")
     private Integer definitionCacheMaxSize;
@@ -236,8 +236,8 @@ public class ApplicationParams {
         return definitionCacheMaxIdleSecs;
     }
 
-    public int getDefinitionCacheTTLSecs() {
-        return definitionCacheTTLSecs;
+    public int getLatestVersionTTLSecs() {
+        return latestVersionTTLSecs;
     }
 
     public int getDefinitionCacheMaxSize() {

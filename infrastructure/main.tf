@@ -129,7 +129,7 @@ module "ccd-data-store-api" {
     CCD_DEFAULTPRINTURL                 = "${local.default_print_url}"
 
     DEFINITION_CACHE_MAX_IDLE_SEC       = "${var.definition_cache_max_idle_sec}"
-    DEFINITION_CACHE_TTL_SEC            = "${var.definition_cache_ttl_sec}"
+    DEFINITION_CACHE_LATEST_VERSION_TTL_SEC = "${var.definition_cache_latest_version_ttl_sec}"
     DEFINITION_CACHE_MAX_SIZE           = "${var.definition_cache_max_size}"
     DEFINITION_CACHE_EVICTION_POLICY    = "${var.definition_cache_eviction_policy}"
 
