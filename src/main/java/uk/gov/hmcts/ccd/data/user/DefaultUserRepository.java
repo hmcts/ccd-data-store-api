@@ -16,7 +16,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.springframework.web.util.DefaultUriBuilderFactory.EncodingMode;
@@ -101,7 +101,7 @@ public class DefaultUserRepository implements UserRepository {
             restTemplate.setUriTemplateHandler(builderFactory);
             return restTemplate.exchange(applicationParams.userDefaultSettingsURL(),
                 HttpMethod.GET, requestEntity, UserDefault.class, queryParams).getBody();
-        } catch (HttpStatusCodeException e) {
+        } catch (RestClientResponseException e) {
             LOG.error("Failed to retrieve user profile", e);
             final List<String> headerMessages = Optional.ofNullable(e.getResponseHeaders())
                 .map(headers -> headers.get("Message")).orElse(null);

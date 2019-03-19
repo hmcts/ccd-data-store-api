@@ -33,6 +33,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +41,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
@@ -48,6 +50,7 @@ import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserDefault;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
 
@@ -197,6 +200,43 @@ class DefaultUserRepositoryTest {
             assertThat(result, is(userDefault));
             verify(restTemplate).exchange(
                 anyString(), same(HttpMethod.GET), any(HttpEntity.class), (Class<?>)any(Class.class), anyMap());
+        }
+
+        @Test
+        @DisplayName("should throw a BadRequestException if the User Profile defaults cannot be retrieved")
+        void shouldThrowExceptionIfUserProfileCannotBeRetrieved() {
+            when(applicationParams.userDefaultSettingsURL()).thenReturn("http://test.hmcts.net/users?uid={uid}");
+            final HttpHeaders headers = new HttpHeaders();
+            headers.add("Message", "User Profile data could not be retrieved");
+            final RestClientResponseException exception =
+                new RestClientResponseException("Error on GET", 400, "Bad Request", headers, null, null);
+            when(restTemplate
+                .exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(UserDefault.class), anyMap()))
+                .thenThrow(exception);
+
+            final BadRequestException badRequestException =
+                assertThrows(BadRequestException.class,
+                    () -> userRepository.getUserDefaultSettings("ccd+test@hmcts.net"),
+                    "Expected getUserDefaultSettings() to throw, but it didn't");
+            assertThat(badRequestException.getMessage(), is(headers.getFirst("Message")));
+        }
+
+        @Test
+        @DisplayName("should throw a ServiceException if an error occurs retrieving the User Profile defaults")
+        void shouldThrowExceptionIfErrorOnRetrievingUserProfile() {
+            when(applicationParams.userDefaultSettingsURL()).thenReturn("http://test.hmcts.net/users?uid={uid}");
+            final RestClientResponseException exception =
+                new RestClientResponseException(null, 500, "Internal Server Error", null, null, null);
+            when(restTemplate
+                .exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(UserDefault.class), anyMap()))
+                .thenThrow(exception);
+
+            final String userId = "ccd+test@hmcts.net";
+            final ServiceException serviceException =
+                assertThrows(ServiceException.class,
+                    () -> userRepository.getUserDefaultSettings(userId),
+                    "Expected getUserDefaultSettings() to throw, but it didn't");
+            assertThat(serviceException.getMessage(), is("Problem getting user default settings for " + userId));
         }
     }
 
