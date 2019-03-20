@@ -18,8 +18,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.DefaultUriBuilderFactory;
-import org.springframework.web.util.DefaultUriBuilderFactory.EncodingMode;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.AuthCheckerConfiguration;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
@@ -94,11 +92,7 @@ public class DefaultUserRepository implements UserRepository {
             LOG.debug("retrieving default user settings for user {}", userId);
             final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
             final Map<String, String> queryParams = new HashMap<>();
-            queryParams.put("uid", userId);
-            final DefaultUriBuilderFactory builderFactory = new DefaultUriBuilderFactory();
-            // The EncodingMode.VALUES_ONLY mode ensures the query string variables are encoded
-            builderFactory.setEncodingMode(EncodingMode.VALUES_ONLY);
-            restTemplate.setUriTemplateHandler(builderFactory);
+            queryParams.put("uid", ApplicationParams.encode(userId));
             return restTemplate.exchange(applicationParams.userDefaultSettingsURL(),
                 HttpMethod.GET, requestEntity, UserDefault.class, queryParams).getBody();
         } catch (RestClientResponseException e) {
