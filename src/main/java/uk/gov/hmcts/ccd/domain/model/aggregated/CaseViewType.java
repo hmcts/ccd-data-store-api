@@ -7,7 +7,7 @@ public class CaseViewType {
     private String name;
     private String description;
     private CaseViewJurisdiction jurisdiction;
-    private String printableDocumenstUrl;
+    private String printableDocumentsUrl;
 
     public CaseViewType() {
         // default constructor
@@ -18,7 +18,7 @@ public class CaseViewType {
         this.name = name;
         this.description = description;
         this.jurisdiction = jurisdiction;
-        this.printableDocumenstUrl = printableDocumentsUrl;
+        this.printableDocumentsUrl = printableDocumentsUrl;
     }
 
     public String getId() {
@@ -53,9 +53,9 @@ public class CaseViewType {
         this.jurisdiction = jurisdiction;
     }
 
-    public String getPrintableDocumentsUrl() { return printableDocumenstUrl; }
+    public String getPrintableDocumentsUrl() { return printableDocumentsUrl; }
 
-    public void setPrintableDocumentsUrl(String printableDocumentUrl) { this.printableDocumenstUrl = printableDocumentUrl; }
+    public void setPrintableDocumentsUrl(String printableDocumentsUrl) { this.printableDocumentsUrl = printableDocumentsUrl; }
 
     public static CaseViewType createFrom(CaseType caseType) {
         return new CaseViewType(caseType.getId(),
