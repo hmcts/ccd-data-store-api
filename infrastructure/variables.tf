@@ -68,6 +68,11 @@ variable "definition_latest_version_ttl_sec" {
   default = "1"
 }
 
+variable "definition_jurisdiction_ttl_sec" {
+  type = "string"
+  default = "1"
+}
+
 variable "definition_cache_max_size" {
   type = "string"
   default = "5000"

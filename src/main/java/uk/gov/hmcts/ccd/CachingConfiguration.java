@@ -23,11 +23,12 @@ public class CachingConfiguration {
         NetworkConfig networkConfig = config.setInstanceName("hazelcast-instance-ccd").getNetworkConfig();
         networkConfig.getJoin().getMulticastConfig().setEnabled(false);
         networkConfig.getJoin().getTcpIpConfig().setEnabled(false);
-        configCaches(applicationParams.getDefinitionCacheMaxIdleSecs(), applicationParams.getLatestVersionTTLSecs(), config);
+        configCaches(config);
         return config;
     }
 
-    private void configCaches(int definitionCacheMaxIdle, int latestVersionTTL, Config config) {
+    private void configCaches(Config config) {
+    	int definitionCacheMaxIdle = applicationParams.getDefinitionCacheMaxIdleSecs();
         config.addMapConfig(newMapConfigWithMaxIdle("caseTypeDefinitionsCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("workBasketResultCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("searchResultCache", definitionCacheMaxIdle));
@@ -36,8 +37,8 @@ public class CachingConfiguration {
         config.addMapConfig(newMapConfigWithMaxIdle("caseTabCollectionCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("wizardPageCollectionCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("userRolesCache", definitionCacheMaxIdle));
-        config.addMapConfig(newMapConfigWithTtl("caseTypeDefinitionLatestVersionCache", latestVersionTTL));  
-        config.addMapConfig(newMapConfigWithMaxIdle("jurisdictionListCache", definitionCacheMaxIdle));
+        config.addMapConfig(newMapConfigWithTtl("caseTypeDefinitionLatestVersionCache", applicationParams.getLatestVersionTTLSecs()));  
+        config.addMapConfig(newMapConfigWithTtl("jurisdictionListCache", applicationParams.getJurisdictionTTLSecs()));
     }
 
     private MapConfig newMapConfigWithMaxIdle(final String name, final Integer maxIdle) {

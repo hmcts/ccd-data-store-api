@@ -112,6 +112,42 @@ public class DefinitionsCachingIT {
     }
 
     @Test
+    public void testTtlBasedEvictionOfJurisdictionLists() throws InterruptedException {
+        Assert.assertEquals(3, applicationParams.getJurisdictionTTLSecs());
+
+        verify(caseDefinitionRepository, times(0)).getJurisdictions(ID_LIST_1);
+        caseDefinitionRepository.getJurisdictions(ID_LIST_1);
+        verify(caseDefinitionRepository, times(1)).getJurisdictions(ID_LIST_1);
+
+        caseDefinitionRepository.getJurisdictions(ID_LIST_1);
+        caseDefinitionRepository.getJurisdictions(ID_LIST_1);
+        caseDefinitionRepository.getJurisdictions(ID_LIST_1);
+        verify(caseDefinitionRepository, times(1)).getJurisdictions(ID_LIST_1);
+
+        TimeUnit.SECONDS.sleep(1);
+        caseDefinitionRepository.getJurisdictions(ID_LIST_1);
+        caseDefinitionRepository.getJurisdictions(ID_LIST_1);
+        caseDefinitionRepository.getJurisdictions(ID_LIST_1);
+        verify(caseDefinitionRepository, times(1)).getJurisdictions(ID_LIST_1);
+
+        TimeUnit.SECONDS.sleep(1);
+        caseDefinitionRepository.getJurisdictions(ID_LIST_1);
+        caseDefinitionRepository.getJurisdictions(ID_LIST_1);
+        caseDefinitionRepository.getJurisdictions(ID_LIST_1);
+        verify(caseDefinitionRepository, times(1)).getJurisdictions(ID_LIST_1);
+
+        TimeUnit.SECONDS.sleep(1);
+        verify(caseDefinitionRepository, times(1)).getJurisdictions(ID_LIST_1);
+        caseDefinitionRepository.getJurisdictions(ID_LIST_1);
+        verify(caseDefinitionRepository, times(2)).getJurisdictions(ID_LIST_1);
+
+        caseDefinitionRepository.getJurisdictions(ID_LIST_1);
+        caseDefinitionRepository.getJurisdictions(ID_LIST_1);
+        caseDefinitionRepository.getJurisdictions(ID_LIST_1);
+        verify(caseDefinitionRepository, times(2)).getJurisdictions(ID_LIST_1);
+    }
+
+    @Test
     public void testCaseDefinitionLatestVersionsAreCached() {
         verify(caseDefinitionRepository, times(0)).getLatestVersion(ID_2);
         cachedCaseDefinitionRepository.getLatestVersion(ID_2);

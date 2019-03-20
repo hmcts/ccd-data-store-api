@@ -19,3 +19,4 @@ http_client_max_client_per_route = 40
 #http_client_validate_after_inactivity = 0
 
 definition_latest_version_ttl_sec = 5
+definition_jurisdiction_ttl_sec = 5

@@ -70,6 +70,9 @@ public class ApplicationParams {
     @Value("${definition.cache.latest-version-ttl.secs}")
     private Integer latestVersionTTLSecs;
 
+    @Value("${definition.cache.jurisdiction-ttl}")
+    private Integer jurisdictionTTL;
+
     @Value("${definition.cache.max.size}")
     private Integer definitionCacheMaxSize;
 
@@ -238,6 +241,10 @@ public class ApplicationParams {
 
     public int getLatestVersionTTLSecs() {
         return latestVersionTTLSecs;
+    }
+
+    public int getJurisdictionTTLSecs() {
+        return jurisdictionTTL;
     }
 
     public int getDefinitionCacheMaxSize() {
