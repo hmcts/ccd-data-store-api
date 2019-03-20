@@ -93,9 +93,9 @@ public class DefinitionsCachingIT {
 
     @Before
     public void setup() {
-        doReturn(aCaseTypeDefVersion(VERSION_1)).when(this.caseDefinitionRepository).doGetLatestVersion(ID_1);
-        doReturn(aCaseTypeDefVersion(VERSION_2)).when(this.caseDefinitionRepository).doGetLatestVersion(ID_2);
-        doReturn(aCaseTypeDefVersion(VERSION_3)).when(this.caseDefinitionRepository).doGetLatestVersion(ID_3);
+        doReturn(aCaseTypeDefVersion(VERSION_1)).when(this.caseDefinitionRepository).getLatestVersionFromDefinitionStore(ID_1);
+        doReturn(aCaseTypeDefVersion(VERSION_2)).when(this.caseDefinitionRepository).getLatestVersionFromDefinitionStore(ID_2);
+        doReturn(aCaseTypeDefVersion(VERSION_3)).when(this.caseDefinitionRepository).getLatestVersionFromDefinitionStore(ID_3);
         doReturn(JURISDICTION_LIST_1).when(this.caseDefinitionRepository).getJurisdictionsFromDefinitionStore(ID_LIST_1);
         doReturn(mockCaseType).when(this.caseDefinitionRepository).getCaseType(ID_1);
     }
