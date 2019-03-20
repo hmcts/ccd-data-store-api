@@ -178,7 +178,12 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     @Override
+    @Cacheable("jurisdictionListCache")
     public List<Jurisdiction> getJurisdictions(List<String> ids) {
+        return getJurisdictionsFromDefinitionStore(ids);
+    }
+
+    public List<Jurisdiction> getJurisdictionsFromDefinitionStore(List<String> ids) {
         try {
             LOG.debug("retrieving jurisdictions definitions for {}", ids);
             HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());

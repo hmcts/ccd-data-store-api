@@ -4,6 +4,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -29,6 +30,7 @@ import uk.gov.hmcts.ccd.data.definition.HttpUIDefinitionGateway;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchInputDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
@@ -48,6 +50,14 @@ public class DefinitionsCachingIT {
     private static final int VERSION_1 = 33;
     private static final int VERSION_2 = 3311;
     private static final int VERSION_3 = 331111;
+
+	private static final List<String> ID_LIST_1 = Arrays.asList(new String[]{"J1", "J2"});
+
+	private static final Jurisdiction JURISDICTION_1 = new Jurisdiction();
+
+	private static final Jurisdiction JURISDICTION_2 = new Jurisdiction();
+
+	private static final List<Jurisdiction> JURISDICTION_LIST_1 = Arrays.asList(new Jurisdiction[]{JURISDICTION_1, JURISDICTION_2});
 
     @SpyBean
     private DefaultCaseDefinitionRepository caseDefinitionRepository;
@@ -86,21 +96,36 @@ public class DefinitionsCachingIT {
         doReturn(aCaseTypeDefVersion(VERSION_1)).when(this.caseDefinitionRepository).doGetLatestVersion(ID_1);
         doReturn(aCaseTypeDefVersion(VERSION_2)).when(this.caseDefinitionRepository).doGetLatestVersion(ID_2);
         doReturn(aCaseTypeDefVersion(VERSION_3)).when(this.caseDefinitionRepository).doGetLatestVersion(ID_3);
+        doReturn(JURISDICTION_LIST_1).when(this.caseDefinitionRepository).getJurisdictionsFromDefinitionStore(ID_LIST_1);
         doReturn(mockCaseType).when(this.caseDefinitionRepository).getCaseType(ID_1);
     }
 
     @Test
-    public void testCaseDefinitionLatestVersionsAreCached() {
-        Assert.assertEquals(3, applicationParams.getLatestVersionTTLSecs());
-        cachedCaseDefinitionRepository.getLatestVersion(ID_2);
-        cachedCaseDefinitionRepository.getLatestVersion(ID_2);
-        cachedCaseDefinitionRepository.getLatestVersion(ID_2);
+    public void testJurisdictionListsAreCached() {
+        verify(caseDefinitionRepository, times(0)).getJurisdictions(ID_LIST_1);
+        cachedCaseDefinitionRepository.getJurisdictions(ID_LIST_1);
+        verify(caseDefinitionRepository, times(1)).getJurisdictions(ID_LIST_1);
+        cachedCaseDefinitionRepository.getJurisdictions(ID_LIST_1);
+        verify(caseDefinitionRepository, times(1)).getJurisdictions(ID_LIST_1);
+        cachedCaseDefinitionRepository.getJurisdictions(ID_LIST_1);
+        verify(caseDefinitionRepository, times(1)).getJurisdictions(ID_LIST_1);
+    }
 
+    @Test
+    public void testCaseDefinitionLatestVersionsAreCached() {
+        verify(caseDefinitionRepository, times(0)).getLatestVersion(ID_2);
+        cachedCaseDefinitionRepository.getLatestVersion(ID_2);
+        verify(caseDefinitionRepository, times(1)).getLatestVersion(ID_2);
+        cachedCaseDefinitionRepository.getLatestVersion(ID_2);
+        verify(caseDefinitionRepository, times(1)).getLatestVersion(ID_2);
+        cachedCaseDefinitionRepository.getLatestVersion(ID_2);
         verify(caseDefinitionRepository, times(1)).getLatestVersion(ID_2);
     }
 
     @Test
     public void testTtlBasedEvictionOfCaseDefinitionLatestVersion() throws InterruptedException {
+        Assert.assertEquals(3, applicationParams.getLatestVersionTTLSecs());
+
         verify(caseDefinitionRepository, times(0)).getLatestVersion(ID_3);
         caseDefinitionRepository.getLatestVersion(ID_3);
         verify(caseDefinitionRepository, times(1)).getLatestVersion(ID_3);
