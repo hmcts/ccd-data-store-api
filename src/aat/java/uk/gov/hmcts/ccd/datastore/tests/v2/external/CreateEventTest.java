@@ -1,25 +1,37 @@
 package uk.gov.hmcts.ccd.datastore.tests.v2.external;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.BaseTest;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder;
+import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.CaseWithInvalidData;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FullCase;
+import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FullCaseUpdated;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event;
+import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.v2.V2;
+
+import java.util.function.Supplier;
 
 import static java.lang.Boolean.FALSE;
 import static org.hamcrest.Matchers.equalTo;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CASE_TYPE;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event.CREATE;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event.UPDATE;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event.create;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.JURISDICTION;
 
 @DisplayName("Create event")
 class CreateEventTest extends BaseTest {
+    private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final String NOT_FOUND_CASE_REFERENCE = "1234123412341238";
     private static final String INVALID_CASE_REFERENCE = "1234123412341234";
+    private static final String INVALID_EVENT_TRIGGER_ID = "invalidEvent";
 
     protected CreateEventTest(AATHelper aat) {
         super(aat);
@@ -34,9 +46,9 @@ class CreateEventTest extends BaseTest {
                                         .withData(FullCase.build())
                                         .submitAndGetReference();
 
-        callCreateEvent(caseReference.toString())
+        callCreateEvent(caseReference.toString(), getBody(UPDATE, FullCaseUpdated::build))
             .when()
-            .get("/cases/{caseReference}")
+            .post("/cases/{caseReference}")
 
             .then()
             .log().ifError()
@@ -52,8 +64,8 @@ class CreateEventTest extends BaseTest {
 
             // Flexible data
             .rootPath("data")
-            .body("TextField", equalTo(AATCaseBuilder.TEXT))
-            .body("NumberField", equalTo(AATCaseBuilder.NUMBER))
+            .body("TextField", equalTo(AATCaseBuilder.TEXT_UPDATE))
+            .body("NumberField", equalTo(AATCaseBuilder.NUMBER_UPDATE))
             .body("YesOrNoField", equalTo(AATCaseBuilder.YES_OR_NO))
             .body("PhoneUKField", equalTo(AATCaseBuilder.PHONE_UK))
             .body("EmailField", equalTo(AATCaseBuilder.EMAIL))
@@ -84,7 +96,7 @@ class CreateEventTest extends BaseTest {
     @Test
     @DisplayName("should get 404 when case reference does NOT exist")
     void should404WhenNotExists() {
-        callCreateEvent(NOT_FOUND_CASE_REFERENCE)
+        callCreateEvent(NOT_FOUND_CASE_REFERENCE, getBody(UPDATE, CaseWithInvalidData::build))
             .when()
             .get("/cases/{caseReference}")
 
@@ -95,7 +107,7 @@ class CreateEventTest extends BaseTest {
     @Test
     @DisplayName("should get 400 when case reference invalid")
     void should400WhenReferenceInvalid() {
-        callCreateEvent(INVALID_CASE_REFERENCE)
+        callCreateEvent(INVALID_CASE_REFERENCE, getBody(INVALID_EVENT_TRIGGER_ID))
             .when()
             .get("/cases/{caseReference}")
 
@@ -103,12 +115,37 @@ class CreateEventTest extends BaseTest {
             .statusCode(400);
     }
 
-    private RequestSpecification callCreateEvent(String caseReference, String eventTriggerId) {
+    @Test
+    @DisplayName("should get 400 when event trigger id invalid")
+    void should400WhenEventTriggerIdInvalid() {
+        callCreateEvent(INVALID_CASE_REFERENCE, getBody(UPDATE, CaseWithInvalidData::build))
+            .when()
+            .get("/cases/{caseReference}")
+
+            .then()
+            .statusCode(400);
+    }
+
+    private RequestSpecification callCreateEvent(String caseReference, Supplier<String> supplier) {
         return asAutoTestCaseworker(FALSE)
             .get()
+            .body(supplier.get())
             .given()
             .pathParam("caseReference", caseReference)
-            .accept(V2.MediaType.CASE)
+            .accept(V2.MediaType.EVENT)
             .header("experimental", "true");
+    }
+
+    private Supplier<String> getBody(String eventId) {
+        return getBody(eventId, () -> FullCase.build());
+    }
+
+    private Supplier<String> getBody(String eventId, Supplier<AATCaseType.CaseData> caseDataSupplier) {
+        CaseDataContent caseDataContent = Event.create()
+            .as(asAutoTestCaseworker())
+            .withData(caseDataSupplier.get())
+            .withEventId(eventId)
+            .toCaseDataContent();
+        return () -> MAPPER.convertValue(caseDataContent, JsonNode.class).toString();
     }
 }

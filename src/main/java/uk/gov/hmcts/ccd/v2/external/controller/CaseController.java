@@ -86,7 +86,7 @@ public class CaseController {
             V2.EXPERIMENTAL_HEADER
         },
         produces = {
-            V2.MediaType.CASE
+            V2.MediaType.EVENT
         }
     )
     @ApiOperation(
