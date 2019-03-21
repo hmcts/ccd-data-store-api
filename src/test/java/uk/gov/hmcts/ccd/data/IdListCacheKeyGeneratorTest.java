@@ -21,7 +21,7 @@ public class IdListCacheKeyGeneratorTest {
 
 
     @Before
-    public void setup() throws Exception{
+    public void setup() throws Exception {
         method = repository.getClass().getMethod("getJurisdictions", List.class);
     }
 
