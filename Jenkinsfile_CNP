@@ -14,7 +14,6 @@ properties(
 def type = "java"
 def product = "ccd"
 def component = "data-store-api"
-
 def secrets = [
     'ccd-${env}': [
         secret('ccd-caseworker-autotest-email', 'CCD_CASEWORKER_AUTOTEST_EMAIL'),
@@ -33,6 +32,8 @@ def secrets = [
         secret('ccd-private-cross-case-type-solicitor-password', 'CCD_PRIVATE_CROSS_CASE_TYPE_SOLICITOR_PASSWORD'),
         secret('ccd-restricted-cross-case-type-caseworker-email', 'CCD_RESTRICTED_CROSS_CASE_TYPE_CASEWORKER_EMAIL'),
         secret('ccd-restricted-cross-case-type-caseworker-password', 'CCD_RESTRICTED_CROSS_CASE_TYPE_CASEWORKER_PASSWORD'),
+        secret('ccd-cache-warm-up-email', 'CCD_CACHE_WARM_UP_EMAIL'),
+        secret('ccd-cache-warm-up-password', 'CCD_CACHE_WARM_UP_PASSWORD'),
         secret('ccd-api-gateway-oauth2-client-secret', 'OAUTH2_CLIENT_SECRET'),
     ],
     's2s-${env}': [

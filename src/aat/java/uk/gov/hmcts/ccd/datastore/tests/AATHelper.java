@@ -1,9 +1,9 @@
 package uk.gov.hmcts.ccd.datastore.tests;
 
+import uk.gov.hmcts.ccd.OAuth2Params;
 import uk.gov.hmcts.ccd.datastore.tests.helper.CCDHelper;
 import uk.gov.hmcts.ccd.datastore.tests.helper.S2SHelper;
-import uk.gov.hmcts.ccd.datastore.tests.helper.idam.IdamHelper;
-import uk.gov.hmcts.ccd.datastore.tests.helper.idam.OAuth2;
+import uk.gov.hmcts.ccd.idam.IdamHelper;
 
 public enum AATHelper {
 
@@ -14,7 +14,28 @@ public enum AATHelper {
     private final CCDHelper ccdHelper;
 
     AATHelper() {
-        idamHelper = new IdamHelper(getIdamURL(), OAuth2.INSTANCE);
+        idamHelper = new IdamHelper(new OAuth2Params() {
+            @Override
+            public String getIdamBaseURL() {
+                return Env.require("IDAM_URL");
+            }
+
+            @Override
+            public String getOauth2RedirectUrl() {
+                return Env.require("OAUTH2_REDIRECT_URI");
+            }
+
+            @Override
+            public String getOauth2ClientId() {
+                return Env.require("OAUTH2_CLIENT_ID");
+            }
+
+            @Override
+            public String getOauth2ClientSecret() {
+                return Env.require("OAUTH2_CLIENT_SECRET");
+            }
+
+        });
         s2SHelper = new S2SHelper(getS2SURL(), getGatewayServiceSecret(), getGatewayServiceName());
         ccdHelper = new CCDHelper();
     }

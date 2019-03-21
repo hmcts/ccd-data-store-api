@@ -15,7 +15,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 @Named
 @Singleton
-public class ApplicationParams {
+public class ApplicationParams implements OAuth2Params {
     @Value("#{'${ccd.callback.retries}'.split(',')}")
     private List<Integer> callbackRetries;
 
@@ -60,6 +60,21 @@ public class ApplicationParams {
 
     @Value("${ccd.defaultPrintType}")
     private String defaultPrintType;
+
+    @Value("${ccd.cache.warm.up.email}")
+    private String cacheWarmUpEmail;
+
+    @Value("${ccd.cache.warm.up.password}")
+    private String cacheWarmUpPassword;
+
+    @Value("${ccd.oauth2.redirect_url}")
+    private String oauth2RedirectUrl;
+
+    @Value("${ccd.oauth2.client_id}")
+    private String oauth2ClientId;
+
+    @Value("${ccd.oauth2.client_secret}")
+    private String oauth2ClientSecret;
 
     @Value("${pagination.page.size}")
     private Integer paginationPageSize;
@@ -125,6 +140,10 @@ public class ApplicationParams {
         return caseDefinitionHost + "/api/data/case-type/" + encode(caseTypeId);
     }
 
+    public String caseTypesDefURL() {
+        return caseDefinitionHost + "/api/data/case-types";
+    }
+
     public String draftBaseURL() {
         return draftHost + "/drafts";
     }
@@ -183,6 +202,10 @@ public class ApplicationParams {
 
     public String baseTypesURL() {
         return caseDefinitionHost + "/api/base-types";
+    }
+
+    public String getIdamBaseURL() {
+        return idamHost;
     }
 
     public String idamUserProfileURL() {
@@ -272,4 +295,25 @@ public class ApplicationParams {
     public String getElasticsearchNodeDiscoveryFilter() {
         return elasticsearchNodeDiscoveryFilter;
     }
+
+    public String getCacheWarmUpEmail() {
+        return cacheWarmUpEmail;
+    }
+
+    public String getCacheWarmUpPassword() {
+        return cacheWarmUpPassword;
+    }
+
+    public String getOauth2RedirectUrl() {
+        return oauth2RedirectUrl;
+    }
+
+    public String getOauth2ClientId() {
+        return oauth2ClientId;
+    }
+
+    public String getOauth2ClientSecret() {
+        return oauth2ClientSecret;
+    }
+
 }

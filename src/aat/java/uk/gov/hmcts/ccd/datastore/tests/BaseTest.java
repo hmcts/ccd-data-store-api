@@ -8,7 +8,7 @@ import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.extension.ExtendWith;
-import uk.gov.hmcts.ccd.datastore.tests.helper.idam.AuthenticatedUser;
+import uk.gov.hmcts.ccd.idam.AuthenticatedUser;
 
 @ExtendWith(AATExtension.class)
 public abstract class BaseTest {
