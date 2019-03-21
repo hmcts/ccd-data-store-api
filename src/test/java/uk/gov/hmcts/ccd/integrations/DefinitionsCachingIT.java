@@ -52,12 +52,14 @@ public class DefinitionsCachingIT {
     private static final int VERSION_3 = 331111;
 
     private static final List<String> ID_LIST_1 = Arrays.asList(new String[]{"J1", "J2"});
+    private static final List<String> ID_LIST_2 = Arrays.asList(new String[]{"J1", "J2", "J3"});
 
     private static final Jurisdiction JURISDICTION_1 = new Jurisdiction();
-
     private static final Jurisdiction JURISDICTION_2 = new Jurisdiction();
+    private static final Jurisdiction JURISDICTION_3 = new Jurisdiction();
 
     private static final List<Jurisdiction> JURISDICTION_LIST_1 = Arrays.asList(new Jurisdiction[]{JURISDICTION_1, JURISDICTION_2});
+    private static final List<Jurisdiction> JURISDICTION_LIST_2 = Arrays.asList(new Jurisdiction[]{JURISDICTION_1, JURISDICTION_2, JURISDICTION_3});
 
     @SpyBean
     private DefaultCaseDefinitionRepository caseDefinitionRepository;
@@ -97,6 +99,7 @@ public class DefinitionsCachingIT {
         doReturn(aCaseTypeDefVersion(VERSION_2)).when(this.caseDefinitionRepository).getLatestVersionFromDefinitionStore(ID_2);
         doReturn(aCaseTypeDefVersion(VERSION_3)).when(this.caseDefinitionRepository).getLatestVersionFromDefinitionStore(ID_3);
         doReturn(JURISDICTION_LIST_1).when(this.caseDefinitionRepository).getJurisdictionsFromDefinitionStore(ID_LIST_1);
+        doReturn(JURISDICTION_LIST_2).when(this.caseDefinitionRepository).getJurisdictionsFromDefinitionStore(ID_LIST_2);
         doReturn(mockCaseType).when(this.caseDefinitionRepository).getCaseType(ID_1);
     }
 
@@ -115,36 +118,36 @@ public class DefinitionsCachingIT {
     public void testTtlBasedEvictionOfJurisdictionLists() throws InterruptedException {
         Assert.assertEquals(3, applicationParams.getJurisdictionTTLSecs());
 
-        verify(caseDefinitionRepository, times(0)).getJurisdictions(ID_LIST_1);
-        caseDefinitionRepository.getJurisdictions(ID_LIST_1);
-        verify(caseDefinitionRepository, times(1)).getJurisdictions(ID_LIST_1);
+        verify(caseDefinitionRepository, times(0)).getJurisdictions(ID_LIST_2);
+        caseDefinitionRepository.getJurisdictions(ID_LIST_2);
+        verify(caseDefinitionRepository, times(1)).getJurisdictions(ID_LIST_2);
 
-        caseDefinitionRepository.getJurisdictions(ID_LIST_1);
-        caseDefinitionRepository.getJurisdictions(ID_LIST_1);
-        caseDefinitionRepository.getJurisdictions(ID_LIST_1);
-        verify(caseDefinitionRepository, times(1)).getJurisdictions(ID_LIST_1);
-
-        TimeUnit.SECONDS.sleep(1);
-        caseDefinitionRepository.getJurisdictions(ID_LIST_1);
-        caseDefinitionRepository.getJurisdictions(ID_LIST_1);
-        caseDefinitionRepository.getJurisdictions(ID_LIST_1);
-        verify(caseDefinitionRepository, times(1)).getJurisdictions(ID_LIST_1);
+        caseDefinitionRepository.getJurisdictions(ID_LIST_2);
+        caseDefinitionRepository.getJurisdictions(ID_LIST_2);
+        caseDefinitionRepository.getJurisdictions(ID_LIST_2);
+        verify(caseDefinitionRepository, times(1)).getJurisdictions(ID_LIST_2);
 
         TimeUnit.SECONDS.sleep(1);
-        caseDefinitionRepository.getJurisdictions(ID_LIST_1);
-        caseDefinitionRepository.getJurisdictions(ID_LIST_1);
-        caseDefinitionRepository.getJurisdictions(ID_LIST_1);
-        verify(caseDefinitionRepository, times(1)).getJurisdictions(ID_LIST_1);
+        caseDefinitionRepository.getJurisdictions(ID_LIST_2);
+        caseDefinitionRepository.getJurisdictions(ID_LIST_2);
+        caseDefinitionRepository.getJurisdictions(ID_LIST_2);
+        verify(caseDefinitionRepository, times(1)).getJurisdictions(ID_LIST_2);
 
         TimeUnit.SECONDS.sleep(1);
-        verify(caseDefinitionRepository, times(1)).getJurisdictions(ID_LIST_1);
-        caseDefinitionRepository.getJurisdictions(ID_LIST_1);
-        verify(caseDefinitionRepository, times(2)).getJurisdictions(ID_LIST_1);
+        caseDefinitionRepository.getJurisdictions(ID_LIST_2);
+        caseDefinitionRepository.getJurisdictions(ID_LIST_2);
+        caseDefinitionRepository.getJurisdictions(ID_LIST_2);
+        verify(caseDefinitionRepository, times(1)).getJurisdictions(ID_LIST_2);
 
-        caseDefinitionRepository.getJurisdictions(ID_LIST_1);
-        caseDefinitionRepository.getJurisdictions(ID_LIST_1);
-        caseDefinitionRepository.getJurisdictions(ID_LIST_1);
-        verify(caseDefinitionRepository, times(2)).getJurisdictions(ID_LIST_1);
+        TimeUnit.SECONDS.sleep(1);
+        verify(caseDefinitionRepository, times(1)).getJurisdictions(ID_LIST_2);
+        caseDefinitionRepository.getJurisdictions(ID_LIST_2);
+        verify(caseDefinitionRepository, times(2)).getJurisdictions(ID_LIST_2);
+
+        caseDefinitionRepository.getJurisdictions(ID_LIST_2);
+        caseDefinitionRepository.getJurisdictions(ID_LIST_2);
+        caseDefinitionRepository.getJurisdictions(ID_LIST_2);
+        verify(caseDefinitionRepository, times(2)).getJurisdictions(ID_LIST_2);
     }
 
     @Test
