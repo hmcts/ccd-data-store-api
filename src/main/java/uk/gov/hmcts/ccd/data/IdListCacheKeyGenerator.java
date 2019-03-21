@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.data.definition;
+package uk.gov.hmcts.ccd.data;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.data.definition;
+package uk.gov.hmcts.ccd.data;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -8,6 +8,9 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import uk.gov.hmcts.ccd.data.IdListCacheKeyGenerator;
+import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
 
 public class IdListCacheKeyGeneratorTest {
 
