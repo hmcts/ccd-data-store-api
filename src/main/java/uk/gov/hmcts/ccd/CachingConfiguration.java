@@ -28,7 +28,7 @@ public class CachingConfiguration {
     }
 
     private void configCaches(Config config) {
-    	int definitionCacheMaxIdle = applicationParams.getDefinitionCacheMaxIdleSecs();
+        int definitionCacheMaxIdle = applicationParams.getDefinitionCacheMaxIdleSecs();
         config.addMapConfig(newMapConfigWithMaxIdle("caseTypeDefinitionsCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("workBasketResultCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("searchResultCache", definitionCacheMaxIdle));

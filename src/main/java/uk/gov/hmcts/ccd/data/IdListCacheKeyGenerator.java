@@ -17,7 +17,7 @@ public class IdListCacheKeyGenerator implements KeyGenerator {
     @Override
     public Object generate(Object target, Method method, Object... params) {
         @SuppressWarnings("unchecked")
-        List<String> idList = params[0] ==  null ? new ArrayList<>() : (List<String>)params[0];
+        List<String> idList = params[0] ==  null ? new ArrayList<>() : (List<String>) params[0];
         Collections.sort(idList);
         String idsCombined = StringUtils.join(idList);
         return target.getClass().getSimpleName() + "_" + method.getName() + "_" + idsCombined;
