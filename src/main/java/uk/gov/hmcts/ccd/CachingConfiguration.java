@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.List;
+
 @Configuration
 public class CachingConfiguration {
 
