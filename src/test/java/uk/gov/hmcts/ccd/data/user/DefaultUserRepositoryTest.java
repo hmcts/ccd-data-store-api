@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.data.user;
 
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
@@ -14,13 +15,11 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyList;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -193,13 +192,13 @@ class DefaultUserRepositoryTest {
             userDefault.setJurisdictions(singletonList(jurisdiction));
             final ResponseEntity<UserDefault> responseEntity = new ResponseEntity<>(userDefault, HttpStatus.OK);
             when(restTemplate
-                .exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(UserDefault.class), anyMap()))
+                .exchange(any(URI.class), eq(HttpMethod.GET), any(HttpEntity.class), eq(UserDefault.class)))
                 .thenReturn(responseEntity);
 
             final UserDefault result = userRepository.getUserDefaultSettings("ccd+test@hmcts.net");
             assertThat(result, is(userDefault));
             verify(restTemplate).exchange(
-                anyString(), same(HttpMethod.GET), any(HttpEntity.class), (Class<?>)any(Class.class), anyMap());
+                any(URI.class), same(HttpMethod.GET), any(HttpEntity.class), (Class<?>)any(Class.class));
         }
 
         @Test
@@ -211,7 +210,7 @@ class DefaultUserRepositoryTest {
             final RestClientResponseException exception =
                 new RestClientResponseException("Error on GET", 400, "Bad Request", headers, null, null);
             when(restTemplate
-                .exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(UserDefault.class), anyMap()))
+                .exchange(any(URI.class), eq(HttpMethod.GET), any(HttpEntity.class), eq(UserDefault.class)))
                 .thenThrow(exception);
 
             final BadRequestException badRequestException =
@@ -228,7 +227,7 @@ class DefaultUserRepositoryTest {
             final RestClientResponseException exception =
                 new RestClientResponseException(null, 500, "Internal Server Error", null, null, null);
             when(restTemplate
-                .exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(UserDefault.class), anyMap()))
+                .exchange(any(URI.class), eq(HttpMethod.GET), any(HttpEntity.class), eq(UserDefault.class)))
                 .thenThrow(exception);
 
             final String userId = "ccd+test@hmcts.net";
