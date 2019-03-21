@@ -78,6 +78,12 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     @Override
+    @Cacheable("caseTypeDefinitionsCache")
+    public CaseType getCaseType(int version, String caseTypeId) {
+        return this.getCaseType(caseTypeId);
+    }
+
+    @Override
     public CaseType getCaseType(final String caseTypeId) {
         LOG.debug("retrieving case type definition for case type: {}", caseTypeId);
         try {
@@ -169,12 +175,6 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                 throw new ServiceException("Problem getting case type version for " + caseTypeId + " because of " + e.getMessage());
             }
         }
-    }
-
-    @Override
-    @Cacheable("caseTypeDefinitionsCache")
-    public CaseType getCaseType(int version, String caseTypeId) {
-        return this.getCaseType(caseTypeId);
     }
 
     @Override
