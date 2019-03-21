@@ -51,13 +51,13 @@ public class DefinitionsCachingIT {
     private static final int VERSION_2 = 3311;
     private static final int VERSION_3 = 331111;
 
-	private static final List<String> ID_LIST_1 = Arrays.asList(new String[]{"J1", "J2"});
+    private static final List<String> ID_LIST_1 = Arrays.asList(new String[]{"J1", "J2"});
 
-	private static final Jurisdiction JURISDICTION_1 = new Jurisdiction();
+    private static final Jurisdiction JURISDICTION_1 = new Jurisdiction();
 
-	private static final Jurisdiction JURISDICTION_2 = new Jurisdiction();
+    private static final Jurisdiction JURISDICTION_2 = new Jurisdiction();
 
-	private static final List<Jurisdiction> JURISDICTION_LIST_1 = Arrays.asList(new Jurisdiction[]{JURISDICTION_1, JURISDICTION_2});
+    private static final List<Jurisdiction> JURISDICTION_LIST_1 = Arrays.asList(new Jurisdiction[]{JURISDICTION_1, JURISDICTION_2});
 
     @SpyBean
     private DefaultCaseDefinitionRepository caseDefinitionRepository;
