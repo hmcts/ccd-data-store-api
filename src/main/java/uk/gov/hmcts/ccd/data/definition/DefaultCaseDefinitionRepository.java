@@ -178,7 +178,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     @Override
-    @Cacheable(value = "jurisdictionListCache", keyGenerator = "idListCacheKeyGenerator")
+    @Cacheable(value = "jurisdictionListCache")
     public List<Jurisdiction> getJurisdictions(List<String> ids) {
         return getJurisdictionsFromDefinitionStore(ids);
     }
