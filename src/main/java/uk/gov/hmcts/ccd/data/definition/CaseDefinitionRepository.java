@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.data.definition;
 
-import org.springframework.http.HttpHeaders;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
