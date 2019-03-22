@@ -2,8 +2,6 @@ package uk.gov.hmcts.ccd.domain.types.sanitiser;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.TEXT;
 
