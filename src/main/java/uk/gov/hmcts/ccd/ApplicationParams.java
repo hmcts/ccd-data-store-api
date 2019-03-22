@@ -67,6 +67,9 @@ public class ApplicationParams implements OAuth2Params {
     @Value("${ccd.cache.warm.up.password}")
     private String cacheWarmUpPassword;
 
+    @Value("${ccd.cache.warm.up.enabled}")
+    private boolean cacheWarmUpEnabled;
+
     @Value("${ccd.cache.warm.up.sleep.time}")
     private Integer cacheWarmUpSleepTime;
 
@@ -323,4 +326,7 @@ public class ApplicationParams implements OAuth2Params {
         return oauth2ClientSecret;
     }
 
+    public boolean isCacheWarmUpEnabled() {
+        return cacheWarmUpEnabled;
+    }
 }

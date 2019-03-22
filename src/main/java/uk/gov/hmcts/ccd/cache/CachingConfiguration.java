@@ -46,7 +46,9 @@ public class CachingConfiguration {
         config.addMapConfig(newMapConfig("caseTabCollectionCache", definitionCacheTTL));
         config.addMapConfig(newMapConfig("wizardPageCollectionCache", definitionCacheTTL));
         config.addMapConfig(newMapConfig("userRolesCache", definitionCacheTTL));
-        cacheWarmUpService.warmUp();
+        if (applicationParams.isCacheWarmUpEnabled()) {
+            cacheWarmUpService.warmUp();
+        }
     }
 
     private MapConfig newMapConfig(final String name, int definitionCacheTTL) {
