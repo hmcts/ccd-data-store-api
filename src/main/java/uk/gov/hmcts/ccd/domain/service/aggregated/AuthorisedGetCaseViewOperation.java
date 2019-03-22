@@ -6,6 +6,7 @@ import java.util.Set;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
@@ -50,15 +51,19 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
         Set<String> userRoles = getUserRoles(caseId);
         verifyReadAccess(caseType, userRoles);
         filterCaseTabFieldsByReadAccess(caseView, userRoles);
-        filterOutEmptyTabs(caseView);
+        filterAllowedTabsWithFields(caseView, userRoles);
 
         return filterUpsertAccess(caseType, userRoles, caseView);
     }
 
-    private void filterOutEmptyTabs(CaseView caseView) {
+    private void filterAllowedTabsWithFields(CaseView caseView, Set<String> userRoles) {
         caseView.setTabs(Arrays.stream(caseView.getTabs())
-            .filter(caseViewTab -> caseViewTab.getFields().length > 0)
+            .filter(caseViewTab -> caseViewTab.getFields().length > 0 && tabAllowed(caseViewTab, userRoles))
             .toArray(CaseViewTab[]::new));
+    }
+
+    private boolean tabAllowed(final CaseViewTab caseViewTab, final Set<String> userRoles) {
+        return StringUtils.isEmpty(caseViewTab.getRole()) || userRoles.contains(caseViewTab.getRole());
     }
 
     private void filterCaseTabFieldsByReadAccess(CaseView caseView, Set<String> userRoles) {

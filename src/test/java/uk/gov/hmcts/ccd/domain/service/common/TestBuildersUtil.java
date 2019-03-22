@@ -548,6 +548,16 @@ public class TestBuildersUtil {
             return new CaseViewTabBuilder();
         }
 
+        public CaseViewTabBuilder withId(String id) {
+            caseViewTab.setId(id);
+            return this;
+        }
+
+        public CaseViewTabBuilder withRole(String role) {
+            caseViewTab.setRole(role);
+            return this;
+        }
+
         public CaseViewTabBuilder addCaseViewField(CaseViewField caseViewField) {
             CaseViewField[] newFields = new CaseViewField[caseViewTab.getFields().length + 1];
             System.arraycopy(caseViewTab.getFields(), 0, newFields, 0, caseViewTab.getFields().length);
