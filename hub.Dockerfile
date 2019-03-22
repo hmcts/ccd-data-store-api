@@ -9,11 +9,12 @@ USER gradle
 WORKDIR /home/gradle/src
 RUN gradle assemble
 
-FROM hmcts/cnp-java-base:openjdk-8u191-jre-alpine3.9-1.0
+ARG JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom"
 
-ENV JAVA_OPTS "-Dspring.config.location=/application.properties -Djava.security.egd=file:/dev/./urandom"
+FROM hmcts/cnp-java-base:openjdk-8u191-jre-alpine3.9-2.0.1
 
 COPY --from=builder /home/gradle/src/build/libs/core-case-data.jar /opt/app/
+COPY lib/AI-Agent.xml /opt/app/
 
 WORKDIR /opt/app
 
