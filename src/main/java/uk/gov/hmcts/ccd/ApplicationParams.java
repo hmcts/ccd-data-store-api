@@ -67,6 +67,9 @@ public class ApplicationParams implements OAuth2Params {
     @Value("${ccd.cache.warm.up.password}")
     private String cacheWarmUpPassword;
 
+    @Value("${ccd.cache.warm.up.sleep.time}")
+    private Integer cacheWarmUpSleepTime;
+
     @Value("${ccd.oauth2.redirect_url}")
     private String oauth2RedirectUrl;
 
@@ -302,6 +305,10 @@ public class ApplicationParams implements OAuth2Params {
 
     public String getCacheWarmUpPassword() {
         return cacheWarmUpPassword;
+    }
+
+    public Integer getCacheWarmUpSleepTime() {
+        return cacheWarmUpSleepTime;
     }
 
     public String getOauth2RedirectUrl() {

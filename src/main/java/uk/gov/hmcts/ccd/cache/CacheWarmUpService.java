@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd;
+package uk.gov.hmcts.ccd.cache;
 
 public interface CacheWarmUpService {
 

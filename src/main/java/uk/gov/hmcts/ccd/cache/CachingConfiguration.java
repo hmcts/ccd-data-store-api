@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd;
+package uk.gov.hmcts.ccd.cache;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.config.MapConfig;
@@ -7,10 +7,13 @@ import com.hazelcast.config.NetworkConfig;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableAsync;
+import uk.gov.hmcts.ccd.ApplicationParams;
 
 import javax.inject.Inject;
 
 @Configuration
+@EnableAsync
 public class CachingConfiguration {
 
     private final ApplicationParams applicationParams;

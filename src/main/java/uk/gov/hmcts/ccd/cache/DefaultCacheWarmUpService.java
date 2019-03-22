@@ -1,16 +1,19 @@
-package uk.gov.hmcts.ccd;
+package uk.gov.hmcts.ccd.cache;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.idam.AuthenticatedUser;
 import uk.gov.hmcts.ccd.idam.IdamHelper;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Qualifier(DefaultCacheWarmUpService.QUALIFIER)
@@ -18,7 +21,6 @@ public class DefaultCacheWarmUpService implements CacheWarmUpService {
 
     private static final Logger LOG = LoggerFactory.getLogger(CachingConfiguration.class);
     public static final String QUALIFIER = "default";
-    private static final long TWO_SECONDS = 2000l;
 
     private final DefaultCaseDefinitionRepository caseDefinitionRepository;
     private final AuthTokenGenerator authTokenGenerator;
@@ -35,13 +37,14 @@ public class DefaultCacheWarmUpService implements CacheWarmUpService {
         this.idamHelper = idamHelper;
     }
 
+    @Async
     @Override
     public void warmUp() {
         try {
             HttpHeaders httpHeaders = authorizationHeaders();
             List<String> caseTypesReferences = caseDefinitionRepository.getCaseTypesReferences(httpHeaders);
             for (String reference : caseTypesReferences) {
-                Thread.sleep(TWO_SECONDS);
+                TimeUnit.SECONDS.sleep(applicationParams.getCacheWarmUpSleepTime());
                 caseDefinitionRepository.getCaseType(reference, httpHeaders);
             };
         } catch (Exception e) {
