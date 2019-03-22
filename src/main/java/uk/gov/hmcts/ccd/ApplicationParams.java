@@ -140,8 +140,8 @@ public class ApplicationParams implements OAuth2Params {
         return caseDefinitionHost + "/api/data/case-type/" + encode(caseTypeId);
     }
 
-    public String caseTypesDefURL() {
-        return caseDefinitionHost + "/api/data/case-types";
+    public String caseTypesReferencesDefURL() {
+        return caseDefinitionHost + "/api/data/case-types-references";
     }
 
     public String draftBaseURL() {
