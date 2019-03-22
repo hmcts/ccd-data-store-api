@@ -11,7 +11,7 @@ java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
   applicationPort: 4452
-  applicationInsightsInstrumentKey: "fake-key"
+  applicationInsightsInstrumentKey: "f61ab34c-07da-42fc-ac7e-3f8cdadfd5a1"
   keyVaults:
     s2s:
       resourceGroup: rpe-service-auth-provider
@@ -24,6 +24,8 @@ java:
     DATA_STORE_DB_NAME: ccd_data_store
     DATA_STORE_DB_USERNAME: ccd
     DATA_STORE_DB_USE_SSL: false
+    
+    SPRING_APPLICATON_NAME: "Draft Store PRs"
 
     CCD_DRAFT_TTL_DAYS: 180
 
