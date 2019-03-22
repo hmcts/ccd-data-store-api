@@ -236,6 +236,7 @@ class MidEventCallbackTest {
                 + "  \"PersonLastName\": \"Last Name\",\n"
                 + "  \"PersonMiddleName\": \"Middle Name\"\n"
                 + "}"), STRING_JSON_MAP);
+        CaseDetails existingCaseDetails = caseDetails(existingData);
         CaseDetails combineCaseDetails = caseDetails(combineData);
         CaseDataContent content = newCaseDataContent()
             .withEvent(event)
@@ -248,11 +249,12 @@ class MidEventCallbackTest {
         when(callbackInvoker.invokeMidEventCallback(wizardPageWithCallback,
             caseType,
             caseEvent,
-            null,
+            existingCaseDetails,
             combineCaseDetails,
             IGNORE_WARNINGS)).thenReturn(combineCaseDetails);
         when(caseService.createNewCaseDetails(Mockito.eq(CASE_TYPE_ID), Mockito.eq(JURISDICTION_ID),
             Mockito.isA(Map.class))).thenReturn(combineCaseDetails);
+        given(caseService.getCaseDetails(JURISDICTION_ID, content.getCaseReference())).willReturn(existingCaseDetails);
         given(caseService.populateCurrentCaseDetailsWithEventFields(content, JURISDICTION_ID)).willReturn(Optional.of(combineCaseDetails));
 
 
@@ -270,7 +272,7 @@ class MidEventCallbackTest {
 
         assertAll(
             () -> assertThat(result, is(expectedResponse)),
-            () -> verify(callbackInvoker).invokeMidEventCallback(wizardPageWithCallback, caseType, caseEvent, null, combineCaseDetails, IGNORE_WARNINGS),
+            () -> verify(callbackInvoker).invokeMidEventCallback(wizardPageWithCallback, caseType, caseEvent, existingCaseDetails, combineCaseDetails, IGNORE_WARNINGS),
             () -> verify(caseService, never()).createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, combineData));
     }
 
