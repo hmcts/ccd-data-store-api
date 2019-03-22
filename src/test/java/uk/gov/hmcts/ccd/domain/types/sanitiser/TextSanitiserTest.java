@@ -2,9 +2,8 @@ package uk.gov.hmcts.ccd.domain.types.sanitiser;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
@@ -16,7 +15,6 @@ import java.util.Collections;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-@DisplayName("TextSanitiser")
 class TextSanitiserTest {
 
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
@@ -38,15 +36,14 @@ class TextSanitiserTest {
     @InjectMocks
     private TextSanitiser textSanitiser;
 
-    @BeforeEach
-    void setUp() {
+    @Before
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
         textSanitiser = new TextSanitiser();
     }
 
     @Test
-    @DisplayName("should sanitise to trim the text value")
-    void shouldSanitizeValidText() {
+    public void shouldSanitizeValidText() {
         JsonNode data = JSON_NODE_FACTORY.textNode("  Mr Tester  ");
         JsonNode result = JSON_NODE_FACTORY.textNode("Mr Tester");
         JsonNode sanitisedText = textSanitiser.sanitise(TEXT_FIELD_TYPE, data);
@@ -55,8 +52,7 @@ class TextSanitiserTest {
     }
 
     @Test
-    @DisplayName("should sanitise to trim only whitespace value")
-    void shouldSanitizeOnlyWhitespace() {
+    public void shouldSanitizeOnlyWhitespace() {
         JsonNode data = JSON_NODE_FACTORY.textNode("       ");
         JsonNode result = JSON_NODE_FACTORY.textNode("");
         JsonNode sanitisedText = textSanitiser.sanitise(TEXT_FIELD_TYPE, data);
