@@ -28,7 +28,7 @@ java:
 
     CCD_DM_DOMAIN: https?://dm-store.*
    # IDAM_USER_URL: http://betaDevBccidamAppLB.reform.hmcts.net
-    IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
+    IDAM_USER_URL: https://idam-api.aat.platform.hmcts.net
 
 
     CCD_DRAFT_TTL_DAYS: 180
