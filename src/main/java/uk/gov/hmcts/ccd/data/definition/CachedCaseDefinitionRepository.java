@@ -9,6 +9,7 @@ import static com.google.common.collect.Maps.newHashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
@@ -46,9 +47,19 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     }
 
     @Override
+    public List<String> getCaseTypesReferences(final HttpHeaders httpHeaders) {
+        return caseDefinitionRepository.getCaseTypesReferences(httpHeaders);
+    }
+
+    @Override
     public CaseType getCaseType(final String caseTypeId) {
         CaseTypeDefinitionVersion latestVersion = this.getLatestVersion(caseTypeId);
         return caseDefinitionRepository.getCaseType(latestVersion.getVersion(), caseTypeId);
+    }
+
+    @Override
+    public CaseType getCaseType(final String caseTypeId, final HttpHeaders httpHeaders) {
+        return caseDefinitionRepository.getCaseType(caseTypeId, httpHeaders);
     }
 
     @Override

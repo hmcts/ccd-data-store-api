@@ -80,13 +80,14 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
 
     @Override
     public List<String> getCaseTypesReferences() {
-        return getCaseTypesReferences(null);
+        return getCaseTypesReferences(new HttpHeaders());
     }
 
+    @Override
     public List<String> getCaseTypesReferences(final HttpHeaders httpHeaders) {
         LOG.debug("retrieving case type references");
         try {
-            final HttpEntity requestEntity = new HttpEntity<CaseType>(httpHeaders != null ? httpHeaders : securityUtils.authorizationHeaders());
+            final HttpEntity requestEntity = new HttpEntity<CaseType>(!httpHeaders.isEmpty() ? httpHeaders : securityUtils.authorizationHeaders());
             return Arrays.asList(restTemplate.exchange(applicationParams.caseTypesReferencesDefURL(), HttpMethod.GET, requestEntity, String[].class).getBody());
 
         } catch (Exception e) {
@@ -102,13 +103,14 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
 
     @Override
     public CaseType getCaseType(final String caseTypeId) {
-        return getCaseType(caseTypeId, null);
+        return getCaseType(caseTypeId, new HttpHeaders());
     }
 
+    @Override
     public CaseType getCaseType(final String caseTypeId, final HttpHeaders httpHeaders) {
         LOG.debug("retrieving case type definition for case type: {}", caseTypeId);
         try {
-            final HttpEntity requestEntity = new HttpEntity<CaseType>(httpHeaders != null ? httpHeaders : securityUtils.authorizationHeaders());
+            final HttpEntity requestEntity = new HttpEntity<CaseType>(!httpHeaders.isEmpty() ? httpHeaders : securityUtils.authorizationHeaders());
             return restTemplate.exchange(applicationParams.caseTypeDefURL(caseTypeId), HttpMethod.GET, requestEntity, CaseType.class).getBody();
 
         } catch (Exception e) {
