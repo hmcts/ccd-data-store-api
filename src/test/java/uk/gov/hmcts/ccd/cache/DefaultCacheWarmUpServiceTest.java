@@ -81,7 +81,7 @@ public class DefaultCacheWarmUpServiceTest {
 
         try {
             defaultCacheWarmUpService.warmUp();
-        } catch(Exception e) {
+        } catch (Exception e) {
             fail();
         }
 
