@@ -143,6 +143,9 @@ module "ccd-data-store-api" {
     ELASTIC_SEARCH_NODES_DISCOVERY_FREQUENCY_MILLIS = "${var.elastic_search_nodes_discovery_frequency_millis}"
     ELASTIC_SEARCH_NODES_DISCOVERY_FILTER = "${var.elastic_search_nodes_discovery_filter}"
 
+    CCD_CACHE_WARM_UP_ENABLED             = "${var.cache_warm_up_enabled}"
+    CCD_CACHE_WARM_UP_SLEEP_TIME          = "${var.cache_warm_up_sleep_time}"
+
     HTTP_CLIENT_CONNECTION_TIMEOUT        = "${var.http_client_connection_timeout}"
     HTTP_CLIENT_READ_TIMEOUT              = "${var.http_client_read_timeout}"
     HTTP_CLIENT_MAX_TOTAL                 = "${var.http_client_max_total}"

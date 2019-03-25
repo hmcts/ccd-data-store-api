@@ -47,5 +47,8 @@ java:
     ELASTIC_SEARCH_CASE_INDEX_NAME_FORMAT: '%s_cases'
     ELASTIC_SEARCH_CASE_INDEX_TYPE: _doc
 
+    CCD_CACHE_WARM_UP_ENABLED: false
+    CCD_CACHE_WARM_UP_SLEEP_TIME: '2000'
+
 tags:
   postgresql-pod: true
