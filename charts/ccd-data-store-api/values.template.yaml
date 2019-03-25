@@ -27,7 +27,9 @@ java:
     DATA_STORE_DB_USE_SSL: false
 
     CCD_DM_DOMAIN: https?://dm-store.*
-    IDAM_USER_URL: http://betaDevBccidamAppLB.reform.hmcts.net
+   # IDAM_USER_URL: http://betaDevBccidamAppLB.reform.hmcts.net
+    IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
+
 
     CCD_DRAFT_TTL_DAYS: 180
     # TODO get this from vault when it is stored there
