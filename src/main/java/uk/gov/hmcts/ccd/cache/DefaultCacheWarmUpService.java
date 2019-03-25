@@ -45,14 +45,18 @@ public class DefaultCacheWarmUpService implements CacheWarmUpService {
             List<String> caseTypesReferences = caseDefinitionRepository.getCaseTypesReferences(httpHeaders);
             for (String reference : caseTypesReferences) {
                 TimeUnit.SECONDS.sleep(applicationParams.getCacheWarmUpSleepTime());
-                caseDefinitionRepository.getCaseType(reference, httpHeaders);
+                try {
+                    caseDefinitionRepository.getCaseType(reference, httpHeaders);
+                } catch (Exception e) {
+                    LOG.warn(String.format("Error while retrieving case type %s to warm up caseTypeDefinitionsCache", reference), e);
+                }
             };
         } catch (Exception e) {
-            LOG.warn("Error while retrieving all case types to warm up caseTypeDefinitionsCache", e);
+            LOG.warn("Error while retrieving all case types references to warm up caseTypeDefinitionsCache", e);
         }
     }
 
-    public HttpHeaders authorizationHeaders() {
+    private HttpHeaders authorizationHeaders() {
         final HttpHeaders headers = new HttpHeaders();
         headers.add("ServiceAuthorization", authTokenGenerator.generate());
         headers.add(HttpHeaders.AUTHORIZATION, getUserToken());
@@ -60,7 +64,7 @@ public class DefaultCacheWarmUpService implements CacheWarmUpService {
     }
 
     private String getUserToken() {
-        AuthenticatedUser caseworker = idamHelper.authenticate(applicationParams.getCacheWarmUpEmail(), applicationParams.getCacheWarmUpPassword());
-        return caseworker.getAccessToken();
+        AuthenticatedUser user = idamHelper.authenticate(applicationParams.getCacheWarmUpEmail(), applicationParams.getCacheWarmUpPassword());
+        return user.getAccessToken();
     }
 }
