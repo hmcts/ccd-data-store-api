@@ -78,7 +78,7 @@ variable "hazelcast_health_monitoring_level" {
 }
 
 variable "hazelcast_health_monitoring_delay_seconds" {
-  default = "3000"
+  default = "3600"
 }
 
 variable "hazelcast_jmx" {
