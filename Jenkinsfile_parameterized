@@ -28,8 +28,6 @@ def secrets = [
         secret('ccd-restricted-cross-case-type-caseworker-password', 'CCD_RESTRICTED_CROSS_CASE_TYPE_CASEWORKER_PASSWORD'),
         secret('ccd-cache-warm-up-email', 'CCD_CACHE_WARM_UP_EMAIL'),
         secret('ccd-cache-warm-up-password', 'CCD_CACHE_WARM_UP_PASSWORD'),
-        secret('ccd-cache-warm-up-sleep-time-sec', 'CCD_CACHE_WARM_UP_SLEEP_TIME_SEC'),
-        secret('ccd-cache-warm-up-enabled', 'CCD_CACHE_WARM_UP_ENABLED'),
         secret('ccd-oauth2-redirect_url', 'CCD_OAUTH2_REDIRECT_URL'),
         secret('ccd-oauth2-client_id', 'CCD_OAUTH2_CLIENT_ID'),
         secret('ccd-oauth2-client_secret', 'OAUTH2_CLIENT_SECRET'),

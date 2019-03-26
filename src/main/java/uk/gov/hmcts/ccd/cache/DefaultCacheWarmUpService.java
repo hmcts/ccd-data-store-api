@@ -44,7 +44,7 @@ public class DefaultCacheWarmUpService implements CacheWarmUpService {
             HttpHeaders httpHeaders = authorizationHeaders();
             List<String> caseTypesReferences = caseDefinitionRepository.getCaseTypesReferences(httpHeaders);
             for (String reference : caseTypesReferences) {
-                TimeUnit.SECONDS.sleep(applicationParams.getCacheWarmUpSleepTime());
+                TimeUnit.MILLISECONDS.sleep(applicationParams.getCacheWarmUpSleepTime());
                 try {
                     caseDefinitionRepository.getCaseType(reference, httpHeaders);
                 } catch (Exception e) {
