@@ -23,6 +23,8 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 
+import javax.transaction.Transactional;
+
 @RestController
 @RequestMapping(path = "/cases")
 public class CaseController {
@@ -80,13 +82,14 @@ public class CaseController {
         return ResponseEntity.ok(new CaseResource(caseDetails));
     }
 
+    @Transactional
     @PostMapping(
         path = "/{caseId}",
         headers = {
             V2.EXPERIMENTAL_HEADER
         },
         produces = {
-            V2.MediaType.EVENT
+            V2.MediaType.CREATE_EVENT
         }
     )
     @ApiOperation(

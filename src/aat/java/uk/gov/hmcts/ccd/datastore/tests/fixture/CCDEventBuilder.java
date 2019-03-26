@@ -27,6 +27,7 @@ public class CCDEventBuilder {
     private Long caseReference;
     private String summary;
     private String description;
+    private String token;
     private CaseData data;
 
     public CCDEventBuilder(String jurisdictionId, String caseTypeId, String eventId) {
@@ -67,6 +68,11 @@ public class CCDEventBuilder {
         return this;
     }
 
+    public CCDEventBuilder withToken(String token) {
+        this.token = token;
+        return this;
+    }
+
     public CaseDataContent toCaseDataContent() {
         final Event event = new Event();
         event.setEventId(eventId);
@@ -76,6 +82,7 @@ public class CCDEventBuilder {
         final CaseDataContent caseDataContent = new CaseDataContent();
         caseDataContent.setEvent(event);
         caseDataContent.setData(MAPPER.convertValue(data, STRING_JSON_MAP_TYPE));
+        caseDataContent.setToken(token);
 
         return caseDataContent;
     }
@@ -99,7 +106,6 @@ public class CCDEventBuilder {
         }
 
         return CCD_HELPER.createCase(asUser,
-                                     jurisdictionId,
                                      caseTypeId,
                                      eventId,
                                      caseDataContent);

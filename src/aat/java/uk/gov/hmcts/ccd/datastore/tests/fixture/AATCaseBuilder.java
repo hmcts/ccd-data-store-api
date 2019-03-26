@@ -98,10 +98,6 @@ public interface AATCaseBuilder {
                            .textAreaField(TEXT_AREA)
                            .fixedListField(FIXED_LIST)
                            .multiSelectListField(MULTI_SELECT_LIST)
-                           .collectionField(new AATCaseType.CollectionItem[]{
-                               new AATCaseType.CollectionItem(null, COLLECTION_VALUE_1),
-                               new AATCaseType.CollectionItem(null, COLLECTION_VALUE_2)
-                           })
                            .complexField(new AATCaseType.ComplexType(COMPLEX_TEXT, COMPLEX_FIXED_LIST))
                            .addressUKField(
                                AATCaseType.AddressUKField.builder()

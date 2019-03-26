@@ -21,9 +21,9 @@ import java.util.function.Supplier;
 import static java.lang.Boolean.FALSE;
 import static org.hamcrest.Matchers.equalTo;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CASE_TYPE;
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event.CREATE;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event.UPDATE;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event.create;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event.update;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.JURISDICTION;
 
 @DisplayName("Create event")
@@ -32,6 +32,7 @@ class CreateEventTest extends BaseTest {
     private static final String NOT_FOUND_CASE_REFERENCE = "1234123412341238";
     private static final String INVALID_CASE_REFERENCE = "1234123412341234";
     private static final String INVALID_EVENT_TRIGGER_ID = "invalidEvent";
+    private static final String EVENT_TOKEN = "someToken";
 
     protected CreateEventTest(AATHelper aat) {
         super(aat);
@@ -46,7 +47,9 @@ class CreateEventTest extends BaseTest {
                                         .withData(FullCase.build())
                                         .submitAndGetReference();
 
-        callCreateEvent(caseReference.toString(), getBody(UPDATE, FullCaseUpdated::build))
+        String eventToken = aat.generateTokenUpdateCase(asAutoTestCaseworker(), JURISDICTION, CASE_TYPE, caseReference, UPDATE);
+
+        callCreateEvent(caseReference.toString(), getBody(caseReference.toString(), UPDATE, eventToken, FullCaseUpdated::build))
             .when()
             .post("/cases/{caseReference}")
 
@@ -96,7 +99,7 @@ class CreateEventTest extends BaseTest {
     @Test
     @DisplayName("should get 404 when case reference does NOT exist")
     void should404WhenNotExists() {
-        callCreateEvent(NOT_FOUND_CASE_REFERENCE, getBody(UPDATE, CaseWithInvalidData::build))
+        callCreateEvent(NOT_FOUND_CASE_REFERENCE, getBody(NOT_FOUND_CASE_REFERENCE, UPDATE, EVENT_TOKEN, CaseWithInvalidData::build))
             .when()
             .get("/cases/{caseReference}")
 
@@ -107,7 +110,7 @@ class CreateEventTest extends BaseTest {
     @Test
     @DisplayName("should get 400 when case reference invalid")
     void should400WhenReferenceInvalid() {
-        callCreateEvent(INVALID_CASE_REFERENCE, getBody(INVALID_EVENT_TRIGGER_ID))
+        callCreateEvent(INVALID_CASE_REFERENCE, getBody(INVALID_CASE_REFERENCE, INVALID_EVENT_TRIGGER_ID, EVENT_TOKEN))
             .when()
             .get("/cases/{caseReference}")
 
@@ -118,7 +121,7 @@ class CreateEventTest extends BaseTest {
     @Test
     @DisplayName("should get 400 when event trigger id invalid")
     void should400WhenEventTriggerIdInvalid() {
-        callCreateEvent(INVALID_CASE_REFERENCE, getBody(UPDATE, CaseWithInvalidData::build))
+        callCreateEvent(INVALID_CASE_REFERENCE, getBody(INVALID_CASE_REFERENCE, UPDATE, EVENT_TOKEN, CaseWithInvalidData::build))
             .when()
             .get("/cases/{caseReference}")
 
@@ -131,21 +134,33 @@ class CreateEventTest extends BaseTest {
             .get()
             .body(supplier.get())
             .given()
+            .log().all()
             .pathParam("caseReference", caseReference)
-            .accept(V2.MediaType.EVENT)
+            .accept(V2.MediaType.CREATE_EVENT)
             .header("experimental", "true");
     }
 
-    private Supplier<String> getBody(String eventId) {
-        return getBody(eventId, () -> FullCase.build());
+    private Supplier<String> getBody(String caseReference, String eventId, String eventToken) {
+        return getBody(caseReference, eventId, eventToken, () -> FullCase.build());
     }
 
-    private Supplier<String> getBody(String eventId, Supplier<AATCaseType.CaseData> caseDataSupplier) {
-        CaseDataContent caseDataContent = Event.create()
+    private Supplier<String> getBody(String caseReference, String eventId, String eventToken, Supplier<AATCaseType.CaseData> caseDataSupplier) {
+        CaseDataContent caseDataContent = Event.update(Long.valueOf(caseReference))
             .as(asAutoTestCaseworker())
             .withData(caseDataSupplier.get())
             .withEventId(eventId)
+            .withToken(eventToken)
             .toCaseDataContent();
         return () -> MAPPER.convertValue(caseDataContent, JsonNode.class).toString();
+    }
+
+    private RequestSpecification callGetStartEventTrigger(String caseId, String eventTriggerId) {
+        return asAutoTestCaseworker(FALSE)
+            .get()
+            .given()
+            .pathParam("caseId", caseId)
+            .pathParam("triggerId", eventTriggerId)
+            .accept(V2.MediaType.START_EVENT_TRIGGER)
+            .header("experimental", "true");
     }
 }

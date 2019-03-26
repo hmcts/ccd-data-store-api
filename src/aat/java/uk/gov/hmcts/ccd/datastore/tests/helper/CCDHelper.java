@@ -10,39 +10,35 @@ import java.util.function.Supplier;
 public class CCDHelper {
 
     public Response createCase(Supplier<RequestSpecification> asUser,
-                               String jurisdiction,
                                String caseType,
                                String event,
                                CaseDataContent casePayload) {
 
         casePayload.getEvent().setEventId(event);
-        casePayload.setToken(generateTokenCreateCase(asUser, jurisdiction, caseType, event));
+        casePayload.setToken(generateTokenCreateCase(asUser, caseType, event));
 
         return asUser.get()
                      .given()
-                     .pathParam("jurisdiction", jurisdiction)
                      .pathParam("caseType", caseType)
                      .contentType(ContentType.JSON)
                      .body(casePayload)
                      .when()
-                     .post("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases");
+                     .post("/case-types/{caseType}/cases");
     }
 
 
     public String generateTokenCreateCase(Supplier<RequestSpecification> asUser,
-                                          String jurisdiction,
                                           String caseType,
                                           String event) {
 
         return asUser
             .get()
             .given()
-            .pathParam("jurisdiction", jurisdiction)
             .pathParam("caseType", caseType)
             .pathParam("event", event)
             .contentType(ContentType.JSON)
             .when()
-            .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/event-triggers/{event}/token")
+            .get("/case-types/{caseType}/event-triggers/{event}")
             .then()
             .statusCode(200)
             .extract()
@@ -80,14 +76,12 @@ public class CCDHelper {
         return asUser
             .get()
             .given()
-            .pathParam("jurisdiction", jurisdiction)
-            .pathParam("caseType", caseType)
             .pathParam("reference", caseReference)
             .pathParam("event", event)
             .contentType(ContentType.JSON)
             .when()
             .get(
-                "/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases/{reference}/event-triggers/{event}/token")
+                "/cases/{reference}/event-triggers/{event}")
             .then()
             .statusCode(200)
             .extract()
