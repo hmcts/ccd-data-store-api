@@ -13,6 +13,7 @@ public class CachingConfiguration {
 
     public static final String HAZELCAST_HEALTH_MONITORING_LEVEL = "hazelcast.health.monitoring.level";
     public static final String HAZELCAST_HEALTH_MONITORING_DELAY_SECONDS = "hazelcast.health.monitoring.delay.seconds";
+    public static final String HAZELCAST_JMX = "hazelcast.jmx";
 
     @Autowired
     ApplicationParams applicationParams;
@@ -27,6 +28,7 @@ public class CachingConfiguration {
         configCaches(applicationParams.getDefinitionCacheTTLSecs(), config);
         config.setProperty(HAZELCAST_HEALTH_MONITORING_LEVEL, applicationParams.getHazelcastHealthMonitoringLevel());
         config.setProperty(HAZELCAST_HEALTH_MONITORING_DELAY_SECONDS, applicationParams.getHazelcastHealthMonitoringDelaySeconds());
+        config.setProperty(HAZELCAST_JMX, applicationParams.getHazelcastJmx());
         return config;
     }
 

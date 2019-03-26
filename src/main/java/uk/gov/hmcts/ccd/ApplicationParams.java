@@ -79,6 +79,9 @@ public class ApplicationParams {
     @Value("${hazelcast.health.monitoring.delay.seconds}")
     private String hazelcastHealthMonitoringDelaySeconds;
 
+    @Value("${hazelcast.jmx}")
+    private String hazelcastJmx;
+
     @Value("#{'${search.elastic.hosts}'.split(',')}")
     private List<String> elasticSearchHosts;
 
@@ -285,5 +288,9 @@ public class ApplicationParams {
 
     public String getHazelcastHealthMonitoringDelaySeconds() {
         return hazelcastHealthMonitoringDelaySeconds;
+    }
+
+    public String getHazelcastJmx() {
+        return hazelcastJmx;
     }
 }

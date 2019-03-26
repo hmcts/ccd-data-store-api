@@ -81,6 +81,10 @@ variable "hazelcast_health_monitoring_delay_seconds" {
   default = "3000"
 }
 
+variable "hazelcast_jmx" {
+  default = "false"
+}
+
 ////////////////////////////////
 // Database
 ////////////////////////////////

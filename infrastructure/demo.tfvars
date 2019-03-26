@@ -12,3 +12,4 @@ database_sku_name = "GP_Gen5_8"
 database_sku_capacity = "8"
 
 hazelcast_health_monitoring_level = "NOISY"
+hazelcast_jmx = "true"

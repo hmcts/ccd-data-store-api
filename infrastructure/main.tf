@@ -133,6 +133,7 @@ module "ccd-data-store-api" {
     DEFINITION_CACHE_EVICTION_POLICY    = "${var.definition_cache_eviction_policy}"
     HAZELCAST_HEALTH_MONITORING_LEVEL             = "${var.hazelcast_health_monitoring_level}"
     HAZELCAST_HEALTH_MONITORING_DELAY_SECONDS     = "${var.hazelcast_health_monitoring_delay_seconds}"
+    HAZELCAST_JMX                       = "${var.hazelcast_jmx}"
 
     ELASTIC_SEARCH_ENABLED              = "${var.elastic_search_enabled}"
     ELASTIC_SEARCH_HOSTS                = "${local.elastic_search_hosts}"
