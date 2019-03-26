@@ -13,8 +13,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
@@ -38,8 +36,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputDefinition;
 @SpringBootTest
 @TestPropertySource(locations = "classpath:integration_tests.properties")
 public class DefinitionsCachingIT {
-
-    static final Logger LOGGER = LoggerFactory.getLogger(DefinitionsCachingIT.class);
 
     private static final String ID_1 = "case1";
     private static final String ID_2 = "case11";
