@@ -62,18 +62,13 @@ public class CaseService {
 
     /**
      * @param content Data received from the client.
-     * @param jurisdictionId of the case.
+     * @param caseDetails of the case.
      * @return <code>Optional&lt;CaseDetails&gt;<code/> - CaseDetails wrapped in Optional
      */
-    public Optional<CaseDetails> populateCurrentCaseDetailsWithEventFields(CaseDataContent content, String jurisdictionId) {
-        try {
-            CaseDetails caseDetails = getCaseDetails(jurisdictionId, content.getCaseReference());
-            content.getEventData().forEach((key, value) -> caseDetails.getData().put(key, value));
+    public CaseDetails populateCurrentCaseDetailsWithEventFields(CaseDataContent content, CaseDetails caseDetails) {
 
-            return Optional.ofNullable(caseDetails);
-        } catch (BadRequestException | ResourceNotFoundException e) {
-            return Optional.empty();
-        }
+            content.getEventData().forEach((key, value) -> caseDetails.getData().put(key, value));
+            return caseDetails;
     }
 
     public CaseDetails clone(CaseDetails source) {

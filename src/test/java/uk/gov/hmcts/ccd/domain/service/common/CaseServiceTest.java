@@ -212,13 +212,13 @@ class CaseServiceTest {
                 .withCaseReference(CASE_REFERENCE)
                 .withEventData(eventData)
                 .build();
-            Optional<CaseDetails> result = caseService.populateCurrentCaseDetailsWithEventFields(caseDataContent, JURISDICTION);
+            CaseDetails caseDetails = buildCaseDetails();
+            caseDetails.setId("299");
+            CaseDetails result = caseService.populateCurrentCaseDetailsWithEventFields(caseDataContent, caseDetails);
 
             assertAll(
-                () -> assertThat(result.get().getId(), is(CaseServiceTest.this.caseDetails.getId())),
-                () -> assertThat(result.get().getData(), is(resultData)),
-                () -> verify(caseDetailsRepository).findByReference(JURISDICTION, REFERENCE),
-                () -> verify(uidService).validateUID(CASE_REFERENCE)
+                () -> assertThat(result.getId(), is(CaseServiceTest.this.caseDetails.getId())),
+                () -> assertThat(result.getData(), is(resultData))
             );
         }
 
