@@ -11,9 +11,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class CachingConfiguration {
 
+    public static final String HAZELCAST_HEALTH_MONITORING_LEVEL = "hazelcast.health.monitoring.level";
+    public static final String HAZELCAST_HEALTH_MONITORING_DELAY_SECONDS = "hazelcast.health.monitoring.delay.seconds";
+
     @Autowired
     ApplicationParams applicationParams;
-
 
     @Bean
     public Config hazelCastConfig() {
@@ -23,6 +25,8 @@ public class CachingConfiguration {
         networkConfig.getJoin().getMulticastConfig().setEnabled(false);
         networkConfig.getJoin().getTcpIpConfig().setEnabled(false);
         configCaches(applicationParams.getDefinitionCacheTTLSecs(), config);
+        config.setProperty(HAZELCAST_HEALTH_MONITORING_LEVEL, applicationParams.getHazelcastHealthMonitoringLevel());
+        config.setProperty(HAZELCAST_HEALTH_MONITORING_DELAY_SECONDS, applicationParams.getHazelcastHealthMonitoringDelaySeconds());
         return config;
     }
 

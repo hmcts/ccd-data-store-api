@@ -73,6 +73,14 @@ variable "definition_cache_eviction_policy" {
   default = "NONE"
 }
 
+variable "hazelcast_health_monitoring_level" {
+  default = "SILENT"
+}
+
+variable "hazelcast_health_monitoring_delay_seconds" {
+  default = "3000"
+}
+
 ////////////////////////////////
 // Database
 ////////////////////////////////

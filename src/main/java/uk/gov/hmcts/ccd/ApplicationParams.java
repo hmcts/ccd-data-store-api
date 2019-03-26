@@ -73,6 +73,12 @@ public class ApplicationParams {
     @Value("${definition.cache.eviction.policy}")
     private EvictionPolicy definitionCacheEvictionPolicy;
 
+    @Value("${hazelcast.health.monitoring.level}")
+    private String hazelcastHealthMonitoringLevel;
+
+    @Value("${hazelcast.health.monitoring.delay.seconds}")
+    private String hazelcastHealthMonitoringDelaySeconds;
+
     @Value("#{'${search.elastic.hosts}'.split(',')}")
     private List<String> elasticSearchHosts;
 
@@ -271,5 +277,13 @@ public class ApplicationParams {
 
     public String getElasticsearchNodeDiscoveryFilter() {
         return elasticsearchNodeDiscoveryFilter;
+    }
+
+    public String getHazelcastHealthMonitoringLevel() {
+        return hazelcastHealthMonitoringLevel;
+    }
+
+    public String getHazelcastHealthMonitoringDelaySeconds() {
+        return hazelcastHealthMonitoringDelaySeconds;
     }
 }

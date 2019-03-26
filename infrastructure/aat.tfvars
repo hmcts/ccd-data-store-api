@@ -13,3 +13,5 @@ database_sku_name = "GP_Gen5_8"
 database_sku_capacity = "8"
 
 http_client_read_timeout = "180000"
+
+hazelcast_health_monitoring_level = "NOISY"
