@@ -19,6 +19,7 @@ import static junit.framework.TestCase.fail;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
@@ -75,7 +76,23 @@ public class DefaultCacheWarmUpServiceTest {
     }
 
     @Test
-    public void shouldFailSafeWhenRetrievingCaseTypesEndinError() {
+    public void shouldFailSafeWhenRetrievingCaseTypesReferencesEndInError() {
+
+        doThrow(RestClientException.class).when(defaultCaseDefinitionRepository).getCaseTypesReferences(headers);
+
+        try {
+            defaultCacheWarmUpService.warmUp();
+        } catch (Exception e) {
+            fail();
+        }
+
+        verify(defaultCaseDefinitionRepository, never()).getCaseType("CT1", headers);
+        verify(defaultCaseDefinitionRepository, never()).getCaseType("CT2", headers);
+        verify(defaultCaseDefinitionRepository, never()).getCaseType("CT3", headers);
+    }
+
+    @Test
+    public void shouldFailSafeWhenRetrievingCaseTypesEndInError() {
 
         doThrow(RestClientException.class).when(defaultCaseDefinitionRepository).getCaseType("CT2", headers);
 
