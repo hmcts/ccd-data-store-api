@@ -3,17 +3,13 @@ package uk.gov.hmcts.ccd.domain.service.createevent;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -96,7 +92,7 @@ class MidEventCallbackTest {
     void shouldInvokeMidEventCallbackWhenUrlDefined() {
         CaseDataContent build = newCaseDataContent().withEvent(event).withCaseReference(CASE_REFERENCE)
             .withData(data).withIgnoreWarning(IGNORE_WARNINGS).build();
-        CaseDetails existingCaseDetails = caseDetails(data) ;
+        CaseDetails existingCaseDetails = caseDetails(data);
         when(caseService.getCaseDetails(caseDetails.getJurisdiction(), CASE_REFERENCE)).thenReturn(existingCaseDetails);
         when(caseService.clone(existingCaseDetails)).thenReturn(existingCaseDetails);
 
