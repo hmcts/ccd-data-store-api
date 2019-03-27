@@ -307,7 +307,7 @@ public class CallbackServiceTest {
         try {
             underTest.send(testUrl, caseEvent, null, caseDetails, String.class);
         } catch (CallbackException ex) {
-            assertThat(ex.getMessage(), is("Unsuccessful callback to " + testUrl));
+            assertThat(ex.getMessage(), is("Callback to service has been unsuccessful for event " + caseEvent.getId()));
             throw ex;
         }
     }
