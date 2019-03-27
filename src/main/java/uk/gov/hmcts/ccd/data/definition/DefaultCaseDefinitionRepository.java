@@ -171,8 +171,14 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             queryParams.put("roles", StringUtils.join(userRoles, ","));
             return Arrays.asList(restTemplate.exchange(applicationParams.userRolesClassificationsURL(), HttpMethod.GET, requestEntity, UserRole[].class, queryParams).getBody());
         } catch (Exception e) {
-            LOG.warn("Error while retrieving classification for user roles {} because of ", userRoles, e);
-            throw new ServiceException("Error while retrieving classification for user roles " + userRoles + " because of " + e.getMessage());
+            if (e instanceof HttpClientErrorException
+                && ((HttpClientErrorException)e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                LOG.debug("No classification found for user roles {} because of ", userRoles, e);
+                throw new ResourceNotFoundException("No classification for user roles " + userRoles + " because of " + e.getMessage());
+            } else {
+                LOG.warn("Error while retrieving classification for user roles {} because of ", userRoles, e);
+                throw new ServiceException("Error while retrieving classifications for user roles " + userRoles + " because of " + e.getMessage());
+            }
         }
     }
 
