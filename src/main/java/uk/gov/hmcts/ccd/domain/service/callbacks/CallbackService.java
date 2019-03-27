@@ -55,8 +55,10 @@ public class CallbackService {
         }
         final CallbackRequest callbackRequest = new CallbackRequest(caseDetails, caseDetailsBefore, caseEvent.getId(), ignoreWarning);
         final Optional<ResponseEntity<CallbackResponse>> responseEntity = sendRequest(url, CallbackResponse.class, callbackRequest);
-        return responseEntity.map(re -> Optional.of(re.getBody())).orElseThrow(() ->
-            new CallbackException("Callback to service has been unsuccessful for event " + caseEvent.getId()));
+        return responseEntity.map(re -> Optional.of(re.getBody())).orElseThrow(() -> {
+            LOG.info("Unsuccessful callback to {} for caseType {} and event {}", url, caseDetails.getCaseTypeId(), caseEvent.getId());
+            return new CallbackException("Callback to service has been unsuccessful for event " + caseEvent.getName());
+        });
     }
 
     // The retry will be on seconds T=1 and T=3 if the initial call fails at T=0
@@ -69,8 +71,10 @@ public class CallbackService {
 
         final CallbackRequest callbackRequest = new CallbackRequest(caseDetails, caseDetailsBefore, caseEvent.getId());
         final Optional<ResponseEntity<T>> requestEntity = sendRequest(url, clazz, callbackRequest);
-        return requestEntity.orElseThrow(() ->
-            new CallbackException("Callback to service has been unsuccessful for event " + caseEvent.getId()));
+        return requestEntity.orElseThrow(() -> {
+            LOG.info("Unsuccessful callback to {} for caseType {} and event {}", url, caseDetails.getCaseTypeId(), caseEvent.getId());
+            return new CallbackException("Callback to service has been unsuccessful for event " + caseEvent.getName());
+        });
     }
 
     private <T> Optional<ResponseEntity<T>> sendRequest(final String url,
