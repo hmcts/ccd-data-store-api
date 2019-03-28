@@ -162,7 +162,7 @@ public class CaseAccessEndpointIT extends BaseTest {
     }
 
     @Test
-    private void revokeAccessUrlWithUuid() throws Exception {
+    public void revokeAccessUrlWithUuid() throws Exception {
         final String url = "/caseworkers/0000-aaaa-2222-bbbb/jurisdictions/" + JURISDICTION + "/case-types/" +
             CASE_TYPE  + "/cases/" + CASE_ID + "/users/" + USER_ID;
 
@@ -172,7 +172,7 @@ public class CaseAccessEndpointIT extends BaseTest {
     }
 
     @Test
-    private void findCaseIdsGivenUserIdHasAccessToWithUuid() throws Exception {
+    public void findCaseIdsGivenUserIdHasAccessToWithUuid() throws Exception {
         final String url = "/caseworkers/0000-aaaa-2222-bbbb/jurisdictions/" + JURISDICTION + "/case-types/" +
             CASE_TYPE + "/cases/ids?userId=" + "0000-zzzz-9999-yyyy";
 
