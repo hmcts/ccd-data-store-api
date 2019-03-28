@@ -112,13 +112,7 @@ public class DefinitionsCachingIT {
         caseDefinitionRepository.getLatestVersion(ID_3);
         verify(caseDefinitionRepository, times(1)).getLatestVersion(ID_3);
 
-        TimeUnit.SECONDS.sleep(1);
-        caseDefinitionRepository.getLatestVersion(ID_3);
-        caseDefinitionRepository.getLatestVersion(ID_3);
-        caseDefinitionRepository.getLatestVersion(ID_3);
-        verify(caseDefinitionRepository, times(1)).getLatestVersion(ID_3);
-
-        TimeUnit.SECONDS.sleep(3);
+        TimeUnit.SECONDS.sleep(4);
         verify(caseDefinitionRepository, times(1)).getLatestVersion(ID_3);
         caseDefinitionRepository.getLatestVersion(ID_3);
         verify(caseDefinitionRepository, times(2)).getLatestVersion(ID_3);
