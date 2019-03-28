@@ -151,7 +151,7 @@ public class CaseAccessEndpointIT extends BaseTest {
     }
 
     private void grantAccess() throws Exception {
-        final String url = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" +
+        final String url = "/caseworkers/0000-aaaa-2222-bbbb/jurisdictions/" + JURISDICTION + "/case-types/" +
             CASE_TYPE + "/cases/" + CASE_ID + "/users";
 
         mockMvc.perform(post(url)
@@ -160,16 +160,7 @@ public class CaseAccessEndpointIT extends BaseTest {
             .andExpect(status().isCreated())
             .andReturn();
     }
-
-    @Test
-    public void revokeAccessUrlWithUuid() throws Exception {
-        final String url = "/caseworkers/0000-aaaa-2222-bbbb/jurisdictions/" + JURISDICTION + "/case-types/" +
-            CASE_TYPE  + "/cases/" + CASE_ID + "/users/" + USER_ID;
-
-        mockMvc.perform(delete(url))
-            .andExpect(status().isOk())
-            .andReturn();
-    }
+    
 
     @Test
     public void findCaseIdsGivenUserIdHasAccessToWithUuid() throws Exception {
