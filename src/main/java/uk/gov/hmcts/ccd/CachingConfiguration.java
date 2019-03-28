@@ -20,7 +20,7 @@ public class CachingConfiguration {
 
         Config config = new Config();
         NetworkConfig networkConfig = config.setInstanceName("hazelcast-instance-ccd").getNetworkConfig();
-        networkConfig.getJoin().getMulticastConfig().setEnabled(false);
+        networkConfig.getJoin().getMulticastConfig().setEnabled(true);
         networkConfig.getJoin().getTcpIpConfig().setEnabled(false);
         configCaches(applicationParams.getDefinitionCacheTTLSecs(), config);
         return config;
