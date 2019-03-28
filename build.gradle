@@ -455,8 +455,9 @@ jacoco {
 
 sonarqube {
     properties {
-        property "sonar.exclusions", "build/generated-sources/**/*.java,src/main/java/uk/gov/hmcts/ccd/idam/*.java"
-        property "sonar.coverage.exclusions", "src/main/java/uk/gov/hmcts/ccd/idam/*.java,src/main/java/uk/gov/hmcts/ccd/AppInsights.java"
+        property "sonar.exclusions", "build/generated-sources/**/*.java, **/idam/*.java"
+        property "sonar.coverage.exclusions", "**/idam/*.java, src/main/java/uk/gov/hmcts/ccd/AppInsights.java"
+        property "sonar.jacoco.exclusions", "**/idam/*.java, src/main/java/uk/gov/hmcts/ccd/AppInsights.java"
         property "sonar.jacoco.reportPaths", "${project.buildDir}/jacoco/junitPlatformTest.exec"
         property "sonar.junit.reportPaths", "${project.buildDir}/test-results/junit-platform"
         property "sonar.projectName", "ccd-data-store-api"
