@@ -200,3 +200,35 @@ variable "http_client_validate_after_inactivity" {
   type = "string"
   default = "0"
 }
+
+////////////////////////////////
+// Hazelcast cache
+////////////////////////////////
+variable "hazelcast_discovery_enabled" {
+  default = "false"
+}
+
+variable "hazelcast_discovery_consul_host" {
+  type = "string"
+  default = "localhost"
+}
+
+variable "hazelcast_discovery_consul_port" {
+  type = "string"
+  default = "8500"
+}
+
+variable "hazelcast_discovery_consul_healthy_only" {
+  type = "string"
+  default = "true"
+}
+
+variable "hazelcast_discovery_consul_delay_in_milliseconds" {
+  type = "string"
+  default = "10000"
+}
+
+variable "hazelcast_discovery_consul_registrator" {
+  type = "string"
+  default = "org.bitsofinfo.hazelcast.discovery.consul.DoNothingRegistrator"
+}

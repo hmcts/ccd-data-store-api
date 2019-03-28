@@ -149,6 +149,13 @@ module "ccd-data-store-api" {
     HTTP_CLIENT_SECONDS_IDLE_CONNECTION   = "${var.http_client_seconds_idle_connection}"
     HTTP_CLIENT_MAX_CLIENT_PER_ROUTE      = "${var.http_client_max_client_per_route}"
     HTTP_CLIENT_VALIDATE_AFTER_INACTIVITY = "${var.http_client_validate_after_inactivity}"
+
+    HAZELCAST_DISCOVERY_ENABLED                       = "${var.hazelcast_discovery_enabled}"
+    HAZELCAST_DISCOVERY_CONSUL_HOST                   = "${var.hazelcast_discovery_consul_host}"
+    HAZELCAST_DISCOVERY_CONSUL_PORT                   = "${var.hazelcast_discovery_consul_port}"
+    HAZELCAST_DISCOVERY_CONSUL_HEALTHY_ONLY           = "${var.hazelcast_discovery_consul_healthy_only}"
+    HAZELCAST_DISCOVERY_CONSUL_DELAY_IN_MILLISECONDS  = "${var.hazelcast_discovery_consul_delay_in_milliseconds}"
+    HAZELCAST_DISCOVERY_CONSUL_REGISTRATOR            = "${var.hazelcast_discovery_consul_registrator}"
   }
 
 }
