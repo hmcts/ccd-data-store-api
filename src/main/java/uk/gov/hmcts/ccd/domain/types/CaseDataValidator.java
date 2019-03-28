@@ -116,7 +116,7 @@ public class CaseDataValidator {
             return Collections.emptyList();
         }
 
-        if (itemValue.isValueNode()) {
+        if (shouldTreatAsValueNode(fieldType, itemValue)) {
             if (!BaseType.contains(fieldType.getType())) {
                 return Collections.singletonList(new ValidationResult("Unknown Type:" + fieldType.getType(), itemFieldId));
             }
@@ -135,6 +135,10 @@ public class CaseDataValidator {
         }
 
         return Collections.singletonList(new ValidationResult("Unsupported collection item:" + itemValue.toString(), itemFieldId));
+    }
+
+    private boolean shouldTreatAsValueNode(FieldType fieldType, JsonNode itemValue) {
+        return itemValue.isValueNode() || fieldType.getType().equalsIgnoreCase(DocumentValidator.TYPE_ID);
     }
 }
 
