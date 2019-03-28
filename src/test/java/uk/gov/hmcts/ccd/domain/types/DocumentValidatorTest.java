@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
@@ -53,9 +52,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
 
     @Before
     public void setUp() throws Exception {
-        final ApplicationParams applicationParams = mock(ApplicationParams.class);
-        when(applicationParams.getValidDMDomain()).thenReturn("https://dm.reform.hmcts.net");
-        validator = new DocumentValidator(applicationParams);
+        validator = new DocumentValidator();
 
         caseField = MAPPER.readValue(CASE_FIELD_STRING, CaseField.class);
     }
@@ -313,9 +310,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
     }
 
     private DocumentValidator buildDocumentValidator(final String url) {
-        final ApplicationParams ap = mock(ApplicationParams.class);
-        when(ap.getValidDMDomain()).thenReturn(url);
-        return new DocumentValidator(ap);
+        return new DocumentValidator();
     }
 
     private ObjectNode createDoc(String documentUrl) {
