@@ -2,5 +2,3 @@ idam_api_url = "http://idam-api-idam-saat.service.core-compute-idam-saat.interna
 asp_name = "ccd-data-store-api-saat"
 asp_rg = "ccd-data-store-api-saat"
 elastic_search_enabled = "false"
-elastic_search_nodes_discovery_enabled = "false"
-capacity = "4"
