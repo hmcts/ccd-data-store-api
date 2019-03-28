@@ -96,17 +96,17 @@ public class DocumentValidatorTest implements IVallidatorTest {
     }
 
     @Test
-    public void shouldNotValidateDocumentWithUnknownDomain() {
+    public void shouldValidateDocumentWithUnknownDomain() {
         ObjectNode data = createDoc(UNKNOWN_DOCUMENT_DOMAIN_URL);
         final List<ValidationResult> validDocumentUrlResult = validator.validate(DOCUMENT_FIELD_ID, data, caseField);
-        assertEquals(validDocumentUrlResult.toString(), 1, validDocumentUrlResult.size());
+        assertEquals(0, validDocumentUrlResult.size());
     }
 
     @Test
-    public void shouldNotValidateDocumentWithUnknownParentDomain() {
+    public void shouldValidateDocumentWithUnknownParentDomain() {
         ObjectNode data = createDoc(UNKNOWN_DOCUMENT_PARENT_DOMAIN_URL);
         final List<ValidationResult> validDocumentUrlResult = validator.validate(DOCUMENT_FIELD_ID, data, caseField);
-        assertEquals(validDocumentUrlResult.toString(), 1, validDocumentUrlResult.size());
+        assertEquals(0, validDocumentUrlResult.size());
     }
 
     @Test
@@ -133,17 +133,17 @@ public class DocumentValidatorTest implements IVallidatorTest {
     }
 
     @Test
-    public void shouldNotValidateDocumentWithUnknownDomainForBinary() {
+    public void shouldValidateDocumentWithUnknownDomainForBinary() {
         ObjectNode data = createDoc(VALID_DOCUMENT_URL, UNKNOWN_DOCUMENT_DOMAIN_URL + "/binary");
         final List<ValidationResult> validDocumentUrlResult = validator.validate(DOCUMENT_FIELD_ID, data, caseField);
-        assertEquals(validDocumentUrlResult.toString(), 1, validDocumentUrlResult.size());
+        assertEquals(0, validDocumentUrlResult.size());
     }
 
     @Test
-    public void shouldNotValidateDocumentWithUnknownParentDomainForBinary() {
+    public void shouldValidateDocumentWithUnknownParentDomainForBinary() {
         ObjectNode data = createDoc(VALID_DOCUMENT_URL, UNKNOWN_DOCUMENT_PARENT_DOMAIN_URL + "/binary");
         final List<ValidationResult> validDocumentUrlResult = validator.validate(DOCUMENT_FIELD_ID, data, caseField);
-        assertEquals(validDocumentUrlResult.toString(), 1, validDocumentUrlResult.size());
+        assertEquals(0, validDocumentUrlResult.size());
     }
 
     @Test
@@ -173,16 +173,14 @@ public class DocumentValidatorTest implements IVallidatorTest {
     }
 
     @Test
-    public void shouldNotValidateIfPortsAreSpecifiedAndNotMatch() {
+    public void shouldValidateIfPortsAreSpecifiedAndNotMatch() {
         final DocumentValidator validatorWithPort = buildDocumentValidator("https://ng.reform.hmcts.net:7789");
 
         final ObjectNode data = createDoc(DOCUMENT_URL_WITH_PORT);
         final List<ValidationResult> validDocumentUrlResult = validatorWithPort.validate(DOCUMENT_FIELD_ID,
                                                                                          data,
                                                                                          caseField);
-        assertThat(validDocumentUrlResult, hasSize(1));
-        assertThat(validDocumentUrlResult.get(0).getErrorMessage(),
-                   is(DOCUMENT_URL_WITH_PORT + " does not match Document Management domain or expected URL path"));
+        assertThat(validDocumentUrlResult, hasSize(0));
     }
 
     @Test
