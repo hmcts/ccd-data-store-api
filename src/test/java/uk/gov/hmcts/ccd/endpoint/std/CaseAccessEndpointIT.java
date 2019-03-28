@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.endpoint.std;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -160,4 +161,26 @@ public class CaseAccessEndpointIT extends BaseTest {
             .andExpect(status().isCreated())
             .andReturn();
     }
+
+    @Test
+    private void revokeAccessUrlWithUuid() throws Exception {
+        final String url = "/caseworkers/0000-aaaa-2222-bbbb/jurisdictions/" + JURISDICTION + "/case-types/" +
+            CASE_TYPE  + "/cases/" + CASE_ID + "/users/" + USER_ID;
+
+        mockMvc.perform(delete(url))
+            .andExpect(status().isOk())
+            .andReturn();
+    }
+
+    @Test
+    private void findCaseIdsGivenUserIdHasAccessToWithUuid() throws Exception {
+        final String url = "/caseworkers/0000-aaaa-2222-bbbb/jurisdictions/" + JURISDICTION + "/case-types/" +
+            CASE_TYPE + "/cases/ids?userId=" + "0000-zzzz-9999-yyyy";
+
+        mockMvc.perform(get(url))
+            .andExpect(status().isOk())
+            .andReturn();
+    }
+
+
 }
