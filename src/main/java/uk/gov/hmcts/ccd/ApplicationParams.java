@@ -97,6 +97,24 @@ public class ApplicationParams {
     @Value("${search.elastic.nodes.discovery.filter}")
     private String elasticsearchNodeDiscoveryFilter;
 
+    @Value("${hazelcast.discovery.enabled}")
+    private boolean hazelcastDiscoveryEnabled;
+
+    @Value("${hazelcast.discovery.consul.host}")
+    private String hazelcastDiscoveryConsulHost;
+
+    @Value("${hazelcast.discovery.consul.port}")
+    private String hazelcastDiscoveryConsulPort;
+
+    @Value("${hazelcast.discovery.consul.healthy.only}")
+    private boolean hazelcastDiscoveryConsulHealthyOnly;
+
+    @Value("${hazelcast.discovery.consul.delay.in.milliseconds}")
+    private Integer hazelcastDiscoveryConsulDelayInMs;
+
+    @Value("${hazelcast.discovery.consul.registrator}")
+    private String hazelcastDiscoveryConsulRegistrator;
+
     private static String encode(final String stringToEncode) {
         try {
             return URLEncoder.encode(stringToEncode, "UTF-8");
@@ -271,5 +289,29 @@ public class ApplicationParams {
 
     public String getElasticsearchNodeDiscoveryFilter() {
         return elasticsearchNodeDiscoveryFilter;
+    }
+
+    public boolean isHazelcastDiscoveryEnabled() {
+        return hazelcastDiscoveryEnabled;
+    }
+
+    public String getHazelcastDiscoveryConsulHost() {
+        return hazelcastDiscoveryConsulHost;
+    }
+
+    public String getHazelcastDiscoveryConsulPort() {
+        return hazelcastDiscoveryConsulPort;
+    }
+
+    public boolean isHazelcastDiscoveryConsulHealthyOnly() {
+        return hazelcastDiscoveryConsulHealthyOnly;
+    }
+
+    public Integer getHazelcastDiscoveryConsulDelayInMs() {
+        return hazelcastDiscoveryConsulDelayInMs;
+    }
+
+    public String getHazelcastDiscoveryConsulRegistrator() {
+        return hazelcastDiscoveryConsulRegistrator;
     }
 }
