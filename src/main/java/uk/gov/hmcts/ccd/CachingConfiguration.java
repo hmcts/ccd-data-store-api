@@ -57,7 +57,7 @@ public class CachingConfiguration {
     private void configConsulDiscoveryStrategy(Config config, JoinConfig joinConfig) {
         config.setProperty("hazelcast.discovery.enabled", String.valueOf(applicationParams
                                                                                  .isHazelcastDiscoveryEnabled()));
-        DiscoveryConfig discoveryConfig = joinConfig.getDiscoveryConfig();
+        final DiscoveryConfig discoveryConfig = joinConfig.getDiscoveryConfig();
         DiscoveryStrategyFactory discoveryStrategyFactory = new ConsulDiscoveryStrategyFactory();
         DiscoveryStrategyConfig strategyConfig = new DiscoveryStrategyConfig(discoveryStrategyFactory);
         strategyConfig.addProperty("consul-host", applicationParams.getHazelcastDiscoveryConsulHost());
