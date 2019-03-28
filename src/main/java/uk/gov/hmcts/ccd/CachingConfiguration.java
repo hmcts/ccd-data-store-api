@@ -28,7 +28,7 @@ public class CachingConfiguration {
         JoinConfig joinConfig = networkConfig.getJoin();
         joinConfig.getMulticastConfig().setEnabled(false);
         joinConfig.getTcpIpConfig().setEnabled(false);
-        if(applicationParams
+        if (applicationParams
                 .isHazelcastDiscoveryEnabled()) {
             configConsulDiscoveryStrategy(config, joinConfig);
         }
