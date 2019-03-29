@@ -14,3 +14,7 @@ http_client_max_total = 200
 #http_client_seconds_idle_connection = 120
 http_client_max_client_per_route = 40
 #http_client_validate_after_inactivity = 0
+
+hazelcast_discovery_enabled = "true"
+hazelcast_discovery_consul_host = "10.100.72.4"
+hazelcast_discovery_consul_registrator = "org.bitsofinfo.hazelcast.discovery.consul.LocalDiscoveryNodeRegistrator"
