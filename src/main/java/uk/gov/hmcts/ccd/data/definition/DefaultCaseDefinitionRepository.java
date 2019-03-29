@@ -24,6 +24,8 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
@@ -82,8 +84,9 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         LOG.debug("retrieving case type definition for case type: {}", caseTypeId);
         try {
             final HttpEntity requestEntity = new HttpEntity<CaseType>(securityUtils.authorizationHeaders());
-            return restTemplate.exchange(applicationParams.caseTypeDefURL(caseTypeId), HttpMethod.GET, requestEntity, CaseType.class).getBody();
-
+            CaseType caseType = restTemplate.exchange(applicationParams.caseTypeDefURL(caseTypeId), HttpMethod.GET, requestEntity, CaseType.class).getBody();
+            completeACLsOf(caseType);
+            return caseType;
         } catch (Exception e) {
             LOG.warn("Error while retrieving case type", e);
             if (e instanceof HttpClientErrorException
@@ -169,7 +172,24 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     @Override
     @Cacheable("caseTypeDefinitionsCache")
     public CaseType getCaseType(int version, String caseTypeId) {
-        return this.getCaseType(caseTypeId);
+        CaseType caseType = this.getCaseType(caseTypeId);
+        return caseType;
+    }
+
+    private static void completeACLsOf(CaseType caseType) {
+        for(CaseField field : caseType.getCaseFields()) {
+            completeACLsWith(field.getFieldType(), field.getAccessControlLists());
+        }
+    }
+
+    private static void completeACLsWith(FieldType fieldType, List<AccessControlList> accessControlLists) {
+        if(fieldType==null || fieldType.getComplexFields()==null)
+            return;
+        completeACLsWith(fieldType.getCollectionFieldType(), accessControlLists);
+        for(CaseField f : fieldType.getComplexFields()) {
+            f.setAccessControlLists(accessControlLists);
+            completeACLsWith(f.getFieldType(), accessControlLists);
+        }
     }
 
     @Override
