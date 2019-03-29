@@ -63,12 +63,12 @@ variable "definition_cache_max_idle_sec" {
   default = "259200"
 }
 
-variable "definition_latest_version_ttl_sec" {
+variable "definition_cache_latest_version_ttl_sec" {
   type = "string"
   default = "1"
 }
 
-variable "definition_jurisdiction_ttl_sec" {
+variable "definition_cache_jurisdiction_ttl_sec" {
   type = "string"
   default = "1"
 }
