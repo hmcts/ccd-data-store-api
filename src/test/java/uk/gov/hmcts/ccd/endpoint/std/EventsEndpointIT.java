@@ -17,7 +17,6 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -100,7 +99,7 @@ public class EventsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect case data size", 16, count);
     }
 
-    @Ignore
+    @Test
     public void getEventsUrlWithUuid() throws Exception {
         final String url = "/caseworkers/0000-aaaa-2222-bbbb/jurisdictions"
             + "/PROBATE/case-types/TestAddressBookCase/cases/1504259907353529/events";
