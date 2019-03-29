@@ -67,6 +67,7 @@ public class CachingConfiguration {
         strategyConfig.addProperty("consul-discovery-delay-ms", String.valueOf(applicationParams
                                                                                        .getHazelcastDiscoveryConsulDelayInMs()));
         strategyConfig.addProperty("consul-registrator", applicationParams.getHazelcastDiscoveryConsulRegistrator());
+        strategyConfig.addProperty("consul-registrator-config", "<![CDATA[{\"preferPublicAddress\":false}]]>");
         discoveryConfig.addDiscoveryStrategyConfig(strategyConfig);
     }
 
