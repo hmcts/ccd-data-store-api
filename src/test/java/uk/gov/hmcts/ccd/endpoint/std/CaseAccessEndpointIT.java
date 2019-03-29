@@ -160,16 +160,21 @@ public class CaseAccessEndpointIT extends BaseTest {
             .andExpect(status().isCreated())
             .andReturn();
     }
-    
+
 
     @Test
     public void findCaseIdsGivenUserIdHasAccessToWithUuid() throws Exception {
-        final String url = "/caseworkers/0000-aaaa-2222-bbbb/jurisdictions/" + JURISDICTION + "/case-types/" +
-            CASE_TYPE + "/cases/ids?userId=" + "0000-zzzz-9999-yyyy";
+        final String url = "/caseworkers/0000-aaaa-2222-bbbb/jurisdictions/" +
+            JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/ids?userId=" +
+            "0000-zzzz-9999-yyyy";
 
-        mockMvc.perform(get(url))
+        final MvcResult mvcResult = mockMvc.perform(get(url))
             .andExpect(status().isOk())
             .andReturn();
+
+        assertThat(mvcResult.getResponse().getStatus())
+            .isEqualTo(200);
+
     }
 
 

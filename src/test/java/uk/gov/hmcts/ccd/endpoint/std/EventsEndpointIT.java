@@ -102,8 +102,8 @@ public class EventsEndpointIT extends WireMockBaseTest {
 
     @Ignore
     public void getEventsUrlWithUuid() throws Exception {
-        final String url = "/caseworkers/0000-aaaa-2222-bbbb/jurisdictions/PROBATE/case-types/" +
-            "TestAddressBookCase/cases/1504259907353529/events";
+        final String url = "/caseworkers/0000-aaaa-2222-bbbb/jurisdictions" +
+            "/PROBATE/case-types/TestAddressBookCase/cases/1504259907353529/events";
 
         mockMvc.perform(get(url))
             .andExpect(status().isOk())
