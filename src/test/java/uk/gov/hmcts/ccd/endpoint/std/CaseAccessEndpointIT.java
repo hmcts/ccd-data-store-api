@@ -151,8 +151,9 @@ public class CaseAccessEndpointIT extends BaseTest {
     }
 
     private void grantAccess() throws Exception {
-        final String url = "/caseworkers/0000-aaaa-2222-bbbb/jurisdictions/" + JURISDICTION + "/case-types/" +
-            CASE_TYPE + "/cases/" + CASE_ID + "/users";
+        final String url = "/caseworkers/0000-aaaa-2222-bbbb/jurisdictions/"
+            + JURISDICTION + "/case-types/"
+            + CASE_TYPE + "/cases/" + CASE_ID + "/users";
 
         mockMvc.perform(post(url)
             .contentType(MediaType.APPLICATION_JSON)
@@ -164,9 +165,9 @@ public class CaseAccessEndpointIT extends BaseTest {
 
     @Test
     public void findCaseIdsGivenUserIdHasAccessToWithUuid() throws Exception {
-        final String url = "/caseworkers/0000-aaaa-2222-bbbb/jurisdictions/" +
-            JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/ids?userId=" +
-            "0000-zzzz-9999-yyyy";
+        final String url = "/caseworkers/0000-aaaa-2222-bbbb/jurisdictions/"
+            + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/ids?userId="
+            + "0000-zzzz-9999-yyyy";
 
         final MvcResult mvcResult = mockMvc.perform(get(url))
             .andExpect(status().isOk())
