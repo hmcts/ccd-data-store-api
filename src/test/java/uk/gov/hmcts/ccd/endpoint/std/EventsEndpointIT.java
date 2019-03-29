@@ -34,7 +34,8 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
 public class EventsEndpointIT extends WireMockBaseTest {
-    private static final String GET_EVENTS_AS_CASEWORKER = "/caseworkers/0000-aaaa-2222-bbbb/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/1504259907353529/events";
+    private static final String GET_EVENTS_AS_CASEWORKER = "/caseworkers/0000-aaaa-2222-bbbb/jurisdictions/"
+        + "PROBATE/case-types/TestAddressBookCase/cases/1504259907353529/events";
 
     @Inject
     private WebApplicationContext wac;
