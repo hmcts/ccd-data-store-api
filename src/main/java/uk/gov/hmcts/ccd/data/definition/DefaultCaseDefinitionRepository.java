@@ -183,11 +183,11 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     private static void completeACLsWith(FieldType fieldType, List<AccessControlList> accessControlLists) {
-        if (fieldType == null || fieldType.getComplexFields() == null) {
+        if(fieldType == null || fieldType.getComplexFields() == null) {
             return;
         }
         completeACLsWith(fieldType.getCollectionFieldType(), accessControlLists);
-        for (CaseField f : fieldType.getComplexFields()) {
+        for(CaseField f : fieldType.getComplexFields()) {
             f.setAccessControlLists(accessControlLists);
             completeACLsWith(f.getFieldType(), accessControlLists);
         }
