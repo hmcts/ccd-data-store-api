@@ -289,5 +289,15 @@ public class CaseViewFieldBuilderTest {
             );
 
         }
+
+        @Test
+        @DisplayName("should propagateACLsToNestedFields to fix ACLs of the children")
+        void callsPropagateACLsToNestedFields() {
+            CaseField caseFieldMock = mock(CaseField.class);
+
+            fieldBuilder.build(caseFieldMock, EVENT_FIELD);
+
+            verify(caseFieldMock).propagateACLsToNestedFields();
+        }
     }
 }
