@@ -24,8 +24,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
-import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
@@ -92,7 +90,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         try {
             final HttpEntity requestEntity = new HttpEntity<CaseType>(securityUtils.authorizationHeaders());
             CaseType caseType = restTemplate.exchange(applicationParams.caseTypeDefURL(caseTypeId), HttpMethod.GET, requestEntity, CaseType.class).getBody();
-            completeACLsOf(caseType);
+            caseType.getCaseFields().stream().forEach(f -> f.propagateACLsToNestedFields());
             return caseType;
         } catch (Exception e) {
             LOG.warn("Error while retrieving case type", e);
@@ -173,23 +171,6 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             } else {
                 throw new ServiceException("Problem getting case type version for " + caseTypeId + " because of " + e.getMessage());
             }
-        }
-    }
-
-    private static void completeACLsOf(CaseType caseType) {
-        caseType.getCaseFields().stream().forEach(field -> {
-            completeACLsWith(field.getFieldType(), field.getAccessControlLists());
-        });
-    }
-
-    private static void completeACLsWith(FieldType fieldType, List<AccessControlList> accessControlLists) {
-        if(fieldType == null || fieldType.getComplexFields() == null) {
-            return;
-        }
-        completeACLsWith(fieldType.getCollectionFieldType(), accessControlLists);
-        for(CaseField f : fieldType.getComplexFields()) {
-            f.setAccessControlLists(accessControlLists);
-            completeACLsWith(f.getFieldType(), accessControlLists);
         }
     }
 
