@@ -80,8 +80,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     @Override
     @Cacheable("caseTypeDefinitionsCache")
     public CaseType getCaseType(int version, String caseTypeId) {
-        CaseType caseType = this.getCaseType(caseTypeId);
-        return caseType;
+        return this.getCaseType(caseTypeId);
     }
 
     @Override
