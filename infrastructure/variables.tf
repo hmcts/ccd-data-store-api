@@ -210,7 +210,6 @@ variable "hazelcast_discovery_enabled" {
 
 variable "hazelcast_discovery_consul_host" {
   type = "string"
-  default = "localhost"
 }
 
 variable "hazelcast_discovery_consul_port" {
