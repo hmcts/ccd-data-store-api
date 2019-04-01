@@ -92,6 +92,25 @@ You don't need to migrate database manually since migrations are executed every 
 
 You can connect to the database at `http://localhost:5452` with the username and password set in the environment variables.
 
+### Functional Tests
+The functional tests are located in `aat` folder. These are the tests run against an environment. For example if you would 
+like to test your local environment you'll need to export the following variables on your `.bash_profile` script. You'll 
+
+
+```bash
+#Smoke Tests
+export TEST_URL=http://localhost:4452
+export S2S_URL=http://localhost:4502
+export CCD_GW_SERVICE_NAME=ccd_gw
+export CCD_GW_SERVICE_SECRET=AAAAAAAAAAAAAAAC
+export CCD_CASEWORKER_AUTOTEST_EMAIL=auto.test.cnp@gmail.com
+export CCD_CASEWORKER_AUTOTEST_PASSWORD=Monday123
+```
+
+These tests also rely on the `CCD_CNP_27.xlsx` file to be already imported. The latest version of this file could be found 
+in [ccd-definition-store-api](https://github.com/hmcts/ccd-definition-store-api) project under the `aat/src/resource` folder. You may want to import it to your local installation 
+before trying to run the functional tests against yoru local environment.  
+
 ## LICENSE
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE.md) file for details.
