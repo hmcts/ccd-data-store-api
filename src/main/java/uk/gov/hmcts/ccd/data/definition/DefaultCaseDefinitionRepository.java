@@ -80,6 +80,13 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     @Override
+    @Cacheable("caseTypeDefinitionsCache")
+    public CaseType getCaseType(int version, String caseTypeId) {
+        CaseType caseType = this.getCaseType(caseTypeId);
+        return caseType;
+    }
+
+    @Override
     public CaseType getCaseType(final String caseTypeId) {
         LOG.debug("retrieving case type definition for case type: {}", caseTypeId);
         try {
@@ -169,24 +176,18 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         }
     }
 
-    @Override
-    @Cacheable("caseTypeDefinitionsCache")
-    public CaseType getCaseType(int version, String caseTypeId) {
-        CaseType caseType = this.getCaseType(caseTypeId);
-        return caseType;
-    }
-
     private static void completeACLsOf(CaseType caseType) {
-        for(CaseField field : caseType.getCaseFields()) {
+        caseType.getCaseFields().stream().forEach(field -> {
             completeACLsWith(field.getFieldType(), field.getAccessControlLists());
-        }
+        });
     }
 
     private static void completeACLsWith(FieldType fieldType, List<AccessControlList> accessControlLists) {
-        if(fieldType==null || fieldType.getComplexFields()==null)
+        if (fieldType == null || fieldType.getComplexFields() == null) {
             return;
+        }
         completeACLsWith(fieldType.getCollectionFieldType(), accessControlLists);
-        for(CaseField f : fieldType.getComplexFields()) {
+        for (CaseField f : fieldType.getComplexFields()) {
             f.setAccessControlLists(accessControlLists);
             completeACLsWith(f.getFieldType(), accessControlLists);
         }
