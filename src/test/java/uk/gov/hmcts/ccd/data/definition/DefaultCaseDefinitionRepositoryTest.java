@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import uk.gov.hmcts.ccd.ApplicationParams;
