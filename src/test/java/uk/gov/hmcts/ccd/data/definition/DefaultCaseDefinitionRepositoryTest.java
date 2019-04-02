@@ -82,12 +82,12 @@ public class DefaultCaseDefinitionRepositoryTest {
         CaseType caseType = new CaseType();
         int fieldCount = 1 + (int)(Math.random() * 20);
         List<CaseField> fields = new ArrayList<>();
-        for(int i = 1; i <= fieldCount; i++) {
+        for (int i = 1; i <= fieldCount; i++) {
             fields.add(Mockito.mock(CaseField.class));
         }
         caseType.setCaseFields(fields);
         doReturn(new ResponseEntity<>(caseType, HttpStatus.OK)).when(restTemplate).exchange(anyString(), any(HttpMethod.class), any(), any(Class.class));
         caseDefinitionRepository.getCaseType("caseTypeId");
-        fields.stream().forEach( field -> Mockito.verify(field, Mockito.times(1)).propagateACLsToNestedFields());
+        fields.stream().forEach(field -> Mockito.verify(field, Mockito.times(1)).propagateACLsToNestedFields());
     }
 }
