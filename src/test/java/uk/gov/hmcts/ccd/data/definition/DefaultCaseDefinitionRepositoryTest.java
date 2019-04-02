@@ -5,7 +5,9 @@ import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
@@ -78,11 +80,15 @@ public class DefaultCaseDefinitionRepositoryTest {
 
     @Test
     public void test_propagation_called_once_and_only_once() {
-    	CaseType caseType = new CaseType();
-    	CaseField caseField = Mockito.mock(CaseField.class);
-        caseType.setCaseFields(Arrays.asList(caseField));
+        CaseType caseType = new CaseType();
+        int fieldCount = 1 + (int)(Math.random() * 20);
+        List<CaseField> fields = new ArrayList<>();
+        for(int i = 1; i <= fieldCount; i++) {
+            fields.add(Mockito.mock(CaseField.class));
+        }
+        caseType.setCaseFields(fields);
         doReturn(new ResponseEntity<>(caseType, HttpStatus.OK)).when(restTemplate).exchange(anyString(), any(HttpMethod.class), any(), any(Class.class));
         caseDefinitionRepository.getCaseType("caseTypeId");
-        Mockito.verify(caseField, Mockito.times(1)).propagateACLsToNestedFields();
+        fields.stream().forEach( field -> Mockito.verify(field, Mockito.times(1)).propagateACLsToNestedFields());
     }
 }
