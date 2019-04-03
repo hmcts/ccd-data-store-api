@@ -1,14 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import java.util.Arrays;
-import java.util.Set;
-
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
 
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -22,6 +16,12 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+
+import java.util.Arrays;
+import java.util.Set;
+
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
 @Service
 @Qualifier(AuthorisedGetCaseViewOperation.QUALIFIER)
@@ -49,21 +49,10 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
         CaseType caseType = getCaseType(caseView.getCaseType().getId());
         String caseId = getCaseId(caseReference);
         Set<String> userRoles = getUserRoles(caseId);
-        verifyReadAccess(caseType, userRoles);
+        verifyCaseTypeReadAccess(caseType, userRoles);
         filterCaseTabFieldsByReadAccess(caseView, userRoles);
         filterAllowedTabsWithFields(caseView, userRoles);
-
         return filterUpsertAccess(caseType, userRoles, caseView);
-    }
-
-    private void filterAllowedTabsWithFields(CaseView caseView, Set<String> userRoles) {
-        caseView.setTabs(Arrays.stream(caseView.getTabs())
-            .filter(caseViewTab -> caseViewTab.getFields().length > 0 && tabAllowed(caseViewTab, userRoles))
-            .toArray(CaseViewTab[]::new));
-    }
-
-    private boolean tabAllowed(final CaseViewTab caseViewTab, final Set<String> userRoles) {
-        return StringUtils.isEmpty(caseViewTab.getRole()) || userRoles.contains(caseViewTab.getRole());
     }
 
     private void filterCaseTabFieldsByReadAccess(CaseView caseView, Set<String> userRoles) {

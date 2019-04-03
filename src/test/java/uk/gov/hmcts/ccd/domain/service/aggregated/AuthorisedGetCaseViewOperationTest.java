@@ -1,9 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.Set;
-
 import static com.google.common.collect.Sets.newHashSet;
 import static java.lang.String.valueOf;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -29,18 +25,16 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewTa
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewTriggerBuilder.aViewTrigger;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.JurisdictionBuilder.newJurisdiction;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.domain.model.aggregated.*;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
+import uk.gov.hmcts.ccd.domain.model.aggregated.ProfileCaseState;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
@@ -49,6 +43,18 @@ import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.Set;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 
 class AuthorisedGetCaseViewOperationTest {
     private static final String JURISDICTION_ID = "Probate";
@@ -86,10 +92,10 @@ class AuthorisedGetCaseViewOperationTest {
     private static final CaseViewType TEST_CASE_VIEW_TYPE = CaseViewType.createFrom(TEST_CASE_TYPE);
     private static final CaseViewField FIELD_1 = aViewField().withId("FIELD_1").build();
     private static final CaseViewField FIELD_2 = aViewField().withId("FIELD_2").build();
-    public static final CaseViewField FIELD_3 = aViewField().withId("FIELD_3").build();
-    public static final CaseViewField FIELD_4 = aViewField().withId("FIELD_4").build();
-    public static final CaseViewField FIELD_5 = aViewField().withId("FIELD_5").build();
-    public static final CaseViewField FIELD_6 = aViewField().withId("FIELD_6").build();
+    private static final CaseViewField FIELD_3 = aViewField().withId("FIELD_3").build();
+    private static final CaseViewField FIELD_4 = aViewField().withId("FIELD_4").build();
+    private static final CaseViewField FIELD_5 = aViewField().withId("FIELD_5").build();
+    private static final CaseViewField FIELD_6 = aViewField().withId("FIELD_6").build();
     private static final CaseViewTab CASE_VIEW_TAB_WITH_MIXED_FIELDS = newCaseViewTab().withId("cvt1")
         .addCaseViewField(FIELD_1)
         .addCaseViewField(FIELD_2)
