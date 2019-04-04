@@ -6,12 +6,19 @@ import java.util.Map;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
@@ -35,6 +42,7 @@ public class CaseViewFieldBuilderTest {
     private static final CaseField CASE_FIELD_2 = new CaseField();
     private static final CaseEventField EVENT_FIELD = new CaseEventField();
     private static final CaseEventField EVENT_FIELD_2 = new CaseEventField();
+    private static final CaseEventField EVENT_FIELD_3 = new CaseEventField();
     private static final String FIRST_NAME = "Patrick";
     private static final String LAST_NAME = "Smith";
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
@@ -49,6 +57,7 @@ public class CaseViewFieldBuilderTest {
         .withAcl(acl2)
         .withAcl(acl3)
         .build();
+    private static final CaseField CASE_FIELD_3 = newCaseField().withFieldType(textFieldType).withId("STATE").build();
 
 
     static {
@@ -57,8 +66,11 @@ public class CaseViewFieldBuilderTest {
         CASE_FIELD.setHintText("Some hint");
         CASE_FIELD.setLabel("First name");
         CASE_FIELD.setSecurityLabel("LO1");
+        CASE_FIELD.setMetadata(false);
 
         CASE_FIELD_2.setId("PersonLastName");
+
+        CASE_FIELD_3.setMetadata(true);
 
         EVENT_FIELD.setCaseFieldId("PersonFirstName");
         EVENT_FIELD.setDisplayContext("READONLY");
@@ -68,6 +80,7 @@ public class CaseViewFieldBuilderTest {
         EVENT_FIELD.setShowSummaryContentOption(3);
 
         EVENT_FIELD_2.setCaseFieldId("PersonLastName");
+        EVENT_FIELD_3.setCaseFieldId("State");
     }
 
     private CaseViewFieldBuilder fieldBuilder;
@@ -85,21 +98,25 @@ public class CaseViewFieldBuilderTest {
 
             final CaseViewField field = fieldBuilder.build(CASE_FIELD, EVENT_FIELD);
 
-        assertThat(field, is(notNullValue()));
-        assertThat(field.getId(), equalTo(CASE_FIELD.getId()));
-        assertThat(field.getFieldType(), equalTo(CASE_FIELD.getFieldType()));
-        assertThat(field.isHidden(), equalTo(CASE_FIELD.getHidden()));
-        assertThat(field.getHintText(), equalTo(CASE_FIELD.getHintText()));
-        assertThat(field.getLabel(), equalTo(CASE_FIELD.getLabel()));
-        assertThat(field.getOrder(), is(nullValue()));
-        assertThat(field.getSecurityLabel(), equalTo(CASE_FIELD.getSecurityLabel()));
-        assertThat(field.getValidationExpression(), is(nullValue()));
-        assertThat(field.getDisplayContext(), is(EVENT_FIELD.getDisplayContext()));
-        assertThat(field.getDisplayContextParameter(), is(EVENT_FIELD.getDisplayContextParamter()));
-        assertThat(field.getShowCondition(), is(EVENT_FIELD.getShowCondition()));
-        assertThat(field.getShowSummaryChangeOption(), is(Boolean.TRUE));
-        assertThat(field.getShowSummaryContentOption(), is(3));
-    }
+            assertThat(field, is(notNullValue()));
+            assertThat(field.getId(), equalTo(CASE_FIELD.getId()));
+            assertThat(field.getFieldType(), equalTo(CASE_FIELD.getFieldType()));
+            assertThat(field.isHidden(), equalTo(CASE_FIELD.getHidden()));
+            assertThat(field.getHintText(), equalTo(CASE_FIELD.getHintText()));
+            assertThat(field.getLabel(), equalTo(CASE_FIELD.getLabel()));
+            assertThat(field.getOrder(), is(nullValue()));
+            assertThat(field.getSecurityLabel(), equalTo(CASE_FIELD.getSecurityLabel()));
+            assertThat(field.getValidationExpression(), is(nullValue()));
+            assertThat(field.getDisplayContext(), is(EVENT_FIELD.getDisplayContext()));
+            assertThat(field.getDisplayContextParameter(), is(EVENT_FIELD.getDisplayContextParamter()));
+            assertThat(field.getShowCondition(), is(EVENT_FIELD.getShowCondition()));
+            assertThat(field.getShowSummaryChangeOption(), is(Boolean.TRUE));
+            assertThat(field.getShowSummaryContentOption(), is(3));
+            assertThat(field.isMetadata(), is(false));
+
+            CaseViewField metadataField = fieldBuilder.build(CASE_FIELD_3, EVENT_FIELD_3);
+            assertThat(metadataField.isMetadata(), is(true));
+        }
 
         @Test
         public void shouldCreateFieldFromCaseEventFieldWithData() {

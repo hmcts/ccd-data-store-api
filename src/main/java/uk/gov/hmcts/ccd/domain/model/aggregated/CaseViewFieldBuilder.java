@@ -34,6 +34,7 @@ public class CaseViewFieldBuilder {
         field.setShowSummaryChangeOption(eventField.getShowSummaryChangeOption());
         field.setShowSummaryContentOption(eventField.getShowSummaryContentOption());
         field.setAccessControlLists(caseField.getAccessControlLists());
+        field.setMetadata(caseField.isMetadata());
         fillEmptyNestedFieldACLs(caseField, caseField.getAccessControlLists());
 
         return field;
