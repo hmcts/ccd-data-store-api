@@ -98,7 +98,7 @@ like to test your local environment you'll need to export the following variable
 
 
 ```bash
-#Smoke Tests
+#Smoke/Functional Tests
 export TEST_URL=http://localhost:4452
 export S2S_URL=http://localhost:4502
 export CCD_GW_SERVICE_NAME=ccd_gw
@@ -109,7 +109,7 @@ export CCD_CASEWORKER_AUTOTEST_PASSWORD=Monday123
 
 These tests also rely on the `CCD_CNP_27.xlsx` file to be already imported. The latest version of this file could be found 
 in [ccd-definition-store-api](https://github.com/hmcts/ccd-definition-store-api) project under the `aat/src/resource` folder. You may want to import it to your local installation 
-before trying to run the functional tests against yoru local environment.  
+before trying to run the functional tests against your local environment.  
 
 ## LICENSE
 
