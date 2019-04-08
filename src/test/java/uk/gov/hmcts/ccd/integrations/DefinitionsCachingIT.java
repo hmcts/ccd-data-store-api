@@ -54,9 +54,6 @@ public class DefinitionsCachingIT {
     private static final Jurisdiction JURISDICTION_2 = new Jurisdiction();
     private static final Jurisdiction JURISDICTION_3 = new Jurisdiction();
 
-    private static final List<Jurisdiction> JURISDICTION_LIST_1 = Arrays.asList(new Jurisdiction[]{JURISDICTION_1, JURISDICTION_2});
-    private static final List<Jurisdiction> JURISDICTION_LIST_2 = Arrays.asList(new Jurisdiction[]{JURISDICTION_1, JURISDICTION_2, JURISDICTION_3});
-
     @SpyBean
     private DefaultCaseDefinitionRepository caseDefinitionRepository;
 
