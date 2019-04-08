@@ -190,19 +190,25 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     @Cacheable(value = "jurisdictionListCache")
     @Override
     public Jurisdiction getJurisdiction(String jurisdictionId) {
+        return getJurisdictionFromDefinitionStore(jurisdictionId);
+    }
+
+    public Jurisdiction getJurisdictionFromDefinitionStore(String jurisdictionId) {
         try {
             HttpEntity<List<Jurisdiction>> requestEntity = new HttpEntity<>(securityUtils.authorizationHeaders());
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(applicationParams.jurisdictionDefURL())
                     .queryParam("ids", jurisdictionId);
-            List<Jurisdiction> jurisdictionList = restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET,
-                    requestEntity, new ParameterizedTypeReference<List<Jurisdiction>>() {
+            List<Jurisdiction> jurisdictionList = restTemplate.exchange(builder.build().encode().toUri(),
+                    HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<Jurisdiction>>() {
                     }).getBody();
             LOG.debug("Retrieved jurisdiction definition: {}", jurisdictionList);
             return jurisdictionList.get(0);
         } catch (Exception e) {
             LOG.warn("Error while retrieving jurisdictions definition", e);
-            if (e instanceof HttpClientErrorException && ((HttpClientErrorException)e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
-                throw new ResourceNotFoundException("Resource not found when retrieving jurisdictions definition because of " + e.getMessage());
+            if (e instanceof HttpClientErrorException
+                    && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                throw new ResourceNotFoundException(
+                        "Resource not found when retrieving jurisdictions definition because of " + e.getMessage());
             } else {
                 throw new ServiceException("Problem retrieving jurisdictions definition because of " + e.getMessage());
             }

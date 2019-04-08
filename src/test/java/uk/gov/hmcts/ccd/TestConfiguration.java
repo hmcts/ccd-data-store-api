@@ -108,8 +108,10 @@ class TestConfiguration extends ContextCleanupListener {
         final FieldType[] fieldTypes = mapper.readValue(baseTypes.getBytes(), FieldType[].class);
         final DefaultCaseDefinitionRepository caseDefinitionRepository = mock(DefaultCaseDefinitionRepository.class);
 
+        RestTemplate mockTemplate = Mockito.mock(RestTemplate.class);
+
         ReflectionTestUtils.setField(caseDefinitionRepository, "applicationParams", applicationParams);
-        ReflectionTestUtils.setField(caseDefinitionRepository, "restTemplate", new RestTemplate());
+        ReflectionTestUtils.setField(caseDefinitionRepository, "restTemplate", mockTemplate);
 
         when(caseDefinitionRepository.getCaseType(any())).thenCallRealMethod();
         when(caseDefinitionRepository.getLatestVersion(anyString())).thenCallRealMethod();
@@ -121,6 +123,7 @@ class TestConfiguration extends ContextCleanupListener {
         when(caseDefinitionRepository.getClassificationsForUserRoleList(any())).thenCallRealMethod();
         when(caseDefinitionRepository.getJurisdictions(anyList())).thenCallRealMethod();
         when(caseDefinitionRepository.getJurisdiction(anyString())).thenCallRealMethod();
+        when(caseDefinitionRepository.getJurisdictionFromDefinitionStore(anyString())).thenCallRealMethod();
         return caseDefinitionRepository;
     }
 
