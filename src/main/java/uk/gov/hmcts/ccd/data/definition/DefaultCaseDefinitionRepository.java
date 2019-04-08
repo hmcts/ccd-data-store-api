@@ -1,12 +1,5 @@
 package uk.gov.hmcts.ccd.data.definition;
 
-import javax.inject.Inject;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import static uk.gov.hmcts.ccd.ApplicationParams.encodeBase64;
 
 import org.apache.commons.lang3.StringUtils;
@@ -22,6 +15,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import javax.inject.Inject;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
@@ -178,22 +181,24 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     @Override
-    @Cacheable(value = "jurisdictionListCache")
     public List<Jurisdiction> getJurisdictions(List<String> ids) {
-        return getJurisdictionsFromDefinitionStore(ids);
+        ArrayList<Jurisdiction> jurisdictions = new ArrayList<>(ids.size());
+        ids.forEach(id -> jurisdictions.add(getJurisdiction(id)));
+        return jurisdictions;
     }
 
-    public List<Jurisdiction> getJurisdictionsFromDefinitionStore(List<String> ids) {
+    @Cacheable(value = "jurisdictionListCache")
+    @Override
+    public Jurisdiction getJurisdiction(String jurisdictionId) {
         try {
-            LOG.debug("retrieving jurisdictions definitions for {}", ids);
-            HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
+            HttpEntity<List<Jurisdiction>> requestEntity = new HttpEntity<>(securityUtils.authorizationHeaders());
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(applicationParams.jurisdictionDefURL())
-                    .queryParam("ids", String.join(",", ids));
+                    .queryParam("ids", jurisdictionId);
             List<Jurisdiction> jurisdictionList = restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET,
                     requestEntity, new ParameterizedTypeReference<List<Jurisdiction>>() {
                     }).getBody();
-            LOG.debug("retrieved jurisdictions definition: {}", jurisdictionList);
-            return jurisdictionList;
+            LOG.debug("Retrieved jurisdiction definition: {}", jurisdictionList);
+            return jurisdictionList.get(0);
         } catch (Exception e) {
             LOG.warn("Error while retrieving jurisdictions definition", e);
             if (e instanceof HttpClientErrorException && ((HttpClientErrorException)e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
@@ -202,6 +207,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                 throw new ServiceException("Problem retrieving jurisdictions definition because of " + e.getMessage());
             }
         }
+
     }
 
 }

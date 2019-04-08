@@ -4,11 +4,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,6 +14,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
@@ -94,8 +94,9 @@ public class DefinitionsCachingIT {
         doReturn(aCaseTypeDefVersion(VERSION_1)).when(this.caseDefinitionRepository).getLatestVersionFromDefinitionStore(ID_1);
         doReturn(aCaseTypeDefVersion(VERSION_2)).when(this.caseDefinitionRepository).getLatestVersionFromDefinitionStore(ID_2);
         doReturn(aCaseTypeDefVersion(VERSION_3)).when(this.caseDefinitionRepository).getLatestVersionFromDefinitionStore(ID_3);
-        doReturn(JURISDICTION_LIST_1).when(this.caseDefinitionRepository).getJurisdictionsFromDefinitionStore(ID_LIST_1);
-        doReturn(JURISDICTION_LIST_2).when(this.caseDefinitionRepository).getJurisdictionsFromDefinitionStore(ID_LIST_2);
+        doReturn(JURISDICTION_1).when(this.caseDefinitionRepository).getJurisdiction("J1");
+        doReturn(JURISDICTION_2).when(this.caseDefinitionRepository).getJurisdiction("J2");
+        doReturn(JURISDICTION_3).when(this.caseDefinitionRepository).getJurisdiction("J3");
         doReturn(mockCaseType).when(this.caseDefinitionRepository).getCaseType(ID_1);
     }
 
