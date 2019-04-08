@@ -18,5 +18,5 @@ http_client_max_total = 200
 http_client_max_client_per_route = 40
 #http_client_validate_after_inactivity = 0
 
-definition_cache_latest_version_ttl_sec = 5
+definition_cache_latest_version_ttl_sec = 30
 definition_cache_jurisdiction_ttl_sec = 5
