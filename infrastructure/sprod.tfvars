@@ -17,3 +17,5 @@ http_client_max_client_per_route = 40
 
 definition_cache_latest_version_ttl_sec = 5
 definition_cache_jurisdiction_ttl_sec = 5
+
+idam_api_url = "https://idam-api-idam-sprod.service.core-compute-idam-sprod.internal"
