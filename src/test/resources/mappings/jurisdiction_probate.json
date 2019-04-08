@@ -1,0 +1,281 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/data/jurisdictions?ids=PROBATE"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": [
+      {
+        "id": "PROBATE",
+        "name" : "Test",
+        "description" : "Test Jurisdiction",
+        "live_from": "2017-01-01",
+        "live_until": "2017-01-01",
+        "case_types": [
+          {
+            "id": "GrantOfRepresentation",
+            "description": "Probate - Grant of Representation",
+            "name": "Grant of Representation",
+            "states": [
+              {
+                "id": "SolAppCreated",
+                "name": "Application created",
+                "description": "Application created (Solicitor)",
+                "order": 1,
+                "title_display": null,
+                "acls": [
+                  {
+                    "role": "caseworker-probate-public",
+                    "create": true,
+                    "read": true,
+                    "update": true,
+                    "delete": true
+                  }
+                ]
+              },
+              {
+                "id": "SolAppUpdated",
+                "name": "Application updated",
+                "description": "Application updated (Solicitor)",
+                "order": 2,
+                "title_display": null,
+                "acls": [
+                  {
+                    "role": "caseworker-probate-public",
+                    "create": true,
+                    "read": true,
+                    "update": true,
+                    "delete": true
+                  }
+                ]
+              },
+              {
+                "id": "SolAppConfirmed",
+                "name": "Application confirmed",
+                "description": "Application confirmed (Solicitor)",
+                "order": 3,
+                "title_display": null,
+                "acls": [
+                  {
+                    "role": "caseworker-probate-solicitor",
+                    "create": true,
+                    "read": true,
+                    "update": true,
+                    "delete": true
+                  }
+                ]
+              },
+              {
+                "id": "CaseCreated",
+                "name": "Case created",
+                "description": "Case created",
+                "order": 4,
+                "title_display": null,
+                "acls": [
+                  {
+                    "role": "caseworker-probate-issuer",
+                    "create": true,
+                    "read": true,
+                    "update": true,
+                    "delete": true
+                  },
+                  {
+                    "role": "caseworker-probate-solicitor",
+                    "create": true,
+                    "read": true,
+                    "update": false,
+                    "delete": false
+                  }
+                ]
+              },
+              {
+                "id": "CasePrinted",
+                "name": "Case printed",
+                "description": "Case printed",
+                "order": 5,
+                "title_display": null,
+                "acls": [
+                  {
+                    "role": "caseworker-probate-issuer",
+                    "create": true,
+                    "read": true,
+                    "update": true,
+                    "delete": true
+                  },
+                  {
+                    "role": "caseworker-probate-solicitor",
+                    "create": false,
+                    "read": true,
+                    "update": false,
+                    "delete": false
+                  }
+                ]
+              },
+              {
+                "id": "Stopped",
+                "name": "Stopped",
+                "description": "Stopped",
+                "order": 6,
+                "title_display": null,
+                "acls": [
+                  {
+                    "role": "caseworker-probate-solicitor",
+                    "create": true,
+                    "read": true,
+                    "update": true,
+                    "delete": true
+                  }
+                ]
+              }
+            ],
+            "events": [
+              {
+                "id": "applyForGrant",
+                "name": "Case created",
+                "description": "Create a case from an application",
+                "acls": [
+                  {
+                    "role": "caseworker-probate-issuer",
+                    "create": false,
+                    "read": true,
+                    "update": false,
+                    "delete": false
+                  },
+                  {
+                    "role": "caseworker-probate-public",
+                    "create": true,
+                    "read": false,
+                    "update": false,
+                    "delete": false
+                  },
+                  {
+                    "role": "caseworker-probate-solicitor",
+                    "create": false,
+                    "read": true,
+                    "update": false,
+                    "delete": false
+                  }
+                ],
+                "pre_states": []
+              },
+              {
+                "id": "casePrinted",
+                "name": "Mark the case as printed",
+                "description": "Mark the case as printed",
+                "acls": [
+                  {
+                    "role": "caseworker-probate-public",
+                    "create": true,
+                    "read": true,
+                    "update": true,
+                    "delete": true
+                  },
+                  {
+                    "role": "caseworker-probate-solicitor",
+                    "create": false,
+                    "read": true,
+                    "update": false,
+                    "delete": false
+                  }
+                ],
+                "pre_states": [
+                  "CaseCreated"
+                ]
+              },
+              {
+                "id": "solicitorCreateApplication",
+                "name": "Create new application",
+                "description": "Solicitor begins a new application with firm and case details",
+                "acls": [
+                  {
+                    "role": "caseworker-probate-public",
+                    "create": true,
+                    "read": true,
+                    "update": true,
+                    "delete": true
+                  }
+                ],
+                "pre_states": []
+              },
+              {
+                "id": "solicitorUpdateApplication",
+                "name": "Update application",
+                "description": "Solicitor updates application",
+                "acls": [
+                  {
+                    "role": "caseworker-probate-solicitor",
+                    "create": true,
+                    "read": true,
+                    "update": true,
+                    "delete": true
+                  }
+                ],
+                "pre_states": [
+                  "SolAppCreated"
+                ]
+              },
+              {
+                "id": "solicitorReviewAndConfirm",
+                "name": "Review legal statement confirm",
+                "description": "Solicitors reviews legal statement and confirms",
+                "acls": [
+                  {
+                    "role": "caseworker-probate-solicitor",
+                    "create": true,
+                    "read": true,
+                    "update": true,
+                    "delete": true
+                  },
+                  {
+                    "role": "caseworker-probate-issuer",
+                    "create": false,
+                    "read": true,
+                    "update": false,
+                    "delete": false
+                  }
+                ],
+                "pre_states": [
+                  "SolAppUpdated"
+                ]
+              }
+            ],
+            "acls": [
+              {
+                "role": "caseworker-probate",
+                "create": true,
+                "read": true,
+                "update": true,
+                "delete": true
+              },
+              {
+                "role": "caseworker-probate-issuer",
+                "create": true,
+                "read": true,
+                "update": true,
+                "delete": true
+              },
+              {
+                "role": "caseworker-probate-solicitor",
+                "create": true,
+                "read": true,
+                "update": true,
+                "delete": true
+              },
+              {
+                "role": "caseworker-probate-public",
+                "create": true,
+                "read": true,
+                "update": false,
+                "delete": false
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
