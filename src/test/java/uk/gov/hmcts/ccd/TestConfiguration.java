@@ -104,7 +104,7 @@ class TestConfiguration extends ContextCleanupListener {
     @Primary
     CaseDefinitionRepository caseDefinitionRepository() throws IOException {
         final FieldType[] fieldTypes = mapper.readValue(baseTypes.getBytes(), FieldType[].class);
-        final CaseDefinitionRepository caseDefinitionRepository = mock(DefaultCaseDefinitionRepository.class);
+        final DefaultCaseDefinitionRepository caseDefinitionRepository = mock(DefaultCaseDefinitionRepository.class);
 
         ReflectionTestUtils.setField(caseDefinitionRepository, "applicationParams", applicationParams);
         ReflectionTestUtils.setField(caseDefinitionRepository, "restTemplate", new RestTemplate());
@@ -112,6 +112,7 @@ class TestConfiguration extends ContextCleanupListener {
         when(caseDefinitionRepository.getCaseType(anyString())).thenCallRealMethod();
         when(caseDefinitionRepository.getCaseType(anyString(), any(HttpHeaders.class))).thenCallRealMethod();
         when(caseDefinitionRepository.getLatestVersion(anyString())).thenCallRealMethod();
+        when(caseDefinitionRepository.doGetLatestVersion(anyString())).thenCallRealMethod();
         when(caseDefinitionRepository.getCaseType(anyInt(), anyString())).thenCallRealMethod();
         when(caseDefinitionRepository.getCaseTypesForJurisdiction(any())).thenCallRealMethod();
         when(caseDefinitionRepository.getBaseTypes()).thenReturn(Arrays.asList(fieldTypes));
