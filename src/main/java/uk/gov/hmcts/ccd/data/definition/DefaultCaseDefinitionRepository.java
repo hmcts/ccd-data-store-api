@@ -18,7 +18,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.inject.Inject;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -181,10 +180,8 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     @Override
-    public List<Jurisdiction> getJurisdictions(List<String> ids) {
-        ArrayList<Jurisdiction> jurisdictions = new ArrayList<>(ids.size());
-        ids.forEach(id -> jurisdictions.add(getJurisdiction(id)));
-        return jurisdictions;
+    public List<Jurisdiction> getJurisdictions(List<String> jurisdictionIds) {
+        return getJurisdictionsFromDefinitionStore(jurisdictionIds);
     }
 
     @Cacheable(value = "jurisdictionCache")
@@ -194,15 +191,19 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     public Jurisdiction getJurisdictionFromDefinitionStore(String jurisdictionId) {
+        return getJurisdictionsFromDefinitionStore(Arrays.asList(jurisdictionId)).get(0);
+    }
+
+    public List<Jurisdiction> getJurisdictionsFromDefinitionStore(List<String> jurisdictionIds) {
         try {
             HttpEntity<List<Jurisdiction>> requestEntity = new HttpEntity<>(securityUtils.authorizationHeaders());
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(applicationParams.jurisdictionDefURL())
-                    .queryParam("ids", jurisdictionId);
+                    .queryParam("ids", String.join(",", jurisdictionIds));
             List<Jurisdiction> jurisdictionList = restTemplate.exchange(builder.build().encode().toUri(),
                     HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<Jurisdiction>>() {
                     }).getBody();
             LOG.debug("Retrieved jurisdiction definition: {}", jurisdictionList);
-            return jurisdictionList.get(0);
+            return jurisdictionList;
         } catch (Exception e) {
             LOG.warn("Error while retrieving jurisdictions definition", e);
             if (e instanceof HttpClientErrorException
