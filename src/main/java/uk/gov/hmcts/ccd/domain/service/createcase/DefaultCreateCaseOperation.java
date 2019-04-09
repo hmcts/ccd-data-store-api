@@ -18,7 +18,7 @@ import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
+import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
@@ -88,7 +88,6 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
             throw new ValidationException("Cannot create case because of event is not specified");
         }
 
-        final IDAMProperties idamUser = userRepository.getUserDetails();
         final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
         if (caseType == null) {
             throw new ValidationException("Cannot find case type definition for " + caseTypeId);
@@ -122,6 +121,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         newCaseDetails.setData(caseSanitiser.sanitise(caseType, data));
         newCaseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(caseType, newCaseDetails.getData(), EMPTY_DATA_CLASSIFICATION));
 
+        final IdamUser idamUser = userRepository.getUser();
         final CaseDetails savedCaseDetails = submitCaseTransaction.submitCase(event,
                                                                               caseType,
                                                                               idamUser,
