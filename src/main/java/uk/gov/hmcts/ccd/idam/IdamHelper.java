@@ -1,8 +1,5 @@
 package uk.gov.hmcts.ccd.idam;
 
-import feign.Feign;
-import feign.jackson.JacksonDecoder;
-import feign.jackson.JacksonEncoder;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.OAuth2Params;
 
@@ -13,8 +10,8 @@ import java.util.Map;
 @Service
 public class IdamHelper {
 
-    private static final String AUTHORIZATION_CODE = "authorization_code";
-    private static final String CODE = "code";
+    protected static final String AUTHORIZATION_CODE = "authorization_code";
+    protected static final String CODE = "code";
     private static final String BASIC = "Basic ";
 
     private final Map<String, AuthenticatedUser> users = new HashMap<>();
@@ -22,11 +19,8 @@ public class IdamHelper {
     private final IdamApi idamApi;
     private OAuth2Params oAuth2Params;
 
-    public IdamHelper(OAuth2Params oAuth2Params) {
-        idamApi = Feign.builder()
-                       .encoder(new JacksonEncoder())
-                       .decoder(new JacksonDecoder())
-                       .target(IdamApi.class, oAuth2Params.getIdamBaseURL());
+    public IdamHelper(OAuth2Params oAuth2Params, IdamApiProvider idamApiProvider) {
+        this.idamApi = idamApiProvider.provide();
         this.oAuth2Params = oAuth2Params;
     }
 

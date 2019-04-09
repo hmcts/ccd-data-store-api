@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 @Qualifier(DefaultCacheWarmUpService.QUALIFIER)
 public class DefaultCacheWarmUpService implements CacheWarmUpService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CachingConfiguration.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultCacheWarmUpService.class);
     public static final String QUALIFIER = "default";
 
     private final DefaultCaseDefinitionRepository caseDefinitionRepository;
