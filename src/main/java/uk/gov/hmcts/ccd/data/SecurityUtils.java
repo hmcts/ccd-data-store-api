@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.data;
 
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.GrantedAuthority;
@@ -7,8 +9,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-
-import java.util.stream.Collectors;
 
 @Service
 public class SecurityUtils {
@@ -44,6 +44,11 @@ public class SecurityUtils {
     public String getUserId() {
         final ServiceAndUserDetails serviceAndUser = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return serviceAndUser.getUsername();
+    }
+
+    public String getUserToken() {
+        final ServiceAndUserDetails serviceAndUser = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return serviceAndUser.getPassword();
     }
 
     public String getUserRolesHeader() {

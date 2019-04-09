@@ -1,5 +1,15 @@
 package uk.gov.hmcts.ccd.data;
 
+import java.util.Arrays;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,20 +24,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
-import java.util.Arrays;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
-
 @DisplayName("SecurityUtils")
 class SecurityUtilsTest {
 
     private static final String SERVICE_JWT = "7gf364fg367f67";
     private static final String USER_ID = "123";
+    private static final String USER_JWT = "Bearer 8gf364fg367f67";
 
     @Mock
     private Authentication authentication;
@@ -55,6 +57,7 @@ class SecurityUtilsTest {
         doReturn(Arrays.asList(authorities)).when(principal).getAuthorities();
         doReturn(USER_ID).when(principal).getUsername();
         doReturn(principal).when(authentication).getPrincipal();
+        doReturn(USER_JWT).when(principal).getPassword();
         doReturn(authentication).when(securityContext).getAuthentication();
         SecurityContextHolder.setContext(securityContext);
     }
@@ -69,6 +72,12 @@ class SecurityUtilsTest {
             () -> assertHeader(headers, "user-id", USER_ID),
             () -> assertHeader(headers, "user-roles", "role1,role2")
         );
+    }
+
+    @Test
+    @DisplayName("Get user token")
+    void shouldReturnUserToken() {
+        assertThat(securityUtils.getUserToken(), is(USER_JWT));
     }
 
     private void assertHeader(HttpHeaders headers, String name, String value) {
