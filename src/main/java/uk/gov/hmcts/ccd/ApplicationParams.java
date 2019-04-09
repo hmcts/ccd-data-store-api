@@ -91,6 +91,9 @@ public class ApplicationParams implements OAuth2Params {
     @Value("${definition.cache.latest-version-ttl.secs}")
     private Integer latestVersionTTLSecs;
 
+    @Value("${user.cache.ttl.secs}")
+    private Integer userCacheTTLSecs;
+
     @Value("${definition.cache.max.size}")
     private Integer definitionCacheMaxSize;
 
@@ -267,6 +270,10 @@ public class ApplicationParams implements OAuth2Params {
 
     public int getLatestVersionTTLSecs() {
         return latestVersionTTLSecs;
+    }
+
+    public Integer getUserCacheTTLSecs() {
+        return userCacheTTLSecs;
     }
 
     public int getDefinitionCacheMaxSize() {

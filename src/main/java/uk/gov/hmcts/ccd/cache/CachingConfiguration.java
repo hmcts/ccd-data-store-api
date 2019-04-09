@@ -46,6 +46,7 @@ public class CachingConfiguration {
         config.addMapConfig(newMapConfigWithMaxIdle("caseTabCollectionCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("wizardPageCollectionCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("userRolesCache", definitionCacheMaxIdle));
+        config.addMapConfig(newMapConfigWithMaxIdle("userCache", applicationParams.getUserCacheTTLSecs()));
         config.addMapConfig(newMapConfigWithTtl("caseTypeDefinitionLatestVersionCache", latestVersionTTL));
         if (applicationParams.isCacheWarmUpEnabled()) {
             cacheWarmUpService.warmUp();
@@ -62,8 +63,8 @@ public class CachingConfiguration {
 
     private MapConfig newMapConfig(final String name) {
         MapConfig mapConfig = new MapConfig().setName(name)
-                .setMaxSizeConfig(new MaxSizeConfig(applicationParams.getDefinitionCacheMaxSize(), MaxSizeConfig.MaxSizePolicy.PER_NODE))
-                .setEvictionPolicy(applicationParams.getDefinitionCacheEvictionPolicy());
+            .setMaxSizeConfig(new MaxSizeConfig(applicationParams.getDefinitionCacheMaxSize(), MaxSizeConfig.MaxSizePolicy.PER_NODE))
+            .setEvictionPolicy(applicationParams.getDefinitionCacheEvictionPolicy());
         return mapConfig;
     }
 

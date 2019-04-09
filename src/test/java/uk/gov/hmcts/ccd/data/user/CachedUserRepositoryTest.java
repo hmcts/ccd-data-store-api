@@ -6,7 +6,11 @@ import java.util.Set;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.RESTRICTED;
@@ -20,6 +24,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
+import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 
 class CachedUserRepositoryTest {
 
@@ -214,5 +219,25 @@ class CachedUserRepositoryTest {
                 () -> verifyNoMoreInteractions(userRepository)
             );
         }
+    }
+
+    @Nested
+    @DisplayName("getUser()")
+    class GetUser {
+
+        @Test
+        @DisplayName("should retrieve user from decorated repository")
+        void shouldRetrieveUserFromDecorated() {
+            IdamUser idamUser = new IdamUser();
+            when(userRepository.getUser()).thenReturn(idamUser);
+
+            IdamUser returnedIdamUser = cachedUserRepository.getUser();
+
+            assertAll(
+                () -> assertThat(returnedIdamUser, is(idamUser)),
+                () -> verify(userRepository).getUser()
+            );
+        }
+
     }
 }
