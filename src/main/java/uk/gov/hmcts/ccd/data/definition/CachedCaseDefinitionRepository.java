@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -79,9 +78,7 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
 
     @Override
     public List<Jurisdiction> getJurisdictions(List<String> ids) {
-        ArrayList<Jurisdiction> jurisdictions = new ArrayList<>(ids.size());
-        ids.forEach(id -> jurisdictions.add(this.getJurisdiction(id)));
-        return jurisdictions;
+        return ids.stream().map(this::getJurisdiction).collect(Collectors.toList());
     }
 
     @Override
