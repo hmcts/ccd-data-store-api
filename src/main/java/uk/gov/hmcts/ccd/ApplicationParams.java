@@ -70,6 +70,9 @@ public class ApplicationParams {
     @Value("${definition.cache.latest-version-ttl.secs}")
     private Integer latestVersionTTLSecs;
 
+    @Value("${user.cache.ttl.secs}")
+    private Integer userCacheTTLSecs;
+
     @Value("${definition.cache.max.size}")
     private Integer definitionCacheMaxSize;
 
@@ -238,6 +241,10 @@ public class ApplicationParams {
 
     public int getLatestVersionTTLSecs() {
         return latestVersionTTLSecs;
+    }
+
+    public Integer getUserCacheTTLSecs() {
+        return userCacheTTLSecs;
     }
 
     public int getDefinitionCacheMaxSize() {

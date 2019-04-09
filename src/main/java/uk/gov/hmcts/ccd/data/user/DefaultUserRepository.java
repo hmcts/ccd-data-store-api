@@ -2,7 +2,11 @@ package uk.gov.hmcts.ccd.data.user;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparingInt;
@@ -13,11 +17,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -28,6 +35,7 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
+import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserDefault;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
@@ -62,6 +70,18 @@ public class DefaultUserRepository implements UserRepository {
     public IDAMProperties getUserDetails() {
         final HttpEntity requestEntity = new HttpEntity(securityUtils.userAuthorizationHeaders());
         return restTemplate.exchange(applicationParams.idamUserProfileURL(), HttpMethod.GET, requestEntity, IDAMProperties.class).getBody();
+    }
+
+    @Override
+    @Cacheable(value = "userCache", key = "@securityUtils.getUserToken()")
+    public IdamUser getUser() {
+        try {
+            HttpEntity requestEntity = new HttpEntity(securityUtils.userAuthorizationHeaders());
+            return restTemplate.exchange(applicationParams.idamUserProfileURL(), HttpMethod.GET, requestEntity, IdamUser.class).getBody();
+        } catch (RestClientException e) {
+            LOG.error("Failed to retrieve user", e);
+            throw new ServiceException("Problem retrieving user from IDAM: " + securityUtils.getUserId());
+        }
     }
 
     @Override

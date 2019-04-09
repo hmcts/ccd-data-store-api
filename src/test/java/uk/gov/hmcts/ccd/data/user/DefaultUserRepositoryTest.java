@@ -17,9 +17,11 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -40,12 +42,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserDefault;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
@@ -269,6 +273,42 @@ class DefaultUserRepositoryTest {
             when(caseDefinitionRepository.getClassificationsForUserRoleList(anyList())).thenReturn(emptyList());
 
             assertThrows(ServiceException.class, () -> userRepository.getHighestUserClassification(JURISDICTION_ID));
+        }
+    }
+
+    @Nested
+    @DisplayName("getUser()")
+    class GetUser {
+        private static final String URL = "url";
+
+        @BeforeEach
+        void setUp() {
+            when(applicationParams.idamUserProfileURL()).thenReturn(URL);
+        }
+
+        @Test
+        @DisplayName("should retrieve user from IDAM")
+        void shouldRetrieveUserFromIdam() {
+            IdamUser idamUser = new IdamUser();
+            when(restTemplate.exchange(eq(URL), eq(HttpMethod.GET), any(HttpEntity.class), eq(IdamUser.class)))
+                .thenReturn(ResponseEntity.ok(idamUser));
+
+            IdamUser result = userRepository.getUser();
+
+            assertThat(result, is(idamUser));
+            verify(applicationParams).idamUserProfileURL();
+            verify(securityUtils).userAuthorizationHeaders();
+            verify(applicationParams).idamUserProfileURL();
+            verify(restTemplate).exchange(eq(URL), eq(HttpMethod.GET), any(HttpEntity.class), eq(IdamUser.class));
+        }
+
+        @Test
+        @DisplayName("should throw exception when rest call fails")
+        void shouldThrowExceptionWhenRestCallFails() {
+            when(applicationParams.idamUserProfileURL()).thenReturn("url");
+            doThrow(new RestClientException("Error")).when(restTemplate).exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(IdamUser.class));
+
+            assertThrows(ServiceException.class, () -> userRepository.getUser());
         }
     }
 
