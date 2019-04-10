@@ -1,12 +1,15 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import static java.util.Collections.emptyList;
 
 public class FieldType implements Serializable {
 
@@ -75,6 +78,20 @@ public class FieldType implements Serializable {
 
     public void setComplexFields(List<CaseField> complexFields) {
         this.complexFields = complexFields;
+    }
+
+    @JsonIgnore
+    public List<CaseField> getChildren() {
+        if (type.equalsIgnoreCase(COMPLEX)) {
+            return complexFields;
+        } else if (type.equalsIgnoreCase(COLLECTION)) {
+            if (collectionFieldType == null) {
+                return emptyList();
+            }
+            return collectionFieldType.complexFields;
+        } else {
+            return emptyList();
+        }
     }
 
     public String getId() {
