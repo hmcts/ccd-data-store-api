@@ -73,6 +73,9 @@ public class ApplicationParams {
     @Value("${definition.cache.jurisdiction-ttl}")
     private Integer jurisdictionTTL;
 
+    @Value("${user.cache.ttl.secs}")
+    private Integer userCacheTTLSecs;
+
     @Value("${definition.cache.max.size}")
     private Integer definitionCacheMaxSize;
 
@@ -245,6 +248,10 @@ public class ApplicationParams {
 
     public int getJurisdictionTTLSecs() {
         return jurisdictionTTL;
+    }
+
+    public Integer getUserCacheTTLSecs() {
+        return userCacheTTLSecs;
     }
 
     public int getDefinitionCacheMaxSize() {

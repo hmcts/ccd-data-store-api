@@ -15,7 +15,6 @@ public class CachingConfiguration {
     @Autowired
     ApplicationParams applicationParams;
 
-
     @Bean
     public Config hazelCastConfig() {
 
@@ -37,6 +36,7 @@ public class CachingConfiguration {
         config.addMapConfig(newMapConfigWithMaxIdle("caseTabCollectionCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("wizardPageCollectionCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("userRolesCache", definitionCacheMaxIdle));
+        config.addMapConfig(newMapConfigWithMaxIdle("userCache", applicationParams.getUserCacheTTLSecs()));
         config.addMapConfig(newMapConfigWithTtl("caseTypeDefinitionLatestVersionCache", applicationParams.getLatestVersionTTLSecs()));  
         config.addMapConfig(newMapConfigWithTtl("jurisdictionCache", applicationParams.getJurisdictionTTLSecs()));
     }

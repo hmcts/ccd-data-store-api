@@ -10,21 +10,26 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseTypeDefinitionVersion;
 import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.HttpUIDefinitionGateway;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
+import uk.gov.hmcts.ccd.data.user.DefaultUserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
@@ -79,6 +84,16 @@ public class DefinitionsCachingIT {
 
     @Mock
     SearchInputDefinition searchInputDefinition;
+
+    @SpyBean
+    private DefaultUserRepository userRepository;
+
+    @MockBean
+    @Qualifier("restTemplate")
+    private RestTemplate restTemplate;
+
+    @MockBean
+    private SecurityUtils securityUtils;
 
     List<WizardPage> wizardPageList = Collections.emptyList();
 
@@ -142,6 +157,7 @@ public class DefinitionsCachingIT {
 
     @Test
     public void testCaseDefinitionLatestVersionsAreCached() {
+        Assert.assertEquals(3, applicationParams.getLatestVersionTTLSecs());
         verify(caseDefinitionRepository, times(0)).getLatestVersion(ID_2);
         cachedCaseDefinitionRepository.getLatestVersion(ID_2);
         verify(caseDefinitionRepository, times(1)).getLatestVersion(ID_2);
