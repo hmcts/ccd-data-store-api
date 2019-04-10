@@ -108,10 +108,8 @@ class TestConfiguration extends ContextCleanupListener {
         final FieldType[] fieldTypes = mapper.readValue(baseTypes.getBytes(), FieldType[].class);
         final DefaultCaseDefinitionRepository caseDefinitionRepository = mock(DefaultCaseDefinitionRepository.class);
 
-        RestTemplate mockTemplate = Mockito.mock(RestTemplate.class);
-
         ReflectionTestUtils.setField(caseDefinitionRepository, "applicationParams", applicationParams);
-        ReflectionTestUtils.setField(caseDefinitionRepository, "restTemplate", mockTemplate);
+        ReflectionTestUtils.setField(caseDefinitionRepository, "restTemplate", new RestTemplate());
 
         when(caseDefinitionRepository.getCaseType(any())).thenCallRealMethod();
         when(caseDefinitionRepository.getLatestVersion(anyString())).thenCallRealMethod();
