@@ -11,4 +11,9 @@ data_store_max_pool_size = 48
 database_sku_name = "GP_Gen5_8"
 database_sku_capacity = "8"
 
+<<<<<<< HEAD
+definition_cache_latest_version_ttl_sec = 120
+definition_cache_jurisdiction_ttl_sec = 120
+=======
 definition_cache_latest_version_ttl_sec = 30
+>>>>>>> refs/heads/master

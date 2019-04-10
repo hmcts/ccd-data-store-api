@@ -15,3 +15,4 @@ database_sku_capacity = "8"
 http_client_read_timeout = "180000"
 
 definition_cache_latest_version_ttl_sec = 1
+definition_cache_jurisdiction_ttl_sec = 1

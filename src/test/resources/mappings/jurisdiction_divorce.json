@@ -1,0 +1,21 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/data/jurisdictions?ids=DIVORCE"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": [
+      {
+        "id": "DIVORCE",
+        "name" : "Test 2",
+        "description" : "Test Jurisdiction 2",
+        "live_from": "2017-01-01",
+        "live_until": "2017-01-01"
+      }
+    ]
+  }
+}
