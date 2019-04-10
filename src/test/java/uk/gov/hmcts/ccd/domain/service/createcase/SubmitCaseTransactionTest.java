@@ -1,5 +1,21 @@
 package uk.gov.hmcts.ccd.domain.service.createcase;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Matchers.notNull;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
+import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,7 +27,7 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
-import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
+import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItemType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -28,18 +44,6 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
-
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Matchers.notNull;
-import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
-import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 
 class SubmitCaseTransactionTest {
 
@@ -91,7 +95,7 @@ class SubmitCaseTransactionTest {
     private SubmitCaseTransaction submitCaseTransaction;
     private Event event;
     private CaseType caseType;
-    private IDAMProperties idamUser;
+    private IdamUser idamUser;
     private CaseEvent eventTrigger;
     private CaseState state;
 
@@ -307,8 +311,8 @@ class SubmitCaseTransactionTest {
     }
 
 
-    private IDAMProperties buildIdamUser() {
-        final IDAMProperties idamUser = new IDAMProperties();
+    private IdamUser buildIdamUser() {
+        final IdamUser idamUser = new IdamUser();
         idamUser.setId(IDAM_ID);
         idamUser.setForename(IDAM_FNAME);
         idamUser.setSurname(IDAM_LNAME);
