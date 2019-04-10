@@ -176,6 +176,18 @@ variable "elastic_search_nodes_discovery_filter" {
   default = "_all"
 }
 
+variable "cache_warm_up_enabled" {
+  description = "Enable cache warmup"
+  type = "string"
+  default = "false"
+}
+
+variable "cache_warm_up_sleep_time" {
+  description = "Time in milliseconds between each call to def store"
+  type = "string"
+  default = "2000"
+}
+
 variable "http_client_connection_timeout" {
   type = "string"
   default = "30000"

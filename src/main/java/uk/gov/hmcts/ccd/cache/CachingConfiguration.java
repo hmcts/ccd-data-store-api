@@ -1,20 +1,30 @@
-package uk.gov.hmcts.ccd;
+package uk.gov.hmcts.ccd.cache;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.config.MaxSizeConfig;
 import com.hazelcast.config.NetworkConfig;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableAsync;
+import uk.gov.hmcts.ccd.ApplicationParams;
+
+import javax.inject.Inject;
 
 @Configuration
+@EnableAsync
 public class CachingConfiguration {
 
-    @Autowired
-    ApplicationParams applicationParams;
+    private final ApplicationParams applicationParams;
+    private final CacheWarmUpService cacheWarmUpService;
 
+    @Inject
+    public CachingConfiguration(final ApplicationParams applicationParams,
+                                @Qualifier(DefaultCacheWarmUpService.QUALIFIER) final CacheWarmUpService cacheWarmUpService) {
+        this.applicationParams = applicationParams;
+        this.cacheWarmUpService = cacheWarmUpService;
+    }
 
     @Bean
     public Config hazelCastConfig() {
@@ -38,6 +48,9 @@ public class CachingConfiguration {
         config.addMapConfig(newMapConfigWithMaxIdle("userRolesCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("userCache", applicationParams.getUserCacheTTLSecs()));
         config.addMapConfig(newMapConfigWithTtl("caseTypeDefinitionLatestVersionCache", latestVersionTTL));
+        if (applicationParams.isCacheWarmUpEnabled()) {
+            cacheWarmUpService.warmUp();
+        }
     }
 
     private MapConfig newMapConfigWithMaxIdle(final String name, final Integer maxIdle) {

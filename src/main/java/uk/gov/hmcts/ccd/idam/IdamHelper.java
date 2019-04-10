@@ -1,32 +1,27 @@
-package uk.gov.hmcts.ccd.datastore.tests.helper.idam;
+package uk.gov.hmcts.ccd.idam;
 
-import feign.Feign;
-import feign.codec.Decoder;
-import feign.jackson.JacksonDecoder;
-import feign.jackson.JacksonEncoder;
+import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.OAuth2Params;
 
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
+@Service
 public class IdamHelper {
 
-    private static final String AUTHORIZATION_CODE = "authorization_code";
-    private static final String CODE = "code";
+    protected static final String AUTHORIZATION_CODE = "authorization_code";
+    protected static final String CODE = "code";
     private static final String BASIC = "Basic ";
 
     private final Map<String, AuthenticatedUser> users = new HashMap<>();
-    private final Decoder.Default defaultDecoder = new Decoder.Default();
 
     private final IdamApi idamApi;
-    private final OAuth2 oauth2;
+    private OAuth2Params oAuth2Params;
 
-    public IdamHelper(String idamBaseUrl, OAuth2 oauth2) {
-        idamApi = Feign.builder()
-                       .encoder(new JacksonEncoder())
-                       .decoder(new JacksonDecoder())
-                       .target(IdamApi.class, idamBaseUrl);
-        this.oauth2 = oauth2;
+    public IdamHelper(OAuth2Params oAuth2Params, IdamApiProvider idamApiProvider) {
+        this.idamApi = idamApiProvider.provide();
+        this.oAuth2Params = oAuth2Params;
     }
 
     public AuthenticatedUser authenticate(String email, String password) {
@@ -45,16 +40,16 @@ public class IdamHelper {
         IdamApi.AuthenticateUserResponse authenticateUserResponse = idamApi.authenticateUser(
             BASIC + base64Authorisation,
             CODE,
-            oauth2.getClientId(),
-            oauth2.getRedirectUri()
+            oAuth2Params.getOauth2ClientId(),
+            oAuth2Params.getOauth2RedirectUrl()
         );
 
         IdamApi.TokenExchangeResponse tokenExchangeResponse = idamApi.exchangeCode(
             authenticateUserResponse.getCode(),
             AUTHORIZATION_CODE,
-            oauth2.getClientId(),
-            oauth2.getClientSecret(),
-            oauth2.getRedirectUri()
+            oAuth2Params.getOauth2ClientId(),
+            oAuth2Params.getOauth2ClientSecret(),
+            oAuth2Params.getOauth2RedirectUrl()
         );
 
         return tokenExchangeResponse.getAccessToken();

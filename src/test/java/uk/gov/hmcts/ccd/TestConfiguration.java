@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpHeaders;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.ContextCleanupListener;
@@ -108,7 +109,8 @@ class TestConfiguration extends ContextCleanupListener {
         ReflectionTestUtils.setField(caseDefinitionRepository, "applicationParams", applicationParams);
         ReflectionTestUtils.setField(caseDefinitionRepository, "restTemplate", new RestTemplate());
 
-        when(caseDefinitionRepository.getCaseType(any())).thenCallRealMethod();
+        when(caseDefinitionRepository.getCaseType(anyString())).thenCallRealMethod();
+        when(caseDefinitionRepository.getCaseType(anyString(), any(HttpHeaders.class))).thenCallRealMethod();
         when(caseDefinitionRepository.getLatestVersion(anyString())).thenCallRealMethod();
         when(caseDefinitionRepository.doGetLatestVersion(anyString())).thenCallRealMethod();
         when(caseDefinitionRepository.getCaseType(anyInt(), anyString())).thenCallRealMethod();
