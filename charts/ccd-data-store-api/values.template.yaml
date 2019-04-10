@@ -27,7 +27,9 @@ java:
     DATA_STORE_DB_USE_SSL: false
 
     CCD_DM_DOMAIN: https?://dm-store.*
-    IDAM_USER_URL: http://betaDevBccidamAppLB.reform.hmcts.net
+   # IDAM_USER_URL: http://betaDevBccidamAppLB.reform.hmcts.net
+    IDAM_USER_URL: https://idam-api.aat.platform.hmcts.net
+
 
     CCD_DRAFT_TTL_DAYS: 180
     # TODO get this from vault when it is stored there
@@ -35,7 +37,8 @@ java:
 
     DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_data,ccd_gw,ccd_ps,probate_backend,divorce_ccd_submission,sscs,sscs_bulkscan,cmc,cmc_claim_store,jui_webapp,pui_webapp,bulk_scan_orchestrator,fpl_case_service,iac,finrem_ccd_data_migrator
 
-    DEFINITION_CACHE_TTL_SEC: 259200
+    DEFINITION_CACHE_MAX_IDLE_SEC: 259200
+    DEFINITION_CACHE_LATEST_VERSION_TTL_SEC: 1
     DEFINITION_CACHE_MAX_SIZE: 5000
     DEFINITION_CACHE_EVICTION_POLICY: NONE
 
