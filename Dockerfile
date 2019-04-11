@@ -7,7 +7,7 @@ LABEL maintainer="https://github.com/hmcts/ccd-data-store-api"
 COPY build/libs/core-case-data.jar /opt/app/
 COPY lib/AI-Agent.xml /opt/app/
 
-HEALTHCHECK --interval=10s --timeout=10s --retries=10 CMD http_proxy="" curl --silent --fail http://localhost:4452/status/health
+HEALTHCHECK --interval=10s --timeout=10s --retries=10 CMD http_proxy="" wget -q --spider http://localhost:4552/status/health || exit 1
 
 EXPOSE 4452
 
