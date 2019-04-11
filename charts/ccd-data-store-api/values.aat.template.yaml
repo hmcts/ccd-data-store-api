@@ -19,8 +19,8 @@ java:
     DATA_STORE_DB_OPTIONS: "?stringtype=unspecified&sslmode=require"
 
     IDAM_S2S_URL: http://rpe-service-auth-provider-java.software-engineering
-    DEFINITION_STORE_HOST: http://ccd-definition-store-api-java
-    USER_PROFILE_HOST: http://ccd-user-profile-api-java
+    DEFINITION_STORE_HOST: http://ccd-definition-store-api-java.ccd
+    USER_PROFILE_HOST: http://ccd-user-profile-api-java.ccd
     CCD_DM_DOMAIN: ^https?://(?:api-gateway\\.preprod\\.dm\\.reform\\.hmcts\\.net|dm-store.*\\.service\\.core-compute-aat\\.internal(?::\\d+)?)
     IDAM_USER_URL: https://idam-api.aat.platform.hmcts.net
     CCD_DRAFT_STORE_URL: http://draft-store-service-java.software-engineering

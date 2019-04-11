@@ -1,7 +1,6 @@
 java:
   image: hmcts.azurecr.io/hmcts/ccd-data-store-api:latest
   applicationPort: 4452
-  applicationInsightsInstrumentKey: "fake-key"
   keyVaults:
     s2s:
       resourceGroup: rpe-service-auth-provider
