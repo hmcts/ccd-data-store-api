@@ -115,7 +115,7 @@ public class DefaultUserRepository implements UserRepository {
             LOG.debug("retrieving default user settings for user {}", userId);
             final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
             final Map<String, String> queryParams = new HashMap<>();
-            queryParams.put("uid", ApplicationParams.encode(userId));
+            queryParams.put("uid", ApplicationParams.encode(userId.toLowerCase()));
             final String encodedUrl = UriComponentsBuilder.fromHttpUrl(applicationParams.userDefaultSettingsURL())
                 .buildAndExpand(queryParams).toUriString();
             return restTemplate.exchange(new URI(encodedUrl), HttpMethod.GET, requestEntity, UserDefault.class)
