@@ -6,8 +6,10 @@ import java.util.Map;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -35,6 +37,7 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 class MidEventCallbackTest {
 
@@ -43,7 +46,9 @@ class MidEventCallbackTest {
     };
     private static final String JURISDICTION_ID = "jurisdictionId";
     private static final String CASE_TYPE_ID = "caseTypeId";
+    private static final String OTHER_CASE_TYPE_ID = "otherCaseTypeId";
     private static final Boolean IGNORE_WARNINGS = Boolean.FALSE;
+    public static final String EVENT_ID = "createCase";
 
     @InjectMocks
     private MidEventCallback midEventCallback;
@@ -73,11 +78,12 @@ class MidEventCallbackTest {
         MockitoAnnotations.initMocks(this);
 
         event = new Event();
-        event.setEventId("createCase");
+        event.setEventId(EVENT_ID);
 
         given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(caseType);
         given(eventTriggerService.findCaseEvent(caseType, event.getEventId())).willReturn(caseEvent);
         given(caseType.getJurisdictionId()).willReturn(JURISDICTION_ID);
+        given(caseType.getId()).willReturn(CASE_TYPE_ID);
         caseDetails = caseDetails(data);
         given(caseService.createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, data)).willReturn(caseDetails);
 
@@ -92,23 +98,23 @@ class MidEventCallbackTest {
     void shouldInvokeMidEventCallbackWhenUrlDefined() {
 
         given(callbackInvoker.invokeMidEventCallback(wizardPageWithCallback,
-                                                     caseType,
-                                                     caseEvent,
-                                                     null,
-                                                     caseDetails,
-                                                     IGNORE_WARNINGS)).willReturn(caseDetails);
+            caseType,
+            caseEvent,
+            null,
+            caseDetails,
+            IGNORE_WARNINGS)).willReturn(caseDetails);
 
         midEventCallback.invoke(CASE_TYPE_ID,
-                                newCaseDataContent().withEvent(event).withData(data).withIgnoreWarning(IGNORE_WARNINGS).build(),
-                                "createCase1"
+            newCaseDataContent().withEvent(event).withData(data).withIgnoreWarning(IGNORE_WARNINGS).build(),
+            "createCase1"
         );
 
         verify(callbackInvoker).invokeMidEventCallback(wizardPageWithCallback,
-                                                       caseType,
-                                                       caseEvent,
-                                                       null,
-                                                       caseDetails,
-                                                       IGNORE_WARNINGS);
+            caseType,
+            caseEvent,
+            null,
+            caseDetails,
+            IGNORE_WARNINGS);
     }
 
     @Test
@@ -122,16 +128,16 @@ class MidEventCallbackTest {
                 + "}"), STRING_JSON_MAP);
         CaseDetails updatedCaseDetails = caseDetails(data);
         given(callbackInvoker.invokeMidEventCallback(wizardPageWithCallback,
-                                                     caseType,
-                                                     caseEvent,
-                                                     null,
-                                                     caseDetails,
-                                                     IGNORE_WARNINGS)).willReturn(updatedCaseDetails);
+            caseType,
+            caseEvent,
+            null,
+            caseDetails,
+            IGNORE_WARNINGS)).willReturn(updatedCaseDetails);
         given(caseService.createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, data)).willReturn(caseDetails);
 
         JsonNode result = midEventCallback.invoke(CASE_TYPE_ID,
-                                                  newCaseDataContent().withEvent(event).withData(data).withIgnoreWarning(IGNORE_WARNINGS).build(),
-                                                  "createCase1");
+            newCaseDataContent().withEvent(event).withData(data).withIgnoreWarning(IGNORE_WARNINGS).build(),
+            "createCase1");
 
         final JsonNode expectedResponse = MAPPER.readTree(
             "{"
@@ -146,13 +152,13 @@ class MidEventCallbackTest {
     @DisplayName("test no interaction when pageId not present")
     void testNoInteractionWhenMidEventCallbackUrlNotPresent() throws IOException {
         JsonNode result = midEventCallback.invoke(CASE_TYPE_ID,
-                                                  newCaseDataContent().withEvent(event).withData(data).withIgnoreWarning(IGNORE_WARNINGS).build(),
-                                                  "");
+            newCaseDataContent().withEvent(event).withData(data).withIgnoreWarning(IGNORE_WARNINGS).build(),
+            "");
 
         final JsonNode expectedResponse = MAPPER.readTree("{\"data\": {}}");
         assertThat("Data should stay unchanged", result, is(expectedResponse));
         verifyNoMoreInteractions(callbackInvoker, caseDefinitionRepository, eventTriggerService,
-                                 uiDefinitionRepository, caseService);
+            uiDefinitionRepository, caseService);
     }
 
     @Test
@@ -166,21 +172,21 @@ class MidEventCallbackTest {
                 + "}"), STRING_JSON_MAP);
         CaseDetails updatedCaseDetails = caseDetails(eventData);
         when(callbackInvoker.invokeMidEventCallback(wizardPageWithCallback,
-                                                    caseType,
-                                                    caseEvent,
-                                                    null,
-                                                    caseDetails,
-                                                    IGNORE_WARNINGS)).thenReturn(updatedCaseDetails);
+            caseType,
+            caseEvent,
+            null,
+            caseDetails,
+            IGNORE_WARNINGS)).thenReturn(updatedCaseDetails);
         when(caseService.createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, eventData)).thenReturn(caseDetails);
 
         JsonNode result = midEventCallback.invoke(CASE_TYPE_ID,
-                                                  newCaseDataContent()
-                                                      .withEvent(event)
-                                                      .withData(data)
-                                                      .withEventData(eventData)
-                                                      .withIgnoreWarning(IGNORE_WARNINGS)
-                                                      .build(),
-                                                  "createCase1");
+            newCaseDataContent()
+                .withEvent(event)
+                .withData(data)
+                .withEventData(eventData)
+                .withIgnoreWarning(IGNORE_WARNINGS)
+                .build(),
+            "createCase1");
 
         JsonNode expectedResponse = MAPPER.readTree(
             "{"
@@ -194,6 +200,31 @@ class MidEventCallbackTest {
             () -> verify(callbackInvoker).invokeMidEventCallback(wizardPageWithCallback, caseType, caseEvent, null, caseDetails, IGNORE_WARNINGS),
             () -> verify(caseService, never()).createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, data),
             () -> verify(caseService).createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, eventData));
+    }
+
+    @Test
+    @DisplayName("should fail to invoke MidEvent callback if case type not found")
+    void shouldFailIfCaseTypeNotFound() {
+
+        ValidationException validationException = assertThrows(ValidationException.class, () -> midEventCallback.invoke(OTHER_CASE_TYPE_ID,
+            newCaseDataContent().withEvent(event).withData(data).withIgnoreWarning(IGNORE_WARNINGS).build(),
+            "createCase1"
+        ));
+
+        assertThat(validationException.getMessage(), startsWith("Cannot find case type definition for " + OTHER_CASE_TYPE_ID));
+    }
+
+    @Test
+    @DisplayName("should fail to invoke MidEvent callback if event trigger not found")
+    void shouldFailIfEventTriggerNotFound() {
+        given(eventTriggerService.findCaseEvent(caseType, event.getEventId())).willReturn(null);
+
+        ValidationException validationException = assertThrows(ValidationException.class, () -> midEventCallback.invoke(CASE_TYPE_ID,
+            newCaseDataContent().withEvent(event).withData(data).withIgnoreWarning(IGNORE_WARNINGS).build(),
+            "createCase1"
+        ));
+
+        assertThat(validationException.getMessage(), startsWith(EVENT_ID + " is not a known event ID for the specified case type " + CASE_TYPE_ID));
     }
 
     private CaseDetails caseDetails(Map<String, JsonNode> data) {

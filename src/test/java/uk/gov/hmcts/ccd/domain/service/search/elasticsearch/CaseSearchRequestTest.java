@@ -12,7 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequestException;
 
 class CaseSearchRequestTest {
     private static final String CASE_TYPE_ID = "caseTypeId";
@@ -38,6 +38,6 @@ class CaseSearchRequestTest {
     @DisplayName("should throw exception when query node not found")
     void shouldThrowExceptionWhenQueryNodeNotFound() {
         String query = "{}";
-        assertThrows(BadSearchRequest.class, () -> new CaseSearchRequest(CASE_TYPE_ID, objectMapper.readValue(query, JsonNode.class)));
+        assertThrows(BadSearchRequestException.class, () -> new CaseSearchRequest(CASE_TYPE_ID, objectMapper.readValue(query, JsonNode.class)));
     }
 }

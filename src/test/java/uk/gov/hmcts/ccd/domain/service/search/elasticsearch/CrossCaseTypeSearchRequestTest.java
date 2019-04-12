@@ -15,7 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequestException;
 
 class CrossCaseTypeSearchRequestTest {
 
@@ -25,7 +25,7 @@ class CrossCaseTypeSearchRequestTest {
     @DisplayName("should throw exception when query node not found")
     void shouldThrowExceptionWhenQueryNodeNotFound() {
         String query = "{}";
-        assertThrows(BadSearchRequest.class, () -> new CrossCaseTypeSearchRequest.Builder()
+        assertThrows(BadSearchRequestException.class, () -> new CrossCaseTypeSearchRequest.Builder()
             .withCaseTypes(singletonList("caseType"))
             .withSearchRequest(objectMapper.readValue(query, JsonNode.class))
             .build());
