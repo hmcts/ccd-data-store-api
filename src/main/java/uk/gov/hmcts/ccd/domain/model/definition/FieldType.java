@@ -24,6 +24,8 @@ public class FieldType implements Serializable {
     private String regularExpression = null;
     @JsonProperty("fixed_list_items")
     private List<FixedListItem> fixedListItems = new ArrayList<>();
+    @JsonProperty("dynamic_list_items")
+    private List<DynamicListItem> dynamicListItems = new ArrayList<>();
     @JsonProperty("complex_fields")
     private List<CaseField> complexFields = new ArrayList<>();
     @JsonProperty("collection_field_type")
@@ -67,6 +69,14 @@ public class FieldType implements Serializable {
 
     public void setFixedListItems(List<FixedListItem> fixedListItems) {
         this.fixedListItems = fixedListItems;
+    }
+
+    public List<DynamicListItem> getDynamicListItems() {
+        return dynamicListItems;
+    }
+
+    public void setDynamicListItems(List<DynamicListItem> dynamicListItems) {
+        this.dynamicListItems = dynamicListItems;
     }
 
     public List<CaseField> getComplexFields() {
