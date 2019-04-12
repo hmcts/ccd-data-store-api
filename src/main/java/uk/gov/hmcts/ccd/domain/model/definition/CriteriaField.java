@@ -1,28 +1,20 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.io.Serializable;
 
-public class SearchResultField implements Serializable {
-    @JsonProperty("case_type_id")
-    private String caseTypeId;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModelProperty;
+
+public class CriteriaField  implements Serializable {
+    private String caseFieldId = null;
+    private String label = null;
+    private Integer displayOrder = null;
+    private String role = null;
+
+    /**
+     **/
+    @ApiModelProperty(value = "")
     @JsonProperty("case_field_id")
-    private String caseFieldId;
-    private String label;
-    @JsonProperty("order")
-    private Integer displayOrder;
-    private boolean metadata;
-    private String role;
-
-    public String getCaseTypeId() {
-        return caseTypeId;
-    }
-
-    public void setCaseTypeId(String caseTypeId) {
-        this.caseTypeId = caseTypeId;
-    }
-
     public String getCaseFieldId() {
         return caseFieldId;
     }
@@ -31,6 +23,10 @@ public class SearchResultField implements Serializable {
         this.caseFieldId = caseFieldId;
     }
 
+    /**
+     **/
+    @ApiModelProperty(value = "")
+    @JsonProperty("label")
     public String getLabel() {
         return label;
     }
@@ -39,6 +35,10 @@ public class SearchResultField implements Serializable {
         this.label = label;
     }
 
+    /**
+     **/
+    @ApiModelProperty(value = "")
+    @JsonProperty("order")
     public Integer getDisplayOrder() {
         return displayOrder;
     }
@@ -47,20 +47,13 @@ public class SearchResultField implements Serializable {
         this.displayOrder = displayOrder;
     }
 
-    public boolean isMetadata() {
-        return metadata;
-    }
-
-    public void setMetadata(boolean metadata) {
-        this.metadata = metadata;
-    }
-
+    @ApiModelProperty(value = "")
     @JsonProperty("role")
     public String getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(final String role) {
         this.role = role;
     }
 }
