@@ -316,10 +316,14 @@ public class CaseViewFieldBuilderTest {
         private CaseField address = newCaseField().withId(ADDRESS).withFieldType(addressFieldType).build();
 
         private CaseField familyName = newCaseField().withId(FAMILY_NAME).withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build()).build();
+        private FieldType nameFieldType =
+            aFieldType().withId(NAME + "-some-uid-value").withType(COLLECTION).withCollectionField(familyName).build();
+        private CaseField familyNames = newCaseField().withId(FAMILY_NAME).withFieldType(nameFieldType).build();
 
         // A complex family field formed of members collection of complex person - text name, text surname and yesNo adult fields,
         // family name(text) and an address (complex address type - collection of text address lines and a text postCode)
-        private FieldType familyFieldType = aFieldType().withId(FAMILY).withType(COMPLEX).withComplexField(familyName).withComplexField(members).withComplexField(address).build();
+        private FieldType familyFieldType =
+            aFieldType().withId(FAMILY).withType(COMPLEX).withComplexField(familyNames).withComplexField(members).withComplexField(address).build();
         private AccessControlList acl1 = anAcl().withRole("role1").withCreate(true).withRead(true).withUpdate(true).withDelete(false).build();
         private AccessControlList acl2 = anAcl().withRole("role2").withCreate(true).withRead(true).withUpdate(false).withDelete(true).build();
         private AccessControlList acl3 = anAcl().withRole("role3").withCreate(false).withRead(false).withUpdate(true).withDelete(false).build();
@@ -333,22 +337,33 @@ public class CaseViewFieldBuilderTest {
         @Test
         @DisplayName("should pass ACLs to the children")
         void createFrom() {
-            Map<String, String> data = new HashMap<>();
-            data.put(FAMILY, "{ \"Name\": \"Some Name\"}");
-
             CaseViewField caseViewField = fieldBuilder.build(family, EVENT_FIELD);
 
             assertAll(
                 () -> assertNotNull(caseViewField),
                 () -> assertThat(caseViewField.getAccessControlLists().size(), is(3)),
                 () -> assertThat(caseViewField.getFieldType().getComplexFields().get(0).getAccessControlLists().size(), is(3)),
-                () -> assertThat(caseViewField.getFieldType().getComplexFields().get(1).getAccessControlLists().size(), is(3)),
+                () -> assertThat(caseViewField.getFieldType().getComplexFields().get(0).getFieldType().getCollectionFieldType().getComplexFields().get(0)
+                    .getAccessControlLists().size(), is(3)),
+                () -> assertThat(caseViewField.getFieldType().getComplexFields().get(1).getFieldType().getCollectionFieldType().getComplexFields().get(0)
+                    .getAccessControlLists().size(), is(3)),
                 () -> assertThat(caseViewField.getFieldType().getComplexFields().get(2).getAccessControlLists().size(), is(3)),
-                () -> assertThat(caseViewField.getFieldType().getComplexFields().get(1).getFieldType().getComplexFields().get(0).getAccessControlLists().size(), is(3)),
+                () -> assertThat(caseViewField.getFieldType().getComplexFields().get(1).getFieldType().getCollectionFieldType().getComplexFields().get(0)
+                    .getAccessControlLists().size(), is(3)),
                 () -> assertThat(caseViewField.getFieldType().getComplexFields().get(2).getFieldType().getComplexFields().get(0).getAccessControlLists().size(), is(3)),
                 () -> assertThat(caseViewField.getFieldType().getComplexFields().get(2).getFieldType().getComplexFields().get(1).getAccessControlLists().size(), is(3))
             );
 
+        }
+
+        @Test
+        @DisplayName("should propagateACLsToNestedFields to fix ACLs of the children")
+        void callsPropagateACLsToNestedFields() {
+            CaseField caseFieldMock = mock(CaseField.class);
+
+            fieldBuilder.build(caseFieldMock, EVENT_FIELD);
+
+            verify(caseFieldMock).propagateACLsToNestedFields();
         }
     }
 }

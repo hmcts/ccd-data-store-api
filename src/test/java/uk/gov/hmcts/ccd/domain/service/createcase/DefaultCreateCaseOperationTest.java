@@ -10,7 +10,14 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.isNull;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.same;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
@@ -29,9 +36,14 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
+import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
+import uk.gov.hmcts.ccd.domain.model.definition.Version;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
@@ -82,7 +94,7 @@ class DefaultCreateCaseOperationTest {
     private static final String UID = "244";
     private static final String JURISDICTION_ID = "jid";
     private static final String CASE_TYPE_ID = "cti";
-    private Event event = buildEvent();
+    private final Event event = buildEvent();
     private CaseDataContent eventData = newCaseDataContent().build();
 
     private static Map<String, JsonNode> data;
@@ -91,7 +103,7 @@ class DefaultCreateCaseOperationTest {
     private static final String TOKEN = "toke";
     private static final String DRAFT_ID = "1";
 
-    private static final IDAMProperties IDAM_PROPERTIES = buildIDAMUser();
+    private static final IdamUser IDAM_USER = buildIdamUser();
     private static final CaseType CASE_TYPE = buildCaseType();
     private CaseEvent eventTrigger;
 
@@ -99,18 +111,18 @@ class DefaultCreateCaseOperationTest {
     void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
         defaultCreateCaseOperation = new DefaultCreateCaseOperation(userRepository,
-            caseDefinitionRepository,
-            eventTriggerService,
-            eventTokenService,
-            caseDataService,
-            submitCaseTransaction,
-            caseSanitiser,
-            caseTypeService,
-            callbackInvoker,
-            validateCaseFieldsOperation,
-            draftGateway);
+                                                                    caseDefinitionRepository,
+                                                                    eventTriggerService,
+                                                                    eventTokenService,
+                                                                    caseDataService,
+                                                                    submitCaseTransaction,
+                                                                    caseSanitiser,
+                                                                    caseTypeService,
+                                                                    callbackInvoker,
+                                                                    validateCaseFieldsOperation,
+                                                                    draftGateway);
         data = buildJsonNodeData();
-        given(userRepository.getUserDetails()).willReturn(IDAM_PROPERTIES);
+        given(userRepository.getUser()).willReturn(IDAM_USER);
         eventTrigger = newCaseEvent().withId("eventId").withName("event Name").build();
         eventData = newCaseDataContent().withEvent(event).withToken(TOKEN).withData(data).withDraftId(DRAFT_ID).build();
     }
@@ -120,12 +132,12 @@ class DefaultCreateCaseOperationTest {
     void shouldThrowValidationException_whenEventIsNull() {
         eventData.setEvent(null);
         assertThrows(ValidationException.class,
-            () -> defaultCreateCaseOperation.createCaseDetails(UID,
-                JURISDICTION_ID,
-                CASE_TYPE_ID,
-                eventData,
-                IGNORE_WARNING),
-            "Cannot create case because of event is not specified");
+                     () -> defaultCreateCaseOperation.createCaseDetails(UID,
+                                                                        JURISDICTION_ID,
+                                                                        CASE_TYPE_ID,
+                                                                        eventData,
+                                                                        IGNORE_WARNING),
+                     "Cannot create case because of event is not specified");
     }
 
     @Test
@@ -133,24 +145,24 @@ class DefaultCreateCaseOperationTest {
     void shouldThrowValidationException_whenEventIdIsNull() {
         eventData.setEvent(anEvent().withEventId(null).build());
         assertThrows(ValidationException.class,
-            () -> defaultCreateCaseOperation.createCaseDetails(UID,
-                JURISDICTION_ID,
-                CASE_TYPE_ID,
-                eventData,
-                IGNORE_WARNING),
-            "Cannot create case because of event is not specified");
+                     () -> defaultCreateCaseOperation.createCaseDetails(UID,
+                                                                        JURISDICTION_ID,
+                                                                        CASE_TYPE_ID,
+                                                                        eventData,
+                                                                        IGNORE_WARNING),
+                     "Cannot create case because of event is not specified");
     }
 
     @Test
     @DisplayName("Should throws ValidationException when case type is not found")
     void shouldThrowValidationException_whenCaseTypeIsNotFound() {
         assertThrows(ValidationException.class,
-            () -> defaultCreateCaseOperation.createCaseDetails(UID,
-                JURISDICTION_ID,
-                CASE_TYPE_ID,
-                eventData,
-                IGNORE_WARNING),
-            "Cannot find case type definition for cti");
+                     () -> defaultCreateCaseOperation.createCaseDetails(UID,
+                                                                        JURISDICTION_ID,
+                                                                        CASE_TYPE_ID,
+                                                                        eventData,
+                                                                        IGNORE_WARNING),
+                     "Cannot find case type definition for cti");
     }
 
     @Test
@@ -159,12 +171,12 @@ class DefaultCreateCaseOperationTest {
         given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(CASE_TYPE);
         given(caseTypeService.isJurisdictionValid(JURISDICTION_ID, CASE_TYPE)).willReturn(Boolean.FALSE);
         assertThrows(ValidationException.class,
-            () -> defaultCreateCaseOperation.createCaseDetails(UID,
-                JURISDICTION_ID,
-                CASE_TYPE_ID,
-                eventData,
-                IGNORE_WARNING),
-            "Cannot create case because of cti is not defined as case type for jid");
+                     () -> defaultCreateCaseOperation.createCaseDetails(UID,
+                                                                        JURISDICTION_ID,
+                                                                        CASE_TYPE_ID,
+                                                                        eventData,
+                                                                        IGNORE_WARNING),
+                     "Cannot create case because of cti is not defined as case type for jid");
     }
 
     @Test
@@ -173,12 +185,12 @@ class DefaultCreateCaseOperationTest {
         given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(CASE_TYPE);
         given(caseTypeService.isJurisdictionValid(JURISDICTION_ID, CASE_TYPE)).willReturn(Boolean.FALSE);
         assertThrows(ValidationException.class,
-            () -> defaultCreateCaseOperation.createCaseDetails(UID,
-                JURISDICTION_ID,
-                CASE_TYPE_ID,
-                eventData,
-                IGNORE_WARNING),
-            "eid is not a known event ID for the specified case type cti");
+                     () -> defaultCreateCaseOperation.createCaseDetails(UID,
+                                                                        JURISDICTION_ID,
+                                                                        CASE_TYPE_ID,
+                                                                        eventData,
+                                                                        IGNORE_WARNING),
+                     "eid is not a known event ID for the specified case type cti");
     }
 
     @Test
@@ -186,13 +198,12 @@ class DefaultCreateCaseOperationTest {
     void shouldThrowValidationException_whenPreStateIsInvalid() {
         given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(CASE_TYPE);
         given(caseTypeService.isJurisdictionValid(JURISDICTION_ID, CASE_TYPE)).willReturn(Boolean.FALSE);
-        assertThrows(ValidationException.class,
-            () -> defaultCreateCaseOperation.createCaseDetails(UID,
-                JURISDICTION_ID,
-                CASE_TYPE_ID,
-                eventData,
-                IGNORE_WARNING),
-            "Cannot create case because of eventId has pre-states defined");
+        assertThrows(ValidationException.class, () -> defaultCreateCaseOperation.createCaseDetails(UID,
+                                                                                                   JURISDICTION_ID,
+                                                                                                   CASE_TYPE_ID,
+                                                                                                   eventData,
+                                                                                                   IGNORE_WARNING),
+                     "Cannot create case because of eventId has pre-states defined");
     }
 
     @Test
@@ -206,21 +217,20 @@ class DefaultCreateCaseOperationTest {
         given(eventTriggerService.isPreStateValid(null, eventTrigger)).willReturn(Boolean.TRUE);
         given(savedCaseType.getState()).willReturn(caseEventStateId);
         given(caseTypeService.findState(CASE_TYPE, caseEventStateId)).willReturn(caseEventState);
-        given(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, eventData))
-            .willReturn(data);
+        given(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, eventData)).willReturn(data);
         given(submitCaseTransaction.submitCase(same(event),
-            same(CASE_TYPE),
-            same(IDAM_PROPERTIES),
-            same(eventTrigger),
-            any(CaseDetails.class),
-            same(IGNORE_WARNING)))
+                                               same(CASE_TYPE),
+                                               same(IDAM_USER),
+                                               same(eventTrigger),
+                                               any(CaseDetails.class),
+                                               same(IGNORE_WARNING)))
             .willReturn(savedCaseType);
 
         defaultCreateCaseOperation.createCaseDetails(UID,
-            JURISDICTION_ID,
-            CASE_TYPE_ID,
-            eventData,
-            IGNORE_WARNING);
+                                                     JURISDICTION_ID,
+                                                     CASE_TYPE_ID,
+                                                     eventData,
+                                                     IGNORE_WARNING);
 
         verify(draftGateway, never()).delete(DRAFT_ID);
     }
@@ -238,11 +248,11 @@ class DefaultCreateCaseOperationTest {
         given(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, eventData))
             .willReturn(data);
         given(submitCaseTransaction.submitCase(same(event),
-            same(CASE_TYPE),
-            same(IDAM_PROPERTIES),
-            same(eventTrigger),
-            any(CaseDetails.class),
-            same(IGNORE_WARNING)))
+                                               same(CASE_TYPE),
+                                               same(IDAM_USER),
+                                               same(eventTrigger),
+                                               any(CaseDetails.class),
+                                               same(IGNORE_WARNING)))
             .willReturn(savedCaseType);
         willDoNothing().given(draftGateway).delete(DRAFT_ID);
         eventTrigger.setCallBackURLSubmittedEvent("   ");
@@ -255,27 +265,26 @@ class DefaultCreateCaseOperationTest {
             IGNORE_WARNING);
 
         final InOrder order = inOrder(eventTokenService,
-            caseTypeService,
-            validateCaseFieldsOperation,
-            submitCaseTransaction,
-            draftGateway);
+                                      caseTypeService,
+                                      validateCaseFieldsOperation,
+                                      submitCaseTransaction,
+                                      draftGateway);
         final ArgumentCaptor<CaseDetails> caseDetailsArgumentCaptor = ArgumentCaptor.forClass(CaseDetails.class);
 
 
         assertAll(() -> assertThat(caseDetails, IsInstanceOf.instanceOf(CaseDetails.class)),
-            () -> order.verify(eventTokenService)
-                .validateToken(TOKEN, UID, eventTrigger, CASE_TYPE.getJurisdiction(), CASE_TYPE),
-            () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
-            () -> order.verify(submitCaseTransaction).submitCase(same(event),
-                same(CASE_TYPE),
-                same(IDAM_PROPERTIES),
-                same(eventTrigger),
-                caseDetailsArgumentCaptor.capture(),
-                same(IGNORE_WARNING)),
-            () -> order.verify(draftGateway).delete(DRAFT_ID),
-            () -> verifyZeroInteractions(callbackInvoker),
-            () -> assertCaseDetails(caseDetailsArgumentCaptor.getValue()),
-            () -> assertThat(caseDetails, is(savedCaseType)));
+                  () -> order.verify(eventTokenService).validateToken(TOKEN, UID, eventTrigger, CASE_TYPE.getJurisdiction(), CASE_TYPE),
+                  () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
+                  () -> order.verify(submitCaseTransaction).submitCase(same(event),
+                                                                       same(CASE_TYPE),
+                                                                       same(IDAM_USER),
+                                                                       same(eventTrigger),
+                                                                       caseDetailsArgumentCaptor.capture(),
+                                                                       same(IGNORE_WARNING)),
+                  () -> order.verify(draftGateway).delete(DRAFT_ID),
+                  () -> verifyZeroInteractions(callbackInvoker),
+                  () -> assertCaseDetails(caseDetailsArgumentCaptor.getValue()),
+                  () -> assertThat(caseDetails, is(savedCaseType)));
     }
 
     @Test
@@ -298,7 +307,7 @@ class DefaultCreateCaseOperationTest {
             submitCaseTransaction.submitCase(
                 same(event),
                 same(CASE_TYPE),
-                same(IDAM_PROPERTIES),
+                same(IDAM_USER),
                 same(eventTrigger),
                 any(CaseDetails.class),
                 same(IGNORE_WARNING)))
@@ -321,19 +330,17 @@ class DefaultCreateCaseOperationTest {
             draftGateway);
 
         assertAll("case details saved when call back fails",
-            () -> order.verify(eventTokenService)
-                .validateToken(TOKEN, UID, eventTrigger, CASE_TYPE.getJurisdiction(), CASE_TYPE),
-            () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
-            () -> order.verify(submitCaseTransaction).submitCase(same(event),
-                same(CASE_TYPE),
-                same(IDAM_PROPERTIES),
-                same(eventTrigger),
-                any(CaseDetails.class),
-                same(IGNORE_WARNING)),
-            () -> order.verify(callbackInvoker)
-                .invokeSubmittedCallback(eq(eventTrigger), isNull(CaseDetails.class), same(savedCaseType)),
-            () -> order.verify(savedCaseType).setIncompleteCallbackResponse(),
-            () -> order.verify(draftGateway).delete(DRAFT_ID));
+                  () -> order.verify(eventTokenService).validateToken(TOKEN, UID, eventTrigger, CASE_TYPE.getJurisdiction(), CASE_TYPE),
+                  () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
+                  () -> order.verify(submitCaseTransaction).submitCase(same(event),
+                                                                       same(CASE_TYPE),
+                                                                       same(IDAM_USER),
+                                                                       same(eventTrigger),
+                                                                       any(CaseDetails.class),
+                                                                       same(IGNORE_WARNING)),
+                  () -> order.verify(callbackInvoker).invokeSubmittedCallback(eq(eventTrigger), isNull(CaseDetails.class), same(savedCaseType)),
+                  () -> order.verify(savedCaseType).setIncompleteCallbackResponse(),
+                  () -> order.verify(draftGateway).delete(DRAFT_ID));
     }
 
     @Test
@@ -349,8 +356,8 @@ class DefaultCreateCaseOperationTest {
         given(caseTypeService.findState(CASE_TYPE, caseEventStateId)).willReturn(caseEventState);
         eventTrigger.setCallBackURLSubmittedEvent("http://localhost/submittedcallback");
         given(callbackInvoker.invokeSubmittedCallback(eventTrigger,
-            null,
-            savedCaseType)).willReturn(response);
+                                                      null,
+                                                      savedCaseType)).willReturn(response);
         given(response.hasBody()).willReturn(true);
         given(response.getBody()).willReturn(responseBody);
         given(response.getStatusCodeValue()).willReturn(200);
@@ -360,7 +367,7 @@ class DefaultCreateCaseOperationTest {
         given(submitCaseTransaction.submitCase(
             same(event),
             same(CASE_TYPE),
-            same(IDAM_PROPERTIES),
+            same(IDAM_USER),
             same(eventTrigger),
             any(CaseDetails.class),
             same(IGNORE_WARNING)))
@@ -374,29 +381,26 @@ class DefaultCreateCaseOperationTest {
             IGNORE_WARNING);
 
         final InOrder order = inOrder(eventTokenService,
-            caseTypeService,
-            validateCaseFieldsOperation,
-            submitCaseTransaction,
-            callbackInvoker,
-            savedCaseType,
-            draftGateway);
+                                      caseTypeService,
+                                      validateCaseFieldsOperation,
+                                      submitCaseTransaction,
+                                      callbackInvoker,
+                                      savedCaseType,
+                                      draftGateway);
 
         assertAll("Call back response returned successfully",
-            () -> assertThat(caseDetails.getCaseTypeId(), is(mockCaseTypeId)),
-            () -> order.verify(eventTokenService)
-                .validateToken(TOKEN, UID, eventTrigger, CASE_TYPE.getJurisdiction(), CASE_TYPE),
-            () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
-            () -> order.verify(submitCaseTransaction).submitCase(same(event),
-                same(CASE_TYPE),
-                same(IDAM_PROPERTIES),
-                same(eventTrigger),
-                any(CaseDetails.class),
-                same(IGNORE_WARNING)),
-            () -> order.verify(callbackInvoker)
-                .invokeSubmittedCallback(eq(eventTrigger),
-                    isNull(CaseDetails.class), same(savedCaseType)),
-            () -> order.verify(savedCaseType).setAfterSubmitCallbackResponseEntity(response),
-            () -> order.verify(draftGateway).delete(DRAFT_ID));
+                  () -> assertThat(caseDetails.getCaseTypeId(), is(mockCaseTypeId)),
+                  () -> order.verify(eventTokenService).validateToken(TOKEN, UID, eventTrigger, CASE_TYPE.getJurisdiction(), CASE_TYPE),
+                  () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
+                  () -> order.verify(submitCaseTransaction).submitCase(same(event),
+                                                                       same(CASE_TYPE),
+                                                                       same(IDAM_USER),
+                                                                       same(eventTrigger),
+                                                                       any(CaseDetails.class),
+                                                                       same(IGNORE_WARNING)),
+                  () -> order.verify(callbackInvoker).invokeSubmittedCallback(eq(eventTrigger), isNull(CaseDetails.class), same(savedCaseType)),
+                  () -> order.verify(savedCaseType).setAfterSubmitCallbackResponseEntity(response),
+                  () -> order.verify(draftGateway).delete(DRAFT_ID));
     }
 
     private void assertCaseDetails(final CaseDetails details) {
@@ -419,10 +423,9 @@ class DefaultCreateCaseOperationTest {
         return map;
     }
 
-    private static IDAMProperties buildIDAMUser() {
-        final IDAMProperties properties = new IDAMProperties();
+    private static IdamUser buildIdamUser() {
+        final IdamUser properties = new IdamUser();
         properties.setId("pid");
-        properties.setRoles(new String[]{"role-A", "role-B"});
         properties.setEmail("ngitb@hmcts.net");
         properties.setForename("Wo");
         properties.setSurname("Mata");
