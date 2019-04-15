@@ -103,7 +103,7 @@ public class CaseEvent implements Serializable {
         this.postState = postState;
     }
 
-    public String   getCallBackURLAboutToStartEvent() {
+    public String getCallBackURLAboutToStartEvent() {
         return callBackURLAboutToStartEvent;
     }
 
