@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.data.definition;
 
 import static org.hamcrest.core.StringStartsWith.startsWith;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -81,7 +82,7 @@ public class DefaultCaseDefinitionRepositoryTest {
     }
 
     @Test
-    public void test_propagation_called_once_and_only_once() {
+    public void testPropagationIsCalledOnceAndOnlyOnce() {
         CaseType caseType = new CaseType();
         int fieldCount = 1 + (int)(Math.random() * 20);
         List<CaseField> fields = new ArrayList<>();
@@ -89,6 +90,7 @@ public class DefaultCaseDefinitionRepositoryTest {
             fields.add(Mockito.mock(CaseField.class));
         }
         caseType.setCaseFields(fields);
+        assertEquals(fieldCount, caseType.getCaseFields().size());
         doReturn(new ResponseEntity<>(caseType, HttpStatus.OK)).when(restTemplate).exchange(anyString(), any(HttpMethod.class), any(), any(Class.class));
         caseDefinitionRepository.getCaseType("caseTypeId");
         fields.stream().forEach(field -> Mockito.verify(field, Mockito.times(1)).propagateACLsToNestedFields());
