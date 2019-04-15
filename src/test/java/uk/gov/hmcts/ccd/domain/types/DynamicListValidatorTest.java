@@ -8,7 +8,6 @@ import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -94,7 +93,8 @@ class DynamicListValidatorTest {
             + "            \"label\": \"Fixed List 1\"\n"
             + "          },\n"
             + "          \"dynamic_list_items\": [{\n"
-            + " \"code\": \"FixedList1FixedList1FixedList1FixedList1FixedList1FixedList1FixedList1FixedList1FixedList1FixedList1FixedList1FixedList1FixedList\",\n"
+            + "          \"code\": \"FixedList1FixedList1FixedList1FixedList1FixedList1FixedList1FixedList1FixedList1FixedList1"
+            + "            FixedList1FixedList1FixedList1FixedList1FixedList1FixedList1FixedList1FixedList\",\n"
             + "            \"label\": \"Fixed List 1\"\n"
             + "          }, {\n"
             + "            \"code\": \"FixedList2\",\n"
