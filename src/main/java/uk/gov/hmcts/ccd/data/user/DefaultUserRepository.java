@@ -1,9 +1,12 @@
 package uk.gov.hmcts.ccd.data.user;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -21,9 +24,10 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.AuthCheckerConfiguration;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
@@ -111,17 +115,22 @@ public class DefaultUserRepository implements UserRepository {
             LOG.debug("retrieving default user settings for user {}", userId);
             final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
             final Map<String, String> queryParams = new HashMap<>();
-            queryParams.put("uid", userId);
-            return restTemplate.exchange(applicationParams.userDefaultSettingsURL(),
-                HttpMethod.GET, requestEntity, UserDefault.class, queryParams).getBody();
-        } catch (HttpStatusCodeException e) {
+            queryParams.put("uid", ApplicationParams.encode(userId));
+            final String encodedUrl = UriComponentsBuilder.fromHttpUrl(applicationParams.userDefaultSettingsURL())
+                .buildAndExpand(queryParams).toUriString();
+            return restTemplate.exchange(new URI(encodedUrl), HttpMethod.GET, requestEntity, UserDefault.class)
+                .getBody();
+        } catch (RestClientResponseException e) {
             LOG.error("Failed to retrieve user profile", e);
-            final List<String> headerMessages = e.getResponseHeaders().get("Message");
+            final List<String> headerMessages = Optional.ofNullable(e.getResponseHeaders())
+                .map(headers -> headers.get("Message")).orElse(null);
             final String message = headerMessages != null ? headerMessages.get(0) : e.getMessage();
             if (message != null) {
                 throw new BadRequestException(message);
             }
             throw new ServiceException("Problem getting user default settings for " + userId);
+        } catch (URISyntaxException e) {
+            throw new BadRequestException(e.getMessage());
         }
     }
 

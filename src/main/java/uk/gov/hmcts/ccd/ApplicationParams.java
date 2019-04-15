@@ -103,7 +103,7 @@ public class ApplicationParams {
     @Value("${search.elastic.nodes.discovery.filter}")
     private String elasticsearchNodeDiscoveryFilter;
 
-    private static String encode(final String stringToEncode) {
+    public static String encode(final String stringToEncode) {
         try {
             return URLEncoder.encode(stringToEncode, "UTF-8");
         } catch (UnsupportedEncodingException e) {
