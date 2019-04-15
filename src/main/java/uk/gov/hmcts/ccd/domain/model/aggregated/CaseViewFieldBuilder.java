@@ -56,9 +56,9 @@ public class CaseViewFieldBuilder {
 
     private void getFieldType(CaseViewField caseField, Object value) {
 
-        if(caseField.getFieldType().getType().equals(DYNAMIC_LIST) && value != null) {
-            caseField.setValue(((ObjectNode)value).get(DEFAULT));
-            caseField.getFieldType().setDynamicListItems(processDynamicList((ObjectNode)value));
+        if (caseField.getFieldType().getType().equals(DYNAMIC_LIST) && value != null) {
+            caseField.setValue(((ObjectNode) value).get(DEFAULT));
+            caseField.getFieldType().setDynamicListItems(processDynamicList((ObjectNode) value));
         }
     }
 
