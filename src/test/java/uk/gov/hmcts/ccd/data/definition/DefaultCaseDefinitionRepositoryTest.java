@@ -92,7 +92,9 @@ public class DefaultCaseDefinitionRepositoryTest {
         caseType.setCaseFields(fields);
         assertEquals(fieldCount, caseType.getCaseFields().size());
         doReturn(new ResponseEntity<>(caseType, HttpStatus.OK)).when(restTemplate).exchange(anyString(), any(HttpMethod.class), any(), any(Class.class));
+
         caseDefinitionRepository.getCaseType("caseTypeId");
+
         fields.stream().forEach(field -> Mockito.verify(field, Mockito.times(1)).propagateACLsToNestedFields());
     }
 }
