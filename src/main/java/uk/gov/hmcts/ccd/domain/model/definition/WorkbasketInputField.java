@@ -4,11 +4,13 @@ import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel(description = "")
 public class WorkbasketInputField implements Serializable {
 
     private String caseFieldId = null;
+    private String caseFieldElementPath = null;
     private String label = null;
     private Integer order = null;
 
@@ -19,6 +21,18 @@ public class WorkbasketInputField implements Serializable {
 
     public void setCaseFieldId(String caseFieldId) {
         this.caseFieldId = caseFieldId;
+    }
+
+    /**
+     **/
+    @ApiModelProperty(value = "")
+    @JsonProperty("case_field_element_path")
+    public String getCaseFieldElementPath() {
+        return caseFieldElementPath;
+    }
+
+    public void setCaseFieldElementPath(String caseFieldElementPath) {
+        this.caseFieldElementPath = caseFieldElementPath;
     }
 
     @JsonProperty("label")

@@ -1,10 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import java.util.List;
-import java.util.function.Predicate;
-
-import static java.util.stream.Collectors.toList;
-
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -12,9 +8,18 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputField;
 import uk.gov.hmcts.ccd.domain.model.search.Field;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
+
+import java.util.List;
+import java.util.function.Predicate;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 @Qualifier(DefaultFindWorkbasketInputOperation.QUALIFIER)
@@ -51,17 +56,20 @@ public class DefaultFindWorkbasketInputOperation implements FindWorkbasketInputO
         result.setOrder(in.getOrder());
         final Field field = new Field();
         field.setId(in.getCaseFieldId());
-        CaseField caseField = getCaseField(in.getCaseFieldId(), caseType);
-        field.setType(caseField.getFieldType());
+
+        CaseField caseField = caseType.getCaseField(in.getCaseFieldId())
+            .orElseThrow(() -> new RuntimeException(String.format("FieldId %s not found", in.getCaseFieldId())));
+
+        if (StringUtils.isBlank(in.getCaseFieldElementPath())) {
+            field.setType(caseField.getFieldType());
+        } else {
+            CaseField caseFieldByPath = caseField.findNestedElementByPath(in.getCaseFieldElementPath());
+            field.setType(caseFieldByPath.getFieldType());
+        }
+
+        field.setElementPath(in.getCaseFieldElementPath());
         field.setMetadata(caseField.isMetadata());
         result.setField(field);
         return result;
-    }
-
-    private CaseField getCaseField(final String fieldId, final CaseType caseType) {
-        return caseType.getCaseFields().stream()
-            .filter(c -> c.getId().equals(fieldId))
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException(String.format("FieldId %s not found", fieldId)));
     }
 }

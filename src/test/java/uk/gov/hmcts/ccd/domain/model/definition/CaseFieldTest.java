@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
@@ -19,6 +21,7 @@ class CaseFieldTest {
     private static final String FAMILY = "Family";
     private static final String MEMBERS = "Members";
     private static final String PERSON = "Person";
+    private static final String DEBTOR_DETAILS = "Debtor details";
     private static final String NAME = "Name";
     private static final String SURNAME = "Surname";
     private static final String FAMILY_NAME = "Family Name";
@@ -27,6 +30,9 @@ class CaseFieldTest {
     private CaseField surname = newCaseField().withId(SURNAME).withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build()).build();
     private FieldType personFieldType = aFieldType().withId(PERSON).withType(COMPLEX).withComplexField(name).withComplexField(surname).build();
     private CaseField person = newCaseField().withId(PERSON).withFieldType(personFieldType).build();
+
+    private FieldType debtorFieldType = aFieldType().withId(DEBTOR_DETAILS).withType(COMPLEX).withComplexField(person).build();
+    private CaseField debtorDetails = newCaseField().withId(DEBTOR_DETAILS).withFieldType(debtorFieldType).build();
 
     private FieldType membersFieldType = aFieldType().withId(MEMBERS + "-some-uid-value").withType(COLLECTION).withCollectionField(person).build();
     private CaseField members = newCaseField().withId(MEMBERS).withFieldType(membersFieldType).build();
@@ -75,6 +81,59 @@ class CaseFieldTest {
                 () -> assertThat(person.getAccessControlLists().size(), is(3)),
                 () -> assertThat(name.getAccessControlLists().size(), is(3)),
                 () -> assertThat(surname.getAccessControlLists().size(), is(3)));
+        }
+    }
+
+    @Nested
+    @DisplayName("findNestedElementByPath test")
+    class FindNestedElementsTest {
+
+        @Test
+        void findNestedElementByPath() {
+            String path = PERSON + "." + NAME;
+            CaseField nestedElementByPath = debtorDetails.findNestedElementByPath(path);
+
+            assertAll(
+                () -> assertThat(nestedElementByPath.getId(), is(name.getId())),
+                () -> assertThat(nestedElementByPath.getFieldType().getType(), is(name.getFieldType().getType())),
+                () -> assertThat(nestedElementByPath.getFieldType().getId(), is(name.getFieldType().getId())),
+                () -> assertThat(nestedElementByPath.getFieldType().getChildren().size(), is(0))
+                     );
+        }
+
+        @Test
+        void findNestedElementByEmptyPath() {
+            Exception exception = assertThrows(RuntimeException.class, () ->
+                family.findNestedElementByPath(""));
+            assertEquals("Invalid blank element path for field Family.", exception.getMessage());
+        }
+
+        @Test
+        void findNestedElementByNullPath() {
+            Exception exception = assertThrows(RuntimeException.class, () ->
+                family.findNestedElementByPath(null));
+            assertEquals("Invalid blank element path for field Family.", exception.getMessage());
+        }
+
+        @Test
+        void findNestedElementForCaseFieldWithNoNestedElements() {
+            Exception exception = assertThrows(RuntimeException.class, () ->
+                name.findNestedElementByPath("Field1"));
+            assertEquals("CaseField Name has no nested elements.", exception.getMessage());
+        }
+
+        @Test
+        void findNestedElementForCaseFieldWithNonMatchingPathElement() {
+            Exception exception = assertThrows(RuntimeException.class, () ->
+                debtorDetails.findNestedElementByPath("Field1"));
+            assertEquals("Nested element not found for Field1", exception.getMessage());
+        }
+
+        @Test
+        void findNestedElementForCaseFieldWithNonMatchingPathElements() {
+            Exception exception = assertThrows(RuntimeException.class, () ->
+                debtorDetails.findNestedElementByPath("Field2.Field3"));
+            assertEquals("Nested element not found for Field2", exception.getMessage());
         }
     }
 

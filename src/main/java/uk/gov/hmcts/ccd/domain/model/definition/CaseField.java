@@ -4,10 +4,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import static java.lang.String.format;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
 
@@ -149,6 +153,36 @@ public class CaseField implements Serializable {
                 }
                 propagateACLsToNestedFields(nestedField, acls);
             });
+        }
+    }
+
+    @JsonIgnore
+    public CaseField findNestedElementByPath(String path) {
+        if (StringUtils.isBlank(path)) {
+            throw new RuntimeException(format("Invalid blank element path for field %s.", this.id));
+        }
+        if (this.getFieldType().getChildren().isEmpty()) {
+            throw new RuntimeException(format("CaseField %s has no nested elements.", this.id));
+        }
+        List<String> pathElements = Arrays.stream(path.trim().split("\\.")).collect(Collectors.toList());
+
+        return reduce(this.getFieldType().getChildren(), pathElements);
+    }
+
+    @JsonIgnore
+    private CaseField reduce(List<CaseField> caseFields, List<String> pathElements) {
+        String head = pathElements.get(0);
+        if (pathElements.size() == 1) {
+            return caseFields.stream().filter(e -> e.getId().equals(head)).findFirst()
+                .orElseThrow(() -> new RuntimeException(format("Nested element not found for %s", head)));
+        } else {
+            CaseField caseField = caseFields.stream().filter(e -> e.getId().equals(head)).findFirst()
+                .orElseThrow(() -> new RuntimeException(format("Nested element not found for %s", head)));
+
+            List<CaseField> newCaseFields = caseField.getFieldType().getChildren();
+            List<String> tail = pathElements.subList(1, pathElements.size());
+
+            return reduce(newCaseFields, tail);
         }
     }
 }
