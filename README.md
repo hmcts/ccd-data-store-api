@@ -34,7 +34,6 @@ The following environment variables are required:
 | DEFINITION_STORE_HOST | - | Base URL for the Definition Store service. `http://localhost:4451` for the dockerised local instance. |
 | CCD_DM_DOMAIN | - | Base URL for the Document Management domain. |
 | AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY | - | For CNP environment this is provided by the terraform scripts. However any value would do for your local environment. |
-| DATA_STORE_DB_USE_SSL | true | Mandated by Cloud Native Platform.  For local testing, set this variable to false |
 | DATA_STORE_DEFAULT_LOG_LEVEL | INFO | Default log level for classes under package uk.gov.hmcts.ccd |
 | HTTP_CLIENT_MAX_TOTAL | 100 | Used for Pooling connection manager; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
 | HTTP_CLIENT_SECONDS_IDLE_CONNECTION | 120 | Used for Pooling connection manager; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
