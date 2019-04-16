@@ -50,9 +50,6 @@ public class UIStartTriggerResource extends ResourceSupport {
             case DRAFT:
                 add(linkTo(methodOn(UIStartTriggerController.class).getStartDraftTrigger(id, ignoreWarning)).withSelfRel());
                 break;
-            default:
-                LOG.warn("Origin={} not supported", origin);
-                break;
         }
     }
 

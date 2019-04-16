@@ -1,14 +1,5 @@
 package uk.gov.hmcts.ccd.data.definition;
 
-import javax.inject.Inject;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static uk.gov.hmcts.ccd.ApplicationParams.encodeBase64;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +8,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -30,6 +22,15 @@ import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
+
+import javax.inject.Inject;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static uk.gov.hmcts.ccd.ApplicationParams.encodeBase64;
 
 @Service
 @Qualifier(DefaultCaseDefinitionRepository.QUALIFIER)
@@ -78,10 +79,38 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     @Override
+    public List<String> getCaseTypesReferences() {
+        return getCaseTypesReferences(new HttpHeaders());
+    }
+
+    @Override
+    public List<String> getCaseTypesReferences(final HttpHeaders httpHeaders) {
+        LOG.debug("retrieving case type references");
+        try {
+            final HttpEntity requestEntity = new HttpEntity<CaseType>(!httpHeaders.isEmpty() ? httpHeaders : securityUtils.authorizationHeaders());
+            return Arrays.asList(restTemplate.exchange(applicationParams.caseTypesReferencesDefURL(), HttpMethod.GET, requestEntity, String[].class).getBody());
+
+        } catch (Exception e) {
+            LOG.warn("Error while retrieving case type references", e);
+            if (e instanceof HttpClientErrorException
+                && ((HttpClientErrorException)e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                throw new ResourceNotFoundException("Resource not found when getting case type references because of " + e.getMessage());
+            } else {
+                throw new ServiceException("Problem getting case type references because of " + e.getMessage());
+            }
+        }
+    }
+
+    @Override
     public CaseType getCaseType(final String caseTypeId) {
+        return getCaseType(caseTypeId, new HttpHeaders());
+    }
+
+    @Override
+    public CaseType getCaseType(final String caseTypeId, final HttpHeaders httpHeaders) {
         LOG.debug("retrieving case type definition for case type: {}", caseTypeId);
         try {
-            final HttpEntity requestEntity = new HttpEntity<CaseType>(securityUtils.authorizationHeaders());
+            final HttpEntity requestEntity = new HttpEntity<CaseType>(!httpHeaders.isEmpty() ? httpHeaders : securityUtils.authorizationHeaders());
             return restTemplate.exchange(applicationParams.caseTypeDefURL(caseTypeId), HttpMethod.GET, requestEntity, CaseType.class).getBody();
 
         } catch (Exception e) {
@@ -142,8 +171,14 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             queryParams.put("roles", StringUtils.join(userRoles, ","));
             return Arrays.asList(restTemplate.exchange(applicationParams.userRolesClassificationsURL(), HttpMethod.GET, requestEntity, UserRole[].class, queryParams).getBody());
         } catch (Exception e) {
-            LOG.warn("Error while retrieving classification for user roles {} because of ", userRoles, e);
-            throw new ServiceException("Error while retrieving classification for user roles " + userRoles + " because of " + e.getMessage());
+            if (e instanceof HttpClientErrorException
+                && ((HttpClientErrorException)e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                LOG.debug("No classification found for user roles {} because of ", userRoles, e);
+                throw new ResourceNotFoundException("No classification for user roles " + userRoles + " because of " + e.getMessage());
+            } else {
+                LOG.warn("Error while retrieving classification for user roles {} because of ", userRoles, e);
+                throw new ServiceException("Error while retrieving classifications for user roles " + userRoles + " because of " + e.getMessage());
+            }
         }
     }
 

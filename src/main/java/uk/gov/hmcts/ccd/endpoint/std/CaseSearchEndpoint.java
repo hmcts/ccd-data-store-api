@@ -28,7 +28,7 @@ import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.AuthorisedCaseSearchOperation;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequestException;
 
 @RestController
 @RequestMapping(path = "/",
@@ -99,7 +99,7 @@ public class CaseSearchEndpoint {
             })
             .findFirst();
         blackListedQueryOpt.ifPresent(blacklisted -> {
-            throw new BadSearchRequest(String.format("Query of type '%s' is not allowed", blacklisted));
+            throw new BadSearchRequestException(String.format("Query of type '%s' is not allowed", blacklisted));
         });
     }
 }

@@ -40,7 +40,7 @@ import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.dto.ElasticSearchCaseDetailsDTO;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.mapper.CaseDetailsMapper;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.CaseSearchRequestSecurity;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequestException;
 
 class ElasticsearchCaseSearchOperationTest {
 
@@ -189,7 +189,7 @@ class ElasticsearchCaseSearchOperationTest {
                 .build();
             when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class))).thenReturn(request);
 
-            assertThrows(BadSearchRequest.class, () -> searchOperation.execute(crossCaseTypeSearchRequest));
+            assertThrows(BadSearchRequestException.class, () -> searchOperation.execute(crossCaseTypeSearchRequest));
         }
 
         @Test
@@ -214,7 +214,7 @@ class ElasticsearchCaseSearchOperationTest {
                 .build();
             when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class))).thenReturn(request);
 
-            assertThrows(BadSearchRequest.class, () -> searchOperation.execute(crossCaseTypeSearchRequest));
+            assertThrows(BadSearchRequestException.class, () -> searchOperation.execute(crossCaseTypeSearchRequest));
         }
 
     }

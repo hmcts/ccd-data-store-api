@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.datastore.tests.helper.idam;
+package uk.gov.hmcts.ccd.idam;
 
 import java.util.List;
 

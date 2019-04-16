@@ -27,7 +27,7 @@ import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.dto.ElasticSearchCaseDetailsDTO;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.mapper.CaseDetailsMapper;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.CaseSearchRequestSecurity;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 @Service
@@ -63,7 +63,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
         if (result.isSucceeded()) {
             return toCaseDetailsSearchResult(result);
         } else {
-            throw new BadSearchRequest(result.getErrorMessage());
+            throw new BadSearchRequestException(result.getErrorMessage());
         }
     }
 
@@ -105,7 +105,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
                 if (errorObject.has(MULTI_SEARCH_ERROR_MSG_ROOT_CAUSE)) {
                     errMsg = errorObject.get(MULTI_SEARCH_ERROR_MSG_ROOT_CAUSE).toString();
                 }
-                throw new BadSearchRequest(errMsg);
+                throw new BadSearchRequestException(errMsg);
             }
             if (response.searchResult != null) {
                 caseDetails.addAll(searchResultToCaseList(response.searchResult));

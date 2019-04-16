@@ -21,6 +21,9 @@ import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -56,14 +59,23 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+
+import static org.hamcrest.core.StringStartsWith.startsWith;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class DefaultCreateEventOperationTest {
 
+    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private static final String USER_ID = "123";
     private static final String JURISDICTION_ID = "SSCS";
     private static final String CASE_TYPE_ID = "Claim";
+    private static final String OTHER_CASE_TYPE_ID = "OtherClaim";
     private static final String CASE_REFERENCE = "1234123412341236";
+    private static final String INVALID_CASE_REFERENCE = "fdasfdasfds";
     private static final String TOKEN = "eygeyvcey12w2";
     private static final Boolean IGNORE_WARNING = Boolean.TRUE;
     private static final String EVENT_ID = "UpdateCase";
@@ -150,6 +162,7 @@ class DefaultCreateEventOperationTest {
         aboutToSubmitCallbackResponse.setSignificantItem(significantItem);
         aboutToSubmitCallbackResponse.setState(Optional.empty());
         caseDetails = new CaseDetails();
+        caseDetails.setData(data);
         caseDetails.setCaseTypeId(CASE_TYPE_ID);
         caseDetails.setState(PRE_STATE_ID);
         caseDetails.setLastModified(LAST_MODIFIED);
@@ -158,6 +171,7 @@ class DefaultCreateEventOperationTest {
         postState.setId(POST_STATE);
         IdamUser user = new IdamUser();
         user.setId("123");
+        doReturn(buildData("filed1", "field2")).when(caseSanitiser).sanitise(caseType, data);
 
         doReturn(caseType).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         doReturn(true).when(caseTypeService).isJurisdictionValid(JURISDICTION_ID, caseType);
@@ -170,10 +184,101 @@ class DefaultCreateEventOperationTest {
         doReturn(user).when(userRepository).getUser();
         doReturn(caseDetailsBefore).when(caseService).clone(caseDetails);
         given(callbackInvoker.invokeAboutToSubmitCallback(any(),
-                                                          any(),
-                                                          any(),
-                                                          any(),
-                                                          any())).willReturn(aboutToSubmitCallbackResponse);
+            any(),
+            any(),
+            any(),
+            any())).willReturn(aboutToSubmitCallbackResponse);
+    }
+
+    @Test
+    @DisplayName("should fail if case type not found")
+    void shouldFailIfCaseTypeNotFound() {
+        doReturn(null).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
+
+        ResourceNotFoundException resourceNotFoundException = assertThrows(ResourceNotFoundException.class, () -> createEventOperation.createCaseEvent(USER_ID,
+            JURISDICTION_ID,
+            CASE_TYPE_ID,
+            CASE_REFERENCE,
+            caseDataContent));
+        assertThat(resourceNotFoundException.getMessage(), startsWith("Case type with id " + CASE_TYPE_ID + " could not be found for jurisdiction " + JURISDICTION_ID));
+    }
+
+    @Test
+    @DisplayName("should fail if event trigger not found")
+    void shouldFailIfEventTriggerNotFound() {
+        doReturn(null).when(eventTriggerService).findCaseEvent(caseType, EVENT_ID);
+
+        ValidationException validationException = assertThrows(ValidationException.class, () -> createEventOperation.createCaseEvent(USER_ID,
+            JURISDICTION_ID,
+            CASE_TYPE_ID,
+            CASE_REFERENCE,
+            caseDataContent));
+        assertThat(validationException.getMessage(), startsWith(EVENT_ID + " is not a known event ID for the specified case type " + CASE_TYPE_ID));
+    }
+
+    @Test
+    @DisplayName("should fail if case event not valid")
+    void shouldFailIfCaseEventNotValid() {
+        doReturn(false).when(eventTriggerService).isPreStateValid(caseDetails.getState(), eventTrigger);
+
+        ValidationException validationException = assertThrows(ValidationException.class, () -> createEventOperation.createCaseEvent(USER_ID,
+            JURISDICTION_ID,
+            CASE_TYPE_ID,
+            CASE_REFERENCE,
+            caseDataContent));
+        assertThat(validationException.getMessage(), startsWith("Pre-state condition is not valid for case with state: " + caseDetails.getState() + "; and event trigger: " + eventTrigger.getId()));
+    }
+
+    @Test
+    @DisplayName("should fail if case reference is not valid")
+    void shouldFailIfCaseReferenceIsNotValid() {
+        doReturn(false).when(uidService).validateUID(CASE_REFERENCE);
+
+        BadRequestException badRequestException = assertThrows(BadRequestException.class, () -> createEventOperation.createCaseEvent(USER_ID,
+            JURISDICTION_ID,
+            CASE_TYPE_ID,
+            CASE_REFERENCE,
+            caseDataContent));
+        assertThat(badRequestException.getMessage(), startsWith("Case reference is not valid"));
+    }
+
+    @Test
+    @DisplayName("should fail if case reference is not in number format")
+    void shouldFailIfCaseReferenceIsNotNumberFormat() {
+        doReturn(true).when(uidService).validateUID(INVALID_CASE_REFERENCE);
+
+        ResourceNotFoundException resourceNotFoundException = assertThrows(ResourceNotFoundException.class, () -> createEventOperation.createCaseEvent(USER_ID,
+            JURISDICTION_ID,
+            CASE_TYPE_ID,
+            INVALID_CASE_REFERENCE,
+            caseDataContent));
+        assertThat(resourceNotFoundException.getMessage(), startsWith("Case with reference " + INVALID_CASE_REFERENCE + " could not be found for case type " + CASE_TYPE_ID));
+    }
+
+    @Test
+    @DisplayName("should fail if case locking returns null")
+    void shouldFailIfCaseLockingReturnsNull() {
+        doReturn(null).when(caseDetailsRepository).lockCase(Long.valueOf(CASE_REFERENCE));
+
+        ResourceNotFoundException resourceNotFoundException = assertThrows(ResourceNotFoundException.class, () -> createEventOperation.createCaseEvent(USER_ID,
+            JURISDICTION_ID,
+            CASE_TYPE_ID,
+            CASE_REFERENCE,
+            caseDataContent));
+        assertThat(resourceNotFoundException.getMessage(), startsWith("Case with reference " + CASE_REFERENCE + " could not be found for case type " + CASE_TYPE_ID));
+    }
+
+    @Test
+    @DisplayName("should fail if case type id on the locked case is different to requested case type id")
+    void shouldFailIfCaseTypeIdOnTheLockedCaseIsDifferentToRequestedOne() {
+        caseDetails.setCaseTypeId(OTHER_CASE_TYPE_ID);
+
+        ResourceNotFoundException resourceNotFoundException = assertThrows(ResourceNotFoundException.class, () -> createEventOperation.createCaseEvent(USER_ID,
+            JURISDICTION_ID,
+            CASE_TYPE_ID,
+            CASE_REFERENCE,
+            caseDataContent));
+        assertThat(resourceNotFoundException.getMessage(), startsWith("Case with reference " + CASE_REFERENCE + " could not be found for case type " + CASE_TYPE_ID));
     }
 
     @Test
@@ -255,6 +360,14 @@ class DefaultCreateEventOperationTest {
 
     private Map<String, JsonNode> buildJsonNodeData() {
         return new HashMap<>();
+    }
+
+    static Map<String, JsonNode> buildData(String... dataFieldIds) {
+        Map<String, JsonNode> dataMap = Maps.newHashMap();
+        Lists.newArrayList(dataFieldIds).forEach(dataFieldId -> {
+            dataMap.put(dataFieldId, JSON_NODE_FACTORY.textNode(dataFieldId));
+        });
+        return dataMap;
     }
 
 }

@@ -12,3 +12,6 @@ database_sku_name = "GP_Gen5_8"
 database_sku_capacity = "8"
 
 definition_cache_latest_version_ttl_sec = 30
+
+cache_warm_up_enabled = "true"
+cache_warm_up_sleep_time = "2000"

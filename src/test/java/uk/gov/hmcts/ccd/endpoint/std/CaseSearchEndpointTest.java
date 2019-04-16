@@ -28,7 +28,7 @@ import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequestException;
 
 class CaseSearchEndpointTest {
 
@@ -64,7 +64,7 @@ class CaseSearchEndpointTest {
         when(applicationParams.getSearchBlackList()).thenReturn(singletonList("query_string"));
         when(objectMapperService.convertStringToObject(searchRequest, JsonNode.class)).thenReturn(objectMapper.readValue(searchRequest, ObjectNode.class));
 
-        assertThrows(BadSearchRequest.class, () -> endpoint.searchCases(singletonList(CASE_TYPE_ID), searchRequest));
+        assertThrows(BadSearchRequestException.class, () -> endpoint.searchCases(singletonList(CASE_TYPE_ID), searchRequest));
         verifyZeroInteractions(caseSearchOperation);
     }
 
@@ -97,7 +97,7 @@ class CaseSearchEndpointTest {
             + "}";
         given(applicationParams.getSearchBlackList()).willReturn(newArrayList("query_string"));
 
-        assertThrows(BadSearchRequest.class, () -> endpoint.searchCases(singletonList(CASE_TYPE_ID), searchRequest));
+        assertThrows(BadSearchRequestException.class, () -> endpoint.searchCases(singletonList(CASE_TYPE_ID), searchRequest));
         verifyZeroInteractions(caseSearchOperation);
     }
 

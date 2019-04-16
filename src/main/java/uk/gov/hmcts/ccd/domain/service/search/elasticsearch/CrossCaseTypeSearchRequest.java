@@ -11,7 +11,7 @@ import static uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchReq
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchAliasField;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequestException;
 
 /**
  * Sample ES json search request.
@@ -62,7 +62,7 @@ public class CrossCaseTypeSearchRequest {
 
     private void validateJsonSearchRequest() {
         if (!searchRequestJsonNode.has(QUERY)) {
-            throw new BadSearchRequest("missing required field 'query'");
+            throw new BadSearchRequestException("missing required field 'query'");
         }
     }
 
