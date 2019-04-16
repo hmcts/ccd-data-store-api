@@ -137,6 +137,12 @@
         <gav regex="true">^org\.springframework:spring-.+:.*$</gav>
         <cve>CVE-2018-15756</cve>
     </suppress>
+    <suppress>
+        <notes>We are using SecureRandom without a custom seed so not affected. This will however be
+            fixed with spring boot 2.1.4 upgrade which is using spring-security.* of 5.1.5 or higher</notes>
+        <gav regex="true">^org\.springframework:spring-security.+:.*$</gav>
+        <cve>CVE-2019-3795</cve>
+    </suppress>
 
     <suppress>
         <notes><![CDATA[
