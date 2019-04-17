@@ -73,13 +73,13 @@ public class ApplicationParams implements OAuth2Params {
     @Value("${ccd.cache.warm.up.sleep.time}")
     private Integer cacheWarmUpSleepTime;
 
-    @Value("${ccd.oauth2.redirect_url}")
+    @Value("${ccd.oauth2.redirect.url}")
     private String oauth2RedirectUrl;
 
-    @Value("${ccd.oauth2.client_id}")
+    @Value("${ccd.oauth2.client.id}")
     private String oauth2ClientId;
 
-    @Value("${ccd.oauth2.client_secret}")
+    @Value("${ccd.oauth2.client.secret}")
     private String oauth2ClientSecret;
 
     @Value("${pagination.page.size}")
