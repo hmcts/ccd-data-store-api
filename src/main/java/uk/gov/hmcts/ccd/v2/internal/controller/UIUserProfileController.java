@@ -39,7 +39,7 @@ public class UIUserProfileController {
         }
     )
     @ApiOperation(
-        value = "Validate case data",
+        value = "Get user profile",
         notes = V2.EXPERIMENTAL_WARNING
     )
     @ApiResponses({
