@@ -1,15 +1,20 @@
 package uk.gov.hmcts.ccd.domain.model.std;
 
+import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.ToString;
-
-import java.util.Map;
 
 @ToString
 public class CaseDataContent {
     private Event event;
     private Map<String, JsonNode> data;
+
+    // full event data payload
+    @JsonProperty("event_data")
+    private Map<String, JsonNode> eventData;
 
     @JsonProperty("security_classification")
     private String securityClassification;
@@ -23,8 +28,16 @@ public class CaseDataContent {
     @JsonProperty("ignore_warning")
     private Boolean ignoreWarning;
 
+    @JsonProperty("draft_id")
+    private String draftId;
+
     public Event getEvent() {
         return event;
+    }
+
+    @JsonIgnore
+    public String getEventId() {
+        return event.getEventId();
     }
 
     public void setEvent(Event event) {
@@ -35,16 +48,24 @@ public class CaseDataContent {
         return data;
     }
 
+    public void setData(Map<String, JsonNode> data) {
+        this.data = data;
+    }
+
+    public Map<String, JsonNode> getEventData() {
+        return eventData;
+    }
+
+    public void setEventData(Map<String, JsonNode> eventData) {
+        this.eventData = eventData;
+    }
+
     public String getSecurityClassification() {
         return securityClassification;
     }
 
     public void setSecurityClassification(String securityClassification) {
         this.securityClassification = securityClassification;
-    }
-
-    public void setData(Map<String, JsonNode> data) {
-        this.data = data;
     }
 
     public Map<String, JsonNode> getDataClassification() {
@@ -64,11 +85,18 @@ public class CaseDataContent {
     }
 
     public Boolean getIgnoreWarning() {
-        return ignoreWarning;
+        return ignoreWarning == null ? Boolean.FALSE : ignoreWarning;
     }
 
     public void setIgnoreWarning(Boolean ignoreWarning) {
         this.ignoreWarning = ignoreWarning;
     }
 
+    public String getDraftId() {
+        return draftId;
+    }
+
+    public void setDraftId(String draftId) {
+        this.draftId = draftId;
+    }
 }

@@ -1,8 +1,5 @@
 package uk.gov.hmcts.ccd;
 
-import org.springframework.beans.factory.annotation.Value;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.UnsupportedEncodingException;
@@ -10,9 +7,15 @@ import java.net.URLEncoder;
 import java.util.Base64;
 import java.util.List;
 
+import static java.util.stream.Collectors.toList;
+
+import com.hazelcast.config.EvictionPolicy;
+import org.springframework.beans.factory.annotation.Value;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
+
 @Named
 @Singleton
-public class ApplicationParams {
+public class ApplicationParams implements OAuth2Params {
     @Value("#{'${ccd.callback.retries}'.split(',')}")
     private List<Integer> callbackRetries;
 
@@ -58,13 +61,70 @@ public class ApplicationParams {
     @Value("${ccd.defaultPrintType}")
     private String defaultPrintType;
 
+    @Value("${ccd.cache.warm.up.email}")
+    private String cacheWarmUpEmail;
+
+    @Value("${ccd.cache.warm.up.password}")
+    private String cacheWarmUpPassword;
+
+    @Value("${ccd.cache.warm.up.enabled}")
+    private boolean cacheWarmUpEnabled;
+
+    @Value("${ccd.cache.warm.up.sleep.time}")
+    private Integer cacheWarmUpSleepTime;
+
+    @Value("${ccd.oauth2.redirect.url}")
+    private String oauth2RedirectUrl;
+
+    @Value("${ccd.oauth2.client.id}")
+    private String oauth2ClientId;
+
+    @Value("${ccd.oauth2.client.secret}")
+    private String oauth2ClientSecret;
+
     @Value("${pagination.page.size}")
     private Integer paginationPageSize;
 
-    @Value("${definition.cache.ttl.secs}")
-    private Integer definitionCacheTTLSecs;
+    @Value("${definition.cache.max-idle.secs}")
+    private Integer definitionCacheMaxIdleSecs;
 
-    private static String encode(final String stringToEncode) {
+    @Value("${definition.cache.latest-version-ttl.secs}")
+    private Integer latestVersionTTLSecs;
+
+    @Value("${user.cache.ttl.secs}")
+    private Integer userCacheTTLSecs;
+
+    @Value("${definition.cache.max.size}")
+    private Integer definitionCacheMaxSize;
+
+    @Value("${definition.cache.eviction.policy}")
+    private EvictionPolicy definitionCacheEvictionPolicy;
+
+    @Value("#{'${search.elastic.hosts}'.split(',')}")
+    private List<String> elasticSearchHosts;
+
+    @Value("#{'${search.elastic.data.hosts}'.split(',')}")
+    private List<String> elasticSearchDataHosts;
+
+    @Value("#{'${search.blacklist}'.split(',')}")
+    private List<String> searchBlackList;
+
+    @Value("${search.cases.index.name.format}")
+    private String casesIndexNameFormat;
+
+    @Value("${search.cases.index.name.type}")
+    private String casesIndexType;
+
+    @Value("${search.elastic.nodes.discovery.enabled}")
+    private Boolean elasticsearchNodeDiscoveryEnabled;
+
+    @Value("${search.elastic.nodes.discovery.frequency.millis}")
+    private Long elasticsearchNodeDiscoveryFrequencyMillis;
+
+    @Value("${search.elastic.nodes.discovery.filter}")
+    private String elasticsearchNodeDiscoveryFilter;
+
+    public static String encode(final String stringToEncode) {
         try {
             return URLEncoder.encode(stringToEncode, "UTF-8");
         } catch (UnsupportedEncodingException e) {
@@ -90,6 +150,10 @@ public class ApplicationParams {
 
     public String caseTypeDefURL(final String caseTypeId) {
         return caseDefinitionHost + "/api/data/case-type/" + encode(caseTypeId);
+    }
+
+    public String caseTypesReferencesDefURL() {
+        return caseDefinitionHost + "/api/data/case-types-references";
     }
 
     public String draftBaseURL() {
@@ -133,7 +197,7 @@ public class ApplicationParams {
     }
 
     public String displayWizardPageCollection(final String caseTypeId, final String eventTriggerId) {
-        return uiDefinitionHost + "/api/display/wizard-page-structure/case-types/" + encode(caseTypeId) +"/event-triggers/" + encode(eventTriggerId);
+        return uiDefinitionHost + "/api/display/wizard-page-structure/case-types/" + encode(caseTypeId) + "/event-triggers/" + encode(eventTriggerId);
     }
 
     public String jurisdictionDefURL() {
@@ -152,8 +216,16 @@ public class ApplicationParams {
         return caseDefinitionHost + "/api/base-types";
     }
 
+    public String getIdamBaseURL() {
+        return idamHost;
+    }
+
     public String idamUserProfileURL() {
         return idamHost + "/details";
+    }
+
+    public String caseRolesURL() {
+        return caseDefinitionHost + "/api/data/caseworkers/uid/jurisdictions/jid/case-types";
     }
 
     public String userDefaultSettingsURL() {
@@ -192,7 +264,83 @@ public class ApplicationParams {
         return paginationPageSize;
     }
 
-    public int getDefinitionCacheTTLSecs() {
-        return definitionCacheTTLSecs;
+    public int getDefinitionCacheMaxIdleSecs() {
+        return definitionCacheMaxIdleSecs;
+    }
+
+    public int getLatestVersionTTLSecs() {
+        return latestVersionTTLSecs;
+    }
+
+    public Integer getUserCacheTTLSecs() {
+        return userCacheTTLSecs;
+    }
+
+    public int getDefinitionCacheMaxSize() {
+        return definitionCacheMaxSize;
+    }
+
+    public EvictionPolicy getDefinitionCacheEvictionPolicy() {
+        return definitionCacheEvictionPolicy;
+    }
+
+    public List<String> getSearchBlackList() {
+        return searchBlackList;
+    }
+
+    public List<String> getElasticSearchHosts() {
+        return elasticSearchHosts;
+    }
+
+    public String getCasesIndexNameFormat() {
+        return casesIndexNameFormat;
+    }
+
+    public String getCasesIndexType() {
+        return casesIndexType;
+    }
+
+    public List<String> getElasticSearchDataHosts() {
+        return elasticSearchDataHosts.stream().map(quotedHost -> quotedHost.replace("\"", "")).collect(toList());
+    }
+
+    public Boolean isElasticsearchNodeDiscoveryEnabled() {
+        return elasticsearchNodeDiscoveryEnabled;
+    }
+
+    public Long getElasticsearchNodeDiscoveryFrequencyMillis() {
+        return elasticsearchNodeDiscoveryFrequencyMillis;
+    }
+
+    public String getElasticsearchNodeDiscoveryFilter() {
+        return elasticsearchNodeDiscoveryFilter;
+    }
+
+    public String getCacheWarmUpEmail() {
+        return cacheWarmUpEmail;
+    }
+
+    public String getCacheWarmUpPassword() {
+        return cacheWarmUpPassword;
+    }
+
+    public Integer getCacheWarmUpSleepTime() {
+        return cacheWarmUpSleepTime;
+    }
+
+    public String getOauth2RedirectUrl() {
+        return oauth2RedirectUrl;
+    }
+
+    public String getOauth2ClientId() {
+        return oauth2ClientId;
+    }
+
+    public String getOauth2ClientSecret() {
+        return oauth2ClientSecret;
+    }
+
+    public boolean isCacheWarmUpEnabled() {
+        return cacheWarmUpEnabled;
     }
 }

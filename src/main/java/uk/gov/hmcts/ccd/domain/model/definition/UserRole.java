@@ -1,15 +1,17 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import java.io.Serializable;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-
 @ApiModel(description = "")
-public class UserRole {
+public class UserRole implements Serializable {
 
+    private static final long serialVersionUID = -6867026961393510122L;
     private static final String INVALID_ISO_DATE_FROMAT = "Invalid ISO 8601 format for date";
     private static final String REGEX_ISO_DATE = "^\\d\\d\\d\\d-\\d\\d-\\d\\d$";
 
@@ -17,16 +19,16 @@ public class UserRole {
 
     private String createdAt;
 
-    @Pattern(regexp=REGEX_ISO_DATE, message=INVALID_ISO_DATE_FROMAT)
+    @Pattern(regexp = REGEX_ISO_DATE, message = INVALID_ISO_DATE_FROMAT)
     private String liveFrom;
 
-    @Pattern(regexp=REGEX_ISO_DATE, message=INVALID_ISO_DATE_FROMAT)
+    @Pattern(regexp = REGEX_ISO_DATE, message = INVALID_ISO_DATE_FROMAT)
     private String liveTo;
 
     @NotNull
     private String role;
 
-    @Pattern(regexp="^[Public|Private|Restricted]$", message="Invalid security classification")
+    @Pattern(regexp = "^[Public|Private|Restricted]$", message = "Invalid security classification")
     @NotNull
     private String securityClassification;
 

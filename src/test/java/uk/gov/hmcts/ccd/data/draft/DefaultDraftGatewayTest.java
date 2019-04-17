@@ -1,5 +1,28 @@
 package uk.gov.hmcts.ccd.data.draft;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Map;
+
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.samePropertyValuesAs;
+import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.newCaseDraft;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CreateCaseDraftBuilder.newCreateCaseDraft;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftBuilder.anDraft;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.UpdateCaseDraftBuilder.newUpdateCaseDraft;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,32 +41,12 @@ import uk.gov.hmcts.ccd.AppInsights;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
+import uk.gov.hmcts.ccd.domain.model.definition.DraftResponseToCaseDetailsBuilder;
 import uk.gov.hmcts.ccd.domain.model.draft.*;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.Map;
-
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.newCaseDraft;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CreateCaseDraftBuilder.aCreateCaseDraft;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftBuilder.anDraft;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.UpdateCaseDraftBuilder.anUpdateCaseDraft;
 
 class DefaultDraftGatewayTest {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
@@ -77,6 +80,9 @@ class DefaultDraftGatewayTest {
 
     @Mock
     private AppInsights appInsights;
+
+    @Mock
+    private DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder;
 
     private DraftGateway draftGateway;
 
@@ -128,16 +134,17 @@ class DefaultDraftGatewayTest {
             .withCreated(NOW)
             .withUpdated(NOW_PLUS_5_MIN)
             .build();
-        createCaseDraftRequest = aCreateCaseDraft()
+        createCaseDraftRequest = newCreateCaseDraft()
             .withDocument(caseDraft)
             .withType(CASE_DATA_CONTENT)
             .withTTLDays(applicationParams.getDraftMaxTTLDays())
             .build();
-        updateCaseDraftRequest = anUpdateCaseDraft()
+        updateCaseDraftRequest = newUpdateCaseDraft()
             .withDocument(caseDraft)
             .withType(CASE_DATA_CONTENT)
             .build();
-        draftGateway = new DefaultDraftGateway(createDraftRestTemplate, restTemplate, securityUtils, applicationParams, appInsights);
+        draftGateway = new DefaultDraftGateway(createDraftRestTemplate, restTemplate, securityUtils, applicationParams, appInsights,
+                                               draftResponseToCaseDetailsBuilder);
     }
 
     @Test
@@ -148,8 +155,8 @@ class DefaultDraftGatewayTest {
         Long result = draftGateway.create(createCaseDraftRequest);
 
         assertAll(
-            () -> verify(createDraftRestTemplate).exchange(eq(draftBaseURL), eq(HttpMethod.POST), any(RequestEntity.class), eq(HttpEntity.class)),
-            () -> verify(restTemplate, never()).exchange(eq(draftBaseURL), eq(HttpMethod.POST), any(RequestEntity.class), eq(HttpEntity.class)),
+            () -> verify(createDraftRestTemplate).exchange(eq(draftBaseURL), eq(HttpMethod.POST), any(HttpEntity.class), eq(HttpEntity.class)),
+            () -> verify(restTemplate, never()).exchange(eq(draftBaseURL), eq(HttpMethod.POST), any(HttpEntity.class), eq(HttpEntity.class)),
             () -> assertThat(result, is(4L))
         );
     }
@@ -171,7 +178,7 @@ class DefaultDraftGatewayTest {
         DraftResponse result = draftGateway.update(updateCaseDraftRequest, DID);
 
         assertAll(
-            () -> verify(restTemplate).exchange(eq(draftURL5), eq(HttpMethod.PUT), any(RequestEntity.class), eq(HttpEntity.class)),
+            () -> verify(restTemplate).exchange(eq(draftURL5), eq(HttpMethod.PUT), any(HttpEntity.class), eq(HttpEntity.class)),
             () -> verify(createDraftRestTemplate, never()).exchange(eq(draftURL5), eq(HttpMethod.PUT), any(RequestEntity.class), eq(HttpEntity.class)),
             () -> assertThat(result, hasProperty("id", is(DID)))
         );
@@ -203,7 +210,7 @@ class DefaultDraftGatewayTest {
         DraftResponse result = draftGateway.get(DID);
 
         assertAll(
-            () -> verify(restTemplate).exchange(eq(draftURL5), eq(HttpMethod.GET), any(RequestEntity.class), eq(Draft.class)),
+            () -> verify(restTemplate).exchange(eq(draftURL5), eq(HttpMethod.GET), any(HttpEntity.class), eq(Draft.class)),
             () -> verify(createDraftRestTemplate, never()).exchange(eq(draftURL5), eq(HttpMethod.GET), any(RequestEntity.class), eq(Draft.class)),
             () -> assertThat(result, hasProperty("id", is(DID))),
             () -> assertThat(result, hasProperty("type", is(TYPE))),
@@ -247,6 +254,34 @@ class DefaultDraftGatewayTest {
         doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(Draft.class));
 
         final ResourceNotFoundException actualException = assertThrows(ResourceNotFoundException.class, () -> draftGateway.get(DID));
+        assertThat(actualException.getMessage(), is("No draft found ( draft reference = '5' )"));
+    }
+
+    @Test
+    void shouldSuccessfullyDeleteDraft() throws URISyntaxException {
+        doReturn(ResponseEntity.ok(draft)).when(restTemplate).exchange(eq(draftURL5), eq(HttpMethod.DELETE), any(HttpEntity.class), eq(Draft.class));
+
+        draftGateway.delete(DID);
+
+        verify(restTemplate).exchange(eq(draftURL5), eq(HttpMethod.DELETE), any(HttpEntity.class), eq(Draft.class));
+    }
+
+    @Test
+    void shouldFailToDeleteFromDraftWhenConnectivityIssue() {
+        Exception exception = new RestClientException("connectivity issue");
+        doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.DELETE), any(HttpEntity.class), eq(Draft.class));
+
+        final ServiceException actualException = assertThrows(ServiceException.class, () -> draftGateway.delete(DID));
+        assertThat(actualException.getMessage(), is("The draft service is currently down, please refresh your browser or try again later"));
+        assertThat(actualException.getCause(), is(exception));
+    }
+
+    @Test
+    void shouldFailToDeleteFromDraftWhenNotFound() {
+        Exception exception = new HttpClientErrorException(HttpStatus.NOT_FOUND);
+        doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.DELETE), any(HttpEntity.class), eq(Draft.class));
+
+        final ResourceNotFoundException actualException = assertThrows(ResourceNotFoundException.class, () -> draftGateway.delete(DID));
         assertThat(actualException.getMessage(), is("No draft found ( draft reference = '5' )"));
     }
 

@@ -33,6 +33,18 @@ variable "common_tags" {
   type = "map"
 }
 
+variable "asp_name" {
+  type = "string"
+  description = "App Service Plan (ASP) to use for the webapp, 'use_shared' to make use of the shared ASP"
+  default = "use_shared"
+}
+
+variable "asp_rg" {
+  type = "string"
+  description = "App Service Plan (ASP) resource group for 'asp_name', 'use_shared' to make use of the shared resource group"
+  default = "use_shared"
+}
+
 variable "tenant_id" {
   description = "(Required) The Azure Active Directory tenant ID that should be used for authenticating requests to the key vault. This is usually sourced from environemnt variables and not normally required to be specified."
 }
@@ -46,8 +58,24 @@ variable "jenkins_AAD_objectId" {
   description                 = "(Required) The Azure AD object ID of a user, service principal or security group in the Azure Active Directory tenant for the vault. The object ID must be unique for the list of access policies."
 }
 
-variable "vault_section" {
-  default = "test"
+variable "definition_cache_max_idle_sec" {
+  type = "string"
+  default = "259200"
+}
+
+variable "definition_cache_latest_version_ttl_sec" {
+  type = "string"
+  default = "1"
+}
+
+variable "definition_cache_max_size" {
+  type = "string"
+  default = "5000"
+}
+
+variable "definition_cache_eviction_policy" {
+  type = "string"
+  default = "NONE"
 }
 
 ////////////////////////////////
@@ -62,9 +90,25 @@ variable "database_name" {
   default = "ccd_data_store"
 }
 
+variable "data_store_max_pool_size" {
+  default = "16"
+}
+
+variable "database_sku_name" {
+  default = "GP_Gen5_2"
+}
+
+variable "database_sku_capacity" {
+  default = "2"
+}
+
+variable "database_storage_mb" {
+  default = "51200"
+}
+
 variable "authorised-services" {
   type    = "string"
-  default = "ccd_data,ccd_gw,ccd_ps,probate_backend,divorce_ccd_submission,sscs,cmc,cmc_claim_store,jui_webapp,pui_webapp"
+  default = "ccd_data,ccd_gw,ccd_ps,probate_backend,divorce_ccd_submission,sscs,sscs_bulkscan,cmc,cmc_claim_store,jui_webapp,pui_webapp,bulk_scan_orchestrator,fpl_case_service,iac,finrem_ccd_data_migrator"
 }
 
 variable "idam_api_url" {
@@ -87,7 +131,89 @@ variable "default_print_url" {
 }
 
 variable "frontend_url" {
+  description = "Optional front end URL to use for building redirect URI"
   type = "string"
   default = ""
-  description = "Optional front end URL to use for building redirect URI"
+}
+
+variable "elastic_search_blacklist" {
+  description = "Forbidden elastic search query types"
+  type = "string"
+  default = "query_string"
+}
+
+variable "elastic_search_enabled" {
+  default = "false"
+}
+
+variable "elastic_search_case_index_name_format" {
+  description = "Format of the elastic search index name for cases"
+  type = "string"
+  default = "%s_cases"
+}
+
+variable "elastic_search_case_index_type" {
+  description = "Cases index document type"
+  type = "string"
+  default = "_doc"
+}
+
+variable "elastic_search_nodes_discovery_enabled" {
+  description = "Enable Elasticsearch node discovery by Jest client"
+  type = "string"
+  default = "true"
+}
+
+variable "elastic_search_nodes_discovery_frequency_millis" {
+  description = "Elasticsearch node discovery frequency in milliseconds"
+  type = "string"
+  default = "5000"
+}
+
+variable "elastic_search_nodes_discovery_filter" {
+  description = "Elasticsearch node discovery filter"
+  type = "string"
+  default = "_all"
+}
+
+variable "cache_warm_up_enabled" {
+  description = "Enable cache warmup"
+  type = "string"
+  default = "false"
+}
+
+variable "cache_warm_up_sleep_time" {
+  description = "Time in milliseconds between each call to def store"
+  type = "string"
+  default = "2000"
+}
+
+variable "http_client_connection_timeout" {
+  type = "string"
+  default = "30000"
+}
+
+variable "http_client_read_timeout" {
+  type = "string"
+  default = "15000"
+}
+
+variable "http_client_max_total" {
+  type = "string"
+  default = "100"
+}
+
+variable "http_client_seconds_idle_connection" {
+  type = "string"
+  default = "120"
+}
+
+variable "http_client_max_client_per_route" {
+  type = "string"
+  default = "20"
+}
+
+variable "http_client_validate_after_inactivity" {
+  type = "string"
+  default = "0"
 }

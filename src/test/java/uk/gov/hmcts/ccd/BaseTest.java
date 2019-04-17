@@ -31,11 +31,13 @@ import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.data.user.DefaultUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
+import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackService;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.client.DocumentManagementRestClient;
 
 import javax.inject.Inject;
@@ -100,14 +102,17 @@ public abstract class BaseTest {
 
         // IDAM
         final SecurityUtils securityUtils = mock(SecurityUtils.class);
-        Mockito.when(securityUtils.authorizationHeaders()).thenReturn( new HttpHeaders());
-        Mockito.when(securityUtils.userAuthorizationHeaders()).thenReturn( new HttpHeaders());
+        Mockito.when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
+        Mockito.when(securityUtils.userAuthorizationHeaders()).thenReturn(new HttpHeaders());
         ReflectionTestUtils.setField(caseDefinitionRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(uiDefinitionRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(userRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(callbackService, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(documentManagementRestClient, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(draftGateway, "securityUtils", securityUtils);
+
+        // Reset static field `caseDefinitionRepository`
+        ReflectionTestUtils.setField(BaseType.class, "caseDefinitionRepository", caseDefinitionRepository);
 
         setupUIDService();
     }
@@ -124,6 +129,9 @@ public abstract class BaseTest {
     public static void init() {
         mapper.registerModule(new JavaTimeModule());
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
+        // Force re-initialisation of base types for each test suite
+        ReflectionTestUtils.setField(BaseType.class, "initialised", false);
     }
 
     @After
@@ -152,7 +160,7 @@ public abstract class BaseTest {
         caseDetails.setSecurityClassification(SecurityClassification.valueOf(resultSet.getString("security_classification")));
         caseDetails.setCaseTypeId(resultSet.getString("case_type_id"));
         final Timestamp createdAt = resultSet.getTimestamp("created_date");
-        if(null != createdAt) {
+        if (null != createdAt) {
             caseDetails.setCreatedDate(createdAt.toLocalDateTime());
         }
         final Timestamp modifiedAt = resultSet.getTimestamp("last_modified");
@@ -178,6 +186,15 @@ public abstract class BaseTest {
             }
         }
         return caseDetails;
+    }
+
+    protected SignificantItem mapSignificantItem(ResultSet resultSet, Integer i) throws SQLException {
+        final SignificantItem  significantItem = new SignificantItem();
+
+        significantItem.setType(resultSet.getString("type"));
+        significantItem.setDescription(resultSet.getString("description"));
+        significantItem.setUrl(resultSet.getString("URL"));
+        return significantItem;
     }
 
     protected AuditEvent mapAuditEvent(ResultSet resultSet, Integer i) throws SQLException {

@@ -1,41 +1,5 @@
 package uk.gov.hmcts.ccd.endpoint.ui;
 
-import com.google.common.collect.Maps;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.ccd.data.casedetails.search.FieldMapSanitizeOperation;
-import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
-import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
-import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
-import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
-import uk.gov.hmcts.ccd.domain.service.aggregated.*;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
-
-import javax.inject.Inject;
-import javax.transaction.Transactional;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Predicate;
-
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CASE_REFERENCE;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CREATED_DATE;
@@ -48,15 +12,69 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CR
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
 
+import uk.gov.hmcts.ccd.data.casedetails.search.FieldMapSanitizeOperation;
+import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
+import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
+import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
+import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
+import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
+import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedFindSearchInputOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedFindWorkbasketInputOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCaseHistoryViewOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCaseTypesOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCaseViewOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetEventTriggerOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetUserProfileOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.FindSearchInputOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.FindWorkbasketInputOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseHistoryViewOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseTypesOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseViewOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.GetEventTriggerOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.GetUserProfileOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Predicate;
+
+import javax.inject.Inject;
+import javax.transaction.Transactional;
+
+import com.google.common.collect.Maps;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 @RestController
 @RequestMapping(path = "/aggregated",
     consumes = MediaType.APPLICATION_JSON_VALUE,
     produces = MediaType.APPLICATION_JSON_VALUE)
 public class QueryEndpoint {
-
     private static final Logger LOG = LoggerFactory.getLogger(QueryEndpoint.class);
     private final GetCaseViewOperation getCaseViewOperation;
-    private final GetCaseViewOperation getDraftViewOperation;
     private final GetCaseHistoryViewOperation getCaseHistoryViewOperation;
     private final GetEventTriggerOperation getEventTriggerOperation;
     private final SearchQueryOperation searchQueryOperation;
@@ -64,22 +82,23 @@ public class QueryEndpoint {
     private final FindSearchInputOperation findSearchInputOperation;
     private final FindWorkbasketInputOperation findWorkbasketInputOperation;
     private final GetCaseTypesOperation getCaseTypesOperation;
+    private final GetUserProfileOperation getUserProfileOperation;
+
     private final HashMap<String, Predicate<AccessControlList>> accessMap;
 
     @Inject
     public QueryEndpoint(
         @Qualifier(AuthorisedGetCaseViewOperation.QUALIFIER) GetCaseViewOperation getCaseViewOperation,
-        @Qualifier(DefaultGetCaseViewFromDraftOperation.QUALIFIER) GetCaseViewOperation getDraftViewOperation,
         @Qualifier(AuthorisedGetCaseHistoryViewOperation.QUALIFIER) GetCaseHistoryViewOperation getCaseHistoryOperation,
         @Qualifier(AuthorisedGetEventTriggerOperation.QUALIFIER) GetEventTriggerOperation getEventTriggerOperation,
         SearchQueryOperation searchQueryOperation, FieldMapSanitizeOperation fieldMapSanitizeOperation,
         @Qualifier(AuthorisedFindSearchInputOperation.QUALIFIER) FindSearchInputOperation findSearchInputOperation,
         @Qualifier(
             AuthorisedFindWorkbasketInputOperation.QUALIFIER) FindWorkbasketInputOperation findWorkbasketInputOperation,
-        @Qualifier(AuthorisedGetCaseTypesOperation.QUALIFIER) GetCaseTypesOperation getCaseTypesOperation) {
+        @Qualifier(AuthorisedGetCaseTypesOperation.QUALIFIER) GetCaseTypesOperation getCaseTypesOperation,
+        @Qualifier(AuthorisedGetUserProfileOperation.QUALIFIER) final GetUserProfileOperation getUserProfileOperation) {
 
         this.getCaseViewOperation = getCaseViewOperation;
-        this.getDraftViewOperation = getDraftViewOperation;
         this.getCaseHistoryViewOperation = getCaseHistoryOperation;
         this.getEventTriggerOperation = getEventTriggerOperation;
         this.searchQueryOperation = searchQueryOperation;
@@ -87,6 +106,7 @@ public class QueryEndpoint {
         this.findSearchInputOperation = findSearchInputOperation;
         this.findWorkbasketInputOperation = findWorkbasketInputOperation;
         this.getCaseTypesOperation = getCaseTypesOperation;
+        this.getUserProfileOperation = getUserProfileOperation;
         this.accessMap = Maps.newHashMap();
         accessMap.put("create", CAN_CREATE);
         accessMap.put("update", CAN_UPDATE);
@@ -103,10 +123,29 @@ public class QueryEndpoint {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "List of case types for the given access criteria"),
         @ApiResponse(code = 404, message = "No case types found for given access criteria")})
+    @SuppressWarnings("squid:CallToDeprecatedMethod")
     public List<CaseType> getCaseTypes(@PathVariable("jid") final String jurisdictionId,
                                        @RequestParam(value = "access", required = true) String access) {
         return getCaseTypesOperation.execute(jurisdictionId, ofNullable(accessMap.get(access))
             .orElseThrow(() -> new ResourceNotFoundException("No case types found")));
+    }
+
+    @GetMapping(value = "/caseworkers/{uid}/jurisdictions")
+    @ApiOperation(value = "Get jurisdictions available to the user")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "List of jurisdictions for the given access criteria"),
+        @ApiResponse(code = 404, message = "No jurisdictions found for given access criteria")})
+    public List<JurisdictionDisplayProperties> getJurisdictions(@RequestParam(value = "access") String access) {
+        if (accessMap.get(access) == null) {
+            throw new BadRequestException("Access can only be 'create', 'read' or 'update'");
+        }
+        List<JurisdictionDisplayProperties> jurisdictions = Arrays.asList(
+            getUserProfileOperation.execute(accessMap.get(access)).getJurisdictions());
+        if (jurisdictions.isEmpty()) {
+            throw new ResourceNotFoundException("No jurisdictions found");
+        } else {
+            return jurisdictions;
+        }
     }
 
     @Transactional
@@ -146,10 +185,10 @@ public class QueryEndpoint {
         @ApiResponse(code = 200, message = "Search Input data found for the given case type and jurisdiction"),
         @ApiResponse(code = 404, message = "No SearchInput found for the given case type and jurisdiction")
     })
-    public SearchInput[] findSearchInputDetails(@PathVariable("uid") final Integer uid,
+    public SearchInput[] findSearchInputDetails(@PathVariable("uid") final String uid,
                                                 @PathVariable("jid") final String jurisdictionId,
                                                 @PathVariable("ctid") final String caseTypeId) {
-        return findSearchInputOperation.execute(jurisdictionId, caseTypeId, CAN_READ).toArray(new SearchInput[0]);
+        return findSearchInputOperation.execute(caseTypeId, CAN_READ).toArray(new SearchInput[0]);
     }
 
     @Transactional
@@ -160,15 +199,15 @@ public class QueryEndpoint {
         @ApiResponse(code = 200, message = "Workbasket Input data found for the given case type and jurisdiction"),
         @ApiResponse(code = 404, message = "No Workbasket Input found for the given case type and jurisdiction")
     })
-    public WorkbasketInput[] findWorkbasketInputDetails(@PathVariable("uid") final Integer uid,
+    public WorkbasketInput[] findWorkbasketInputDetails(@PathVariable("uid") final String uid,
                                                         @PathVariable("jid") final String jurisdictionId,
                                                         @PathVariable("ctid") final String caseTypeId) {
         Instant start = Instant.now();
-        WorkbasketInput[] workbasketInputs = findWorkbasketInputOperation.execute(jurisdictionId, caseTypeId,
+        WorkbasketInput[] workbasketInputs = findWorkbasketInputOperation.execute(caseTypeId,
                                                                                   CAN_READ).toArray(
             new WorkbasketInput[0]);
         final Duration between = Duration.between(start, Instant.now());
-        LOG.warn("findWorkbasketInputDetails has been completed in {} millisecs...", between.toMillis());
+        LOG.info("findWorkbasketInputDetails has been completed in {} millisecs...", between.toMillis());
         return workbasketInputs;
     }
 
@@ -183,26 +222,9 @@ public class QueryEndpoint {
                              @PathVariable("ctid") final String caseTypeId,
                              @PathVariable("cid") final String cid) {
         Instant start = Instant.now();
-        CaseView caseView = getCaseViewOperation.execute(jurisdictionId, caseTypeId, cid);
+        CaseView caseView = getCaseViewOperation.execute(cid);
         final Duration between = Duration.between(start, Instant.now());
-        LOG.warn("findCase has been completed in {} millisecs...", between.toMillis());
-        return caseView;
-    }
-
-    @Transactional
-    @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/drafts/{did}",
-        method = RequestMethod.GET)
-    @ApiOperation(value = "Fetch a draft for display")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "A displayable draft")
-    })
-    public CaseView findDraft(@PathVariable("jid") final String jurisdictionId,
-                              @PathVariable("ctid") final String caseTypeId,
-                              @PathVariable("did") final String did) {
-        Instant start = Instant.now();
-        CaseView caseView = getDraftViewOperation.execute(jurisdictionId, caseTypeId, did);
-        final Duration between = Duration.between(start, Instant.now());
-        LOG.warn("findDraft has been completed in {} millisecs...", between.toMillis());
+        LOG.info("findCase has been completed in {} millisecs...", between.toMillis());
         return caseView;
     }
 
@@ -220,9 +242,7 @@ public class QueryEndpoint {
                                                        @PathVariable("etid") String eventTriggerId,
                                                        @RequestParam(value = "ignore-warning",
                                                            required = false) Boolean ignoreWarning) {
-        return getEventTriggerOperation.executeForCaseType(userId,
-                                                           jurisdictionId,
-                                                           casetTypeId,
+        return getEventTriggerOperation.executeForCaseType(casetTypeId,
                                                            eventTriggerId,
                                                            ignoreWarning);
     }
@@ -242,10 +262,7 @@ public class QueryEndpoint {
                                                    @PathVariable("etid") String eventTriggerId,
                                                    @RequestParam(value = "ignore-warning",
                                                        required = false) Boolean ignoreWarning) {
-        return getEventTriggerOperation.executeForCase(userId,
-                                                       jurisdictionId,
-                                                       caseTypeId,
-                                                       caseId,
+        return getEventTriggerOperation.executeForCase(caseId,
                                                        eventTriggerId,
                                                        ignoreWarning);
     }
@@ -265,11 +282,7 @@ public class QueryEndpoint {
                                                     @PathVariable("etid") String eventTriggerId,
                                                     @RequestParam(value = "ignore-warning",
                                                         required = false) Boolean ignoreWarning) {
-        return getEventTriggerOperation.executeForDraft(userId,
-                                                        jurisdictionId,
-                                                        caseTypeId,
-                                                        draftId,
-                                                        eventTriggerId,
+        return getEventTriggerOperation.executeForDraft(draftId,
                                                         ignoreWarning);
     }
 
@@ -287,10 +300,9 @@ public class QueryEndpoint {
                                                   @PathVariable("cid") final String caseReference,
                                                   @PathVariable("eventId") final Long eventId) {
         Instant start = Instant.now();
-        CaseHistoryView caseView = getCaseHistoryViewOperation.execute(jurisdictionId, caseTypeId, caseReference,
-                                                                       eventId);
+        CaseHistoryView caseView = getCaseHistoryViewOperation.execute(caseReference, eventId);
         final Duration between = Duration.between(start, Instant.now());
-        LOG.warn("getCaseHistoryForEvent has been completed in {} millisecs...", between.toMillis());
+        LOG.info("getCaseHistoryForEvent has been completed in {} millisecs...", between.toMillis());
         return caseView;
     }
 

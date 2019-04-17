@@ -1,5 +1,27 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import java.util.Arrays;
+import java.util.List;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.*;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventTriggerBuilder.newCaseEventTrigger;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewTriggerBuilder.aViewTrigger;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageBuilder.newWizardPage;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,25 +32,6 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-
-import java.util.Arrays;
-import java.util.List;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.*;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.anCaseEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventTriggerBuilder.anEventTrigger;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.aCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewTriggerBuilder.aViewTrigger;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageBuilder.aWizardPage;
 
 class AccessControlServiceFilterTest {
     private static final String EVENT_ID_1 = "EVENT_ID_1";
@@ -52,15 +55,16 @@ class AccessControlServiceFilterTest {
     @Test
     @DisplayName("Should filter caseFields if CREATE ACL is missing for some fields")
     void filterCaseFieldsUserHasAccess() {
+
         final CaseType caseType = newCaseType()
-            .withField(aCaseField()
+            .withField(newCaseField()
                 .withId("Name")
                 .withAcl(anAcl()
                     .withRole(ROLE_IN_USER_ROLES)
                     .withCreate(false)
                     .build())
                 .build())
-            .withField(aCaseField()
+            .withField(newCaseField()
                 .withId("Surname")
                 .withAcl(anAcl()
                     .withRole(ROLE_IN_USER_ROLES_2)
@@ -77,10 +81,10 @@ class AccessControlServiceFilterTest {
             .withId("Surname")
             .build();
 
-        CaseEventTrigger caseEventTrigger = anEventTrigger()
+        CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
             .withField(caseViewField1)
             .withField(caseViewField2)
-            .withWizardPage(aWizardPage()
+            .withWizardPage(newWizardPage()
                 .withId("Page One")
                 .withField(caseViewField1)
                 .withField(caseViewField2)
@@ -104,14 +108,14 @@ class AccessControlServiceFilterTest {
     @DisplayName("Should filter all caseFields if CREATE ACL is missing")
     void filterCaseFieldsUserHasNoAccess() {
         final CaseType caseType = newCaseType()
-            .withField(aCaseField()
+            .withField(newCaseField()
                 .withId("Name")
                 .withAcl(anAcl()
                     .withRole(ROLE_NOT_IN_USER_ROLES)
                     .withCreate(true)
                     .build())
                 .build())
-            .withField(aCaseField()
+            .withField(newCaseField()
                 .withId("Surname")
                 .withAcl(anAcl()
                     .withRole(ROLE_NOT_IN_USER_ROLES_2)
@@ -128,10 +132,10 @@ class AccessControlServiceFilterTest {
             .withId("Surname")
             .build();
 
-        CaseEventTrigger caseEventTrigger = anEventTrigger()
+        CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
             .withField(caseViewField1)
             .withField(caseViewField2)
-            .withWizardPage(aWizardPage()
+            .withWizardPage(newWizardPage()
                 .withId("Page One")
                 .withField(caseViewField1)
                 .withField(caseViewField2)
@@ -153,7 +157,7 @@ class AccessControlServiceFilterTest {
     @DisplayName("Should filter caseFields definition is missing for those fields")
     void filterCaseFieldsWithNoDefinition() {
         final CaseType caseType = newCaseType()
-            .withField(aCaseField()
+            .withField(newCaseField()
                 .withId("Surname")
                 .withAcl(anAcl()
                     .withRole(ROLE_IN_USER_ROLES_2)
@@ -169,10 +173,10 @@ class AccessControlServiceFilterTest {
             .withId("Surname")
             .build();
 
-        CaseEventTrigger caseEventTrigger = anEventTrigger()
+        CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
             .withField(caseViewField1)
             .withField(caseViewField2)
-            .withWizardPage(aWizardPage()
+            .withWizardPage(newWizardPage()
                 .withId("Page One")
                 .withField(caseViewField1)
                 .withField(caseViewField2)
@@ -195,19 +199,19 @@ class AccessControlServiceFilterTest {
     @Test
     @DisplayName("Should not change view trigger when all has required ACL")
     void doNotFilterCaseViewTriggersWhenACLsMatch() {
-        final CaseEvent event1 = anCaseEvent()
+        final CaseEvent event1 = newCaseEvent()
             .withId(EVENT_ID_1)
             .withAcl(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withCreate(true)
                 .build()).build();
-        final CaseEvent event2 = anCaseEvent()
+        final CaseEvent event2 = newCaseEvent()
             .withId(EVENT_ID_2)
             .withAcl(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withCreate(true)
                 .build()).build();
-        final CaseEvent event3 = anCaseEvent()
+        final CaseEvent event3 = newCaseEvent()
             .withId(EVENT_ID_3)
             .withAcl(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
@@ -223,19 +227,19 @@ class AccessControlServiceFilterTest {
     @Test
     @DisplayName("Should filter view triggers according to the ACLs")
     void filterCaseViewTriggersWhenCreateACLIsMissing() {
-        final CaseEvent event1 = anCaseEvent()
+        final CaseEvent event1 = newCaseEvent()
             .withId(EVENT_ID_1)
             .withAcl(anAcl()
                 .withRole(ROLE_NOT_IN_USER_ROLES)
                 .withCreate(true)
                 .build()).build();
-        final CaseEvent event2 = anCaseEvent()
+        final CaseEvent event2 = newCaseEvent()
             .withId(EVENT_ID_2)
             .withAcl(anAcl()
                 .withRole(ROLE_NOT_IN_USER_ROLES_2)
                 .withCreate(true)
                 .build()).build();
-        final CaseEvent event3 = anCaseEvent()
+        final CaseEvent event3 = newCaseEvent()
             .withId(EVENT_ID_3)
             .withAcl(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
@@ -254,21 +258,21 @@ class AccessControlServiceFilterTest {
     @Test
     @DisplayName("Should not filter and case field if user has all required ACLs")
     void doNotFilterCaseFieldsIfUserHasAccess() {
-        final CaseField caseField1 = aCaseField()
+        final CaseField caseField1 = newCaseField()
             .withId("Firsname")
             .withAcl(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withRead(true)
                 .build())
             .build();
-        final CaseField caseField2 = aCaseField()
+        final CaseField caseField2 = newCaseField()
             .withId("LastName")
             .withAcl(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withRead(true)
                 .build())
             .build();
-        final CaseField caseField3 = aCaseField()
+        final CaseField caseField3 = newCaseField()
             .withId("Address")
             .withAcl(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
@@ -290,21 +294,21 @@ class AccessControlServiceFilterTest {
     @Test
     @DisplayName("Should filter and case fields if user missing ACLs")
     void filterCaseFieldsByUserAccess() {
-        final CaseField caseField1 = aCaseField()
+        final CaseField caseField1 = newCaseField()
             .withId("Firsname")
             .withAcl(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withRead(true)
                 .build())
             .build();
-        final CaseField caseField2 = aCaseField()
+        final CaseField caseField2 = newCaseField()
             .withId("LastName")
             .withAcl(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withRead(true)
                 .build())
             .build();
-        final CaseField caseField3 = aCaseField()
+        final CaseField caseField3 = newCaseField()
             .withId("Address")
             .withAcl(anAcl()
                 .withRole(ROLE_NOT_IN_USER_ROLES)

@@ -4,6 +4,5 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 
 public interface GetCaseViewOperation {
 
-    CaseView execute(String jurisdictionId, String caseTypeId, String caseReference);
-
+    CaseView execute(String caseReference);
 }

@@ -47,16 +47,6 @@ public class CaseDefinitionRepositoryWireMockNotRunningTest extends BaseTest {
     }
 
     @Test
-    public void shouldFailToGetClassificationForUserRole() {
-        final ServiceException
-            exception =
-            assertThrows(ServiceException.class,
-                         () -> caseDefinitionRepository.getUserRoleClassifications("nor_defined"));
-        assertThat(exception.getMessage(),
-                   startsWith("Error while retrieving classification for user role nor_defined because of "));
-    }
-
-    @Test
     public void shouldFailToGetClassificationsForUserRoleList() {
         List<String> userRoles = Arrays.asList("neither_defined", "nor_defined");
         final ServiceException
@@ -64,6 +54,6 @@ public class CaseDefinitionRepositoryWireMockNotRunningTest extends BaseTest {
             assertThrows(ServiceException.class,
                 () -> caseDefinitionRepository.getClassificationsForUserRoleList(userRoles));
         assertThat(exception.getMessage(),
-                   startsWith("Error while retrieving classification for user roles " + userRoles + " because of "));
+                   startsWith("Error while retrieving classifications for user roles " + userRoles + " because of "));
     }
 }

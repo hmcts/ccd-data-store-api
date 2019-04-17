@@ -1,5 +1,10 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import java.util.List;
+import java.util.function.Predicate;
+
+import static java.util.stream.Collectors.toList;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
@@ -8,11 +13,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
-
-import java.util.List;
-import java.util.function.Predicate;
-
-import static java.util.stream.Collectors.toList;
 
 @Service
 @Qualifier(ClassifiedFindWorkbasketInputOperation.QUALIFIER)
@@ -33,11 +33,12 @@ public class ClassifiedFindWorkbasketInputOperation implements FindWorkbasketInp
     }
 
     @Override
-    public List<WorkbasketInput> execute(String jurisdictionId, String caseTypeId, Predicate<AccessControlList> access) {
+    public List<WorkbasketInput> execute(String caseTypeId, Predicate<AccessControlList> access) {
         final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
-        return findWorkbasketInputOperation.execute(jurisdictionId, caseTypeId, access).stream()
-            .filter(workbasketInput -> classificationService.userHasEnoughSecurityClassificationForField(jurisdictionId,
-                caseType, workbasketInput.getField().getId())
+        return findWorkbasketInputOperation.execute(caseTypeId, access).stream()
+            .filter(workbasketInput -> classificationService.userHasEnoughSecurityClassificationForField(caseType.getJurisdictionId(),
+                caseType,
+                workbasketInput.getField().getId())
             ).collect(toList());
     }
 }

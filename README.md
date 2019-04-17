@@ -1,23 +1,22 @@
 # ccd-data-store-api 
-[![API Docs](https://img.shields.io/badge/API%20Docs-site-e140ad.svg)](https://hmcts.github.io/reform-api-docs/swagger.html?url=https://hmcts.github.io/reform-api-docs/specs/ccd-data-store-api.json)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![API v1](https://img.shields.io/badge/API%20Docs-v1-e140ad.svg)](https://hmcts.github.io/reform-api-docs/swagger.html?url=https://hmcts.github.io/reform-api-docs/specs/ccd-data-store-api.v1.json)
+[![API v2 (beta)](https://img.shields.io/badge/API%20Docs-v2%20%28beta%29-4286f4.svg)](https://hmcts.github.io/reform-api-docs/swagger.html?url=https://hmcts.github.io/reform-api-docs/specs/ccd-data-store-api.v2.json)
 [![Build Status](https://travis-ci.org/hmcts/ccd-data-store-api.svg?branch=master)](https://travis-ci.org/hmcts/ccd-data-store-api)
 [![Docker Build Status](https://img.shields.io/docker/build/hmcts/ccd-data-store-api.svg)](https://hub.docker.com/r/hmcts/ccd-data-store-api)
 [![codecov](https://codecov.io/gh/hmcts/ccd-data-store-api/branch/master/graph/badge.svg)](https://codecov.io/gh/hmcts/ccd-data-store-api)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/3038977127484764ad0ae9b81a1a14ad)](https://www.codacy.com/app/adr1ancho/ccd-data-store-api?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=hmcts/ccd-data-store-api&amp;utm_campaign=Badge_Grade)
-[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/3038977127484764ad0ae9b81a1a14ad)](https://www.codacy.com/app/adr1ancho/ccd-data-store-api?utm_source=github.com&utm_medium=referral&utm_content=hmcts/ccd-data-store-api&utm_campaign=Badge_Coverage)
 [![Known Vulnerabilities](https://snyk.io/test/github/hmcts/ccd-data-store-api/badge.svg)](https://snyk.io/test/github/hmcts/ccd-data-store-api)
 [![HitCount](http://hits.dwyl.io/SP9gBJ/ccd-data-store-api.svg)](#ccd-data-store-api)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Store/search cases and provide workbaskets
 
 ### Prerequisites
 
-- [JDK 8](https://www.oracle.com/java)
+- [Open JDK 8](https://openjdk.java.net/)
 - [Docker](https://www.docker.com)
 
 #### Environment variables
-
 The following environment variables are required:
 
 | Name | Default | Description |
@@ -34,8 +33,7 @@ The following environment variables are required:
 | USER_PROFILE_HOST | - | Base URL for the User Profile service. `http://localhost:4453` for the dockerised local instance. |
 | DEFINITION_STORE_HOST | - | Base URL for the Definition Store service. `http://localhost:4451` for the dockerised local instance. |
 | CCD_DM_DOMAIN | - | Base URL for the Document Management domain. |
-| APPINSIGHTS_INSTRUMENTATIONKEY | - | For CNP environment this is provided by the terraform scripts. However any value would do for your local environment. |
-| DATA_STORE_DB_USE_SSL | true | Mandated by Cloud Native Platform.  For local testing, set this variable to false |
+| AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY | - | For CNP environment this is provided by the terraform scripts. However any value would do for your local environment. |
 | DATA_STORE_DEFAULT_LOG_LEVEL | INFO | Default log level for classes under package uk.gov.hmcts.ccd |
 | HTTP_CLIENT_MAX_TOTAL | 100 | Used for Pooling connection manager; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
 | HTTP_CLIENT_SECONDS_IDLE_CONNECTION | 120 | Used for Pooling connection manager; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
@@ -52,7 +50,7 @@ The following environment variables are required:
 
 The project uses [Gradle](https://gradle.org/).
 
-To build project please execute the following command:
+To build project please execute the following:
 
 ```bash
 ./gradlew clean build

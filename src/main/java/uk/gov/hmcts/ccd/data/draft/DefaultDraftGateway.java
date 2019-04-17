@@ -1,5 +1,15 @@
 package uk.gov.hmcts.ccd.data.draft;
 
+import javax.inject.Inject;
+import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
+import static uk.gov.hmcts.ccd.AppInsights.DRAFT_STORE;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,19 +24,11 @@ import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.ccd.AppInsights;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.DraftResponseToCaseDetailsBuilder;
 import uk.gov.hmcts.ccd.domain.model.draft.*;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
-
-import javax.inject.Inject;
-import java.io.IOException;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
-import static uk.gov.hmcts.ccd.AppInsights.DRAFT_STORE;
 
 @Service
 @Qualifier(DefaultDraftGateway.QUALIFIER)
@@ -46,6 +48,7 @@ public class DefaultDraftGateway implements DraftGateway {
     private final SecurityUtils securityUtils;
     private final ApplicationParams applicationParams;
     private final AppInsights appInsights;
+    private final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder;
 
     @Inject
     public DefaultDraftGateway(
@@ -53,12 +56,14 @@ public class DefaultDraftGateway implements DraftGateway {
         @Qualifier("draftsRestTemplate") final RestTemplate restTemplate,
         final SecurityUtils securityUtils,
         final ApplicationParams applicationParams,
-        final AppInsights appInsights) {
+        final AppInsights appInsights,
+        final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder) {
         this.createDraftRestTemplate = createDraftRestTemplate;
         this.restTemplate = restTemplate;
         this.securityUtils = securityUtils;
         this.applicationParams = applicationParams;
         this.appInsights = appInsights;
+        this.draftResponseToCaseDetailsBuilder = draftResponseToCaseDetailsBuilder;
     }
 
     @Override
@@ -127,6 +132,33 @@ public class DefaultDraftGateway implements DraftGateway {
             throw new ServiceException(DRAFT_STORE_DOWN_ERR_MESSAGE, e);
         }
         return null;
+    }
+
+    @Override
+    public CaseDetails getCaseDetails(String draftId) {
+        DraftResponse draftResponse = get(draftId);
+        return draftResponseToCaseDetailsBuilder.build(draftResponse);
+    }
+
+    @Override
+    public void delete(final String draftId) {
+        try {
+            HttpHeaders headers = securityUtils.authorizationHeaders();
+            headers.add(DRAFT_ENCRYPTION_KEY_HEADER, applicationParams.getDraftEncryptionKey());
+            final HttpEntity requestEntity = new HttpEntity(headers);
+            final Instant start = Instant.now();
+            restTemplate.exchange(applicationParams.draftURL(draftId), HttpMethod.DELETE, requestEntity, Draft.class);
+            final Duration duration = Duration.between(start, Instant.now());
+            appInsights.trackDependency(DRAFT_STORE, "Delete", duration.toMillis(), true);
+        } catch (HttpClientErrorException e) {
+            LOG.warn("Error while deleting draftId=" + draftId, e);
+            if (e.getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                throw new ResourceNotFoundException(String.format(RESOURCE_NOT_FOUND_MSG, draftId));
+            }
+        } catch (Exception e) {
+            LOG.warn("Error while getting draftId=" + draftId, e);
+            throw new ServiceException(DRAFT_STORE_DOWN_ERR_MESSAGE, e);
+        }
     }
 
     @Override

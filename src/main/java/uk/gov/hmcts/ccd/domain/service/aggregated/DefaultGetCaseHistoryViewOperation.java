@@ -11,6 +11,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.common.DefaultObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
@@ -32,18 +33,21 @@ public class DefaultGetCaseHistoryViewOperation extends AbstractDefaultGetCaseVi
         @Qualifier(CreatorGetCaseOperation.QUALIFIER) GetCaseOperation getCaseOperation,
         @Qualifier("authorised") GetEventsOperation getEventsOperation,
         UIDefinitionRepository uiDefinitionRepository, CaseTypeService caseTypeService,
-        UIDService uidService) {
+        UIDService uidService,
+        DefaultObjectMapperService defaultObjectMapperService) {
 
-        super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService);
+        super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService, defaultObjectMapperService);
         this.getEventsOperation = getEventsOperation;
     }
 
     @Override
-    public CaseHistoryView execute(String jurisdictionId, String caseTypeId, String caseReference, Long eventId) {
+    public CaseHistoryView execute(String caseReference, Long eventId) {
         validateCaseReference(caseReference);
 
+        CaseDetails caseDetails = getCaseDetails(caseReference);
+        String jurisdictionId = caseDetails.getJurisdiction();
+        String caseTypeId = caseDetails.getCaseTypeId();
         CaseType caseType = getCaseType(jurisdictionId, caseTypeId);
-        CaseDetails caseDetails = getCaseDetails(jurisdictionId, caseTypeId, caseReference);
 
         AuditEvent event = getEventsOperation.getEvent(jurisdictionId, caseTypeId, eventId).orElseThrow(
             () -> new ResourceNotFoundException(EVENT_NOT_FOUND));

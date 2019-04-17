@@ -12,7 +12,7 @@ import java.util.List;
 @Named
 @Singleton
 public class YesNoValidator implements BaseTypeValidator {
-    static final String TYPE_ID = "YesOrNo";
+    public static final String TYPE_ID = "YesOrNo";
 
     public BaseType getType() {
         return BaseType.get(TYPE_ID);

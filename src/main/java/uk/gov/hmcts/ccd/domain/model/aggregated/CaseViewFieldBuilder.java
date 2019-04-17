@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static java.util.Optional.ofNullable;
+
 @Named
 @Singleton
 public class CaseViewFieldBuilder {
@@ -20,13 +22,17 @@ public class CaseViewFieldBuilder {
         field.setId(eventField.getCaseFieldId());
         field.setFieldType(caseField.getFieldType());
         field.setHidden(caseField.getHidden());
-        field.setHintText(caseField.getHintText());
-        field.setLabel(caseField.getLabel());
+        field.setHintText(ofNullable(eventField.getHintText()).orElse(caseField.getHintText()));
+        field.setLabel(ofNullable(eventField.getLabel()).orElse(caseField.getLabel()));
         field.setSecurityLabel(caseField.getSecurityLabel());
         field.setDisplayContext(eventField.getDisplayContext());
+        field.setDisplayContextParameter(eventField.getDisplayContextParamter());
         field.setShowCondition(eventField.getShowCondition());
         field.setShowSummaryChangeOption(eventField.getShowSummaryChangeOption());
         field.setShowSummaryContentOption(eventField.getShowSummaryContentOption());
+        field.setAccessControlLists(caseField.getAccessControlLists());
+
+        caseField.propagateACLsToNestedFields();
 
         return field;
     }
@@ -44,7 +50,7 @@ public class CaseViewFieldBuilder {
 
         return eventFields.stream()
             .filter(eventField -> caseFieldMap.containsKey(eventField.getCaseFieldId()))
-            .map(eventField -> build(caseFieldMap.get(eventField.getCaseFieldId()), eventField, data != null ? data.get(eventField.getCaseFieldId()): null))
+            .map(eventField -> build(caseFieldMap.get(eventField.getCaseFieldId()), eventField, data != null ? data.get(eventField.getCaseFieldId()) : null))
             .collect(Collectors.toList());
     }
 }

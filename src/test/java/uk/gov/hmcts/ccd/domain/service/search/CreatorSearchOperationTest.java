@@ -1,18 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.search;
 
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.jupiter.api.DisplayName;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +13,21 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.same;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
+import org.mockito.ArgumentMatcher;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 
 public class CreatorSearchOperationTest {
 
@@ -117,18 +118,12 @@ public class CreatorSearchOperationTest {
 
     }
 
-    private Matcher<CaseDetails> matchesCaseIn(final List<CaseDetails> candidatesToMatch) {
+    private ArgumentMatcher<CaseDetails> matchesCaseIn(final List<CaseDetails> candidatesToMatch) {
 
-        return new BaseMatcher<CaseDetails>() {
+        return new ArgumentMatcher<CaseDetails>() {
             @Override
-            public boolean matches(Object o) {
-                return o instanceof CaseDetails
-                    && candidatesToMatch.contains(o);
-            }
-
-            @Override
-            public void describeTo(Description description) {
-
+            public boolean matches(CaseDetails argument) {
+                return candidatesToMatch.contains(argument);
             }
         };
     }

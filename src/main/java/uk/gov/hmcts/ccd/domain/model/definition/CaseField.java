@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import lombok.ToString;
@@ -7,9 +8,14 @@ import lombok.ToString;
 import java.io.Serializable;
 import java.util.List;
 
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
+
 @ToString
 @ApiModel(description = "")
 public class CaseField implements Serializable {
+
+    private static final long serialVersionUID = -4257574164546267919L;
 
     private String id = null;
     @JsonProperty("case_type_id")
@@ -122,5 +128,27 @@ public class CaseField implements Serializable {
 
     public void setMetadata(boolean metadata) {
         this.metadata = metadata;
+    }
+
+    @JsonIgnore
+    public boolean isCollectionFieldType() {
+        return FieldType.COLLECTION.equalsIgnoreCase(fieldType.getType());
+    }
+
+    @JsonIgnore
+    public void propagateACLsToNestedFields() {
+        propagateACLsToNestedFields(this, this.accessControlLists);
+    }
+
+    @JsonIgnore
+    private static void propagateACLsToNestedFields(CaseField caseField, List<AccessControlList> acls) {
+        if (caseField.getFieldType().getType().equalsIgnoreCase(COMPLEX) || caseField.getFieldType().getType().equalsIgnoreCase(COLLECTION)) {
+            caseField.getFieldType().getChildren().forEach(nestedField -> {
+                if (nestedField.getAccessControlLists() == null || nestedField.getAccessControlLists().isEmpty()) {
+                    nestedField.setAccessControlLists(acls);
+                }
+                propagateACLsToNestedFields(nestedField, acls);
+            });
+        }
     }
 }
