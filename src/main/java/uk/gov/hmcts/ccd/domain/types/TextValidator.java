@@ -25,7 +25,7 @@ public class TextValidator implements BaseTypeValidator {
                                            final CaseField caseFieldDefinition) {
 
         // Empty text should still check against MIN - MIN may or may not be 0
-        if (isNullOrEmpty(dataValue)) {
+        if (isNull(dataValue)) {
             return Collections.emptyList();
         }
 
@@ -34,7 +34,7 @@ public class TextValidator implements BaseTypeValidator {
             return Collections.singletonList(new ValidationResult(nodeType + " is not a string", dataFieldId));
         }
 
-        final String value = dataValue.textValue();
+        final String value = dataValue.textValue().trim();
 
         if (!checkMax(caseFieldDefinition.getFieldType().getMax(), value)) {
             return Collections.singletonList(new ValidationResult(value + " exceed maximum length " + caseFieldDefinition.getFieldType().getMax(), dataFieldId));
