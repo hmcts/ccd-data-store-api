@@ -151,18 +151,6 @@ class TextValidatorTest {
         assertThat(validationResult, hasSize(0));
     }
 
-    @Test
-    @DisplayName("should NOT be valid with only white spaces or leading trailing white spaces")
-    void checkWhitespaces() {
-        final JsonNode whitespaceValue = NODE_FACTORY.textNode("   ");
-        final List<ValidationResult> whitespaceValueResult = validator.validate(FIELD_ID, whitespaceValue, caseField);
-        assertThat(whitespaceValueResult, hasSize(1));
-
-        final JsonNode trailingwhitespaces = NODE_FACTORY.textNode("   Testing   ");
-        final List<ValidationResult> trailingwhitespacesResult = validator.validate(FIELD_ID, trailingwhitespaces, caseField);
-        assertThat(trailingwhitespacesResult, hasSize(0));
-    }
-
     private CaseFieldBuilder caseField() {
         return new CaseFieldBuilder(FIELD_ID).withType(TextValidator.TYPE_ID);
     }
