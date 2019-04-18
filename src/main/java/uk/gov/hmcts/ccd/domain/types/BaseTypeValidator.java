@@ -19,7 +19,13 @@ public interface BaseTypeValidator {
     default Boolean isNullOrEmpty(final JsonNode dataValue) {
         return dataValue == null
             || dataValue.isNull()
-            || (dataValue.isTextual() && (null == dataValue.asText() || dataValue.asText().trim().length() == 0))
+            || (dataValue.isTextual() && (null == dataValue.asText() || dataValue.asText().length() == 0))
             || (dataValue.isObject() && dataValue.toString().equals("{}"));
+    }
+
+    default Boolean isNull(final JsonNode dataValue) {
+        return dataValue == null
+            || dataValue.isNull()
+            || (dataValue.isTextual() && (null == dataValue.asText()));
     }
 }
