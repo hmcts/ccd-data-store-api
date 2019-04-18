@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -85,8 +86,29 @@ class CaseFieldTest {
     }
 
     @Nested
-    @DisplayName("findNestedElementByPath test")
+    @DisplayName("find by path tests")
     class FindNestedElementsTest {
+
+        @Test
+        @DisplayName("returns current caseField if path is null")
+        void getFieldTypeByPathReturnsSameWhenPathIsNull() {
+            FieldType fieldType = debtorDetails.getFieldTypeByPath(null);
+
+            assertSame(fieldType, debtorDetails.getFieldType());
+        }
+
+        @Test
+        @DisplayName("returns current caseField if path is null")
+        void getFieldTypeByPathReturnsTypeOfNestedField() {
+            String path = PERSON + "." + NAME;
+            FieldType fieldType = debtorDetails.getFieldTypeByPath(path);
+
+            assertAll(
+                () -> assertThat(fieldType.getType(), is(name.getFieldType().getType())),
+                () -> assertThat(fieldType.getId(), is(name.getFieldType().getId())),
+                () -> assertThat(fieldType.getChildren().size(), is(0))
+                     );
+        }
 
         @Test
         void findNestedElementByPath() {

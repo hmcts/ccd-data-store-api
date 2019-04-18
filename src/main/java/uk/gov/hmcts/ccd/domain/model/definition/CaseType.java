@@ -153,12 +153,17 @@ public class CaseType implements Serializable {
     }
 
     @JsonIgnore
-    public Optional<CaseField> getCaseField(String caseFieldId) {
-        return caseFields.stream().filter(caseField -> caseField.getId().equalsIgnoreCase(caseFieldId)).findFirst();
+    public CaseField getCaseField(String caseFieldId) {
+        return caseFields.stream().filter(caseField -> caseField.getId().equalsIgnoreCase(caseFieldId)).findFirst()
+            .orElseThrow(() -> new RuntimeException(String.format("FieldId %s not found", caseFieldId)));
     }
 
     @JsonIgnore
     public boolean isCaseFieldACollection(String caseFieldId) {
-        return getCaseField(caseFieldId).map(CaseField::isCollectionFieldType).orElse(false);
+        try {
+            return getCaseField(caseFieldId).isCollectionFieldType();
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

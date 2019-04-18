@@ -145,14 +145,12 @@ public class CaseField implements Serializable {
     }
 
     @JsonIgnore
-    private static void propagateACLsToNestedFields(CaseField caseField, List<AccessControlList> acls) {
-        if (caseField.getFieldType().getType().equalsIgnoreCase(COMPLEX) || caseField.getFieldType().getType().equalsIgnoreCase(COLLECTION)) {
-            caseField.getFieldType().getChildren().forEach(nestedField -> {
-                if (nestedField.getAccessControlLists() == null || nestedField.getAccessControlLists().isEmpty()) {
-                    nestedField.setAccessControlLists(acls);
-                }
-                propagateACLsToNestedFields(nestedField, acls);
-            });
+    public FieldType getFieldTypeByPath(String path) {
+        if (StringUtils.isBlank(path)) {
+            return this.getFieldType();
+        } else {
+            CaseField caseFieldByPath = this.findNestedElementByPath(path);
+            return caseFieldByPath.getFieldType();
         }
     }
 
@@ -183,6 +181,18 @@ public class CaseField implements Serializable {
             List<String> tail = pathElements.subList(1, pathElements.size());
 
             return reduce(newCaseFields, tail);
+        }
+    }
+
+    @JsonIgnore
+    private static void propagateACLsToNestedFields(CaseField caseField, List<AccessControlList> acls) {
+        if (caseField.getFieldType().getType().equalsIgnoreCase(COMPLEX) || caseField.getFieldType().getType().equalsIgnoreCase(COLLECTION)) {
+            caseField.getFieldType().getChildren().forEach(nestedField -> {
+                if (nestedField.getAccessControlLists() == null || nestedField.getAccessControlLists().isEmpty()) {
+                    nestedField.setAccessControlLists(acls);
+                }
+                propagateACLsToNestedFields(nestedField, acls);
+            });
         }
     }
 }

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -52,22 +51,15 @@ public class DefaultFindSearchInputOperation implements FindSearchInputOperation
         final SearchInput result = new SearchInput();
         result.setLabel(in.getLabel());
         result.setOrder(in.getDisplayOrder());
+        CaseField caseField = caseType.getCaseField(in.getCaseFieldId());
+
         final Field field = new Field();
         field.setId(in.getCaseFieldId());
-
-        CaseField caseField = caseType.getCaseField(in.getCaseFieldId())
-            .orElseThrow(() -> new RuntimeException(String.format("FieldId %s not found", in.getCaseFieldId())));
-
-        if (StringUtils.isBlank(in.getCaseFieldElementPath())) {
-            field.setType(caseField.getFieldType());
-        } else {
-            CaseField caseFieldByPath = caseField.findNestedElementByPath(in.getCaseFieldElementPath());
-            field.setType(caseFieldByPath.getFieldType());
-        }
-
+        field.setType(caseField.getFieldTypeByPath(in.getCaseFieldElementPath()));
         field.setElementPath(in.getCaseFieldElementPath());
         field.setMetadata(caseField.isMetadata());
         result.setField(field);
+
         return result;
     }
 }
