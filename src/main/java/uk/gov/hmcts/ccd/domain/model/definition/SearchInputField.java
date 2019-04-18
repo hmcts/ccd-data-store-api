@@ -12,7 +12,7 @@ import java.io.Serializable;
 public class SearchInputField implements Serializable {
 
     private String caseFieldId = null;
-    private String caseFieldElementPath = null;
+    private String caseFieldPath = null;
     private String label = null;
     private Integer displayOrder = null;
 
@@ -32,12 +32,12 @@ public class SearchInputField implements Serializable {
      **/
     @ApiModelProperty(value = "")
     @JsonProperty("case_field_element_path")
-    public String getCaseFieldElementPath() {
-        return caseFieldElementPath;
+    public String getCaseFieldPath() {
+        return caseFieldPath;
     }
 
-    public void setCaseFieldElementPath(String caseFieldElementPath) {
-        this.caseFieldElementPath = caseFieldElementPath;
+    public void setCaseFieldPath(String caseFieldPath) {
+        this.caseFieldPath = caseFieldPath;
     }
 
     /**

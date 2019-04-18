@@ -55,8 +55,8 @@ public class DefaultFindSearchInputOperation implements FindSearchInputOperation
 
         final Field field = new Field();
         field.setId(in.getCaseFieldId());
-        field.setType(caseField.getFieldTypeByPath(in.getCaseFieldElementPath()));
-        field.setElementPath(in.getCaseFieldElementPath());
+        field.setType(caseField.getFieldTypeByPath(in.getCaseFieldPath()));
+        field.setElementPath(in.getCaseFieldPath());
         field.setMetadata(caseField.isMetadata());
         result.setField(field);
 

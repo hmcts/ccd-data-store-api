@@ -132,7 +132,7 @@ class DefaultFindSearchInputOperationTest {
         searchInputField.setCaseFieldId(id);
         searchInputField.setLabel(id);
         searchInputField.setDisplayOrder(order);
-        searchInputField.setCaseFieldElementPath(path);
+        searchInputField.setCaseFieldPath(path);
         return searchInputField;
     }
 
