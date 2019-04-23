@@ -183,7 +183,7 @@ variable "http_client_connection_timeout" {
 
 variable "http_client_read_timeout" {
   type = "string"
-  default = "15000"
+  default = "60000"
 }
 
 variable "http_client_max_total" {

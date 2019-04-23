@@ -64,6 +64,7 @@ import java.util.function.Consumer;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
 
 public class TestBuildersUtil {
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -232,6 +233,11 @@ public class TestBuildersUtil {
 
         public CaseDataContentBuilder withIgnoreWarning(Boolean ignoreWarning) {
             this.caseDataContent.setIgnoreWarning(ignoreWarning);
+            return this;
+        }
+
+        public CaseDataContentBuilder withCaseReference(String caseReference) {
+            this.caseDataContent.setCaseReference(caseReference);
             return this;
         }
 
@@ -1004,7 +1010,8 @@ public class TestBuildersUtil {
         }
 
         public FieldTypeBuilder withCollectionField(CaseField complexField) {
-            complexFields.add(complexField);
+            fieldType.setCollectionFieldType(FieldTypeBuilder.aFieldType().withComplexField(complexField)
+                .withType(COMPLEX).build());
             return this;
         }
 

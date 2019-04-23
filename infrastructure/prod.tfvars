@@ -12,7 +12,6 @@ database_sku_name = "GP_Gen5_8"
 database_sku_capacity = "8"
 
 http_client_connection_timeout = 10000
-#http_client_read_timeout = 15000
 http_client_max_total = 200
 #http_client_seconds_idle_connection = 120
 http_client_max_client_per_route = 40
