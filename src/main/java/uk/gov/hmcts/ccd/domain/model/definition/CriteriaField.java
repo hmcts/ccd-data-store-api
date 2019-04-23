@@ -6,10 +6,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 
 public class CriteriaField  implements Serializable {
-    private String caseFieldId = null;
-    private String label = null;
-    private Integer displayOrder = null;
-    private String role = null;
+    private String caseFieldId;
+    private String label;
+    private Integer displayOrder;
+    private String role;
 
     /**
      **/
