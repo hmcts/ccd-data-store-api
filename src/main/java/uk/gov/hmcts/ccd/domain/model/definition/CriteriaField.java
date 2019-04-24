@@ -5,7 +5,7 @@ import java.io.Serializable;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 
-public class CriteriaField  implements Serializable {
+public class CriteriaField implements Serializable {
     private String caseFieldId;
     private String label;
     private Integer displayOrder;
