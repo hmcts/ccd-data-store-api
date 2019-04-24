@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.client.RestClientException;
+import uk.gov.hmcts.ccd.AppInsights;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.idam.AuthenticatedUser;
@@ -34,6 +35,8 @@ public class DefaultCacheWarmUpServiceTest {
     @Mock
     private IdamHelper idamHelper;
     @Mock
+    private AppInsights appInsights;
+    @Mock
     private AuthenticatedUser authenticatedUser;
 
     private String serviceToken = "serviceToken";
@@ -60,7 +63,8 @@ public class DefaultCacheWarmUpServiceTest {
         defaultCacheWarmUpService = new DefaultCacheWarmUpService(defaultCaseDefinitionRepository,
             authTokenGenerator,
             applicationParams,
-            idamHelper, appInsights);
+            idamHelper,
+            appInsights);
     }
 
     @Test
