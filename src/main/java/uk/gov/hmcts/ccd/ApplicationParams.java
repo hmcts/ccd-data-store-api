@@ -17,7 +17,10 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 @Singleton
 public class ApplicationParams {
     @Value("#{'${ccd.callback.retries}'.split(',')}")
-    private List<Integer> callbackRetries;
+    private List<Integer> callbackRetryIntervalsInSeconds;
+
+    @Value("${http.client.read.timeout}")
+    private Integer callbackReadTimeoutInMillis;
 
     @Value("${ccd.token.secret}")
     private String tokenSecret;
@@ -204,8 +207,12 @@ public class ApplicationParams {
         return tokenSecret;
     }
 
-    public List<Integer> getCallbackRetries() {
-        return callbackRetries;
+    public List<Integer> getCallbackRetryIntervalsInSeconds() {
+        return callbackRetryIntervalsInSeconds;
+    }
+
+    public Integer getCallbackReadTimeoutInMillis() {
+        return callbackReadTimeoutInMillis;
     }
 
     public String getValidDMDomain() {
