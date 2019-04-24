@@ -111,6 +111,7 @@ public class CallbackService {
                 return Optional.of(responseEntity.get().getBody());
             }
         }
+        LOG.info("Unsuccessful callback to {} for caseType {} and event {}", url, caseDetails.getCaseTypeId(), caseEvent.getId());
         throw new CallbackException("Unsuccessful callback to " + url);
     }
 
@@ -184,25 +185,20 @@ public class CallbackService {
                                                         final CallbackRequest callbackRequest,
                                                         final Integer timeout) {
         try {
-            LOG.debug("Trying {} with timeout interval {}", url, timeout);
+            LOG.info("Trying {} with timeout interval {}", url, timeout);
 
             final HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.add("Content-Type", "application/json");
-
             final HttpHeaders securityHeaders = securityUtils.authorizationHeaders();
             if (null != securityHeaders) {
                 securityHeaders.forEach((key, values) -> httpHeaders.put(key, values));
             }
-
             final HttpEntity requestEntity = new HttpEntity(callbackRequest, httpHeaders);
 
             LOG.info("readTimeout: {}", timeout);
 
             final HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
-
-//            requestFactory.setConnectionRequestTimeout(secondsToMilliseconds(timeout));
             requestFactory.setReadTimeout(secondsToMilliseconds(timeout));
-//            requestFactory.setConnectTimeout(secondsToMilliseconds(timeout));
             restTemplate.setRequestFactory(requestFactory);
 
             return ofNullable(
@@ -212,8 +208,7 @@ public class CallbackService {
                 url,
                 e.getClass().getSimpleName(),
                 e.getMessage());
-            LOG.debug("Unable to connect to callback service {} because of", url,
-                e);  // debug stack trace
+            LOG.debug("", e);  // debug stack trace
             return Optional.empty();
         }
     }
@@ -221,5 +216,4 @@ public class CallbackService {
     private int secondsToMilliseconds(final Integer timeout) {
         return (int) TimeUnit.SECONDS.toMillis(timeout);
     }
-
 }

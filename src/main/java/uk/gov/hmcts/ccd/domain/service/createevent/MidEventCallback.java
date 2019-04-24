@@ -8,6 +8,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -62,16 +63,28 @@ public class MidEventCallback {
                 .findFirst();
 
             if (wizardPageOptional.isPresent() && !isBlank(wizardPageOptional.get().getCallBackURLMidEvent())) {
-                CaseDetails newCaseDetails = caseService.createNewCaseDetails(caseTypeId, caseType.getJurisdictionId(),
-                                                                              content.getEventData() == null ? content.getData() : content.getEventData());
 
-                CaseDetails caseDetails = callbackInvoker.invokeMidEventCallback(wizardPageOptional.get(),
-                                                                                 caseType,
-                                                                                 caseEvent,
-                                                                                 null,
-                                                                                 newCaseDetails,
-                                                                                 content.getIgnoreWarning());
-                return dataJsonNode(caseDetails.getData());
+                CaseDetails caseDetailsBefore = null;
+                CaseDetails currentOrNewCaseDetails;
+                if (StringUtils.isNotEmpty(content.getCaseReference())) {
+                    CaseDetails caseDetails = caseService.getCaseDetails(caseType.getJurisdictionId(), content.getCaseReference());
+                    caseDetailsBefore = caseService.clone(caseDetails);
+                    currentOrNewCaseDetails = caseService.populateCurrentCaseDetailsWithEventFields(content,
+                        caseDetails);
+
+                } else {
+                    currentOrNewCaseDetails = caseService.createNewCaseDetails(caseTypeId, caseType.getJurisdictionId(),
+                        content.getEventData() == null ? content.getData() : content.getEventData());
+                }
+
+                CaseDetails caseDetailsFromMidEventCallback = callbackInvoker.invokeMidEventCallback(wizardPageOptional.get(),
+                    caseType,
+                    caseEvent,
+                    caseDetailsBefore,
+                    currentOrNewCaseDetails,
+                    content.getIgnoreWarning());
+
+                return dataJsonNode(caseDetailsFromMidEventCallback.getData());
             }
         }
         return dataJsonNode(content.getData());
