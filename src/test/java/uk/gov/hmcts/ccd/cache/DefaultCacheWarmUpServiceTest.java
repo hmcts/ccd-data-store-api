@@ -60,7 +60,7 @@ public class DefaultCacheWarmUpServiceTest {
         defaultCacheWarmUpService = new DefaultCacheWarmUpService(defaultCaseDefinitionRepository,
             authTokenGenerator,
             applicationParams,
-            idamHelper);
+            idamHelper, appInsights);
     }
 
     @Test
