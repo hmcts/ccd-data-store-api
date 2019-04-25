@@ -87,7 +87,7 @@ data "azurerm_key_vault_secret" "ccd_cache_warm_up_password" {
 
 // oauth2 secret
 data "azurerm_key_vault_secret" "ccd_api_gateway_oauth2_client_secret" {
-  name = "ccd-API-GATEWAY-OAUTH2_CLIENT_SECRET"
+  name = "ccd-API-GATEWAY-OAUTH2-CLIENT-SECRET"
   vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
 }
 
