@@ -3,9 +3,9 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -90,27 +90,6 @@ class CaseFieldTest {
     class FindNestedElementsTest {
 
         @Test
-        @DisplayName("returns current caseField if path is null")
-        void getFieldTypeByPathReturnsSameWhenPathIsNull() {
-            FieldType fieldType = debtorDetails.getFieldTypeByPath(null);
-
-            assertSame(fieldType, debtorDetails.getFieldType());
-        }
-
-        @Test
-        @DisplayName("returns current caseField if path is null")
-        void getFieldTypeByPathReturnsTypeOfNestedField() {
-            String path = PERSON + "." + NAME;
-            FieldType fieldType = debtorDetails.getFieldTypeByPath(path);
-
-            assertAll(
-                () -> assertThat(fieldType.getType(), is(name.getFieldType().getType())),
-                () -> assertThat(fieldType.getId(), is(name.getFieldType().getId())),
-                () -> assertThat(fieldType.getChildren().size(), is(0))
-                     );
-        }
-
-        @Test
         void findNestedElementByPath() {
             String path = PERSON + "." + NAME;
             CaseField nestedElementByPath = debtorDetails.findNestedElementByPath(path);
@@ -124,36 +103,22 @@ class CaseFieldTest {
         }
 
         @Test
-        void findNestedElementByEmptyPath() {
-            Exception exception = assertThrows(RuntimeException.class, () ->
-                family.findNestedElementByPath(""));
-            assertEquals("Invalid blank element path for field Family.", exception.getMessage());
-        }
-
-        @Test
-        void findNestedElementByNullPath() {
-            Exception exception = assertThrows(RuntimeException.class, () ->
-                family.findNestedElementByPath(null));
-            assertEquals("Invalid blank element path for field Family.", exception.getMessage());
-        }
-
-        @Test
         void findNestedElementForCaseFieldWithNoNestedElements() {
-            Exception exception = assertThrows(RuntimeException.class, () ->
+            Exception exception = assertThrows(ResourceNotFoundException.class, () ->
                 name.findNestedElementByPath("Field1"));
             assertEquals("CaseField Name has no nested elements.", exception.getMessage());
         }
 
         @Test
         void findNestedElementForCaseFieldWithNonMatchingPathElement() {
-            Exception exception = assertThrows(RuntimeException.class, () ->
+            Exception exception = assertThrows(ResourceNotFoundException.class, () ->
                 debtorDetails.findNestedElementByPath("Field1"));
             assertEquals("Nested element not found for Field1", exception.getMessage());
         }
 
         @Test
         void findNestedElementForCaseFieldWithNonMatchingPathElements() {
-            Exception exception = assertThrows(RuntimeException.class, () ->
+            Exception exception = assertThrows(ResourceNotFoundException.class, () ->
                 debtorDetails.findNestedElementByPath("Field2.Field3"));
             assertEquals("Nested element not found for Field2", exception.getMessage());
         }

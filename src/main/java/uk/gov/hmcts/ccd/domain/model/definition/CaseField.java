@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import lombok.ToString;
-import org.apache.commons.lang3.StringUtils;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -145,22 +145,9 @@ public class CaseField implements Serializable {
     }
 
     @JsonIgnore
-    public FieldType getFieldTypeByPath(String path) {
-        if (StringUtils.isBlank(path)) {
-            return this.getFieldType();
-        } else {
-            CaseField caseFieldByPath = this.findNestedElementByPath(path);
-            return caseFieldByPath.getFieldType();
-        }
-    }
-
-    @JsonIgnore
     public CaseField findNestedElementByPath(String path) {
-        if (StringUtils.isBlank(path)) {
-            throw new RuntimeException(format("Invalid blank element path for field %s.", this.id));
-        }
         if (this.getFieldType().getChildren().isEmpty()) {
-            throw new RuntimeException(format("CaseField %s has no nested elements.", this.id));
+            throw new ResourceNotFoundException(format("CaseField %s has no nested elements.", this.id));
         }
         List<String> pathElements = Arrays.stream(path.trim().split("\\.")).collect(Collectors.toList());
 
@@ -172,10 +159,10 @@ public class CaseField implements Serializable {
         String head = pathElements.get(0);
         if (pathElements.size() == 1) {
             return caseFields.stream().filter(e -> e.getId().equals(head)).findFirst()
-                .orElseThrow(() -> new RuntimeException(format("Nested element not found for %s", head)));
+                .orElseThrow(() -> new ResourceNotFoundException(format("Nested element not found for %s", head)));
         } else {
             CaseField caseField = caseFields.stream().filter(e -> e.getId().equals(head)).findFirst()
-                .orElseThrow(() -> new RuntimeException(format("Nested element not found for %s", head)));
+                .orElseThrow(() -> new ResourceNotFoundException(format("Nested element not found for %s", head)));
 
             List<CaseField> newCaseFields = caseField.getFieldType().getChildren();
             List<String> tail = pathElements.subList(1, pathElements.size());

@@ -13,13 +13,16 @@ import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputField;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
+import java.util.Collections;
 import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
@@ -99,6 +102,18 @@ class DefaultFindWorkbasketInputOperationTest {
             () -> assertThat(workbasketInputs.get(4).getField().getType().getId(), is(name.getFieldType().getId())),
             () -> assertThat(workbasketInputs.get(4).getField().getType().getChildren().size(), is(0))
         );
+    }
+
+    @Test
+    void shouldThrowResourceNotFoundExceptionWhenCaseFieldNotFoundInCaseType() {
+        doReturn(generateWorkbasketInput()).when(uiDefinitionRepository).getWorkbasketInputDefinitions(caseType.getId());
+        caseType.setCaseFields(Collections.emptyList());
+
+        final ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+            () -> findWorkbasketInputOperation.execute(caseType.getId(), CAN_READ));
+
+        assertThat(exception.getMessage(),
+            is("CaseField with id=[field1] and path=[null] not found"));
     }
 
     private WorkbasketInputDefinition generateWorkbasketInput() {
