@@ -98,8 +98,7 @@ class CaseFieldTest {
                 () -> assertThat(nestedElementByPath.getId(), is(name.getId())),
                 () -> assertThat(nestedElementByPath.getFieldType().getType(), is(name.getFieldType().getType())),
                 () -> assertThat(nestedElementByPath.getFieldType().getId(), is(name.getFieldType().getId())),
-                () -> assertThat(nestedElementByPath.getFieldType().getChildren().size(), is(0))
-                     );
+                () -> assertThat(nestedElementByPath.getFieldType().getChildren().size(), is(0)));
         }
 
         @Test

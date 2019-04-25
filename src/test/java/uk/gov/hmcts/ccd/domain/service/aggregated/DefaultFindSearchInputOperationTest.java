@@ -102,8 +102,7 @@ class DefaultFindSearchInputOperationTest {
             () -> assertThat(searchInputs.get(4).getField().getId(), is(DEBTOR_DETAILS)),
             () -> assertThat(searchInputs.get(4).getField().getType().getType(), is(name.getFieldType().getType())),
             () -> assertThat(searchInputs.get(4).getField().getType().getId(), is(name.getFieldType().getId())),
-            () -> assertThat(searchInputs.get(4).getField().getType().getChildren().size(), is(0))
-                 );
+            () -> assertThat(searchInputs.get(4).getField().getType().getChildren().size(), is(0)));
     }
 
     @Test

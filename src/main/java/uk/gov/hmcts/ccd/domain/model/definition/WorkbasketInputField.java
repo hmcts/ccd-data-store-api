@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel(description = "")
 public class WorkbasketInputField implements Serializable {
@@ -23,9 +22,6 @@ public class WorkbasketInputField implements Serializable {
         this.caseFieldId = caseFieldId;
     }
 
-    /**
-     **/
-    @ApiModelProperty(value = "")
     @JsonProperty("case_field_element_path")
     public String getCaseFieldElementPath() {
         return caseFieldElementPath;

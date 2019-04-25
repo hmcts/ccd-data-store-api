@@ -159,7 +159,8 @@ public class CaseType implements Serializable {
     }
 
     /**
-     * Gets a caseField by caseField id and specified path
+     * Gets a caseField by caseField id and specified path.
+     *
      * @param caseFieldId CaseField id
      * @param path Path to a nested CaseField
      * @return Optional of a CaseField
