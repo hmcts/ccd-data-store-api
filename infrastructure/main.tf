@@ -74,6 +74,17 @@ data "azurerm_key_vault_secret" "ccd_elastic_search_password" {
   vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
 }
 
+// cache warmer
+data "azurerm_key_vault_secret" "ccd_cache_warm_up_email" {
+  name = "ccd-CACHE-WARM-UP-EMAIL"
+  vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
+}
+
+data "azurerm_key_vault_secret" "ccd_cache_warm_up_password" {
+  name = "ccd-CACHE-WARM-UP-PASSWORD"
+  vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
+}
+
 resource "random_string" "draft_encryption_key" {
   length  = 16
   special = true
@@ -147,6 +158,9 @@ module "ccd-data-store-api" {
 
     CCD_CACHE_WARM_UP_ENABLED             = "${var.cache_warm_up_enabled}"
     CCD_CACHE_WARM_UP_SLEEP_TIME          = "${var.cache_warm_up_sleep_time}"
+    CCD_CACHE_WARM_UP_SLEEP_TIME          = "${var.cache_warm_up_sleep_time}"
+    CCD_CACHE_WARM_UP_EMAIL               = "${data.azurerm_key_vault_secret.ccd_cache_warm_up_email.value}"
+    CCD_CACHE_WARM_UP_PASSWORD            = "${data.azurerm_key_vault_secret.ccd_cache_warm_up_password.value}"
 
     HTTP_CLIENT_CONNECTION_TIMEOUT        = "${var.http_client_connection_timeout}"
     HTTP_CLIENT_READ_TIMEOUT              = "${var.http_client_read_timeout}"
