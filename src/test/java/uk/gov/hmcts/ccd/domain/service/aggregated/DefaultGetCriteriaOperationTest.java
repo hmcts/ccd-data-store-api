@@ -28,17 +28,18 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 public class DefaultGetCriteriaOperationTest {
-    @Mock
-    private UIDefinitionRepository uiDefinitionRepository;
-    @Mock
-    private CaseDefinitionRepository caseDefinitionRepository;
 
     private final CaseType caseType = new CaseType();
-    private DefaultGetCriteriaOperation defaultGetCriteriaOperation;
     private final CaseField caseField1 = new CaseField();
     private final CaseField caseField2 = new CaseField();
     private final CaseField caseField3 = new CaseField();
     private final CaseField caseField4 = new CaseField();
+
+    @Mock
+    private UIDefinitionRepository uiDefinitionRepository;
+    @Mock
+    private CaseDefinitionRepository caseDefinitionRepository;
+    private DefaultGetCriteriaOperation defaultGetCriteriaOperation;
 
     @BeforeEach
     void setup() {
