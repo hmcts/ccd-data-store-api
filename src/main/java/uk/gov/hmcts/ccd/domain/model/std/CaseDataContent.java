@@ -31,6 +31,9 @@ public class CaseDataContent {
     @JsonProperty("draft_id")
     private String draftId;
 
+    @JsonProperty("case_reference")
+    private String caseReference;
+
     public Event getEvent() {
         return event;
     }
@@ -98,5 +101,13 @@ public class CaseDataContent {
 
     public void setDraftId(String draftId) {
         this.draftId = draftId;
+    }
+
+    public String getCaseReference() {
+        return caseReference;
+    }
+
+    public void setCaseReference(String caseReference) {
+        this.caseReference = caseReference;
     }
 }

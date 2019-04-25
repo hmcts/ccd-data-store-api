@@ -70,6 +70,9 @@ public class ApplicationParams {
     @Value("${definition.cache.latest-version-ttl.secs}")
     private Integer latestVersionTTLSecs;
 
+    @Value("${user.cache.ttl.secs}")
+    private Integer userCacheTTLSecs;
+
     @Value("${definition.cache.max.size}")
     private Integer definitionCacheMaxSize;
 
@@ -100,7 +103,7 @@ public class ApplicationParams {
     @Value("${search.elastic.nodes.discovery.filter}")
     private String elasticsearchNodeDiscoveryFilter;
 
-    private static String encode(final String stringToEncode) {
+    public static String encode(final String stringToEncode) {
         try {
             return URLEncoder.encode(stringToEncode, "UTF-8");
         } catch (UnsupportedEncodingException e) {
@@ -238,6 +241,10 @@ public class ApplicationParams {
 
     public int getLatestVersionTTLSecs() {
         return latestVersionTTLSecs;
+    }
+
+    public Integer getUserCacheTTLSecs() {
+        return userCacheTTLSecs;
     }
 
     public int getDefinitionCacheMaxSize() {

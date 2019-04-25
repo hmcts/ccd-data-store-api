@@ -8,10 +8,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.Optional.ofNullable;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
 
-import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 
@@ -35,7 +32,8 @@ public class CaseViewFieldBuilder {
         field.setShowSummaryContentOption(eventField.getShowSummaryContentOption());
         field.setAccessControlLists(caseField.getAccessControlLists());
         field.setMetadata(caseField.isMetadata());
-        fillEmptyNestedFieldACLs(caseField, caseField.getAccessControlLists());
+
+        caseField.propagateACLsToNestedFields();
 
         return field;
     }
@@ -55,16 +53,5 @@ public class CaseViewFieldBuilder {
             .filter(eventField -> caseFieldMap.containsKey(eventField.getCaseFieldId()))
             .map(eventField -> build(caseFieldMap.get(eventField.getCaseFieldId()), eventField, data != null ? data.get(eventField.getCaseFieldId()) : null))
             .collect(Collectors.toList());
-    }
-
-    private static void fillEmptyNestedFieldACLs(CaseField field, List<AccessControlList> acls) {
-        if (field.getFieldType().getType().equalsIgnoreCase(COMPLEX) || field.getFieldType().getType().equalsIgnoreCase(COLLECTION)) {
-            field.getFieldType().getComplexFields().forEach(nestedField -> {
-                if (nestedField.getAccessControlLists() == null || nestedField.getAccessControlLists().isEmpty()) {
-                    nestedField.setAccessControlLists(acls);
-                }
-                fillEmptyNestedFieldACLs(nestedField, acls);
-            });
-        }
     }
 }

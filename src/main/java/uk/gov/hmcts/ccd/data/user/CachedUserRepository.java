@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
+import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserDefault;
 
 @Service
@@ -37,6 +38,11 @@ public class CachedUserRepository implements UserRepository {
     @Override
     public IDAMProperties getUserDetails() {
         return userDetails.computeIfAbsent("userDetails", e -> userRepository.getUserDetails());
+    }
+
+    @Override
+    public IdamUser getUser() {
+        return userRepository.getUser();
     }
 
     @Override
