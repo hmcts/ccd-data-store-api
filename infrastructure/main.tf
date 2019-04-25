@@ -85,6 +85,12 @@ data "azurerm_key_vault_secret" "ccd_cache_warm_up_password" {
   vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
 }
 
+// oauth2 secret
+data "azurerm_key_vault_secret" "ccd_oauth2_client_secret" {
+  name = "ccd-OAUTH2-CLIENT-SECRET"
+  vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
+}
+
 resource "random_string" "draft_encryption_key" {
   length  = 16
   special = true
@@ -170,6 +176,7 @@ module "ccd-data-store-api" {
     HTTP_CLIENT_VALIDATE_AFTER_INACTIVITY = "${var.http_client_validate_after_inactivity}"
 
     OAUTH2_REDIRECT_URI                   = "${local.default_redirect_uri}"
+    OAUTH2_CLIENT_SECRET                  = "${data.azurerm_key_vault_secret.ccd_oauth2_client_secret.value}"
   }
 
 }
