@@ -13,7 +13,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputField;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
 import java.util.Collections;
 import java.util.List;
@@ -109,7 +109,7 @@ class DefaultFindWorkbasketInputOperationTest {
         doReturn(generateWorkbasketInput()).when(uiDefinitionRepository).getWorkbasketInputDefinitions(caseType.getId());
         caseType.setCaseFields(Collections.emptyList());
 
-        final ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+        final BadRequestException exception = assertThrows(BadRequestException.class,
             () -> findWorkbasketInputOperation.execute(caseType.getId(), CAN_READ));
 
         assertThat(exception.getMessage(),

@@ -13,7 +13,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchInputDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchInputField;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
 import java.util.Collections;
 import java.util.List;
@@ -111,7 +111,7 @@ class DefaultFindSearchInputOperationTest {
         doReturn(generateSearchInput()).when(uiDefinitionRepository).getSearchInputDefinitions(caseType.getId());
         caseType.setCaseFields(Collections.emptyList());
 
-        final ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+        final BadRequestException exception = assertThrows(BadRequestException.class,
             () -> findSearchInputOperation.execute(caseType.getId(), CAN_READ));
 
         assertThat(exception.getMessage(),

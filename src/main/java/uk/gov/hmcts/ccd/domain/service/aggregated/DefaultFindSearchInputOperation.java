@@ -14,7 +14,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.SearchInputDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchInputField;
 import uk.gov.hmcts.ccd.domain.model.search.Field;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -57,7 +57,7 @@ public class DefaultFindSearchInputOperation implements FindSearchInputOperation
         result.setOrder(in.getDisplayOrder());
 
         CaseField caseField = caseType.getCaseFieldByPath(in.getCaseFieldId(), in.getCaseFieldPath())
-            .orElseThrow(() -> new ResourceNotFoundException(format(CASE_FIELD_NOT_FOUND,
+            .orElseThrow(() -> new BadRequestException(format(CASE_FIELD_NOT_FOUND,
                 in.getCaseFieldId(), in.getCaseFieldPath())));
 
         final Field field = new Field();

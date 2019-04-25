@@ -3,7 +3,7 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -104,21 +104,21 @@ class CaseFieldTest {
 
         @Test
         void findNestedElementForCaseFieldWithNoNestedElements() {
-            Exception exception = assertThrows(ResourceNotFoundException.class, () ->
+            Exception exception = assertThrows(BadRequestException.class, () ->
                 name.findNestedElementByPath("Field1"));
             assertEquals("CaseField Name has no nested elements.", exception.getMessage());
         }
 
         @Test
         void findNestedElementForCaseFieldWithNonMatchingPathElement() {
-            Exception exception = assertThrows(ResourceNotFoundException.class, () ->
+            Exception exception = assertThrows(BadRequestException.class, () ->
                 debtorDetails.findNestedElementByPath("Field1"));
             assertEquals("Nested element not found for Field1", exception.getMessage());
         }
 
         @Test
         void findNestedElementForCaseFieldWithNonMatchingPathElements() {
-            Exception exception = assertThrows(ResourceNotFoundException.class, () ->
+            Exception exception = assertThrows(BadRequestException.class, () ->
                 debtorDetails.findNestedElementByPath("Field2.Field3"));
             assertEquals("Nested element not found for Field2", exception.getMessage());
         }

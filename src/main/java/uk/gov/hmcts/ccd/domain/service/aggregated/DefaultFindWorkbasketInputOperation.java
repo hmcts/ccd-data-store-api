@@ -14,7 +14,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputField;
 import uk.gov.hmcts.ccd.domain.model.search.Field;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -59,7 +59,7 @@ public class DefaultFindWorkbasketInputOperation implements FindWorkbasketInputO
         result.setOrder(in.getOrder());
 
         CaseField caseField = caseType.getCaseFieldByPath(in.getCaseFieldId(), in.getCaseFieldElementPath())
-            .orElseThrow(() -> new ResourceNotFoundException(format(CASE_FIELD_NOT_FOUND,
+            .orElseThrow(() -> new BadRequestException(format(CASE_FIELD_NOT_FOUND,
                 in.getCaseFieldId(), in.getCaseFieldElementPath())));
 
         final Field field = new Field();
