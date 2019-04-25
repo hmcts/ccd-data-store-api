@@ -32,6 +32,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 @Service
 public class CallbackService {
     private static final Logger LOG = LoggerFactory.getLogger(CallbackService.class);
+    public static final int CALLBACK_RETRY_INTERVAL_MULTIPLIER = 3;
 
     private final SecurityUtils securityUtils;
     private final RestTemplate restTemplate;
@@ -155,7 +156,7 @@ public class CallbackService {
             for (int i = 0; i < callbackRetryTimeouts.size(); i++) {
                 retryContextList.add(
                     new CallbackRetryContext(
-                        getLastElement(retryContextList).getCallbackRetryInterval() * 3,
+                        getLastElement(retryContextList).getCallbackRetryInterval() * CALLBACK_RETRY_INTERVAL_MULTIPLIER,
                         callbackRetryTimeouts.get(i)));
             }
         } else {
