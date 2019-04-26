@@ -9,8 +9,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class AppInsights {
     private static final String MODULE = "CASE_DATA";
-    public static final String CASE_DEFINITION = "CASE_DEFINITION";
+    public static final String CASE_TYPE = "CASE_TYPE";
     public static final String DOC_MANAGEMENT = "DOCUMENT_MANAGEMENT";
+    public static final String CASE_TYPES_REFERENCES = "CASE_TYPES_REFERENCES";
+    public static final String CASE_TYPES_WARM_UP = "CASE_TYPES_WARM_UP";
     public static final String DRAFT_STORE = "DRAFT_STORE";
     private final TelemetryClient telemetry;
 

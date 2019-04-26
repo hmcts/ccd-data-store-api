@@ -74,6 +74,23 @@ data "azurerm_key_vault_secret" "ccd_elastic_search_password" {
   vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
 }
 
+// cache warmer
+data "azurerm_key_vault_secret" "ccd_cache_warm_up_email" {
+  name = "ccd-CACHE-WARM-UP-EMAIL"
+  vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
+}
+
+data "azurerm_key_vault_secret" "ccd_cache_warm_up_password" {
+  name = "ccd-CACHE-WARM-UP-PASSWORD"
+  vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
+}
+
+// oauth2 secret
+data "azurerm_key_vault_secret" "ccd_api_gateway_oauth2_client_secret" {
+  name = "ccd-API-GATEWAY-OAUTH2-CLIENT-SECRET"
+  vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
+}
+
 resource "random_string" "draft_encryption_key" {
   length  = 16
   special = true
@@ -147,6 +164,9 @@ module "ccd-data-store-api" {
 
     CCD_CACHE_WARM_UP_ENABLED             = "${var.cache_warm_up_enabled}"
     CCD_CACHE_WARM_UP_SLEEP_TIME          = "${var.cache_warm_up_sleep_time}"
+    CCD_CACHE_WARM_UP_SLEEP_TIME          = "${var.cache_warm_up_sleep_time}"
+    CCD_CACHE_WARM_UP_EMAIL               = "${data.azurerm_key_vault_secret.ccd_cache_warm_up_email.value}"
+    CCD_CACHE_WARM_UP_PASSWORD            = "${data.azurerm_key_vault_secret.ccd_cache_warm_up_password.value}"
 
     HTTP_CLIENT_CONNECTION_TIMEOUT        = "${var.http_client_connection_timeout}"
     HTTP_CLIENT_READ_TIMEOUT              = "${var.http_client_read_timeout}"
@@ -154,6 +174,9 @@ module "ccd-data-store-api" {
     HTTP_CLIENT_SECONDS_IDLE_CONNECTION   = "${var.http_client_seconds_idle_connection}"
     HTTP_CLIENT_MAX_CLIENT_PER_ROUTE      = "${var.http_client_max_client_per_route}"
     HTTP_CLIENT_VALIDATE_AFTER_INACTIVITY = "${var.http_client_validate_after_inactivity}"
+
+    OAUTH2_REDIRECT_URI                   = "${local.default_redirect_uri}"
+    OAUTH2_CLIENT_SECRET                  = "${data.azurerm_key_vault_secret.ccd_api_gateway_oauth2_client_secret.value}"
   }
 
 }
