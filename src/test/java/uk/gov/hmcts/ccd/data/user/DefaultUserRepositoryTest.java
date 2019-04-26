@@ -11,6 +11,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -19,6 +20,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -30,6 +32,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -196,13 +199,13 @@ class DefaultUserRepositoryTest {
             userDefault.setJurisdictions(singletonList(jurisdiction));
             final ResponseEntity<UserDefault> responseEntity = new ResponseEntity<>(userDefault, HttpStatus.OK);
             when(restTemplate
-                .exchange(any(URI.class), eq(HttpMethod.GET), any(HttpEntity.class), eq(UserDefault.class)))
+                .exchange(isA(URI.class), eq(HttpMethod.GET), isA(HttpEntity.class), eq(UserDefault.class)))
                 .thenReturn(responseEntity);
 
             final UserDefault result = userRepository.getUserDefaultSettings("ccd+test@hmcts.net");
             assertThat(result, is(userDefault));
             verify(restTemplate).exchange(
-                any(URI.class), same(HttpMethod.GET), any(HttpEntity.class), (Class<?>)any(Class.class));
+                isA(URI.class), same(HttpMethod.GET), isA(HttpEntity.class), eq(UserDefault.class));
         }
 
         @Test
@@ -214,7 +217,7 @@ class DefaultUserRepositoryTest {
             final RestClientResponseException exception =
                 new RestClientResponseException("Error on GET", 400, "Bad Request", headers, null, null);
             when(restTemplate
-                .exchange(any(URI.class), eq(HttpMethod.GET), any(HttpEntity.class), eq(UserDefault.class)))
+                .exchange(isA(URI.class), eq(HttpMethod.GET), isA(HttpEntity.class), eq(UserDefault.class)))
                 .thenThrow(exception);
 
             final BadRequestException badRequestException =
@@ -231,7 +234,7 @@ class DefaultUserRepositoryTest {
             final RestClientResponseException exception =
                 new RestClientResponseException(null, 500, "Internal Server Error", null, null, null);
             when(restTemplate
-                .exchange(any(URI.class), eq(HttpMethod.GET), any(HttpEntity.class), eq(UserDefault.class)))
+                .exchange(isA(URI.class), eq(HttpMethod.GET), isA(HttpEntity.class), eq(UserDefault.class)))
                 .thenThrow(exception);
 
             final String userId = "ccd+test@hmcts.net";
@@ -240,6 +243,24 @@ class DefaultUserRepositoryTest {
                     () -> userRepository.getUserDefaultSettings(userId),
                     "Expected getUserDefaultSettings() to throw, but it didn't");
             assertThat(serviceException.getMessage(), is("Problem getting user default settings for " + userId));
+        }
+
+        @Test
+        @DisplayName("should make the User Profile API call with the userId converted to lowercase, prior to encoding")
+        void shouldCallUserProfileWithLowercaseEncodedUserId() {
+            when(applicationParams.userDefaultSettingsURL()).thenReturn("http://test.hmcts.net/users?uid={uid}");
+            ArgumentCaptor<URI> uriCaptor = ArgumentCaptor.forClass(URI.class);
+            final ResponseEntity responseEntity = new ResponseEntity(HttpStatus.OK);
+            doReturn(responseEntity)
+                .when(restTemplate)
+                .exchange(isA(URI.class), eq(HttpMethod.GET), isA(HttpEntity.class), (Class<?>)any(Class.class));
+
+            final String userId = "CCD+Test@HMCTS.net";
+            userRepository.getUserDefaultSettings(userId);
+            verify(restTemplate).exchange(
+                uriCaptor.capture(), same(HttpMethod.GET), isA(HttpEntity.class), (Class<?>)any(Class.class));
+            final String lowercaseEncodedUserId = "ccd%2Btest%40hmcts.net";
+            assertThat(uriCaptor.getValue().getRawQuery(), containsString(lowercaseEncodedUserId));
         }
     }
 
