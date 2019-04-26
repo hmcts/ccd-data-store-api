@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
 import java.io.Serializable;
@@ -144,8 +145,17 @@ public class CaseField implements Serializable {
         propagateACLsToNestedFields(this, this.accessControlLists);
     }
 
+    /**
+     * Gets a caseField by specified path.
+     *
+     * @param path Path to a nested CaseField
+     * @return A nested CaseField or 'this' when path is blank
+     */
     @JsonIgnore
     public CaseField findNestedElementByPath(String path) {
+        if (StringUtils.isBlank(path)) {
+            return this;
+        }
         if (this.getFieldType().getChildren().isEmpty()) {
             throw new BadRequestException(format("CaseField %s has no nested elements.", this.id));
         }

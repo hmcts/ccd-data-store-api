@@ -102,6 +102,18 @@ class CaseFieldTest {
         }
 
         @Test
+        void findNestedElementForCaseFieldWithEmptyPath() {
+            CaseField nestedElementByPath = debtorDetails.findNestedElementByPath("");
+            assertEquals(debtorDetails, nestedElementByPath);
+        }
+
+        @Test
+        void findNestedElementForCaseFieldWithNullPath() {
+            CaseField nestedElementByPath = debtorDetails.findNestedElementByPath(null);
+            assertEquals(debtorDetails, nestedElementByPath);
+        }
+
+        @Test
         void findNestedElementForCaseFieldWithNoNestedElements() {
             Exception exception = assertThrows(BadRequestException.class, () ->
                 name.findNestedElementByPath("Field1"));

@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.ToString;
-import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 
 import java.io.Serializable;
@@ -158,30 +157,8 @@ public class CaseType implements Serializable {
         return getCaseField(caseFieldId).map(CaseField::isCollectionFieldType).orElse(false);
     }
 
-    /**
-     * Gets a caseField by caseField id and specified path.
-     *
-     * @param caseFieldId CaseField id
-     * @param path Path to a nested CaseField
-     * @return Optional of a CaseField
-     */
     @JsonIgnore
-    public Optional<CaseField> getCaseFieldByPath(String caseFieldId, String path) {
-        Optional<CaseField> caseFieldOptional = getCaseField(caseFieldId);
-
-        if (!caseFieldOptional.isPresent()) {
-            return Optional.empty();
-        }
-
-        if (StringUtils.isBlank(path)) {
-            return caseFieldOptional;
-        }
-
-        return Optional.of(caseFieldOptional.get().findNestedElementByPath(path));
-    }
-
-    @JsonIgnore
-    private Optional<CaseField> getCaseField(String caseFieldId) {
+    public Optional<CaseField> getCaseField(String caseFieldId) {
         return caseFields.stream().filter(caseField -> caseField.getId().equalsIgnoreCase(caseFieldId)).findFirst();
     }
 }

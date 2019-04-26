@@ -56,15 +56,16 @@ public class DefaultFindSearchInputOperation implements FindSearchInputOperation
         result.setLabel(in.getLabel());
         result.setOrder(in.getDisplayOrder());
 
-        CaseField caseField = caseType.getCaseFieldByPath(in.getCaseFieldId(), in.getCaseFieldPath())
-            .orElseThrow(() -> new BadRequestException(format(CASE_FIELD_NOT_FOUND,
-                in.getCaseFieldId(), in.getCaseFieldPath())));
+        CaseField caseField = caseType.getCaseField(in.getCaseFieldId())
+            .orElseThrow(() -> new BadRequestException(format(CASE_FIELD_NOT_FOUND, in.getCaseFieldId(), in.getCaseFieldPath())));
+
+        CaseField caseFieldByPath = caseField.findNestedElementByPath(in.getCaseFieldPath());
 
         final Field field = new Field();
         field.setId(in.getCaseFieldId());
-        field.setType(caseField.getFieldType());
+        field.setType(caseFieldByPath.getFieldType());
         field.setElementPath(in.getCaseFieldPath());
-        field.setMetadata(caseField.isMetadata());
+        field.setMetadata(caseFieldByPath.isMetadata());
         result.setField(field);
 
         return result;

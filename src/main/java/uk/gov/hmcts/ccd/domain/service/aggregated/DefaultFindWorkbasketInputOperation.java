@@ -58,15 +58,16 @@ public class DefaultFindWorkbasketInputOperation implements FindWorkbasketInputO
         result.setLabel(in.getLabel());
         result.setOrder(in.getOrder());
 
-        CaseField caseField = caseType.getCaseFieldByPath(in.getCaseFieldId(), in.getCaseFieldElementPath())
-            .orElseThrow(() -> new BadRequestException(format(CASE_FIELD_NOT_FOUND,
-                in.getCaseFieldId(), in.getCaseFieldElementPath())));
+        CaseField caseField = caseType.getCaseField(in.getCaseFieldId())
+            .orElseThrow(() -> new BadRequestException(format(CASE_FIELD_NOT_FOUND, in.getCaseFieldId(), in.getCaseFieldElementPath())));
+
+        CaseField caseFieldByPath = caseField.findNestedElementByPath(in.getCaseFieldElementPath());
 
         final Field field = new Field();
         field.setId(in.getCaseFieldId());
-        field.setType(caseField.getFieldType());
+        field.setType(caseFieldByPath.getFieldType());
         field.setElementPath(in.getCaseFieldElementPath());
-        field.setMetadata(caseField.isMetadata());
+        field.setMetadata(caseFieldByPath.isMetadata());
         result.setField(field);
 
         return result;
