@@ -102,8 +102,8 @@ export TEST_URL=http://localhost:4452
 export S2S_URL=http://localhost:4502
 export CCD_GW_SERVICE_NAME=ccd_gw
 export CCD_GW_SERVICE_SECRET=AAAAAAAAAAAAAAAC
-export CCD_CASEWORKER_AUTOTEST_EMAIL=auto.test.cnp@gmail.com
-export CCD_CASEWORKER_AUTOTEST_PASSWORD=Monday123
+export CCD_CASEWORKER_AUTOTEST_EMAIL=someemail@blob.com
+export CCD_CASEWORKER_AUTOTEST_PASSWORD=XYZT
 ```
 
 These tests also rely on the `CCD_CNP_27.xlsx` file to be already imported. The latest version of this file could be found 
