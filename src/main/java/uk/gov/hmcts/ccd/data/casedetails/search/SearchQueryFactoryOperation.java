@@ -28,9 +28,10 @@ public class SearchQueryFactoryOperation {
     @PersistenceContext
     private final EntityManager entityManager;
 
-    private static final String MAIN_QUERY = "SELECT * FROM case_data WHERE %s ORDER BY created_date %s";
+    private static final String MAIN_QUERY = "SELECT * FROM case_data WHERE %s ORDER BY %s %s";
     private static final String MAIN_COUNT_QUERY = "SELECT count(*) FROM case_data WHERE %s";
 
+    private static final String CREATED_DATE = "created_date";
     private static final String SORT_ASCENDING = "ASC";
 
     private final CriterionFactory criterionFactory;
@@ -54,6 +55,7 @@ public class SearchQueryFactoryOperation {
         final List<Criterion> criteria = criterionFactory.build(metadata, params);
         String queryString = String.format(isCountQuery ? MAIN_COUNT_QUERY : MAIN_QUERY,
                                            secure(toClauses(criteria), metadata),
+                                           metadata.getSortField().orElse(CREATED_DATE),
                                            metadata.getSortDirection().orElse(SORT_ASCENDING).toUpperCase()
         );
         Query query;

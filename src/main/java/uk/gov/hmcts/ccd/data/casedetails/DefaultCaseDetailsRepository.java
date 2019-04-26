@@ -3,7 +3,11 @@ package uk.gov.hmcts.ccd.data.casedetails;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.persistence.*;
+import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
+import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
+import javax.persistence.Query;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.HashMap;
@@ -223,9 +227,9 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
 
     private Query getQueryByMetaData(MetaData metadata) {
         return queryBuilderFactory.select(em, metadata)
-                                  .whereMetadata(metadata)
-                                  .orderByCreatedDate(metadata.getSortDirection().orElse("asc"))
-                                  .build();
+            .whereMetadata(metadata)
+            .orderBy(metadata)
+            .build();
     }
 
     private void paginate(Query query, Optional<String> pageOpt) {

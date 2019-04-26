@@ -1,5 +1,16 @@
 package uk.gov.hmcts.ccd.endpoint.ui;
 
+import javax.inject.Inject;
+import javax.transaction.Transactional;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Predicate;
+
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CASE_REFERENCE;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CREATED_DATE;
@@ -12,6 +23,20 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CR
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
 
+import com.google.common.collect.Maps;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.data.casedetails.search.FieldMapSanitizeOperation;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
@@ -41,39 +66,17 @@ import uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Predicate;
-
-import javax.inject.Inject;
-import javax.transaction.Transactional;
-
-import com.google.common.collect.Maps;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 @RestController
 @RequestMapping(path = "/aggregated",
     consumes = MediaType.APPLICATION_JSON_VALUE,
     produces = MediaType.APPLICATION_JSON_VALUE)
 public class QueryEndpoint {
+
     private static final Logger LOG = LoggerFactory.getLogger(QueryEndpoint.class);
+    private static final String CASE_TYPE_DIVORCE = "DIVORCE";
+    private static final String CASE_DATA_COLUMN_LAST_MODIFIED = "last_modified";
+    private static final String CASE_DATA_ENTITY_FIELD_LAST_MODIFIED = "lastModified";
+
     private final GetCaseViewOperation getCaseViewOperation;
     private final GetCaseHistoryViewOperation getCaseHistoryViewOperation;
     private final GetEventTriggerOperation getEventTriggerOperation;
@@ -170,7 +173,20 @@ public class QueryEndpoint {
 
         Map<String, String> sanitized = fieldMapSanitizeOperation.execute(params);
 
+        addSortField(metadata, sanitized);
+
         return searchQueryOperation.execute(view, metadata, sanitized);
+    }
+
+    private void addSortField(MetaData metadata, Map<String, String> queryParameters) {
+        //Some (ugly) hardcoding (RDM-4636), until we provide feature for default sorting of search results via definition
+        if (CASE_TYPE_DIVORCE.equalsIgnoreCase(metadata.getCaseTypeId())) {
+            if (queryParameters.isEmpty()) {
+                metadata.setSortField(CASE_DATA_ENTITY_FIELD_LAST_MODIFIED);
+            } else {
+                metadata.setSortField(CASE_DATA_COLUMN_LAST_MODIFIED);
+            }
+        }
     }
 
     private Optional<String> param(Map<String, String> queryParameters, String param) {

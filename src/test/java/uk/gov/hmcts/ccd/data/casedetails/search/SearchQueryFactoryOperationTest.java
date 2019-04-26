@@ -140,4 +140,17 @@ public class SearchQueryFactoryOperationTest {
                 "SELECT * FROM case_data WHERE case_type_id = ?0 AND jurisdiction = ?1 AND state IN ('STATE1','STATE2') ORDER BY created_date ASC",
                 CaseDetailsEntity.class));
     }
+
+    @Test
+    public void shouldGenerateOrderByWithSortFieldAndSortDirection() {
+        MetaData metadata = new MetaData(TEST_CASE_TYPE_VALUE, null);
+        metadata.setSortDirection(Optional.of("desc"));
+        metadata.setSortField("last_modified");
+        when(em.createNativeQuery(any(String.class), any(Class.class))).thenReturn(mockQuery);
+
+        subject.build(metadata, params, false);
+
+        verify(em, times(1)).createNativeQuery("SELECT * FROM case_data WHERE case_type_id = ?0 ORDER BY last_modified DESC", CaseDetailsEntity.class);
+    }
+
 }
