@@ -72,17 +72,16 @@ public class MergeDataToSearchResultOperation {
     }
 
     private boolean filterDistinctFieldsByRole(final HashSet<String> addedFields, final SearchResultField resultField) {
-        if (!addedFields.contains(resultField.getCaseFieldId())) {
+        if (addedFields.contains(resultField.getCaseFieldId())) {
+            return false;
+        } else {
             if (StringUtils.isEmpty(resultField.getRole()) || userRepository.getUserRoles().contains(resultField.getRole())) {
                addedFields.add(resultField.getCaseFieldId());
                return true;
             } else {
                 return false;
             }
-        } else {
-            return false;
         }
-
     }
 
     private SearchResultViewItem buildSearchResultViewItem(final CaseDetails caseData, final CaseType caseType) {

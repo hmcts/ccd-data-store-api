@@ -11,6 +11,7 @@ import uk.gov.hmcts.ccd.domain.model.search.CriteriaInput;
 import uk.gov.hmcts.ccd.domain.model.search.CriteriaType;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -47,10 +48,10 @@ public class AuthorisedGetCriteriaOperation implements GetCriteriaOperation {
             resourceNotFoundException.withDetails(NO_CASE_TYPE_FOUND_DETAILS);
             throw resourceNotFoundException;
         }
-
+        final HashSet<String> addedFields = new HashSet<>();
         return getCriteriaOperation.execute(caseTypeId, access, criteriaType).stream()
             .filter(crInput -> criteriaAllowedByCRUD(caseType.get(), crInput))
-            .filter(input -> criteriaAllowedByRole(input, userRepository.getUserRoles()))
+            .filter(input -> filterDistinctFieldsByRole(addedFields, input, userRepository.getUserRoles()))
             .collect(Collectors.toList());
     }
 
@@ -61,7 +62,16 @@ public class AuthorisedGetCriteriaOperation implements GetCriteriaOperation {
             .anyMatch(caseField -> caseField.getId().equalsIgnoreCase(criteriaInput.getField().getId()));
     }
 
-    private boolean criteriaAllowedByRole(final CriteriaInput criteriaInput, final Set<String> userRoles) {
-        return StringUtils.isEmpty(criteriaInput.getRole()) || userRoles.contains(criteriaInput.getRole());
+    private boolean filterDistinctFieldsByRole(final Set<String> addedFields, final CriteriaInput criteriaInput, final Set<String> userRoles) {
+        if (addedFields.contains(criteriaInput.getField().getId())) {
+            return false;
+        } else {
+            if (StringUtils.isEmpty(criteriaInput.getRole()) || userRoles.contains(criteriaInput.getRole())) {
+                addedFields.add(criteriaInput.getField().getId());
+                return true;
+            } else {
+                return false;
+            }
+        }
     }
 }

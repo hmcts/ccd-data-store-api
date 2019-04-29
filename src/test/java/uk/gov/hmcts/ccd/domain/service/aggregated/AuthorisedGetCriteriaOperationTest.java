@@ -35,6 +35,7 @@ import org.mockito.MockitoAnnotations;
 class AuthorisedGetCriteriaOperationTest {
     private static final String CASE_TYPE_ONE = "CaseTypeOne";
     private static final String ROLE1 = "Role1";
+    private static final String ROLE2 = "Role1";
     private static final String CASE_FIELD_ID_1_1 = "CASE_FIELD_1_1";
     private static final String CASE_FIELD_ID_1_2 = "CASE_FIELD_1_2";
     private static final String CASE_FIELD_ID_1_3 = "CASE_FIELD_1_3";
@@ -63,14 +64,16 @@ class AuthorisedGetCriteriaOperationTest {
             aWorkbasketInput().withFieldId(CASE_FIELD_ID_1_2).build(),
             aWorkbasketInput().withFieldId(CASE_FIELD_ID_1_3).build(),
             aWorkbasketInput().withFieldId(CASE_FIELD_ID_1_4).build(),
-            aWorkbasketInput().withFieldId(CASE_FIELD_ID_1_5).withUserRole(ROLE1).build()
+            aWorkbasketInput().withFieldId(CASE_FIELD_ID_1_5).withUserRole(ROLE1).build(),
+            aWorkbasketInput().withFieldId(CASE_FIELD_ID_1_5).withUserRole(ROLE2).build()
         );
         testSearchInputs = Arrays.asList(
             aSearchInput().withFieldId(CASE_FIELD_ID_1_1).build(),
             aSearchInput().withFieldId(CASE_FIELD_ID_1_2).build(),
             aSearchInput().withFieldId(CASE_FIELD_ID_1_3).build(),
             aSearchInput().withFieldId(CASE_FIELD_ID_1_4).build(),
-            aSearchInput().withFieldId(CASE_FIELD_ID_1_5).withUserRole(ROLE1).build()
+            aSearchInput().withFieldId(CASE_FIELD_ID_1_5).withUserRole(ROLE1).build(),
+            aSearchInput().withFieldId(CASE_FIELD_ID_1_5).withUserRole(ROLE2).build()
         );
         CaseType testCaseType = newCaseType()
             .withField(CASE_FIELD_1_1)
@@ -127,6 +130,23 @@ class AuthorisedGetCriteriaOperationTest {
     }
 
     @Test
+    @DisplayName("should not return duplicate search input when user has more than necessary role")
+    void shouldReturnDistinctSearchInputWhenRoleExists() {
+        doReturn(testSearchInputs).when(getCriteriaOperation).execute(CASE_TYPE_ONE, CAN_READ, SEARCH);
+        doReturn(Sets.newHashSet(ROLE1, ROLE2)).when(userRepository).getUserRoles();
+
+        final List<SearchInput> searchInputs = (List<SearchInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, SEARCH);
+
+        assertAll(
+            () -> assertThat(searchInputs.size(), is(4)),
+            () -> assertThat(searchInputs.get(0), is(testSearchInputs.get(0))),
+            () -> assertThat(searchInputs.get(1), is(testSearchInputs.get(1))),
+            () -> assertThat(searchInputs.get(2), is(testSearchInputs.get(2))),
+            () -> assertThat(searchInputs.get(3), is(testSearchInputs.get(4)))
+        );
+    }
+
+    @Test
     @DisplayName("Should return empty search inputs when no case field is authorised")
     void shouldReturnEmptySearchInputWhenNoFieldIsAuthorised() {
         doReturn(new ArrayList<>()).when(getCriteriaOperation).execute(CASE_TYPE_ONE, CAN_READ, SEARCH);
@@ -158,6 +178,23 @@ class AuthorisedGetCriteriaOperationTest {
     void shouldReturnWorkbasketInputWhenRoleExists() {
         doReturn(testWorkbasketInputs).when(getCriteriaOperation).execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
         doReturn(Sets.newHashSet(ROLE1)).when(userRepository).getUserRoles();
+
+        final List<WorkbasketInput> workbasketInputs = (List<WorkbasketInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
+
+        assertAll(
+            () -> assertThat(workbasketInputs.size(), is(4)),
+            () -> assertThat(workbasketInputs.get(0), is(testWorkbasketInputs.get(0))),
+            () -> assertThat(workbasketInputs.get(1), is(testWorkbasketInputs.get(1))),
+            () -> assertThat(workbasketInputs.get(2), is(testWorkbasketInputs.get(2))),
+            () -> assertThat(workbasketInputs.get(3), is(testWorkbasketInputs.get(4)))
+        );
+    }
+    
+    @Test
+    @DisplayName("should not return return duplicate workbasket input field when user has more than necessary role")
+    void shouldReturnDistinctWorkbasketInputWhenRoleExists() {
+        doReturn(testWorkbasketInputs).when(getCriteriaOperation).execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
+        doReturn(Sets.newHashSet(ROLE1, ROLE2)).when(userRepository).getUserRoles();
 
         final List<WorkbasketInput> workbasketInputs = (List<WorkbasketInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
 
