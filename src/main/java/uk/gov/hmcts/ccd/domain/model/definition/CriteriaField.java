@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
 
 public class CriteriaField implements Serializable {
     private String caseFieldId;
+    private String caseFieldPath = null;
     private String label;
     private Integer displayOrder;
     private String role;
@@ -21,6 +22,18 @@ public class CriteriaField implements Serializable {
 
     public void setCaseFieldId(String caseFieldId) {
         this.caseFieldId = caseFieldId;
+    }
+
+    /**
+     **/
+    @ApiModelProperty(value = "")
+    @JsonProperty("case_field_element_path")
+    public String getCaseFieldPath() {
+        return caseFieldPath;
+    }
+
+    public void setCaseFieldPath(String caseFieldPath) {
+        this.caseFieldPath = caseFieldPath;
     }
 
     /**
