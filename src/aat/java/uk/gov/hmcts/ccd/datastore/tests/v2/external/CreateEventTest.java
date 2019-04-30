@@ -22,8 +22,6 @@ import static java.lang.Boolean.FALSE;
 import static org.hamcrest.Matchers.equalTo;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CASE_TYPE;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event.UPDATE;
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event.create;
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event.update;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.JURISDICTION;
 
 @DisplayName("Create event")
