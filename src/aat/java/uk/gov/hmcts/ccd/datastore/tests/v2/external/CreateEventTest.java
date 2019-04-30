@@ -38,7 +38,7 @@ class CreateEventTest extends BaseTest {
 
     @Test
     @DisplayName("should create event")
-    void shouldCreateCase() {
+    void shouldCreateEvent() {
         // Prepare new case in known state
         final Long caseReference = Event.create()
                                         .as(asAutoTestCaseworker())
