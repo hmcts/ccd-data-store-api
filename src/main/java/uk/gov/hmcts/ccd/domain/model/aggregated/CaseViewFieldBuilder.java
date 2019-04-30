@@ -50,27 +50,8 @@ public class CaseViewFieldBuilder {
     public CaseViewField build(CaseField caseField, CaseEventField eventField, Object value) {
         final CaseViewField field = build(caseField, eventField);
         field.setValue(value);
-        getFieldType(field, value);
+        getFieldTypeWithDynamicListsPopulated(field, value);
         return field;
-    }
-
-    private void getFieldType(CaseViewField caseField, Object value) {
-
-        if (caseField.getFieldType().getType().equals(DYNAMIC_LIST) && value != null) {
-            caseField.setValue(((ObjectNode) value).get(DEFAULT));
-            caseField.getFieldType().setDynamicListItems(processDynamicList((ObjectNode) value));
-        }
-    }
-
-    private List<DynamicListItem> processDynamicList(ObjectNode value) {
-        List<DynamicListItem> result = new ArrayList<>();
-        value.get(DYNAMIC_LIST_ITEMS).elements().forEachRemaining(dynamicList -> {
-            DynamicListItem dynamicListItem = new DynamicListItem();
-            dynamicListItem.setCode(dynamicList.get(CODE).textValue());
-            dynamicListItem.setLabel(dynamicList.get(LABEL).textValue());
-            result.add(dynamicListItem);
-        });
-        return result;
     }
 
     public List<CaseViewField> build(List<CaseField> caseFields, List<CaseEventField> eventFields, Map<String, ?> data) {
@@ -81,5 +62,24 @@ public class CaseViewFieldBuilder {
             .filter(eventField -> caseFieldMap.containsKey(eventField.getCaseFieldId()))
             .map(eventField -> build(caseFieldMap.get(eventField.getCaseFieldId()), eventField, data != null ? data.get(eventField.getCaseFieldId()) : null))
             .collect(Collectors.toList());
+    }
+
+    private void getFieldTypeWithDynamicListsPopulated(CaseViewField caseField, Object value) {
+
+        if (caseField.getFieldType().getType().equals(DYNAMIC_LIST) && value != null) {
+            caseField.setValue(((ObjectNode) value).get(DEFAULT));
+            caseField.getFieldType().setFixedListItems(processDynamicList((ObjectNode) value));
+        }
+    }
+
+    private List<FixedListItem> processDynamicList(ObjectNode value) {
+        List<FixedListItem> result = new ArrayList<>();
+        value.get(DYNAMIC_LIST_ITEMS).elements().forEachRemaining(dynamicList -> {
+            FixedListItem listItem = new FixedListItem();
+            listItem.setCode(dynamicList.get(CODE).textValue());
+            listItem.setLabel(dynamicList.get(LABEL).textValue());
+            result.add(listItem);
+        });
+        return result;
     }
 }

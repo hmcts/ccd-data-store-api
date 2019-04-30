@@ -211,53 +211,6 @@ public class CaseViewFieldBuilderTest {
         }
 
         @Test
-        public void shouldCreateFieldWithDynamicLists() throws Exception {
-            JsonNode dataValue = new ObjectMapper().readTree("{\n" + "          \"default\": {\n"
-                + "            \"code\": \"FixedList1\",\n"
-                + "            \"label\": \"Fixed List 1\"\n"
-                + "          },\n"
-                + "          \"dynamic_list_items\": [{\n"
-                + "            \"code\": \"FixedList1\",\n"
-                + "            \"label\": \"Fixed List 1\"\n"
-                + "          }, {\n"
-                + "            \"code\": \"FixedList2\",\n"
-                + "            \"label\": \"Fixed List 2\"\n"
-                + "          }, {\n"
-                + "            \"code\": \"FixedList3\",\n"
-                + "            \"label\": \"Fixed List 3\"\n"
-                + "          }, {\n"
-                + "            \"code\": \"FixedList4\",\n"
-                + "            \"label\": \"Fixed List 4\"\n"
-                + "          }, {\n"
-                + "            \"code\": \"FixedList5\",\n"
-                + "            \"label\": \"Fixed List 5\"\n"
-                + "          }, {\n"
-                + "            \"code\": \"FixedList6\",\n"
-                + "            \"label\": \"Fixed List 6\"\n"
-                + "          }, {\n"
-                + "            \"code\": \"FixedList7\",\n"
-                + "            \"label\": \"Fixed List 7\"\n"
-                + "          }\n"
-                + "          ]\n"
-                + "        }");
-
-            final CaseViewField expectedField = getCaseViewField("DynamicList");
-            expectedField.setId("dynamicList");
-            doReturn(expectedField).when(fieldBuilder).build(CASE_FIELD_DYNAMIC_LIST, EVENT_FIELD_DYNAMIC_LIST);
-
-            final List<CaseField> caseFields = asList(CASE_FIELD_DYNAMIC_LIST);
-            final List<CaseEventField> eventFields = asList(EVENT_FIELD_DYNAMIC_LIST);
-            final Map<String, JsonNode> data = new HashMap<>();
-            data.put("dynamicList", dataValue);
-
-            final List<CaseViewField> fields = fieldBuilder.build(caseFields, eventFields, data);
-
-            assertThat(fields.get(0).getFieldType().getDynamicListItems(), hasSize(7));
-
-            verify(fieldBuilder).build(CASE_FIELD_DYNAMIC_LIST, EVENT_FIELD_DYNAMIC_LIST, dataValue);
-        }
-
-        @Test
         public void shouldOverrideCaseFieldLabelAndHintWithEventFieldLabelAndHint() {
             String overriddenLabel = "overridden label";
             String overriddenHint = "overridden hint";

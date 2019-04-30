@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.test;
 
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.DynamicListItem;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.definition.FixedListItem;
 
@@ -72,16 +71,16 @@ public class CaseFieldBuilder {
     }
 
     public CaseFieldBuilder withDynamicListItem(String itemCode, String itemValue) {
-        if (null == caseField.getFieldType().getDynamicListItems()) {
-            caseField.getFieldType().setDynamicListItems(new ArrayList<>());
+        if (null == caseField.getFieldType().getFixedListItems()) {
+            caseField.getFieldType().setFixedListItems(new ArrayList<>());
         }
 
-        final DynamicListItem item = new DynamicListItem();
+        final FixedListItem item = new FixedListItem();
         item.setCode(itemCode);
         item.setLabel(itemValue);
 
         caseField.getFieldType()
-            .getDynamicListItems()
+            .getFixedListItems()
             .add(item);
         return this;
     }
