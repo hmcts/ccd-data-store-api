@@ -9,6 +9,8 @@ public class SearchResultField implements Serializable {
     private String caseTypeId;
     @JsonProperty("case_field_id")
     private String caseFieldId;
+    @JsonProperty("case_field_element_path")
+    private String caseFieldPath = null;
     private String label;
     @JsonProperty("order")
     private Integer displayOrder;
@@ -28,6 +30,14 @@ public class SearchResultField implements Serializable {
 
     public void setCaseFieldId(String caseFieldId) {
         this.caseFieldId = caseFieldId;
+    }
+
+    public String getCaseFieldPath() {
+        return caseFieldPath;
+    }
+
+    public void setCaseFieldPath(String caseFieldPath) {
+        this.caseFieldPath = caseFieldPath;
     }
 
     public String getLabel() {
