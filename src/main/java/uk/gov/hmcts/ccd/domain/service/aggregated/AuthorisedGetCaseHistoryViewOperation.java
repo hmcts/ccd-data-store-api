@@ -1,10 +1,10 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import java.util.Set;
-
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Set;
 
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
@@ -44,7 +44,9 @@ public class AuthorisedGetCaseHistoryViewOperation extends AbstractAuthorisedCas
         CaseDetails caseDetails = getCase(caseReference);
         CaseType caseType = getCaseType(caseDetails.getCaseTypeId());
         Set<String> userRoles = getUserRoles(caseDetails.getId());
-        verifyReadAccess(caseType, userRoles);
-        return getCaseHistoryViewOperation.execute(caseReference, eventId);
+        verifyCaseTypeReadAccess(caseType, userRoles);
+        CaseHistoryView caseHistoryView = getCaseHistoryViewOperation.execute(caseReference, eventId);
+        filterAllowedTabsWithFields(caseHistoryView, userRoles);
+        return caseHistoryView;
     }
 }

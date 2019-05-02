@@ -34,7 +34,6 @@ The following environment variables are required:
 | DEFINITION_STORE_HOST | - | Base URL for the Definition Store service. `http://localhost:4451` for the dockerised local instance. |
 | CCD_DM_DOMAIN | - | Base URL for the Document Management domain. |
 | AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY | - | For CNP environment this is provided by the terraform scripts. However any value would do for your local environment. |
-| DATA_STORE_DB_USE_SSL | true | Mandated by Cloud Native Platform.  For local testing, set this variable to false |
 | DATA_STORE_DEFAULT_LOG_LEVEL | INFO | Default log level for classes under package uk.gov.hmcts.ccd |
 | HTTP_CLIENT_MAX_TOTAL | 100 | Used for Pooling connection manager; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
 | HTTP_CLIENT_SECONDS_IDLE_CONNECTION | 120 | Used for Pooling connection manager; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
@@ -91,6 +90,25 @@ Database will get initiated when you run `docker-compose up` for the first time 
 You don't need to migrate database manually since migrations are executed every time `docker-compose up` is executed.
 
 You can connect to the database at `http://localhost:5452` with the username and password set in the environment variables.
+
+### Functional Tests
+The functional tests are located in `aat` folder. These are the tests run against an environment. For example if you would 
+like to test your local environment you'll need to export the following variables on your `.bash_profile` script. You'll 
+
+
+```bash
+#Smoke/Functional Tests
+export TEST_URL=http://localhost:4452
+export S2S_URL=http://localhost:4502
+export CCD_GW_SERVICE_NAME=ccd_gw
+export CCD_GW_SERVICE_SECRET=AAAAAAAAAAAAAAAC
+export CCD_CASEWORKER_AUTOTEST_EMAIL=someemail@blob.com
+export CCD_CASEWORKER_AUTOTEST_PASSWORD=XYZT
+```
+
+These tests also rely on the `CCD_CNP_27.xlsx` file to be already imported. The latest version of this file could be found 
+in [ccd-definition-store-api](https://github.com/hmcts/ccd-definition-store-api) project under the `aat/src/resource` folder. You may want to import it to your local installation 
+before trying to run the functional tests against your local environment.  
 
 ## LICENSE
 
