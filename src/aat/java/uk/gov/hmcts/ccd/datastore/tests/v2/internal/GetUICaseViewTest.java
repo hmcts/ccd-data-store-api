@@ -96,7 +96,7 @@ class GetUICaseViewTest extends BaseTest {
             .body("case_type.id", equalTo(CASE_TYPE))
             .body("case_type.jurisdiction.id", equalTo(JURISDICTION))
             // Tabs
-            .body("tabs", hasSize(Tab.values().length))
+            .body("tabs", hasSize(Tab.values().length - 1)) //we don't expect HistoryTab to show up
             // Events
             .body("event.id", equalTo(eventId))
             .body("event.event_id", equalTo(UPDATE))
