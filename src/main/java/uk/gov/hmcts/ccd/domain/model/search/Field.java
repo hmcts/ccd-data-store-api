@@ -5,6 +5,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 
 public class Field {
     private String id;
+    private String elementPath;
     @JsonProperty("field_type")
     private FieldType type;
     private boolean metadata;
@@ -15,6 +16,14 @@ public class Field {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getElementPath() {
+        return elementPath;
+    }
+
+    public void setElementPath(String elementPath) {
+        this.elementPath = elementPath;
     }
 
     public FieldType getType() {
