@@ -14,17 +14,21 @@ import uk.gov.hmcts.ccd.domain.model.definition.SearchInputDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchInputField;
 import uk.gov.hmcts.ccd.domain.model.search.Field;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
 import java.util.List;
 import java.util.function.Predicate;
 
+import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 
 @Service
 @Qualifier(DefaultFindSearchInputOperation.QUALIFIER)
 public class DefaultFindSearchInputOperation implements FindSearchInputOperation {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultFindSearchInputOperation.class);
+
     public static final String QUALIFIER = "default";
+    private static final String CASE_FIELD_NOT_FOUND = "CaseField with id=[%s] and path=[%s] not found";
 
     private final UIDefinitionRepository uiDefinitionRepository;
     private final CaseDefinitionRepository caseDefinitionRepository;
@@ -51,19 +55,19 @@ public class DefaultFindSearchInputOperation implements FindSearchInputOperation
         final SearchInput result = new SearchInput();
         result.setLabel(in.getLabel());
         result.setOrder(in.getDisplayOrder());
+
+        CaseField caseField = caseType.getCaseField(in.getCaseFieldId())
+            .orElseThrow(() -> new BadRequestException(format(CASE_FIELD_NOT_FOUND, in.getCaseFieldId(), in.getCaseFieldPath())));
+
+        CaseField caseFieldByPath = caseField.findNestedElementByPath(in.getCaseFieldPath());
+
         final Field field = new Field();
         field.setId(in.getCaseFieldId());
-        CaseField caseField = getCaseField(in.getCaseFieldId(), caseType);
-        field.setType(caseField.getFieldType());
-        field.setMetadata(caseField.isMetadata());
+        field.setType(caseFieldByPath.getFieldType());
+        field.setElementPath(in.getCaseFieldPath());
+        field.setMetadata(caseFieldByPath.isMetadata());
         result.setField(field);
-        return result;
-    }
 
-    private CaseField getCaseField(final String fieldId, final CaseType caseType) {
-        return caseType.getCaseFields().stream()
-            .filter(c -> c.getId().equals(fieldId))
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException(String.format("FieldId %s not found", fieldId)));
+        return result;
     }
 }

@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "url": "/user-profile/users?uid=Cloud.Strife@test.com"
+    "url": "/user-profile/users?uid=cloud.strife%40test.com"
   },
   "response": {
     "status": 200,
