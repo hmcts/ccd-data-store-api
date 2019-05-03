@@ -58,9 +58,14 @@ variable "jenkins_AAD_objectId" {
   description                 = "(Required) The Azure AD object ID of a user, service principal or security group in the Azure Active Directory tenant for the vault. The object ID must be unique for the list of access policies."
 }
 
-variable "definition_cache_ttl_sec" {
+variable "definition_cache_max_idle_sec" {
   type = "string"
   default = "259200"
+}
+
+variable "definition_cache_latest_version_ttl_sec" {
+  type = "string"
+  default = "1"
 }
 
 variable "definition_cache_max_size" {
@@ -115,7 +120,7 @@ variable "database_storage_mb" {
 
 variable "authorised-services" {
   type    = "string"
-  default = "ccd_data,ccd_gw,ccd_ps,probate_backend,divorce_ccd_submission,sscs,sscs_bulkscan,cmc,cmc_claim_store,jui_webapp,pui_webapp,bulk_scan_orchestrator,fpl_case_service,iac,finrem_ccd_data_migrator"
+  default = "ccd_data,ccd_gw,ccd_ps,probate_backend,divorce_ccd_submission,sscs,sscs_bulkscan,cmc,cmc_claim_store,jui_webapp,pui_webapp,bulk_scan_orchestrator,fpl_case_service,iac,finrem_ccd_data_migrator,finrem_case_orchestration"
 }
 
 variable "idam_api_url" {
@@ -190,7 +195,7 @@ variable "http_client_connection_timeout" {
 
 variable "http_client_read_timeout" {
   type = "string"
-  default = "15000"
+  default = "60000"
 }
 
 variable "http_client_max_total" {
@@ -211,4 +216,9 @@ variable "http_client_max_client_per_route" {
 variable "http_client_validate_after_inactivity" {
   type = "string"
   default = "0"
+}
+
+variable "appinsights_instrumentation_key" {
+  description = "Instrumentation key of the App Insights instance this webapp should use. Module will create own App Insights resource if this is not provided"
+  default = ""
 }
