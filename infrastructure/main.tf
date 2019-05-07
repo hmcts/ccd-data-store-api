@@ -95,7 +95,7 @@ module "ccd-data-store-api" {
   subscription = "${var.subscription}"
   is_frontend = false
   common_tags  = "${var.common_tags}"
-  additional_host_name = "debugparam"
+  additional_host_name = "${var.additional_host_name}"
   asp_name = "${(var.asp_name == "use_shared") ? local.sharedAppServicePlan : var.asp_name}"
   asp_rg = "${(var.asp_rg == "use_shared") ? local.sharedASPResourceGroup : var.asp_rg}"
   website_local_cache_sizeinmb = 2000
