@@ -51,11 +51,11 @@ class DynamicListValidatorTest {
 
     @Test
     public void validValue() throws Exception {
-        JsonNode dataValue = new ObjectMapper().readTree("{\n" + "          \"default\": {\n"
+        JsonNode dataValue = new ObjectMapper().readTree("{\n" + "          \"value\": {\n"
             + "            \"code\": \"FixedList1\",\n"
             + "            \"label\": \"Fixed List 1\"\n"
             + "          },\n"
-            + "          \"dynamic_list_items\": [{\n"
+            + "          \"list_items\": [{\n"
             + "            \"code\": \"FixedList1\",\n"
             + "            \"label\": \"Fixed List 1\"\n"
             + "          }, {\n"
@@ -92,7 +92,7 @@ class DynamicListValidatorTest {
             + "            \"code\": \"FixedList1\",\n"
             + "            \"label\": \"Fixed List 1\"\n"
             + "          },\n"
-            + "          \"dynamic_list_items\": [{\n"
+            + "          \"list_items\": [{\n"
             + "          \"code\": \"FixedList1FixedList1FixedList1FixedList1FixedList1FixedList1FixedList1FixedList1FixedList1"
             + "            FixedList1FixedList1FixedList1FixedList1FixedList1FixedList1FixedList1FixedList\",\n"
             + "            \"label\": \"Fixed List 1\"\n"

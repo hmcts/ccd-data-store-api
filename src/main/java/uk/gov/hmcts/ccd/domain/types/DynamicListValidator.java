@@ -14,9 +14,9 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 @Singleton
 public class DynamicListValidator implements BaseTypeValidator {
     protected static final String TYPE_ID = "DynamicList";
-    private static final String DYNAMIC_LIST_ITEMS = "dynamic_list_items";
+    private static final String LIST_ITEMS = "list_items";
     private static final String CODE = "code";
-    private static final String DEFAULT = "default";
+    private static final String VALUE = "value";
     private static final String LABEL = "label";
 
     @Override
@@ -31,8 +31,11 @@ public class DynamicListValidator implements BaseTypeValidator {
         }
         List<ValidationResult> results = new ArrayList<>();
 
-        dataValue.get(DYNAMIC_LIST_ITEMS).elements().forEachRemaining(node -> validateLength(results, node, dataFieldId));
-        validateLength(results, dataValue.get(DEFAULT), dataFieldId);
+        dataValue.get(LIST_ITEMS).elements().forEachRemaining(node -> validateLength(results, node, dataFieldId));
+        JsonNode value = dataValue.get(VALUE);
+        if (value != null) {
+            validateLength(results, value, dataFieldId);
+        }
 
         return results;
     }

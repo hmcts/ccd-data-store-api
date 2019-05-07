@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 
@@ -20,11 +22,12 @@ import uk.gov.hmcts.ccd.domain.model.definition.*;
 @Singleton
 public class CaseViewFieldBuilder {
 
-    public static final String DYNAMIC_LIST_ITEMS = "dynamic_list_items";
+    public static final String LIST_ITEMS = "list_items";
     public static final String CODE = "code";
     public static final String DYNAMIC_LIST = "DynamicList";
-    public static final String DEFAULT = "default";
+    public static final String VALUE = "value";
     public static final String LABEL = "label";
+    private static String LIST_ITEM_CONTENTS = "{\"value\": %s,\"list_items\": %s }";
 
     public CaseViewField build(CaseField caseField, CaseEventField eventField) {
         final CaseViewField field = new CaseViewField();
@@ -67,19 +70,23 @@ public class CaseViewFieldBuilder {
     private void getFieldTypeWithDynamicListsPopulated(CaseViewField caseField, Object value) {
 
         if (caseField.getFieldType().getType().equals(DYNAMIC_LIST) && value != null) {
-            caseField.setValue(((ObjectNode) value).get(DEFAULT));
+            caseField.setValue(((ObjectNode) value).get(VALUE).get(CODE).textValue());
             caseField.getFieldType().setFixedListItems(processDynamicList((ObjectNode) value));
         }
     }
 
     private List<FixedListItem> processDynamicList(ObjectNode value) {
         List<FixedListItem> result = new ArrayList<>();
-        value.get(DYNAMIC_LIST_ITEMS).elements().forEachRemaining(dynamicList -> {
+        value.get(LIST_ITEMS).elements().forEachRemaining(dynamicList -> {
             FixedListItem listItem = new FixedListItem();
-            listItem.setCode(dynamicList.get(CODE).textValue());
+            listItem.setCode(populateDynamicListCode(dynamicList.toString(), value.get(LIST_ITEMS).toString()));
             listItem.setLabel(dynamicList.get(LABEL).textValue());
             result.add(listItem);
         });
         return result;
+    }
+
+    private String populateDynamicListCode(String value, String listItems) {
+        return String.format(this.LIST_ITEM_CONTENTS, value, listItems);
     }
 }
