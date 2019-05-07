@@ -255,19 +255,36 @@ public class CaseViewFieldBuilderTest {
         private final CaseField name = newCaseField().withId(NAME).withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build()).build();
         private final CaseField surname = newCaseField().withId(SURNAME).withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build()).build();
         private final CaseField adult = newCaseField().withId(ADULT).withFieldType(aFieldType().withId(YESNO_TYPE).withType(YESNO_TYPE).build()).build();
-        private final FieldType personFieldType = aFieldType().withId(PERSON).withType(COMPLEX).withComplexField(name).withComplexField(surname).withComplexField(adult).build();
+        private final FieldType personFieldType = aFieldType()
+            .withId(PERSON)
+            .withType(COMPLEX)
+            .withComplexField(name)
+            .withComplexField(surname)
+            .withComplexField(adult)
+            .build();
         private final CaseField person = newCaseField().withId(PERSON).withFieldType(personFieldType).build();
         private final FieldType membersFieldType = aFieldType().withId(MEMBERS + "-some-uid-value").withType(COLLECTION).withCollectionField(person).build();
         private final CaseField members = newCaseField().withId(MEMBERS).withFieldType(membersFieldType).build();
 
-        private final CaseField addressLine = newCaseField().withId(ADDRESS_LINE).withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build()).build();
+        private final CaseField addressLine = newCaseField()
+            .withId(ADDRESS_LINE)
+            .withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build())
+            .build();
         private final FieldType addressLinesType = aFieldType().withId(ADDRESS_LINES).withType(COLLECTION).withCollectionField(addressLine).build();
         private final CaseField addressLines = newCaseField().withId(ADDRESS_LINES).withFieldType(addressLinesType).build();
         private final CaseField postCode = newCaseField().withId(POSTCODE).withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build()).build();
-        private final FieldType addressFieldType = aFieldType().withComplexField(addressLines).withComplexField(postCode).withId(ADDRESS).withType(COMPLEX).build();
+        private final FieldType addressFieldType = aFieldType()
+            .withComplexField(addressLines)
+            .withComplexField(postCode)
+            .withId(ADDRESS)
+            .withType(COMPLEX)
+            .build();
         private final CaseField address = newCaseField().withId(ADDRESS).withFieldType(addressFieldType).build();
 
-        private final CaseField familyName = newCaseField().withId(FAMILY_NAME).withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build()).build();
+        private final CaseField familyName = newCaseField()
+            .withId(FAMILY_NAME)
+            .withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build())
+            .build();
         private final FieldType nameFieldType =
             aFieldType().withId(NAME + "-some-uid-value").withType(COLLECTION).withCollectionField(familyName).build();
         private final CaseField familyNames = newCaseField().withId(FAMILY_NAME).withFieldType(nameFieldType).build();
