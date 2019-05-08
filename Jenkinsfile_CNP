@@ -36,8 +36,7 @@ def secrets = [
         secret('ccd-api-gateway-oauth2-client-secret', 'OAUTH2_CLIENT_SECRET'),
     ],
     's2s-${env}': [
-        secret('microservicekey-ccd-gw', 'CCD_GW_SERVICE_SECRET'),
-        secret('microservicekey-ccd-data', 'CCD_DATA_SERVICE_SECRET')
+        secret('microservicekey-ccd-gw', 'CCD_GW_SERVICE_SECRET')
     ]
 ]
 
@@ -65,7 +64,7 @@ withPipeline(type, product, component) {
     onPR {
         enableSlackNotifications('#ccd-pr-builds')
 
-        env.IDAM_URL = "https://preprod-idamapi.reform.hmcts.net:3511"
+        env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
         env.S2S_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
         env.CCD_GW_SERVICE_NAME = "ccd_gw"
         env.OAUTH2_CLIENT_ID = "ccd_gateway"

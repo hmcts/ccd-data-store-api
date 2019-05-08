@@ -105,7 +105,7 @@ public class SearchQueryOperationTest {
             () -> verify(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ),
             () -> verify(searchOperation).execute(metadata, criteria),
             () -> verify(getDraftsOperation).execute(metadata),
-            () -> verify(mergeDataToSearchResultOperation).execute(anyObject(), anyList(), anyString(), anyString())
+            () -> verify(mergeDataToSearchResultOperation).execute(any(), anyList(), anyString(), any())
         );
     }
 

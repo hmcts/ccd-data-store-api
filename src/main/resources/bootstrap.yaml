@@ -1,0 +1,11 @@
+spring:
+  cloud:
+    propertiesvolume:
+      paths: /mnt/secrets/s2s,/mnt/secrets/ccd
+      aliases:
+        s2s.microservicekey-ccd-data: DATA_STORE_IDAM_KEY
+        ccd.ccd-data-store-api-draft-key: CCD_DRAFT_ENCRYPTION_KEY
+        ccd.ccd-ELASTIC-SEARCH-URL: ELASTIC_SEARCH_HOSTS
+        ccd.ccd-ELASTIC-SEARCH-DATA-NODES-URL: ELASTIC_SEARCH_DATA_NODES_HOSTS
+        ccd.ccd-ELASTIC-SEARCH-PASSWORD: ELASTIC_SEARCH_PASSWORD
+        ccd.ccd-data-store-api-POSTGRES-PASS: spring.datasource.password

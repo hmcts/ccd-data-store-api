@@ -10,10 +10,14 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
-
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.isNull;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.same;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
@@ -32,9 +36,14 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
+import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
+import uk.gov.hmcts.ccd.domain.model.definition.Version;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
@@ -85,7 +94,7 @@ class DefaultCreateCaseOperationTest {
     private static final String UID = "244";
     private static final String JURISDICTION_ID = "jid";
     private static final String CASE_TYPE_ID = "cti";
-    private Event event = buildEvent();
+    private final Event event = buildEvent();
     private CaseDataContent eventData = newCaseDataContent().build();
 
     private static Map<String, JsonNode> data;
@@ -94,7 +103,7 @@ class DefaultCreateCaseOperationTest {
     private static final String TOKEN = "toke";
     private static final String DRAFT_ID = "1";
 
-    private static final IDAMProperties IDAM_PROPERTIES = buildIDAMUser();
+    private static final IdamUser IDAM_USER = buildIdamUser();
     private static final CaseType CASE_TYPE = buildCaseType();
     private CaseEvent eventTrigger;
 
@@ -113,7 +122,7 @@ class DefaultCreateCaseOperationTest {
                                                                     validateCaseFieldsOperation,
                                                                     draftGateway);
         data = buildJsonNodeData();
-        given(userRepository.getUserDetails()).willReturn(IDAM_PROPERTIES);
+        given(userRepository.getUser()).willReturn(IDAM_USER);
         eventTrigger = newCaseEvent().withId("eventId").withName("event Name").build();
         eventData = newCaseDataContent().withEvent(event).withToken(TOKEN).withData(data).withDraftId(DRAFT_ID).build();
     }
@@ -189,12 +198,11 @@ class DefaultCreateCaseOperationTest {
     void shouldThrowValidationException_whenPreStateIsInvalid() {
         given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(CASE_TYPE);
         given(caseTypeService.isJurisdictionValid(JURISDICTION_ID, CASE_TYPE)).willReturn(Boolean.FALSE);
-        assertThrows(ValidationException.class,
-                     () -> defaultCreateCaseOperation.createCaseDetails(UID,
-                                                                        JURISDICTION_ID,
-                                                                        CASE_TYPE_ID,
-                                                                        eventData,
-                                                                        IGNORE_WARNING),
+        assertThrows(ValidationException.class, () -> defaultCreateCaseOperation.createCaseDetails(UID,
+                                                                                                   JURISDICTION_ID,
+                                                                                                   CASE_TYPE_ID,
+                                                                                                   eventData,
+                                                                                                   IGNORE_WARNING),
                      "Cannot create case because of eventId has pre-states defined");
     }
 
@@ -209,11 +217,10 @@ class DefaultCreateCaseOperationTest {
         given(eventTriggerService.isPreStateValid(null, eventTrigger)).willReturn(Boolean.TRUE);
         given(savedCaseType.getState()).willReturn(caseEventStateId);
         given(caseTypeService.findState(CASE_TYPE, caseEventStateId)).willReturn(caseEventState);
-        given(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, eventData))
-            .willReturn(data);
+        given(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, eventData)).willReturn(data);
         given(submitCaseTransaction.submitCase(same(event),
                                                same(CASE_TYPE),
-                                               same(IDAM_PROPERTIES),
+                                               same(IDAM_USER),
                                                same(eventTrigger),
                                                any(CaseDetails.class),
                                                same(IGNORE_WARNING)))
@@ -242,7 +249,7 @@ class DefaultCreateCaseOperationTest {
             .willReturn(data);
         given(submitCaseTransaction.submitCase(same(event),
                                                same(CASE_TYPE),
-                                               same(IDAM_PROPERTIES),
+                                               same(IDAM_USER),
                                                same(eventTrigger),
                                                any(CaseDetails.class),
                                                same(IGNORE_WARNING)))
@@ -250,11 +257,12 @@ class DefaultCreateCaseOperationTest {
         willDoNothing().given(draftGateway).delete(DRAFT_ID);
         eventTrigger.setCallBackURLSubmittedEvent("   ");
 
-        final CaseDetails caseDetails = defaultCreateCaseOperation.createCaseDetails(UID,
-                                                                                     JURISDICTION_ID,
-                                                                                     CASE_TYPE_ID,
-                                                                                     eventData,
-                                                                                     IGNORE_WARNING);
+        final CaseDetails caseDetails = defaultCreateCaseOperation.createCaseDetails(
+            UID,
+            JURISDICTION_ID,
+            CASE_TYPE_ID,
+            eventData,
+            IGNORE_WARNING);
 
         final InOrder order = inOrder(eventTokenService,
                                       caseTypeService,
@@ -265,12 +273,11 @@ class DefaultCreateCaseOperationTest {
 
 
         assertAll(() -> assertThat(caseDetails, IsInstanceOf.instanceOf(CaseDetails.class)),
-                  () -> order.verify(eventTokenService)
-                      .validateToken(TOKEN, UID, eventTrigger, CASE_TYPE.getJurisdiction(), CASE_TYPE),
+                  () -> order.verify(eventTokenService).validateToken(TOKEN, UID, eventTrigger, CASE_TYPE.getJurisdiction(), CASE_TYPE),
                   () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
                   () -> order.verify(submitCaseTransaction).submitCase(same(event),
                                                                        same(CASE_TYPE),
-                                                                       same(IDAM_PROPERTIES),
+                                                                       same(IDAM_USER),
                                                                        same(eventTrigger),
                                                                        caseDetailsArgumentCaptor.capture(),
                                                                        same(IGNORE_WARNING)),
@@ -293,42 +300,45 @@ class DefaultCreateCaseOperationTest {
         eventTrigger.setCallBackURLSubmittedEvent("http://localhost/submittedcallback");
         given(callbackInvoker.invokeSubmittedCallback(eventTrigger, null, savedCaseType)).willThrow(new CallbackException(
             "call back exception"));
-        given(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, eventData))
+        given(
+            validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, eventData))
             .willReturn(data);
-        given(submitCaseTransaction.submitCase(same(event),
-                                               same(CASE_TYPE),
-                                               same(IDAM_PROPERTIES),
-                                               same(eventTrigger),
-                                               any(CaseDetails.class),
-                                               same(IGNORE_WARNING)))
+        given(
+            submitCaseTransaction.submitCase(
+                same(event),
+                same(CASE_TYPE),
+                same(IDAM_USER),
+                same(eventTrigger),
+                any(CaseDetails.class),
+                same(IGNORE_WARNING)))
             .willReturn(savedCaseType);
 
-        defaultCreateCaseOperation.createCaseDetails(UID,
-                                                     JURISDICTION_ID,
-                                                     CASE_TYPE_ID,
-                                                     eventData,
-                                                     IGNORE_WARNING);
+        defaultCreateCaseOperation.createCaseDetails(
+            UID,
+            JURISDICTION_ID,
+            CASE_TYPE_ID,
+            eventData,
+            IGNORE_WARNING);
 
-        final InOrder order = inOrder(eventTokenService,
-                                      caseTypeService,
-                                      validateCaseFieldsOperation,
-                                      submitCaseTransaction,
-                                      callbackInvoker,
-                                      savedCaseType,
-                                      draftGateway);
+        final InOrder order = inOrder(
+            eventTokenService,
+            caseTypeService,
+            validateCaseFieldsOperation,
+            submitCaseTransaction,
+            callbackInvoker,
+            savedCaseType,
+            draftGateway);
 
         assertAll("case details saved when call back fails",
-                  () -> order.verify(eventTokenService)
-                      .validateToken(TOKEN, UID, eventTrigger, CASE_TYPE.getJurisdiction(), CASE_TYPE),
+                  () -> order.verify(eventTokenService).validateToken(TOKEN, UID, eventTrigger, CASE_TYPE.getJurisdiction(), CASE_TYPE),
                   () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
                   () -> order.verify(submitCaseTransaction).submitCase(same(event),
                                                                        same(CASE_TYPE),
-                                                                       same(IDAM_PROPERTIES),
+                                                                       same(IDAM_USER),
                                                                        same(eventTrigger),
                                                                        any(CaseDetails.class),
                                                                        same(IGNORE_WARNING)),
-                  () -> order.verify(callbackInvoker)
-                      .invokeSubmittedCallback(eq(eventTrigger), isNull(CaseDetails.class), same(savedCaseType)),
+                  () -> order.verify(callbackInvoker).invokeSubmittedCallback(eq(eventTrigger), isNull(CaseDetails.class), same(savedCaseType)),
                   () -> order.verify(savedCaseType).setIncompleteCallbackResponse(),
                   () -> order.verify(draftGateway).delete(DRAFT_ID));
     }
@@ -354,19 +364,21 @@ class DefaultCreateCaseOperationTest {
         given(savedCaseType.getCaseTypeId()).willReturn(mockCaseTypeId);
         given(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, eventData))
             .willReturn(data);
-        given(submitCaseTransaction.submitCase(same(event),
-                                               same(CASE_TYPE),
-                                               same(IDAM_PROPERTIES),
-                                               same(eventTrigger),
-                                               any(CaseDetails.class),
-                                               same(IGNORE_WARNING)))
+        given(submitCaseTransaction.submitCase(
+            same(event),
+            same(CASE_TYPE),
+            same(IDAM_USER),
+            same(eventTrigger),
+            any(CaseDetails.class),
+            same(IGNORE_WARNING)))
             .willReturn(savedCaseType);
 
-        final CaseDetails caseDetails = defaultCreateCaseOperation.createCaseDetails(UID,
-                                                                                     JURISDICTION_ID,
-                                                                                     CASE_TYPE_ID,
-                                                                                     eventData,
-                                                                                     IGNORE_WARNING);
+        final CaseDetails caseDetails = defaultCreateCaseOperation.createCaseDetails(
+            UID,
+            JURISDICTION_ID,
+            CASE_TYPE_ID,
+            eventData,
+            IGNORE_WARNING);
 
         final InOrder order = inOrder(eventTokenService,
                                       caseTypeService,
@@ -378,18 +390,15 @@ class DefaultCreateCaseOperationTest {
 
         assertAll("Call back response returned successfully",
                   () -> assertThat(caseDetails.getCaseTypeId(), is(mockCaseTypeId)),
-                  () -> order.verify(eventTokenService)
-                      .validateToken(TOKEN, UID, eventTrigger, CASE_TYPE.getJurisdiction(), CASE_TYPE),
+                  () -> order.verify(eventTokenService).validateToken(TOKEN, UID, eventTrigger, CASE_TYPE.getJurisdiction(), CASE_TYPE),
                   () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
                   () -> order.verify(submitCaseTransaction).submitCase(same(event),
                                                                        same(CASE_TYPE),
-                                                                       same(IDAM_PROPERTIES),
+                                                                       same(IDAM_USER),
                                                                        same(eventTrigger),
                                                                        any(CaseDetails.class),
                                                                        same(IGNORE_WARNING)),
-                  () -> order.verify(callbackInvoker)
-                      .invokeSubmittedCallback(eq(eventTrigger),
-                                               isNull(CaseDetails.class), same(savedCaseType)),
+                  () -> order.verify(callbackInvoker).invokeSubmittedCallback(eq(eventTrigger), isNull(CaseDetails.class), same(savedCaseType)),
                   () -> order.verify(savedCaseType).setAfterSubmitCallbackResponseEntity(response),
                   () -> order.verify(draftGateway).delete(DRAFT_ID));
     }
@@ -414,10 +423,9 @@ class DefaultCreateCaseOperationTest {
         return map;
     }
 
-    private static IDAMProperties buildIDAMUser() {
-        final IDAMProperties properties = new IDAMProperties();
+    private static IdamUser buildIdamUser() {
+        final IdamUser properties = new IdamUser();
         properties.setId("pid");
-        properties.setRoles(new String[]{"role-A", "role-B"});
         properties.setEmail("ngitb@hmcts.net");
         properties.setForename("Wo");
         properties.setSurname("Mata");

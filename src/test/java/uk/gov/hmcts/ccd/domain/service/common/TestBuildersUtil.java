@@ -1,12 +1,10 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
+
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
@@ -61,9 +59,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 public class TestBuildersUtil {
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -232,6 +234,11 @@ public class TestBuildersUtil {
 
         public CaseDataContentBuilder withIgnoreWarning(Boolean ignoreWarning) {
             this.caseDataContent.setIgnoreWarning(ignoreWarning);
+            return this;
+        }
+
+        public CaseDataContentBuilder withCaseReference(String caseReference) {
+            this.caseDataContent.setCaseReference(caseReference);
             return this;
         }
 
@@ -546,6 +553,16 @@ public class TestBuildersUtil {
 
         public static CaseViewTabBuilder newCaseViewTab() {
             return new CaseViewTabBuilder();
+        }
+
+        public CaseViewTabBuilder withId(String id) {
+            caseViewTab.setId(id);
+            return this;
+        }
+
+        public CaseViewTabBuilder withRole(String role) {
+            caseViewTab.setRole(role);
+            return this;
         }
 
         public CaseViewTabBuilder addCaseViewField(CaseViewField caseViewField) {
@@ -1004,7 +1021,8 @@ public class TestBuildersUtil {
         }
 
         public FieldTypeBuilder withCollectionField(CaseField complexField) {
-            complexFields.add(complexField);
+            fieldType.setCollectionFieldType(FieldTypeBuilder.aFieldType().withComplexField(complexField)
+                .withType(COMPLEX).build());
             return this;
         }
 
@@ -1028,6 +1046,11 @@ public class TestBuildersUtil {
 
         public CaseViewFieldBuilder withId(String id) {
             caseViewField.setId(id);
+            return this;
+        }
+
+        public CaseViewFieldBuilder withFieldType(FieldType fieldType) {
+            caseViewField.setFieldType(fieldType);
             return this;
         }
 
@@ -1151,6 +1174,7 @@ public class TestBuildersUtil {
 
         private CaseHistoryViewBuilder() {
             this.caseHistoryView = new CaseHistoryView();
+            this.caseHistoryView.setTabs(new CaseViewTab[0]);
         }
 
         public static CaseHistoryViewBuilder aCaseHistoryView() {
@@ -1159,6 +1183,14 @@ public class TestBuildersUtil {
 
         public CaseHistoryViewBuilder withEvent(CaseViewEvent caseViewEvent) {
             this.caseHistoryView.setEvent(caseViewEvent);
+            return this;
+        }
+
+        public CaseHistoryViewBuilder addCaseHistoryViewTab(CaseViewTab caseViewTab) {
+            CaseViewTab[] newTabs = new CaseViewTab[caseHistoryView.getTabs().length + 1];
+            System.arraycopy(caseHistoryView.getTabs(), 0, newTabs, 0, caseHistoryView.getTabs().length);
+            newTabs[newTabs.length - 1] = caseViewTab;
+            caseHistoryView.setTabs(newTabs);
             return this;
         }
 
@@ -1188,11 +1220,61 @@ public class TestBuildersUtil {
         }
     }
 
+    public static class CaseTypeTabFieldBuilder {
+        private final CaseTypeTabField caseTypeTabField;
+
+        private CaseTypeTabFieldBuilder() {
+            this.caseTypeTabField = new CaseTypeTabField();
+        }
+
+        public CaseTypeTabFieldBuilder withCaseField(CaseField caseField) {
+            this.caseTypeTabField.setCaseField(caseField);
+            return this;
+        }
+
+        public CaseTypeTabField build() {
+            return this.caseTypeTabField;
+        }
+
+        public static CaseTypeTabFieldBuilder newCaseTabField() {
+            return new CaseTypeTabFieldBuilder();
+        }
+
+    }
+
+    public static class CaseTypeTabBuilder {
+        private final CaseTypeTab caseTypeTab;
+        private final List<CaseTypeTabField> caseTypeTabFields;
+
+        private CaseTypeTabBuilder() {
+            this.caseTypeTabFields = newArrayList();
+            this.caseTypeTab = new CaseTypeTab();
+            this.caseTypeTab.setTabFields(caseTypeTabFields);
+        }
+
+        public CaseTypeTabBuilder withTabField(CaseTypeTabField field) {
+            this.caseTypeTabFields.add(field);
+            return this;
+        }
+
+        public CaseTypeTab build() {
+            return this.caseTypeTab;
+        }
+
+        public static CaseTypeTabBuilder newCaseTab() {
+            return new CaseTypeTabBuilder();
+        }
+
+    }
+
     public static class CaseTabCollectionBuilder {
+        private final List<CaseTypeTab> tabs;
         private final CaseTabCollection caseTabCollection;
 
         private CaseTabCollectionBuilder() {
+            this.tabs = newArrayList();
             this.caseTabCollection = new CaseTabCollection();
+            this.caseTabCollection.setTabs(tabs);
         }
 
         public static CaseTabCollectionBuilder newCaseTabCollection() {
@@ -1220,6 +1302,11 @@ public class TestBuildersUtil {
             tabs.add(tab);
             caseTabCollection.setTabs(tabs);
 
+            return this;
+        }
+
+        public CaseTabCollectionBuilder withTab(CaseTypeTab tab) {
+            tabs.add(tab);
             return this;
         }
 

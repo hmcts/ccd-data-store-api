@@ -1,11 +1,10 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
@@ -45,11 +43,7 @@ public class CaseAccessService {
     }
 
     public Boolean canUserAccess(CaseDetails caseDetails) {
-
-        IDAMProperties currentUser = userRepository.getUserDetails();
-        return !canOnlyViewGrantedCases(currentUser)
-            || accessGranted(caseDetails, currentUser);
-
+        return !canOnlyViewGrantedCases() || accessGranted(caseDetails);
     }
 
     public AccessLevel getAccessLevel(ServiceAndUserDetails serviceAndUserDetails) {
@@ -63,19 +57,15 @@ public class CaseAccessService {
     }
 
     public Optional<List<Long>> getGrantedCaseIdsForRestrictedRoles() {
-        IDAMProperties currentUser = userRepository.getUserDetails();
-        if (canOnlyViewGrantedCases(currentUser)) {
-            return Optional.of(caseUserRepository.findCasesUserIdHasAccessTo(currentUser.getId()));
+        if (canOnlyViewGrantedCases()) {
+            return Optional.of(caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId()));
         }
 
         return Optional.empty();
     }
 
     public Set<String> getCaseRoles(String caseId) {
-        return caseUserRepository
-            .findCaseRoles(Long.valueOf(caseId), userRepository.getUserId())
-            .stream()
-            .collect(Collectors.toSet());
+        return new HashSet<>(caseUserRepository.findCaseRoles(Long.valueOf(caseId), userRepository.getUserId()));
     }
 
     public Set<String> getUserRoles() {
@@ -86,8 +76,8 @@ public class CaseAccessService {
         return userRoles;
     }
 
-    private Boolean accessGranted(CaseDetails caseDetails, IDAMProperties currentUser) {
-        final List<Long> grantedCases = caseUserRepository.findCasesUserIdHasAccessTo(currentUser.getId());
+    private Boolean accessGranted(CaseDetails caseDetails) {
+        final List<Long> grantedCases = caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId());
 
         if (null != grantedCases && grantedCases.contains(Long.valueOf(caseDetails.getId()))) {
             return Boolean.TRUE;
@@ -96,9 +86,10 @@ public class CaseAccessService {
         return Boolean.FALSE;
     }
 
-    private Boolean canOnlyViewGrantedCases(IDAMProperties currentUser) {
-        return Stream.of(currentUser.getRoles())
-                     .anyMatch(role -> RESTRICT_GRANTED_ROLES_PATTERN.matcher(role).matches());
+    private Boolean canOnlyViewGrantedCases() {
+        return userRepository.getUserRoles()
+            .stream()
+            .anyMatch(role -> RESTRICT_GRANTED_ROLES_PATTERN.matcher(role).matches());
     }
 
 }

@@ -13,6 +13,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.JurisdictionBuilder.newJurisdiction;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,7 +26,6 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 import uk.gov.hmcts.ccd.domain.service.security.DefaultAuthorisedCaseDefinitionDataService;
 
 class DefaultAuthorisedCaseDefinitionDataServiceTest {
@@ -46,7 +46,7 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-        when(caseType.getJurisdiction()).thenReturn(new Jurisdiction());
+        when(caseType.getJurisdiction()).thenReturn(newJurisdiction().withJurisdictionId("jid").build());
     }
 
     @Nested
