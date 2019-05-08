@@ -89,16 +89,19 @@ module "ccd-data-store-api" {
   source   = "git@github.com:hmcts/cnp-module-webapp?ref=master"
   product  = "${local.app_full_name}"
   location = "${var.location}"
+  appinsights_location = "${var.location}"
   env      = "${var.env}"
   ilbIp    = "${var.ilbIp}"
   subscription = "${var.subscription}"
   is_frontend = false
   common_tags  = "${var.common_tags}"
-  additional_host_name = "debugparam"
+  additional_host_name = "${var.additional_host_name}"
   asp_name = "${(var.asp_name == "use_shared") ? local.sharedAppServicePlan : var.asp_name}"
   asp_rg = "${(var.asp_rg == "use_shared") ? local.sharedASPResourceGroup : var.asp_rg}"
   website_local_cache_sizeinmb = 2000
   capacity = "${var.capacity}"
+  java_container_version = "9.0"
+  appinsights_instrumentation_key = "${var.appinsights_instrumentation_key}"
 
   app_settings = {
     DATA_STORE_DB_HOST = "${module.data-store-db.host_name}"

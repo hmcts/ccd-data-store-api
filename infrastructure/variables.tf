@@ -108,7 +108,7 @@ variable "database_storage_mb" {
 
 variable "authorised-services" {
   type    = "string"
-  default = "ccd_data,ccd_gw,ccd_ps,probate_backend,divorce_ccd_submission,sscs,sscs_bulkscan,cmc,cmc_claim_store,cmc_claim_external_api,jui_webapp,pui_webapp,bulk_scan_orchestrator,fpl_case_service,iac,finrem_ccd_data_migrator"
+  default = "ccd_data,ccd_gw,ccd_ps,probate_backend,divorce_ccd_submission,sscs,sscs_bulkscan,cmc,cmc_claim_store,cmc_claim_external_api,jui_webapp,pui_webapp,bulk_scan_orchestrator,fpl_case_service,iac,finrem_ccd_data_migrator,finrem_case_orchestration"
 }
 
 variable "idam_api_url" {
@@ -183,7 +183,7 @@ variable "http_client_connection_timeout" {
 
 variable "http_client_read_timeout" {
   type = "string"
-  default = "15000"
+  default = "60000"
 }
 
 variable "http_client_max_total" {
@@ -204,4 +204,14 @@ variable "http_client_max_client_per_route" {
 variable "http_client_validate_after_inactivity" {
   type = "string"
   default = "0"
+}
+
+variable "appinsights_instrumentation_key" {
+  description = "Instrumentation key of the App Insights instance this webapp should use. Module will create own App Insights resource if this is not provided"
+  default = ""
+}
+
+variable "additional_host_name" {
+  description = "A custom domain name for this webapp."
+  default = ""
 }
