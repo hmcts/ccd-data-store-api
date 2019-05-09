@@ -84,6 +84,7 @@ public class CallbackService {
         return send(url, callbackRetryTimeouts, caseEvent, caseDetailsBefore, caseDetails, false);
     }
 
+    @SuppressWarnings("javasecurity:S5145")
     public Optional<CallbackResponse> send(final String url,
                                            final List<Integer> callbackRetryTimeouts,
                                            final CaseEvent caseEvent,
@@ -112,7 +113,7 @@ public class CallbackService {
                 return Optional.of(responseEntity.get().getBody());
             }
         }
-        LOG.info("Unsuccessful callback to {} for caseType {} and event {}", url, caseDetails.getCaseTypeId(), caseEvent.getId());
+        LOG.debug("Unsuccessful callback to {} for caseType {} and event {}", url, caseDetails.getCaseTypeId(), caseEvent.getId());
         throw new CallbackException("Unsuccessful callback to " + url);
     }
 
