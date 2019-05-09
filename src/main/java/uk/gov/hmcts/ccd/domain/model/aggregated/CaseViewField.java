@@ -38,6 +38,7 @@ public class CaseViewField {
     private Integer showSummaryContentOption;
     @JsonProperty("acls")
     private List<AccessControlList> accessControlLists;
+    private boolean metadata;
 
     public String getId() {
         return id;
@@ -159,6 +160,14 @@ public class CaseViewField {
         this.accessControlLists = accessControlLists;
     }
 
+    public boolean isMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(boolean metadata) {
+        this.metadata = metadata;
+    }
+
     public static CaseViewField createFrom(CaseTypeTabField field, Map<String, ?> data) {
         CaseViewField caseViewField = createFrom(field.getCaseField(), data);
         caseViewField.setOrder(field.getDisplayOrder());
@@ -178,6 +187,7 @@ public class CaseViewField {
         caseViewField.setValidationExpression(caseField.getFieldType().getRegularExpression());
         caseViewField.setAccessControlLists(caseField.getAccessControlLists());
         caseViewField.setValue(data.get(caseField.getId()));
+        caseViewField.setMetadata(caseField.isMetadata());
 
         return caseViewField;
     }
