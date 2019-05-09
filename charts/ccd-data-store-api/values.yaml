@@ -46,5 +46,3 @@ java:
     CCD_DEFAULTPRINTURL: https://return-case-doc-ccd.nonprod.platform.hmcts.net/jurisdictions/:jid/case-types/:ctid/cases/:cid
   postgresql:
     postgresqlDatabase: ccd_data_store
-    image:
-      tag: 10.7.0-r68
