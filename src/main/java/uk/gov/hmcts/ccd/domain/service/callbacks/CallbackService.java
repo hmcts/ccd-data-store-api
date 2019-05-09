@@ -160,9 +160,7 @@ public class CallbackService {
                         callbackRetryTimeouts.get(i)));
             }
         } else {
-            this.defaultCallbackRetryIntervalsInSeconds.forEach(cbRetryInterval -> {
-                retryContextList.add(new CallbackRetryContext(cbRetryInterval, defaultCallbackTimeoutInMillis));
-            });
+            this.defaultCallbackRetryIntervalsInSeconds.forEach(cbRetryInterval -> retryContextList.add(new CallbackRetryContext(cbRetryInterval, defaultCallbackTimeoutInMillis)));
         }
         return retryContextList;
     }
@@ -171,6 +169,7 @@ public class CallbackService {
         return retryContextList.get(retryContextList.size() - 1);
     }
 
+    @SuppressWarnings({"squid:S2139","squid:S00112"})
     private void sleep(final Integer timeout) {
         try {
             TimeUnit.SECONDS.sleep((long) timeout);
