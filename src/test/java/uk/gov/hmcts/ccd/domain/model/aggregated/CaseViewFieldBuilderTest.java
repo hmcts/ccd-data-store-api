@@ -127,52 +127,6 @@ public class CaseViewFieldBuilderTest {
         }
 
         @Test
-        public void shouldCreateFieldFromCaseEventFieldWithDynamicListTypeData() throws Exception {
-            final String expectedValue = "{\"value\": {\"code\":\"FixedList1\",\"label\":\"Fixed List 1\"}," +
-                "\"list_items\": [{\"code\":\"FixedList1\",\"label\":\"Fixed List 1\"},{\"code\":\"FixedList2\",\"label\":\"Fixed List 2\"}," +
-                "{\"code\":\"FixedList3\",\"label\":\"Fixed List 3\"},{\"code\":\"FixedList4\",\"label\":\"Fixed List 4\"}," +
-                "{\"code\":\"FixedList5\",\"label\":\"Fixed List 5\"},{\"code\":\"FixedList6\",\"label\":\"Fixed List 6\"}," +
-                "{\"code\":\"FixedList7\",\"label\":\"Fixed List 7\"}] }";
-
-
-            String content = "{\n" + "          \"value\": {\n"
-                + "            \"code\": \"FixedList1\",\n"
-                + "            \"label\": \"Fixed List 1\"\n"
-                + "          },\n"
-                + "          \"list_items\": [{\n"
-                + "            \"code\": \"FixedList1\",\n"
-                + "            \"label\": \"Fixed List 1\"\n"
-                + "          }, {\n"
-                + "            \"code\": \"FixedList2\",\n"
-                + "            \"label\": \"Fixed List 2\"\n"
-                + "          }, {\n"
-                + "            \"code\": \"FixedList3\",\n"
-                + "            \"label\": \"Fixed List 3\"\n"
-                + "          }, {\n"
-                + "            \"code\": \"FixedList4\",\n"
-                + "            \"label\": \"Fixed List 4\"\n"
-                + "          }, {\n"
-                + "            \"code\": \"FixedList5\",\n"
-                + "            \"label\": \"Fixed List 5\"\n"
-                + "          }, {\n"
-                + "            \"code\": \"FixedList6\",\n"
-                + "            \"label\": \"Fixed List 6\"\n"
-                + "          }, {\n"
-                + "            \"code\": \"FixedList7\",\n"
-                + "            \"label\": \"Fixed List 7\"\n"
-                + "          }\n"
-                + "          ]\n"
-                + "        }";
-            final JsonNode data = new ObjectMapper().readTree(content);
-
-            final CaseViewField field = fieldBuilder.build(CASE_FIELD_DYNAMIC_LIST, EVENT_FIELD, data);
-
-            verify(fieldBuilder).build(CASE_FIELD_DYNAMIC_LIST, EVENT_FIELD);
-            assertThat(field.getFieldType().getFixedListItems().size(), is(7));
-            assertThat(field.getFieldType().getFixedListItems().get(0).getCode(), equalTo(expectedValue));
-        }
-
-        @Test
         public void shouldCreateFieldFromArrayOfCaseEventField() {
             final CaseViewField expectedField = getCaseViewField("FixedList");
             final CaseViewField expectedField2 = getCaseViewField("FixedList");
