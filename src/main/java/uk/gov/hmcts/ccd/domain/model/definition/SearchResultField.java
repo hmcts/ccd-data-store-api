@@ -3,6 +3,9 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class SearchResultField implements Serializable {
     @JsonProperty("case_type_id")
@@ -34,6 +37,10 @@ public class SearchResultField implements Serializable {
 
     public String getCaseFieldPath() {
         return caseFieldPath;
+    }
+
+    public List<String> getPathElements() {
+        return Arrays.stream(this.caseFieldPath.trim().split("\\.")).collect(Collectors.toList());
     }
 
     public void setCaseFieldPath(String caseFieldPath) {

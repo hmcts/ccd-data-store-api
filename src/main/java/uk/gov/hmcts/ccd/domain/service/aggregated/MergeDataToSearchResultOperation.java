@@ -103,7 +103,7 @@ public class MergeDataToSearchResultOperation {
             JsonNode jsonNode = caseData.get(searchResultField.getCaseFieldId());
             if (jsonNode != null) {
                 newResults.put(searchResultField.getCaseFieldId() + "." + searchResultField.getCaseFieldPath(),
-                    getObjectByPath(searchResultField.getCaseFieldPath(), jsonNode));
+                    getObjectByPath(searchResultField, jsonNode));
             }
         });
 
@@ -114,17 +114,17 @@ public class MergeDataToSearchResultOperation {
         return newResults;
     }
 
-    private Object getObjectByPath(String path, JsonNode value) {
-        //todo add getPathElements to searchResultField
-        List<String> pathElements = Arrays.stream(path.trim().split("\\.")).collect(Collectors.toList());
+    private Object getObjectByPath(SearchResultField searchResultField, JsonNode value) {
 
-        //rather than cast here can't we declare it as JsonNode
-        return reduce(value, pathElements, path);
+        List<String> pathElements = searchResultField.getPathElements();
+
+        return reduce(value, pathElements, searchResultField.getCaseFieldPath());
     }
 
     private Object reduce(JsonNode caseFields, List<String> pathElements, String path) {
         String firstPathElement = pathElements.get(0);
 
+        //TODO this is a rest layer exception does not belong here
         JsonNode caseField = Optional.ofNullable(caseFields.get(firstPathElement))
             .orElseThrow(() -> new BadRequestException(format(NESTED_ELEMENT_NOT_FOUND_FOR_PATH, path)));
 
