@@ -92,7 +92,7 @@ class CaseFieldTest {
         @Test
         void findNestedElementByPath() {
             String path = PERSON + "." + NAME;
-            CaseField nestedElementByPath = debtorDetails.findNestedElementByPath(path);
+            CaseField nestedElementByPath = debtorDetails.getComplexTypeNestedField(path);
 
             assertAll(
                 () -> assertThat(nestedElementByPath.getId(), is(name.getId())),
@@ -103,34 +103,34 @@ class CaseFieldTest {
 
         @Test
         void findNestedElementForCaseFieldWithEmptyPath() {
-            CaseField nestedElementByPath = debtorDetails.findNestedElementByPath("");
+            CaseField nestedElementByPath = debtorDetails.getComplexTypeNestedField("");
             assertEquals(debtorDetails, nestedElementByPath);
         }
 
         @Test
         void findNestedElementForCaseFieldWithNullPath() {
-            CaseField nestedElementByPath = debtorDetails.findNestedElementByPath(null);
+            CaseField nestedElementByPath = debtorDetails.getComplexTypeNestedField(null);
             assertEquals(debtorDetails, nestedElementByPath);
         }
 
         @Test
         void findNestedElementForCaseFieldWithNoNestedElements() {
             Exception exception = assertThrows(BadRequestException.class, () ->
-                name.findNestedElementByPath("Field1"));
+                name.getComplexTypeNestedField("Field1"));
             assertEquals("CaseField Name has no nested elements.", exception.getMessage());
         }
 
         @Test
         void findNestedElementForCaseFieldWithNonMatchingPathElement() {
             Exception exception = assertThrows(BadRequestException.class, () ->
-                debtorDetails.findNestedElementByPath("Field1"));
+                debtorDetails.getComplexTypeNestedField("Field1"));
             assertEquals("Nested element not found for Field1", exception.getMessage());
         }
 
         @Test
         void findNestedElementForCaseFieldWithNonMatchingPathElements() {
             Exception exception = assertThrows(BadRequestException.class, () ->
-                debtorDetails.findNestedElementByPath("Field2.Field3"));
+                debtorDetails.getComplexTypeNestedField("Field2.Field3"));
             assertEquals("Nested element not found for Field2", exception.getMessage());
         }
     }

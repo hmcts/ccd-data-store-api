@@ -79,7 +79,7 @@ public class MergeDataToSearchResultOperation {
 
     private CaseField getNestedCaseField(final CaseField caseField,
                                          final SearchResultField searchResultField) {
-        return caseField.findNestedElementByPath(searchResultField.getCaseFieldPath());
+        return caseField.getComplexTypeNestedField(searchResultField.getCaseFieldPath());
     }
 
     private SearchResultViewItem buildSearchResultViewItem(final CaseDetails caseDetails,
@@ -125,8 +125,10 @@ public class MergeDataToSearchResultOperation {
     }
 
     private Object getObjectByPath(String path, Object value) {
+        //todo add getPathElements to searchResultField
         List<String> pathElements = Arrays.stream(path.trim().split("\\.")).collect(Collectors.toList());
 
+        //rather than cast here can't we declare it as JsonNode
         return reduce((JsonNode) value, pathElements, path);
     }
 
