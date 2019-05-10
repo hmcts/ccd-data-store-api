@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 
 import static java.util.Optional.ofNullable;
 
-
 @Named
 @Singleton
 public class CaseViewFieldBuilder {
@@ -41,6 +40,7 @@ public class CaseViewFieldBuilder {
     public CaseViewField build(CaseField caseField, CaseEventField eventField, Object value) {
         final CaseViewField field = build(caseField, eventField);
         field.setValue(value);
+
         return field;
     }
 

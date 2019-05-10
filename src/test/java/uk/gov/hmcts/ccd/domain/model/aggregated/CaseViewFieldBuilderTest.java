@@ -19,7 +19,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldB
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -36,7 +35,6 @@ public class CaseViewFieldBuilderTest {
     private static final CaseField CASE_FIELD_2 = new CaseField();
     private static final CaseEventField EVENT_FIELD = new CaseEventField();
     private static final CaseEventField EVENT_FIELD_2 = new CaseEventField();
-    private static final CaseEventField EVENT_FIELD_DYNAMIC_LIST = new CaseEventField();
     private static final String FIRST_NAME = "Patrick";
     private static final String LAST_NAME = "Smith";
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
@@ -44,7 +42,6 @@ public class CaseViewFieldBuilderTest {
     private static final AccessControlList acl2 = anAcl().withRole("role2").withCreate(true).withRead(true).withUpdate(false).withDelete(true).build();
     private static final AccessControlList acl3 = anAcl().withRole("role3").withCreate(false).withRead(false).withUpdate(true).withDelete(false).build();
     private static final FieldType textFieldType = aFieldType().withId("Text").withType("Text").build();
-    private static final FieldType dynamicFieldType = aFieldType().withId("dynamicList").withType("DynamicList").build();
     private static final CaseField CASE_FIELD = newCaseField()
         .withFieldType(textFieldType)
         .withId("PersonFirstName")
@@ -52,13 +49,7 @@ public class CaseViewFieldBuilderTest {
         .withAcl(acl2)
         .withAcl(acl3)
         .build();
-    private static final CaseField CASE_FIELD_DYNAMIC_LIST = newCaseField()
-        .withFieldType(dynamicFieldType)
-        .withId("dynamicList")
-        .withAcl(acl1)
-        .withAcl(acl2)
-        .withAcl(acl3)
-        .build();
+
 
     static {
         CASE_FIELD.setCaseTypeId("TestAddressBookCase");
@@ -77,8 +68,6 @@ public class CaseViewFieldBuilderTest {
         EVENT_FIELD.setShowSummaryContentOption(3);
 
         EVENT_FIELD_2.setCaseFieldId("PersonLastName");
-
-        EVENT_FIELD_DYNAMIC_LIST.setCaseFieldId("dynamicList");
     }
 
     private CaseViewFieldBuilder fieldBuilder;
@@ -96,25 +85,25 @@ public class CaseViewFieldBuilderTest {
 
             final CaseViewField field = fieldBuilder.build(CASE_FIELD, EVENT_FIELD);
 
-            assertThat(field, is(notNullValue()));
-            assertThat(field.getId(), equalTo(CASE_FIELD.getId()));
-            assertThat(field.getFieldType(), equalTo(CASE_FIELD.getFieldType()));
-            assertThat(field.isHidden(), equalTo(CASE_FIELD.getHidden()));
-            assertThat(field.getHintText(), equalTo(CASE_FIELD.getHintText()));
-            assertThat(field.getLabel(), equalTo(CASE_FIELD.getLabel()));
-            assertThat(field.getOrder(), is(nullValue()));
-            assertThat(field.getSecurityLabel(), equalTo(CASE_FIELD.getSecurityLabel()));
-            assertThat(field.getValidationExpression(), is(nullValue()));
-            assertThat(field.getDisplayContext(), is(EVENT_FIELD.getDisplayContext()));
-            assertThat(field.getDisplayContextParameter(), is(EVENT_FIELD.getDisplayContextParamter()));
-            assertThat(field.getShowCondition(), is(EVENT_FIELD.getShowCondition()));
-            assertThat(field.getShowSummaryChangeOption(), is(Boolean.TRUE));
-            assertThat(field.getShowSummaryContentOption(), is(3));
-        }
+        assertThat(field, is(notNullValue()));
+        assertThat(field.getId(), equalTo(CASE_FIELD.getId()));
+        assertThat(field.getFieldType(), equalTo(CASE_FIELD.getFieldType()));
+        assertThat(field.isHidden(), equalTo(CASE_FIELD.getHidden()));
+        assertThat(field.getHintText(), equalTo(CASE_FIELD.getHintText()));
+        assertThat(field.getLabel(), equalTo(CASE_FIELD.getLabel()));
+        assertThat(field.getOrder(), is(nullValue()));
+        assertThat(field.getSecurityLabel(), equalTo(CASE_FIELD.getSecurityLabel()));
+        assertThat(field.getValidationExpression(), is(nullValue()));
+        assertThat(field.getDisplayContext(), is(EVENT_FIELD.getDisplayContext()));
+        assertThat(field.getDisplayContextParameter(), is(EVENT_FIELD.getDisplayContextParamter()));
+        assertThat(field.getShowCondition(), is(EVENT_FIELD.getShowCondition()));
+        assertThat(field.getShowSummaryChangeOption(), is(Boolean.TRUE));
+        assertThat(field.getShowSummaryContentOption(), is(3));
+    }
 
         @Test
         public void shouldCreateFieldFromCaseEventFieldWithData() {
-            final CaseViewField expectedField = getCaseViewField("FixedList");
+            final CaseViewField expectedField = new CaseViewField();
             doReturn(expectedField).when(fieldBuilder).build(CASE_FIELD, EVENT_FIELD);
 
             final JsonNode data = JSON_NODE_FACTORY.textNode("value");
@@ -128,8 +117,8 @@ public class CaseViewFieldBuilderTest {
 
         @Test
         public void shouldCreateFieldFromArrayOfCaseEventField() {
-            final CaseViewField expectedField = getCaseViewField("FixedList");
-            final CaseViewField expectedField2 = getCaseViewField("FixedList");
+            final CaseViewField expectedField = new CaseViewField();
+            final CaseViewField expectedField2 = new CaseViewField();
 
             doReturn(expectedField).when(fieldBuilder).build(CASE_FIELD, EVENT_FIELD);
             doReturn(expectedField2).when(fieldBuilder).build(CASE_FIELD_2, EVENT_FIELD_2);
@@ -151,7 +140,7 @@ public class CaseViewFieldBuilderTest {
 
         @Test
         public void shouldCreateFieldFromArrayOfCaseEventField_fieldNotInCaseFieldsIsIgnored() {
-            final CaseViewField expectedField = getCaseViewField("FixedList");
+            final CaseViewField expectedField = new CaseViewField();
 
             doReturn(expectedField).when(fieldBuilder).build(CASE_FIELD, EVENT_FIELD);
 
@@ -172,7 +161,7 @@ public class CaseViewFieldBuilderTest {
 
         @Test
         public void shouldCreateFieldFromArrayOfCaseEventField_fieldNotInEventFieldsIsIgnored() {
-            final CaseViewField expectedField = getCaseViewField("FixedList");
+            final CaseViewField expectedField = new CaseViewField();
 
             doReturn(expectedField).when(fieldBuilder).build(CASE_FIELD, EVENT_FIELD);
 
@@ -193,7 +182,7 @@ public class CaseViewFieldBuilderTest {
 
         @Test
         public void shouldCreateFieldFromArrayOfCaseEventField_fieldWithoutData() {
-            final CaseViewField expectedField = getCaseViewField("FixedList");
+            final CaseViewField expectedField = new CaseViewField();
 
             doReturn(expectedField).when(fieldBuilder).build(CASE_FIELD, EVENT_FIELD);
 
@@ -225,14 +214,6 @@ public class CaseViewFieldBuilderTest {
             assertThat(caseViewField.getLabel(), is(overriddenLabel));
             assertThat(caseViewField.getHintText(), is(overriddenHint));
         }
-    }
-
-    private CaseViewField getCaseViewField(String type) {
-        final CaseViewField expectedField = new CaseViewField();
-        FieldType fieldType = new FieldType();
-        fieldType.setType(type);
-        expectedField.setFieldType(fieldType);
-        return expectedField;
     }
 
     @Nested
