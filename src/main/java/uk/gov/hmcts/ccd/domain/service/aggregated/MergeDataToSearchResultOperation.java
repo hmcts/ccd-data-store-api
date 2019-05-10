@@ -61,7 +61,7 @@ public class MergeDataToSearchResultOperation {
                     .filter(caseField -> caseField.getId().equals(searchResultField.getCaseFieldId()))
                     .map(caseField -> new SearchResultViewColumn(
                         buildCaseFieldId(searchResultField),
-                        getNestedCaseField(caseField, searchResultField).getFieldType(),
+                        caseField.getComplexFieldNestedField(searchResultField.getCaseFieldPath()).getFieldType(),
                         searchResultField.getLabel(),
                         searchResultField.getDisplayOrder(),
                         searchResultField.isMetadata()))
@@ -75,11 +75,6 @@ public class MergeDataToSearchResultOperation {
         } else {
             return searchResultField.getCaseFieldId();
         }
-    }
-
-    private CaseField getNestedCaseField(final CaseField caseField,
-                                         final SearchResultField searchResultField) {
-        return caseField.getComplexTypeNestedField(searchResultField.getCaseFieldPath());
     }
 
     private SearchResultViewItem buildSearchResultViewItem(final CaseDetails caseDetails,
@@ -104,17 +99,12 @@ public class MergeDataToSearchResultOperation {
 
         Map<String, Object> newResults = new HashMap<>();
 
-        List<SearchResultField> searchResultsWithPath = Arrays.stream(searchResult.getFields())
-            .filter(e -> StringUtils.isNotBlank(e.getCaseFieldPath()))
-            .collect(Collectors.toList());
-
-        searchResultsWithPath.forEach(searchResultField -> {
-            caseData.forEach((key, value) -> {
-                if (searchResultField.getCaseFieldId().equals(key)) {
-                    newResults.put(searchResultField.getCaseFieldId() + "." + searchResultField.getCaseFieldPath(),
-                        getObjectByPath(searchResultField.getCaseFieldPath(), value));
-                }
-            });
+        searchResult.getFieldsWithPaths().forEach(searchResultField -> {
+            JsonNode jsonNode = caseData.get(searchResultField.getCaseFieldId());
+            if (jsonNode != null) {
+                newResults.put(searchResultField.getCaseFieldId() + "." + searchResultField.getCaseFieldPath(),
+                    getObjectByPath(searchResultField.getCaseFieldPath(), jsonNode));
+            }
         });
 
         newResults.putAll(caseData);
@@ -124,12 +114,12 @@ public class MergeDataToSearchResultOperation {
         return newResults;
     }
 
-    private Object getObjectByPath(String path, Object value) {
+    private Object getObjectByPath(String path, JsonNode value) {
         //todo add getPathElements to searchResultField
         List<String> pathElements = Arrays.stream(path.trim().split("\\.")).collect(Collectors.toList());
 
         //rather than cast here can't we declare it as JsonNode
-        return reduce((JsonNode) value, pathElements, path);
+        return reduce(value, pathElements, path);
     }
 
     private Object reduce(JsonNode caseFields, List<String> pathElements, String path) {

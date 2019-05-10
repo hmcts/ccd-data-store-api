@@ -61,7 +61,7 @@ public class DefaultFindWorkbasketInputOperation implements FindWorkbasketInputO
         CaseField caseField = caseType.getCaseField(in.getCaseFieldId())
             .orElseThrow(() -> new BadRequestException(format(CASE_FIELD_NOT_FOUND, in.getCaseFieldId(), in.getCaseFieldElementPath())));
 
-        CaseField caseFieldByPath = caseField.getComplexTypeNestedField(in.getCaseFieldElementPath());
+        CaseField caseFieldByPath = caseField.getComplexFieldNestedField(in.getCaseFieldElementPath());
 
         final Field field = new Field();
         field.setId(in.getCaseFieldId());

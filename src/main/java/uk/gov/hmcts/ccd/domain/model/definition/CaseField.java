@@ -152,7 +152,7 @@ public class CaseField implements Serializable {
      * @return A nested CaseField or 'this' when path is blank
      */
     @JsonIgnore
-    public CaseField getComplexTypeNestedField(String path) {
+    public CaseField getComplexFieldNestedField(String path) {
         if (StringUtils.isBlank(path)) {
             return this;
         }
