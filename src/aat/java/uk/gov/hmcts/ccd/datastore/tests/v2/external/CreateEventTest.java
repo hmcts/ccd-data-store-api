@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.datastore.tests.v2.external;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,11 +42,11 @@ class CreateEventTest extends BaseTest {
     void shouldCreateEvent() {
         // Prepare new case in known state
         final Long caseReference = Event.create()
-                                        .as(asAutoTestCaseworker(FALSE))
+                                        .as(asAutoTestCaseworker())
                                         .withData(FullCase.build())
                                         .submitAndGetReference();
 
-        String eventToken = aat.generateTokenUpdateCase(asAutoTestCaseworker(FALSE), JURISDICTION, CASE_TYPE, caseReference, UPDATE);
+        String eventToken = aat.generateTokenUpdateCase(asAutoTestCaseworker(), JURISDICTION, CASE_TYPE, caseReference, UPDATE);
 
         callCreateEvent(caseReference.toString(), getBody(caseReference.toString(), UPDATE, eventToken, FullCaseUpdated::build))
             .when()
@@ -130,8 +131,9 @@ class CreateEventTest extends BaseTest {
     private RequestSpecification callCreateEvent(String caseReference, Supplier<String> supplier) {
         return asAutoTestCaseworker(FALSE)
             .get()
-            .body(supplier.get())
             .given()
+            .body(supplier.get())
+            .contentType(ContentType.JSON)
             .log().all()
             .pathParam("caseReference", caseReference)
             .accept(V2.MediaType.CREATE_EVENT)
