@@ -129,16 +129,15 @@ public class CallbackServiceTest {
     @DisplayName("Custom Retry Context")
     class CustomRetryContext {
 
-        List<Integer> callbackRetryTimeoutsInMillis = Lists.newArrayList(500, 1000, 1500);
-
         @Test
-        @DisplayName("Should return with no errors or warnings")
-        public void shouldReturnWithNoErrorsOrWarnings() {
-            final Optional<CallbackResponse> result = callbackService.send(testUrl, callbackRetryTimeoutsInMillis, caseEvent, caseDetails);
+        @DisplayName("Should return with no errors or warnings and no retries configured")
+        public void shouldReturnWithNoRetriesConfigured() {
+            final Optional<CallbackResponse> result = callbackService.send(testUrl, Lists.newArrayList(500), caseEvent, caseDetails);
             final CallbackResponse response = result.orElseThrow(() -> new AssertionError("Missing result"));
 
             Assertions.assertAll(
                 () -> assertTrue(response.getErrors().isEmpty()),
+                () -> assertTrue(response.getWarnings().isEmpty()),
                 () -> verify(restTemplate).setRequestFactory(any(HttpComponentsClientHttpRequestFactory.class)),
                 () -> verify(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(CallbackResponse.class)),
                 () -> verifyNoMoreInteractions(restTemplate)
@@ -146,22 +145,41 @@ public class CallbackServiceTest {
         }
 
         @Test
-        @DisplayName("Should retry if callback responds late")
-        public void shouldRetryIfCallbackRespondsLate() {
+        @DisplayName("Should return with no errors or warnings and callback respond on second try")
+        public void shouldReturnWithOneRetries() {
+            doThrow(RestClientException.class)
+                .doReturn(response)
+                .when(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(CallbackResponse.class));
+
+            final Optional<CallbackResponse> result = callbackService.send(testUrl, Lists.newArrayList(500, 1000), caseEvent, caseDetails);
+            final CallbackResponse response = result.orElseThrow(() -> new AssertionError("Missing result"));
+
+            Assertions.assertAll(
+                () -> assertTrue(response.getErrors().isEmpty()),
+                () -> assertTrue(response.getWarnings().isEmpty()),
+                () -> verify(restTemplate, times(2)).setRequestFactory(any(HttpComponentsClientHttpRequestFactory.class)),
+                () -> verify(restTemplate, times(2)).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(CallbackResponse.class)),
+                () -> verifyNoMoreInteractions(restTemplate)
+            );
+        }
+
+        @Test
+        @DisplayName("Should return with no errors or warnings and callback respond on third retry")
+        public void shouldRetryIfCallbackRespondsAfterTwoRetries() {
             doThrow(RestClientException.class)
                 .doThrow(RestClientException.class)
                 .doReturn(response)
                 .when(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(CallbackResponse.class));
 
-            Instant start = Instant.now();
-            callbackService.send(testUrl, callbackRetryTimeoutsInMillis, caseEvent, caseDetails);
+            final Optional<CallbackResponse> result = callbackService.send(testUrl, Lists.newArrayList(500, 1000, 1500), caseEvent, caseDetails);
+            final CallbackResponse response = result.orElseThrow(() -> new AssertionError("Missing result"));
 
-            final Duration between = Duration.between(start, Instant.now());
             Assertions.assertAll(
+                () -> assertTrue(response.getErrors().isEmpty()),
+                () -> assertTrue(response.getWarnings().isEmpty()),
                 () -> verify(restTemplate, times(3)).setRequestFactory(any(HttpComponentsClientHttpRequestFactory.class)),
                 () -> verify(restTemplate, times(3)).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(CallbackResponse.class)),
-                () -> verifyNoMoreInteractions(restTemplate),
-                () -> assertThat((int) between.toMillis(), greaterThan(4000))
+                () -> verifyNoMoreInteractions(restTemplate)
             );
         }
     }
