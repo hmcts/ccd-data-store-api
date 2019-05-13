@@ -142,11 +142,10 @@ public class CaseType implements Serializable {
         return events.stream().anyMatch(event -> event.getId().equals(eventId));
     }
 
-    public CaseEvent findCaseEvent(String eventId) {
+    public Optional<CaseEvent> findCaseEvent(String eventId) {
         return events.stream()
             .filter(event -> event.getId().equalsIgnoreCase(eventId))
-            .findFirst()
-            .orElse(null);
+            .findFirst();
     }
 
     public List<SearchAliasField> getSearchAliasFields() {
