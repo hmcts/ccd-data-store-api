@@ -153,12 +153,14 @@ public class CallbackService {
         List<CallbackRetryContext> retryContextList = Lists.newArrayList();
         if (!callbackRetryTimeouts.isEmpty()) {
             retryContextList.add(new CallbackRetryContext(0, callbackRetryTimeouts.remove(0)));
-            retryContextList.add(new CallbackRetryContext(1, callbackRetryTimeouts.remove(0)));
-            for (int i = 0; i < callbackRetryTimeouts.size(); i++) {
-                retryContextList.add(
-                    new CallbackRetryContext(
-                        getLastElement(retryContextList).getCallbackRetryInterval() * CALLBACK_RETRY_INTERVAL_MULTIPLIER,
-                        callbackRetryTimeouts.get(i)));
+            if (!callbackRetryTimeouts.isEmpty()) {
+                retryContextList.add(new CallbackRetryContext(1, callbackRetryTimeouts.remove(0)));
+                for (int i = 0; i < callbackRetryTimeouts.size(); i++) {
+                    retryContextList.add(
+                        new CallbackRetryContext(
+                            getLastElement(retryContextList).getCallbackRetryInterval() * CALLBACK_RETRY_INTERVAL_MULTIPLIER,
+                            callbackRetryTimeouts.get(i)));
+                }
             }
         } else {
             this.defaultCallbackRetryIntervalsInSeconds.forEach(cbRetryInterval -> retryContextList.add(new CallbackRetryContext(cbRetryInterval, defaultCallbackTimeoutInMillis)));
