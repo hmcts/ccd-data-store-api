@@ -35,7 +35,7 @@ public class CaseAccessEndpoint {
     })
     public List<String> findCaseIdsGivenUserIdHasAccessTo(
         @ApiParam(value = "Idam user ID", required = true)
-        @PathVariable("uid") final Integer uid,
+        @PathVariable("uid") final String uid,
         @ApiParam(value = "Jurisdiction ID", required = true)
         @PathVariable("jid") final String jurisdictionId,
         @ApiParam(value = "Case type ID", required = true)
@@ -86,7 +86,7 @@ public class CaseAccessEndpoint {
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void revokeAccessToCase(
         @ApiParam(value = "Idam user ID", required = true)
-        @PathVariable("uid") final Integer uid,
+        @PathVariable("uid") final String uid,
         @ApiParam(value = "Jurisdiction ID", required = true)
         @PathVariable("jid") final String jurisdictionId,
         @ApiParam(value = "Case type ID", required = true)

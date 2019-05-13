@@ -17,7 +17,10 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 @Singleton
 public class ApplicationParams {
     @Value("#{'${ccd.callback.retries}'.split(',')}")
-    private List<Integer> callbackRetries;
+    private List<Integer> callbackRetryIntervalsInSeconds;
+
+    @Value("${http.client.read.timeout}")
+    private Integer callbackReadTimeoutInMillis;
 
     @Value("${ccd.token.secret}")
     private String tokenSecret;
@@ -64,8 +67,14 @@ public class ApplicationParams {
     @Value("${pagination.page.size}")
     private Integer paginationPageSize;
 
-    @Value("${definition.cache.ttl.secs}")
-    private Integer definitionCacheTTLSecs;
+    @Value("${definition.cache.max-idle.secs}")
+    private Integer definitionCacheMaxIdleSecs;
+
+    @Value("${definition.cache.latest-version-ttl.secs}")
+    private Integer latestVersionTTLSecs;
+
+    @Value("${user.cache.ttl.secs}")
+    private Integer userCacheTTLSecs;
 
     @Value("${definition.cache.max.size}")
     private Integer definitionCacheMaxSize;
@@ -97,7 +106,7 @@ public class ApplicationParams {
     @Value("${search.elastic.nodes.discovery.filter}")
     private String elasticsearchNodeDiscoveryFilter;
 
-    private static String encode(final String stringToEncode) {
+    public static String encode(final String stringToEncode) {
         try {
             return URLEncoder.encode(stringToEncode, "UTF-8");
         } catch (UnsupportedEncodingException e) {
@@ -201,8 +210,12 @@ public class ApplicationParams {
         return tokenSecret;
     }
 
-    public List<Integer> getCallbackRetries() {
-        return callbackRetries;
+    public List<Integer> getCallbackRetryIntervalsInSeconds() {
+        return callbackRetryIntervalsInSeconds;
+    }
+
+    public Integer getCallbackReadTimeoutInMillis() {
+        return callbackReadTimeoutInMillis;
     }
 
     public String getValidDMDomain() {
@@ -229,8 +242,16 @@ public class ApplicationParams {
         return paginationPageSize;
     }
 
-    public int getDefinitionCacheTTLSecs() {
-        return definitionCacheTTLSecs;
+    public int getDefinitionCacheMaxIdleSecs() {
+        return definitionCacheMaxIdleSecs;
+    }
+
+    public int getLatestVersionTTLSecs() {
+        return latestVersionTTLSecs;
+    }
+
+    public Integer getUserCacheTTLSecs() {
+        return userCacheTTLSecs;
     }
 
     public int getDefinitionCacheMaxSize() {
