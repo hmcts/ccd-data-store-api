@@ -4,6 +4,8 @@
     <Instrumentation>
         <BuiltIn enabled="true">
             <HTTP enabled="true"/>
+            <JDBC enabled="true"/>
+            <MaxStatementQueryLimitInMS>1000</MaxStatementQueryLimitInMS>
         </BuiltIn>
         <Class name="uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository">
             <Method name="set"/>
@@ -53,6 +55,24 @@
             <Method name="getWorkbasketInputDefinitions"/>
             <Method name="getWizardPageCollection"/>
             <Method name="getCaseTabCollection"/>
+        </Class>
+        <Class name="uk.gov.hmcts.ccd.data.definition.HttpUIDefinitionGateway">
+            <Method name="getSearchResult"/>
+            <Method name="getSearchInputDefinitions"/>
+            <Method name="getWorkbasketInputDefinitions"/>
+            <Method name="getCaseTabCollection"/>
+            <Method name="getWizardPageCollection"/>
+            <Method name="getWorkBasketResult"/>
+        </Class>
+        <Class name="uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway">
+            <Method name="create"/>
+            <Method name="update"/>
+            <Method name="get"/>
+            <Method name="delete"/>
+            <Method name="getAll"/>
+        </Class>
+        <Class name="uk.gov.hmcts.ccd.domain.types.sanitiser.client.DocumentManagementRestClient">
+            <Method name="getDocument"/>
         </Class>
     </Instrumentation>
 </ApplicationInsightsAgent>
