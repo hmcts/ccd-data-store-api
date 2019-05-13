@@ -1,8 +1,5 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEventField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.List;
@@ -11,6 +8,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.Optional.ofNullable;
+
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 
 @Named
 @Singleton
@@ -31,6 +31,7 @@ public class CaseViewFieldBuilder {
         field.setShowSummaryChangeOption(eventField.getShowSummaryChangeOption());
         field.setShowSummaryContentOption(eventField.getShowSummaryContentOption());
         field.setAccessControlLists(caseField.getAccessControlLists());
+        field.setMetadata(caseField.isMetadata());
 
         caseField.propagateACLsToNestedFields();
 
