@@ -195,26 +195,6 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
         return caseDetails;
     }
 
-    private CaseDetails lockCaseDetails(final CaseType caseType,
-                                        final String caseReference) {
-        if (!uidService.validateUID(caseReference)) {
-            throw new BadRequestException("Case reference is not valid");
-        }
-
-        final CaseDetails caseDetails;
-        try {
-            caseDetails = caseDetailsRepository.lockCase(Long.valueOf(caseReference));
-        } catch (NumberFormatException exception) {
-            throw new ResourceNotFoundException(
-                String.format("Case with reference %s could not be found for case type %s", caseReference, caseType.getId()));
-        }
-        if (null == caseDetails || !caseType.getId().equalsIgnoreCase(caseDetails.getCaseTypeId())) {
-            throw new ResourceNotFoundException(
-                String.format("Case with reference %s could not be found for case type %s", caseReference, caseType.getId()));
-        }
-        return caseDetails;
-    }
-
     private CaseDetails saveCaseDetails(final CaseDetails caseDetails,
                                         final CaseEvent eventTrigger,
                                         final Optional<String> state) {
