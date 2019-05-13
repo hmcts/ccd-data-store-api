@@ -46,7 +46,7 @@ class CreateEventTest extends BaseTest {
                                         .withData(FullCase.build())
                                         .submitAndGetReference();
 
-        String eventToken = aat.generateTokenUpdateCase(asAutoTestCaseworker(), JURISDICTION, CASE_TYPE, caseReference, UPDATE);
+        String eventToken = aat.getCcdHelper().generateTokenUpdateCase(asAutoTestCaseworker(), JURISDICTION, CASE_TYPE, caseReference, UPDATE);
 
         callCreateEvent(caseReference.toString(), getBody(caseReference.toString(), UPDATE, eventToken, FullCaseUpdated::build))
             .when()
