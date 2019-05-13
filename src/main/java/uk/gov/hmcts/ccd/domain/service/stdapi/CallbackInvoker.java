@@ -56,14 +56,12 @@ public class CallbackInvoker {
                                            final Boolean ignoreWarning) {
         final Optional<CallbackResponse> callbackResponse = callbackService.send(
             caseEvent.getCallBackURLAboutToStartEvent(),
-            caseEvent.getRetriesTimeoutAboutToStartEvent(),
-            caseEvent,
-            caseDetails);
+            caseEvent, null, caseDetails, false);
 
         callbackResponse.ifPresent(response -> validateAndSetFromAboutToStartCallback(caseType,
-            caseDetails,
-            ignoreWarning,
-            response));
+                                                                                      caseDetails,
+                                                                                      ignoreWarning,
+                                                                                      response));
     }
 
     public AboutToSubmitCallbackResponse invokeAboutToSubmitCallback(final CaseEvent eventTrigger,
@@ -74,17 +72,13 @@ public class CallbackInvoker {
 
         final Optional<CallbackResponse> callbackResponse = callbackService.send(
             eventTrigger.getCallBackURLAboutToSubmitEvent(),
-            eventTrigger.getRetriesTimeoutURLAboutToSubmitEvent(),
-            eventTrigger,
-            caseDetailsBefore,
-            caseDetails,
-            ignoreWarning);
+            eventTrigger, caseDetailsBefore, caseDetails, ignoreWarning);
 
         if (callbackResponse.isPresent()) {
             return validateAndSetFromAboutToSubmitCallback(caseType,
-                caseDetails,
-                ignoreWarning,
-                callbackResponse.get());
+                                                           caseDetails,
+                                                           ignoreWarning,
+                                                           callbackResponse.get());
         }
 
         return new AboutToSubmitCallbackResponse();
@@ -94,11 +88,10 @@ public class CallbackInvoker {
                                                                                final CaseDetails caseDetailsBefore,
                                                                                final CaseDetails caseDetails) {
         return callbackService.send(eventTrigger.getCallBackURLSubmittedEvent(),
-            eventTrigger.getRetriesTimeoutURLSubmittedEvent(),
-            eventTrigger,
-            caseDetailsBefore,
-            caseDetails,
-            AfterSubmitCallbackResponse.class);
+                                    eventTrigger,
+                                    caseDetailsBefore,
+                                    caseDetails,
+                                    AfterSubmitCallbackResponse.class);
     }
 
     public CaseDetails invokeMidEventCallback(final WizardPage wizardPage,
@@ -109,10 +102,9 @@ public class CallbackInvoker {
                                               final Boolean ignoreWarning) {
 
         Optional<CallbackResponse> callbackResponseOptional = callbackService.send(wizardPage.getCallBackURLMidEvent(),
-            wizardPage.getRetriesTimeoutMidEvent(),
             caseEvent,
             caseDetailsBefore,
-            caseDetails);
+            caseDetails, false);
 
         if (callbackResponseOptional.isPresent()) {
             CallbackResponse callbackResponse = callbackResponseOptional.get();
@@ -150,10 +142,10 @@ public class CallbackInvoker {
             validateAndSetData(caseType, caseDetails, callbackResponse.getData());
             if (callbackResponseHasCaseAndDataClassification(callbackResponse)) {
                 securityValidationService.setClassificationFromCallbackIfValid(callbackResponse,
-                    caseDetails,
-                    deduceDefaultClassificationForExistingFields(
-                        caseType,
-                        caseDetails));
+                                                                               caseDetails,
+                                                                               deduceDefaultClassificationForExistingFields(
+                                                                                   caseType,
+                                                                                   caseDetails));
             }
             final Optional<String> newCaseState = filterCaseState(callbackResponse.getData());
             newCaseState.ifPresent(caseDetails::setState);
