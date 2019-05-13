@@ -106,6 +106,7 @@ public class CCDEventBuilder {
         }
 
         return CCD_HELPER.createCase(asUser,
+                                     jurisdictionId,
                                      caseTypeId,
                                      eventId,
                                      caseDataContent);

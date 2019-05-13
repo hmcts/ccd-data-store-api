@@ -10,6 +10,7 @@ import java.util.function.Supplier;
 public class CCDHelper {
 
     public Response createCase(Supplier<RequestSpecification> asUser,
+                               String jurisdiction,
                                String caseType,
                                String event,
                                CaseDataContent casePayload) {
@@ -19,11 +20,12 @@ public class CCDHelper {
 
         return asUser.get()
                      .given()
+                     .pathParam("jurisdiction", jurisdiction)
                      .pathParam("caseType", caseType)
                      .contentType(ContentType.JSON)
                      .body(casePayload)
                      .when()
-                     .post("/case-types/{caseType}/cases");
+                     .post("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases");
     }
 
 

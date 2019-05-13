@@ -41,11 +41,11 @@ class CreateEventTest extends BaseTest {
     void shouldCreateEvent() {
         // Prepare new case in known state
         final Long caseReference = Event.create()
-                                        .as(asAutoTestCaseworker())
+                                        .as(asAutoTestCaseworker(FALSE))
                                         .withData(FullCase.build())
                                         .submitAndGetReference();
 
-        String eventToken = aat.generateTokenUpdateCase(asAutoTestCaseworker(), JURISDICTION, CASE_TYPE, caseReference, UPDATE);
+        String eventToken = aat.generateTokenUpdateCase(asAutoTestCaseworker(FALSE), JURISDICTION, CASE_TYPE, caseReference, UPDATE);
 
         callCreateEvent(caseReference.toString(), getBody(caseReference.toString(), UPDATE, eventToken, FullCaseUpdated::build))
             .when()
