@@ -119,7 +119,7 @@ public class MergeDataToSearchResultOperation {
 
     private Object getObjectByPath(SearchResultField searchResultField, JsonNode value) {
 
-        List<String> pathElements = searchResultField.getPathElements();
+        List<String> pathElements = searchResultField.getCaseFieldPathElements();
 
         return reduce(value, pathElements, searchResultField.getCaseFieldPath());
     }

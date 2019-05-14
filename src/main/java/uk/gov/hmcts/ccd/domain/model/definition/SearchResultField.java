@@ -39,7 +39,7 @@ public class SearchResultField implements Serializable {
         return caseFieldPath;
     }
 
-    public List<String> getPathElements() {
+    public List<String> getCaseFieldPathElements() {
         return Arrays.stream(this.caseFieldPath.trim().split("\\.")).collect(Collectors.toList());
     }
 
