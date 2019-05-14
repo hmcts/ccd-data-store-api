@@ -7,6 +7,7 @@ import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultField;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
@@ -43,9 +44,9 @@ public class MergeDataToSearchResultOperation {
                                     final List<CaseDetails> caseDetails,
                                     final String view,
                                     final String resultError) {
-        final SearchResult searchResult = getSearchResult(caseType, view);
+        final SearchResult searchResult = getSearchResultDefinitions(caseType, view);
 
-        final List<SearchResultViewColumn> viewColumns = prepareSearchResultViewColumns(caseType, searchResult);
+        final List<SearchResultViewColumn> viewColumns = buildSearchResultViewColumn(caseType, searchResult);
 
         final List<SearchResultViewItem> viewItems = caseDetails.stream()
             .map(caseData -> buildSearchResultViewItem(caseData, caseType, searchResult))
@@ -54,14 +55,14 @@ public class MergeDataToSearchResultOperation {
         return new SearchResultView(viewColumns, viewItems, resultError);
     }
 
-    private List<SearchResultViewColumn> prepareSearchResultViewColumns(CaseType caseType,
-                                                                        SearchResult searchResult) {
+    private List<SearchResultViewColumn> buildSearchResultViewColumn(CaseType caseType,
+                                                                     SearchResult searchResult) {
         return Arrays.stream(searchResult.getFields())
             .flatMap(searchResultField -> caseType.getCaseFields().stream()
                     .filter(caseField -> caseField.getId().equals(searchResultField.getCaseFieldId()))
                     .map(caseField -> new SearchResultViewColumn(
                         buildCaseFieldId(searchResultField),
-                        caseField.getComplexFieldNestedField(searchResultField.getCaseFieldPath()).getFieldType(),
+                        buildCaseFieldType(searchResultField, caseField),
                         searchResultField.getLabel(),
                         searchResultField.getDisplayOrder(),
                         searchResultField.isMetadata()))
@@ -77,18 +78,20 @@ public class MergeDataToSearchResultOperation {
         }
     }
 
+    private FieldType buildCaseFieldType(SearchResultField searchResultField, CaseField caseField) {
+        return caseField.getComplexFieldNestedField(searchResultField.getCaseFieldPath()).getFieldType();
+    }
+
     private SearchResultViewItem buildSearchResultViewItem(final CaseDetails caseDetails,
                                                            final CaseType caseType,
                                                            final SearchResult searchResult) {
 
-        String caseId = caseDetails.hasCaseReference() ? caseDetails.getReferenceAsString() : caseDetails.getId();
-
         Map<String, JsonNode> caseData = new HashMap<>(caseDetails.getData());
         Map<String, Object> caseMetadata = new HashMap<>(caseDetails.getMetadata());
         Map<String, TextNode> labels = getLabelsFromCaseFields(caseType);
-
         Map<String, Object> caseFields = prepareData(searchResult, caseData, caseMetadata, labels);
 
+        String caseId = caseDetails.hasCaseReference() ? caseDetails.getReferenceAsString() : caseDetails.getId();
         return new SearchResultViewItem(caseId, caseFields);
     }
 
@@ -124,7 +127,6 @@ public class MergeDataToSearchResultOperation {
     private Object reduce(JsonNode caseFields, List<String> pathElements, String path) {
         String firstPathElement = pathElements.get(0);
 
-        //TODO this is a rest layer exception does not belong here
         JsonNode caseField = Optional.ofNullable(caseFields.get(firstPathElement))
             .orElseThrow(() -> new BadRequestException(format(NESTED_ELEMENT_NOT_FOUND_FOR_PATH, path)));
 
@@ -143,7 +145,7 @@ public class MergeDataToSearchResultOperation {
             .collect(Collectors.toMap(CaseField::getId, caseField -> instance.textNode(caseField.getLabel())));
     }
 
-    private SearchResult getSearchResult(final CaseType caseType, final String view) {
+    private SearchResult getSearchResultDefinitions(final CaseType caseType, final String view) {
         if (WORKBASKET_VIEW.equalsIgnoreCase(view)) {
             return uiDefinitionRepository.getWorkBasketResult(caseType.getId());
         } else {
