@@ -56,8 +56,6 @@ class AuthorisedCreateEventOperationTest {
                                                                   CASEWORKER_PROBATE_LOA1,
                                                                   CASEWORKER_PROBATE_LOA3);
 
-    private static final String UID = "123";
-    private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_TYPE_ID = "Grant";
     private static final String CASE_ID = "26";
     private static final String CASE_REFERENCE = "123456789012345";
@@ -119,6 +117,7 @@ class AuthorisedCreateEventOperationTest {
         existingCase.setState(STATE_ID);
         existingCase.setData(existingData);
         existingCase.setId(CASE_ID);
+        existingCase.setCaseTypeId(CASE_TYPE_ID);
         when(getCaseOperation.execute(CASE_REFERENCE)).thenReturn(Optional.of(existingCase));
 
         classifiedCase = new CaseDetails();
@@ -195,9 +194,9 @@ class AuthorisedCreateEventOperationTest {
         assertAll(
             () -> assertThat(output, sameInstance(classifiedCase)),
             () -> assertThat(output.getData(), is(equalTo(MAPPER.convertValue(authorisedCaseNode, STRING_JSON_MAP)))),
-            () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
             () -> inOrder.verify(getCaseOperation).execute(CASE_REFERENCE),
             () -> inOrder.verify(caseAccessService).getUserRoles(),
+            () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
             () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseType),
                                                                                      eq(USER_ROLES),
                                                                                      eq(CAN_UPDATE)),

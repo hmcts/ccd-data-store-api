@@ -57,6 +57,7 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
+import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 class DefaultCreateEventOperationTest {
 
@@ -103,6 +104,8 @@ class DefaultCreateEventOperationTest {
     private ValidateCaseFieldsOperation validateCaseFieldsOperation;
     @Mock
     private CaseService caseService;
+    @Mock
+    private UserAuthorisation userAuthorisation;
 
     @InjectMocks
     private DefaultCreateEventOperation createEventOperation;
