@@ -50,7 +50,7 @@ class CreateEventTest extends BaseTest {
 
         callCreateEvent(caseReference.toString(), getBody(caseReference.toString(), UPDATE, eventToken, FullCaseUpdated::build))
             .when()
-            .post("/cases/{caseReference}")
+            .post("/cases/{caseReference}/events")
 
             .then()
             .log().ifError()
@@ -91,7 +91,7 @@ class CreateEventTest extends BaseTest {
             .body("AddressUKField.Country", equalTo(AATCaseBuilder.ADDRESS_COUNTRY))
 
             .rootPath("_links")
-            .body("self.href", equalTo(String.format("%s/cases/%s", aat.getTestUrl(), caseReference)))
+            .body("self.href", equalTo(String.format("%s/cases/%s/events", aat.getTestUrl(), caseReference)))
         ;
     }
 
@@ -100,7 +100,7 @@ class CreateEventTest extends BaseTest {
     void should404WhenNotExists() {
         callCreateEvent(NOT_FOUND_CASE_REFERENCE, getBody(NOT_FOUND_CASE_REFERENCE, UPDATE, EVENT_TOKEN, CaseWithInvalidData::build))
             .when()
-            .get("/cases/{caseReference}")
+            .post("/cases/{caseReference}/events")
 
             .then()
             .statusCode(404);
@@ -109,23 +109,31 @@ class CreateEventTest extends BaseTest {
     @Test
     @DisplayName("should get 400 when case reference invalid")
     void should400WhenReferenceInvalid() {
-        callCreateEvent(INVALID_CASE_REFERENCE, getBody(INVALID_CASE_REFERENCE, INVALID_EVENT_TRIGGER_ID, EVENT_TOKEN))
+        callCreateEvent(INVALID_CASE_REFERENCE, getBody(INVALID_CASE_REFERENCE, UPDATE, EVENT_TOKEN))
             .when()
-            .get("/cases/{caseReference}")
+            .post("/cases/{caseReference}/events")
 
             .then()
             .statusCode(400);
     }
 
     @Test
-    @DisplayName("should get 400 when event trigger id invalid")
-    void should400WhenEventTriggerIdInvalid() {
-        callCreateEvent(INVALID_CASE_REFERENCE, getBody(INVALID_CASE_REFERENCE, UPDATE, EVENT_TOKEN, CaseWithInvalidData::build))
+    @DisplayName("should get 404 when event trigger id invalid")
+    void should404WhenEventTriggerIdInvalid() {
+        // Prepare new case in known state
+        final Long caseReference = Event.create()
+            .as(asAutoTestCaseworker())
+            .withData(FullCase.build())
+            .submitAndGetReference();
+
+        String eventToken = aat.getCcdHelper().generateTokenUpdateCase(asAutoTestCaseworker(), JURISDICTION, CASE_TYPE, caseReference, UPDATE);
+
+        callCreateEvent(caseReference.toString(), getBody(INVALID_CASE_REFERENCE, INVALID_EVENT_TRIGGER_ID, eventToken, CaseWithInvalidData::build))
             .when()
-            .get("/cases/{caseReference}")
+            .post("/cases/{caseReference}/events")
 
             .then()
-            .statusCode(400);
+            .statusCode(404);
     }
 
     private RequestSpecification callCreateEvent(String caseReference, Supplier<String> supplier) {

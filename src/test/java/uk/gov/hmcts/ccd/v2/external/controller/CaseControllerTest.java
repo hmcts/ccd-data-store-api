@@ -103,7 +103,7 @@ class CaseControllerTest {
     }
 
     @Nested
-    @DisplayName("POST /cases/{caseId}")
+    @DisplayName("POST /cases/{caseId}/events")
     class PostCaseEvent {
 
         @Test

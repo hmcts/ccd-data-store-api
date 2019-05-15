@@ -84,7 +84,7 @@ public class CaseController {
 
     @Transactional
     @PostMapping(
-        path = "/{caseId}",
+        path = "/{caseId}/events",
         headers = {
             V2.EXPERIMENTAL_HEADER
         },
@@ -93,7 +93,7 @@ public class CaseController {
         }
     )
     @ApiOperation(
-        value = "Submit event creation as Case worker",
+        value = "Submit event creation",
         notes = V2.EXPERIMENTAL_WARNING
     )
     @ApiResponses({
@@ -124,6 +124,6 @@ public class CaseController {
         final CaseDetails caseDetails = createEventOperation.createCaseEvent(caseId,
             content);
 
-        return ResponseEntity.ok(new CaseResource(caseDetails));
+        return ResponseEntity.ok(new CaseResource(caseDetails, content));
     }
 }
