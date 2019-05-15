@@ -1,12 +1,10 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
+
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
@@ -61,10 +59,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 public class TestBuildersUtil {
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -552,6 +553,16 @@ public class TestBuildersUtil {
 
         public static CaseViewTabBuilder newCaseViewTab() {
             return new CaseViewTabBuilder();
+        }
+
+        public CaseViewTabBuilder withId(String id) {
+            caseViewTab.setId(id);
+            return this;
+        }
+
+        public CaseViewTabBuilder withRole(String role) {
+            caseViewTab.setRole(role);
+            return this;
         }
 
         public CaseViewTabBuilder addCaseViewField(CaseViewField caseViewField) {
@@ -1173,6 +1184,7 @@ public class TestBuildersUtil {
 
         private CaseHistoryViewBuilder() {
             this.caseHistoryView = new CaseHistoryView();
+            this.caseHistoryView.setTabs(new CaseViewTab[0]);
         }
 
         public static CaseHistoryViewBuilder aCaseHistoryView() {
@@ -1181,6 +1193,14 @@ public class TestBuildersUtil {
 
         public CaseHistoryViewBuilder withEvent(CaseViewEvent caseViewEvent) {
             this.caseHistoryView.setEvent(caseViewEvent);
+            return this;
+        }
+
+        public CaseHistoryViewBuilder addCaseHistoryViewTab(CaseViewTab caseViewTab) {
+            CaseViewTab[] newTabs = new CaseViewTab[caseHistoryView.getTabs().length + 1];
+            System.arraycopy(caseHistoryView.getTabs(), 0, newTabs, 0, caseHistoryView.getTabs().length);
+            newTabs[newTabs.length - 1] = caseViewTab;
+            caseHistoryView.setTabs(newTabs);
             return this;
         }
 

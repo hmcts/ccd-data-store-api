@@ -77,7 +77,7 @@ public abstract class AbstractDefaultGetCaseViewOperation {
                 .toArray(CaseViewField[]::new);
 
             return new CaseViewTab(tab.getId(), tab.getLabel(), tab.getDisplayOrder(), caseViewFields,
-                                   tab.getShowCondition());
+                                   tab.getShowCondition(), tab.getRole());
 
         }).toArray(CaseViewTab[]::new);
     }
