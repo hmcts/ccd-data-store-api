@@ -1,14 +1,14 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.ToString;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @ToString
 public class CaseType implements Serializable {
@@ -153,12 +153,12 @@ public class CaseType implements Serializable {
     }
 
     @JsonIgnore
-    public Optional<CaseField> getCaseField(String caseFieldId) {
-        return caseFields.stream().filter(caseField -> caseField.getId().equalsIgnoreCase(caseFieldId)).findFirst();
+    public boolean isCaseFieldACollection(String caseFieldId) {
+        return getCaseField(caseFieldId).map(CaseField::isCollectionFieldType).orElse(false);
     }
 
     @JsonIgnore
-    public boolean isCaseFieldACollection(String caseFieldId) {
-        return getCaseField(caseFieldId).map(CaseField::isCollectionFieldType).orElse(false);
+    public Optional<CaseField> getCaseField(String caseFieldId) {
+        return caseFields.stream().filter(caseField -> caseField.getId().equalsIgnoreCase(caseFieldId)).findFirst();
     }
 }
