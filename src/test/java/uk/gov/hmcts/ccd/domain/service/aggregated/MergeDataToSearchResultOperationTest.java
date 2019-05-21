@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -22,12 +23,14 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeB
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+import com.google.common.collect.Sets;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
+import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 
@@ -37,6 +40,11 @@ class MergeDataToSearchResultOperationTest {
     private static final String CASE_FIELD_1 = "Case field 1";
     private static final String CASE_FIELD_2 = "Case field 2";
     private static final String CASE_FIELD_3 = "Case field 3";
+    private static final String CASE_FIELD_4 = "Case field 4";
+    private static final String CASE_FIELD_5 = "Case field 5";
+    private static final String ROLE_IN_USER_ROLE_1 = "Role 1";
+    private static final String ROLE_IN_USER_ROLE_2 = "Role 2";
+    private static final String ROLE_NOT_IN_USER_ROLE = "Role X";
     private static final String LABEL_ID = "LabelId";
     private static final String LABEL_TEXT = "LabelText";
     private static final String NO_ERROR = null;
@@ -45,6 +53,8 @@ class MergeDataToSearchResultOperationTest {
     @Mock
     private UIDefinitionRepository uiDefinitionRepository;
 
+    @Mock
+    private UserRepository userRepository;
     private MergeDataToSearchResultOperation classUnderTest;
 
     private List<CaseDetails> caseDetailsList;
@@ -55,7 +65,7 @@ class MergeDataToSearchResultOperationTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        Map<String, JsonNode> dataMap = buildData(CASE_FIELD_1, CASE_FIELD_2, CASE_FIELD_3);
+        Map<String, JsonNode> dataMap = buildData(CASE_FIELD_1, CASE_FIELD_2, CASE_FIELD_3, CASE_FIELD_4);
 
         CaseDetails caseDetails1 = new CaseDetails();
         caseDetails1.setReference(999L);
@@ -74,6 +84,8 @@ class MergeDataToSearchResultOperationTest {
             .withField(newCaseField().withId(CASE_FIELD_1).withFieldType(ftt).build())
             .withField(newCaseField().withId(CASE_FIELD_2).withFieldType(ftt).build())
             .withField(newCaseField().withId(CASE_FIELD_3).withFieldType(ftt).build())
+            .withField(newCaseField().withId(CASE_FIELD_4).withFieldType(ftt).build())
+            .withField(newCaseField().withId(CASE_FIELD_5).withFieldType(ftt).build())
             .build();
 
         final CaseField labelField = buildLabelCaseField(LABEL_ID, LABEL_TEXT);
@@ -84,7 +96,8 @@ class MergeDataToSearchResultOperationTest {
             .withField(newCaseField().withId(CASE_FIELD_3).withFieldType(ftt).build())
             .withField(labelField)
             .build();
-        classUnderTest = new MergeDataToSearchResultOperation(uiDefinitionRepository);
+        doReturn(Collections.emptySet()).when(userRepository).getUserRoles();
+        classUnderTest = new MergeDataToSearchResultOperation(uiDefinitionRepository, userRepository);
     }
 
     @Test
@@ -103,9 +116,114 @@ class MergeDataToSearchResultOperationTest {
         assertAll(
             () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(2)),
-            () -> assertThat(searchResultView.getResultError(), is(NO_ERROR)),
             () -> assertThat(searchResultView.getSearchResultViewItems().get(0).getCaseFields().get(STATE.getReference()), is("state1")),
             () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getCaseFields().get(STATE.getReference()), is("state2")),
+            () -> assertThat(searchResultView.getResultError(), is(NO_ERROR))
+        );
+    }
+
+    @Test
+    @DisplayName("should get Workbasket Results with defined columns and allowed roles")
+    void getWorkbasketViewWithValidRoles() {
+        SearchResultField searchResultFieldWithValidRole = buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_4, CASE_FIELD_4);
+        searchResultFieldWithValidRole.setRole(ROLE_IN_USER_ROLE_1);
+        SearchResultField searchResultFieldWithInvalidRole = buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_5, CASE_FIELD_5);
+        searchResultFieldWithInvalidRole.setRole(ROLE_NOT_IN_USER_ROLE);
+        SearchResult searchResult = aSearchResult()
+            .withSearchResultFields(
+                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_1, CASE_FIELD_1),
+                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, CASE_FIELD_2),
+                searchResultFieldWithValidRole,
+                searchResultFieldWithInvalidRole)
+            .build();
+
+        doReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1)).when(userRepository).getUserRoles();
+        doReturn(searchResult).when(uiDefinitionRepository).getWorkBasketResult(CASE_TYPE_ID);
+
+
+        final SearchResultView searchResultView = classUnderTest.execute(caseType, caseDetailsList, WORKBASKET, NO_ERROR);
+        assertAll(
+            () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
+            () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(3)),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(0).getCaseFields().get(STATE.getReference()), is("state1")),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getCaseFields().get(STATE.getReference()), is("state2")),
+            () -> assertThat(searchResultView.getSearchResultViewColumns().get(0).getCaseFieldId(), is(CASE_FIELD_1)),
+            () -> assertThat(searchResultView.getSearchResultViewColumns().get(1).getCaseFieldId(), is(CASE_FIELD_2)),
+            () -> assertThat(searchResultView.getSearchResultViewColumns().get(2).getCaseFieldId(), is(CASE_FIELD_4)),
+            () -> assertThat(searchResultView.getResultError(), is(NO_ERROR))
+        );
+    }
+
+    @Test
+    @DisplayName("should get Workbasket Results with defined columns for allowed roles and no duplicate columns")
+    void getWorkbasketViewWithValidRolesAndNoDuplicateColumns() {
+        SearchResultField searchResultFieldWithValidRole = buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_4, CASE_FIELD_4);
+        searchResultFieldWithValidRole.setRole(ROLE_IN_USER_ROLE_1);
+        SearchResultField searchResultFieldWithValidRole2 = buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_4, CASE_FIELD_4);
+        searchResultFieldWithValidRole2.setRole(ROLE_IN_USER_ROLE_2);
+        SearchResultField searchResultFieldWithInvalidRole = buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_5, CASE_FIELD_5);
+        searchResultFieldWithInvalidRole.setRole(ROLE_NOT_IN_USER_ROLE);
+        SearchResult searchResult = aSearchResult()
+            .withSearchResultFields(
+                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_1, CASE_FIELD_1),
+                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_1, CASE_FIELD_1),
+                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_1, CASE_FIELD_1),
+                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, CASE_FIELD_2),
+                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, CASE_FIELD_2),
+                searchResultFieldWithValidRole,
+                searchResultFieldWithValidRole2,
+                searchResultFieldWithInvalidRole)
+            .build();
+
+        doReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2)).when(userRepository).getUserRoles();
+        doReturn(searchResult).when(uiDefinitionRepository).getWorkBasketResult(CASE_TYPE_ID);
+
+
+        final SearchResultView searchResultView = classUnderTest.execute(caseType, caseDetailsList, WORKBASKET, NO_ERROR);
+        assertAll(
+            () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
+            () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(3)),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(0).getCaseFields().get(STATE.getReference()), is("state1")),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getCaseFields().get(STATE.getReference()), is("state2")),
+            () -> assertThat(searchResultView.getSearchResultViewColumns().get(0).getCaseFieldId(), is(CASE_FIELD_1)),
+            () -> assertThat(searchResultView.getSearchResultViewColumns().get(1).getCaseFieldId(), is(CASE_FIELD_2)),
+            () -> assertThat(searchResultView.getSearchResultViewColumns().get(2).getCaseFieldId(), is(CASE_FIELD_4)),
+            () -> assertThat(searchResultView.getResultError(), is(NO_ERROR))
+        );
+    }
+
+    @Test
+    @DisplayName("should process result fields with valid and invalid roles correctly")
+    void getWorkbasketViewWithValidRolesAndInvalidRoles() {
+        SearchResultField searchResultFieldWithInvalidRole1 = buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_4, CASE_FIELD_4);
+        searchResultFieldWithInvalidRole1.setRole(ROLE_NOT_IN_USER_ROLE);
+        SearchResultField searchResultFieldWithValidRole = buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_4, CASE_FIELD_4);
+        searchResultFieldWithValidRole.setRole(ROLE_IN_USER_ROLE_2);
+        SearchResultField searchResultFieldWithInvalidRole2 = buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_5, CASE_FIELD_5);
+        searchResultFieldWithInvalidRole2.setRole(ROLE_NOT_IN_USER_ROLE);
+        SearchResult searchResult = aSearchResult()
+            .withSearchResultFields(
+                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_1, CASE_FIELD_1),
+                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_1, CASE_FIELD_1),
+                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, CASE_FIELD_2),
+                searchResultFieldWithInvalidRole1,
+                searchResultFieldWithInvalidRole2,
+                searchResultFieldWithValidRole)
+            .build();
+
+        doReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2)).when(userRepository).getUserRoles();
+        doReturn(searchResult).when(uiDefinitionRepository).getWorkBasketResult(CASE_TYPE_ID);
+
+
+        final SearchResultView searchResultView = classUnderTest.execute(caseType, caseDetailsList, WORKBASKET, NO_ERROR);
+        assertAll(
+            () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
+            () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(3)),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(0).getCaseFields().get(STATE.getReference()), is("state1")),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getCaseFields().get(STATE.getReference()), is("state2")),
+            () -> assertThat(searchResultView.getSearchResultViewColumns().get(0).getCaseFieldId(), is(CASE_FIELD_1)),
+            () -> assertThat(searchResultView.getSearchResultViewColumns().get(1).getCaseFieldId(), is(CASE_FIELD_2)),
+            () -> assertThat(searchResultView.getSearchResultViewColumns().get(2).getCaseFieldId(), is(CASE_FIELD_4)),
             () -> assertThat(searchResultView.getResultError(), is(NO_ERROR))
         );
     }
