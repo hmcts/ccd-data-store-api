@@ -13,6 +13,8 @@ public class SearchResultField implements Serializable {
     @JsonProperty("order")
     private Integer displayOrder;
     private boolean metadata;
+    @JsonProperty("role")
+    private String role;
 
     public String getCaseTypeId() {
         return caseTypeId;
@@ -52,5 +54,13 @@ public class SearchResultField implements Serializable {
 
     public void setMetadata(boolean metadata) {
         this.metadata = metadata;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }
