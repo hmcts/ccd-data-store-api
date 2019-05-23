@@ -1,13 +1,13 @@
 package uk.gov.hmcts.ccd.v2.internal.controller;
 
+import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.SEARCH;
+import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.WORKBASKET;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
-import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedFindSearchInputOperation;
-import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedFindWorkbasketInputOperation;
-import uk.gov.hmcts.ccd.domain.service.aggregated.FindSearchInputOperation;
-import uk.gov.hmcts.ccd.domain.service.aggregated.FindWorkbasketInputOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCriteriaOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.GetCriteriaOperation;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.internal.resource.UISearchInputsResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.UIWorkbasketInputsResource;
@@ -27,14 +27,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(path = "/internal")
 public class UIDefinitionController {
 
-    private final FindWorkbasketInputOperation findWorkbasketInputOperation;
-    private final FindSearchInputOperation findSearchInputOperation;
+    private final GetCriteriaOperation getCriteriaOperation;
 
     @Autowired
-    public UIDefinitionController(@Qualifier(AuthorisedFindWorkbasketInputOperation.QUALIFIER) FindWorkbasketInputOperation findWorkbasketInputOperation,
-                                  @Qualifier(AuthorisedFindSearchInputOperation.QUALIFIER) FindSearchInputOperation findSearchInputOperation) {
-        this.findWorkbasketInputOperation = findWorkbasketInputOperation;
-        this.findSearchInputOperation = findSearchInputOperation;
+    public UIDefinitionController(@Qualifier(AuthorisedGetCriteriaOperation.QUALIFIER) GetCriteriaOperation getCriteriaOperation) {
+        this.getCriteriaOperation = getCriteriaOperation;
     }
 
     @GetMapping(
@@ -63,7 +60,7 @@ public class UIDefinitionController {
     })
     public ResponseEntity<UIWorkbasketInputsResource> getWorkbasketInputsDetails(@PathVariable("caseTypeId") String caseTypeId) {
 
-        WorkbasketInput[] workbasketInputs = findWorkbasketInputOperation.execute(caseTypeId, CAN_READ).toArray(new WorkbasketInput[0]);
+        WorkbasketInput[] workbasketInputs = getCriteriaOperation.execute(caseTypeId, CAN_READ, WORKBASKET).toArray(new WorkbasketInput[0]);
 
         return ResponseEntity.ok(new UIWorkbasketInputsResource(workbasketInputs, caseTypeId));
     }
@@ -94,7 +91,7 @@ public class UIDefinitionController {
     })
     public ResponseEntity<UISearchInputsResource> getSearchInputsDetails(@PathVariable("caseTypeId") String caseTypeId) {
 
-        SearchInput[] searchInputs = findSearchInputOperation.execute(caseTypeId, CAN_READ).toArray(new SearchInput[0]);
+        SearchInput[] searchInputs = getCriteriaOperation.execute(caseTypeId, CAN_READ, SEARCH).toArray(new SearchInput[0]);
 
         return ResponseEntity.ok(new UISearchInputsResource(searchInputs, caseTypeId));
     }

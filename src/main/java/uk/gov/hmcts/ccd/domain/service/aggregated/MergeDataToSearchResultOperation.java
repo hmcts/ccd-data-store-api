@@ -3,7 +3,10 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
+import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
+import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
@@ -19,6 +22,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -35,16 +39,19 @@ public class MergeDataToSearchResultOperation {
     private static final String NESTED_ELEMENT_NOT_FOUND_FOR_PATH = "Nested element not found for path %s";
 
     private final UIDefinitionRepository uiDefinitionRepository;
+    private final UserRepository userRepository;
 
-    public MergeDataToSearchResultOperation(final UIDefinitionRepository uiDefinitionRepository) {
+    public MergeDataToSearchResultOperation(final UIDefinitionRepository uiDefinitionRepository,
+                                            @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository) {
         this.uiDefinitionRepository = uiDefinitionRepository;
+        this.userRepository = userRepository;
     }
 
     public SearchResultView execute(final CaseType caseType,
                                     final List<CaseDetails> caseDetails,
                                     final String view,
                                     final String resultError) {
-        final SearchResult searchResult = getSearchResultDefinitions(caseType, view);
+        final SearchResult searchResult = getSearchResult(caseType, view);
 
         final List<SearchResultViewColumn> viewColumns = buildSearchResultViewColumn(caseType, searchResult);
 
@@ -57,17 +64,37 @@ public class MergeDataToSearchResultOperation {
 
     private List<SearchResultViewColumn> buildSearchResultViewColumn(CaseType caseType,
                                                                      SearchResult searchResult) {
+        final HashSet<String> addedFields = new HashSet<>();
+
         return Arrays.stream(searchResult.getFields())
             .flatMap(searchResultField -> caseType.getCaseFields().stream()
                     .filter(caseField -> caseField.getId().equals(searchResultField.getCaseFieldId()))
-                    .map(caseField -> new SearchResultViewColumn(
-                        buildCaseFieldId(searchResultField),
-                        buildCaseFieldType(searchResultField, caseField),
-                        searchResultField.getLabel(),
-                        searchResultField.getDisplayOrder(),
-                        searchResultField.isMetadata()))
+                    .filter(caseField -> filterDistinctFieldsByRole(addedFields, searchResultField))
+                    .map(caseField -> createSearchResultViewColumn(searchResultField, caseField))
                     )
             .collect(Collectors.toList());
+    }
+
+    private SearchResultViewColumn createSearchResultViewColumn(final SearchResultField searchResultField, final CaseField caseField) {
+        return new SearchResultViewColumn(
+            buildCaseFieldId(searchResultField),
+            buildCaseFieldType(searchResultField, caseField),
+            searchResultField.getLabel(),
+            searchResultField.getDisplayOrder(),
+            searchResultField.isMetadata());
+    }
+
+    private boolean filterDistinctFieldsByRole(final HashSet<String> addedFields, final SearchResultField resultField) {
+        if (addedFields.contains(resultField.getCaseFieldId())) {
+            return false;
+        } else {
+            if (StringUtils.isEmpty(resultField.getRole()) || userRepository.getUserRoles().contains(resultField.getRole())) {
+                addedFields.add(resultField.getCaseFieldId());
+                return true;
+            } else {
+                return false;
+            }
+        }
     }
 
     private String buildCaseFieldId(SearchResultField searchResultField) {
@@ -145,7 +172,7 @@ public class MergeDataToSearchResultOperation {
             .collect(Collectors.toMap(CaseField::getId, caseField -> instance.textNode(caseField.getLabel())));
     }
 
-    private SearchResult getSearchResultDefinitions(final CaseType caseType, final String view) {
+    private SearchResult getSearchResult(final CaseType caseType, final String view) {
         if (WORKBASKET_VIEW.equalsIgnoreCase(view)) {
             return uiDefinitionRepository.getWorkBasketResult(caseType.getId());
         } else {

@@ -1,34 +1,21 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
-public class SearchResultField implements Serializable {
-    @JsonProperty("case_type_id")
-    private String caseTypeId;
-    @JsonProperty("case_field_id")
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModelProperty;
+
+public class CriteriaField implements Serializable {
     private String caseFieldId;
-    @JsonProperty("case_field_element_path")
     private String caseFieldPath = null;
     private String label;
-    @JsonProperty("order")
     private Integer displayOrder;
-    private boolean metadata;
-    @JsonProperty("role")
     private String role;
 
-    public String getCaseTypeId() {
-        return caseTypeId;
-    }
-
-    public void setCaseTypeId(String caseTypeId) {
-        this.caseTypeId = caseTypeId;
-    }
-
+    /**
+     **/
+    @ApiModelProperty(value = "")
+    @JsonProperty("case_field_id")
     public String getCaseFieldId() {
         return caseFieldId;
     }
@@ -37,18 +24,22 @@ public class SearchResultField implements Serializable {
         this.caseFieldId = caseFieldId;
     }
 
+    /**
+     **/
+    @ApiModelProperty(value = "")
+    @JsonProperty("case_field_element_path")
     public String getCaseFieldPath() {
         return caseFieldPath;
-    }
-
-    public List<String> getCaseFieldPathElements() {
-        return Arrays.stream(this.caseFieldPath.trim().split("\\.")).collect(Collectors.toList());
     }
 
     public void setCaseFieldPath(String caseFieldPath) {
         this.caseFieldPath = caseFieldPath;
     }
 
+    /**
+     **/
+    @ApiModelProperty(value = "")
+    @JsonProperty("label")
     public String getLabel() {
         return label;
     }
@@ -57,6 +48,10 @@ public class SearchResultField implements Serializable {
         this.label = label;
     }
 
+    /**
+     **/
+    @ApiModelProperty(value = "")
+    @JsonProperty("order")
     public Integer getDisplayOrder() {
         return displayOrder;
     }
@@ -65,19 +60,13 @@ public class SearchResultField implements Serializable {
         this.displayOrder = displayOrder;
     }
 
-    public boolean isMetadata() {
-        return metadata;
-    }
-
-    public void setMetadata(boolean metadata) {
-        this.metadata = metadata;
-    }
-
+    @ApiModelProperty(value = "")
+    @JsonProperty("role")
     public String getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(final String role) {
         this.role = role;
     }
 }
