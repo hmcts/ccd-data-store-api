@@ -314,8 +314,6 @@ public class CaseViewFieldBuilderTest {
                 () -> assertThat(caseViewField.getFieldType().getComplexFields().get(0).getAccessControlLists().size(), is(3)),
                 () -> assertThat(caseViewField.getFieldType().getComplexFields().get(0).getFieldType().getCollectionFieldType().getComplexFields().get(0)
                     .getAccessControlLists().size(), is(3)),
-                () -> assertThat(caseViewField.getFieldType().getComplexFields().get(1).getFieldType().getCollectionFieldType().getComplexFields().get(0)
-                    .getAccessControlLists().size(), is(3)),
                 () -> assertThat(caseViewField.getFieldType().getComplexFields().get(2).getAccessControlLists().size(), is(3)),
                 () -> assertThat(caseViewField.getFieldType().getComplexFields().get(1).getFieldType().getCollectionFieldType().getComplexFields().get(0)
                     .getAccessControlLists().size(), is(3)),

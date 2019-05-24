@@ -32,6 +32,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTab;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
+import uk.gov.hmcts.ccd.domain.model.definition.ComplexACL;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
@@ -647,6 +648,53 @@ public class TestBuildersUtil {
         }
     }
 
+    public static class ComplexACLBuilder {
+        private final ComplexACL complexACL;
+
+        private ComplexACLBuilder() {
+            this.complexACL = new ComplexACL();
+        }
+
+        public static ComplexACLBuilder aComplexACL() {
+            return new ComplexACLBuilder();
+        }
+
+        public ComplexACLBuilder withListElementCode(String code) {
+            this.complexACL.setListElementCode(code);
+            return this;
+        }
+
+        public ComplexACLBuilder withRole(String role) {
+            this.complexACL.setRole(role);
+            return this;
+        }
+
+        public ComplexACLBuilder withCreate(boolean create) {
+            this.complexACL.setCreate(create);
+            return this;
+        }
+
+        public ComplexACLBuilder withDelete(boolean delete) {
+            this.complexACL.setDelete(delete);
+            return this;
+        }
+
+        public ComplexACLBuilder withUpdate(boolean update) {
+            this.complexACL.setUpdate(update);
+            return this;
+        }
+
+        public ComplexACLBuilder withRead(boolean read) {
+            this.complexACL.setRead(read);
+            return this;
+        }
+
+        public ComplexACL build() {
+            return complexACL;
+        }
+
+    }
+
     public static class CaseEventBuilder {
         private final CaseEvent caseEvent;
         private final List<AccessControlList> accessControlLists = newArrayList();
@@ -945,6 +993,7 @@ public class TestBuildersUtil {
     public static class CaseFieldBuilder {
         private final CaseField caseField;
         private final List<AccessControlList> accessControlLists = newArrayList();
+        private final List<ComplexACL> complexACLs = newArrayList();
         private FieldType caseFieldType;
 
         private CaseFieldBuilder() {
@@ -980,8 +1029,14 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public CaseFieldBuilder withComplexACL(ComplexACL complexACL) {
+            complexACLs.add(complexACL);
+            return this;
+        }
+
         public CaseField build() {
             caseField.setAccessControlLists(accessControlLists);
+            caseField.setComplexACLs(complexACLs);
             caseField.setFieldType(caseFieldType);
             return caseField;
         }
