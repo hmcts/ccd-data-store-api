@@ -24,9 +24,12 @@ public class CaseUserRepositoryTest extends BaseTest {
 
     private static final Long CASE_ID = 1L;
     private static final Long CASE_ID_GRANTED = 2L;
+    private static final Long CASE_ID_OPTIONAL = 3L;
     private static final String USER_ID = "89000";
     private static final String USER_ID_GRANTED = "89001";
     private static final String CASE_ROLE = "[DEFENDANT]";
+    private static final String CASE_ROLE_OPTIONAL = "[SOLICITOR]";
+    private static final String CASE_ROLE_PRIMARY = "[CREATOR]";
 
     @PersistenceContext
     private EntityManager em;
@@ -75,6 +78,12 @@ public class CaseUserRepositoryTest extends BaseTest {
 
         assertThat(casesId.size(), equalTo(1));
         assertThat(casesId.get(0), equalTo(CASE_ID));
+
+        final List<Long> casesIdList = repository.findCasesUserIdHasAccessTo(USER_ID_GRANTED);
+
+        assertThat(casesIdList.size(), equalTo(3));
+        assertThat(casesIdList.get(0), equalTo(CASE_ID_GRANTED));
+        assertThat(casesIdList.get(2), equalTo(CASE_ID_OPTIONAL));
     }
 
     private Integer countAccesses(Long caseId, String userId) {
@@ -92,5 +101,26 @@ public class CaseUserRepositoryTest extends BaseTest {
 
         return template.queryForObject(COUNT_CASE_USERS, parameters, Integer.class);
     }
+
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {
+        "classpath:sql/insert_cases.sql",
+        "classpath:sql/insert_case_users.sql",
+    })
+    public void shouldFindCaseRolesUserPerformsForCase() {
+
+        final List<String> casesRoles = repository.findCaseRoles(CASE_ID , USER_ID);
+
+        assertThat(casesRoles.size(), equalTo(1));
+        assertThat(casesRoles.get(0), equalTo(CASE_ROLE_PRIMARY));
+
+        final List<String> casesRolesList = repository.findCaseRoles(CASE_ID_GRANTED , USER_ID_GRANTED);
+
+        assertThat(casesRolesList.size(), equalTo(2));
+        assertThat(casesRolesList.get(0), equalTo(CASE_ROLE));
+        assertThat(casesRolesList.get(1), equalTo(CASE_ROLE_OPTIONAL));
+    }
+
 
 }
