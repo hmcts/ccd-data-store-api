@@ -75,15 +75,15 @@ public class CaseUserRepositoryTest extends BaseTest {
         "classpath:sql/insert_case_users.sql",
     })
     public void shouldFindCasesUserIdHasAccessTo() {
-        final List<Long> casesId = repository.findCasesUserIdHasAccessTo(USER_ID);
+        List<Long> casesId = repository.findCasesUserIdHasAccessTo(USER_ID);
 
         assertThat(casesId.size(), equalTo(1));
         assertThat(casesId.get(0), equalTo(CASE_ID));
 
-        final List<Long> casesIdList = repository.findCasesUserIdHasAccessTo(USER_ID_GRANTED);
+        casesId = repository.findCasesUserIdHasAccessTo(USER_ID_GRANTED);
 
-        assertThat(casesIdList.size(), equalTo(3));
-        assertThat(casesIdList, containsInAnyOrder(CASE_ID_GRANTED,CASE_ID_GRANTED,CASE_ID_3));
+        assertThat(casesId.size(), equalTo(3));
+        assertThat(casesId, containsInAnyOrder(CASE_ID_GRANTED,CASE_ID_GRANTED,CASE_ID_3));
     }
 
     private Integer countAccesses(Long caseId, String userId) {
@@ -109,15 +109,15 @@ public class CaseUserRepositoryTest extends BaseTest {
     })
     public void shouldFindCaseRolesUserPerformsForCase() {
 
-        final List<String> casesRoles = repository.findCaseRoles(CASE_ID , USER_ID);
+        List<String> caseRoles = repository.findCaseRoles(CASE_ID , USER_ID);
 
-        assertThat(casesRoles.size(), equalTo(1));
-        assertThat(casesRoles.get(0), equalTo(CASE_ROLE_CREATOR));
+        assertThat(caseRoles.size(), equalTo(1));
+        assertThat(caseRoles.get(0), equalTo(CASE_ROLE_CREATOR));
 
-        final List<String> casesRolesList = repository.findCaseRoles(CASE_ID_GRANTED , USER_ID_GRANTED);
+        caseRoles = repository.findCaseRoles(CASE_ID_GRANTED , USER_ID_GRANTED);
 
-        assertThat(casesRolesList.size(), equalTo(2));
-        assertThat(casesRolesList, containsInAnyOrder(CASE_ROLE,CASE_ROLE_SOLICITOR));
+        assertThat(caseRoles.size(), equalTo(2));
+        assertThat(caseRoles, containsInAnyOrder(CASE_ROLE,CASE_ROLE_SOLICITOR));
     }
 
 }
