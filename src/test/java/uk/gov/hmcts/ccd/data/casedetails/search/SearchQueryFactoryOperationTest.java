@@ -53,7 +53,7 @@ public class SearchQueryFactoryOperationTest {
     private Map<String, String> params;
 
     private Set<String> roles = null;
-    private UserAuthorisation userAuthorisationTest = new UserAuthorisation("2", UserAuthorisation.AccessLevel.GRANTED,roles);
+    private UserAuthorisation userAuthorisationWithAccessLevel = new UserAuthorisation("2", UserAuthorisation.AccessLevel.GRANTED,roles);
 
     @Before
     public void prepare() {
@@ -69,7 +69,7 @@ public class SearchQueryFactoryOperationTest {
             criterionFactory,
             em,
             mockApp,
-            userAuthorisationTest,
+            userAuthorisationWithAccessLevel,
             authorisedCaseDefinitionDataService);
 
         params = new HashMap<>();
