@@ -71,7 +71,7 @@ public class FieldType implements Serializable {
     public void setFixedListItems(List<FixedListItem> fixedListItems) {
         this.fixedListItems = fixedListItems;
     }
-
+    
     public List<CaseField> getComplexFields() {
         return complexFields;
     }
