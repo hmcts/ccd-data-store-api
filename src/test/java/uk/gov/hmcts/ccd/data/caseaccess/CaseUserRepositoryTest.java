@@ -75,15 +75,15 @@ public class CaseUserRepositoryTest extends BaseTest {
         "classpath:sql/insert_case_users.sql",
     })
     public void shouldFindCasesUserIdHasAccessTo() {
-        List<Long> casesId = repository.findCasesUserIdHasAccessTo(USER_ID);
+        List<Long> caseIds = repository.findCasesUserIdHasAccessTo(USER_ID);
 
-        assertThat(casesId.size(), equalTo(1));
-        assertThat(casesId.get(0), equalTo(CASE_ID));
+        assertThat(caseIds.size(), equalTo(1));
+        assertThat(caseIds.get(0), equalTo(CASE_ID));
 
-        casesId = repository.findCasesUserIdHasAccessTo(USER_ID_GRANTED);
+        caseIds = repository.findCasesUserIdHasAccessTo(USER_ID_GRANTED);
 
-        assertThat(casesId.size(), equalTo(3));
-        assertThat(casesId, containsInAnyOrder(CASE_ID_GRANTED,CASE_ID_GRANTED,CASE_ID_3));
+        assertThat(caseIds.size(), equalTo(3));
+        assertThat(caseIds, containsInAnyOrder(CASE_ID_GRANTED,CASE_ID_GRANTED,CASE_ID_3));
     }
 
     private Integer countAccesses(Long caseId, String userId) {
