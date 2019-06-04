@@ -7,6 +7,7 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.verify;
+import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -24,9 +25,12 @@ public class CaseUserRepositoryTest extends BaseTest {
 
     private static final Long CASE_ID = 1L;
     private static final Long CASE_ID_GRANTED = 2L;
+    private static final Long CASE_ID_3 = 3L;
     private static final String USER_ID = "89000";
     private static final String USER_ID_GRANTED = "89001";
     private static final String CASE_ROLE = "[DEFENDANT]";
+    private static final String CASE_ROLE_SOLICITOR = "[SOLICITOR]";
+    private static final String CASE_ROLE_CREATOR = "[CREATOR]";
 
     @PersistenceContext
     private EntityManager em;
@@ -71,10 +75,15 @@ public class CaseUserRepositoryTest extends BaseTest {
         "classpath:sql/insert_case_users.sql",
     })
     public void shouldFindCasesUserIdHasAccessTo() {
-        final List<Long> casesId = repository.findCasesUserIdHasAccessTo(USER_ID);
+        List<Long> caseIds = repository.findCasesUserIdHasAccessTo(USER_ID);
 
-        assertThat(casesId.size(), equalTo(1));
-        assertThat(casesId.get(0), equalTo(CASE_ID));
+        assertThat(caseIds.size(), equalTo(1));
+        assertThat(caseIds.get(0), equalTo(CASE_ID));
+
+        caseIds = repository.findCasesUserIdHasAccessTo(USER_ID_GRANTED);
+
+        assertThat(caseIds.size(), equalTo(3));
+        assertThat(caseIds, containsInAnyOrder(CASE_ID_GRANTED,CASE_ID_GRANTED,CASE_ID_3));
     }
 
     private Integer countAccesses(Long caseId, String userId) {
@@ -91,6 +100,24 @@ public class CaseUserRepositoryTest extends BaseTest {
         };
 
         return template.queryForObject(COUNT_CASE_USERS, parameters, Integer.class);
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {
+        "classpath:sql/insert_cases.sql",
+        "classpath:sql/insert_case_users.sql",
+    })
+    public void shouldFindCaseRolesUserPerformsForCase() {
+
+        List<String> caseRoles = repository.findCaseRoles(CASE_ID , USER_ID);
+
+        assertThat(caseRoles.size(), equalTo(1));
+        assertThat(caseRoles.get(0), equalTo(CASE_ROLE_CREATOR));
+
+        caseRoles = repository.findCaseRoles(CASE_ID_GRANTED , USER_ID_GRANTED);
+
+        assertThat(caseRoles.size(), equalTo(2));
+        assertThat(caseRoles, containsInAnyOrder(CASE_ROLE,CASE_ROLE_SOLICITOR));
     }
 
 }

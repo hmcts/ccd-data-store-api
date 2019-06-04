@@ -19,7 +19,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 @Singleton
 public class CaseDataValidator {
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
+    private static final TypeReference<HashMap<String, JsonNode>> STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
     };
     private static final String EMPTY_STRING = "";
     private static final String FIELD_SEPARATOR = ".";
@@ -116,7 +116,7 @@ public class CaseDataValidator {
             return Collections.emptyList();
         }
 
-        if (itemValue.isValueNode()) {
+        if (shouldTreatAsValueNode(fieldType, itemValue)) {
             if (!BaseType.contains(fieldType.getType())) {
                 return Collections.singletonList(new ValidationResult("Unknown Type:" + fieldType.getType(), itemFieldId));
             }
@@ -135,6 +135,10 @@ public class CaseDataValidator {
         }
 
         return Collections.singletonList(new ValidationResult("Unsupported collection item:" + itemValue.toString(), itemFieldId));
+    }
+
+    private boolean shouldTreatAsValueNode(FieldType fieldType, JsonNode itemValue) {
+        return itemValue.isValueNode() || fieldType.getType().equalsIgnoreCase(DocumentValidator.TYPE_ID);
     }
 }
 
