@@ -19,6 +19,8 @@ import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.SECURI
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.PAGE_PARAM;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.SORT_PARAM;
+import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.SEARCH;
+import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.WORKBASKET;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
@@ -48,18 +50,16 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
-import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedFindSearchInputOperation;
-import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedFindWorkbasketInputOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCaseHistoryViewOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCaseTypesOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCaseViewOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCriteriaOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetEventTriggerOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetUserProfileOperation;
-import uk.gov.hmcts.ccd.domain.service.aggregated.FindSearchInputOperation;
-import uk.gov.hmcts.ccd.domain.service.aggregated.FindWorkbasketInputOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseHistoryViewOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseTypesOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseViewOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.GetCriteriaOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetEventTriggerOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetUserProfileOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation;
@@ -82,8 +82,7 @@ public class QueryEndpoint {
     private final GetEventTriggerOperation getEventTriggerOperation;
     private final SearchQueryOperation searchQueryOperation;
     private final FieldMapSanitizeOperation fieldMapSanitizeOperation;
-    private final FindSearchInputOperation findSearchInputOperation;
-    private final FindWorkbasketInputOperation findWorkbasketInputOperation;
+    private final GetCriteriaOperation getCriteriaOperation;
     private final GetCaseTypesOperation getCaseTypesOperation;
     private final GetUserProfileOperation getUserProfileOperation;
 
@@ -95,9 +94,7 @@ public class QueryEndpoint {
         @Qualifier(AuthorisedGetCaseHistoryViewOperation.QUALIFIER) GetCaseHistoryViewOperation getCaseHistoryOperation,
         @Qualifier(AuthorisedGetEventTriggerOperation.QUALIFIER) GetEventTriggerOperation getEventTriggerOperation,
         SearchQueryOperation searchQueryOperation, FieldMapSanitizeOperation fieldMapSanitizeOperation,
-        @Qualifier(AuthorisedFindSearchInputOperation.QUALIFIER) FindSearchInputOperation findSearchInputOperation,
-        @Qualifier(
-            AuthorisedFindWorkbasketInputOperation.QUALIFIER) FindWorkbasketInputOperation findWorkbasketInputOperation,
+        @Qualifier(AuthorisedGetCriteriaOperation.QUALIFIER) GetCriteriaOperation getCriteriaOperation,
         @Qualifier(AuthorisedGetCaseTypesOperation.QUALIFIER) GetCaseTypesOperation getCaseTypesOperation,
         @Qualifier(AuthorisedGetUserProfileOperation.QUALIFIER) final GetUserProfileOperation getUserProfileOperation) {
 
@@ -106,8 +103,7 @@ public class QueryEndpoint {
         this.getEventTriggerOperation = getEventTriggerOperation;
         this.searchQueryOperation = searchQueryOperation;
         this.fieldMapSanitizeOperation = fieldMapSanitizeOperation;
-        this.findSearchInputOperation = findSearchInputOperation;
-        this.findWorkbasketInputOperation = findWorkbasketInputOperation;
+        this.getCriteriaOperation = getCriteriaOperation;
         this.getCaseTypesOperation = getCaseTypesOperation;
         this.getUserProfileOperation = getUserProfileOperation;
         this.accessMap = Maps.newHashMap();
@@ -204,7 +200,9 @@ public class QueryEndpoint {
     public SearchInput[] findSearchInputDetails(@PathVariable("uid") final String uid,
                                                 @PathVariable("jid") final String jurisdictionId,
                                                 @PathVariable("ctid") final String caseTypeId) {
-        return findSearchInputOperation.execute(caseTypeId, CAN_READ).toArray(new SearchInput[0]);
+        return getCriteriaOperation
+            .execute(caseTypeId, CAN_READ, SEARCH)
+            .toArray(new SearchInput[0]);
     }
 
     @Transactional
@@ -219,9 +217,9 @@ public class QueryEndpoint {
                                                         @PathVariable("jid") final String jurisdictionId,
                                                         @PathVariable("ctid") final String caseTypeId) {
         Instant start = Instant.now();
-        WorkbasketInput[] workbasketInputs = findWorkbasketInputOperation.execute(caseTypeId,
-                                                                                  CAN_READ).toArray(
-            new WorkbasketInput[0]);
+        WorkbasketInput[] workbasketInputs = getCriteriaOperation
+            .execute(caseTypeId, CAN_READ, WORKBASKET)
+            .toArray(new WorkbasketInput[0]);
         final Duration between = Duration.between(start, Instant.now());
         LOG.info("findWorkbasketInputDetails has been completed in {} millisecs...", between.toMillis());
         return workbasketInputs;
@@ -258,9 +256,7 @@ public class QueryEndpoint {
                                                        @PathVariable("etid") String eventTriggerId,
                                                        @RequestParam(value = "ignore-warning",
                                                            required = false) Boolean ignoreWarning) {
-        return getEventTriggerOperation.executeForCaseType(casetTypeId,
-                                                           eventTriggerId,
-                                                           ignoreWarning);
+        return getEventTriggerOperation.executeForCaseType(casetTypeId, eventTriggerId, ignoreWarning);
     }
 
     @Transactional
@@ -278,9 +274,7 @@ public class QueryEndpoint {
                                                    @PathVariable("etid") String eventTriggerId,
                                                    @RequestParam(value = "ignore-warning",
                                                        required = false) Boolean ignoreWarning) {
-        return getEventTriggerOperation.executeForCase(caseId,
-                                                       eventTriggerId,
-                                                       ignoreWarning);
+        return getEventTriggerOperation.executeForCase(caseId, eventTriggerId, ignoreWarning);
     }
 
     @Transactional
@@ -298,8 +292,7 @@ public class QueryEndpoint {
                                                     @PathVariable("etid") String eventTriggerId,
                                                     @RequestParam(value = "ignore-warning",
                                                         required = false) Boolean ignoreWarning) {
-        return getEventTriggerOperation.executeForDraft(draftId,
-                                                        ignoreWarning);
+        return getEventTriggerOperation.executeForDraft(draftId, ignoreWarning);
     }
 
     @Transactional

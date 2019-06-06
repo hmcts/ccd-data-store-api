@@ -17,6 +17,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.model.callbacks.EventTokenProperties.JURISDICTION_ID;
+import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.WORKBASKET;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
@@ -35,11 +36,10 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
-import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedFindSearchInputOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCaseHistoryViewOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCaseViewOperation;
-import uk.gov.hmcts.ccd.domain.service.aggregated.DefaultFindWorkbasketInputOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseTypesOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.GetCriteriaOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetEventTriggerOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetUserProfileOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation;
@@ -59,9 +59,7 @@ class QueryEndpointTest {
     @Mock
     private FieldMapSanitizeOperation fieldMapSanitizerOperation;
     @Mock
-    private AuthorisedFindSearchInputOperation findSearchInputOperation;
-    @Mock
-    private DefaultFindWorkbasketInputOperation findWorkbasketInputOperation;
+    private GetCriteriaOperation getCriteriaOperation;
     @Mock
     private GetCaseTypesOperation getCaseTypesOperation;
     @Mock
@@ -74,21 +72,20 @@ class QueryEndpointTest {
     void setup() {
         MockitoAnnotations.initMocks(this);
         queryEndpoint = new QueryEndpoint(getCaseViewOperation,
-            getCaseHistoryViewOperation,
-            getEventTriggerOperation,
-            searchQueryOperation,
-            fieldMapSanitizerOperation,
-            findSearchInputOperation,
-            findWorkbasketInputOperation,
-            getCaseTypesOperation,
-            getUserProfileOperation
+                                          getCaseHistoryViewOperation,
+                                          getEventTriggerOperation,
+                                          searchQueryOperation,
+                                          fieldMapSanitizerOperation,
+                                          getCriteriaOperation,
+                                          getCaseTypesOperation,
+                                          getUserProfileOperation
         );
     }
 
     @Test
     void shouldFailIfAccessParamInvalid() {
         assertThrows(ResourceNotFoundException.class,
-            () -> queryEndpoint.getCaseTypes(JURISDICTION_ID, "INVALID"));
+                     () -> queryEndpoint.getCaseTypes(JURISDICTION_ID, "INVALID"));
     }
 
     @Test
@@ -104,15 +101,15 @@ class QueryEndpointTest {
         CaseEventTrigger caseEventTrigger = new CaseEventTrigger();
         doReturn(caseEventTrigger).when(getEventTriggerOperation).executeForDraft(any(), any());
         queryEndpoint.getEventTriggerForDraft("userId", "jurisdictionId", "caseTypeId", "draftId", "eventTriggerId", false);
-        verify(getEventTriggerOperation).executeForDraft("draftId",false);
+        verify(getEventTriggerOperation).executeForDraft("draftId", false);
     }
 
     @Test
     void shouldCallFindWorkBasketOperation() {
         List<WorkbasketInput> workBasketResults = new ArrayList<>();
-        when(findWorkbasketInputOperation.execute("TEST-CASE-TYPE", CAN_READ)).thenReturn(workBasketResults);
+        doReturn(workBasketResults).when(getCriteriaOperation).execute("TEST-CASE-TYPE", CAN_READ, WORKBASKET);
         queryEndpoint.findWorkbasketInputDetails("22", "TEST", "TEST-CASE-TYPE");
-        verify(findWorkbasketInputOperation, times(1)).execute("TEST-CASE-TYPE", CAN_READ);
+        verify(getCriteriaOperation, times(1)).execute("TEST-CASE-TYPE", CAN_READ, WORKBASKET);
     }
 
     @Test

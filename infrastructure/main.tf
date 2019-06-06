@@ -31,7 +31,6 @@ locals {
 
   // S2S
   s2s_url = "http://rpe-service-auth-provider-${local.env_ase_url}"
-  s2s_vault_url = "https://s2s-${local.local_env}.vault.azure.net/"
 
   custom_redirect_uri = "${var.frontend_url}/oauth2redirect"
   default_redirect_uri = "https://ccd-case-management-web-${local.env_ase_url}/oauth2redirect"
@@ -49,29 +48,34 @@ data "azurerm_key_vault" "ccd_shared_key_vault" {
   resource_group_name = "${local.sharedResourceGroup}"
 }
 
+data "azurerm_key_vault" "s2s_vault" {
+  name = "s2s-${local.local_env}"
+  resource_group_name = "rpe-service-auth-provider-${local.local_env}"
+}
+
 data "azurerm_key_vault_secret" "ccd_data_s2s_key" {
   name = "microservicekey-ccd-data"
-  vault_uri = "${local.s2s_vault_url}"
+  key_vault_id = "${data.azurerm_key_vault.s2s_vault.id}"
 }
 
 // load balancer url. The load balancer will kill connections when idle for 5 min. Used by functional tests
 data "azurerm_key_vault_secret" "ccd_elastic_search_url" {
   count = "${var.elastic_search_enabled == "false" ? 0 : 1}"
   name = "ccd-ELASTIC-SEARCH-URL"
-  vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
+  key_vault_id = "${data.azurerm_key_vault.ccd_shared_key_vault.id}"
 }
 
 // format: "http://ccd-data-1:9200","http://ccd-data-2:9200"
 data "azurerm_key_vault_secret" "ccd_elastic_search_data_nodes_url" {
   count = "${var.elastic_search_enabled == "false" ? 0 : 1}"
   name = "ccd-ELASTIC-SEARCH-DATA-NODES-URL"
-  vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
+  key_vault_id = "${data.azurerm_key_vault.ccd_shared_key_vault.id}"
 }
 
 data "azurerm_key_vault_secret" "ccd_elastic_search_password" {
   count = "${var.elastic_search_enabled == "false" ? 0 : 1}"
   name = "ccd-ELASTIC-SEARCH-PASSWORD"
-  vault_uri = "${data.azurerm_key_vault.ccd_shared_key_vault.vault_uri}"
+  key_vault_id = "${data.azurerm_key_vault.ccd_shared_key_vault.id}"
 }
 
 resource "random_string" "draft_encryption_key" {
@@ -89,17 +93,19 @@ module "ccd-data-store-api" {
   source   = "git@github.com:hmcts/cnp-module-webapp?ref=master"
   product  = "${local.app_full_name}"
   location = "${var.location}"
+  appinsights_location = "${var.location}"
   env      = "${var.env}"
   ilbIp    = "${var.ilbIp}"
   subscription = "${var.subscription}"
   is_frontend = false
   common_tags  = "${var.common_tags}"
-  additional_host_name = "debugparam"
+  additional_host_name = "${var.additional_host_name}"
   asp_name = "${(var.asp_name == "use_shared") ? local.sharedAppServicePlan : var.asp_name}"
   asp_rg = "${(var.asp_rg == "use_shared") ? local.sharedASPResourceGroup : var.asp_rg}"
   website_local_cache_sizeinmb = 2000
   capacity = "${var.capacity}"
   java_container_version = "9.0"
+  appinsights_instrumentation_key = "${var.appinsights_instrumentation_key}"
 
   app_settings = {
     DATA_STORE_DB_HOST = "${module.data-store-db.host_name}"
@@ -160,6 +166,7 @@ module "data-store-db" {
   product = "${local.app_full_name}-postgres-db"
   location = "${var.location}"
   env = "${var.env}"
+  subscription = "${var.subscription}"
   postgresql_user = "${var.postgresql_user}"
   database_name = "${var.database_name}"
   sku_name = "${var.database_sku_name}"
