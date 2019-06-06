@@ -1141,6 +1141,11 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public WorkbasketInputBuilder withUserRole(String role) {
+            this.workbasketInput.setRole(role);
+            return this;
+        }
+
         public WorkbasketInput build() {
             return this.workbasketInput;
         }
@@ -1155,6 +1160,11 @@ public class TestBuildersUtil {
 
         public static SearchInputBuilder aSearchInput() {
             return new SearchInputBuilder();
+        }
+
+        public SearchInputBuilder withUserRole(String role) {
+            this.searchInput.setRole(role);
+            return this;
         }
 
         public SearchInputBuilder withFieldId(String fieldId) {

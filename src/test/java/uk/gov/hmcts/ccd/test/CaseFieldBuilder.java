@@ -65,8 +65,23 @@ public class CaseFieldBuilder {
         item.setCode(itemCode);
 
         caseField.getFieldType()
-                 .getFixedListItems()
-                 .add(item);
+            .getFixedListItems()
+            .add(item);
+        return this;
+    }
+
+    public CaseFieldBuilder withDynamicListItem(String itemCode, String itemValue) {
+        if (null == caseField.getFieldType().getFixedListItems()) {
+            caseField.getFieldType().setFixedListItems(new ArrayList<>());
+        }
+
+        final FixedListItem item = new FixedListItem();
+        item.setCode(itemCode);
+        item.setLabel(itemValue);
+
+        caseField.getFieldType()
+            .getFixedListItems()
+            .add(item);
         return this;
     }
 }
