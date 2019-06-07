@@ -81,7 +81,7 @@ public class CallbackService {
                                                         final Class<T> clazz,
                                                         final CallbackRequest callbackRequest) {
         try {
-            LOG.info("Trying {}", url);
+            LOG.info("Invoking callback {}", url);
             final HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.add("Content-Type", "application/json");
             final HttpHeaders securityHeaders = securityUtils.authorizationHeaders();
