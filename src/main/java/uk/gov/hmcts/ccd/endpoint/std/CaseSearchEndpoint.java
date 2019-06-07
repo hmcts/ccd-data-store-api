@@ -79,7 +79,7 @@ public class CaseSearchEndpoint {
         CaseSearchResult result = caseSearchOperation.execute(request);
 
         Duration between = Duration.between(start, Instant.now());
-        LOG.debug("searchCases execution completed in {} millisecs...", between.toMillis());
+        log.debug("searchCases execution completed in {} millisecs...", between.toMillis());
 
         return result;
     }
