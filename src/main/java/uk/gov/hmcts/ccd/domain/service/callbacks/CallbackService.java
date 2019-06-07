@@ -92,7 +92,7 @@ public class CallbackService {
             return Optional.ofNullable(restTemplate.exchange(url, HttpMethod.POST, requestEntity, clazz));
         } catch (RestClientException e) {
             LOG.warn("Unable to connect to callback service {} because of {} {}", url, e.getClass().getSimpleName(), e.getMessage());
-            LOG.warn("", e);  // debug stack trace
+            LOG.debug("", e);  // debug stack trace
             return Optional.empty();
         }
     }
