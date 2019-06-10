@@ -83,7 +83,7 @@ public class DefaultGetCriteriaOperation implements GetCriteriaOperation {
         CaseField caseField = caseType.getCaseField(in.getCaseFieldId())
             .orElseThrow(() -> new BadRequestException(format(CASE_FIELD_NOT_FOUND, in.getCaseFieldId(), in.getCaseFieldPath())));
 
-        CaseField caseFieldByPath = caseField.findNestedElementByPath(in.getCaseFieldPath());
+        CaseField caseFieldByPath = (CaseField) caseField.findNestedElementByPath(in.getCaseFieldPath());
 
         final Field field = new Field();
         field.setId(in.getCaseFieldId());

@@ -82,7 +82,9 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         LOG.debug("retrieving case type definition for case type: {}", caseTypeId);
         try {
             final HttpEntity requestEntity = new HttpEntity<CaseType>(securityUtils.authorizationHeaders());
-            return restTemplate.exchange(applicationParams.caseTypeDefURL(caseTypeId), HttpMethod.GET, requestEntity, CaseType.class).getBody();
+            final CaseType caseType = restTemplate.exchange(applicationParams.caseTypeDefURL(caseTypeId), HttpMethod.GET, requestEntity, CaseType.class).getBody();
+            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            return caseType;
 
         } catch (Exception e) {
             LOG.warn("Error while retrieving case type", e);
