@@ -120,6 +120,73 @@ VALUES (4, 'TestAddressBookCase', 'PROBATE', 'Invalid', 'PUBLIC',
         '1504259907353552'
 );
 
+
+INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, created_date, last_modified)
+VALUES (17, 'bookcase-default-post-state', 'PROBATE', 'CaseCreated', 'PUBLIC',
+        '{
+          "PersonFirstName": "George",
+          "PersonLastName": "Roof",
+          "PersonAddress": {
+            "AddressLine1": "Flat 9",
+            "AddressLine2": "2 Hubble Avenue",
+            "AddressLine3": "ButtonVillie",
+            "Country": "Wales",
+            "Postcode": "W11 5DF"
+          }
+        }',
+        '{
+          "PersonFirstName": "PUBLIC",
+          "PersonLastName": "PUBLIC",
+          "PersonAddress": {
+            "classification" : "PUBLIC",
+            "value" : {
+              "AddressLine1": "PUBLIC",
+              "AddressLine2": "PUBLIC",
+              "AddressLine3": "PUBLIC",
+              "Country": "PUBLIC",
+              "Postcode": "PUBLIC"
+            }
+          },
+          "D8Document": "PUBLIC"
+        }',
+        '1557845948403939',
+        '2016-08-22 20:44:52.824',
+        '2016-08-24 20:44:52.824'
+);
+
+INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, created_date, last_modified)
+VALUES (18, 'bookcase-default-pre-state-test', 'PROBATE', 'CaseCreated', 'PUBLIC',
+        '{
+          "PersonFirstName": "George",
+          "PersonLastName": "Roof",
+          "PersonAddress": {
+            "AddressLine1": "Flat 9",
+            "AddressLine2": "2 Hubble Avenue",
+            "AddressLine3": "ButtonVillie",
+            "Country": "Wales",
+            "Postcode": "W11 5DF"
+          }
+        }',
+        '{
+          "PersonFirstName": "PUBLIC",
+          "PersonLastName": "PUBLIC",
+          "PersonAddress": {
+            "classification" : "PUBLIC",
+            "value" : {
+              "AddressLine1": "PUBLIC",
+              "AddressLine2": "PUBLIC",
+              "AddressLine3": "PUBLIC",
+              "Country": "PUBLIC",
+              "Postcode": "PUBLIC"
+            }
+          },
+          "D8Document": "PUBLIC"
+        }',
+        '1557850043804031',
+        '2016-08-22 20:44:52.824',
+        '2016-08-24 20:44:52.824'
+);
+
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, created_date, last_modified)
 VALUES (14, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PRIVATE',
         '{

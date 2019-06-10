@@ -49,7 +49,7 @@ public class CaseSearchRequest {
 
     public String toJsonString() {
         String jsonString = searchRequestJsonNode.toString();
-        log.info("json search request: {}", jsonString);
+        log.debug("json search request: {}", jsonString);
         return jsonString;
     }
 }
