@@ -107,6 +107,7 @@ class GetCaseTest extends BaseTest {
         return asAutoTestCaseworker(FALSE)
             .get()
             .given()
+            .log().all()
             .pathParam("caseReference", caseReference)
             .accept(V2.MediaType.CASE)
             .header("experimental", "true");

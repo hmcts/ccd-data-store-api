@@ -1,9 +1,12 @@
 package uk.gov.hmcts.ccd.datastore.tests;
 
+import io.restassured.specification.RequestSpecification;
 import uk.gov.hmcts.ccd.datastore.tests.helper.CCDHelper;
 import uk.gov.hmcts.ccd.datastore.tests.helper.S2SHelper;
 import uk.gov.hmcts.ccd.datastore.tests.helper.idam.IdamHelper;
 import uk.gov.hmcts.ccd.datastore.tests.helper.idam.OAuth2;
+
+import java.util.function.Supplier;
 
 public enum AATHelper {
 
@@ -49,6 +52,14 @@ public enum AATHelper {
 
     public CCDHelper getCcdHelper() {
         return ccdHelper;
+    }
+
+    public String generateTokenUpdateCase(Supplier<RequestSpecification> asUser,
+                                          String jurisdiction,
+                                          String caseType,
+                                          Long caseReference,
+                                          String event) {
+        return ccdHelper.generateTokenUpdateCase(asUser, jurisdiction, caseType, caseReference, event);
     }
 
     public String getCaseworkerAutoTestEmail() {

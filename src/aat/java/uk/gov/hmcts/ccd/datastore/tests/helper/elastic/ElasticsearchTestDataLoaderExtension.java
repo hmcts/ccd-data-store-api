@@ -5,6 +5,7 @@ import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.AAT_PRIVATE2_
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.AAT_PRIVATE_CASE_TYPE;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.JURISDICTION_AUTOTEST2;
 import static uk.gov.hmcts.ccd.datastore.tests.functional.elasticsearch.ElasticsearchBaseTest.assertElasticsearchEnabled;
+import static uk.gov.hmcts.ccd.datastore.tests.util.TestUtils.withRetries;
 
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
@@ -28,6 +29,8 @@ public class ElasticsearchTestDataLoaderExtension extends TestDataLoaderExtensio
     private static final String AAT_PRIVATE_INDEX_ALIAS = "aat_private_cases";
     private static final String AAT_PRIVATE2_INDEX_NAME = "aat_private2_cases-000001";
     private static final String AAT_PRIVATE2_INDEX_ALIAS = "aat_private2_cases";
+    private static final long RETRY_POLL_DELAY_MILLIS = 1000;
+    private static final long RETRY_POLL_INTERVAL_MILLIS = 1000;
 
     private final ElasticsearchHelper elasticsearchHelper = new ElasticsearchHelper();
 
@@ -37,6 +40,8 @@ public class ElasticsearchTestDataLoaderExtension extends TestDataLoaderExtensio
 
         LOG.info("importing definitions");
         importDefinitions();
+        withRetries(RETRY_POLL_DELAY_MILLIS, RETRY_POLL_INTERVAL_MILLIS, "ES index verification", () -> verifyIndex(AAT_PRIVATE_INDEX_ALIAS));
+        withRetries(RETRY_POLL_DELAY_MILLIS, RETRY_POLL_INTERVAL_MILLIS, "ES index verification", () -> verifyIndex(AAT_PRIVATE2_INDEX_ALIAS));
 
         LOG.info("creating test case data");
         createCases();
@@ -162,4 +167,19 @@ public class ElasticsearchTestDataLoaderExtension extends TestDataLoaderExtensio
             e.printStackTrace();
         }
     }
+
+    private boolean verifyIndex(String indexAlias) {
+        try {
+            asElasticsearchApiUser()
+                .when()
+                .get(indexAlias)
+                .then()
+                .statusCode(200);
+        } catch (AssertionError e) {
+            LOG.info("Retrying Elasticsearch index api due to error: {}", e.getMessage());
+            return false;
+        }
+        return true;
+    }
+
 }

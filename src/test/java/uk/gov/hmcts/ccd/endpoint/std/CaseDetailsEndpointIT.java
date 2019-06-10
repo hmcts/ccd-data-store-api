@@ -84,8 +84,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private static final String TEST_CASE_TYPE = "TestAddressBookCase";
     private static final String TEST_JURISDICTION = "PROBATE";
     private static final String TEST_STATE = "CaseCreated";
-    private static final String UID = "0";
+    private static final String UID = "123";
     private static final String DRAFT_ID = "5";
+    private static final int NUMBER_OF_CASES = 18;
 
     @Inject
     private WebApplicationContext wac;
@@ -1180,7 +1181,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String CASE_REFERENCE = "1504259907353545";
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
-        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
+        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
@@ -1225,7 +1226,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").toString());
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> CASE_REFERENCE.equals(c.getReference().toString()))
@@ -1265,7 +1266,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String CASE_REFERENCE = "1504259907353545";
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
-        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
+        final String URL = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
@@ -1310,7 +1311,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").toString());
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> CASE_REFERENCE.equals(c.getReference().toString()))
@@ -1372,10 +1373,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn201WhenPostCreateCaseEventWithNoPreStateCheckForCaseworker() throws Exception {
         final String urlPortionForCaseType = "bookcase-default-pre-state-test";
-        final String caseReference = "1504259907353545";
+        final String caseReference = "1557850043804031";
         final String summary = "Case event summary";
         final String description = "Case event description";
-        final String url = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + urlPortionForCaseType
+        final String url = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + urlPortionForCaseType
             + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
@@ -1383,7 +1384,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         event.setSummary(summary);
         event.setDescription(description);
         caseDetailsToSave.setEvent(event);
-        final String token = generateEventToken(template, UID, JURISDICTION, CASE_TYPE, caseReference, TEST_EVENT_ID);
+        final String token = generateEventToken(template, UID, JURISDICTION, urlPortionForCaseType, caseReference, TEST_EVENT_ID);
         caseDetailsToSave.setToken(token);
         final JsonNode DATA = mapper.readTree("{" +
             "\"PersonAddress\":{" +
@@ -1407,14 +1408,14 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").toString());
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> caseReference.equals(c.getReference().toString()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
-        assertEquals("Incorrect Case Type", CASE_TYPE, savedCaseDetails.getCaseTypeId());
+        assertEquals("Incorrect Case Type", urlPortionForCaseType, savedCaseDetails.getCaseTypeId());
         assertEquals(
             "Incorrect Data content: Data should have changed",
             caseDetailsToSave.getData(),
@@ -1445,10 +1446,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn201WhenPostCreateCaseEventWithNoPreStateCheckForCitizen() throws Exception {
         final String urlPortionForCaseType = "bookcase-default-pre-state-test";
-        final String caseReference = "1504259907353545";
+        final String caseReference = "1557850043804031";
         final String summary = "Case event summary";
         final String description = "Case event description";
-        final String url = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + urlPortionForCaseType
+        final String url = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + urlPortionForCaseType
             + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
@@ -1456,7 +1457,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         event.setSummary(summary);
         event.setDescription(description);
         caseDetailsToSave.setEvent(event);
-        final String token = generateEventToken(template, UID, JURISDICTION, CASE_TYPE, caseReference, TEST_EVENT_ID);
+        final String token = generateEventToken(template, UID, JURISDICTION, urlPortionForCaseType, caseReference, TEST_EVENT_ID);
         caseDetailsToSave.setToken(token);
         final JsonNode DATA = mapper.readTree("{" +
             "\"PersonAddress\":{" +
@@ -1480,14 +1481,14 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").toString());
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> caseReference.equals(c.getReference().toString()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
-        assertEquals("Incorrect Case Type", CASE_TYPE, savedCaseDetails.getCaseTypeId());
+        assertEquals("Incorrect Case Type", urlPortionForCaseType, savedCaseDetails.getCaseTypeId());
         assertEquals(
             "Incorrect Data content: Data should have changed",
             caseDetailsToSave.getData(),
@@ -1518,10 +1519,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn201WhenPostCreateCaseEventWithNoChangesToPostStateForCaseworker() throws Exception {
         final String caseTypeUrlPortion = "bookcase-default-post-state";
-        final String caseReference = "1504259907353545";
+        final String caseReference = "1557845948403939";
         final String summary = "Case event summary";
         final String description = "Case event description";
-        final String url = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + caseTypeUrlPortion
+        final String url = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + caseTypeUrlPortion
             + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
@@ -1529,7 +1530,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         event.setSummary(summary);
         event.setDescription(description);
 
-        final String token = generateEventToken(template, UID, JURISDICTION, CASE_TYPE, caseReference, TEST_EVENT_ID);
+        final String token = generateEventToken(template, UID, JURISDICTION, caseTypeUrlPortion, caseReference, TEST_EVENT_ID);
         caseDetailsToSave.setToken(token);
         caseDetailsToSave.setEvent(event);
         final JsonNode data = mapper.readTree("{" +
@@ -1554,14 +1555,14 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").toString());
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> caseReference.equals(c.getReference().toString()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
-        assertEquals("Incorrect Case Type", CASE_TYPE, savedCaseDetails.getCaseTypeId());
+        assertEquals("Incorrect Case Type", caseTypeUrlPortion, savedCaseDetails.getCaseTypeId());
         assertEquals(
             "Incorrect Data content: Data should have changed",
             caseDetailsToSave.getData(),
@@ -1592,10 +1593,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn201WhenPostCreateCaseEventWithNoChangesToPostStateForCitizen() throws Exception {
         final String caseTypeUrlPortion = "bookcase-default-post-state";
-        final String caseReference = "1504259907353545";
+        final String caseReference = "1557845948403939";
         final String summary = "Case event summary";
         final String description = "Case event description";
-        final String url = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + caseTypeUrlPortion
+        final String url = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + caseTypeUrlPortion
             + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
@@ -1603,7 +1604,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         event.setSummary(summary);
         event.setDescription(description);
 
-        final String token = generateEventToken(template, UID, JURISDICTION, CASE_TYPE, caseReference, TEST_EVENT_ID);
+        final String token = generateEventToken(template, UID, JURISDICTION, caseTypeUrlPortion, caseReference, TEST_EVENT_ID);
         caseDetailsToSave.setToken(token);
         caseDetailsToSave.setEvent(event);
         final JsonNode data = mapper.readTree("{" +
@@ -1628,14 +1629,14 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").toString());
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> caseReference.equals(c.getReference().toString()))
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
-        assertEquals("Incorrect Case Type", CASE_TYPE, savedCaseDetails.getCaseTypeId());
+        assertEquals("Incorrect Case Type", caseTypeUrlPortion, savedCaseDetails.getCaseTypeId());
         assertEquals(
             "Incorrect Data content: Data should have changed",
             caseDetailsToSave.getData(),
@@ -1750,7 +1751,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     public void shouldReturn201WhenPostCreateCaseEventWithNoSummaryForCaseWorker() throws Exception {
         final String CASE_REFERENCE = "1504259907353545";
         final String DESCRIPTION = "Case event description";
-        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
+        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
@@ -1773,7 +1774,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> CASE_REFERENCE.equals(c.getReference().toString()))
@@ -1790,7 +1791,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     public void shouldReturn201WhenPostCreateCaseEventWithNoSummaryForCitizen() throws Exception {
         final String CASE_REFERENCE = "1504259907353545";
         final String DESCRIPTION = "Case event description";
-        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
+        final String URL = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
@@ -1813,7 +1814,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> CASE_REFERENCE.equals(c.getReference().toString()))
@@ -1831,7 +1832,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String CASE_REFERENCE = "1504259907353545";
         final String SUMMARY = "        ";
         final String DESCRIPTION = "Case event summary";
-        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
+        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
@@ -1852,7 +1853,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> CASE_REFERENCE.equals(c.getReference().toString()))
@@ -1869,7 +1870,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String CASE_REFERENCE = "1504259907353545";
         final String SUMMARY = "        ";
         final String DESCRIPTION = "Case event summary";
-        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
+        final String URL = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
@@ -1890,7 +1891,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> CASE_REFERENCE.equals(c.getReference().toString()))
@@ -1931,7 +1932,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> CASE_REFERENCE.equals(c.getReference().toString()))
@@ -1972,7 +1973,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> CASE_REFERENCE.equals(c.getReference().toString()))
@@ -2013,7 +2014,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> CASE_REFERENCE.equals(c.getReference().toString()))
@@ -2054,7 +2055,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> CASE_REFERENCE.equals(c.getReference().toString()))
@@ -2095,7 +2096,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> CASE_REFERENCE.equals(c.getReference().toString()))
@@ -2136,7 +2137,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> CASE_REFERENCE.equals(c.getReference().toString()))
@@ -2169,7 +2170,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> CASE_REFERENCE.equals(c.getReference().toString()))
@@ -2202,7 +2203,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> CASE_REFERENCE.equals(c.getReference().toString()))
@@ -2372,7 +2373,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andReturn();
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> CASE_REFERENCE.equals(c.getReference().toString()))
@@ -2430,7 +2431,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andReturn();
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> CASE_REFERENCE.equals(c.getReference().toString()))
@@ -2455,7 +2456,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String CASE_REFERENCE = "1504259907353545";
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
-        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
+        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
@@ -2487,7 +2488,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String CASE_REFERENCE = "1504259907353545";
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
-        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
+        final String URL = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
@@ -2519,7 +2520,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String CASE_REFERENCE = "1504259907353545";
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
-        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
+        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
@@ -2551,7 +2552,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String CASE_REFERENCE = "1504259907353545";
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
-        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
+        final String URL = "/citizens/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
@@ -2829,7 +2830,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String caseReference = "1504259907353610";
         final String summary = "Case event summary";
         final String description = "Case event description";
-        final String url = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_READ_CASE_TYPE_ACCESS
+        final String url = "/" + userRole + "/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_READ_CASE_TYPE_ACCESS
             + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
@@ -2866,7 +2867,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String caseReference = "1504259907353628";
         final String summary = "Case event summary";
         final String description = "Case event description";
-        final String url = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_READ_FIELD_ACCESS
+        final String url = "/" + userRole + "/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_READ_FIELD_ACCESS
             + "/cases/" + caseReference + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
@@ -3190,7 +3191,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String CASE_REFERENCE = "1504259907353545";
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
-        final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
+        final String URL = "/" + userRole + "/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
@@ -3244,7 +3245,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").toString());
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> CASE_REFERENCE.equals(c.getReference().toString()))
@@ -3284,7 +3285,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String CASE_REFERENCE = "1504259907353529";
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
-        final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
+        final String URL = "/" + userRole + "/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_REFERENCE + "/events";
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event event = anEvent().build();
         event.setEventId(PRE_STATES_EVENT_ID);
@@ -3332,7 +3333,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").toString());
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases: No case should be created", 16, caseDetailsList.size());
+        assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
 
         final CaseDetails savedCaseDetails = caseDetailsList.stream()
             .filter(c -> CASE_REFERENCE.equals(c.getReference().toString()))
@@ -3987,7 +3988,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
      */
     private void assertCaseDataResultSetSize() {
         final int count = template.queryForObject("SELECT count(1) as n FROM case_data",Integer.class);
-        assertEquals("Incorrect case data size", 16, count);
+        assertEquals("Incorrect case data size", NUMBER_OF_CASES, count);
     }
 
     private JsonNode getTextNode(String value) {
