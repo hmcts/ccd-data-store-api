@@ -42,6 +42,7 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
     private static final String WRONG_JURISDICTION = "DIVORCE";
     private static final Long REFERENCE = 1504259907353529L;
     private static final Long WRONG_REFERENCE = 9999999999999999L;
+    public static final int NUMBER_OF_CASES = 18;
 
     private JdbcTemplate template;
 
@@ -190,7 +191,7 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
         // Check that we have the expected test data set size, this is to ensure
         // that state filtering is correct
         final List<CaseDetails> resultList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect data initiation", 16, resultList.size());
+        assertEquals("Incorrect data initiation", NUMBER_OF_CASES, resultList.size());
     }
 
     @Test

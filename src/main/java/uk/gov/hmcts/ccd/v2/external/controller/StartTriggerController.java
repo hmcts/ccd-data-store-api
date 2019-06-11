@@ -14,6 +14,8 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.StartTriggerResource;
 
+import static uk.gov.hmcts.ccd.v2.V2.Error.EVENT_TRIGGER_NOT_FOUND;
+
 @RestController
 @RequestMapping(path = "/")
 public class StartTriggerController {
@@ -56,7 +58,7 @@ public class StartTriggerController {
         ),
         @ApiResponse(
             code = 404,
-            message = "Trigger not found"
+            message = EVENT_TRIGGER_NOT_FOUND
         )
     })
     public ResponseEntity<StartTriggerResource> getStartCaseTrigger(@PathVariable("caseTypeId") String caseTypeId,
@@ -99,7 +101,7 @@ public class StartTriggerController {
         ),
         @ApiResponse(
             code = 404,
-            message = "Trigger not found"
+            message = EVENT_TRIGGER_NOT_FOUND
         )
     })
     public ResponseEntity<StartTriggerResource> getStartEventTrigger(@PathVariable("caseId") String caseId,

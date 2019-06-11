@@ -32,7 +32,6 @@ public class SearchQueryFactoryOperation {
     private static final String MAIN_COUNT_QUERY = "SELECT count(*) FROM case_data WHERE %s";
 
     private static final String CREATED_DATE = "created_date";
-    private static final String SORT_ASCENDING = "ASC";
 
     private final CriterionFactory criterionFactory;
     private final ApplicationParams applicationParam;
@@ -53,11 +52,14 @@ public class SearchQueryFactoryOperation {
 
     public Query build(MetaData metadata, Map<String, String> params, boolean isCountQuery) {
         final List<Criterion> criteria = criterionFactory.build(metadata, params);
-        String queryString = String.format(isCountQuery ? MAIN_COUNT_QUERY : MAIN_QUERY,
-                                           secure(toClauses(criteria), metadata),
-                                           metadata.getSortField().orElse(CREATED_DATE),
-                                           metadata.getSortDirection().orElse(SORT_ASCENDING).toUpperCase()
-        );
+
+        String queryToFormat = isCountQuery ? MAIN_COUNT_QUERY : MAIN_QUERY;
+        String whereClausePart = secure(toClauses(criteria), metadata);
+        String sortField = metadata.getSortField().orElse(CREATED_DATE);
+        SortDirection direction = SortDirection.fromOptionalString(metadata.getSortDirection());
+
+        String queryString = String.format(queryToFormat, whereClausePart, sortField, direction.name());
+
         Query query;
         if (isCountQuery) {
             query = entityManager.createNativeQuery(queryString);

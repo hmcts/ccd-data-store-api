@@ -216,9 +216,6 @@ class CaseDetailsEndpointTest {
     void createCaseEventForCaseWorker() {
         final CaseDetails toBeReturned = new CaseDetails();
         doReturn(toBeReturned).when(createEventOperation).createCaseEvent(
-            UID,
-            JURISDICTION_ID,
-            CASE_TYPE_ID,
             CASE_ID,
             EVENT_DATA);
 
@@ -232,9 +229,6 @@ class CaseDetailsEndpointTest {
         assertAll(
             () -> assertThat(output, sameInstance(toBeReturned)),
             () -> verify(createEventOperation).createCaseEvent(
-                UID,
-                JURISDICTION_ID,
-                CASE_TYPE_ID,
                 CASE_ID,
                 EVENT_DATA)
         );

@@ -11,6 +11,7 @@ public final class V2 {
 
         // External API
         public static final String CASE = "application/vnd.uk.gov.hmcts.ccd-data-store-api.case.v2+json;charset=UTF-8";
+        public static final String CREATE_EVENT = "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-event.v2+json;charset=UTF-8";
         public static final String START_CASE_TRIGGER = "application/vnd.uk.gov.hmcts.ccd-data-store-api.start-case-trigger.v2+json;charset=UTF-8";
         public static final String START_EVENT_TRIGGER = "application/vnd.uk.gov.hmcts.ccd-data-store-api.start-event-trigger.v2+json;charset=UTF-8";
         public static final String CASE_DATA_VALIDATE = "application/vnd.uk.gov.hmcts.ccd-data-store-api.case-data-validate.v2+json;charset=UTF-8";
@@ -37,7 +38,9 @@ public final class V2 {
         private Error() {}
 
         public static final String CASE_NOT_FOUND = "Case not found";
+        public static final String EVENT_TRIGGER_NOT_FOUND = "Event trigger not found";
         public static final String CASE_ID_INVALID = "Case ID is not valid";
+        public static final String CASE_ALTERED = "Case altered outside of transaction";
         public static final String CASE_ROLE_REQUIRED = "Case role missing";
         public static final String CASE_ROLE_INVALID = "Case role does not exist";
         public static final String GRANT_FORBIDDEN = "Grant action is reserved to users with entire jurisdiction access";
