@@ -9,8 +9,10 @@ import lombok.NonNull;
 import org.springframework.hateoas.ResourceSupport;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.v2.external.controller.CaseController;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -53,6 +55,12 @@ public class CaseResource extends ResourceSupport {
         copyProperties(caseDetails);
 
         add(linkTo(methodOn(CaseController.class).getCase(reference)).withSelfRel());
+    }
+
+    public CaseResource(@NonNull CaseDetails caseDetails, @NotNull CaseDataContent caseDataContent) {
+        copyProperties(caseDetails);
+
+        add(linkTo(methodOn(CaseController.class).createEvent(reference, caseDataContent)).withSelfRel());
     }
 
     private void copyProperties(CaseDetails caseDetails) {

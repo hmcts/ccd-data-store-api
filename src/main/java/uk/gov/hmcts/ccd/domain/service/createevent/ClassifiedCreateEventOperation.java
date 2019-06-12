@@ -24,15 +24,9 @@ public class ClassifiedCreateEventOperation implements CreateEventOperation {
     }
 
     @Override
-    public CaseDetails createCaseEvent(String uid,
-                                       String jurisdictionId,
-                                       String caseTypeId,
-                                       String caseReference,
+    public CaseDetails createCaseEvent(String caseReference,
                                        CaseDataContent content) {
-        final CaseDetails caseDetails = createEventOperation.createCaseEvent(uid,
-                                                                           jurisdictionId,
-                                                                           caseTypeId,
-                                                                           caseReference,
+        final CaseDetails caseDetails = createEventOperation.createCaseEvent(caseReference,
                                                                            content);
         return Optional.ofNullable(caseDetails)
                        .flatMap(classificationService::applyClassification)

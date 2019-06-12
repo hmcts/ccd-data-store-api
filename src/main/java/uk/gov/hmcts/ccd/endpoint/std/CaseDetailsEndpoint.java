@@ -333,10 +333,7 @@ public class CaseDetailsEndpoint {
         @ApiParam(value = "Case ID", required = true)
         @PathVariable("cid") final String caseId,
         @RequestBody final CaseDataContent content) {
-        return createEventOperation.createCaseEvent(uid,
-                                                    jurisdictionId,
-                                                    caseTypeId,
-                                                    caseId,
+        return createEventOperation.createCaseEvent(caseId,
                                                     content);
     }
 
@@ -362,10 +359,7 @@ public class CaseDetailsEndpoint {
         @ApiParam(value = "Case ID", required = true)
         @PathVariable("cid") final String caseId,
         @RequestBody final CaseDataContent content) {
-        return createEventOperation.createCaseEvent(uid,
-                                                    jurisdictionId,
-                                                    caseTypeId,
-                                                    caseId,
+        return createEventOperation.createCaseEvent(caseId,
                                                     content);
     }
 
