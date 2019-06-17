@@ -146,16 +146,17 @@ public class CaseField implements Serializable {
     }
 
     /**
-     * Gets a caseField by specified path.
+     * Gets a Complex field nested caseField by specified path.
      *
      * @param path Path to a nested CaseField
      * @return A nested CaseField or 'this' when path is blank
      */
     @JsonIgnore
-    public CaseField findNestedElementByPath(String path) {
+    public CaseField getComplexFieldNestedField(String path) {
         if (StringUtils.isBlank(path)) {
             return this;
         }
+        //TODO: remove BadRequestException from here, it's a rest layer exception it does not belong here
         if (this.getFieldType().getChildren().isEmpty()) {
             throw new BadRequestException(format("CaseField %s has no nested elements.", this.id));
         }
