@@ -1,11 +1,5 @@
 package uk.gov.hmcts.ccd.data.casedetails.query;
 
-import org.apache.commons.collections.CollectionUtils;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseUserEntity;
-import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
-import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
-import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
-
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -20,6 +14,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import org.apache.commons.collections.CollectionUtils;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseUserEntity;
+import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
+import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 
 public abstract class CaseDetailsQueryBuilder<T> {
 
@@ -121,11 +121,13 @@ public abstract class CaseDetailsQueryBuilder<T> {
         return this;
     }
 
-    public CaseDetailsQueryBuilder orderByCreatedDate(String sortDirection) {
+    public CaseDetailsQueryBuilder orderBy(MetaData metadata) {
+        String sortDirection = metadata.getSortDirection().orElse("asc");
+        String sortField = metadata.getSortField().orElse(CREATED_DATE);
         if (sortDirection.equalsIgnoreCase("asc")) {
-            orders.add(cb.asc(root.get(CREATED_DATE)));
+            orders.add(cb.asc(root.get(sortField)));
         } else {
-            orders.add(cb.desc(root.get(CREATED_DATE)));
+            orders.add(cb.desc(root.get(sortField)));
         }
 
         return this;

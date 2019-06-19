@@ -173,4 +173,17 @@ public class SearchQueryFactoryOperationTest {
         verify(em, times(1)).createNativeQuery("SELECT count(*) FROM case_data WHERE TRIM( UPPER ( data #>> '{name}')) = TRIM( UPPER ( ?0)) AND id IN (SELECT cu.case_data_id FROM case_users AS cu WHERE user_id = '2')");
         verify(result, times(1)).setParameter(0, TEST_FIELD_VALUE);
     }
+
+    @Test
+    public void shouldGenerateOrderByWithSortFieldAndSortDirection() {
+        MetaData metadata = new MetaData(TEST_CASE_TYPE_VALUE, null);
+        metadata.setSortDirection(Optional.of("desc"));
+        metadata.setSortField("last_modified");
+        when(em.createNativeQuery(any(String.class), any(Class.class))).thenReturn(mockQuery);
+
+        subject.build(metadata, params, false);
+
+        verify(em, times(1)).createNativeQuery("SELECT * FROM case_data WHERE case_type_id = ?0 ORDER BY last_modified DESC", CaseDetailsEntity.class);
+    }
+
 }

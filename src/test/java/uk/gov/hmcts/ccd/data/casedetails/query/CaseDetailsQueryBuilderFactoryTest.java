@@ -1,5 +1,20 @@
 package uk.gov.hmcts.ccd.data.casedetails.query;
 
+import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import java.util.Optional;
+
+import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -8,19 +23,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
-
-import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
-
-import static java.util.Arrays.asList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @DisplayName("CaseDetailsQueryBuilderFactory")
 class CaseDetailsQueryBuilderFactoryTest {
@@ -83,11 +85,29 @@ class CaseDetailsQueryBuilderFactoryTest {
         void shouldSecureSelectQuery() {
             MetaData metaData = new MetaData("caseType", "jurisdiction");
             CaseDetailsQueryBuilder<CaseDetailsEntity> queryBuilder = factory.select(em, metaData);
-
             assertAll(
                 () -> assertThat(queryBuilder, is(notNullValue())),
                 () -> verify(userAuthorisationSecurity).secure(queryBuilder, metaData),
                 () -> verify(caseStateAuthorisationSecurity).secure(queryBuilder, metaData)
+            );
+        }
+
+        @Test
+        @DisplayName("should add order by clause to select query")
+        void shouldAddOrderByClauseToSelectQuery() {
+            String sortField = "sortField";
+            String sortDirection = "desc";
+            MetaData metaData = new MetaData("caseType", "jurisdiction");
+            metaData.setSortField(sortField);
+            metaData.setSortDirection(Optional.of(sortDirection));
+
+            CaseDetailsQueryBuilder<CaseDetailsEntity> queryBuilder = factory.select(em, metaData);
+            queryBuilder.orderBy(metaData);
+
+            assertAll(
+                () -> assertThat(queryBuilder, is(notNullValue())),
+                () -> verify(root).get(sortField),
+                () -> verify(criteriaBuilder).desc(any())
             );
         }
     }

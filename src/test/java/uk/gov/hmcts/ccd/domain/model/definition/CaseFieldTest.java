@@ -195,21 +195,21 @@ class CaseFieldTest {
         @Test
         void findNestedElementForCaseFieldWithNoNestedElements() {
             Exception exception = assertThrows(BadRequestException.class, () ->
-                name.findNestedElementByPath("Field1"));
+                name.getComplexFieldNestedField("Field1"));
             assertEquals("CaseField Name has no nested elements.", exception.getMessage());
         }
 
         @Test
         void findNestedElementForCaseFieldWithNonMatchingPathElement() {
             Exception exception = assertThrows(BadRequestException.class, () ->
-                debtorDetails.findNestedElementByPath("Field1"));
+                debtorDetails.getComplexFieldNestedField("Field1"));
             assertEquals("Nested element not found for Field1", exception.getMessage());
         }
 
         @Test
         void findNestedElementForCaseFieldWithNonMatchingPathElements() {
             Exception exception = assertThrows(BadRequestException.class, () ->
-                debtorDetails.findNestedElementByPath("Field2.Field3"));
+                debtorDetails.getComplexFieldNestedField("Field2.Field3"));
             assertEquals("Nested element not found for Field2", exception.getMessage());
         }
     }
