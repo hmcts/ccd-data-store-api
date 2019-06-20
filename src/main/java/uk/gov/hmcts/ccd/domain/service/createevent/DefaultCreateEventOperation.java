@@ -44,6 +44,7 @@ import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
+import uk.gov.hmcts.ccd.domain.service.util.TransactionHelper;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -75,6 +76,7 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
     private final SecurityClassificationService securityClassificationService;
     private final ValidateCaseFieldsOperation validateCaseFieldsOperation;
     private final UserAuthorisation userAuthorisation;
+    private final TransactionHelper transactionHelper;
 
     @Inject
     public DefaultCreateEventOperation(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -92,7 +94,8 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
                                        final UIDService uidService,
                                        final SecurityClassificationService securityClassificationService,
                                        final ValidateCaseFieldsOperation validateCaseFieldsOperation,
-                                       final UserAuthorisation userAuthorisation) {
+                                       final UserAuthorisation userAuthorisation,
+                                       final TransactionHelper transactionHelper) {
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -109,6 +112,7 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
         this.securityClassificationService = securityClassificationService;
         this.validateCaseFieldsOperation = validateCaseFieldsOperation;
         this.userAuthorisation = userAuthorisation;
+        this.transactionHelper = transactionHelper;
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
@@ -201,7 +205,7 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
         if (!state.isPresent() && !equalsIgnoreCase(CaseState.ANY, eventTrigger.getPostState())) {
             caseDetails.setState(eventTrigger.getPostState());
         }
-        return caseDetailsRepository.set(caseDetails);
+        return transactionHelper.withNewTransaction(() -> caseDetailsRepository.set(caseDetails));
     }
 
     private void mergeUpdatedFieldsToCaseDetails(final Map<String, JsonNode> data,
