@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
+import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.beans.HasPropertyWithValue.hasProperty;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -17,6 +19,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import java.util.List;
 import java.util.Optional;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -128,17 +131,25 @@ class CaseFieldTest {
             CaseField surname = person.getFieldType().getChildren().stream()
                 .filter(e -> e.getId().equals(SURNAME)).findFirst().get();
 
-            validateACL(family.findNestedElementByPath(MEMBERS).getAccessControlLists(), complexACL1);
-            validateACL(family.findNestedElementByPath(MEMBERS + "." + PERSON).getAccessControlLists(), complexACL1);
-            validateACL(family.findNestedElementByPath(MEMBERS + "." + PERSON + "." + NAME).getAccessControlLists(), complexACL1);
-            validateACL(family.findNestedElementByPath(MEMBERS + "." + PERSON + "." + SURNAME).getAccessControlLists(), complexACL1);
-            validateACL(family.findNestedElementByPath(FAMILY_INFO + "." + FAMILY_ADDRESS + "." + ADDRES_LINE_1).getAccessControlLists(), complexACL5);
-            validateACL(family.findNestedElementByPath(FAMILY_INFO + "." + FAMILY_ADDRESS + "." + ADDRES_LINE_2).getAccessControlLists(), complexACL5);
+            validateACL(family.getComplexFieldNestedField(MEMBERS).getAccessControlLists(), complexACL1);
+            validateACL(family.getComplexFieldNestedField(MEMBERS + "." + PERSON).getAccessControlLists(), complexACL1);
+            validateACL(family.getComplexFieldNestedField(MEMBERS + "." + PERSON + "." + NAME).getAccessControlLists(), complexACL1);
+            validateACL(family.getComplexFieldNestedField(MEMBERS + "." + PERSON + "." + SURNAME).getAccessControlLists(), complexACL1);
+            validateACL(family.getComplexFieldNestedField(FAMILY_INFO + "." + FAMILY_ADDRESS + "." + ADDRES_LINE_1).getAccessControlLists(), complexACL5);
+            validateACL(family.getComplexFieldNestedField(FAMILY_INFO + "." + FAMILY_ADDRESS + "." + ADDRES_LINE_2).getAccessControlLists(), complexACL5);
 
             assertAll(
                 () -> assertThat(family.getAccessControlLists().size(), is(3)),
-                () -> assertThat(familyName.getAccessControlLists().size(), is(3)),
-                () -> assertThat(familyNames.getAccessControlLists().size(), is(3)),
+                () -> assertThat(familyNames.getAccessControlLists().size(), is(2)),
+                () -> assertThat(family.getComplexFieldNestedField(FAMILY_INFO + "." + FAMILY_NAMES).getAccessControlLists(),
+                    hasItems(
+                        hasProperty("role", CoreMatchers.is(ROLE2)),
+                        hasProperty("role", is(ROLE3)))),
+                () -> assertThat(familyName.getAccessControlLists().size(), is(2)),
+                () -> assertThat(family.getComplexFieldNestedField(FAMILY_INFO + "." + FAMILY_NAMES + "." + FAMILY_NAME).getAccessControlLists(),
+                    hasItems(
+                        hasProperty("role", CoreMatchers.is(ROLE2)),
+                        hasProperty("role", is(ROLE3)))),
                 () -> assertThat(members.getAccessControlLists().size(), is(3)),
                 () -> assertThat(person.getAccessControlLists().size(), is(3)),
                 () -> assertThat(name.getAccessControlLists().size(), is(3)),
@@ -153,11 +164,11 @@ class CaseFieldTest {
 
             family.propagateACLsToNestedFields();
 
-            validateACL(family.findNestedElementByPath(MEMBERS).getAccessControlLists(), complexACL1);
-            validateACL(family.findNestedElementByPath(MEMBERS + "." + PERSON).getAccessControlLists(), complexACL2);
-            validateACL(family.findNestedElementByPath(MEMBERS + "." + PERSON + "." + NAME).getAccessControlLists(), complexACL3);
-            assertThat(((CaseField)family.findNestedElementByPath(MEMBERS + "." + PERSON + "." + SURNAME)).getAccessControlListByRole(ROLE1), is(Optional.empty()));
-            assertThrows(RuntimeException.class, () -> family.findNestedElementByPath(MEMBERS + "." + PERSON + "." + SURNAME).getAccessControlLists().stream()
+            validateACL(family.getComplexFieldNestedField(MEMBERS).getAccessControlLists(), complexACL1);
+            validateACL(family.getComplexFieldNestedField(MEMBERS + "." + PERSON).getAccessControlLists(), complexACL2);
+            validateACL(family.getComplexFieldNestedField(MEMBERS + "." + PERSON + "." + NAME).getAccessControlLists(), complexACL3);
+            assertThat(((CaseField) family.getComplexFieldNestedField(MEMBERS + "." + PERSON + "." + SURNAME)).getAccessControlListByRole(ROLE1), is(Optional.empty()));
+            assertThrows(RuntimeException.class, () -> family.getComplexFieldNestedField(MEMBERS + "." + PERSON + "." + SURNAME).getAccessControlLists().stream()
                 .filter(el -> el.getRole().equalsIgnoreCase(ROLE1))
                 .findFirst()
                 .orElseThrow(RuntimeException::new));
@@ -171,7 +182,7 @@ class CaseFieldTest {
         @Test
         void findNestedElementByPath() {
             String path = PERSON + "." + NAME;
-            CaseField nestedElementByPath = (CaseField) debtorDetails.findNestedElementByPath(path);
+            CaseField nestedElementByPath = (CaseField) debtorDetails.getComplexFieldNestedField(path);
 
             assertAll(
                 () -> assertThat(nestedElementByPath.getId(), is(name.getId())),
@@ -182,13 +193,13 @@ class CaseFieldTest {
 
         @Test
         void findNestedElementForCaseFieldWithEmptyPath() {
-            CaseField nestedElementByPath = (CaseField) debtorDetails.findNestedElementByPath("");
+            CaseField nestedElementByPath = (CaseField) debtorDetails.getComplexFieldNestedField("");
             assertEquals(debtorDetails, nestedElementByPath);
         }
 
         @Test
         void findNestedElementForCaseFieldWithNullPath() {
-            CaseField nestedElementByPath = (CaseField) debtorDetails.findNestedElementByPath(null);
+            CaseField nestedElementByPath = (CaseField) debtorDetails.getComplexFieldNestedField(null);
             assertEquals(debtorDetails, nestedElementByPath);
         }
 
@@ -220,10 +231,10 @@ class CaseFieldTest {
             .findFirst()
             .orElseThrow(RuntimeException::new);
         assertAll(
-            () -> assertThat("Create doesn't match",acl1.isCreate(), is(expected.isCreate())),
-            () -> assertThat("Read doesn't match",acl1.isRead(), is(expected.isRead())),
-            () -> assertThat("Update doesn't match",acl1.isUpdate(), is(expected.isUpdate())),
-            () -> assertThat("Delete doesn't match",acl1.isDelete(), is(expected.isDelete()))
+            () -> assertThat("Create doesn't match", acl1.isCreate(), is(expected.isCreate())),
+            () -> assertThat("Read doesn't match", acl1.isRead(), is(expected.isRead())),
+            () -> assertThat("Update doesn't match", acl1.isUpdate(), is(expected.isUpdate())),
+            () -> assertThat("Delete doesn't match", acl1.isDelete(), is(expected.isDelete()))
         );
     }
 }

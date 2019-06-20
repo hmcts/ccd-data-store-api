@@ -71,7 +71,8 @@ import com.google.common.collect.Maps;
 public class TestBuildersUtil {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    private TestBuildersUtil() {}
+    private TestBuildersUtil() {
+    }
 
     public static class CallbackResponseBuilder {
         private final CallbackResponse callbackResponse;
@@ -1076,8 +1077,10 @@ public class TestBuildersUtil {
         }
 
         public FieldTypeBuilder withCollectionField(CaseField complexField) {
-            fieldType.setCollectionFieldType(FieldTypeBuilder.aFieldType().withComplexField(complexField)
-                .withType(COMPLEX).build());
+            fieldType.setCollectionFieldType(aFieldType()
+                .withComplexField(complexField)
+                .withType(COMPLEX)
+                .build());
             return this;
         }
 
@@ -1090,6 +1093,7 @@ public class TestBuildersUtil {
     public static class CaseViewFieldBuilder {
         private final CaseViewField caseViewField;
         private final List<AccessControlList> acls = newArrayList();
+        private FieldType caseFieldType;
 
         private CaseViewFieldBuilder() {
             this.caseViewField = new CaseViewField();
@@ -1105,7 +1109,7 @@ public class TestBuildersUtil {
         }
 
         public CaseViewFieldBuilder withFieldType(FieldType fieldType) {
-            caseViewField.setFieldType(fieldType);
+            this.caseFieldType = fieldType;
             return this;
         }
 
@@ -1116,6 +1120,7 @@ public class TestBuildersUtil {
 
         public CaseViewField build() {
             this.caseViewField.setAccessControlLists(acls);
+            this.caseViewField.setFieldType(this.caseFieldType);
             return this.caseViewField;
         }
     }

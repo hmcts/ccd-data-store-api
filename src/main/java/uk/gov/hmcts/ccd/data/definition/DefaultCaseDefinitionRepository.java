@@ -24,6 +24,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
@@ -83,7 +84,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         try {
             final HttpEntity requestEntity = new HttpEntity<CaseType>(securityUtils.authorizationHeaders());
             final CaseType caseType = restTemplate.exchange(applicationParams.caseTypeDefURL(caseTypeId), HttpMethod.GET, requestEntity, CaseType.class).getBody();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseType.getCaseFields().stream().forEach(CaseField::propagateACLsToNestedFields);
             return caseType;
 
         } catch (Exception e) {

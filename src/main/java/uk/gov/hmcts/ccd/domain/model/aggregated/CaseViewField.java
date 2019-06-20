@@ -11,7 +11,9 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 
 @ToString
-public class CaseViewField implements CompoundField{
+public class CaseViewField implements CommonField {
+    public static final String READONLY = "READONLY";
+
     private String id;
     private String label;
     @JsonProperty("hint_text")

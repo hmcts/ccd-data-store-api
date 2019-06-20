@@ -1,17 +1,12 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
-import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
 
-import uk.gov.hmcts.ccd.domain.model.aggregated.CompoundField;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -22,11 +17,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import lombok.ToString;
-import org.apache.commons.lang3.StringUtils;
 
 @ToString
 @ApiModel(description = "")
-public class CaseField implements Serializable, CompoundField {
+public class CaseField implements Serializable, CommonField {
 
     private static final long serialVersionUID = -4257574164546267919L;
 
@@ -52,6 +46,8 @@ public class CaseField implements Serializable, CompoundField {
     @JsonProperty("complexACLs")
     private List<ComplexACL> complexACLs = new ArrayList<>();
     private boolean metadata;
+    @JsonProperty("display_context")
+    private String displayContext;
 
     public String getId() {
         return id;
@@ -157,6 +153,14 @@ public class CaseField implements Serializable, CompoundField {
         this.metadata = metadata;
     }
 
+    public String getDisplayContext() {
+        return displayContext;
+    }
+
+    public void setDisplayContext(String displayContext) {
+        this.displayContext = displayContext;
+    }
+
     @JsonIgnore
     public void propagateACLsToNestedFields() {
         propagateACLsToNestedFields(this, this.accessControlLists);
@@ -167,7 +171,7 @@ public class CaseField implements Serializable, CompoundField {
     @JsonIgnore
     private void applyComplexACLs() {
         this.complexACLs.forEach(complexACL -> {
-            final CaseField nestedField = (CaseField) this.findNestedElementByPath(complexACL.getListElementCode());
+            final CaseField nestedField = (CaseField) this.getComplexFieldNestedField(complexACL.getListElementCode());
             nestedField.getAccessControlListByRole(complexACL.getRole())
                 .ifPresent(accessControlList -> nestedField.accessControlLists.remove(accessControlList));
             nestedField.getAccessControlLists().add(complexACL);
@@ -196,7 +200,7 @@ public class CaseField implements Serializable, CompoundField {
     @JsonIgnore
     private void removeACLS(final List<String> siblingsWithNoComplexACLs, final String role) {
         siblingsWithNoComplexACLs.stream().forEach(s -> {
-            final CaseField nestedElement = (CaseField) this.findNestedElementByPath(s);
+            final CaseField nestedElement = (CaseField) this.getComplexFieldNestedField(s);
             nestedElement.getAccessControlListByRole(role).ifPresent(acl -> nestedElement.getAccessControlLists().remove(acl));
             propagateACLsToNestedFields(nestedElement, nestedElement.getAccessControlLists());
         });
@@ -228,25 +232,7 @@ public class CaseField implements Serializable, CompoundField {
                 .collect(toList());
         }
     }
-    /**
-     * Gets a Complex field nested caseField by specified path.
-     *
-     * @param path Path to a nested CaseField
-     * @return A nested CaseField or 'this' when path is blank
-     */
-    @JsonIgnore
-    public CaseField getComplexFieldNestedField(String path) {
-        if (StringUtils.isBlank(path)) {
-            return this;
-        }
-        //TODO: remove BadRequestException from here, it's a rest layer exception it does not belong here
-        if (this.getFieldType().getChildren().isEmpty()) {
-            throw new BadRequestException(format("CaseField %s has no nested elements.", this.id));
-        }
-        List<String> pathElements = Arrays.stream(path.trim().split("\\.")).collect(Collectors.toList());
 
-        return reduce(this.getFieldType().getChildren(), pathElements);
-    }
     @JsonIgnore
     private boolean isNotAChild(final String parent, final String s) {
         return s.indexOf('.', parent.length()) == parent.length()
@@ -267,10 +253,8 @@ public class CaseField implements Serializable, CompoundField {
     private static void propagateACLsToNestedFields(CaseField caseField, List<AccessControlList> acls) {
         if (caseField.isCompound()) {
             caseField.getFieldType().getChildren().forEach(nestedField -> {
-//                if (nestedField.getAccessControlLists() == null || nestedField.getAccessControlLists().isEmpty()) {
-                final List<AccessControlList> cloneACLs = acls.stream().map(accessControlList -> accessControlList.duplicate()).collect(toList());
+                final List<AccessControlList> cloneACLs = acls.stream().map(AccessControlList::duplicate).collect(toList());
                 nestedField.setAccessControlLists(cloneACLs);
-//                }
                 propagateACLsToNestedFields(nestedField, acls);
             });
         }

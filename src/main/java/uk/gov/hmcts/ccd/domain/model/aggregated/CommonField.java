@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.domain.model.aggregated;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
 
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
@@ -16,13 +15,15 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.StringUtils;
 
-public interface CompoundField {
+public interface CommonField {
 
     FieldType getFieldType();
 
     String getId();
 
-    public List<AccessControlList> getAccessControlLists();
+    List<AccessControlList> getAccessControlLists();
+
+    void setDisplayContext(String displayContext);
 
     @JsonIgnore
     default boolean isCollectionFieldType() {
@@ -46,7 +47,7 @@ public interface CompoundField {
      * @return A nested CaseField or 'this' when path is blank
      */
     @JsonIgnore
-    default CompoundField findNestedElementByPath(String path) {
+    default CommonField getComplexFieldNestedField(String path) {
         if (StringUtils.isBlank(path)) {
             return this;
         }
