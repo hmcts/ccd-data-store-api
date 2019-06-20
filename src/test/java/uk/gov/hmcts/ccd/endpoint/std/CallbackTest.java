@@ -1,11 +1,15 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
 import javax.inject.Inject;
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.ok;
@@ -38,6 +42,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -1304,6 +1309,57 @@ public class CallbackTest extends WireMockBaseTest {
         ).andReturn();
 
         assertEquals("Did not catch invalid token", 404, mvcResult.getResponse().getStatus());
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
+    @Transactional()
+    @Rollback(false)
+    public void shouldCommitUpdatedCaseDetailsImmediatelyBeforeSendToPostCallback() throws Exception {
+        String SUMMARY = "Case event summary";
+        String DESCRIPTION = "Case event description";
+        String URL = String.format("/caseworkers/%s/jurisdictions/%s/case-types/%s/cases/%d/events", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+
+        CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        Event event = anEvent().build();
+        event.setEventId(UPDATE_EVENT_ID);
+        event.setSummary(SUMMARY);
+        event.setDescription(DESCRIPTION);
+
+        String token = generateEventToken(jdbcTemplate, USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, UPDATE_EVENT_ID);
+        caseDetailsToSave.setToken(token);
+        caseDetailsToSave.setEvent(event);
+        caseDetailsToSave.setData(mapper.convertValue(DATA, STRING_NODE_TYPE));
+
+        CallbackResponse callbackResponse = new CallbackResponse();
+        callbackResponse.setData(mapper.convertValue(MODIFIED_DATA, STRING_NODE_TYPE));
+        callbackResponse.setSecurityClassification(PUBLIC);
+        callbackResponse.setDataClassification(mapper.convertValue(DATA_CLASSIFICATION, STRING_NODE_TYPE));
+
+        stubFor(WireMock.post(urlMatching("/before-commit.*"))
+            .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
+
+        stubFor(WireMock.post(urlMatching("/after-commit.*"))
+            .willReturn(ok()));
+
+        // when
+        MvcResult mvcResult = mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andReturn();
+
+        // then
+        assertEquals(mvcResult.getResponse().getContentAsString(), 201, mvcResult.getResponse().getStatus());
+
+        // read from db using another thread / transaction
+        ExecutorService es = Executors.newSingleThreadExecutor();
+        Future<?> future = es.submit(() -> {
+            List<CaseDetails> caseDetailsList = jdbcTemplate.query("SELECT * FROM case_data", this::mapCaseData);
+            CaseDetails savedCaseDetails = caseDetailsList.get(0);
+            assertEquals("CaseUpdated", savedCaseDetails.getState());
+            return null;
+        });
+        future.get(); // This will rethrow Exceptions and Errors as ExecutionException
     }
 
     private void stubForErrorCallbackResponse(final String url) throws JsonProcessingException {
