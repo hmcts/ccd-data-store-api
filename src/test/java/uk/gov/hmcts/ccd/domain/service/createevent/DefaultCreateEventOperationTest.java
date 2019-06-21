@@ -29,6 +29,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.PlatformTransactionManager;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
@@ -108,6 +109,8 @@ class DefaultCreateEventOperationTest {
     private CaseService caseService;
     @Spy
     private TransactionHelper transactionHelper;
+    @Mock
+    private PlatformTransactionManager transactionManager;
     @Mock
     private UserAuthorisation userAuthorisation;
 
