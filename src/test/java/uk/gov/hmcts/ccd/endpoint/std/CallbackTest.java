@@ -1359,7 +1359,7 @@ public class CallbackTest extends WireMockBaseTest {
             assertEquals("CaseUpdated", savedCaseDetails.getState());
             return null;
         });
-        future.get(); // This will rethrow Exceptions and Errors as ExecutionException
+        future.get(); // This will rethrow exceptions and assertion errors as executionException
     }
 
     private void stubForErrorCallbackResponse(final String url) throws JsonProcessingException {
