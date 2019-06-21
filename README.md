@@ -110,6 +110,6 @@ These tests also rely on the `CCD_CNP_27.xlsx` file to be already imported. The 
 in [ccd-definition-store-api](https://github.com/hmcts/ccd-definition-store-api) project under the `aat/src/resource` folder. You may want to import it to your local installation 
 before trying to run the functional tests against your local environment.  
 
-## LICENSE
+### LICENSE
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE.md) file for details.
