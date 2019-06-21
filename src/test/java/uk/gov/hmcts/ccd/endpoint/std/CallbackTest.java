@@ -1313,8 +1313,8 @@ public class CallbackTest extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
-    @Transactional()
-    @Rollback(false)
+    //@Transactional()
+    //@Rollback(false)
     public void shouldCommitUpdatedCaseDetailsImmediatelyBeforeSendToPostCallback() throws Exception {
         String SUMMARY = "Case event summary";
         String DESCRIPTION = "Case event description";
@@ -1356,7 +1356,7 @@ public class CallbackTest extends WireMockBaseTest {
         Future<?> future = es.submit(() -> {
             List<CaseDetails> caseDetailsList = jdbcTemplate.query("SELECT * FROM case_data", this::mapCaseData);
             CaseDetails savedCaseDetails = caseDetailsList.get(0);
-            //assertEquals("CaseUpdated", savedCaseDetails.getState());
+            assertEquals("CaseUpdated", savedCaseDetails.getState());
             return null;
         });
         future.get(); // This will rethrow exceptions and assertion errors as executionException
