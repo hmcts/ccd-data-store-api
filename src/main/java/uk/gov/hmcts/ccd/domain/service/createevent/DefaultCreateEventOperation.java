@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -76,6 +77,7 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
     private final SecurityClassificationService securityClassificationService;
     private final ValidateCaseFieldsOperation validateCaseFieldsOperation;
     private final UserAuthorisation userAuthorisation;
+    private final PlatformTransactionManager transactionManager;
     private final TransactionHelper transactionHelper;
 
     @Inject
@@ -95,7 +97,7 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
                                        final SecurityClassificationService securityClassificationService,
                                        final ValidateCaseFieldsOperation validateCaseFieldsOperation,
                                        final UserAuthorisation userAuthorisation,
-                                       final TransactionHelper transactionHelper) {
+                                       PlatformTransactionManager transactionManager, final TransactionHelper transactionHelper) {
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -112,6 +114,7 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
         this.securityClassificationService = securityClassificationService;
         this.validateCaseFieldsOperation = validateCaseFieldsOperation;
         this.userAuthorisation = userAuthorisation;
+        this.transactionManager = transactionManager;
         this.transactionHelper = transactionHelper;
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
@@ -143,6 +146,7 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
 
         validateCaseFieldsOperation.validateData(caseDetails.getData(), caseType);
         LOG.info("before save of createCaseEvent with caseReference:{}", caseReference);
+        LOG.info("transactionManager:{}", transactionManager.getClass().getName());
         final CaseDetails savedCaseDetails = saveCaseDetails(caseDetails, eventTrigger, newState);
         LOG.info("after save of createCaseEvent with caseReference:{}", caseReference);
         saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse, content.getEvent(), eventTrigger, savedCaseDetails, caseType);
