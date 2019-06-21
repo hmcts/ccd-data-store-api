@@ -119,7 +119,7 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
     @Override
     public CaseDetails createCaseEvent(final String caseReference,
                                        final CaseDataContent content) {
-        LOG.info("createCaseEvent with caseReference:{}, and data :{}", caseReference);
+        LOG.info("createCaseEvent with caseReference:{}", caseReference);
         eventValidator.validate(content.getEvent());
 
         final CaseDetails caseDetails = lockCaseDetails(caseReference);
@@ -142,9 +142,9 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
             newState = aboutToSubmitCallbackResponse.getState();
 
         validateCaseFieldsOperation.validateData(caseDetails.getData(), caseType);
-        LOG.info("before save of createCaseEvent with caseReference:{}, and data :{}", caseReference);
+        LOG.info("before save of createCaseEvent with caseReference:{}", caseReference);
         final CaseDetails savedCaseDetails = saveCaseDetails(caseDetails, eventTrigger, newState);
-        LOG.info("after save of createCaseEvent with caseReference:{}, and data :{}", caseReference);
+        LOG.info("after save of createCaseEvent with caseReference:{}", caseReference);
         saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse, content.getEvent(), eventTrigger, savedCaseDetails, caseType);
 
         if (!isBlank(eventTrigger.getCallBackURLSubmittedEvent())) {
