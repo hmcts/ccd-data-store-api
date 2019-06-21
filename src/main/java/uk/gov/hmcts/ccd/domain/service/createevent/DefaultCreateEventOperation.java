@@ -212,7 +212,8 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
         if (!state.isPresent() && !equalsIgnoreCase(CaseState.ANY, eventTrigger.getPostState())) {
             caseDetails.setState(eventTrigger.getPostState());
         }
-        return transactionHelper.withNewTransaction(() -> caseDetailsRepository.set(caseDetails));
+        //return transactionHelper.withNewTransaction(() -> caseDetailsRepository.set(caseDetails));
+        return transactionHelper.commitCaseDetails(caseDetails);
     }
 
     private void mergeUpdatedFieldsToCaseDetails(final Map<String, JsonNode> data,

@@ -27,7 +27,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.PlatformTransactionManager;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
@@ -107,7 +106,7 @@ class DefaultCreateEventOperationTest {
     private ValidateCaseFieldsOperation validateCaseFieldsOperation;
     @Mock
     private CaseService caseService;
-    @Spy
+    @Mock
     private TransactionHelper transactionHelper;
     @Mock
     private PlatformTransactionManager transactionManager;
@@ -176,6 +175,7 @@ class DefaultCreateEventOperationTest {
         doReturn(caseDetails).when(caseDetailsRepository).lockCase(Long.valueOf(CASE_REFERENCE));
         doReturn(true).when(eventTriggerService).isPreStateValid(PRE_STATE_ID, eventTrigger);
         doReturn(caseDetails).when(caseDetailsRepository).set(caseDetails);
+        doReturn(caseDetails).when(transactionHelper).commitCaseDetails(caseDetails);
         doReturn(postState).when(caseTypeService).findState(caseType, POST_STATE);
         doReturn(user).when(userRepository).getUser();
         doReturn(caseDetailsBefore).when(caseService).clone(caseDetails);
