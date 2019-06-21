@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
 import javax.inject.Inject;
-import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -42,7 +41,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -1313,8 +1311,6 @@ public class CallbackTest extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
-    //@Transactional()
-    //@Rollback(false)
     public void shouldCommitUpdatedCaseDetailsImmediatelyBeforeSendToPostCallback() throws Exception {
         String SUMMARY = "Case event summary";
         String DESCRIPTION = "Case event description";
