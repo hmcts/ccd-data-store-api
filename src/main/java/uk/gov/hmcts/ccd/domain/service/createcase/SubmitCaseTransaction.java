@@ -5,6 +5,7 @@ import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
+import static javax.transaction.Transactional.TxType.REQUIRES_NEW;
 import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -63,7 +64,7 @@ class SubmitCaseTransaction {
         this.userAuthorisation = userAuthorisation;
     }
 
-    @Transactional
+    @Transactional(REQUIRES_NEW)
     @Retryable(
         value = {CaseConcurrencyException.class},
         maxAttempts = 2,

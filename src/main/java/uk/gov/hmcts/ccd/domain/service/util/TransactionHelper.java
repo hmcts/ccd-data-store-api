@@ -9,6 +9,9 @@ import static org.springframework.transaction.annotation.Propagation.REQUIRES_NE
 
 
 @Component
+/**
+ * Helper class to provide spring transaction aspect on private methods.
+ */
 public class TransactionHelper {
 
     @Transactional(propagation = REQUIRES_NEW)
