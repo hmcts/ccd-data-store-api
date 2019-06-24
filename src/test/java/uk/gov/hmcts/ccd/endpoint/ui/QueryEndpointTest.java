@@ -1,25 +1,40 @@
 package uk.gov.hmcts.ccd.endpoint.ui;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.model.callbacks.EventTokenProperties.JURISDICTION_ID;
 import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.WORKBASKET;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.search.FieldMapSanitizeOperation;
+import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
+import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
 import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCaseHistoryViewOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCaseViewOperation;
@@ -30,15 +45,6 @@ import uk.gov.hmcts.ccd.domain.service.aggregated.GetUserProfileOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 class QueryEndpointTest {
 
@@ -66,20 +72,20 @@ class QueryEndpointTest {
     void setup() {
         MockitoAnnotations.initMocks(this);
         queryEndpoint = new QueryEndpoint(getCaseViewOperation,
-            getCaseHistoryViewOperation,
-            getEventTriggerOperation,
-            searchQueryOperation,
-            fieldMapSanitizerOperation,
-            getCriteriaOperation,
-            getCaseTypesOperation,
-            getUserProfileOperation
+                                          getCaseHistoryViewOperation,
+                                          getEventTriggerOperation,
+                                          searchQueryOperation,
+                                          fieldMapSanitizerOperation,
+                                          getCriteriaOperation,
+                                          getCaseTypesOperation,
+                                          getUserProfileOperation
         );
     }
 
     @Test
     void shouldFailIfAccessParamInvalid() {
         assertThrows(ResourceNotFoundException.class,
-            () -> queryEndpoint.getCaseTypes(JURISDICTION_ID, "INVALID"));
+                     () -> queryEndpoint.getCaseTypes(JURISDICTION_ID, "INVALID"));
     }
 
     @Test
@@ -95,7 +101,7 @@ class QueryEndpointTest {
         CaseEventTrigger caseEventTrigger = new CaseEventTrigger();
         doReturn(caseEventTrigger).when(getEventTriggerOperation).executeForDraft(any(), any());
         queryEndpoint.getEventTriggerForDraft("userId", "jurisdictionId", "caseTypeId", "draftId", "eventTriggerId", false);
-        verify(getEventTriggerOperation).executeForDraft("draftId",false);
+        verify(getEventTriggerOperation).executeForDraft("draftId", false);
     }
 
     @Test
@@ -139,5 +145,26 @@ class QueryEndpointTest {
     @DisplayName("Should throw bad request Exception when access is not correct")
     void shouldThrowBadRequest() {
         assertThrows(BadRequestException.class, () -> queryEndpoint.getJurisdictions("creat"));
+    }
+
+    @Nested
+    @DisplayName("search")
+    class Search {
+
+        @Test
+        @DisplayName("Should call search query operation")
+        void shouldCallSearchQueryOperation() {
+            Map<String, String> params = new HashMap<>();
+            Map<String, String> sanitised = new HashMap<>();
+            SearchResultView searchResultView = new SearchResultView();
+            when(fieldMapSanitizerOperation.execute(params)).thenReturn(sanitised);
+            when(searchQueryOperation.execute(eq(null), any(MetaData.class), eq(sanitised))).thenReturn(searchResultView);
+
+            SearchResultView result = queryEndpoint.searchNew("DIVORCE", "DIVORCE", params);
+
+            assertThat(result, is(searchResultView));
+            verify(searchQueryOperation).execute(eq(null), any(MetaData.class), eq(sanitised));
+        }
+
     }
 }

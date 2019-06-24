@@ -116,7 +116,7 @@ class GetCaseValidatorTest extends BaseTest {
         @Test
         @DisplayName("should get 422 when event trigger does not exist")
         void should422WhenCaseDataInvalid() throws JsonProcessingException {
-            callCaseDataValidate(CASE_TYPE, getBody(CREATE, () -> CaseWithInvalidData.build()))
+            callCaseDataValidate(CASE_TYPE, getBody(CREATE, CaseWithInvalidData::build))
                 .when()
                 .post("/case-types/{caseTypeId}/validate")
 

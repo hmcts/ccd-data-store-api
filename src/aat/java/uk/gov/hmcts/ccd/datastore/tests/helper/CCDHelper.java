@@ -86,8 +86,7 @@ public class CCDHelper {
             .pathParam("event", event)
             .contentType(ContentType.JSON)
             .when()
-            .get(
-                "/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases/{reference}/event-triggers/{event}/token")
+            .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases/{reference}/event-triggers/{event}/token")
             .then()
             .statusCode(200)
             .extract()
