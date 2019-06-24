@@ -121,33 +121,16 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
                                        final CaseDataContent content) {
         eventValidator.validate(content.getEvent());
 
-        final CaseDetails caseDetails = lockCaseDetails(caseReference);
-        final CaseType caseType = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
-        final CaseEvent eventTrigger = findAndValidateCaseEvent(caseType, content.getEvent());
-        final CaseDetails caseDetailsBefore = caseService.clone(caseDetails);
-        String uid = userAuthorisation.getUserId();
+        CaseEventCreator caseEventCreator = transactionHelper.withNewTransaction(
+            () -> new CaseEventCreator().create(caseReference, content));
 
-        eventTokenService.validateToken(content.getToken(), uid, caseDetails, eventTrigger, caseType.getJurisdiction(), caseType);
+        CaseDetails caseDetails = caseEventCreator.getCaseDetails();
 
-        validatePreState(caseDetails, eventTrigger);
-        mergeUpdatedFieldsToCaseDetails(content.getData(), caseDetails, eventTrigger, caseType);
-        AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = callbackInvoker.invokeAboutToSubmitCallback(eventTrigger,
-            caseDetailsBefore,
-            caseDetails,
-            caseType,
-            content.getIgnoreWarning());
-
-        final Optional<String>
-            newState = aboutToSubmitCallbackResponse.getState();
-
-        validateCaseFieldsOperation.validateData(caseDetails.getData(), caseType);
-        final CaseDetails savedCaseDetails = saveCaseDetails(caseDetails, eventTrigger, newState);
-        saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse, content.getEvent(), eventTrigger, savedCaseDetails, caseType);
-
-        if (!isBlank(eventTrigger.getCallBackURLSubmittedEvent())) {
+        if (!isBlank(caseEventCreator.getEventTrigger().getCallBackURLSubmittedEvent())) {
             try { // make a call back
                 final ResponseEntity<AfterSubmitCallbackResponse> callBackResponse = callbackInvoker
-                    .invokeSubmittedCallback(eventTrigger, caseDetailsBefore, savedCaseDetails);
+                    .invokeSubmittedCallback(caseEventCreator.getEventTrigger(), caseEventCreator.getCaseDetailsBefore(),
+                        caseEventCreator.getSavedCaseDetails());
                 caseDetails.setAfterSubmitCallbackResponseEntity(callBackResponse);
             } catch (CallbackException ex) {
                 LOG.warn("Submitted callback failed", ex);
@@ -158,101 +141,151 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
         return caseDetails;
     }
 
-    private CaseEvent findAndValidateCaseEvent(final CaseType caseType,
-                                               final Event event) {
-        final CaseEvent eventTrigger = eventTriggerService.findCaseEvent(caseType, event.getEventId());
-        if (eventTrigger == null) {
-            throw new ValidationException(String.format("%s is not a known event ID for the specified case type %s", event.getEventId(), caseType.getId()));
-        }
-        return eventTrigger;
-    }
+    private class CaseEventCreator {
 
-    private void validatePreState(final CaseDetails caseDetails,
-                                  final CaseEvent caseEvent) {
-        if (!eventTriggerService.isPreStateValid(caseDetails.getState(), caseEvent)) {
-            throw new ValidationException(
-                String.format(
-                    "Pre-state condition is not valid for case with state: %s; and event trigger: %s",
-                    caseDetails.getState(),
-                    caseEvent.getId()
-                )
-            );
-        }
-    }
+        private CaseDetails caseDetails;
+        private CaseEvent eventTrigger;
+        private CaseDetails caseDetailsBefore;
+        private CaseDetails savedCaseDetails;
 
-    private CaseDetails lockCaseDetails(final String caseReference) {
-        if (!uidService.validateUID(caseReference)) {
-            throw new BadRequestException("Case reference is not valid");
+        public CaseDetails getCaseDetails() {
+            return caseDetails;
         }
 
-        final CaseDetails caseDetails;
-        try {
-            caseDetails = caseDetailsRepository.lockCase(Long.valueOf(caseReference));
-        } catch (NumberFormatException exception) {
-            throw new ResourceNotFoundException(
-                String.format("Case with reference %s could not be found", caseReference));
+        public CaseEvent getEventTrigger() {
+            return eventTrigger;
         }
-        if (null == caseDetails) {
-            throw new ResourceNotFoundException(
-                String.format("Case with reference %s could not be found", caseReference));
-        }
-        return caseDetails;
-    }
 
-    private CaseDetails saveCaseDetails(final CaseDetails caseDetails,
-                                        final CaseEvent eventTrigger,
-                                        final Optional<String> state) {
-        if (!state.isPresent() && !equalsIgnoreCase(CaseState.ANY, eventTrigger.getPostState())) {
-            caseDetails.setState(eventTrigger.getPostState());
+        public CaseDetails getCaseDetailsBefore() {
+            return caseDetailsBefore;
         }
-        return transactionHelper.withNewTransaction(() -> caseDetailsRepository.set(caseDetails));
-    }
 
-    private void mergeUpdatedFieldsToCaseDetails(final Map<String, JsonNode> data,
-                                                 final CaseDetails caseDetails,
-                                                 final CaseEvent caseEvent,
-                                                 final CaseType caseType) {
-        if (null != data) {
-            final Map<String, JsonNode> sanitisedData = caseSanitiser.sanitise(caseType, data);
-            for (Map.Entry<String, JsonNode> field : sanitisedData.entrySet()) {
-                caseDetails.getData().put(field.getKey(), field.getValue());
+        public CaseDetails getSavedCaseDetails() {
+            return savedCaseDetails;
+        }
+
+        public CaseEventCreator create(String caseReference, CaseDataContent content) {
+            caseDetails = lockCaseDetails(caseReference);
+            final CaseType caseType = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
+            eventTrigger = findAndValidateCaseEvent(caseType, content.getEvent());
+            caseDetailsBefore = caseService.clone(caseDetails);
+            String uid = userAuthorisation.getUserId();
+
+            eventTokenService.validateToken(content.getToken(), uid, caseDetails, eventTrigger, caseType.getJurisdiction(), caseType);
+
+            validatePreState(caseDetails, eventTrigger);
+            mergeUpdatedFieldsToCaseDetails(content.getData(), caseDetails, eventTrigger, caseType);
+            AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = callbackInvoker.invokeAboutToSubmitCallback(eventTrigger,
+                caseDetailsBefore,
+                caseDetails,
+                caseType,
+                content.getIgnoreWarning());
+
+            final Optional<String>
+                newState = aboutToSubmitCallbackResponse.getState();
+
+            validateCaseFieldsOperation.validateData(caseDetails.getData(), caseType);
+            savedCaseDetails = saveCaseDetails(caseDetails, eventTrigger, newState);
+            saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse, content.getEvent(), eventTrigger, savedCaseDetails, caseType);
+            return this;
+        }
+
+        private CaseEvent findAndValidateCaseEvent(final CaseType caseType,
+                                                       final Event event) {
+            final CaseEvent eventTrigger = eventTriggerService.findCaseEvent(caseType, event.getEventId());
+            if (eventTrigger == null) {
+                throw new ValidationException(String.format("%s is not a known event ID for the specified case type %s", event.getEventId(), caseType.getId()));
             }
-            caseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(caseType, caseDetails.getData(), caseDetails.getDataClassification()));
+            return eventTrigger;
         }
-        caseDetails.setLastModified(LocalDateTime.now(ZoneOffset.UTC));
-        if (!StringUtils.equalsAnyIgnoreCase(CaseState.ANY, caseEvent.getPostState())) {
-            caseDetails.setState(caseEvent.getPostState());
+
+        private void validatePreState(final CaseDetails caseDetails,
+                                          final CaseEvent caseEvent) {
+            if (!eventTriggerService.isPreStateValid(caseDetails.getState(), caseEvent)) {
+                throw new ValidationException(
+                    String.format(
+                        "Pre-state condition is not valid for case with state: %s; and event trigger: %s",
+                        caseDetails.getState(),
+                        caseEvent.getId()
+                    )
+                );
+            }
         }
-    }
 
-    private void saveAuditEventForCaseDetails(final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse,
-                                              final Event event,
-                                              final CaseEvent eventTrigger,
-                                              final CaseDetails caseDetails,
-                                              final CaseType caseType) {
-        final IdamUser user = userRepository.getUser();
-        final CaseState caseState = caseTypeService.findState(caseType, caseDetails.getState());
-        final AuditEvent auditEvent = new AuditEvent();
+        private CaseDetails lockCaseDetails(final String caseReference) {
+            if (!uidService.validateUID(caseReference)) {
+                throw new BadRequestException("Case reference is not valid");
+            }
 
-        auditEvent.setEventId(event.getEventId());
-        auditEvent.setEventName(eventTrigger.getName());
-        auditEvent.setSummary(event.getSummary());
-        auditEvent.setDescription(event.getDescription());
-        auditEvent.setCaseDataId(caseDetails.getId());
-        auditEvent.setData(caseDetails.getData());
-        auditEvent.setStateId(caseDetails.getState());
-        auditEvent.setStateName(caseState.getName());
-        auditEvent.setCaseTypeId(caseType.getId());
-        auditEvent.setCaseTypeVersion(caseType.getVersion().getNumber());
-        auditEvent.setUserId(user.getId());
-        auditEvent.setUserLastName(user.getSurname());
-        auditEvent.setUserFirstName(user.getForename());
-        auditEvent.setCreatedDate(LocalDateTime.now(ZoneOffset.UTC));
-        auditEvent.setSecurityClassification(securityClassificationService.getClassificationForEvent(caseType, eventTrigger));
-        auditEvent.setDataClassification(caseDetails.getDataClassification());
-        auditEvent.setSignificantItem(aboutToSubmitCallbackResponse.getSignificantItem());
+            final CaseDetails caseDetails;
+            try {
+                caseDetails = caseDetailsRepository.lockCase(Long.valueOf(caseReference));
+            } catch (NumberFormatException exception) {
+                throw new ResourceNotFoundException(
+                    String.format("Case with reference %s could not be found", caseReference));
+            }
+            if (null == caseDetails) {
+                throw new ResourceNotFoundException(
+                    String.format("Case with reference %s could not be found", caseReference));
+            }
+            return caseDetails;
+        }
 
-        caseAuditEventRepository.set(auditEvent);
+        private CaseDetails saveCaseDetails(final CaseDetails caseDetails,
+                                            final CaseEvent eventTrigger,
+                                            final Optional<String> state) {
+            if (!state.isPresent() && !equalsIgnoreCase(CaseState.ANY, eventTrigger.getPostState())) {
+                caseDetails.setState(eventTrigger.getPostState());
+            }
+            return caseDetailsRepository.set(caseDetails);
+        }
+
+        private void mergeUpdatedFieldsToCaseDetails(final Map<String, JsonNode> data,
+                                                         final CaseDetails caseDetails,
+                                                         final CaseEvent caseEvent,
+                                                         final CaseType caseType) {
+            if (null != data) {
+                final Map<String, JsonNode> sanitisedData = caseSanitiser.sanitise(caseType, data);
+                for (Map.Entry<String, JsonNode> field : sanitisedData.entrySet()) {
+                    caseDetails.getData().put(field.getKey(), field.getValue());
+                }
+                caseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(caseType, caseDetails.getData(), caseDetails.getDataClassification()));
+            }
+            caseDetails.setLastModified(LocalDateTime.now(ZoneOffset.UTC));
+            if (!StringUtils.equalsAnyIgnoreCase(CaseState.ANY, caseEvent.getPostState())) {
+                caseDetails.setState(caseEvent.getPostState());
+            }
+        }
+
+        private void saveAuditEventForCaseDetails(final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse,
+                                                      final Event event,
+                                                      final CaseEvent eventTrigger,
+                                                      final CaseDetails caseDetails,
+                                                      final CaseType caseType) {
+            final IdamUser user = userRepository.getUser();
+            final CaseState caseState = caseTypeService.findState(caseType, caseDetails.getState());
+            final AuditEvent auditEvent = new AuditEvent();
+
+            auditEvent.setEventId(event.getEventId());
+            auditEvent.setEventName(eventTrigger.getName());
+            auditEvent.setSummary(event.getSummary());
+            auditEvent.setDescription(event.getDescription());
+            auditEvent.setCaseDataId(caseDetails.getId());
+            auditEvent.setData(caseDetails.getData());
+            auditEvent.setStateId(caseDetails.getState());
+            auditEvent.setStateName(caseState.getName());
+            auditEvent.setCaseTypeId(caseType.getId());
+            auditEvent.setCaseTypeVersion(caseType.getVersion().getNumber());
+            auditEvent.setUserId(user.getId());
+            auditEvent.setUserLastName(user.getSurname());
+            auditEvent.setUserFirstName(user.getForename());
+            auditEvent.setCreatedDate(LocalDateTime.now(ZoneOffset.UTC));
+            auditEvent.setSecurityClassification(securityClassificationService.getClassificationForEvent(caseType, eventTrigger));
+            auditEvent.setDataClassification(caseDetails.getDataClassification());
+            auditEvent.setSignificantItem(aboutToSubmitCallbackResponse.getSignificantItem());
+
+            caseAuditEventRepository.set(auditEvent);
+        }
     }
 
 }
