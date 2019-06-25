@@ -8,7 +8,7 @@
              endDelimiter="\nGO"
              splitStatements="true"
              stripComments="true">
-            DROP INDEX referenceNumber;
+            DROP INDEX idx_case_data_reference_number;
             CREATE INDEX idx_case_data_previous_service_caseReference ON public.case_data USING BTREE ((TRIM(UPPER(data#>>'{previousServiceCaseReference}'))));
         </sql>
     </changeSet>
