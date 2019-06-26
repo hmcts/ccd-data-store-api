@@ -3,6 +3,11 @@ package uk.gov.hmcts.ccd.domain.model.aggregated;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.PREDEFINED_COMPLEX_ADDRESS_GLOBAL;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.PREDEFINED_COMPLEX_ADDRESS_GLOBAL_UK;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.PREDEFINED_COMPLEX_ADDRESS_UK;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.PREDEFINED_COMPLEX_CASELINK;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.PREDEFINED_COMPLEX_ORDER_SUMMARY;
 
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
@@ -38,6 +43,15 @@ public interface CommonField {
     @JsonIgnore
     default boolean isCompound() {
         return isCollectionFieldType() || isComplexFieldType();
+    }
+
+    @JsonIgnore
+    default boolean isPredefinedComplexType() {
+        return PREDEFINED_COMPLEX_ADDRESS_GLOBAL.equalsIgnoreCase(getFieldType().getId()) ||
+            PREDEFINED_COMPLEX_ADDRESS_GLOBAL_UK.equalsIgnoreCase(getFieldType().getId()) ||
+            PREDEFINED_COMPLEX_ADDRESS_UK.equalsIgnoreCase(getFieldType().getId()) ||
+            PREDEFINED_COMPLEX_ORDER_SUMMARY.equalsIgnoreCase(getFieldType().getId()) ||
+            PREDEFINED_COMPLEX_CASELINK.equalsIgnoreCase(getFieldType().getId());
     }
 
     /**

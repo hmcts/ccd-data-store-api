@@ -307,7 +307,7 @@ public class AccessControlService {
     }
 
     private void locateChildInCaseViewAndFilterChildren(final CommonField caseViewField, final Set<String> userRoles, final Predicate<AccessControlList> access, final CaseField childField, final CaseField subField) {
-        if (subField.isCompound()) {
+        if (subField.isCompound() && !subField.isPredefinedComplexType()) {
             filterChildren(subField, caseViewField.getComplexFieldNestedField(childField.getId() + "." + subField.getId()), userRoles, access);
         } else {
             filterChildren(subField, caseViewField.getComplexFieldNestedField(childField.getId()), userRoles, access);
