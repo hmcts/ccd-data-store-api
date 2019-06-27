@@ -52,35 +52,24 @@ public class CaseResource extends ResourceSupport {
     @JsonProperty("data_classification")
     private Map<String, JsonNode> dataClassification;
 
-    /**
-     * Attribute passed to UI layer, does not need persistence
-     */
     @JsonProperty("after_submit_callback_response")
+    @SuppressWarnings("squid:common-java:DuplicatedBlocks")
     private AfterSubmitCallbackResponse afterSubmitCallbackResponse;
 
-    /**
-     * Attribute passed to UI layer, does not need persistence
-     */
     @JsonProperty("callback_response_status_code")
+    @SuppressWarnings("squid:common-java:DuplicatedBlocks")
     private Integer callbackResponseStatusCode;
 
-    /**
-     * Attribute passed to UI layer, does not need persistence
-     */
     @JsonProperty("callback_response_status")
+    @SuppressWarnings("squid:common-java:DuplicatedBlocks")
     private String callbackResponseStatus;
 
-    /**
-     * Attribute passed to UI layer, does not need persistence
-     */
     @JsonProperty("delete_draft_response_status_code")
+    @SuppressWarnings("squid:common-java:DuplicatedBlocks")
     private Integer deleteDraftResponseStatusCode;
 
-
-    /**
-     * Attribute passed to UI layer, does not need persistence
-     */
     @JsonProperty("delete_draft_response_status")
+    @SuppressWarnings("squid:common-java:DuplicatedBlocks")
     private String deleteDraftResponseStatus;
 
 
