@@ -28,10 +28,10 @@ public class SearchQueryFactoryOperation {
     @PersistenceContext
     private final EntityManager entityManager;
 
-    private static final String MAIN_QUERY = "SELECT * FROM case_data WHERE %s ORDER BY created_date %s";
+    private static final String MAIN_QUERY = "SELECT * FROM case_data WHERE %s ORDER BY %s %s";
     private static final String MAIN_COUNT_QUERY = "SELECT count(*) FROM case_data WHERE %s";
 
-    private static final String SORT_ASCENDING = "ASC";
+    private static final String CREATED_DATE = "created_date";
 
     private final CriterionFactory criterionFactory;
     private final ApplicationParams applicationParam;
@@ -52,10 +52,14 @@ public class SearchQueryFactoryOperation {
 
     public Query build(MetaData metadata, Map<String, String> params, boolean isCountQuery) {
         final List<Criterion> criteria = criterionFactory.build(metadata, params);
-        String queryString = String.format(isCountQuery ? MAIN_COUNT_QUERY : MAIN_QUERY,
-                                           secure(toClauses(criteria), metadata),
-                                           metadata.getSortDirection().orElse(SORT_ASCENDING).toUpperCase()
-        );
+
+        String queryToFormat = isCountQuery ? MAIN_COUNT_QUERY : MAIN_QUERY;
+        String whereClausePart = secure(toClauses(criteria), metadata);
+        String sortField = metadata.getSortField().orElse(CREATED_DATE);
+        SortDirection direction = SortDirection.fromOptionalString(metadata.getSortDirection());
+
+        String queryString = String.format(queryToFormat, whereClausePart, sortField, direction.name());
+
         Query query;
         if (isCountQuery) {
             query = entityManager.createNativeQuery(queryString);

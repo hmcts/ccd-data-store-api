@@ -1,26 +1,29 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-
-import java.util.Collections;
-import java.util.List;
-
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.types.DocumentValidator.DOCUMENT_URL;
+
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
+
+import java.util.Collections;
+import java.util.List;
+
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 
 public class DocumentValidatorTest implements IVallidatorTest {
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -35,7 +38,6 @@ public class DocumentValidatorTest implements IVallidatorTest {
     private static final String MISSING_DOCUMENT_PATH_URL = "https://dm.reform.hmcts.net/docs/a1-2Z-3-x";
     private static final String UNKNOWN_DOCUMENT_DOMAIN_URL = "https://example.com/documents/a1-2Z-3-x";
     private static final String UNKNOWN_DOCUMENT_PARENT_DOMAIN_URL = "https://dm.reform.hmcts.net.example.com/documents/a1-2Z-3-x";
-    private static final String DOCUMENT_URL_WITH_PORT = "https://ng.reform.hmcts.net:6789/documents/a1-2Z-3-x-ngitb";
     public static final String DOCUMENT_FIELD_ID = "DOCUMENT_FIELD_ID";
 
     private DocumentValidator validator;
@@ -53,9 +55,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
 
     @Before
     public void setUp() throws Exception {
-        final ApplicationParams applicationParams = mock(ApplicationParams.class);
-        when(applicationParams.getValidDMDomain()).thenReturn("https://dm.reform.hmcts.net");
-        validator = new DocumentValidator(applicationParams);
+        validator = new DocumentValidator();
 
         caseField = MAPPER.readValue(CASE_FIELD_STRING, CaseField.class);
     }
@@ -99,17 +99,17 @@ public class DocumentValidatorTest implements IVallidatorTest {
     }
 
     @Test
-    public void shouldNotValidateDocumentWithUnknownDomain() {
+    public void shouldValidateDocumentWithUnknownDomain() {
         ObjectNode data = createDoc(UNKNOWN_DOCUMENT_DOMAIN_URL);
         final List<ValidationResult> validDocumentUrlResult = validator.validate(DOCUMENT_FIELD_ID, data, caseField);
-        assertEquals(validDocumentUrlResult.toString(), 1, validDocumentUrlResult.size());
+        assertEquals(0, validDocumentUrlResult.size());
     }
 
     @Test
-    public void shouldNotValidateDocumentWithUnknownParentDomain() {
+    public void shouldValidateDocumentWithUnknownParentDomain() {
         ObjectNode data = createDoc(UNKNOWN_DOCUMENT_PARENT_DOMAIN_URL);
         final List<ValidationResult> validDocumentUrlResult = validator.validate(DOCUMENT_FIELD_ID, data, caseField);
-        assertEquals(validDocumentUrlResult.toString(), 1, validDocumentUrlResult.size());
+        assertEquals(0, validDocumentUrlResult.size());
     }
 
     @Test
@@ -136,17 +136,17 @@ public class DocumentValidatorTest implements IVallidatorTest {
     }
 
     @Test
-    public void shouldNotValidateDocumentWithUnknownDomainForBinary() {
+    public void shouldValidateDocumentWithUnknownDomainForBinary() {
         ObjectNode data = createDoc(VALID_DOCUMENT_URL, UNKNOWN_DOCUMENT_DOMAIN_URL + "/binary");
         final List<ValidationResult> validDocumentUrlResult = validator.validate(DOCUMENT_FIELD_ID, data, caseField);
-        assertEquals(validDocumentUrlResult.toString(), 1, validDocumentUrlResult.size());
+        assertEquals(0, validDocumentUrlResult.size());
     }
 
     @Test
-    public void shouldNotValidateDocumentWithUnknownParentDomainForBinary() {
+    public void shouldValidateDocumentWithUnknownParentDomainForBinary() {
         ObjectNode data = createDoc(VALID_DOCUMENT_URL, UNKNOWN_DOCUMENT_PARENT_DOMAIN_URL + "/binary");
         final List<ValidationResult> validDocumentUrlResult = validator.validate(DOCUMENT_FIELD_ID, data, caseField);
-        assertEquals(validDocumentUrlResult.toString(), 1, validDocumentUrlResult.size());
+        assertEquals(0, validDocumentUrlResult.size());
     }
 
     @Test
@@ -162,30 +162,6 @@ public class DocumentValidatorTest implements IVallidatorTest {
     @Test
     public void nullObjectValue() {
         assertEquals("Did not catch NULL", 0, validator.validate(DOCUMENT_FIELD_ID, new ObjectNode(null), caseField).size());
-    }
-
-    @Test
-    public void shouldValidateIfPortsAreSpecifiedAndMatch() {
-        final DocumentValidator validatorWithPort = buildDocumentValidator("https://ng.reform.hmcts.net:6789");
-
-        final ObjectNode data = createDoc(DOCUMENT_URL_WITH_PORT);
-        final List<ValidationResult> validDocumentUrlResult = validatorWithPort.validate(DOCUMENT_FIELD_ID,
-                                                                                         data,
-                                                                                         caseField);
-        assertThat(validDocumentUrlResult, empty());
-    }
-
-    @Test
-    public void shouldNotValidateIfPortsAreSpecifiedAndNotMatch() {
-        final DocumentValidator validatorWithPort = buildDocumentValidator("https://ng.reform.hmcts.net:7789");
-
-        final ObjectNode data = createDoc(DOCUMENT_URL_WITH_PORT);
-        final List<ValidationResult> validDocumentUrlResult = validatorWithPort.validate(DOCUMENT_FIELD_ID,
-                                                                                         data,
-                                                                                         caseField);
-        assertThat(validDocumentUrlResult, hasSize(1));
-        assertThat(validDocumentUrlResult.get(0).getErrorMessage(),
-                   is(DOCUMENT_URL_WITH_PORT + " does not match Document Management domain or expected URL path"));
     }
 
     @Test
@@ -310,12 +286,6 @@ public class DocumentValidatorTest implements IVallidatorTest {
         final List<ValidationResult> result = validator.validate(DOCUMENT_FIELD_ID, data, caseField);
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getErrorMessage(), is("document_url is not a text value or is null"));
-    }
-
-    private DocumentValidator buildDocumentValidator(final String url) {
-        final ApplicationParams ap = mock(ApplicationParams.class);
-        when(ap.getValidDMDomain()).thenReturn(url);
-        return new DocumentValidator(ap);
     }
 
     private ObjectNode createDoc(String documentUrl) {

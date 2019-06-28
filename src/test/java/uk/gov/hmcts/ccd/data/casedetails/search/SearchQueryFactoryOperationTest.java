@@ -5,10 +5,11 @@ import javax.persistence.Query;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -31,6 +32,7 @@ public class SearchQueryFactoryOperationTest {
     private static final String TEST_FIELD_VALUE = "Tim";
 
     private SearchQueryFactoryOperation subject;
+    private SearchQueryFactoryOperation subjectWithUserAuthValues;
     private final CriterionFactory criterionFactory = new CriterionFactory();
 
     @Mock
@@ -50,6 +52,9 @@ public class SearchQueryFactoryOperationTest {
 
     private Map<String, String> params;
 
+    private Set<String> roles = null;
+    private UserAuthorisation userAuthorisationWithAccessLevel = new UserAuthorisation("2", UserAuthorisation.AccessLevel.GRANTED,roles);
+
     @Before
     public void prepare() {
         MockitoAnnotations.initMocks(this);
@@ -58,6 +63,13 @@ public class SearchQueryFactoryOperationTest {
             em,
             mockApp,
             userAuthorisation,
+            authorisedCaseDefinitionDataService);
+
+        subjectWithUserAuthValues = new SearchQueryFactoryOperation(
+            criterionFactory,
+            em,
+            mockApp,
+            userAuthorisationWithAccessLevel,
             authorisedCaseDefinitionDataService);
 
         params = new HashMap<>();
@@ -140,4 +152,38 @@ public class SearchQueryFactoryOperationTest {
                 "SELECT * FROM case_data WHERE case_type_id = ?0 AND jurisdiction = ?1 AND state IN ('STATE1','STATE2') ORDER BY created_date ASC",
                 CaseDetailsEntity.class));
     }
+
+    @Test
+    public void searchFactorySqlGeneratedTestFromMetaAndFromCaseUsersEntity() {
+        MetaData metadata = new MetaData(TEST_CASE_TYPE_VALUE, null);
+        when(em.createNativeQuery(any(String.class), any(Class.class)))
+            .thenReturn(mockQuery);
+        Query result = subjectWithUserAuthValues.build(metadata, params, false);
+        verify(em, times(1)).createNativeQuery("SELECT * FROM case_data WHERE case_type_id = ?0 AND id IN (SELECT cu.case_data_id FROM case_users AS cu WHERE user_id = '2') ORDER BY created_date ASC", CaseDetailsEntity.class);
+        verify(result, times(1)).setParameter(0, TEST_CASE_TYPE_VALUE);
+    }
+
+    @Test
+    public void searchFactorySqlGeneratedTestFromFieldWithQueryCountAndFromCaseUsersEntity() {
+        MetaData metadata = new MetaData(null, null);
+        params.put(TEST_FIELD_NAME, TEST_FIELD_VALUE);
+        when(em.createNativeQuery(any(String.class)))
+            .thenReturn(mockQuery);
+        Query result = subjectWithUserAuthValues.build(metadata, params, true);
+        verify(em, times(1)).createNativeQuery("SELECT count(*) FROM case_data WHERE TRIM( UPPER ( data #>> '{name}')) = TRIM( UPPER ( ?0)) AND id IN (SELECT cu.case_data_id FROM case_users AS cu WHERE user_id = '2')");
+        verify(result, times(1)).setParameter(0, TEST_FIELD_VALUE);
+    }
+
+    @Test
+    public void shouldGenerateOrderByWithSortFieldAndSortDirection() {
+        MetaData metadata = new MetaData(TEST_CASE_TYPE_VALUE, null);
+        metadata.setSortDirection(Optional.of("desc"));
+        metadata.setSortField("last_modified");
+        when(em.createNativeQuery(any(String.class), any(Class.class))).thenReturn(mockQuery);
+
+        subject.build(metadata, params, false);
+
+        verify(em, times(1)).createNativeQuery("SELECT * FROM case_data WHERE case_type_id = ?0 ORDER BY last_modified DESC", CaseDetailsEntity.class);
+    }
+
 }

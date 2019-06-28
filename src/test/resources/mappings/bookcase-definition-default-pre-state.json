@@ -9,7 +9,7 @@
       "Content-Type": "application/json"
     },
     "jsonBody": {
-      "id": "TestAddressBookCase",
+      "id": "bookcase-default-pre-state-test",
       "version": {
         "number": 1,
         "live_from": "2017-01-01"

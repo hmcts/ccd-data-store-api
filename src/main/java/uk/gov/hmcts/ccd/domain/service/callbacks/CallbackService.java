@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.callbacks;
 
-import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,11 +8,12 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.hmcts.ccd.ApplicationParams;
+
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackRequest;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
@@ -22,71 +22,29 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
-import static java.util.Optional.ofNullable;
 import static org.springframework.util.CollectionUtils.isEmpty;
+
+// RDM-4316 discarded timeout/backoff value in case event definition until requirements are cleared
 
 @Service
 public class CallbackService {
     private static final Logger LOG = LoggerFactory.getLogger(CallbackService.class);
-    public static final int CALLBACK_RETRY_INTERVAL_MULTIPLIER = 3;
 
     private final SecurityUtils securityUtils;
     private final RestTemplate restTemplate;
-    private final List<Integer> defaultCallbackRetryIntervalsInSeconds;
-    private final Integer defaultCallbackTimeoutInMillis;
-
-    static class CallbackRetryContext {
-        private final Integer callbackRetryInterval;
-        private final Integer callbackRetryTimeout;
-
-        CallbackRetryContext(final Integer callbackRetryInterval, final Integer callbackRetryTimeout) {
-            this.callbackRetryInterval = callbackRetryInterval;
-            this.callbackRetryTimeout = callbackRetryTimeout;
-        }
-
-        Integer getCallbackRetryInterval() {
-            return callbackRetryInterval;
-        }
-
-        Integer getCallbackRetryTimeout() {
-            return callbackRetryTimeout;
-        }
-
-    }
 
     @Autowired
     public CallbackService(final SecurityUtils securityUtils,
-                           @Qualifier("restTemplate") final RestTemplate restTemplate,
-                           final ApplicationParams applicationParams) {
+                           @Qualifier("restTemplate") final RestTemplate restTemplate) {
         this.securityUtils = securityUtils;
         this.restTemplate = restTemplate;
-        this.defaultCallbackRetryIntervalsInSeconds = applicationParams.getCallbackRetryIntervalsInSeconds();
-        this.defaultCallbackTimeoutInMillis = applicationParams.getCallbackReadTimeoutInMillis();
     }
 
+    // The retry will be on seconds T=1 and T=3 if the initial call fails at T=0
+    @Retryable(value = {CallbackException.class}, maxAttempts = 3, backoff = @Backoff(delay = 1000, multiplier = 3))
     public Optional<CallbackResponse> send(final String url,
-                                           final List<Integer> callbackRetryTimeouts,
-                                           final CaseEvent caseEvent,
-                                           final CaseDetails caseDetails) {
-        return send(url, callbackRetryTimeouts, caseEvent, null, caseDetails);
-    }
-
-    public Optional<CallbackResponse> send(final String url,
-                                           final List<Integer> callbackRetryTimeouts,
-                                           final CaseEvent caseEvent,
-                                           final CaseDetails caseDetailsBefore,
-                                           final CaseDetails caseDetails) {
-
-        return send(url, callbackRetryTimeouts, caseEvent, caseDetailsBefore, caseDetails, false);
-    }
-
-    @SuppressWarnings("javasecurity:S5145")
-    public Optional<CallbackResponse> send(final String url,
-                                           final List<Integer> callbackRetryTimeouts,
                                            final CaseEvent caseEvent,
                                            final CaseDetails caseDetailsBefore,
                                            final CaseDetails caseDetails,
@@ -95,30 +53,17 @@ public class CallbackService {
         if (url == null || url.isEmpty()) {
             return Optional.empty();
         }
-
-        final CallbackRequest callbackRequest = new CallbackRequest(caseDetails,
-            caseDetailsBefore,
-            caseEvent.getId(),
-            ignoreWarning);
-
-        List<CallbackRetryContext> retryContextList = buildCallbackRetryContexts(ofNullable(callbackRetryTimeouts).orElse(Lists.newArrayList()));
-
-        for (CallbackRetryContext retryContext : retryContextList) {
-            sleep(retryContext.getCallbackRetryInterval());
-            final Optional<ResponseEntity<CallbackResponse>> responseEntity = sendRequest(url,
-                CallbackResponse.class,
-                callbackRequest,
-                retryContext.getCallbackRetryTimeout());
-            if (responseEntity.isPresent()) {
-                return Optional.of(responseEntity.get().getBody());
-            }
-        }
-        LOG.debug("Unsuccessful callback to {} for caseType {} and event {}", url, caseDetails.getCaseTypeId(), caseEvent.getId());
-        throw new CallbackException("Unsuccessful callback to " + url);
+        final CallbackRequest callbackRequest = new CallbackRequest(caseDetails, caseDetailsBefore, caseEvent.getId(), ignoreWarning);
+        final Optional<ResponseEntity<CallbackResponse>> responseEntity = sendRequest(url, CallbackResponse.class, callbackRequest);
+        return responseEntity.map(re -> Optional.of(re.getBody())).orElseThrow(() -> {
+            LOG.warn("Unsuccessful callback to {} for caseType {} and event {}", url, caseDetails.getCaseTypeId(), caseEvent.getId());
+            return new CallbackException("Callback to service has been unsuccessful for event " + caseEvent.getName());
+        });
     }
 
+    // The retry will be on seconds T=1 and T=3 if the initial call fails at T=0
+    @Retryable(value = {CallbackException.class}, maxAttempts = 3, backoff = @Backoff(delay = 1000, multiplier = 3))
     public <T> ResponseEntity<T> send(final String url,
-                                      final List<Integer> callbackRetryTimeouts,
                                       final CaseEvent caseEvent,
                                       final CaseDetails caseDetailsBefore,
                                       final CaseDetails caseDetails,
@@ -185,11 +130,9 @@ public class CallbackService {
 
     private <T> Optional<ResponseEntity<T>> sendRequest(final String url,
                                                         final Class<T> clazz,
-                                                        final CallbackRequest callbackRequest,
-                                                        final Integer timeout) {
+                                                        final CallbackRequest callbackRequest) {
         try {
-            LOG.info("Trying {} with timeout interval {}", url, timeout);
-
+            LOG.debug("Invoking callback {}", url);
             final HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.add("Content-Type", "application/json");
             final HttpHeaders securityHeaders = securityUtils.authorizationHeaders();
@@ -197,26 +140,21 @@ public class CallbackService {
                 securityHeaders.forEach((key, values) -> httpHeaders.put(key, values));
             }
             final HttpEntity requestEntity = new HttpEntity(callbackRequest, httpHeaders);
-
-            LOG.info("readTimeout: {}", timeout);
-
-            final HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
-            requestFactory.setReadTimeout(secondsToMilliseconds(timeout));
-            restTemplate.setRequestFactory(requestFactory);
-
-            return ofNullable(
-                restTemplate.exchange(url, HttpMethod.POST, requestEntity, clazz));
+            return Optional.ofNullable(restTemplate.exchange(url, HttpMethod.POST, requestEntity, clazz));
         } catch (RestClientException e) {
-            LOG.info("Unable to connect to callback service {} because of {} {}",
-                url,
-                e.getClass().getSimpleName(),
-                e.getMessage());
+            LOG.warn("Unable to connect to callback service {} because of {} {}", url, e.getClass().getSimpleName(), e.getMessage());
             LOG.debug("", e);  // debug stack trace
             return Optional.empty();
         }
     }
 
-    private int secondsToMilliseconds(final Integer timeout) {
-        return (int) TimeUnit.SECONDS.toMillis(timeout);
+    public void validateCallbackErrorsAndWarnings(final CallbackResponse callbackResponse,
+                                                  final Boolean ignoreWarning) {
+        if (!isEmpty(callbackResponse.getErrors())
+            || (!isEmpty(callbackResponse.getWarnings()) && (ignoreWarning == null || !ignoreWarning))) {
+            throw new ApiException("Unable to proceed because there are one or more callback Errors or Warnings")
+                .withErrors(callbackResponse.getErrors())
+                .withWarnings(callbackResponse.getWarnings());
+        }
     }
 }

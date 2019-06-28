@@ -1,0 +1,14 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+
+    <changeSet id="rdm-4970" author="sateesh.mathangi@hmcts.net">
+        <sql dbms="postgresql"
+             endDelimiter="\nGO"
+             splitStatements="true"
+             stripComments="true">
+            CREATE INDEX idx_case_data_subscription_appellantsubscription_email ON public.case_data USING BTREE ((TRIM(UPPER(data#>>'{subscriptions,appellantSubscription,email}'))));
+        </sql>
+    </changeSet>
+</databaseChangeLog>
