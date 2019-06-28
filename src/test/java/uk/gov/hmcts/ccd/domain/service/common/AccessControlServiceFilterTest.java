@@ -1,8 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import java.util.Arrays;
-import java.util.List;
-
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
@@ -16,7 +13,14 @@ import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.PREDEFINED_COMP
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.*;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.ROLE_IN_USER_ROLES;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.ROLE_IN_USER_ROLES_2;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.ROLE_NOT_IN_USER_ROLES;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.ROLE_NOT_IN_USER_ROLES_2;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.USER_ROLES;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.getAddressFieldType;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.getPeopleCollectionFieldDefinition;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.getPersonFieldType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventTriggerBuilder.newCaseEventTrigger;
@@ -27,12 +31,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewTr
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.ComplexACLBuilder.aComplexACL;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageBuilder.newWizardPage;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.mockito.MockitoAnnotations;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageComplexFieldOverrideBuilder.newWizardPageComplexFieldOverride;
 
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
@@ -40,6 +39,15 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.mockito.MockitoAnnotations;
 
 class AccessControlServiceFilterTest {
     private static final String EVENT_ID_1 = "EVENT_ID_1";
@@ -639,7 +647,25 @@ class AccessControlServiceFilterTest {
                     .withId("Page One")
                     .withField(caseViewField1)
                     .withField(caseViewField2)
-                    .withField(caseViewField3)
+                    .withField(caseViewField3, asList(
+                        newWizardPageComplexFieldOverride()
+                            .withComplexFieldId("People.FirstName")
+                            .build(),
+                        newWizardPageComplexFieldOverride()
+                            .withComplexFieldId("People.LastName")
+                            .build(),
+                        newWizardPageComplexFieldOverride()
+                            .withComplexFieldId("People.BirthInfo.BornCity")
+                            .build(),
+                        newWizardPageComplexFieldOverride()
+                            .withComplexFieldId("People.BirthInfo.BornCountry")
+                            .build(),
+                        newWizardPageComplexFieldOverride()
+                            .withComplexFieldId("People.BirthInfo.BornAddress.Name")
+                            .build(),
+                        newWizardPageComplexFieldOverride()
+                            .withComplexFieldId("People.BirthInfo.BornAddress.Address")
+                            .build()))
                     .build()
                 )
                 .build();
@@ -673,7 +699,11 @@ class AccessControlServiceFilterTest {
                 () -> assertThat(eventTrigger.getCaseFields().get(1).getFieldType().getChildren().get(3).getFieldType().getChildren().get(0).getId(), is("Tags")),
                 () -> assertThat(eventTrigger.getCaseFields().get(1).getFieldType().getChildren().get(3).getFieldType().getChildren().get(0).getFieldType().getChildren().size(), is(1)),
                 () -> assertThat(eventTrigger.getCaseFields().get(1).getFieldType().getChildren().get(3).getFieldType().getChildren().get(0).getFieldType().getChildren().get(0).getId(), is("Tag")),
-                () -> assertThat(eventTrigger.getWizardPages().get(0).getWizardPageFields(), hasSize(2))
+                () -> assertThat(eventTrigger.getWizardPages().get(0).getWizardPageFields(), hasSize(2)),
+                () -> assertThat(eventTrigger.getWizardPages().get(0).getWizardPageFields().get(1).getComplexFieldOverrides(), hasSize(3)),
+                () -> assertThat(eventTrigger.getWizardPages().get(0).getWizardPageFields().get(1).getComplexFieldOverrides().get(0).getComplexFieldElementId(), is("People.LastName")),
+                () -> assertThat(eventTrigger.getWizardPages().get(0).getWizardPageFields().get(1).getComplexFieldOverrides().get(1).getComplexFieldElementId(), is("People.BirthInfo.BornCity")),
+                () -> assertThat(eventTrigger.getWizardPages().get(0).getWizardPageFields().get(1).getComplexFieldOverrides().get(2).getComplexFieldElementId(), is("People.BirthInfo.BornAddress.Address"))
             );
         }
 

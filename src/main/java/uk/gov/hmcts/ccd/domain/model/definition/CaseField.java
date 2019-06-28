@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
+import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -171,7 +172,8 @@ public class CaseField implements Serializable, CommonField {
     @JsonIgnore
     private void applyComplexACLs() {
         this.complexACLs.forEach(complexACL -> {
-            final CaseField nestedField = (CaseField) this.getComplexFieldNestedField(complexACL.getListElementCode());
+            final CaseField nestedField = (CaseField) this.getComplexFieldNestedField(complexACL.getListElementCode())
+                .orElseThrow(() -> new RuntimeException(format("CaseField %s has no nested elements with code %s.", this.getId(), complexACL.getListElementCode())));
             nestedField.getAccessControlListByRole(complexACL.getRole())
                 .ifPresent(accessControlList -> nestedField.accessControlLists.remove(accessControlList));
             nestedField.getAccessControlLists().add(complexACL);
@@ -200,7 +202,8 @@ public class CaseField implements Serializable, CommonField {
     @JsonIgnore
     private void removeACLS(final List<String> siblingsWithNoComplexACLs, final String role) {
         siblingsWithNoComplexACLs.stream().forEach(s -> {
-            final CaseField nestedElement = (CaseField) this.getComplexFieldNestedField(s);
+            final CaseField nestedElement = (CaseField) this.getComplexFieldNestedField(s)
+                .orElseThrow(() -> new RuntimeException(format("CaseField %s has no nested elements with code %s.", this.getId(), s)));
             nestedElement.getAccessControlListByRole(role).ifPresent(acl -> nestedElement.getAccessControlLists().remove(acl));
             propagateACLsToNestedFields(nestedElement, nestedElement.getAccessControlLists());
         });

@@ -16,6 +16,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.READONLY;
+import static uk.gov.hmcts.ccd.domain.model.definition.CaseFieldTest.findNestedField;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
@@ -2388,8 +2389,8 @@ public class AccessControlServiceTest {
 
             assertAll(
                 () -> assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext", is(READONLY)))),
-                () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Line1"), hasProperty("displayContext", is(READONLY))),
-                () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Line2"), hasProperty("displayContext", is(READONLY)))
+                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Line1"), hasProperty("displayContext", is(READONLY))),
+                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0),"Line2"), hasProperty("displayContext", is(READONLY)))
             );
         }
 
@@ -2576,9 +2577,9 @@ public class AccessControlServiceTest {
 
             assertAll(
                 () -> assertThat(eventTrigger.getCaseFields().get(0), not(hasProperty("displayContext", is(READONLY)))),
-                () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Addresses"), not(hasProperty("displayContext", is(READONLY)))),
-                () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Addresses.Line1"), hasProperty("displayContext", is(READONLY))),
-                () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Addresses.Line2"), hasProperty("displayContext", is(READONLY)))
+                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0),"Addresses"), not(hasProperty("displayContext", is(READONLY)))),
+                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Addresses.Line1"), hasProperty("displayContext", is(READONLY))),
+                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Addresses.Line2"), hasProperty("displayContext", is(READONLY)))
             );
         }
 

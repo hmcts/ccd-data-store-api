@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
-import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.PREDEFINED_COMPLEX_ADDRESS_GLOBAL;
@@ -12,10 +11,10 @@ import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.PREDEFINED_COMP
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.StringUtils;
@@ -61,12 +60,12 @@ public interface CommonField {
      * @return A nested CaseField or 'this' when path is blank
      */
     @JsonIgnore
-    default CommonField getComplexFieldNestedField(String path) {
+    default Optional<CommonField> getComplexFieldNestedField(String path) {
         if (StringUtils.isBlank(path)) {
-            return this;
+            return Optional.of(this);
         }
         if (this.getFieldType().getChildren().isEmpty()) {
-            throw new BadRequestException(format("CaseField %s has no nested elements.", this.getId()));
+            return Optional.empty();
         }
         List<String> pathElements = Arrays.stream(path.trim().split("\\.")).collect(toList());
 
@@ -74,19 +73,23 @@ public interface CommonField {
     }
 
     @JsonIgnore
-    default CaseField reduce(List<CaseField> caseFields, List<String> pathElements) {
+    default Optional<CommonField> reduce(List<CaseField> caseFields, List<String> pathElements) {
         String firstPathElement = pathElements.get(0);
 
-        CaseField caseField = caseFields.stream().filter(e -> e.getId().equals(firstPathElement)).findFirst()
-            .orElseThrow(() -> new BadRequestException(format("Nested element not found for %s", firstPathElement)));
+        Optional<CaseField> optionalCaseField = caseFields.stream().filter(e -> e.getId().equals(firstPathElement)).findFirst();
+        if (optionalCaseField.isPresent()) {
+            CaseField caseField = optionalCaseField.get();
 
-        if (pathElements.size() == 1) {
-            return caseField;
+            if (pathElements.size() == 1) {
+                return Optional.of(caseField);
+            } else {
+                List<CaseField> newCaseFields = caseField.getFieldType().getChildren();
+                List<String> tail = pathElements.subList(1, pathElements.size());
+
+                return reduce(newCaseFields, tail);
+            }
         } else {
-            List<CaseField> newCaseFields = caseField.getFieldType().getChildren();
-            List<String> tail = pathElements.subList(1, pathElements.size());
-
-            return reduce(newCaseFields, tail);
+            return Optional.empty();
         }
     }
 }
