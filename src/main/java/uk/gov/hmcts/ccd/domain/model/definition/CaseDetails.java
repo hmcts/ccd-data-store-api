@@ -289,6 +289,14 @@ public class CaseDetails implements Cloneable {
         return metadata;
     }
 
+    public Integer getDeleteDraftResponseStatusCode() {
+        return deleteDraftResponseStatusCode;
+    }
+
+    public String getDeleteDraftResponseStatus() {
+        return deleteDraftResponseStatus;
+    }
+
     @JsonIgnore
     public Map<String, Object> getCaseDataAndMetadata() {
         Map<String, Object> allData = new HashMap<>(getMetadata());
