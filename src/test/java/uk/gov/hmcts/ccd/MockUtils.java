@@ -15,7 +15,7 @@ public class MockUtils {
     public static final String ROLE_CITIZEN = "citizen";
 
     public static final void setSecurityAuthorities(Authentication authenticationMock, String... authorities) {
-        String username = "someusername";
+        String username = "123";
         String token = "Bearer jwtToken";
         String serviceName = "ccd-data";
         Object principal = new ServiceAndUserDetails(username, token, Arrays.asList(authorities), serviceName);

@@ -50,6 +50,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 @Service
 @Qualifier("default")
@@ -73,6 +74,7 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
     private final UIDService uidService;
     private final SecurityClassificationService securityClassificationService;
     private final ValidateCaseFieldsOperation validateCaseFieldsOperation;
+    private final UserAuthorisation userAuthorisation;
 
     @Inject
     public DefaultCreateEventOperation(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -89,7 +91,8 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
                                        final CallbackInvoker callbackInvoker,
                                        final UIDService uidService,
                                        final SecurityClassificationService securityClassificationService,
-                                       final ValidateCaseFieldsOperation validateCaseFieldsOperation) {
+                                       final ValidateCaseFieldsOperation validateCaseFieldsOperation,
+                                       final UserAuthorisation userAuthorisation) {
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -105,21 +108,20 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
         this.uidService = uidService;
         this.securityClassificationService = securityClassificationService;
         this.validateCaseFieldsOperation = validateCaseFieldsOperation;
+        this.userAuthorisation = userAuthorisation;
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
     @Override
-    public CaseDetails createCaseEvent(final String uid,
-                                       final String jurisdictionId,
-                                       final String caseTypeId,
-                                       final String caseReference,
+    public CaseDetails createCaseEvent(final String caseReference,
                                        final CaseDataContent content) {
         eventValidator.validate(content.getEvent());
 
-        final CaseType caseType = findAndValidateCaseType(caseTypeId, jurisdictionId);
+        final CaseDetails caseDetails = lockCaseDetails(caseReference);
+        final CaseType caseType = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
         final CaseEvent eventTrigger = findAndValidateCaseEvent(caseType, content.getEvent());
-        final CaseDetails caseDetails = lockCaseDetails(caseType, caseReference);
         final CaseDetails caseDetailsBefore = caseService.clone(caseDetails);
+        String uid = userAuthorisation.getUserId();
 
         eventTokenService.validateToken(content.getToken(), uid, caseDetails, eventTrigger, caseType.getJurisdiction(), caseType);
 
@@ -134,7 +136,7 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
         final Optional<String>
             newState = aboutToSubmitCallbackResponse.getState();
 
-        this.validateCaseFieldsOperation.validateCaseDetails(caseTypeId, content);
+        validateCaseFieldsOperation.validateData(caseDetails.getData(), caseType);
         final CaseDetails savedCaseDetails = saveCaseDetails(caseDetails, eventTrigger, newState);
         saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse, content.getEvent(), eventTrigger, savedCaseDetails, caseType);
 
@@ -150,16 +152,6 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
             }
         }
         return caseDetails;
-    }
-
-    private CaseType findAndValidateCaseType(final String caseTypeId,
-                                             final String jurisdictionId) {
-        final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
-        if (!caseTypeService.isJurisdictionValid(jurisdictionId, caseType)) {
-            throw new ResourceNotFoundException(
-                String.format("Case type with id %s could not be found for jurisdiction %s", caseTypeId, jurisdictionId));
-        }
-        return caseType;
     }
 
     private CaseEvent findAndValidateCaseEvent(final CaseType caseType,
@@ -184,8 +176,7 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
         }
     }
 
-    private CaseDetails lockCaseDetails(final CaseType caseType,
-                                        final String caseReference) {
+    private CaseDetails lockCaseDetails(final String caseReference) {
         if (!uidService.validateUID(caseReference)) {
             throw new BadRequestException("Case reference is not valid");
         }
@@ -195,11 +186,11 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
             caseDetails = caseDetailsRepository.lockCase(Long.valueOf(caseReference));
         } catch (NumberFormatException exception) {
             throw new ResourceNotFoundException(
-                String.format("Case with reference %s could not be found for case type %s", caseReference, caseType.getId()));
+                String.format("Case with reference %s could not be found", caseReference));
         }
-        if (null == caseDetails || !caseType.getId().equalsIgnoreCase(caseDetails.getCaseTypeId())) {
+        if (null == caseDetails) {
             throw new ResourceNotFoundException(
-                String.format("Case with reference %s could not be found for case type %s", caseReference, caseType.getId()));
+                String.format("Case with reference %s could not be found", caseReference));
         }
         return caseDetails;
     }

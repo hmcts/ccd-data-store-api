@@ -57,6 +57,7 @@ public class MetaData {
     private Optional<String> securityClassification = Optional.empty();
     private Optional<String> page = Optional.empty();
     private Optional<String> sortDirection = Optional.empty();
+    private Optional<String> sortField = Optional.empty();
 
     public MetaData(String caseTypeId, String jurisdiction) {
         this.caseTypeId = caseTypeId;
@@ -125,6 +126,14 @@ public class MetaData {
 
     public void setSortDirection(Optional<String> sortDirection) {
         this.sortDirection = sortDirection;
+    }
+
+    public Optional<String> getSortField() {
+        return sortField;
+    }
+
+    public void setSortField(String sortField) {
+        this.sortField = Optional.of(sortField);
     }
 
     public static List<String> unknownMetadata(List<String> parameters) {
