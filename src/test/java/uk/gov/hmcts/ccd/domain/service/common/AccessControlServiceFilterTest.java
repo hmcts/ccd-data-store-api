@@ -502,6 +502,124 @@ class AccessControlServiceFilterTest {
         }
 
         @Test
+        @DisplayName("Should filter child fields of a collection caseField if UPDATE ACL is missing for child fields - alternate")
+        void filterCollectionCaseFieldChildrenByUpdateAccessAlternate() {
+            final CaseField people = getPeopleCollectionFieldDefinition();
+            people.setAccessControlLists(asList(anAcl()
+                .withRole(ROLE_IN_USER_ROLES)
+                .withUpdate(true)
+                .build()));
+            people.setComplexACLs(asList(
+                aComplexACL()
+                    .withListElementCode("LastName")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withUpdate(true)
+                    .build(),
+                aComplexACL()
+                    .withListElementCode("BirthInfo")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withUpdate(true)
+                    .build(),
+                aComplexACL()
+                    .withListElementCode("Notes")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withUpdate(true)
+                    .build(),
+                aComplexACL()
+                    .withListElementCode("Addresses")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withUpdate(true)
+                    .build(),
+                aComplexACL()
+                    .withListElementCode("Addresses.Address")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withUpdate(false)
+                    .build(),
+                aComplexACL()
+                    .withListElementCode("Addresses.Address.Line1")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withUpdate(false)
+                    .build(),
+                aComplexACL()
+                    .withListElementCode("Addresses.Address.Line2")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withUpdate(false)
+                    .build()
+            ));
+
+            final CaseType caseType = newCaseType()
+                .withField(people)
+                .withField(newCaseField()
+                    .withId("Name")
+                    .withFieldType(aFieldType()
+                        .withId("Text")
+                        .withType("Text")
+                        .build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(false)
+                        .build())
+                    .build())
+                .withField(newCaseField()
+                    .withId("Surname")
+                    .withFieldType(aFieldType()
+                        .withId("Text")
+                        .withType("Text")
+                        .build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES_2)
+                        .withUpdate(true)
+                        .build())
+                    .build())
+                .build();
+            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+
+            final CaseViewField caseViewField1 = aViewField()
+                .withId("Name")
+                .build();
+            final CaseViewField caseViewField2 = aViewField()
+                .withId("Surname")
+                .build();
+            final CaseViewField caseViewField3 = aViewField()
+                .withId("People")
+                .withFieldType(aFieldType()
+                    .withId("G339483948")
+                    .withType(COLLECTION)
+                    .build())
+                .build();
+            caseViewField3.getFieldType().setCollectionFieldType(getPersonFieldType());
+
+            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
+                .withField(caseViewField1)
+                .withField(caseViewField2)
+                .withField(caseViewField3)
+                .withWizardPage(newWizardPage()
+                    .withId("Page One")
+                    .withField(caseViewField1)
+                    .withField(caseViewField2)
+                    .withField(caseViewField3)
+                    .build()
+                )
+                .build();
+
+            CaseEventTrigger eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
+                caseEventTrigger,
+                caseType.getCaseFields(),
+                USER_ROLES,
+                CAN_UPDATE);
+
+            assertAll(
+                () -> assertThat(eventTrigger.getCaseFields(), hasSize(2)),
+                () -> assertThat(eventTrigger.getCaseFields(), not(hasItem(caseViewField1))),
+                () -> assertThat(eventTrigger.getCaseFields(), hasItem(caseViewField2)),
+                () -> assertThat(eventTrigger.getCaseFields().get(1).getId(), is("People")),
+                () -> assertThat(eventTrigger.getCaseFields().get(1).getFieldType().getChildren().size(), is(4)),
+                () -> assertThat(eventTrigger.getCaseFields().get(1).getFieldType().getChildren().get(0).getId(), is("LastName")),
+                () -> assertThat(eventTrigger.getCaseFields().get(1).getFieldType().getChildren().get(2).getFieldType().getChildren().size(), is(0))
+            );
+        }
+
+        @Test
         @DisplayName("Should filter child fields of a collection caseField if CREATE ACL is missing for child fields")
         void filterCollectionCaseFieldChildrenByCreateAccess() {
             final CaseField people = getPeopleCollectionFieldDefinition();
