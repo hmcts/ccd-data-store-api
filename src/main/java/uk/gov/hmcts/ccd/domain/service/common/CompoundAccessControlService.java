@@ -230,11 +230,11 @@ public class CompoundAccessControlService {
     private boolean checkComplexNodesForUpdate(final CaseField caseField, final JsonNode oldNode, final JsonNode newNode, Set<String> userRoles) {
         boolean updateDenied = false;
         for (CaseField field : caseField.getFieldType().getComplexFields()) {
-            if (!field.isCompound() && !oldNode.get(field.getId()).equals(newNode.get(field.getId()))
+            if (!field.isCompound()
+                && isSimpleFieldValueReallyUpdated(oldNode, newNode, field)
                 && !hasAccessControlList(userRoles, CAN_UPDATE, field.getAccessControlLists())) {
                 updateDenied = true;
                 LOG.info(SIMPLE_CHILD_OF_HAS_DATA_UPDATE_BUT_NO_UPDATE_ACL, field.getId(), caseField.getId());
-
             } else if (field.isCompound() && oldNode.get(field.getId()) != null && newNode.get(field.getId()) != null
                 && isUpdateDeniedForCaseField(oldNode.get(field.getId()), newNode.get(field.getId()), field, userRoles)) {
                 updateDenied = true;
@@ -245,6 +245,18 @@ public class CompoundAccessControlService {
             }
         }
         return updateDenied;
+    }
+
+    private boolean isSimpleFieldValueReallyUpdated(final JsonNode oldNode, final JsonNode newNode, final CaseField field) {
+        if (oldNode.get(field.getId()) == null && newNode.get(field.getId()) != null && newNode.get(field.getId()).isNull()) {
+            // We mark fields (and subfields) with no UPDATE as READONLY, this causes "null" value to be submitted
+            // when the old value is null and new value is sent as "null" due to the above requirement,
+            // this mustn't be interpreted as an update
+            return false;
+        } else if (oldNode.get(field.getId()) == null && newNode.get(field.getId()) == null) {
+            return false; // nothing changed if both null
+        }
+        return !oldNode.get(field.getId()).equals(newNode.get(field.getId()));
     }
 
     private Optional<JsonNode> findCorrespondingNode(final JsonNode newItem, final JsonNode id) {

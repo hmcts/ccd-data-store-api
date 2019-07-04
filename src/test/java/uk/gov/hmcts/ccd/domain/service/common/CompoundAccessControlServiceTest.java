@@ -64,6 +64,26 @@ class CompoundAccessControlServiceTest {
         + "        },\n"
         + "        \"id\": \"2939423847298729384\"\n"
         + "      }\n";
+    private static final String existingAddressWMissingLines = "      {\n"
+        + "        \"value\": {\n"
+        + "           \"Name\": \"home\",\n"
+        + "           \"Address\": {"
+        + "               \"Country\": \"United Kingdom\"\n"
+        + "           }\n"
+        + "        },\n"
+        + "        \"id\": \"2939423847298729384\"\n"
+        + "      }\n";
+    private static final String existingAddressWNullLines = "      {\n"
+        + "        \"value\": {\n"
+        + "           \"Name\": \"home\",\n"
+        + "           \"Address\": {"
+        + "               \"Line1\": null,\n"
+        + "               \"Line2\": null,\n"
+        + "               \"Country\": \"United Kingdom\"\n"
+        + "           }\n"
+        + "        },\n"
+        + "        \"id\": \"2939423847298729384\"\n"
+        + "      }\n";
     private static final String existingAddress1Line1Updated = "      {\n"
         + "        \"value\": {\n"
         + "           \"Name\": \"home\",\n"
@@ -680,6 +700,43 @@ class CompoundAccessControlServiceTest {
             String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1LinesUpdated + addressEnd + "," + p2Notes + p2End;
             assertThat(compoundAccessControlService.hasAccessForAction(
                 generatePeopleDataWithPerson(p2Updated, p1Updated), dataNode, people, USER_ROLES), is(true));
+        }
+
+        @Test
+        @DisplayName("Should grant access when child is not updated and No U exists but 'null' is sent as value - READONLY case")
+        void shouldGrantAccessWhenChildIsNotUpdatedAndNullValueSent() throws IOException {
+            final CaseField people = getPeopleCollectionFieldDefinition();
+            people.setAccessControlLists(asList(anAcl()
+                .withRole(ROLE_IN_USER_ROLES)
+                .withCreate(true)
+                .withUpdate(true)
+                .build()));
+            people.setComplexACLs(asList(
+                aComplexACL()
+                    .withListElementCode("Addresses")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withUpdate(true)
+                    .build(),
+                aComplexACL()
+                    .withListElementCode("Addresses.Address.Line1")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withUpdate(false)
+                    .build(),
+                aComplexACL()
+                    .withListElementCode("Addresses.Address.Line2")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withUpdate(false)
+                    .build()
+            ));
+
+            final CaseType caseType = newCaseType().withField(people).build();
+            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+
+            String p1 = existingPersonStart + addressesStart + existingAddressWMissingLines + "," + existingAddress2 + addressEnd + personEnd;
+            JsonNode dataNode = generatePeopleDataWithPerson(p1);
+
+            String p1Updated = existingPersonStart + addressesStart + existingAddressWNullLines + "," + existingAddress2 + addressEnd + personEnd;
+            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(p1Updated), dataNode, people, USER_ROLES), is(true));
         }
 
         @Test
