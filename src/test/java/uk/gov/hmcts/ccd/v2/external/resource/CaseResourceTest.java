@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
+import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
 import java.time.LocalDateTime;
@@ -22,12 +24,18 @@ class CaseResourceTest {
     private static final String LINK_SELF = String.format("/cases/%s", REFERENCE);
     private static final LocalDateTime CREATED_ON = LocalDateTime.now();
     private static final LocalDateTime LAST_MODIFIED_ON = LocalDateTime.now();
+    private static final String DRAFT_ID = "123";
     private static final String JURISDICTION = "Test";
     private static final String CASE_TYPE = "Demo";
     private static final String STATE = "Started";
+    private static final String CALLBACK_COMPLETED = "CALLBACK_COMPLETED";
     private static final SecurityClassification SECURITY_CLASSIFICATION = SecurityClassification.PUBLIC;
     private static final Map<String, JsonNode> DATA = Collections.singletonMap("FieldID", new TextNode("Value"));
     private static final Map<String, JsonNode> DATA_CLASSIFICATION = Collections.singletonMap("FieldID", new TextNode("PUBLIC"));
+    private static final AfterSubmitCallbackResponse CALLBACK_BODY = new AfterSubmitCallbackResponse();
+    private static final ResponseEntity<AfterSubmitCallbackResponse> AFTER_SUBMIT_CALLBACK_RESPONSE = ResponseEntity.ok(CALLBACK_BODY);
+    private static final String DELETE_DRAFT_COMPLETED = "DELETE_DRAFT_COMPLETED";
+    private static final ResponseEntity<Void> DELETE_DRAFT_RESPONSE = ResponseEntity.ok().build();
 
     private CaseDetails caseDetails;
 
@@ -50,7 +58,12 @@ class CaseResourceTest {
             () -> assertThat(caseResource.getState(), equalTo(STATE)),
             () -> assertThat(caseResource.getSecurityClassification(), equalTo(SECURITY_CLASSIFICATION)),
             () -> assertThat(caseResource.getData(), equalTo(DATA)),
-            () -> assertThat(caseResource.getDataClassification(), equalTo(DATA_CLASSIFICATION))
+            () -> assertThat(caseResource.getDataClassification(), equalTo(DATA_CLASSIFICATION)),
+            () -> assertThat(caseResource.getAfterSubmitCallbackResponse(), equalTo(CALLBACK_BODY)),
+            () -> assertThat(caseResource.getCallbackResponseStatusCode(), equalTo(AFTER_SUBMIT_CALLBACK_RESPONSE.getStatusCodeValue())),
+            () -> assertThat(caseResource.getCallbackResponseStatus(), equalTo(CALLBACK_COMPLETED)),
+            () -> assertThat(caseResource.getDeleteDraftResponseStatusCode(), equalTo(DELETE_DRAFT_RESPONSE.getStatusCodeValue())),
+            () -> assertThat(caseResource.getDeleteDraftResponseStatus(), equalTo(DELETE_DRAFT_COMPLETED))
         );
     }
 
@@ -74,6 +87,8 @@ class CaseResourceTest {
         caseDetails.setSecurityClassification(SECURITY_CLASSIFICATION);
         caseDetails.setData(DATA);
         caseDetails.setDataClassification(DATA_CLASSIFICATION);
+        caseDetails.setAfterSubmitCallbackResponseEntity(AFTER_SUBMIT_CALLBACK_RESPONSE);
+        caseDetails.setDeleteDraftResponseEntity(DRAFT_ID, DELETE_DRAFT_RESPONSE);
 
         return caseDetails;
     }
