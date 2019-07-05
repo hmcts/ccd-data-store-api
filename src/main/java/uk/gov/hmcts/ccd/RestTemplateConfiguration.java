@@ -49,7 +49,7 @@ class RestTemplateConfiguration {
     @Bean(name = "restTemplate")
     public RestTemplate restTemplate() {
         final RestTemplate restTemplate = new RestTemplate();
-        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(getHttpClient());
+        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient());
         requestFactory.setReadTimeout(readTimeout);
         LOG.info("readTimeout: {}", readTimeout);
         restTemplate.setRequestFactory(requestFactory);
@@ -79,7 +79,8 @@ class RestTemplateConfiguration {
         }
     }
 
-    private HttpClient getHttpClient() {
+    @Bean(name = "httpClient")
+    public HttpClient httpClient() {
         return getHttpClient(connectionTimeout);
     }
 
@@ -99,15 +100,15 @@ class RestTemplateConfiguration {
         final RequestConfig
             config =
             RequestConfig.custom()
-                         .setConnectTimeout(timeout)
-                         .setConnectionRequestTimeout(timeout)
-                         .setSocketTimeout(timeout)
-                         .build();
+                .setConnectTimeout(timeout)
+                .setConnectionRequestTimeout(timeout)
+                .setSocketTimeout(timeout)
+                .build();
 
         return HttpClientBuilder.create()
-                                .useSystemProperties()
-                                .setDefaultRequestConfig(config)
-                                .setConnectionManager(cm)
-                                .build();
+            .useSystemProperties()
+            .setDefaultRequestConfig(config)
+            .setConnectionManager(cm)
+            .build();
     }
 }

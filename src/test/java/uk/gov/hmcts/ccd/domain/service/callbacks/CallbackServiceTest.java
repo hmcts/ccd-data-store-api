@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.callbacks;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,7 +12,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ServerErrorException;
@@ -40,6 +38,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -50,14 +49,14 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CallbackResponseBuilder.aCallbackResponse;
 
 public class CallbackServiceTest {
-    private static final ObjectMapper mapper = new ObjectMapper();
-
     @Mock
     private SecurityUtils securityUtils;
     @Mock
-    private RestTemplate restTemplate;
-    @Mock
     private ApplicationParams applicationParams;
+    @Mock
+    private RestTemplateProvider restTemplateProvider;
+    @Mock
+    private RestTemplate restTemplate;
 
     private CallbackService callbackService;
 
@@ -81,10 +80,11 @@ public class CallbackServiceTest {
         callbackResponse.setData(caseDetails.getData());
 
         doReturn(new HttpHeaders()).when(securityUtils).authorizationHeaders();
+        doReturn(restTemplate).when(restTemplateProvider).provide(anyInt());
         doReturn(response).when(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(CallbackResponse.class));
         doReturn(defaultCallbackRetryIntervals).when(applicationParams).getCallbackRetryIntervalsInSeconds();
         doReturn(defaultCallbackReadTimeout).when(applicationParams).getCallbackReadTimeoutInMillis();
-        callbackService = new CallbackService(securityUtils, restTemplate, applicationParams);
+        callbackService = new CallbackService(securityUtils, applicationParams, restTemplateProvider);
     }
 
     @Nested
@@ -98,7 +98,6 @@ public class CallbackServiceTest {
 
             Assertions.assertAll(
                 () -> assertTrue(response.getErrors().isEmpty()),
-                () -> verify(restTemplate).setRequestFactory(any(HttpComponentsClientHttpRequestFactory.class)),
                 () -> verify(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(CallbackResponse.class)),
                 () -> verifyNoMoreInteractions(restTemplate)
             );
@@ -117,7 +116,6 @@ public class CallbackServiceTest {
 
             final Duration between = Duration.between(start, Instant.now());
             Assertions.assertAll(
-                () -> verify(restTemplate, times(3)).setRequestFactory(any(HttpComponentsClientHttpRequestFactory.class)),
                 () -> verify(restTemplate, times(3)).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(CallbackResponse.class)),
                 () -> verifyNoMoreInteractions(restTemplate),
                 () -> assertThat((int) between.toMillis(), greaterThan(4000))
@@ -138,7 +136,6 @@ public class CallbackServiceTest {
             Assertions.assertAll(
                 () -> assertTrue(response.getErrors().isEmpty()),
                 () -> assertTrue(response.getWarnings().isEmpty()),
-                () -> verify(restTemplate).setRequestFactory(any(HttpComponentsClientHttpRequestFactory.class)),
                 () -> verify(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(CallbackResponse.class)),
                 () -> verifyNoMoreInteractions(restTemplate)
             );
@@ -157,7 +154,6 @@ public class CallbackServiceTest {
             Assertions.assertAll(
                 () -> assertTrue(response.getErrors().isEmpty()),
                 () -> assertTrue(response.getWarnings().isEmpty()),
-                () -> verify(restTemplate, times(2)).setRequestFactory(any(HttpComponentsClientHttpRequestFactory.class)),
                 () -> verify(restTemplate, times(2)).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(CallbackResponse.class)),
                 () -> verifyNoMoreInteractions(restTemplate)
             );
@@ -177,7 +173,6 @@ public class CallbackServiceTest {
             Assertions.assertAll(
                 () -> assertTrue(response.getErrors().isEmpty()),
                 () -> assertTrue(response.getWarnings().isEmpty()),
-                () -> verify(restTemplate, times(3)).setRequestFactory(any(HttpComponentsClientHttpRequestFactory.class)),
                 () -> verify(restTemplate, times(3)).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(CallbackResponse.class)),
                 () -> verifyNoMoreInteractions(restTemplate)
             );

@@ -4,12 +4,10 @@ import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -35,9 +33,9 @@ public class CallbackService {
     public static final int CALLBACK_RETRY_INTERVAL_MULTIPLIER = 3;
 
     private final SecurityUtils securityUtils;
-    private final RestTemplate restTemplate;
     private final List<Integer> defaultCallbackRetryIntervalsInSeconds;
     private final Integer defaultCallbackTimeoutInMillis;
+    private final RestTemplateProvider restTemplateProvider;
 
     static class CallbackRetryContext {
         private final Integer callbackRetryInterval;
@@ -60,12 +58,12 @@ public class CallbackService {
 
     @Autowired
     public CallbackService(final SecurityUtils securityUtils,
-                           @Qualifier("restTemplate") final RestTemplate restTemplate,
-                           final ApplicationParams applicationParams) {
+                           final ApplicationParams applicationParams,
+                           final RestTemplateProvider restTemplateProvider) {
         this.securityUtils = securityUtils;
-        this.restTemplate = restTemplate;
         this.defaultCallbackRetryIntervalsInSeconds = applicationParams.getCallbackRetryIntervalsInSeconds();
         this.defaultCallbackTimeoutInMillis = applicationParams.getCallbackReadTimeoutInMillis();
+        this.restTemplateProvider = restTemplateProvider;
     }
 
     public Optional<CallbackResponse> send(final String url,
@@ -108,7 +106,7 @@ public class CallbackService {
             final Optional<ResponseEntity<CallbackResponse>> responseEntity = sendRequest(url,
                 CallbackResponse.class,
                 callbackRequest,
-                retryContext.getCallbackRetryTimeout());
+                restTemplateProvider.provide(retryContext.getCallbackRetryTimeout()));
             if (responseEntity.isPresent()) {
                 return Optional.of(responseEntity.get().getBody());
             }
@@ -130,7 +128,10 @@ public class CallbackService {
 
         for (CallbackRetryContext retryContext : retryContextList) {
             sleep(retryContext.getCallbackRetryInterval());
-            final Optional<ResponseEntity<T>> requestEntity = sendRequest(url, clazz, callbackRequest, retryContext.getCallbackRetryTimeout());
+            final Optional<ResponseEntity<T>> requestEntity = sendRequest(url,
+                clazz,
+                callbackRequest,
+                restTemplateProvider.provide(retryContext.getCallbackRetryTimeout()));
             if (requestEntity.isPresent()) {
                 return requestEntity.get();
             }
@@ -172,7 +173,7 @@ public class CallbackService {
         return retryContextList.get(retryContextList.size() - 1);
     }
 
-    @SuppressWarnings({"squid:S2139","squid:S00112"})
+    @SuppressWarnings({"squid:S2139", "squid:S00112"})
     private void sleep(final Integer timeout) {
         try {
             TimeUnit.SECONDS.sleep((long) timeout);
@@ -186,9 +187,9 @@ public class CallbackService {
     private <T> Optional<ResponseEntity<T>> sendRequest(final String url,
                                                         final Class<T> clazz,
                                                         final CallbackRequest callbackRequest,
-                                                        final Integer timeout) {
+                                                        final RestTemplate restTemplate) {
         try {
-            LOG.info("Trying {} with timeout interval {}", url, timeout);
+            LOG.info("Trying {}", url);
 
             final HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.add("Content-Type", "application/json");
@@ -197,12 +198,6 @@ public class CallbackService {
                 securityHeaders.forEach((key, values) -> httpHeaders.put(key, values));
             }
             final HttpEntity requestEntity = new HttpEntity(callbackRequest, httpHeaders);
-
-            LOG.info("readTimeout: {}", timeout);
-
-            final HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
-            requestFactory.setReadTimeout(secondsToMilliseconds(timeout));
-            restTemplate.setRequestFactory(requestFactory);
 
             return ofNullable(
                 restTemplate.exchange(url, HttpMethod.POST, requestEntity, clazz));
