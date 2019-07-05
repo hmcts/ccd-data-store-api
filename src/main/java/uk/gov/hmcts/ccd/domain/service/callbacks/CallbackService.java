@@ -79,40 +79,7 @@ public class CallbackService {
                                            final CaseDetails caseDetailsBefore,
                                            final CaseDetails caseDetails) {
 
-        return send(url, callbackRetryTimeouts, caseEvent, caseDetailsBefore, caseDetails, false);
-    }
-
-    @SuppressWarnings("javasecurity:S5145")
-    public Optional<CallbackResponse> send(final String url,
-                                           final List<Integer> callbackRetryTimeouts,
-                                           final CaseEvent caseEvent,
-                                           final CaseDetails caseDetailsBefore,
-                                           final CaseDetails caseDetails,
-                                           final Boolean ignoreWarning) {
-
-        if (url == null || url.isEmpty()) {
-            return Optional.empty();
-        }
-
-        final CallbackRequest callbackRequest = new CallbackRequest(caseDetails,
-            caseDetailsBefore,
-            caseEvent.getId(),
-            ignoreWarning);
-
-        List<CallbackRetryContext> retryContextList = buildCallbackRetryContexts(ofNullable(callbackRetryTimeouts).orElse(Lists.newArrayList()));
-
-        for (CallbackRetryContext retryContext : retryContextList) {
-            sleep(retryContext.getCallbackRetryInterval());
-            final Optional<ResponseEntity<CallbackResponse>> responseEntity = sendRequest(url,
-                CallbackResponse.class,
-                callbackRequest,
-                restTemplateProvider.provide(retryContext.getCallbackRetryTimeout()));
-            if (responseEntity.isPresent()) {
-                return Optional.of(responseEntity.get().getBody());
-            }
-        }
-        LOG.debug("Unsuccessful callback to {} for caseType {} and event {}", url, caseDetails.getCaseTypeId(), caseEvent.getId());
-        throw new CallbackException("Unsuccessful callback to " + url);
+        return Optional.ofNullable(send(url, callbackRetryTimeouts, caseEvent, caseDetailsBefore, caseDetails, CallbackResponse.class, false).getBody());
     }
 
     public <T> ResponseEntity<T> send(final String url,
@@ -120,24 +87,39 @@ public class CallbackService {
                                       final CaseEvent caseEvent,
                                       final CaseDetails caseDetailsBefore,
                                       final CaseDetails caseDetails,
-                                      final Class<T> clazz) {
+                                      final Class<T> clazz,
+                                      final boolean ignoreWarning) {
 
-        final CallbackRequest callbackRequest = new CallbackRequest(caseDetails, caseDetailsBefore, caseEvent.getId());
+        if (url == null || url.isEmpty()) {
+            return noResponse();
+        }
+
+        final CallbackRequest callbackRequest = ignoreWarning ?
+            new CallbackRequest(caseDetails,
+                caseDetailsBefore,
+                caseEvent.getId(),
+                true) :
+            new CallbackRequest(caseDetails, caseDetailsBefore, caseEvent.getId());
 
         List<CallbackRetryContext> retryContextList = buildCallbackRetryContexts(ofNullable(callbackRetryTimeouts).orElse(Lists.newArrayList()));
 
         for (CallbackRetryContext retryContext : retryContextList) {
             sleep(retryContext.getCallbackRetryInterval());
-            final Optional<ResponseEntity<T>> requestEntity = sendRequest(url,
+            final Optional<ResponseEntity<T>> responseEntity = sendRequest(url,
                 clazz,
                 callbackRequest,
                 restTemplateProvider.provide(retryContext.getCallbackRetryTimeout()));
-            if (requestEntity.isPresent()) {
-                return requestEntity.get();
+            if (responseEntity.isPresent()) {
+                return responseEntity.get();
             }
         }
         // Sent so many requests and still got nothing, throw exception here
+        LOG.debug("Unsuccessful callback to {} for caseType {} and event {}", url, caseDetails.getCaseTypeId(), caseEvent.getId());
         throw new CallbackException("Unsuccessful callback to " + url);
+    }
+
+    private <T> ResponseEntity<T> noResponse() {
+        return ResponseEntity.ok().build();
     }
 
     public void validateCallbackErrorsAndWarnings(final CallbackResponse callbackResponse,

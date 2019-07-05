@@ -72,13 +72,14 @@ public class CallbackInvoker {
                                                                      final CaseType caseType,
                                                                      final Boolean ignoreWarning) {
 
-        final Optional<CallbackResponse> callbackResponse = callbackService.send(
+        final Optional<CallbackResponse> callbackResponse = Optional.ofNullable(callbackService.send(
             eventTrigger.getCallBackURLAboutToSubmitEvent(),
             eventTrigger.getRetriesTimeoutURLAboutToSubmitEvent(),
             eventTrigger,
             caseDetailsBefore,
             caseDetails,
-            ignoreWarning);
+            CallbackResponse.class,
+            Optional.ofNullable(ignoreWarning).isPresent()).getBody());
 
         if (callbackResponse.isPresent()) {
             return validateAndSetFromAboutToSubmitCallback(caseType,
@@ -98,7 +99,8 @@ public class CallbackInvoker {
             eventTrigger,
             caseDetailsBefore,
             caseDetails,
-            AfterSubmitCallbackResponse.class);
+            AfterSubmitCallbackResponse.class,
+            false);
     }
 
     public CaseDetails invokeMidEventCallback(final WizardPage wizardPage,

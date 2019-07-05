@@ -88,7 +88,7 @@ public class CallbackServiceWireMockTest {
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200).withFixedDelay(499)));
 
         Instant start = Instant.now();
-        callbackService.send(testUrl, null, caseEvent, null, caseDetails, false);
+        callbackService.send(testUrl, null, caseEvent, null, caseDetails, CallbackResponse.class, false);
 
         final Duration between = Duration.between(start, Instant.now());
         // 0s retryInterval + 0.5s readTimeout + 1s retryInterval + 0.5s readTimeout + 3s retryInterval + 0.5s readTimeout
@@ -115,7 +115,7 @@ public class CallbackServiceWireMockTest {
 
         List<Integer> callbackRetryTimeoutsInMillis = Lists.newArrayList(500, 1000, 1500);
         Instant start = Instant.now();
-        callbackService.send(testUrl, callbackRetryTimeoutsInMillis, caseEvent, null, caseDetails, String.class);
+        callbackService.send(testUrl, callbackRetryTimeoutsInMillis, caseEvent, null, caseDetails, String.class, false);
 
         final Duration between = Duration.between(start, Instant.now());
         // 0s retryInterval + 0.5s readTimeout + 1s retryInterval + 1s readTimeout + 3s retryInterval + 1.5s readTimeout

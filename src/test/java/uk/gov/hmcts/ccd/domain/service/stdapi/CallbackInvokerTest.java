@@ -10,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
+import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
@@ -103,11 +104,12 @@ class CallbackInvokerTest {
             same(caseEvent),
             same(caseDetailsBefore),
             same(caseDetails));
-        doReturn(Optional.empty()).when(callbackService).send(any(),
+        doReturn(ResponseEntity.of(Optional.empty())).when(callbackService).send(any(),
             any(),
             same(caseEvent),
             same(caseDetailsBefore),
             same(caseDetails),
+            any(),
             anyBoolean());
 
         inOrder = inOrder(callbackService,
@@ -150,6 +152,7 @@ class CallbackInvokerTest {
                 caseEvent,
                 caseDetailsBefore,
                 caseDetails,
+                CallbackResponse.class,
                 IGNORE_WARNING);
             assertThat(response.getState().isPresent(), is(false));
         }
@@ -158,12 +161,13 @@ class CallbackInvokerTest {
         @DisplayName("should send callback and get state")
         void sendCallbackAndGetState() {
             final String expectedState = "uNiCORn";
-            doReturn(Optional.of(mockCallbackResponse(expectedState))).when(callbackService)
+            doReturn(ResponseEntity.of(Optional.of(mockCallbackResponse(expectedState)))).when(callbackService)
                 .send(any(),
                     any(),
                     same(caseEvent),
                     same(caseDetailsBefore),
                     same(caseDetails),
+                    eq(CallbackResponse.class),
                     anyBoolean());
             final AboutToSubmitCallbackResponse response =
                 callbackInvoker.invokeAboutToSubmitCallback(caseEvent,
@@ -177,6 +181,7 @@ class CallbackInvokerTest {
                 caseEvent,
                 caseDetailsBefore,
                 caseDetails,
+                CallbackResponse.class,
                 true);
             assertThat(response.getState().get(), is(expectedState));
         }
@@ -184,12 +189,13 @@ class CallbackInvokerTest {
         @Test
         @DisplayName("should send callback and get no state")
         void sendCallbackAndGetNoState() {
-            doReturn(Optional.of(mockCallbackResponseWithNoState())).when(callbackService)
+            doReturn(ResponseEntity.of(Optional.of(mockCallbackResponseWithNoState()))).when(callbackService)
                 .send(any(),
                     any(),
                     same(caseEvent),
                     same(caseDetailsBefore),
                     same(caseDetails),
+                    eq(CallbackResponse.class),
                     anyBoolean());
             final AboutToSubmitCallbackResponse response =
                 callbackInvoker.invokeAboutToSubmitCallback(caseEvent,
@@ -203,6 +209,7 @@ class CallbackInvokerTest {
                 caseEvent,
                 caseDetailsBefore,
                 caseDetails,
+                CallbackResponse.class,
                 true);
             assertThat(response.getState().isPresent(), is(false));
         }
@@ -211,12 +218,13 @@ class CallbackInvokerTest {
         @DisplayName("should send callback and get state and significant Item")
         void sendCallbackAndGetStateAndSignificantDocument() {
             final String expectedState = "uNiCORn";
-            doReturn(Optional.of(mockCallbackResponseWithSignificantItem(expectedState))).when(callbackService)
+            doReturn(ResponseEntity.of(Optional.of(mockCallbackResponseWithSignificantItem(expectedState)))).when(callbackService)
                 .send(any(),
                     any(),
                     same(caseEvent),
                     same(caseDetailsBefore),
                     same(caseDetails),
+                    eq(CallbackResponse.class),
                     anyBoolean());
 
             final AboutToSubmitCallbackResponse response =
@@ -231,6 +239,7 @@ class CallbackInvokerTest {
                 caseEvent,
                 caseDetailsBefore,
                 caseDetails,
+                CallbackResponse.class,
                 true);
             assertThat(response.getState().get(), is(expectedState));
             assertEquals("description", response.getSignificantItem().getDescription());
@@ -242,12 +251,13 @@ class CallbackInvokerTest {
         @DisplayName("should send callback and get state and significant Item")
         void sendCallbackAndGetStateAndSignificantDocumentWithInvalidURL() {
             final String expectedState = "uNiCORn";
-            doReturn(Optional.of(mockCallbackResponseWithSignificantItem(expectedState))).when(callbackService)
+            doReturn(ResponseEntity.of(Optional.of(mockCallbackResponseWithSignificantItem(expectedState)))).when(callbackService)
                 .send(any(),
                     any(),
                     same(caseEvent),
                     same(caseDetailsBefore),
                     same(caseDetails),
+                    eq(CallbackResponse.class),
                     anyBoolean());
 
             final AboutToSubmitCallbackResponse response =
@@ -262,6 +272,7 @@ class CallbackInvokerTest {
                 caseEvent,
                 caseDetailsBefore,
                 caseDetails,
+                CallbackResponse.class,
                 true);
             assertThat(response.getState().get(), is(expectedState));
             assertEquals("description", response.getSignificantItem().getDescription());
@@ -274,12 +285,13 @@ class CallbackInvokerTest {
         void sendCallbackAndGetStateAndIncorrectSignificantDocument() {
             final String expectedState = "uNiCORn";
             CallbackResponse callbackResponse = mockCallbackResponseWithIncorrectSignificantItem(expectedState);
-            doReturn(Optional.of(callbackResponse)).when(callbackService)
+            doReturn(ResponseEntity.of(Optional.of(callbackResponse))).when(callbackService)
                 .send(any(),
                     any(),
                     same(caseEvent),
                     same(caseDetailsBefore),
                     same(caseDetails),
+                    eq(CallbackResponse.class),
                     anyBoolean());
             final AboutToSubmitCallbackResponse
                 response =
@@ -294,6 +306,7 @@ class CallbackInvokerTest {
                 caseEvent,
                 caseDetailsBefore,
                 caseDetails,
+                CallbackResponse.class,
                 true);
             assertThat(response.getState().get(), is(expectedState));
             assertNull(response.getSignificantItem());
@@ -354,7 +367,8 @@ class CallbackInvokerTest {
                 caseEvent,
                 caseDetailsBefore,
                 caseDetails,
-                AfterSubmitCallbackResponse.class);
+                AfterSubmitCallbackResponse.class,
+                false);
         }
     }
 
@@ -483,6 +497,7 @@ class CallbackInvokerTest {
             final Map<String, JsonNode> newFieldsDataClassification = Maps.newHashMap();
             final Map<String, JsonNode> allFieldsDataClassification = Maps.newHashMap();
             final CallbackResponse callbackResponse = new CallbackResponse();
+            final ResponseEntity<CallbackResponse> responseEntity = ResponseEntity.<CallbackResponse>of(Optional.of(callbackResponse));
             final Map<String, JsonNode> data = new HashMap<>();
 
             @BeforeEach
@@ -502,7 +517,8 @@ class CallbackInvokerTest {
                     caseEvent,
                     caseDetailsBefore,
                     caseDetails,
-                    TRUE)).thenReturn(Optional.of(callbackResponse));
+                    CallbackResponse.class,
+                    TRUE)).thenReturn(responseEntity);
                 when(caseSanitiser.sanitise(eq(caseType), eq(caseDetails.getData()))).thenReturn(data);
                 when(caseDataService.getDefaultSecurityClassifications(eq(caseType),
                     eq(caseDetails.getData()),
