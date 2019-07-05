@@ -169,7 +169,6 @@ public class CaseField implements Serializable, CommonField {
         clearACLsForMissingComplexACLs();
     }
 
-    @JsonIgnore
     private void applyComplexACLs() {
         this.complexACLs.forEach(complexACL -> {
             final CaseField nestedField = (CaseField) this.getComplexFieldNestedField(complexACL.getListElementCode())
@@ -182,7 +181,6 @@ public class CaseField implements Serializable, CommonField {
         });
     }
 
-    @JsonIgnore
     private void clearACLsForMissingComplexACLs() {
         if (this.isCompound()) {
             final List<String> allPaths = buildAllDottedComplexFieldPossibilities(this.getFieldType().getChildren());
@@ -199,7 +197,6 @@ public class CaseField implements Serializable, CommonField {
         }
     }
 
-    @JsonIgnore
     private void removeACLS(final List<String> siblingsWithNoComplexACLs, final String role) {
         siblingsWithNoComplexACLs.stream().forEach(s -> {
             final CaseField nestedElement = (CaseField) this.getComplexFieldNestedField(s)
@@ -209,7 +206,6 @@ public class CaseField implements Serializable, CommonField {
         });
     }
 
-    @JsonIgnore
     private List<String> findSiblingsWithNoComplexACLs(final List<String> siblings) {
         return siblings
             .stream()
@@ -217,7 +213,6 @@ public class CaseField implements Serializable, CommonField {
             .collect(toList());
     }
 
-    @JsonIgnore
     private List<String> filterSiblings(String parent, String me, List<String> allPaths) {
         if (parent.equalsIgnoreCase("")) {
             return allPaths
@@ -236,13 +231,11 @@ public class CaseField implements Serializable, CommonField {
         }
     }
 
-    @JsonIgnore
     private boolean isNotAChild(final String parent, final String s) {
         return s.indexOf('.', parent.length()) == parent.length()
             && (s.split("\\.").length == parent.split("\\.").length + 1);
     }
 
-    @JsonIgnore
     private Optional<String> getParentPath(String path) {
         return path.lastIndexOf('.') > 0 ? Optional.of(path.substring(0, path.lastIndexOf('.'))) : Optional.empty();
     }
@@ -252,7 +245,6 @@ public class CaseField implements Serializable, CommonField {
         return this.accessControlLists.stream().filter(acl -> acl.getRole().equalsIgnoreCase(role)).findFirst();
     }
 
-    @JsonIgnore
     private static void propagateACLsToNestedFields(CaseField caseField, List<AccessControlList> acls) {
         if (caseField.isCompound()) {
             caseField.getFieldType().getChildren().forEach(nestedField -> {
@@ -263,7 +255,6 @@ public class CaseField implements Serializable, CommonField {
         }
     }
 
-    @JsonIgnore
     private List<String> buildAllDottedComplexFieldPossibilities(List<CaseField> caseFieldEntities) {
         List<String> allSubTypePossibilities = new ArrayList<>();
         List<CaseField> fieldEntities = caseFieldEntities.stream()
@@ -273,7 +264,6 @@ public class CaseField implements Serializable, CommonField {
         return allSubTypePossibilities;
     }
 
-    @JsonIgnore
     private void prepare(List<String> allSubTypePossibilities,
                          String startingString,
                          List<CaseField> caseFieldEntities) {
@@ -297,7 +287,6 @@ public class CaseField implements Serializable, CommonField {
         });
     }
 
-    @JsonIgnore
     private boolean isCollection(CaseField caseField) {
         return caseField.getFieldType().getCollectionFieldType() != null
             && caseField.getFieldType().getCollectionFieldType().getComplexFields() != null

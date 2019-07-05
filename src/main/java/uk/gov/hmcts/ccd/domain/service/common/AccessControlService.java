@@ -146,14 +146,14 @@ public class AccessControlService {
     public JsonNode filterCaseFieldsByAccess(final JsonNode caseFields, final List<CaseField> caseFieldDefinitions,
                                              final Set<String> userRoles, final Predicate<AccessControlList> access,
                                              boolean isClassification) {
-        JsonNode filteredCaseFields = JSON_NODE_FACTORY.objectNode();
+        ObjectNode filteredCaseFields = JSON_NODE_FACTORY.objectNode();
         getStream(caseFields).forEach(
             fieldName -> findCaseFieldAndVerifyHasAccess(fieldName, caseFieldDefinitions, userRoles, access)
                 .ifPresent(caseField -> {
                     if (isEmpty(caseField.getComplexACLs())) {
-                        ((ObjectNode) filteredCaseFields).set(fieldName, caseFields.get(fieldName));
+                        filteredCaseFields.set(fieldName, caseFields.get(fieldName));
                     } else if (!isClassification) {
-                        ((ObjectNode) filteredCaseFields).set(fieldName, filterChildren(caseField, caseFields.get(fieldName), userRoles, access, isClassification));
+                        filteredCaseFields.set(fieldName, filterChildren(caseField, caseFields.get(fieldName), userRoles, access, isClassification));
                     }
                 })
         );

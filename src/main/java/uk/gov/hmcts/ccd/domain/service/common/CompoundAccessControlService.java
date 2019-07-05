@@ -55,11 +55,7 @@ public class CompoundAccessControlService {
         }
         boolean createDenied = false;
         if (caseField.isCollectionFieldType() && data.size() > 0) {
-            for (JsonNode node : data) {
-                createDenied = isCreateDeniedForAnyChildNode(caseField, userRoles, node);
-                if (createDenied)
-                    break;
-            }
+            createDenied = StreamSupport.stream(data.spliterator(), false).anyMatch(node -> isCreateDeniedForAnyChildNode(caseField, userRoles, node));
         } else if (caseField.isComplexFieldType() && data != null) {
             createDenied = isCreateDeniedForAnyChildNode(caseField, userRoles, data);
         }
@@ -107,11 +103,9 @@ public class CompoundAccessControlService {
     private boolean isDeleteDeniedForChildren(final JsonNode existingData, final JsonNode newData, final CaseField caseField, final Set<String> userRoles) {
         boolean deleteDenied = false;
         if (caseField.isCollectionFieldType() && existingData.size() > 0) {
-            for (JsonNode existingNode : existingData) {
-                deleteDenied = isCurrentNodeOrAnyChildNodeDeletedWithoutAccess(newData, caseField, userRoles, existingNode);
-                if (deleteDenied)
-                    break;
-            }
+            deleteDenied = StreamSupport
+                .stream(existingData.spliterator(), false)
+                .anyMatch(existingNode -> isCurrentNodeOrAnyChildNodeDeletedWithoutAccess(newData, caseField, userRoles, existingNode));
         } else {
             deleteDenied = isAnyChildOfComplexNodeDeletedWithoutAccess(existingData, newData, caseField, userRoles);
         }
@@ -157,8 +151,7 @@ public class CompoundAccessControlService {
 
     private boolean itemUpdatedAndHasUpdateAccess(JsonNode existingData, JsonNode newData, CaseField caseField, Set<String> userRoles) {
         if (caseField.isCollectionFieldType()) {
-            boolean containsUpdatedItem = StreamSupport
-                .stream(spliteratorUnknownSize(existingData.get(caseField.getId()).elements(), Spliterator.ORDERED), false)
+            boolean containsUpdatedItem = StreamSupport.stream(spliteratorUnknownSize(existingData.get(caseField.getId()).elements(), Spliterator.ORDERED), false)
                 .anyMatch(oldItem -> itemUpdated(oldItem, newData.get(caseField.getId()), caseField, userRoles));
             return !containsUpdatedItem;
         } else {
@@ -248,13 +241,13 @@ public class CompoundAccessControlService {
     }
 
     private boolean isSimpleFieldValueReallyUpdated(final JsonNode oldNode, final JsonNode newNode, final CaseField field) {
-        if (oldNode.get(field.getId()) == null && newNode.get(field.getId()) != null && newNode.get(field.getId()).isNull()) {
+        if (oldNode.get(field.getId()) == null && newNode.get(field.getId()) == null) {
+            return false; // nothing changed if both null
+        } else if (oldNode.get(field.getId()) == null && newNode.get(field.getId()).isNull()) {
             // We mark fields (and subfields) with no UPDATE as READONLY, this causes "null" value to be submitted
             // when the old value is null and new value is sent as "null" due to the above requirement,
             // this mustn't be interpreted as an update
             return false;
-        } else if (oldNode.get(field.getId()) == null && newNode.get(field.getId()) == null) {
-            return false; // nothing changed if both null
         }
         return !oldNode.get(field.getId()).equals(newNode.get(field.getId()));
     }
