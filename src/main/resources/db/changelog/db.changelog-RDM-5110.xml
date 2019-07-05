@@ -8,7 +8,7 @@
              endDelimiter="\nGO"
              splitStatements="true"
              stripComments="true">
-            CREATE UNIQUE INDEX uidx_case_data_external_id ON public.case_data USING BTREE ((TRIM(UPPER(data#>>'{externalId}'))));
+            CREATE UNIQUE INDEX uidx_case_data_external_id ON public.case_data USING BTREE ((TRIM(UPPER(data#>>'{externalId}')))) where jurisdiction = 'CMC';
         </sql>
     </changeSet>
 </databaseChangeLog>
