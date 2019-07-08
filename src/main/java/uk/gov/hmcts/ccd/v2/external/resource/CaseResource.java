@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.springframework.hateoas.ResourceSupport;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
+import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.v2.external.controller.CaseController;
@@ -51,6 +52,27 @@ public class CaseResource extends ResourceSupport {
     @JsonProperty("data_classification")
     private Map<String, JsonNode> dataClassification;
 
+    @JsonProperty("after_submit_callback_response")
+    @SuppressWarnings("squid:common-java:DuplicatedBlocks")
+    private AfterSubmitCallbackResponse afterSubmitCallbackResponse;
+
+    @JsonProperty("callback_response_status_code")
+    @SuppressWarnings("squid:common-java:DuplicatedBlocks")
+    private Integer callbackResponseStatusCode;
+
+    @JsonProperty("callback_response_status")
+    @SuppressWarnings("squid:common-java:DuplicatedBlocks")
+    private String callbackResponseStatus;
+
+    @JsonProperty("delete_draft_response_status_code")
+    @SuppressWarnings("squid:common-java:DuplicatedBlocks")
+    private Integer deleteDraftResponseStatusCode;
+
+    @JsonProperty("delete_draft_response_status")
+    @SuppressWarnings("squid:common-java:DuplicatedBlocks")
+    private String deleteDraftResponseStatus;
+
+
     public CaseResource(@NonNull CaseDetails caseDetails) {
         copyProperties(caseDetails);
 
@@ -73,5 +95,10 @@ public class CaseResource extends ResourceSupport {
         this.securityClassification = caseDetails.getSecurityClassification();
         this.data = caseDetails.getData();
         this.dataClassification = caseDetails.getDataClassification();
+        this.afterSubmitCallbackResponse = caseDetails.getAfterSubmitCallbackResponse();
+        this.callbackResponseStatusCode = caseDetails.getCallbackResponseStatusCode();
+        this.callbackResponseStatus = caseDetails.getCallbackResponseStatus();
+        this.deleteDraftResponseStatusCode = caseDetails.getDeleteDraftResponseStatusCode();
+        this.deleteDraftResponseStatus = caseDetails.getDeleteDraftResponseStatus();
     }
 }
