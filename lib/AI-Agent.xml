@@ -75,5 +75,8 @@
         <Class name="uk.gov.hmcts.ccd.domain.types.sanitiser.client.DocumentManagementRestClient">
             <Method name="getDocument"/>
         </Class>
+        <Class name="uk.gov.hmcts.ccd.data.casedetails.search.SearchQueryFactoryOperation">
+            <Method name="build"/>
+        </Class>
     </Instrumentation>
 </ApplicationInsightsAgent>
