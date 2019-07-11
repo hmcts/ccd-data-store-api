@@ -25,6 +25,7 @@ public class RestTemplateProvider {
     public RestTemplate provide(Integer timeoutInSeconds) {
         LOG.info("Building rest template with read timeoutInSeconds interval {}", timeoutInSeconds);
         final HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
+        requestFactory.setConnectionRequestTimeout(secondsToMilliseconds(timeoutInSeconds));
         requestFactory.setReadTimeout(secondsToMilliseconds(timeoutInSeconds));
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.setRequestFactory(requestFactory);

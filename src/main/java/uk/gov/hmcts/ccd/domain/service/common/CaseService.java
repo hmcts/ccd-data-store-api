@@ -63,7 +63,7 @@ public class CaseService {
     /**
      * @param content Data received from the client.
      * @param caseDetails of the case.
-     * @return <code>Optional&lt;CaseDetails&gt;<code/> - CaseDetails wrapped in Optional
+     * @return CaseDetails - CaseDetails wrapped in Optional
      */
     public CaseDetails populateCurrentCaseDetailsWithEventFields(CaseDataContent content, CaseDetails caseDetails) {
 
