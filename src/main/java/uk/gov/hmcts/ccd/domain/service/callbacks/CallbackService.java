@@ -95,6 +95,7 @@ public class CallbackService {
         return Optional.ofNullable(send(url, callbackRetryTimeouts, caseEvent, caseDetailsBefore, caseDetails, CallbackResponse.class, false).getBody());
     }
 
+    @SuppressWarnings("javasecurity:S5145")
     public <T> ResponseEntity<T> send(final String url,
                                       final List<Integer> callbackRetryTimeouts,
                                       final CaseEvent caseEvent,
