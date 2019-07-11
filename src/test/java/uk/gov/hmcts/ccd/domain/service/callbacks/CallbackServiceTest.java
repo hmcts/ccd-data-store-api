@@ -1,6 +1,14 @@
 package uk.gov.hmcts.ccd.domain.service.callbacks;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.StatusLine;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.entity.EntityBuilder;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -8,13 +16,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.server.ServerErrorException;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
@@ -23,6 +26,8 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -38,9 +43,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
@@ -54,9 +56,11 @@ public class CallbackServiceTest {
     @Mock
     private ApplicationParams applicationParams;
     @Mock
-    private RestTemplateProvider restTemplateProvider;
+    private CloseableHttpClient httpClient;
     @Mock
-    private RestTemplate restTemplate;
+    private CloseableHttpResponse closeableHttpResponse;
+    @Mock
+    private StatusLine statusLine;
 
     private CallbackService callbackService;
 
@@ -65,11 +69,12 @@ public class CallbackServiceTest {
     private final String testUrl = "http://localhost:/test-callback";
     private final CaseDetails caseDetails = new CaseDetails();
     private final CaseEvent caseEvent = new CaseEvent();
+    private HttpEntity httpEntity;
     private final CallbackResponse callbackResponse = aCallbackResponse().build();
     private final ResponseEntity<CallbackResponse> response = ResponseEntity.ok(callbackResponse);
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws IOException {
         MockitoAnnotations.initMocks(this);
 
         caseDetails.setState("test state");
@@ -79,12 +84,18 @@ public class CallbackServiceTest {
 
         callbackResponse.setData(caseDetails.getData());
 
+        InputStream stubInputStream =
+            IOUtils.toInputStream("{\"data\":{\"TextField0\":\"TextField0\"}}", "UTF-8");
+        httpEntity = EntityBuilder.create().setStream(stubInputStream).build();
+
         doReturn(new HttpHeaders()).when(securityUtils).authorizationHeaders();
-        doReturn(restTemplate).when(restTemplateProvider).provide(anyInt());
-        doReturn(response).when(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(CallbackResponse.class));
+        doReturn(closeableHttpResponse).when(httpClient).execute(any(HttpPost.class));
+        doReturn(statusLine).when(closeableHttpResponse).getStatusLine();
+        doReturn(httpEntity).when(closeableHttpResponse).getEntity();
+        doReturn(200).when(statusLine).getStatusCode();
         doReturn(defaultCallbackRetryIntervals).when(applicationParams).getCallbackRetryIntervalsInSeconds();
         doReturn(defaultCallbackReadTimeout).when(applicationParams).getCallbackReadTimeoutInMillis();
-        callbackService = new CallbackService(securityUtils, applicationParams, restTemplateProvider);
+        callbackService = new CallbackService(securityUtils, applicationParams, httpClient);
     }
 
     @Nested
@@ -98,26 +109,26 @@ public class CallbackServiceTest {
 
             Assertions.assertAll(
                 () -> assertTrue(response.getErrors().isEmpty()),
-                () -> verify(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(CallbackResponse.class)),
-                () -> verifyNoMoreInteractions(restTemplate)
+                () -> verify(httpClient).execute(any(HttpPost.class)),
+                () -> verifyNoMoreInteractions(httpClient)
             );
         }
 
         @Test
         @DisplayName("Should retry if callback responds late")
-        public void shouldRetryIfCallbackRespondsLate() {
-            doThrow(RestClientException.class)
-                .doThrow(RestClientException.class)
-                .doReturn(response)
-                .when(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(CallbackResponse.class));
+        public void shouldRetryIfCallbackRespondsLate() throws IOException {
+            doThrow(ClientProtocolException.class)
+                .doThrow(ClientProtocolException.class)
+                .doReturn(closeableHttpResponse)
+                .when(httpClient).execute(any(HttpPost.class));
 
             Instant start = Instant.now();
             callbackService.send(testUrl, null, caseEvent, caseDetails);
 
             final Duration between = Duration.between(start, Instant.now());
             Assertions.assertAll(
-                () -> verify(restTemplate, times(3)).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(CallbackResponse.class)),
-                () -> verifyNoMoreInteractions(restTemplate),
+                () -> verify(httpClient, times(3)).execute(any(HttpPost.class)),
+                () -> verifyNoMoreInteractions(httpClient),
                 () -> assertThat((int) between.toMillis(), greaterThan(4000))
             );
         }
@@ -136,17 +147,17 @@ public class CallbackServiceTest {
             Assertions.assertAll(
                 () -> assertTrue(response.getErrors().isEmpty()),
                 () -> assertTrue(response.getWarnings().isEmpty()),
-                () -> verify(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(CallbackResponse.class)),
-                () -> verifyNoMoreInteractions(restTemplate)
+                () -> verify(httpClient).execute(any(HttpPost.class)),
+                () -> verifyNoMoreInteractions(httpClient)
             );
         }
 
         @Test
         @DisplayName("Should return with no errors or warnings and callback respond on second try")
-        public void shouldReturnWithOneRetries() {
-            doThrow(RestClientException.class)
-                .doReturn(response)
-                .when(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(CallbackResponse.class));
+        public void shouldReturnWithOneRetries() throws IOException {
+            doThrow(ClientProtocolException.class)
+                .doReturn(closeableHttpResponse)
+                .when(httpClient).execute(any(HttpPost.class));
 
             final Optional<CallbackResponse> result = callbackService.send(testUrl, Lists.newArrayList(500, 1000), caseEvent, caseDetails);
             final CallbackResponse response = result.orElseThrow(() -> new AssertionError("Missing result"));
@@ -154,18 +165,18 @@ public class CallbackServiceTest {
             Assertions.assertAll(
                 () -> assertTrue(response.getErrors().isEmpty()),
                 () -> assertTrue(response.getWarnings().isEmpty()),
-                () -> verify(restTemplate, times(2)).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(CallbackResponse.class)),
-                () -> verifyNoMoreInteractions(restTemplate)
+                () -> verify(httpClient, times(2)).execute(any(HttpPost.class)),
+                () -> verifyNoMoreInteractions(httpClient)
             );
         }
 
         @Test
         @DisplayName("Should return with no errors or warnings and callback respond on third retry")
-        public void shouldRetryIfCallbackRespondsAfterTwoRetries() {
-            doThrow(RestClientException.class)
-                .doThrow(RestClientException.class)
-                .doReturn(response)
-                .when(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(CallbackResponse.class));
+        public void shouldRetryIfCallbackRespondsAfterTwoRetries() throws IOException {
+            doThrow(ClientProtocolException.class)
+                .doThrow(ClientProtocolException.class)
+                .doReturn(closeableHttpResponse)
+                .when(httpClient).execute(any(HttpPost.class));
 
             final Optional<CallbackResponse> result = callbackService.send(testUrl, Lists.newArrayList(500, 1000, 1500), caseEvent, caseDetails);
             final CallbackResponse response = result.orElseThrow(() -> new AssertionError("Missing result"));
@@ -173,15 +184,18 @@ public class CallbackServiceTest {
             Assertions.assertAll(
                 () -> assertTrue(response.getErrors().isEmpty()),
                 () -> assertTrue(response.getWarnings().isEmpty()),
-                () -> verify(restTemplate, times(3)).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(CallbackResponse.class)),
-                () -> verifyNoMoreInteractions(restTemplate)
+                () -> verify(httpClient, times(3)).execute(any(HttpPost.class)),
+                () -> verifyNoMoreInteractions(httpClient)
             );
         }
     }
 
     @Test
-    public void shouldReturnWithErrorsOrWarningsIfExist() {
-        callbackResponse.setErrors(Collections.singletonList("Test message"));
+    public void shouldReturnWithErrorsOrWarningsIfExist() throws IOException {
+        InputStream stubInputStream =
+            IOUtils.toInputStream("{\"errors\":[\"Test message\"]}", "UTF-8");
+        httpEntity = EntityBuilder.create().setStream(stubInputStream).build();
+        doReturn(httpEntity).when(closeableHttpResponse).getEntity();
 
         final Optional<CallbackResponse> result = callbackService.send(testUrl, null, caseEvent, caseDetails);
 
@@ -191,21 +205,21 @@ public class CallbackServiceTest {
     }
 
     @Test
-    public void shouldFailIfCallbackCallFailsForeverWithRestClientException() {
-        doThrow(RestClientException.class)
-            .when(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(CallbackResponse.class));
+    public void shouldFailIfCallbackCallFailsForeverWithRestClientException() throws IOException {
+        doThrow(ClientProtocolException.class)
+            .when(httpClient).execute(any(HttpPost.class));
 
         CallbackException callbackException = assertThrows(CallbackException.class, () -> callbackService.send(testUrl, null, caseEvent, caseDetails));
         assertThat(callbackException.getMessage(), is(equalTo("Unsuccessful callback to http://localhost:/test-callback")));
     }
 
     @Test
-    public void shouldFailIfCallbackCallFailsFirstTimeWithNonRestClientException() {
-        doThrow(ServerErrorException.class)
-            .doReturn(response)
-            .when(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(CallbackResponse.class));
+    public void shouldFailIfCallbackCallFailsFirstTimeWithNonRestClientException() throws IOException {
+        doThrow(IllegalArgumentException.class)
+            .doReturn(closeableHttpResponse)
+            .when(httpClient).execute(any(HttpPost.class));
 
-        assertThrows(ServerErrorException.class, () -> callbackService.send(testUrl, null, caseEvent, caseDetails));
+        assertThrows(IllegalArgumentException.class, () -> callbackService.send(testUrl, null, caseEvent, caseDetails));
     }
 
     @Test
