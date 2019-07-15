@@ -241,9 +241,8 @@ public class CompoundAccessControlService {
     }
 
     private boolean isSimpleFieldValueReallyUpdated(final JsonNode oldNode, final JsonNode newNode, final CaseField field) {
-        if (oldNode.get(field.getId()) == null && newNode.get(field.getId()) == null) {
-            return false; // nothing changed if both null
-        } else if (oldNode.get(field.getId()) == null && newNode.get(field.getId()).isNull()) {
+        if (oldNode.get(field.getId()) == null && (newNode.get(field.getId()) == null || newNode.get(field.getId()).isNull())) {
+            // If both null, then nothing changed
             // We mark fields (and subfields) with no UPDATE as READONLY, this causes "null" value to be submitted
             // when the old value is null and new value is sent as "null" due to the above requirement,
             // this mustn't be interpreted as an update

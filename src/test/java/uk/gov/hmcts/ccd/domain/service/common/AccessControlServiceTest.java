@@ -15,6 +15,8 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.MANDATORY;
+import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.OPTIONAL;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.READONLY;
 import static uk.gov.hmcts.ccd.domain.model.definition.CaseFieldTest.findNestedField;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
@@ -32,8 +34,11 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBu
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.ComplexACLBuilder.aComplexACL;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageBuilder.newWizardPage;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageComplexFieldOverrideBuilder.newWizardPageComplexFieldOverride;
 
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
@@ -2390,7 +2395,7 @@ public class AccessControlServiceTest {
             assertAll(
                 () -> assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext", is(READONLY)))),
                 () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Line1"), hasProperty("displayContext", is(READONLY))),
-                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0),"Line2"), hasProperty("displayContext", is(READONLY)))
+                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Line2"), hasProperty("displayContext", is(READONLY)))
             );
         }
 
@@ -2481,6 +2486,111 @@ public class AccessControlServiceTest {
                 () -> assertThat(eventTrigger.getCaseFields().get(0).getDisplayContext(), not(READONLY)),
                 () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Line1"), not(hasProperty("displayContext", is(READONLY)))),
                 () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Line2"), not(hasProperty("displayContext", is(READONLY))))
+            );
+        }
+
+        @Test
+        @DisplayName("Should set readonly flag for complex children and complex field overrides if relevant acl is missing")
+        void shouldSetReadonlyFlagForComplexChildrenIfRelevantAclIsMissing() throws IOException {
+            final CaseType caseType = newCaseType()
+                .withField(newCaseField()
+                    .withFieldType(aFieldType()
+                        .withType(COMPLEX)
+                        .withComplexField(
+                            newCaseField()
+                                .withFieldType(
+                                    aFieldType()
+                                        .withType("Text")
+                                        .withId("Text")
+                                        .build())
+                                .withId("Line1")
+                                .build())
+                        .withComplexField(
+                            newCaseField()
+                                .withFieldType(
+                                    aFieldType()
+                                        .withType("Text")
+                                        .withId("Text")
+                                        .build())
+                                .withId("Line2")
+                                .build())
+                        .build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .withUpdate(true)
+                        .withRead(true)
+                        .build())
+                    .withComplexACL(
+                        aComplexACL()
+                            .withListElementCode("Line1")
+                            .withRole(ROLE_IN_USER_ROLES)
+                            .withUpdate(true)
+                            .build())
+                    .withComplexACL(
+                        aComplexACL()
+                            .withListElementCode("Line2")
+                            .withRole(ROLE_IN_USER_ROLES)
+                            .withUpdate(false)
+                            .build())
+                    .build())
+                .build();
+            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+
+            final CaseViewField caseViewField1 = aViewField()
+                .withFieldType(aFieldType()
+                    .withType(COMPLEX)
+                    .withComplexField(
+                        newCaseField()
+                            .withFieldType(
+                                aFieldType()
+                                    .withType("Text")
+                                    .withId("Text")
+                                    .build())
+                            .withId("Line1")
+                            .build())
+                    .withComplexField(
+                        newCaseField()
+                            .withFieldType(
+                                aFieldType()
+                                    .withType("Text")
+                                    .withId("Text")
+                                    .build())
+                            .withId("Line2")
+                            .build())
+                    .build())
+                .withId("Addresses")
+                .build();
+            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
+                .withField(caseViewField1)
+                .withWizardPage(newWizardPage()
+                    .withId("Page One")
+                    .withField(caseViewField1, asList(
+                        newWizardPageComplexFieldOverride()
+                            .withComplexFieldId("Addresses.Line1")
+                            .withDisplayContext(OPTIONAL)
+                            .build(),
+                        newWizardPageComplexFieldOverride()
+                            .withComplexFieldId("Addresses.Line2")
+                            .withDisplayContext(MANDATORY)
+                            .build()))
+                    .build()
+                )
+                .build();
+
+            CaseEventTrigger eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                caseEventTrigger,
+                caseType.getCaseFields(),
+                USER_ROLES,
+                CAN_UPDATE);
+
+            assertAll(
+                () -> assertThat(eventTrigger.getCaseFields().get(0).getDisplayContext(), not(READONLY)),
+                () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Line1").orElseThrow(() -> new RuntimeException("Line 2 is not there")), not(hasProperty("displayContext", is(READONLY)))),
+                () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Line2").orElseThrow(() -> new RuntimeException("Line 2 is not there")), hasProperty("displayContext", is(READONLY))),
+                () -> assertThat(eventTrigger.getWizardPages().get(0).getWizardPageFields().get(0).getComplexFieldOverrides().get(0).getDisplayContext(), is(OPTIONAL)),
+                () -> assertThat(eventTrigger.getWizardPages().get(0).getWizardPageFields().get(0).getComplexFieldOverrides().get(1).getDisplayContext(), is(READONLY))
             );
         }
 
@@ -2577,7 +2687,7 @@ public class AccessControlServiceTest {
 
             assertAll(
                 () -> assertThat(eventTrigger.getCaseFields().get(0), not(hasProperty("displayContext", is(READONLY)))),
-                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0),"Addresses"), not(hasProperty("displayContext", is(READONLY)))),
+                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Addresses"), not(hasProperty("displayContext", is(READONLY)))),
                 () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Addresses.Line1"), hasProperty("displayContext", is(READONLY))),
                 () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Addresses.Line2"), hasProperty("displayContext", is(READONLY)))
             );

@@ -13,6 +13,8 @@ import static java.util.Objects.nonNull;
 import static java.util.Spliterators.spliteratorUnknownSize;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.util.CollectionUtils.isEmpty;
+import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.MANDATORY;
+import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.OPTIONAL;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.READONLY;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
 
@@ -228,7 +230,7 @@ public class AccessControlService {
                         caseViewField.setDisplayContext(READONLY);
                     }
                     if (field.isCompound()) {
-                        setChildrenAsReadOnlyIfNoAccess(field, caseViewField, userRoles, access);
+                        setChildrenAsReadOnlyIfNoAccess(caseEventTrigger.getWizardPages(), field.getId(), field, access, userRoles, caseViewField);
                     }
                 } else {
                     caseViewField.setDisplayContext(READONLY);
@@ -237,17 +239,46 @@ public class AccessControlService {
         return caseEventTrigger;
     }
 
-    private void setChildrenAsReadOnlyIfNoAccess(final CaseField caseField, final CommonField caseViewField, final Set<String> userRoles, final Predicate<AccessControlList> access) {
+    private void setChildrenAsReadOnlyIfNoAccess(final List<WizardPage> wizardPages, final String rootFieldId, final CaseField caseField, final Predicate<AccessControlList> access, final Set<String> userRoles, final CommonField caseViewField) {
         if (caseField.isCompound()) {
             caseField.getFieldType().getChildren().stream().forEach(childField -> {
                 if (!hasAccessControlList(userRoles, access, childField.getAccessControlLists())) {
                     findNestedField(caseViewField, childField.getId()).setDisplayContext(READONLY);
+                    Optional<WizardPageField> optionalWizardPageField = getWizardPageField(wizardPages, rootFieldId);
+                    if (optionalWizardPageField.isPresent()) {
+                        setOverrideAsReadOnlyIfNotReadOnly(optionalWizardPageField.get(), rootFieldId, childField);
+                    }
                 }
                 if (childField.isCompound()) {
-                    setChildrenAsReadOnlyIfNoAccess(childField, findNestedField(caseViewField, childField.getId()), userRoles, access);
+                    setChildrenAsReadOnlyIfNoAccess(wizardPages, rootFieldId, childField, access, userRoles, findNestedField(caseViewField, childField.getId()));
                 }
             });
         }
+    }
+
+    private void setOverrideAsReadOnlyIfNotReadOnly(final WizardPageField wizardPageField, final String rootFieldId, final CaseField field) {
+        final Optional<WizardPageComplexFieldOverride> fieldOverrideOptional = getWizardPageComplexFieldOverride(wizardPageField, rootFieldId, field);
+        if (fieldOverrideOptional.isPresent()) {
+            WizardPageComplexFieldOverride override = fieldOverrideOptional.get();
+            if (MANDATORY.equalsIgnoreCase(override.getDisplayContext()) || OPTIONAL.equalsIgnoreCase(override.getDisplayContext())) {
+                override.setDisplayContext(READONLY);
+            }
+        }
+    }
+
+    private Optional<WizardPageComplexFieldOverride> getWizardPageComplexFieldOverride(final WizardPageField wizardPageField, final String rootFieldId, final CaseField field) {
+        return wizardPageField.getComplexFieldOverrides()
+                .stream()
+                .filter(wpcfo -> wpcfo.getComplexFieldElementId().startsWith(rootFieldId)
+                    && wpcfo.getComplexFieldElementId().contains("." + field.getId()))
+                .findFirst();
+    }
+
+    private Optional<WizardPageField> getWizardPageField(final List<WizardPage> wizardPages, final String rootFieldId) {
+        return wizardPages.stream()
+            .filter(wizardPage -> wizardPage.getWizardPageFields().stream().anyMatch(wizardPageField -> wizardPageField.getCaseFieldId().equalsIgnoreCase(rootFieldId)))
+            .map(wizardPage -> wizardPage.getWizardPageFields().stream().filter(wizardPageField -> wizardPageField.getCaseFieldId().equalsIgnoreCase(rootFieldId)).findFirst().get())
+            .findFirst();
     }
 
     public CaseEventTrigger filterCaseViewFieldsByAccess(final CaseEventTrigger caseEventTrigger,
