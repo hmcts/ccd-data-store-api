@@ -91,6 +91,9 @@ public class CaseDetailsEntity {
     @Convert(converter = uk.gov.hmcts.ccd.data.JSONBConverter.class)
     private JsonNode dataClassification;
 
+    @Version
+    private Integer version;
+
     public Long getId() {
         return id;
     }
@@ -178,5 +181,13 @@ public class CaseDetailsEntity {
 
     public void setDataClassification(JsonNode dataClassification) {
         this.dataClassification = dataClassification;
+    }
+
+    public Integer getVersion() {
+        return version;
+    }
+
+    public void setVersion(final Integer version) {
+        this.version = version;
     }
 }

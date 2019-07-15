@@ -5,6 +5,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
+import javax.persistence.LockTimeoutException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
@@ -26,6 +27,7 @@ import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.data.casedetails.search.SearchQueryFactoryOperation;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
@@ -102,9 +104,31 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
 
     @Override
     public Optional<CaseDetails> lockByReference(String jurisdiction, String reference) {
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("javax.persistence.lock.timeout", 0L);
         return find(jurisdiction, null, reference).map(entity -> {
-            em.lock(entity, LockModeType.PESSIMISTIC_WRITE);
+            try {
+                em.lock(entity, LockModeType.OPTIMISTIC, properties);
+            } catch (LockTimeoutException lte) {
+                throw new BadRequestException("This particular record is being updated by someone else. "
+                    + "Please click cancel and start over after a short while...");
+            }
             return this.caseDetailsMapper.entityToModel(entity);
+        });
+    }
+
+    @Override
+    public Optional<CaseDetails> lockByReference(final String reference) {
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("javax.persistence.lock.timeout", 0L);
+        return find(null, null, reference).map(caseDetails -> {
+            try {
+                em.lock(caseDetails, LockModeType.OPTIMISTIC, properties);
+            } catch (LockTimeoutException lte) {
+                throw new BadRequestException("This particular record is being updated by someone else. "
+                    + "Please click cancel and start over after a short while...");
+            }
+            return this.caseDetailsMapper.entityToModel(caseDetails);
         });
     }
 

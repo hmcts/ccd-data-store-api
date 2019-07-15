@@ -23,6 +23,8 @@ public interface CaseDetailsRepository {
 
     Optional<CaseDetails> lockByReference(String jurisdiction, String reference);
 
+    Optional<CaseDetails> lockByReference(String reference);
+
     /**
      *
      * @param id Internal case ID

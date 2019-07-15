@@ -92,6 +92,11 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     @Override
+    public Optional<CaseDetails> lockByReference(final String reference) {
+        return caseDetailsRepository.lockByReference(reference);
+    }
+
+    @Override
     public CaseDetails lockCase(final Long caseReference) {
         return caseDetailsRepository.lockCase(caseReference);
     }
