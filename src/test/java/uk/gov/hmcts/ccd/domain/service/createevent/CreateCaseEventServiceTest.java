@@ -139,7 +139,7 @@ class CreateCaseEventServiceTest {
         doReturn(true).when(caseTypeService).isJurisdictionValid(JURISDICTION_ID, caseType);
         doReturn(eventTrigger).when(eventTriggerService).findCaseEvent(caseType, EVENT_ID);
         doReturn(true).when(uidService).validateUID(CASE_REFERENCE);
-        doReturn(caseDetails).when(caseDetailsRepository).lockCase(Long.valueOf(CASE_REFERENCE));
+        doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).lockByReference(CASE_REFERENCE);
         doReturn(true).when(eventTriggerService).isPreStateValid(PRE_STATE_ID, eventTrigger);
         doReturn(caseDetails).when(caseDetailsRepository).set(caseDetails);
         doReturn(postState).when(caseTypeService).findState(caseType, POST_STATE);

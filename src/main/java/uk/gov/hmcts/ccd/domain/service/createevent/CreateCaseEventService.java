@@ -1,15 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
+import static java.lang.String.format;
+import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
+
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -26,7 +19,12 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
-import uk.gov.hmcts.ccd.domain.service.common.*;
+import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
+import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
+import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
@@ -36,19 +34,24 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
-import javax.inject.Inject;
-
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
+import javax.inject.Inject;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CreateCaseEventService {
-
-    private static final Logger LOG = LoggerFactory.getLogger(CreateCaseEventService.class);
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
@@ -139,7 +142,7 @@ public class CreateCaseEventService {
                                                final Event event) {
         final CaseEvent eventTrigger = eventTriggerService.findCaseEvent(caseType, event.getEventId());
         if (eventTrigger == null) {
-            throw new ValidationException(String.format("%s is not a known event ID for the specified case type %s", event.getEventId(), caseType.getId()));
+            throw new ValidationException(format("%s is not a known event ID for the specified case type %s", event.getEventId(), caseType.getId()));
         }
         return eventTrigger;
     }
@@ -148,7 +151,7 @@ public class CreateCaseEventService {
                                   final CaseEvent caseEvent) {
         if (!eventTriggerService.isPreStateValid(caseDetails.getState(), caseEvent)) {
             throw new ValidationException(
-                String.format(
+                format(
                     "Pre-state condition is not valid for case with state: %s; and event trigger: %s",
                     caseDetails.getState(),
                     caseEvent.getId()
@@ -161,19 +164,8 @@ public class CreateCaseEventService {
         if (!uidService.validateUID(caseReference)) {
             throw new BadRequestException("Case reference is not valid");
         }
-
-        final CaseDetails caseDetails;
-        try {
-            caseDetails = caseDetailsRepository.lockCase(Long.valueOf(caseReference));
-        } catch (NumberFormatException exception) {
-            throw new ResourceNotFoundException(
-                String.format("Case with reference %s could not be found", caseReference));
-        }
-        if (null == caseDetails) {
-            throw new ResourceNotFoundException(
-                String.format("Case with reference %s could not be found", caseReference));
-        }
-        return caseDetails;
+        return caseDetailsRepository.lockByReference(caseReference)
+            .orElseThrow(() -> new ResourceNotFoundException(format("Case with reference %s could not be found", caseReference)));
     }
 
     private CaseDetails saveCaseDetails(final CaseDetails caseDetails,
