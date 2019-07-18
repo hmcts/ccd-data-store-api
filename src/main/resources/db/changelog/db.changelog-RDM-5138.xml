@@ -6,6 +6,7 @@
         <addColumn tableName="case_data">
             <column name="version" type="integer" defaultValue="1"/>
         </addColumn>
+        <dropColumn tableName="case_data" columnName="locked_by_user_id"/>
     </changeSet>
 
 </databaseChangeLog>

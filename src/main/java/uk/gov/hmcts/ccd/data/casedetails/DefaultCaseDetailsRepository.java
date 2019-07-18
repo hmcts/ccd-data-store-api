@@ -7,7 +7,6 @@ import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.data.casedetails.search.SearchQueryFactoryOperation;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
@@ -22,8 +21,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
-import javax.persistence.LockTimeoutException;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
@@ -75,7 +72,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
             em.flush();
         } catch (StaleObjectStateException | OptimisticLockException e) {
             LOG.info("Optimistic Lock Exception: Case data has been altered", e);
-            throw new CaseConcurrencyException("The case data has been altered outside of this transaction");
+            throw new CaseConcurrencyException("The case data has been altered outside of this transaction.");
         } catch (PersistenceException e) {
             LOG.warn("Failed to store case details", e);
             if (e.getCause() instanceof ConstraintViolationException) {
@@ -103,29 +100,6 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     @Override
     public Optional<CaseDetails> findByReference(String caseReference) {
         return findByReference(null, caseReference);
-    }
-
-    @Override
-    public Optional<CaseDetails> lockByReference(String jurisdiction, Long reference) {
-        return lockByReference(jurisdiction, reference.toString());
-    }
-
-    @Override
-    public Optional<CaseDetails> lockByReference(String jurisdiction, String reference) {
-        return lockByReference(reference);
-    }
-
-    @Override
-    public Optional<CaseDetails> lockByReference(final String reference) {
-        return find(null, null, reference).map(caseDetails -> {
-            try {
-                em.lock(caseDetails, LockModeType.OPTIMISTIC);
-            } catch (LockTimeoutException lte) {
-                throw new BadRequestException("This particular record is being updated by someone else. "
-                    + "Please click cancel and start over after a short while...");
-            }
-            return this.caseDetailsMapper.entityToModel(caseDetails);
-        });
     }
 
     /**
@@ -163,17 +137,6 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
                                       final String caseTypeId,
                                       final String reference) {
         return findByReference(jurisdiction, reference).orElse(null);
-    }
-
-    /**
-     * @param reference Case unique 16-digit reference
-     * @return Case details if found; throw NotFound exception otherwise
-     * @deprecated Use {@link DefaultCaseDetailsRepository#lockByReference(String, Long)} instead
-     */
-    @Override
-    @Deprecated
-    public CaseDetails lockCase(final Long reference) {
-        return lockByReference(null, reference).orElseThrow(() -> new ResourceNotFoundException("No case found"));
     }
 
     @Override

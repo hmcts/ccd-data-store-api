@@ -1,21 +1,24 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
-import javax.inject.Inject;
+import static com.google.common.collect.Maps.newHashMap;
+import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
+
+import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
+import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.google.common.collect.Maps.newHashMap;
-import static java.lang.String.format;
+import javax.inject.Inject;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
-import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
-import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
 @Service
 @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
@@ -51,16 +54,13 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
 
     @Override
     public CaseDetails findById(final Long id) {
-        return idToCaseDetails.computeIfAbsent(id, key -> Optional.ofNullable(caseDetailsRepository.findById(id)))
-                              .orElse(null);
+        return idToCaseDetails.computeIfAbsent(id, key -> ofNullable(caseDetailsRepository.findById(id))).orElse(null);
     }
 
     @Override
     public CaseDetails findByReference(final Long caseReference) {
-        final Function<String, Optional<CaseDetails>> findFunction = key -> Optional.ofNullable(
-            caseDetailsRepository.findByReference(caseReference));
-        return referenceToCaseDetails.computeIfAbsent(caseReference.toString(), findFunction)
-                                     .orElse(null);
+        final Function<String, Optional<CaseDetails>> findFunction = key -> ofNullable(caseDetailsRepository.findByReference(caseReference));
+        return referenceToCaseDetails.computeIfAbsent(caseReference.toString(), findFunction).orElse(null);
     }
 
     @Override
@@ -70,64 +70,32 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
 
     @Override
     public Optional<CaseDetails> findByReference(String jurisdiction, String reference) {
-        return referenceToCaseDetails.computeIfAbsent(reference,
-                                                      key -> caseDetailsRepository.findByReference(jurisdiction,
-                                                                                                     reference));
+        return referenceToCaseDetails.computeIfAbsent(reference, key -> caseDetailsRepository.findByReference(jurisdiction, reference));
     }
 
     @Override
     public Optional<CaseDetails> findByReference(String reference) {
-        return referenceToCaseDetails.computeIfAbsent(reference,
-                                                      key -> caseDetailsRepository.findByReference(reference));
+        return referenceToCaseDetails.computeIfAbsent(reference, key -> caseDetailsRepository.findByReference(reference));
     }
 
     @Override
-    public Optional<CaseDetails> lockByReference(String jurisdiction, Long reference) {
-        return lockByReference(jurisdiction, reference.toString());
-    }
-
-    @Override
-    public Optional<CaseDetails> lockByReference(String jurisdiction, String reference) {
-        return caseDetailsRepository.lockByReference(jurisdiction, reference);
-    }
-
-    @Override
-    public Optional<CaseDetails> lockByReference(final String reference) {
-        return caseDetailsRepository.lockByReference(reference);
-    }
-
-    @Override
-    public CaseDetails lockCase(final Long caseReference) {
-        return caseDetailsRepository.lockCase(caseReference);
-    }
-
-    @Override
-    public CaseDetails findUniqueCase(final String jurisdictionId,
-                                      final String caseTypeId,
-                                      final String caseReference) {
+    public CaseDetails findUniqueCase(final String jurisdictionId, final String caseTypeId, final String caseReference) {
         return findHashToCaseDetails.computeIfAbsent(format(FIND_HASH_FORMAT, jurisdictionId, caseTypeId, caseReference),
-                                                            hash -> caseDetailsRepository.findUniqueCase(jurisdictionId, caseTypeId, caseReference));
+            hash -> caseDetailsRepository.findUniqueCase(jurisdictionId, caseTypeId, caseReference));
     }
 
     @Override
     public List<CaseDetails> findByMetaDataAndFieldData(final MetaData metadata, final Map<String, String> dataSearchParams) {
-        return metaAndFieldDataHashToCaseDetails.computeIfAbsent(format(META_AND_FIELD_DATA_HASH_FORMAT,
-                                                                        metadata.hashCode(),
-                                                                        getMapHashCode(dataSearchParams)),
-                                                                        hash -> caseDetailsRepository.findByMetaDataAndFieldData(
-                                                                            metadata,
-                                                                            dataSearchParams));
+        return metaAndFieldDataHashToCaseDetails.computeIfAbsent(
+            format(META_AND_FIELD_DATA_HASH_FORMAT, metadata.hashCode(), getMapHashCode(dataSearchParams)),
+            hash -> caseDetailsRepository.findByMetaDataAndFieldData(metadata, dataSearchParams));
     }
 
     @Override
     public PaginatedSearchMetadata getPaginatedSearchMetadata(MetaData metadata, Map<String, String> dataSearchParams) {
-        return hashToPaginatedSearchMetadata.computeIfAbsent(format(META_AND_FIELD_DATA_HASH_FORMAT,
-                                                                    metadata.hashCode(),
-                                                                    getMapHashCode(dataSearchParams)),
-                                                             hash -> caseDetailsRepository.getPaginatedSearchMetadata(
-                                                                 metadata,
-                                                                 dataSearchParams
-                                                             ));
+        return hashToPaginatedSearchMetadata.computeIfAbsent(
+            format(META_AND_FIELD_DATA_HASH_FORMAT, metadata.hashCode(), getMapHashCode(dataSearchParams)),
+            hash -> caseDetailsRepository.getPaginatedSearchMetadata(metadata, dataSearchParams));
     }
 
     private String getMapHashCode(Map<String, String> dataSearchParams) {

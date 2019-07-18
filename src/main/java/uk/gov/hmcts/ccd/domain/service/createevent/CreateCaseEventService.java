@@ -108,7 +108,7 @@ public class CreateCaseEventService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public CreateCaseEventResult createCaseEvent(String caseReference, CaseDataContent content) {
 
-        final CaseDetails caseDetails = lockCaseDetails(caseReference);
+        final CaseDetails caseDetails = getCaseDetails(caseReference);
         final CaseType caseType = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
         final CaseEvent eventTrigger = findAndValidateCaseEvent(caseType, content.getEvent());
         final CaseDetails caseDetailsBefore = caseService.clone(caseDetails);
@@ -160,11 +160,11 @@ public class CreateCaseEventService {
         }
     }
 
-    private CaseDetails lockCaseDetails(final String caseReference) {
+    private CaseDetails getCaseDetails(final String caseReference) {
         if (!uidService.validateUID(caseReference)) {
             throw new BadRequestException("Case reference is not valid");
         }
-        return caseDetailsRepository.lockByReference(caseReference)
+        return caseDetailsRepository.findByReference(caseReference)
             .orElseThrow(() -> new ResourceNotFoundException(format("Case with reference %s could not be found", caseReference)));
     }
 
