@@ -1,5 +1,5 @@
 java:
-  image: hmcts.azurecr.io/hmcts/ccd-data-store-api:latest
+  image: hmctspublic.azurecr.io/ccd/ccd-data-store-api:latest
   applicationPort: 4452
   keyVaults:
     s2s:
