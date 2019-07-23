@@ -71,7 +71,7 @@ public class CallbackService {
     @Autowired
     public CallbackService(final SecurityUtils securityUtils,
                            final ApplicationParams applicationParams,
-                           @Qualifier("httpClient") final HttpClient httpClient) {
+                           @Qualifier("callbacksHttpClient") final HttpClient httpClient) {
         this.securityUtils = securityUtils;
         this.defaultCallbackRetryIntervalsInSeconds = applicationParams.getCallbackRetryIntervalsInSeconds();
         this.defaultCallbackTimeoutInMillis = applicationParams.getCallbackReadTimeoutInMillis();

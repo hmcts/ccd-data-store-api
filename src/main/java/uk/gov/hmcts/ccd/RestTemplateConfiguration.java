@@ -84,6 +84,11 @@ class RestTemplateConfiguration {
         return getHttpClient(connectionTimeout);
     }
 
+    @Bean(name = "callbacksHttpClient")
+    public HttpClient callbacksHttpClient() {
+        return getHttpClient(connectionTimeout);
+    }
+
     private HttpClient getHttpClient(final int timeout) {
         cm = new PoolingHttpClientConnectionManager();
 
