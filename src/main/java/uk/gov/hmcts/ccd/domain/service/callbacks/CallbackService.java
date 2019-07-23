@@ -229,6 +229,7 @@ public class CallbackService {
     }
 
     private void setHeaders(final HttpPost httpPost) {
+        httpPost.setHeader("Accept", "application/json, application/x-jackson-smile, application/cbor, application/*+json");
         httpPost.setHeader("Content-Type", "application/json");
         final HttpHeaders securityHeaders = securityUtils.authorizationHeaders();
         if (null != securityHeaders) {
