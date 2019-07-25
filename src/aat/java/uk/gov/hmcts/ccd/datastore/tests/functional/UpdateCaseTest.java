@@ -68,4 +68,78 @@ class UpdateCaseTest extends BaseTest {
              // Other fields not updated
              .body("TextField", equalTo(AATCaseBuilder.TEXT));
     }
+
+    @Test
+    @DisplayName("should update a case with CRUD Access for a Case Type")
+    void shouldUpdateCaseWithCRUDAccessCaseType() {
+        // Prepare new case in known state
+        final Long caseReference = Event.create("AAT_AUTH_15")
+            .as(asAutoTestCaseworker())
+            .withData(FullCase.build())
+            .submitAndGetReference();
+
+        Event.update(caseReference)
+            .as(asAutoTestCaseworker())
+            .withData(
+                CaseData.builder()
+                    .numberField(UPDATED_NUMBER)
+                    .build()
+            )
+            .submit()
+
+            .then()
+            .statusCode(201)
+            .assertThat()
+            .rootPath("case_data")
+
+            // Field updated
+            .body("NumberField", equalTo(UPDATED_NUMBER))
+
+            // Other fields not updated
+            .body("TextField", equalTo(AATCaseBuilder.TEXT));
+    }
+
+    @Test
+    @DisplayName("should not update a case with CR Access for a Case Type")
+    void shouldNotUpdateCaseWithCRAccessCaseType() {
+        // Prepare new case in known state
+        final Long caseReference = Event.create("AAT_AUTH_3")
+            .as(asAutoTestCaseworker())
+            .withData(FullCase.build())
+            .submitAndGetReference();
+
+        Event.update(caseReference)
+            .as(asAutoTestCaseworker())
+            .withData(
+                CaseData.builder()
+                    .numberField(UPDATED_NUMBER)
+                    .build()
+            )
+            .submit()
+
+            .then()
+            .statusCode(404);
+    }
+
+    @Test
+    @DisplayName("should not update a case with C Access for a Case Type")
+    void shouldNotUpdateCaseWithCAccessCaseType() {
+        // Prepare new case in known state
+        final Long caseReference = Event.create("AAT_AUTH_1")
+            .as(asPrivateCaseworker(true))
+            .withData(FullCase.build())
+            .submitAndGetReference();
+
+        Event.update(caseReference)
+            .as(asAutoTestCaseworker())
+            .withData(
+                CaseData.builder()
+                    .numberField(UPDATED_NUMBER)
+                    .build()
+            )
+            .submit()
+
+            .then()
+            .statusCode(404);
+    }
 }
