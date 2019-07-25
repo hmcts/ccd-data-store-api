@@ -75,7 +75,8 @@ public class CompoundAccessControlService {
             }
         } else {
             for (CaseField field : caseField.getFieldType().getComplexFields()) {
-                if (field.isCompound() && isCreateDenied(node.get(field.getId()), field, userRoles)) {
+                if (field.isCompound() && node.get(VALUE) != null && node.get(VALUE).get(field.getId()) != null
+                    && isCreateDenied(node.get(field.getId()), field, userRoles)) {
                     LOG.info("Child {} has new data and no create access", field.getId());
                     createDeniedForAnyChild = true;
                     break;
