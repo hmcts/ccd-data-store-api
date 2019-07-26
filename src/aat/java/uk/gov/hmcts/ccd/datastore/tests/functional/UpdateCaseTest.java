@@ -114,11 +114,7 @@ class UpdateCaseTest extends BaseTest {
             .submit()
 
             .then()
-            .statusCode(201)
-            .assertThat()
-            .rootPath("case_data")
-            .body("NumberField", equalTo(UPDATED_NUMBER))
-            .body("TextField", equalTo(AATCaseBuilder.TEXT));
+            .statusCode(201);
     }
 
     @Test
@@ -140,11 +136,7 @@ class UpdateCaseTest extends BaseTest {
             .submit()
 
             .then()
-            .statusCode(201)
-            .assertThat()
-            .rootPath("case_data")
-            .body("NumberField", equalTo(UPDATED_NUMBER))
-            .body("TextField", equalTo(AATCaseBuilder.TEXT));
+            .statusCode(201);
     }
 
     @Test
