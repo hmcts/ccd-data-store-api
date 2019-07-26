@@ -5,7 +5,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.BaseTest;
+import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder;
+import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType;
 
+import static org.hamcrest.Matchers.equalTo;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CASE_TYPE;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.JURISDICTION;
 
@@ -31,5 +34,176 @@ class SearchCaseTest extends BaseTest {
 
             .then()
             .statusCode(200);
+    }
+
+    @Test
+    @DisplayName("should retrieve when a case exists if caseworker has 'CRUD' access on CaseType")
+    void shouldRetrieveCaseWhenExistsWithCRUDAccessForCaseType() {
+        // Prepare new case in known state
+        final Long caseReference = createFullCase("AAT_AUTH_15");
+
+        asAutoTestCaseworker()
+            .get()
+            .given()
+            .pathParam("jurisdiction", JURISDICTION)
+            .pathParam("caseType", "AAT_AUTH_15")
+            .contentType(ContentType.JSON)
+
+            .when()
+            .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases")
+
+            .then()
+            .statusCode(200);
+    }
+
+    @Test
+    @DisplayName("should retrieve when a case exists if caseworker has 'CR' access on CaseType")
+    void shouldRetrieveCaseWhenExistsWithCRAccessForCaseType() {
+        // Prepare new case in known state
+        final Long caseReference = createFullCase("AAT_AUTH_3");
+
+        asAutoTestCaseworker()
+            .get()
+            .given()
+            .pathParam("jurisdiction", JURISDICTION)
+            .pathParam("caseType", "AAT_AUTH_3")
+            .contentType(ContentType.JSON)
+
+            .when()
+            .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases")
+
+            .then()
+            .statusCode(200);
+    }
+
+    @Test
+    @DisplayName("should retrieve when a case exists if caseworker has 'R' access on CaseType")
+    void shouldRetrieveCaseWhenExistsWithRAccessForCaseType() {
+        // Prepare new case in known state
+        final Long caseReference = createFullCase("AAT_AUTH_2");
+
+        asAutoTestCaseworker()
+            .get()
+            .given()
+            .pathParam("jurisdiction", JURISDICTION)
+            .pathParam("caseType", "AAT_AUTH_2")
+            .contentType(ContentType.JSON)
+
+            .when()
+            .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases")
+
+            .then()
+            .statusCode(200);
+    }
+
+    @Test
+    @DisplayName("should retrieve when a case exists if caseworker has 'RU' access on CaseType")
+    void shouldRetrieveCaseWhenExistsWithRUAccessForCaseType() {
+        // Prepare new case in known state
+        final Long caseReference = createFullCase("AAT_AUTH_6");
+
+        asAutoTestCaseworker()
+            .get()
+            .given()
+            .pathParam("jurisdiction", JURISDICTION)
+            .pathParam("caseType", "AAT_AUTH_6")
+            .contentType(ContentType.JSON)
+
+            .when()
+            .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases")
+
+            .then()
+            .statusCode(200);
+    }
+
+    @Test
+    @DisplayName("should retrieve empty result when a case exists if caseworker has 'CU' access on CaseType")
+    void shouldRetrieveEmptyResultWhenExistsWithCRAccessForCaseType() {
+        // Prepare new case in known state
+        final Long caseReference = createFullCase("AAT_AUTH_5");
+
+        asAutoTestCaseworker()
+            .get()
+            .given()
+            .pathParam("jurisdiction", JURISDICTION)
+            .pathParam("caseType", "AAT_AUTH_5")
+            .contentType(ContentType.JSON)
+
+            .when()
+            .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases")
+
+            .then()
+            .statusCode(200);
+    }
+
+    @Test
+    @DisplayName("should retrieve empty result when a case exists if caseworker has 'U' access on CaseType")
+    void shouldRetrieveEmptyResultWhenExistsWithUAccessForCaseType() {
+        // Prepare new case in known state
+        final Long caseReference = createFullCase("AAT_AUTH_4");
+
+        asAutoTestCaseworker()
+            .get()
+            .given()
+            .pathParam("jurisdiction", JURISDICTION)
+            .pathParam("caseType", "AAT_AUTH_4")
+            .contentType(ContentType.JSON)
+
+            .when()
+            .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases")
+
+            .then()
+            .statusCode(200);
+    }
+
+    @Test
+    @DisplayName("should retrieve empty result when a case exists if caseworker has 'D' access on CaseType")
+    void shouldRetrieveEmptyResultWhenExistsWithDAccessForCaseType() {
+        // Prepare new case in known state
+        final Long caseReference = createFullCase("AAT_AUTH_8");
+
+        asAutoTestCaseworker()
+            .get()
+            .given()
+            .pathParam("jurisdiction", JURISDICTION)
+            .pathParam("caseType", "AAT_AUTH_8")
+            .contentType(ContentType.JSON)
+
+            .when()
+            .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases")
+
+            .then()
+            .statusCode(200);
+    }
+
+    @Test
+    @DisplayName("should retrieve empty result when a case exists if caseworker has 'C' access on CaseType")
+    void shouldRetrieveEmptyResultWhenExistsWithCAccessForCaseType() {
+        // Prepare new case in known state
+        final Long caseReference = createFullCase("AAT_AUTH_1");
+
+        asAutoTestCaseworker()
+            .get()
+            .given()
+            .pathParam("jurisdiction", JURISDICTION)
+            .pathParam("caseType", "AAT_AUTH_1")
+            .contentType(ContentType.JSON)
+
+            .when()
+            .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases")
+
+            .then()
+            .statusCode(200);
+    }
+
+    /*
+       Method to create a Full Case with caseType param.
+       This method uses 'privatecaseworker' as default user role
+     */
+    private Long createFullCase(String caseType){
+        return AATCaseType.Event.create(caseType)
+            .as(asPrivateCaseworker(true))
+            .withData(AATCaseBuilder.FullCase.build())
+            .submitAndGetReference();
     }
 }
