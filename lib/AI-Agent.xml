@@ -42,6 +42,12 @@
             <Method name="findCasesUserIdHasAccessTo"/>
             <Method name="findCaseRoles"/>
         </Class>
+        <Class name="uk.gov.hmcts.ccd.data.caseaccess.AMCaseUserRepository">
+            <Method name="grantAccess"/>
+            <Method name="revokeAccess"/>
+            <Method name="findCasesUserIdHasAccessTo"/>
+            <Method name="findCaseRoles"/>
+        </Class>
         <Class name="uk.gov.hmcts.ccd.data.caseaccess.DefaultCaseRoleRepository">
             <Method name="getCaseRoles"/>
         </Class>
