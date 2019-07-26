@@ -34,31 +34,19 @@ public class SwitchableCaseUserRepository {
         caseUserRepositoryTypes.forEach(caseUserRepository -> this.caseUserRepositoryTypes.put(caseUserRepository.getType(), caseUserRepository));
     }
 
-    public void updateWriteToAMCaseUserRepositoryForCaseType(String caseType) {
-        writeCaseTypeToCaseUserRepository.put(caseType, caseUserRepositoryTypes.get(AM_TYPE));
-        caseTypesToWriteModes.put(caseType, AM_TYPE);
-    }
-
-    public void updateWriteToCCDCaseUserRepositoryForCaseType(String caseType) {
-        writeCaseTypeToCaseUserRepository.put(caseType, caseUserRepositoryTypes.get(CCD_TYPE));
-        caseTypesToWriteModes.put(caseType, CCD_TYPE);
+    public void updateWriteToCaseUserRepositoryForCaseType(String caseType, String type) {
+        writeCaseTypeToCaseUserRepository.put(caseType, caseUserRepositoryTypes.get(type));
+        caseTypesToWriteModes.put(caseType, type);
     }
 
     public void updateWriteToBothCaseUserRepositoryForCaseType(String caseType) {
-        writeCaseTypeToCaseUserRepository.put(caseType, caseUserRepositoryTypes.get(AM_TYPE));
-        writeCaseTypeToCaseUserRepository.put(caseType, caseUserRepositoryTypes.get(CCD_TYPE));
-        caseTypesToWriteModes.put(caseType, AM_TYPE);
-        caseTypesToWriteModes.put(caseType, CCD_TYPE);
+        updateWriteToCaseUserRepositoryForCaseType(caseType, AM_TYPE);
+        updateWriteToCaseUserRepositoryForCaseType(caseType, CCD_TYPE);
     }
 
-    public void updateReadFromAMCaseUserRepositoryForCaseType(String caseType) {
-        readCaseTypeToCaseUserRepository.put(caseType, caseUserRepositoryTypes.get(AM_TYPE));
-        caseTypesToReadModes.put(caseType, AM_TYPE);
-    }
-
-    public void updateReadFromCCDCaseUserRepositoryForCaseType(String caseType) {
-        readCaseTypeToCaseUserRepository.put(caseType, caseUserRepositoryTypes.get(CCD_TYPE));
-        caseTypesToReadModes.put(caseType, CCD_TYPE);
+    public void updateReadFromCaseUserRepositoryForCaseType(String caseType, String type) {
+        readCaseTypeToCaseUserRepository.put(caseType, caseUserRepositoryTypes.get(type));
+        caseTypesToReadModes.put(caseType, type);
     }
 
     // API section
