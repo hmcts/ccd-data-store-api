@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.BaseTest;
 
 @Transactional
-public class CaseUserRepositoryTest extends BaseTest {
+public class CCDCaseUserRepositoryTest extends BaseTest {
 
     private static final String COUNT_CASE_USERS = "select count(*) from case_users where case_data_id = ? and user_id = ? and case_role = ?";
 
