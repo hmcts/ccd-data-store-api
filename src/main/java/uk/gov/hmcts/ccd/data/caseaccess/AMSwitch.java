@@ -38,21 +38,21 @@ public class AMSwitch {
     }
 
     public boolean isWriteAccessManagementWithCCD(final String caseTypeId) {
-        String mode = caseTypesToWriteModes.get(caseTypeId);
+        String mode = caseTypesToWriteModes.getOrDefault(caseTypeId, CCD_TYPE);
         return mode.equals(BOTH_TYPE) || mode.equals(CCD_TYPE);
     }
 
     public boolean isWriteAccessManagementWithAM(final String caseTypeId) {
-        String mode = caseTypesToWriteModes.get(caseTypeId);
+        String mode = caseTypesToWriteModes.getOrDefault(caseTypeId, CCD_TYPE);
         return mode.equals(BOTH_TYPE) || mode.equals(AM_TYPE);
     }
 
     public boolean isReadAccessManagementWithCCD(final String caseTypeId) {
-        return caseTypesToReadModes.get(caseTypeId).equals(CCD_TYPE);
+        return caseTypesToReadModes.getOrDefault(caseTypeId, CCD_TYPE).equals(CCD_TYPE);
     }
 
     public boolean isReadAccessManagementWithAM(final String caseTypeId) {
-        return caseTypesToReadModes.get(caseTypeId).equals(AM_TYPE);
+        return caseTypesToReadModes.getOrDefault(caseTypeId, CCD_TYPE).equals(AM_TYPE);
     }
 
 }

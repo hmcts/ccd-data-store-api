@@ -46,6 +46,12 @@ class AMSwitchTest {
     }
 
     @Test
+    void shouldGrantCCDOnlyWriteAccessIfCaseTypeNotSpecified() {
+        assertTrue(amSwitch.isWriteAccessManagementWithCCD("Unspecified"));
+        assertFalse(amSwitch.isWriteAccessManagementWithAM("Unspecified"));
+    }
+
+    @Test
     void shouldGrantCCDOnlyWriteAccess() {
         assertTrue(amSwitch.isWriteAccessManagementWithCCD(DIVORCE_CT));
         assertTrue(amSwitch.isWriteAccessManagementWithCCD(CMC_CT));
@@ -67,6 +73,12 @@ class AMSwitchTest {
     void shouldGrantBothWriteAccessEvenIfCCDOnlyOrAMOnlyDoesNotHaveItSpecified() {
         assertTrue(amSwitch.isWriteAccessManagementWithCCD(FR_CT));
         assertTrue(amSwitch.isWriteAccessManagementWithAM(FR_CT));
+    }
+
+    @Test
+    void shouldGrantCCDOnlyReadAccessIfCaseTypeNotSpecified() {
+        assertTrue(amSwitch.isReadAccessManagementWithCCD("Unspecified"));
+        assertFalse(amSwitch.isReadAccessManagementWithAM("Unspecified"));
     }
 
     @Test
