@@ -276,7 +276,7 @@ class CaseDetailsEndpointTest {
         given(fieldMapSanitizeOperation.execute(params)).willReturn(sanitizedParams);
         final ArgumentCaptor<MetaData> argument = ArgumentCaptor.forClass(MetaData.class);
 
-        endpoint.searchCasesForCaseWorkers(JURISDICTION_ID, CASE_TYPE_ID, params);
+        endpoint.searchCasesForCaseWorkers(UID, JURISDICTION_ID, CASE_TYPE_ID, params);
 
         verify(fieldMapSanitizeOperation).execute(params);
         verify(searchOperation).execute(argument.capture(), eq(sanitizedParams));
@@ -293,7 +293,7 @@ class CaseDetailsEndpointTest {
         params.put("notExisting2", "y");
         params.put("state", "z");
         BadRequestException badRequestException = assertThrows(BadRequestException.class,
-                                                               () -> endpoint.searchCasesForCaseWorkers(JURISDICTION_ID, "", params));
+                                                               () -> endpoint.searchCasesForCaseWorkers(UID, JURISDICTION_ID, "", params));
 
         assertThat(badRequestException.getMessage(), is("unknown metadata search parameters: notExisting2,notExisting1"));
     }
@@ -304,7 +304,7 @@ class CaseDetailsEndpointTest {
 
         params.put("security_classification", "XX");
         BadRequestException badRequestException = assertThrows(BadRequestException.class,
-                                                               () -> endpoint.searchCasesForCaseWorkers(JURISDICTION_ID, "", params));
+                                                               () -> endpoint.searchCasesForCaseWorkers(UID, JURISDICTION_ID, "", params));
 
         assertThat(badRequestException.getMessage(), is("unknown security classification 'XX'"));
     }
@@ -315,7 +315,7 @@ class CaseDetailsEndpointTest {
 
         params.put("sortDirection", "XX");
         BadRequestException badRequestException = assertThrows(BadRequestException.class,
-                                                               () -> endpoint.searchCasesForCaseWorkers(JURISDICTION_ID, "", params));
+                                                               () -> endpoint.searchCasesForCaseWorkers(UID, JURISDICTION_ID, "", params));
 
         assertThat(badRequestException.getMessage(), is("Unknown sort direction: XX"));
     }
@@ -326,7 +326,7 @@ class CaseDetailsEndpointTest {
         given(fieldMapSanitizeOperation.execute(params)).willReturn(sanitizedParams);
         final ArgumentCaptor<MetaData> argument = ArgumentCaptor.forClass(MetaData.class);
 
-        endpoint.searchCasesForCitizens(JURISDICTION_ID, CASE_TYPE_ID, params);
+        endpoint.searchCasesForCitizens(UID, JURISDICTION_ID, CASE_TYPE_ID, params);
 
         verify(fieldMapSanitizeOperation).execute(params);
         verify(searchOperation).execute(argument.capture(), eq(sanitizedParams));
@@ -336,7 +336,10 @@ class CaseDetailsEndpointTest {
     }
 
     private Map<String, String> initParams(final String state) {
-        return new HashMap<String, String>() {{
+        return new HashMap<String, String>() {
+            private static final long serialVersionUID = -2644130204347949654L;
+
+            {
             put("state", state);
         }};
     }
