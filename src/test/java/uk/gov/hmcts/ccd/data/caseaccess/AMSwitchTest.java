@@ -48,8 +48,8 @@ class AMSwitchTest {
 
     @Test
     void shouldGrantCCDOnlyWriteAccessIfCaseTypeNotSpecified() {
-        assertTrue(amSwitch.isWriteAccessManagementWithCCD("Unspecified"));
-        assertFalse(amSwitch.isWriteAccessManagementWithAM("Unspecified"));
+        assertTrue(amSwitch.isWriteAccessManagementWithCCD(UNSPECIFIED));
+        assertFalse(amSwitch.isWriteAccessManagementWithAM(UNSPECIFIED));
     }
 
     @Test
