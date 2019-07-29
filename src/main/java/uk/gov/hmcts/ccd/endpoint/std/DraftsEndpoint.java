@@ -4,14 +4,28 @@ import javax.transaction.Transactional;
 import java.time.Duration;
 import java.time.Instant;
 
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.SwaggerDefinition;
+import io.swagger.annotations.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
@@ -99,7 +113,8 @@ public class DraftsEndpoint {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "A displayable draft")
     })
-    public CaseView findDraft(@PathVariable("jid") final String jurisdictionId,
+    public CaseView findDraft(@PathVariable("uid") final String uid,
+                              @PathVariable("jid") final String jurisdictionId,
                               @PathVariable("ctid") final String caseTypeId,
                               @PathVariable("did") final String did) {
         Instant start = Instant.now();
@@ -115,7 +130,8 @@ public class DraftsEndpoint {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "A draft deleted successfully")
     })
-    public void deleteDraft(@PathVariable("jid") final String jurisdictionId,
+    public void deleteDraft(@PathVariable("uid") final String uid,
+                            @PathVariable("jid") final String jurisdictionId,
                             @PathVariable("ctid") final String caseTypeId,
                             @PathVariable("did") final String did) {
         Instant start = Instant.now();
