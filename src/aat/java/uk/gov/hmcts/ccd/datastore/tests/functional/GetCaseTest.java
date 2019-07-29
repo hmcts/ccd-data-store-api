@@ -123,7 +123,7 @@ class GetCaseTest extends BaseTest {
 
     @Test
     @DisplayName("should retrieve when a case reference exists if caseworker has 'CRUD' access on CaseType")
-    void shouldRetrieveCaseWhenExistsWithCRUDAccessForCaseType() {
+    void shouldRetrieveCaseWhenExistsWithFullAccessForCaseType() {
         // Prepare new case in known state
         final Long caseReference = createFullCase("AAT_AUTH_15");
 
@@ -236,6 +236,7 @@ class GetCaseTest extends BaseTest {
             .body("case_type_id", equalTo("AAT_AUTH_2"))
             .body("id", equalTo(caseReference));
     }
+
     @Test
     @DisplayName("should not retrieve when a case reference exists if caseworker has 'CU' access on CaseType")
     void shouldNotRetrieveCaseWhenExistsWithCUAccessForCaseType() {
@@ -332,7 +333,8 @@ class GetCaseTest extends BaseTest {
        Method to create a Full Case with caseType param.
        This method uses 'privatecaseworker' as default user role
      */
-    private Long createFullCase(String caseType){
+    private Long createFullCase(String caseType) {
+
         return Event.create(caseType)
             .as(asPrivateCaseworker(true))
             .withData(FullCase.build())

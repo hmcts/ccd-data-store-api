@@ -57,7 +57,7 @@ class CreateCaseTest extends BaseTest {
 
     @Test
     @DisplayName("should create a case if caseworker has 'CRUD' access on CaseType")
-    void shouldCreateCaseWithCRUDAccessForCaseType() {
+    void shouldCreateCaseWithFullAccessForCaseType() {
         //Case Type with "CRUD" access to the role autoTestCaseWorker
         Event.create("AAT_AUTH_15")
             .as(asAutoTestCaseworker())

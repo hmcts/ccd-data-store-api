@@ -9,7 +9,6 @@ import uk.gov.hmcts.ccd.datastore.tests.BaseTest;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType;
 
-import static org.hamcrest.Matchers.equalTo;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CASE_TYPE;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.JURISDICTION;
 
@@ -39,7 +38,7 @@ class SearchCaseTest extends BaseTest {
 
     @Test
     @DisplayName("should retrieve when a case exists if caseworker has 'CRUD' access on CaseType")
-    void shouldRetrieveCaseWhenExistsWithCRUDAccessForCaseType() {
+    void shouldRetrieveCaseWhenExistsWithFullAccessForCaseType() {
         // Prepare new case in known state
         final Long caseReference = createFullCase("AAT_AUTH_15");
 
@@ -201,7 +200,8 @@ class SearchCaseTest extends BaseTest {
        Method to create a Full Case with caseType param.
        This method uses 'privatecaseworker' as default user role
      */
-    private Long createFullCase(String caseType){
+    private Long createFullCase(String caseType) {
+
         return AATCaseType.Event.create(caseType)
             .as(asPrivateCaseworker(true))
             .withData(AATCaseBuilder.FullCase.build())

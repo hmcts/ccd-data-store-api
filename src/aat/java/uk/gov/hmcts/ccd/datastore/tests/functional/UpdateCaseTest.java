@@ -73,7 +73,7 @@ class UpdateCaseTest extends BaseTest {
 
     @Test
     @DisplayName("should update a case if the caseworker has 'CRUD' access on CaseType")
-    void shouldUpdateCaseWithCRUDAccessForCaseType() {
+    void shouldUpdateCaseWithFullAccessForCaseType() {
         // Case Type with "CRUD" access to the role autoTestCaseWorker
         final Long caseReference = Event.create("AAT_AUTH_15")
             .as(asPrivateCaseworker(true))
