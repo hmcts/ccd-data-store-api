@@ -20,7 +20,7 @@ public class ApplicationParams {
     @Value("#{'${ccd.am.write.to_ccd_only}'.split(',')}")
     private List<String> writeToCCDCaseTypesOnly;
 
-    @Value("#{'${ccd.am.write.to_am_inly}'.split(',')}")
+    @Value("#{'${ccd.am.write.to_am_only}'.split(',')}")
     private List<String> writeToAMCaseTypesOnly;
 
     @Value("#{'${ccd.am.write.to_both}'.split(',')}")
