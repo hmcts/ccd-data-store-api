@@ -22,6 +22,7 @@ class AMSwitchTest {
     @InjectMocks
     private AMSwitch amSwitch;
 
+    public static final String UNSPECIFIED = "Unspecified";
     private static final String DIVORCE_CT = "DIVORCE";
     private static final String PROBATE_CT = "PROBATE";
     private static final String CMC_CT = "CMC";
@@ -77,8 +78,8 @@ class AMSwitchTest {
 
     @Test
     void shouldGrantCCDOnlyReadAccessIfCaseTypeNotSpecified() {
-        assertTrue(amSwitch.isReadAccessManagementWithCCD("Unspecified"));
-        assertFalse(amSwitch.isReadAccessManagementWithAM("Unspecified"));
+        assertTrue(amSwitch.isReadAccessManagementWithCCD(UNSPECIFIED));
+        assertFalse(amSwitch.isReadAccessManagementWithAM(UNSPECIFIED));
     }
 
     @Test
