@@ -185,6 +185,7 @@ public abstract class BaseTest {
                 fail("Incorrect JSON structure: " + dataClassification);
             }
         }
+        caseDetails.setVersion(resultSet.getInt("version"));
         return caseDetails;
     }
 
