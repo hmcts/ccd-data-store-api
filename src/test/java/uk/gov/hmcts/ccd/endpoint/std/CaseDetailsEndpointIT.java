@@ -2468,7 +2468,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setToken(token);
 
         // Simulate case alteration by other actor to fail event token version check
-        template.update("UPDATE case_data SET data = '{}' WHERE reference = ?", CASE_REFERENCE);
+        template.update("UPDATE case_data SET data = '{}', version = 2 WHERE reference = ?", CASE_REFERENCE);
 
         mockMvc.perform(post(URL)
             .contentType(JSON_CONTENT_TYPE)
@@ -2500,7 +2500,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         caseDetailsToSave.setToken(token);
 
         // Simulate case alteration by other actor to fail event token version check
-        template.update("UPDATE case_data SET data = '{}' WHERE reference = ?", CASE_REFERENCE);
+        template.update("UPDATE case_data SET data = '{}', version = 2 WHERE reference = ?", CASE_REFERENCE);
 
         mockMvc.perform(post(URL)
             .contentType(JSON_CONTENT_TYPE)
@@ -2516,7 +2516,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn409WhenPostCreateCaseEventWithCaseStateConflictForCaseWorker() throws Exception {
+    public void shouldReturn422WhenPostCreateCaseEventWithCaseStateConflictForCaseWorker() throws Exception {
         final String CASE_REFERENCE = "1504259907353545";
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
@@ -2531,13 +2531,13 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                                                 UID, JURISDICTION, CASE_TYPE, CASE_REFERENCE, PRE_STATES_EVENT_ID);
         caseDetailsToSave.setToken(token);
 
-        // Simulate case state alteration by other actor to fail event token version check
-        template.update("UPDATE case_data SET state = 'CaseStopped' WHERE reference = ?", CASE_REFERENCE);
+        // Simulate case state alteration by other actor to fail event token version check - no effect since it's checked at save step
+        template.update("UPDATE case_data SET state = 'CaseStopped', version = 2 WHERE reference = ?", CASE_REFERENCE);
 
         mockMvc.perform(post(URL)
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsBytes(caseDetailsToSave))
-        ).andExpect(status().is(409))
+        ).andExpect(status().is(422))
             .andReturn();
 
         // No database entry created
@@ -2548,7 +2548,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn409WhenPostCreateCaseEventWithCaseStateConflictForCitizen() throws Exception {
+    public void shouldReturn422WhenPostCreateCaseEventWithCaseStateConflictForCitizen() throws Exception {
         final String CASE_REFERENCE = "1504259907353545";
         final String SUMMARY = "Case event summary";
         final String DESCRIPTION = "Case event description";
@@ -2563,13 +2563,13 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                                                 UID, JURISDICTION, CASE_TYPE, CASE_REFERENCE, PRE_STATES_EVENT_ID);
         caseDetailsToSave.setToken(token);
 
-        // Simulate case state alteration by other actor to fail event token version check
-        template.update("UPDATE case_data SET state = 'CaseStopped' WHERE reference = ?", CASE_REFERENCE);
+        // Simulate case state alteration by other actor to fail event token version check - no effect since it's checked at save step
+        template.update("UPDATE case_data SET state = 'CaseStopped', version = 2 WHERE reference = ?", CASE_REFERENCE);
 
         mockMvc.perform(post(URL)
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsBytes(caseDetailsToSave))
-        ).andExpect(status().is(409))
+        ).andExpect(status().is(422))
             .andReturn();
 
         // No database entry created
