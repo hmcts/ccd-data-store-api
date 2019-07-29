@@ -206,6 +206,31 @@ variable "http_client_validate_after_inactivity" {
   default = "0"
 }
 
+variable "ccd_am_write_to_ccd_only" {
+  type = "string"
+  default = ""
+}
+
+variable "ccd_am_write_to_am_only" {
+  type = "string"
+  default = ""
+}
+
+variable "ccd_am_write_to_both" {
+  type = "string"
+  default = ""
+}
+
+variable "ccd_am_read_from_ccd" {
+  type = "string"
+  default = ""
+}
+
+variable "ccd_am_read_from_am" {
+  type = "string"
+  default = ""
+}
+
 variable "appinsights_instrumentation_key" {
   description = "Instrumentation key of the App Insights instance this webapp should use. Module will create own App Insights resource if this is not provided"
   default = ""
