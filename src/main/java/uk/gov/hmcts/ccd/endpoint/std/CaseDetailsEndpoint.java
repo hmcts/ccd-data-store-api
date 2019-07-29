@@ -9,18 +9,33 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.*;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CASE_REFERENCE;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CREATED_DATE;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.LAST_MODIFIED_DATE;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.SECURITY_CLASSIFICATION;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.PAGE_PARAM;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.SORT_PARAM;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.AppInsights;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.search.FieldMapSanitizeOperation;
@@ -370,6 +385,7 @@ public class CaseDetailsEndpoint {
         @ApiResponse(code = 200, message = "Documents list for the given case type and id")
     })
     public List<Document> getDocumentsForEvent(
+        @PathVariable("uid") final String uid,
         @PathVariable("jid") String jid,
         @PathVariable("ctid") String ctid,
         @PathVariable("cid") String cid) {
@@ -385,7 +401,8 @@ public class CaseDetailsEndpoint {
     @ApiOperation(value = "Get case data for a given case type")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "List of case data for the given search criteria")})
-    public List<CaseDetails> searchCasesForCaseWorkers(@PathVariable("jid") final String jurisdictionId,
+    public List<CaseDetails> searchCasesForCaseWorkers(@PathVariable("uid") final String uid,
+                                                       @PathVariable("jid") final String jurisdictionId,
                                                        @PathVariable("ctid") final String caseTypeId,
                                                        @RequestParam Map<String, String> queryParameters) {
         return searchCases(jurisdictionId, caseTypeId, queryParameters);
@@ -396,7 +413,8 @@ public class CaseDetailsEndpoint {
     @ApiOperation(value = "Get case data for a given case type")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "List of case data for the given search criteria")})
-    public List<CaseDetails> searchCasesForCitizens(@PathVariable("jid") final String jurisdictionId,
+    public List<CaseDetails> searchCasesForCitizens(@PathVariable("uid") final String uid,
+                                                    @PathVariable("jid") final String jurisdictionId,
                                                     @PathVariable("ctid") final String caseTypeId,
                                                     @RequestParam Map<String, String> queryParameters) {
         return searchCases(jurisdictionId, caseTypeId, queryParameters);
@@ -418,7 +436,8 @@ public class CaseDetailsEndpoint {
     @ApiOperation(value = "Get the pagination metadata for a case data search")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Pagination metadata for the given search criteria")})
-    public PaginatedSearchMetadata searchCasesMetadataForCaseworkers(@PathVariable("jid") final String jurisdictionId,
+    public PaginatedSearchMetadata searchCasesMetadataForCaseworkers(@PathVariable("uid") final String uid,
+                                                                     @PathVariable("jid") final String jurisdictionId,
                                                                      @PathVariable("ctid") final String caseTypeId,
                                                                      @RequestParam Map<String, String> queryParameters) {
         return searchMetadata(jurisdictionId, caseTypeId, queryParameters);
@@ -429,7 +448,8 @@ public class CaseDetailsEndpoint {
     @ApiOperation(value = "Get the pagination metadata for a case data search")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Pagination metadata for the given search criteria")})
-    public PaginatedSearchMetadata searchCasesMetadataForCitizens(@PathVariable("jid") final String jurisdictionId,
+    public PaginatedSearchMetadata searchCasesMetadataForCitizens(@PathVariable("uid") final String uid,
+                                                                  @PathVariable("jid") final String jurisdictionId,
                                                                   @PathVariable("ctid") final String caseTypeId,
                                                                   @RequestParam Map<String, String> queryParameters) {
         return searchMetadata(jurisdictionId, caseTypeId, queryParameters);

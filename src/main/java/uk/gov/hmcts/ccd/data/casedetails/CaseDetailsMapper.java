@@ -32,6 +32,7 @@ public class CaseDetailsMapper {
         caseDetails.setLastModified(caseDetailsEntity.getLastModified());
         caseDetails.setState(caseDetailsEntity.getState());
         caseDetails.setSecurityClassification(caseDetailsEntity.getSecurityClassification());
+        caseDetails.setVersion(caseDetailsEntity.getVersion());
         if (caseDetailsEntity.getData() != null) {
             caseDetails.setData(mapper.convertValue(caseDetailsEntity.getData(), STRING_JSON_MAP_TYPE));
             caseDetails.setDataClassification(mapper.convertValue(caseDetailsEntity.getDataClassification(), STRING_JSON_MAP_TYPE));
@@ -52,6 +53,7 @@ public class CaseDetailsMapper {
         newCaseDetailsEntity.setCaseType(caseDetails.getCaseTypeId());
         newCaseDetailsEntity.setState(caseDetails.getState());
         newCaseDetailsEntity.setSecurityClassification(caseDetails.getSecurityClassification());
+        newCaseDetailsEntity.setVersion(caseDetails.getVersion());
         if (caseDetails.getData() == null) {
             newCaseDetailsEntity.setData(mapper.createObjectNode());
         } else {
