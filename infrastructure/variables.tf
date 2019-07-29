@@ -187,7 +187,6 @@ variable "http_client_connection_timeout" {
 }
 
 variable "http_client_read_timeout" {
-  type = "string"
   default = "60000"
 }
 
