@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.datastore.tests.functional;
 
 import io.restassured.http.ContentType;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
@@ -133,7 +134,7 @@ class SearchCaseTest extends BaseTest {
             .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases")
 
             .then()
-            .statusCode(200);
+            .statusCode(200).assertThat().body("isEmpty()", Matchers.is(true));
     }
 
     @Test
@@ -153,7 +154,7 @@ class SearchCaseTest extends BaseTest {
             .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases")
 
             .then()
-            .statusCode(200);
+            .statusCode(200).assertThat().body("isEmpty()", Matchers.is(true));
     }
 
     @Test
@@ -173,7 +174,7 @@ class SearchCaseTest extends BaseTest {
             .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases")
 
             .then()
-            .statusCode(200);
+            .statusCode(200).assertThat().body("isEmpty()", Matchers.is(true));
     }
 
     @Test
@@ -193,7 +194,7 @@ class SearchCaseTest extends BaseTest {
             .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases")
 
             .then()
-            .statusCode(200);
+            .statusCode(200).assertThat().body("isEmpty()", Matchers.is(true));
     }
 
     /*
