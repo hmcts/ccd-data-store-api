@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.caseaccess;
 
-import com.google.common.collect.Lists;
 import org.elasticsearch.common.util.set.Sets;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -27,14 +26,14 @@ import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 @Service
 public class CaseAccessOperation {
 
-    private final SwitchableCaseUserRepository switchableCaseUserRepository;
+    private final CaseUserRepository caseUserRepository;
     private final CaseDetailsRepository caseDetailsRepository;
     private final CaseRoleRepository caseRoleRepository;
 
-    public CaseAccessOperation(final SwitchableCaseUserRepository switchableCaseUserRepository,
+    public CaseAccessOperation(@Qualifier(SwitchableCaseUserRepository.QUALIFIER) final CaseUserRepository caseUserRepository,
                                @Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
                                @Qualifier(CachedCaseRoleRepository.QUALIFIER) CaseRoleRepository caseRoleRepository) {
-        this.switchableCaseUserRepository = switchableCaseUserRepository;
+        this.caseUserRepository = caseUserRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseRoleRepository = caseRoleRepository;
     }
@@ -45,9 +44,7 @@ public class CaseAccessOperation {
             Long.valueOf(caseReference));
 
         final CaseDetails caseDetails = maybeCase.orElseThrow(() -> new CaseNotFoundException(caseReference));
-        switchableCaseUserRepository.forWriting(caseDetails.getCaseTypeId()).forEach(caseUserRepository ->
-            caseUserRepository.grantAccess(Long.valueOf(caseDetails.getId()), userId, CREATOR.getRole())
-        );
+        caseUserRepository.grantAccess(jurisdictionId, caseReference, Long.valueOf(caseDetails.getId()), userId, CREATOR.getRole());
     }
 
     @Transactional
@@ -55,22 +52,14 @@ public class CaseAccessOperation {
         final Optional<CaseDetails> maybeCase = caseDetailsRepository.findByReference(jurisdictionId,
             Long.valueOf(caseReference));
         final CaseDetails caseDetails = maybeCase.orElseThrow(() -> new CaseNotFoundException(caseReference));
-        switchableCaseUserRepository.forWriting(caseDetails.getCaseTypeId()).forEach(caseUserRepository ->
-            caseUserRepository.revokeAccess(Long.valueOf(caseDetails.getId()), userId, CREATOR.getRole())
-        );
+        caseUserRepository.revokeAccess(jurisdictionId, caseReference, Long.valueOf(caseDetails.getId()), userId, CREATOR.getRole());
     }
 
     public List<String> findCasesUserIdHasAccessTo(final String userId) {
-        List<String> casesReferences = Lists.newArrayList();
-        switchableCaseUserRepository.forReading().forEach(caseUserRepository ->
-            casesReferences.addAll(caseUserRepository.findCasesUserIdHasAccessTo(userId)
-                .stream()
-                .map(caseId -> caseDetailsRepository.findById(caseId))
-                .filter(caseDetails -> discardCasesForUknownMode(caseUserRepository, caseDetails))
-                .map(caseDetails -> caseDetails.getReference() + "")
-                .collect(Collectors.toList()))
-        );
-        return casesReferences;
+        return caseUserRepository.findCasesUserIdHasAccessTo(userId)
+            .stream()
+            .map(databaseId -> caseDetailsRepository.findById(databaseId).getReference() + "")
+            .collect(Collectors.toList());
     }
 
     @Transactional
@@ -83,14 +72,10 @@ public class CaseAccessOperation {
 
         final Long caseId = new Long(caseDetails.getId());
         final String userId = caseUser.getUserId();
-        final List<String> currentCaseRoles = switchableCaseUserRepository.forReading(caseDetails.getCaseTypeId()).findCaseRoles(caseId, userId);
+        final List<String> currentCaseRoles = caseUserRepository.findCaseRoles(caseDetails.getCaseTypeId(), caseId, userId);
 
-        grantAddedCaseRoles(userId, caseId, currentCaseRoles, targetCaseRoles);
-        revokeRemovedCaseRoles(userId, caseId, currentCaseRoles, targetCaseRoles);
-    }
-
-    private boolean discardCasesForUknownMode(final CaseUserRepository caseUserRepository, final CaseDetails caseDetails) {
-        return switchableCaseUserRepository.getReadModeForCaseType(caseDetails.getCaseTypeId()).equals(caseUserRepository.getType());
+        grantAddedCaseRoles(caseDetails.getJurisdiction(), caseDetails.getReferenceAsString(), userId, caseId, currentCaseRoles, targetCaseRoles);
+        revokeRemovedCaseRoles(caseDetails.getJurisdiction(), caseDetails.getReferenceAsString(), userId, caseId, currentCaseRoles, targetCaseRoles);
     }
 
     private void validateCaseRoles(Set<String> validCaseRoles, Set<String> targetCaseRoles) {
@@ -102,35 +87,25 @@ public class CaseAccessOperation {
             });
     }
 
-    private void grantAddedCaseRoles(String userId,
-                                     Long caseId,
-                                     List<String> currentCaseRoles,
-                                     Set<String> targetCaseRoles) {
-        List<CaseUserRepository> caseUserRepositories = switchableCaseUserRepository.forWriting(getCaseTypeId(caseId));
+    private void grantAddedCaseRoles(final String jurisdictionId,
+                                     final String caseReference,
+                                     final String userId,
+                                     final Long caseId,
+                                     final List<String> currentCaseRoles,
+                                     final Set<String> targetCaseRoles) {
         targetCaseRoles.stream()
             .filter(targetRole -> !currentCaseRoles.contains(targetRole))
-            .forEach(targetRole -> caseUserRepositories
-                .forEach(caseUserRepository ->
-                    caseUserRepository.grantAccess(caseId, userId, targetRole))
-            );
+            .forEach(targetRole -> caseUserRepository.grantAccess(jurisdictionId, caseReference, caseId, userId, targetRole));
     }
 
-    private void revokeRemovedCaseRoles(String userId,
-                                        Long caseId,
-                                        List<String> currentCaseRoles,
-                                        Set<String> targetCaseRoles) {
-        List<CaseUserRepository> caseUserRepositories = switchableCaseUserRepository.forWriting(getCaseTypeId(caseId));
+    private void revokeRemovedCaseRoles(final String jurisdictionId,
+                                        final String caseReference,
+                                        final String userId,
+                                        final Long caseId,
+                                        final List<String> currentCaseRoles,
+                                        final Set<String> targetCaseRoles) {
         currentCaseRoles.stream()
             .filter(currentRole -> !targetCaseRoles.contains(currentRole))
-            .forEach(currentRole -> caseUserRepositories
-                .forEach(caseUserRepository ->
-                    caseUserRepository.revokeAccess(caseId,
-                        userId,
-                        currentRole))
-            );
-    }
-
-    private String getCaseTypeId(final Long caseId) {
-        return caseDetailsRepository.findById(caseId).getCaseTypeId();
+            .forEach(currentRole -> caseUserRepository.revokeAccess(jurisdictionId, caseReference, caseId, userId, currentRole));
     }
 }

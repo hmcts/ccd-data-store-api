@@ -61,9 +61,6 @@ public class CaseAccessEndpointIT extends BaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn200WhenFindIdsCalled() throws Exception {
 
-        final String url = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" +
-            CASE_TYPE + "/cases/ids?userId=" + USER_ID;
-
         grantAccess();
 
         final String aUrl = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" +
@@ -74,6 +71,9 @@ public class CaseAccessEndpointIT extends BaseTest {
             .content(mapper.writeValueAsString(new UserId(USER_ID))))
             .andExpect(status().isCreated())
             .andReturn();
+
+        final String url = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" +
+            CASE_TYPE + "/cases/ids?userId=" + USER_ID;
 
         final MvcResult mvcResult = mockMvc.perform(get(url))
             .andExpect(status().isOk())

@@ -106,7 +106,7 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
         if (caseDetails == null || caseDetails.getId() == null || Draft.isDraft(caseDetails.getId())) {
             return Collections.emptySet();
         } else {
-            return caseAccessService.getCaseRoles(caseDetails.getId());
+            return caseAccessService.getCaseRoles(caseDetails.getCaseTypeId(), caseDetails.getId());
         }
     }
 

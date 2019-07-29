@@ -276,9 +276,9 @@ class AuthorisedGetCaseViewOperationTest {
     @Test
     @DisplayName("get User Roles must merge user roles and case roles")
     void shouldMergeRoles() {
-        doReturn(Arrays.asList(ROLE_IN_CASE_ROLES, ROLE_IN_CASE_ROLES_2)).when(caseUserRepository).findCaseRoles(Long.valueOf(CASE_REFERENCE), USER_ID);
+        doReturn(Arrays.asList(ROLE_IN_CASE_ROLES, ROLE_IN_CASE_ROLES_2)).when(caseUserRepository).findCaseRoles(CASE_TYPE_ID, Long.valueOf(CASE_REFERENCE), USER_ID);
 
-        Set<String> userRoles = authorisedGetCaseViewOperation.getUserRoles(CASE_REFERENCE);
+        Set<String> userRoles = authorisedGetCaseViewOperation.getUserRoles(CASE_TYPE_ID,CASE_REFERENCE);
 
         assertAll(
             () -> assertThat(userRoles.size(), is(4)),

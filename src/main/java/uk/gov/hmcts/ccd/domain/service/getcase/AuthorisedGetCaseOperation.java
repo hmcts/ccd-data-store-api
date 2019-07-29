@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
+import uk.gov.hmcts.ccd.data.caseaccess.SwitchableCaseUserRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
@@ -41,7 +42,7 @@ public class AuthorisedGetCaseOperation implements GetCaseOperation {
                                       @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
                                       final AccessControlService accessControlService,
                                       @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
-                                      CaseUserRepository caseUserRepository) {
+                                      @Qualifier(SwitchableCaseUserRepository.QUALIFIER) final CaseUserRepository caseUserRepository) {
         this.getCaseOperation = getCaseOperation;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.accessControlService = accessControlService;
@@ -60,7 +61,7 @@ public class AuthorisedGetCaseOperation implements GetCaseOperation {
         return getCaseOperation.execute(caseReference)
             .flatMap(caseDetails ->
                 verifyReadAccess(getCaseType(caseDetails.getCaseTypeId()),
-                    getUserRoles(caseDetails.getId()),
+                    getUserRoles(caseDetails.getCaseTypeId(), caseDetails.getId()),
                     caseDetails));
     }
 
@@ -69,10 +70,10 @@ public class AuthorisedGetCaseOperation implements GetCaseOperation {
     }
 
 
-    private Set<String> getUserRoles(String caseId) {
+    private Set<String> getUserRoles(String caseTypeId, String caseId) {
         return Sets.union(userRepository.getUserRoles(),
             caseUserRepository
-                .findCaseRoles(Long.valueOf(caseId), userRepository.getUserId())
+                .findCaseRoles(caseTypeId, Long.valueOf(caseId), userRepository.getUserId())
                 .stream()
                 .collect(Collectors.toSet()));
     }

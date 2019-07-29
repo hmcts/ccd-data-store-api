@@ -1,74 +1,85 @@
 package uk.gov.hmcts.ccd.data.caseaccess;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.google.common.collect.Lists;
+import org.springframework.beans.factory.annotation.Qualifier;
+import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
+import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-public class SwitchableCaseUserRepository {
+@Named
+@Singleton
+@Qualifier(SwitchableCaseUserRepository.QUALIFIER)
+public class SwitchableCaseUserRepository implements CaseUserRepository {
 
-    public static final String AM_TYPE = "am";
-    public static final String CCD_TYPE = "ccd";
-    private final Map<String, CaseUserRepository> caseUserRepositoryTypes;
-    private final Multimap<String, String> caseTypesToWriteModes;
-    private final Map<String, String> caseTypesToReadModes;
+    public static final String QUALIFIER = "switchable";
+    private final CaseDetailsRepository caseDetailsRepository;
+    private final CaseUserRepository ccdCaseUserRepository;
+    private final CaseUserRepository amCaseUserRepository;
+    private final AMSwitch amSwitch;
 
-    private final Multimap<String, CaseUserRepository> writeCaseTypeToCaseUserRepository;
-    private final Map<String, CaseUserRepository> readCaseTypeToCaseUserRepository;
-
-    public SwitchableCaseUserRepository() {
-        this.caseUserRepositoryTypes = Maps.newHashMap();
-        this.caseTypesToWriteModes = ArrayListMultimap.create();
-        this.caseTypesToReadModes = Maps.newHashMap();
-        this.writeCaseTypeToCaseUserRepository = ArrayListMultimap.create();
-        this.readCaseTypeToCaseUserRepository = Maps.newHashMap();
+    public SwitchableCaseUserRepository(@Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
+                                        @Qualifier(CCDCaseUserRepository.QUALIFIER) final CaseUserRepository ccdCaseUserRepository,
+                                        @Qualifier(AMCaseUserRepository.QUALIFIER) final CaseUserRepository amCaseUserRepository,
+                                        final AMSwitch amSwitch) {
+        this.caseDetailsRepository = caseDetailsRepository;
+        this.ccdCaseUserRepository = ccdCaseUserRepository;
+        this.amCaseUserRepository = amCaseUserRepository;
+        this.amSwitch = amSwitch;
     }
 
-    // set up section
-
-    @Autowired
-    public void setCaseUserRepositoryTypes(List<CaseUserRepository> caseUserRepositoryTypes) {
-        caseUserRepositoryTypes.forEach(caseUserRepository -> this.caseUserRepositoryTypes.put(caseUserRepository.getType(), caseUserRepository));
+    @Override
+    public void grantAccess(final String jurisdictionId, final String caseReference, final Long caseId, final String userId, final String caseRole) {
+        final Optional<CaseDetails> maybeCase = caseDetailsRepository.findByReference(jurisdictionId, Long.valueOf(caseReference));
+        final CaseDetails caseDetails = maybeCase.orElseThrow(() -> new CaseNotFoundException(caseReference));
+        if (amSwitch.isWriteAccessManagementWithCCD(caseDetails.getCaseTypeId())) {
+            ccdCaseUserRepository.grantAccess(jurisdictionId, caseReference, Long.valueOf(caseDetails.getId()), userId, caseRole);
+        }
+        if (amSwitch.isWriteAccessManagementWithAM(caseDetails.getCaseTypeId())) {
+            amCaseUserRepository.grantAccess(jurisdictionId, caseReference, Long.valueOf(caseDetails.getId()), userId, caseRole);
+        }
     }
 
-    public void updateWriteToCaseUserRepositoryForCaseType(String caseType, String type) {
-        writeCaseTypeToCaseUserRepository.put(caseType, caseUserRepositoryTypes.get(type));
-        caseTypesToWriteModes.put(caseType, type);
+    @Override
+    public void revokeAccess(final String jurisdictionId, final String caseReference, final Long caseId, final String userId, final String caseRole) {
+        final Optional<CaseDetails> maybeCase = caseDetailsRepository.findByReference(jurisdictionId,
+            Long.valueOf(caseReference));
+        final CaseDetails caseDetails = maybeCase.orElseThrow(() -> new CaseNotFoundException(caseReference));
+        if (amSwitch.isWriteAccessManagementWithCCD(caseDetails.getCaseTypeId())) {
+            ccdCaseUserRepository.revokeAccess(jurisdictionId, caseReference, Long.valueOf(caseDetails.getId()), userId, caseRole);
+        }
+        if (amSwitch.isWriteAccessManagementWithAM(caseDetails.getCaseTypeId())) {
+            amCaseUserRepository.revokeAccess(jurisdictionId, caseReference, Long.valueOf(caseDetails.getId()), userId, caseRole);
+        }
     }
 
-    public void updateWriteToBothCaseUserRepositoryForCaseType(String caseType) {
-        updateWriteToCaseUserRepositoryForCaseType(caseType, AM_TYPE);
-        updateWriteToCaseUserRepositoryForCaseType(caseType, CCD_TYPE);
+    @Override
+    public List<Long> findCasesUserIdHasAccessTo(final String userId) {
+        List<Long> casesReferences = Lists.newArrayList();
+        Lists.newArrayList(ccdCaseUserRepository, amCaseUserRepository).forEach(caseUserRepository ->
+            casesReferences.addAll(caseUserRepository.findCasesUserIdHasAccessTo(userId)
+                .stream()
+                .map(caseId -> caseDetailsRepository.findById(caseId))
+                .filter(caseDetails -> discardCasesForUknownMode(caseUserRepository, caseDetails))
+                .map(caseDetails -> Long.valueOf(caseDetails.getId()))
+                .collect(Collectors.toList()))
+        );
+        return casesReferences;
     }
 
-    public void updateReadFromCaseUserRepositoryForCaseType(String caseType, String type) {
-        readCaseTypeToCaseUserRepository.put(caseType, caseUserRepositoryTypes.get(type));
-        caseTypesToReadModes.put(caseType, type);
+    @Override
+    public List<String> findCaseRoles(final String caseTypeId, final Long caseId, final String userId) {
+        return amSwitch.isReadAccessManagementWithCCD(caseTypeId) ? ccdCaseUserRepository.findCaseRoles(caseTypeId, caseId, userId) : amCaseUserRepository.findCaseRoles(caseTypeId, caseId, userId);
     }
 
-    // API section
-
-    public List<String> getWriteModeForCaseType(String caseType) {
-        return (List<String>)caseTypesToWriteModes.get(caseType);
+    private boolean discardCasesForUknownMode(final CaseUserRepository caseUserRepository, final CaseDetails caseDetails) {
+        return amSwitch.isReadAccessManagementWithCCD(caseDetails.getCaseTypeId()) && caseUserRepository instanceof CCDCaseUserRepository ||
+            amSwitch.isReadAccessManagementWithAM(caseDetails.getCaseTypeId()) && caseUserRepository instanceof AMCaseUserRepository;
     }
-
-    public String getReadModeForCaseType(String caseType) {
-        return caseTypesToReadModes.get(caseType);
-    }
-
-    public List<CaseUserRepository> forWriting(String caseTypeId) {
-        return (List<CaseUserRepository>)this.writeCaseTypeToCaseUserRepository.get(caseTypeId);
-    }
-
-    public CaseUserRepository forReading(String caseTypeId) {
-        return this.readCaseTypeToCaseUserRepository.getOrDefault(caseTypeId, this.caseUserRepositoryTypes.get("ccd"));
-    }
-
-    public List<CaseUserRepository> forReading() {
-        return (List<CaseUserRepository>) caseUserRepositoryTypes.values();
-    }
-
 }

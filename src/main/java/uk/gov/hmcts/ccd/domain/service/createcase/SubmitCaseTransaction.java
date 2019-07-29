@@ -13,6 +13,7 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
+import uk.gov.hmcts.ccd.data.caseaccess.SwitchableCaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -51,7 +52,7 @@ class SubmitCaseTransaction {
                                  final CallbackInvoker callbackInvoker,
                                  final UIDService uidService,
                                  final SecurityClassificationService securityClassificationService,
-                                 final CaseUserRepository caseUserRepository,
+                                 @Qualifier(SwitchableCaseUserRepository.QUALIFIER) final CaseUserRepository caseUserRepository,
                                  final UserAuthorisation userAuthorisation
                                  ) {
         this.caseDetailsRepository = caseDetailsRepository;
@@ -94,7 +95,9 @@ class SubmitCaseTransaction {
             saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse, event, caseType, idamUser, eventTrigger, newCaseDetails);
 
         if (AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
-            caseUserRepository.grantAccess(Long.valueOf(savedCaseDetails.getId()),
+            caseUserRepository.grantAccess(caseType.getJurisdictionId(),
+                                           newCaseDetails.getReference().toString(),
+                                           Long.valueOf(savedCaseDetails.getId()),
                                            idamUser.getId(),
                                            CREATOR.getRole());
         }

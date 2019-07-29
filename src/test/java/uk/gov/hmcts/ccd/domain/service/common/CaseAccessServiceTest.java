@@ -38,6 +38,7 @@ class CaseAccessServiceTest {
 
     private static final String USER_ID = "69";
 
+    private static final String CASE_TYPE_ID = "CASE_TYPE";
     private static final String CASE_GRANTED_1_ID = "123";
     private static final String CASE_GRANTED_2_ID = "456";
     private static final String CASE_REVOKED_ID = "789";
@@ -448,13 +449,13 @@ class CaseAccessServiceTest {
         @BeforeEach
         void setUp() {
             doReturn(USER_ID).when(userRepository).getUserId();
-            doReturn(caseRoles).when(caseUserRepository).findCaseRoles(Long.valueOf(CASE_GRANTED_1_ID), USER_ID);
+            doReturn(caseRoles).when(caseUserRepository).findCaseRoles(CASE_TYPE_ID, Long.valueOf(CASE_GRANTED_1_ID), USER_ID);
         }
 
         @Test
         @DisplayName("get case roles for a case Id")
         void getCaseRoles() {
-            Set<String> caseRoles = caseAccessService.getCaseRoles(CASE_GRANTED_1_ID);
+            Set<String> caseRoles = caseAccessService.getCaseRoles(CASE_TYPE_ID, CASE_GRANTED_1_ID);
 
             assertAll(
                 () -> assertThat(caseRoles.size(), Is.is(2)),

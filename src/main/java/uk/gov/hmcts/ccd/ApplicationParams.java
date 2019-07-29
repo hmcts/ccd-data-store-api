@@ -17,11 +17,11 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 @Singleton
 public class ApplicationParams {
 
-    @Value("#{'${ccd.am.write.to_ccd}'.split(',')}")
-    private List<String> writeToCCDCaseTypes;
+    @Value("#{'${ccd.am.write.to_ccd_only}'.split(',')}")
+    private List<String> writeToCCDCaseTypesOnly;
 
-    @Value("#{'${ccd.am.write.to_am}'.split(',')}")
-    private List<String> writeToAMCaseTypes;
+    @Value("#{'${ccd.am.write.to_am_inly}'.split(',')}")
+    private List<String> writeToAMCaseTypesOnly;
 
     @Value("#{'${ccd.am.write.to_both}'.split(',')}")
     private List<String> writeToBothCaseTypes;
@@ -303,12 +303,12 @@ public class ApplicationParams {
         return elasticsearchNodeDiscoveryFilter;
     }
 
-    public List<String> getWriteToCCDCaseTypes() {
-        return writeToCCDCaseTypes;
+    public List<String> getWriteToCCDCaseTypesOnly() {
+        return writeToCCDCaseTypesOnly;
     }
 
-    public List<String> getWriteToAMCaseTypes() {
-        return writeToAMCaseTypes;
+    public List<String> getWriteToAMCaseTypesOnly() {
+        return writeToAMCaseTypesOnly;
     }
 
     public List<String> getWriteToBothCaseTypes() {

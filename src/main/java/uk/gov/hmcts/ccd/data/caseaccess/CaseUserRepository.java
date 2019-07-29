@@ -4,13 +4,11 @@ import java.util.List;
 
 public interface CaseUserRepository {
 
-    String getType();
+    void grantAccess(String jurisdictionId, String caseReference, Long caseId, String userId, String caseRole);
 
-    void grantAccess(Long caseId, String userId, String caseRole);
-
-    void revokeAccess(Long caseId, String userId, String caseRole);
+    void revokeAccess(String jurisdictionId, String caseReference, Long caseId, String userId, String caseRole);
 
     List<Long> findCasesUserIdHasAccessTo(String userId);
 
-    List<String> findCaseRoles(Long caseId, String userId);
+    List<String> findCaseRoles(String caseTypeId, Long caseId, String userId);
 }

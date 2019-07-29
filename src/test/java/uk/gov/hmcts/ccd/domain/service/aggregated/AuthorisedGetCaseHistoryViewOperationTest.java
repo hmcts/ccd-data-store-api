@@ -1,24 +1,12 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import static com.google.common.collect.Sets.newHashSet;
-import static java.lang.String.valueOf;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseHistoryViewBuilder.aCaseHistoryView;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewEventBuilder.aCaseViewEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewTabBuilder.newCaseViewTab;
-
-import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
+import org.hamcrest.CoreMatchers;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.caseaccess.SwitchableCaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
@@ -37,12 +25,23 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.hamcrest.CoreMatchers;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import static com.google.common.collect.Sets.newHashSet;
+import static java.lang.String.valueOf;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseHistoryViewBuilder.aCaseHistoryView;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewEventBuilder.aCaseViewEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewTabBuilder.newCaseViewTab;
 
 class AuthorisedGetCaseHistoryViewOperationTest {
     private static final String CASE_TYPE_ID = "Grant";
@@ -57,7 +56,7 @@ class AuthorisedGetCaseHistoryViewOperationTest {
     private static final CaseEvent CASE_EVENT = newCaseEvent().withId(EVENT_ID_STRING).build();
     private static final CaseDetails CASE_DETAILS = newCaseDetails().withId(CASE_REFERENCE).withCaseTypeId(CASE_TYPE_ID).build();
     private static final CaseEvent CASE_EVENT_2 = newCaseEvent().withId("event2").build();
-    private static final CaseType TEST_CASE_TYPE = newCaseType().withEvent(CASE_EVENT).withEvent(CASE_EVENT_2).build();
+    private static final CaseType TEST_CASE_TYPE = newCaseType().withId(CASE_TYPE_ID).withEvent(CASE_EVENT).withEvent(CASE_EVENT_2).build();
     private static final CaseViewEvent CASE_VIEW_EVENT = aCaseViewEvent().withId(EVENT_ID_STRING).build();
     private final List<String> caseRoles = Collections.emptyList();
 
@@ -94,7 +93,7 @@ class AuthorisedGetCaseHistoryViewOperationTest {
     @Mock
     private UserRepository userRepository;
     @Mock
-    private CaseUserRepository caseUserRepository;
+    private SwitchableCaseUserRepository caseUserRepository;
     @Mock
     private CaseDetailsRepository caseDetailsRepository;
 
@@ -107,7 +106,7 @@ class AuthorisedGetCaseHistoryViewOperationTest {
         doReturn(TEST_CASE_TYPE).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         doReturn(USER_ROLES).when(userRepository).getUserRoles();
         doReturn(TEST_CASE_HISTORY_VIEW).when(getCaseHistoryViewOperation).execute(CASE_REFERENCE, EVENT_ID);
-        doReturn(caseRoles).when(caseUserRepository).findCaseRoles(Long.valueOf(CASE_REFERENCE), USER_ID);
+        doReturn(caseRoles).when(caseUserRepository).findCaseRoles(CASE_TYPE_ID, Long.valueOf(CASE_REFERENCE), USER_ID);
         doReturn(Optional.of(CASE_DETAILS)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
 
         authorisedGetCaseHistoryViewOperation = new AuthorisedGetCaseHistoryViewOperation(getCaseHistoryViewOperation,
@@ -128,7 +127,7 @@ class AuthorisedGetCaseHistoryViewOperationTest {
         verify(caseDetailsRepository).findByReference(CASE_REFERENCE);
         verify(userRepository).getUserRoles();
         verify(userRepository).getUserId();
-        verify(caseUserRepository).findCaseRoles(Long.valueOf(CASE_REFERENCE), USER_ID);
+        verify(caseUserRepository).findCaseRoles(CASE_TYPE_ID, Long.valueOf(CASE_REFERENCE), USER_ID);
         verify(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES, CAN_READ);
     }
 

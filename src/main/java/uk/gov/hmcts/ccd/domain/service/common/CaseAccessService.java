@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
+import uk.gov.hmcts.ccd.data.caseaccess.SwitchableCaseUserRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -36,8 +37,8 @@ public class CaseAccessService {
     private static final Pattern RESTRICT_GRANTED_ROLES_PATTERN
         = Pattern.compile(".+-solicitor$|.+-panelmember$|^citizen(-.*)?$|^letter-holder$|^caseworker-.+-localAuthority$");
 
-    public CaseAccessService(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
-                             CaseUserRepository caseUserRepository) {
+    public CaseAccessService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
+                             @Qualifier(SwitchableCaseUserRepository.QUALIFIER) final CaseUserRepository caseUserRepository) {
         this.userRepository = userRepository;
         this.caseUserRepository = caseUserRepository;
     }
@@ -64,8 +65,8 @@ public class CaseAccessService {
         return Optional.empty();
     }
 
-    public Set<String> getCaseRoles(String caseId) {
-        return new HashSet<>(caseUserRepository.findCaseRoles(Long.valueOf(caseId), userRepository.getUserId()));
+    public Set<String> getCaseRoles(String caseTypeId, String caseId) {
+        return new HashSet<>(caseUserRepository.findCaseRoles(caseTypeId, Long.valueOf(caseId), userRepository.getUserId()));
     }
 
     public Set<String> getUserRoles() {

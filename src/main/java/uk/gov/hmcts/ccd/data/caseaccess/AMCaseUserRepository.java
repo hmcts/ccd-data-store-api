@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ccd.data.caseaccess;
 
 import com.google.common.collect.Lists;
+import org.springframework.beans.factory.annotation.Qualifier;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
@@ -11,31 +11,20 @@ import java.util.List;
 
 @Named
 @Singleton
+@Qualifier(AMCaseUserRepository.QUALIFIER)
 public class AMCaseUserRepository implements CaseUserRepository {
 
-    private final CaseUserAuditRepository auditRepo;
+    public static final String QUALIFIER = "am";
 
     @PersistenceContext
     private EntityManager em;
 
-    @Inject
-    public AMCaseUserRepository(CaseUserAuditRepository caseUserAuditRepository) {
-        this.auditRepo = caseUserAuditRepository;
+    @Override
+    public void grantAccess(String jurisdictionId, String caseReference, Long caseId, String userId, String caseRole) {
     }
 
     @Override
-    public String getType() {
-        return "am";
-    }
-
-    @Override
-    public void grantAccess(Long caseId, String userId, String caseRole) {
-
-    }
-
-    @Override
-    public void revokeAccess(Long caseId, String userId, String caseRole) {
-
+    public void revokeAccess(String jurisdictionId, String caseReference, Long caseId, String userId, String caseRole) {
     }
 
     @Override
@@ -44,7 +33,7 @@ public class AMCaseUserRepository implements CaseUserRepository {
     }
 
     @Override
-    public List<String> findCaseRoles(final Long caseId, final String userId) {
+    public List<String> findCaseRoles(final String casecTypeId, final Long caseId, final String userId) {
         return Lists.newArrayList();
     }
 }

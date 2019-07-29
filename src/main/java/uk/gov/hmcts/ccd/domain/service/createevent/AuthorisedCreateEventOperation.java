@@ -59,7 +59,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
             .orElseThrow(() -> new ResourceNotFoundException("Case not found"));
 
         Set<String> userRoles = Sets.union(caseAccessService.getUserRoles(),
-            caseAccessService.getCaseRoles(existingCaseDetails.getId()));
+            caseAccessService.getCaseRoles(existingCaseDetails.getCaseTypeId(), existingCaseDetails.getId()));
         if (userRoles == null || userRoles.isEmpty()) {
             throw new ValidationException("Cannot find user roles for the user");
         }

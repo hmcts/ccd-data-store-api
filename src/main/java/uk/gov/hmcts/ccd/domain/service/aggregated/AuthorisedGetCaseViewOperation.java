@@ -4,6 +4,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_RE
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
 
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
+import uk.gov.hmcts.ccd.data.caseaccess.SwitchableCaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
@@ -32,12 +33,12 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
     private final GetCaseViewOperation getCaseViewOperation;
 
     public AuthorisedGetCaseViewOperation(
-        final @Qualifier(DefaultGetCaseViewOperation.QUALIFIER) GetCaseViewOperation getCaseViewOperation,
+        @Qualifier(DefaultGetCaseViewOperation.QUALIFIER) final GetCaseViewOperation getCaseViewOperation,
         @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
         final AccessControlService accessControlService,
-        final @Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
-        final CaseUserRepository caseUserRepository,
-        final @Qualifier(CachedCaseDetailsRepository.QUALIFIER) CaseDetailsRepository caseDetailsRepository) {
+        @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
+        @Qualifier(SwitchableCaseUserRepository.QUALIFIER) final CaseUserRepository caseUserRepository,
+        @Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository) {
         super(caseDefinitionRepository, accessControlService, userRepository, caseUserRepository, caseDetailsRepository);
         this.getCaseViewOperation = getCaseViewOperation;
     }
@@ -48,7 +49,7 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
 
         CaseType caseType = getCaseType(caseView.getCaseType().getId());
         String caseId = getCaseId(caseReference);
-        Set<String> userRoles = getUserRoles(caseId);
+        Set<String> userRoles = getUserRoles(caseType.getId(), caseId);
         verifyCaseTypeReadAccess(caseType, userRoles);
         filterCaseTabFieldsByReadAccess(caseView, userRoles);
         filterAllowedTabsWithFields(caseView, userRoles);

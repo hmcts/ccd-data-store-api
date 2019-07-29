@@ -3,7 +3,9 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CASE_TYPE_FOUND_DETAILS;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
+import uk.gov.hmcts.ccd.data.caseaccess.SwitchableCaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
@@ -32,11 +34,11 @@ public abstract class AbstractAuthorisedCaseViewOperation {
     private final CaseUserRepository caseUserRepository;
     private final CaseDetailsRepository caseDetailsRepository;
 
-    AbstractAuthorisedCaseViewOperation(CaseDefinitionRepository caseDefinitionRepository,
-                                        AccessControlService accessControlService,
-                                        UserRepository userRepository,
-                                        CaseUserRepository caseUserRepository,
-                                        CaseDetailsRepository caseDetailsRepository) {
+    AbstractAuthorisedCaseViewOperation(final CaseDefinitionRepository caseDefinitionRepository,
+                                        final AccessControlService accessControlService,
+                                        final UserRepository userRepository,
+                                        @Qualifier(SwitchableCaseUserRepository.QUALIFIER) final CaseUserRepository caseUserRepository,
+                                        final CaseDetailsRepository caseDetailsRepository) {
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.accessControlService = accessControlService;
         this.userRepository = userRepository;
@@ -71,10 +73,10 @@ public abstract class AbstractAuthorisedCaseViewOperation {
             .orElseThrow(() -> new CaseNotFoundException(caseReference));
     }
 
-    protected Set<String> getUserRoles(String caseId) {
+    protected Set<String> getUserRoles(String caseTypeId, String caseId) {
         return Sets.union(userRepository.getUserRoles(),
             caseUserRepository
-                .findCaseRoles(Long.valueOf(caseId), userRepository.getUserId())
+                .findCaseRoles(caseTypeId, Long.valueOf(caseId), userRepository.getUserId())
                 .stream()
                 .collect(Collectors.toSet()));
     }

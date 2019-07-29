@@ -15,6 +15,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.JurisdictionBuilder.newJurisdiction;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -51,6 +52,8 @@ class SubmitCaseTransactionTest {
     private static final String EVENT_NAME = "Some event";
     private static final String EVENT_SUMMARY = "Some event summary";
     private static final String EVENT_DESC = "Some event description";
+    private static final String JURISDICTION_ID = "DIVORCE";
+    private static final Long NEW_CASE_REFERENCE = 1234123412341234L;
     private static final String CASE_TYPE_ID = "TestCaseType";
     private static final Integer VERSION = 67;
     private static final String IDAM_ID = "23";
@@ -117,7 +120,6 @@ class SubmitCaseTransactionTest {
         idamUser = buildIdamUser();
         eventTrigger = buildEventTrigger();
         state = buildState();
-        final AboutToSubmitCallbackResponse response = buildResponse();
         doReturn(STATE_ID).when(savedCaseDetails).getState();
 
         doReturn(state).when(caseTypeService).findState(caseType, STATE_ID);
@@ -128,10 +130,12 @@ class SubmitCaseTransactionTest {
 
         doReturn(CASE_ID).when(savedCaseDetails).getId();
 
+        final AboutToSubmitCallbackResponse response = buildResponse();
         doReturn(response).when(callbackInvoker).invokeAboutToSubmitCallback(eventTrigger,
                                                                              null,
                                                                              this.caseDetails, caseType, IGNORE_WARNING
         );
+        doReturn(NEW_CASE_REFERENCE).when(caseDetails).getReference();
 
     }
 
@@ -220,7 +224,7 @@ class SubmitCaseTransactionTest {
                                          this.caseDetails,
                                          IGNORE_WARNING);
 
-        verify(caseUserRepository).grantAccess(Long.valueOf(CASE_ID), IDAM_ID, CREATOR.getRole());
+        verify(caseUserRepository).grantAccess(JURISDICTION_ID, NEW_CASE_REFERENCE.toString(), Long.valueOf(CASE_ID), IDAM_ID, CREATOR.getRole());
     }
 
     @Test
@@ -298,6 +302,7 @@ class SubmitCaseTransactionTest {
         final Version version = new Version();
         version.setNumber(VERSION);
         final CaseType caseType = new CaseType();
+        caseType.setJurisdiction(newJurisdiction().withJurisdictionId(JURISDICTION_ID).build());
         caseType.setId(CASE_TYPE_ID);
         caseType.setVersion(version);
         return caseType;

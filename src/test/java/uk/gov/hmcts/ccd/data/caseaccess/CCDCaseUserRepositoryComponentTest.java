@@ -19,10 +19,13 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.BaseTest;
 
 @Transactional
-public class CCDCaseUserRepositoryTest extends BaseTest {
+public class CCDCaseUserRepositoryComponentTest extends BaseTest {
 
     private static final String COUNT_CASE_USERS = "select count(*) from case_users where case_data_id = ? and user_id = ? and case_role = ?";
 
+    private static final String JURISDICTION_ID = "JURISDICTION";
+    private static final String CASE_TYPE_ID = "CASE_TYPE";
+    private static final String CASE_REFERENCE = "1234123412341234";
     private static final Long CASE_ID = 1L;
     private static final Long CASE_ID_GRANTED = 2L;
     private static final Long CASE_ID_3 = 3L;
@@ -41,7 +44,7 @@ public class CCDCaseUserRepositoryTest extends BaseTest {
     private CaseUserAuditRepository auditRepository;
 
     @Autowired
-    private CaseUserRepository repository;
+    private CCDCaseUserRepository repository;
 
     @Before
     public void setUp() {
@@ -51,7 +54,7 @@ public class CCDCaseUserRepositoryTest extends BaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldGrantAccessAsCustomCaseRole() {
-        repository.grantAccess(CASE_ID, USER_ID, CASE_ROLE);
+        repository.grantAccess(JURISDICTION_ID, CASE_REFERENCE, CASE_ID, USER_ID, CASE_ROLE);
 
         assertThat(countAccesses(CASE_ID, USER_ID, CASE_ROLE), equalTo(1));
         verify(auditRepository).auditGrant(CASE_ID, USER_ID, CASE_ROLE);
@@ -63,7 +66,7 @@ public class CCDCaseUserRepositoryTest extends BaseTest {
         "classpath:sql/insert_case_users.sql",
     })
     public void shouldRevokeAccessAsCustomCaseRole() {
-        repository.revokeAccess(CASE_ID_GRANTED, USER_ID_GRANTED, CASE_ROLE);
+        repository.revokeAccess(JURISDICTION_ID, CASE_TYPE_ID, CASE_ID_GRANTED, USER_ID_GRANTED, CASE_ROLE);
 
         assertThat(countAccesses(CASE_ID_GRANTED, USER_ID_GRANTED, CASE_ROLE), equalTo(0));
         verify(auditRepository).auditRevoke(CASE_ID_GRANTED, USER_ID_GRANTED, CASE_ROLE);
@@ -109,12 +112,12 @@ public class CCDCaseUserRepositoryTest extends BaseTest {
     })
     public void shouldFindCaseRolesUserPerformsForCase() {
 
-        List<String> caseRoles = repository.findCaseRoles(CASE_ID , USER_ID);
+        List<String> caseRoles = repository.findCaseRoles(CASE_TYPE_ID, CASE_ID , USER_ID);
 
         assertThat(caseRoles.size(), equalTo(1));
         assertThat(caseRoles.get(0), equalTo(CASE_ROLE_CREATOR));
 
-        caseRoles = repository.findCaseRoles(CASE_ID_GRANTED , USER_ID_GRANTED);
+        caseRoles = repository.findCaseRoles(CASE_TYPE_ID, CASE_ID_GRANTED , USER_ID_GRANTED);
 
         assertThat(caseRoles.size(), equalTo(2));
         assertThat(caseRoles, containsInAnyOrder(CASE_ROLE,CASE_ROLE_SOLICITOR));

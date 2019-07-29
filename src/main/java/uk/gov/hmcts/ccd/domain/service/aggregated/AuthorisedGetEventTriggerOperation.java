@@ -83,7 +83,7 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
 
         validateEventTrigger(() -> !eventTriggerService.isPreStateValid(caseDetails.getState(), eventTrigger));
 
-        Set<String> userRoles = Sets.union(caseAccessService.getUserRoles(), caseAccessService.getCaseRoles(caseDetails.getId()));
+        Set<String> userRoles = Sets.union(caseAccessService.getUserRoles(), caseAccessService.getCaseRoles(caseType.getId(), caseDetails.getId()));
 
         verifyMandatoryAccessForCase(eventTriggerId, caseDetails, caseType, userRoles);
 
