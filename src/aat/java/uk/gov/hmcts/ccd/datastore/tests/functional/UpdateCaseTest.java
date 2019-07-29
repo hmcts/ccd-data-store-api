@@ -1,7 +1,9 @@
 package uk.gov.hmcts.ccd.datastore.tests.functional;
 
 import static org.hamcrest.Matchers.equalTo;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.JURISDICTION;
 
+import io.restassured.http.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
@@ -115,6 +117,19 @@ class UpdateCaseTest extends BaseTest {
 
             .then()
             .statusCode(201);
+
+        //read the case data using private case worker and verify that the case was successfully updated.
+        asPrivateCaseworker(true).get().given()
+            .pathParam("jurisdiction", JURISDICTION)
+            .pathParam("caseType", "AAT_AUTH_4")
+            .pathParam("caseReference", caseReference)
+            .contentType(ContentType.JSON).when()
+            .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases/{caseReference}")
+            .then().log().ifError().statusCode(200)
+            .assertThat()
+            .rootPath("case_data")
+            .body("NumberField", equalTo(UPDATED_NUMBER))
+            .body("TextField", equalTo(AATCaseBuilder.TEXT));
     }
 
     @Test
@@ -137,6 +152,19 @@ class UpdateCaseTest extends BaseTest {
 
             .then()
             .statusCode(201);
+
+        //read the case data using private case worker and verify that the case was successfully updated.
+        asPrivateCaseworker(true).get().given()
+            .pathParam("jurisdiction", JURISDICTION)
+            .pathParam("caseType", "AAT_AUTH_5")
+            .pathParam("caseReference", caseReference)
+            .contentType(ContentType.JSON).when()
+            .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases/{caseReference}")
+            .then().log().ifError().statusCode(200)
+            .assertThat()
+            .rootPath("case_data")
+            .body("NumberField", equalTo(UPDATED_NUMBER))
+            .body("TextField", equalTo(AATCaseBuilder.TEXT));
     }
 
     @Test
