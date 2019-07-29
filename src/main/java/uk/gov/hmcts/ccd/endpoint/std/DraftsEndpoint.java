@@ -25,7 +25,10 @@ import uk.gov.hmcts.ccd.domain.service.upsertdraft.UpsertDraftOperation;
 @RequestMapping(path = "/",
     consumes = MediaType.APPLICATION_JSON_VALUE,
     produces = MediaType.APPLICATION_JSON_VALUE)
-@Api(value = "/", description = "Drafts API")
+@Api(tags = {"Drafts API"})
+@SwaggerDefinition(tags = {
+    @Tag(name = "Drafts API", description = "The API for saving, updating, finding or deleting draft case data")
+})
 public class DraftsEndpoint {
     private static final Logger LOG = LoggerFactory.getLogger(DraftsEndpoint.class);
 
@@ -42,7 +45,7 @@ public class DraftsEndpoint {
         this.draftGateway = draftGateway;
     }
 
-    @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-trigger/{etid}/drafts", method = RequestMethod.POST)
+    @PostMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-trigger/{etid}/drafts")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(
         value = "Save draft as a caseworker."
@@ -65,7 +68,7 @@ public class DraftsEndpoint {
         return upsertDraftOperation.executeSave(caseTypeId, caseDataContent);
     }
 
-    @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-trigger/{etid}/drafts/{did}", method = RequestMethod.PUT)
+    @PutMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-trigger/{etid}/drafts/{did}")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
         value = "Update draft as a caseworker."
@@ -91,8 +94,7 @@ public class DraftsEndpoint {
     }
 
     @Transactional
-    @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/drafts/{did}",
-        method = RequestMethod.GET)
+    @GetMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/drafts/{did}")
     @ApiOperation(value = "Fetch a draft for display")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "A displayable draft")
@@ -108,8 +110,7 @@ public class DraftsEndpoint {
     }
 
     @Transactional
-    @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/drafts/{did}",
-        method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/drafts/{did}")
     @ApiOperation(value = "Delete a given draft")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "A draft deleted successfully")
@@ -122,5 +123,4 @@ public class DraftsEndpoint {
         final Duration between = Duration.between(start, Instant.now());
         LOG.info("deleteDraft has been completed in {} millisecs...", between.toMillis());
     }
-
 }
