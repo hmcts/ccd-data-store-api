@@ -7,13 +7,16 @@ import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.JURISDICTION;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.BaseTest;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FullCase;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event;
+import uk.gov.hmcts.ccd.datastore.tests.helper.CaseTestDataLoaderExtension;
 
+@ExtendWith(CaseTestDataLoaderExtension.class)
 @DisplayName("Get case by reference")
 class GetCaseTest extends BaseTest {
     private static final String NOT_FOUND_CASE_REFERENCE = "1234123412341238";
