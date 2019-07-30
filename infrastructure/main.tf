@@ -158,6 +158,12 @@ module "ccd-data-store-api" {
     HTTP_CLIENT_SECONDS_IDLE_CONNECTION   = "${var.http_client_seconds_idle_connection}"
     HTTP_CLIENT_MAX_CLIENT_PER_ROUTE      = "${var.http_client_max_client_per_route}"
     HTTP_CLIENT_VALIDATE_AFTER_INACTIVITY = "${var.http_client_validate_after_inactivity}"
+
+    CCD_AM_WRITE_TO_CCD_ONLY              = "${var.ccd_am_write_to_ccd_only}"
+    CCD_AM_WRITE_TO_AM_ONLY               = "${var.ccd_am_write_to_am_only}"
+    CCD_AM_WRITE_TO_BOTH                  = "${var.ccd_am_write_to_both}"
+    CCD_AM_READ_FROM_CCD                  = "${var.ccd_am_read_from_ccd}"
+    CCD_AM_READ_FROM_AM                   = "${var.ccd_am_read_from_am}"
   }
 
 }
