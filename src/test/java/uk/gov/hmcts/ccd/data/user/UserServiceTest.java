@@ -58,6 +58,7 @@ public class UserServiceTest {
         when(userRepoMock.getUserDefaultSettings("email")).thenReturn(userDefaultMock);
         when(caseDefinitionRepoMock.getJurisdiction("J1")).thenReturn(j1);
         when(caseDefinitionRepoMock.getJurisdiction("J2")).thenReturn(j2);
+        when(caseDefinitionRepoMock.getJurisdiction("J3")).thenReturn(unknownJurisdiction);
         when(jurisdictionMapperMock.toResponse(j1)).thenReturn(jdp1);
         when(jurisdictionMapperMock.toResponse(j2)).thenReturn(jdp2);
 
