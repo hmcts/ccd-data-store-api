@@ -178,6 +178,17 @@ public class SearchQueryFactoryOperationTest {
     }
 
     @Test
+    public void searchFactorySqlGeneratedTestFromMetaAndWhenNoCaseIdsForGivenUserId() {
+        doReturn(Lists.newArrayList()).when(caseUserRepository).findCasesUserIdHasAccessTo(USER_ID);
+        MetaData metadata = new MetaData(TEST_CASE_TYPE_VALUE, null);
+        when(em.createNativeQuery(any(String.class), any(Class.class)))
+            .thenReturn(mockQuery);
+        Query result = subjectWithUserAuthValues.build(metadata, params, false);
+        verify(em, times(1)).createNativeQuery("SELECT * FROM case_data WHERE case_type_id = ?0 ORDER BY created_date ASC", CaseDetailsEntity.class);
+        verify(result, times(1)).setParameter(0, TEST_CASE_TYPE_VALUE);
+    }
+
+    @Test
     public void searchFactorySqlGeneratedTestFromFieldWithQueryCountAndFromCaseUsersEntity() {
         MetaData metadata = new MetaData(null, null);
         params.put(TEST_FIELD_NAME, TEST_FIELD_VALUE);
@@ -185,6 +196,18 @@ public class SearchQueryFactoryOperationTest {
             .thenReturn(mockQuery);
         Query result = subjectWithUserAuthValues.build(metadata, params, true);
         verify(em, times(1)).createNativeQuery("SELECT count(*) FROM case_data WHERE TRIM( UPPER ( data #>> '{name}')) = TRIM( UPPER ( ?0)) AND id IN ('123','456')");
+        verify(result, times(1)).setParameter(0, TEST_FIELD_VALUE);
+    }
+
+    @Test
+    public void searchFactorySqlGeneratedTestFromFieldWithQueryCountWhenNoCaseIdsForGivenUserId() {
+        doReturn(Lists.newArrayList()).when(caseUserRepository).findCasesUserIdHasAccessTo(USER_ID);
+        MetaData metadata = new MetaData(null, null);
+        params.put(TEST_FIELD_NAME, TEST_FIELD_VALUE);
+        when(em.createNativeQuery(any(String.class)))
+            .thenReturn(mockQuery);
+        Query result = subjectWithUserAuthValues.build(metadata, params, true);
+        verify(em, times(1)).createNativeQuery("SELECT count(*) FROM case_data WHERE TRIM( UPPER ( data #>> '{name}')) = TRIM( UPPER ( ?0))");
         verify(result, times(1)).setParameter(0, TEST_FIELD_VALUE);
     }
 
