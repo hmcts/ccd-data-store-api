@@ -36,6 +36,8 @@ public class UserServiceTest {
     private JurisdictionDisplayProperties jdp1;
     @Mock
     private JurisdictionDisplayProperties jdp2;
+    @Mock
+    private JurisdictionDisplayProperties jdp3;
 
     private Jurisdiction j1;
     private Jurisdiction j2;
@@ -61,11 +63,13 @@ public class UserServiceTest {
         when(caseDefinitionRepoMock.getJurisdiction("J3")).thenReturn(unknownJurisdiction);
         when(jurisdictionMapperMock.toResponse(j1)).thenReturn(jdp1);
         when(jurisdictionMapperMock.toResponse(j2)).thenReturn(jdp2);
+        when(jurisdictionMapperMock.toResponse(unknownJurisdiction)).thenReturn(jdp3);
 
         UserProfile userProfile = userService.getUserProfile();
 
         assertThat(userProfile.getUser().getIdamProperties(), is(mockIDAMProps));
-        assertThat(userProfile.getJurisdictions(), equalTo(new JurisdictionDisplayProperties[] {jdp1, jdp2}));
+        assertThat(userProfile.getJurisdictions(),
+                equalTo(new JurisdictionDisplayProperties[] { jdp1, jdp2, jdp3 }));
         WorkbasketDefault workbasketDefault = userProfile.getDefaultSettings().getWorkbasketDefault();
         assertThat(workbasketDefault.getJurisdictionId(), is("J1"));
         assertThat(workbasketDefault.getCaseTypeId(), is("CT"));
