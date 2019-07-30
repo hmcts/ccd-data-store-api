@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.data.casedetails.search;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -10,16 +11,19 @@ import java.util.Set;
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
+import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
@@ -30,6 +34,7 @@ public class SearchQueryFactoryOperationTest {
     private static final String TEST_JURISDICTION_VALUE = "JURISDICTION";
     private static final String TEST_FIELD_NAME = "case.name";
     private static final String TEST_FIELD_VALUE = "Tim";
+    public static final String USER_ID = "2";
 
     private SearchQueryFactoryOperation subject;
     private SearchQueryFactoryOperation subjectWithUserAuthValues;
@@ -50,10 +55,14 @@ public class SearchQueryFactoryOperationTest {
     @Mock
     private AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService;
 
+    @Mock
+    private CaseUserRepository caseUserRepository;
+
     private Map<String, String> params;
 
     private Set<String> roles = null;
-    private UserAuthorisation userAuthorisationWithAccessLevel = new UserAuthorisation("2", UserAuthorisation.AccessLevel.GRANTED,roles);
+    private UserAuthorisation userAuthorisationWithAccessLevel = new UserAuthorisation(USER_ID, UserAuthorisation.AccessLevel.GRANTED,roles);
+    private List<Long> caseIdsUserHasAccessTo;
 
     @Before
     public void prepare() {
@@ -63,14 +72,19 @@ public class SearchQueryFactoryOperationTest {
             em,
             mockApp,
             userAuthorisation,
-            authorisedCaseDefinitionDataService);
+            authorisedCaseDefinitionDataService,
+            caseUserRepository);
 
         subjectWithUserAuthValues = new SearchQueryFactoryOperation(
             criterionFactory,
             em,
             mockApp,
             userAuthorisationWithAccessLevel,
-            authorisedCaseDefinitionDataService);
+            authorisedCaseDefinitionDataService,
+            caseUserRepository);
+
+        caseIdsUserHasAccessTo = Lists.newArrayList(123l, 456l);
+        doReturn(caseIdsUserHasAccessTo).when(caseUserRepository).findCasesUserIdHasAccessTo(USER_ID);
 
         params = new HashMap<>();
     }
@@ -159,7 +173,7 @@ public class SearchQueryFactoryOperationTest {
         when(em.createNativeQuery(any(String.class), any(Class.class)))
             .thenReturn(mockQuery);
         Query result = subjectWithUserAuthValues.build(metadata, params, false);
-        verify(em, times(1)).createNativeQuery("SELECT * FROM case_data WHERE case_type_id = ?0 AND id IN (SELECT cu.case_data_id FROM case_users AS cu WHERE user_id = '2') ORDER BY created_date ASC", CaseDetailsEntity.class);
+        verify(em, times(1)).createNativeQuery("SELECT * FROM case_data WHERE case_type_id = ?0 AND id IN ('123','456') ORDER BY created_date ASC", CaseDetailsEntity.class);
         verify(result, times(1)).setParameter(0, TEST_CASE_TYPE_VALUE);
     }
 
@@ -170,7 +184,7 @@ public class SearchQueryFactoryOperationTest {
         when(em.createNativeQuery(any(String.class)))
             .thenReturn(mockQuery);
         Query result = subjectWithUserAuthValues.build(metadata, params, true);
-        verify(em, times(1)).createNativeQuery("SELECT count(*) FROM case_data WHERE TRIM( UPPER ( data #>> '{name}')) = TRIM( UPPER ( ?0)) AND id IN (SELECT cu.case_data_id FROM case_users AS cu WHERE user_id = '2')");
+        verify(em, times(1)).createNativeQuery("SELECT count(*) FROM case_data WHERE TRIM( UPPER ( data #>> '{name}')) = TRIM( UPPER ( ?0)) AND id IN ('123','456')");
         verify(result, times(1)).setParameter(0, TEST_FIELD_VALUE);
     }
 

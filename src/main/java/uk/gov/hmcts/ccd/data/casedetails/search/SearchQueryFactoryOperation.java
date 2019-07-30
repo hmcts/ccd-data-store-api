@@ -12,7 +12,11 @@ import java.util.stream.IntStream;
 
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
+import uk.gov.hmcts.ccd.data.caseaccess.SwitchableCaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
@@ -37,17 +41,20 @@ public class SearchQueryFactoryOperation {
     private final ApplicationParams applicationParam;
     private final UserAuthorisation userAuthorisation;
     private final AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService;
+    private final CaseUserRepository switchableCaseUserRepository;
 
     public SearchQueryFactoryOperation(CriterionFactory criterionFactory,
                                        EntityManager entityManager,
                                        ApplicationParams applicationParam,
                                        UserAuthorisation userAuthorisation,
-                                       AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService) {
+                                       AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService,
+                                       @Qualifier(SwitchableCaseUserRepository.QUALIFIER) final CaseUserRepository switchableCaseUserRepository) {
         this.criterionFactory = criterionFactory;
         this.entityManager = entityManager;
         this.applicationParam = applicationParam;
         this.userAuthorisation = userAuthorisation;
         this.authorisedCaseDefinitionDataService = authorisedCaseDefinitionDataService;
+        this.switchableCaseUserRepository = switchableCaseUserRepository;
     }
 
     public Query build(MetaData metadata, Map<String, String> params, boolean isCountQuery) {
@@ -76,9 +83,10 @@ public class SearchQueryFactoryOperation {
 
     private String addUserCaseAccessClause() {
         if (UserAuthorisation.AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
-            return String.format(
-                " AND id IN (SELECT cu.case_data_id FROM case_users AS cu WHERE user_id = '%s')",
-                userAuthorisation.getUserId()
+            List<Long> casesUserIdHasAccessTo = switchableCaseUserRepository.findCasesUserIdHasAccessTo(userAuthorisation.getUserId());
+            return casesUserIdHasAccessTo.isEmpty() ? "" : String.format(
+                " AND id IN ('%s')",
+                StringUtils.join(casesUserIdHasAccessTo, "','")
             );
         }
         return "";
