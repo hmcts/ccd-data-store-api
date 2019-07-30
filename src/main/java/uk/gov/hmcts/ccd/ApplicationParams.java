@@ -16,6 +16,22 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 @Named
 @Singleton
 public class ApplicationParams {
+
+    @Value("#{'${ccd.am.write.to_ccd_only}'.split(',')}")
+    private List<String> writeToCCDCaseTypesOnly;
+
+    @Value("#{'${ccd.am.write.to_am_only}'.split(',')}")
+    private List<String> writeToAMCaseTypesOnly;
+
+    @Value("#{'${ccd.am.write.to_both}'.split(',')}")
+    private List<String> writeToBothCaseTypes;
+
+    @Value("#{'${ccd.am.read.from_ccd}'.split(',')}")
+    private List<String> readFromCCDCaseTypes;
+
+    @Value("#{'${ccd.am.read.from_am}'.split(',')}")
+    private List<String> readFromAMCaseTypes;
+
     @Value("#{'${ccd.callback.retries}'.split(',')}")
     private List<Integer> callbackRetries;
 
@@ -285,5 +301,25 @@ public class ApplicationParams {
 
     public String getElasticsearchNodeDiscoveryFilter() {
         return elasticsearchNodeDiscoveryFilter;
+    }
+
+    public List<String> getWriteToCCDCaseTypesOnly() {
+        return writeToCCDCaseTypesOnly;
+    }
+
+    public List<String> getWriteToAMCaseTypesOnly() {
+        return writeToAMCaseTypesOnly;
+    }
+
+    public List<String> getWriteToBothCaseTypes() {
+        return writeToBothCaseTypes;
+    }
+
+    public List<String> getReadFromCCDCaseTypes() {
+        return readFromCCDCaseTypes;
+    }
+
+    public List<String> getReadFromAMCaseTypes() {
+        return readFromAMCaseTypes;
     }
 }

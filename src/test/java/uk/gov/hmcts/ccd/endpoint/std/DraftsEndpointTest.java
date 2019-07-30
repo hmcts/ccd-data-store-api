@@ -90,7 +90,7 @@ class DraftsEndpointTest {
     void shouldFetchDraftForCaseWorker() {
         CaseView toBeReturned = new CaseView();
         doReturn(toBeReturned).when(getDraftViewOperation).execute(any());
-        final CaseView output = endpoint.findDraft(JURISDICTION_ID, CASE_TYPE_ID, DRAFT_ID);
+        final CaseView output = endpoint.findDraft(UID, JURISDICTION_ID, CASE_TYPE_ID, DRAFT_ID);
 
         assertAll(
             () -> assertThat(output, sameInstance(toBeReturned)),
@@ -103,7 +103,7 @@ class DraftsEndpointTest {
     void shouldDeleteDraftForCaseWorker() {
         doNothing().when(draftGateway).delete(DRAFT_ID);
 
-        endpoint.deleteDraft(JURISDICTION_ID, CASE_TYPE_ID, DRAFT_ID);
+        endpoint.deleteDraft(UID, JURISDICTION_ID, CASE_TYPE_ID, DRAFT_ID);
 
         assertAll(
             () -> verify(draftGateway).delete(DRAFT_ID)
