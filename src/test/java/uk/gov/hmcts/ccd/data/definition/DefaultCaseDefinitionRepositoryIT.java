@@ -19,6 +19,7 @@ import javax.inject.Inject;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
@@ -102,7 +103,8 @@ public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
 
     @Test
     public void shouldGetJurisdictionsDefinition() {
-        List<Jurisdiction> allJurisdictions = caseDefinitionRepository.getJurisdictions(newArrayList("PROBATE", "DIVORCE", "SSCS"));
+        List<Jurisdiction> allJurisdictions = newArrayList("PROBATE", "DIVORCE", "SSCS").stream()
+                .map(id -> caseDefinitionRepository.getJurisdiction(id)).collect(Collectors.toList());
 
         assertAll(
                 () -> assertThat(allJurisdictions, hasSize(3)),

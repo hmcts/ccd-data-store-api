@@ -179,11 +179,6 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         }
     }
 
-    @Override
-    public List<Jurisdiction> getJurisdictions(List<String> jurisdictionIds) {
-        return getJurisdictionsFromDefinitionStore(jurisdictionIds);
-    }
-
     @Cacheable(value = "jurisdictionCache")
     @Override
     public Jurisdiction getJurisdiction(String jurisdictionId) {

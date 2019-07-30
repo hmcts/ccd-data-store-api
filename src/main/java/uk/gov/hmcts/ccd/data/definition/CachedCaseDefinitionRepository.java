@@ -77,11 +77,6 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     }
 
     @Override
-    public List<Jurisdiction> getJurisdictions(List<String> ids) {
-        return ids.stream().map(this::getJurisdiction).collect(Collectors.toList());
-    }
-
-    @Override
     public Jurisdiction getJurisdiction(String jurisdictionId) {
         return caseDefinitionRepository.getJurisdiction(jurisdictionId);
     }

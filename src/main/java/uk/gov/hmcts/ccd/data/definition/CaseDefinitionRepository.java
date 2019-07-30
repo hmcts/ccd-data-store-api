@@ -22,8 +22,6 @@ public interface CaseDefinitionRepository {
 
     CaseTypeDefinitionVersion getLatestVersion(String caseTypeId);
 
-    List<Jurisdiction> getJurisdictions(List<String> ids);
-
     Jurisdiction getJurisdiction(String jurisdictionId);
     
 }
