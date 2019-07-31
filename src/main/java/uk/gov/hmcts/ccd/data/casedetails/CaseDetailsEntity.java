@@ -82,14 +82,15 @@ public class CaseDetailsEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = SECURITY_CLASSIFICATION_FIELD_COL, nullable = false)
     private SecurityClassification securityClassification;
-    @Column(name = "locked_by_user_id")
-    private Integer lockedBy;
     @Column(name = "data", nullable = false)
     @Convert(converter = uk.gov.hmcts.ccd.data.JSONBConverter.class)
     private JsonNode data;
     @Column(name = "data_classification", nullable = false)
     @Convert(converter = uk.gov.hmcts.ccd.data.JSONBConverter.class)
     private JsonNode dataClassification;
+
+    @Version
+    private Integer version;
 
     public Long getId() {
         return id;
@@ -98,7 +99,6 @@ public class CaseDetailsEntity {
     public void setId(Long uuid) {
         this.id = uuid;
     }
-
 
     public Long getReference() {
         return reference;
@@ -156,14 +156,6 @@ public class CaseDetailsEntity {
         this.securityClassification = securityClassification;
     }
 
-    public Integer getLockedBy() {
-        return lockedBy;
-    }
-
-    public void setLockedBy(Integer lockedBy) {
-        this.lockedBy = lockedBy;
-    }
-
     public JsonNode getData() {
         return data;
     }
@@ -178,5 +170,13 @@ public class CaseDetailsEntity {
 
     public void setDataClassification(JsonNode dataClassification) {
         this.dataClassification = dataClassification;
+    }
+
+    public Integer getVersion() {
+        return version;
+    }
+
+    public void setVersion(final Integer version) {
+        this.version = version;
     }
 }
