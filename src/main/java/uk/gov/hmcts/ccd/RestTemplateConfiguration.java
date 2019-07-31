@@ -21,6 +21,8 @@ class RestTemplateConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(RestTemplateConfiguration.class);
 
     private PoolingHttpClientConnectionManager cm;
+    private PoolingHttpClientConnectionManager draftsCm;
+    private PoolingHttpClientConnectionManager cbCm;
 
     @Value("${http.client.max.total}")
     private int maxTotalHttpClient;
@@ -62,21 +64,21 @@ class RestTemplateConfiguration {
     @Bean(name = "createDraftRestTemplate")
     public RestTemplate createDraftsRestTemplate() {
         final RestTemplate restTemplate = new RestTemplate();
-        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(getHttpClient(draftsCreateConnectionTimeout)));
+        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(getHttpClient(draftsCm, draftsCreateConnectionTimeout)));
         return restTemplate;
     }
 
     @Bean(name = "draftsRestTemplate")
     public RestTemplate draftsRestTemplate() {
         final RestTemplate restTemplate = new RestTemplate();
-        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(getHttpClient(draftsConnectionTimeout)));
+        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(getHttpClient(draftsCm, draftsConnectionTimeout)));
         return restTemplate;
     }
 
     @Bean(name = "callbackRestTemplate")
     public RestTemplate callbackRestTemplate() {
         final RestTemplate restTemplate = new RestTemplate();
-        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(getHttpClient(callbackConnectionTimeout)));
+        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(getHttpClient(cbCm,callbackConnectionTimeout)));
         return restTemplate;
     }
 
@@ -90,10 +92,10 @@ class RestTemplateConfiguration {
     }
 
     private HttpClient getHttpClient() {
-        return getHttpClient(connectionTimeout);
+        return getHttpClient(cm, connectionTimeout);
     }
 
-    private HttpClient getHttpClient(final int timeout) {
+    private HttpClient getHttpClient(PoolingHttpClientConnectionManager cm, final int timeout) {
         cm = new PoolingHttpClientConnectionManager();
 
         LOG.info("maxTotalHttpClient: {}", maxTotalHttpClient);
