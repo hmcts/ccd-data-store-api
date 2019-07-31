@@ -46,10 +46,13 @@ class RestTemplateConfiguration {
     @Value("${http.client.connection.drafts.create.timeout}")
     private int draftsCreateConnectionTimeout;
 
+    @Value("${http.client.connection.callback.timeout}")
+    private int callbackConnectionTimeout;
+
     @Bean(name = "restTemplate")
     public RestTemplate restTemplate() {
         final RestTemplate restTemplate = new RestTemplate();
-        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient());
+        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(getHttpClient());
         requestFactory.setReadTimeout(readTimeout);
         LOG.info("readTimeout: {}", readTimeout);
         restTemplate.setRequestFactory(requestFactory);
@@ -70,6 +73,13 @@ class RestTemplateConfiguration {
         return restTemplate;
     }
 
+    @Bean(name = "callbackRestTemplate")
+    public RestTemplate callbackRestTemplate() {
+        final RestTemplate restTemplate = new RestTemplate();
+        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(getHttpClient(callbackConnectionTimeout)));
+        return restTemplate;
+    }
+
     @PreDestroy
     void close() {
         LOG.info("PreDestory called");
@@ -79,13 +89,7 @@ class RestTemplateConfiguration {
         }
     }
 
-    @Bean(name = "httpClient")
-    public HttpClient httpClient() {
-        return getHttpClient(connectionTimeout);
-    }
-
-    @Bean(name = "callbacksHttpClient")
-    public HttpClient callbacksHttpClient() {
+    private HttpClient getHttpClient() {
         return getHttpClient(connectionTimeout);
     }
 

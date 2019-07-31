@@ -122,6 +122,10 @@ public class ApplicationParams {
     @Value("${search.elastic.nodes.discovery.filter}")
     private String elasticsearchNodeDiscoveryFilter;
 
+    @Value("${http.client.max.total}")
+    private int maxTotalHttpClient;
+
+
     public static String encode(final String stringToEncode) {
         try {
             return URLEncoder.encode(stringToEncode, "UTF-8");
@@ -308,6 +312,10 @@ public class ApplicationParams {
 
     public String getElasticsearchNodeDiscoveryFilter() {
         return elasticsearchNodeDiscoveryFilter;
+    }
+
+    public int getMaxTotalHttpClient() {
+        return maxTotalHttpClient;
     }
 
     public List<String> getWriteToCCDCaseTypesOnly() {
