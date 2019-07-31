@@ -1,5 +1,22 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
+import javax.transaction.Transactional;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CASE_REFERENCE;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CREATED_DATE;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.LAST_MODIFIED_DATE;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.SECURITY_CLASSIFICATION;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.PAGE_PARAM;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.SORT_PARAM;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -42,23 +59,6 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.DocumentsOperation;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
-
-import javax.transaction.Transactional;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Stream;
-
-import static java.util.stream.Collectors.toList;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CASE_REFERENCE;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CREATED_DATE;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.LAST_MODIFIED_DATE;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.SECURITY_CLASSIFICATION;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.PAGE_PARAM;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.SORT_PARAM;
 
 @RestController
 @RequestMapping(path = "/",
@@ -385,6 +385,7 @@ public class CaseDetailsEndpoint {
         @ApiResponse(code = 200, message = "Documents list for the given case type and id")
     })
     public List<Document> getDocumentsForEvent(
+        @PathVariable("uid") final String uid,
         @PathVariable("jid") String jid,
         @PathVariable("ctid") String ctid,
         @PathVariable("cid") String cid) {
@@ -400,7 +401,8 @@ public class CaseDetailsEndpoint {
     @ApiOperation(value = "Get case data for a given case type")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "List of case data for the given search criteria")})
-    public List<CaseDetails> searchCasesForCaseWorkers(@PathVariable("jid") final String jurisdictionId,
+    public List<CaseDetails> searchCasesForCaseWorkers(@PathVariable("uid") final String uid,
+                                                       @PathVariable("jid") final String jurisdictionId,
                                                        @PathVariable("ctid") final String caseTypeId,
                                                        @RequestParam Map<String, String> queryParameters) {
         return searchCases(jurisdictionId, caseTypeId, queryParameters);
@@ -411,7 +413,8 @@ public class CaseDetailsEndpoint {
     @ApiOperation(value = "Get case data for a given case type")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "List of case data for the given search criteria")})
-    public List<CaseDetails> searchCasesForCitizens(@PathVariable("jid") final String jurisdictionId,
+    public List<CaseDetails> searchCasesForCitizens(@PathVariable("uid") final String uid,
+                                                    @PathVariable("jid") final String jurisdictionId,
                                                     @PathVariable("ctid") final String caseTypeId,
                                                     @RequestParam Map<String, String> queryParameters) {
         return searchCases(jurisdictionId, caseTypeId, queryParameters);
@@ -433,7 +436,8 @@ public class CaseDetailsEndpoint {
     @ApiOperation(value = "Get the pagination metadata for a case data search")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Pagination metadata for the given search criteria")})
-    public PaginatedSearchMetadata searchCasesMetadataForCaseworkers(@PathVariable("jid") final String jurisdictionId,
+    public PaginatedSearchMetadata searchCasesMetadataForCaseworkers(@PathVariable("uid") final String uid,
+                                                                     @PathVariable("jid") final String jurisdictionId,
                                                                      @PathVariable("ctid") final String caseTypeId,
                                                                      @RequestParam Map<String, String> queryParameters) {
         return searchMetadata(jurisdictionId, caseTypeId, queryParameters);
@@ -444,7 +448,8 @@ public class CaseDetailsEndpoint {
     @ApiOperation(value = "Get the pagination metadata for a case data search")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Pagination metadata for the given search criteria")})
-    public PaginatedSearchMetadata searchCasesMetadataForCitizens(@PathVariable("jid") final String jurisdictionId,
+    public PaginatedSearchMetadata searchCasesMetadataForCitizens(@PathVariable("uid") final String uid,
+                                                                  @PathVariable("jid") final String jurisdictionId,
                                                                   @PathVariable("ctid") final String caseTypeId,
                                                                   @RequestParam Map<String, String> queryParameters) {
         return searchMetadata(jurisdictionId, caseTypeId, queryParameters);

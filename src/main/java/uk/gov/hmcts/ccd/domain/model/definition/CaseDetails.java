@@ -38,6 +38,9 @@ public class CaseDetails implements Cloneable {
     @JsonIgnore
     private Long reference;
 
+    @JsonProperty("version")
+    private Integer version;
+
     private String jurisdiction;
 
     @JsonProperty("case_type_id")
@@ -118,6 +121,14 @@ public class CaseDetails implements Cloneable {
     @JsonSetter("id")
     public void setReference(Long reference) {
         this.reference = reference;
+    }
+
+    public Integer getVersion() {
+        return version;
+    }
+
+    public void setVersion(final Integer version) {
+        this.version = version;
     }
 
     public String getCaseTypeId() {
