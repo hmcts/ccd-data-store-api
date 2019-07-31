@@ -10,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
@@ -109,10 +110,14 @@ public class CallbackService {
 
         for (CallbackRetryContext retryContext : retryContextList) {
             sleep(retryContext.getCallbackRetryInterval());
+            StopWatch sw = new StopWatch();
+            sw.start();
             final Optional<ResponseEntity<T>> maybeHttpResponse = sendRequest(url,
                 callbackRequest,
                 retryContext.getCallbackRetryTimeout(),
                 clazz);
+            sw.stop();
+            LOG.error("sw.time={}, caseType={}", sw.getTotalTimeMillis(), caseDetails.getCaseTypeId());
             return maybeHttpResponse.orElseThrow(() -> {
                     LOG.warn("Unsuccessful callback to {} for caseType {} and event {} due to {}", url, caseDetails.getCaseTypeId(), caseEvent.getId());
                     return new CallbackException("Unsuccessful callback to " + url);
