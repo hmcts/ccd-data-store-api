@@ -54,8 +54,10 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DataClassi
 public class CallbackServiceTest {
 
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
-    public static final ArrayList<Integer> NON_DISABLE_CUSTOM_RETRIES = Lists.newArrayList(1, 3, 5);
+    public static final ArrayList<Integer> NON_DISABLE_CUSTOM_RETRIES_MULTIPLE_VALUES = Lists.newArrayList(1, 3, 5);
+    public static final ArrayList<Integer> NON_DISABLE_CUSTOM_RETRIES_SINGLE_VALUE = Lists.newArrayList(3);
     public static final ArrayList<Integer> DISABLE_CUSTOM_RETRIES = Lists.newArrayList(0);
+    public static final ArrayList<Integer> NO_CALLBACKS_RETRIES_PROVIDED = null;
     @Mock
     private SecurityUtils securityUtils;
     @Mock
@@ -123,20 +125,7 @@ public class CallbackServiceTest {
         @Test
         @DisplayName("Should retry if callback responds late")
         public void shouldRetryIfCallbackRespondsLate() throws IOException {
-            doThrow(RestClientException.class)
-                .doThrow(RestClientException.class)
-                .doReturn(responseEntity)
-                .when(restTemplate).exchange(eq(testUrl), eq(HttpMethod.POST), any(HttpEntity.class), any(Class.class));
-
-            Instant start = Instant.now();
-            callbackService.send(testUrl, null, caseEvent, caseDetails);
-
-            final Duration between = Duration.between(start, Instant.now());
-            Assertions.assertAll(
-                () -> verify(restTemplate, times(3)).exchange(eq(testUrl), eq(HttpMethod.POST), any(HttpEntity.class), any(Class.class)),
-                () -> verifyNoMoreInteractions(restTemplate),
-                () -> assertThat((int) between.toMillis(), greaterThan(4000))
-            );
+            shouldExecuteDefaultCallbacksWhen(NO_CALLBACKS_RETRIES_PROVIDED);
         }
     }
 
@@ -159,23 +148,33 @@ public class CallbackServiceTest {
         }
 
         @Test
-        @DisplayName("Should execute default callback flow if value other than 0 provided")
-        public void shouldExecuteDefaultCallbackFlow() {
-            doThrow(RestClientException.class)
-                .doThrow(RestClientException.class)
-                .doReturn(responseEntity)
-                .when(restTemplate).exchange(eq(testUrl), eq(HttpMethod.POST), any(HttpEntity.class), any(Class.class));
-
-            Instant start = Instant.now();
-            callbackService.send(testUrl, NON_DISABLE_CUSTOM_RETRIES, caseEvent, caseDetails);
-
-            final Duration between = Duration.between(start, Instant.now());
-            Assertions.assertAll(
-                () -> verify(restTemplate, times(3)).exchange(eq(testUrl), eq(HttpMethod.POST), any(HttpEntity.class), any(Class.class)),
-                () -> verifyNoMoreInteractions(restTemplate),
-                () -> assertThat((int) between.toMillis(), greaterThan(4000))
-            );
+        @DisplayName("Should execute default callback flow if single value other than 0 provided")
+        public void shouldExecuteDefaultCallbackFlowSingleValue() {
+            shouldExecuteDefaultCallbacksWhen(NON_DISABLE_CUSTOM_RETRIES_SINGLE_VALUE);
         }
+
+        @Test
+        @DisplayName("Should execute default callback flow if multiple values provided")
+        public void shouldExecuteDefaultCallbackFlowMultipleValues() {
+            shouldExecuteDefaultCallbacksWhen(NON_DISABLE_CUSTOM_RETRIES_MULTIPLE_VALUES);
+        }
+    }
+
+    private void shouldExecuteDefaultCallbacksWhen(final ArrayList<Integer> nonDisableCustomRetriesSingleValue) {
+        doThrow(RestClientException.class)
+            .doThrow(RestClientException.class)
+            .doReturn(responseEntity)
+            .when(restTemplate).exchange(eq(testUrl), eq(HttpMethod.POST), any(HttpEntity.class), any(Class.class));
+
+        Instant start = Instant.now();
+        callbackService.send(testUrl, nonDisableCustomRetriesSingleValue, caseEvent, caseDetails);
+
+        final Duration between = Duration.between(start, Instant.now());
+        Assertions.assertAll(
+            () -> verify(restTemplate, times(3)).exchange(eq(testUrl), eq(HttpMethod.POST), any(HttpEntity.class), any(Class.class)),
+            () -> verifyNoMoreInteractions(restTemplate),
+            () -> assertThat((int) between.toMillis(), greaterThan(4000))
+        );
     }
 
     @Test
@@ -196,7 +195,7 @@ public class CallbackServiceTest {
             .when(restTemplate).exchange(eq(testUrl), eq(HttpMethod.POST), any(HttpEntity.class), any(Class.class));
 
         CallbackException callbackException = assertThrows(CallbackException.class, () -> callbackService.send(testUrl, null, caseEvent, caseDetails));
-        assertThat(callbackException.getMessage(), is(equalTo("Unsuccessful callback to http://localhost:/test-callback")));
+        assertThat(callbackException.getMessage(), is(equalTo("Unsuccessful callback to url=http://localhost:/test-callback")));
     }
 
     @Test

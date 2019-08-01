@@ -118,23 +118,23 @@ public class CallbackService {
                 sw.start();
                 final Optional<ResponseEntity<T>> maybeHttpResponse = sendRequest(url, callbackRequest, clazz);
                 sw.stop();
-                LOG.info("Callback execution time={} caseType={} event={} url={}", sw.getTotalTimeMillis(),
+                LOG.info("CallbackExecutionTime={} caseType={} event={} url={}", sw.getTotalTimeMillis(),
                     caseDetails.getCaseTypeId(), caseEvent.getId(), url);
                 return maybeHttpResponse.orElseThrow(() -> {
-                        LOG.warn("Unsuccessful callback to {} for caseType {} and event {}", url,
+                        LOG.warn("Unsuccessful callback to url={} for caseType={} and event={}", url,
                             caseDetails.getCaseTypeId(), caseEvent.getId());
                         return new CallbackException("Unsuccessful callback to " + url);
                     }
                 );
             } catch (RestClientException rce) {
-                LOG.warn("Unsuccessful callback to {} for caseType {} and event {} due to {}", url,
+                LOG.warn("Unsuccessful callback to url={} for caseType={} and event={} due to exception={}", url,
                     caseDetails.getCaseTypeId(), caseEvent.getId(), rce.toString());
             }
         }
         // Sent so many requests and still got nothing, throw exception here
-        LOG.warn("Retry context exhausted. Unsuccessful callback to {} for caseType {} and event {}", url,
+        LOG.warn("Retry context exhausted. Unsuccessful callback to url={} for caseType={} and event={}", url,
             caseDetails.getCaseTypeId(), caseEvent.getId());
-        throw new CallbackException("Unsuccessful callback to " + url);
+        throw new CallbackException("Unsuccessful callback to url=" + url);
     }
 
     public void validateCallbackErrorsAndWarnings(final CallbackResponse callbackResponse,
@@ -149,7 +149,7 @@ public class CallbackService {
 
     private List<CallbackRetryContext> buildCallbackRetryContexts(final List<Integer> callbackRetryTimeouts) {
         List<CallbackRetryContext> retryContextList = Lists.newArrayList();
-        if (callbackRetryTimeouts.size() == 1) {
+        if (isCallbackRetriesDisabled(callbackRetryTimeouts)) {
             retryContextList.add(new CallbackRetryContext(0, callbackRetryTimeouts.remove(0)));
         } else {
             this.defaultCallbackRetryIntervalsInSeconds.forEach(cbRetryInterval -> {
@@ -157,6 +157,10 @@ public class CallbackService {
             });
         }
         return retryContextList;
+    }
+
+    private boolean isCallbackRetriesDisabled(final List<Integer> callbackRetryTimeouts) {
+        return callbackRetryTimeouts.size() == 1 && callbackRetryTimeouts.get(0) == 0;
     }
 
     @SuppressWarnings({"squid:S2139", "squid:S00112"})
