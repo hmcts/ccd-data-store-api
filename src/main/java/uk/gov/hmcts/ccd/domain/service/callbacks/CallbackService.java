@@ -116,12 +116,12 @@ public class CallbackService {
             try {
                 StopWatch sw = new StopWatch();
                 sw.start();
-                final Optional<ResponseEntity<T>> maybeHttpResponse = sendRequest(url, callbackRequest, clazz);
+                final Optional<ResponseEntity<T>> optionalHttpResponse = sendRequest(url, callbackRequest, clazz);
                 sw.stop();
                 LOG.info("CallbackExecutionTime={} caseType={} event={} url={}", sw.getTotalTimeMillis(),
                     caseDetails.getCaseTypeId(), caseEvent.getId(), url);
-                return maybeHttpResponse.orElseThrow(() -> {
-                        LOG.warn("Unsuccessful callback to url={} for caseType={} and event={}", url,
+                return optionalHttpResponse.orElseThrow(() -> {
+                        LOG.warn("Unsuccessful callback to url={} for caseType={} and event={} due to no response", url,
                             caseDetails.getCaseTypeId(), caseEvent.getId());
                         return new CallbackException("Unsuccessful callback to " + url);
                     }
