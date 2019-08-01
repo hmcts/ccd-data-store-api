@@ -82,7 +82,6 @@ public class CallbackService {
                                            final CaseEvent caseEvent,
                                            final CaseDetails caseDetailsBefore,
                                            final CaseDetails caseDetails) {
-
         ResponseEntity<CallbackResponse> responseResponseEntity = send(url, callbackRetryTimeouts, caseEvent,
             caseDetailsBefore, caseDetails, CallbackResponse.class, false);
         return Optional.ofNullable(responseResponseEntity.getBody());
@@ -96,6 +95,9 @@ public class CallbackService {
                                       final CaseDetails caseDetails,
                                       final Class<T> clazz,
                                       final boolean ignoreWarning) {
+        if (url == null || url.isEmpty()) {
+            return ResponseEntity.of(Optional.empty());
+        }
 
         final CallbackRequest callbackRequest = ignoreWarning ?
             new CallbackRequest(caseDetails,
