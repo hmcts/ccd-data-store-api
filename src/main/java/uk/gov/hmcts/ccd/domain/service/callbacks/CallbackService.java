@@ -116,7 +116,7 @@ public class CallbackService {
                 sw.stop();
                 LOG.info("Callback execution time={} caseType={} event={} url={}", sw.getTotalTimeMillis(), caseDetails.getCaseTypeId(), caseEvent.getId(), url);
                 return maybeHttpResponse.orElseThrow(() -> {
-                        LOG.warn("Unsuccessful callback to {} for caseType {} and event {} due to {}", url, caseDetails.getCaseTypeId(), caseEvent.getId());
+                        LOG.warn("Unsuccessful callback to {} for caseType {} and event {}", url, caseDetails.getCaseTypeId(), caseEvent.getId());
                         return new CallbackException("Unsuccessful callback to " + url);
                     }
                 );
