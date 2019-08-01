@@ -157,10 +157,6 @@ public class CallbackService {
         return retryContextList;
     }
 
-    private CallbackRetryContext getLastElement(final List<CallbackRetryContext> retryContextList) {
-        return retryContextList.get(retryContextList.size() - 1);
-    }
-
     @SuppressWarnings({"squid:S2139", "squid:S00112"})
     private void sleep(final Integer timeout) {
         try {
