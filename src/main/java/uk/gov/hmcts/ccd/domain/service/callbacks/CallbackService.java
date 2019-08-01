@@ -32,8 +32,8 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Service
 public class CallbackService {
+    
     private static final Logger LOG = LoggerFactory.getLogger(CallbackService.class);
-    public static final int CALLBACK_RETRY_INTERVAL_MULTIPLIER = 3;
 
     private final SecurityUtils securityUtils;
     private final List<Integer> defaultCallbackRetryIntervalsInSeconds;
