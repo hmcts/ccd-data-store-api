@@ -83,7 +83,9 @@ public class CallbackService {
                                            final CaseDetails caseDetailsBefore,
                                            final CaseDetails caseDetails) {
 
-        return Optional.ofNullable(send(url, callbackRetryTimeouts, caseEvent, caseDetailsBefore, caseDetails, CallbackResponse.class, false).getBody());
+        ResponseEntity<CallbackResponse> responseResponseEntity = send(url, callbackRetryTimeouts, caseEvent,
+            caseDetailsBefore, caseDetails, CallbackResponse.class, false);
+        return Optional.ofNullable(responseResponseEntity.getBody());
     }
 
     @SuppressWarnings("javasecurity:S5145")
@@ -102,30 +104,34 @@ public class CallbackService {
                 true) :
             new CallbackRequest(caseDetails, caseDetailsBefore, caseEvent.getId());
 
-        List<CallbackRetryContext> retryContextList = buildCallbackRetryContexts(ofNullable(callbackRetryTimeouts).orElse(Lists.newArrayList()));
-        LOG.info("Built callbackContext={} for caseType={} event={} url={}", retryContextList, caseDetails.getCaseTypeId(), caseEvent.getId(), url);
+        List<Integer> retryTimeouts = ofNullable(callbackRetryTimeouts).orElse(Lists.newArrayList());
+        List<CallbackRetryContext> retryContextList = buildCallbackRetryContexts(retryTimeouts);
+        LOG.info("Built callbackContext={} for caseType={} event={} url={}", retryContextList,
+            caseDetails.getCaseTypeId(), caseEvent.getId(), url);
 
         for (CallbackRetryContext retryContext : retryContextList) {
             sleep(retryContext.getCallbackRetryInterval());
             try {
                 StopWatch sw = new StopWatch();
                 sw.start();
-                final Optional<ResponseEntity<T>> maybeHttpResponse = sendRequest(url,
-                    callbackRequest,
-                    clazz);
+                final Optional<ResponseEntity<T>> maybeHttpResponse = sendRequest(url, callbackRequest, clazz);
                 sw.stop();
-                LOG.info("Callback execution time={} caseType={} event={} url={}", sw.getTotalTimeMillis(), caseDetails.getCaseTypeId(), caseEvent.getId(), url);
+                LOG.info("Callback execution time={} caseType={} event={} url={}", sw.getTotalTimeMillis(),
+                    caseDetails.getCaseTypeId(), caseEvent.getId(), url);
                 return maybeHttpResponse.orElseThrow(() -> {
-                        LOG.warn("Unsuccessful callback to {} for caseType {} and event {}", url, caseDetails.getCaseTypeId(), caseEvent.getId());
+                        LOG.warn("Unsuccessful callback to {} for caseType {} and event {}", url,
+                            caseDetails.getCaseTypeId(), caseEvent.getId());
                         return new CallbackException("Unsuccessful callback to " + url);
                     }
                 );
             } catch (RestClientException rce) {
-                LOG.warn("Unsuccessful callback to {} for caseType {} and event {} due to {}", url, caseDetails.getCaseTypeId(), caseEvent.getId(), rce.toString());
+                LOG.warn("Unsuccessful callback to {} for caseType {} and event {} due to {}", url,
+                    caseDetails.getCaseTypeId(), caseEvent.getId(), rce.toString());
             }
         }
         // Sent so many requests and still got nothing, throw exception here
-        LOG.warn("Retry context exhausted. Unsuccessful callback to {} for caseType {} and event {}", url, caseDetails.getCaseTypeId(), caseEvent.getId());
+        LOG.warn("Retry context exhausted. Unsuccessful callback to {} for caseType {} and event {}", url,
+            caseDetails.getCaseTypeId(), caseEvent.getId());
         throw new CallbackException("Unsuccessful callback to " + url);
     }
 
@@ -144,7 +150,9 @@ public class CallbackService {
         if (callbackRetryTimeouts.size() == 1) {
             retryContextList.add(new CallbackRetryContext(0, callbackRetryTimeouts.remove(0)));
         } else {
-            this.defaultCallbackRetryIntervalsInSeconds.forEach(cbRetryInterval -> retryContextList.add(new CallbackRetryContext(cbRetryInterval, defaultCallbackTimeoutInMillis)));
+            this.defaultCallbackRetryIntervalsInSeconds.forEach(cbRetryInterval -> {
+                retryContextList.add(new CallbackRetryContext(cbRetryInterval, defaultCallbackTimeoutInMillis));
+            });
         }
         return retryContextList;
     }
@@ -179,15 +187,6 @@ public class CallbackService {
 
         return ofNullable(restTemplate.exchange(url, HttpMethod.POST, requestEntity, clazz));
 
-    }
-
-    private <T> Optional<ResponseEntity<T>> handleException(final String urlPrefix, final Exception e) {
-        LOG.warn(urlPrefix + "Unable to connect to callback service {} because of {} {}",
-            urlPrefix,
-            e.getClass().getSimpleName(),
-            e.getMessage());
-        LOG.debug("", e);  // debug stack trace
-        return Optional.empty();
     }
 
 }
