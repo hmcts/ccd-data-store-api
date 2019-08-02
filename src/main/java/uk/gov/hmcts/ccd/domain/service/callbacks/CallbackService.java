@@ -66,26 +66,6 @@ public class CallbackService {
 
     }
 
-    @ToString
-    static class CallbackRetryContext {
-        private final Integer callbackRetryInterval;
-        private final Integer callbackRetryTimeout;
-
-        CallbackRetryContext(final Integer callbackRetryInterval, final Integer callbackRetryTimeout) {
-            this.callbackRetryInterval = callbackRetryInterval;
-            this.callbackRetryTimeout = callbackRetryTimeout;
-        }
-
-        Integer getCallbackRetryInterval() {
-            return callbackRetryInterval;
-        }
-
-        Integer getCallbackRetryTimeout() {
-            return callbackRetryTimeout;
-        }
-
-    }
-
     @Autowired
     public CallbackService(final SecurityUtils securityUtils,
                            final ApplicationParams applicationParams,
