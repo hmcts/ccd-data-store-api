@@ -156,23 +156,35 @@ public class CallbackService {
     private List<CallbackRetryContext> buildCallbackRetryContexts(final List<Integer> callbackRetryTimeouts) {
         List<CallbackRetryContext> retryContextList = Lists.newArrayList();
         if (isCallbackRetriesDisabled(callbackRetryTimeouts)) {
-            retryContextList.add(new CallbackRetryContext(0, defaultCallbackTimeoutInSeconds));
+            disableRetryContext(retryContextList);
         } else if (!callbackRetryTimeouts.isEmpty()) {
-            retryContextList.add(new CallbackRetryContext(0, callbackRetryTimeouts.remove(0)));
-            if (!callbackRetryTimeouts.isEmpty()) {
-                retryContextList.add(new CallbackRetryContext(1, callbackRetryTimeouts.remove(0)));
-                for (int i = 0; i < callbackRetryTimeouts.size(); i++) {
-                    retryContextList.add(
-                        new CallbackRetryContext(
-                            getLastElement(retryContextList).getCallbackRetryInterval() * CALLBACK_RETRY_INTERVAL_MULTIPLIER,
-                            callbackRetryTimeouts.get(i)));
-                }
-            }
+            buildCustomRetryContext(callbackRetryTimeouts, retryContextList);
         } else {
-            this.defaultCallbackRetryIntervalsInSeconds.forEach(cbRetryInterval -> retryContextList.add(
-                new CallbackRetryContext(cbRetryInterval, defaultCallbackTimeoutInSeconds)));
+            buildDefaultRetryContext(retryContextList);
         }
         return retryContextList;
+    }
+
+    private void disableRetryContext(final List<CallbackRetryContext> retryContextList) {
+        retryContextList.add(new CallbackRetryContext(0, defaultCallbackTimeoutInSeconds));
+    }
+
+    private void buildDefaultRetryContext(final List<CallbackRetryContext> retryContextList) {
+        this.defaultCallbackRetryIntervalsInSeconds.forEach(cbRetryInterval -> retryContextList.add(
+            new CallbackRetryContext(cbRetryInterval, defaultCallbackTimeoutInSeconds)));
+    }
+
+    private void buildCustomRetryContext(final List<Integer> callbackRetryTimeouts, final List<CallbackRetryContext> retryContextList) {
+        retryContextList.add(new CallbackRetryContext(0, callbackRetryTimeouts.remove(0)));
+        if (!callbackRetryTimeouts.isEmpty()) {
+            retryContextList.add(new CallbackRetryContext(1, callbackRetryTimeouts.remove(0)));
+            for (Integer callbackRetryTimeout : callbackRetryTimeouts) {
+                retryContextList.add(
+                    new CallbackRetryContext(
+                        getLastElement(retryContextList).getCallbackRetryInterval() * CALLBACK_RETRY_INTERVAL_MULTIPLIER,
+                        callbackRetryTimeout));
+            }
+        }
     }
 
     private CallbackRetryContext getLastElement(final List<CallbackRetryContext> retryContextList) {
