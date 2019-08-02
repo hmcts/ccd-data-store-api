@@ -56,7 +56,7 @@ class SearchCaseTest extends BaseTest {
             .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases")
 
             .then()
-            .statusCode(200);
+            .statusCode(200).assertThat().body("isEmpty()", Matchers.is(false));
     }
 
     @Test
@@ -76,7 +76,7 @@ class SearchCaseTest extends BaseTest {
             .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases")
 
             .then()
-            .statusCode(200);
+            .statusCode(200).assertThat().body("isEmpty()", Matchers.is(false));
     }
 
     @Test
@@ -96,7 +96,7 @@ class SearchCaseTest extends BaseTest {
             .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases")
 
             .then()
-            .statusCode(200);
+            .statusCode(200).assertThat().body("isEmpty()", Matchers.is(false));
     }
 
     @Test
@@ -116,7 +116,7 @@ class SearchCaseTest extends BaseTest {
             .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases")
 
             .then()
-            .statusCode(200);
+            .statusCode(200).assertThat().body("isEmpty()", Matchers.is(false));
     }
 
     @Test
