@@ -114,6 +114,7 @@ public class CallbackServiceTest {
 
             Assertions.assertAll(
                 () -> assertTrue(response.getErrors().isEmpty()),
+                () -> assertTrue(response.getWarnings().isEmpty()),
                 () -> verify(restTemplate).exchange(eq(testUrl), eq(HttpMethod.POST), any(HttpEntity.class), any(Class.class)),
                 () -> verifyNoMoreInteractions(restTemplate)
             );

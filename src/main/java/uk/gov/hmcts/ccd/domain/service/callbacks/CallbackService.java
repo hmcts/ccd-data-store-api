@@ -36,6 +36,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Service
 public class CallbackService {
+    
     private static final Logger LOG = LoggerFactory.getLogger(CallbackService.class);
     public static final int CALLBACK_RETRY_INTERVAL_MULTIPLIER = 3;
 
@@ -44,6 +45,26 @@ public class CallbackService {
     private final Integer defaultCallbackTimeoutInSeconds;
     private final RestTemplate restTemplate;
     private final ExecutorService executorService;
+
+    @ToString
+    static class CallbackRetryContext {
+        private final Integer callbackRetryInterval;
+        private final Integer callbackRetryTimeout;
+
+        CallbackRetryContext(final Integer callbackRetryInterval, final Integer callbackRetryTimeout) {
+            this.callbackRetryInterval = callbackRetryInterval;
+            this.callbackRetryTimeout = callbackRetryTimeout;
+        }
+
+        Integer getCallbackRetryInterval() {
+            return callbackRetryInterval;
+        }
+
+        Integer getCallbackRetryTimeout() {
+            return callbackRetryTimeout;
+        }
+
+    }
 
     @ToString
     static class CallbackRetryContext {
@@ -154,8 +175,10 @@ public class CallbackService {
 
     private List<CallbackRetryContext> buildCallbackRetryContexts(final List<Integer> callbackRetryTimeouts) {
         List<CallbackRetryContext> retryContextList = Lists.newArrayList();
-        if (!callbackRetryTimeouts.isEmpty()) {
+        if (isCallbackRetriesDisabled(callbackRetryTimeouts)) {
             retryContextList.add(new CallbackRetryContext(0, defaultCallbackTimeoutInSeconds));
+        } else if (!callbackRetryTimeouts.isEmpty()) {
+            retryContextList.add(new CallbackRetryContext(0, callbackRetryTimeouts.remove(0)));
             if (!callbackRetryTimeouts.isEmpty()) {
                 retryContextList.add(new CallbackRetryContext(1, callbackRetryTimeouts.remove(0)));
                 for (int i = 0; i < callbackRetryTimeouts.size(); i++) {
@@ -174,6 +197,10 @@ public class CallbackService {
 
     private CallbackRetryContext getLastElement(final List<CallbackRetryContext> retryContextList) {
         return retryContextList.get(retryContextList.size() - 1);
+    }
+
+    private boolean isCallbackRetriesDisabled(final List<Integer> callbackRetryTimeouts) {
+        return callbackRetryTimeouts.size() == 1 && callbackRetryTimeouts.get(0) == 0;
     }
 
     @SuppressWarnings({"squid:S2139", "squid:S00112"})

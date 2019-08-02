@@ -95,12 +95,12 @@ public class CallbackInvoker {
                                                                                final CaseDetails caseDetailsBefore,
                                                                                final CaseDetails caseDetails) {
         return callbackService.send(eventTrigger.getCallBackURLSubmittedEvent(),
-            eventTrigger.getRetriesTimeoutURLSubmittedEvent(),
-            eventTrigger,
-            caseDetailsBefore,
-            caseDetails,
-            AfterSubmitCallbackResponse.class,
-            false);
+                                    eventTrigger.getRetriesTimeoutURLSubmittedEvent(),
+                                    eventTrigger,
+                                    caseDetailsBefore,
+                                    caseDetails,
+                                    AfterSubmitCallbackResponse.class,
+                                    false);
     }
 
     public CaseDetails invokeMidEventCallback(final WizardPage wizardPage,
@@ -169,7 +169,7 @@ public class CallbackInvoker {
 
 
     private boolean callbackResponseHasCaseAndDataClassification(CallbackResponse callbackResponse) {
-        return (callbackResponse.getSecurityClassification() != null && callbackResponse.getDataClassification() != null) ? true : false;
+        return callbackResponse.getSecurityClassification() != null && callbackResponse.getDataClassification() != null;
     }
 
     private Map<String, JsonNode> deduceDefaultClassificationForExistingFields(CaseType caseType,
