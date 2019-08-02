@@ -118,19 +118,19 @@ public class CallbackService {
         for (CallbackRetryContext retryContext : retryContextList) {
             sleep(retryContext.getCallbackRetryInterval());
             try {
-            StopWatch sw = new StopWatch();
-            sw.start();
-            final Optional<ResponseEntity<T>> optionalHttpResponse = sendRequest(url, callbackRequest,
-                retryContext.getCallbackRetryTimeout(), clazz);
-            sw.stop();
-            LOG.info("CallbackExecutionTime={} caseType={} event={} url={}", sw.getTotalTimeMillis(),
-                caseDetails.getCaseTypeId(), caseEvent.getId(), url);
-            return optionalHttpResponse.orElseThrow(() -> {
-                    LOG.warn("Unsuccessful callback to url={} for caseType={} and event={} due to no response", url,
-                        caseDetails.getCaseTypeId(), caseEvent.getId());
-                    return new CallbackException("Unsuccessful callback to url=" + url);
-                }
-            );
+                StopWatch sw = new StopWatch();
+                sw.start();
+                final Optional<ResponseEntity<T>> optionalHttpResponse = sendRequest(url, callbackRequest,
+                    retryContext.getCallbackRetryTimeout(), clazz);
+                sw.stop();
+                LOG.info("CallbackExecutionTime={} caseType={} event={} url={}", sw.getTotalTimeMillis(),
+                    caseDetails.getCaseTypeId(), caseEvent.getId(), url);
+                return optionalHttpResponse.orElseThrow(() -> {
+                        LOG.warn("Unsuccessful callback to url={} for caseType={} and event={} due to no response", url,
+                            caseDetails.getCaseTypeId(), caseEvent.getId());
+                        return new CallbackException("Unsuccessful callback to url=" + url);
+                    }
+                );
             } catch (RestClientException rce) {
                 LOG.warn("Unsuccessful callback to url={} for caseType={} and event={} due to exception={}", url,
                     caseDetails.getCaseTypeId(), caseEvent.getId(), rce.toString());
@@ -155,7 +155,7 @@ public class CallbackService {
     private List<CallbackRetryContext> buildCallbackRetryContexts(final List<Integer> callbackRetryTimeouts) {
         List<CallbackRetryContext> retryContextList = Lists.newArrayList();
         if (!callbackRetryTimeouts.isEmpty()) {
-            retryContextList.add(new CallbackRetryContext(0, callbackRetryTimeouts.remove(0)));
+            retryContextList.add(new CallbackRetryContext(0, defaultCallbackTimeoutInSeconds));
             if (!callbackRetryTimeouts.isEmpty()) {
                 retryContextList.add(new CallbackRetryContext(1, callbackRetryTimeouts.remove(0)));
                 for (int i = 0; i < callbackRetryTimeouts.size(); i++) {
@@ -208,7 +208,12 @@ public class CallbackService {
         } catch (InterruptedException e) {
             return handleException("Task interrupted. ", e);
         } catch (ExecutionException e) {
-            return handleException("Execution exception. ", e);
+            handleException("Execution exception. ", e);
+            if (e.getCause() instanceof RuntimeException) {
+                throw (RuntimeException)e.getCause();
+            } else {
+                return Optional.empty();
+            }
         } catch (TimeoutException e) {
             return handleException("Future timed out. ", e);
         }
