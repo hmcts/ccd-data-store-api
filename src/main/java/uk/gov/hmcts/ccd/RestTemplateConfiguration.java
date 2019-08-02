@@ -13,6 +13,8 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PreDestroy;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
@@ -48,8 +50,11 @@ class RestTemplateConfiguration {
     @Value("${http.client.connection.drafts.create.timeout}")
     private int draftsCreateConnectionTimeout;
 
-    @Value("${http.client.connection.callback.timeout}")
+    @Value("${http.client.connection.callbacks.timeout}")
     private int callbackConnectionTimeout;
+
+    @Value("${http.client.read.callbacks.timeout}")
+    private int callbackReadTimeout;
 
     @Bean(name = "restTemplate")
     public RestTemplate restTemplate() {
@@ -78,8 +83,16 @@ class RestTemplateConfiguration {
     @Bean(name = "callbackRestTemplate")
     public RestTemplate callbackRestTemplate() {
         final RestTemplate restTemplate = new RestTemplate();
-        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(getHttpClient(cbCm,callbackConnectionTimeout)));
+        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(getHttpClient(cbCm, callbackConnectionTimeout));
+        requestFactory.setReadTimeout(callbackReadTimeout);
+        LOG.info("callbackReadTimeout: {}", callbackReadTimeout);
+        restTemplate.setRequestFactory(requestFactory);
         return restTemplate;
+    }
+
+    @Bean(name = "callbacksExecutor")
+    public ExecutorService callbacksExecutor() {
+        return Executors.newFixedThreadPool(maxTotalHttpClient);
     }
 
     @PreDestroy

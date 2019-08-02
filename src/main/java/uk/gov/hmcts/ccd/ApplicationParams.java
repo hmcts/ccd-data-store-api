@@ -35,8 +35,8 @@ public class ApplicationParams {
     @Value("#{'${ccd.callback.retries}'.split(',')}")
     private List<Integer> callbackRetryIntervalsInSeconds;
 
-    @Value("${http.client.read.timeout}")
-    private Integer callbackReadTimeoutInMillis;
+    @Value("${ccd.callback.timeout}")
+    private Integer callbackTimeoutInSeconds;
 
     @Value("${ccd.token.secret}")
     private String tokenSecret;
@@ -234,8 +234,8 @@ public class ApplicationParams {
         return callbackRetryIntervalsInSeconds;
     }
 
-    public Integer getCallbackReadTimeoutInMillis() {
-        return callbackReadTimeoutInMillis;
+    public Integer getCallbackTimeoutInSeconds() {
+        return callbackTimeoutInSeconds;
     }
 
     public String getValidDMDomain() {
