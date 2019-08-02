@@ -69,7 +69,7 @@ public class CallbackService {
     public CallbackService(final SecurityUtils securityUtils,
                            final ApplicationParams applicationParams,
                            @Qualifier("callbackRestTemplate") final RestTemplate restTemplate,
-                           @Qualifier("callbackRestTemplate") final ExecutorService callbacksExecutor) {
+                           @Qualifier("callbacksExecutor") final ExecutorService callbacksExecutor) {
         this.securityUtils = securityUtils;
         this.defaultCallbackRetryIntervalsInSeconds = applicationParams.getCallbackRetryIntervalsInSeconds();
         this.defaultCallbackTimeoutInSeconds = applicationParams.getCallbackTimeoutInSeconds();
