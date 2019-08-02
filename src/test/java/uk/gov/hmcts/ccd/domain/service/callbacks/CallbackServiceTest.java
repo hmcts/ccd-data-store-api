@@ -63,7 +63,7 @@ public class CallbackServiceTest {
     private ApplicationParams applicationParams;
     @Mock
     private RestTemplate restTemplate;
-    private ExecutorService executorService = Executors.newFixedThreadPool(1);;
+    private ExecutorService executorService = Executors.newFixedThreadPool(1);
 
     private CallbackService callbackService;
 
