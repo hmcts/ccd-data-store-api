@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.callbacks;
 
 import com.google.common.collect.Lists;
-import lombok.ToString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,12 +13,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackRequest;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.service.callbacks.retrycontext.CallbackRetryContext;
+import uk.gov.hmcts.ccd.domain.service.callbacks.retrycontext.CallbackRetryContextBuilder;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 
@@ -38,44 +38,21 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 public class CallbackService {
     
     private static final Logger LOG = LoggerFactory.getLogger(CallbackService.class);
-    public static final int CALLBACK_RETRY_INTERVAL_MULTIPLIER = 3;
 
     private final SecurityUtils securityUtils;
-    private final List<Integer> defaultCallbackRetryIntervalsInSeconds;
-    private final Integer defaultCallbackTimeoutInSeconds;
     private final RestTemplate restTemplate;
+    private final CallbackRetryContextBuilder callbackRetryContextBuilder;
     private final ExecutorService executorService;
-
-    @ToString
-    static class CallbackRetryContext {
-        private final Integer callbackRetryInterval;
-        private final Integer callbackRetryTimeout;
-
-        CallbackRetryContext(final Integer callbackRetryInterval, final Integer callbackRetryTimeout) {
-            this.callbackRetryInterval = callbackRetryInterval;
-            this.callbackRetryTimeout = callbackRetryTimeout;
-        }
-
-        Integer getCallbackRetryInterval() {
-            return callbackRetryInterval;
-        }
-
-        Integer getCallbackRetryTimeout() {
-            return callbackRetryTimeout;
-        }
-
-    }
 
     @Autowired
     public CallbackService(final SecurityUtils securityUtils,
-                           final ApplicationParams applicationParams,
                            @Qualifier("callbackRestTemplate") final RestTemplate restTemplate,
-                           @Qualifier("callbacksExecutor") final ExecutorService callbacksExecutor) {
+                           @Qualifier("callbacksExecutor") final ExecutorService callbacksExecutor,
+                           final CallbackRetryContextBuilder callbackRetryContextBuilder) {
         this.securityUtils = securityUtils;
-        this.defaultCallbackRetryIntervalsInSeconds = applicationParams.getCallbackRetryIntervalsInSeconds();
-        this.defaultCallbackTimeoutInSeconds = applicationParams.getCallbackTimeoutInSeconds();
         this.restTemplate = restTemplate;
         this.executorService = callbacksExecutor;
+        this.callbackRetryContextBuilder = callbackRetryContextBuilder;
     }
 
     public Optional<CallbackResponse> send(final String url,
@@ -112,7 +89,7 @@ public class CallbackService {
             new CallbackRequest(caseDetails, caseDetailsBefore, caseEvent.getId());
 
         List<Integer> retryTimeouts = ofNullable(callbackRetryTimeouts).orElse(Lists.newArrayList());
-        List<CallbackRetryContext> retryContextList = buildCallbackRetryContexts(retryTimeouts);
+        List<CallbackRetryContext> retryContextList = callbackRetryContextBuilder.buildCallbackRetryContexts(retryTimeouts);
         LOG.info("Built callbackContext={} for caseType={} event={} url={}", retryContextList,
             caseDetails.getCaseTypeId(), caseEvent.getId(), url);
 
@@ -151,48 +128,6 @@ public class CallbackService {
                 .withErrors(callbackResponse.getErrors())
                 .withWarnings(callbackResponse.getWarnings());
         }
-    }
-
-    private List<CallbackRetryContext> buildCallbackRetryContexts(final List<Integer> callbackRetryTimeouts) {
-        List<CallbackRetryContext> retryContextList = Lists.newArrayList();
-        if (isCallbackRetriesDisabled(callbackRetryTimeouts)) {
-            disableRetryContext(retryContextList);
-        } else if (!callbackRetryTimeouts.isEmpty()) {
-            buildCustomRetryContext(callbackRetryTimeouts, retryContextList);
-        } else {
-            buildDefaultRetryContext(retryContextList);
-        }
-        return retryContextList;
-    }
-
-    private void disableRetryContext(final List<CallbackRetryContext> retryContextList) {
-        retryContextList.add(new CallbackRetryContext(0, defaultCallbackTimeoutInSeconds));
-    }
-
-    private void buildDefaultRetryContext(final List<CallbackRetryContext> retryContextList) {
-        this.defaultCallbackRetryIntervalsInSeconds.forEach(cbRetryInterval -> retryContextList.add(
-            new CallbackRetryContext(cbRetryInterval, defaultCallbackTimeoutInSeconds)));
-    }
-
-    private void buildCustomRetryContext(final List<Integer> callbackRetryTimeouts, final List<CallbackRetryContext> retryContextList) {
-        retryContextList.add(new CallbackRetryContext(0, callbackRetryTimeouts.remove(0)));
-        if (!callbackRetryTimeouts.isEmpty()) {
-            retryContextList.add(new CallbackRetryContext(1, callbackRetryTimeouts.remove(0)));
-            for (Integer callbackRetryTimeout : callbackRetryTimeouts) {
-                retryContextList.add(
-                    new CallbackRetryContext(
-                        getLastElement(retryContextList).getCallbackRetryInterval() * CALLBACK_RETRY_INTERVAL_MULTIPLIER,
-                        callbackRetryTimeout));
-            }
-        }
-    }
-
-    private CallbackRetryContext getLastElement(final List<CallbackRetryContext> retryContextList) {
-        return retryContextList.get(retryContextList.size() - 1);
-    }
-
-    private boolean isCallbackRetriesDisabled(final List<Integer> callbackRetryTimeouts) {
-        return callbackRetryTimeouts.size() == 1 && callbackRetryTimeouts.get(0) == 0;
     }
 
     @SuppressWarnings({"squid:S2139", "squid:S00112"})

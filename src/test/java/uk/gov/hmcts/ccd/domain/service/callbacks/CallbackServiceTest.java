@@ -16,11 +16,12 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.service.callbacks.retrycontext.CallbackRetryContext;
+import uk.gov.hmcts.ccd.domain.service.callbacks.retrycontext.CallbackRetryContextBuilder;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 
@@ -55,20 +56,27 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DataClassi
 public class CallbackServiceTest {
 
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
-    public static final ArrayList<Integer> DISABLE_CUSTOM_RETRIES = Lists.newArrayList(0);
-    public static final ArrayList<Integer> NO_CALLBACKS_RETRIES_PROVIDED = null;
+    private static final ArrayList<Integer> NO_CALLBACKS_RETRIES_PROVIDED = null;
+    private static final int SECOND = 1;
+    private static final int TWO_SECONDS = 2;
+    private static final int THREE_SECONDS = 3;
+    private static final ArrayList<Integer> DISABLE_CUSTOM_RETRIES = Lists.newArrayList(0);
+    private static final ArrayList<Integer> TWO_CALLBACK_RETRY_TIMEOUTS = Lists.newArrayList(SECOND, TWO_SECONDS);
+    private static final ArrayList<Integer> THREE_CALLBACK_RETRY_TIMEOUTS = Lists.newArrayList(SECOND, TWO_SECONDS, THREE_SECONDS);
+    private static final Integer DEFAULT_CALLBACK_TIMEOUT = SECOND;
+
     @Mock
     private SecurityUtils securityUtils;
     @Mock
-    private ApplicationParams applicationParams;
-    @Mock
     private RestTemplate restTemplate;
+    @Mock
+    private CallbackRetryContextBuilder callbackRetryContextBuilder;
+
     private ExecutorService executorService = Executors.newFixedThreadPool(1);
 
     private CallbackService callbackService;
 
-    private List<Integer> defaultCallbackRetryIntervals = Lists.newArrayList(0, 1, 3);
-    private Integer defaultCallbackTimeout = 1;
+    private List<CallbackRetryContext> defaultCallbackRetryContext;
     private final String testUrl = "http://localhost:/test-callback";
     private final CaseDetails caseDetails = new CaseDetails();
     private final CaseEvent caseEvent = new CaseEvent();
@@ -95,21 +103,24 @@ public class CallbackServiceTest {
                 .withData("TextField0", textFieldList)
                 .buildAsMap())
             .build());
+        defaultCallbackRetryContext = Lists.newArrayList(new CallbackRetryContext(0, DEFAULT_CALLBACK_TIMEOUT),
+            new CallbackRetryContext(1, DEFAULT_CALLBACK_TIMEOUT),
+            new CallbackRetryContext(3, DEFAULT_CALLBACK_TIMEOUT));
+        doReturn(defaultCallbackRetryContext).when(callbackRetryContextBuilder).buildCallbackRetryContexts(Lists.newArrayList());
 
         doReturn(new HttpHeaders()).when(securityUtils).authorizationHeaders();
         doReturn(responseEntity).when(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(CallbackResponse.class));
-        doReturn(defaultCallbackRetryIntervals).when(applicationParams).getCallbackRetryIntervalsInSeconds();
-        doReturn(defaultCallbackTimeout).when(applicationParams).getCallbackTimeoutInSeconds();
-        callbackService = new CallbackService(securityUtils, applicationParams, restTemplate, executorService);
+        callbackService = new CallbackService(securityUtils, restTemplate, executorService, callbackRetryContextBuilder);
     }
 
     @Nested
     @DisplayName("Default Retry Context")
     class DefaultRetryContext {
+
         @Test
         @DisplayName("Should return with no errors or warnings")
         public void shouldReturnWithNoErrorsOrWarnings() {
-            final Optional<CallbackResponse> result = callbackService.send(testUrl, null, caseEvent, caseDetails);
+            final Optional<CallbackResponse> result = callbackService.send(testUrl, NO_CALLBACKS_RETRIES_PROVIDED, caseEvent, caseDetails);
             final CallbackResponse response = result.orElseThrow(() -> new AssertionError("Missing result"));
 
             Assertions.assertAll(
@@ -144,6 +155,12 @@ public class CallbackServiceTest {
     @DisplayName("Custom Retry Context")
     class CustomRetryContext {
 
+        @BeforeEach
+        void setUp() {
+            defaultCallbackRetryContext = Lists.newArrayList(new CallbackRetryContext(0, DEFAULT_CALLBACK_TIMEOUT));
+            doReturn(defaultCallbackRetryContext).when(callbackRetryContextBuilder).buildCallbackRetryContexts(DISABLE_CUSTOM_RETRIES);
+        }
+
         @Test
         @DisplayName("Should disable callbacks")
         public void shouldDisableCallbacks() {
@@ -161,11 +178,13 @@ public class CallbackServiceTest {
         @Test
         @DisplayName("Should return with no errors or warnings and callback respond on second try")
         public void shouldReturnWithOneRetries() throws IOException {
+            defaultCallbackRetryContext = Lists.newArrayList(new CallbackRetryContext(0, SECOND), new CallbackRetryContext(1, TWO_SECONDS));
+            doReturn(defaultCallbackRetryContext).when(callbackRetryContextBuilder).buildCallbackRetryContexts(TWO_CALLBACK_RETRY_TIMEOUTS);
             doThrow(RestClientException.class)
                 .doReturn(responseEntity)
                 .when(restTemplate).exchange(eq(testUrl), eq(HttpMethod.POST), any(HttpEntity.class), any(Class.class));
 
-            final Optional<CallbackResponse> result = callbackService.send(testUrl, Lists.newArrayList(500, 1000), caseEvent, caseDetails);
+            final Optional<CallbackResponse> result = callbackService.send(testUrl, TWO_CALLBACK_RETRY_TIMEOUTS, caseEvent, caseDetails);
             final CallbackResponse response = result.orElseThrow(() -> new AssertionError("Missing result"));
 
             Assertions.assertAll(
@@ -179,12 +198,17 @@ public class CallbackServiceTest {
         @Test
         @DisplayName("Should return with no errors or warnings and callback respond on third retry")
         public void shouldRetryIfCallbackRespondsAfterTwoRetries() throws IOException {
+            defaultCallbackRetryContext = Lists.newArrayList(new CallbackRetryContext(0, SECOND),
+                new CallbackRetryContext(1, TWO_SECONDS),
+                new CallbackRetryContext(3, THREE_SECONDS));
+            doReturn(defaultCallbackRetryContext).when(callbackRetryContextBuilder).buildCallbackRetryContexts(THREE_CALLBACK_RETRY_TIMEOUTS);
+
             doThrow(RestClientException.class)
                 .doThrow(RestClientException.class)
                 .doReturn(responseEntity)
                 .when(restTemplate).exchange(eq(testUrl), eq(HttpMethod.POST), any(HttpEntity.class), any(Class.class));
 
-            final Optional<CallbackResponse> result = callbackService.send(testUrl, Lists.newArrayList(500, 1000, 1500), caseEvent, caseDetails);
+            final Optional<CallbackResponse> result = callbackService.send(testUrl, THREE_CALLBACK_RETRY_TIMEOUTS, caseEvent, caseDetails);
             final CallbackResponse response = result.orElseThrow(() -> new AssertionError("Missing result"));
 
             Assertions.assertAll(
