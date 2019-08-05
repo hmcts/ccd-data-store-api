@@ -32,7 +32,7 @@ public class ApplicationParams {
     @Value("#{'${ccd.am.read.from_am}'.split(',')}")
     private List<String> readFromAMCaseTypes;
 
-    @Value("#{'${ccd.callback.retries}'.split(',')}")
+    @Value("#{'${ccd.callback.retry.intervals}'.split(',')}")
     private List<Integer> callbackRetryIntervalsInSeconds;
 
     @Value("${http.client.read.timeout}")
