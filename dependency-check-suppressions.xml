@@ -162,6 +162,13 @@
     </suppress>
     <suppress>
         <notes><![CDATA[
+            file name: jackson-databind-2.9.9.jar
+            We've upgraded to jackson-databind 2.9.9.2 but the dependecy check keeps flagging it, thus mark as false positive.
+        ]]></notes>
+        <cve>CVE-2019-14379</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
            no fix available, not affected anyway
            ]]></notes>
         <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson-databind@.*$</packageUrl>
