@@ -4,11 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.google.common.collect.Lists;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -29,7 +30,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 
 import javax.inject.Inject;
-import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -166,22 +166,30 @@ public class CallbackServiceWireMockTest {
         verify(exactly(3), postRequestedFor(urlMatching("/test-callbackGrrrr.*")));
     }
 
-    @Ignore("for local dev only")
     @Test
     public void multipleCallbackRequestsWithDifferentTimeoutsDoNotClash() throws Exception {
 
+        final WireMockServer secureServer = new WireMockServer(WireMockConfiguration.options()
+            // Set the number of request handling threads in Jetty. Defaults to 10.
+            .containerThreads(100)
+            // Set the number of connection acceptor threads in Jetty. Defaults to 2.
+            .jettyAcceptors(80)
+            // Set the Jetty accept queue size. Defaults to Jetty's default of unbounded.
+            .jettyAcceptQueueSize(200)
+            .port(0));
+        secureServer.start();
+
         final List<Future<Integer>> futures = newArrayList();
         final ExecutorService executorService = Executors.newFixedThreadPool(25);
-        final int totalNumberOfCalls = 10;
-        int[] randomDelays = new int[totalNumberOfCalls];
+        final int totalNumberOfCalls = 100;
 
-        setupStubs(totalNumberOfCalls, randomDelays);
+        setupStubs(totalNumberOfCalls);
 
         for (int i = 0; i < totalNumberOfCalls; i++) {
 
             Map<String, JsonNode> delay = aClassificationBuilder().withData("delay", JSON_NODE_FACTORY.textNode(String.valueOf(totalNumberOfCalls - i))).buildAsMap();
 
-            List<Integer> callbackRetryTimeoutsInMillis = Lists.newArrayList((totalNumberOfCalls - i + 1) * 1000);
+            List<Integer> callbackRetryTimeoutsInMillis = Lists.newArrayList(10000);
 
             System.out.println("delay=" + delay);
             final CaseDetails caseDetails = newCaseDetails().withDataClassification(delay).build();
@@ -200,27 +208,28 @@ public class CallbackServiceWireMockTest {
 
     }
 
-    private void setupStubs(final int totalNumberOfCalls, final int[] randomDelays) throws NoSuchAlgorithmException, JsonProcessingException {
+    private void setupStubs(final int totalNumberOfCalls) throws JsonProcessingException {
         for (int i = 0; i < totalNumberOfCalls; i++) {
             System.out.println("delay=" + (totalNumberOfCalls - i));
 
             Map<String, JsonNode> delay = aClassificationBuilder().withData("delay", JSON_NODE_FACTORY.textNode(String.valueOf(totalNumberOfCalls - i))).buildAsMap();
             CallbackResponse callbackResponse = aCallbackResponse().withDataClassification(delay).build();
+            int fixedDelay = ((totalNumberOfCalls - i) % 5) * 1000;
 
             if (i == 0) {
                 System.out.println("i=" + i);
-                System.out.println("fixedDelay=" + (totalNumberOfCalls - i) * 1000);
+                System.out.println("fixedDelay=" + fixedDelay);
                 stubFor(post(urlMatching("/test-callbackGrrrr.*"))
                     .inScenario("CallbackSequence")
-                    .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200).withFixedDelay((totalNumberOfCalls - i) * 1000))
+                    .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200).withFixedDelay(fixedDelay))
                     .willSetStateTo(String.valueOf(i)));
             } else {
                 System.out.println("i=" + i);
-                System.out.println("fixedDelay=" + (totalNumberOfCalls - i) * 1000);
+                System.out.println("fixedDelay=" + fixedDelay);
                 stubFor(post(urlMatching("/test-callbackGrrrr.*"))
                     .inScenario("CallbackSequence")
                     .whenScenarioStateIs(String.valueOf(i - 1))
-                    .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200).withFixedDelay((totalNumberOfCalls - i) * 1000))
+                    .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200).withFixedDelay(fixedDelay))
                     .willSetStateTo(String.valueOf(i)));
             }
         }
