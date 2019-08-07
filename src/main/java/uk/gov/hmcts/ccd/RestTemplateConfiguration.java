@@ -105,11 +105,11 @@ class RestTemplateConfiguration {
         }
         if (null != draftsCm) {
             LOG.info("closing connection manager");
-            cm.close();
+            draftsCm.close();
         }
         if (null != cbCm) {
             LOG.info("closing connection manager");
-            cm.close();
+            cbCm.close();
         }
     }
 
@@ -118,7 +118,6 @@ class RestTemplateConfiguration {
     }
 
     private HttpClient getHttpClient(PoolingHttpClientConnectionManager cm, final int timeout) {
-        cm = new PoolingHttpClientConnectionManager();
 
         LOG.info("maxTotalHttpClient: {}", maxTotalHttpClient);
         LOG.info("maxSecondsIdleConnection: {}", maxSecondsIdleConnection);
