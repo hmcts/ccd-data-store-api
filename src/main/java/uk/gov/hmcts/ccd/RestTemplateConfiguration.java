@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.slf4j.Logger;
@@ -124,15 +125,16 @@ class RestTemplateConfiguration {
         final RequestConfig
             config =
             RequestConfig.custom()
-                .setConnectTimeout(timeout)
-                .setConnectionRequestTimeout(timeout)
-                .setSocketTimeout(timeout)
-                .build();
+                         .setConnectTimeout(timeout)
+                         .setConnectionRequestTimeout(timeout)
+                         .setSocketTimeout(timeout)
+                         .build();
 
         return HttpClientBuilder.create()
-            .useSystemProperties()
-            .setDefaultRequestConfig(config)
-            .setConnectionManager(cm)
-            .build();
+                                .useSystemProperties()
+                                .setDefaultRequestConfig(config)
+                                .setConnectionManager(cm)
+                                .setRetryHandler(new DefaultHttpRequestRetryHandler(3, false))
+                                .build();
     }
 }

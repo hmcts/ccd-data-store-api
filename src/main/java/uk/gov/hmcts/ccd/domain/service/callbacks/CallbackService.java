@@ -96,13 +96,8 @@ public class CallbackService {
         for (CallbackRetryContext retryContext : retryContextList) {
             sleep(retryContext.getCallbackRetryInterval());
             try {
-                StopWatch sw = new StopWatch();
-                sw.start();
-                final Optional<ResponseEntity<T>> optionalHttpResponse = sendRequest(url, callbackRequest,
-                    retryContext.getCallbackRetryTimeout(), clazz);
-                sw.stop();
-                LOG.info("CallbackExecutionTime={} caseType={} event={} url={}", sw.getTotalTimeMillis(),
-                    caseDetails.getCaseTypeId(), caseEvent.getId(), url);
+                final Optional<ResponseEntity<T>> optionalHttpResponse = sendRequest(url, callbackRequest, retryContext.getCallbackRetryTimeout(),
+                    clazz, caseDetails.getCaseTypeId(), caseEvent.getId());
                 return optionalHttpResponse.orElseThrow(() -> {
                         LOG.warn("Unsuccessful callback to url={} for caseType={} and event={} due to no response", url,
                             caseDetails.getCaseTypeId(), caseEvent.getId());
@@ -144,8 +139,10 @@ public class CallbackService {
     private <T> Optional<ResponseEntity<T>> sendRequest(final String url,
                                                         final CallbackRequest callbackRequest,
                                                         final Integer timeout,
-                                                        final Class<T> clazz) {
-        LOG.info("Trying {} with timeout {}", url, timeout);
+                                                        final Class<T> clazz,
+                                                        final String caseTypeId,
+                                                        final String eventId) {
+        LOG.info("Trying url={} with timeout={}", url, timeout);
 
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("Content-Type", "application/json");
@@ -155,7 +152,14 @@ public class CallbackService {
         }
         final HttpEntity requestEntity = new HttpEntity(callbackRequest, httpHeaders);
 
-        Future<ResponseEntity> future = executorService.submit(() -> restTemplate.exchange(url, HttpMethod.POST, requestEntity, clazz));
+        Future<ResponseEntity> future = executorService.submit(() -> {
+            StopWatch sw = new StopWatch();
+            sw.start();
+            ResponseEntity<T> response =  restTemplate.exchange(url, HttpMethod.POST, requestEntity, clazz);
+            sw.stop();
+            LOG.info("CallbackExecutionTime={} caseType={} event={} url={}", sw.getTotalTimeMillis(), caseTypeId, eventId, url);
+            return response;
+        });
 
         try {
             return ofNullable(future.get(timeout, TimeUnit.SECONDS));

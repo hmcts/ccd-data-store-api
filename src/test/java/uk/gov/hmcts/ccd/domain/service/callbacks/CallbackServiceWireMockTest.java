@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.common.collect.Lists;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -25,6 +26,7 @@ import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 
 import javax.inject.Inject;
 import java.security.NoSuchAlgorithmException;
@@ -45,9 +47,11 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CallbackResponseBuilder.aCallbackResponse;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DataClassificationBuilder.aClassificationBuilder;
@@ -105,15 +109,34 @@ public class CallbackServiceWireMockTest {
         stubFor(post(urlMatching("/test-callbackGrrrr.*"))
             .inScenario("CallbackRetry")
             .whenScenarioStateIs("SecondFailedAttempt")
-            .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200).withFixedDelay(499)));
+            .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200).withFixedDelay(490)));
 
         Instant start = Instant.now();
         callbackService.send(testUrl, null, caseEvent, null, caseDetails, CallbackResponse.class, false);
 
         final Duration between = Duration.between(start, Instant.now());
-        // 0s retryInterval + 0.5s readTimeout + 1s retryInterval + 0.5s readTimeout + 3s retryInterval + 0.5s readTimeout
+        // 0s retryInterval + 0.5s readTimeout + 1s retryInterval + 0.5s readTimeout + 3s retryInterval + 0.49s readTimeout
         assertThat((int) between.toMillis(), greaterThan(5500));
         verify(exactly(3), postRequestedFor(urlMatching("/test-callbackGrrrr.*")));
+    }
+
+    @Test
+    public void shouldNotRetryWhenCallbackRetriesDisabled() throws Exception {
+
+        stubFor(post(urlMatching("/test-callbackGrrrr.*"))
+            .inScenario("CallbackRetry")
+            .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(500).withFixedDelay(501))
+            .willSetStateTo("FirstFailedAttempt"));
+
+        List<Integer> disabledRetries = Lists.newArrayList(0);
+        Instant start = Instant.now();
+
+        CallbackException callbackException = assertThrows(CallbackException.class, () -> callbackService.send(testUrl, disabledRetries, caseEvent, null, caseDetails, CallbackResponse.class, false));
+        Assert.assertThat(callbackException.getMessage(), is("Unsuccessful callback to url=http://localhost:" + wiremockPort + "/test-callbackGrrrr"));
+        final Duration between = Duration.between(start, Instant.now());
+        // 0s retryInterval + 0.5s readTimeout and no follow up retries
+        assertThat((int) between.toMillis(), lessThan(1500));
+        verify(exactly(1), postRequestedFor(urlMatching("/test-callbackGrrrr.*")));
     }
 
     @Test
