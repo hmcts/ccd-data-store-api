@@ -165,22 +165,23 @@ public class CallbackService {
         try {
             return ofNullable(future.get(timeout, TimeUnit.SECONDS));
         } catch (InterruptedException e) {
-            return handleException("Task interrupted. ", e);
+            return handleException("Task interrupted. ", url, e);
         } catch (ExecutionException e) {
-            handleException("Execution exception. ", e);
+            handleException("Execution exception. ", url, e);
             if (e.getCause() instanceof RuntimeException) {
                 throw (RuntimeException)e.getCause();
             } else {
                 return Optional.empty();
             }
         } catch (TimeoutException e) {
-            return handleException("Future timed out. ", e);
+            return handleException("Future timed out. ", url, e);
         }
     }
 
-    private <T> Optional<ResponseEntity<T>> handleException(final String urlPrefix, final Exception e) {
-        LOG.warn(urlPrefix + "Unable to connect to callback service {} because of {} {}",
+    private <T> Optional<ResponseEntity<T>> handleException(final String urlPrefix, final String url, final Exception e) {
+        LOG.warn("{} Unable to connect to callback service url={} because of {} {}",
             urlPrefix,
+            url,
             e.getClass().getSimpleName(),
             e.getMessage());
         LOG.debug("", e);  // debug stack trace
