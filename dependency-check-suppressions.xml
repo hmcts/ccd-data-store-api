@@ -159,12 +159,6 @@
         ]]></notes>
         <gav regex="true">^com\.fasterxml\.jackson\.core:jackson-databind:2\.9\.8$</gav>
         <cve>CVE-2019-12086</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-            file name: jackson-databind-2.9.9.jar
-            We've upgraded to jackson-databind 2.9.9.2 but the dependecy check keeps flagging it, thus mark as false positive.
-        ]]></notes>
         <cve>CVE-2019-14379</cve>
     </suppress>
     <suppress>
