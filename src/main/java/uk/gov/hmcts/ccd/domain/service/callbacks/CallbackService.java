@@ -162,6 +162,10 @@ public class CallbackService {
             return response;
         });
 
+        return handleResponse(url, timeout, future);
+    }
+
+    private <T> Optional<ResponseEntity<T>> handleResponse(final String url, final Integer timeout, final Future<ResponseEntity> future) {
         try {
             return ofNullable(future.get(timeout, TimeUnit.SECONDS));
         } catch (InterruptedException e) {
