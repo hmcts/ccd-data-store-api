@@ -130,7 +130,7 @@ public class CallbackService {
         try {
             TimeUnit.SECONDS.sleep((long) timeout);
         } catch (Exception e) {
-            LOG.warn("Error while performing a sleep of timeout={}", timeout, e);
+            LOG.warn("Error while performing a sleep of timeout={}s", timeout, e);
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
         }
@@ -143,7 +143,7 @@ public class CallbackService {
                                                         final Class<T> clazz,
                                                         final String caseTypeId,
                                                         final String eventId) {
-        LOG.info("Trying url={} with timeout={}", url, timeout);
+        LOG.info("Trying url={} with timeout={}s", url, timeout);
 
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("Content-Type", "application/json");
@@ -158,7 +158,7 @@ public class CallbackService {
             sw.start();
             ResponseEntity<T> response =  restTemplate.exchange(url, HttpMethod.POST, requestEntity, clazz);
             sw.stop();
-            LOG.info("CallbackExecutionTime={} caseType={} event={} url={}", sw.getTotalTimeMillis(), caseTypeId, eventId, url);
+            LOG.info("CallbackExecutionTime={}ms caseType={} event={} url={} response={}", sw.getTotalTimeMillis(), caseTypeId, eventId, url, response);
             return response;
         });
 
@@ -169,6 +169,7 @@ public class CallbackService {
         try {
             return ofNullable(future.get(timeout, TimeUnit.SECONDS));
         } catch (InterruptedException e) {
+            future.cancel(true);
             return handleException("Task interrupted. ", url, e);
         } catch (ExecutionException e) {
             handleException("Execution exception. ", url, e);
@@ -178,7 +179,9 @@ public class CallbackService {
                 return Optional.empty();
             }
         } catch (TimeoutException e) {
-            return handleException("Future timed out. ", url, e);
+            future.cancel(true);
+            handleException("Future timed out. ", url, e);
+            throw new RestClientException("Callback no response. Timed out waiting.");
         }
     }
 
