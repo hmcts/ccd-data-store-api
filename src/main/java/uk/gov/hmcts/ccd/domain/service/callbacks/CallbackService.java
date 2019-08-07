@@ -169,8 +169,9 @@ public class CallbackService {
         try {
             return ofNullable(future.get(timeout, TimeUnit.SECONDS));
         } catch (InterruptedException e) {
-            future.cancel(true);
-            return handleException("Task interrupted. ", url, e);
+            handleException("Task interrupted. ", url, e);
+            Thread.currentThread().interrupt(); // Here!
+            throw new RuntimeException(e);
         } catch (ExecutionException e) {
             handleException("Execution exception. ", url, e);
             if (e.getCause() instanceof RuntimeException) {

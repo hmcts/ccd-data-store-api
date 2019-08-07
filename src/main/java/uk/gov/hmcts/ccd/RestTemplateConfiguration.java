@@ -23,9 +23,9 @@ class RestTemplateConfiguration {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestTemplateConfiguration.class);
 
-    private PoolingHttpClientConnectionManager cm;
-    private PoolingHttpClientConnectionManager draftsCm;
-    private PoolingHttpClientConnectionManager cbCm;
+    private PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
+    private PoolingHttpClientConnectionManager draftsCm = new PoolingHttpClientConnectionManager();
+    private PoolingHttpClientConnectionManager cbCm = new PoolingHttpClientConnectionManager();
 
     @Value("${http.client.max.total}")
     private int maxTotalHttpClient;
@@ -100,6 +100,14 @@ class RestTemplateConfiguration {
     void close() {
         LOG.info("PreDestory called");
         if (null != cm) {
+            LOG.info("closing connection manager");
+            cm.close();
+        }
+        if (null != draftsCm) {
+            LOG.info("closing connection manager");
+            cm.close();
+        }
+        if (null != cbCm) {
             LOG.info("closing connection manager");
             cm.close();
         }
