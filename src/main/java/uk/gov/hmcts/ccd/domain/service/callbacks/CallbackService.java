@@ -136,6 +136,7 @@ public class CallbackService {
         }
     }
 
+    @SuppressWarnings("javasecurity:S5145")
     private <T> Optional<ResponseEntity<T>> sendRequest(final String url,
                                                         final CallbackRequest callbackRequest,
                                                         final Integer timeout,
