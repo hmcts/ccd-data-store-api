@@ -153,21 +153,20 @@ public class CallbackService {
         }
         final HttpEntity requestEntity = new HttpEntity(callbackRequest, httpHeaders);
 
-        Future<ResponseEntity> future = executorService.submit(() -> {
-            StopWatch sw = new StopWatch();
-            sw.start();
-            ResponseEntity<T> response =  restTemplate.exchange(url, HttpMethod.POST, requestEntity, clazz);
-            sw.stop();
-            LOG.info("CallbackExecutionTime={}ms caseType={} event={} url={} response={}", sw.getTotalTimeMillis(), caseTypeId, eventId, url, response);
-            return response;
-        });
+        Future<ResponseEntity> future = executorService.submit(() -> restTemplate.exchange(url, HttpMethod.POST, requestEntity, clazz));
 
-        return handleResponse(url, timeout, future);
+        return handleResponse(url, timeout, future, caseTypeId, eventId);
     }
 
-    private <T> Optional<ResponseEntity<T>> handleResponse(final String url, final Integer timeout, final Future<ResponseEntity> future) {
+    private <T> Optional<ResponseEntity<T>> handleResponse(final String url, final Integer timeout, final Future<ResponseEntity> future,
+                                                           final String caseTypeId, final String eventId) {
         try {
-            return ofNullable(future.get(timeout, TimeUnit.SECONDS));
+            StopWatch sw = new StopWatch();
+            sw.start();
+            Optional optionalResponseEntity = ofNullable(future.get(timeout, TimeUnit.SECONDS));
+            sw.stop();
+            LOG.info("CallbackExecutionTime={}ms caseType={} event={} url={}", sw.getTotalTimeMillis(), caseTypeId, eventId, url);
+            return optionalResponseEntity;
         } catch (InterruptedException e) {
             handleException("Task interrupted. ", url, e);
             Thread.currentThread().interrupt(); // Here!
@@ -186,14 +185,13 @@ public class CallbackService {
         }
     }
 
-    private <T> Optional<ResponseEntity<T>> handleException(final String urlPrefix, final String url, final Exception e) {
-        LOG.warn("{} Unable to connect to callback service url={} because of {} {}",
+    private void handleException(final String urlPrefix, final String url, final Exception e) {
+        LOG.warn("{} Unable to execute callback on url={} because of exceptionName={} exceptionMessage={}",
             urlPrefix,
             url,
             e.getClass().getSimpleName(),
             e.getMessage());
         LOG.debug("", e);  // debug stack trace
-        return Optional.empty();
     }
 
 }
