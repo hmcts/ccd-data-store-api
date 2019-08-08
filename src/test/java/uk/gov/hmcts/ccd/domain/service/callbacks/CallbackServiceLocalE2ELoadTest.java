@@ -31,7 +31,7 @@ import static org.junit.Assert.fail;
 import static wiremock.com.google.common.collect.Lists.newArrayList;
 
 @Ignore("Only for local development")
-public class CallbackServiceLocalE2ETest {
+public class CallbackServiceLocalE2ELoadTest {
 
     RestTemplate restTemplate;
 
