@@ -169,7 +169,7 @@ public class CallbackService {
             return optionalResponseEntity;
         } catch (InterruptedException e) {
             handleException("Task interrupted. ", url, e);
-            Thread.currentThread().interrupt(); // Here!
+            Thread.currentThread().interrupt();
             throw new RuntimeException(e);
         } catch (ExecutionException e) {
             handleException("Execution exception. ", url, e);
