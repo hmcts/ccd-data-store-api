@@ -99,4 +99,24 @@ class CallbackRetryContextBuilderTest {
                 ))
         );
     }
+
+    @Test
+    void shouldUseCustomRetriesWithSingleZero() {
+
+        List<CallbackRetryContext> callbackRetryContexts = callbackRetryContextBuilder.buildCallbackRetryContexts(Lists.newArrayList(3, 6, 0, 12));
+
+        Assertions.assertAll(
+            () -> Assert.assertThat(callbackRetryContexts, hasSize(4)),
+            () -> Assert.assertThat(callbackRetryContexts, contains(
+                both(hasProperty("callbackRetryInterval", is(0)))
+                    .and(hasProperty("callbackRetryTimeout", is(3))),
+                both(hasProperty("callbackRetryInterval", is(1)))
+                    .and(hasProperty("callbackRetryTimeout", is(6))),
+                both(hasProperty("callbackRetryInterval", is(3)))
+                    .and(hasProperty("callbackRetryTimeout", is(0))),
+                both(hasProperty("callbackRetryInterval", is(9)))
+                    .and(hasProperty("callbackRetryTimeout", is(12)))
+                ))
+        );
+    }
 }
