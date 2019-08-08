@@ -215,7 +215,7 @@ dependencies {
     compile group: 'org.awaitility', name: 'awaitility', version: '3.1.6'
 
     // CVE-2019-12086 - force update of jackson-databind - remove when dependencies move off <2.9.9
-    compile "com.fasterxml.jackson.core:jackson-databind:2.9.9.2"
+    compile "com.fasterxml.jackson.core:jackson-databind:2.9.9"
 
     // FIXME 0.6 doesn't support jsonb; 0.7 doesn't work on Windows
 //    runtime group: 'com.impossibl.pgjdbc-ng', name: 'pgjdbc-ng', version: '0.6'
