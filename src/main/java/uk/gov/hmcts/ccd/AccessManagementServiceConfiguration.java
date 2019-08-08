@@ -17,6 +17,7 @@ public class AccessManagementServiceConfiguration {
     public DataSource dataSource() {
         return DataSourceBuilder.create().build();
     }
+
     @Bean
     public AccessManagementService getAccessManagementService(@Qualifier("amDataSource") DataSource dataSource) {
         return new AccessManagementService(dataSource);
