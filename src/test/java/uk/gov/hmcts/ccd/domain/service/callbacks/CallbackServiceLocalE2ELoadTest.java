@@ -4,8 +4,8 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -30,7 +30,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static wiremock.com.google.common.collect.Lists.newArrayList;
 
-@Ignore("Only for local development")
 public class CallbackServiceLocalE2ELoadTest {
 
     RestTemplate restTemplate;
@@ -60,6 +59,7 @@ public class CallbackServiceLocalE2ELoadTest {
             .build()));
     }
 
+    @Disabled("IgnoreOnly for local development")
     @Test
     public void shouldFireMany() {
 
