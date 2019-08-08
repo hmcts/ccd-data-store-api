@@ -39,9 +39,21 @@ class CallbackRetryContextBuilderTest {
     }
 
     @Test
-    void shouldDisableCallbackRetries() {
+    void shouldDisableCallbackRetriesWithSingleValue() {
 
         List<CallbackRetryContext> callbackRetryContexts = callbackRetryContextBuilder.buildCallbackRetryContexts(Lists.newArrayList(0));
+
+        Assertions.assertAll(
+            () -> Assert.assertThat(callbackRetryContexts, hasSize(1)),
+            () -> Assert.assertThat(callbackRetryContexts, hasItems(hasProperty("callbackRetryInterval", is(0)))),
+            () -> Assert.assertThat(callbackRetryContexts, hasItems(hasProperty("callbackRetryTimeout", is(1))))
+        );
+    }
+
+    @Test
+    void shouldDisableCallbackRetriesWithMultipleValues() {
+
+        List<CallbackRetryContext> callbackRetryContexts = callbackRetryContextBuilder.buildCallbackRetryContexts(Lists.newArrayList(0, 0, 0, 0));
 
         Assertions.assertAll(
             () -> Assert.assertThat(callbackRetryContexts, hasSize(1)),
