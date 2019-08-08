@@ -19,7 +19,7 @@ public class CallbackRetryContextBuilder {
 
     public List<CallbackRetryContext> buildCallbackRetryContexts(final List<Integer> callbackRetryTimeouts) {
         List<CallbackRetryContext> retryContextList = Lists.newArrayList();
-        if (callbackRetryTimeouts.isEmpty()) {
+        if (callbackRetryTimeouts.isEmpty() || isCallbackRetriesWithZeros(callbackRetryTimeouts)) {
             buildDefaultRetryContext(retryContextList);
         } else if (isCallbackRetriesDisabled(callbackRetryTimeouts)) {
             disableRetryContext(retryContextList);
@@ -27,6 +27,10 @@ public class CallbackRetryContextBuilder {
             buildCustomRetryContext(callbackRetryTimeouts, retryContextList);
         }
         return retryContextList;
+    }
+
+    private boolean isCallbackRetriesWithZeros(final List<Integer> callbackRetryTimeouts) {
+        return callbackRetryTimeouts.size() != 1 && callbackRetryTimeouts.stream().anyMatch(callback -> callback == 0);
     }
 
     private void disableRetryContext(final List<CallbackRetryContext> retryContextList) {
@@ -56,6 +60,6 @@ public class CallbackRetryContextBuilder {
     }
 
     private boolean isCallbackRetriesDisabled(final List<Integer> callbackRetryTimeouts) {
-        return !callbackRetryTimeouts.stream().anyMatch(timeout -> timeout > 0);
+        return callbackRetryTimeouts.size() == 1 && callbackRetryTimeouts.get(0) == 0;
     }
 }

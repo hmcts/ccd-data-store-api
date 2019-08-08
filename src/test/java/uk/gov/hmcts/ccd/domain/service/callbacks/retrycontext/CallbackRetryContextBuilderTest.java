@@ -51,18 +51,6 @@ class CallbackRetryContextBuilderTest {
     }
 
     @Test
-    void shouldDisableCallbackRetriesWithMultipleValues() {
-
-        List<CallbackRetryContext> callbackRetryContexts = callbackRetryContextBuilder.buildCallbackRetryContexts(Lists.newArrayList(0, 0, 0, 0));
-
-        Assertions.assertAll(
-            () -> Assert.assertThat(callbackRetryContexts, hasSize(1)),
-            () -> Assert.assertThat(callbackRetryContexts, hasItems(hasProperty("callbackRetryInterval", is(0)))),
-            () -> Assert.assertThat(callbackRetryContexts, hasItems(hasProperty("callbackRetryTimeout", is(1))))
-        );
-    }
-
-    @Test
     void shouldUseDefaultRetries() {
 
         List<CallbackRetryContext> callbackRetryContexts = callbackRetryContextBuilder.buildCallbackRetryContexts(Lists.newArrayList());
@@ -101,22 +89,20 @@ class CallbackRetryContextBuilderTest {
     }
 
     @Test
-    void shouldUseCustomRetriesWithSingleZero() {
+    void shouldUseDefaultRetriesWithSingleZero() {
 
         List<CallbackRetryContext> callbackRetryContexts = callbackRetryContextBuilder.buildCallbackRetryContexts(Lists.newArrayList(3, 6, 0, 12));
 
         Assertions.assertAll(
-            () -> Assert.assertThat(callbackRetryContexts, hasSize(4)),
+            () -> Assert.assertThat(callbackRetryContexts, hasSize(3)),
             () -> Assert.assertThat(callbackRetryContexts, contains(
                 both(hasProperty("callbackRetryInterval", is(0)))
-                    .and(hasProperty("callbackRetryTimeout", is(3))),
+                    .and(hasProperty("callbackRetryTimeout", is(1))),
                 both(hasProperty("callbackRetryInterval", is(1)))
-                    .and(hasProperty("callbackRetryTimeout", is(6))),
+                    .and(hasProperty("callbackRetryTimeout", is(1))),
                 both(hasProperty("callbackRetryInterval", is(3)))
-                    .and(hasProperty("callbackRetryTimeout", is(0))),
-                both(hasProperty("callbackRetryInterval", is(9)))
-                    .and(hasProperty("callbackRetryTimeout", is(12)))
-                ))
+                    .and(hasProperty("callbackRetryTimeout", is(1)))
+            ))
         );
     }
 }
