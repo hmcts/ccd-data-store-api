@@ -81,6 +81,7 @@ public class CallbackServiceWireMockTest {
             .jettyAcceptQueueSize(200)
             .dynamicPort());
         ws.start();
+        System.out.println("WIREMOCK PORT=" + ws.port());
         testUrl = "http://localhost:" + ws.port() + "/test-callbackGrrrr";
     }
 
