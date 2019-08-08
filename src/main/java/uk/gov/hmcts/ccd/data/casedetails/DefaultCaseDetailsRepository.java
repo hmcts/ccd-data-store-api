@@ -1,24 +1,5 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
-import javax.persistence.PersistenceContext;
-import javax.persistence.PersistenceException;
-import javax.persistence.Query;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import org.hibernate.exception.ConstraintViolationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.query.CaseDetailsQueryBuilder;
 import uk.gov.hmcts.ccd.data.casedetails.query.CaseDetailsQueryBuilderFactory;
@@ -28,6 +9,28 @@ import uk.gov.hmcts.ccd.data.casedetails.search.SearchQueryFactoryOperation;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.persistence.EntityManager;
+import javax.persistence.OptimisticLockException;
+import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
+import javax.persistence.Query;
+
+import org.hibernate.StaleObjectStateException;
+import org.hibernate.exception.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 
 @Named
@@ -66,6 +69,10 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
         CaseDetailsEntity mergedEntity = null;
         try {
             mergedEntity = em.merge(newCaseDetailsEntity);
+            em.flush();
+        } catch (StaleObjectStateException | OptimisticLockException e) {
+            LOG.info("Optimistic Lock Exception: Case data has been altered", e);
+            throw new CaseConcurrencyException("The case data has been altered outside of this transaction.");
         } catch (PersistenceException e) {
             LOG.warn("Failed to store case details", e);
             if (e.getCause() instanceof ConstraintViolationException) {
@@ -95,21 +102,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
         return findByReference(null, caseReference);
     }
 
-    @Override
-    public Optional<CaseDetails> lockByReference(String jurisdiction, Long reference) {
-        return lockByReference(jurisdiction, reference.toString());
-    }
-
-    @Override
-    public Optional<CaseDetails> lockByReference(String jurisdiction, String reference) {
-        return find(jurisdiction, null, reference).map(entity -> {
-            em.lock(entity, LockModeType.PESSIMISTIC_WRITE);
-            return this.caseDetailsMapper.entityToModel(entity);
-        });
-    }
-
     /**
-     *
      * @param id Internal case ID
      * @return Case details if found; null otherwise
      * @deprecated Use {@link DefaultCaseDetailsRepository#findByReference(String, Long)} instead
@@ -121,7 +114,6 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     /**
-     *
      * @param caseReference Public case reference
      * @return Case details if found; null otherwise.
      * @deprecated Use {@link DefaultCaseDetailsRepository#findByReference(String, Long)} instead
@@ -133,10 +125,9 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     /**
-     *
      * @param jurisdiction Jurisdiction's ID
-     * @param caseTypeId Case's type ID
-     * @param reference Case unique 16-digit reference
+     * @param caseTypeId   Case's type ID
+     * @param reference    Case unique 16-digit reference
      * @return Case details if found; null otherwise
      * @deprecated Use {@link DefaultCaseDetailsRepository#findByReference(String, String)} instead
      */
@@ -146,18 +137,6 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
                                       final String caseTypeId,
                                       final String reference) {
         return findByReference(jurisdiction, reference).orElse(null);
-    }
-
-    /**
-     *
-     * @param reference Case unique 16-digit reference
-     * @return Case details if found; throw NotFound exception otherwise
-     * @deprecated Use {@link DefaultCaseDetailsRepository#lockByReference(String, Long)} instead
-     */
-    @Override
-    @Deprecated
-    public CaseDetails lockCase(final Long reference) {
-        return lockByReference(null, reference).orElseThrow(() -> new ResourceNotFoundException("No case found"));
     }
 
     @Override
@@ -221,8 +200,8 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
 
     private Query getCountQueryByMetaData(MetaData metadata) {
         return queryBuilderFactory.count(em, metadata)
-                                  .whereMetadata(metadata)
-                                  .build();
+            .whereMetadata(metadata)
+            .build();
     }
 
     private Query getQueryByMetaData(MetaData metadata) {

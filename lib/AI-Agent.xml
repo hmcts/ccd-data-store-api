@@ -5,7 +5,8 @@
         <BuiltIn enabled="true">
             <HTTP enabled="true"/>
             <JDBC enabled="true"/>
-            <MaxStatementQueryLimitInMS>1000</MaxStatementQueryLimitInMS>
+            <!-- Set SQL query duration above which query plan is reported. Default is 10000 ms. -->
+            <MaxStatementQueryLimitInMS>10000</MaxStatementQueryLimitInMS>
         </BuiltIn>
         <Class name="uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository">
             <Method name="set"/>
@@ -73,6 +74,9 @@
         </Class>
         <Class name="uk.gov.hmcts.ccd.domain.types.sanitiser.client.DocumentManagementRestClient">
             <Method name="getDocument"/>
+        </Class>
+        <Class name="uk.gov.hmcts.ccd.data.casedetails.search.SearchQueryFactoryOperation">
+            <Method name="build"/>
         </Class>
     </Instrumentation>
 </ApplicationInsightsAgent>
