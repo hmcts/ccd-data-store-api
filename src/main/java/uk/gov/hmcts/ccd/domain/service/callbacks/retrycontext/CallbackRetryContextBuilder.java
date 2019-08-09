@@ -7,6 +7,8 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 
 import java.util.List;
 
+import static java.util.Collections.unmodifiableList;
+
 /**
  * This builder builds retries context based on the spreadsheet config for retries timeouts.
  * The intervals are fixed and are multiples of 3 starting from 0s and 1 i.e. 0s, 1s, 3s, 9s, 27s ...
@@ -33,7 +35,7 @@ public class CallbackRetryContextBuilder {
     private final Integer defaultCallbackTimeoutInSeconds;
 
     public CallbackRetryContextBuilder(final ApplicationParams applicationParams) {
-        this.defaultCallbackRetryIntervalsInSeconds = applicationParams.getCallbackRetryIntervalsInSeconds();
+        this.defaultCallbackRetryIntervalsInSeconds = unmodifiableList(applicationParams.getCallbackRetryIntervalsInSeconds());
         this.defaultCallbackTimeoutInSeconds = applicationParams.getCallbackTimeoutInSeconds();
     }
 
@@ -63,9 +65,9 @@ public class CallbackRetryContextBuilder {
     }
 
     private void buildCustomRetryContext(final List<Integer> callbackRetryTimeouts, final List<CallbackRetryContext> retryContextList) {
-        retryContextList.add(new CallbackRetryContext(0, callbackRetryTimeouts.remove(0)));
+        retryContextList.add(new CallbackRetryContext(defaultCallbackRetryIntervalsInSeconds.get(0), callbackRetryTimeouts.remove(0)));
         if (!callbackRetryTimeouts.isEmpty()) {
-            retryContextList.add(new CallbackRetryContext(1, callbackRetryTimeouts.remove(0)));
+            retryContextList.add(new CallbackRetryContext(defaultCallbackRetryIntervalsInSeconds.get(1), callbackRetryTimeouts.remove(0)));
             for (Integer callbackRetryTimeout : callbackRetryTimeouts) {
                 retryContextList.add(
                     new CallbackRetryContext(
