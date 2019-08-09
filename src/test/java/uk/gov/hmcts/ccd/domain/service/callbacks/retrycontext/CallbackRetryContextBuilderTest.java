@@ -71,10 +71,10 @@ class CallbackRetryContextBuilderTest {
     @Test
     void shouldUseCustomRetries() {
 
-        List<CallbackRetryContext> callbackRetryContexts = callbackRetryContextBuilder.buildCallbackRetryContexts(Lists.newArrayList(3, 6, 9, 12));
+        List<CallbackRetryContext> callbackRetryContexts = callbackRetryContextBuilder.buildCallbackRetryContexts(Lists.newArrayList(3, 6, 9, 12, 15));
 
         Assertions.assertAll(
-            () -> Assert.assertThat(callbackRetryContexts, hasSize(4)),
+            () -> Assert.assertThat(callbackRetryContexts, hasSize(5)),
             () -> Assert.assertThat(callbackRetryContexts, contains(
                 both(hasProperty("callbackRetryInterval", is(0)))
                     .and(hasProperty("callbackRetryTimeout", is(3))),
@@ -83,7 +83,9 @@ class CallbackRetryContextBuilderTest {
                 both(hasProperty("callbackRetryInterval", is(3)))
                     .and(hasProperty("callbackRetryTimeout", is(9))),
                 both(hasProperty("callbackRetryInterval", is(9)))
-                    .and(hasProperty("callbackRetryTimeout", is(12)))
+                    .and(hasProperty("callbackRetryTimeout", is(12))),
+                both(hasProperty("callbackRetryInterval", is(27)))
+                    .and(hasProperty("callbackRetryTimeout", is(15)))
                 ))
         );
     }
