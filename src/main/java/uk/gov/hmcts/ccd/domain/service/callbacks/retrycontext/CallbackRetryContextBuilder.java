@@ -25,8 +25,8 @@ import static java.util.Collections.unmodifiableList;
  *      1 - custom retries (0s interval with 1s custom timeout)
  *      1,5 - custom retries (0s interval with 1s custom timeout, 1s interval with 5s custom timeout)
  *      1,5,10 - custom retries (0s interval with 1s custom timeout, 1s interval with 5s custom timeout, 3s interval with 10s custom timeout)
- *      0,0,0,0 - default retries context (0s interval with 60s default timeout, 1s interval with 60s default timeout, 3s interval with 60s default timeout)
- *      0,5,0,10 - default retries context (0s interval with 60s default timeout, 1s interval with 60s default timeout, 3s interval with 60s default timeout)
+ *      0,0,0,0 - default retries context (see blank above)
+ *      0,5,0,10 - default retries context (see blank above)
  *      1,5,10,15 - custom retries (0s interval with 1s custom timeout, 1s interval with 5s custom timeout, 3s interval with 10s custom timeout, 9s interval
  *                  with 15s custom timeout) etc
  */
