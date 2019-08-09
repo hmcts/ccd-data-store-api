@@ -5,11 +5,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.http.RequestMethod;
 import com.google.common.collect.Lists;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -68,22 +67,16 @@ public class CallbackServiceWireMockTest {
     private CaseDetails caseDetails = new CaseDetails();
     private final CaseEvent caseEvent = new CaseEvent();
     private static String testUrl;
-    private static WireMockServer ws;
 
-    @BeforeAll
-    static void setUp() throws Exception {
-        ws = new WireMockServer(WireMockConfiguration.options()
-            // Set the number of request handling threads in Jetty. Defaults to 10.
-            .containerThreads(100)
-            // Set the number of connection acceptor threads in Jetty. Defaults to 2.
-            .jettyAcceptors(80)
-            // Set the Jetty accept queue size. Defaults to Jetty's default of unbounded.
-            .jettyAcceptQueueSize(200)
-            .dynamicPort());
-        ws.start();
-        System.out.println("WIREMOCK PORT=" + ws.port());
-        testUrl = "http://localhost:" + ws.port() + "/test-callbackGrrrr";
-    }
+    @Rule
+    private WireMockServer ws = new WireMockServer(WireMockConfiguration.options()
+        // Set the number of request handling threads in Jetty. Defaults to 10.
+        .containerThreads(100)
+        // Set the number of connection acceptor threads in Jetty. Defaults to 2.
+        .jettyAcceptors(80)
+        // Set the Jetty accept queue size. Defaults to Jetty's default of unbounded.
+        .jettyAcceptQueueSize(200)
+        .dynamicPort());
 
     @BeforeEach
     void setUpEach() {
@@ -93,8 +86,9 @@ public class CallbackServiceWireMockTest {
         Mockito.when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
         ReflectionTestUtils.setField(callbackService, "securityUtils", securityUtils);
 
+        ws.start();
+        testUrl = "http://localhost:" + ws.port() + "/test-callbackGrrrr";
         ws.resetAll();
-        WireMock.resetAllRequests();
     }
 
     @Test
