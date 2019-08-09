@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.callbacks.retrycontext;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
@@ -68,14 +69,10 @@ public class CallbackRetryContextBuilder {
             for (Integer callbackRetryTimeout : callbackRetryTimeouts) {
                 retryContextList.add(
                     new CallbackRetryContext(
-                        getLastElement(retryContextList).getCallbackRetryInterval() * CALLBACK_RETRY_INTERVAL_MULTIPLIER,
+                        Iterables.getLast(retryContextList).getCallbackRetryInterval() * CALLBACK_RETRY_INTERVAL_MULTIPLIER,
                         callbackRetryTimeout));
             }
         }
-    }
-
-    private CallbackRetryContext getLastElement(final List<CallbackRetryContext> retryContextList) {
-        return retryContextList.get(retryContextList.size() - 1);
     }
 
     private boolean isCallbackRetriesDisabled(final List<Integer> callbackRetryTimeouts) {
