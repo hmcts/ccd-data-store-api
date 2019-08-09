@@ -106,7 +106,7 @@ public class CallbackService {
                 );
             } catch (RestClientException rce) {
                 LOG.warn("Unsuccessful callback to url={} for caseType={} and event={} due to exception={}", url,
-                    caseDetails.getCaseTypeId(), caseEvent.getId(), rce.toString());
+                    caseDetails.getCaseTypeId(), caseEvent.getId(), rce);
             }
         }
         // Sent so many requests and still got nothing, throw exception here
@@ -136,7 +136,6 @@ public class CallbackService {
         }
     }
 
-    @SuppressWarnings("javasecurity:S5145")
     private <T> Optional<ResponseEntity<T>> sendRequest(final String url,
                                                         final CallbackRequest callbackRequest,
                                                         final Integer timeout,
@@ -158,6 +157,7 @@ public class CallbackService {
         return handleResponse(url, timeout, future, caseTypeId, eventId);
     }
 
+    @SuppressWarnings("javasecurity:S5145")
     private <T> Optional<ResponseEntity<T>> handleResponse(final String url, final Integer timeout, final Future<ResponseEntity> future,
                                                            final String caseTypeId, final String eventId) {
         try {
@@ -170,7 +170,7 @@ public class CallbackService {
         } catch (InterruptedException e) {
             handleException("Task interrupted. ", url, e);
             Thread.currentThread().interrupt();
-            throw new RuntimeException(e);
+            throw new CallbackException(e.getMessage());
         } catch (ExecutionException e) {
             handleException("Execution exception. ", url, e);
             if (e.getCause() instanceof RuntimeException) {

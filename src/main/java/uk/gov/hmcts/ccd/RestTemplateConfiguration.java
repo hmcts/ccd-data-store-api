@@ -23,7 +23,7 @@ class RestTemplateConfiguration {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestTemplateConfiguration.class);
 
-    private PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
+    private PoolingHttpClientConnectionManager mainCm = new PoolingHttpClientConnectionManager();
     private PoolingHttpClientConnectionManager draftsCm = new PoolingHttpClientConnectionManager();
     private PoolingHttpClientConnectionManager cbCm = new PoolingHttpClientConnectionManager();
 
@@ -99,22 +99,22 @@ class RestTemplateConfiguration {
     @PreDestroy
     void close() {
         LOG.info("PreDestory called");
-        if (null != cm) {
-            LOG.info("closing connection manager");
-            cm.close();
+        if (null != mainCm) {
+            LOG.info("closing main connection manager");
+            mainCm.close();
         }
         if (null != draftsCm) {
-            LOG.info("closing connection manager");
+            LOG.info("closing drafts connection manager");
             draftsCm.close();
         }
         if (null != cbCm) {
-            LOG.info("closing connection manager");
+            LOG.info("closing callbacks connection manager");
             cbCm.close();
         }
     }
 
     private HttpClient getHttpClient() {
-        return getHttpClient(cm, connectionTimeout);
+        return getHttpClient(mainCm, connectionTimeout);
     }
 
     private HttpClient getHttpClient(PoolingHttpClientConnectionManager cm, final int timeout) {
