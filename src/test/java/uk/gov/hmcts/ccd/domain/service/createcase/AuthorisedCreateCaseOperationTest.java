@@ -100,7 +100,7 @@ class AuthorisedCreateCaseOperationTest {
         when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseType), eq(userRoles), eq(CAN_READ))).thenReturn(true);
         when(accessControlService.canAccessCaseEventWithCriteria(eq(EVENT_ID), eq(events), eq(userRoles), eq(CAN_CREATE))).thenReturn(true);
         when(accessControlService.canAccessCaseFieldsWithCriteria(any(JsonNode.class), eq(caseFields), eq(userRoles), eq(CAN_CREATE))).thenReturn(true);
-        when(accessControlService.filterCaseFieldsByAccess(any(JsonNode.class), eq(caseFields), eq(userRoles), eq(CAN_READ))).thenReturn(authorisedCaseNode);
+        when(accessControlService.filterCaseFieldsByAccess(any(JsonNode.class), eq(caseFields), eq(userRoles), eq(CAN_READ), anyBoolean())).thenReturn(authorisedCaseNode);
     }
 
     @Test
@@ -137,7 +137,7 @@ class AuthorisedCreateCaseOperationTest {
         assertAll(
             () -> assertThat(output, is(nullValue())),
             () -> verify(accessControlService, never()).canAccessCaseTypeWithCriteria(eq(caseType), eq(userRoles), eq(CAN_READ)),
-            () -> verify(accessControlService, never()).filterCaseFieldsByAccess(any(JsonNode.class), eq(caseFields), eq(userRoles), eq(CAN_READ))
+            () -> verify(accessControlService, never()).filterCaseFieldsByAccess(any(JsonNode.class), eq(caseFields), eq(userRoles), eq(CAN_READ), anyBoolean())
         );
     }
 
@@ -161,7 +161,7 @@ class AuthorisedCreateCaseOperationTest {
             () -> inOrder.verify(accessControlService).canAccessCaseFieldsWithCriteria(any(JsonNode.class), eq(caseFields), eq(userRoles), eq(CAN_CREATE)),
             () -> inOrder.verify(classifiedCreateCaseOperation).createCaseDetails(UID, JURISDICTION_ID, CASE_TYPE_ID, EVENT_DATA, IGNORE),
             () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseType), eq(userRoles), eq(CAN_READ)),
-            () -> inOrder.verify(accessControlService, times(2)).filterCaseFieldsByAccess(any(JsonNode.class), eq(caseFields), eq(userRoles), eq(CAN_READ))
+            () -> inOrder.verify(accessControlService, times(2)).filterCaseFieldsByAccess(any(JsonNode.class), eq(caseFields), eq(userRoles), eq(CAN_READ), anyBoolean())
         );
     }
 

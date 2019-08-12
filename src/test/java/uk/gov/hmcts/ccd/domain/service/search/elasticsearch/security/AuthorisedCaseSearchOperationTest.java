@@ -104,7 +104,7 @@ class AuthorisedCaseSearchOperationTest {
             when(userRepository.getUserRoles()).thenReturn(userRoles);
             when(objectMapperService.convertObjectToJsonNode(unFilteredData)).thenReturn(jsonNode);
             CaseType caseType = new CaseType();
-            when(accessControlService.filterCaseFieldsByAccess(jsonNode, caseType.getCaseFields(), userRoles, CAN_READ)).thenReturn(jsonNode);
+            when(accessControlService.filterCaseFieldsByAccess(jsonNode, caseType.getCaseFields(), userRoles, CAN_READ, false)).thenReturn(jsonNode);
             Map<String, JsonNode> filteredData = new HashMap<>();
             when(objectMapperService.convertJsonNodeToMap(jsonNode)).thenReturn(filteredData);
 
@@ -123,7 +123,7 @@ class AuthorisedCaseSearchOperationTest {
                 () -> verify(caseSearchOperation).execute(any(CrossCaseTypeSearchRequest.class)),
                 () -> verify(userRepository).getUserRoles(),
                 () -> verify(objectMapperService).convertObjectToJsonNode(unFilteredData),
-                () -> verify(accessControlService).filterCaseFieldsByAccess(jsonNode, caseType.getCaseFields(), userRoles, CAN_READ),
+                () -> verify(accessControlService).filterCaseFieldsByAccess(jsonNode, caseType.getCaseFields(), userRoles, CAN_READ, false),
                 () -> verify(objectMapperService).convertJsonNodeToMap(jsonNode),
                 () -> verify(classificationService).applyClassification(caseDetails)
             );

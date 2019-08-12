@@ -1,14 +1,26 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import java.io.IOException;
-import java.util.*;
-
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.emptyCollectionOf;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.everyItem;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.MANDATORY;
+import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.OPTIONAL;
+import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.READONLY;
+import static uk.gov.hmcts.ccd.domain.model.definition.CaseFieldTest.findNestedField;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
-
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
@@ -20,7 +32,28 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldB
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseStateBuilder.newState;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.ComplexACLBuilder.aComplexACL;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageBuilder.newWizardPage;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageComplexFieldOverrideBuilder.newWizardPageComplexFieldOverride;
+
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
+import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -32,9 +65,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
-import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
 public class AccessControlServiceTest {
 
@@ -43,7 +73,7 @@ public class AccessControlServiceTest {
     private static final String EVENT_ID_WITHOUT_ACCESS = "EVENT_ID_WITHOUT_ACCESS";
     private static final String EVENT_ID_WITHOUT_ACCESS_2 = "EVENT_ID_WITHOUT_ACCESS_2";
     private static final String EVENT_ID_WITH_ACCESS_2 = "EVENT_ID_WITH_ACCESS_2";
-    private final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
+    static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
     };
     private static final ObjectMapper MAPPER = new ObjectMapper();
     static final String ROLE_IN_USER_ROLES = "caseworker-probate-loa1";
@@ -54,8 +84,8 @@ public class AccessControlServiceTest {
     private static final String FIRST_CHILD_ID = "46f98326-6c88-426d-82be-d362f0246b7a";
     private static final String SECOND_CHILD_ID = "7c7cfd2a-b5d7-420a-8420-3ac3019cfdc7";
     static final Set<String> USER_ROLES = Sets.newHashSet(ROLE_IN_USER_ROLES,
-                                                           ROLE_IN_USER_ROLES_3,
-                                                           ROLE_IN_USER_ROLES_2);
+        ROLE_IN_USER_ROLES_3,
+        ROLE_IN_USER_ROLES_2);
 
     private AccessControlService accessControlService;
     private static final String EVENT_ID = "EVENT_ID";
@@ -63,10 +93,141 @@ public class AccessControlServiceTest {
     private static final String STATE_ID1 = "State1";
     private static final String STATE_ID2 = "State2";
 
+    static final String person1 = "{\n"
+        + "  \"id\": \"1577805e-9584-4994-bfa0-5618846b8918\",\n"
+        + "  \"value\": {\n"
+        + "    \"FirstName\": \"Fatih\",\n"
+        + "    \"LastName\": \"Ozceylan\",\n"
+        + "    \"BirthInfo\": {\n"
+        + "         \"BornCity\": \"Salihli\",\n"
+        + "         \"BornCountry\": \"Turkey\",\n"
+        + "         \"BornAddress\": {\n"
+        + "               \"Name\": \"work\",\n"
+        + "               \"Address\": {"
+        + "                   \"Line1\": \"23 Lampton Road\",\n"
+        + "                   \"Line2\": \"Fitzgrovia, London\",\n"
+        + "                   \"PostCode\": \"EC2 5GN\",\n"
+        + "                   \"Country\": \"United Kingdom\"\n"
+        + "               }\n"
+        + "         }\n"
+        + "     },\n"
+        + "    \"Addresses\": [\n"
+        + "      {\n"
+        + "        \"value\": {\n"
+        + "           \"Name\": \"home\",\n"
+        + "           \"Address\": {"
+        + "               \"Line1\": \"106 Dumbledore Close\",\n"
+        + "               \"Line2\": \"London\",\n"
+        + "               \"PostCode\": \"NP15 6EJ\",\n"
+        + "               \"Country\": \"United Kingdom\"\n"
+        + "           }\n"
+        + "        },\n"
+        + "        \"id\": \"13982380030\"\n"
+        + "      },\n"
+        + "      {\n"
+        + "        \"value\": {\n"
+        + "          \"Name\": \"work\",\n"
+        + "           \"Address\": {"
+        + "               \"Line1\": \"41 Kings Road\",\n"
+        + "               \"Line2\": \"London\",\n"
+        + "               \"PostCode\": \"NP15 6EJ\",\n"
+        + "               \"Country\": \"United Kingdom\"\n"
+        + "           }\n"
+        + "        },\n"
+        + "        \"id\": \"123874284787\"\n"
+        + "      }\n"
+        + "    ],\n"
+        + "    \"Notes\": [\n"
+        + "      {\n"
+        + "        \"value\": {\n"
+        + "           \"Txt\": \"someNote11\",\n"
+        + "           \"Tags\": [\n"
+        + "               {\n"
+        + "                   \"value\": {\n"
+        + "                       \"Tag\": \"private\",\n"
+        + "                       \"Category\": \"Personal\"\n"
+        + "                   },\n"
+        + "                   \"id\": \"1tak3324dfjk\"\n"
+        + "               }\n"
+        + "           ]\n"
+        + "        },\n"
+        + "        \"id\": \"134234\"\n"
+        + "      },\n"
+        + "      {\n"
+        + "        \"value\": {\n"
+        + "          \"Txt\": \"someNote21\",\n"
+        + "           \"Tags\": [\n"
+        + "               {\n"
+        + "                   \"value\": {\n"
+        + "                       \"Tag\": \"home\",\n"
+        + "                       \"Category\": \"Personal\"\n"
+        + "                   },\n"
+        + "                   \"id\": \"234tak3324dfjk\"\n"
+        + "               }\n"
+        + "           ]\n"
+        + "        },\n"
+        + "        \"id\": \"132332e\"\n"
+        + "      }\n"
+        + "    ]\n"
+        + "  }\n"
+        + "}";
+    static final String p2Start = "    {\n"
+        + "      \"id\": \"2577805e-9584-4994-bfa0-5618846b8920\",\n"
+        + "      \"value\": {\n";
+    static final String p2Names = "        \"FirstName\": \"Andrew\",\n"
+        + "        \"LastName\": \"Folga\",\n";
+    static final String addressesStart = "        \"Addresses\": [\n";
+    static final String p2Address1 = "          {\n"
+        + "               \"value\": {\n"
+        + "                   \"Name\": \"home\",\n"
+        + "                   \"Address\": {"
+        + "                       \"Line1\": \"63 Albany Road\",\n"
+        + "                       \"Line2\": \"Reading\",\n"
+        + "                       \"PostCode\": \"SJ15 6EJ\",\n"
+        + "                       \"Country\": \"United Kingdom\"\n"
+        + "                   }\n"
+        + "               },\n"
+        + "               \"id\": \"23982380031\"\n"
+        + "          }\n";
+    static final String p2Address2 = "          {\n"
+        + "               \"value\": {\n"
+        + "                   \"Name\": \"work\",\n"
+        + "                   \"Address\": {"
+        + "                       \"Line1\": \"66 Evgeny Road\",\n"
+        + "                       \"Line2\": \"London\",\n"
+        + "                       \"PostCode\": \"SW15 4EJ\",\n"
+        + "                       \"Country\": \"United Kingdom\"\n"
+        + "                   }\n"
+        + "               },\n"
+        + "               \"id\": \"223874284789\"\n"
+        + "          }\n";
+    static final String arrayEnd = "        ],\n";
+    static final String p2Notes = "        \"Notes\": [\n"
+        + "          {\n"
+        + "            \"value\": {\n"
+        + "               \"Txt\": \"Buy tickets\",\n"
+        + "               \"Tags\": [\n"
+        + "                   {\n"
+        + "                       \"value\": {\n"
+        + "                           \"Tag\": \"todos\",\n"
+        + "                           \"Category\": \"Work\"\n"
+        + "                       },\n"
+        + "                       \"id\": \"2tak24dfjk\"\n"
+        + "                   }\n"
+        + "               ]\n"
+        + "            },\n"
+        + "            \"id\": \"234212\"\n"
+        + "          }\n"
+        + "        ]\n";
+    static final String p2End = "      }\n"
+        + "    }\n";
+    static final String person2 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + arrayEnd + p2Notes + p2End;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-        accessControlService = new AccessControlService();
+
+        accessControlService = new AccessControlService(new CompoundAccessControlService());
     }
 
     @Nested
@@ -78,13 +239,13 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToStateIfRelevantACLMissing() {
             CaseType caseType = newCaseType()
                 .withState(newState()
-                               .withId(STATE_ID1)
-                               .withAcl(anAcl().withRole(ROLE_NOT_IN_USER_ROLES).withCreate(true).withRead(true).build())
-                               .build())
+                    .withId(STATE_ID1)
+                    .withAcl(anAcl().withRole(ROLE_NOT_IN_USER_ROLES).withCreate(true).withRead(true).build())
+                    .build())
                 .withState(newState()
-                               .withId(STATE_ID2)
-                               .withAcl(anAcl().withRole(ROLE_NOT_IN_USER_ROLES).withCreate(true).withRead(true).build())
-                               .build())
+                    .withId(STATE_ID2)
+                    .withAcl(anAcl().withRole(ROLE_NOT_IN_USER_ROLES).withCreate(true).withRead(true).build())
+                    .build())
                 .build();
 
             assertAll(
@@ -98,13 +259,13 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToStateIfRelevantAclNotGrantingAccess() {
             CaseType caseType = newCaseType()
                 .withState(newState()
-                               .withId(STATE_ID1)
-                               .withAcl(anAcl().withRole(ROLE_IN_USER_ROLES).build())
-                               .build())
+                    .withId(STATE_ID1)
+                    .withAcl(anAcl().withRole(ROLE_IN_USER_ROLES).build())
+                    .build())
                 .withState(newState()
-                               .withId(STATE_ID2)
-                               .withAcl(anAcl().withRole(ROLE_IN_USER_ROLES_2).build())
-                               .build())
+                    .withId(STATE_ID2)
+                    .withAcl(anAcl().withRole(ROLE_IN_USER_ROLES_2).build())
+                    .build())
                 .build();
 
             assertAll(
@@ -118,18 +279,18 @@ public class AccessControlServiceTest {
         void shouldGrantAccessToStateWithAclMatching() {
             CaseType caseType = newCaseType()
                 .withState(newState()
-                               .withId(STATE_ID1)
-                               .withAcl(anAcl().withRole(ROLE_IN_USER_ROLES).withCreate(true).build())
-                               .build())
+                    .withId(STATE_ID1)
+                    .withAcl(anAcl().withRole(ROLE_IN_USER_ROLES).withCreate(true).build())
+                    .build())
                 .withState(newState()
-                               .withId(STATE_ID2)
-                               .withAcl(anAcl().withRole(ROLE_IN_USER_ROLES_2).withCreate(true).build())
-                               .build())
+                    .withId(STATE_ID2)
+                    .withAcl(anAcl().withRole(ROLE_IN_USER_ROLES_2).withCreate(true).build())
+                    .build())
                 .build();
 
             assertAll(
-                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID1, caseType, USER_ROLES,CAN_CREATE),is(true)),
-                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID2, caseType, USER_ROLES,CAN_CREATE),is(true))
+                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID1, caseType, USER_ROLES, CAN_CREATE), is(true)),
+                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID2, caseType, USER_ROLES, CAN_CREATE), is(true))
             );
         }
 
@@ -138,7 +299,7 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToStateIfStateIsNotPresentInDefinition() throws IOException {
             CaseType caseType = newCaseType().build();
 
-            assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID1, caseType,USER_ROLES,CAN_CREATE), is(false));
+            assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID1, caseType, USER_ROLES, CAN_CREATE), is(false));
         }
 
         @Test
@@ -147,17 +308,17 @@ public class AccessControlServiceTest {
             CaseState caseState1 = newState()
                 .withId(STATE_ID1)
                 .withAcl(anAcl()
-                             .withRole(ROLE_IN_USER_ROLES)
-                             .withRead(true)
-                             .build())
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withRead(true)
+                    .build())
                 .build();
             CaseState caseState2 = newState()
                 .withId(STATE_ID2)
                 .withAcl(anAcl()
-                             .withRole(ROLE_IN_USER_ROLES)
-                             .build())
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .build())
                 .build();
-            List<CaseState> caseStates = new ArrayList<>(Arrays.asList(caseState1, caseState2));
+            List<CaseState> caseStates = new ArrayList<>(asList(caseState1, caseState2));
             final List<CaseState> states = accessControlService.filterCaseStatesByAccess(caseStates, USER_ROLES, CAN_READ);
 
             assertAll(
@@ -173,22 +334,22 @@ public class AccessControlServiceTest {
             CaseState caseState1 = newState()
                 .withId(STATE_ID1)
                 .withAcl(anAcl()
-                             .withRole(ROLE_IN_USER_ROLES)
-                             .build())
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .build())
                 .build();
             CaseState caseState2 = newState()
                 .withId(STATE_ID2)
                 .withAcl(anAcl()
-                             .withRole(ROLE_IN_USER_ROLES)
-                             .build())
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .build())
                 .build();
             CaseState caseState3 = newState()
                 .withId("Some State")
                 .withAcl(anAcl()
-                             .withRole(ROLE_IN_USER_ROLES)
-                             .build())
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .build())
                 .build();
-            List<CaseState> caseStates = new ArrayList<>(Arrays.asList(caseState1, caseState2, caseState3));
+            List<CaseState> caseStates = new ArrayList<>(asList(caseState1, caseState2, caseState3));
             final List<CaseState> states = accessControlService.filterCaseStatesByAccess(caseStates, USER_ROLES, CAN_READ);
 
             assertAll(
@@ -209,8 +370,8 @@ public class AccessControlServiceTest {
         void shouldFailToGrantCreateAccessForGivenFieldsIfOneFieldIsMissingAcls() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .build())
+                    .withId("Addresses")
+                    .build())
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": \"SomeText\" }\n"
@@ -231,13 +392,13 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToFieldsIfRelevantAclMissing() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_NOT_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .withRead(true)
-                                            .build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_NOT_IN_USER_ROLES)
+                        .withCreate(true)
+                        .withRead(true)
                         .build())
+                    .build())
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": \"someText\" }"
@@ -258,28 +419,28 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToFieldsIfRelevantAclNotGrantingAccess() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES_2)
-                                            .build())
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES_2)
+                        .build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build())
+                    .build())
                 .withField(newCaseField()
-                               .withId("Addresses2")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES_2)
-                                            .build())
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES_2)
-                                            .build())
-                               .build())
+                    .withId("Addresses2")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES_2)
+                        .build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES_2)
+                        .build())
+                    .build())
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
-                "{  \"Addresses\": \"someText\", " +
-                    "   \"Addresses2\": \"someText\" }"
+                "{  \"Addresses\": \"someText\", "
+                    + "   \"Addresses2\": \"someText\" }"
             ), STRING_JSON_MAP);
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
@@ -297,14 +458,14 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToNullValue() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES_3)
-                                            .build())
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES_3)
+                        .build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .build())
+                    .build())
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": null }"
@@ -325,29 +486,29 @@ public class AccessControlServiceTest {
         void shouldGrantAccessToFieldsWithAclMatching() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES_3)
-                                            .build())
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES_3)
+                        .build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build())
+                    .build())
                 .withField(newCaseField()
-                               .withId("Addresses2")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES_3)
-                                            .build())
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .build())
-                               .build())
+                    .withId("Addresses2")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES_3)
+                        .build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build())
+                    .build())
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
-                "{  \"Addresses\": \"someText\", " +
-                    "   \"Addresses2\": \"someText\" }"
+                "{  \"Addresses\": \"someText\", "
+                    + "   \"Addresses2\": \"someText\" }"
             ), STRING_JSON_MAP);
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
@@ -389,12 +550,12 @@ public class AccessControlServiceTest {
         void shouldGrantAccessToTextValueType() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build())
+                    .build())
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": \"someText\" }"
@@ -415,11 +576,11 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToEmptyTextType() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .build())
+                    .build())
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": \"\" }"
@@ -445,37 +606,37 @@ public class AccessControlServiceTest {
         void shouldGrantAccessToCollectionType() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build())
+                    .build())
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
-                "{  \"Addresses\":[  \n" +
-                    "         {  \n" +
-                    "            \"value\":{  \n" +
-                    "               \"Address\":\"address1\",\n" +
-                    "               \"Notes\": {\n" +
-                    "                   \"Note1\": \"someNote11\",\n" +
-                    "                   \"Note2\": \"someNote21\"\n" +
-                    "                }" +
-                    "            },\n" +
-                    "            \"id\":\"" + FIRST_CHILD_ID + "\"\n" +
-                    "         },\n" +
-                    "         {  \n" +
-                    "            \"value\":{  \n" +
-                    "               \"Address\":\"address1\",\n" +
-                    "               \"Notes\": {\n" +
-                    "                   \"Note1\": \"someNote21\",\n" +
-                    "                   \"Note2\": \"someNote22\"\n" +
-                    "                }" +
-                    "            },\n" +
-                    "            \"id\":\"" + SECOND_CHILD_ID + "\"\n" +
-                    "         }\n" +
-                    "      ]\n" +
-                    "    }\n"
+                "{  \"Addresses\":[  \n"
+                    + "         {  \n"
+                    + "            \"value\":{  \n"
+                    + "               \"Address\":\"address1\",\n"
+                    + "               \"Notes\": {\n"
+                    + "                   \"Note1\": \"someNote11\",\n"
+                    + "                   \"Note2\": \"someNote21\"\n"
+                    + "                }"
+                    + "            },\n"
+                    + "            \"id\":\"" + FIRST_CHILD_ID + "\"\n"
+                    + "         },\n"
+                    + "         {  \n"
+                    + "            \"value\":{  \n"
+                    + "               \"Address\":\"address1\",\n"
+                    + "               \"Notes\": {\n"
+                    + "                   \"Note1\": \"someNote21\",\n"
+                    + "                   \"Note2\": \"someNote22\"\n"
+                    + "                }"
+                    + "            },\n"
+                    + "            \"id\":\"" + SECOND_CHILD_ID + "\"\n"
+                    + "         }\n"
+                    + "      ]\n"
+                    + "    }\n"
             ), STRING_JSON_MAP);
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
@@ -493,11 +654,11 @@ public class AccessControlServiceTest {
         void shouldNotGrantCreateAccessToCollectionTypeIfEmpty() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .build())
+                    .build())
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\":[] }\n"
@@ -523,18 +684,18 @@ public class AccessControlServiceTest {
         void shouldGrantAccessToComplexType() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build())
+                    .build())
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
-                "{  \"Addresses\":{  \n" +
-                    "          \"Note\": \"someNote11\"\n" +
-                    "       }\n" +
-                    "    }\n"
+                "{  \"Addresses\":{  \n"
+                    + "          \"Note\": \"someNote11\"\n"
+                    + "       }\n"
+                    + "    }\n"
             ), STRING_JSON_MAP);
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
@@ -552,11 +713,11 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToComplexTypeIfEmpty() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .build())
+                    .build())
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\":{} }\n"
@@ -582,9 +743,9 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToFieldsIfFieldIsMissingAclsForUpdate() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withFieldType(aFieldType().withType("Text").build())
-                               .build())
+                    .withId("Addresses")
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .build())
                 .build();
             JsonNode newDataNode = getJsonNode("{ \"Addresses\" : \"UpdateAddress\" }");
             JsonNode existingDataNode = getJsonNode("{  \"Addresses\": \"SomeText\" }");
@@ -597,8 +758,8 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToFieldsIfFieldIsMissingAclsForCreate() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .build())
+                    .withId("Addresses")
+                    .build())
                 .build();
             JsonNode newDataNode = getJsonNode("{ \"Addresses\" : \"CreateAddress\" }\n");
             JsonNode existingDataNode = getJsonNode("{ }");
@@ -611,15 +772,15 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToFieldsIfFieldIsMissingRelevantAclForUpdate() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withFieldType(aFieldType().withType("Text").build())
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_NOT_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .withRead(true)
-                                            .withUpdate(true)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_NOT_IN_USER_ROLES)
+                        .withCreate(true)
+                        .withRead(true)
+                        .withUpdate(true)
+                        .build())
+                    .build())
                 .build();
             JsonNode newDataNode = getJsonNode("{ \"Addresses\" : \"UpdateAddress\" }");
             JsonNode existingDataNode = getJsonNode("{  \"Addresses\": \"SomeText\" }");
@@ -632,14 +793,14 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToFieldsIfFieldIsMissingRelevantAclForCreate() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_NOT_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .withRead(true)
-                                            .withUpdate(true)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_NOT_IN_USER_ROLES)
+                        .withCreate(true)
+                        .withRead(true)
+                        .withUpdate(true)
+                        .build())
+                    .build())
                 .build();
             JsonNode newDataNode = getJsonNode("{ \"Addresses\" : \"CreateAddress\" }\n");
             JsonNode existingDataNode = getJsonNode("{ }");
@@ -652,14 +813,14 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToFieldIfRelevantAclNotGrantingAccessForUpdate() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withFieldType(aFieldType().withType("Text").build())
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .withRead(true)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .withRead(true)
+                        .build())
+                    .build())
                 .build();
             JsonNode newDataNode = getJsonNode("{ \"Addresses\" : \"UpdateAddress\" }\n");
             JsonNode existingDataNode = getJsonNode("{ \"Addresses\": \"SomeText\" }\n");
@@ -672,13 +833,13 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToFieldIfRelevantAclNotGrantingAccessForCreate() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withRead(true)
-                                            .withUpdate(true)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withRead(true)
+                        .withUpdate(true)
+                        .build())
+                    .build())
                 .build();
             JsonNode newDataNode = getJsonNode("{ \"Addresses\" : \"NewAddress\" }\n");
             JsonNode existingDataNode = getJsonNode("{ }");
@@ -709,11 +870,11 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToFieldWithNullValueForCreate() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .build())
+                    .build())
                 .build();
             JsonNode newDataNode = getJsonNode("{ \"Addresses\" : null }\n");
             JsonNode existingDataNode = getJsonNode("{ }");
@@ -726,14 +887,14 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToFieldWithAclAccessGrantedAndFieldNameNotMatchingForUpdate() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .withUpdate(true)
-                                            .withRead(true)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .withUpdate(true)
+                        .withRead(true)
+                        .build())
+                    .build())
                 .build();
             JsonNode newDataNode = getJsonNode("{ \"addresses\" : null }\n");
             JsonNode existingDataNode = getJsonNode("{ \"Addresses\": \"SomeText\" }");
@@ -746,14 +907,14 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToFieldWithAclAccessGrantedAndFieldNameNotMatchingForCreate() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .withUpdate(true)
-                                            .withRead(true)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .withUpdate(true)
+                        .withRead(true)
+                        .build())
+                    .build())
                 .build();
             JsonNode newDataNode = getJsonNode("{ \"addresses\" : null }\n");
             JsonNode existingDataNode = getJsonNode("{ }");
@@ -785,12 +946,12 @@ public class AccessControlServiceTest {
         void shouldGrantAccessToFieldWithAclMatchingForCreate() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build())
+                    .build())
                 .build();
             JsonNode newDataNode = getJsonNode("{ \"Addresses\": \"CreateAddress\" }\n");
             JsonNode existingDataNode = getJsonNode("{ }");
@@ -803,11 +964,11 @@ public class AccessControlServiceTest {
         void shouldNotNeedToGrantAccessToFieldIfNoChangeInValue() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .build())
+                    .build())
                 .build();
             JsonNode newDataNode = getJsonNode("{ \"Addresses\": \"CreateAddress\" }\n");
             JsonNode existingDataNode = getJsonNode("{ \"Addresses\": \"CreateAddress\" }");
@@ -851,12 +1012,12 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            JsonNode newDataNode = getJsonNode("{ \"Addresses\": \"CreateAddress\"," +
-                                                   " \"FirstName\": \"John\"," +
-                                                   " \"LastName\": \"Smith\" }");
-            JsonNode existingDataNode = getJsonNode("{ \"FirstName\": \"Mark\"," +
-                                                        " \"Mobile\": \"07234543543\"," +
-                                                        " \"LastName\": \"Smith\" }");
+            JsonNode newDataNode = getJsonNode("{ \"Addresses\": \"CreateAddress\","
+                + " \"FirstName\": \"John\","
+                + " \"LastName\": \"Smith\" }");
+            JsonNode existingDataNode = getJsonNode("{ \"FirstName\": \"Mark\","
+                + " \"Mobile\": \"07234543543\","
+                + " \"LastName\": \"Smith\" }");
 
             assertFieldsAccess(true, caseType, newDataNode, existingDataNode);
         }
@@ -896,12 +1057,12 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            JsonNode newDataNode = getJsonNode("{ \"Addresses\": \"CreateAddress\"," +
-                                                   " \"FirstName\": \"John\"," +
-                                                   " \"LastName\": \"Smith\" }");
-            JsonNode existingDataNode = getJsonNode("{ \"FirstName\": \"Mark\"," +
-                                                        " \"Mobile\": \"07234543543\"," +
-                                                        " \"LastName\": \"Smith\" }");
+            JsonNode newDataNode = getJsonNode("{ \"Addresses\": \"CreateAddress\","
+                + " \"FirstName\": \"John\","
+                + " \"LastName\": \"Smith\" }");
+            JsonNode existingDataNode = getJsonNode("{ \"FirstName\": \"Mark\","
+                + " \"Mobile\": \"07234543543\","
+                + " \"LastName\": \"Smith\" }");
 
 
             assertFieldsAccess(false, caseType, newDataNode, existingDataNode);
@@ -934,12 +1095,12 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            JsonNode newDataNode = getJsonNode("{ \"Addresses\": \"CreateAddress\"," +
-                                                   " \"FirstName\": \"John\"," +
-                                                   " \"LastName\": \"Smith\" }");
-            JsonNode existingDataNode = getJsonNode("{ \"FirstName\": \"Mark\"," +
-                                                        " \"Mobile\": \"07234543543\"," +
-                                                        " \"LastName\": \"Smith\" }");
+            JsonNode newDataNode = getJsonNode("{ \"Addresses\": \"CreateAddress\","
+                + " \"FirstName\": \"John\","
+                + " \"LastName\": \"Smith\" }");
+            JsonNode existingDataNode = getJsonNode("{ \"FirstName\": \"Mark\","
+                + " \"Mobile\": \"07234543543\","
+                + " \"LastName\": \"Smith\" }");
 
 
             assertFieldsAccess(false, caseType, newDataNode, existingDataNode);
@@ -994,11 +1155,11 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToEventIfRelevantAclNotGrantingAccess() throws IOException {
             final CaseType caseType = newCaseType()
                 .withEvent(newCaseEvent()
-                               .withId(EVENT_ID)
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .build())
-                               .build())
+                    .withId(EVENT_ID)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .build())
+                    .build())
                 .build();
 
             assertThat(
@@ -1015,11 +1176,11 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToNullValue() throws IOException {
             final CaseType caseType = newCaseType()
                 .withEvent(newCaseEvent()
-                               .withId(EVENT_ID)
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .build())
-                               .build())
+                    .withId(EVENT_ID)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .build())
+                    .build())
                 .build();
 
             assertThat(
@@ -1036,12 +1197,12 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessWithEventNameNotMatching() throws IOException {
             final CaseType caseType = newCaseType()
                 .withEvent(newCaseEvent()
-                               .withId(EVENT_ID)
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .build())
-                               .build())
+                    .withId(EVENT_ID)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build())
+                    .build())
                 .build();
 
             assertThat(
@@ -1058,16 +1219,16 @@ public class AccessControlServiceTest {
         void shouldGrantAccessToEventWithAclMatching() throws IOException {
             final CaseType caseType = newCaseType()
                 .withEvent(newCaseEvent()
-                               .withId(EVENT_ID)
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_NOT_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .build())
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .build())
-                               .build())
+                    .withId(EVENT_ID)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_NOT_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build())
+                    .build())
                 .build();
 
             assertThat(
@@ -1102,12 +1263,12 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToCaseIfRelevantAclMissing() throws IOException {
             final CaseType caseType = newCaseType()
                 .withEvent(newCaseEvent()
-                               .withId(EVENT_ID)
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_NOT_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .build())
-                               .build())
+                    .withId(EVENT_ID)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_NOT_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build())
+                    .build())
                 .build();
 
             assertThat(
@@ -1123,10 +1284,10 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToCaseIfRelevantAclNotGrantingAccess() throws IOException {
             final CaseType caseType = newCaseType()
                 .withEvent(newCaseEvent()
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .build())
-                               .build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .build())
+                    .build())
                 .build();
 
             assertThat(
@@ -1142,12 +1303,12 @@ public class AccessControlServiceTest {
         void shouldGrantAccessToCaseWithAclMatching() throws IOException {
             final CaseType caseType = newCaseType()
                 .withAcl(anAcl()
-                            .withRole(ROLE_IN_USER_ROLES_3)
-                            .build())
+                    .withRole(ROLE_IN_USER_ROLES_3)
+                    .build())
                 .withAcl(anAcl()
-                             .withRole(ROLE_IN_USER_ROLES)
-                             .withCreate(true)
-                             .build())
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withCreate(true)
+                    .build())
                 .build();
 
             assertThat(
@@ -1168,8 +1329,8 @@ public class AccessControlServiceTest {
         void shouldNotReturnDataIfCaseFieldIsMissingAcls() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .build())
+                    .withId("Addresses")
+                    .build())
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": \"SomeText\" }\n"
@@ -1180,7 +1341,8 @@ public class AccessControlServiceTest {
                 dataNode,
                 caseType.getCaseFields(),
                 USER_ROLES,
-                CAN_READ);
+                CAN_READ,
+                false);
 
             assertThat(jsonNode, is(equalTo(JSON_NODE_FACTORY.objectNode())));
         }
@@ -1190,12 +1352,12 @@ public class AccessControlServiceTest {
         void shouldNotReturnFieldIfRelevantAclMissing() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_NOT_IN_USER_ROLES)
-                                            .withRead(true)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_NOT_IN_USER_ROLES)
+                        .withRead(true)
+                        .build())
+                    .build())
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": \"someText\" }"
@@ -1206,7 +1368,8 @@ public class AccessControlServiceTest {
                 dataNode,
                 caseType.getCaseFields(),
                 USER_ROLES,
-                CAN_READ);
+                CAN_READ,
+                false);
 
             assertThat(jsonNode, is(equalTo(JSON_NODE_FACTORY.objectNode())));
         }
@@ -1216,11 +1379,11 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToFieldsIfRelevantAclNotGrantingAccess() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .build())
+                    .build())
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": \"someText\" }"
@@ -1231,7 +1394,8 @@ public class AccessControlServiceTest {
                 dataNode,
                 caseType.getCaseFields(),
                 USER_ROLES,
-                CAN_READ);
+                CAN_READ,
+                false);
 
             assertThat(jsonNode, is(equalTo(JSON_NODE_FACTORY.objectNode())));
         }
@@ -1241,14 +1405,14 @@ public class AccessControlServiceTest {
         void shouldNotReturnDataWithAclFalseAndNullValue() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES_3)
-                                            .build())
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES_3)
+                        .build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .build())
+                    .build())
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": null }"
@@ -1259,7 +1423,8 @@ public class AccessControlServiceTest {
                 dataNode,
                 caseType.getCaseFields(),
                 USER_ROLES,
-                CAN_READ);
+                CAN_READ,
+                false);
 
             assertThat(jsonNode, is(equalTo(JSON_NODE_FACTORY.objectNode())));
         }
@@ -1269,15 +1434,15 @@ public class AccessControlServiceTest {
         void shouldNotReturnDataWithAclTrueAndFieldNameNotMatching() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES_3)
-                                            .build())
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withRead(true)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES_3)
+                        .build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withRead(true)
+                        .build())
+                    .build())
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"addresses\": \"someText\" }"
@@ -1288,7 +1453,8 @@ public class AccessControlServiceTest {
                 dataNode,
                 caseType.getCaseFields(),
                 USER_ROLES,
-                CAN_READ);
+                CAN_READ,
+                false);
 
             assertThat(jsonNode, is(equalTo(JSON_NODE_FACTORY.objectNode())));
         }
@@ -1298,15 +1464,15 @@ public class AccessControlServiceTest {
         void shouldReturnDataWithAclTrueAndNullValue() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES_3)
-                                            .build())
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withRead(true)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES_3)
+                        .build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withRead(true)
+                        .build())
+                    .build())
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": null }"
@@ -1317,7 +1483,8 @@ public class AccessControlServiceTest {
                 dataNode,
                 caseType.getCaseFields(),
                 USER_ROLES,
-                CAN_READ);
+                CAN_READ,
+                false);
 
             assertThat(jsonNode, is(equalTo(dataNode)));
         }
@@ -1327,15 +1494,15 @@ public class AccessControlServiceTest {
         void shouldReturnDataWithAclTrueAndEmptyValue() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES_3)
-                                            .build())
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withRead(true)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES_3)
+                        .build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withRead(true)
+                        .build())
+                    .build())
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": \"\" }"
@@ -1346,7 +1513,8 @@ public class AccessControlServiceTest {
                 dataNode,
                 caseType.getCaseFields(),
                 USER_ROLES,
-                CAN_READ);
+                CAN_READ,
+                false);
 
             assertThat(jsonNode, is(equalTo(dataNode)));
         }
@@ -1356,15 +1524,15 @@ public class AccessControlServiceTest {
         void shouldGrantAccessToFieldsWithAclMatching() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES_3)
-                                            .build())
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withRead(true)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES_3)
+                        .build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withRead(true)
+                        .build())
+                    .build())
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": \"someText\" }"
@@ -1375,7 +1543,8 @@ public class AccessControlServiceTest {
                 dataNode,
                 caseType.getCaseFields(),
                 USER_ROLES,
-                CAN_READ);
+                CAN_READ,
+                false);
 
             assertThat(jsonNode, is(equalTo(dataNode)));
         }
@@ -1390,11 +1559,11 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToEmptyTextType() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .build())
+                    .build())
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\": \"\" }"
@@ -1405,7 +1574,8 @@ public class AccessControlServiceTest {
                 dataNode,
                 caseType.getCaseFields(),
                 USER_ROLES,
-                CAN_READ);
+                CAN_READ,
+                false);
 
             assertThat(jsonNode, is(equalTo(JSON_NODE_FACTORY.objectNode())));
         }
@@ -1415,23 +1585,23 @@ public class AccessControlServiceTest {
         void shouldReturnDataWithNullAndEmptyValuesOnRootLevel() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withRead(true)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withRead(true)
+                        .build())
+                    .build())
                 .withField(newCaseField()
-                               .withId("Addresses2")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withRead(true)
-                                            .build())
-                               .build())
+                    .withId("Addresses2")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withRead(true)
+                        .build())
+                    .build())
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
-                "{  \"Addresses\": null,\n" +
-                    "       \"Addresses2\": \"\" }"
+                "{  \"Addresses\": null,\n"
+                    + "       \"Addresses2\": \"\" }"
             ), STRING_JSON_MAP);
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
@@ -1439,7 +1609,8 @@ public class AccessControlServiceTest {
                 dataNode,
                 caseType.getCaseFields(),
                 USER_ROLES,
-                CAN_READ);
+                CAN_READ,
+                false);
 
             assertAll(
                 () -> assertThat(jsonNode.get("Addresses"), is(JSON_NODE_FACTORY.nullNode())),
@@ -1459,38 +1630,38 @@ public class AccessControlServiceTest {
         void shouldGrantAccessToCollectionType() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withRead(true)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withRead(true)
+                        .build())
+                    .build())
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
-                "{\n" +
-                    "         \"Addresses\":[  \n" +
-                    "         {  \n" +
-                    "            \"value\":{  \n" +
-                    "               \"Address\":\"address1\",\n" +
-                    "               \"Notes\": {\n" +
-                    "                   \"Note1\": \"someNote11\",\n" +
-                    "                   \"Note2\": \"someNote21\"\n" +
-                    "                }" +
-                    "            },\n" +
-                    "            \"id\":\"" + FIRST_CHILD_ID + "\"\n" +
-                    "         },\n" +
-                    "         {  \n" +
-                    "            \"value\":{  \n" +
-                    "               \"Address\":\"address2\",\n" +
-                    "               \"Notes\": {\n" +
-                    "                   \"Note1\": \"someNote21\",\n" +
-                    "                   \"Note2\": \"someNote22\"\n" +
-                    "                }" +
-                    "            },\n" +
-                    "            \"id\":\"" + SECOND_CHILD_ID + "\"\n" +
-                    "         }\n" +
-                    "      ]\n" +
-                    "    }\n"
+                "{\n"
+                    + "         \"Addresses\":[  \n"
+                    + "         {  \n"
+                    + "            \"value\":{  \n"
+                    + "               \"Address\":\"address1\",\n"
+                    + "               \"Notes\": {\n"
+                    + "                   \"Note1\": \"someNote11\",\n"
+                    + "                   \"Note2\": \"someNote21\"\n"
+                    + "                }"
+                    + "            },\n"
+                    + "            \"id\":\"" + FIRST_CHILD_ID + "\"\n"
+                    + "         },\n"
+                    + "         {  \n"
+                    + "            \"value\":{  \n"
+                    + "               \"Address\":\"address2\",\n"
+                    + "               \"Notes\": {\n"
+                    + "                   \"Note1\": \"someNote21\",\n"
+                    + "                   \"Note2\": \"someNote22\"\n"
+                    + "                }"
+                    + "            },\n"
+                    + "            \"id\":\"" + SECOND_CHILD_ID + "\"\n"
+                    + "         }\n"
+                    + "      ]\n"
+                    + "    }\n"
             ), STRING_JSON_MAP);
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
@@ -1498,65 +1669,210 @@ public class AccessControlServiceTest {
                 dataNode,
                 caseType.getCaseFields(),
                 USER_ROLES,
-                CAN_READ);
+                CAN_READ,
+                false);
 
             assertThat(jsonNode, is(equalTo(dataNode)));
         }
 
+        @Test
+        @DisplayName("Should return data if field and children have ACLs")
+        void shouldGrantAccessToCollectionTypeChildren() throws IOException {
+            final CaseField people = getPeopleCollectionFieldDefinition();
+            people.setAccessControlLists(asList(anAcl()
+                .withRole(ROLE_IN_USER_ROLES)
+                .withRead(true)
+                .build()));
+            people.setComplexACLs(asList(
+                aComplexACL()
+                    .withListElementCode("FirstName")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withRead(true)
+                    .build(),
+                aComplexACL()
+                    .withListElementCode("LastName")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withRead(false)
+                    .build(),
+                aComplexACL()
+                    .withListElementCode("Addresses")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withRead(true)
+                    .build(),
+                aComplexACL()
+                    .withListElementCode("Notes")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withRead(true)
+                    .build()
+            ));
+
+            final CaseType caseType = newCaseType().withField(people).build();
+            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+
+            JsonNode dataNode = generatePeopleData();
+
+            JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
+                dataNode,
+                caseType.getCaseFields(),
+                USER_ROLES,
+                CAN_READ,
+                false);
+
+            assertAll(
+                () -> assertThat(jsonNode.get("People").get(0).get("value").get("FirstName").textValue(), is("Fatih")),
+                () -> assertThat(jsonNode.get("People").get(0).get("value").get("LastName"), is(nullValue())),
+                () -> assertThat(jsonNode.get("People").get(0).get("value").get("Addresses").get(0).get("value").get("Name").textValue(), is("home")),
+                () -> assertThat(jsonNode.get("People").get(0).get("value").get("Addresses").get(1).get("value").get("Address").get("Line1").textValue(), is("41 Kings Road")),
+                () -> assertThat(jsonNode.get("People").get(0).get("value").get("Notes").get(0).get("value").get("Txt").textValue(), is("someNote11")),
+                () -> assertThat(jsonNode.get("People").get(0).get("value").size(), is(3))
+            );
+        }
+
+        @Test
+        @DisplayName("Should filter data when child doesnot have ACLs")
+        void shouldfilterDataWhenChildDoesnotHaveACL() throws IOException {
+            final CaseField people = getPeopleCollectionFieldDefinition();
+            people.setAccessControlLists(asList(anAcl()
+                .withRole(ROLE_IN_USER_ROLES)
+                .withRead(true)
+                .build()));
+            people.setComplexACLs(asList(
+                aComplexACL()
+                    .withListElementCode("FirstName")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withRead(true)
+                    .build(),
+                aComplexACL()
+                    .withListElementCode("LastName")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withRead(false)
+                    .build(),
+                aComplexACL()
+                    .withListElementCode("BirthInfo")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withRead(true)
+                    .build(),
+                aComplexACL()
+                    .withListElementCode("BirthInfo.BornCity")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withRead(true)
+                    .build(),
+                aComplexACL()
+                    .withListElementCode("BirthInfo.BornAddress")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withRead(true)
+                    .build(),
+                aComplexACL()
+                    .withListElementCode("BirthInfo.BornAddress.Address")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withRead(true)
+                    .build(),
+                aComplexACL()
+                    .withListElementCode("Addresses")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withRead(true)
+                    .build(),
+                aComplexACL()
+                    .withListElementCode("Addresses.Name")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withRead(true)
+                    .build(),
+                aComplexACL()
+                    .withListElementCode("Addresses.Address")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withRead(false)
+                    .build(),
+                aComplexACL()
+                    .withListElementCode("Notes")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withRead(true)
+                    .build(),
+                aComplexACL()
+                    .withListElementCode("Notes.Txt")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withRead(true)
+                    .build()
+            ));
+
+            final CaseType caseType = newCaseType().withField(people).build();
+            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+
+            JsonNode dataNode = generatePeopleData();
+
+            JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
+                dataNode,
+                caseType.getCaseFields(),
+                USER_ROLES,
+                CAN_READ,
+                false);
+
+            assertAll(
+                () -> assertThat(jsonNode.get("People").get(0).get("value").get("FirstName").textValue(), is("Fatih")),
+                () -> assertThat(jsonNode.get("People").get(0).get("value").get("LastName"), is(nullValue())),
+                () -> assertThat(jsonNode.get("People").get(0).get("value").get("BirthInfo").get("BornCity").textValue(), is("Salihli")),
+                () -> assertThat(jsonNode.get("People").get(0).get("value").get("BirthInfo").get("BornCountry"), is(nullValue())),
+                () -> assertThat(jsonNode.get("People").get(0).get("value").get("BirthInfo").get("BornAddress").get("Address").get("Line1").textValue(), is("23 Lampton Road")),
+                () -> assertThat(jsonNode.get("People").get(0).get("value").get("Addresses").get(0).get("value").get("Name").textValue(), is("home")),
+                () -> assertThat(jsonNode.get("People").get(0).get("value").get("Addresses").get(0).get("value").get("Address"), is(nullValue())),
+                () -> assertThat(jsonNode.get("People").get(0).get("value").get("Notes").get(0).get("value").get("Note"), is(nullValue())),
+                () -> assertThat(jsonNode.get("People").get(0).get("value").get("Notes").get(0).get("value").get("Txt").textValue(), is("someNote11")),
+                () -> assertThat(jsonNode.get("People").get(0).get("value").size(), is(4))
+            );
+        }
 
         @Test
         @DisplayName("Should return data with null and empty values on root level")
         void shouldReturnDataWithNullAndEmptyValuesOnRootLevel() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withRead(true)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withRead(true)
+                        .build())
+                    .build())
                 .withField(newCaseField()
-                               .withId("Addresses2")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withRead(true)
-                                            .build())
-                               .build())
+                    .withId("Addresses2")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withRead(true)
+                        .build())
+                    .build())
                 .withField(newCaseField()
-                               .withId("Addresses3")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withRead(true)
-                                            .build())
-                               .build())
+                    .withId("Addresses3")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withRead(true)
+                        .build())
+                    .build())
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
-                "{    \n" +
-                    "         \"Addresses\":[  \n" +
-                    "         {  \n" +
-                    "            \"value\":{  \n" +
-                    "               \"Address\":\"address1\",\n" +
-                    "               \"Notes\": {\n" +
-                    "                   \"Note1\": \"someNote11\",\n" +
-                    "                   \"Note2\": \"someNote21\"\n" +
-                    "                }" +
-                    "            },\n" +
-                    "            \"id\":\"" + FIRST_CHILD_ID + "\"\n" +
-                    "         },\n" +
-                    "         {  \n" +
-                    "            \"value\":{  \n" +
-                    "               \"Address\":\"address2\",\n" +
-                    "               \"Notes\": {\n" +
-                    "                   \"Note1\": \"someNote21\",\n" +
-                    "                   \"Note2\": \"someNote22\"\n" +
-                    "                }" +
-                    "            },\n" +
-                    "            \"id\":\"" + SECOND_CHILD_ID + "\"\n" +
-                    "         }\n" +
-                    "        ],\n" +
-                    "      \"Addresses2\": [],\n" +
-                    "      \"Addresses3\": null\n" +
-                    "    }\n"
+                "{    \n"
+                    + "         \"Addresses\":[  \n"
+                    + "         {  \n"
+                    + "            \"value\":{  \n"
+                    + "               \"Address\":\"address1\",\n"
+                    + "               \"Notes\": {\n"
+                    + "                   \"Note1\": \"someNote11\",\n"
+                    + "                   \"Note2\": \"someNote21\"\n"
+                    + "                }"
+                    + "            },\n"
+                    + "            \"id\":\"" + FIRST_CHILD_ID + "\"\n"
+                    + "         },\n"
+                    + "         {  \n"
+                    + "            \"value\":{  \n"
+                    + "               \"Address\":\"address2\",\n"
+                    + "               \"Notes\": {\n"
+                    + "                   \"Note1\": \"someNote21\",\n"
+                    + "                   \"Note2\": \"someNote22\"\n"
+                    + "                }"
+                    + "            },\n"
+                    + "            \"id\":\"" + SECOND_CHILD_ID + "\"\n"
+                    + "         }\n"
+                    + "        ],\n"
+                    + "      \"Addresses2\": [],\n"
+                    + "      \"Addresses3\": null\n"
+                    + "    }\n"
             ), STRING_JSON_MAP);
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
@@ -1564,7 +1880,8 @@ public class AccessControlServiceTest {
                 dataNode,
                 caseType.getCaseFields(),
                 USER_ROLES,
-                CAN_READ);
+                CAN_READ,
+                false);
 
             assertAll(
                 () -> assertThat(jsonNode.has("Addresses2"), is(true)),
@@ -1573,18 +1890,18 @@ public class AccessControlServiceTest {
                 () -> assertThat(jsonNode.get("Addresses3"), is(JSON_NODE_FACTORY.nullNode())),
                 () -> assertThat(jsonNode.get("Addresses").get(0).get(ID), is(getTextNode(FIRST_CHILD_ID))),
                 () -> assertThat(jsonNode.get("Addresses").get(0).get(VALUE).get("Address"),
-                                 is(getTextNode("address1"))),
+                    is(getTextNode("address1"))),
                 () -> assertThat(jsonNode.get("Addresses").get(0).get(VALUE).get("Notes").get("Note1"),
-                                 is(getTextNode("someNote11"))),
+                    is(getTextNode("someNote11"))),
                 () -> assertThat(jsonNode.get("Addresses").get(0).get(VALUE).get("Notes").get("Note2"),
-                                 is(getTextNode("someNote21"))),
+                    is(getTextNode("someNote21"))),
                 () -> assertThat(jsonNode.get("Addresses").get(1).get(ID), is(getTextNode(SECOND_CHILD_ID))),
                 () -> assertThat(jsonNode.get("Addresses").get(1).get(VALUE).get("Address"),
-                                 is(getTextNode("address2"))),
+                    is(getTextNode("address2"))),
                 () -> assertThat(jsonNode.get("Addresses").get(1).get(VALUE).get("Notes").get("Note1"),
-                                 is(getTextNode("someNote21"))),
+                    is(getTextNode("someNote21"))),
                 () -> assertThat(jsonNode.get("Addresses").get(1).get(VALUE).get("Notes").get("Note2"),
-                                 is(getTextNode("someNote22")))
+                    is(getTextNode("someNote22")))
             );
         }
 
@@ -1594,11 +1911,11 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToCollectionTypeIfEmpty() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .build())
+                    .build())
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
                 "{  \"Addresses\":[] }\n"
@@ -1609,7 +1926,8 @@ public class AccessControlServiceTest {
                 dataNode,
                 caseType.getCaseFields(),
                 USER_ROLES,
-                CAN_READ);
+                CAN_READ,
+                false);
 
             assertThat(jsonNode, is(equalTo(JSON_NODE_FACTORY.objectNode())));
         }
@@ -1624,18 +1942,18 @@ public class AccessControlServiceTest {
         void shouldGrantAccessToComplexType() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withRead(true)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withRead(true)
+                        .build())
+                    .build())
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
-                "{  \"Addresses\":{  \n" +
-                    "           \"Note\": \"someNote11\"\n" +
-                    "       }\n" +
-                    "    }\n"
+                "{  \"Addresses\":{  \n"
+                    + "           \"Note\": \"someNote11\"\n"
+                    + "       }\n"
+                    + "    }\n"
             ), STRING_JSON_MAP);
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
@@ -1643,7 +1961,8 @@ public class AccessControlServiceTest {
                 dataNode,
                 caseType.getCaseFields(),
                 USER_ROLES,
-                CAN_READ);
+                CAN_READ,
+                false);
 
             assertThat(jsonNode.get("Addresses").get("Note"), is(getTextNode("someNote11")));
         }
@@ -1653,26 +1972,26 @@ public class AccessControlServiceTest {
         void shouldReturnDataWithNullAndEmptyValuesOnRootLevel() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withRead(true)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withRead(true)
+                        .build())
+                    .build())
                 .withField(newCaseField()
-                               .withId("Addresses2")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withRead(true)
-                                            .build())
-                               .build())
+                    .withId("Addresses2")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withRead(true)
+                        .build())
+                    .build())
                 .build();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
-                "{  \"Addresses\": null,\n" +
-                    "      \"Addresses2\":{  \n" +
-                    "           \"Note\": \"\"\n" +
-                    "       }\n" +
-                    "    }\n"
+                "{  \"Addresses\": null,\n"
+                    + "      \"Addresses2\":{  \n"
+                    + "           \"Note\": \"\"\n"
+                    + "       }\n"
+                    + "    }\n"
             ), STRING_JSON_MAP);
             JsonNode dataNode = MAPPER.convertValue(data, JsonNode.class);
 
@@ -1680,7 +1999,8 @@ public class AccessControlServiceTest {
                 dataNode,
                 caseType.getCaseFields(),
                 USER_ROLES,
-                CAN_READ);
+                CAN_READ,
+                false);
 
             assertAll(
                 () -> assertThat(jsonNode.get("Addresses"), is(JSON_NODE_FACTORY.nullNode())),
@@ -1693,11 +2013,11 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToComplexTypeIfEmpty() throws IOException {
             CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .build())
+                    .build())
                 .build();
             List<CaseField> caseFields = newArrayList();
             final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
@@ -1709,7 +2029,8 @@ public class AccessControlServiceTest {
                 dataNode,
                 caseType.getCaseFields(),
                 USER_ROLES,
-                CAN_READ);
+                CAN_READ,
+                false);
 
             assertThat(jsonNode, is(equalTo(JSON_NODE_FACTORY.objectNode())));
         }
@@ -1724,15 +2045,15 @@ public class AccessControlServiceTest {
         void shouldNotReturnEventIfCaseEventIsMissing() throws IOException {
             final CaseType caseType = newCaseType()
                 .withEvent(newCaseEvent()
-                               .withId(EVENT_ID)
-                               .build())
+                    .withId(EVENT_ID)
+                    .build())
                 .build();
             List<AuditEvent> auditEvents = null;
 
             assertThat(accessControlService.filterCaseAuditEventsByReadAccess(auditEvents,
-                                                                              caseType.getEvents(),
-                                                                              USER_ROLES),
-                       is(emptyCollectionOf(AuditEvent.class)));
+                caseType.getEvents(),
+                USER_ROLES),
+                is(emptyCollectionOf(AuditEvent.class)));
         }
     }
 
@@ -1745,15 +2066,15 @@ public class AccessControlServiceTest {
         void shouldNotReturnEventIfCaseEventIsMissing() throws IOException {
             final CaseType caseType = newCaseType()
                 .withEvent(newCaseEvent()
-                               .withId(EVENT_ID)
-                               .build())
+                    .withId(EVENT_ID)
+                    .build())
                 .build();
             List<AuditEvent> auditEvents = null;
 
             assertThat(accessControlService.filterCaseAuditEventsByReadAccess(auditEvents,
-                                                                              caseType.getEvents(),
-                                                                              USER_ROLES),
-                       is(emptyCollectionOf(AuditEvent.class)));
+                caseType.getEvents(),
+                USER_ROLES),
+                is(emptyCollectionOf(AuditEvent.class)));
         }
 
         @Test
@@ -1761,17 +2082,17 @@ public class AccessControlServiceTest {
         void shouldNotReturnEventIfCaseEventIsMissingAcls() throws IOException {
             final CaseType caseType = newCaseType()
                 .withEvent(newCaseEvent()
-                               .withId(EVENT_ID)
-                               .build())
+                    .withId(EVENT_ID)
+                    .build())
                 .build();
             List<AuditEvent> auditEvents = newArrayList(anAuditEvent()
-                                                                  .withEventId(EVENT_ID)
-                                                                  .build());
+                .withEventId(EVENT_ID)
+                .build());
 
             assertThat(accessControlService.filterCaseAuditEventsByReadAccess(auditEvents,
-                                                                              caseType.getEvents(),
-                                                                              USER_ROLES),
-                       is(emptyCollectionOf(AuditEvent.class)));
+                caseType.getEvents(),
+                USER_ROLES),
+                is(emptyCollectionOf(AuditEvent.class)));
         }
 
         @Test
@@ -1779,21 +2100,21 @@ public class AccessControlServiceTest {
         void shouldNotReturnEventIfRelevantAclMissing() throws IOException {
             final CaseType caseType = newCaseType()
                 .withEvent(newCaseEvent()
-                               .withId(EVENT_ID)
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_NOT_IN_USER_ROLES)
-                                            .withRead(true)
-                                            .build())
-                               .build())
+                    .withId(EVENT_ID)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_NOT_IN_USER_ROLES)
+                        .withRead(true)
+                        .build())
+                    .build())
                 .build();
             List<AuditEvent> auditEvents = newArrayList(anAuditEvent()
-                                                            .withEventId(EVENT_ID)
-                                                            .build());
+                .withEventId(EVENT_ID)
+                .build());
 
             assertThat(accessControlService.filterCaseAuditEventsByReadAccess(auditEvents,
-                                                                              caseType.getEvents(),
-                                                                              USER_ROLES),
-                       is(emptyCollectionOf(AuditEvent.class)));
+                caseType.getEvents(),
+                USER_ROLES),
+                is(emptyCollectionOf(AuditEvent.class)));
         }
 
         @Test
@@ -1801,20 +2122,20 @@ public class AccessControlServiceTest {
         void shouldNotReturnEventIfRelevantAclNotGrantingAccess() throws IOException {
             final CaseType caseType = newCaseType()
                 .withEvent(newCaseEvent()
-                               .withId(EVENT_ID)
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .build())
-                               .build())
+                    .withId(EVENT_ID)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .build())
+                    .build())
                 .build();
             List<AuditEvent> auditEvents = newArrayList(anAuditEvent()
-                                                            .withEventId(EVENT_ID)
-                                                            .build());
+                .withEventId(EVENT_ID)
+                .build());
 
             assertThat(accessControlService.filterCaseAuditEventsByReadAccess(auditEvents,
-                                                                              caseType.getEvents(),
-                                                                              USER_ROLES),
-                       is(emptyCollectionOf(AuditEvent.class)));
+                caseType.getEvents(),
+                USER_ROLES),
+                is(emptyCollectionOf(AuditEvent.class)));
         }
 
         @Test
@@ -1822,21 +2143,21 @@ public class AccessControlServiceTest {
         void shouldNotReturnEventIfRelevantAclGrantingAccessAndEventNameNotMatching() throws IOException {
             final CaseType caseType = newCaseType()
                 .withEvent(newCaseEvent()
-                               .withId(EVENT_ID)
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .build())
-                               .build())
+                    .withId(EVENT_ID)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build())
+                    .build())
                 .build();
             List<AuditEvent> auditEvents = newArrayList(anAuditEvent()
-                                                            .withEventId(EVENT_ID_LOWER_CASE)
-                                                            .build());
+                .withEventId(EVENT_ID_LOWER_CASE)
+                .build());
 
             assertThat(accessControlService.filterCaseAuditEventsByReadAccess(auditEvents,
-                                                                              caseType.getEvents(),
-                                                                              USER_ROLES),
-                       is(emptyCollectionOf(AuditEvent.class)));
+                caseType.getEvents(),
+                USER_ROLES),
+                is(emptyCollectionOf(AuditEvent.class)));
         }
 
         @Test
@@ -1844,22 +2165,22 @@ public class AccessControlServiceTest {
         void shouldReturnEventWithAclMatching() throws IOException {
             final CaseType caseType = newCaseType()
                 .withEvent(newCaseEvent()
-                               .withId(EVENT_ID)
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withRead(true)
-                                            .build())
-                               .build())
+                    .withId(EVENT_ID)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withRead(true)
+                        .build())
+                    .build())
                 .build();
             List<AuditEvent> auditEvents = newArrayList(anAuditEvent()
-                                                            .withEventId(EVENT_ID)
-                                                            .build());
+                .withEventId(EVENT_ID)
+                .build());
 
             assertThat(accessControlService.filterCaseAuditEventsByReadAccess(
                 auditEvents,
                 caseType.getEvents(),
                 USER_ROLES),
-                       is(auditEvents));
+                is(auditEvents));
         }
 
         @Test
@@ -1867,29 +2188,29 @@ public class AccessControlServiceTest {
         void shouldReturnEventWithAclMatchingFromGroup() throws IOException {
             final CaseType caseType = newCaseType()
                 .withEvent(newCaseEvent()
-                               .withId(EVENT_ID)
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_NOT_IN_USER_ROLES)
-                                            .withRead(true)
-                                            .build())
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_NOT_IN_USER_ROLES_2)
-                                            .withRead(true)
-                                            .build())
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withRead(true)
-                                            .build())
-                               .build())
+                    .withId(EVENT_ID)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_NOT_IN_USER_ROLES)
+                        .withRead(true)
+                        .build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_NOT_IN_USER_ROLES_2)
+                        .withRead(true)
+                        .build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withRead(true)
+                        .build())
+                    .build())
                 .build();
             List<AuditEvent> auditEvents = newArrayList(anAuditEvent()
-                                                            .withEventId(EVENT_ID)
-                                                            .build());
+                .withEventId(EVENT_ID)
+                .build());
 
             assertThat(accessControlService.filterCaseAuditEventsByReadAccess(auditEvents,
-                                                                              caseType.getEvents(),
-                                                                              USER_ROLES),
-                       is(auditEvents));
+                caseType.getEvents(),
+                USER_ROLES),
+                is(auditEvents));
         }
 
         @Test
@@ -1897,55 +2218,55 @@ public class AccessControlServiceTest {
         void shouldReturnEventsWithAclsMatching() throws IOException {
             final CaseType caseType = newCaseType()
                 .withEvent(newCaseEvent().withId(EVENT_ID_WITH_ACCESS)
-                                    .withAcl(anAcl()
-                                                 .withRole(ROLE_IN_USER_ROLES)
-                                                 .withRead(true)
-                                                 .build())
-                                    .withAcl(anAcl()
-                                                 .withRole(ROLE_NOT_IN_USER_ROLES)
-                                                 .build())
-                           .build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withRead(true)
+                        .build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_NOT_IN_USER_ROLES)
+                        .build())
+                    .build())
                 .withEvent(newCaseEvent()
-                               .withId(EVENT_ID_WITHOUT_ACCESS)
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES_3)
-                                            .build())
-                            .build())
+                    .withId(EVENT_ID_WITHOUT_ACCESS)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES_3)
+                        .build())
+                    .build())
                 .withEvent(newCaseEvent()
-                               .withId(EVENT_ID_WITHOUT_ACCESS_2)
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_NOT_IN_USER_ROLES)
-                                            .withRead(true)
-                                            .build())
-                           .build())
+                    .withId(EVENT_ID_WITHOUT_ACCESS_2)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_NOT_IN_USER_ROLES)
+                        .withRead(true)
+                        .build())
+                    .build())
                 .withEvent(newCaseEvent()
-                               .withId(EVENT_ID_WITH_ACCESS_2)
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES_2)
-                                            .withRead(true)
-                                            .build())
-                           .build())
+                    .withId(EVENT_ID_WITH_ACCESS_2)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES_2)
+                        .withRead(true)
+                        .build())
+                    .build())
                 .build();
 
             List<AuditEvent> auditEvents = newArrayList(anAuditEvent()
-                                                            .withEventId(EVENT_ID_WITH_ACCESS)
-                                                            .build(),
-                                                        anAuditEvent()
-                                                            .withEventId(EVENT_ID_WITHOUT_ACCESS)
-                                                            .build(),
-                                                        anAuditEvent()
-                                                            .withEventId(EVENT_ID_WITHOUT_ACCESS_2)
-                                                            .build(),
-                                                        anAuditEvent()
-                                                            .withEventId(EVENT_ID_WITH_ACCESS_2)
-                                                            .build());
+                    .withEventId(EVENT_ID_WITH_ACCESS)
+                    .build(),
+                anAuditEvent()
+                    .withEventId(EVENT_ID_WITHOUT_ACCESS)
+                    .build(),
+                anAuditEvent()
+                    .withEventId(EVENT_ID_WITHOUT_ACCESS_2)
+                    .build(),
+                anAuditEvent()
+                    .withEventId(EVENT_ID_WITH_ACCESS_2)
+                    .build());
 
             List<AuditEvent> actual = accessControlService.filterCaseAuditEventsByReadAccess(
                 auditEvents,
                 caseType.getEvents(),
                 USER_ROLES);
             assertThat(actual, containsInAnyOrder(hasProperty("eventId", is("EVENT_ID_WITH_ACCESS")),
-                                                  hasProperty("eventId", is("EVENT_ID_WITH_ACCESS_2"))));
+                hasProperty("eventId", is("EVENT_ID_WITH_ACCESS_2"))));
         }
     }
 
@@ -1959,19 +2280,21 @@ public class AccessControlServiceTest {
         void shouldSetReadonlyFlagIfRelevantAclMissing() throws IOException {
             final CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_NOT_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .withUpdate(true)
-                                            .withRead(true)
-                                            .build())
-                               .build())
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_NOT_IN_USER_ROLES)
+                        .withCreate(true)
+                        .withUpdate(true)
+                        .withRead(true)
+                        .build())
+                    .build())
                 .build();
 
             CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
                 .withField(
                     aViewField()
+                        .withFieldType(aFieldType().withType("Text").build())
                         .withId("Addresses")
                         .build())
                 .build();
@@ -1982,7 +2305,491 @@ public class AccessControlServiceTest {
                 USER_ROLES,
                 CAN_UPDATE);
 
-            assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext", is("READONLY"))));
+            assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext", is(READONLY))));
+        }
+
+        @Test
+        @DisplayName("Should set readonly flag for complex children if relevant acl missing")
+        void shouldSetReadonlyFlagForComplexChildrenIfRelevantAclMissing() throws IOException {
+            final CaseType caseType = newCaseType()
+                .withField(newCaseField()
+                    .withFieldType(aFieldType()
+                        .withType(COMPLEX)
+                        .withComplexField(
+                            newCaseField()
+                                .withFieldType(
+                                    aFieldType()
+                                        .withType("Text")
+                                        .withId("Text")
+                                        .build())
+                                .withId("Line1")
+                                .build())
+                        .withComplexField(
+                            newCaseField()
+                                .withFieldType(
+                                    aFieldType()
+                                        .withType("Text")
+                                        .withId("Text")
+                                        .build())
+                                .withId("Line2")
+                                .build())
+                        .build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .withUpdate(false)
+                        .withRead(true)
+                        .build())
+                    .withComplexACL(
+                        aComplexACL()
+                            .withListElementCode("Line1")
+                            .withRole(ROLE_IN_USER_ROLES)
+                            .withCreate(false)
+                            .withUpdate(false)
+                            .build())
+                    .withComplexACL(
+                        aComplexACL()
+                            .withListElementCode("Line2")
+                            .withRole(ROLE_IN_USER_ROLES)
+                            .withCreate(true)
+                            .build())
+                    .build())
+                .build();
+            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+
+            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
+                .withField(
+                    aViewField()
+                        .withFieldType(aFieldType()
+                            .withType(COMPLEX)
+                            .withComplexField(
+                                newCaseField()
+                                    .withFieldType(
+                                        aFieldType()
+                                            .withType("Text")
+                                            .withId("Text")
+                                            .build())
+                                    .withId("Line1")
+                                    .build())
+                            .withComplexField(
+                                newCaseField()
+                                    .withFieldType(
+                                        aFieldType()
+                                            .withType("Text")
+                                            .withId("Text")
+                                            .build())
+                                    .withId("Line2")
+                                    .build())
+                            .build())
+                        .withId("Addresses")
+                        .build())
+                .build();
+
+            CaseEventTrigger eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                caseEventTrigger,
+                caseType.getCaseFields(),
+                USER_ROLES,
+                CAN_UPDATE);
+
+            assertAll(
+                () -> assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext", is(READONLY)))),
+                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Line1"), hasProperty("displayContext", is(READONLY))),
+                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Line2"), hasProperty("displayContext", is(READONLY)))
+            );
+        }
+
+        @Test
+        @DisplayName("Should not set readonly flag for complex children if relevant acl is there")
+        void shouldNotSetReadonlyFlagForComplexChildrenIfRelevantAclIsThere() throws IOException {
+            final CaseType caseType = newCaseType()
+                .withField(newCaseField()
+                    .withFieldType(aFieldType()
+                        .withType(COMPLEX)
+                        .withComplexField(
+                            newCaseField()
+                                .withFieldType(
+                                    aFieldType()
+                                        .withType("Text")
+                                        .withId("Text")
+                                        .build())
+                                .withId("Line1")
+                                .build())
+                        .withComplexField(
+                            newCaseField()
+                                .withFieldType(
+                                    aFieldType()
+                                        .withType("Text")
+                                        .withId("Text")
+                                        .build())
+                                .withId("Line2")
+                                .build())
+                        .build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .withUpdate(true)
+                        .withRead(true)
+                        .build())
+                    .withComplexACL(
+                        aComplexACL()
+                            .withListElementCode("Line1")
+                            .withRole(ROLE_IN_USER_ROLES)
+                            .withUpdate(true)
+                            .build())
+                    .withComplexACL(
+                        aComplexACL()
+                            .withListElementCode("Line2")
+                            .withRole(ROLE_IN_USER_ROLES)
+                            .withUpdate(true)
+                            .build())
+                    .build())
+                .build();
+            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+
+            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
+                .withField(
+                    aViewField()
+                        .withFieldType(aFieldType()
+                            .withType(COMPLEX)
+                            .withComplexField(
+                                newCaseField()
+                                    .withFieldType(
+                                        aFieldType()
+                                            .withType("Text")
+                                            .withId("Text")
+                                            .build())
+                                    .withId("Line1")
+                                    .build())
+                            .withComplexField(
+                                newCaseField()
+                                    .withFieldType(
+                                        aFieldType()
+                                            .withType("Text")
+                                            .withId("Text")
+                                            .build())
+                                    .withId("Line2")
+                                    .build())
+                            .build())
+                        .withId("Addresses")
+                        .build())
+                .build();
+
+            CaseEventTrigger eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                caseEventTrigger,
+                caseType.getCaseFields(),
+                USER_ROLES,
+                CAN_UPDATE);
+
+            assertAll(
+                () -> assertThat(eventTrigger.getCaseFields().get(0).getDisplayContext(), not(READONLY)),
+                () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Line1"), not(hasProperty("displayContext", is(READONLY)))),
+                () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Line2"), not(hasProperty("displayContext", is(READONLY))))
+            );
+        }
+
+        @Test
+        @DisplayName("Should set readonly flag for complex children and complex field overrides if relevant acl is missing")
+        void shouldSetReadonlyFlagForComplexChildrenIfRelevantAclIsMissing() throws IOException {
+            final CaseType caseType = newCaseType()
+                .withField(newCaseField()
+                    .withFieldType(aFieldType()
+                        .withType(COMPLEX)
+                        .withComplexField(
+                            newCaseField()
+                                .withFieldType(
+                                    aFieldType()
+                                        .withType("Text")
+                                        .withId("Text")
+                                        .build())
+                                .withId("Line1")
+                                .build())
+                        .withComplexField(
+                            newCaseField()
+                                .withFieldType(
+                                    aFieldType()
+                                        .withType("Text")
+                                        .withId("Text")
+                                        .build())
+                                .withId("Line2")
+                                .build())
+                        .build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .withUpdate(true)
+                        .withRead(true)
+                        .build())
+                    .withComplexACL(
+                        aComplexACL()
+                            .withListElementCode("Line1")
+                            .withRole(ROLE_IN_USER_ROLES)
+                            .withUpdate(true)
+                            .build())
+                    .withComplexACL(
+                        aComplexACL()
+                            .withListElementCode("Line2")
+                            .withRole(ROLE_IN_USER_ROLES)
+                            .withUpdate(false)
+                            .build())
+                    .build())
+                .build();
+            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+
+            final CaseViewField caseViewField1 = aViewField()
+                .withFieldType(aFieldType()
+                    .withType(COMPLEX)
+                    .withComplexField(
+                        newCaseField()
+                            .withFieldType(
+                                aFieldType()
+                                    .withType("Text")
+                                    .withId("Text")
+                                    .build())
+                            .withId("Line1")
+                            .build())
+                    .withComplexField(
+                        newCaseField()
+                            .withFieldType(
+                                aFieldType()
+                                    .withType("Text")
+                                    .withId("Text")
+                                    .build())
+                            .withId("Line2")
+                            .build())
+                    .build())
+                .withId("Addresses")
+                .build();
+            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
+                .withField(caseViewField1)
+                .withWizardPage(newWizardPage()
+                    .withId("Page One")
+                    .withField(caseViewField1, asList(
+                        newWizardPageComplexFieldOverride()
+                            .withComplexFieldId("Addresses.Line1")
+                            .withDisplayContext(OPTIONAL)
+                            .build(),
+                        newWizardPageComplexFieldOverride()
+                            .withComplexFieldId("Addresses.Line2")
+                            .withDisplayContext(MANDATORY)
+                            .build()))
+                    .build()
+                )
+                .build();
+
+            CaseEventTrigger eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                caseEventTrigger,
+                caseType.getCaseFields(),
+                USER_ROLES,
+                CAN_UPDATE);
+
+            assertAll(
+                () -> assertThat(eventTrigger.getCaseFields().get(0).getDisplayContext(), not(READONLY)),
+                () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Line1").orElseThrow(() -> new RuntimeException("Line 2 is not there")), not(hasProperty("displayContext", is(READONLY)))),
+                () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Line2").orElseThrow(() -> new RuntimeException("Line 2 is not there")), hasProperty("displayContext", is(READONLY))),
+                () -> assertThat(eventTrigger.getWizardPages().get(0).getWizardPageFields().get(0).getComplexFieldOverrides().get(0).getDisplayContext(), is(OPTIONAL)),
+                () -> assertThat(eventTrigger.getWizardPages().get(0).getWizardPageFields().get(0).getComplexFieldOverrides().get(1).getDisplayContext(), is(READONLY))
+            );
+        }
+
+        @Test
+        @DisplayName("Should set readonly flag for collection children if relevant acl missing")
+        void shouldSetReadonlyFlagForCollectionChildrenIfRelevantAclMissing() throws IOException {
+            final CaseType caseType = newCaseType()
+                .withField(newCaseField()
+                    .withId("AddressCollection")
+                    .withFieldType(aFieldType()
+                        .withType(COLLECTION)
+                        .withCollectionField(newCaseField()
+                            .withId("Addresses")
+                            .withFieldType(aFieldType()
+                                .withType(COMPLEX)
+                                .withComplexField(newCaseField()
+                                    .withId("Line1")
+                                    .withFieldType(aFieldType()
+                                        .withId("Text")
+                                        .withType("Text")
+                                        .build())
+                                    .build())
+                                .withComplexField(newCaseField()
+                                    .withId("Line2")
+                                    .withFieldType(aFieldType()
+                                        .withId("Text")
+                                        .withType("Text")
+                                        .build())
+                                    .build())
+                                .build())
+                            .build())
+                        .build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build())
+                    .withComplexACL(
+                        aComplexACL()
+                            .withListElementCode("Addresses")
+                            .withRole(ROLE_IN_USER_ROLES)
+                            .withUpdate(true)
+                            .build())
+                    .withComplexACL(
+                        aComplexACL()
+                            .withListElementCode("Addresses.Line1")
+                            .withRole(ROLE_IN_USER_ROLES)
+                            .withUpdate(false)
+                            .build())
+                    .withComplexACL(
+                        aComplexACL()
+                            .withListElementCode("Addresses.Line2")
+                            .withRole(ROLE_IN_USER_ROLES)
+                            .withUpdate(false)
+                            .build())
+                    .build())
+                .build();
+            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+
+            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
+                .withField(aViewField()
+                    .withId("AddressCollection")
+                    .withFieldType(aFieldType()
+                        .withType(COLLECTION)
+                        .withCollectionField(newCaseField()
+                            .withId("Addresses")
+                            .withFieldType(aFieldType()
+                                .withType(COMPLEX)
+                                .withComplexField(newCaseField()
+                                    .withId("Line1")
+                                    .withFieldType(aFieldType()
+                                        .withId("Text")
+                                        .withType("Text")
+                                        .build())
+                                    .build())
+                                .withComplexField(
+                                    newCaseField()
+                                        .withId("Line2")
+                                        .withFieldType(aFieldType()
+                                            .withId("Text")
+                                            .withType("Text")
+                                            .build())
+                                        .build())
+                                .build())
+                            .build())
+                        .build())
+                    .build())
+                .build();
+
+            CaseEventTrigger eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                caseEventTrigger,
+                caseType.getCaseFields(),
+                USER_ROLES,
+                CAN_UPDATE);
+
+            assertAll(
+                () -> assertThat(eventTrigger.getCaseFields().get(0), not(hasProperty("displayContext", is(READONLY)))),
+                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Addresses"), not(hasProperty("displayContext", is(READONLY)))),
+                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Addresses.Line1"), hasProperty("displayContext", is(READONLY))),
+                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Addresses.Line2"), hasProperty("displayContext", is(READONLY)))
+            );
+        }
+
+        @Test
+        @DisplayName("Should not set readonly flag for collection children if relevant acl is there")
+        void shouldNotSetReadonlyFlagForCollectionChildrenIfRelevantAclIsThere() throws IOException {
+            final CaseType caseType = newCaseType()
+                .withField(newCaseField()
+                    .withId("AddressCollection")
+                    .withFieldType(aFieldType()
+                        .withType(COLLECTION)
+                        .withCollectionField(newCaseField()
+                            .withId("Addresses")
+                            .withFieldType(aFieldType()
+                                .withType(COMPLEX)
+                                .withComplexField(newCaseField()
+                                    .withId("Line1")
+                                    .withFieldType(aFieldType()
+                                        .withId("Text")
+                                        .withType("Text")
+                                        .build())
+                                    .build())
+                                .withComplexField(newCaseField()
+                                    .withId("Line2")
+                                    .withFieldType(aFieldType()
+                                        .withId("Text")
+                                        .withType("Text")
+                                        .build())
+                                    .build())
+                                .build())
+                            .build())
+                        .build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build())
+                    .withComplexACL(
+                        aComplexACL()
+                            .withListElementCode("Addresses")
+                            .withRole(ROLE_IN_USER_ROLES)
+                            .withUpdate(true)
+                            .build())
+                    .withComplexACL(
+                        aComplexACL()
+                            .withListElementCode("Addresses.Line1")
+                            .withRole(ROLE_IN_USER_ROLES)
+                            .withUpdate(true)
+                            .build())
+                    .withComplexACL(
+                        aComplexACL()
+                            .withListElementCode("Addresses.Line2")
+                            .withRole(ROLE_IN_USER_ROLES)
+                            .withUpdate(true)
+                            .build())
+                    .build())
+                .build();
+            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+
+            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
+                .withField(aViewField()
+                    .withId("AddressCollection")
+                    .withFieldType(aFieldType()
+                        .withType(COLLECTION)
+                        .withCollectionField(newCaseField()
+                            .withId("Addresses")
+                            .withFieldType(aFieldType()
+                                .withType(COMPLEX)
+                                .withComplexField(newCaseField()
+                                    .withId("Line1")
+                                    .withFieldType(aFieldType()
+                                        .withId("Text")
+                                        .withType("Text")
+                                        .build())
+                                    .build())
+                                .withComplexField(
+                                    newCaseField()
+                                        .withId("Line2")
+                                        .withFieldType(aFieldType()
+                                            .withId("Text")
+                                            .withType("Text")
+                                            .build())
+                                        .build())
+                                .build())
+                            .build())
+                        .build())
+                    .build())
+                .build();
+
+            CaseEventTrigger eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                caseEventTrigger,
+                caseType.getCaseFields(),
+                USER_ROLES,
+                CAN_UPDATE);
+
+            assertAll(
+                () -> assertThat(eventTrigger.getCaseFields().get(0), not(hasProperty("displayContext", is(READONLY)))),
+                () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Addresses"), not(hasProperty("displayContext", is(READONLY)))),
+                () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Addresses.Line1"), not(hasProperty("displayContext", is(READONLY)))),
+                () -> assertThat(eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Addresses.Line2"), not(hasProperty("displayContext", is(READONLY))))
+            );
         }
 
         @Test
@@ -1990,15 +2797,17 @@ public class AccessControlServiceTest {
         void shouldSetReadonlyFlagIfRelevantAclNotGrantingAccess() throws IOException {
             final CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .build())
-                               .build())
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .build())
+                    .build())
                 .build();
             CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
                 .withField(
                     aViewField()
+                        .withFieldType(aFieldType().withType("Text").build())
                         .withId("Addresses")
                         .build())
                 .build();
@@ -2009,7 +2818,7 @@ public class AccessControlServiceTest {
                 USER_ROLES,
                 CAN_UPDATE);
 
-            assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext", is("READONLY"))));
+            assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext", is(READONLY))));
         }
 
         @Test
@@ -2017,12 +2826,12 @@ public class AccessControlServiceTest {
         void shouldSetReadonlyFlagIfRelevantAclGrantingAccessAndEventNameNotMatching() throws IOException {
             final CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withUpdate(true)
-                                            .build())
-                               .build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build())
+                    .build())
                 .build();
             CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
                 .withField(
@@ -2037,7 +2846,7 @@ public class AccessControlServiceTest {
                 USER_ROLES,
                 CAN_UPDATE);
 
-            assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext", is("READONLY"))));
+            assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext", is(READONLY))));
         }
 
         @Test
@@ -2045,16 +2854,18 @@ public class AccessControlServiceTest {
         void shouldNotSetReadonlyFlagIfAclMatching() throws IOException {
             final CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withUpdate(true)
-                                            .build())
-                               .build())
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build())
+                    .build())
                 .build();
             CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
                 .withField(
                     aViewField()
+                        .withFieldType(aFieldType().withType("Text").build())
                         .withId("Addresses")
                         .build())
                 .build();
@@ -2065,7 +2876,7 @@ public class AccessControlServiceTest {
                 USER_ROLES,
                 CAN_UPDATE);
 
-            assertThat(eventTrigger.getCaseFields(), everyItem(not(hasProperty("displayContext", is("READONLY")))));
+            assertThat(eventTrigger.getCaseFields(), everyItem(not(hasProperty("displayContext", is(READONLY)))));
         }
 
         @Test
@@ -2073,34 +2884,36 @@ public class AccessControlServiceTest {
         void shouldNotSetReadonlyFlagIfAclMatchingInAclsGroup() throws IOException {
             final CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_NOT_IN_USER_ROLES)
-                                            .withUpdate(true)
-                                            .build())
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_NOT_IN_USER_ROLES_2)
-                                            .withUpdate(true)
-                                            .build())
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withUpdate(true)
-                                            .build())
-                               .build())
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_NOT_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_NOT_IN_USER_ROLES_2)
+                        .withUpdate(true)
+                        .build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build())
+                    .build())
                 .build();
             CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
                 .withField(
                     aViewField()
+                        .withFieldType(aFieldType().withType("Text").build())
                         .withId("Addresses")
                         .build())
                 .build();
 
             CaseEventTrigger eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(caseEventTrigger,
-                                                                                                       caseType.getCaseFields(),
-                                                                                                       USER_ROLES,
-                                                                                                       CAN_UPDATE);
+                caseType.getCaseFields(),
+                USER_ROLES,
+                CAN_UPDATE);
 
-            assertThat(eventTrigger.getCaseFields(), everyItem(not(hasProperty("displayContext", is("READONLY")))));
+            assertThat(eventTrigger.getCaseFields(), everyItem(not(hasProperty("displayContext", is(READONLY)))));
 
         }
 
@@ -2109,69 +2922,77 @@ public class AccessControlServiceTest {
         void shouldNotSetReadonlyFlagsIfAclsMatchingInCaseViewFieldsGroup() throws IOException {
             final CaseType caseType = newCaseType()
                 .withField(newCaseField()
-                               .withId("Addresses")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_NOT_IN_USER_ROLES)
-                                            .build())
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withUpdate(true)
-                                            .build())
-                               .build())
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_NOT_IN_USER_ROLES)
+                        .build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build())
+                    .build())
                 .withField(newCaseField()
-                               .withId("AddressesNoAccess")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES_3)
-                                            .build())
-                               .build())
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withId("AddressesNoAccess")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES_3)
+                        .build())
+                    .build())
                 .withField(newCaseField()
-                               .withId("AddressesNoAccess2")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_NOT_IN_USER_ROLES)
-                                            .build())
-                               .build())
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withId("AddressesNoAccess2")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_NOT_IN_USER_ROLES)
+                        .build())
+                    .build())
                 .withField(newCaseField()
-                               .withId("Addresses2")
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES_2)
-                                            .withUpdate(true)
-                                            .build())
-                               .build())
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withId("Addresses2")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES_2)
+                        .withUpdate(true)
+                        .build())
+                    .build())
                 .build();
 
             CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
                 .withField(
                     aViewField()
+                        .withFieldType(aFieldType().withType("Text").build())
                         .withId("Addresses")
                         .build())
                 .withField(
                     aViewField()
+                        .withFieldType(aFieldType().withType("Text").build())
                         .withId("AddressesNoAccess")
                         .build())
                 .withField(
                     aViewField()
+                        .withFieldType(aFieldType().withType("Text").build())
                         .withId("AddressesNoAccess2")
                         .build())
                 .withField(
                     aViewField()
+                        .withFieldType(aFieldType().withType("Text").build())
                         .withId("Addresses2")
                         .build())
                 .build();
 
             CaseEventTrigger actual = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(caseEventTrigger,
-                                                                                                 caseType.getCaseFields(),
-                                                                                                 USER_ROLES,
-                                                                                                 CAN_UPDATE);
+                caseType.getCaseFields(),
+                USER_ROLES,
+                CAN_UPDATE);
             assertAll(
                 () -> assertThat(actual.getCaseFields(), hasSize(4)),
                 () -> assertThat(actual.getCaseFields(), hasItem(allOf(hasProperty("id", is("Addresses")),
-                                                                       not(hasProperty("displayContext", is("READONLY")))))),
+                    not(hasProperty("displayContext", is(READONLY)))))),
                 () -> assertThat(actual.getCaseFields(), hasItem(allOf(hasProperty("id", is("AddressesNoAccess")),
-                                                                       hasProperty("displayContext", is("READONLY"))))),
+                    hasProperty("displayContext", is(READONLY))))),
                 () -> assertThat(actual.getCaseFields(), hasItem(allOf(hasProperty("id", is("AddressesNoAccess2")),
-                                                                       hasProperty("displayContext", is("READONLY"))))),
+                    hasProperty("displayContext", is(READONLY))))),
                 () -> assertThat(actual.getCaseFields(), hasItem(allOf(hasProperty("id", is("Addresses2")),
-                                                                       not(hasProperty("displayContext", is("READONLY"))))))
+                    not(hasProperty("displayContext", is(READONLY))))))
             );
         }
     }
@@ -2185,20 +3006,20 @@ public class AccessControlServiceTest {
         void shouldNotReturnCaseEventDefinitionIfRelevantAclMissing() throws IOException {
             final CaseType caseType = newCaseType()
                 .withEvent(newCaseEvent()
-                               .withId(EVENT_ID)
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_NOT_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .withRead(true)
-                                            .withUpdate(true)
-                                            .build())
-                               .build())
+                    .withId(EVENT_ID)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_NOT_IN_USER_ROLES)
+                        .withCreate(true)
+                        .withRead(true)
+                        .withUpdate(true)
+                        .build())
+                    .build())
                 .build();
 
             assertThat(accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                                                                     USER_ROLES,
-                                                                     CAN_CREATE),
-                       is(emptyCollectionOf(CaseEvent.class)));
+                USER_ROLES,
+                CAN_CREATE),
+                is(emptyCollectionOf(CaseEvent.class)));
         }
 
         @Test
@@ -2206,20 +3027,20 @@ public class AccessControlServiceTest {
         void shouldNotReturnCaseEventDefinitionIfRelevantAclNotGrantingAccess() throws IOException {
             final CaseType caseType = newCaseType()
                 .withEvent(newCaseEvent()
-                               .withId(EVENT_ID)
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withCreate(false)
-                                            .withRead(true)
-                                            .withUpdate(true)
-                                       .build())
-                               .build())
+                    .withId(EVENT_ID)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(false)
+                        .withRead(true)
+                        .withUpdate(true)
+                        .build())
+                    .build())
                 .build();
 
             assertThat(accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                                                                     USER_ROLES,
-                                                                     CAN_CREATE),
-                       is(emptyCollectionOf(CaseEvent.class)));
+                USER_ROLES,
+                CAN_CREATE),
+                is(emptyCollectionOf(CaseEvent.class)));
         }
 
         @Test
@@ -2227,22 +3048,22 @@ public class AccessControlServiceTest {
         void shouldReturnCaseEventDefinitionWithAclMatching() throws IOException {
             final CaseType caseType = newCaseType()
                 .withEvent(newCaseEvent()
-                               .withId(EVENT_ID)
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .build())
-                               .build())
+                    .withId(EVENT_ID)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build())
+                    .build())
                 .build();
 
             List<CaseEvent> result = accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                                                                                      USER_ROLES,
-                                                                                      CAN_CREATE);
+                USER_ROLES,
+                CAN_CREATE);
 
             assertAll(
-                    () -> assertThat(result, hasSize(1)),
-                    () -> assertThat(result, hasItem(hasProperty("id", is(EVENT_ID))))
-                );
+                () -> assertThat(result, hasSize(1)),
+                () -> assertThat(result, hasItem(hasProperty("id", is(EVENT_ID))))
+            );
         }
 
         @Test
@@ -2250,25 +3071,25 @@ public class AccessControlServiceTest {
         void shouldReturnCaseEventDefinitionWithAclMatchingFromGroup() throws IOException {
             final CaseType caseType = newCaseType()
                 .withEvent(newCaseEvent()
-                               .withId(EVENT_ID)
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_NOT_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .build())
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_NOT_IN_USER_ROLES_2)
-                                            .withCreate(true)
-                                            .build())
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .build())
-                               .build())
+                    .withId(EVENT_ID)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_NOT_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_NOT_IN_USER_ROLES_2)
+                        .withCreate(true)
+                        .build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build())
+                    .build())
                 .build();
 
             List<CaseEvent> result = accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                                                                      USER_ROLES,
-                                                                      CAN_CREATE);
+                USER_ROLES,
+                CAN_CREATE);
             assertAll(
                 () -> assertThat(result, hasSize(1)),
                 () -> assertThat(result, hasItem(hasProperty("id", is(EVENT_ID))))
@@ -2280,39 +3101,39 @@ public class AccessControlServiceTest {
         void shouldReturnCaseEventDefinitionWithAclsMatching() throws IOException {
             final CaseType caseType = newCaseType()
                 .withEvent(newCaseEvent()
-                               .withId(EVENT_ID_WITH_ACCESS)
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .build())
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_NOT_IN_USER_ROLES)
-                                            .build())
-                           .build())
+                    .withId(EVENT_ID_WITH_ACCESS)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_NOT_IN_USER_ROLES)
+                        .build())
+                    .build())
                 .withEvent(newCaseEvent().withId(EVENT_ID_WITHOUT_ACCESS)
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES_3)
-                                            .build())
-                           .build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES_3)
+                        .build())
+                    .build())
                 .withEvent(newCaseEvent()
-                               .withId(EVENT_ID_WITHOUT_ACCESS_2)
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_NOT_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .build())
-                           .build())
+                    .withId(EVENT_ID_WITHOUT_ACCESS_2)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_NOT_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build())
+                    .build())
                 .withEvent(newCaseEvent()
-                               .withId(EVENT_ID_WITH_ACCESS_2)
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES_2)
-                                            .withCreate(true)
-                                            .build())
-                           .build())
+                    .withId(EVENT_ID_WITH_ACCESS_2)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES_2)
+                        .withCreate(true)
+                        .build())
+                    .build())
                 .build();
 
             List<CaseEvent> result = accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                                                                                   USER_ROLES,
-                                                                                   CAN_CREATE);
+                USER_ROLES,
+                CAN_CREATE);
             assertAll(
                 () -> assertThat(result, hasSize(2)),
                 () -> assertThat(result, hasItem(hasProperty("id", is("EVENT_ID_WITH_ACCESS")))),
@@ -2330,20 +3151,20 @@ public class AccessControlServiceTest {
         void shouldNotReturnCaseEventDefinitionIfRelevantAclMissing() throws IOException {
             final CaseType caseType = newCaseType()
                 .withEvent(newCaseEvent()
-                               .withId(EVENT_ID)
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_NOT_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .withRead(true)
-                                            .withUpdate(true)
-                                            .build())
-                               .build())
+                    .withId(EVENT_ID)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_NOT_IN_USER_ROLES)
+                        .withCreate(true)
+                        .withRead(true)
+                        .withUpdate(true)
+                        .build())
+                    .build())
                 .build();
 
             assertThat(accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                                                                     USER_ROLES,
-                                                                     CAN_CREATE),
-                       is(emptyCollectionOf(CaseEvent.class)));
+                USER_ROLES,
+                CAN_CREATE),
+                is(emptyCollectionOf(CaseEvent.class)));
         }
 
         @Test
@@ -2351,20 +3172,20 @@ public class AccessControlServiceTest {
         void shouldNotReturnCaseEventDefinitionIfRelevantAclNotGrantingAccess() throws IOException {
             final CaseType caseType = newCaseType()
                 .withEvent(newCaseEvent()
-                               .withId(EVENT_ID)
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withCreate(false)
-                                            .withRead(true)
-                                            .withUpdate(true)
-                                       .build())
-                               .build())
+                    .withId(EVENT_ID)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(false)
+                        .withRead(true)
+                        .withUpdate(true)
+                        .build())
+                    .build())
                 .build();
 
             assertThat(accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                                                                     USER_ROLES,
-                                                                     CAN_CREATE),
-                       is(emptyCollectionOf(CaseEvent.class)));
+                USER_ROLES,
+                CAN_CREATE),
+                is(emptyCollectionOf(CaseEvent.class)));
         }
 
         @Test
@@ -2372,22 +3193,22 @@ public class AccessControlServiceTest {
         void shouldReturnCaseEventDefinitionWithAclMatching() throws IOException {
             final CaseType caseType = newCaseType()
                 .withEvent(newCaseEvent()
-                               .withId(EVENT_ID)
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .build())
-                               .build())
+                    .withId(EVENT_ID)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build())
+                    .build())
                 .build();
 
             List<CaseEvent> result = accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                                                                                      USER_ROLES,
-                                                                                      CAN_CREATE);
+                USER_ROLES,
+                CAN_CREATE);
 
             assertAll(
-                    () -> assertThat(result, hasSize(1)),
-                    () -> assertThat(result, hasItem(hasProperty("id", is(EVENT_ID))))
-                );
+                () -> assertThat(result, hasSize(1)),
+                () -> assertThat(result, hasItem(hasProperty("id", is(EVENT_ID))))
+            );
         }
 
         @Test
@@ -2395,25 +3216,25 @@ public class AccessControlServiceTest {
         void shouldReturnCaseEventDefinitionWithAclMatchingFromGroup() throws IOException {
             final CaseType caseType = newCaseType()
                 .withEvent(newCaseEvent()
-                               .withId(EVENT_ID)
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_NOT_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .build())
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_NOT_IN_USER_ROLES_2)
-                                            .withCreate(true)
-                                            .build())
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .build())
-                               .build())
+                    .withId(EVENT_ID)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_NOT_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_NOT_IN_USER_ROLES_2)
+                        .withCreate(true)
+                        .build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build())
+                    .build())
                 .build();
 
             List<CaseEvent> result = accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                                                                      USER_ROLES,
-                                                                      CAN_CREATE);
+                USER_ROLES,
+                CAN_CREATE);
             assertAll(
                 () -> assertThat(result, hasSize(1)),
                 () -> assertThat(result, hasItem(hasProperty("id", is(EVENT_ID))))
@@ -2425,39 +3246,39 @@ public class AccessControlServiceTest {
         void shouldReturnCaseEventDefinitionWithAclsMatching() throws IOException {
             final CaseType caseType = newCaseType()
                 .withEvent(newCaseEvent()
-                               .withId(EVENT_ID_WITH_ACCESS)
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .build())
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_NOT_IN_USER_ROLES)
-                                            .build())
-                           .build())
+                    .withId(EVENT_ID_WITH_ACCESS)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_NOT_IN_USER_ROLES)
+                        .build())
+                    .build())
                 .withEvent(newCaseEvent().withId(EVENT_ID_WITHOUT_ACCESS)
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES_3)
-                                            .build())
-                           .build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES_3)
+                        .build())
+                    .build())
                 .withEvent(newCaseEvent()
-                               .withId(EVENT_ID_WITHOUT_ACCESS_2)
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_NOT_IN_USER_ROLES)
-                                            .withCreate(true)
-                                            .build())
-                           .build())
+                    .withId(EVENT_ID_WITHOUT_ACCESS_2)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_NOT_IN_USER_ROLES)
+                        .withCreate(true)
+                        .build())
+                    .build())
                 .withEvent(newCaseEvent()
-                               .withId(EVENT_ID_WITH_ACCESS_2)
-                               .withAcl(anAcl()
-                                            .withRole(ROLE_IN_USER_ROLES_2)
-                                            .withCreate(true)
-                                            .build())
-                           .build())
+                    .withId(EVENT_ID_WITH_ACCESS_2)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES_2)
+                        .withCreate(true)
+                        .build())
+                    .build())
                 .build();
 
             List<CaseEvent> result = accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                                                                                   USER_ROLES,
-                                                                                   CAN_CREATE);
+                USER_ROLES,
+                CAN_CREATE);
             assertAll(
                 () -> assertThat(result, hasSize(2)),
                 () -> assertThat(result, hasItem(hasProperty("id", is("EVENT_ID_WITH_ACCESS")))),
@@ -2524,30 +3345,77 @@ public class AccessControlServiceTest {
 
         private String collEnd = "      ]\n }\n";
 
+        private CaseField addressField;
+        private CaseType caseType;
+
         @BeforeEach
         void setUp() throws IOException {
             existingDataNode = getJsonNode(collStart + child1 + comma + child2 + collEnd);
+
+            addressField = newCaseField()
+                .withId("Addresses")
+                .withFieldType(aFieldType().withType(COLLECTION).build())
+                .withAcl(anAcl()
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withCreate(true)
+                    .build())
+                .build();
+            addressField.getFieldType().setCollectionFieldType(getSimpleAddressFieldType());
+
+            caseType = newCaseType()
+                .withField(addressField)
+                .build();
+        }
+
+        private FieldType getSimpleAddressFieldType() {
+            return aFieldType()
+                .withId("Address")
+                .withType(COMPLEX)
+                .withComplexField(newCaseField()
+                    .withId("Address")
+                    .withFieldType(aFieldType()
+                        .withId("Text")
+                        .withType("Text")
+                        .build())
+                    .build())
+                .withComplexField(getNotesFieldDefinition())
+                .build();
+        }
+
+        private CaseField getNotesFieldDefinition() {
+            return newCaseField()
+                .withId("Notes")
+                .withFieldType(aFieldType()
+                    .withId("NotesType")
+                    .withType(COMPLEX)
+                    .withComplexField(newCaseField()
+                        .withId("Note1")
+                        .withFieldType(aFieldType()
+                            .withId("Text")
+                            .withType("Text")
+                            .build())
+                        .build())
+                    .withComplexField(newCaseField()
+                        .withId("Note2")
+                        .withFieldType(aFieldType()
+                            .withId("Text")
+                            .withType("Text")
+                            .build())
+                        .build())
+                    .build())
+                .build();
         }
 
         @Test
         @DisplayName("Should fail if the caseField not found")
         void shouldFailIfCaseFieldDoesNotExist() throws IOException {
-            CaseType caseType = newCaseType()
-                .withField(newCaseField()
-                    .withId("AddressesWhatNot")
-                    .withFieldType(aFieldType().withType(COLLECTION).build())
-                    .withAcl(anAcl()
-                        .withRole(ROLE_IN_USER_ROLES)
-                        .withCreate(true)
-                        .build())
-                    .build())
-                .build();
+            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             assertThat(
                 accessControlService.canAccessCaseFieldsForUpsert(
                     getJsonNode(collStart + child1 + comma + child2 + comma + newChild + collEnd),
                     existingDataNode,
-                    caseType.getCaseFields(),
+                    Collections.emptyList(),
                     USER_ROLES),
                 is(false));
         }
@@ -2555,16 +3423,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should allow creation of new items on collection")
         void shouldGrantCreateAccessToCollectionType() throws IOException {
-            CaseType caseType = newCaseType()
-                .withField(newCaseField()
-                    .withId("Addresses")
-                    .withFieldType(aFieldType().withType(COLLECTION).build())
-                    .withAcl(anAcl()
-                        .withRole(ROLE_IN_USER_ROLES)
-                        .withCreate(true)
-                        .build())
-                    .build())
-                .build();
+            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             assertThat(
                 accessControlService.canAccessCaseFieldsForUpsert(
@@ -2578,16 +3437,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should allow creation of new items on collection even when no Id provided")
         void shouldGrantCreateAccessToCollectionTypeWOutId() throws IOException {
-            CaseType caseType = newCaseType()
-                .withField(newCaseField()
-                    .withId("Addresses")
-                    .withFieldType(aFieldType().withType(COLLECTION).build())
-                    .withAcl(anAcl()
-                        .withRole(ROLE_IN_USER_ROLES)
-                        .withCreate(true)
-                        .build())
-                    .build())
-                .build();
+            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             assertThat(
                 accessControlService.canAccessCaseFieldsForUpsert(
@@ -2601,16 +3451,8 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not allow creation of new items on collection")
         void shouldNotGrantCreateAccessToCollectionType() throws IOException {
-            CaseType caseType = newCaseType()
-                .withField(newCaseField()
-                    .withId("Addresses")
-                    .withFieldType(aFieldType().withType(COLLECTION).build())
-                    .withAcl(anAcl()
-                        .withRole(ROLE_IN_USER_ROLES)
-                        .withCreate(false)
-                        .build())
-                    .build())
-                .build();
+            addressField.setAccessControlLists(asList(anAcl().withRole(ROLE_IN_USER_ROLES).withCreate(false).build()));
+            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             assertThat(
                 accessControlService.canAccessCaseFieldsForUpsert(
@@ -2625,16 +3467,8 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should allow update of items on collection")
         void shouldGrantUpdateAccessToCollectionType() throws IOException {
-            CaseType caseType = newCaseType()
-                .withField(newCaseField()
-                    .withId("Addresses")
-                    .withFieldType(aFieldType().withType(COLLECTION).build())
-                    .withAcl(anAcl()
-                        .withRole(ROLE_IN_USER_ROLES)
-                        .withUpdate(true)
-                        .build())
-                    .build())
-                .build();
+            addressField.setAccessControlLists(asList(anAcl().withRole(ROLE_IN_USER_ROLES).withUpdate(true).build()));
+            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             assertThat(
                 accessControlService.canAccessCaseFieldsForUpsert(
@@ -2648,17 +3482,8 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should allow update of items on collection along with creation")
         void shouldGrantUpdateAndCreateAccessToCollectionType() throws IOException {
-            CaseType caseType = newCaseType()
-                .withField(newCaseField()
-                    .withId("Addresses")
-                    .withFieldType(aFieldType().withType(COLLECTION).build())
-                    .withAcl(anAcl()
-                        .withRole(ROLE_IN_USER_ROLES)
-                        .withUpdate(true)
-                        .withCreate(true)
-                        .build())
-                    .build())
-                .build();
+            addressField.setAccessControlLists(asList(anAcl().withRole(ROLE_IN_USER_ROLES).withCreate(true).withUpdate(true).build()));
+            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             assertThat(
                 accessControlService.canAccessCaseFieldsForUpsert(
@@ -2673,16 +3498,8 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not allow update of items on collection")
         void shouldNotGrantUpdateAccessToCollectionType() throws IOException {
-            CaseType caseType = newCaseType()
-                .withField(newCaseField()
-                    .withId("Addresses")
-                    .withFieldType(aFieldType().withType(COLLECTION).build())
-                    .withAcl(anAcl()
-                        .withRole(ROLE_IN_USER_ROLES)
-                        .withUpdate(false)
-                        .build())
-                    .build())
-                .build();
+            addressField.setAccessControlLists(asList(anAcl().withRole(ROLE_IN_USER_ROLES).withUpdate(false).build()));
+            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             assertThat(
                 accessControlService.canAccessCaseFieldsForUpsert(
@@ -2696,16 +3513,8 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should allow deletion of items on collection")
         void shouldGrantDeleteAccessToCollectionType() throws IOException {
-            CaseType caseType = newCaseType()
-                .withField(newCaseField()
-                    .withId("Addresses")
-                    .withFieldType(aFieldType().withType(COLLECTION).build())
-                    .withAcl(anAcl()
-                        .withRole(ROLE_IN_USER_ROLES)
-                        .withDelete(true)
-                        .build())
-                    .build())
-                .build();
+            addressField.setAccessControlLists(asList(anAcl().withRole(ROLE_IN_USER_ROLES).withDelete(true).build()));
+            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             assertThat(
                 accessControlService.canAccessCaseFieldsForUpsert(
@@ -2719,17 +3528,8 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should allow deletion of items on collection along with creation")
         void shouldGrantDeleteAndCreateAccessToCollectionType() throws IOException {
-            CaseType caseType = newCaseType()
-                .withField(newCaseField()
-                    .withId("Addresses")
-                    .withFieldType(aFieldType().withType(COLLECTION).build())
-                    .withAcl(anAcl()
-                        .withRole(ROLE_IN_USER_ROLES)
-                        .withDelete(true)
-                        .withCreate(true)
-                        .build())
-                    .build())
-                .build();
+            addressField.setAccessControlLists(asList(anAcl().withRole(ROLE_IN_USER_ROLES).withCreate(true).withDelete(true).build()));
+            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             assertThat(
                 accessControlService.canAccessCaseFieldsForUpsert(
@@ -2743,16 +3543,8 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should not allow deletion of items on collection")
         void shouldNotGrantDeleteAccessToCollectionType() throws IOException {
-            CaseType caseType = newCaseType()
-                .withField(newCaseField()
-                    .withId("Addresses")
-                    .withFieldType(aFieldType().withType(COLLECTION).build())
-                    .withAcl(anAcl()
-                        .withRole(ROLE_IN_USER_ROLES)
-                        .withDelete(false)
-                        .build())
-                    .build())
-                .build();
+            addressField.setAccessControlLists(asList(anAcl().withRole(ROLE_IN_USER_ROLES).withDelete(false).build()));
+            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             assertThat(
                 accessControlService.canAccessCaseFieldsForUpsert(
@@ -2765,20 +3557,10 @@ public class AccessControlServiceTest {
 
 
         @Test
-        @DisplayName("Should allow cretation, updating and deletion of items on collection")
+        @DisplayName("Should allow creation, updating and deletion of items on collection")
         void shouldGrantUpdateDeleteAndCreateAccessToCollectionType() throws IOException {
-            CaseType caseType = newCaseType()
-                .withField(newCaseField()
-                    .withId("Addresses")
-                    .withFieldType(aFieldType().withType(COLLECTION).build())
-                    .withAcl(anAcl()
-                        .withRole(ROLE_IN_USER_ROLES)
-                        .withDelete(true)
-                        .withCreate(true)
-                        .withUpdate(true)
-                        .build())
-                    .build())
-                .build();
+            addressField.setAccessControlLists(asList(anAcl().withRole(ROLE_IN_USER_ROLES).withCreate(true).withUpdate(true).withDelete(true).build()));
+            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
 
             assertThat(
                 accessControlService.canAccessCaseFieldsForUpsert(
@@ -2808,5 +3590,200 @@ public class AccessControlServiceTest {
 
     private JsonNode getTextNode(String value) {
         return JSON_NODE_FACTORY.textNode(value);
+    }
+
+    static CaseField getPeopleCollectionFieldDefinition() {
+        CaseField caseField = newCaseField()
+            .withId("People")
+            .withFieldType(aFieldType()
+                .withId("G339483948")
+                .withType(COLLECTION)
+                .build())
+            .build();
+        caseField.getFieldType().setCollectionFieldType(getPersonFieldType());
+        return caseField;
+    }
+
+    static FieldType getPersonFieldType() {
+        return aFieldType()
+            .withId("Person")
+            .withType(COMPLEX)
+            .withComplexField(newCaseField()
+                .withId("FirstName")
+                .withFieldType(aFieldType()
+                    .withId("Text")
+                    .withType("Text")
+                    .build())
+                .build())
+            .withComplexField(newCaseField()
+                .withId("LastName")
+                .withFieldType(aFieldType()
+                    .withId("Text")
+                    .withType("Text")
+                    .build())
+                .build())
+            .withComplexField(getBirtInfoComplexField())
+            .withComplexField(getAddressesCollectionFieldDefinition())
+            .withComplexField(getNotesCollectionFieldDefinition())
+            .build();
+    }
+
+    static CaseField getAddressesCollectionFieldDefinition() {
+        CaseField caseField = newCaseField()
+            .withId("Addresses")
+            .withFieldType(aFieldType()
+                .withId("Addresses-XYZT")
+                .withType(COLLECTION)
+                .build())
+            .build();
+        caseField.getFieldType().setCollectionFieldType(getAddressFieldType());
+        return caseField;
+    }
+
+    static CaseField getBirtInfoComplexField() {
+        return newCaseField()
+            .withId("BirthInfo")
+            .withFieldType(aFieldType()
+                .withId("BirthInfoType")
+                .withType(COMPLEX)
+                .withComplexField(newCaseField()
+                    .withId("BornCity")
+                    .withFieldType(aFieldType()
+                        .withId("Text")
+                        .withType("Text")
+                        .build())
+                    .build())
+                .withComplexField(newCaseField()
+                    .withId("BornCountry")
+                    .withFieldType(aFieldType()
+                        .withId("Text")
+                        .withType("Text")
+                        .build())
+                    .build())
+                .withComplexField(newCaseField()
+                    .withId("BornAddress")
+                    .withFieldType(getAddressFieldType())
+                    .build())
+                .build())
+            .build();
+    }
+
+    static FieldType getAddressFieldType() {
+        return aFieldType()
+            .withId("AddressComplexType")
+            .withType(COMPLEX)
+            .withComplexField(newCaseField()
+                .withId("Name")
+                .withFieldType(aFieldType()
+                    .withId("Text")
+                    .withType("Text")
+                    .build())
+                .build())
+            .withComplexField(newCaseField()
+                .withId("Address")
+                .withFieldType(getAddressDetailFieldType())
+                .build())
+            .build();
+    }
+
+    static FieldType getAddressDetailFieldType() {
+        return aFieldType()
+            .withId("AddressDetailComplexType")
+            .withType(COMPLEX)
+            .withComplexField(newCaseField()
+                .withId("Line1")
+                .withFieldType(aFieldType()
+                    .withId("Text")
+                    .withType("Text")
+                    .build())
+                .build())
+            .withComplexField(newCaseField()
+                .withId("Line2")
+                .withFieldType(aFieldType()
+                    .withId("Text")
+                    .withType("Text")
+                    .build())
+                .build())
+            .withComplexField(newCaseField()
+                .withId("PostCode")
+                .withFieldType(aFieldType()
+                    .withId("Text")
+                    .withType("Text")
+                    .build())
+                .build())
+            .withComplexField(newCaseField()
+                .withId("Country")
+                .withFieldType(aFieldType()
+                    .withId("Text")
+                    .withType("Text")
+                    .build())
+                .build())
+            .build();
+    }
+
+    static CaseField getNotesCollectionFieldDefinition() {
+        CaseField notes = newCaseField()
+            .withId("Notes")
+            .withFieldType(aFieldType()
+                .withId("Notes-EREJRKf")
+                .withType(COLLECTION)
+                .build())
+            .build();
+        notes.getFieldType().setCollectionFieldType(aFieldType()
+            .withId("Note")
+            .withType(COMPLEX)
+            .withComplexField(newCaseField()
+                .withId("Txt")
+                .withFieldType(aFieldType()
+                    .withId("Text")
+                    .withType("Text")
+                    .build())
+                .build())
+            .withComplexField(getTagFieldDefinition())
+            .build());
+        return notes;
+    }
+
+    static CaseField getTagFieldDefinition() {
+        CaseField tagsField = newCaseField()
+            .withId("Tags")
+            .withFieldType(aFieldType()
+                .withId("Tag-EREJRKf")
+                .withType(COLLECTION)
+                .build())
+            .build();
+        tagsField.getFieldType().setCollectionFieldType(aFieldType()
+            .withId("TagComplex")
+            .withType(COMPLEX)
+            .withComplexField(newCaseField()
+                .withId("Tag")
+                .withFieldType(aFieldType()
+                    .withId("Text")
+                    .withType("Text")
+                    .build())
+                .build())
+            .withComplexField(newCaseField()
+                .withId("Category")
+                .withFieldType(aFieldType()
+                    .withId("Text")
+                    .withType("Text")
+                    .build())
+                .build())
+            .build());
+        return tagsField;
+    }
+
+    static JsonNode generatePeopleData() throws IOException {
+        final Map<String, JsonNode> data = MAPPER.convertValue(MAPPER.readTree(
+            "{\n"
+                + "  \"People\": [\n" +
+                person1 +
+                "    ,\n" +
+                person2 +
+                "  ]\n"
+                + "}"
+        ), STRING_JSON_MAP);
+
+        return MAPPER.convertValue(data, JsonNode.class);
     }
 }
