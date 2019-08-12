@@ -249,11 +249,7 @@ public class CompoundAccessControlService {
             return false;
         }
         if (oldNode.get(field.getId()) == null) {
-            if (field.isCollectionFieldType()) {
-                return false; //for collection this means create
-            } else {
-                return true;
-            }
+            return true;
         }
         return !oldNode.get(field.getId()).equals(newNode.get(field.getId()));
     }

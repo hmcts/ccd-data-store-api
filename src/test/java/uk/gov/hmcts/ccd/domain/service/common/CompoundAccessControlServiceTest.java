@@ -753,10 +753,99 @@ class CompoundAccessControlServiceTest {
                 generatePeopleDataWithPerson(p2Updated, p1Updated), dataNode, people, USER_ROLES), is(true));
         }
 
+        @Test
+        @DisplayName("Should grand access when a child is updated and U exist, complex child has null initial value - fine grained ACL")
+        void shouldGrantAccessWhenChildUpdatedFromNullNodeAndFineGrainedACLExists() throws IOException {
+            final CaseField people = getPeopleCollectionFieldDefinition();
+            people.setAccessControlLists(asList(anAcl()
+                .withRole(ROLE_IN_USER_ROLES)
+                .withCreate(true)
+                .withUpdate(true)
+                .build()));
+            people.setComplexACLs(asList(
+                aComplexACL()
+                    .withListElementCode("Addresses")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withUpdate(true)
+                    .build(),
+                aComplexACL()
+                    .withListElementCode("Addresses.Address.Line1")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withUpdate(true)
+                    .build(),
+                aComplexACL()
+                    .withListElementCode("Addresses.Address.Line2")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withUpdate(true)
+                    .build(),
+                aComplexACL()
+                    .withListElementCode("Addresses.Address.PostCode")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withUpdate(true)
+                    .build(),
+                aComplexACL()
+                    .withListElementCode("Addresses.Address.Country")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withUpdate(true)
+                    .build()
+            ));
+
+            final CaseType caseType = newCaseType().withField(people).build();
+            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+
+            String p1 = existingPersonStart + addressesStart + existingAddressWNullLines + "," + existingAddress2 + addressEnd + personEnd;
+            String p2 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1 + addressEnd + "," + p2Notes + p2End;
+            JsonNode dataNode = generatePeopleDataWithPerson(p1, p2);
+
+            String p1Updated = existingPersonStart + addressesStart + existingAddress2 + "," + existingAddress1LinesUpdated + addressEnd + personEnd;
+            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1LinesUpdated + addressEnd + "," + p2Notes + p2End;
+            assertThat(compoundAccessControlService.hasAccessForAction(
+                generatePeopleDataWithPerson(p2Updated, p1Updated), dataNode, people, USER_ROLES), is(true));
+        }
+
+        @Test
+        @DisplayName("Should grand access when a child is updated and U exist, complex child has null final value - fine grained ACL")
+        void shouldGrantAccessWhenChildUpdatedToNullAndFineGrainedACLExists() throws IOException {
+            final CaseField people = getPeopleCollectionFieldDefinition();
+            people.setAccessControlLists(asList(anAcl()
+                .withRole(ROLE_IN_USER_ROLES)
+                .withCreate(true)
+                .withUpdate(true)
+                .build()));
+            people.setComplexACLs(asList(
+                aComplexACL()
+                    .withListElementCode("Addresses")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withUpdate(true)
+                    .build(),
+                aComplexACL()
+                    .withListElementCode("Addresses.Address.Line1")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withUpdate(true)
+                    .build(),
+                aComplexACL()
+                    .withListElementCode("Addresses.Address.Line2")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withUpdate(true)
+                    .build()
+            ));
+
+            final CaseType caseType = newCaseType().withField(people).build();
+            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+
+            String p1 = existingPersonStart + addressesStart + existingAddress1 + "," + existingAddress2 + addressEnd + personEnd;
+            String p2 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1 + addressEnd + "," + p2Notes + p2End;
+            JsonNode dataNode = generatePeopleDataWithPerson(p1, p2);
+
+            String p1Updated = existingPersonStart + addressesStart + existingAddress2 + "," + existingAddress1NullLine1 + addressEnd + personEnd;
+            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1LinesUpdated + addressEnd + "," + p2Notes + p2End;
+            assertThat(compoundAccessControlService.hasAccessForAction(
+                generatePeopleDataWithPerson(p2Updated, p1Updated), dataNode, people, USER_ROLES), is(true));
+        }
 
         @Test
         @DisplayName("Should deny access when a child is updated and U doesnot exist, complex child has no initial value - fine grained ACL")
-        void shouldDenyAccessWhenChildUpdatedFromNullAndFineGrainedACLExists() throws IOException {
+        void shouldDenyAccessWhenChildUpdatedFromNullAndFineGrainedACLDoesNotExist() throws IOException {
             final CaseField people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
@@ -789,6 +878,46 @@ class CompoundAccessControlServiceTest {
             JsonNode dataNode = generatePeopleDataWithPerson(p1, p2);
 
             String p1Updated = existingPersonStart + addressesStart + existingAddress2 + "," + existingAddress1LinesUpdated + addressEnd + personEnd;
+            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1LinesUpdated + addressEnd + "," + p2Notes + p2End;
+            assertThat(compoundAccessControlService.hasAccessForAction(
+                generatePeopleDataWithPerson(p2Updated, p1Updated), dataNode, people, USER_ROLES), is(false));
+        }
+
+        @Test
+        @DisplayName("Should deny access when a child is updated and U doesnot exist, complex child has null final value - fine grained ACL")
+        void shouldDenyAccessWhenChildUpdatedToNullAndFineGrainedACLDoesNotExist() throws IOException {
+            final CaseField people = getPeopleCollectionFieldDefinition();
+            people.setAccessControlLists(asList(anAcl()
+                .withRole(ROLE_IN_USER_ROLES)
+                .withCreate(true)
+                .withUpdate(true)
+                .build()));
+            people.setComplexACLs(asList(
+                aComplexACL()
+                    .withListElementCode("Addresses")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withUpdate(true)
+                    .build(),
+                aComplexACL()
+                    .withListElementCode("Addresses.Address.Line1")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withUpdate(false)
+                    .build(),
+                aComplexACL()
+                    .withListElementCode("Addresses.Address.Line2")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withUpdate(true)
+                    .build()
+            ));
+
+            final CaseType caseType = newCaseType().withField(people).build();
+            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+
+            String p1 = existingPersonStart + addressesStart + existingAddress1 + "," + existingAddress2 + addressEnd + personEnd;
+            String p2 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1 + addressEnd + "," + p2Notes + p2End;
+            JsonNode dataNode = generatePeopleDataWithPerson(p1, p2);
+
+            String p1Updated = existingPersonStart + addressesStart + existingAddress2 + "," + existingAddress1NullLine1 + addressEnd + personEnd;
             String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1LinesUpdated + addressEnd + "," + p2Notes + p2End;
             assertThat(compoundAccessControlService.hasAccessForAction(
                 generatePeopleDataWithPerson(p2Updated, p1Updated), dataNode, people, USER_ROLES), is(false));
