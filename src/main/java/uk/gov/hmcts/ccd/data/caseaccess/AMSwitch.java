@@ -21,38 +21,38 @@ public class AMSwitch {
         this.caseTypesToWriteModes = Maps.newHashMap();
         this.caseTypesToReadModes = Maps.newHashMap();
         applicationParams.getWriteToCCDCaseTypesOnly().forEach(caseType -> {
-            caseTypesToWriteModes.put(caseType, CCD_MODE);
+            caseTypesToWriteModes.put(caseType.toUpperCase(), CCD_MODE);
         });
         applicationParams.getWriteToAMCaseTypesOnly().forEach(caseType -> {
-            caseTypesToWriteModes.put(caseType, AM_MODE);
+            caseTypesToWriteModes.put(caseType.toUpperCase(), AM_MODE);
         });
         applicationParams.getWriteToBothCaseTypes().forEach(caseType -> {
-            caseTypesToWriteModes.put(caseType, BOTH_MODE);
+            caseTypesToWriteModes.put(caseType.toUpperCase(), BOTH_MODE);
         });
         applicationParams.getReadFromCCDCaseTypes().forEach(caseType -> {
-            caseTypesToReadModes.put(caseType, CCD_MODE);
+            caseTypesToReadModes.put(caseType.toUpperCase(), CCD_MODE);
         });
         applicationParams.getReadFromAMCaseTypes().forEach(caseType -> {
-            caseTypesToReadModes.put(caseType, AM_MODE);
+            caseTypesToReadModes.put(caseType.toUpperCase(), AM_MODE);
         });
     }
 
     public boolean isWriteAccessManagementWithCCD(final String caseTypeId) {
-        String mode = caseTypesToWriteModes.getOrDefault(caseTypeId, CCD_MODE);
+        String mode = caseTypesToWriteModes.getOrDefault(caseTypeId.toUpperCase(), CCD_MODE);
         return mode.equals(BOTH_MODE) || mode.equals(CCD_MODE);
     }
 
     public boolean isWriteAccessManagementWithAM(final String caseTypeId) {
-        String mode = caseTypesToWriteModes.getOrDefault(caseTypeId, CCD_MODE);
+        String mode = caseTypesToWriteModes.getOrDefault(caseTypeId.toUpperCase(), CCD_MODE);
         return mode.equals(BOTH_MODE) || mode.equals(AM_MODE);
     }
 
     public boolean isReadAccessManagementWithCCD(final String caseTypeId) {
-        return caseTypesToReadModes.getOrDefault(caseTypeId, CCD_MODE).equals(CCD_MODE);
+        return caseTypesToReadModes.getOrDefault(caseTypeId.toUpperCase(), CCD_MODE).equals(CCD_MODE);
     }
 
     public boolean isReadAccessManagementWithAM(final String caseTypeId) {
-        return caseTypesToReadModes.getOrDefault(caseTypeId, CCD_MODE).equals(AM_MODE);
+        return caseTypesToReadModes.getOrDefault(caseTypeId.toUpperCase(), CCD_MODE).equals(AM_MODE);
     }
 
 }
