@@ -92,10 +92,11 @@ public class AMCaseUserRepository implements CaseUserRepository {
 
     @Override
     public List<Long> findCasesUserIdHasAccessTo(final String userId) {
-        UserCasesEnvelope userCasesEnvelope =
+       /* UserCasesEnvelope userCasesEnvelope =
             accessManagementService.returnUserCases(userId);
         return userCasesEnvelope.getCases().stream().map(Long::valueOf).collect(Collectors.toList());
-    }
+    */
+        return Lists.newArrayList();}
 
     @Override
     public List<String> findCaseRoles(final String caseTypeId, final Long caseId, final String userId) {
