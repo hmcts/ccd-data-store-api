@@ -1,28 +1,15 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
-import javax.inject.Inject;
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-
+import com.google.common.collect.Maps;
 import org.hamcrest.MatcherAssert;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.BaseTest;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
@@ -31,6 +18,31 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
+
+import javax.inject.Inject;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
 @Transactional
 public class DefaultCaseDetailsRepositoryTest extends BaseTest {
@@ -52,6 +64,12 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
     @MockBean
     private AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService;
 
+    @Autowired
+    private DefaultCaseDetailsRepository defaultCaseDetailsRepository;
+
+    @MockBean
+    private CachedCaseDetailsRepository cachedCaseDetailsRepository;
+
     @Inject
     @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
     private CaseDetailsRepository caseDetailsRepository;
@@ -61,6 +79,10 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
         template = new JdbcTemplate(db);
 
         when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.ALL);
+        ReflectionTestUtils.setField(cachedCaseDetailsRepository, "idToCaseDetails", Maps.newHashMap());
+        ReflectionTestUtils.setField(cachedCaseDetailsRepository, "caseDetailsRepository", defaultCaseDetailsRepository);
+        when(cachedCaseDetailsRepository.findById(anyLong())).thenCallRealMethod();
+        when(cachedCaseDetailsRepository.findByMetaDataAndFieldData(any(MetaData.class), anyMap())).thenCallRealMethod();
     }
 
     @Test
