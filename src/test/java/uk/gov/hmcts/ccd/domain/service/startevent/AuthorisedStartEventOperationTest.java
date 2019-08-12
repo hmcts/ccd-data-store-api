@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
@@ -87,8 +88,8 @@ class AuthorisedStartEventOperationTest {
     private final CaseType caseType = new CaseType();
     private final List<CaseField> caseFields = Lists.newArrayList();
     private final Set<String> userRoles = Sets.newHashSet(CASEWORKER_DIVORCE,
-                                                          CASEWORKER_PROBATE_LOA1,
-                                                          CASEWORKER_PROBATE_LOA3);
+        CASEWORKER_PROBATE_LOA1,
+        CASEWORKER_PROBATE_LOA3);
 
     @BeforeEach
     void setUp() {
@@ -99,44 +100,45 @@ class AuthorisedStartEventOperationTest {
         ((ObjectNode) classifiedCaseDetailsNode).put("dataTestField2", "dataTestValue2");
         classifiedCaseDetailsClassificationNode = JSON_NODE_FACTORY.objectNode();
         ((ObjectNode) classifiedCaseDetailsClassificationNode).put("classificationTestField",
-                                                                   "classificationTestValue");
+            "classificationTestValue");
         ((ObjectNode) classifiedCaseDetailsClassificationNode).put("classificationTestField2",
-                                                                   "classificationTestValue2");
+            "classificationTestValue2");
 
         authorisedCaseDetailsNode = JSON_NODE_FACTORY.objectNode();
         ((ObjectNode) authorisedCaseDetailsNode).put("dataTestField", "dataTestValue");
         authorisedCaseDetailsClassificationNode = JSON_NODE_FACTORY.objectNode();
         ((ObjectNode) authorisedCaseDetailsClassificationNode).put("classificationTestField",
-                                                                   "classificationTestValue");
+            "classificationTestValue");
 
         classifiedCaseDetails = new CaseDetails();
         classifiedCaseDetails.setData(MAPPER.convertValue(classifiedCaseDetailsNode, STRING_JSON_MAP));
         classifiedCaseDetails.setDataClassification(MAPPER.convertValue(classifiedCaseDetailsClassificationNode,
-                                                                        STRING_JSON_MAP));
+            STRING_JSON_MAP));
         classifiedStartEvent = new StartEventTrigger();
         classifiedStartEvent.setCaseDetails(classifiedCaseDetails);
 
         caseDetailsOptional = Optional.of(newCaseDetails().withCaseTypeId(CASE_TYPE_ID).build());
 
         authorisedStartEventOperation = new AuthorisedStartEventOperation(classifiedStartEventOperation,
-                                                                          caseDefinitionRepository,
-                                                                          caseDetailsRepository,
-                                                                          accessControlService,
-                                                                          uidService,
-                                                                          draftGateway,
-                                                                          caseAccessService);
+            caseDefinitionRepository,
+            caseDetailsRepository,
+            accessControlService,
+            uidService,
+            draftGateway,
+            caseAccessService);
         caseType.setCaseFields(caseFields);
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseType);
         when(caseAccessService.getUserRoles()).thenReturn(userRoles);
         when(accessControlService.canAccessCaseTypeWithCriteria(caseType, userRoles, CAN_READ)).thenReturn(true);
         when(accessControlService.filterCaseFieldsByAccess(eq(classifiedCaseDetailsNode),
-                                                           eq(caseFields),
-                                                           eq(userRoles),
-                                                           eq(CAN_READ))).thenReturn(authorisedCaseDetailsNode);
+            eq(caseFields),
+            eq(userRoles),
+            eq(CAN_READ),
+            anyBoolean())).thenReturn(authorisedCaseDetailsNode);
         when(accessControlService.filterCaseFieldsByAccess(eq(classifiedCaseDetailsClassificationNode),
-                                                           eq(caseFields),
-                                                           eq(userRoles),
-                                                           eq(CAN_READ))).thenReturn(
+            eq(caseFields),
+            eq(userRoles),
+            eq(CAN_READ), anyBoolean())).thenReturn(
             authorisedCaseDetailsClassificationNode);
         when(uidService.validateUID(anyString())).thenReturn(true);
     }
@@ -148,11 +150,11 @@ class AuthorisedStartEventOperationTest {
         @BeforeEach
         void setUp() {
             doReturn(classifiedStartEvent).when(classifiedStartEventOperation).triggerStartForCaseType(CASE_TYPE_ID,
-                                                                                                       EVENT_TRIGGER_ID,
-                                                                                                       IGNORE_WARNING);
+                EVENT_TRIGGER_ID,
+                IGNORE_WARNING);
             when(accessControlService.canAccessCaseTypeWithCriteria(caseType,
-                                                                    userRoles,
-                                                                    CAN_CREATE)).thenReturn(true);
+                userRoles,
+                CAN_CREATE)).thenReturn(true);
         }
 
         @Test
@@ -160,15 +162,15 @@ class AuthorisedStartEventOperationTest {
         void shouldCallDecoratedStartEventOperation() {
 
             final StartEventTrigger output = authorisedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
-                                                                                                   EVENT_TRIGGER_ID,
-                                                                                                   IGNORE_WARNING);
+                EVENT_TRIGGER_ID,
+                IGNORE_WARNING);
 
             assertAll(
                 () -> assertThat(output, sameInstance(classifiedStartEvent)),
                 () -> assertThat(output.getCaseDetails(), sameInstance(classifiedCaseDetails)),
                 () -> verify(classifiedStartEventOperation).triggerStartForCaseType(CASE_TYPE_ID,
-                                                                                    EVENT_TRIGGER_ID,
-                                                                                    IGNORE_WARNING)
+                    EVENT_TRIGGER_ID,
+                    IGNORE_WARNING)
             );
         }
 
@@ -179,16 +181,16 @@ class AuthorisedStartEventOperationTest {
             when(accessControlService.canAccessCaseTypeWithCriteria(caseType, userRoles, CAN_READ)).thenReturn(false);
 
             final StartEventTrigger output = authorisedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
-                                                                                                   EVENT_TRIGGER_ID,
-                                                                                                   IGNORE_WARNING);
+                EVENT_TRIGGER_ID,
+                IGNORE_WARNING);
 
             assertAll(
                 () -> assertThat(output, sameInstance(classifiedStartEvent)),
                 () -> assertThat(output.getCaseDetails().getData(), is(EMPTY_MAP)),
                 () -> assertThat(output.getCaseDetails().getDataClassification(), is(EMPTY_MAP)),
                 () -> verify(classifiedStartEventOperation).triggerStartForCaseType(CASE_TYPE_ID,
-                                                                                    EVENT_TRIGGER_ID,
-                                                                                    IGNORE_WARNING)
+                    EVENT_TRIGGER_ID,
+                    IGNORE_WARNING)
             );
         }
     }
@@ -200,11 +202,11 @@ class AuthorisedStartEventOperationTest {
         @BeforeEach
         void setUp() {
             doReturn(classifiedStartEvent).when(classifiedStartEventOperation).triggerStartForCaseType(CASE_TYPE_ID,
-                                                                                                       EVENT_TRIGGER_ID,
-                                                                                                       IGNORE_WARNING);
+                EVENT_TRIGGER_ID,
+                IGNORE_WARNING);
             when(accessControlService.canAccessCaseTypeWithCriteria(caseType,
-                                                                    userRoles,
-                                                                    CAN_CREATE)).thenReturn(true);
+                userRoles,
+                CAN_CREATE)).thenReturn(true);
         }
 
         @Test
@@ -212,15 +214,15 @@ class AuthorisedStartEventOperationTest {
         void shouldCallDecoratedStartEventOperation() {
 
             final StartEventTrigger output = authorisedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
-                                                                                                   EVENT_TRIGGER_ID,
-                                                                                                   IGNORE_WARNING);
+                EVENT_TRIGGER_ID,
+                IGNORE_WARNING);
 
             assertAll(
                 () -> assertThat(output, sameInstance(classifiedStartEvent)),
                 () -> assertThat(output.getCaseDetails(), sameInstance(classifiedCaseDetails)),
                 () -> verify(classifiedStartEventOperation).triggerStartForCaseType(CASE_TYPE_ID,
-                                                                                    EVENT_TRIGGER_ID,
-                                                                                    IGNORE_WARNING)
+                    EVENT_TRIGGER_ID,
+                    IGNORE_WARNING)
             );
         }
 
@@ -231,16 +233,16 @@ class AuthorisedStartEventOperationTest {
             when(accessControlService.canAccessCaseTypeWithCriteria(caseType, userRoles, CAN_READ)).thenReturn(false);
 
             final StartEventTrigger output = authorisedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
-                                                                                                   EVENT_TRIGGER_ID,
-                                                                                                   IGNORE_WARNING);
+                EVENT_TRIGGER_ID,
+                IGNORE_WARNING);
 
             assertAll(
                 () -> assertThat(output, sameInstance(classifiedStartEvent)),
                 () -> assertThat(output.getCaseDetails().getData(), is(EMPTY_MAP)),
                 () -> assertThat(output.getCaseDetails().getDataClassification(), is(EMPTY_MAP)),
                 () -> verify(classifiedStartEventOperation).triggerStartForCaseType(CASE_TYPE_ID,
-                                                                                    EVENT_TRIGGER_ID,
-                                                                                    IGNORE_WARNING)
+                    EVENT_TRIGGER_ID,
+                    IGNORE_WARNING)
             );
         }
     }
@@ -252,8 +254,8 @@ class AuthorisedStartEventOperationTest {
         @BeforeEach
         void setUp() {
             doReturn(classifiedStartEvent).when(classifiedStartEventOperation).triggerStartForCase(CASE_REFERENCE,
-                                                                                                   EVENT_TRIGGER_ID,
-                                                                                                   IGNORE_WARNING);
+                EVENT_TRIGGER_ID,
+                IGNORE_WARNING);
             doReturn(caseDetailsOptional).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
         }
 
@@ -262,15 +264,15 @@ class AuthorisedStartEventOperationTest {
         void shouldCallDecoratedStartEventOperation() {
 
             StartEventTrigger output = authorisedStartEventOperation.triggerStartForCase(CASE_REFERENCE,
-                                                                                         EVENT_TRIGGER_ID,
-                                                                                         IGNORE_WARNING);
+                EVENT_TRIGGER_ID,
+                IGNORE_WARNING);
 
             assertAll(
                 () -> assertThat(output, sameInstance(classifiedStartEvent)),
                 () -> assertThat(output.getCaseDetails(), sameInstance(classifiedCaseDetails)),
                 () -> verify(classifiedStartEventOperation).triggerStartForCase(CASE_REFERENCE,
-                                                                                EVENT_TRIGGER_ID,
-                                                                                IGNORE_WARNING)
+                    EVENT_TRIGGER_ID,
+                    IGNORE_WARNING)
             );
         }
 
@@ -280,8 +282,8 @@ class AuthorisedStartEventOperationTest {
             classifiedStartEvent.setCaseDetails(null);
 
             final StartEventTrigger output = authorisedStartEventOperation.triggerStartForCase(CASE_REFERENCE,
-                                                                                               EVENT_TRIGGER_ID,
-                                                                                               IGNORE_WARNING);
+                EVENT_TRIGGER_ID,
+                IGNORE_WARNING);
 
             assertAll(
                 () -> assertThat(output, sameInstance(classifiedStartEvent)),
@@ -294,41 +296,43 @@ class AuthorisedStartEventOperationTest {
         void shouldReturnEventTriggerWithClassifiedCaseDetails() {
 
             final StartEventTrigger output = authorisedStartEventOperation.triggerStartForCase(CASE_REFERENCE,
-                                                                                               EVENT_TRIGGER_ID,
-                                                                                               IGNORE_WARNING);
+                EVENT_TRIGGER_ID,
+                IGNORE_WARNING);
 
             InOrder inOrder = inOrder(caseDefinitionRepository,
-                                      caseAccessService,
-                                      classifiedStartEventOperation,
-                                      accessControlService,
-                                      uidService,
-                                      caseDetailsRepository);
+                caseAccessService,
+                classifiedStartEventOperation,
+                accessControlService,
+                uidService,
+                caseDetailsRepository);
             assertAll(
                 () -> assertThat(output, sameInstance(classifiedStartEvent)),
                 () -> assertThat(output.getCaseDetails(), sameInstance(classifiedCaseDetails)),
                 () -> assertThat(output.getCaseDetails().getData(),
-                                 is(equalTo(MAPPER.convertValue(authorisedCaseDetailsNode, STRING_JSON_MAP)))),
+                    is(equalTo(MAPPER.convertValue(authorisedCaseDetailsNode, STRING_JSON_MAP)))),
                 () -> assertThat(output.getCaseDetails().getDataClassification(),
-                                 is(equalTo(MAPPER.convertValue(authorisedCaseDetailsClassificationNode,
-                                                                STRING_JSON_MAP)))),
+                    is(equalTo(MAPPER.convertValue(authorisedCaseDetailsClassificationNode,
+                        STRING_JSON_MAP)))),
                 () -> inOrder.verify(uidService).validateUID(CASE_REFERENCE),
                 () -> inOrder.verify(caseDetailsRepository).findByReference(CASE_REFERENCE),
                 () -> inOrder.verify(classifiedStartEventOperation).triggerStartForCase(CASE_REFERENCE,
-                                                                                        EVENT_TRIGGER_ID,
-                                                                                        IGNORE_WARNING),
+                    EVENT_TRIGGER_ID,
+                    IGNORE_WARNING),
                 () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
                 () -> inOrder.verify(caseAccessService).getUserRoles(),
                 () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseType),
-                                                                                         eq(userRoles),
-                                                                                         eq(CAN_READ)),
+                    eq(userRoles),
+                    eq(CAN_READ)),
                 () -> inOrder.verify(accessControlService).filterCaseFieldsByAccess(eq(classifiedCaseDetailsNode),
-                                                                                    eq(caseFields),
-                                                                                    eq(userRoles),
-                                                                                    eq(CAN_READ)),
+                    eq(caseFields),
+                    eq(userRoles),
+                    eq(CAN_READ),
+                    anyBoolean()),
                 () -> inOrder.verify(accessControlService).filterCaseFieldsByAccess(eq(classifiedCaseDetailsClassificationNode),
-                                                                                    eq(caseFields),
-                                                                                    eq(userRoles),
-                                                                                    eq(CAN_READ))
+                    eq(caseFields),
+                    eq(userRoles),
+                    eq(CAN_READ),
+                    anyBoolean())
             );
         }
 
@@ -339,8 +343,8 @@ class AuthorisedStartEventOperationTest {
             doReturn(null).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
 
             assertThrows(ValidationException.class, () -> authorisedStartEventOperation.triggerStartForCase(CASE_REFERENCE,
-                                                                                                            EVENT_TRIGGER_ID,
-                                                                                                            IGNORE_WARNING));
+                EVENT_TRIGGER_ID,
+                IGNORE_WARNING));
         }
 
     }
