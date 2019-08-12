@@ -248,7 +248,7 @@ public class CompoundAccessControlService {
             // this mustn't be interpreted as an update
             return false;
         }
-        if(oldNode.get(field.getId()) == null) {
+        if (oldNode.get(field.getId()) == null) {
             if (field.isCollectionFieldType()) {
                 return false; //for collection this means create
             } else {
