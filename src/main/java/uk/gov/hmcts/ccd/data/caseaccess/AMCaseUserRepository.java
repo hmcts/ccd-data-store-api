@@ -16,13 +16,17 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.DELETE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 
 @Named
 @Singleton
@@ -30,7 +34,7 @@ import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 public class AMCaseUserRepository implements CaseUserRepository {
 
     public static final String QUALIFIER = "am";
-    private String cases = "CASE";
+    private static final String cases = "CASE";
 
     @PersistenceContext
     private EntityManager em;
@@ -40,18 +44,19 @@ public class AMCaseUserRepository implements CaseUserRepository {
 
     @Override
     public void grantAccess(String jurisdictionId, String caseReference, Long caseId, String userId, String caseRole) {
-        Set<String> accessorIds = new HashSet<String>() {{
-            add(userId);
-        }};
+
+        Set<String> accessorIds = Collections.singleton(userId);
 
         ResourceDefinition resourceDefinition =
-            //TODO: What should be the resourceType and resourceName
-            //resoruce name: CMC, FPL
-            new ResourceDefinition(jurisdictionId, cases, "TODO::::::");
+            //TODO: What should be the resourceType and resourceName.
+            //To be clarified with Mutlu/Shashank again.
+            //resource name: CMC, FPL
+            new ResourceDefinition(jurisdictionId, cases, caseReference);
 
         ExplicitAccessGrant explicitAccessGrant = ExplicitAccessGrant.builder()
             .accessorType(AccessorType.USER)
             .accessorIds(accessorIds)
+            .resourceId(caseId.toString())
             .attributePermissions(getAttributePermissions())
             .resourceDefinition(resourceDefinition)
             .relationship(caseRole)
@@ -63,7 +68,7 @@ public class AMCaseUserRepository implements CaseUserRepository {
     private Map<JsonPointer, Set<Permission>> getAttributePermissions() {
         return new HashMap<JsonPointer, Set<Permission>>() {{
             //TODO: What should be the permission set? Just read or CRUD?
-            put(JsonPointer.valueOf(""), ImmutableSet.of(READ));
+            put(JsonPointer.valueOf(""), ImmutableSet.of(CREATE, READ, UPDATE, DELETE));
         }};
     }
 
@@ -76,9 +81,9 @@ public class AMCaseUserRepository implements CaseUserRepository {
                 .accessorType(AccessorType.USER)
                 .attribute(JsonPointer.valueOf(""))
                 .relationship(caseRole)
-                .resourceId(caseReference)
+                .resourceId(caseId.toString())
                 .serviceName(jurisdictionId)
-                .resourceName(cases)
+                .resourceName(caseReference)
                 .resourceType(cases)
                 .build();
 
@@ -87,11 +92,13 @@ public class AMCaseUserRepository implements CaseUserRepository {
 
     @Override
     public List<Long> findCasesUserIdHasAccessTo(final String userId) {
-        return Lists.newArrayList();
+        UserCasesEnvelope userCasesEnvelope =
+            accessManagementService.returnUserCases(userId);
+        return userCasesEnvelope.getCases().stream().map(Long::valueOf).collect(Collectors.toList());
     }
 
     @Override
-    public List<String> findCaseRoles(final String casecTypeId, final Long caseId, final String userId) {
+    public List<String> findCaseRoles(final String caseTypeId, final Long caseId, final String userId) {
         return Lists.newArrayList();
     }
 }
