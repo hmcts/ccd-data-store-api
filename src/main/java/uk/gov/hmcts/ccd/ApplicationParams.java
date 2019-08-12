@@ -35,8 +35,8 @@ public class ApplicationParams {
     @Value("#{'${ccd.callback.retry.intervals}'.split(',')}")
     private List<Integer> callbackRetryIntervalsInSeconds;
 
-    @Value("${ccd.callback.timeout}")
-    private Integer callbackTimeoutInSeconds;
+    @Value("${ccd.default.callback.timeout}")
+    private Integer defaultCallbackTimeoutInSeconds;
 
     @Value("${ccd.token.secret}")
     private String tokenSecret;
@@ -234,8 +234,8 @@ public class ApplicationParams {
         return callbackRetryIntervalsInSeconds;
     }
 
-    public Integer getCallbackTimeoutInSeconds() {
-        return callbackTimeoutInSeconds;
+    public Integer getDefaultCallbackTimeoutInSeconds() {
+        return defaultCallbackTimeoutInSeconds;
     }
 
     public String getValidDMDomain() {

@@ -34,7 +34,7 @@ class CallbackRetryContextBuilderTest {
         MockitoAnnotations.initMocks(this);
 
         doReturn(defaultCallbackRetryIntervals).when(applicationParams).getCallbackRetryIntervalsInSeconds();
-        doReturn(defaultCallbackTimeout).when(applicationParams).getCallbackTimeoutInSeconds();
+        doReturn(defaultCallbackTimeout).when(applicationParams).getDefaultCallbackTimeoutInSeconds();
         callbackRetryContextBuilder = new CallbackRetryContextBuilder(applicationParams);
     }
 

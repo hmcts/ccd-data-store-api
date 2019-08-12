@@ -38,7 +38,7 @@ public class CallbackRetryContextBuilder {
 
     public CallbackRetryContextBuilder(final ApplicationParams applicationParams) {
         this.defaultCallbackRetryIntervalsInSeconds = unmodifiableList(applicationParams.getCallbackRetryIntervalsInSeconds());
-        this.defaultCallbackTimeoutInSeconds = applicationParams.getCallbackTimeoutInSeconds();
+        this.defaultCallbackTimeoutInSeconds = applicationParams.getDefaultCallbackTimeoutInSeconds();
     }
 
     public List<CallbackRetryContext> buildCallbackRetryContexts(final List<Integer> callbackRetryTimeouts) {
