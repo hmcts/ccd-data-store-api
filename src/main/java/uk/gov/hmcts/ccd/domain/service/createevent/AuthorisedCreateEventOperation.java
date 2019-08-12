@@ -92,14 +92,16 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
                     MAPPER.convertValue(caseDetails.getData(), JsonNode.class),
                     caseType.getCaseFields(),
                     userRoles,
-                    CAN_READ),
+                    CAN_READ,
+                    false),
                 STRING_JSON_MAP));
             caseDetails.setDataClassification(MAPPER.convertValue(
                 accessControlService.filterCaseFieldsByAccess(
                     MAPPER.convertValue(caseDetails.getDataClassification(), JsonNode.class),
                     caseType.getCaseFields(),
                     userRoles,
-                    CAN_READ),
+                    CAN_READ,
+                    true),
                 STRING_JSON_MAP));
         }
         return caseDetails;

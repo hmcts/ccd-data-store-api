@@ -20,6 +20,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.READONLY;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
@@ -74,7 +75,7 @@ public class CaseViewFieldBuilderTest {
         CASE_FIELD_3.setMetadata(true);
 
         EVENT_FIELD.setCaseFieldId("PersonFirstName");
-        EVENT_FIELD.setDisplayContext("READONLY");
+        EVENT_FIELD.setDisplayContext(READONLY);
         EVENT_FIELD.setDisplayContext("#TABLE(Title, FirstName, MiddleName)");
         EVENT_FIELD.setShowCondition("ShowCondition");
         EVENT_FIELD.setShowSummaryChangeOption(Boolean.TRUE);
@@ -313,8 +314,6 @@ public class CaseViewFieldBuilderTest {
                 () -> assertThat(caseViewField.getAccessControlLists().size(), is(3)),
                 () -> assertThat(caseViewField.getFieldType().getComplexFields().get(0).getAccessControlLists().size(), is(3)),
                 () -> assertThat(caseViewField.getFieldType().getComplexFields().get(0).getFieldType().getCollectionFieldType().getComplexFields().get(0)
-                    .getAccessControlLists().size(), is(3)),
-                () -> assertThat(caseViewField.getFieldType().getComplexFields().get(1).getFieldType().getCollectionFieldType().getComplexFields().get(0)
                     .getAccessControlLists().size(), is(3)),
                 () -> assertThat(caseViewField.getFieldType().getComplexFields().get(2).getAccessControlLists().size(), is(3)),
                 () -> assertThat(caseViewField.getFieldType().getComplexFields().get(1).getFieldType().getCollectionFieldType().getComplexFields().get(0)
