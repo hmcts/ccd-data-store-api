@@ -44,7 +44,8 @@ public class MergeDataToSearchResultOperation {
     }
 
     public SearchResultView execute(final CaseType caseType,
-                                    final SearchResult searchResult, final List<CaseDetails> caseDetails,
+                                    final SearchResult searchResult,
+                                    final List<CaseDetails> caseDetails,
                                     final String resultError) {
 
         final List<SearchResultViewColumn> viewColumns = buildSearchResultViewColumn(caseType, searchResult);

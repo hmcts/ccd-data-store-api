@@ -10,8 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.*;
 import static org.mockito.ArgumentMatchers.any;
 import static uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway.DRAFT_STORE_DOWN_ERR_MESSAGE;
-import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.NO_ERROR;
-import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WORKBASKET;
+import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.*;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.SearchResultBuilder.aSearchResult;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildSearchResultField;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
@@ -55,7 +54,7 @@ public class SearchQueryOperationTest {
     private static final String DESC = "DESC";
     private static final String USER_ROLE_1 = "Role 1";
     private static final String USER_ROLE_2 = "Role 2";
-    public static final String CASE_FIELD_PATH = "nestedFieldPath";
+    private static final String CASE_FIELD_PATH = "nestedFieldPath";
 
     @Mock
     private SearchOperation searchOperation;
@@ -261,12 +260,10 @@ public class SearchQueryOperationTest {
 
         searchQueryOperation.execute(WORKBASKET, metadata, criteria);
 
-        assertAll(
-            () -> assertThat(metadata.getSortOrderFields().size(), is(1)),
-            () -> assertThat(metadata.getSortOrderFields().get(0).getCaseFieldId(), is(CASE_FIELD_2)),
-            () -> assertThat(metadata.getSortOrderFields().get(0).isMetadata(), is(false)),
-            () -> assertThat(metadata.getSortOrderFields().get(0).getDirection(), is(ASC))
-        );
+        assertThat(metadata.getSortOrderFields().size(), is(1));
+        assertThat(metadata.getSortOrderFields().get(0).getCaseFieldId(), is(CASE_FIELD_2));
+        assertThat(metadata.getSortOrderFields().get(0).isMetadata(), is(false));
+        assertThat(metadata.getSortOrderFields().get(0).getDirection(), is(ASC));
     }
 
     @Test
@@ -282,13 +279,11 @@ public class SearchQueryOperationTest {
 
         searchQueryOperation.execute(WORKBASKET, metadata, criteria);
 
-        assertAll(
-            () -> assertThat(metadata.getSortOrderFields().size(), is(2)),
-            () -> assertThat(metadata.getSortOrderFields().get(0).getCaseFieldId(), is(CASE_FIELD_ID_1_2)),
-            () -> assertThat(metadata.getSortOrderFields().get(0).getDirection(), is(DESC)),
-            () -> assertThat(metadata.getSortOrderFields().get(1).getCaseFieldId(), is(CASE_FIELD_ID_1_1)),
-            () -> assertThat(metadata.getSortOrderFields().get(1).getDirection(), is(ASC))
-        );
+        assertThat(metadata.getSortOrderFields().size(), is(2));
+        assertThat(metadata.getSortOrderFields().get(0).getCaseFieldId(), is(CASE_FIELD_ID_1_2));
+        assertThat(metadata.getSortOrderFields().get(0).getDirection(), is(DESC));
+        assertThat(metadata.getSortOrderFields().get(1).getCaseFieldId(), is(CASE_FIELD_ID_1_1));
+        assertThat(metadata.getSortOrderFields().get(1).getDirection(), is(ASC));
     }
 
     @Test
@@ -305,11 +300,26 @@ public class SearchQueryOperationTest {
 
         searchQueryOperation.execute(WORKBASKET, metadata, criteria);
 
-        assertAll(
-            () -> assertThat(metadata.getSortOrderFields().size(), is(1)),
-            () -> assertThat(metadata.getSortOrderFields().get(0).getCaseFieldId(), is(CASE_FIELD_ID_1_2 + "." + CASE_FIELD_PATH)),
-            () -> assertThat(metadata.getSortOrderFields().get(0).getDirection(), is(DESC))
-        );
+        assertThat(metadata.getSortOrderFields().size(), is(1));
+        assertThat(metadata.getSortOrderFields().get(0).getCaseFieldId(), is(CASE_FIELD_ID_1_2 + "." + CASE_FIELD_PATH));
+        assertThat(metadata.getSortOrderFields().get(0).getDirection(), is(DESC));
+    }
+
+    @Test
+    @DisplayName("should build sortOrderFields for divorce hack")
+    public void shouldBuildSortOrderFieldsForDivorceCaseType() {
+        metadata = new MetaData(CASE_TYPE_DIVORCE, JURISDICTION_ID);
+        metadata.setSortDirection(Optional.of(ASC));
+        criteria.put("someCriteria", "someValue");
+
+        doReturn(Optional.of(testCaseType)).when(getCaseTypeOperation).execute(CASE_TYPE_DIVORCE, CAN_READ);
+
+        searchQueryOperation.execute(WORKBASKET, metadata, criteria);
+
+        assertThat(metadata.getSortOrderFields().size(), is(1));
+        assertThat(metadata.getSortOrderFields().get(0).getCaseFieldId(), is(CASE_DATA_COLUMN_LAST_MODIFIED));
+        assertThat(metadata.getSortOrderFields().get(0).isMetadata(), is(true));
+        assertThat(metadata.getSortOrderFields().get(0).getDirection(), is(ASC));
     }
 
     private static SearchResultField buildSortResultField(String caseFieldId,

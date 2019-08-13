@@ -29,9 +29,9 @@ public class SearchQueryOperation {
     protected static final String NO_ERROR = null;
     public static final String WORKBASKET = "WORKBASKET";
 
-    private static final String CASE_TYPE_DIVORCE = "DIVORCE";
-    private static final String CASE_DATA_COLUMN_LAST_MODIFIED = "last_modified";
-    private static final String CASE_DATA_ENTITY_FIELD_LAST_MODIFIED = "lastModified";
+    protected static final String CASE_TYPE_DIVORCE = "DIVORCE";
+    protected static final String CASE_DATA_COLUMN_LAST_MODIFIED = "last_modified";
+    protected static final String CASE_DATA_ENTITY_FIELD_LAST_MODIFIED = "lastModified";
 
     private final MergeDataToSearchResultOperation mergeDataToSearchResultOperation;
     private final GetCaseTypeOperation getCaseTypeOperation;
