@@ -21,7 +21,7 @@ import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInA
 @Ignore("This is pending AM library implementation")
 public class AMCaseUserRepositoryComponentTest extends BaseTest {
 
-    private static final String COUNT_CASE_USERS = "select count(*) from case_users where case_data_id = ? and user_id = ? and case_role = ?";
+    private static final String COUNT_CASE_USERS = "TBD - see CCDCaseUserRepositoryComponentTest";
 
     private static final String JURISDICTION_ID = "JURISDICTION";
     private static final String CASE_TYPE_ID = "CASE_TYPE";
