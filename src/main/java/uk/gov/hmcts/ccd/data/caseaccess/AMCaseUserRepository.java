@@ -100,6 +100,9 @@ public class AMCaseUserRepository implements CaseUserRepository {
 
     @Override
     public List<String> findCaseRoles(final String caseTypeId, final Long caseId, final String userId) {
+        /*UserCaseRolesEnvelope envelope  = accessManagementService.returnUserCaseRoles(caseId, userId);
+        return envelope.getRoles();
+*/
         return Lists.newArrayList();
     }
 }
