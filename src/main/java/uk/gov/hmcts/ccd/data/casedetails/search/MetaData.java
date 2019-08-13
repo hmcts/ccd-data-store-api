@@ -58,6 +58,7 @@ public class MetaData {
     private Optional<String> page = Optional.empty();
     private Optional<String> sortDirection = Optional.empty();
     private Optional<String> sortField = Optional.empty();
+    private List<SortOrderField> sortOrderFields = newArrayList();
 
     public MetaData(String caseTypeId, String jurisdiction) {
         this.caseTypeId = caseTypeId;
@@ -134,6 +135,18 @@ public class MetaData {
 
     public void setSortField(String sortField) {
         this.sortField = Optional.of(sortField);
+    }
+
+    public List<SortOrderField> getSortOrderFields() {
+        return sortOrderFields;
+    }
+
+    public void setSortOrderFields(List<SortOrderField> sortOrderFields) {
+        this.sortOrderFields = sortOrderFields;
+    }
+
+    public void addSortOrderField(SortOrderField sortOrderField) {
+        this.sortOrderFields.add(sortOrderField);
     }
 
     public static List<String> unknownMetadata(List<String> parameters) {

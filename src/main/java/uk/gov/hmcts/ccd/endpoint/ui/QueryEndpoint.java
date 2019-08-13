@@ -73,9 +73,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 public class QueryEndpoint {
 
     private static final Logger LOG = LoggerFactory.getLogger(QueryEndpoint.class);
-    private static final String CASE_TYPE_DIVORCE = "DIVORCE";
-    private static final String CASE_DATA_COLUMN_LAST_MODIFIED = "last_modified";
-    private static final String CASE_DATA_ENTITY_FIELD_LAST_MODIFIED = "lastModified";
 
     private final GetCaseViewOperation getCaseViewOperation;
     private final GetCaseHistoryViewOperation getCaseHistoryViewOperation;
@@ -169,20 +166,7 @@ public class QueryEndpoint {
 
         Map<String, String> sanitized = fieldMapSanitizeOperation.execute(params);
 
-        addSortField(metadata, sanitized);
-
         return searchQueryOperation.execute(view, metadata, sanitized);
-    }
-
-    private void addSortField(MetaData metadata, Map<String, String> queryParameters) {
-        //Some (ugly) hardcoding (RDM-4636), until we provide feature for default sorting of search results via definition
-        if (CASE_TYPE_DIVORCE.equalsIgnoreCase(metadata.getCaseTypeId())) {
-            if (queryParameters.isEmpty()) {
-                metadata.setSortField(CASE_DATA_ENTITY_FIELD_LAST_MODIFIED);
-            } else {
-                metadata.setSortField(CASE_DATA_COLUMN_LAST_MODIFIED);
-            }
-        }
     }
 
     private Optional<String> param(Map<String, String> queryParameters, String param) {

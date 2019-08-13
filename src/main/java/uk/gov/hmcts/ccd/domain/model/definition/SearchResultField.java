@@ -20,6 +20,8 @@ public class SearchResultField implements Serializable {
     private boolean metadata;
     @JsonProperty("role")
     private String role;
+    @JsonProperty("sortOrder")
+    private SortOrder sortOrder;
 
     public String getCaseTypeId() {
         return caseTypeId;
@@ -79,5 +81,13 @@ public class SearchResultField implements Serializable {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public SortOrder getSortOrder() {
+        return sortOrder;
+    }
+
+    public void setSortOrder(SortOrder sortOrder) {
+        this.sortOrder = sortOrder;
     }
 }
