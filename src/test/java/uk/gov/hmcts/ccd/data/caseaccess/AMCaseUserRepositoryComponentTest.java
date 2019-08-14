@@ -18,7 +18,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 
 @Transactional
-@Ignore("This is pending AM library implementation")
 public class AMCaseUserRepositoryComponentTest extends BaseTest {
 
     private static final String COUNT_CASE_USERS = "TBD - see CCDCaseUserRepositoryComponentTest";
