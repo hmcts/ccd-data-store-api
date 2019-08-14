@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.data.caseaccess;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.InvalidPropertyException;
 import uk.gov.hmcts.ccd.ApplicationParams;
 
@@ -24,16 +25,16 @@ public class AMSwitch {
         this.caseTypesToWriteModes = Maps.newHashMap();
         this.caseTypesToReadModes = Maps.newHashMap();
         List<String> writeDuplicates = Lists.newArrayList(applicationParams.getWriteToCCDCaseTypesOnly());
-        applicationParams.getWriteToCCDCaseTypesOnly().forEach(caseType -> caseTypesToWriteModes.put(caseType.toUpperCase(), CCD_MODE));
-        applicationParams.getWriteToAMCaseTypesOnly().forEach(caseType -> {
+        applicationParams.getWriteToCCDCaseTypesOnly().stream().filter(StringUtils::isNotEmpty).forEach(caseType -> caseTypesToWriteModes.put(caseType.toUpperCase(), CCD_MODE));
+        applicationParams.getWriteToAMCaseTypesOnly().stream().filter(StringUtils::isNotEmpty).forEach(caseType -> {
             consumeOrThrow(writeDuplicates, caseTypesToWriteModes, "ccd.am.write.to_am_only", caseType, AM_MODE);
         });
-        applicationParams.getWriteToBothCaseTypes().forEach(caseType -> {
+        applicationParams.getWriteToBothCaseTypes().stream().filter(StringUtils::isNotEmpty).forEach(caseType -> {
             consumeOrThrow(writeDuplicates, caseTypesToWriteModes,"ccd.am.write.to_both", caseType, BOTH_MODE);
         });
         List<String> readDuplicates = Lists.newArrayList(applicationParams.getReadFromCCDCaseTypes());
-        applicationParams.getReadFromCCDCaseTypes().forEach(caseType -> caseTypesToReadModes.put(caseType.toUpperCase(), CCD_MODE));
-        applicationParams.getReadFromAMCaseTypes().forEach(caseType -> {
+        applicationParams.getReadFromCCDCaseTypes().stream().filter(StringUtils::isNotEmpty).forEach(caseType -> caseTypesToReadModes.put(caseType.toUpperCase(), CCD_MODE));
+        applicationParams.getReadFromAMCaseTypes().stream().filter(StringUtils::isNotEmpty).forEach(caseType -> {
             consumeOrThrow(readDuplicates, caseTypesToReadModes, "ccd.am.read.from_am", caseType, AM_MODE);
         });
     }
