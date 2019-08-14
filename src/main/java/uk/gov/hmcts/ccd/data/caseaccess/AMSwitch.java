@@ -1,58 +1,68 @@
 package uk.gov.hmcts.ccd.data.caseaccess;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.springframework.beans.InvalidPropertyException;
 import uk.gov.hmcts.ccd.ApplicationParams;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.util.List;
 import java.util.Map;
 
 @Named
 @Singleton
 public class AMSwitch {
 
-    public static final String AM_MODE = "am";
-    public static final String CCD_MODE = "ccd";
-    public static final String BOTH_MODE = "both";
+    private static final String AM_MODE = "am";
+    private static final String CCD_MODE = "ccd";
+    private static final String BOTH_MODE = "both";
     private final Map<String, String> caseTypesToWriteModes;
     private final Map<String, String> caseTypesToReadModes;
 
     public AMSwitch(final ApplicationParams applicationParams) {
         this.caseTypesToWriteModes = Maps.newHashMap();
         this.caseTypesToReadModes = Maps.newHashMap();
-        applicationParams.getWriteToCCDCaseTypesOnly().forEach(caseType -> {
-            caseTypesToWriteModes.put(caseType, CCD_MODE);
-        });
+        List<String> writeDuplicates = Lists.newArrayList(applicationParams.getWriteToCCDCaseTypesOnly());
+        applicationParams.getWriteToCCDCaseTypesOnly().forEach(caseType -> caseTypesToWriteModes.put(caseType.toUpperCase(), CCD_MODE));
         applicationParams.getWriteToAMCaseTypesOnly().forEach(caseType -> {
-            caseTypesToWriteModes.put(caseType, AM_MODE);
+            consumeOrThrow(writeDuplicates, caseTypesToWriteModes, "ccd.am.write.to_am_only", caseType, AM_MODE);
         });
         applicationParams.getWriteToBothCaseTypes().forEach(caseType -> {
-            caseTypesToWriteModes.put(caseType, BOTH_MODE);
+            consumeOrThrow(writeDuplicates, caseTypesToWriteModes,"ccd.am.write.to_both", caseType, BOTH_MODE);
         });
-        applicationParams.getReadFromCCDCaseTypes().forEach(caseType -> {
-            caseTypesToReadModes.put(caseType, CCD_MODE);
-        });
+        List<String> readDuplicates = Lists.newArrayList(applicationParams.getReadFromCCDCaseTypes());
+        applicationParams.getReadFromCCDCaseTypes().forEach(caseType -> caseTypesToReadModes.put(caseType.toUpperCase(), CCD_MODE));
         applicationParams.getReadFromAMCaseTypes().forEach(caseType -> {
-            caseTypesToReadModes.put(caseType, AM_MODE);
+            consumeOrThrow(readDuplicates, caseTypesToReadModes, "ccd.am.read.from_am", caseType, AM_MODE);
         });
     }
 
+    private void consumeOrThrow(final List<String> duplicates, Map<String, String> caseTypesToModes, String property, final String caseType, final String mode) {
+        if (duplicates.contains(caseType)) {
+            throw new InvalidPropertyException(ApplicationParams.class, property, "Duplicate case type configurations detected for Access Management persistence switches.");
+        } else {
+            duplicates.add(caseType);
+            caseTypesToModes.put(caseType.toUpperCase(), mode);
+        }
+    }
+
     public boolean isWriteAccessManagementWithCCD(final String caseTypeId) {
-        String mode = caseTypesToWriteModes.getOrDefault(caseTypeId, CCD_MODE);
+        String mode = caseTypesToWriteModes.getOrDefault(caseTypeId.toUpperCase(), CCD_MODE);
         return mode.equals(BOTH_MODE) || mode.equals(CCD_MODE);
     }
 
     public boolean isWriteAccessManagementWithAM(final String caseTypeId) {
-        String mode = caseTypesToWriteModes.getOrDefault(caseTypeId, CCD_MODE);
+        String mode = caseTypesToWriteModes.getOrDefault(caseTypeId.toUpperCase(), CCD_MODE);
         return mode.equals(BOTH_MODE) || mode.equals(AM_MODE);
     }
 
     public boolean isReadAccessManagementWithCCD(final String caseTypeId) {
-        return caseTypesToReadModes.getOrDefault(caseTypeId, CCD_MODE).equals(CCD_MODE);
+        return caseTypesToReadModes.getOrDefault(caseTypeId.toUpperCase(), CCD_MODE).equals(CCD_MODE);
     }
 
     public boolean isReadAccessManagementWithAM(final String caseTypeId) {
-        return caseTypesToReadModes.getOrDefault(caseTypeId, CCD_MODE).equals(AM_MODE);
+        return caseTypesToReadModes.getOrDefault(caseTypeId.toUpperCase(), CCD_MODE).equals(AM_MODE);
     }
 
 }

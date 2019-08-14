@@ -41,20 +41,20 @@ public class SearchQueryFactoryOperation {
     private final ApplicationParams applicationParam;
     private final UserAuthorisation userAuthorisation;
     private final AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService;
-    private final CaseUserRepository switchableCaseUserRepository;
+    private final CaseUserRepository caseUserRepository;
 
     public SearchQueryFactoryOperation(CriterionFactory criterionFactory,
                                        EntityManager entityManager,
                                        ApplicationParams applicationParam,
                                        UserAuthorisation userAuthorisation,
                                        AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService,
-                                       @Qualifier(SwitchableCaseUserRepository.QUALIFIER) final CaseUserRepository switchableCaseUserRepository) {
+                                       @Qualifier(SwitchableCaseUserRepository.QUALIFIER) final CaseUserRepository caseUserRepository) {
         this.criterionFactory = criterionFactory;
         this.entityManager = entityManager;
         this.applicationParam = applicationParam;
         this.userAuthorisation = userAuthorisation;
         this.authorisedCaseDefinitionDataService = authorisedCaseDefinitionDataService;
-        this.switchableCaseUserRepository = switchableCaseUserRepository;
+        this.caseUserRepository = caseUserRepository;
     }
 
     public Query build(MetaData metadata, Map<String, String> params, boolean isCountQuery) {
@@ -83,7 +83,7 @@ public class SearchQueryFactoryOperation {
 
     private String addUserCaseAccessClause() {
         if (UserAuthorisation.AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
-            List<Long> casesUserIdHasAccessTo = switchableCaseUserRepository.findCasesUserIdHasAccessTo(userAuthorisation.getUserId());
+            List<Long> casesUserIdHasAccessTo = caseUserRepository.findCasesUserIdHasAccessTo(userAuthorisation.getUserId());
             return casesUserIdHasAccessTo.isEmpty() ? "" : String.format(
                 " AND id IN ('%s')",
                 StringUtils.join(casesUserIdHasAccessTo, "','")
