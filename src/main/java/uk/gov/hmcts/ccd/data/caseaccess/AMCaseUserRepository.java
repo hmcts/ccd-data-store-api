@@ -14,14 +14,11 @@ import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.DELETE;
@@ -35,9 +32,6 @@ public class AMCaseUserRepository implements CaseUserRepository {
 
     public static final String QUALIFIER = "am";
     private static final String cases = "CASE";
-
-    @PersistenceContext
-    private EntityManager em;
 
     @Autowired
     AccessManagementService accessManagementService;
@@ -96,7 +90,8 @@ public class AMCaseUserRepository implements CaseUserRepository {
             accessManagementService.returnUserCases(userId);
         return userCasesEnvelope.getCases().stream().map(Long::valueOf).collect(Collectors.toList());
     */
-        return Lists.newArrayList();}
+        return Lists.newArrayList();
+    }
 
     @Override
     public List<String> findCaseRoles(final String caseTypeId, final Long caseId, final String userId) {
