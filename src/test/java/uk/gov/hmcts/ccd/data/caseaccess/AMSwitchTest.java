@@ -1,16 +1,24 @@
 package uk.gov.hmcts.ccd.data.caseaccess;
 
 import com.google.common.collect.Lists;
+import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.InvalidPropertyException;
 import uk.gov.hmcts.ccd.ApplicationParams;
 
 import java.util.List;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
 
@@ -49,6 +57,50 @@ class AMSwitchTest {
         doReturn(amOnlyReadCaseTypes).when(applicationParams).getReadFromAMCaseTypes();
 
         amSwitch = new AMSwitch(applicationParams);
+    }
+
+    @Test
+    void shouldFailWritesConfigWithInvalidPropertyExceptionIfDuplicatesInAM() {
+        doReturn(ccdOnlyWriteCaseTypes).when(applicationParams).getWriteToAMCaseTypesOnly();
+
+        InvalidPropertyException invalidPropertyException = assertThrows(InvalidPropertyException.class, () -> new AMSwitch(applicationParams));
+        assertAll(
+            () -> assertThat(invalidPropertyException.getBeanClass(), equalTo(ApplicationParams.class)),
+            () -> assertThat(invalidPropertyException.getPropertyName(), is("ccd.am.write.to_am_only"))
+        );
+    }
+
+    @Test
+    void shouldFailWritesConfigWithInvalidPropertyExceptionIfDuplicatesInBoth() {
+        doReturn(ccdOnlyWriteCaseTypes).when(applicationParams).getWriteToBothCaseTypes();
+
+        InvalidPropertyException invalidPropertyException = assertThrows(InvalidPropertyException.class, () -> new AMSwitch(applicationParams));
+        assertAll(
+            () -> assertThat(invalidPropertyException.getBeanClass(), equalTo(ApplicationParams.class)),
+            () -> assertThat(invalidPropertyException.getPropertyName(), is("ccd.am.write.to_both"))
+        );
+    }
+
+    @Test
+    void shouldFailWritesConfigWithInvalidPropertyExceptionIfDuplicatesInBoth2() {
+        doReturn(amOnlyWriteCaseTypes).when(applicationParams).getWriteToBothCaseTypes();
+
+        InvalidPropertyException invalidPropertyException = assertThrows(InvalidPropertyException.class, () -> new AMSwitch(applicationParams));
+        assertAll(
+            () -> assertThat(invalidPropertyException.getBeanClass(), equalTo(ApplicationParams.class)),
+            () -> assertThat(invalidPropertyException.getPropertyName(), is("ccd.am.write.to_both"))
+        );
+    }
+
+    @Test
+    void shouldFailWritesConfigWithInvalidPropertyExceptionIfDuplicatesInBoth3() {
+        doReturn(bothWriteCaseTypes).when(applicationParams).getWriteToAMCaseTypesOnly();
+
+        InvalidPropertyException invalidPropertyException = assertThrows(InvalidPropertyException.class, () -> new AMSwitch(applicationParams));
+        assertAll(
+            () -> assertThat(invalidPropertyException.getBeanClass(), equalTo(ApplicationParams.class)),
+            () -> assertThat(invalidPropertyException.getPropertyName(), is("ccd.am.write.to_both"))
+        );
     }
 
     @Test
