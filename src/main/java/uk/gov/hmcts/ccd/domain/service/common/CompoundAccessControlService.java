@@ -248,6 +248,9 @@ public class CompoundAccessControlService {
             // this mustn't be interpreted as an update
             return false;
         }
+        if (oldNode.get(field.getId()) == null) {
+            return true;
+        }
         return !oldNode.get(field.getId()).equals(newNode.get(field.getId()));
     }
 
