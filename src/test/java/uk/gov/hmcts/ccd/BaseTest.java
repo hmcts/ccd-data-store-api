@@ -22,6 +22,8 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseUserAuditEntity;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseUserEntity;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
@@ -240,6 +242,31 @@ public abstract class BaseTest {
         }
 
         return auditEvent;
+    }
+
+    protected CaseUserEntity mapCaseUser(ResultSet resultSet, Integer i) throws SQLException {
+        final CaseUserEntity caseUserEntity = new CaseUserEntity();
+        CaseUserEntity.CasePrimaryKey casePrimaryKey = new CaseUserEntity.CasePrimaryKey();
+        casePrimaryKey.setCaseDataId(resultSet.getLong("case_data_id"));
+        casePrimaryKey.setUserId(resultSet.getString("user_id"));
+        casePrimaryKey.setCaseRole(resultSet.getString("case_role"));
+        caseUserEntity.setCasePrimaryKey(casePrimaryKey);
+        return caseUserEntity;
+    }
+
+    protected CaseUserAuditEntity mapCaseUserAudit(ResultSet resultSet, Integer i) throws SQLException {
+        final CaseUserAuditEntity caseUserAuditEntity = new CaseUserAuditEntity();
+        caseUserAuditEntity.setId(resultSet.getLong("id"));
+        caseUserAuditEntity.setCaseDataId(resultSet.getLong("case_data_id"));
+        caseUserAuditEntity.setUserId(resultSet.getString("user_id"));
+        caseUserAuditEntity.setChangedById(resultSet.getString("changed_by_id"));
+        final Timestamp changedAt = resultSet.getTimestamp("changed_at");
+        if (null != changedAt) {
+            caseUserAuditEntity.setChangedAt(changedAt.toLocalDateTime());
+        }
+        caseUserAuditEntity.setAction(CaseUserAuditEntity.Action.valueOf(resultSet.getString("action")));
+        caseUserAuditEntity.setCaseRole(resultSet.getString("case_role"));
+        return caseUserAuditEntity;
     }
 
     protected String generateEventToken(JdbcTemplate template, String userId, String jurisdictionId, String caseTypeId, String caseReference, String eventId) {
