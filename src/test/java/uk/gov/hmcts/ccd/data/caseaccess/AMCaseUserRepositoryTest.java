@@ -1,27 +1,27 @@
 package uk.gov.hmcts.ccd.data.caseaccess;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.transaction.annotation.Transactional;
+import uk.gov.hmcts.ccd.BaseTest;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Mockito.verify;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.transaction.annotation.Transactional;
-import uk.gov.hmcts.ccd.BaseTest;
-
 @Transactional
-public class CCDCaseUserRepositoryComponentTest extends BaseTest {
+@Ignore("This is pending AM library implementation")
+public class AMCaseUserRepositoryTest extends BaseTest {
 
-    private static final String COUNT_CASE_USERS = "select count(*) from case_users where case_data_id = ? and user_id = ? and case_role = ?";
+    private static final String COUNT_CASE_USERS = "TBD - see CCDCaseUserRepositoryTest";
 
     private static final String JURISDICTION_ID = "JURISDICTION";
     private static final String CASE_TYPE_ID = "CASE_TYPE";
@@ -40,11 +40,8 @@ public class CCDCaseUserRepositoryComponentTest extends BaseTest {
 
     private JdbcTemplate template;
 
-    @MockBean
-    private CaseUserAuditRepository auditRepository;
-
     @Autowired
-    private CCDCaseUserRepository repository;
+    private AMCaseUserRepository repository;
 
     @Before
     public void setUp() {
@@ -57,25 +54,23 @@ public class CCDCaseUserRepositoryComponentTest extends BaseTest {
         repository.grantAccess(JURISDICTION_ID, CASE_REFERENCE, CASE_ID, USER_ID, CASE_ROLE);
 
         assertThat(countAccesses(CASE_ID, USER_ID, CASE_ROLE), equalTo(1));
-        verify(auditRepository).auditGrant(CASE_ID, USER_ID, CASE_ROLE);
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {
-        "classpath:sql/insert_cases.sql",
-        "classpath:sql/insert_case_users.sql",
+        "classpath:sql/insert_cases_am.sql",
+        "classpath:sql/insert_case_users_am.sql",
     })
     public void shouldRevokeAccessAsCustomCaseRole() {
         repository.revokeAccess(JURISDICTION_ID, CASE_TYPE_ID, CASE_ID_GRANTED, USER_ID_GRANTED, CASE_ROLE);
 
         assertThat(countAccesses(CASE_ID_GRANTED, USER_ID_GRANTED, CASE_ROLE), equalTo(0));
-        verify(auditRepository).auditRevoke(CASE_ID_GRANTED, USER_ID_GRANTED, CASE_ROLE);
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {
-        "classpath:sql/insert_cases.sql",
-        "classpath:sql/insert_case_users.sql",
+        "classpath:sql/insert_cases_am.sql",
+        "classpath:sql/insert_case_users_am.sql",
     })
     public void shouldFindCasesUserIdHasAccessTo() {
         List<Long> caseIds = repository.findCasesUserIdHasAccessTo(USER_ID);
@@ -107,8 +102,8 @@ public class CCDCaseUserRepositoryComponentTest extends BaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {
-        "classpath:sql/insert_cases.sql",
-        "classpath:sql/insert_case_users.sql",
+        "classpath:sql/insert_cases_am.sql",
+        "classpath:sql/insert_case_users_am.sql",
     })
     public void shouldFindCaseRolesUserPerformsForCase() {
 

@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.data.caseaccess;
 
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -59,6 +60,7 @@ class AMSwitchTest {
     }
 
     @Test
+    @DisplayName("should fail writes config with invalid property exception if duplicates in AM")
     void shouldFailWritesConfigWithInvalidPropertyExceptionIfDuplicatesInAM() {
         doReturn(ccdOnlyWriteCaseTypes).when(applicationParams).getWriteToAMCaseTypesOnly();
 

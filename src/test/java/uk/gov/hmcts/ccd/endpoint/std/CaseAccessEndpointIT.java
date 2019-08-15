@@ -233,7 +233,7 @@ public class CaseAccessEndpointIT extends BaseTest {
         Future<?> future = es.submit(() -> {
             final List<CaseUserAuditEntity> caseUserAuditEntities = template.query("SELECT * FROM case_users_audit", this::mapCaseUserAudit);
             assertEquals("Incorrect number of case user audit entities", numEntries, caseUserAuditEntities.size());
-            final List<CaseUserEntity> caseUserEntities = template.query("SELECT * FROM case_users_audit", this::mapCaseUser);
+            final List<CaseUserEntity> caseUserEntities = template.query("SELECT * FROM case_users", this::mapCaseUser);
             assertEquals("Incorrect number of case user entities", numEntries, caseUserEntities.size());
             return null;
         });
