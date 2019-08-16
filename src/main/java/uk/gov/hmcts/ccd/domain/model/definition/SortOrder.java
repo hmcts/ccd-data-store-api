@@ -2,7 +2,9 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class SortOrder {
+import java.io.Serializable;
+
+public class SortOrder implements Serializable {
 
     @JsonProperty("direction")
     private String direction;
