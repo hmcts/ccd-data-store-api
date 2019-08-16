@@ -20,7 +20,7 @@ import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInA
 @Transactional
 public class AMCaseUserRepositoryComponentTest extends BaseTest {
 
-    private static final String COUNT_CASE_USERS = "TBD - see CCDCaseUserRepositoryComponentTest";
+    private static final String COUNT_CASE_USERS = "TBD - see CCDCaseUserRepositoryTest";
 
     private static final String JURISDICTION_ID = "JURISDICTION";
     private static final String CASE_TYPE_ID = "CASE_TYPE";
@@ -80,7 +80,7 @@ public class AMCaseUserRepositoryComponentTest extends BaseTest {
         caseIds = repository.findCasesUserIdHasAccessTo(USER_ID_GRANTED);
 
         assertThat(caseIds.size(), equalTo(3));
-        assertThat(caseIds, containsInAnyOrder(CASE_ID_GRANTED, CASE_ID_GRANTED, CASE_ID_3));
+        assertThat(caseIds, containsInAnyOrder(CASE_ID_GRANTED,CASE_ID_GRANTED,CASE_ID_3));
     }
 
     private Integer countAccesses(Long caseId, String userId) {
@@ -106,15 +106,15 @@ public class AMCaseUserRepositoryComponentTest extends BaseTest {
     })
     public void shouldFindCaseRolesUserPerformsForCase() {
 
-        List<String> caseRoles = repository.findCaseRoles(CASE_TYPE_ID, CASE_ID, USER_ID);
+        List<String> caseRoles = repository.findCaseRoles(CASE_TYPE_ID, CASE_ID , USER_ID);
 
         assertThat(caseRoles.size(), equalTo(1));
         assertThat(caseRoles.get(0), equalTo(CASE_ROLE_CREATOR));
 
-        caseRoles = repository.findCaseRoles(CASE_TYPE_ID, CASE_ID_GRANTED, USER_ID_GRANTED);
+        caseRoles = repository.findCaseRoles(CASE_TYPE_ID, CASE_ID_GRANTED , USER_ID_GRANTED);
 
         assertThat(caseRoles.size(), equalTo(2));
-        assertThat(caseRoles, containsInAnyOrder(CASE_ROLE, CASE_ROLE_SOLICITOR));
+        assertThat(caseRoles, containsInAnyOrder(CASE_ROLE,CASE_ROLE_SOLICITOR));
     }
 
 }

@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.data.caseaccess;
 
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -44,6 +45,7 @@ class AMSwitchTest {
     private List<String> bothWriteCaseTypes = Lists.newArrayList(FR_CT);
     private List<String> ccdOnlyReadCaseTypes = Lists.newArrayList(CMC_CT, PROBATE_CT);
     private List<String> amOnlyReadCaseTypes = Lists.newArrayList(DIVORCE_CT, FR_CT, TEST_CT);
+    private List<String> emptyCaseTypes = Lists.newArrayList("");
 
     @BeforeEach
     void setUp() {
@@ -58,6 +60,7 @@ class AMSwitchTest {
     }
 
     @Test
+    @DisplayName("should fail writes config with invalid property exception if duplicates in AM")
     void shouldFailWritesConfigWithInvalidPropertyExceptionIfDuplicatesInAM() {
         doReturn(ccdOnlyWriteCaseTypes).when(applicationParams).getWriteToAMCaseTypesOnly();
 
@@ -102,6 +105,26 @@ class AMSwitchTest {
     }
 
     @Test
+    void shouldDefaultToCCDIfWriteCaseTypesEmpty() {
+        doReturn(emptyCaseTypes).when(applicationParams).getWriteToCCDCaseTypesOnly();
+        doReturn(emptyCaseTypes).when(applicationParams).getWriteToAMCaseTypesOnly();
+        doReturn(emptyCaseTypes).when(applicationParams).getWriteToBothCaseTypes();
+
+        AMSwitch amSwitch = new AMSwitch(applicationParams);
+
+        assertTrue(amSwitch.isWriteAccessManagementWithCCD(CMC_CT));
+        assertTrue(amSwitch.isWriteAccessManagementWithCCD(CMC_CT_LOWERCASE));
+        assertTrue(amSwitch.isWriteAccessManagementWithCCD(PROBATE_CT));
+        assertTrue(amSwitch.isWriteAccessManagementWithCCD(PROBATE_CT_LOWERCASE));
+        assertTrue(amSwitch.isWriteAccessManagementWithCCD(DIVORCE_CT));
+        assertTrue(amSwitch.isWriteAccessManagementWithCCD(DIVORCE_CT_LOWERCASE));
+        assertTrue(amSwitch.isWriteAccessManagementWithCCD(FR_CT));
+        assertTrue(amSwitch.isWriteAccessManagementWithCCD(FR_CT_LOWERCASE));
+        assertTrue(amSwitch.isWriteAccessManagementWithCCD(TEST_CT));
+        assertTrue(amSwitch.isWriteAccessManagementWithCCD(TEST_CT_LOWERCASE));
+    }
+
+    @Test
     void shouldGrantCCDOnlyWriteAccessIfCaseTypeNotSpecified() {
         assertTrue(amSwitch.isWriteAccessManagementWithCCD(UNSPECIFIED));
         assertFalse(amSwitch.isWriteAccessManagementWithAM(UNSPECIFIED));
@@ -139,6 +162,36 @@ class AMSwitchTest {
         assertTrue(amSwitch.isWriteAccessManagementWithCCD(FR_CT_LOWERCASE));
         assertTrue(amSwitch.isWriteAccessManagementWithAM(FR_CT));
         assertTrue(amSwitch.isWriteAccessManagementWithAM(FR_CT_LOWERCASE));
+    }
+
+    @Test
+    void shouldFailReadsConfigWithInvalidPropertyExceptionIfDuplicatesInAM() {
+        doReturn(ccdOnlyReadCaseTypes).when(applicationParams).getReadFromAMCaseTypes();
+
+        InvalidPropertyException invalidPropertyException = assertThrows(InvalidPropertyException.class, () -> new AMSwitch(applicationParams));
+        assertAll(
+            () -> assertThat(invalidPropertyException.getBeanClass(), equalTo(ApplicationParams.class)),
+            () -> assertThat(invalidPropertyException.getPropertyName(), is("ccd.am.read.from_am"))
+        );
+    }
+
+    @Test
+    void shouldDefaultToCCDIfReadCaseTypesEmpty() {
+        doReturn(emptyCaseTypes).when(applicationParams).getReadFromCCDCaseTypes();
+        doReturn(emptyCaseTypes).when(applicationParams).getReadFromAMCaseTypes();
+
+        AMSwitch amSwitch = new AMSwitch(applicationParams);
+
+        assertTrue(amSwitch.isReadAccessManagementWithCCD(CMC_CT));
+        assertTrue(amSwitch.isReadAccessManagementWithCCD(CMC_CT_LOWERCASE));
+        assertTrue(amSwitch.isReadAccessManagementWithCCD(PROBATE_CT));
+        assertTrue(amSwitch.isReadAccessManagementWithCCD(PROBATE_CT_LOWERCASE));
+        assertTrue(amSwitch.isReadAccessManagementWithCCD(DIVORCE_CT));
+        assertTrue(amSwitch.isReadAccessManagementWithCCD(DIVORCE_CT_LOWERCASE));
+        assertTrue(amSwitch.isReadAccessManagementWithCCD(FR_CT));
+        assertTrue(amSwitch.isReadAccessManagementWithCCD(FR_CT_LOWERCASE));
+        assertTrue(amSwitch.isReadAccessManagementWithCCD(TEST_CT));
+        assertTrue(amSwitch.isReadAccessManagementWithCCD(TEST_CT_LOWERCASE));
     }
 
     @Test
