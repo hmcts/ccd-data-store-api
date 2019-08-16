@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.data.caseaccess;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;

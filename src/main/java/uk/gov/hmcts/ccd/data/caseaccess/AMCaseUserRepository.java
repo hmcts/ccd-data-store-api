@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
+import uk.gov.hmcts.reform.amlib.models.UserCaseRolesEnvelope;
+import uk.gov.hmcts.reform.amlib.models.UserCasesEnvelope;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -19,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.DELETE;
@@ -62,7 +65,7 @@ public class AMCaseUserRepository implements CaseUserRepository {
     private Map<JsonPointer, Set<Permission>> getAttributePermissions() {
         return new HashMap<JsonPointer, Set<Permission>>() {{
             //TODO: What should be the permission set? Just read or CRUD?
-            put(JsonPointer.valueOf(""), ImmutableSet.of(CREATE, READ, UPDATE, DELETE));
+            put(JsonPointer.valueOf(""), ImmutableSet.of(READ));
         }};
     }
 
@@ -86,18 +89,14 @@ public class AMCaseUserRepository implements CaseUserRepository {
 
     @Override
     public List<Long> findCasesUserIdHasAccessTo(final String userId) {
-       /* UserCasesEnvelope userCasesEnvelope =
+        UserCasesEnvelope userCasesEnvelope =
             accessManagementService.returnUserCases(userId);
         return userCasesEnvelope.getCases().stream().map(Long::valueOf).collect(Collectors.toList());
-    */
-        return Lists.newArrayList();
     }
 
     @Override
     public List<String> findCaseRoles(final String caseTypeId, final Long caseId, final String userId) {
-        /*UserCaseRolesEnvelope envelope  = accessManagementService.returnUserCaseRoles(caseId, userId);
+        UserCaseRolesEnvelope envelope = accessManagementService.returnUserCaseRoles(caseId.toString(), userId);
         return envelope.getRoles();
-*/
-        return Lists.newArrayList();
     }
 }
