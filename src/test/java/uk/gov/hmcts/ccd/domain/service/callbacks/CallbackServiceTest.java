@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.callbacks;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.google.common.collect.Lists;
+import org.apache.http.StatusLine;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,6 +17,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -77,6 +79,7 @@ public class CallbackServiceTest {
     private CallbackService callbackService;
 
     private List<CallbackRetryContext> defaultCallbackRetryContext;
+
     private final String testUrl = "http://localhost:/test-callback";
     private final CaseDetails caseDetails = new CaseDetails();
     private final CaseEvent caseEvent = new CaseEvent();

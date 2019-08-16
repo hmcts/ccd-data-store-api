@@ -63,6 +63,11 @@
         <cve>CVE-2018-1000632</cve>
     </suppress>
     <suppress>
+        <notes>Temporary suppression while we investigate.</notes>
+        <cve>CVE-2019-14379</cve>
+        <cve>CVE-2019-14439</cve>
+    </suppress>
+    <suppress>
         <notes>Temporary suppression to ignore CVE with com.google.guava. See RDM-3372</notes>
         <cve>CVE-2018-10237</cve>
     </suppress>
