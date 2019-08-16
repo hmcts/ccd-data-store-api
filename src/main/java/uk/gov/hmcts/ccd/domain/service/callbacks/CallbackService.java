@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.callbacks;
 
 import com.google.common.collect.Lists;
-import lombok.ToString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackRequest;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
@@ -42,31 +40,9 @@ public class CallbackService {
     private static final Logger LOG = LoggerFactory.getLogger(CallbackService.class);
 
     private final SecurityUtils securityUtils;
-    private final List<Integer> defaultCallbackRetryIntervalsInSeconds;
-    private final Integer defaultCallbackTimeoutInMillis;
     private final RestTemplate restTemplate;
     private final CallbackRetryContextBuilder callbackRetryContextBuilder;
     private final ExecutorService executorService;
-
-    @ToString
-    static class CallbackRetryContext {
-        private final Integer callbackRetryInterval;
-        private final Integer callbackRetryTimeout;
-
-        CallbackRetryContext(final Integer callbackRetryInterval, final Integer callbackRetryTimeout) {
-            this.callbackRetryInterval = callbackRetryInterval;
-            this.callbackRetryTimeout = callbackRetryTimeout;
-        }
-
-        Integer getCallbackRetryInterval() {
-            return callbackRetryInterval;
-        }
-
-        Integer getCallbackRetryTimeout() {
-            return callbackRetryTimeout;
-        }
-
-    }
 
     @Autowired
     public CallbackService(final SecurityUtils securityUtils,
@@ -74,8 +50,6 @@ public class CallbackService {
                            @Qualifier("callbacksExecutor") final ExecutorService callbacksExecutor,
                            final CallbackRetryContextBuilder callbackRetryContextBuilder) {
         this.securityUtils = securityUtils;
-        this.defaultCallbackRetryIntervalsInSeconds = applicationParams.getCallbackRetryIntervalsInSeconds();
-        this.defaultCallbackTimeoutInMillis = applicationParams.getCallbackReadTimeoutInMillis();
         this.restTemplate = restTemplate;
         this.executorService = callbacksExecutor;
         this.callbackRetryContextBuilder = callbackRetryContextBuilder;
@@ -116,16 +90,8 @@ public class CallbackService {
 
         List<Integer> retryTimeouts = ofNullable(callbackRetryTimeouts).orElse(Lists.newArrayList());
         List<CallbackRetryContext> retryContextList = callbackRetryContextBuilder.buildCallbackRetryContexts(retryTimeouts);
-            new CallbackRequest(caseDetails,
-                caseDetailsBefore,
-                caseEvent.getId(),
-                true) :
-            new CallbackRequest(caseDetails, caseDetailsBefore, caseEvent.getId());
         LOG.info("Built callbackContext={} for caseType={} event={} url={}", retryContextList,
             caseDetails.getCaseTypeId(), caseEvent.getId(), url);
-
-        List<Integer> retryTimeouts = ofNullable(callbackRetryTimeouts).orElse(Lists.newArrayList());
-        List<CallbackRetryContext> retryContextList = buildCallbackRetryContexts(retryTimeouts);
 
         for (CallbackRetryContext retryContext : retryContextList) {
             sleep(retryContext.getCallbackRetryInterval());
