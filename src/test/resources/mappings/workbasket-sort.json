@@ -32,6 +32,7 @@
             "case_field_element_path": "Postcode",
             "label": "Address",
             "order": 1,
+            "role": "caseworker-test-public",
             "sortOrder" : {
               "direction": "ASC",
               "priority": 2

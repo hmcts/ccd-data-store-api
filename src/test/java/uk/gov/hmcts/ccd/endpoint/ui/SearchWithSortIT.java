@@ -32,6 +32,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.ccd.MockUtils.*;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WORKBASKET;
 
 public class SearchWithSortIT extends WireMockBaseTest {
@@ -40,6 +41,7 @@ public class SearchWithSortIT extends WireMockBaseTest {
 
     private static final String TEST_CASE_TYPE = "TestAddressBookCase";
     private static final String TEST_JURISDICTION = "PROBATE";
+    private static final String CASE_CREATED = "CaseCreated";
 
     @Inject
     private WebApplicationContext wac;
@@ -60,7 +62,7 @@ public class SearchWithSortIT extends WireMockBaseTest {
         doReturn(authentication).when(securityContext).getAuthentication();
         SecurityContextHolder.setContext(securityContext);
 
-        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, MockUtils.ROLE_CASEWORKER_PRIVATE);
+        MockUtils.setSecurityAuthorities(authentication, ROLE_CASEWORKER_PUBLIC, ROLE_CASEWORKER_PRIVATE);
 
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
 
@@ -77,21 +79,51 @@ public class SearchWithSortIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_search_sort_cases.sql"})
     public void workbasketSearchWithSortOrder() throws Exception {
-        final String TEST_STATE = "CaseCreated";
-
-        final MvcResult result = mockMvc.perform(get(GET_CASES)
+        MvcResult result = mockMvc.perform(get(GET_CASES)
             .contentType(JSON_CONTENT_TYPE)
             .param("view", WORKBASKET)
             .param("case_type", TEST_CASE_TYPE)
             .param("jurisdiction", TEST_JURISDICTION)
-            .param("state", TEST_STATE)
+            .param("state", CASE_CREATED)
             .param("page", "1")
             .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();
 
         String contentAsString = result.getResponse().getContentAsString();
+        final SearchResultView searchResultView = mapper.readValue(contentAsString,
+            SearchResultView.class);
+        final List<SearchResultViewItem> searchResultViewItems = searchResultView.getSearchResultViewItems();
 
+        assertEquals("Incorrect view items count", 4, searchResultViewItems.size());
+
+        assertEquals("John", searchResultViewItems.get(0).getCaseFields().get("PersonFirstName"));
+        assertEquals(null, searchResultViewItems.get(0).getCaseFields().get("PersonAddress"));
+
+        assertEquals("Angel", searchResultViewItems.get(1).getCaseFields().get("PersonFirstName"));
+        assertEquals("George", searchResultViewItems.get(2).getCaseFields().get("PersonFirstName"));
+        assertEquals("1504259907353545", searchResultViewItems.get(2).getCaseId());
+        assertEquals("George", searchResultViewItems.get(3).getCaseFields().get("PersonFirstName"));
+        assertEquals("1504259907353548", searchResultViewItems.get(3).getCaseId());
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_search_sort_cases.sql"})
+    public void workbasketSearchWithRoleSpecificSortOrder() throws Exception {
+        String roleWithSortOrder = ROLE_TEST_PUBLIC;
+        MockUtils.setSecurityAuthorities(authentication, roleWithSortOrder, ROLE_CASEWORKER_PUBLIC, ROLE_CASEWORKER_PRIVATE);
+        MvcResult result = mockMvc.perform(get(GET_CASES)
+            .contentType(JSON_CONTENT_TYPE)
+            .param("view", WORKBASKET)
+            .param("case_type", TEST_CASE_TYPE)
+            .param("jurisdiction", TEST_JURISDICTION)
+            .param("state", CASE_CREATED)
+            .param("page", "1")
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(200))
+            .andReturn();
+
+        String contentAsString = result.getResponse().getContentAsString();
         final SearchResultView searchResultView = mapper.readValue(contentAsString,
             SearchResultView.class);
         final List<SearchResultViewItem> searchResultViewItems = searchResultView.getSearchResultViewItems();
