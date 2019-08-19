@@ -2,19 +2,27 @@ package uk.gov.hmcts.ccd.data.caseaccess;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.BaseTest;
+import uk.gov.hmcts.reform.amlib.AccessManagementService;
+import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
+import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
+import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
+import static uk.gov.hmcts.reform.amlib.enums.AccessType.ROLE_BASED;
+import static uk.gov.hmcts.reform.amlib.enums.RoleType.IDAM;
+import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 
 @Transactional
 public class AMCaseUserRepositoryComponentTest extends BaseTest {
@@ -41,9 +49,23 @@ public class AMCaseUserRepositoryComponentTest extends BaseTest {
     @Autowired
     private AMCaseUserRepository repository;
 
+    @Autowired
+    DefaultRoleSetupImportService defaultRoleSetupImportService;
+
     @Before
     public void setUp() {
         template = new JdbcTemplate(db);
+
+        defaultRoleSetupImportService.addService(JURISDICTION_ID);
+        defaultRoleSetupImportService.addRole(CASE_ROLE, IDAM, PUBLIC, ROLE_BASED);
+        defaultRoleSetupImportService.addRole(CASE_ROLE_SOLICITOR, IDAM, PUBLIC, ROLE_BASED);
+        defaultRoleSetupImportService.addRole(CASE_ROLE_CREATOR, IDAM, PUBLIC, ROLE_BASED);
+
+        ResourceDefinition resourceDefinition =
+            //TODO: What should be the resourceType and resourceName.
+            //To be clarified with Mutlu/Shashank again.//resource name: CMC, FPL
+            new ResourceDefinition(JURISDICTION_ID, "case", CASE_REFERENCE);
+        defaultRoleSetupImportService.addResourceDefinition(resourceDefinition);
     }
 
     @Test
@@ -79,7 +101,7 @@ public class AMCaseUserRepositoryComponentTest extends BaseTest {
         caseIds = repository.findCasesUserIdHasAccessTo(USER_ID_GRANTED);
 
         assertThat(caseIds.size(), equalTo(3));
-        assertThat(caseIds, containsInAnyOrder(CASE_ID_GRANTED,CASE_ID_GRANTED,CASE_ID_3));
+        assertThat(caseIds, containsInAnyOrder(CASE_ID_GRANTED, CASE_ID_GRANTED, CASE_ID_3));
     }
 
     private Integer countAccesses(Long caseId, String userId) {
@@ -105,15 +127,15 @@ public class AMCaseUserRepositoryComponentTest extends BaseTest {
     })
     public void shouldFindCaseRolesUserPerformsForCase() {
 
-        List<String> caseRoles = repository.findCaseRoles(CASE_TYPE_ID, CASE_ID , USER_ID);
+        List<String> caseRoles = repository.findCaseRoles(CASE_TYPE_ID, CASE_ID, USER_ID);
 
         assertThat(caseRoles.size(), equalTo(1));
         assertThat(caseRoles.get(0), equalTo(CASE_ROLE_CREATOR));
 
-        caseRoles = repository.findCaseRoles(CASE_TYPE_ID, CASE_ID_GRANTED , USER_ID_GRANTED);
+        caseRoles = repository.findCaseRoles(CASE_TYPE_ID, CASE_ID_GRANTED, USER_ID_GRANTED);
 
         assertThat(caseRoles.size(), equalTo(2));
-        assertThat(caseRoles, containsInAnyOrder(CASE_ROLE,CASE_ROLE_SOLICITOR));
+        assertThat(caseRoles, containsInAnyOrder(CASE_ROLE, CASE_ROLE_SOLICITOR));
     }
 
 }

@@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
+import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 import uk.gov.hmcts.reform.amlib.enums.AccessorType;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
@@ -34,10 +35,13 @@ import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 public class AMCaseUserRepository implements CaseUserRepository {
 
     public static final String QUALIFIER = "am";
-    private static final String cases = "CASE";
+    private static final String cases = "case";
 
     @Autowired
     AccessManagementService accessManagementService;
+
+    @Autowired
+    DefaultRoleSetupImportService defaultRoleSetupImportService;
 
     @Override
     public void grantAccess(String jurisdictionId, String caseReference, Long caseId, String userId, String caseRole) {
@@ -46,8 +50,7 @@ public class AMCaseUserRepository implements CaseUserRepository {
 
         ResourceDefinition resourceDefinition =
             //TODO: What should be the resourceType and resourceName.
-            //To be clarified with Mutlu/Shashank again.
-            //resource name: CMC, FPL
+            //To be clarified with Mutlu/Shashank again. resource name: CMC, FPL
             new ResourceDefinition(jurisdictionId, cases, caseReference);
 
         ExplicitAccessGrant explicitAccessGrant = ExplicitAccessGrant.builder()
