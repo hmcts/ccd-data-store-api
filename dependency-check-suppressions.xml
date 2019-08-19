@@ -63,7 +63,7 @@
         <cve>CVE-2018-1000632</cve>
     </suppress>
     <suppress>
-        <notes>Temporary suppression while we investigate CVE-2019-14379.</notes>
+        <notes>Temporary suppression while we investigate.</notes>
         <cve>CVE-2019-14439</cve>
     </suppress>
     <suppress>
@@ -161,7 +161,7 @@
             file name: jackson-databind-2.9.8.jar
             We've upgraded to jackson-databind 2.9.9.3 but the dependecy check keeps flagging CVEs, thus mark as false positive.
         ]]></notes>
-        <gav regex="true">^com\.fasterxml\.jackson\.core:jackson-databind:2\.9\.8$</gav>
+        <gav regex="true">^com\.fasterxml\.jackson\.core:jackson-databind:2\.9\.[89]$</gav>
         <cve>CVE-2019-12086</cve>
         <cve>CVE-2019-14379</cve>
     </suppress>

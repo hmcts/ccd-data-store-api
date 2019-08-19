@@ -18,6 +18,11 @@ public class FieldType implements Serializable {
     public static final String LABEL = "Label";
     public static final String CASE_PAYMENT_HISTORY_VIEWER = "CasePaymentHistoryViewer";
     public static final String CASE_HISTORY_VIEWER = "CaseHistoryViewer";
+    public static final String PREDEFINED_COMPLEX_ADDRESS_GLOBAL = "AddressGlobal";
+    public static final String PREDEFINED_COMPLEX_ADDRESS_GLOBAL_UK = "AddressGlobalUK";
+    public static final String PREDEFINED_COMPLEX_ADDRESS_UK = "AddressUK";
+    public static final String PREDEFINED_COMPLEX_ORDER_SUMMARY = "OrderSummary";
+    public static final String PREDEFINED_COMPLEX_CASELINK = "CaseLink";
 
     private String id = null;
     private String type = null;
