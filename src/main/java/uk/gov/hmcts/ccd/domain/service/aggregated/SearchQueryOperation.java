@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
-import uk.gov.hmcts.ccd.data.casedetails.search.SortDirection;
 import uk.gov.hmcts.ccd.data.casedetails.search.SortOrderField;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftAccessException;
@@ -28,10 +27,6 @@ import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
 public class SearchQueryOperation {
     protected static final String NO_ERROR = null;
     public static final String WORKBASKET = "WORKBASKET";
-
-    protected static final String CASE_TYPE_DIVORCE = "DIVORCE";
-    protected static final String CASE_DATA_COLUMN_LAST_MODIFIED = "last_modified";
-    protected static final String CASE_DATA_ENTITY_FIELD_LAST_MODIFIED = "lastModified";
 
     private final MergeDataToSearchResultOperation mergeDataToSearchResultOperation;
     private final GetCaseTypeOperation getCaseTypeOperation;
@@ -66,7 +61,8 @@ public class SearchQueryOperation {
         }
 
         final SearchResult searchResult = getSearchResult(caseType.get(), view);
-        addSortOrders(metadata, queryParameters, searchResult);
+
+        addSortOrderFields(metadata, searchResult);
 
         final List<CaseDetails> cases = searchOperation.execute(metadata, queryParameters);
 
@@ -90,25 +86,9 @@ public class SearchQueryOperation {
         return uiDefinitionRepository.getSearchResult(caseType.getId());
     }
 
-    private void addSortOrders(MetaData metadata, Map<String, String> queryParameters, SearchResult searchResult) {
-        //Some (ugly) hardcoding (RDM-4636), until we provide feature for default sorting of search results via definition
-        if (CASE_TYPE_DIVORCE.equalsIgnoreCase(metadata.getCaseTypeId())) {
-            if (queryParameters.isEmpty()) {
-                metadata.addSortOrderField(getDivorceSortOrder(CASE_DATA_ENTITY_FIELD_LAST_MODIFIED, metadata.getSortDirection(), false));
-            } else {
-                metadata.addSortOrderField(getDivorceSortOrder(CASE_DATA_COLUMN_LAST_MODIFIED, metadata.getSortDirection(), true));
-            }
-        } else {
-            metadata.setSortOrderFields(getSortOrders(searchResult));
-        }
-    }
-
-    private SortOrderField getDivorceSortOrder(String column, Optional<String> direction, boolean metadata) {
-        return SortOrderField.sortOrderWith()
-            .caseFieldId(column)
-            .direction(SortDirection.fromOptionalString(direction).name())
-            .metadata(metadata)
-            .build();
+    private void addSortOrderFields(MetaData metadata,SearchResult searchResult) {
+        List<SortOrderField> sortOrders = getSortOrders(searchResult);
+        metadata.setSortOrderFields(sortOrders);
     }
 
     private List<SortOrderField> getSortOrders(SearchResult searchResult) {

@@ -305,23 +305,6 @@ public class SearchQueryOperationTest {
         assertThat(metadata.getSortOrderFields().get(0).getDirection(), is(DESC));
     }
 
-    @Test
-    @DisplayName("should build sortOrderFields for divorce hack")
-    public void shouldBuildSortOrderFieldsForDivorceCaseType() {
-        metadata = new MetaData(CASE_TYPE_DIVORCE, JURISDICTION_ID);
-        metadata.setSortDirection(Optional.of(ASC));
-        criteria.put("someCriteria", "someValue");
-
-        doReturn(Optional.of(testCaseType)).when(getCaseTypeOperation).execute(CASE_TYPE_DIVORCE, CAN_READ);
-
-        searchQueryOperation.execute(WORKBASKET, metadata, criteria);
-
-        assertThat(metadata.getSortOrderFields().size(), is(1));
-        assertThat(metadata.getSortOrderFields().get(0).getCaseFieldId(), is(CASE_DATA_COLUMN_LAST_MODIFIED));
-        assertThat(metadata.getSortOrderFields().get(0).isMetadata(), is(true));
-        assertThat(metadata.getSortOrderFields().get(0).getDirection(), is(ASC));
-    }
-
     private static SearchResultField buildSortResultField(String caseFieldId,
                                                     String caseFieldPath,
                                                     String role,
