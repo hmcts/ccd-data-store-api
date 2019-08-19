@@ -426,7 +426,7 @@ class MergeDataToSearchResultOperationTest {
             () -> classUnderTest.execute(caseType, caseDetailsList, SEARCH_VIEW, NO_ERROR));
 
         Assert.assertThat(exception.getMessage(),
-            Matchers.is("Nested element not found for InvalidElement"));
+            Matchers.is("CaseField " + FAMILY_DETAILS + " has no nested elements with code InvalidElement."));
     }
 
     @Test
