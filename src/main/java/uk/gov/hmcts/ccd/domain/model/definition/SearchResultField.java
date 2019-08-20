@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -89,5 +90,12 @@ public class SearchResultField implements Serializable {
 
     public void setSortOrder(SortOrder sortOrder) {
         this.sortOrder = sortOrder;
+    }
+
+    public String buildCaseFieldId() {
+        if (StringUtils.isNotBlank(getCaseFieldPath())) {
+            return getCaseFieldId() + '.' + getCaseFieldPath();
+        }
+        return getCaseFieldId();
     }
 }

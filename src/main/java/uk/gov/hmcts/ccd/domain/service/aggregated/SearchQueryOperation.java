@@ -60,7 +60,7 @@ public class SearchQueryOperation {
             return new SearchResultView(Collections.emptyList(), Collections.emptyList(), NO_ERROR);
         }
 
-        final SearchResult searchResult = getSearchResult(caseType.get(), view);
+        final SearchResult searchResult = getSearchResultDefinition(caseType.get(), view);
 
         addSortOrderFields(metadata, searchResult);
 
@@ -79,7 +79,7 @@ public class SearchQueryOperation {
         return mergeDataToSearchResultOperation.execute(caseType.get(), searchResult, draftsAndCases, draftResultError);
     }
 
-    private SearchResult getSearchResult(final CaseType caseType, final String view) {
+    private SearchResult getSearchResultDefinition(final CaseType caseType, final String view) {
         if (WORKBASKET.equalsIgnoreCase(view)) {
             return uiDefinitionRepository.getWorkBasketResult(caseType.getId());
         }
@@ -96,7 +96,7 @@ public class SearchQueryOperation {
             .filter(searchResultField -> hasSortField(searchResultField))
             .filter(searchResultField -> filterByRole(searchResultField))
             .sorted(Comparator.comparing(srf -> srf.getSortOrder().getPriority()))
-            .map(this::getSortOrder)
+            .map(this::toSortOrderField)
             .collect(Collectors.toList());
     }
 
@@ -109,19 +109,12 @@ public class SearchQueryOperation {
         return StringUtils.isEmpty(resultField.getRole()) || userRepository.getUserRoles().contains(resultField.getRole());
     }
 
-    private SortOrderField getSortOrder(SearchResultField searchResultField) {
+    private SortOrderField toSortOrderField(SearchResultField searchResultField) {
         return SortOrderField.sortOrderWith()
-            .caseFieldId(buildCaseFieldId(searchResultField))
+            .caseFieldId(searchResultField.buildCaseFieldId())
             .metadata(searchResultField.isMetadata())
             .direction(searchResultField.getSortOrder().getDirection())
             .build();
-    }
-
-    private String buildCaseFieldId(SearchResultField searchResultField) {
-        if (StringUtils.isNotBlank(searchResultField.getCaseFieldPath())) {
-            return searchResultField.getCaseFieldId() + '.' + searchResultField.getCaseFieldPath();
-        }
-        return searchResultField.getCaseFieldId();
     }
 
 }
