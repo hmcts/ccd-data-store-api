@@ -57,7 +57,6 @@ public class MetaData {
     private Optional<String> securityClassification = Optional.empty();
     private Optional<String> page = Optional.empty();
     private Optional<String> sortDirection = Optional.empty();
-    private Optional<String> sortField = Optional.empty();
     private List<SortOrderField> sortOrderFields = newArrayList();
 
     public MetaData(String caseTypeId, String jurisdiction) {
@@ -127,14 +126,6 @@ public class MetaData {
 
     public void setSortDirection(Optional<String> sortDirection) {
         this.sortDirection = sortDirection;
-    }
-
-    public Optional<String> getSortField() {
-        return sortField;
-    }
-
-    public void setSortField(String sortField) {
-        this.sortField = Optional.of(sortField);
     }
 
     public List<SortOrderField> getSortOrderFields() {
