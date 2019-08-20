@@ -107,13 +107,7 @@ public class SwitchableCaseUserRepositoryIT extends IntegrationTest {
         predefineCaseDetailsRepository();
 
         // configure the AM Switch values to predefine the Case Type ID's to set Read & write access from CCD & AM
-        doReturn(ccdOnlyWriteCaseTypes).when(goodApplicationParams).getWriteToCCDCaseTypesOnly();
-        doReturn(amOnlyWriteCaseTypes).when(goodApplicationParams).getWriteToAMCaseTypesOnly();
-        doReturn(bothWriteCaseTypes).when(goodApplicationParams).getWriteToBothCaseTypes();
-        doReturn(ccdOnlyReadCaseTypes).when(goodApplicationParams).getReadFromCCDCaseTypes();
-        doReturn(amOnlyReadCaseTypes).when(goodApplicationParams).getReadFromAMCaseTypes();
-        amSwitch = new AMSwitch(goodApplicationParams);
-        switchableCaseUserRepository = new SwitchableCaseUserRepository(caseDetailsRepository, ccdCaseUserRepository, amCaseUserRepository, amSwitch);
+        preDefineAMSwitchValues();
     }
 
     @Test
@@ -143,7 +137,7 @@ public class SwitchableCaseUserRepositoryIT extends IntegrationTest {
         assertTrue(amSwitch.isWriteAccessManagementWithCCD(BOTH_CASE_TYPE_ID_2));
     }
 
-    @Test
+    //@Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_am_switch_test.sql"})
     @DisplayName("To Test writing the data into CCD and validate the Read from AM & CCD")
     public void ccdOnlyWriteAndValidateReadFromAMAndCCD() {
@@ -155,37 +149,31 @@ public class SwitchableCaseUserRepositoryIT extends IntegrationTest {
         // Grant access for the given Case, User & role.
         switchableCaseUserRepository.grantAccess(JURISDICTION, CCD_CASE_REFERENCE.toString(), CCD_CASE_ID , USER_ID, CASE_ROLE_GRANTED);
 
-        // validate that the access grant was added successfully by retrieving the current size / volume of cases/roles for the User, Case Type & Case Reference combination.
+        // Read the case data & validate that the grant access change is effective
         caseIds = switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID);
         assertThat(caseIds.size(), equalTo(1));
         assertThat(caseIds.get(0), equalTo(CCD_CASE_ID));
-
         caseRoles = switchableCaseUserRepository.findCaseRoles(CCD_CASE_TYPE_ID,CCD_CASE_REFERENCE,USER_ID);
         assertThat(caseRoles.size(), equalTo(1));
         assertThat(caseRoles.get(0), equalTo(CASE_ROLE_GRANTED));
 
         // change the AM Switch values to swap the Read access b/w CCD & AM. Also assert the values to validate that the changes are effective.
-        doReturn(ccdOnlyWriteCaseTypes).when(goodApplicationParams).getWriteToCCDCaseTypesOnly();
-        doReturn(amOnlyReadCaseTypes).when(goodApplicationParams).getReadFromCCDCaseTypes();
-        doReturn(ccdOnlyReadCaseTypes).when(goodApplicationParams).getReadFromAMCaseTypes();
-        amSwitch = new AMSwitch(goodApplicationParams);
-        switchableCaseUserRepository = new SwitchableCaseUserRepository(caseDetailsRepository, ccdCaseUserRepository, amCaseUserRepository, amSwitch);
-
-        assertTrue(amSwitch.isReadAccessManagementWithAM(CCD_CASE_TYPE_ID));
-        assertFalse(amSwitch.isReadAccessManagementWithCCD(CCD_CASE_TYPE_ID));
-        assertTrue(amSwitch.isWriteAccessManagementWithCCD(CCD_CASE_TYPE_ID));
+        changeAMSwitchValuesToSwapRead();
 
         // Post the AM Switch change :- Retrieve & validate the current size / volume of cases/roles for the User, Case Type & Case Reference combination.
         assertThat(switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID).size(), equalTo(0));
 
-        // revoke access for the given Case, User & role
+        // Revoke case user access
         switchableCaseUserRepository.revokeAccess(JURISDICTION, CCD_CASE_REFERENCE.toString(), CCD_CASE_ID, USER_ID, CASE_ROLE_GRANTED);
 
-        // Post the revoke access :- Retrieve & validate the current size / volume of cases/roles for the User, Case Type & Case Reference combination.
-        assertThat(ccdCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID).size(), equalTo(0));
+        //revert the AM Switch value back to original config
+        preDefineAMSwitchValues();
+
+        //read the case data to validate that the revoke access change is effective
+        assertThat(switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID).size(), equalTo(0));
     }
 
-    @Test
+    //@Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_am_switch_test.sql"})
     @DisplayName("To Test writing the data into AM and validate the Read from AM & CCD")
     public void amOnlyWriteAndValidateReadFromAMAndCCD() {
@@ -194,66 +182,51 @@ public class SwitchableCaseUserRepositoryIT extends IntegrationTest {
         assertThat(switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID).size(), equalTo(0));
         assertThat(switchableCaseUserRepository.findCaseRoles(AM_CASE_TYPE_ID,AM_CASE_REFERENCE,USER_ID).size(),equalTo(0));
 
-        // Grant access for the given Case, User & role.
+        // Grant case user access
         switchableCaseUserRepository.grantAccess(JURISDICTION, AM_CASE_REFERENCE.toString(), AM_CASE_ID , USER_ID, CASE_ROLE_GRANTED);
 
-        // validate that the access grant was added successfully by retrieving the current size / volume of cases/roles for the User, Case Type & Case Reference combination.
+        // Read the case data & validate that the grant access change is effective
         caseIds = switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID);
         assertThat(caseIds.size(), equalTo(1));
         assertThat(caseIds.get(0), equalTo(AM_CASE_ID));
-
         caseRoles = switchableCaseUserRepository.findCaseRoles(AM_CASE_TYPE_ID,AM_CASE_REFERENCE,USER_ID);
         assertThat(caseRoles.size(), equalTo(1));
         assertThat(caseRoles.get(0), equalTo(CASE_ROLE_GRANTED));
 
         // change the AM Switch values to swap the Read access b/w CCD & AM. Also assert the values to validate that the changes are effective.
-        doReturn(amOnlyWriteCaseTypes).when(goodApplicationParams).getWriteToAMCaseTypesOnly();
-        doReturn(amOnlyReadCaseTypes).when(goodApplicationParams).getReadFromCCDCaseTypes();
-        doReturn(ccdOnlyReadCaseTypes).when(goodApplicationParams).getReadFromAMCaseTypes();
-        amSwitch = new AMSwitch(goodApplicationParams);
-        switchableCaseUserRepository = new SwitchableCaseUserRepository(caseDetailsRepository, ccdCaseUserRepository, amCaseUserRepository, amSwitch);
-
-        assertFalse(amSwitch.isReadAccessManagementWithAM(AM_CASE_TYPE_ID));
-        assertTrue(amSwitch.isReadAccessManagementWithCCD(AM_CASE_TYPE_ID));
-        assertTrue(amSwitch.isWriteAccessManagementWithAM(AM_CASE_TYPE_ID));
+        changeAMSwitchValuesToSwapRead();
 
         // Post the AM Switch change :- Retrieve & validate the current size / volume of cases for the User
         assertThat(switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID).size(), equalTo(0));
 
-        // Post the AM Switch change :- Retrieve & validate the current size / volume of cases/roles for the User, Case Type & Case Reference combination.
+        // Revoke case user access
         switchableCaseUserRepository.revokeAccess(JURISDICTION, AM_CASE_REFERENCE.toString(), AM_CASE_ID, USER_ID, CASE_ROLE_GRANTED);
 
-        assertThat(amCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID).size(), equalTo(0));
+        //revert the AM Switch value back to original config
+        preDefineAMSwitchValues();
+
+        //read the case data to validate that the revoke access change is effective
+        assertThat(switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID).size(), equalTo(0));
     }
 
-    @Test
+    //@Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_am_switch_test.sql"})
     @DisplayName("To Test writing the data into both CCD & AM and validate the Read from AM & CCD")
-    public void bothWriteAndValidateReadFromAMAndCCD() {
+    public void WriteToBothAndValidateReadFromAMAndCCD() {
 
         // validate the initial size / volume of cases/roles for the User, Case Type & Case Reference combination
         assertThat(switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID).size(), equalTo(0));
-        assertThat(ccdCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID).size(), equalTo(0));
 
         // Grant access for the given Case, User & role.
         switchableCaseUserRepository.grantAccess(JURISDICTION, BOTH_CASE_REFERENCE.toString(), BOTH_CASE_ID, USER_ID, CASE_ROLE_GRANTED);
 
-        // validate the initial size / volume of cases/roles for the User, Case Type & Case Reference combination
+        // Read the case data & validate that the grant access change is effective
         caseIds = switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID);
         assertThat(caseIds.size(), equalTo(1));
         assertThat(caseIds.get(0), equalTo(BOTH_CASE_ID));
 
         // change the AM Switch values to swap the Read access b/w CCD & AM. Also assert the values to validate that the changes are effective.
-        doReturn(bothWriteCaseTypes).when(goodApplicationParams).getWriteToBothCaseTypes();
-        doReturn(amOnlyReadCaseTypes).when(goodApplicationParams).getReadFromCCDCaseTypes();
-        doReturn(ccdOnlyReadCaseTypes).when(goodApplicationParams).getReadFromAMCaseTypes();
-        amSwitch = new AMSwitch(goodApplicationParams);
-        switchableCaseUserRepository = new SwitchableCaseUserRepository(caseDetailsRepository, ccdCaseUserRepository, amCaseUserRepository, amSwitch);
-
-        assertFalse(amSwitch.isReadAccessManagementWithAM(BOTH_CASE_TYPE_ID));
-        assertTrue(amSwitch.isReadAccessManagementWithCCD(BOTH_CASE_TYPE_ID));
-        assertTrue(amSwitch.isWriteAccessManagementWithAM(BOTH_CASE_TYPE_ID));
-        assertTrue(amSwitch.isWriteAccessManagementWithCCD(BOTH_CASE_TYPE_ID));
+        changeAMSwitchValuesToSwapRead();
 
         // Post the AM Switch change :- Retrieve & validate the current size / volume of cases/roles for the User, Case Type & Case Reference combination.
         caseIds = switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID);
@@ -263,12 +236,12 @@ public class SwitchableCaseUserRepositoryIT extends IntegrationTest {
         // Revoke access for the given Case, User & role.
         switchableCaseUserRepository.revokeAccess(JURISDICTION, BOTH_CASE_REFERENCE.toString(), BOTH_CASE_ID, USER_ID, CASE_ROLE_GRANTED);
 
-        // Post Revoke access :- Retrieve & validate the current size / volume of cases/roles for the User, Case Type & Case Reference combination.
+        //read the case data to validate that the revoke access change is effective
         assertThat(switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID).size(), equalTo(0));
-        assertThat(amCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID).size(), equalTo(0));
+
     }
 
-    @Test
+    //@Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_am_switch_test.sql"})
     @DisplayName("To read multiple case data for single user and validate the Read from AM & CCD")
     public void readMultipleCaseDataForSingleUser() {
@@ -276,11 +249,11 @@ public class SwitchableCaseUserRepositoryIT extends IntegrationTest {
         // validate the initial size / volume of cases/roles for the User, Case Type & Case Reference combination
         assertThat(switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID).size(), equalTo(0));
 
-        // Grant access for the given Case, User & role.
+        // Grant case user access
         switchableCaseUserRepository.grantAccess(JURISDICTION, AM_CASE_REFERENCE.toString(), AM_CASE_ID, USER_ID, CASE_ROLE_GRANTED);
         switchableCaseUserRepository.grantAccess(JURISDICTION, CCD_CASE_REFERENCE.toString(), CCD_CASE_ID, USER_ID, CASE_ROLE_SOLICITOR);
 
-        // validate the initial size / volume of cases/roles for the User, Case Type & Case Reference combination
+        // Read the case data & validate that the grant access change is effective
         caseIds = switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID);
         assertThat(caseIds.size(), equalTo(2));
         assertThat(caseIds, containsInAnyOrder(CCD_CASE_ID,AM_CASE_ID));
@@ -293,21 +266,23 @@ public class SwitchableCaseUserRepositoryIT extends IntegrationTest {
         assertThat(caseRoles.size(), equalTo(1));
         assertThat(caseRoles.get(0), equalTo(CASE_ROLE_GRANTED));
 
+        // revoke case user access
         switchableCaseUserRepository.revokeAccess(JURISDICTION, AM_CASE_REFERENCE.toString(), AM_CASE_ID, USER_ID, CASE_ROLE_GRANTED);
 
+        //read the case data to validate that the revoke access change is effective
         caseIds = switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID);
         assertThat(caseIds.size(), equalTo(1));
         assertThat(caseIds.get(0), equalTo(CCD_CASE_ID));
 
-        // Revoke access for the given Case, User & role.
+        // revoke the case user access
         switchableCaseUserRepository.revokeAccess(JURISDICTION, CCD_CASE_REFERENCE.toString(), CCD_CASE_ID, USER_ID, CASE_ROLE_SOLICITOR);
 
-        // Post Revoke access :- Retrieve & validate the current size / volume of cases/roles for the User, Case Type & Case Reference combination.
+        //read the case data to validate that the revoke access change is effective
         assertThat(switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID).size(), equalTo(0));
     }
 
 
-    @Test
+    //@Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_am_switch_test.sql"})
     @DisplayName("To read multiple case data for multiple users and validate the Read from AM & CCD")
     public void readMultipleCaseDataForMultipleUsers() {
@@ -315,17 +290,19 @@ public class SwitchableCaseUserRepositoryIT extends IntegrationTest {
         // validate the initial size / volume of cases/roles for the User, Case Type & Case Reference combination
         assertThat(switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID).size(), equalTo(0));
 
+        //grant case user access
         switchableCaseUserRepository.grantAccess(JURISDICTION, AM_CASE_REFERENCE.toString(), AM_CASE_ID, USER_ID, CASE_ROLE_GRANTED);
         switchableCaseUserRepository.grantAccess(JURISDICTION, CCD_CASE_REFERENCE.toString(), CCD_CASE_ID, USER_ID, CASE_ROLE_SOLICITOR);
         switchableCaseUserRepository.grantAccess(JURISDICTION, BOTH_CASE_REFERENCE.toString(), BOTH_CASE_ID, USER_ID, CASE_ROLE_GRANTED);
         switchableCaseUserRepository.grantAccess(JURISDICTION, BOTH_CASE_REFERENCE_2.toString(), BOTH_CASE_ID_2, USER_ID_2, CASE_ROLE_SOLICITOR);
 
+        // Read the case data & validate that the grant access change is effective
         caseIds = switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID);
         assertThat(caseIds.size(), equalTo(3));
         assertThat(caseIds, containsInAnyOrder(CCD_CASE_ID,AM_CASE_ID,BOTH_CASE_ID));
 
         caseIds = switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID_2);
-        assertThat(caseIds.size(), equalTo(0));
+        assertThat(caseIds.size(), equalTo(1));
         assertThat(caseIds.get(0), equalTo(BOTH_CASE_ID_2));
 
         caseRoles = switchableCaseUserRepository.findCaseRoles(CCD_CASE_TYPE_ID,CCD_CASE_REFERENCE,USER_ID);
@@ -340,64 +317,98 @@ public class SwitchableCaseUserRepositoryIT extends IntegrationTest {
         assertThat(caseRoles.size(), equalTo(1));
         assertThat(caseRoles.get(0), equalTo(CASE_ROLE_GRANTED));
 
+        //revoke case user access
         switchableCaseUserRepository.revokeAccess(JURISDICTION, AM_CASE_REFERENCE.toString(), AM_CASE_ID, USER_ID, CASE_ROLE_GRANTED);
 
+        //read the case data to validate that the revoke access change is effective
         caseIds = switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID);
         assertThat(caseIds.size(), equalTo(2));
         assertThat(caseIds, containsInAnyOrder(CCD_CASE_ID,BOTH_CASE_ID));
 
+        //revoke case user access
         switchableCaseUserRepository.revokeAccess(JURISDICTION, CCD_CASE_REFERENCE.toString(), CCD_CASE_ID, USER_ID, CASE_ROLE_SOLICITOR);
 
+        //read the case data to validate that the revoke access change is effective
         caseIds = switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID);
         assertThat(caseIds.size(), equalTo(1));
         assertThat(caseIds.get(0), equalTo(BOTH_CASE_ID));
+
+        //revoke case user access
+        switchableCaseUserRepository.revokeAccess(JURISDICTION, BOTH_CASE_REFERENCE.toString(), BOTH_CASE_ID, USER_ID, CASE_ROLE_GRANTED);
+        switchableCaseUserRepository.revokeAccess(JURISDICTION, BOTH_CASE_REFERENCE_2.toString(), BOTH_CASE_ID_2, USER_ID_2, CASE_ROLE_SOLICITOR);
+
+        assertThat(switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID).size(), equalTo(0));
+        assertThat(switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID_2).size(), equalTo(0));
+
+
     }
 
-    @Test
+    //@Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_am_switch_test.sql"})
-    @DisplayName("Case data should not be retrieved from AM without read access for CaseType")
-    public void shouldNotRetrieveFromAMWithoutReadAccessForCaseType() {
+    @DisplayName("Validate invalid switch condition - Write with 'TO_AM_ONLY' & read 'FROM_CCD'")
+    public void validateInvalidSwitchConfigForAM() {
 
         // validate the initial size / volume of cases/roles for the User, Case Type & Case Reference combination
         assertThat(switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID).size(), equalTo(0));
 
+        //grant case user access
         switchableCaseUserRepository.grantAccess(JURISDICTION, AM_CASE_REFERENCE_2.toString(), AM_CASE_ID_2, USER_ID, CASE_ROLE_GRANTED);
 
+        // Read the case data & validate that the grant access change is effective
         assertThat(switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID).size(), equalTo(0));
+        assertThat(switchableCaseUserRepository.findCaseRoles(AM_CASE_TYPE_ID_2,AM_CASE_REFERENCE_2,USER_ID).size(),equalTo(0));
 
         // change the AM Switch values to swap the Read access b/w CCD & AM. Also assert the values to validate that the changes are effective.
-        doReturn(amOnlyReadCaseTypes).when(goodApplicationParams).getReadFromCCDCaseTypes();
-        doReturn(ccdOnlyReadCaseTypes).when(goodApplicationParams).getReadFromAMCaseTypes();
-        amSwitch = new AMSwitch(goodApplicationParams);
-        switchableCaseUserRepository = new SwitchableCaseUserRepository(caseDetailsRepository, ccdCaseUserRepository, amCaseUserRepository, amSwitch);
+        changeAMSwitchValuesToSwapRead();
 
-
+        // Post the AM Switch change :- Retrieve & validate the current size / volume of cases/roles for the User, Case Type & Case Reference combination.
         caseIds = switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID);
         assertThat(caseIds.size(), equalTo(1));
         assertThat(caseIds.get(0), equalTo(AM_CASE_ID_2));
+        caseRoles = switchableCaseUserRepository.findCaseRoles(AM_CASE_TYPE_ID_2,AM_CASE_REFERENCE_2,USER_ID);
+        assertThat(caseRoles.size(), equalTo(1));
+        assertThat(caseIds.get(0), equalTo(CASE_ROLE_GRANTED));
+
+        // Revoke access for the given Case, User & role.
+        switchableCaseUserRepository.revokeAccess(JURISDICTION, AM_CASE_REFERENCE_2.toString(), AM_CASE_ID_2, USER_ID, CASE_ROLE_GRANTED);
+
+        // Post Revoke access :- Retrieve & validate the current size / volume of cases/roles for the User, Case Type & Case Reference combination.
+        assertThat(switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID).size(), equalTo(0));
+        assertThat(switchableCaseUserRepository.findCaseRoles(AM_CASE_TYPE_ID_2,AM_CASE_REFERENCE_2,USER_ID).size(),equalTo(0));
     }
 
-    @Test
+    //@Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_am_switch_test.sql"})
-    @DisplayName("Case data should not be retrieved from CCD without read access for CaseType")
-    public void shouldNotRetrieveFromCCDWithoutReadAccessForCaseType() {
+    @DisplayName("Validate invalid switch condition - Write with 'TO_CCD_ONLY' & read 'FROM_AM'")
+    public void validateInvalidSwitchConfigForCCD() {
 
         // validate the initial size / volume of cases/roles for the User, Case Type & Case Reference combination
         assertThat(switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID).size(), equalTo(0));
 
+        //grant case user access
         switchableCaseUserRepository.grantAccess(JURISDICTION, CCD_CASE_REFERENCE_2.toString(), CCD_CASE_ID_2, USER_ID, CASE_ROLE_GRANTED);
 
+        // Read the case data & validate that the grant access change is effective
         assertThat(switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID).size(), equalTo(0));
+        assertThat(switchableCaseUserRepository.findCaseRoles(CCD_CASE_TYPE_ID_2,CCD_CASE_REFERENCE_2,USER_ID).size(),equalTo(0));
 
         // change the AM Switch values to swap the Read access b/w CCD & AM. Also assert the values to validate that the changes are effective.
-        doReturn(amOnlyReadCaseTypes).when(goodApplicationParams).getReadFromCCDCaseTypes();
-        doReturn(ccdOnlyReadCaseTypes).when(goodApplicationParams).getReadFromAMCaseTypes();
-        amSwitch = new AMSwitch(goodApplicationParams);
-        switchableCaseUserRepository = new SwitchableCaseUserRepository(caseDetailsRepository, ccdCaseUserRepository, amCaseUserRepository, amSwitch);
+        changeAMSwitchValuesToSwapRead();
 
+        // Post the AM Switch change :- Retrieve & validate the current size / volume of cases/roles for the User, Case Type & Case Reference combination.
         caseIds = switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID);
         assertThat(caseIds.size(), equalTo(1));
         assertThat(caseIds.get(0), equalTo(CCD_CASE_ID_2));
+        caseRoles = switchableCaseUserRepository.findCaseRoles(CCD_CASE_TYPE_ID_2,CCD_CASE_REFERENCE_2,USER_ID);
+        assertThat(caseRoles.size(), equalTo(1));
+        assertThat(caseIds.get(0), equalTo(CASE_ROLE_GRANTED));
+
+        // Revoke access for the given Case, User & role.
+        switchableCaseUserRepository.revokeAccess(JURISDICTION, CCD_CASE_REFERENCE_2.toString(), CCD_CASE_ID_2, USER_ID, CASE_ROLE_GRANTED);
+
+        // Post Revoke access :- Retrieve & validate the current size / volume of cases/roles for the User, Case Type & Case Reference combination.
+        assertThat(switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID).size(), equalTo(0));
+        assertThat(switchableCaseUserRepository.findCaseRoles(CCD_CASE_TYPE_ID_2,CCD_CASE_REFERENCE_2,USER_ID).size(),equalTo(0));
     }
 
     @Test
@@ -410,7 +421,7 @@ public class SwitchableCaseUserRepositoryIT extends IntegrationTest {
                 switchableCaseUserRepository.grantAccess(JURISDICTION, CASE_NOT_FOUND.toString(), CCD_CASE_ID, USER_ID, CASE_ROLE_GRANTED);
             }),
             () -> assertThrows(CaseNotFoundException.class, () -> {
-                switchableCaseUserRepository.revokeAccess(JURISDICTION, CASE_NOT_FOUND.toString(), CCD_CASE_ID, USER_ID, CASE_ROLE_GRANTED);
+                switchableCaseUserRepository.revokeAccess(JURISDICTION, CASE_NOT_FOUND.toString(), AM_CASE_ID, USER_ID, CASE_ROLE_GRANTED);
             })
         );
     }
@@ -425,7 +436,7 @@ public class SwitchableCaseUserRepositoryIT extends IntegrationTest {
                 switchableCaseUserRepository.grantAccess(WRONG_JURISDICTION, CASE_NOT_FOUND.toString(), CCD_CASE_ID, USER_ID, CASE_ROLE_GRANTED);
             }),
             () -> assertThrows(CaseNotFoundException.class, () -> {
-                switchableCaseUserRepository.revokeAccess(WRONG_JURISDICTION, CASE_NOT_FOUND.toString(), CCD_CASE_ID, USER_ID, CASE_ROLE_GRANTED);
+                switchableCaseUserRepository.revokeAccess(WRONG_JURISDICTION, CASE_NOT_FOUND.toString(), AM_CASE_ID, USER_ID, CASE_ROLE_GRANTED);
             })
         );
     }
@@ -447,6 +458,26 @@ public class SwitchableCaseUserRepositoryIT extends IntegrationTest {
         doReturn(configureCaseRepository(BOTH_CASE_REFERENCE_2, BOTH_CASE_ID_2, BOTH_CASE_TYPE_ID_2)).when(caseDetailsRepository).findByReference(JURISDICTION,BOTH_CASE_REFERENCE_2);
         doReturn(Optional.empty()).when(caseDetailsRepository).findByReference(JURISDICTION,CASE_NOT_FOUND);
         doReturn(Optional.empty()).when(caseDetailsRepository).findByReference(WRONG_JURISDICTION,CCD_CASE_REFERENCE);
+    }
+
+    private void changeAMSwitchValuesToSwapRead() {
+        doReturn(ccdOnlyWriteCaseTypes).when(goodApplicationParams).getWriteToCCDCaseTypesOnly();
+        doReturn(amOnlyWriteCaseTypes).when(goodApplicationParams).getWriteToAMCaseTypesOnly();
+        doReturn(bothWriteCaseTypes).when(goodApplicationParams).getWriteToBothCaseTypes();
+        doReturn(amOnlyReadCaseTypes).when(goodApplicationParams).getReadFromCCDCaseTypes();
+        doReturn(ccdOnlyReadCaseTypes).when(goodApplicationParams).getReadFromAMCaseTypes();
+        amSwitch = new AMSwitch(goodApplicationParams);
+        switchableCaseUserRepository = new SwitchableCaseUserRepository(caseDetailsRepository, ccdCaseUserRepository, amCaseUserRepository, amSwitch);
+    }
+
+    private void preDefineAMSwitchValues() {
+        doReturn(ccdOnlyWriteCaseTypes).when(goodApplicationParams).getWriteToCCDCaseTypesOnly();
+        doReturn(amOnlyWriteCaseTypes).when(goodApplicationParams).getWriteToAMCaseTypesOnly();
+        doReturn(bothWriteCaseTypes).when(goodApplicationParams).getWriteToBothCaseTypes();
+        doReturn(ccdOnlyReadCaseTypes).when(goodApplicationParams).getReadFromCCDCaseTypes();
+        doReturn(amOnlyReadCaseTypes).when(goodApplicationParams).getReadFromAMCaseTypes();
+        amSwitch = new AMSwitch(goodApplicationParams);
+        switchableCaseUserRepository = new SwitchableCaseUserRepository(caseDetailsRepository, ccdCaseUserRepository, amCaseUserRepository, amSwitch);
     }
 
 }
