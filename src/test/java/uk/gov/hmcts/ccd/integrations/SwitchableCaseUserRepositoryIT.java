@@ -4,11 +4,13 @@ import com.google.common.collect.Lists;
 import org.junit.Ignore;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
+
 import org.junit.jupiter.api.DisplayName;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.data.caseaccess.*;
@@ -17,10 +19,12 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Optional;
+import javax.sql.DataSource;
 
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -33,19 +37,24 @@ import static org.mockito.Mockito.*;
 @Transactional
 public class SwitchableCaseUserRepositoryIT extends IntegrationTest {
 
-    @Mock
-    protected CaseDetailsRepository caseDetailsRepository;
-
-    @Autowired
-    protected CaseUserAuditRepository caseUserAuditRepository;
-
     @PersistenceContext
     private EntityManager em;
 
-    @Autowired
+    private JdbcTemplate template;
+
+    @Inject
+    protected DataSource db;
+
+    @Mock
+    protected CaseDetailsRepository caseDetailsRepository;
+
+    @MockBean
+    private CaseUserAuditRepository auditRepository;
+
+    @Inject
     protected CCDCaseUserRepository ccdCaseUserRepository;
 
-    @Autowired
+    @Inject
     protected AMCaseUserRepository amCaseUserRepository;
 
     @InjectMocks
@@ -54,7 +63,7 @@ public class SwitchableCaseUserRepositoryIT extends IntegrationTest {
     @Mock
     private ApplicationParams goodApplicationParams;
 
-    @Autowired
+    @Inject
     private SwitchableCaseUserRepository switchableCaseUserRepository;
 
     private static final String JURISDICTION = "CMC";
@@ -103,6 +112,8 @@ public class SwitchableCaseUserRepositoryIT extends IntegrationTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
+        template = new JdbcTemplate(db);
+
         // predefine the CaseDetailsRepository(mocked Object) to return the respective case details for the given Jurisdiction and Case Reference combination
         predefineCaseDetailsRepository();
 
@@ -137,7 +148,7 @@ public class SwitchableCaseUserRepositoryIT extends IntegrationTest {
         assertTrue(amSwitch.isWriteAccessManagementWithCCD(BOTH_CASE_TYPE_ID_2));
     }
 
-    //@Test
+    @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_am_switch_test.sql"})
     @DisplayName("To Test writing the data into CCD and validate the Read from AM & CCD")
     public void ccdOnlyWriteAndValidateReadFromAMAndCCD() {
@@ -153,7 +164,7 @@ public class SwitchableCaseUserRepositoryIT extends IntegrationTest {
         caseIds = switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID);
         assertThat(caseIds.size(), equalTo(1));
         assertThat(caseIds.get(0), equalTo(CCD_CASE_ID));
-        caseRoles = switchableCaseUserRepository.findCaseRoles(CCD_CASE_TYPE_ID,CCD_CASE_REFERENCE,USER_ID);
+        caseRoles = switchableCaseUserRepository.findCaseRoles(CCD_CASE_TYPE_ID,CCD_CASE_ID,USER_ID);
         assertThat(caseRoles.size(), equalTo(1));
         assertThat(caseRoles.get(0), equalTo(CASE_ROLE_GRANTED));
 
@@ -180,7 +191,7 @@ public class SwitchableCaseUserRepositoryIT extends IntegrationTest {
 
         // validate the initial size / volume of cases/roles for the User, Case Type & Case Reference combination
         assertThat(switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID).size(), equalTo(0));
-        assertThat(switchableCaseUserRepository.findCaseRoles(AM_CASE_TYPE_ID,AM_CASE_REFERENCE,USER_ID).size(),equalTo(0));
+        assertThat(switchableCaseUserRepository.findCaseRoles(AM_CASE_TYPE_ID,AM_CASE_ID,USER_ID).size(),equalTo(0));
 
         // Grant case user access
         switchableCaseUserRepository.grantAccess(JURISDICTION, AM_CASE_REFERENCE.toString(), AM_CASE_ID , USER_ID, CASE_ROLE_GRANTED);
@@ -189,7 +200,7 @@ public class SwitchableCaseUserRepositoryIT extends IntegrationTest {
         caseIds = switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID);
         assertThat(caseIds.size(), equalTo(1));
         assertThat(caseIds.get(0), equalTo(AM_CASE_ID));
-        caseRoles = switchableCaseUserRepository.findCaseRoles(AM_CASE_TYPE_ID,AM_CASE_REFERENCE,USER_ID);
+        caseRoles = switchableCaseUserRepository.findCaseRoles(AM_CASE_TYPE_ID,AM_CASE_ID,USER_ID);
         assertThat(caseRoles.size(), equalTo(1));
         assertThat(caseRoles.get(0), equalTo(CASE_ROLE_GRANTED));
 
@@ -258,11 +269,11 @@ public class SwitchableCaseUserRepositoryIT extends IntegrationTest {
         assertThat(caseIds.size(), equalTo(2));
         assertThat(caseIds, containsInAnyOrder(CCD_CASE_ID,AM_CASE_ID));
 
-        caseRoles = switchableCaseUserRepository.findCaseRoles(CCD_CASE_TYPE_ID,CCD_CASE_REFERENCE,USER_ID);
+        caseRoles = switchableCaseUserRepository.findCaseRoles(CCD_CASE_TYPE_ID,CCD_CASE_ID,USER_ID);
         assertThat(caseRoles.size(), equalTo(1));
         assertThat(caseRoles.get(0), equalTo(CASE_ROLE_SOLICITOR));
 
-        caseRoles = switchableCaseUserRepository.findCaseRoles(AM_CASE_TYPE_ID,AM_CASE_REFERENCE,USER_ID);
+        caseRoles = switchableCaseUserRepository.findCaseRoles(AM_CASE_TYPE_ID,AM_CASE_ID,USER_ID);
         assertThat(caseRoles.size(), equalTo(1));
         assertThat(caseRoles.get(0), equalTo(CASE_ROLE_GRANTED));
 
@@ -305,15 +316,15 @@ public class SwitchableCaseUserRepositoryIT extends IntegrationTest {
         assertThat(caseIds.size(), equalTo(1));
         assertThat(caseIds.get(0), equalTo(BOTH_CASE_ID_2));
 
-        caseRoles = switchableCaseUserRepository.findCaseRoles(CCD_CASE_TYPE_ID,CCD_CASE_REFERENCE,USER_ID);
+        caseRoles = switchableCaseUserRepository.findCaseRoles(CCD_CASE_TYPE_ID,CCD_CASE_ID,USER_ID);
         assertThat(caseRoles.size(), equalTo(1));
         assertThat(caseRoles.get(0), equalTo(CASE_ROLE_SOLICITOR));
 
-        caseRoles = switchableCaseUserRepository.findCaseRoles(AM_CASE_TYPE_ID,AM_CASE_REFERENCE,USER_ID);
+        caseRoles = switchableCaseUserRepository.findCaseRoles(AM_CASE_TYPE_ID,AM_CASE_ID,USER_ID);
         assertThat(caseRoles.size(), equalTo(1));
         assertThat(caseRoles.get(0), equalTo(CASE_ROLE_GRANTED));
 
-        caseRoles = switchableCaseUserRepository.findCaseRoles(BOTH_CASE_TYPE_ID_2,BOTH_CASE_REFERENCE_2,USER_ID_2);
+        caseRoles = switchableCaseUserRepository.findCaseRoles(BOTH_CASE_TYPE_ID_2,BOTH_CASE_ID_2,USER_ID_2);
         assertThat(caseRoles.size(), equalTo(1));
         assertThat(caseRoles.get(0), equalTo(CASE_ROLE_GRANTED));
 
@@ -356,7 +367,7 @@ public class SwitchableCaseUserRepositoryIT extends IntegrationTest {
 
         // Read the case data & validate that the grant access change is effective
         assertThat(switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID).size(), equalTo(0));
-        assertThat(switchableCaseUserRepository.findCaseRoles(AM_CASE_TYPE_ID_2,AM_CASE_REFERENCE_2,USER_ID).size(),equalTo(0));
+        assertThat(switchableCaseUserRepository.findCaseRoles(AM_CASE_TYPE_ID_2,AM_CASE_ID_2,USER_ID).size(),equalTo(0));
 
         // change the AM Switch values to swap the Read access b/w CCD & AM. Also assert the values to validate that the changes are effective.
         changeAMSwitchValuesToSwapRead();
@@ -365,7 +376,7 @@ public class SwitchableCaseUserRepositoryIT extends IntegrationTest {
         caseIds = switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID);
         assertThat(caseIds.size(), equalTo(1));
         assertThat(caseIds.get(0), equalTo(AM_CASE_ID_2));
-        caseRoles = switchableCaseUserRepository.findCaseRoles(AM_CASE_TYPE_ID_2,AM_CASE_REFERENCE_2,USER_ID);
+        caseRoles = switchableCaseUserRepository.findCaseRoles(AM_CASE_TYPE_ID_2,AM_CASE_ID_2,USER_ID);
         assertThat(caseRoles.size(), equalTo(1));
         assertThat(caseIds.get(0), equalTo(CASE_ROLE_GRANTED));
 
@@ -374,10 +385,10 @@ public class SwitchableCaseUserRepositoryIT extends IntegrationTest {
 
         // Post Revoke access :- Retrieve & validate the current size / volume of cases/roles for the User, Case Type & Case Reference combination.
         assertThat(switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID).size(), equalTo(0));
-        assertThat(switchableCaseUserRepository.findCaseRoles(AM_CASE_TYPE_ID_2,AM_CASE_REFERENCE_2,USER_ID).size(),equalTo(0));
+        assertThat(switchableCaseUserRepository.findCaseRoles(AM_CASE_TYPE_ID_2,AM_CASE_ID_2,USER_ID).size(),equalTo(0));
     }
 
-    //@Test
+    @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_am_switch_test.sql"})
     @DisplayName("Validate invalid switch condition - Write with 'TO_CCD_ONLY' & read 'FROM_AM'")
     public void validateInvalidSwitchConfigForCCD() {
@@ -390,7 +401,7 @@ public class SwitchableCaseUserRepositoryIT extends IntegrationTest {
 
         // Read the case data & validate that the grant access change is effective
         assertThat(switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID).size(), equalTo(0));
-        assertThat(switchableCaseUserRepository.findCaseRoles(CCD_CASE_TYPE_ID_2,CCD_CASE_REFERENCE_2,USER_ID).size(),equalTo(0));
+        assertThat(switchableCaseUserRepository.findCaseRoles(CCD_CASE_TYPE_ID_2,CCD_CASE_ID_2,USER_ID).size(),equalTo(0));
 
         // change the AM Switch values to swap the Read access b/w CCD & AM. Also assert the values to validate that the changes are effective.
         changeAMSwitchValuesToSwapRead();
@@ -399,16 +410,16 @@ public class SwitchableCaseUserRepositoryIT extends IntegrationTest {
         caseIds = switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID);
         assertThat(caseIds.size(), equalTo(1));
         assertThat(caseIds.get(0), equalTo(CCD_CASE_ID_2));
-        caseRoles = switchableCaseUserRepository.findCaseRoles(CCD_CASE_TYPE_ID_2,CCD_CASE_REFERENCE_2,USER_ID);
+        caseRoles = switchableCaseUserRepository.findCaseRoles(CCD_CASE_TYPE_ID_2,CCD_CASE_ID_2,USER_ID);
         assertThat(caseRoles.size(), equalTo(1));
-        assertThat(caseIds.get(0), equalTo(CASE_ROLE_GRANTED));
+        assertThat(caseRoles.get(0), equalTo(CASE_ROLE_GRANTED));
 
         // Revoke access for the given Case, User & role.
         switchableCaseUserRepository.revokeAccess(JURISDICTION, CCD_CASE_REFERENCE_2.toString(), CCD_CASE_ID_2, USER_ID, CASE_ROLE_GRANTED);
 
         // Post Revoke access :- Retrieve & validate the current size / volume of cases/roles for the User, Case Type & Case Reference combination.
         assertThat(switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID).size(), equalTo(0));
-        assertThat(switchableCaseUserRepository.findCaseRoles(CCD_CASE_TYPE_ID_2,CCD_CASE_REFERENCE_2,USER_ID).size(),equalTo(0));
+        assertThat(switchableCaseUserRepository.findCaseRoles(CCD_CASE_TYPE_ID_2,CCD_CASE_ID_2,USER_ID).size(),equalTo(0));
     }
 
     @Test
@@ -441,7 +452,7 @@ public class SwitchableCaseUserRepositoryIT extends IntegrationTest {
         );
     }
 
-    private Optional<CaseDetails> configureCaseRepository(Long caseReference, Long caseId, String caseTypeId) {
+    private Optional<CaseDetails> configureCaseDetailRepository(Long caseReference, Long caseId, String caseTypeId) {
         final CaseDetails caseDetails = new CaseDetails();
         caseDetails.setId(String.valueOf(caseId));
         caseDetails.setReference(caseReference);
@@ -449,15 +460,29 @@ public class SwitchableCaseUserRepositoryIT extends IntegrationTest {
         return Optional.of(caseDetails);
     }
 
+    private CaseDetails configureCaseDetailRepositoryData(Long caseReference, Long caseId, String caseTypeId) {
+        final CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setId(String.valueOf(caseId));
+        caseDetails.setReference(caseReference);
+        caseDetails.setCaseTypeId(caseTypeId);
+        return caseDetails;
+    }
+
     private void predefineCaseDetailsRepository() {
-        doReturn(configureCaseRepository(CCD_CASE_REFERENCE, CCD_CASE_ID, CCD_CASE_TYPE_ID)).when(caseDetailsRepository).findByReference(JURISDICTION,CCD_CASE_REFERENCE);
-        doReturn(configureCaseRepository(CCD_CASE_REFERENCE_2, CCD_CASE_ID_2, CCD_CASE_TYPE_ID_2)).when(caseDetailsRepository).findByReference(JURISDICTION,CCD_CASE_REFERENCE_2);
-        doReturn(configureCaseRepository(AM_CASE_REFERENCE, AM_CASE_ID, AM_CASE_TYPE_ID)).when(caseDetailsRepository).findByReference(JURISDICTION,AM_CASE_REFERENCE);
-        doReturn(configureCaseRepository(AM_CASE_REFERENCE_2, AM_CASE_ID_2, AM_CASE_TYPE_ID_2)).when(caseDetailsRepository).findByReference(JURISDICTION,AM_CASE_REFERENCE_2);
-        doReturn(configureCaseRepository(BOTH_CASE_REFERENCE, BOTH_CASE_ID, BOTH_CASE_TYPE_ID)).when(caseDetailsRepository).findByReference(JURISDICTION,BOTH_CASE_REFERENCE);
-        doReturn(configureCaseRepository(BOTH_CASE_REFERENCE_2, BOTH_CASE_ID_2, BOTH_CASE_TYPE_ID_2)).when(caseDetailsRepository).findByReference(JURISDICTION,BOTH_CASE_REFERENCE_2);
+        doReturn(configureCaseDetailRepository(CCD_CASE_REFERENCE, CCD_CASE_ID, CCD_CASE_TYPE_ID)).when(caseDetailsRepository).findByReference(JURISDICTION,CCD_CASE_REFERENCE);
+        doReturn(configureCaseDetailRepository(CCD_CASE_REFERENCE_2, CCD_CASE_ID_2, CCD_CASE_TYPE_ID_2)).when(caseDetailsRepository).findByReference(JURISDICTION,CCD_CASE_REFERENCE_2);
+        doReturn(configureCaseDetailRepository(AM_CASE_REFERENCE, AM_CASE_ID, AM_CASE_TYPE_ID)).when(caseDetailsRepository).findByReference(JURISDICTION,AM_CASE_REFERENCE);
+        doReturn(configureCaseDetailRepository(AM_CASE_REFERENCE_2, AM_CASE_ID_2, AM_CASE_TYPE_ID_2)).when(caseDetailsRepository).findByReference(JURISDICTION,AM_CASE_REFERENCE_2);
+        doReturn(configureCaseDetailRepository(BOTH_CASE_REFERENCE, BOTH_CASE_ID, BOTH_CASE_TYPE_ID)).when(caseDetailsRepository).findByReference(JURISDICTION,BOTH_CASE_REFERENCE);
+        doReturn(configureCaseDetailRepository(BOTH_CASE_REFERENCE_2, BOTH_CASE_ID_2, BOTH_CASE_TYPE_ID_2)).when(caseDetailsRepository).findByReference(JURISDICTION,BOTH_CASE_REFERENCE_2);
         doReturn(Optional.empty()).when(caseDetailsRepository).findByReference(JURISDICTION,CASE_NOT_FOUND);
         doReturn(Optional.empty()).when(caseDetailsRepository).findByReference(WRONG_JURISDICTION,CCD_CASE_REFERENCE);
+        doReturn(configureCaseDetailRepositoryData(CCD_CASE_REFERENCE, CCD_CASE_ID, CCD_CASE_TYPE_ID)).when(caseDetailsRepository).findById(CCD_CASE_ID);
+        doReturn(configureCaseDetailRepositoryData(CCD_CASE_REFERENCE_2, CCD_CASE_ID_2, CCD_CASE_TYPE_ID_2)).when(caseDetailsRepository).findById(CCD_CASE_ID_2);
+        doReturn(configureCaseDetailRepositoryData(AM_CASE_REFERENCE, AM_CASE_ID, AM_CASE_TYPE_ID)).when(caseDetailsRepository).findById(AM_CASE_ID);
+        doReturn(configureCaseDetailRepositoryData(AM_CASE_REFERENCE_2, AM_CASE_ID_2, AM_CASE_TYPE_ID_2)).when(caseDetailsRepository).findById(AM_CASE_ID_2);
+        doReturn(configureCaseDetailRepositoryData(BOTH_CASE_REFERENCE, BOTH_CASE_ID, BOTH_CASE_TYPE_ID)).when(caseDetailsRepository).findById(BOTH_CASE_ID);
+        doReturn(configureCaseDetailRepositoryData(BOTH_CASE_REFERENCE_2, BOTH_CASE_ID_2, BOTH_CASE_TYPE_ID_2)).when(caseDetailsRepository).findById(BOTH_CASE_ID_2);
     }
 
     private void changeAMSwitchValuesToSwapRead() {
