@@ -21,7 +21,7 @@ public class SearchResultField implements Serializable {
     private boolean metadata;
     @JsonProperty("role")
     private String role;
-    @JsonProperty("sortOrder")
+    @JsonProperty("sort_order")
     private SortOrder sortOrder;
 
     public String getCaseTypeId() {

@@ -15,7 +15,7 @@
             "case_field_id": "PersonFirstName",
             "label": "First Name",
             "order": 1,
-            "sortOrder" : {
+            "sort_order" : {
               "direction": "ASC",
               "priority": 1
             }
@@ -33,7 +33,7 @@
             "label": "Address",
             "order": 1,
             "role": "caseworker-test-public",
-            "sortOrder" : {
+            "sort_order" : {
               "direction": "ASC",
               "priority": 2
             }
