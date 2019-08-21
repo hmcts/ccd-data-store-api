@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.data.caseaccess;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
@@ -24,10 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
-import static uk.gov.hmcts.reform.amlib.enums.Permission.DELETE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
-import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 
 @Named
 @Singleton

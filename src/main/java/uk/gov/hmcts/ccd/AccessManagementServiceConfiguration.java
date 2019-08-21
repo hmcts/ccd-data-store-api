@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -12,14 +11,12 @@ public class AccessManagementServiceConfiguration {
 
     @Bean
     public AccessManagementService getAccessManagementService() {
-        DriverManagerDataSource driver = getDriverManagerDataSource();
-        return new AccessManagementService(driver);
+        return new AccessManagementService(getDriverManagerDataSource());
     }
 
     @Bean
     public DefaultRoleSetupImportService getDefaultRoleSetupImportService() {
-        DriverManagerDataSource driver = getDriverManagerDataSource();
-        return new DefaultRoleSetupImportService(driver);
+        return new DefaultRoleSetupImportService(getDriverManagerDataSource());
     }
 
     private DriverManagerDataSource getDriverManagerDataSource() {

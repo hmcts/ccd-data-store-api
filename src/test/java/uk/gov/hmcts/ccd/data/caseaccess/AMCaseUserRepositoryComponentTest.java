@@ -1,21 +1,20 @@
 package uk.gov.hmcts.ccd.data.caseaccess;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.BaseTest;
-import uk.gov.hmcts.reform.amlib.AccessManagementService;
+import uk.gov.hmcts.ccd.data.helper.AccessManagementQueryHelper;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
-import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -26,8 +25,6 @@ import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 
 @Transactional
 public class AMCaseUserRepositoryComponentTest extends BaseTest {
-
-    private static final String COUNT_CASE_USERS = "TBD - see CCDCaseUserRepositoryTest";
 
     private static final String JURISDICTION_ID = "JURISDICTION";
     private static final String CASE_TYPE_ID = "CASE_TYPE";
@@ -52,6 +49,9 @@ public class AMCaseUserRepositoryComponentTest extends BaseTest {
     @Autowired
     DefaultRoleSetupImportService defaultRoleSetupImportService;
 
+    @Autowired
+    AccessManagementQueryHelper accessManagementQueryHelper;
+
     @Before
     public void setUp() {
         template = new JdbcTemplate(db);
@@ -68,74 +68,62 @@ public class AMCaseUserRepositoryComponentTest extends BaseTest {
         defaultRoleSetupImportService.addResourceDefinition(resourceDefinition);
     }
 
+    @After
+    public void tearDown() {
+        accessManagementQueryHelper.deleteAllFromAccessManagementTables();
+    }
+
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldGrantAccessAsCustomCaseRole() {
         repository.grantAccess(JURISDICTION_ID, CASE_REFERENCE, CASE_ID, USER_ID, CASE_ROLE);
+        Integer records = accessManagementQueryHelper.findExplicitAccessPermissions(JURISDICTION_ID);
 
-        assertThat(countAccesses(CASE_ID, USER_ID, CASE_ROLE), equalTo(1));
+        assertThat(records, equalTo(1));
+
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {
-        "classpath:sql/insert_cases_am.sql",
-        "classpath:sql/insert_case_users_am.sql",
-    })
     public void shouldRevokeAccessAsCustomCaseRole() {
-        repository.revokeAccess(JURISDICTION_ID, CASE_TYPE_ID, CASE_ID_GRANTED, USER_ID_GRANTED, CASE_ROLE);
+        repository.grantAccess(JURISDICTION_ID, CASE_REFERENCE, CASE_ID, USER_ID, CASE_ROLE);
+        repository.revokeAccess(JURISDICTION_ID, CASE_REFERENCE, CASE_ID, USER_ID, CASE_ROLE);
 
-        assertThat(countAccesses(CASE_ID_GRANTED, USER_ID_GRANTED, CASE_ROLE), equalTo(0));
+        Integer records = accessManagementQueryHelper.findExplicitAccessPermissions(JURISDICTION_ID);
+        assertThat(records, equalTo(0));
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {
-        "classpath:sql/insert_cases_am.sql",
-        "classpath:sql/insert_case_users_am.sql",
-    })
     public void shouldFindCasesUserIdHasAccessTo() {
+        repository.grantAccess(JURISDICTION_ID, CASE_REFERENCE, CASE_ID, USER_ID, CASE_ROLE);
         List<Long> caseIds = repository.findCasesUserIdHasAccessTo(USER_ID);
 
         assertThat(caseIds.size(), equalTo(1));
         assertThat(caseIds.get(0), equalTo(CASE_ID));
 
+        repository.grantAccess(JURISDICTION_ID, CASE_REFERENCE, CASE_ID, USER_ID_GRANTED, CASE_ROLE);
+        repository.grantAccess(JURISDICTION_ID, CASE_REFERENCE, CASE_ID_3, USER_ID_GRANTED, CASE_ROLE);
+        repository.grantAccess(JURISDICTION_ID, CASE_REFERENCE, CASE_ID_GRANTED, USER_ID_GRANTED, CASE_ROLE);
+
         caseIds = repository.findCasesUserIdHasAccessTo(USER_ID_GRANTED);
 
         assertThat(caseIds.size(), equalTo(3));
-        assertThat(caseIds, containsInAnyOrder(CASE_ID_GRANTED, CASE_ID_GRANTED, CASE_ID_3));
-    }
-
-    private Integer countAccesses(Long caseId, String userId) {
-        return countAccesses(caseId, userId, GlobalCaseRole.CREATOR.getRole());
-    }
-
-    private Integer countAccesses(Long caseId, String userId, String role) {
-        em.flush();
-
-        final Object[] parameters = new Object[]{
-            caseId,
-            userId,
-            role
-        };
-
-        return template.queryForObject(COUNT_CASE_USERS, parameters, Integer.class);
+        assertThat(caseIds, containsInAnyOrder(CASE_ID, CASE_ID_GRANTED, CASE_ID_3));
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {
-        "classpath:sql/insert_cases_am.sql",
-        "classpath:sql/insert_case_users_am.sql",
-    })
     public void shouldFindCaseRolesUserPerformsForCase() {
-
+        repository.grantAccess(JURISDICTION_ID, CASE_REFERENCE, CASE_ID, USER_ID, CASE_ROLE_CREATOR);
         List<String> caseRoles = repository.findCaseRoles(CASE_TYPE_ID, CASE_ID, USER_ID);
 
         assertThat(caseRoles.size(), equalTo(1));
         assertThat(caseRoles.get(0), equalTo(CASE_ROLE_CREATOR));
 
-        caseRoles = repository.findCaseRoles(CASE_TYPE_ID, CASE_ID_GRANTED, USER_ID_GRANTED);
+        repository.grantAccess(JURISDICTION_ID, CASE_REFERENCE, CASE_ID, USER_ID, CASE_ROLE);
+        repository.grantAccess(JURISDICTION_ID, CASE_REFERENCE, CASE_ID, USER_ID, CASE_ROLE_CREATOR);
+        repository.grantAccess(JURISDICTION_ID, CASE_REFERENCE, CASE_ID, USER_ID, CASE_ROLE_SOLICITOR);
 
-        assertThat(caseRoles.size(), equalTo(2));
-        assertThat(caseRoles, containsInAnyOrder(CASE_ROLE, CASE_ROLE_SOLICITOR));
+        caseRoles = repository.findCaseRoles(CASE_TYPE_ID, CASE_ID, USER_ID);
+
+        assertThat(caseRoles.size(), equalTo(3));
+        assertThat(caseRoles, containsInAnyOrder(CASE_ROLE, CASE_ROLE_CREATOR, CASE_ROLE_SOLICITOR));
     }
-
 }
