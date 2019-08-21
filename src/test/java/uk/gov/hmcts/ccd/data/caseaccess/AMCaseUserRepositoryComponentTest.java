@@ -5,7 +5,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.BaseTest;
 import uk.gov.hmcts.ccd.data.helper.AccessManagementQueryHelper;
@@ -79,7 +78,6 @@ public class AMCaseUserRepositoryComponentTest extends BaseTest {
         Integer records = accessManagementQueryHelper.findExplicitAccessPermissions(JURISDICTION_ID);
 
         assertThat(records, equalTo(1));
-
     }
 
     @Test
