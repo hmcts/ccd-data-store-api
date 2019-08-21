@@ -1,5 +1,5 @@
 java:
-  image: hmcts.azurecr.io/hmcts/ccd-data-store-api:latest
+  image: 'hmctspublic.azurecr.io/ccd/data-store-api:latest' 
   applicationPort: 4452
   keyVaults:
     s2s:
@@ -44,5 +44,4 @@ java:
     IDAM_USER_URL: https://idam-api.aat.platform.hmcts.net
     CCD_DRAFT_STORE_URL: http://draft-store-service-aat.service.core-compute-aat.internal
     CCD_DEFAULTPRINTURL: https://return-case-doc-ccd.nonprod.platform.hmcts.net/jurisdictions/:jid/case-types/:ctid/cases/:cid
-  postgresql:
-    postgresqlDatabase: ccd_data_store
+  
