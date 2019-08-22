@@ -4,79 +4,64 @@
     <Instrumentation>
         <BuiltIn enabled="true">
             <HTTP enabled="true"/>
-            <JDBC enabled="true"/>
-            <!-- Set SQL query duration above which query plan is reported. Default is 10000 ms. -->
-            <MaxStatementQueryLimitInMS>10000</MaxStatementQueryLimitInMS>
         </BuiltIn>
-        <Class name="uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository">
-            <Method name="set"/>
-            <Method name="findByCase"/>
-            <Method name="getCreateEvent"/>
-            <Method name="findByEventId"/>
+        <Class name="uk.gov.hmcts.probate.services.submit.clients.CoreCaseDataClient">
+            <Method name="createCase" reportExecutionTime="true"/>
+            <Method name="saveCase" reportCaughtExceptions="true" reportExecutionTime="true"/>
         </Class>
-        <Class name="uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository">
-            <Method name="getCaseTypesForJurisdiction"/>
-            <Method name="getCaseType"/>
-            <Method name="getBaseTypes"/>
-            <Method name="getUserRoleClassifications"/>
-            <Method name="getClassificationsForUserRoleList"/>
-            <Method name="getLatestVersion"/>
-            <Method name="getJurisdictions"/>
+        <Class name="uk.gov.hmcts.probate.services.submit.clients.CoreCaseDataMapper">
+            <Method name="createCcdData" reportExecutionTime="true"/>
+            <Method name="mapData" reportExecutionTime="true"/>
+            <Method name="fieldMapper" reportExecutionTime="true"/>
+            <Method name="map" reportExecutionTime="true"/>
+            <Method name="dateMapper" reportExecutionTime="true"/>
+            <Method name="executorsMapper" reportExecutionTime="true"/>
+            <Method name="mapExecutor" reportExecutionTime="true"/>
+            <Method name="monetaryValueMapper" reportExecutionTime="true"/>
+            <Method name="aliasesMapper" reportExecutionTime="true"/>
+            <Method name="mapAlias" reportExecutionTime="true"/>
+            <Method name="addressMapper" reportExecutionTime="true"/>
+            <Method name="declarationMapper" reportExecutionTime="true"/>
+            <Method name="legalStatementMapper" reportExecutionTime="true"/>
+            <Method name="mapExecNotApplying" reportExecutionTime="true"/>
+            <Method name="mapExecApplying" reportExecutionTime="true"/>
         </Class>
-        <Class name="uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository">
-            <Method name="set"/>
-            <Method name="findById"/>
-            <Method name="findByReference"/>
-            <Method name="lockCase"/>
-            <Method name="findUniqueCase"/>
-            <Method name="findByMetaDataAndFieldData"/>
-            <Method name="getPaginatedSearchMetadata"/>
+        <Class name="uk.gov.hmcts.probate.services.submit.clients.MailClient">
+            <Method name="execute" reportExecutionTime="true"/>
         </Class>
-        <Class name="uk.gov.hmcts.ccd.data.caseaccess.CaseUserAuditRepository">
-            <Method name="auditGrant"/>
-            <Method name="auditRevoke"/>
+        <Class name="uk.gov.hmcts.probate.services.submit.clients.MailMessageBuilder">
+            <Method name="buildMessage" reportExecutionTime="true"/>
+            <Method name="createTemplateContext" reportExecutionTime="true"/>
+            <Method name="getDataMap" reportExecutionTime="true"/>
+            <Method name="getFieldValue" reportExecutionTime="true"/>
         </Class>
-        <Class name="uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository">
-            <Method name="grantAccess"/>
-            <Method name="revokeAccess"/>
-            <Method name="findCasesUserIdHasAccessTo"/>
-            <Method name="findCaseRoles"/>
+        <Class name="uk.gov.hmcts.probate.services.submit.clients.PersistenceClient">
+            <Method name="saveSubmission" reportExecutionTime="true"/>
+            <Method name="loadSubmission" reportExecutionTime="true"/>
+            <Method name="loadFormDataById" reportExecutionTime="true"/>
+            <Method name="loadFormDataBySubmissionReference" reportExecutionTime="true"/>
+            <Method name="updateFormData" reportExecutionTime="true"/>
+            <Method name="getNextSequenceNumber" reportExecutionTime="true"/>
         </Class>
-        <Class name="uk.gov.hmcts.ccd.data.caseaccess.DefaultCaseRoleRepository">
-            <Method name="getCaseRoles"/>
+        <Class name="uk.gov.hmcts.probate.services.submit.clients.PersistenceEntityBuilder">
+            <Method name="createPersistenceRequest" reportExecutionTime="true"/>
+            <Method name="createCcdSaveRequest" reportExecutionTime="true"/>
+            <Method name="createCcdStartRequest" reportExecutionTime="true"/>
         </Class>
-        <Class name="uk.gov.hmcts.ccd.data.user.DefaultUserRepository">
-            <Method name="getUserDetails"/>
-            <Method name="getUserDefaultSettings"/>
+        <Class name="uk.gov.hmcts.probate.services.submit.controllers.SubmitController">
+            <Method name="submit" reportExecutionTime="true"/>
+            <Method name="resubmit" reportExecutionTime="true"/>
         </Class>
-        <Class name="uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository">
-            <Method name="getWorkBasketResult"/>
-            <Method name="getSearchResult"/>
-            <Method name="getSearchInputDefinitions"/>
-            <Method name="getWorkbasketInputDefinitions"/>
-            <Method name="getWizardPageCollection"/>
-            <Method name="getCaseTabCollection"/>
+        <Class name="uk.gov.hmcts.probate.services.submit.services.SequenceService">
+            <Method name="nextRegistry" reportExecutionTime="true"/>
+            <Method name="populateRegistrySubmitData" reportExecutionTime="true"/>
+            <Method name="populateRegistryResubmitData" reportExecutionTime="true"/>
+            <Method name="getRegistrySequenceNumber" reportExecutionTime="true"/>
+            <Method name="identifyNextRegistry" reportExecutionTime="true"/>
         </Class>
-        <Class name="uk.gov.hmcts.ccd.data.definition.HttpUIDefinitionGateway">
-            <Method name="getSearchResult"/>
-            <Method name="getSearchInputDefinitions"/>
-            <Method name="getWorkbasketInputDefinitions"/>
-            <Method name="getCaseTabCollection"/>
-            <Method name="getWizardPageCollection"/>
-            <Method name="getWorkBasketResult"/>
-        </Class>
-        <Class name="uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway">
-            <Method name="create"/>
-            <Method name="update"/>
-            <Method name="get"/>
-            <Method name="delete"/>
-            <Method name="getAll"/>
-        </Class>
-        <Class name="uk.gov.hmcts.ccd.domain.types.sanitiser.client.DocumentManagementRestClient">
-            <Method name="getDocument"/>
-        </Class>
-        <Class name="uk.gov.hmcts.ccd.data.casedetails.search.SearchQueryFactoryOperation">
-            <Method name="build"/>
+        <Class name="uk.gov.hmcts.probate.services.submit.services.SubmitService">
+            <Method name="submit" reportCaughtExceptions="true" reportExecutionTime="true"/>
+            <Method name="resubmit" reportCaughtExceptions="true" reportExecutionTime="true"/>
         </Class>
     </Instrumentation>
 </ApplicationInsightsAgent>
