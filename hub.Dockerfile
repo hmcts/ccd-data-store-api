@@ -11,7 +11,7 @@ RUN gradle assemble
 
 ARG JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom"
 
-FROM hmcts/cnp-java-base:openjdk-8u191-jre-alpine3.9-2.0.1
+FROM hmctspublic/cnp-java-base:openjdk-8u191-jre-alpine3.9-2.0.1
 
 COPY --from=builder /home/gradle/src/build/libs/core-case-data.jar /opt/app/
 COPY lib/AI-Agent.xml /opt/app/
