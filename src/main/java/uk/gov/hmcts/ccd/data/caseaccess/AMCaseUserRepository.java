@@ -32,8 +32,12 @@ public class AMCaseUserRepository implements CaseUserRepository {
     public static final String QUALIFIER = "am";
     private static final String cases = "case";
 
-    @Autowired
     AccessManagementService accessManagementService;
+
+    @Autowired
+    public AMCaseUserRepository(AccessManagementService accessManagementService) {
+        this.accessManagementService = accessManagementService;
+    }
 
     @Override
     public void grantAccess(String jurisdictionId, String caseReference, Long caseId, String userId, String caseRole) {
