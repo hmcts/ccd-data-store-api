@@ -1,7 +1,10 @@
 package uk.gov.hmcts.ccd.data.helper;
 
+import com.opentable.db.postgres.embedded.EmbeddedPostgres;
+import org.flywaydb.core.Flyway;
 import org.springframework.jdbc.core.JdbcTemplate;
 import javax.sql.DataSource;
+import java.io.IOException;
 
 public class AccessManagementQueryHelper {
     private DataSource dataSource;
@@ -24,5 +27,18 @@ public class AccessManagementQueryHelper {
                         "delete from default_permissions_for_roles;" +
                         "delete from services;");
         jdbcTemplate.update(query);
+    }
+
+    public static DataSource amDataSource() throws IOException {
+        DataSource embeddedPostgresDS = EmbeddedPostgres.builder()
+            .start().getPostgresDatabase();
+
+        Flyway flyway = Flyway.configure()
+            .dataSource(embeddedPostgresDS)
+            .locations("db/migration")
+            .load();
+
+        flyway.migrate();
+        return embeddedPostgresDS;
     }
 }

@@ -9,13 +9,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.ContextCleanupListener;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
-import uk.gov.hmcts.ccd.data.helper.AccessManagementQueryHelper;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 
@@ -120,20 +118,6 @@ class TestConfiguration extends ContextCleanupListener {
         when(caseDefinitionRepository.getClassificationsForUserRoleList(any())).thenCallRealMethod();
         when(caseDefinitionRepository.getJurisdictions(anyList())).thenCallRealMethod();
         return caseDefinitionRepository;
-    }
-
-    @Bean
-    public AccessManagementQueryHelper getAccessManagementQueryHelper() throws IOException, SQLException {
-        return new AccessManagementQueryHelper(getDriverManagerDataSource());
-    }
-
-    private DriverManagerDataSource getDriverManagerDataSource() {
-        DriverManagerDataSource driver = new DriverManagerDataSource();
-        driver.setDriverClassName("org.postgresql.Driver");
-        driver.setUrl("jdbc:postgresql://localhost:5500/am");
-        driver.setUsername("amuser");
-        driver.setPassword("ampass");
-        return driver;
     }
 
     @Bean

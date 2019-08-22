@@ -5,7 +5,6 @@ import com.google.common.collect.ImmutableSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
-import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 import uk.gov.hmcts.reform.amlib.enums.AccessorType;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
@@ -35,9 +34,6 @@ public class AMCaseUserRepository implements CaseUserRepository {
 
     @Autowired
     AccessManagementService accessManagementService;
-
-    @Autowired
-    DefaultRoleSetupImportService defaultRoleSetupImportService;
 
     @Override
     public void grantAccess(String jurisdictionId, String caseReference, Long caseId, String userId, String caseRole) {

@@ -7,9 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.BaseTest;
 import uk.gov.hmcts.ccd.data.helper.AccessManagementQueryHelper;
+import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
+import javax.sql.DataSource;
+import java.io.IOException;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -37,14 +40,17 @@ public class AMCaseUserRepositoryComponentTest extends BaseTest {
     @Autowired
     private AMCaseUserRepository repository;
 
-    @Autowired
-    DefaultRoleSetupImportService defaultRoleSetupImportService;
+    private DefaultRoleSetupImportService defaultRoleSetupImportService;
 
-    @Autowired
-    AccessManagementQueryHelper accessManagementQueryHelper;
+    private AccessManagementQueryHelper accessManagementQueryHelper;
 
     @Before
-    public void setUp() {
+    public void setUp()  throws IOException{
+
+        DataSource dataSource = AccessManagementQueryHelper.amDataSource();
+        repository.accessManagementService = new AccessManagementService(dataSource);
+        defaultRoleSetupImportService = new DefaultRoleSetupImportService(dataSource);
+        accessManagementQueryHelper = new AccessManagementQueryHelper(dataSource);
 
         defaultRoleSetupImportService.addService(JURISDICTION_ID);
         defaultRoleSetupImportService.addRole(CASE_ROLE, IDAM, PUBLIC, ROLE_BASED);
