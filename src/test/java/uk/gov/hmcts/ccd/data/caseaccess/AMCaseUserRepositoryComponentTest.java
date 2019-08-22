@@ -4,15 +4,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.BaseTest;
 import uk.gov.hmcts.ccd.data.helper.AccessManagementQueryHelper;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -37,11 +34,6 @@ public class AMCaseUserRepositoryComponentTest extends BaseTest {
     private static final String CASE_ROLE_SOLICITOR = "[SOLICITOR]";
     private static final String CASE_ROLE_CREATOR = "[CREATOR]";
 
-    @PersistenceContext
-    private EntityManager em;
-
-    private JdbcTemplate template;
-
     @Autowired
     private AMCaseUserRepository repository;
 
@@ -53,7 +45,6 @@ public class AMCaseUserRepositoryComponentTest extends BaseTest {
 
     @Before
     public void setUp() {
-        template = new JdbcTemplate(db);
 
         defaultRoleSetupImportService.addService(JURISDICTION_ID);
         defaultRoleSetupImportService.addRole(CASE_ROLE, IDAM, PUBLIC, ROLE_BASED);
