@@ -36,6 +36,12 @@
             <Method name="auditGrant"/>
             <Method name="auditRevoke"/>
         </Class>
+        <Class name="uk.gov.hmcts.ccd.data.caseaccess.SwitchableCaseUserRepository">
+            <Method name="grantAccess"/>
+            <Method name="revokeAccess"/>
+            <Method name="findCasesUserIdHasAccessTo"/>
+            <Method name="findCaseRoles"/>
+        </Class>
         <Class name="uk.gov.hmcts.ccd.data.caseaccess.CCDCaseUserRepository">
             <Method name="grantAccess"/>
             <Method name="revokeAccess"/>
