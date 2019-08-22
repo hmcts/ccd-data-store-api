@@ -45,8 +45,7 @@ public class AMCaseUserRepositoryComponentTest extends BaseTest {
     private AccessManagementQueryHelper accessManagementQueryHelper;
 
     @Before
-    public void setUp()  throws IOException{
-
+    public void setUp() throws IOException {
         DataSource dataSource = AccessManagementQueryHelper.amDataSource();
         repository.accessManagementService = new AccessManagementService(dataSource);
         defaultRoleSetupImportService = new DefaultRoleSetupImportService(dataSource);
