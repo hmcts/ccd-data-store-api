@@ -7,7 +7,7 @@ java:
     ccd:
       resourceGroup: ccd-shared
       secrets:
-      - ccd-data-store-api-POSTGRES-PASS
+      - data-store-api-POSTGRES-PASS
       - ccd-data-store-api-draftStoreEncryptionSecret
       - ccd-ELASTIC-SEARCH-URL
       - ccd-ELASTIC-SEARCH-DATA-NODES-URL
