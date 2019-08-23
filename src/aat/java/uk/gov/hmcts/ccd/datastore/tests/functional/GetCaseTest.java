@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.datastore.tests.functional;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CASE_TYPE;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.JURISDICTION;
 
@@ -332,6 +333,174 @@ class GetCaseTest extends BaseTest {
             .statusCode(404);
     }
 
+    @Test
+    @DisplayName("should read the case created by user if solicitor has 'CRUD' access on CaseType")
+    void shouldReadCaseCreatedByUserWhenExistsWithFullAccessForCaseType() {
+
+        // Prepare new case in known state
+        final Long caseReference  = createFullCaseSolicitor("AAT_AUTH_15");
+
+        asPrivateCaseworkerSolicitor(true)
+            .get()
+            .given()
+            .pathParam("jurisdiction", JURISDICTION)
+            .pathParam("caseType", "AAT_AUTH_15")
+            .pathParam("caseReference", caseReference)
+            .contentType(ContentType.JSON)
+
+            .when()
+            .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases/{caseReference}")
+
+            .then()
+            .log().ifError()
+            .statusCode(200)
+            .assertThat()
+
+            // Metadata
+            .body("jurisdiction", equalTo(JURISDICTION))
+            .body("case_type_id", equalTo("AAT_AUTH_15"))
+            .body("id", equalTo(caseReference));
+    }
+
+    @Test
+    @DisplayName("should not read case he has not created if Solicitor role has CRUD access on a case Type")
+    void shouldNotReadCaseHasNotCreatedIfSolsRoleHasCrudAccessOnCaseType() {
+
+        // Prepare new case in known state
+        final Long caseReference = createFullCaseSolicitor("AAT_AUTH_15");
+
+        asPrivateCaseworkerSolicitor2(true)
+            .get()
+            .given()
+            .pathParam("jurisdiction", JURISDICTION)
+            .pathParam("caseType", "AAT_AUTH_15")
+            .pathParam("caseReference", caseReference)
+            .contentType(ContentType.JSON)
+
+            .when()
+            .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases/{caseReference}")
+            .then()
+            .statusCode(404);
+    }
+
+    @Test
+    @DisplayName("should read only case he has created if LocalAuthority role has CR access on a case Type")
+    void shouldReadCaseHasCreatedIfLaRoleHasCrAccessOnCaseType() {
+
+        // Prepare new case in known state
+        final Long caseReference  = createFullCaseLocalAuthority("AAT_AUTH_3");
+
+        asPrivateCaseworkerLocalAuthority(true)
+            .get()
+            .given()
+            .pathParam("jurisdiction", JURISDICTION)
+            .pathParam("caseType", "AAT_AUTH_3")
+            .pathParam("caseReference", caseReference)
+            .contentType(ContentType.JSON)
+
+            .when()
+            .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases/{caseReference}")
+
+            .then()
+            .log().ifError()
+            .statusCode(200)
+            .assertThat()
+
+            // Metadata
+            .body("jurisdiction", equalTo(JURISDICTION))
+            .body("case_type_id", equalTo("AAT_AUTH_3"))
+            .body("id", equalTo(caseReference));
+    }
+
+    @Test
+    @DisplayName("should not read only case he has created if LocalAuthority role has CR access on a case Type")
+    void shouldNotReadCaseHasCreatedIfLaRoleHasCrAccessOnCaseType() {
+
+        // Prepare new case in known state
+        final Long caseReference  = createFullCaseLocalAuthority("AAT_AUTH_3");
+
+        asPrivateCaseworkerLocalAuthority1(true)
+            .get()
+            .given()
+            .pathParam("jurisdiction", JURISDICTION)
+            .pathParam("caseType", "AAT_AUTH_3")
+            .pathParam("caseReference", caseReference)
+            .contentType(ContentType.JSON)
+
+            .when()
+            .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases/{caseReference}")
+            .then()
+            .log().ifError()
+            .statusCode(404);
+    }
+
+    @Test
+    @DisplayName("should not read case he has created if PanelMember role has U access on a case Type")
+    void shouldNotReadCasesIfPmRoleHasUAccessOnCaseType() {
+
+        // Prepare new case in known state
+        final Long caseReference  = createFullCasePanelMember("AAT_AUTH_15");
+
+        asPrivateCaseworkerPanelMember1(true)
+            .get()
+            .given()
+            .pathParam("jurisdiction", JURISDICTION)
+            .pathParam("caseType", "AAT_AUTH_4")
+            .pathParam("caseReference", caseReference)
+            .contentType(ContentType.JSON)
+
+            .when()
+            .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases/{caseReference}")
+            .then()
+            .log().ifError()
+            .statusCode(404);
+    }
+
+    @Test
+    @DisplayName("should not read case he has created if Citizen role has RU access on a case Type")
+    void shouldNotReadCaseIfCtznRoleHasRuAccessOnCaseType() {
+
+        // Prepare new case in known state
+        final Long caseReference  = createFullCaseCitizen("AAT_AUTH_15");
+
+        asPrivateCaseworkerCitizen(true)
+            .get()
+            .given()
+            .pathParam("jurisdiction", JURISDICTION)
+            .pathParam("caseType", "AAT_AUTH_6")
+            .pathParam("caseReference", caseReference)
+            .contentType(ContentType.JSON)
+
+            .when()
+            .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases/{caseReference}")
+            .then()
+            .log().ifError()
+            .statusCode(404);
+    }
+
+
+    @Test
+    @DisplayName("should not read case if AnySingleAccess role has D access on a case Type")
+    void shouldNotReadCaseIfSingAcsRoleHasDAccessOnCaseType() {
+
+        // Prepare new case in known state
+        final Long caseReference  = createFullCasePanelMember("AAT_AUTH_15");
+
+        asPrivateCaseworkerPanelMember(true)
+            .get()
+            .given()
+            .pathParam("jurisdiction", JURISDICTION)
+            .pathParam("caseType", "AAT_AUTH_8")
+            .pathParam("caseReference", caseReference)
+            .contentType(ContentType.JSON)
+
+            .when()
+            .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases/{caseReference}")
+            .then()
+            .log().ifError()
+            .statusCode(404);
+    }
+
     /*
        Method to create a Full Case with caseType param.
        This method uses 'privatecaseworker' as default user role
@@ -343,4 +512,38 @@ class GetCaseTest extends BaseTest {
             .withData(FullCase.build())
             .submitAndGetReference();
     }
+
+    private Long createFullCaseSolicitor(String caseType) {
+
+        return AATCaseType.Event.create(caseType)
+            .as(asPrivateCaseworkerSolicitor(true))
+            .withData(AATCaseBuilder.FullCase.build())
+            .submitAndGetReference();
+    }
+
+    private Long createFullCaseLocalAuthority(String caseType) {
+
+        return AATCaseType.Event.create(caseType)
+            .as(asPrivateCaseworkerLocalAuthority(true))
+            .withData(AATCaseBuilder.FullCase.build())
+            .submitAndGetReference();
+    }
+
+    private Long createFullCasePanelMember(String caseType) {
+
+        return AATCaseType.Event.create(caseType)
+            .as(asPrivateCaseworkerPanelMember(true))
+            .withData(AATCaseBuilder.FullCase.build())
+            .submitAndGetReference();
+    }
+
+    private Long createFullCaseCitizen(String caseType) {
+
+        return AATCaseType.Event.create(caseType)
+            .as(asPrivateCaseworkerCitizen(true))
+            .withData(AATCaseBuilder.FullCase.build())
+            .submitAndGetReference();
+    }
+
+
 }

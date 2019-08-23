@@ -102,8 +102,72 @@ public enum AATHelper {
         return Env.require("CCD_PRIVATE_CASEWORKER_SOLICITOR_EMAIL");
     }
 
+    public String getPrivateCaseworkerSolicitor1Email() {
+        return Env.require("CCD_PRIVATE_CASEWORKER_SOLICITOR_1_EMAIL");
+    }
+
+    public String getPrivateCaseworkerSolicitor2Email() {
+        return Env.require("CCD_PRIVATE_CASEWORKER_SOLICITOR_2_EMAIL");
+    }
+
     public String getPrivateCaseworkerSolicitorPassword() {
         return Env.require("CCD_PRIVATE_CASEWORKER_SOLICITOR_PASSWORD");
+    }
+
+    public String getPrivateCaseworkerSolicitor1Password() {
+        return Env.require("CCD_PRIVATE_CASEWORKER_SOLICITOR_1_PASSWORD");
+    }
+
+    public String getPrivateCaseworkerSolicitor2Password() {
+        return Env.require("CCD_PRIVATE_CASEWORKER_SOLICITOR_2_PASSWORD");
+    }
+
+    public String getPrivateCaseworkerLocalAuthorityEmail() {
+        return Env.require("CCD_PRIVATE_CASEWORKER_LOCALAUTHORITY_EMAIL");
+    }
+
+    public String getPrivateCaseworkerLocalAuthority1Email() {
+        return Env.require("CCD_PRIVATE_CASEWORKER_LOCALAUTHORITY_1_EMAIL");
+    }
+
+    public String getPrivateCaseworkerLocalAuthority2Email() {
+        return Env.require("CCD_PRIVATE_CASEWORKER_LOCALAUTHORITY_2_EMAIL");
+    }
+
+    public String getPrivateCaseworkerLocalAuthorityPassword() {
+        return Env.require("CCD_PRIVATE_CASEWORKER_LOCALAUTHORITY_PASSWORD");
+    }
+
+    public String getPrivateCaseworkerLocalAuthority1Password() {
+        return Env.require("CCD_PRIVATE_CASEWORKER_LOCALAUTHORITY_1_PASSWORD");
+    }
+
+    public String getPrivateCaseworkerLocalAuthority2Password() {
+        return Env.require("CCD_PRIVATE_CASEWORKER_LOCALAUTHORITY_2_PASSWORD");
+    }
+
+    public String getPrivateCaseworkerPanelMemberEmail() {
+        return Env.require("CCD_PRIVATE_CASEWORKER_PANELMEMBER_EMAIL");
+    }
+
+    public String getPrivateCaseworkerPanelMember1Email() {
+        return Env.require("CCD_PRIVATE_CASEWORKER_PANELMEMBER_1_EMAIL");
+    }
+
+    public String getPrivateCaseworkerPanelMemberPassword() {
+        return Env.require("CCD_PRIVATE_CASEWORKER_PANELMEMBER_PASSWORD");
+    }
+
+    public String getPrivateCaseworkerPanelMember1Password() {
+        return Env.require("CCD_PRIVATE_CASEWORKER_PANELMEMBER_1_PASSWORD");
+    }
+
+    public String getPrivateCaseworkerCitizenEmail() {
+        return Env.require("CCD_PRIVATE_CASEWORKER_CITIZEN_EMAIL");
+    }
+
+    public String getPrivateCaseworkerCitizenPassword() {
+        return Env.require("CCD_PRIVATE_CASEWORKER_CITIZEN_PASSWORD");
     }
 
     public String getPrivateCrossCaseTypeCaseworkerEmail() {

@@ -283,4 +283,142 @@ class UpdateCaseTest extends BaseTest {
             .then()
             .statusCode(404);
     }
+
+    @Test
+    @DisplayName("should update created case if the Solicitor has 'CRUD' access on CaseType")
+    void shouldUpdateCreatedCaseWithSolsCrudAccess() {
+        final Long caseReference = Event.create("AAT_AUTH_15")
+            .as(asPrivateCaseworkerSolicitor(true))
+            .withData(FullCase.build())
+            .submitAndGetReference();
+
+        Event.update(caseReference, "AAT_AUTH_15" )
+            .as(asPrivateCaseworkerSolicitor(true))
+            .withData(
+                CaseData.builder()
+                    .numberField(UPDATED_NUMBER)
+                    .build()
+            )
+            .submit()
+
+            .then()
+            .statusCode(201)
+            .assertThat()
+            .rootPath("case_data")
+            .body("NumberField", equalTo(UPDATED_NUMBER))
+            .body("TextField", equalTo(AATCaseBuilder.TEXT));
+    }
+
+    @Test
+    @DisplayName("should not update not created case if the Solicitor has 'CRUD' access on CaseType")
+    void shouldNotUpdateOthersCaseWithSolsCrudAccess() {
+        final Long caseReference = Event.create("AAT_AUTH_15")
+            .as(asPrivateCaseworkerSolicitor(true))
+            .withData(FullCase.build())
+            .submitAndGetReference();
+
+        Event.update(caseReference, "AAT_AUTH_15" )
+            .as(asPrivateCaseworkerSolicitor1(true))
+            .withData(
+                CaseData.builder()
+                    .numberField(UPDATED_NUMBER)
+                    .build()
+            )
+            .submit()
+
+            .then()
+            .statusCode(404);
+    }
+
+    @Test
+    @DisplayName("should not update a case if the LocalAuthority has 'CR' access on CaseType")
+    void shouldNotUpdateCaseWithLaCrAccess() {
+        final Long caseReference = Event.create("AAT_AUTH_3")
+            .as(asPrivateCaseworkerLocalAuthority(true))
+            .withData(FullCase.build())
+            .submitAndGetReference();
+
+        Event.update(caseReference, "AAT_AUTH_3" )
+            .as(asPrivateCaseworkerLocalAuthority(true))
+            .withData(
+                CaseData.builder()
+                    .numberField(UPDATED_NUMBER)
+                    .build()
+            )
+            .submit()
+
+            .then()
+            .statusCode(404);
+    }
+
+    @Test
+    @DisplayName("should update case if the PanelMember has 'U' access on CaseType")
+    void shouldUpdateCaseWithPmUAccess() {
+        final Long caseReference = Event.create("AAT_AUTH_4")
+            .as(asPrivateCaseworker(true))
+            .withData(FullCase.build())
+            .submitAndGetReference();
+
+        Event.update(caseReference, "AAT_AUTH_4" )
+            .as(asPrivateCaseworkerPanelMember1(true))
+            .withData(
+                CaseData.builder()
+                    .numberField(UPDATED_NUMBER)
+                    .build()
+            )
+            .submit()
+
+            .then()
+            .statusCode(201)
+            .assertThat()
+            .rootPath("case_data")
+            .body("NumberField", equalTo(UPDATED_NUMBER))
+            .body("TextField", equalTo(AATCaseBuilder.TEXT));
+    }
+
+    @Test
+    @DisplayName("should update case if the Citizen has 'RU' access on CaseType")
+    void shouldUpdateCaseWithCtznRuAccess() {
+        final Long caseReference = Event.create("AAT_AUTH_6")
+            .as(asPrivateCaseworker(true))
+            .withData(FullCase.build())
+            .submitAndGetReference();
+
+        Event.update(caseReference, "AAT_AUTH_6" )
+            .as(asPrivateCaseworkerCitizen(true))
+            .withData(
+                CaseData.builder()
+                    .numberField(UPDATED_NUMBER)
+                    .build()
+            )
+            .submit()
+
+            .then()
+            .statusCode(201)
+            .assertThat()
+            .rootPath("case_data")
+            .body("NumberField", equalTo(UPDATED_NUMBER))
+            .body("TextField", equalTo(AATCaseBuilder.TEXT));
+    }
+
+    @Test
+    @DisplayName("should not update a case if the SingleAccess role has 'D' access")
+    void shouldNotUpdateCaseWithSingAccsDAccess() {
+        final Long caseReference = Event.create("AAT_AUTH_8")
+            .as(asPrivateCaseworker(true))
+            .withData(FullCase.build())
+            .submitAndGetReference();
+
+        Event.update(caseReference, "AAT_AUTH_8" )
+            .as(asPrivateCaseworkerPanelMember1(true))
+            .withData(
+                CaseData.builder()
+                    .numberField(UPDATED_NUMBER)
+                    .build()
+            )
+            .submit()
+
+            .then()
+            .statusCode(404);
+    }
 }

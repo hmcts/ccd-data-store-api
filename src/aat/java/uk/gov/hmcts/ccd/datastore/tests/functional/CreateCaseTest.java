@@ -155,4 +155,68 @@ class CreateCaseTest extends BaseTest {
             .statusCode(404);
     }
 
+    @Test
+    @DisplayName("should create a case if Solicitor has 'CRUD' access on CaseType")
+    void shouldCreateCaseWithSolsCrudAccessForCaseType() {
+        //Case Type with "CU" access to the role autoTestCaseWorker
+        Event.create("AAT_AUTH_15")
+            .as(asPrivateCaseworkerSolicitor(true))
+            .withData(AATCaseBuilder.FullCase.build())
+            .submit()
+            .then()
+            .log().ifError()
+            .statusCode(201);
+    }
+
+    @Test
+    @DisplayName("should create a case if LocalAuthority has 'CR' access on CaseType")
+    void shouldCreateCaseWithLaCrAccessForCaseType() {
+        //Case Type with "CU" access to the role autoTestCaseWorker
+        Event.create("AAT_AUTH_3")
+            .as(asPrivateCaseworkerLocalAuthority(true))
+            .withData(AATCaseBuilder.FullCase.build())
+            .submit()
+            .then()
+            .log().ifError()
+            .statusCode(201);
+    }
+
+    @Test
+    @DisplayName("should not create a case if PanelMember has 'U' access on CaseType")
+    void shouldNotCreateCaseWithPmUAccessForCaseType() {
+        //Case Type with "U" access to the role autoTestCaseWorker
+        Event.create("AAT_AUTH_4")
+            .as(asPrivateCaseworkerPanelMember(true))
+            .withData(AATCaseBuilder.FullCase.build())
+            .submit()
+            .then()
+            .log().ifError()
+            .statusCode(404);
+    }
+
+    @Test
+    @DisplayName("should not create a case if Citizen has 'RU' on CaseType")
+    void shouldNotCreateCaseWithCtznRuAccessForCaseType() {
+        //Case Type with "RU" access to the role autoTestCaseWorker
+        Event.create("AAT_AUTH_6")
+            .as(asPrivateCaseworkerCitizen(true))
+            .withData(AATCaseBuilder.FullCase.build())
+            .submit()
+            .then()
+            .log().ifError()
+            .statusCode(404);
+    }
+
+    @Test
+    @DisplayName("should not create a case if SingleAccess Role has 'D' on CaseType")
+    void shouldNotCreateCaseIfSingAcsRoleHasDAccessOnCaseType() {
+        //Case Type with "D" access to the role autoTestCaseWorker
+        Event.create("AAT_AUTH_8")
+            .as(asPrivateCaseworkerPanelMember(true))
+            .withData(AATCaseBuilder.FullCase.build())
+            .submit()
+            .then()
+            .log().ifError()
+            .statusCode(404);
+    }
 }

@@ -14,7 +14,7 @@ public class CaseTestDataLoaderExtension extends BaseTest implements BeforeAllCa
 
     private static final Logger LOG = LoggerFactory.getLogger(CaseTestDataLoaderExtension.class);
 
-    private static final String AUTO_TEST1_DEFINITION_FILE_NEW = "src/aat/resources/CCD_CNP_RDM5118.xlsx";
+    private static final String AUTO_TEST1_DEFINITION_FILE_NEW = "src/aat/resources/CCD_CNP_RDM5118_5122_Extended.xlsx";
 
     private static boolean testExecutionStarted = false;
 

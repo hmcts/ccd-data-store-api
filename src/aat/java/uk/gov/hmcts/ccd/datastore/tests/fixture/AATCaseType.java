@@ -109,6 +109,10 @@ public interface AATCaseType {
             return new CCDEventBuilder(JURISDICTION, CASE_TYPE, caseReference, UPDATE);
         }
 
+        static CCDEventBuilder update(Long caseReference, String caseType) {
+            return new CCDEventBuilder(JURISDICTION, caseType, caseReference, UPDATE);
+        }
+
         static CCDEventBuilder review(Long caseReference) {
             return new CCDEventBuilder(JURISDICTION, CASE_TYPE, caseReference, REVIEW);
         }
