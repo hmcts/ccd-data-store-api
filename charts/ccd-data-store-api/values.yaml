@@ -9,7 +9,7 @@ java:
     ccd:
       resourceGroup: ccd-shared
       secrets:
-        - ccd-data-store-api-draftStoreEncryptionSecret
+        - data-store-api-draftStoreEncryptionSecret
   environment:
     ENABLE_DB_MIGRATE: true
     DATA_STORE_DB_HOST: "{{ .Release.Name }}-postgresql"
