@@ -23,6 +23,8 @@ public class DocumentRestoreService {
 
     public static final String CASE_QUERY = "SELECT * FROM case_data WHERE last_modified BETWEEN  '2019-08-20 15:50:00.000' AND '2019-08-21 13:30:00.000'";
 
+    public static final String CASE_QUERY_WITH_JUID = "SELECT * FROM case_data WHERE jurisdiction IN :jids AND last_modified BETWEEN  '2019-08-20 15:50:00.000' AND '2019-08-21 13:30:00.000'";
+
     public static final String EVENT_QUERY = "SELECT * FROM case_event WHERE id IN " +
         "(SELECT max(id) FROM case_event WHERE case_data_id IN :caseIds AND created_date < '2019-08-20 15:50:00.000' GROUP BY case_data_id)";
 
@@ -31,8 +33,15 @@ public class DocumentRestoreService {
     @PersistenceContext
     private EntityManager em;
 
-    public List<CaseDetailsEntity> findDocumentMissingCases() {
-        List<CaseDetailsEntity> caseDetailsEntities = em.createNativeQuery(CASE_QUERY, CaseDetailsEntity.class).getResultList();
+    public List<CaseDetailsEntity> findDocumentMissingCases(List<String> jurisdictionList) {
+        Query query;
+        if (jurisdictionList.isEmpty()) {
+            query = em.createNativeQuery(CASE_QUERY, CaseDetailsEntity.class);
+        } else { // specific jurisdictions instead of all - to minimise load
+            query = em.createNativeQuery(CASE_QUERY_WITH_JUID, CaseDetailsEntity.class);
+            query.setParameter("jids", jurisdictionList);
+        }
+        List<CaseDetailsEntity> caseDetailsEntities = query.getResultList();
         return findMissingDocCasesBasedOnEventHistory(caseDetailsEntities);
     }
 
