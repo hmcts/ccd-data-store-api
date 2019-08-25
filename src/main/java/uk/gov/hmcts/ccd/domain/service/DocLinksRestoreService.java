@@ -26,7 +26,8 @@ public class DocLinksRestoreService {
     public static final String END_TIME = "'2019-08-21 13:30:00.000'";
     public static final String BETWEEN_CLAUSE = "BETWEEN  " + START_TIME + " AND " + END_TIME;
 
-    public static final String OLD_CASE_QUERY = "SELECT * FROM case_data WHERE last_modified " + BETWEEN_CLAUSE + " AND created_date < " + START_TIME;
+    public static final String OLD_CASE_QUERY = "SELECT * FROM case_data WHERE created_date < " + START_TIME + " AND id IN " +
+        "(SELECT distinct(case_data_id) FROM case_event WHERE created_date " + BETWEEN_CLAUSE + ")";
     public static final String OLD_CASE_QUERY_WITH_JUIDS = OLD_CASE_QUERY + " AND jurisdiction IN :jids";
 
     public static final String LAST_EVENT_WITH_VALID_DATA = "SELECT * FROM case_event WHERE id IN " +
@@ -113,7 +114,7 @@ public class DocLinksRestoreService {
     }
 
     private void logStats(List<CaseDetailsEntity> oldCases, List<CaseDetailsEntity> newCases) {
-        LOG.info("Total number of impacted cases during bug window :{}", oldCases.size() + newCases.size());
+        LOG.info("Total number of cases impacted during bug period :{}", oldCases.size() + newCases.size());
         logStats(oldCases, true);
         logStats(newCases, false);
     }
