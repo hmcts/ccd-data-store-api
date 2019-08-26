@@ -1,6 +1,13 @@
 package uk.gov.hmcts.ccd.domain.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.Option;
+import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
 import org.apache.commons.collections.ListUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -14,8 +21,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static com.jayway.jsonpath.JsonPath.using;
 import static java.util.stream.Collectors.*;
 
 @Component
@@ -38,10 +48,19 @@ public class DocLinksRestoreService {
 
     public static final String NEW_CASE_EVENTS = "SELECT * FROM case_event WHERE case_data_id IN :caseIds";
 
-    public static final String DOCUMENT_URL = "document_url";
+    public Pattern BRACKET_PATTERN = Pattern.compile("\\[(.*?)\\]");
+
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @PersistenceContext
     private EntityManager em;
+
+    private final Configuration jsonPathConfig;
+
+    public DocLinksRestoreService() {
+        this.jsonPathConfig = Configuration.builder().jsonProvider(new JacksonJsonProvider())
+            .options(Option.AS_PATH_LIST, Option.SUPPRESS_EXCEPTIONS).build();
+    }
 
     public List<CaseDetailsEntity> findDocLinksMissedCases(List<String> jurisdictionList) {
         // missing links in old cases due to an edit during bug window
@@ -100,17 +119,25 @@ public class DocLinksRestoreService {
     }
 
     private boolean hasMissingDocuments(CaseDetailsEntity caseDetails, CaseAuditEventEntity caseEvent) {
-        List<String> eventDocValues = caseEvent.getData().findValuesAsText(DOCUMENT_URL);
-        List<String> caseDocValues = caseDetails.getData().findValuesAsText(DOCUMENT_URL);
-        return !caseDocValues.containsAll(eventDocValues);
+        String eventDataString;
+        try {
+            eventDataString = mapper.writeValueAsString(caseEvent.getData());
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        List<String> dockUrlPaths = using(jsonPathConfig).parse(eventDataString).read("$..document_url");
+        return dockUrlPaths.stream()
+            .anyMatch(jsonPath -> isDockLinkMissingInTheCase(jsonPath, caseDetails.getData()));
+    }
+
+    private boolean isDockLinkMissingInTheCase(String jsonPath, JsonNode caseData) {
+        JsonNode dockLinkNode = findByPath(jsonPath, caseData);
+        return dockLinkNode.isMissingNode() || dockLinkNode.isNull();
     }
 
     private boolean hasMissingDocuments(CaseDetailsEntity caseDetails, List<CaseAuditEventEntity> caseEvents) {
-        List<String> eventDocValues = caseEvents.stream()
-            .flatMap(event -> event.getData().findValuesAsText(DOCUMENT_URL).stream())
-            .collect(toList());
-        List<String> caseDocValues = caseDetails.getData().findValuesAsText(DOCUMENT_URL);
-        return !caseDocValues.containsAll(eventDocValues);
+        return caseEvents.stream()
+            .anyMatch(event -> hasMissingDocuments(caseDetails, event));
     }
 
     private void logStats(List<CaseDetailsEntity> oldCases, List<CaseDetailsEntity> newCases) {
@@ -129,6 +156,25 @@ public class DocLinksRestoreService {
             LOG.info("Number of impacted cases in {} is :{}", key, value.size());
             LOG.info("Case references for {} are :{}", key, value);
         });
-        LOG.info("** {} case stats end **", type);
+        LOG.info("** {} cases stats end **", type);
+    }
+
+    // simplify this if possible
+    private JsonNode findByPath(String bracketPath, JsonNode jsonNode) {
+        String path = bracketPath.substring(1); // ignore $
+        Matcher matcher = BRACKET_PATTERN.matcher(path);
+        JsonNode childNode = jsonNode;
+        while(matcher.find()) {
+            if (childNode.isMissingNode()) {
+                return childNode;
+            }
+            String group = matcher.group(1);
+            if (group.startsWith("\'")) {
+                childNode = childNode.path(StringUtils.unwrap(group, '\''));
+            } else {
+                childNode = childNode.path(Integer.valueOf(group));
+            }
+        }
+        return childNode;
     }
 }
