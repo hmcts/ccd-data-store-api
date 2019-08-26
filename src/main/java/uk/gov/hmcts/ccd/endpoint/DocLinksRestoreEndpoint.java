@@ -24,8 +24,8 @@ public class DocLinksRestoreEndpoint {
         this.docLinksRestoreService = docLinksRestoreService;
     }
 
-    @RequestMapping(value = "/document/restore", method = RequestMethod.POST)
-    public List<Long> getPrintableDocuments(
+    @RequestMapping(value = "/doclinks/restore", method = RequestMethod.GET)
+    public List<Long> findDocLinksMissedCases(
         @RequestParam(value = "jids", required = false) final String jurisdictionIds) {
         List<String> jurisdictionList = StringUtils.isNotEmpty(jurisdictionIds) ?
             Arrays.asList(jurisdictionIds.split(",")) : new ArrayList<>();
