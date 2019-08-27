@@ -119,20 +119,27 @@ public class DocLinksRestoreService {
     }
 
     private boolean hasMissingDocuments(CaseDetailsEntity caseDetails, CaseAuditEventEntity caseEvent) {
+        JsonNode eventData = caseEvent.getData();
         String eventDataString;
         try {
-            eventDataString = mapper.writeValueAsString(caseEvent.getData());
+            eventDataString = mapper.writeValueAsString(eventData);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
         List<String> dockUrlPaths = using(jsonPathConfig).parse(eventDataString).read("$..document_url");
         return dockUrlPaths.stream()
-            .anyMatch(jsonPath -> isDockLinkMissingInTheCase(jsonPath, caseDetails.getData()));
+            .anyMatch(jsonPath -> isDockLinkMissingInTheCase(jsonPath, caseDetails.getData(), eventData));
     }
 
-    private boolean isDockLinkMissingInTheCase(String jsonPath, JsonNode caseData) {
+    private boolean isDockLinkMissingInTheCase(String jsonPath, JsonNode caseData, JsonNode eventData) {
         JsonNode dockLinkNode = findByPath(jsonPath, caseData);
-        return dockLinkNode.isMissingNode() || dockLinkNode.isNull();
+        if (dockLinkNode.isMissingNode() || dockLinkNode.isNull()) {
+            return true;
+        } else if (jsonPath.contains("['value']")) { // collection field match value
+            JsonNode eventLinkNode = findByPath(jsonPath, eventData);
+            return !dockLinkNode.textValue().equalsIgnoreCase(eventLinkNode.textValue());
+        }
+        return false;
     }
 
     private boolean hasMissingDocuments(CaseDetailsEntity caseDetails, List<CaseAuditEventEntity> caseEvents) {
