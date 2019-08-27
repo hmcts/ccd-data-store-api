@@ -84,9 +84,7 @@ public class CallbackService {
             return ResponseEntity.of(Optional.empty());
         }
 
-        final CallbackRequest callbackRequest = ignoreWarning ?
-            new CallbackRequest(caseDetails, caseDetailsBefore, caseEvent.getId(), true) :
-            new CallbackRequest(caseDetails, caseDetailsBefore, caseEvent.getId());
+        final CallbackRequest callbackRequest = new CallbackRequest(caseDetails, caseDetailsBefore, caseEvent.getId(), ignoreWarning);
 
         List<Integer> retryTimeouts = ofNullable(callbackRetryTimeouts).orElse(Lists.newArrayList());
         List<CallbackRetryContext> retryContextList = callbackRetryContextBuilder.buildCallbackRetryContexts(retryTimeouts);

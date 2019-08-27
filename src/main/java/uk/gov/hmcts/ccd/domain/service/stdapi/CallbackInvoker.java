@@ -79,7 +79,7 @@ public class CallbackInvoker {
             caseDetailsBefore,
             caseDetails,
             CallbackResponse.class,
-            Optional.ofNullable(ignoreWarning).isPresent()).getBody());
+            Optional.ofNullable(ignoreWarning).orElse(false)).getBody());
 
         if (callbackResponse.isPresent()) {
             return validateAndSetFromAboutToSubmitCallback(caseType,
