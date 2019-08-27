@@ -255,7 +255,7 @@ class CallbackInvokerTest {
         }
 
         @Test
-        @DisplayName("should send callback and get state and significant Item")
+        @DisplayName("should send callback and get state and significant Item with invalid URL")
         void sendCallbackAndGetStateAndSignificantDocumentWithInvalidURL() {
             final String expectedState = "uNiCORn";
             doReturn(Optional.of(mockCallbackResponseWithSignificantItem(expectedState))).when(callbackService)
