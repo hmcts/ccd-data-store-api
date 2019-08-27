@@ -46,7 +46,11 @@ public class DocLinksRestoreService {
     public static final String NEW_CASE_QUERY = "SELECT * FROM case_data WHERE created_date " + BETWEEN_CLAUSE;
     public static final String NEW_CASE_QUERY_WITH_JUIDS = NEW_CASE_QUERY +  " AND jurisdiction IN :jids";
 
-    public static final String NEW_CASE_EVENTS = "SELECT * FROM case_event WHERE case_data_id IN :caseIds";
+    public static final String NEW_CASE_EVENTS = "SELECT * FROM case_event WHERE case_data_id IN :caseIds AND created_date " + BETWEEN_CLAUSE;
+
+    public static final String DOCUMENT_FILENAME = "document_filename";
+    public static final String DOT_VALUE = "/value/";
+    public static final String SLASH = "/";
 
     public Pattern BRACKET_PATTERN = Pattern.compile("\\[(.*?)\\]");
 
@@ -126,18 +130,20 @@ public class DocLinksRestoreService {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        List<String> dockUrlPaths = using(jsonPathConfig).parse(eventDataString).read("$..document_url");
+        List<String> dockUrlPaths = using(jsonPathConfig).parse(eventDataString).read("$..document_filename");
         return dockUrlPaths.stream()
             .anyMatch(jsonPath -> isDockLinkMissingInTheCase(jsonPath, caseDetails.getData(), eventData));
     }
 
-    private boolean isDockLinkMissingInTheCase(String jsonPath, JsonNode caseData, JsonNode eventData) {
-        JsonNode dockLinkNode = findByPath(jsonPath, caseData);
+    private boolean isDockLinkMissingInTheCase(String bracketPath, JsonNode caseData, JsonNode eventData) {
+        String jsonPath = toDottedPath(bracketPath);
+        JsonNode dockLinkNode = caseData.at(jsonPath);
         if (dockLinkNode.isMissingNode() || dockLinkNode.isNull()) {
             return true;
-        } else if (jsonPath.contains("['value']")) { // collection field match value
-            JsonNode eventLinkNode = findByPath(jsonPath, eventData);
-            return !dockLinkNode.textValue().equalsIgnoreCase(eventLinkNode.textValue());
+        } else if (jsonPath.contains(DOT_VALUE)) { // collection field match value
+            String eventFileName = eventData.at(jsonPath).textValue();
+            List<String> allFileNamesInTheCaseCollection = caseData.at(getCollectionRootPath(jsonPath)).findValuesAsText(DOCUMENT_FILENAME);
+            return !allFileNamesInTheCaseCollection.contains(eventFileName);
         }
         return false;
     }
@@ -145,6 +151,29 @@ public class DocLinksRestoreService {
     private boolean hasMissingDocuments(CaseDetailsEntity caseDetails, List<CaseAuditEventEntity> caseEvents) {
         return caseEvents.stream()
             .anyMatch(event -> hasMissingDocuments(caseDetails, event));
+    }
+
+    // simplify this if possible
+    // eg: $['D8DocumentsUploaded'][0]['value']['DocumentLink']['document_filename'] to /D8DocumentsUploaded/0/value/DocumentLink/document_ur
+    private String toDottedPath(String bracketPath) {
+        String path = bracketPath.substring(1); // ignore $
+        Matcher matcher = BRACKET_PATTERN.matcher(path);
+        StringBuilder stringBuilder = new StringBuilder();
+        while(matcher.find()) {
+            String group = matcher.group(1);
+            stringBuilder.append(SLASH);
+            if (group.startsWith("\'")) {
+                stringBuilder.append(StringUtils.unwrap(group, '\''));
+            } else {
+                stringBuilder.append(group);
+            }
+        }
+        return stringBuilder.toString();
+    }
+
+    private String getCollectionRootPath(String jsonPath) {
+        String collectionArray = jsonPath.substring(0, jsonPath.lastIndexOf(DOT_VALUE));
+        return collectionArray.substring(0, collectionArray.lastIndexOf(SLASH));
     }
 
     private void logStats(List<CaseDetailsEntity> oldCases, List<CaseDetailsEntity> newCases) {
@@ -166,22 +195,4 @@ public class DocLinksRestoreService {
         LOG.info("** {} cases stats end **", type);
     }
 
-    // simplify this if possible
-    private JsonNode findByPath(String bracketPath, JsonNode jsonNode) {
-        String path = bracketPath.substring(1); // ignore $
-        Matcher matcher = BRACKET_PATTERN.matcher(path);
-        JsonNode childNode = jsonNode;
-        while(matcher.find()) {
-            if (childNode.isMissingNode()) {
-                return childNode;
-            }
-            String group = matcher.group(1);
-            if (group.startsWith("\'")) {
-                childNode = childNode.path(StringUtils.unwrap(group, '\''));
-            } else {
-                childNode = childNode.path(Integer.valueOf(group));
-            }
-        }
-        return childNode;
-    }
 }
