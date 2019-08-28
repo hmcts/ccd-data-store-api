@@ -17,15 +17,14 @@ import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.jayway.jsonpath.JsonPath.using;
+import static java.util.Collections.EMPTY_LIST;
 import static java.util.stream.Collectors.*;
 
 @Component
@@ -78,13 +77,15 @@ public class DocLinksRestoreService {
     private List<CaseDetailsEntity> findDocLinksMissedOldCases(List<String> jurisdictionList) {
         Query query = jurisdictionList.isEmpty() ? em.createNativeQuery(OLD_CASE_QUERY, CaseDetailsEntity.class) :
             em.createNativeQuery(OLD_CASE_QUERY_WITH_JUIDS, CaseDetailsEntity.class).setParameter("jids", jurisdictionList);
-        return findInOldCasesBasedOnEventHistory(query.getResultList());
+        List<CaseDetailsEntity> resultList = query.getResultList();
+        return resultList.isEmpty() ? EMPTY_LIST : findInOldCasesBasedOnEventHistory(query.getResultList());
     }
 
     private List<CaseDetailsEntity> findDocLinksMissedNewCases(List<String> jurisdictionList) {
         Query query = jurisdictionList.isEmpty() ? em.createNativeQuery(NEW_CASE_QUERY, CaseDetailsEntity.class) :
             em.createNativeQuery(NEW_CASE_QUERY_WITH_JUIDS, CaseDetailsEntity.class).setParameter("jids", jurisdictionList);
-        return findInNewCasesBasedOnEventHistory(query.getResultList());
+        List<CaseDetailsEntity> resultList = query.getResultList();
+        return resultList.isEmpty() ? EMPTY_LIST : findInNewCasesBasedOnEventHistory(query.getResultList());
     }
 
     private List<CaseDetailsEntity> findInOldCasesBasedOnEventHistory(List<CaseDetailsEntity> caseDetailsEntities) {
