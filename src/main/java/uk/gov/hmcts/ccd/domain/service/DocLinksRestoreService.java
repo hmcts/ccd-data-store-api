@@ -45,7 +45,7 @@ public class DocLinksRestoreService {
     public static final String NEW_CASE_QUERY = "SELECT * FROM case_data WHERE created_date " + BETWEEN_CLAUSE;
     public static final String NEW_CASE_QUERY_WITH_JUIDS = NEW_CASE_QUERY +  " AND jurisdiction IN :jids";
 
-    public static final String NEW_CASE_EVENTS = "SELECT * FROM case_event WHERE case_data_id IN :caseIds AND created_date " + BETWEEN_CLAUSE;
+    public static final String EVENTS_DURING_BUG_PERIOD = "SELECT * FROM case_event WHERE case_data_id IN :caseIds AND created_date " + BETWEEN_CLAUSE;
 
     public static final String DOCUMENT_FILENAME = "document_filename";
     public static final String DOT_VALUE = "/value/";
@@ -92,23 +92,29 @@ public class DocLinksRestoreService {
         Map<Long, CaseDetailsEntity> caseMap = getCaseIdMap(caseDetailsEntities);
 
         Query query = em.createNativeQuery(LAST_EVENT_WITH_VALID_DATA, CaseAuditEventEntity.class).setParameter("caseIds", caseMap.keySet());
-        List<CaseAuditEventEntity> lastWellKnownEvents = query.getResultList();
 
-        Map<CaseDetailsEntity, CaseAuditEventEntity> caseToEventsMap = lastWellKnownEvents.stream()
-            .collect(Collectors.toMap(event -> caseMap.get(event.getCaseDataId()), Function.identity()));
+        List<CaseAuditEventEntity> mostRecentEventsBeforeBug = query.getResultList();
 
-        return caseToEventsMap.keySet().stream()
-            .filter(key -> hasMissingDocuments(key, caseToEventsMap.get(key)))
-            .collect(Collectors.toList());
+        query = em.createNativeQuery(EVENTS_DURING_BUG_PERIOD, CaseAuditEventEntity.class).setParameter("caseIds", caseMap.keySet());
+
+        List<CaseAuditEventEntity> eventsDuringBug = query.getResultList();
+
+        List<CaseAuditEventEntity> allEvents = ListUtils.union(mostRecentEventsBeforeBug, eventsDuringBug);
+
+        return findMissedCases(caseDetailsEntities, allEvents);
     }
 
     private List<CaseDetailsEntity> findInNewCasesBasedOnEventHistory(List<CaseDetailsEntity> caseDetailsEntities) {
         Map<Long, CaseDetailsEntity> caseMap = getCaseIdMap(caseDetailsEntities);
 
-        Query query = em.createNativeQuery(NEW_CASE_EVENTS, CaseAuditEventEntity.class).setParameter("caseIds", caseMap.keySet());
+        Query query = em.createNativeQuery(EVENTS_DURING_BUG_PERIOD, CaseAuditEventEntity.class).setParameter("caseIds", caseMap.keySet());
         List<CaseAuditEventEntity> caseEvents = query.getResultList();
 
-        Map<Long, List<CaseAuditEventEntity>> eventsByCaseIdMap = caseEvents.stream().collect(groupingBy(CaseAuditEventEntity::getCaseDataId));
+        return findMissedCases(caseDetailsEntities, caseEvents);
+    }
+
+    private List<CaseDetailsEntity> findMissedCases(List<CaseDetailsEntity> caseDetailsEntities, List<CaseAuditEventEntity> allEvents) {
+        Map<Long, List<CaseAuditEventEntity>> eventsByCaseIdMap = allEvents.stream().collect(groupingBy(CaseAuditEventEntity::getCaseDataId));
 
         Map<CaseDetailsEntity, List<CaseAuditEventEntity>> caseToEventsMap = caseDetailsEntities.stream()
             .collect(Collectors.toMap(Function.identity(), caseData -> eventsByCaseIdMap.get(caseData.getId())));
@@ -125,28 +131,30 @@ public class DocLinksRestoreService {
 
     private boolean hasMissingDocuments(CaseDetailsEntity caseDetails, CaseAuditEventEntity caseEvent) {
         JsonNode eventData = caseEvent.getData();
-        String eventDataString;
-        try {
-            eventDataString = mapper.writeValueAsString(eventData);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        String eventDataString = getJsonString(eventData);
         List<String> dockUrlPaths = using(jsonPathConfig).parse(eventDataString).read("$..document_filename");
         return dockUrlPaths.stream()
-            .anyMatch(jsonPath -> isDockLinkMissingInTheCase(jsonPath, caseDetails.getData(), eventData));
+            .anyMatch(jsonPath -> isDockLinkMissingInTheCase(jsonPath, caseDetails, caseEvent));
     }
 
-    private boolean isDockLinkMissingInTheCase(String bracketPath, JsonNode caseData, JsonNode eventData) {
-        String jsonPath = toDottedPath(bracketPath);
+    private boolean isDockLinkMissingInTheCase(String bracketPath, CaseDetailsEntity caseDetails, CaseAuditEventEntity caseEvent) {
+        JsonNode eventData = caseEvent.getData();
+        JsonNode caseData = caseDetails.getData();
+        String jsonPath = toJsonPtrExpression(bracketPath);
         JsonNode dockLinkNode = caseData.at(jsonPath);
+        boolean isMissed = false;
         if (dockLinkNode.isMissingNode() || dockLinkNode.isNull()) {
-            return true;
+            isMissed = true;
         } else if (jsonPath.contains(DOT_VALUE)) { // collection field match value
             String eventFileName = eventData.at(jsonPath).textValue();
             List<String> allFileNamesInTheCaseCollection = caseData.at(getCollectionRootPath(jsonPath)).findValuesAsText(DOCUMENT_FILENAME);
-            return !allFileNamesInTheCaseCollection.contains(eventFileName);
+            isMissed = !allFileNamesInTheCaseCollection.contains(eventFileName);
         }
-        return false;
+        if (isMissed) {
+            LOG.info("Document link is missing for case :{} from event :{} with link path :{} and fileName: {}",
+                caseDetails.getReference(), caseEvent.getId(), jsonPath, eventData.at(jsonPath).textValue());
+        }
+        return isMissed;
     }
 
     private boolean hasMissingDocuments(CaseDetailsEntity caseDetails, List<CaseAuditEventEntity> caseEvents) {
@@ -156,7 +164,7 @@ public class DocLinksRestoreService {
 
     // simplify this if possible
     // eg: $['D8DocumentsUploaded'][0]['value']['DocumentLink']['document_filename'] to /D8DocumentsUploaded/0/value/DocumentLink/document_ur
-    private String toDottedPath(String bracketPath) {
+    private String toJsonPtrExpression(String bracketPath) {
         String path = bracketPath.substring(1); // ignore $
         Matcher matcher = BRACKET_PATTERN.matcher(path);
         StringBuilder stringBuilder = new StringBuilder();
@@ -177,23 +185,34 @@ public class DocLinksRestoreService {
         return collectionArray.substring(0, collectionArray.lastIndexOf(SLASH));
     }
 
+    private String getJsonString(JsonNode eventData) {
+        try {
+            return mapper.writeValueAsString(eventData);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private void logStats(List<CaseDetailsEntity> oldCases, List<CaseDetailsEntity> newCases) {
         LOG.info("Total number of cases impacted during bug period :{}", oldCases.size() + newCases.size());
-        logStats(oldCases, true);
-        logStats(newCases, false);
+        logStatsByJurisdiction(ListUtils.union(oldCases, newCases));
     }
 
-    private void logStats(List<CaseDetailsEntity> cases, boolean isOld) {
-        String type = isOld ? "Old" : "New";
-        LOG.info("** {} cases stats begin **", type);
-        LOG.info("Number of impacted cases :{}", cases.size());
-        Map<String, Set<Long>> jurisdictionCaseMap = cases.stream()
-            .collect(groupingBy(CaseDetailsEntity::getJurisdiction, mapping(CaseDetailsEntity::getReference, toSet())));
-        jurisdictionCaseMap.forEach((key,value) -> {
-            LOG.info("Number of impacted cases in {} is :{}", key, value.size());
-            LOG.info("Case references for {} are :{}", key, value);
+    private void logStatsByJurisdiction(List<CaseDetailsEntity> cases) {
+
+        Map<String, List<CaseDetailsEntity>> byJurisdictionMap = cases.stream()
+            .collect(groupingBy(CaseDetailsEntity::getJurisdiction));
+
+        byJurisdictionMap.forEach((key,jCases) -> {
+            LOG.info("Number of impacted cases in Jurisdiction: {} is :{}", key, jCases.size());
+
+            Map<String, Set<Long>> byCaseTypeMap = byJurisdictionMap.get(key).stream()
+                .collect(groupingBy(CaseDetailsEntity::getCaseType, mapping(CaseDetailsEntity::getReference, toSet())));
+
+            byCaseTypeMap.forEach((caseType, caseTypeCases) -> {
+                LOG.info("Number of impacted cases in CaseType: {} is :{}", caseType, caseTypeCases.size());
+                LOG.info("Case references for {} are :{}", caseType, caseTypeCases);
+                });
         });
-        LOG.info("** {} cases stats end **", type);
     }
-
 }
