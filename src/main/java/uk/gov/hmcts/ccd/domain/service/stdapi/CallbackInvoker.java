@@ -61,9 +61,9 @@ public class CallbackInvoker {
             caseDetails);
 
         callbackResponse.ifPresent(response -> validateAndSetFromAboutToStartCallback(caseType,
-            caseDetails,
-            ignoreWarning,
-            response));
+                                                                                      caseDetails,
+                                                                                      ignoreWarning,
+                                                                                      response));
     }
 
     public AboutToSubmitCallbackResponse invokeAboutToSubmitCallback(final CaseEvent eventTrigger,
@@ -83,9 +83,9 @@ public class CallbackInvoker {
 
         if (callbackResponse.isPresent()) {
             return validateAndSetFromAboutToSubmitCallback(caseType,
-                caseDetails,
-                ignoreWarning,
-                callbackResponse.get());
+                                                           caseDetails,
+                                                           ignoreWarning,
+                                                           callbackResponse.get());
         }
 
         return new AboutToSubmitCallbackResponse();
@@ -152,10 +152,10 @@ public class CallbackInvoker {
             validateAndSetData(caseType, caseDetails, callbackResponse.getData());
             if (callbackResponseHasCaseAndDataClassification(callbackResponse)) {
                 securityValidationService.setClassificationFromCallbackIfValid(callbackResponse,
-                    caseDetails,
-                    deduceDefaultClassificationForExistingFields(
-                        caseType,
-                        caseDetails));
+                                                                               caseDetails,
+                                                                               deduceDefaultClassificationForExistingFields(
+                                                                                   caseType,
+                                                                                   caseDetails));
             }
             final Optional<String> newCaseState = filterCaseState(callbackResponse.getData());
             newCaseState.ifPresent(caseDetails::setState);
