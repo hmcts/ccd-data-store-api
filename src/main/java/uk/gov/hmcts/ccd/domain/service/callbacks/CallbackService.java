@@ -72,14 +72,23 @@ public class CallbackService {
         return Optional.ofNullable(responseResponseEntity.getBody());
     }
 
-    @SuppressWarnings("javasecurity:S5145")
+    public <T> ResponseEntity<T> send(final String url,
+                                      final List<Integer> callbackRetryTimeouts,
+                                      final CaseEvent caseEvent,
+                                      final CaseDetails caseDetailsBefore,
+                                      final CaseDetails caseDetails,
+                                      final Class<T> clazz) {
+        return send(url, callbackRetryTimeouts, caseEvent, caseDetailsBefore, caseDetails, clazz, null);
+    }
+
+        @SuppressWarnings("javasecurity:S5145")
     public <T> ResponseEntity<T> send(final String url,
                                       final List<Integer> callbackRetryTimeouts,
                                       final CaseEvent caseEvent,
                                       final CaseDetails caseDetailsBefore,
                                       final CaseDetails caseDetails,
                                       final Class<T> clazz,
-                                      final boolean ignoreWarning) {
+                                      final Boolean ignoreWarning) {
         if (url == null || url.isEmpty()) {
             return ResponseEntity.of(Optional.empty());
         }

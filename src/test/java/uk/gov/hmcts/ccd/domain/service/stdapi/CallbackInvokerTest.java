@@ -367,8 +367,7 @@ class CallbackInvokerTest {
                 caseEvent,
                 caseDetailsBefore,
                 caseDetails,
-                AfterSubmitCallbackResponse.class,
-                false);
+                AfterSubmitCallbackResponse.class);
         }
     }
 

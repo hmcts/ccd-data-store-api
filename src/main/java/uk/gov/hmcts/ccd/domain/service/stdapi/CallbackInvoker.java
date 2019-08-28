@@ -79,7 +79,7 @@ public class CallbackInvoker {
             caseDetailsBefore,
             caseDetails,
             CallbackResponse.class,
-            Optional.ofNullable(ignoreWarning).orElse(false)).getBody());
+            ignoreWarning).getBody());
 
         if (callbackResponse.isPresent()) {
             return validateAndSetFromAboutToSubmitCallback(caseType,
@@ -99,8 +99,7 @@ public class CallbackInvoker {
                                     eventTrigger,
                                     caseDetailsBefore,
                                     caseDetails,
-                                    AfterSubmitCallbackResponse.class,
-                                    false);
+                                    AfterSubmitCallbackResponse.class);
     }
 
     public CaseDetails invokeMidEventCallback(final WizardPage wizardPage,
