@@ -133,8 +133,10 @@ public class DocLinksRestoreService {
         JsonNode eventData = caseEvent.getData();
         String eventDataString = getJsonString(eventData);
         List<String> dockUrlPaths = using(jsonPathConfig).parse(eventDataString).read("$..document_filename");
-        return dockUrlPaths.stream()
-            .anyMatch(jsonPath -> isDockLinkMissingInTheCase(jsonPath, caseDetails, caseEvent));
+        List<Boolean> missedLinks = dockUrlPaths.stream()
+            .map(jsonPath -> isDockLinkMissingInTheCase(jsonPath, caseDetails, caseEvent))
+            .collect(toList());
+        return missedLinks.contains(true);
     }
 
     private boolean isDockLinkMissingInTheCase(String bracketPath, CaseDetailsEntity caseDetails, CaseAuditEventEntity caseEvent) {
