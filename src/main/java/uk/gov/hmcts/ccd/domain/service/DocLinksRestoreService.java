@@ -135,7 +135,7 @@ public class DocLinksRestoreService {
         List<String> dockUrlPaths = using(jsonPathConfig).parse(eventDataString).read("$..document_filename");
         List<Boolean> missedLinks = dockUrlPaths.stream()
             .map(jsonPath -> isDockLinkMissingInTheCase(jsonPath, caseDetails, caseEvent))
-            .collect(toList());
+            .collect(toList()); // checking all instead of anyMatch to find all missing Links
         return missedLinks.contains(true);
     }
 
@@ -160,8 +160,10 @@ public class DocLinksRestoreService {
     }
 
     private boolean hasMissingDocuments(CaseDetailsEntity caseDetails, List<CaseAuditEventEntity> caseEvents) {
-        return caseEvents.stream()
-            .anyMatch(event -> hasMissingDocuments(caseDetails, event));
+        List<Boolean> missedLinks = caseEvents.stream()
+            .map(event -> hasMissingDocuments(caseDetails, event))
+            .collect(toList()); // checking all instead of anyMatch to find all missing Links
+        return missedLinks.contains(true);
     }
 
     // simplify this if possible
