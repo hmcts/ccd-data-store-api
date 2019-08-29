@@ -146,6 +146,10 @@ variable "elastic_search_enabled" {
   default = "false"
 }
 
+variable "elastic_search_timeout" {
+  default = "6000"
+}
+
 variable "elastic_search_case_index_name_format" {
   description = "Format of the elastic search index name for cases"
   type = "string"

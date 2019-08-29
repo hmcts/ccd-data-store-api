@@ -36,6 +36,7 @@ java:
     ELASTIC_SEARCH_BLACKLIST: query_string
     ELASTIC_SEARCH_CASE_INDEX_NAME_FORMAT: '%s_cases'
     ELASTIC_SEARCH_CASE_INDEX_TYPE: _doc
+    ELASTIC_SEARCH_TIMEOUT: 6000
 
     IDAM_S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
     DEFINITION_STORE_HOST: http://ccd-definition-store-api-aat.service.core-compute-aat.internal

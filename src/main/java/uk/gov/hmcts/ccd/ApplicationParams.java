@@ -101,6 +101,9 @@ public class ApplicationParams {
     @Value("#{'${search.elastic.data.hosts}'.split(',')}")
     private List<String> elasticSearchDataHosts;
 
+    @Value("${search.elastic.timeout}")
+    private Integer elasticSearchTimeout;
+
     @Value("#{'${search.blacklist}'.split(',')}")
     private List<String> searchBlackList;
 
@@ -321,5 +324,9 @@ public class ApplicationParams {
 
     public List<String> getReadFromAMCaseTypes() {
         return readFromAMCaseTypes;
+    }
+
+    public Integer getElasticSearchTimeout() {
+        return elasticSearchTimeout;
     }
 }
