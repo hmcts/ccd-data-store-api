@@ -8,12 +8,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
@@ -24,6 +29,7 @@ import uk.gov.hmcts.ccd.domain.service.callbacks.retrycontext.CallbackRetryConte
 import uk.gov.hmcts.ccd.domain.service.callbacks.retrycontext.CallbackRetryContextBuilder;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
+import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -35,9 +41,11 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -66,11 +74,19 @@ public class CallbackServiceTest {
     private static final Integer DEFAULT_CALLBACK_TIMEOUT = SECOND;
 
     @Mock
+    private Authentication authentication;
+    @Mock
     private SecurityUtils securityUtils;
     @Mock
     private RestTemplate restTemplate;
     @Mock
     private CallbackRetryContextBuilder callbackRetryContextBuilder;
+    @Mock
+    private SecurityContext securityContext;
+    @Mock
+    private ServiceAndUserDetails principal;
+    @Captor
+    private ArgumentCaptor<HttpEntity> argument;
 
     private ExecutorService executorService = Executors.newFixedThreadPool(1);
 
@@ -111,6 +127,15 @@ public class CallbackServiceTest {
 
         doReturn(new HttpHeaders()).when(securityUtils).authorizationHeaders();
         doReturn(responseEntity).when(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(CallbackResponse.class));
+
+        caseEvent.setId("TEST-EVENT");
+
+        caseDetails.setState("test state");
+        caseDetails.setCaseTypeId("test case type");
+
+        callbackResponse.setData(caseDetails.getData());
+
+        initSecurityContext();
         callbackService = new CallbackService(securityUtils, restTemplate, executorService, callbackRetryContextBuilder);
     }
 
@@ -222,9 +247,9 @@ public class CallbackServiceTest {
     }
 
     @Test
-    public void shouldReturnWithErrorsOrWarningsIfExist() throws IOException {
+    public void shouldReturnWithErrorsOrWarningsIfExist() {
         responseEntity = ResponseEntity.<CallbackResponse>ok(aCallbackResponse().withError("Test message").build());
-        doReturn(responseEntity).when(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), any(Class.class));
+        doReturn(responseEntity).when(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(CallbackResponse.class));
 
         final Optional<CallbackResponse> result = callbackService.send(testUrl, null, caseEvent, caseDetails);
 
@@ -291,8 +316,46 @@ public class CallbackServiceTest {
         assertThat(apiException.getMessage(), is(equalTo("Unable to proceed because there are one or more callback Errors or Warnings")));
     }
 
+    @Nested
+    @DisplayName("Ignore warning flag")
+    class IgnoreWarningFlag {
+
+        @Test
+        @DisplayName("Should set ignore warning flag in callback request if set by client")
+        public void shouldSetIgnoreWarningsFlagInCallbackRequestIfSetByClient() throws Exception {
+            callbackService.send(testUrl, null, caseEvent, null, caseDetails, CallbackResponse.class, true);
+
+            verify(restTemplate).exchange(eq(testUrl), eq(HttpMethod.POST), argument.capture(), eq(CallbackResponse.class));
+            assertThat(argument.getValue().getBody(), hasProperty("ignoreWarning", is(true)));
+        }
+
+        @Test
+        @DisplayName("Should not set ignore warning flag in callback request if not set by client")
+        public void shouldNotSetIgnoreWarningsFlagInCallbackRequestIfNotSetByClient() throws Exception {
+            callbackService.send(testUrl, null, caseEvent, null, caseDetails, CallbackResponse.class, false);
+
+            verify(restTemplate).exchange(eq(testUrl), eq(HttpMethod.POST), argument.capture(), eq(CallbackResponse.class));
+            assertThat(argument.getValue().getBody(), hasProperty("ignoreWarning", is(false)));
+        }
+
+        @Test
+        @DisplayName("Should not set ignore warning flag in callback request if null set by client")
+        public void shouldNotSetIgnoreWarningsFlagInCallbackRequestIfNullSetByClient() throws Exception {
+            callbackService.send(testUrl, null, caseEvent, null, caseDetails, CallbackResponse.class, (Boolean) null);
+
+            verify(restTemplate).exchange(eq(testUrl), eq(HttpMethod.POST), argument.capture(), eq(CallbackResponse.class));
+            assertThat(argument.getValue().getBody(), hasProperty("ignoreWarning", nullValue()));
+        }
+    }
+
     private JsonNode getTextNode(String value) {
         return JSON_NODE_FACTORY.textNode(value);
+    }
+
+    private void initSecurityContext() {
+        doReturn(principal).when(authentication).getPrincipal();
+        doReturn(authentication).when(securityContext).getAuthentication();
+        SecurityContextHolder.setContext(securityContext);
     }
 
 }
