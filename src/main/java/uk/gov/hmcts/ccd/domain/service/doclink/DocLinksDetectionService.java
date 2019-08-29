@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service;
+package uk.gov.hmcts.ccd.domain.service.doclink;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -28,8 +28,8 @@ import static java.util.Collections.EMPTY_LIST;
 import static java.util.stream.Collectors.*;
 
 @Component
-public class DocLinksRestoreService {
-    private static final Logger LOG = LoggerFactory.getLogger(DocLinksRestoreService.class);
+public class DocLinksDetectionService {
+    private static final Logger LOG = LoggerFactory.getLogger(DocLinksDetectionService.class);
 
     public static final String START_TIME = "'2019-08-20 15:50:00.000'";
     public static final String END_TIME = "'2019-08-21 13:30:00.000'";
@@ -60,7 +60,7 @@ public class DocLinksRestoreService {
 
     private final Configuration jsonPathConfig;
 
-    public DocLinksRestoreService() {
+    public DocLinksDetectionService() {
         this.jsonPathConfig = Configuration.builder().jsonProvider(new JacksonJsonProvider())
             .options(Option.AS_PATH_LIST, Option.SUPPRESS_EXCEPTIONS).build();
     }
