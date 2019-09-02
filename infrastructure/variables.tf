@@ -146,8 +146,8 @@ variable "elastic_search_enabled" {
   default = "false"
 }
 
-variable "elastic_search_timeout" {
-  default = "6000"
+variable "elastic_search_request_timeout" {
+  default = "10000"
 }
 
 variable "elastic_search_case_index_name_format" {

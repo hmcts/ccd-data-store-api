@@ -19,5 +19,3 @@ http_client_max_client_per_route = 40
 #http_client_validate_after_inactivity = 0
 
 definition_cache_latest_version_ttl_sec = 30
-
-elastic_search_timeout=10000
