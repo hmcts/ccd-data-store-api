@@ -54,7 +54,7 @@ public class DockLinkUtil {
         if (dockLinkNode.isMissingNode() || dockLinkNode.isNull()) {
             isMissed = true;
         } else if (jsonPath.contains(DOT_VALUE)) { // collection field match value
-            LOG.info("Inside DOT_VALUE block jsonPath:{}, eventId:{}", jsonPath, caseEvent.getId());
+            LOG.info("Probably manually overridden / corrected link jsonPath:{}, eventId:{}", jsonPath, caseEvent.getId());
             String eventFileName = eventData.at(jsonPath).textValue();
             List<String> allFileNamesInTheCaseCollection = caseData.at(getCollectionRootPath(jsonPath)).findValuesAsText(DOCUMENT_FILENAME);
             isMissed = !allFileNamesInTheCaseCollection.contains(eventFileName);

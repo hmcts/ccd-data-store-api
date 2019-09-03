@@ -124,9 +124,17 @@ public class DocLinksRestoreService {
 
             // restore in case data
             JsonNode detailsData = caseDetails.getData();
-            JsonNode caseNode = detailsData.at(docNodeParent);
+            JsonNode docNodeParentInCase = detailsData.at(docNodeParent);
             String docNodeName = docNodePath.substring(docNodePath.lastIndexOf(SLASH) + 1);
-            ((ObjectNode)caseNode).set(docNodeName, eventDocLinkNode);
+            JsonNode docNodeInCase = docNodeParentInCase.at(docNodeName);
+
+            // don't touch manually corrected doc-link nodes both in collection and simple field
+            if (!docNodeParentInCase.isMissingNode() && (docNodeInCase.isMissingNode() || docNodeInCase.isNull())) {
+                ((ObjectNode)docNodeParentInCase).set(docNodeName, eventDocLinkNode);
+            } else if (jsonPath.contains(DOT_VALUE)) { // add as a new element
+                LOG.info("Found manually overridden / corrected links in the case which are lost from eventId:{} and jsonPath:{}", event.getId(), jsonPath);
+                // TODO : add whole element to end of collection if required
+            }
 
             recoveredFiles.put(eventDocLinkNode.findValuesAsText(DOCUMENT_FILENAME).get(0), eventDocLinkNode.findValuesAsText("document_url").get(0));
 
