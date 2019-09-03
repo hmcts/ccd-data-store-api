@@ -126,13 +126,13 @@ public class DocLinksRestoreService {
             JsonNode detailsData = caseDetails.getData();
             JsonNode docNodeParentInCase = detailsData.at(docNodeParent);
             String docNodeName = docNodePath.substring(docNodePath.lastIndexOf(SLASH) + 1);
-            JsonNode docNodeInCase = docNodeParentInCase.at(docNodeName);
+            JsonNode docNodeInCase = docNodeParentInCase.path(docNodeName);
 
             // don't touch manually corrected doc-link nodes both in collection and simple field
             if (!docNodeParentInCase.isMissingNode() && (docNodeInCase.isMissingNode() || docNodeInCase.isNull())) {
                 ((ObjectNode)docNodeParentInCase).set(docNodeName, eventDocLinkNode);
             } else if (jsonPath.contains(DOT_VALUE)) { // add as a new element
-                LOG.info("Found manually overridden / corrected links in the case which are lost from eventId:{} and jsonPath:{}", event.getId(), jsonPath);
+                LOG.info("Found manually removed / corrected links in the case which are lost from eventId:{} and jsonPath:{}", event.getId(), jsonPath);
                 // TODO : add whole element to end of collection if required
             }
 
@@ -144,7 +144,7 @@ public class DocLinksRestoreService {
 
         // 1. persist case data
         caseDetails.setLastModified(LocalDateTime.now(ZoneOffset.UTC));
-        em.merge(caseDetails);
+        // em.merge(caseDetails);
         LOG.info("Restored missing links for case:{} with data:{}", caseDetails.getReference(), getJsonString(caseDetails.getData()));
 
         // 2. mark events
@@ -152,7 +152,7 @@ public class DocLinksRestoreService {
 
         // 3. create admin event
         CaseAuditEventEntity adminEvent = createAdminEvent(caseDetails, recoveredFiles);
-        em.persist(adminEvent);
+        // em.persist(adminEvent);
         LOG.info("Created adminEvent with id:{}, summary:{} and data:{}", adminEvent.getId(), adminEvent.getSummary(), getJsonString(adminEvent.getData()));
     }
 
@@ -178,7 +178,7 @@ public class DocLinksRestoreService {
             List<CaseAuditEventEntity> eventsToMark = getEventsToMark(event);
             eventsToMark.forEach(e -> {
                 e.setSummary("In this event history if you see any missing document links please check history of the 'Document recovery' event");
-                em.merge(e);
+                // em.merge(e);
 
             });
         });
