@@ -19,9 +19,7 @@ import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -52,7 +50,9 @@ public class DocLinksRestoreService {
 
     private static final String CASE_QUERY = "SELECT * FROM case_data where reference IN :caseReferences";
 
-    public static final String EVENTS_TO_MARK = "SELECT * FROM case_event WHERE case_data_id = :caseId and id > :eventId";
+    public static final String EVENTS_TO_MARK = "SELECT * FROM case_event WHERE case_data_id = :caseId AND id > :eventId";
+
+    public static final String LATEST_EVENT = "SELECT * FROM case_event WHERE case_data_id = :caseId ORDER BY id DESC LIMIT 1";
 
     public static final String DOCUMENT_FILENAME = "document_filename";
     public static final String SLASH = "/";
@@ -72,7 +72,16 @@ public class DocLinksRestoreService {
     }
 
     @Transactional(readOnly = true)
-    public void restoreByCaseReferences(List<Long> caseReferences) {
+    public void restoreWithDryRun(List<Long> caseReferences) {
+        restoreByCaseReferences(caseReferences, true);
+    }
+
+    @Transactional
+    public void restoreWithPersist(List<Long> caseReferences) {
+        restoreByCaseReferences(caseReferences, false);
+    }
+
+    private void restoreByCaseReferences(List<Long> caseReferences, boolean dryRun) {
         Query query = em.createNativeQuery(CASE_QUERY, CaseDetailsEntity.class).setParameter("caseReferences", caseReferences);
         List<CaseDetailsEntity> caseDetailsEntities = query.getResultList();
 
@@ -80,14 +89,14 @@ public class DocLinksRestoreService {
         List<CaseDetailsEntity> newCases = caseDetailsEntities.stream().filter(c -> BUG_START_TIME.isBefore(c.getCreatedDate())).collect(Collectors.toList());
 
         if (CollectionUtils.isNotEmpty(oldCases)) {
-            restoreOldCasesBasedOnEventHistory(oldCases);
+            restoreOldCasesBasedOnEventHistory(oldCases, dryRun);
         }
         if (CollectionUtils.isNotEmpty(newCases)) {
-            restoreNewCasesBasedOnEventHistory(newCases);
+            restoreNewCasesBasedOnEventHistory(newCases, dryRun);
         }
     }
 
-    private void restoreOldCasesBasedOnEventHistory(List<CaseDetailsEntity> caseDetailsEntities) {
+    private void restoreOldCasesBasedOnEventHistory(List<CaseDetailsEntity> caseDetailsEntities, boolean dryRun) {
         List<Long> caseIds = caseDetailsEntities.stream().map(CaseDetailsEntity::getId).collect(Collectors.toList());
 
         Query query = em.createNativeQuery(LAST_EVENT_WITH_VALID_DATA, CaseAuditEventEntity.class).setParameter("caseIds", caseIds);
@@ -98,21 +107,21 @@ public class DocLinksRestoreService {
 
         List<CaseAuditEventEntity> allEvents = ListUtils.union(eventsDuringBug, mostRecentEventsBeforeBug);
 
-        findAndRestoreMissedLinks(caseDetailsEntities, allEvents);
+        findAndRestoreMissedLinks(caseDetailsEntities, allEvents, dryRun);
     }
 
-    private void restoreNewCasesBasedOnEventHistory(List<CaseDetailsEntity> caseDetailsEntities) {
+    private void restoreNewCasesBasedOnEventHistory(List<CaseDetailsEntity> caseDetailsEntities, boolean dryRun) {
         List<Long> caseIds = caseDetailsEntities.stream().map(CaseDetailsEntity::getId).collect(Collectors.toList());
         Query query = em.createNativeQuery(EVENTS_DURING_BUG_PERIOD, CaseAuditEventEntity.class).setParameter("caseIds", caseIds);
-        findAndRestoreMissedLinks(caseDetailsEntities, query.getResultList());
+        findAndRestoreMissedLinks(caseDetailsEntities, query.getResultList(), dryRun);
     }
 
-    private void findAndRestoreMissedLinks(List<CaseDetailsEntity> caseDetailsEntities, List<CaseAuditEventEntity> allEvents) {
+    private void findAndRestoreMissedLinks(List<CaseDetailsEntity> caseDetailsEntities, List<CaseAuditEventEntity> allEvents, boolean dryRun) {
         Map<CaseDetailsEntity, List<CaseAuditEventEntity>> caseToEventsMap = getCaseToEventsMap(caseDetailsEntities, allEvents);
-        caseToEventsMap.keySet().forEach(key -> restoreMissedLinks(key, caseToEventsMap.get(key)));
+        caseToEventsMap.keySet().forEach(key -> restoreMissedLinks(key, caseToEventsMap.get(key), dryRun));
     }
 
-    private void restoreMissedLinks(CaseDetailsEntity caseDetails, List<CaseAuditEventEntity> events) {
+    private void restoreMissedLinks(CaseDetailsEntity caseDetails, List<CaseAuditEventEntity> events, boolean dryRun) {
         Map<String, CaseAuditEventEntity> linksToRecoverFromEvent = findLinksToRecoverForACase(caseDetails, events);
         Map<String, String> recoveredFiles = new HashMap<>();
         linksToRecoverFromEvent.keySet().forEach(jsonPath -> {
@@ -132,7 +141,7 @@ public class DocLinksRestoreService {
             if (!docNodeParentInCase.isMissingNode() && (docNodeInCase.isMissingNode() || docNodeInCase.isNull())) {
                 ((ObjectNode)docNodeParentInCase).set(docNodeName, eventDocLinkNode);
             } else if (jsonPath.contains(DOT_VALUE)) { // add as a new element
-                LOG.info("Found manually removed / corrected links in the case which are lost from eventId:{} and jsonPath:{}", event.getId(), jsonPath);
+                LOG.info("Found manually removed links in the case which are lost from eventId:{} and jsonPath:{}", event.getId(), jsonPath);
                 // TODO : add whole element to end of collection if required
             }
 
@@ -144,7 +153,7 @@ public class DocLinksRestoreService {
 
         // 1. persist case data
         caseDetails.setLastModified(LocalDateTime.now(ZoneOffset.UTC));
-        // em.merge(caseDetails);
+        em.merge(caseDetails);
         LOG.info("Restored missing links for case:{} with data:{}", caseDetails.getReference(), getJsonString(caseDetails.getData()));
 
         // 2. mark events
@@ -152,7 +161,9 @@ public class DocLinksRestoreService {
 
         // 3. create admin event
         CaseAuditEventEntity adminEvent = createAdminEvent(caseDetails, recoveredFiles);
-        // em.persist(adminEvent);
+        if (!dryRun) {
+            em.persist(adminEvent);
+        }
         LOG.info("Created adminEvent with id:{}, summary:{} and data:{}", adminEvent.getId(), adminEvent.getSummary(), getJsonString(adminEvent.getData()));
     }
 
@@ -177,9 +188,10 @@ public class DocLinksRestoreService {
         eventBeforeDocsLost.ifPresent(event -> {
             List<CaseAuditEventEntity> eventsToMark = getEventsToMark(event);
             eventsToMark.forEach(e -> {
-                e.setSummary("In this event history if you see any missing document links please check history of the 'Document recovery' event");
-                // em.merge(e);
-
+                String summary = e.getSummary() + " AND "
+                    + "In this event history if you see any missing document links please check history of the 'Document recovery' event";
+                e.setSummary(summary);
+                em.merge(e);
             });
         });
     }
@@ -201,8 +213,11 @@ public class DocLinksRestoreService {
         newCaseAuditEventEntity.setSecurityClassification(caseDetails.getSecurityClassification());
         newCaseAuditEventEntity.setData(caseDetails.getData());
         newCaseAuditEventEntity.setDataClassification(caseDetails.getDataClassification());
-        newCaseAuditEventEntity.setStateId(caseDetails.getState());
-        newCaseAuditEventEntity.setStateName(caseDetails.getState());
+
+        Query query = em.createNativeQuery(LATEST_EVENT, CaseAuditEventEntity.class).setParameter("caseId", caseDetails.getId());
+        CaseAuditEventEntity latestEvent = (CaseAuditEventEntity) query.getSingleResult();
+        newCaseAuditEventEntity.setStateId(latestEvent.getStateId());
+        newCaseAuditEventEntity.setStateName(latestEvent.getStateName());
 
         IdamUser idamUser = getIdamUser();
         newCaseAuditEventEntity.setUserId(idamUser.getId());
@@ -210,20 +225,14 @@ public class DocLinksRestoreService {
         newCaseAuditEventEntity.setUserFirstName(idamUser.getForename());
 
         newCaseAuditEventEntity.setEventId("CCD_ADMIN");
-        newCaseAuditEventEntity.setEventName("CCD ADMIN");
+        newCaseAuditEventEntity.setEventName("CCD Admin");
         newCaseAuditEventEntity.setSummary("Document links recovered because of a bug:" + recoveredFiles);
         newCaseAuditEventEntity.setDescription("Between 20-08-2019 16:35:57 and 21-08-2019 13:40:05 a bug caused document links to disappear from case data");
         return newCaseAuditEventEntity;
     }
 
     private IdamUser getIdamUser() {
-        IdamUser idamUser = new IdamUser();
-        idamUser.setId("2222");
-        idamUser.setForename("CCD");
-        idamUser.setSurname("ADMIN");
-        return idamUser;
-        // FIXME : uncomment once security is enabled and remove dummy user
-        // return userRepository.getUser();
+        return userRepository.getUser();
     }
 
 }

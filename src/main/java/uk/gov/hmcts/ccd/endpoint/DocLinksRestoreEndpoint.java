@@ -34,8 +34,13 @@ public class DocLinksRestoreEndpoint {
     }
 
     @RequestMapping(value = "/doclinks/restore", method = RequestMethod.POST)
-    public void restoreDocLinks(@RequestBody List<Long> caseReferences) {
-        docLinksRestoreService.restoreByCaseReferences(caseReferences);
+    public void restoreDocLinks(@RequestBody List<Long> caseReferences,
+                                @RequestParam(value = "dryRun", required = false, defaultValue = "true") final Boolean dryRun) {
+        if (dryRun) {
+            docLinksRestoreService.restoreWithDryRun(caseReferences);
+        } else {
+            docLinksRestoreService.restoreWithPersist(caseReferences);
+        }
     }
 }
 
