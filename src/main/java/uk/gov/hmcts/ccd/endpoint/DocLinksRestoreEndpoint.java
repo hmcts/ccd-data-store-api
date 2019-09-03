@@ -27,8 +27,8 @@ public class DocLinksRestoreEndpoint {
     @RequestMapping(value = "/doclinks/restore", method = RequestMethod.GET)
     public List<Long> findDocLinksMissedCases(
         @RequestParam(value = "jids", required = false) final String jurisdictionIds) {
-        List<String> jurisdictionList = StringUtils.isNotEmpty(jurisdictionIds) ?
-            Arrays.asList(jurisdictionIds.split(",")) : new ArrayList<>();
+        List<String> jurisdictionList = StringUtils.isNotEmpty(jurisdictionIds)
+            ? Arrays.asList(jurisdictionIds.split(",")) : new ArrayList<>();
         List<CaseDetailsEntity> docLinksMissedCases = docLinksDetectionService.findDocLinksMissedCases(jurisdictionList);
         return docLinksMissedCases.stream().map(c -> c.getId()).collect(Collectors.toList());
     }

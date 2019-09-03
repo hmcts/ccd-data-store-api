@@ -30,6 +30,8 @@ public class DockLinkUtil {
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
+    private DockLinkUtil() {}
+
     public static String getJsonString(JsonNode eventData) {
         try {
             return mapper.writeValueAsString(eventData);
@@ -70,7 +72,7 @@ public class DockLinkUtil {
         String path = bracketPath.substring(1); // ignore $
         Matcher matcher = BRACKET_PATTERN.matcher(path);
         StringBuilder stringBuilder = new StringBuilder();
-        while(matcher.find()) {
+        while (matcher.find()) {
             String group = matcher.group(1);
             stringBuilder.append(SLASH);
             if (group.startsWith("\'")) {
@@ -82,7 +84,8 @@ public class DockLinkUtil {
         return stringBuilder.toString();
     }
 
-    public static Map<CaseDetailsEntity, List<CaseAuditEventEntity>> getCaseToEventsMap(List<CaseDetailsEntity> caseDetailsEntities, List<CaseAuditEventEntity> allEvents) {
+    public static Map<CaseDetailsEntity, List<CaseAuditEventEntity>> getCaseToEventsMap(
+        List<CaseDetailsEntity> caseDetailsEntities, List<CaseAuditEventEntity> allEvents) {
         Map<Long, List<CaseAuditEventEntity>> eventsByCaseIdMap = allEvents.stream().collect(groupingBy(CaseAuditEventEntity::getCaseDataId));
 
         return caseDetailsEntities.stream()

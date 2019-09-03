@@ -44,10 +44,11 @@ public class DocLinksRestoreService {
 
     public static final String BETWEEN_CLAUSE = "BETWEEN  " + START_TIME + " AND " + END_TIME;
 
-    public static final String LAST_EVENT_WITH_VALID_DATA = "SELECT * FROM case_event WHERE id IN " +
-        "(SELECT max(id) FROM case_event WHERE case_data_id IN :caseIds AND created_date < " + START_TIME + " GROUP BY case_data_id)";
+    public static final String LAST_EVENT_WITH_VALID_DATA = "SELECT * FROM case_event WHERE id IN "
+        + "(SELECT max(id) FROM case_event WHERE case_data_id IN :caseIds AND created_date < " + START_TIME + " GROUP BY case_data_id)";
 
-    public static final String EVENTS_DURING_BUG_PERIOD = "SELECT * FROM case_event WHERE case_data_id IN :caseIds AND created_date " + BETWEEN_CLAUSE + " order by id DESC " ;
+    public static final String EVENTS_DURING_BUG_PERIOD = "SELECT * FROM case_event WHERE case_data_id IN :caseIds "
+        + "AND created_date " + BETWEEN_CLAUSE + " order by id DESC ";
 
     private static final String CASE_QUERY = "SELECT * FROM case_data where reference IN :caseReferences";
 
@@ -81,7 +82,7 @@ public class DocLinksRestoreService {
         if (CollectionUtils.isNotEmpty(oldCases)) {
             restoreOldCasesBasedOnEventHistory(oldCases);
         }
-        if(CollectionUtils.isNotEmpty(newCases)) {
+        if (CollectionUtils.isNotEmpty(newCases)) {
             restoreNewCasesBasedOnEventHistory(newCases);
         }
     }
@@ -167,7 +168,7 @@ public class DocLinksRestoreService {
             .min(Comparator.comparing(CaseAuditEventEntity::getId));
         eventBeforeDocsLost.ifPresent(event -> {
             List<CaseAuditEventEntity> eventsToMark = getEventsToMark(event);
-            eventsToMark.forEach( e -> {
+            eventsToMark.forEach(e -> {
                 e.setSummary("In this event history if you see any missing document links please check history of the 'Document recovery' event");
                 em.merge(e);
 
