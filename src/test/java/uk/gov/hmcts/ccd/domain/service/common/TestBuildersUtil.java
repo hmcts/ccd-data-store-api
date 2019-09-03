@@ -389,6 +389,16 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public CaseDetailsBuilder withReference(Long reference) {
+            caseDetails.setReference(reference);
+            return this;
+        }
+
+        public CaseDetailsBuilder withState(String state){
+            caseDetails.setState(state);
+            return this;
+        }
+
         public CaseDetails build() {
             return caseDetails;
         }

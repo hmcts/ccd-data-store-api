@@ -120,6 +120,7 @@ ext {
     ]
     appInsights = '2.0.1'
     springCloudVersion = 'Greenwich.RELEASE'
+    pact_version = '3.5.24'
 }
 
 group 'uk.gov.hmcts.ccd'
@@ -165,6 +166,74 @@ tasks.withType(com.github.spotbugs.SpotBugsTask) {
 spotbugs {
     ignoreFailures = true
 }
+
+project.ext {
+    pactVersion = getCheckedOutGitCommitHash()
+}
+
+sourceSets {
+    aat {
+        java {
+            srcDir('src/aat/java')
+            compileClasspath += main.output
+            runtimeClasspath += main.output
+        }
+        resources {
+            srcDir('src/aat/resources')
+        }
+    }
+    testPact {
+        java {
+            compileClasspath += main.output
+            runtimeClasspath += main.output
+            srcDir file('src/pactTest/java')
+        }
+        resources.srcDir file('src/pactTest/resources')
+    }
+}
+task smoke(type: Test) {
+    systemProperty "http.proxyHost", System.getProperty('http.proxyHost')
+    systemProperty "http.proxyPort", System.getProperty('http.proxyPort')
+    systemProperty "https.proxyHost", System.getProperty('https.proxyHost')
+    systemProperty "https.proxyPort", System.getProperty('https.proxyPort')
+
+    environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
+
+    group = 'Delivery pipeline'
+    description = 'Executes smoke tests against an AAT CCD Data Store instance'
+    setTestClassesDirs(sourceSets.aat.output.classesDirs)
+    setClasspath(sourceSets.aat.runtimeClasspath)
+    include "uk/gov/hmcts/ccd/datastore/tests/functional/**"
+    include "uk/gov/hmcts/ccd/datastore/tests/v2/**"
+    useJUnitPlatform {
+        includeTags 'smoke'
+    }
+
+}
+
+task functional(type: Test) {
+    systemProperty "http.proxyHost", System.getProperty('http.proxyHost')
+    systemProperty "http.proxyPort", System.getProperty('http.proxyPort')
+    systemProperty "https.proxyHost", System.getProperty('https.proxyHost')
+    systemProperty "https.proxyPort", System.getProperty('https.proxyPort')
+
+    environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
+
+    group = 'Delivery pipeline'
+    description = 'Executes functional tests against an AAT CCD Data Store instance'
+    setTestClassesDirs(sourceSets.aat.output.classesDirs)
+    setClasspath(sourceSets.aat.runtimeClasspath)
+    include "uk/gov/hmcts/ccd/datastore/tests/functional/**"
+    include "uk/gov/hmcts/ccd/datastore/tests/v2/**"
+    useJUnitPlatform()
+}
+
+task pactTask(type: Test) {
+    description = "Runs pact Tests"
+    testClassesDirs = sourceSets.testPact.output.classesDirs
+    classpath = sourceSets.testPact.runtimeClasspath
+}
+
 
 dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'logging', version: reformLogging
@@ -235,7 +304,9 @@ dependencies {
     testImplementation('org.springframework.cloud:spring-cloud-starter-contract-stub-runner')
     testCompile ('com.opentable.components:otj-pg-embedded:0.12.0')
     testCompile ('com.github.tomakehurst:wiremock-jre8:2.21.0')
+    testCompile 'javax.servlet:javax.servlet-api:4.0.1'
     testCompile ('org.springframework.cloud:spring-cloud-contract-wiremock:2.1.0.RELEASE')
+    testCompile("au.com.dius:pact-jvm-provider-junit5_2.12:${pact_version}")
     // To avoid compiler warnings about @API annotations in JUnit5 code.
     testCompileOnly 'org.apiguardian:apiguardian-api:1.0.0'
     testCompile "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
@@ -248,7 +319,95 @@ dependencies {
     testCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.1.0'
     testCompile group: 'com.xebialabs.restito', name: 'restito', version: '0.9.3'
     testCompile 'io.github.openfeign:feign-jackson:9.7.0'
+    testCompile group: 'au.com.dius', name: 'pact-jvm-provider-spring_2.12', version: '3.5.24'
+    testCompile (group: 'uk.gov.hmcts.reform.auth', name: 'auth-checker-lib', version: '2.1.3') {
+        // TODO remove when auth-checker-lib upgrades its dependency to spring boot 2.0.x
+        exclude group: 'uk.gov.hmcts.reform', module: 'java-logging-spring'
+    }
 
+    testPactCompile "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
+    testPactRuntime "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
+    testPactRuntime "org.junit.vintage:junit-vintage-engine:${junitVintageVersion}"
+    testPactCompile group: 'org.springframework.security', name: 'spring-security-config', version: '5.1.6.RELEASE'
+    testPactCompile group: 'com.hazelcast', name: 'hazelcast', version: '3.11.2'
+    testPactCompile group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
+    //excluding log4j-core which causes a vulnerability issue
+    testPactCompile(group: 'io.searchbox', name: 'jest', version: '6.3.1') {
+        exclude group: 'org.apache.logging.log4j', module: 'log4j-core'
+    }
+    testPactCompile(group: 'org.elasticsearch', name: 'elasticsearch', version: '6.4.2') {
+        exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
+    }
+    testPactCompile group: 'com.zaxxer', name: 'HikariCP', version: '2.7.9'
+    testPactCompile group: 'org.mockito', name: 'mockito-core', version: '2.24.0'
+    testPactCompile group:'org.mockito', name: 'mockito-junit-jupiter', version:'2.24.0'
+    testPactCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: powermockVersion
+    testPactCompile group: 'org.powermock', name: 'powermock-module-junit4', version: powermockVersion
+    testPactCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.1.0'
+    testPactCompile group: 'com.xebialabs.restito', name: 'restito', version: '0.9.3'
+    testPactCompile 'io.github.openfeign:feign-jackson:9.7.0'
+    testPactCompile group: 'au.com.dius', name: 'pact-jvm-provider-spring_2.12', version: '3.5.24'
+    testPactCompile("au.com.dius:pact-jvm-provider-junit5_2.12:${pact_version}")
+    testPactCompile group: 'org.springframework.security', name: 'spring-security-web', version: '5.1.6.RELEASE'
+    testPactCompile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.5'
+    testPactCompile (group: 'uk.gov.hmcts.reform.auth', name: 'auth-checker-lib', version: '2.1.3') {
+        // TODO remove when auth-checker-lib upgrades its dependency to spring boot 2.0.x
+        exclude group: 'uk.gov.hmcts.reform', module: 'java-logging-spring'
+    }
+    
+    //////////////////////////////////////////////
+    testPactCompile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: reformLogging
+    testPactCompile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: reformLogging
+    testPactCompile 'uk.gov.hmcts.reform:properties-volume-spring-boot-starter:0.0.4'
+    testPactCompile 'uk.gov.hmcts.reform:health-spring-boot-starter:0.0.3'
+    testPactCompile 'org.projectlombok:lombok:1.18.4'
+    testPactImplementation 'org.mapstruct:mapstruct-jdk8:1.3.0.Final'
+    testPactCompile 'org.mapstruct:mapstruct-processor:1.2.0.Final', 'org.projectlombok:lombok:1.18.4'
+    testPactAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.2.0.Final', 'org.projectlombok:lombok:1.18.4'
+
+//     Needs to explicitly bring in a different hibernate version as in pom.xml
+    testPactCompile "org.hibernate:hibernate-core:${hibernateVersion}"
+    testPactCompile "org.hibernate:hibernate-entitymanager:${hibernateVersion}"
+
+    testPactCompile('org.springframework.boot:spring-boot-starter-actuator')
+
+    testPactCompile("org.springframework.boot:spring-boot-starter-data-jpa") {
+        exclude group: 'org.hibernate', module: 'hibernate-core'
+        exclude group: 'org.hibernate', module: 'hibernate-entitymanager'
+    }
+    testPactCompile('org.springframework.boot:spring-boot-starter-hateoas')
+    testPactCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc') {
+        exclude group: 'org.apache.tomcat', module: 'tomcat-jdbc'
+    }
+    testPactCompile('org.springframework.boot:spring-boot-starter-web')
+    testPactCompile('org.springframework.cloud:spring-cloud-starter-openfeign')
+    testPactCompile('org.springframework.retry:spring-retry')
+    testPactCompile('org.springframework.boot:spring-boot-starter-cache')
+    testPactCompile group: 'com.hazelcast', name: 'hazelcast'
+    testPactCompile group: 'com.hazelcast', name: 'hazelcast-spring'
+
+    testPactCompile group: 'javax.inject', name: 'javax.inject', version: '1'
+    testPactCompile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
+    testPactCompile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.1'
+    testPactCompile group: 'io.springfox', name: 'springfox-swagger2', version: swagger2Version
+    testPactCompile group: 'io.springfox', name: 'springfox-swagger-ui', version: swagger2Version
+    testPactCompile group: 'org.liquibase', name: 'liquibase-core', version: '3.6.3'
+    testPactCompile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.5'
+    testPactCompile (group: 'uk.gov.hmcts.reform.auth', name: 'auth-checker-lib', version: '2.1.3') {
+        // TODO remove when auth-checker-lib upgrades its dependency to spring boot 2.0.x
+        exclude group: 'uk.gov.hmcts.reform', module: 'java-logging-spring'
+    }
+    testPactCompile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '2.0.0'
+    testPactCompile group: 'com.sun.mail', name: 'mailapi', version: '1.6.1'
+    testPactCompile group: 'commons-lang', name: 'commons-lang', version: '2.6'
+    testPactCompile group: 'commons-validator', name: 'commons-validator', version: '1.6'
+    testPactCompile group: 'com.jayway.jsonpath', name: 'json-path', version: '2.4.0'
+    testPactCompile group: 'org.awaitility', name: 'awaitility', version: '3.1.6'
+
+    // CVE-2019-12086 - force update of jackson-databind - remove when dependencies move off <2.9.9
+    testPactCompile "com.fasterxml.jackson.core:jackson-databind:2.9.9"
+
+    /////////////////////////////////////////
     // for sonar analysis
     testCompile group: 'org.openid4java', name: 'openid4java', version: '1.0.0'
     // remove me once insights is in
@@ -607,56 +766,6 @@ test {
 
 check.dependsOn jacocoTestReport
 
-sourceSets {
-    aat {
-        java {
-            srcDir('src/aat/java')
-            compileClasspath += main.output
-            runtimeClasspath += main.output
-        }
-        resources {
-            srcDir('src/aat/resources')
-        }
-    }
-}
-task smoke(type: Test) {
-    systemProperty "http.proxyHost", System.getProperty('http.proxyHost')
-    systemProperty "http.proxyPort", System.getProperty('http.proxyPort')
-    systemProperty "https.proxyHost", System.getProperty('https.proxyHost')
-    systemProperty "https.proxyPort", System.getProperty('https.proxyPort')
-
-    environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
-
-    group = 'Delivery pipeline'
-    description = 'Executes smoke tests against an AAT CCD Data Store instance'
-    setTestClassesDirs(sourceSets.aat.output.classesDirs)
-    setClasspath(sourceSets.aat.runtimeClasspath)
-    include "uk/gov/hmcts/ccd/datastore/tests/functional/**"
-    include "uk/gov/hmcts/ccd/datastore/tests/v2/**"
-    useJUnitPlatform {
-        includeTags 'smoke'
-    }
-
-}
-
-task functional(type: Test) {
-    systemProperty "http.proxyHost", System.getProperty('http.proxyHost')
-    systemProperty "http.proxyPort", System.getProperty('http.proxyPort')
-    systemProperty "https.proxyHost", System.getProperty('https.proxyHost')
-    systemProperty "https.proxyPort", System.getProperty('https.proxyPort')
-
-    environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
-
-    group = 'Delivery pipeline'
-    description = 'Executes functional tests against an AAT CCD Data Store instance'
-    setTestClassesDirs(sourceSets.aat.output.classesDirs)
-    setClasspath(sourceSets.aat.runtimeClasspath)
-    include "uk/gov/hmcts/ccd/datastore/tests/functional/**"
-    include "uk/gov/hmcts/ccd/datastore/tests/v2/**"
-    useJUnitPlatform()
-}
-
-
 def timestamp() {
     def date = new Date()
     return date.format('yyyy-MM-dd HH:mm:ss')
@@ -698,4 +807,8 @@ task sendCoverageToCodacy(type: JavaExec, dependsOn: jacocoTestReport) {
 task installDist(overwrite: true) {
     // This task must be overwritten to do as it's breaking JAR packaging and it's a mandatory step of swagger
     // documentation publication.
+}
+
+def getCheckedOutGitCommitHash() {
+    'git rev-parse --verify --short HEAD'.execute().text.trim()
 }
