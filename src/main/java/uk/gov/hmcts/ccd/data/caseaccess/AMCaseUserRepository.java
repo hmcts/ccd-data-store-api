@@ -26,13 +26,13 @@ import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 
 @Named
 @Singleton
-@Qualifier(AMCaseUserRepository.QUALIFIER)
+@Qualifier(AMCaseUserRepository.ACCESS_MANAGEMENT_QUALIFIER)
 public class AMCaseUserRepository implements CaseUserRepository {
 
-    public static final String QUALIFIER = "am";
-    private static final String cases = "case";
+    public static final String ACCESS_MANAGEMENT_QUALIFIER = "accessManagement";
+    private static final String CASE_CONSTANT = "case";
 
-    AccessManagementService accessManagementService;
+    private AccessManagementService accessManagementService;
 
     @Autowired
     public AMCaseUserRepository(AccessManagementService accessManagementService) {
@@ -42,16 +42,14 @@ public class AMCaseUserRepository implements CaseUserRepository {
     @Override
     public void grantAccess(String jurisdictionId, String caseReference, Long caseId, String userId, String caseRole) {
 
-        Set<String> accessorIds = Collections.singleton(userId);
-
         ResourceDefinition resourceDefinition =
             //TODO: What should be the resourceType and resourceName.
             //To be clarified with Mutlu/Shashank again. resource name: CMC, FPL
-            new ResourceDefinition(jurisdictionId, cases, caseReference);
+            new ResourceDefinition(jurisdictionId, CASE_CONSTANT, caseReference);
 
         ExplicitAccessGrant explicitAccessGrant = ExplicitAccessGrant.builder()
             .accessorType(AccessorType.USER)
-            .accessorIds(accessorIds)
+            .accessorIds(Collections.singleton(userId))
             .resourceId(caseId.toString())
             .attributePermissions(getAttributePermissions())
             .resourceDefinition(resourceDefinition)
@@ -80,7 +78,7 @@ public class AMCaseUserRepository implements CaseUserRepository {
                 .resourceId(caseId.toString())
                 .serviceName(jurisdictionId)
                 .resourceName(caseReference)
-                .resourceType(cases)
+                .resourceType(CASE_CONSTANT)
                 .build();
 
         accessManagementService.revokeResourceAccess(explicitAccessMetadata);

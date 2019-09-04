@@ -60,7 +60,7 @@ public class CaseAccessEndpointIT extends BaseTest {
     private JdbcTemplate template;
 
     @MockBean
-    @Qualifier(AMCaseUserRepository.QUALIFIER)
+    @Qualifier(AMCaseUserRepository.ACCESS_MANAGEMENT_QUALIFIER)
     private CaseUserRepository amCaseUserRepository;
 
     @Mock

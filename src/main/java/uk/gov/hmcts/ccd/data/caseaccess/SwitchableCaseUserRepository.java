@@ -29,7 +29,7 @@ public class SwitchableCaseUserRepository implements CaseUserRepository {
 
     public SwitchableCaseUserRepository(@Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
                                         @Qualifier(CCDCaseUserRepository.QUALIFIER) final CaseUserRepository ccdCaseUserRepository,
-                                        @Qualifier(AMCaseUserRepository.QUALIFIER) final CaseUserRepository amCaseUserRepository,
+                                        @Qualifier(AMCaseUserRepository.ACCESS_MANAGEMENT_QUALIFIER) final CaseUserRepository amCaseUserRepository,
                                         final AMSwitch amSwitch) {
         this.caseDetailsRepository = caseDetailsRepository;
         this.ccdCaseUserRepository = ccdCaseUserRepository;

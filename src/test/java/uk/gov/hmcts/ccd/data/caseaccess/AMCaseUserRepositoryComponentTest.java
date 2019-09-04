@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.data.caseaccess;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.BaseTest;
 import uk.gov.hmcts.ccd.data.helper.AccessManagementQueryHelper;
@@ -37,18 +36,16 @@ public class AMCaseUserRepositoryComponentTest extends BaseTest {
     private static final String CASE_ROLE_SOLICITOR = "[SOLICITOR]";
     private static final String CASE_ROLE_CREATOR = "[CREATOR]";
 
-    @Autowired
     private AMCaseUserRepository repository;
-
-    private DefaultRoleSetupImportService defaultRoleSetupImportService;
 
     private AccessManagementQueryHelper accessManagementQueryHelper;
 
     @Before
     public void setUp() throws IOException {
         DataSource dataSource = AccessManagementQueryHelper.amDataSource();
-        repository.accessManagementService = new AccessManagementService(dataSource);
-        defaultRoleSetupImportService = new DefaultRoleSetupImportService(dataSource);
+        repository = new AMCaseUserRepository(new AccessManagementService(dataSource));
+
+        DefaultRoleSetupImportService defaultRoleSetupImportService = new DefaultRoleSetupImportService(dataSource);
         accessManagementQueryHelper = new AccessManagementQueryHelper();
 
         defaultRoleSetupImportService.addService(JURISDICTION_ID);
