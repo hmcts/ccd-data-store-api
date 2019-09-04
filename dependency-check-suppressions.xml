@@ -2,7 +2,10 @@
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
 
     <suppress>
-        <notes>Transitive dependency not used by our source. However it is needed for run time.</notes>
+        <notes>
+            Commons BeanUtils: has been updated to
+            http://commons.apache.org/proper/commons-beanutils/index.html
+        </notes>
         <cve>CVE-2019-10086</cve>
     </suppress>
 
