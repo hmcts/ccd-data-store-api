@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
+import liquibase.util.StringUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.ListUtils;
 import org.slf4j.Logger;
@@ -61,12 +62,14 @@ public class DocLinksRestoreService {
     private EntityManager em;
 
     private final UserRepository userRepository;
+    private final DataClassificationRestoreService dataClassificationRestoreService;
 
     private final Configuration jsonPathConfig;
 
     @Autowired
-    public DocLinksRestoreService(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository) {
+    public DocLinksRestoreService(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository, DataClassificationRestoreService dataClassificationRestoreService) {
         this.userRepository = userRepository;
+        this.dataClassificationRestoreService = dataClassificationRestoreService;
         this.jsonPathConfig = Configuration.builder().jsonProvider(new JacksonJsonProvider())
             .options(Option.AS_PATH_LIST, Option.SUPPRESS_EXCEPTIONS).build();
     }
@@ -149,13 +152,10 @@ public class DocLinksRestoreService {
 
             LOG.info("Restored a doc link for case:{} from event:{} with path:{} and value :{}",
                 caseDetails.getReference(), event.getId(), docNodePath, detailsData.at(docNodePath).findValuesAsText(DOCUMENT_FILENAME));
-
-            // Data classification
-            JsonNode classification = caseDetails.getDataClassification();
-            merge(classification, event.getDataClassification());
         });
 
         // 1. persist case data
+        dataClassificationRestoreService.deduceAndUpdateDataClassification(caseDetails);  // Data classification
         caseDetails.setLastModified(LocalDateTime.now(ZoneOffset.UTC));
         em.merge(caseDetails);
         LOG.info("Restored missing links for case:{} with data:{}", caseDetails.getReference(), getJsonString(caseDetails.getData()));
@@ -193,8 +193,9 @@ public class DocLinksRestoreService {
         eventBeforeDocsLost.ifPresent(event -> {
             List<CaseAuditEventEntity> eventsToMark = getEventsToMark(event);
             eventsToMark.forEach(e -> {
-                String summary = e.getSummary() + " AND "
-                    + "In this event history if you see any missing document links please check history of the 'Document recovery' event";
+                String summary = StringUtils.isNotEmpty(e.getSummary()) ? e.getSummary() + " AND " : e.getSummary();
+                summary = summary
+                    + " In this event history if you see any missing document links please check history of the 'Document recovery' event";
                 e.setSummary(summary);
                 em.merge(e);
             });
