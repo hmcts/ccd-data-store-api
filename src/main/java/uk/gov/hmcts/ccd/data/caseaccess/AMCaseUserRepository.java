@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.amlib.models.UserCasesEnvelope;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.transaction.Transactional;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +41,7 @@ public class AMCaseUserRepository implements CaseUserRepository {
     }
 
     @Override
+    @Transactional
     public void grantAccess(String jurisdictionId, String caseReference, Long caseId, String userId, String caseRole) {
 
         ResourceDefinition resourceDefinition =
@@ -67,6 +69,7 @@ public class AMCaseUserRepository implements CaseUserRepository {
     }
 
     @Override
+    @Transactional
     public void revokeAccess(String jurisdictionId, String caseReference, Long caseId, String userId, String caseRole) {
 
         ExplicitAccessMetadata explicitAccessMetadata =
@@ -85,6 +88,7 @@ public class AMCaseUserRepository implements CaseUserRepository {
     }
 
     @Override
+    @Transactional
     public List<Long> findCasesUserIdHasAccessTo(final String userId) {
         UserCasesEnvelope userCasesEnvelope =
             accessManagementService.returnUserCases(userId);
@@ -92,6 +96,7 @@ public class AMCaseUserRepository implements CaseUserRepository {
     }
 
     @Override
+    @Transactional
     public List<String> findCaseRoles(final String caseTypeId, final Long caseId, final String userId) {
         UserCaseRolesEnvelope envelope = accessManagementService.returnUserCaseRoles(caseId.toString(), userId);
         return envelope.getRoles();
