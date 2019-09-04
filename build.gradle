@@ -303,9 +303,12 @@ dependencies {
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation('org.springframework.cloud:spring-cloud-starter-contract-stub-runner')
     testCompile ('com.opentable.components:otj-pg-embedded:0.12.0')
+    testPactCompile ('com.opentable.components:otj-pg-embedded:0.12.0')
     testCompile ('com.github.tomakehurst:wiremock-jre8:2.21.0')
+    testPactCompile ('com.github.tomakehurst:wiremock-jre8:2.21.0')
     testCompile 'javax.servlet:javax.servlet-api:4.0.1'
     testCompile ('org.springframework.cloud:spring-cloud-contract-wiremock:2.1.0.RELEASE')
+    testPactCompile ('org.springframework.cloud:spring-cloud-contract-wiremock:2.1.0.RELEASE')
     testCompile("au.com.dius:pact-jvm-provider-junit5_2.12:${pact_version}")
     // To avoid compiler warnings about @API annotations in JUnit5 code.
     testCompileOnly 'org.apiguardian:apiguardian-api:1.0.0'
@@ -324,7 +327,7 @@ dependencies {
         // TODO remove when auth-checker-lib upgrades its dependency to spring boot 2.0.x
         exclude group: 'uk.gov.hmcts.reform', module: 'java-logging-spring'
     }
-
+    testPactCompile ('com.github.tomakehurst:wiremock-jre8:2.21.0')
     testPactCompile "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
     testPactRuntime "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
     testPactRuntime "org.junit.vintage:junit-vintage-engine:${junitVintageVersion}"

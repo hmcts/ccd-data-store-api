@@ -26,10 +26,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.OverrideAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.ccd.SecurityConfiguration;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
@@ -57,30 +61,33 @@ import uk.gov.hmcts.reform.auth.checker.core.SubjectResolver;
 import uk.gov.hmcts.reform.auth.checker.core.service.Service;
 import uk.gov.hmcts.reform.auth.checker.core.service.ServiceRequestAuthorizer;
 import uk.gov.hmcts.reform.auth.checker.core.user.User;
+import uk.gov.hmcts.reform.auth.checker.core.user.UserRequestAuthorizer;
 
 @Provider("ccd")
 //@PactBroker(scheme = "${pact.broker.scheme}",host = "${pact.broker.baseUrl}", port = "${pact.broker.port}", tags={"${pact.broker.consumer.tag}"})
-@PactFolder( value="pact/probate")
+@PactFolder(value = "probate")
 @RunWith(SpringRestPactRunner.class)
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = {
     "server.port=8125", "spring.application.name=PACT_TEST"
 })
 @TestPropertySource(locations = "classpath:application-pact.properties")
+@OverrideAutoConfiguration(enabled = true)
+//@EnableAutoConfiguration(exclude = {SecurityConfiguration.class})
 public class ProbateSubmitServiceProviderTest {
 
     @MockBean
     private CachedCaseDetailsRepository caseDetailsRepository;
 
     @MockBean
-    private  UIDService uidService;
+    private UIDService uidService;
 
     @TestTarget
     @SuppressWarnings(value = "VisibilityModifier")
     public final Target target = new HttpTarget("http", "localhost", 8125, "/");
 
 
-    private static final String PRINCIPAL = "probate_backend";
+    private static final String PRINCIPAL = "ccd_data";
 
     private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
 
@@ -90,7 +97,7 @@ public class ProbateSubmitServiceProviderTest {
     private SubjectResolver<Service> serviceResolver;
 
     @MockBean
-    private RequestAuthorizer<User> userRequestAuthorizer;
+    private UserRequestAuthorizer<User> userRequestAuthorizer;
 
     @MockBean
     ServiceRequestAuthorizer serviceRequestAuthorizer;
@@ -125,31 +132,35 @@ public class ProbateSubmitServiceProviderTest {
     private Service service;
 
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
-//
+
+    //
 //    @Value("${pact.broker.version}")
 //    private String providerVersion;
 //
     @Before
     public void setUpTest() {
 
-//        service = new Service(PRINCIPAL);
-//        when(serviceResolver.getTokenDetails(anyString())).thenReturn(service);
-//        when(serviceRequestAuthorizer.authorise(any(HttpServletRequest.class))).thenReturn(service);
-        //System.getProperties().setProperty("pact.verifier.publishResults", "true");
+        service = new Service(PRINCIPAL);
+        when(serviceResolver.getTokenDetails(anyString())).thenReturn(service);
+        when(serviceRequestAuthorizer.authorise(any(HttpServletRequest.class))).thenReturn(service);
+        Set<String> roles = new HashSet<>();
+        User user = new User(PRINCIPAL,roles);
+        when(userRequestAuthorizer.authorise(any(HttpServletRequest.class))).thenReturn(user);
+        // System.getProperties().setProperty("pact.verifier.publishResults", "true");
         //System.getProperties().setProperty("pact.provider.version", providerVersion);
     }
 
     @State("A start request for citizen is requested")
-    public void toCheckStartRequestForCitizen(){
+    public void toCheckStartRequestForCitizen() {
         StartEventTrigger startEventTrigger = new StartEventTrigger();
         startEventTrigger.setEventId("GOP_UPDATE_DRAFT");
         startEventTrigger.setToken("123234543456");
-        when(authorisedStartEventOperation.triggerStartForCase("654321","updateDraft", null)).thenReturn(startEventTrigger);
+        when(authorisedStartEventOperation.triggerStartForCase("654321", "updateDraft", null)).thenReturn(startEventTrigger);
 
     }
 
     @State("A submit request for citizen is requested")
-    public void toCheckSubmitRequestForCitizen(){
+    public void toCheckSubmitRequestForCitizen() {
         Map<String, JsonNode> data = new HashMap<>();
         data.put("deceasedMartialStatus", JSON_NODE_FACTORY.textNode("divorcedCivilPartnership"));
         data.put("primaryApplicantPhoneNumber", JSON_NODE_FACTORY.textNode("123455678"));
@@ -203,57 +214,57 @@ public class ProbateSubmitServiceProviderTest {
         data.put("deceasedAliasNameList", deceasedAliasNameList);
         data.put("primaryApplicantForenames", JSON_NODE_FACTORY.textNode("Jon"));
         ObjectNode primaryApplicantAddress = JSON_NODE_FACTORY.objectNode();
-        primaryApplicantAddress.set("AddressLine2",JSON_NODE_FACTORY.textNode("St. Georges Hospital"));
-        primaryApplicantAddress.put("AddressLine1",JSON_NODE_FACTORY.textNode("Pret a Manger"));
-        primaryApplicantAddress.put("AddressLine2",JSON_NODE_FACTORY.textNode("St. Georges Hospital"));
-        primaryApplicantAddress.put("PostTown",JSON_NODE_FACTORY.textNode("London"));
-        primaryApplicantAddress.put("PostCode",JSON_NODE_FACTORY.textNode("SW17 0QT"));
+        primaryApplicantAddress.set("AddressLine2", JSON_NODE_FACTORY.textNode("St. Georges Hospital"));
+        primaryApplicantAddress.put("AddressLine1", JSON_NODE_FACTORY.textNode("Pret a Manger"));
+        primaryApplicantAddress.put("AddressLine2", JSON_NODE_FACTORY.textNode("St. Georges Hospital"));
+        primaryApplicantAddress.put("PostTown", JSON_NODE_FACTORY.textNode("London"));
+        primaryApplicantAddress.put("PostCode", JSON_NODE_FACTORY.textNode("SW17 0QT"));
         data.put("primaryApplicantAddress", primaryApplicantAddress);
         ObjectNode deceasedAddress = JSON_NODE_FACTORY.objectNode();
-        deceasedAddress.put("AddressLine2",JSON_NODE_FACTORY.textNode("Westeros" ));
-        deceasedAddress.put("AddressLine1",JSON_NODE_FACTORY.textNode("Winterfell" ));
-        deceasedAddress.put("PostTown",JSON_NODE_FACTORY.textNode("London" ));
-        deceasedAddress.put("PostCode",JSON_NODE_FACTORY.textNode("SW17 0QT" ));
+        deceasedAddress.put("AddressLine2", JSON_NODE_FACTORY.textNode("Westeros"));
+        deceasedAddress.put("AddressLine1", JSON_NODE_FACTORY.textNode("Winterfell"));
+        deceasedAddress.put("PostTown", JSON_NODE_FACTORY.textNode("London"));
+        deceasedAddress.put("PostCode", JSON_NODE_FACTORY.textNode("SW17 0QT"));
         data.put("deceasedAddress", deceasedAddress);
 
 
         ArrayNode executorsApplyingList = JSON_NODE_FACTORY.arrayNode();
         ObjectNode executorsApplyingListObject = JSON_NODE_FACTORY.objectNode();
         ObjectNode executorsApplyingListObjectContent = JSON_NODE_FACTORY.objectNode();
-        executorsApplyingListObjectContent.set("applyingExecutorPhoneNumber",JSON_NODE_FACTORY.textNode("07981898999"));
-        executorsApplyingListObjectContent.set("applyingExecutorInvitationId",JSON_NODE_FACTORY.textNode("54321"));
-        executorsApplyingListObjectContent.set("applyingExecutorAgreed",JSON_NODE_FACTORY.textNode("Yes"));
-        executorsApplyingListObjectContent.set("applyingExecutorOtherNames",JSON_NODE_FACTORY.textNode("Graham Poll"));
-        executorsApplyingListObjectContent.set("applyingExecutorEmail",JSON_NODE_FACTORY.textNode("address@email.com"));
-        executorsApplyingListObjectContent.set("applyingExecutorLeadName",JSON_NODE_FACTORY.textNode("Graham Garderner"));
-        executorsApplyingListObjectContent.set("applyingExecutorName",JSON_NODE_FACTORY.textNode("Jon Snow"));
-        executorsApplyingListObjectContent.set("applyingExecutorOtherNamesReason",JSON_NODE_FACTORY.textNode("Divorce"));
+        executorsApplyingListObjectContent.set("applyingExecutorPhoneNumber", JSON_NODE_FACTORY.textNode("07981898999"));
+        executorsApplyingListObjectContent.set("applyingExecutorInvitationId", JSON_NODE_FACTORY.textNode("54321"));
+        executorsApplyingListObjectContent.set("applyingExecutorAgreed", JSON_NODE_FACTORY.textNode("Yes"));
+        executorsApplyingListObjectContent.set("applyingExecutorOtherNames", JSON_NODE_FACTORY.textNode("Graham Poll"));
+        executorsApplyingListObjectContent.set("applyingExecutorEmail", JSON_NODE_FACTORY.textNode("address@email.com"));
+        executorsApplyingListObjectContent.set("applyingExecutorLeadName", JSON_NODE_FACTORY.textNode("Graham Garderner"));
+        executorsApplyingListObjectContent.set("applyingExecutorName", JSON_NODE_FACTORY.textNode("Jon Snow"));
+        executorsApplyingListObjectContent.set("applyingExecutorOtherNamesReason", JSON_NODE_FACTORY.textNode("Divorce"));
         ObjectNode applyingExecutorAddress = JSON_NODE_FACTORY.objectNode();
         applyingExecutorAddress.set("AddressLine2", JSON_NODE_FACTORY.textNode("Westeros"));
         applyingExecutorAddress.set("AddressLine1", JSON_NODE_FACTORY.textNode("Winterfell"));
         applyingExecutorAddress.set("PostTown", JSON_NODE_FACTORY.textNode("London"));
         applyingExecutorAddress.set("PostCode", JSON_NODE_FACTORY.textNode("SW17 0QT"));
-        executorsApplyingListObjectContent.set("applyingExecutorAddress",applyingExecutorAddress);
+        executorsApplyingListObjectContent.set("applyingExecutorAddress", applyingExecutorAddress);
 
         executorsApplyingListObject.set("value", executorsApplyingListObjectContent);
 
         ObjectNode executorsApplyingListObject1 = JSON_NODE_FACTORY.objectNode();
         ObjectNode executorsApplyingListObjectContent1 = JSON_NODE_FACTORY.objectNode();
-        executorsApplyingListObjectContent1.set("applyingExecutorPhoneNumber",JSON_NODE_FACTORY.textNode("07981898999"));
-        executorsApplyingListObjectContent1.set("applyingExecutorInvitationId",JSON_NODE_FACTORY.textNode("54321"));
-        executorsApplyingListObjectContent1.set("applyingExecutorAgreed",JSON_NODE_FACTORY.textNode("Yes"));
-        executorsApplyingListObjectContent1.set("applyingExecutorOtherNames",JSON_NODE_FACTORY.textNode("Graham Poll"));
-        executorsApplyingListObjectContent1.set("applyingExecutorEmail",JSON_NODE_FACTORY.textNode("address@email.com"));
-        executorsApplyingListObjectContent1.set("applyingExecutorLeadName",JSON_NODE_FACTORY.textNode("Graham Garderner"));
-        executorsApplyingListObjectContent1.set("applyingExecutorName",JSON_NODE_FACTORY.textNode("Jon Snow"));
-        executorsApplyingListObjectContent1.set("applyingExecutorOtherNamesReason",JSON_NODE_FACTORY.textNode("Divorce"));
+        executorsApplyingListObjectContent1.set("applyingExecutorPhoneNumber", JSON_NODE_FACTORY.textNode("07981898999"));
+        executorsApplyingListObjectContent1.set("applyingExecutorInvitationId", JSON_NODE_FACTORY.textNode("54321"));
+        executorsApplyingListObjectContent1.set("applyingExecutorAgreed", JSON_NODE_FACTORY.textNode("Yes"));
+        executorsApplyingListObjectContent1.set("applyingExecutorOtherNames", JSON_NODE_FACTORY.textNode("Graham Poll"));
+        executorsApplyingListObjectContent1.set("applyingExecutorEmail", JSON_NODE_FACTORY.textNode("address@email.com"));
+        executorsApplyingListObjectContent1.set("applyingExecutorLeadName", JSON_NODE_FACTORY.textNode("Graham Garderner"));
+        executorsApplyingListObjectContent1.set("applyingExecutorName", JSON_NODE_FACTORY.textNode("Jon Snow"));
+        executorsApplyingListObjectContent1.set("applyingExecutorOtherNamesReason", JSON_NODE_FACTORY.textNode("Divorce"));
 
         ObjectNode applyingExecutorAddress1 = JSON_NODE_FACTORY.objectNode();
         applyingExecutorAddress1.set("AddressLine2", JSON_NODE_FACTORY.textNode("Westeros"));
         applyingExecutorAddress1.set("AddressLine1", JSON_NODE_FACTORY.textNode("Winterfell"));
         applyingExecutorAddress1.set("PostTown", JSON_NODE_FACTORY.textNode("London"));
         applyingExecutorAddress1.set("PostCode", JSON_NODE_FACTORY.textNode("SW17 0QT"));
-        executorsApplyingListObjectContent1.set("applyingExecutorAddress",applyingExecutorAddress);
+        executorsApplyingListObjectContent1.set("applyingExecutorAddress", applyingExecutorAddress);
         executorsApplyingListObject1.set("value", executorsApplyingListObjectContent1);
         executorsApplyingList.add(executorsApplyingListObject);
         executorsApplyingList.add(executorsApplyingListObject1);
@@ -268,10 +279,11 @@ public class ProbateSubmitServiceProviderTest {
             .withState("Draft").build();
         when(authorisedCreateEventOperation.createCaseEvent(eq("654321"), any(CaseDataContent.class))).thenReturn(caseDetails);
     }
+
     @State("A GrantOfRepresentation case exists")
-	public void toCheckGrantOfRepresentationCase654321Exists() {
+    public void toCheckGrantOfRepresentationCase654321Exists() {
         List<String> caseRoles = new ArrayList<>();
-        when(caseUserRepository.findCaseRoles(anyLong(),anyString())).thenReturn(caseRoles);
+        when(caseUserRepository.findCaseRoles(anyLong(), anyString())).thenReturn(caseRoles);
         CaseDataService caseDataService = new CaseDataService();
         when(uidService.validateUID("654321")).thenReturn(true);
         Set<String> roles = new HashSet<>();
@@ -363,44 +375,44 @@ public class ProbateSubmitServiceProviderTest {
         ArrayNode executorsApplying = JSON_NODE_FACTORY.arrayNode();
         ObjectNode executorsApplyingObject1 = JSON_NODE_FACTORY.objectNode();
         ObjectNode executorsApplyingObjectContent1 = JSON_NODE_FACTORY.objectNode();
-        executorsApplyingObjectContent1.set("applyingExecutorLeadName",JSON_NODE_FACTORY.textNode("Graham Garderner"));
-        executorsApplyingObjectContent1.set("applyingExecutorOtherNames",JSON_NODE_FACTORY.textNode("Graham Poll"));
-        executorsApplyingObjectContent1.set("applyingExecutorPhoneNumber",JSON_NODE_FACTORY.textNode("07981898999"));
-        executorsApplyingObjectContent1.set("applyingExecutorAgreed",JSON_NODE_FACTORY.textNode("Yes"));
-        executorsApplyingObjectContent1.set("applyingExecutorName",JSON_NODE_FACTORY.textNode("Jon Snow"));
-        executorsApplyingObjectContent1.set("applyingExecutorEmail",JSON_NODE_FACTORY.textNode("address@email.com"));
-        executorsApplyingObjectContent1.set("applyingExecutorInvitationId",JSON_NODE_FACTORY.textNode("54321"));
-        executorsApplyingObjectContent1.set("applyingExecutorOtherNamesReason",JSON_NODE_FACTORY.textNode("Divorce"));
+        executorsApplyingObjectContent1.set("applyingExecutorLeadName", JSON_NODE_FACTORY.textNode("Graham Garderner"));
+        executorsApplyingObjectContent1.set("applyingExecutorOtherNames", JSON_NODE_FACTORY.textNode("Graham Poll"));
+        executorsApplyingObjectContent1.set("applyingExecutorPhoneNumber", JSON_NODE_FACTORY.textNode("07981898999"));
+        executorsApplyingObjectContent1.set("applyingExecutorAgreed", JSON_NODE_FACTORY.textNode("Yes"));
+        executorsApplyingObjectContent1.set("applyingExecutorName", JSON_NODE_FACTORY.textNode("Jon Snow"));
+        executorsApplyingObjectContent1.set("applyingExecutorEmail", JSON_NODE_FACTORY.textNode("address@email.com"));
+        executorsApplyingObjectContent1.set("applyingExecutorInvitationId", JSON_NODE_FACTORY.textNode("54321"));
+        executorsApplyingObjectContent1.set("applyingExecutorOtherNamesReason", JSON_NODE_FACTORY.textNode("Divorce"));
         ObjectNode applyingExecutorAddress1 = JSON_NODE_FACTORY.objectNode();
 
 
-        applyingExecutorAddress1.set("AddressLine2",JSON_NODE_FACTORY.textNode("Westeros"));
-        applyingExecutorAddress1.set("AddressLine1",JSON_NODE_FACTORY.textNode("Winterfell"));
-        applyingExecutorAddress1.set("PostTown",JSON_NODE_FACTORY.textNode("London"));
-        applyingExecutorAddress1.set("PostCode",JSON_NODE_FACTORY.textNode("SW17 0QT"));
+        applyingExecutorAddress1.set("AddressLine2", JSON_NODE_FACTORY.textNode("Westeros"));
+        applyingExecutorAddress1.set("AddressLine1", JSON_NODE_FACTORY.textNode("Winterfell"));
+        applyingExecutorAddress1.set("PostTown", JSON_NODE_FACTORY.textNode("London"));
+        applyingExecutorAddress1.set("PostCode", JSON_NODE_FACTORY.textNode("SW17 0QT"));
         executorsApplyingObjectContent1.set("applyingExecutorAddress", applyingExecutorAddress1);
-        executorsApplyingObject1.set("value",executorsApplyingObjectContent1);
+        executorsApplyingObject1.set("value", executorsApplyingObjectContent1);
         executorsApplying.add(executorsApplyingObject1);
 
         ObjectNode executorsApplyingObject2 = JSON_NODE_FACTORY.objectNode();
         ObjectNode executorsApplyingObjectContent2 = JSON_NODE_FACTORY.objectNode();
-        executorsApplyingObjectContent2.set("applyingExecutorLeadName",JSON_NODE_FACTORY.textNode("Graham Garderner"));
-        executorsApplyingObjectContent2.set("applyingExecutorOtherNames",JSON_NODE_FACTORY.textNode("Graham Poll"));
-        executorsApplyingObjectContent2.set("applyingExecutorPhoneNumber",JSON_NODE_FACTORY.textNode("07981898999"));
-        executorsApplyingObjectContent2.set("applyingExecutorAgreed",JSON_NODE_FACTORY.textNode("Yes"));
-        executorsApplyingObjectContent2.set("applyingExecutorName",JSON_NODE_FACTORY.textNode("Jon Snow"));
-        executorsApplyingObjectContent2.set("applyingExecutorEmail",JSON_NODE_FACTORY.textNode("address@email.com"));
-        executorsApplyingObjectContent2.set("applyingExecutorInvitationId",JSON_NODE_FACTORY.textNode("54321"));
-        executorsApplyingObjectContent2.set("applyingExecutorOtherNamesReason",JSON_NODE_FACTORY.textNode("Divorce"));
+        executorsApplyingObjectContent2.set("applyingExecutorLeadName", JSON_NODE_FACTORY.textNode("Graham Garderner"));
+        executorsApplyingObjectContent2.set("applyingExecutorOtherNames", JSON_NODE_FACTORY.textNode("Graham Poll"));
+        executorsApplyingObjectContent2.set("applyingExecutorPhoneNumber", JSON_NODE_FACTORY.textNode("07981898999"));
+        executorsApplyingObjectContent2.set("applyingExecutorAgreed", JSON_NODE_FACTORY.textNode("Yes"));
+        executorsApplyingObjectContent2.set("applyingExecutorName", JSON_NODE_FACTORY.textNode("Jon Snow"));
+        executorsApplyingObjectContent2.set("applyingExecutorEmail", JSON_NODE_FACTORY.textNode("address@email.com"));
+        executorsApplyingObjectContent2.set("applyingExecutorInvitationId", JSON_NODE_FACTORY.textNode("54321"));
+        executorsApplyingObjectContent2.set("applyingExecutorOtherNamesReason", JSON_NODE_FACTORY.textNode("Divorce"));
         ObjectNode applyingExecutorAddress2 = JSON_NODE_FACTORY.objectNode();
 
-        applyingExecutorAddress2.set("AddressLine2",JSON_NODE_FACTORY.textNode("Westeros"));
-        applyingExecutorAddress2.set("AddressLine1",JSON_NODE_FACTORY.textNode("Winterfell"));
-        applyingExecutorAddress2.set("PostTown",JSON_NODE_FACTORY.textNode("London"));
-        applyingExecutorAddress2.set("PostCode",JSON_NODE_FACTORY.textNode("SW17 0QT"));
+        applyingExecutorAddress2.set("AddressLine2", JSON_NODE_FACTORY.textNode("Westeros"));
+        applyingExecutorAddress2.set("AddressLine1", JSON_NODE_FACTORY.textNode("Winterfell"));
+        applyingExecutorAddress2.set("PostTown", JSON_NODE_FACTORY.textNode("London"));
+        applyingExecutorAddress2.set("PostCode", JSON_NODE_FACTORY.textNode("SW17 0QT"));
         executorsApplyingObjectContent2.set("applyingExecutorAddress", applyingExecutorAddress2);
 
-        executorsApplyingObject2.set("value",executorsApplyingObjectContent2);
+        executorsApplyingObject2.set("value", executorsApplyingObjectContent2);
         executorsApplying.add(executorsApplyingObject2);
 
         data.put("executorsApplying", executorsApplying);
@@ -411,7 +423,7 @@ public class ProbateSubmitServiceProviderTest {
             .withSecurityClassification(SecurityClassification.PUBLIC)
             .withData(data)
             .withReference(654321L)
-            .withDataClassification(caseDataService.getDefaultSecurityClassifications(caseType, data,  Maps.newHashMap()))
+            .withDataClassification(caseDataService.getDefaultSecurityClassifications(caseType, data, Maps.newHashMap()))
             .build();
         caseDetails.setState("Draft");
         caseDetails.setCreatedDate(LocalDateTime.now());
