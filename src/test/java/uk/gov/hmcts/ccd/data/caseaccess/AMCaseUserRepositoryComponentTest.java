@@ -49,7 +49,7 @@ public class AMCaseUserRepositoryComponentTest extends BaseTest {
         DataSource dataSource = AccessManagementQueryHelper.amDataSource();
         repository.accessManagementService = new AccessManagementService(dataSource);
         defaultRoleSetupImportService = new DefaultRoleSetupImportService(dataSource);
-        accessManagementQueryHelper = new AccessManagementQueryHelper(dataSource);
+        accessManagementQueryHelper = new AccessManagementQueryHelper();
 
         defaultRoleSetupImportService.addService(JURISDICTION_ID);
         defaultRoleSetupImportService.addRole(CASE_ROLE, IDAM, PUBLIC, ROLE_BASED);
@@ -64,8 +64,9 @@ public class AMCaseUserRepositoryComponentTest extends BaseTest {
     }
 
     @After
-    public void tearDown() {
+    public void tearDown() throws IOException {
         accessManagementQueryHelper.deleteAllFromAccessManagementTables();
+        accessManagementQueryHelper.closePostgres();
     }
 
     @Test

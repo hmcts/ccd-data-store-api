@@ -9,17 +9,20 @@ import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 
 @Configuration
 public class AccessManagementServiceConfiguration {
-    private ApplicationParams applicationParams;
-    private static final String DRIVER_CLASS = "org.postgresql.Driver";
-    private DriverManagerDataSource driverManagerDataSource;
 
-    AccessManagementServiceConfiguration() {
-        driverManagerDataSource = new DriverManagerDataSource();
+    @Autowired
+    private ApplicationParams applicationParams;
+
+    private static final String DRIVER_CLASS = "org.postgresql.Driver";
+
+    private DriverManagerDataSource getDriverManagerDataSource() {
+        DriverManagerDataSource driverManagerDataSource = new DriverManagerDataSource();
 
         driverManagerDataSource.setDriverClassName(DRIVER_CLASS);
         driverManagerDataSource.setUrl(applicationParams.getAmDBConnectionString());
         driverManagerDataSource.setUsername(applicationParams.getAmDBUserName());
         driverManagerDataSource.setPassword(applicationParams.getAmDBPassword());
+        return driverManagerDataSource;
     }
 
     @Autowired
@@ -29,11 +32,11 @@ public class AccessManagementServiceConfiguration {
 
     @Bean
     public AccessManagementService getAccessManagementService() {
-        return new AccessManagementService(driverManagerDataSource);
+        return new AccessManagementService(getDriverManagerDataSource());
     }
 
     @Bean
     public DefaultRoleSetupImportService getDefaultRoleSetupImportService() {
-        return new DefaultRoleSetupImportService(driverManagerDataSource);
+        return new DefaultRoleSetupImportService(getDriverManagerDataSource());
     }
 }
