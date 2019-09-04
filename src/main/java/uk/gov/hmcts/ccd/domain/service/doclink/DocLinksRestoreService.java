@@ -127,8 +127,8 @@ public class DocLinksRestoreService {
         linksToRecoverFromEvent.keySet().forEach(jsonPath -> {
             CaseAuditEventEntity event = linksToRecoverFromEvent.get(jsonPath);
 
-            String docNodePath = jsonPath.substring(0, jsonPath.lastIndexOf(SLASH + DOCUMENT_FILENAME));
-            String docNodeParent = docNodePath.substring(0, docNodePath.lastIndexOf(SLASH));
+            String docNodePath = jsonPath.substring(0, jsonPath.lastIndexOf(SLASH + DOCUMENT_FILENAME)); //Eg : /D8DocumentsUploaded/0/value/DocumentLink
+            String docNodeParent = docNodePath.substring(0, docNodePath.lastIndexOf(SLASH)); //Eg : /D8DocumentsUploaded/0/value
             JsonNode eventDocLinkNode = event.getData().at(docNodePath);
 
             // restore in case data
@@ -149,12 +149,17 @@ public class DocLinksRestoreService {
 
             LOG.info("Restored a doc link for case:{} from event:{} with path:{} and value :{}",
                 caseDetails.getReference(), event.getId(), docNodePath, detailsData.at(docNodePath).findValuesAsText(DOCUMENT_FILENAME));
+
+            // Data classification
+            JsonNode classification = caseDetails.getDataClassification();
+            merge(classification, event.getDataClassification());
         });
 
         // 1. persist case data
         caseDetails.setLastModified(LocalDateTime.now(ZoneOffset.UTC));
         em.merge(caseDetails);
         LOG.info("Restored missing links for case:{} with data:{}", caseDetails.getReference(), getJsonString(caseDetails.getData()));
+        LOG.info("Restored missing link field info for case:{} with classification:{}", caseDetails.getReference(), getJsonString(caseDetails.getDataClassification()));
 
         // 2. mark events
         markImpactedEvents(linksToRecoverFromEvent);
@@ -208,7 +213,6 @@ public class DocLinksRestoreService {
 
         newCaseAuditEventEntity.setCaseDataId(caseDetails.getId());
         newCaseAuditEventEntity.setCaseTypeId(caseDetails.getCaseType());
-        newCaseAuditEventEntity.setCaseTypeVersion(caseDetails.getVersion());
         newCaseAuditEventEntity.setCreatedDate(LocalDateTime.now(ZoneOffset.UTC));
         newCaseAuditEventEntity.setSecurityClassification(caseDetails.getSecurityClassification());
         newCaseAuditEventEntity.setData(caseDetails.getData());
@@ -218,6 +222,7 @@ public class DocLinksRestoreService {
         CaseAuditEventEntity latestEvent = (CaseAuditEventEntity) query.getSingleResult();
         newCaseAuditEventEntity.setStateId(latestEvent.getStateId());
         newCaseAuditEventEntity.setStateName(latestEvent.getStateName());
+        newCaseAuditEventEntity.setCaseTypeVersion(latestEvent.getCaseTypeVersion());
 
         IdamUser idamUser = getIdamUser();
         newCaseAuditEventEntity.setUserId(idamUser.getId());
