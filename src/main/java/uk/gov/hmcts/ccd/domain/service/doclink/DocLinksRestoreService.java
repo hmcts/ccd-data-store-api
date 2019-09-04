@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.doclink;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.Option;
@@ -141,11 +142,18 @@ public class DocLinksRestoreService {
             JsonNode docNodeInCase = docNodeParentInCase.path(docNodeName);
 
             // don't touch manually corrected doc-link nodes both in collection and simple field
-            if (!docNodeParentInCase.isMissingNode() && (docNodeInCase.isMissingNode() || docNodeInCase.isNull())) {
+            if (!docNodeParentInCase.isMissingNode() && (docNodeInCase.isMissingNode())) {
                 ((ObjectNode)docNodeParentInCase).set(docNodeName, eventDocLinkNode);
-            } else if (jsonPath.contains(DOT_VALUE)) { // add as a new element
+            } else if (jsonPath.contains(DOT_VALUE) && docNodeParentInCase.isMissingNode()) { // add whole element to end of collection
                 LOG.info("Found manually removed links in the case which are lost from eventId:{} and jsonPath:{}", event.getId(), jsonPath);
-                // TODO : add whole element to end of collection if required
+                String arrayElementPath = jsonPath.substring(0, docNodeParent.lastIndexOf(SLASH));
+                String collectionRootPath = jsonPath.substring(0, arrayElementPath.lastIndexOf(SLASH));
+                JsonNode collectionRoot = detailsData.at(collectionRootPath);
+
+                if (!collectionRoot.isMissingNode()) {
+                    JsonNode eventElementNode = event.getData().at(arrayElementPath);
+                    ((ArrayNode) collectionRoot).add(eventElementNode);
+                }
             }
 
             recoveredFiles.put(eventDocLinkNode.findValuesAsText(DOCUMENT_FILENAME).get(0), eventDocLinkNode.findValuesAsText("document_url").get(0));
@@ -158,8 +166,8 @@ public class DocLinksRestoreService {
         dataClassificationRestoreService.deduceAndUpdateDataClassification(caseDetails);  // Data classification
         caseDetails.setLastModified(LocalDateTime.now(ZoneOffset.UTC));
         em.merge(caseDetails);
-        LOG.info("Restored missing links for case:{} with data:{}", caseDetails.getReference(), getJsonString(caseDetails.getData()));
-        LOG.info("Restored missing link field info for case:{} with classification:{}", caseDetails.getReference(), getJsonString(caseDetails.getDataClassification()));
+        LOG.info("Restored case data for case:{} with data:{}", caseDetails.getReference(), getJsonString(caseDetails.getData()));
+        LOG.info("Restored classification data for case:{} with classification:{}", caseDetails.getReference(), getJsonString(caseDetails.getDataClassification()));
 
         // 2. mark events
         markImpactedEvents(linksToRecoverFromEvent);
