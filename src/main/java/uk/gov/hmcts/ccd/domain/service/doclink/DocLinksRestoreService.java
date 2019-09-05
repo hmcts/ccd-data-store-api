@@ -6,9 +6,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
-import liquibase.util.StringUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.ListUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -131,8 +131,8 @@ public class DocLinksRestoreService {
         linksToRecoverFromEvent.keySet().forEach(jsonPath -> {
             CaseAuditEventEntity event = linksToRecoverFromEvent.get(jsonPath);
 
-            String docNodePath = jsonPath.substring(0, jsonPath.lastIndexOf(SLASH + DOCUMENT_FILENAME)); //Eg : /D8DocumentsUploaded/0/value/DocumentLink
-            String docNodeParent = docNodePath.substring(0, docNodePath.lastIndexOf(SLASH)); //Eg : /D8DocumentsUploaded/0/value
+            String docNodePath = StringUtils.substringBeforeLast(jsonPath,SLASH + DOCUMENT_FILENAME); //Eg : /D8DocumentsUploaded/0/value/DocumentLink
+            String docNodeParent = StringUtils.substringBeforeLast(docNodePath,SLASH); //Eg : /D8DocumentsUploaded/0/value
             JsonNode eventDocLinkNode = event.getData().at(docNodePath);
 
             // restore in case data
