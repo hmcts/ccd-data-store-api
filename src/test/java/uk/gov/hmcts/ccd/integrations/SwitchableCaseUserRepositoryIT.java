@@ -157,10 +157,10 @@ public class SwitchableCaseUserRepositoryIT extends IntegrationTest {
         assertThat(switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID).size(), equalTo(0));
         assertThat(switchableCaseUserRepository.findCaseRoles(CCD_CASE_TYPE_ID,CCD_CASE_REFERENCE,USER_ID).size(),equalTo(0));
 
-        // Grant access for the given Case, User & role.
+        // Grant access for the given Case, User & role :- Case Type = "DIVORCE"
         switchableCaseUserRepository.grantAccess(JURISDICTION, CCD_CASE_REFERENCE.toString(), CCD_CASE_ID , USER_ID, CASE_ROLE_GRANTED);
 
-        // Read the case data & validate that the grant access change is effective
+        // Read the case data & validate that the grant access change is effective in CCD
         caseIds = switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID);
         assertThat(caseIds.size(), equalTo(1));
         assertThat(caseIds.get(0), equalTo(CCD_CASE_ID));
@@ -171,16 +171,19 @@ public class SwitchableCaseUserRepositoryIT extends IntegrationTest {
         // change the AM Switch values to swap the Read access b/w CCD & AM. Also assert the values to validate that the changes are effective.
         changeAMSwitchValuesToSwapRead();
 
-        // Post the AM Switch change :- Retrieve & validate the current size / volume of cases/roles for the User, Case Type & Case Reference combination.
+        // Post the AM Switch change :- validate the current size cases for the User in AM. As there wasn't anything saved into AM this should return 0
         assertThat(switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID).size(), equalTo(0));
 
         // Revoke case user access
         switchableCaseUserRepository.revokeAccess(JURISDICTION, CCD_CASE_REFERENCE.toString(), CCD_CASE_ID, USER_ID, CASE_ROLE_GRANTED);
 
+        //read the case data to check there is no data in AM DB for the given User. As there wasn't anything granted/revoked in AM DB this should return 0
+        assertThat(switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID).size(), equalTo(0));
+
         //revert the AM Switch value back to original config
         preDefineAMSwitchValues();
 
-        //read the case data to validate that the revoke access change is effective
+        //read the case data to validate that the revoke access change is effective in CCD
         assertThat(switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID).size(), equalTo(0));
     }
 
@@ -207,11 +210,14 @@ public class SwitchableCaseUserRepositoryIT extends IntegrationTest {
         // change the AM Switch values to swap the Read access b/w CCD & AM. Also assert the values to validate that the changes are effective.
         changeAMSwitchValuesToSwapRead();
 
-        // Post the AM Switch change :- Retrieve & validate the current size / volume of cases for the User
+        // Post the AM Switch change :- validate the current size cases for the User in CCD. As there wasn't anything saved into CCD this should return 0
         assertThat(switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID).size(), equalTo(0));
 
         // Revoke case user access
         switchableCaseUserRepository.revokeAccess(JURISDICTION, AM_CASE_REFERENCE.toString(), AM_CASE_ID, USER_ID, CASE_ROLE_GRANTED);
+
+        //read the case data to check there is no data in CCD DB for the given User. As there wasn't anything granted/revoked in CCD DB this should return 0
+        assertThat(switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID).size(), equalTo(0));
 
         //revert the AM Switch value back to original config
         preDefineAMSwitchValues();
@@ -231,7 +237,7 @@ public class SwitchableCaseUserRepositoryIT extends IntegrationTest {
         // Grant access for the given Case, User & role.
         switchableCaseUserRepository.grantAccess(JURISDICTION, BOTH_CASE_REFERENCE.toString(), BOTH_CASE_ID, USER_ID, CASE_ROLE_GRANTED);
 
-        // Read the case data & validate that the grant access change is effective
+        // Read the case data & validate that the grant access change is effective - from AM
         caseIds = switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID);
         assertThat(caseIds.size(), equalTo(1));
         assertThat(caseIds.get(0), equalTo(BOTH_CASE_ID));
@@ -239,7 +245,7 @@ public class SwitchableCaseUserRepositoryIT extends IntegrationTest {
         // change the AM Switch values to swap the Read access b/w CCD & AM. Also assert the values to validate that the changes are effective.
         changeAMSwitchValuesToSwapRead();
 
-        // Post the AM Switch change :- Retrieve & validate the current size / volume of cases/roles for the User, Case Type & Case Reference combination.
+        // Post the AM Switch change :- Retrieve & validate the current size / volume of cases/roles for the User, Case Type & Case Reference combination. - from CCD
         caseIds = switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID);
         assertThat(caseIds.size(), equalTo(1));
         assertThat(caseIds.get(0), equalTo(BOTH_CASE_ID));
@@ -247,7 +253,13 @@ public class SwitchableCaseUserRepositoryIT extends IntegrationTest {
         // Revoke access for the given Case, User & role.
         switchableCaseUserRepository.revokeAccess(JURISDICTION, BOTH_CASE_REFERENCE.toString(), BOTH_CASE_ID, USER_ID, CASE_ROLE_GRANTED);
 
-        //read the case data to validate that the revoke access change is effective
+        //read the case data to validate that the revoke access change is effective in CCD
+        assertThat(switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID).size(), equalTo(0));
+
+        // revert the AM Switch to original config
+        preDefineAMSwitchValues();
+
+        //read the case data to validate that the revoke access change is effective in AM
         assertThat(switchableCaseUserRepository.findCasesUserIdHasAccessTo(USER_ID).size(), equalTo(0));
 
     }
