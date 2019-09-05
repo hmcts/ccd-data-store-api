@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.doclink;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.Option;
@@ -128,32 +127,32 @@ public class DocLinksRestoreService {
     private void restoreMissedLinks(CaseDetailsEntity caseDetails, List<CaseAuditEventEntity> events, boolean dryRun) {
         Map<String, CaseAuditEventEntity> linksToRecoverFromEvent = findLinksToRecoverForACase(caseDetails, events);
         Map<String, String> recoveredFiles = new HashMap<>();
+        JsonNode detailsData = caseDetails.getData();
         linksToRecoverFromEvent.keySet().forEach(jsonPath -> {
             CaseAuditEventEntity event = linksToRecoverFromEvent.get(jsonPath);
 
+            // Eg: jsonPath : /D8DocumentsUploaded/0/value/DocumentLink/document_filename
             String docNodePath = StringUtils.substringBeforeLast(jsonPath,SLASH + DOCUMENT_FILENAME); //Eg : /D8DocumentsUploaded/0/value/DocumentLink
-            String docNodeParent = StringUtils.substringBeforeLast(docNodePath,SLASH); //Eg : /D8DocumentsUploaded/0/value
+            String docNodeParent = StringUtils.substringBeforeLast(docNodePath, SLASH); //Eg : /D8DocumentsUploaded/0/value
+            String docNodeName = docNodePath.substring(docNodePath.lastIndexOf(SLASH) + 1);
             JsonNode eventDocLinkNode = event.getData().at(docNodePath);
 
             // restore in case data
-            JsonNode detailsData = caseDetails.getData();
             JsonNode docNodeParentInCase = detailsData.at(docNodeParent);
-            String docNodeName = docNodePath.substring(docNodePath.lastIndexOf(SLASH) + 1);
-            JsonNode docNodeInCase = docNodeParentInCase.path(docNodeName);
 
-            // don't touch manually corrected doc-link nodes both in collection and simple field
-            if (!docNodeParentInCase.isMissingNode() && (docNodeInCase.isMissingNode())) {
-                ((ObjectNode)docNodeParentInCase).set(docNodeName, eventDocLinkNode);
-            } else if (jsonPath.contains(DOT_VALUE) && docNodeParentInCase.isMissingNode()) { // add whole element to end of collection
-                LOG.info("Found manually removed links in the case which are lost from eventId:{} and jsonPath:{}", event.getId(), jsonPath);
-                String arrayElementPath = jsonPath.substring(0, docNodeParent.lastIndexOf(SLASH));
-                String collectionRootPath = jsonPath.substring(0, arrayElementPath.lastIndexOf(SLASH));
-                JsonNode collectionRoot = detailsData.at(collectionRootPath);
+            if (jsonPath.contains(DOT_VALUE)) { // collection field match value
+                String arrayElementPath = StringUtils.substringBeforeLast(jsonPath, DOT_VALUE);
+                String collectionRootPath = StringUtils.substringBeforeLast(arrayElementPath, SLASH);
+                String idValue = event.getData().at(arrayElementPath + "/id").textValue();
 
-                if (!collectionRoot.isMissingNode()) {
-                    JsonNode eventElementNode = event.getData().at(arrayElementPath);
-                    ((ArrayNode) collectionRoot).add(eventElementNode);
+                JsonNode matchingCaseElementNode= findInCaseCollection(detailsData, collectionRootPath, idValue);
+
+                if (!matchingCaseElementNode.isMissingNode() && matchingCaseElementNode.findValue(docNodeName) == null)  {
+                    ((ObjectNode)matchingCaseElementNode.findValue("value")).set(docNodeName, eventDocLinkNode);
                 }
+
+            } else if (!docNodeParentInCase.isMissingNode() && (docNodeParentInCase.path(docNodeName).isMissingNode())) {
+                ((ObjectNode)docNodeParentInCase).set(docNodeName, eventDocLinkNode);
             }
 
             recoveredFiles.put(eventDocLinkNode.findValuesAsText(DOCUMENT_FILENAME).get(0), eventDocLinkNode.findValuesAsText("document_url").get(0));
@@ -162,6 +161,16 @@ public class DocLinksRestoreService {
                 caseDetails.getReference(), event.getId(), docNodePath, detailsData.at(docNodePath).findValuesAsText(DOCUMENT_FILENAME));
         });
 
+        if (!recoveredFiles.isEmpty()) {
+            CaseAuditEventEntity eventBeforeDocsLost = linksToRecoverFromEvent.values().stream()
+                .min(Comparator.comparing(CaseAuditEventEntity::getId)).get();
+            saveToDatabase(caseDetails, dryRun, eventBeforeDocsLost, recoveredFiles);
+        } else {
+            LOG.info("No Missing links identified for case :{}", caseDetails.getReference());
+        }
+    }
+
+    private void saveToDatabase(CaseDetailsEntity caseDetails, boolean dryRun, CaseAuditEventEntity eventBeforeDocsLost, Map<String, String> recoveredFiles) {
         // 1. persist case data
         dataClassificationRestoreService.deduceAndUpdateDataClassification(caseDetails);  // Data classification
         caseDetails.setLastModified(LocalDateTime.now(ZoneOffset.UTC));
@@ -170,7 +179,7 @@ public class DocLinksRestoreService {
         LOG.info("Restored classification data for case:{} with classification:{}", caseDetails.getReference(), getJsonString(caseDetails.getDataClassification()));
 
         // 2. mark events
-        markImpactedEvents(linksToRecoverFromEvent);
+        markImpactedEvents(eventBeforeDocsLost);
 
         // 3. create admin event
         CaseAuditEventEntity adminEvent = createAdminEvent(caseDetails, recoveredFiles);
@@ -195,18 +204,14 @@ public class DocLinksRestoreService {
         return linksToRecoverFromEvent;
     }
 
-    private void markImpactedEvents(Map<String, CaseAuditEventEntity> linksToRecoverFromEvent) {
-        Optional<CaseAuditEventEntity> eventBeforeDocsLost = linksToRecoverFromEvent.values().stream()
-            .min(Comparator.comparing(CaseAuditEventEntity::getId));
-        eventBeforeDocsLost.ifPresent(event -> {
-            List<CaseAuditEventEntity> eventsToMark = getEventsToMark(event);
-            eventsToMark.forEach(e -> {
-                String summary = StringUtils.isNotEmpty(e.getSummary()) ? e.getSummary() + " AND " : e.getSummary();
-                summary = summary
-                    + " In this event history if you see any missing document links please check history of the 'Document recovery' event";
-                e.setSummary(summary);
-                em.merge(e);
-            });
+    private void markImpactedEvents(CaseAuditEventEntity eventBeforeDocsLost) {
+        List<CaseAuditEventEntity> eventsToMark = getEventsToMark(eventBeforeDocsLost);
+        eventsToMark.forEach(e -> {
+            String summary = StringUtils.isNotEmpty(e.getSummary()) ? e.getSummary() + " AND " : e.getSummary();
+            summary = summary
+                + " In this event history if you see any missing document links please check history of the 'Document recovery' event";
+            e.setSummary(summary);
+            em.merge(e);
         });
     }
 
@@ -241,7 +246,8 @@ public class DocLinksRestoreService {
         newCaseAuditEventEntity.setEventId("CCD_ADMIN");
         newCaseAuditEventEntity.setEventName("CCD Admin");
         newCaseAuditEventEntity.setSummary("Document links recovered because of a bug:" + recoveredFiles);
-        newCaseAuditEventEntity.setDescription("Between 20-08-2019 16:35:57 and 21-08-2019 13:40:05 a bug caused document links to disappear from case data");
+        newCaseAuditEventEntity.setDescription("Between 20-08-2019 16:35:57 and 21-08-2019 13:40:05 a bug caused document links to disappear from case data."
+            + " This event recovers all documents lost during the bug period");
         return newCaseAuditEventEntity;
     }
 
