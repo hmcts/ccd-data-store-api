@@ -57,6 +57,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .formLogin().disable()
             .logout().disable()
             .authorizeRequests()
+            .antMatchers("/doclinks/restore").hasAuthority("ccd-admin")
             .anyRequest()
             .authenticated();
     }
