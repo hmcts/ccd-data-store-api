@@ -162,6 +162,17 @@ public class DocLinksRestoreService {
                 caseDetails.getReference(), event.getId(), docNodePath, detailsData.at(docNodePath).findValuesAsText(DOCUMENT_FILENAME));
         });
 
+        if (!recoveredFiles.isEmpty()) {
+            CaseAuditEventEntity eventBeforeDocsLost = linksToRecoverFromEvent.values().stream()
+                .min(Comparator.comparing(CaseAuditEventEntity::getId)).get();
+            saveToDatabase(caseDetails, dryRun, eventBeforeDocsLost, recoveredFiles);
+        } else {
+            LOG.info("No Missing links identified for case :{}", caseDetails.getReference());
+        }
+
+    }
+
+    private void saveToDatabase(CaseDetailsEntity caseDetails, boolean dryRun, CaseAuditEventEntity eventBeforeDocsLost, Map<String, String> recoveredFiles) {
         // 1. persist case data
         dataClassificationRestoreService.deduceAndUpdateDataClassification(caseDetails);  // Data classification
         caseDetails.setLastModified(LocalDateTime.now(ZoneOffset.UTC));
@@ -170,7 +181,7 @@ public class DocLinksRestoreService {
         LOG.info("Restored classification data for case:{} with classification:{}", caseDetails.getReference(), getJsonString(caseDetails.getDataClassification()));
 
         // 2. mark events
-        markImpactedEvents(linksToRecoverFromEvent);
+        markImpactedEvents(eventBeforeDocsLost);
 
         // 3. create admin event
         CaseAuditEventEntity adminEvent = createAdminEvent(caseDetails, recoveredFiles);
@@ -195,18 +206,14 @@ public class DocLinksRestoreService {
         return linksToRecoverFromEvent;
     }
 
-    private void markImpactedEvents(Map<String, CaseAuditEventEntity> linksToRecoverFromEvent) {
-        Optional<CaseAuditEventEntity> eventBeforeDocsLost = linksToRecoverFromEvent.values().stream()
-            .min(Comparator.comparing(CaseAuditEventEntity::getId));
-        eventBeforeDocsLost.ifPresent(event -> {
-            List<CaseAuditEventEntity> eventsToMark = getEventsToMark(event);
-            eventsToMark.forEach(e -> {
-                String summary = StringUtils.isNotEmpty(e.getSummary()) ? e.getSummary() + " AND " : e.getSummary();
-                summary = summary
-                    + " In this event history if you see any missing document links please check history of the 'Document recovery' event";
-                e.setSummary(summary);
-                em.merge(e);
-            });
+    private void markImpactedEvents(CaseAuditEventEntity eventBeforeDocsLost) {
+        List<CaseAuditEventEntity> eventsToMark = getEventsToMark(eventBeforeDocsLost);
+        eventsToMark.forEach(e -> {
+            String summary = StringUtils.isNotEmpty(e.getSummary()) ? e.getSummary() + " AND " : e.getSummary();
+            summary = summary
+                + " In this event history if you see any missing document links please check history of the 'Document recovery' event";
+            e.setSummary(summary);
+            em.merge(e);
         });
     }
 
