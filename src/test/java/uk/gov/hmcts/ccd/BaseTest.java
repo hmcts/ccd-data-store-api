@@ -30,6 +30,7 @@ import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.HttpUIDefinitionGateway;
 import uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
+import uk.gov.hmcts.ccd.data.helper.AccessManagementQueryHelper;
 import uk.gov.hmcts.ccd.data.user.DefaultUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
@@ -41,6 +42,7 @@ import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.client.DocumentManagementRestClient;
+import uk.gov.hmcts.reform.amlib.AccessManagementService;
 
 import javax.inject.Inject;
 import javax.sql.DataSource;
@@ -98,6 +100,7 @@ public abstract class BaseTest {
     private EventTokenService eventTokenService;
     @Inject
     private DocumentManagementRestClient documentManagementRestClient;
+    protected AccessManagementService accessManagementService;
 
     @Before
     public void initMock() throws IOException {
@@ -117,7 +120,13 @@ public abstract class BaseTest {
         ReflectionTestUtils.setField(BaseType.class, "caseDefinitionRepository", caseDefinitionRepository);
 
         setupUIDService();
+        setupAccessManagementService();
     }
+
+    private void setupAccessManagementService() throws IOException {
+        accessManagementService = new AccessManagementService(AccessManagementQueryHelper.amDataSource());
+    }
+
 
     private void setupUIDService() {
         reset(uidService);
