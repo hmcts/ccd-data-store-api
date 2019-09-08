@@ -162,9 +162,8 @@
             file name: jackson-databind-2.9.8.jar
             We've upgraded to jackson-databind 2.9.9 but the dependecy check keeps flagging it, thus mark as false positive.
         ]]></notes>
-        <gav regex="true">^com\.fasterxml\.jackson\.core:jackson-databind:2\.9\.[89]$</gav>
+        <gav regex="true">^com\.fasterxml\.jackson\.core:jackson-databind:2\.9\.8$</gav>
         <cve>CVE-2019-12086</cve>
-        <cve>CVE-2019-14379</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[
@@ -187,6 +186,11 @@
         <vulnerabilityName>CVE-2019-7611</vulnerabilityName>
         <vulnerabilityName>CVE-2018-17244</vulnerabilityName>
         <!-- Temporary suppression to ignore until it's fixed in master -->
+        <vulnerabilityName>CVE-2019-7614</vulnerabilityName>
+    </suppress>
+    <suppress>
+        <notes>Temporary suppression of an issue related to the current stable elasticsearch 6.4.2. On a system with multiple users submitting requests, it could be possible
+            for an attacker to gain access to response header containing sensitive data from another user.</notes>
         <vulnerabilityName>CVE-2019-7614</vulnerabilityName>
     </suppress>
 </suppressions>
