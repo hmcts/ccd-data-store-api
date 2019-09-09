@@ -245,7 +245,7 @@ public class DocLinksRestoreService {
 
         newCaseAuditEventEntity.setEventId("CCD_ADMIN");
         newCaseAuditEventEntity.setEventName("CCD Admin");
-        newCaseAuditEventEntity.setSummary("Document links recovered because of a bug:" + recoveredFiles);
+        newCaseAuditEventEntity.setSummary("Document links recovered because of a bug:" + recoveredFiles.keySet());
         newCaseAuditEventEntity.setDescription("Between 20-08-2019 16:35:57 and 21-08-2019 13:40:05 a bug caused document links to disappear from case data."
             + " This event recovers all documents lost during the bug period");
         return newCaseAuditEventEntity;

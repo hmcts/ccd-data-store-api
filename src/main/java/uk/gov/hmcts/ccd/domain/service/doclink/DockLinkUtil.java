@@ -91,7 +91,8 @@ public class DockLinkUtil {
             // 3. exists but different link names means - manually corrected / replaced with new link
 
             if (matchingCaseElementNode.isMissingNode()) {
-                LOG.warn("Ignoring manually removed link for case :{} from event :{} with link path :{}", caseDetails.getReference(), caseEvent.getId(), jsonPath);
+                LOG.warn("Ignoring manually removed link for case :{} from event :{} with link path :{} and fileName: {}",
+                    caseDetails.getReference(), caseEvent.getId(), jsonPath, eventData.at(jsonPath).textValue());
             } else if (matchingCaseElementNode.findValue(docNodeName) == null)  {
                 isMissed = true;
             } else if (!matchingCaseElementNode.findValue(docNodeName).findValue(DOCUMENT_FILENAME).textValue()
