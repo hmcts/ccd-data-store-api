@@ -90,16 +90,16 @@ public class SwitchableCaseUserRepository implements CaseUserRepository {
         LOG.info("{}. Granting role={} access to caseId={} (caseTypeId={}) for userId={}",
             repositoryType, caseRole, caseId, caseTypeId, userId);
         caseUserRepository.grantAccess(caseTypeId, caseId, userId, caseRole);
-        LOG.info("{}. Granted role={} access to caseId={} (jurisdictionId={}) for userId={}",
+        LOG.info("{}. Granted role={} access to caseId={} (caseTypeId={}) for userId={}",
             repositoryType, caseRole, caseId, caseTypeId, userId);
     }
 
     private void revokeAccess(final String caseTypeId, final Long caseId, final String userId, final String caseRole, final CaseUserRepository caseUserRepository) {
         String repositoryType = getRepositoryType(caseUserRepository);
-        LOG.info("{}. Revoking role={} access to caseId={} (jurisdictionId={}, caseReference={}) for userId={}",
+        LOG.info("{}. Revoking role={} access to caseId={} (caseTypeId={}) for userId={}",
             repositoryType, caseRole, caseId, caseTypeId, userId);
         caseUserRepository.revokeAccess(caseTypeId, caseId, userId, caseRole);
-        LOG.info("{}. Revoked role={} access to caseId={} (jurisdictionId={}) for userId={}",
+        LOG.info("{}. Revoked role={} access to caseId={} (caseTypeId={}) for userId={}",
             repositoryType, caseRole, caseId, caseTypeId, userId);
     }
 
