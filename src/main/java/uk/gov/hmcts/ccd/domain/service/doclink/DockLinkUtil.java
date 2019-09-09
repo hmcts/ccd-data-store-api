@@ -28,7 +28,7 @@ public class DockLinkUtil {
     public static final String DOT_VALUE = "/value/";
     public static final String SLASH = "/";
 
-    public static Pattern BRACKET_PATTERN = Pattern.compile("\\[(.*?)\\]");
+    public static final Pattern BRACKET_PATTERN = Pattern.compile("\\[(.*?)\\]");
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
@@ -46,29 +46,6 @@ public class DockLinkUtil {
     public static String getCollectionRootPath(String jsonPath) {
         String collectionArray = jsonPath.substring(0, jsonPath.lastIndexOf(DOT_VALUE));
         return collectionArray.substring(0, collectionArray.lastIndexOf(SLASH));
-    }
-
-    public static boolean isDockLinkMissingInTheCaseOld(String bracketPath, CaseDetailsEntity caseDetails, CaseAuditEventEntity caseEvent) {
-        JsonNode eventData = caseEvent.getData();
-        JsonNode caseData = caseDetails.getData();
-        String jsonPath = toJsonPtrExpression(bracketPath);
-        JsonNode dockLinkNode = caseData.at(jsonPath);
-        boolean isMissed = false;
-        if (dockLinkNode.isMissingNode() || dockLinkNode.isNull()) {
-            isMissed = true;
-        } else if (jsonPath.contains(DOT_VALUE)) { // collection field match value
-            String eventFileName = eventData.at(jsonPath).textValue();
-            List<String> allFileNamesInTheCaseCollection = caseData.at(getCollectionRootPath(jsonPath)).findValuesAsText(DOCUMENT_FILENAME);
-            isMissed = !allFileNamesInTheCaseCollection.contains(eventFileName);
-            if (isMissed) {
-                LOG.info("Probably manually corrected link jsonPath:{}, eventId:{}", jsonPath, caseEvent.getId());
-            }
-        }
-        if (isMissed) {
-            LOG.info("Document link is missing for case :{} from event :{} with link path :{} and fileName: {}",
-                caseDetails.getReference(), caseEvent.getId(), jsonPath, eventData.at(jsonPath).textValue());
-        }
-        return isMissed;
     }
 
     public static boolean isDockLinkMissingInTheCase(String bracketPath, CaseDetailsEntity caseDetails, CaseAuditEventEntity caseEvent) {

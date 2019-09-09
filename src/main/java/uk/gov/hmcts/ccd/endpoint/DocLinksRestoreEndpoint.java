@@ -24,7 +24,7 @@ public class DocLinksRestoreEndpoint {
         this.docLinksRestoreService = docLinksRestoreService;
     }
 
-    @RequestMapping(value = "/doclinks/restore", method = RequestMethod.GET)
+    @GetMapping(value = "/doclinks/restore")
     public List<Long> findDocLinksMissedCases(
         @RequestParam(value = "jids", required = false) final String jurisdictionIds) {
         List<String> jurisdictionList = StringUtils.isNotEmpty(jurisdictionIds)
@@ -33,7 +33,7 @@ public class DocLinksRestoreEndpoint {
         return docLinksMissedCases.stream().map(c -> c.getId()).collect(Collectors.toList());
     }
 
-    @RequestMapping(value = "/doclinks/restore", method = RequestMethod.POST)
+    @PostMapping(value = "/doclinks/restore")
     public void restoreDocLinks(@RequestBody List<Long> caseReferences,
                                 @RequestParam(value = "dryRun", required = false, defaultValue = "true") final Boolean dryRun) {
         if (dryRun) {
