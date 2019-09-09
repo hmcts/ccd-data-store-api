@@ -169,7 +169,7 @@ public class CaseAccessEndpointIT extends BaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn500AndRollbackWhenCCDAccessGrantedButAMAccessGrantingFailedInWritingToBothMode() throws Exception {
-        doThrow(RuntimeException.class).when(amCaseUserRepository).grantAccess(anyString(), anyLong(), anyString(), anyString());
+        doThrow(RuntimeException.class).when(amCaseUserRepository).grantAccess(anyString(), anyString(), anyLong(), anyString(), anyString());
         grantAccessFailsDueToAMFailure();
     }
 
@@ -177,7 +177,7 @@ public class CaseAccessEndpointIT extends BaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn500AndRollbackWhenCCDAccessRevokedButAMAccessRevokingFailedInWritingToBothMode() throws Exception {
         grantAccess();
-        doThrow(RuntimeException.class).when(amCaseUserRepository).revokeAccess(anyString(), anyLong(), anyString(), anyString());
+        doThrow(RuntimeException.class).when(amCaseUserRepository).revokeAccess(anyString(), anyString(), anyLong(), anyString(), anyString());
         revokeAccessFailsDueToAMFailure();
     }
 

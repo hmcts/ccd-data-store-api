@@ -20,11 +20,11 @@ public class AMCaseUserRepository implements CaseUserRepository {
     private EntityManager em;
 
     @Override
-    public void grantAccess(String caseTypeId, Long caseId, String userId, String caseRole) {
+    public void grantAccess(String jurisdictionId, String caseTypeId, Long caseId, String userId, String caseRole) {
     }
 
     @Override
-    public void revokeAccess(String caseTypeId, Long caseId, String userId, String caseRole) {
+    public void revokeAccess(String jurisdictionId, String caseTypeId, Long caseId, String userId, String caseRole) {
     }
 
     @Override

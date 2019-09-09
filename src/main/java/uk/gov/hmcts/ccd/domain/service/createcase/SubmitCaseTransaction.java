@@ -95,7 +95,8 @@ class SubmitCaseTransaction {
             saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse, event, caseType, idamUser, eventTrigger, newCaseDetails);
 
         if (AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
-            caseUserRepository.grantAccess(caseType.getId(),
+            caseUserRepository.grantAccess(caseType.getJurisdictionId(),
+                                           caseType.getId(),
                                            Long.valueOf(savedCaseDetails.getId()),
                                            idamUser.getId(),
                                            CREATOR.getRole());
