@@ -209,9 +209,8 @@ public class DocLinksRestoreService {
     private void markImpactedEvents(CaseAuditEventEntity eventBeforeDocsLost) {
         List<CaseAuditEventEntity> eventsToMark = getEventsToMark(eventBeforeDocsLost);
         eventsToMark.forEach(e -> {
-            String summary = StringUtils.isNotEmpty(e.getSummary()) ? e.getSummary() + " AND " : e.getSummary();
-            summary = summary
-                + " In this event history if you see any missing document links please check history of the 'Document recovery' event";
+            String summary =  e.getSummary()
+                + " CCD Admin - In this event history if you see any missing document links please check history of the 'CCD Admin' event";
             e.setSummary(summary);
             em.merge(e);
         });
