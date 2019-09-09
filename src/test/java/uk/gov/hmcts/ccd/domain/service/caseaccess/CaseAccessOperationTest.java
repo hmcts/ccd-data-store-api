@@ -77,7 +77,7 @@ class CaseAccessOperationTest {
             caseAccessOperation.grantAccess(JURISDICTION, CASE_REFERENCE.toString(), USER_ID);
 
             assertAll(
-                () -> verify(caseUserRepository).grantAccess(JURISDICTION, CASE_TYPE_ID, CASE_ID, USER_ID, CREATOR.getRole())
+                () -> verify(caseUserRepository).grantAccess(JURISDICTION, CASE_TYPE_ID, CASE_REFERENCE.toString(), CASE_ID, USER_ID, CREATOR.getRole())
             );
         }
 
@@ -89,7 +89,7 @@ class CaseAccessOperationTest {
                     caseAccessOperation.grantAccess(JURISDICTION, CASE_NOT_FOUND.toString(), USER_ID);
                 }),
                 () -> verify(caseDetailsRepository).findByReference(JURISDICTION, CASE_NOT_FOUND),
-                () -> verify(caseUserRepository, never()).grantAccess(JURISDICTION, CASE_TYPE_ID, CASE_ID, USER_ID, CREATOR.getRole())
+                () -> verify(caseUserRepository, never()).grantAccess(JURISDICTION, CASE_TYPE_ID, CASE_REFERENCE.toString(), CASE_ID, USER_ID, CREATOR.getRole())
             );
         }
 
@@ -101,7 +101,7 @@ class CaseAccessOperationTest {
                     caseAccessOperation.grantAccess(WRONG_JURISDICTION, CASE_REFERENCE.toString(), USER_ID);
                 }),
                 () -> verify(caseDetailsRepository).findByReference(WRONG_JURISDICTION, CASE_REFERENCE),
-                () -> verify(caseUserRepository, never()).grantAccess(JURISDICTION, CASE_TYPE_ID, CASE_ID, USER_ID, CREATOR.getRole())
+                () -> verify(caseUserRepository, never()).grantAccess(JURISDICTION, CASE_TYPE_ID, CASE_REFERENCE.toString(), CASE_ID, USER_ID, CREATOR.getRole())
             );
         }
     }
@@ -116,6 +116,8 @@ class CaseAccessOperationTest {
             caseDetails = new CaseDetails();
             caseDetails.setId(CASE_ID.toString());
             caseDetails.setCaseTypeId(CASE_TYPE_ID);
+            caseDetails.setJurisdiction(JURISDICTION);
+            caseDetails.setReference(CASE_REFERENCE);
         }
 
         @Test
@@ -132,7 +134,7 @@ class CaseAccessOperationTest {
         void shouldGrantAccessForCaseRole() {
             caseAccessOperation.updateUserAccess(caseDetails, caseUser(CASE_ROLE));
 
-            verify(caseUserRepository).grantAccess(eq(JURISDICTION), eq(CASE_TYPE_ID), eq(CASE_ID), eq(USER_ID), eq(CASE_ROLE));
+            verify(caseUserRepository).grantAccess(eq(JURISDICTION), eq(CASE_TYPE_ID), eq(CASE_REFERENCE.toString()), eq(CASE_ID), eq(USER_ID), eq(CASE_ROLE));
         }
 
         @Test
@@ -141,8 +143,8 @@ class CaseAccessOperationTest {
             caseAccessOperation.updateUserAccess(caseDetails, caseUser(CASE_ROLE, CREATOR.getRole()));
 
             assertAll(
-                () -> verify(caseUserRepository).grantAccess(eq(JURISDICTION), eq(CASE_TYPE_ID), eq(CASE_ID), eq(USER_ID), eq(CASE_ROLE)),
-                () -> verify(caseUserRepository).grantAccess(eq(JURISDICTION), eq(CASE_TYPE_ID), eq(CASE_ID), eq(USER_ID), eq(CREATOR.getRole()))
+                () -> verify(caseUserRepository).grantAccess(eq(JURISDICTION), eq(CASE_TYPE_ID), eq(CASE_REFERENCE.toString()), eq(CASE_ID), eq(USER_ID), eq(CASE_ROLE)),
+                () -> verify(caseUserRepository).grantAccess(eq(JURISDICTION), eq(CASE_TYPE_ID), eq(CASE_REFERENCE.toString()), eq(CASE_ID), eq(USER_ID), eq(CREATOR.getRole()))
             );
         }
 
@@ -151,7 +153,7 @@ class CaseAccessOperationTest {
         void shouldRevokeRemovedCaseRoles() {
             caseAccessOperation.updateUserAccess(caseDetails, caseUser(CASE_ROLE));
 
-            verify(caseUserRepository).revokeAccess(eq(JURISDICTION), eq(CASE_TYPE_ID), eq(CASE_ID), eq(USER_ID), eq(CASE_ROLE_GRANTED));
+            verify(caseUserRepository).revokeAccess(eq(JURISDICTION), eq(CASE_TYPE_ID), eq(CASE_REFERENCE.toString()), eq(CASE_ID), eq(USER_ID), eq(CASE_ROLE_GRANTED));
         }
 
         @Test
@@ -159,7 +161,7 @@ class CaseAccessOperationTest {
         void shouldIgnoreGrantedCaseRoles() {
             caseAccessOperation.updateUserAccess(caseDetails, caseUser(CASE_ROLE_GRANTED));
 
-            verify(caseUserRepository, never()).grantAccess(JURISDICTION, CASE_TYPE_ID, CASE_ID, USER_ID, CASE_ROLE_GRANTED);
+            verify(caseUserRepository, never()).grantAccess(JURISDICTION, CASE_TYPE_ID, CASE_REFERENCE.toString(), CASE_ID, USER_ID, CASE_ROLE_GRANTED);
         }
     }
 
@@ -173,7 +175,7 @@ class CaseAccessOperationTest {
             caseAccessOperation.revokeAccess(JURISDICTION, CASE_REFERENCE.toString(), USER_ID);
 
             assertAll(
-                () -> verify(caseUserRepository).revokeAccess(JURISDICTION, CASE_TYPE_ID, CASE_ID, USER_ID, CREATOR.getRole())
+                () -> verify(caseUserRepository).revokeAccess(JURISDICTION, CASE_TYPE_ID, CASE_REFERENCE.toString(), CASE_ID, USER_ID, CREATOR.getRole())
             );
         }
 
@@ -185,7 +187,7 @@ class CaseAccessOperationTest {
                     caseAccessOperation.revokeAccess(JURISDICTION, CASE_NOT_FOUND.toString(), USER_ID);
                 }),
                 () -> verify(caseDetailsRepository).findByReference(JURISDICTION, CASE_NOT_FOUND),
-                () -> verify(caseUserRepository, never()).revokeAccess(JURISDICTION, CASE_TYPE_ID, CASE_ID, USER_ID, CREATOR.getRole())
+                () -> verify(caseUserRepository, never()).revokeAccess(JURISDICTION, CASE_TYPE_ID, CASE_REFERENCE.toString(), CASE_ID, USER_ID, CREATOR.getRole())
             );
         }
 
@@ -197,7 +199,7 @@ class CaseAccessOperationTest {
                     caseAccessOperation.revokeAccess(WRONG_JURISDICTION, CASE_REFERENCE.toString(), USER_ID);
                 }),
                 () -> verify(caseDetailsRepository).findByReference(WRONG_JURISDICTION, CASE_REFERENCE),
-                () -> verify(caseUserRepository, never()).revokeAccess(JURISDICTION, CASE_TYPE_ID, CASE_ID, USER_ID, CREATOR.getRole())
+                () -> verify(caseUserRepository, never()).revokeAccess(JURISDICTION, CASE_TYPE_ID, CASE_REFERENCE.toString(), CASE_ID, USER_ID, CREATOR.getRole())
             );
         }
     }
@@ -207,6 +209,7 @@ class CaseAccessOperationTest {
         caseDetails.setId(String.valueOf(CASE_ID));
         caseDetails.setReference(CASE_REFERENCE);
         caseDetails.setCaseTypeId(CASE_TYPE_ID);
+        caseDetails.setJurisdiction(JURISDICTION);
 
         doReturn(Optional.of(caseDetails)).when(caseDetailsRepository)
             .findByReference(JURISDICTION, CASE_REFERENCE);

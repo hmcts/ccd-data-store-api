@@ -94,12 +94,12 @@ class SwitchableCaseUserRepositoryTest {
             @Test
             @DisplayName("should invoke services in order for granting access to user")
             void shouldInvokeServicesInOrder() {
-                caseUserRepository.grantAccess(JURISDICTION, CCD_CASE_TYPE_ID, CCD_CASE_ID, USER_ID, CREATOR.getRole());
+                caseUserRepository.grantAccess(JURISDICTION, CCD_CASE_TYPE_ID, CCD_CASE_REFERENCE.toString(), CCD_CASE_ID, USER_ID, CREATOR.getRole());
 
                 InOrder inOrder = inOrder(caseDetailsRepository, amSwitch, ccdCaseUserRepository, amCaseUserRepository);
                 assertAll(
                     () -> inOrder.verify(amSwitch).isWriteAccessManagementWithCCD(CCD_CASE_TYPE_ID),
-                    () -> inOrder.verify(ccdCaseUserRepository).grantAccess(JURISDICTION, CCD_CASE_TYPE_ID, CCD_CASE_ID, USER_ID, CREATOR.getRole()),
+                    () -> inOrder.verify(ccdCaseUserRepository).grantAccess(JURISDICTION, CCD_CASE_TYPE_ID, CCD_CASE_REFERENCE.toString(), CCD_CASE_ID, USER_ID, CREATOR.getRole()),
                     () -> inOrder.verify(amSwitch).isWriteAccessManagementWithAM(CCD_CASE_TYPE_ID),
                     () -> verifyNoMoreInteractions(ccdCaseUserRepository),
                     () -> verifyZeroInteractions(amCaseUserRepository)
@@ -120,13 +120,13 @@ class SwitchableCaseUserRepositoryTest {
             @Test
             @DisplayName("should invoke services in order for granting access to user")
             void shouldInvokeServicesInOrder() {
-                caseUserRepository.grantAccess(JURISDICTION, AM_CASE_TYPE_ID, AM_CASE_ID, USER_ID, CREATOR.getRole());
+                caseUserRepository.grantAccess(JURISDICTION, AM_CASE_TYPE_ID, AM_CASE_REFERENCE.toString(), AM_CASE_ID, USER_ID, CREATOR.getRole());
 
                 InOrder inOrder = inOrder(caseDetailsRepository, amSwitch, ccdCaseUserRepository, amCaseUserRepository);
                 assertAll(
                     () -> inOrder.verify(amSwitch).isWriteAccessManagementWithCCD(AM_CASE_TYPE_ID),
                     () -> inOrder.verify(amSwitch).isWriteAccessManagementWithAM(AM_CASE_TYPE_ID),
-                    () -> inOrder.verify(amCaseUserRepository).grantAccess(JURISDICTION, AM_CASE_TYPE_ID, AM_CASE_ID, USER_ID, CREATOR.getRole()),
+                    () -> inOrder.verify(amCaseUserRepository).grantAccess(JURISDICTION, AM_CASE_TYPE_ID, AM_CASE_REFERENCE.toString(), AM_CASE_ID, USER_ID, CREATOR.getRole()),
                     () -> verifyNoMoreInteractions(amCaseUserRepository),
                     () -> verifyZeroInteractions(ccdCaseUserRepository)
                 );
@@ -147,14 +147,14 @@ class SwitchableCaseUserRepositoryTest {
             @Test
             @DisplayName("should invoke services in order for granting access to user")
             void shouldInvokeServicesInOrder() {
-                caseUserRepository.grantAccess(JURISDICTION, BOTH_CASE_TYPE_ID, BOTH_CASE_ID, USER_ID, CREATOR.getRole());
+                caseUserRepository.grantAccess(JURISDICTION, BOTH_CASE_TYPE_ID, BOTH_CASE_REFERENCE.toString(), BOTH_CASE_ID, USER_ID, CREATOR.getRole());
 
                 InOrder inOrder = inOrder(caseDetailsRepository, amSwitch, ccdCaseUserRepository, amCaseUserRepository);
                 assertAll(
                     () -> inOrder.verify(amSwitch).isWriteAccessManagementWithCCD(BOTH_CASE_TYPE_ID),
-                    () -> inOrder.verify(ccdCaseUserRepository).grantAccess(JURISDICTION, BOTH_CASE_TYPE_ID, BOTH_CASE_ID, USER_ID, CREATOR.getRole()),
+                    () -> inOrder.verify(ccdCaseUserRepository).grantAccess(JURISDICTION, BOTH_CASE_TYPE_ID, BOTH_CASE_REFERENCE.toString(), BOTH_CASE_ID, USER_ID, CREATOR.getRole()),
                     () -> inOrder.verify(amSwitch).isWriteAccessManagementWithAM(BOTH_CASE_TYPE_ID),
-                    () -> inOrder.verify(amCaseUserRepository).grantAccess(JURISDICTION, BOTH_CASE_TYPE_ID, BOTH_CASE_ID, USER_ID, CREATOR.getRole()),
+                    () -> inOrder.verify(amCaseUserRepository).grantAccess(JURISDICTION, BOTH_CASE_TYPE_ID, BOTH_CASE_REFERENCE.toString(), BOTH_CASE_ID, USER_ID, CREATOR.getRole()),
                     () -> inOrder.verifyNoMoreInteractions(),
                     () -> verifyNoMoreInteractions(amCaseUserRepository),
                     () -> verifyNoMoreInteractions(ccdCaseUserRepository)
@@ -181,11 +181,11 @@ class SwitchableCaseUserRepositoryTest {
             @Test
             @DisplayName("should revoke access to user")
             void shouldRevokeAccess() {
-                caseUserRepository.revokeAccess(JURISDICTION, CCD_CASE_TYPE_ID, CCD_CASE_ID, USER_ID, CREATOR.getRole());
+                caseUserRepository.revokeAccess(JURISDICTION, CCD_CASE_TYPE_ID, CCD_CASE_REFERENCE.toString(), CCD_CASE_ID, USER_ID, CREATOR.getRole());
 
                 assertAll(
                     () -> verify(amSwitch).isWriteAccessManagementWithCCD(CCD_CASE_TYPE_ID),
-                    () -> verify(ccdCaseUserRepository).revokeAccess(JURISDICTION, CCD_CASE_TYPE_ID, CCD_CASE_ID, USER_ID, CREATOR.getRole()),
+                    () -> verify(ccdCaseUserRepository).revokeAccess(JURISDICTION, CCD_CASE_TYPE_ID, CCD_CASE_REFERENCE.toString(), CCD_CASE_ID, USER_ID, CREATOR.getRole()),
                     () -> verifyZeroInteractions(amCaseUserRepository)
                 );
             }
@@ -193,12 +193,12 @@ class SwitchableCaseUserRepositoryTest {
             @Test
             @DisplayName("should invoke services in order for revoking access to user")
             void shouldInvokeServicesInOrder() {
-                caseUserRepository.revokeAccess(JURISDICTION, CCD_CASE_TYPE_ID, CCD_CASE_ID, USER_ID, CREATOR.getRole());
+                caseUserRepository.revokeAccess(JURISDICTION, CCD_CASE_TYPE_ID, CCD_CASE_REFERENCE.toString(), CCD_CASE_ID, USER_ID, CREATOR.getRole());
 
                 InOrder inOrder = inOrder(caseDetailsRepository, amSwitch, ccdCaseUserRepository, amCaseUserRepository);
                 assertAll(
                     () -> inOrder.verify(amSwitch).isWriteAccessManagementWithCCD(CCD_CASE_TYPE_ID),
-                    () -> inOrder.verify(ccdCaseUserRepository).revokeAccess(JURISDICTION, CCD_CASE_TYPE_ID, CCD_CASE_ID, USER_ID, CREATOR.getRole()),
+                    () -> inOrder.verify(ccdCaseUserRepository).revokeAccess(JURISDICTION, CCD_CASE_TYPE_ID, CCD_CASE_REFERENCE.toString(), CCD_CASE_ID, USER_ID, CREATOR.getRole()),
                     () -> inOrder.verify(amSwitch).isWriteAccessManagementWithAM(CCD_CASE_TYPE_ID),
                     inOrder::verifyNoMoreInteractions,
                     () -> verifyNoMoreInteractions(ccdCaseUserRepository),
@@ -220,13 +220,13 @@ class SwitchableCaseUserRepositoryTest {
             @Test
             @DisplayName("should invoke services in order for revoking access to user")
             void shouldInvokeServicesInOrder() {
-                caseUserRepository.revokeAccess(JURISDICTION, AM_CASE_TYPE_ID, AM_CASE_ID, USER_ID, CREATOR.getRole());
+                caseUserRepository.revokeAccess(JURISDICTION, AM_CASE_TYPE_ID, AM_CASE_REFERENCE.toString(), AM_CASE_ID, USER_ID, CREATOR.getRole());
 
                 InOrder inOrder = inOrder(caseDetailsRepository, amSwitch, ccdCaseUserRepository, amCaseUserRepository);
                 assertAll(
                     () -> inOrder.verify(amSwitch).isWriteAccessManagementWithCCD(AM_CASE_TYPE_ID),
                     () -> inOrder.verify(amSwitch).isWriteAccessManagementWithAM(AM_CASE_TYPE_ID),
-                    () -> inOrder.verify(amCaseUserRepository).revokeAccess(JURISDICTION, AM_CASE_TYPE_ID, AM_CASE_ID, USER_ID, CREATOR.getRole()),
+                    () -> inOrder.verify(amCaseUserRepository).revokeAccess(JURISDICTION, AM_CASE_TYPE_ID, AM_CASE_REFERENCE.toString(), AM_CASE_ID, USER_ID, CREATOR.getRole()),
                     () -> inOrder.verifyNoMoreInteractions(),
                     () -> verifyNoMoreInteractions(amCaseUserRepository),
                     () -> verifyZeroInteractions(ccdCaseUserRepository)
@@ -248,14 +248,14 @@ class SwitchableCaseUserRepositoryTest {
             @Test
             @DisplayName("should invoke services in order for revoking access to user")
             void shouldInvokeServicesInOrder() {
-                caseUserRepository.revokeAccess(JURISDICTION, BOTH_CASE_TYPE_ID, BOTH_CASE_ID, USER_ID, CREATOR.getRole());
+                caseUserRepository.revokeAccess(JURISDICTION, BOTH_CASE_TYPE_ID, BOTH_CASE_REFERENCE.toString(), BOTH_CASE_ID, USER_ID, CREATOR.getRole());
 
                 InOrder inOrder = inOrder(caseDetailsRepository, amSwitch, ccdCaseUserRepository, amCaseUserRepository);
                 assertAll(
                     () -> inOrder.verify(amSwitch).isWriteAccessManagementWithCCD(BOTH_CASE_TYPE_ID),
-                    () -> inOrder.verify(ccdCaseUserRepository).revokeAccess(JURISDICTION, BOTH_CASE_TYPE_ID, BOTH_CASE_ID, USER_ID, CREATOR.getRole()),
+                    () -> inOrder.verify(ccdCaseUserRepository).revokeAccess(JURISDICTION, BOTH_CASE_TYPE_ID, BOTH_CASE_REFERENCE.toString(), BOTH_CASE_ID, USER_ID, CREATOR.getRole()),
                     () -> inOrder.verify(amSwitch).isWriteAccessManagementWithAM(BOTH_CASE_TYPE_ID),
-                    () -> inOrder.verify(amCaseUserRepository).revokeAccess(JURISDICTION, BOTH_CASE_TYPE_ID, BOTH_CASE_ID, USER_ID, CREATOR.getRole()),
+                    () -> inOrder.verify(amCaseUserRepository).revokeAccess(JURISDICTION, BOTH_CASE_TYPE_ID, BOTH_CASE_REFERENCE.toString(), BOTH_CASE_ID, USER_ID, CREATOR.getRole()),
                     inOrder::verifyNoMoreInteractions,
                     () -> verifyNoMoreInteractions(amCaseUserRepository),
                     () -> verifyNoMoreInteractions(ccdCaseUserRepository)

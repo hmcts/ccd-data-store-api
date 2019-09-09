@@ -97,6 +97,7 @@ class SubmitCaseTransaction {
         if (AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
             caseUserRepository.grantAccess(caseType.getJurisdictionId(),
                                            caseType.getId(),
+                                           newCaseDetails.getReference().toString(),
                                            Long.valueOf(savedCaseDetails.getId()),
                                            idamUser.getId(),
                                            CREATOR.getRole());
