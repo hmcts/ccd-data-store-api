@@ -105,9 +105,9 @@ public class SwitchableCaseUserRepository implements CaseUserRepository {
 
     private List<Long> findCasesUserIdHasAccessTo(final String userId, final CaseUserRepository caseUserRepository) {
         String repositoryType = getRepositoryType(caseUserRepository);
-        LOG.info("{}. Finding cases userId={} has access to", repositoryType, userId);
+        LOG.info("{}. Finding case ids userId={} has access to", repositoryType, userId);
         List<Long> casesUserIdHasAccessTo = caseUserRepository.findCasesUserIdHasAccessTo(userId);
-        LOG.info("{}. Found cases userId={} has access to", repositoryType, userId);
+        LOG.info("{}. Found caseIds={} userId={} has access to", repositoryType, casesUserIdHasAccessTo, userId);
         return casesUserIdHasAccessTo;
     }
 
