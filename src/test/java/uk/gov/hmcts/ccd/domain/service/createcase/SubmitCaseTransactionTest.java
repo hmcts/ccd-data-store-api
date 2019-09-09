@@ -224,7 +224,7 @@ class SubmitCaseTransactionTest {
                                          this.caseDetails,
                                          IGNORE_WARNING);
 
-        verify(caseUserRepository).grantAccess(JURISDICTION_ID, NEW_CASE_REFERENCE.toString(), Long.valueOf(CASE_ID), IDAM_ID, CREATOR.getRole());
+        verify(caseUserRepository).grantAccess(CASE_TYPE_ID, Long.valueOf(CASE_ID), IDAM_ID, CREATOR.getRole());
     }
 
     @Test

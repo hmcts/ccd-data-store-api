@@ -44,7 +44,7 @@ public class CaseAccessOperation {
             Long.valueOf(caseReference));
 
         final CaseDetails caseDetails = maybeCase.orElseThrow(() -> new CaseNotFoundException(caseReference));
-        caseUserRepository.grantAccess(jurisdictionId, caseReference, Long.valueOf(caseDetails.getId()), userId, CREATOR.getRole());
+        caseUserRepository.grantAccess(caseDetails.getCaseTypeId(), Long.valueOf(caseDetails.getId()), userId, CREATOR.getRole());
     }
 
     @Transactional
@@ -52,7 +52,7 @@ public class CaseAccessOperation {
         final Optional<CaseDetails> maybeCase = caseDetailsRepository.findByReference(jurisdictionId,
             Long.valueOf(caseReference));
         final CaseDetails caseDetails = maybeCase.orElseThrow(() -> new CaseNotFoundException(caseReference));
-        caseUserRepository.revokeAccess(jurisdictionId, caseReference, Long.valueOf(caseDetails.getId()), userId, CREATOR.getRole());
+        caseUserRepository.revokeAccess(caseDetails.getCaseTypeId(), Long.valueOf(caseDetails.getId()), userId, CREATOR.getRole());
     }
 
     public List<String> findCasesUserIdHasAccessTo(final String userId) {
@@ -74,8 +74,8 @@ public class CaseAccessOperation {
         final String userId = caseUser.getUserId();
         final List<String> currentCaseRoles = caseUserRepository.findCaseRoles(caseDetails.getCaseTypeId(), caseId, userId);
 
-        grantAddedCaseRoles(caseDetails.getJurisdiction(), caseDetails.getReferenceAsString(), userId, caseId, currentCaseRoles, targetCaseRoles);
-        revokeRemovedCaseRoles(caseDetails.getJurisdiction(), caseDetails.getReferenceAsString(), userId, caseId, currentCaseRoles, targetCaseRoles);
+        grantAddedCaseRoles(caseDetails.getCaseTypeId(), userId, caseId, currentCaseRoles, targetCaseRoles);
+        revokeRemovedCaseRoles(caseDetails.getCaseTypeId(), userId, caseId, currentCaseRoles, targetCaseRoles);
     }
 
     private void validateCaseRoles(Set<String> validCaseRoles, Set<String> targetCaseRoles) {
@@ -87,25 +87,23 @@ public class CaseAccessOperation {
             });
     }
 
-    private void grantAddedCaseRoles(final String jurisdictionId,
-                                     final String caseReference,
+    private void grantAddedCaseRoles(final String caseTypeId,
                                      final String userId,
                                      final Long caseId,
                                      final List<String> currentCaseRoles,
                                      final Set<String> targetCaseRoles) {
         targetCaseRoles.stream()
             .filter(targetRole -> !currentCaseRoles.contains(targetRole))
-            .forEach(targetRole -> caseUserRepository.grantAccess(jurisdictionId, caseReference, caseId, userId, targetRole));
+            .forEach(targetRole -> caseUserRepository.grantAccess(caseTypeId, caseId, userId, targetRole));
     }
 
-    private void revokeRemovedCaseRoles(final String jurisdictionId,
-                                        final String caseReference,
+    private void revokeRemovedCaseRoles(final String caseTypeId,
                                         final String userId,
                                         final Long caseId,
                                         final List<String> currentCaseRoles,
                                         final Set<String> targetCaseRoles) {
         currentCaseRoles.stream()
             .filter(currentRole -> !targetCaseRoles.contains(currentRole))
-            .forEach(currentRole -> caseUserRepository.revokeAccess(jurisdictionId, caseReference, caseId, userId, currentRole));
+            .forEach(currentRole -> caseUserRepository.revokeAccess(caseTypeId, caseId, userId, currentRole));
     }
 }

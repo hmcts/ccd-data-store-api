@@ -7,12 +7,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Named
@@ -38,27 +36,22 @@ public class SwitchableCaseUserRepository implements CaseUserRepository {
     }
 
     @Override
-    public void grantAccess(final String jurisdictionId, final String caseReference, final Long caseId, final String userId, final String caseRole) {
-        final Optional<CaseDetails> maybeCase = caseDetailsRepository.findByReference(jurisdictionId, Long.valueOf(caseReference));
-        final CaseDetails caseDetails = maybeCase.orElseThrow(() -> new CaseNotFoundException(caseReference));
-        if (amSwitch.isWriteAccessManagementWithCCD(caseDetails.getCaseTypeId())) {
-            grantAccess(jurisdictionId, caseId, caseReference, userId, caseRole, caseDetails, ccdCaseUserRepository);
+    public void grantAccess(final String caseTypeId, final Long caseId, final String userId, final String caseRole) {
+        if (amSwitch.isWriteAccessManagementWithCCD(caseTypeId)) {
+            grantAccess(caseTypeId, caseId, userId, caseRole, ccdCaseUserRepository);
         }
-        if (amSwitch.isWriteAccessManagementWithAM(caseDetails.getCaseTypeId())) {
-            grantAccess(jurisdictionId, caseId, caseReference, userId, caseRole, caseDetails, amCaseUserRepository);
+        if (amSwitch.isWriteAccessManagementWithAM(caseTypeId)) {
+            grantAccess(caseTypeId, caseId, userId, caseRole, amCaseUserRepository);
         }
     }
 
     @Override
-    public void revokeAccess(final String jurisdictionId, final String caseReference, final Long caseId, final String userId, final String caseRole) {
-        final Optional<CaseDetails> maybeCase = caseDetailsRepository.findByReference(jurisdictionId,
-            Long.valueOf(caseReference));
-        final CaseDetails caseDetails = maybeCase.orElseThrow(() -> new CaseNotFoundException(caseReference));
-        if (amSwitch.isWriteAccessManagementWithCCD(caseDetails.getCaseTypeId())) {
-            revokeAccess(jurisdictionId, caseId, caseReference, userId, caseRole, caseDetails, ccdCaseUserRepository);
+    public void revokeAccess(final String caseTypeId, final Long caseId, final String userId, final String caseRole) {
+        if (amSwitch.isWriteAccessManagementWithCCD(caseTypeId)) {
+            revokeAccess(caseTypeId, caseId, userId, caseRole, ccdCaseUserRepository);
         }
-        if (amSwitch.isWriteAccessManagementWithAM(caseDetails.getCaseTypeId())) {
-            revokeAccess(jurisdictionId, caseId, caseReference, userId, caseRole, caseDetails, amCaseUserRepository);
+        if (amSwitch.isWriteAccessManagementWithAM(caseTypeId)) {
+            revokeAccess(caseTypeId, caseId, userId, caseRole, amCaseUserRepository);
         }
     }
 
@@ -92,24 +85,22 @@ public class SwitchableCaseUserRepository implements CaseUserRepository {
         return caseRoles;
     }
 
-    private void grantAccess(final String jurisdictionId, final Long caseId, final String caseReference, final String userId, final String caseRole,
-                             final CaseDetails caseDetails, final CaseUserRepository caseUserRepository) {
+    private void grantAccess(final String caseTypeId, final Long caseId, final String userId, final String caseRole, final CaseUserRepository caseUserRepository) {
         String repositoryType = getRepositoryType(caseUserRepository);
-        LOG.info("{}. Granting role={} access to caseId={} (jurisdictionId={}, caseReference={}) for userId={}",
-            repositoryType, caseRole, caseId, jurisdictionId, caseReference, userId);
-        caseUserRepository.grantAccess(jurisdictionId, caseReference, Long.valueOf(caseDetails.getId()), userId, caseRole);
-        LOG.info("{}. Granted role={} access to caseId={} (jurisdictionId={}, caseReference={}) for userId={}",
-            repositoryType, caseRole, caseId, jurisdictionId, caseReference, userId);
+        LOG.info("{}. Granting role={} access to caseId={} (caseTypeId={}) for userId={}",
+            repositoryType, caseRole, caseId, caseTypeId, userId);
+        caseUserRepository.grantAccess(caseTypeId, caseId, userId, caseRole);
+        LOG.info("{}. Granted role={} access to caseId={} (jurisdictionId={}) for userId={}",
+            repositoryType, caseRole, caseId, caseTypeId, userId);
     }
 
-    private void revokeAccess(final String jurisdictionId, final Long caseId, final String caseReference, final String userId, final String caseRole,
-                              final CaseDetails caseDetails, final CaseUserRepository caseUserRepository) {
+    private void revokeAccess(final String caseTypeId, final Long caseId, final String userId, final String caseRole, final CaseUserRepository caseUserRepository) {
         String repositoryType = getRepositoryType(caseUserRepository);
         LOG.info("{}. Revoking role={} access to caseId={} (jurisdictionId={}, caseReference={}) for userId={}",
-            repositoryType, caseRole, caseId, jurisdictionId, caseReference, userId);
-        caseUserRepository.revokeAccess(jurisdictionId, caseReference, Long.valueOf(caseDetails.getId()), userId, caseRole);
-        LOG.info("{}. Revoked role={} access to caseId={} (jurisdictionId={}, caseReference={}) for userId={}",
-            repositoryType, caseRole, caseId, jurisdictionId, caseReference, userId);
+            repositoryType, caseRole, caseId, caseTypeId, userId);
+        caseUserRepository.revokeAccess(caseTypeId, caseId, userId, caseRole);
+        LOG.info("{}. Revoked role={} access to caseId={} (jurisdictionId={}) for userId={}",
+            repositoryType, caseRole, caseId, caseTypeId, userId);
     }
 
     private List<Long> findCasesUserIdHasAccessTo(final String userId, final CaseUserRepository caseUserRepository) {
