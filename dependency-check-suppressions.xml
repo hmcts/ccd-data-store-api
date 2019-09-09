@@ -191,4 +191,11 @@
             for an attacker to gain access to response header containing sensitive data from another user.</notes>
         <vulnerabilityName>CVE-2019-7614</vulnerabilityName>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: commons-beanutils-1.9.3.jar
+   ]]></notes>
+        <gav regex="true">^commons-beanutils:commons-beanutils:.*$</gav>
+        <cve>CVE-2019-10086</cve>
+    </suppress>
 </suppressions>
