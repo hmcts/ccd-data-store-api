@@ -1,10 +1,5 @@
 package uk.gov.hmcts.ccd.datastore.tests.functional;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.core.IsCollectionContaining.hasItem;
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CASE_TYPE;
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.JURISDICTION;
-
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,6 +11,10 @@ import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FullCase;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event;
 import uk.gov.hmcts.ccd.datastore.tests.helper.CaseTestDataLoaderExtension;
+
+import static org.hamcrest.Matchers.equalTo;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CASE_TYPE;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.JURISDICTION;
 
 @ExtendWith(CaseTestDataLoaderExtension.class)
 @DisplayName("Get case by reference")
@@ -413,8 +412,8 @@ class GetCaseTest extends BaseTest {
     }
 
     @Test
-    @DisplayName("should not read only case he has created if LocalAuthority role has CR access on a case Type")
-    void shouldNotReadCaseHasCreatedIfLaRoleHasCrAccessOnCaseType() {
+    @DisplayName("should not read case he has not created if LocalAuthority role has CR access on a case Type")
+    void shouldNotReadCaseHasNotCreatedIfLaRoleHasCrAccessOnCaseType() {
 
         // Prepare new case in known state
         final Long caseReference  = createFullCaseLocalAuthority("AAT_AUTH_3");
@@ -461,9 +460,10 @@ class GetCaseTest extends BaseTest {
     void shouldNotReadCaseIfCtznRoleHasRuAccessOnCaseType() {
 
         // Prepare new case in known state
-        final Long caseReference  = createFullCaseCitizen("AAT_AUTH_15");
+        final Long caseReference  = createFullCaseCitizen("AAT_AUTH_6");
+        //final Long caseReference = 1567515075020644L;
 
-        asPrivateCaseworkerCitizen(true)
+        asPrivateCaseworkerCitizen2(true)
             .get()
             .given()
             .pathParam("jurisdiction", JURISDICTION)
@@ -486,7 +486,7 @@ class GetCaseTest extends BaseTest {
         // Prepare new case in known state
         final Long caseReference  = createFullCasePanelMember("AAT_AUTH_15");
 
-        asPrivateCaseworkerPanelMember(true)
+        asPrivateCaseworkerPanelMember1(true)
             .get()
             .given()
             .pathParam("jurisdiction", JURISDICTION)

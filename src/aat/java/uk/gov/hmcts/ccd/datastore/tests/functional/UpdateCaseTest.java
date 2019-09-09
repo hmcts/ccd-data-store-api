@@ -1,8 +1,5 @@
 package uk.gov.hmcts.ccd.datastore.tests.functional;
 
-import static org.hamcrest.Matchers.equalTo;
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.JURISDICTION;
-
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +12,9 @@ import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CaseData;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.State;
 import uk.gov.hmcts.ccd.datastore.tests.helper.CaseTestDataLoaderExtension;
+
+import static org.hamcrest.Matchers.equalTo;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.JURISDICTION;
 
 @ExtendWith(CaseTestDataLoaderExtension.class)
 @DisplayName("Update case")
@@ -292,7 +292,7 @@ class UpdateCaseTest extends BaseTest {
             .withData(FullCase.build())
             .submitAndGetReference();
 
-        Event.update(caseReference, "AAT_AUTH_15" )
+        Event.update(caseReference, "AAT_AUTH_15")
             .as(asPrivateCaseworkerSolicitor(true))
             .withData(
                 CaseData.builder()
@@ -317,8 +317,8 @@ class UpdateCaseTest extends BaseTest {
             .withData(FullCase.build())
             .submitAndGetReference();
 
-        Event.update(caseReference, "AAT_AUTH_15" )
-            .as(asPrivateCaseworkerSolicitor1(true))
+        Event.update(caseReference, "AAT_AUTH_15")
+            .as(asPrivateCaseworkerSolicitor(true))
             .withData(
                 CaseData.builder()
                     .numberField(UPDATED_NUMBER)
@@ -338,7 +338,7 @@ class UpdateCaseTest extends BaseTest {
             .withData(FullCase.build())
             .submitAndGetReference();
 
-        Event.update(caseReference, "AAT_AUTH_3" )
+        Event.update(caseReference, "AAT_AUTH_3")
             .as(asPrivateCaseworkerLocalAuthority(true))
             .withData(
                 CaseData.builder()
@@ -354,13 +354,13 @@ class UpdateCaseTest extends BaseTest {
     @Test
     @DisplayName("should update case if the PanelMember has 'U' access on CaseType")
     void shouldUpdateCaseWithPmUAccess() {
-        final Long caseReference = Event.create("AAT_AUTH_4")
-            .as(asPrivateCaseworker(true))
+        final Long caseReference = Event.create("AAT_AUTH_15")
+            .as(asPrivateCaseworkerPanelMember(true))
             .withData(FullCase.build())
             .submitAndGetReference();
 
-        Event.update(caseReference, "AAT_AUTH_4" )
-            .as(asPrivateCaseworkerPanelMember1(true))
+        Event.update(caseReference, "AAT_AUTH_4")
+            .as(asPrivateCaseworkerPanelMember(true))
             .withData(
                 CaseData.builder()
                     .numberField(UPDATED_NUMBER)
@@ -384,7 +384,7 @@ class UpdateCaseTest extends BaseTest {
             .withData(FullCase.build())
             .submitAndGetReference();
 
-        Event.update(caseReference, "AAT_AUTH_6" )
+        Event.update(caseReference, "AAT_AUTH_6")
             .as(asPrivateCaseworkerCitizen(true))
             .withData(
                 CaseData.builder()
@@ -404,13 +404,14 @@ class UpdateCaseTest extends BaseTest {
     @Test
     @DisplayName("should not update a case if the SingleAccess role has 'D' access")
     void shouldNotUpdateCaseWithSingAccsDAccess() {
+
         final Long caseReference = Event.create("AAT_AUTH_8")
             .as(asPrivateCaseworker(true))
             .withData(FullCase.build())
             .submitAndGetReference();
 
-        Event.update(caseReference, "AAT_AUTH_8" )
-            .as(asPrivateCaseworkerPanelMember1(true))
+        Event.update(caseReference, "AAT_AUTH_8")
+            .as(asPrivateCaseworkerCitizen(true))
             .withData(
                 CaseData.builder()
                     .numberField(UPDATED_NUMBER)

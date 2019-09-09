@@ -42,7 +42,8 @@ public class CCDHelper {
             .pathParam("event", event)
             .contentType(ContentType.JSON)
             .when()
-            .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/event-triggers/{event}/token")
+            .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/event-triggers/"
+                + "{event}/token")
             .then()
             .statusCode(200)
             .extract()
@@ -68,7 +69,8 @@ public class CCDHelper {
                      .body(casePayload)
                      .when()
                      .post(
-                         "/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases/{reference}/events");
+                         "/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases/"
+                             + "{reference}/events");
     }
 
     public String generateTokenUpdateCase(Supplier<RequestSpecification> asUser,
@@ -86,7 +88,8 @@ public class CCDHelper {
             .pathParam("event", event)
             .contentType(ContentType.JSON)
             .when()
-            .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases/{reference}/event-triggers/{event}/token")
+            .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases/{reference}/"
+                + "event-triggers/{event}/token")
             .then()
             .statusCode(200)
             .extract()
