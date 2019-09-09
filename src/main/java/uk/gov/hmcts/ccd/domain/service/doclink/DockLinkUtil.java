@@ -84,7 +84,7 @@ public class DockLinkUtil {
             String collectionRootPath = StringUtils.substringBeforeLast(arrayElementPath, SLASH);
             String idValue = eventData.at(arrayElementPath + "/id").textValue();
 
-            JsonNode matchingCaseElementNode= findInCaseCollection(caseData, collectionRootPath, idValue);
+            JsonNode matchingCaseElementNode = findInCaseCollection(caseData, collectionRootPath, idValue);
 
             // 1. matching id not exists means - manually removed
             // 2. exists but no links node - lost because of bug
@@ -96,8 +96,9 @@ public class DockLinkUtil {
             } else if (matchingCaseElementNode.findValue(docNodeName) == null)  {
                 isMissed = true;
             } else if (!matchingCaseElementNode.findValue(docNodeName).findValue(DOCUMENT_FILENAME).textValue()
-                .equalsIgnoreCase(eventData.at(jsonPath).textValue()) ){
-                LOG.warn("Found manually corrected / replaced a new link for case :{} from event :{} with link path :{}", caseDetails.getReference(), caseEvent.getId(), jsonPath);
+                .equalsIgnoreCase(eventData.at(jsonPath).textValue())) {
+                LOG.warn("Found manually corrected / replaced a new link for case :{} from event :{} with link path :{}",
+                    caseDetails.getReference(), caseEvent.getId(), jsonPath);
             }
 
         } else { // Simple field

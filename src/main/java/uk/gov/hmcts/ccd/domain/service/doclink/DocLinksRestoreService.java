@@ -67,7 +67,8 @@ public class DocLinksRestoreService {
     private final Configuration jsonPathConfig;
 
     @Autowired
-    public DocLinksRestoreService(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository, DataClassificationRestoreService dataClassificationRestoreService) {
+    public DocLinksRestoreService(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
+                                  DataClassificationRestoreService dataClassificationRestoreService) {
         this.userRepository = userRepository;
         this.dataClassificationRestoreService = dataClassificationRestoreService;
         this.jsonPathConfig = Configuration.builder().jsonProvider(new JacksonJsonProvider())
@@ -145,7 +146,7 @@ public class DocLinksRestoreService {
                 String collectionRootPath = StringUtils.substringBeforeLast(arrayElementPath, SLASH);
                 String idValue = event.getData().at(arrayElementPath + "/id").textValue();
 
-                JsonNode matchingCaseElementNode= findInCaseCollection(detailsData, collectionRootPath, idValue);
+                JsonNode matchingCaseElementNode = findInCaseCollection(detailsData, collectionRootPath, idValue);
 
                 if (!matchingCaseElementNode.isMissingNode() && matchingCaseElementNode.findValue(docNodeName) == null)  {
                     ((ObjectNode)matchingCaseElementNode.findValue("value")).set(docNodeName, eventDocLinkNode);
@@ -176,7 +177,8 @@ public class DocLinksRestoreService {
         caseDetails.setLastModified(LocalDateTime.now(ZoneOffset.UTC));
         em.merge(caseDetails);
         LOG.info("Restored case data for case:{} with data:{}", caseDetails.getReference(), getJsonString(caseDetails.getData()));
-        LOG.info("Restored classification data for case:{} with classification:{}", caseDetails.getReference(), getJsonString(caseDetails.getDataClassification()));
+        LOG.info("Restored classification data for case:{} with classification:{}", caseDetails.getReference(),
+            getJsonString(caseDetails.getDataClassification()));
 
         // 2. mark events
         markImpactedEvents(eventBeforeDocsLost);
