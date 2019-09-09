@@ -45,7 +45,6 @@ public class AMCaseUserRepository implements CaseUserRepository {
 
         ResourceDefinition resourceDefinition =
             //TODO: What should be the resourceType and resourceName.
-            //To be clarified with Mutlu/Shashank again. resource name: CMC, FPL
             new ResourceDefinition(jurisdictionId, CASE_CONSTANT, caseReference);
 
         ExplicitAccessGrant explicitAccessGrant = ExplicitAccessGrant.builder()
