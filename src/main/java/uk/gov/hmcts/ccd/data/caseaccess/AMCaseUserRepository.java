@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.data.caseaccess;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.google.common.collect.ImmutableSet;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.enums.AccessorType;
@@ -15,6 +14,7 @@ import uk.gov.hmcts.reform.amlib.models.UserCasesEnvelope;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.sql.DataSource;
 import javax.transaction.Transactional;
 import java.util.Collections;
 import java.util.HashMap;
@@ -35,9 +35,8 @@ public class AMCaseUserRepository implements CaseUserRepository {
 
     private AccessManagementService accessManagementService;
 
-    @Autowired
-    public AMCaseUserRepository(AccessManagementService accessManagementService) {
-        this.accessManagementService = accessManagementService;
+    public AMCaseUserRepository(@Qualifier("amDataSource") DataSource dataSource) {
+        accessManagementService = new AccessManagementService(dataSource);
     }
 
     @Override
@@ -90,8 +89,7 @@ public class AMCaseUserRepository implements CaseUserRepository {
     @Override
     @Transactional
     public List<Long> findCasesUserIdHasAccessTo(final String userId) {
-        UserCasesEnvelope userCasesEnvelope =
-            accessManagementService.returnUserCases(userId);
+        UserCasesEnvelope userCasesEnvelope = accessManagementService.returnUserCases(userId);
         return userCasesEnvelope.getCases().stream().map(Long::valueOf).collect(Collectors.toList());
     }
 

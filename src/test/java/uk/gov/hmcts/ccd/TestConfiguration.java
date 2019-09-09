@@ -121,6 +121,7 @@ class TestConfiguration extends ContextCleanupListener {
     }
 
     @Bean
+    @Primary
     DataSource dataSource() throws IOException, SQLException {
         pg = postgresUtil.embeddedPostgres();
         return postgresUtil.dataSource(pg);

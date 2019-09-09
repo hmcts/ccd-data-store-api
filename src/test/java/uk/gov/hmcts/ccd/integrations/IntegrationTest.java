@@ -6,6 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -30,6 +31,7 @@ public abstract class IntegrationTest {
         private EmbeddedPostgres pg;
 
         @Bean
+        @Primary
         public DataSource dataSource() throws IOException, SQLException {
             final PostgresUtil postgresUtil = new PostgresUtil();
             final EmbeddedPostgres pg = postgresUtil.embeddedPostgres();

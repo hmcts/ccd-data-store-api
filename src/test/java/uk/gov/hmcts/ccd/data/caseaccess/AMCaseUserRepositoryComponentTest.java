@@ -3,15 +3,19 @@ package uk.gov.hmcts.ccd.data.caseaccess;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.BaseTest;
 import uk.gov.hmcts.ccd.data.helper.AccessManagementQueryHelper;
-import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import javax.sql.DataSource;
-import java.io.IOException;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -22,6 +26,9 @@ import static uk.gov.hmcts.reform.amlib.enums.RoleType.IDAM;
 import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 
 @Transactional
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = {AccessManagementQueryHelper.class})
+@ActiveProfiles("test")
 public class AMCaseUserRepositoryComponentTest extends BaseTest {
 
     private static final String JURISDICTION_ID = "JURISDICTION";
@@ -36,17 +43,23 @@ public class AMCaseUserRepositoryComponentTest extends BaseTest {
     private static final String CASE_ROLE_SOLICITOR = "[SOLICITOR]";
     private static final String CASE_ROLE_CREATOR = "[CREATOR]";
 
+    @Autowired
     private AMCaseUserRepository repository;
 
+    @Autowired
     private AccessManagementQueryHelper accessManagementQueryHelper;
 
-    @Before
-    public void setUp() throws IOException {
-        DataSource dataSource = AccessManagementQueryHelper.amDataSource();
-        repository = new AMCaseUserRepository(new AccessManagementService(dataSource));
+    @Autowired
+    DefaultRoleSetupImportService defaultRoleSetupImportService;
 
-        DefaultRoleSetupImportService defaultRoleSetupImportService = new DefaultRoleSetupImportService(dataSource);
-        accessManagementQueryHelper = new AccessManagementQueryHelper();
+    @Autowired
+    @Qualifier("amDataSource")
+    private DataSource dataSource;
+
+    @Before
+    public void setUp() {
+
+        defaultRoleSetupImportService = new DefaultRoleSetupImportService(dataSource);
 
         defaultRoleSetupImportService.addService(JURISDICTION_ID);
         defaultRoleSetupImportService.addRole(CASE_ROLE, IDAM, PUBLIC, ROLE_BASED);
@@ -61,9 +74,8 @@ public class AMCaseUserRepositoryComponentTest extends BaseTest {
     }
 
     @After
-    public void tearDown() throws IOException {
+    public void tearDown() {
         accessManagementQueryHelper.deleteAllFromAccessManagementTables();
-        accessManagementQueryHelper.closePostgres();
     }
 
     @Test

@@ -2,11 +2,14 @@ package uk.gov.hmcts.ccd.data.helper;
 
 import com.opentable.db.postgres.embedded.EmbeddedPostgres;
 import org.flywaydb.core.Flyway;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
 import java.io.IOException;
 
+@TestConfiguration
 public class AccessManagementQueryHelper {
     private static DataSource dataSource;
     private static EmbeddedPostgres pg;
@@ -27,6 +30,7 @@ public class AccessManagementQueryHelper {
         jdbcTemplate.update(query);
     }
 
+    @Bean("amDataSource")
     public static DataSource amDataSource() throws IOException {
         dataSource = getPostgres().getPostgresDatabase();
 
@@ -40,13 +44,19 @@ public class AccessManagementQueryHelper {
     }
 
     private static EmbeddedPostgres getPostgres() throws IOException {
-        pg = EmbeddedPostgres.builder().start();
+        if (pg == null) {
+            pg = EmbeddedPostgres.builder().start();
+        }
         return pg;
     }
 
-    public void closePostgres() throws IOException {
-        if (pg != null) {
-            pg.close();
+    public void closePostgres() {
+        try {
+            if (pg != null) {
+                pg.close();
+            }
+        } catch (IOException e) {
+
         }
     }
 }
