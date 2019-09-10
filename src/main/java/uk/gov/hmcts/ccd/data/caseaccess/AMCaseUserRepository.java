@@ -59,10 +59,11 @@ public class AMCaseUserRepository implements CaseUserRepository {
     }
 
     private Map<JsonPointer, Set<Permission>> getAttributePermissions() {
-        return new HashMap<JsonPointer, Set<Permission>>() {{
+        Map attributePermissionMap = new HashMap<JsonPointer, Set<Permission>>();
             //TODO: What should be the permission set? Just read or CRUD?
-            put(JsonPointer.valueOf(""), ImmutableSet.of(READ));
-        }};
+        attributePermissionMap.put(JsonPointer.valueOf(""), ImmutableSet.of(READ));
+        return attributePermissionMap;
+
     }
 
     @Override
