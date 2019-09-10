@@ -119,7 +119,6 @@ public abstract class BaseTest {
         setupUIDService();
     }
 
-
     private void setupUIDService() {
         reset(uidService);
         when(uidService.generateUID()).thenReturn(REFERENCE);
