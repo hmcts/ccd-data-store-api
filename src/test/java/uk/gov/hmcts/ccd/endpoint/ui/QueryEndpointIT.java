@@ -17,6 +17,7 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.READONLY;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WORKBASKET;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -1187,7 +1188,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertThat(field1.getFieldType().getId(), equalTo("Text"));
         assertThat(field1.getFieldType().getType(), equalTo("Text"));
         assertThat(field1.getId(), equalTo("PersonFirstName"));
-        assertThat(field1.getDisplayContext(), equalTo("READONLY"));
+        assertThat(field1.getDisplayContext(), equalTo(READONLY));
 
         final CaseViewField field2 = eventTrigger.getCaseFields().get(1);
         assertThat(field2.getLabel(), equalTo("Last name"));
@@ -1252,7 +1253,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertThat(field1.getFieldType().getId(), equalTo("Text"));
         assertThat(field1.getFieldType().getType(), equalTo("Text"));
         assertThat(field1.getId(), equalTo("PersonFirstName"));
-        assertThat(field1.getDisplayContext(), equalTo("READONLY"));
+        assertThat(field1.getDisplayContext(), equalTo(READONLY));
         assertThat(field1.getShowSummaryContentOption(), equalTo(2));
 
         final CaseViewField field2 = eventTrigger.getCaseFields().get(1);
