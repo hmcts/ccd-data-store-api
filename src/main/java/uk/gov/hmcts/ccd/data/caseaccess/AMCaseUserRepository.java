@@ -59,7 +59,7 @@ public class AMCaseUserRepository implements CaseUserRepository {
     }
 
     private Map<JsonPointer, Set<Permission>> getAttributePermissions() {
-        Map attributePermissionMap = new HashMap<JsonPointer, Set<Permission>>();
+        Map<JsonPointer, Set<Permission>> attributePermissionMap = new HashMap<JsonPointer, Set<Permission>>();
             //TODO: What should be the permission set? Just read or CRUD?
         attributePermissionMap.put(JsonPointer.valueOf(""), ImmutableSet.of(READ));
         return attributePermissionMap;
