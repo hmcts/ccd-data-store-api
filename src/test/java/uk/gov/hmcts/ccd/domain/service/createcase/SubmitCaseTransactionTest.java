@@ -8,6 +8,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Matchers.notNull;
+import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
@@ -136,7 +137,7 @@ class SubmitCaseTransactionTest {
                                                                              this.caseDetails, caseType, IGNORE_WARNING
         );
         doReturn(NEW_CASE_REFERENCE).when(caseDetails).getReference();
-
+        doCallRealMethod().when(caseDetails).getReferenceAsString();
     }
 
     private AboutToSubmitCallbackResponse buildResponse() {
@@ -224,7 +225,7 @@ class SubmitCaseTransactionTest {
                                          this.caseDetails,
                                          IGNORE_WARNING);
 
-        verify(caseUserRepository).grantAccess(JURISDICTION_ID, NEW_CASE_REFERENCE.toString(), Long.valueOf(CASE_ID), IDAM_ID, CREATOR.getRole());
+        verify(caseUserRepository).grantAccess(JURISDICTION_ID, CASE_TYPE_ID, NEW_CASE_REFERENCE.toString(), Long.valueOf(CASE_ID), IDAM_ID, CREATOR.getRole());
     }
 
     @Test

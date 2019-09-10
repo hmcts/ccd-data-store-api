@@ -54,7 +54,7 @@ public class CCDCaseUserRepositoryTest extends BaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldGrantAccessAsCustomCaseRole() {
-        repository.grantAccess(JURISDICTION_ID, CASE_REFERENCE, CASE_ID, USER_ID, CASE_ROLE);
+        repository.grantAccess(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, CASE_ID, USER_ID, CASE_ROLE);
 
         assertThat(countAccesses(CASE_ID, USER_ID, CASE_ROLE), equalTo(1));
         verify(auditRepository).auditGrant(CASE_ID, USER_ID, CASE_ROLE);
@@ -66,7 +66,7 @@ public class CCDCaseUserRepositoryTest extends BaseTest {
         "classpath:sql/insert_case_users.sql",
     })
     public void shouldRevokeAccessAsCustomCaseRole() {
-        repository.revokeAccess(JURISDICTION_ID, CASE_TYPE_ID, CASE_ID_GRANTED, USER_ID_GRANTED, CASE_ROLE);
+        repository.revokeAccess(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, CASE_ID_GRANTED, USER_ID_GRANTED, CASE_ROLE);
 
         assertThat(countAccesses(CASE_ID_GRANTED, USER_ID_GRANTED, CASE_ROLE), equalTo(0));
         verify(auditRepository).auditRevoke(CASE_ID_GRANTED, USER_ID_GRANTED, CASE_ROLE);

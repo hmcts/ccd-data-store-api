@@ -27,13 +27,13 @@ public class CCDCaseUserRepository implements CaseUserRepository {
     }
 
     @Override
-    public void grantAccess(String jurisdictionId, String caseReference, Long caseId, String userId, String caseRole) {
+    public void grantAccess(String jurisdictionId, String caseTypeId, String caseReference, Long caseId, String userId, String caseRole) {
         em.merge(new CaseUserEntity(caseId, userId, caseRole));
         auditRepo.auditGrant(caseId, userId, caseRole);
     }
 
     @Override
-    public void revokeAccess(String jurisdictionId, String caseReference, Long caseId, String userId, String caseRole) {
+    public void revokeAccess(String jurisdictionId, String caseTypeId, String caseReference, Long caseId, String userId, String caseRole) {
         CaseUserEntity primaryKey = new CaseUserEntity(caseId, userId, caseRole);
         CaseUserEntity caseUser = em.find(CaseUserEntity.class, primaryKey.getCasePrimaryKey());
 

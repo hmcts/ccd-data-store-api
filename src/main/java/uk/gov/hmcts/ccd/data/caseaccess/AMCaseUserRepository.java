@@ -41,8 +41,7 @@ public class AMCaseUserRepository implements CaseUserRepository {
 
     @Override
     @Transactional
-    public void grantAccess(String jurisdictionId, String caseReference, Long caseId, String userId, String caseRole) {
-
+    public void grantAccess(String jurisdictionId, String caseTypeId, String caseReference, Long caseId, String userId, String caseRole) {
         ResourceDefinition resourceDefinition =
             //TODO: What should be the resourceType and resourceName.
             new ResourceDefinition(jurisdictionId, CASE_CONSTANT, caseReference);
@@ -68,8 +67,7 @@ public class AMCaseUserRepository implements CaseUserRepository {
 
     @Override
     @Transactional
-    public void revokeAccess(String jurisdictionId, String caseReference, Long caseId, String userId, String caseRole) {
-
+    public void revokeAccess(String jurisdictionId, String caseTypeId, String caseReference, Long caseId, String userId, String caseRole) {
         ExplicitAccessMetadata explicitAccessMetadata =
             ExplicitAccessMetadata.builder()
                 .accessorId(userId)

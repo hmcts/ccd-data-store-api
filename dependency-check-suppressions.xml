@@ -3,8 +3,8 @@
 
     <suppress>
         <notes>
-            Commons BeanUtils: has been updated to
-            http://commons.apache.org/proper/commons-beanutils/index.html
+            We've upgraded to Commons BeanUtils 1.9.4 but the dependecy check keeps flagging CVEs, thus mark as false positive.
+            More info: http://commons.apache.org/proper/commons-beanutils/index.html
         </notes>
         <cve>CVE-2019-10086</cve>
     </suppress>

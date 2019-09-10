@@ -80,7 +80,7 @@ public class AMCaseUserRepositoryComponentTest extends BaseTest {
 
     @Test
     public void shouldGrantAccessAsCustomCaseRole() {
-        repository.grantAccess(JURISDICTION_ID, CASE_REFERENCE, CASE_ID, USER_ID, CASE_ROLE);
+        repository.grantAccess(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, CASE_ID, USER_ID, CASE_ROLE);
         Integer records = accessManagementQueryHelper.findExplicitAccessPermissions(JURISDICTION_ID);
 
         assertThat(records, equalTo(1));
@@ -88,8 +88,8 @@ public class AMCaseUserRepositoryComponentTest extends BaseTest {
 
     @Test
     public void shouldRevokeAccessAsCustomCaseRole() {
-        repository.grantAccess(JURISDICTION_ID, CASE_REFERENCE, CASE_ID, USER_ID, CASE_ROLE);
-        repository.revokeAccess(JURISDICTION_ID, CASE_REFERENCE, CASE_ID, USER_ID, CASE_ROLE);
+        repository.grantAccess(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, CASE_ID, USER_ID, CASE_ROLE);
+        repository.revokeAccess(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, CASE_ID, USER_ID, CASE_ROLE);
 
         Integer records = accessManagementQueryHelper.findExplicitAccessPermissions(JURISDICTION_ID);
         assertThat(records, equalTo(0));
@@ -97,15 +97,15 @@ public class AMCaseUserRepositoryComponentTest extends BaseTest {
 
     @Test
     public void shouldFindCasesUserIdHasAccessTo() {
-        repository.grantAccess(JURISDICTION_ID, CASE_REFERENCE, CASE_ID, USER_ID, CASE_ROLE);
+        repository.grantAccess(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, CASE_ID, USER_ID, CASE_ROLE);
         List<Long> caseIds = repository.findCasesUserIdHasAccessTo(USER_ID);
 
         assertThat(caseIds.size(), equalTo(1));
         assertThat(caseIds.get(0), equalTo(CASE_ID));
 
-        repository.grantAccess(JURISDICTION_ID, CASE_REFERENCE, CASE_ID, USER_ID_GRANTED, CASE_ROLE);
-        repository.grantAccess(JURISDICTION_ID, CASE_REFERENCE, CASE_ID_3, USER_ID_GRANTED, CASE_ROLE);
-        repository.grantAccess(JURISDICTION_ID, CASE_REFERENCE, CASE_ID_GRANTED, USER_ID_GRANTED, CASE_ROLE);
+        repository.grantAccess(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, CASE_ID, USER_ID_GRANTED, CASE_ROLE);
+        repository.grantAccess(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, CASE_ID_3, USER_ID_GRANTED, CASE_ROLE);
+        repository.grantAccess(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, CASE_ID_GRANTED, USER_ID_GRANTED, CASE_ROLE);
 
         caseIds = repository.findCasesUserIdHasAccessTo(USER_ID_GRANTED);
 
@@ -115,15 +115,15 @@ public class AMCaseUserRepositoryComponentTest extends BaseTest {
 
     @Test
     public void shouldFindCaseRolesUserPerformsForCase() {
-        repository.grantAccess(JURISDICTION_ID, CASE_REFERENCE, CASE_ID, USER_ID, CASE_ROLE_CREATOR);
+        repository.grantAccess(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, CASE_ID, USER_ID, CASE_ROLE_CREATOR);
         List<String> caseRoles = repository.findCaseRoles(CASE_TYPE_ID, CASE_ID, USER_ID);
 
         assertThat(caseRoles.size(), equalTo(1));
         assertThat(caseRoles.get(0), equalTo(CASE_ROLE_CREATOR));
 
-        repository.grantAccess(JURISDICTION_ID, CASE_REFERENCE, CASE_ID, USER_ID, CASE_ROLE);
-        repository.grantAccess(JURISDICTION_ID, CASE_REFERENCE, CASE_ID, USER_ID, CASE_ROLE_CREATOR);
-        repository.grantAccess(JURISDICTION_ID, CASE_REFERENCE, CASE_ID, USER_ID, CASE_ROLE_SOLICITOR);
+        repository.grantAccess(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, CASE_ID, USER_ID, CASE_ROLE);
+        repository.grantAccess(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, CASE_ID, USER_ID, CASE_ROLE_CREATOR);
+        repository.grantAccess(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, CASE_ID, USER_ID, CASE_ROLE_SOLICITOR);
 
         caseRoles = repository.findCaseRoles(CASE_TYPE_ID, CASE_ID, USER_ID);
 
