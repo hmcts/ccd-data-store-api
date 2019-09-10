@@ -149,7 +149,8 @@ public class DocLinksRestoreService {
                 JsonNode matchingCaseElementNode = findInCaseCollection(detailsData, collectionRootPath, idValue);
 
                 if (!matchingCaseElementNode.isMissingNode() && matchingCaseElementNode.findValue(docNodeName) == null)  {
-                    ((ObjectNode)matchingCaseElementNode.findValue("value")).set(docNodeName, eventDocLinkNode);
+                    JsonNode parentNode = matchingCaseElementNode.path(StringUtils.substringAfterLast(docNodeParent, SLASH));
+                    ((ObjectNode)parentNode).set(docNodeName, eventDocLinkNode);
                 }
 
             } else if (!docNodeParentInCase.isMissingNode() && (docNodeParentInCase.path(docNodeName).isMissingNode())) {
