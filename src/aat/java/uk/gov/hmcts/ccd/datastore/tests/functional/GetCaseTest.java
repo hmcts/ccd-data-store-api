@@ -460,7 +460,7 @@ class GetCaseTest extends BaseTest {
     void shouldNotReadCaseIfCtznRoleHasRuAccessOnCaseType() {
 
         // Prepare new case in known state
-        final Long caseReference  = createFullCaseCitizen("AAT_AUTH_6");
+        final Long caseReference  = createFullCaseCitizen("AAT_AUTH_15");
         //final Long caseReference = 1567515075020644L;
 
         asPrivateCaseworkerCitizen2(true)

@@ -11,6 +11,9 @@ import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType;
 import uk.gov.hmcts.ccd.datastore.tests.helper.CaseTestDataLoaderExtension;
 
+import java.time.LocalDate;
+
+import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CASE_TYPE;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.JURISDICTION;
 
@@ -206,7 +209,9 @@ class SearchCaseTest extends BaseTest {
         final Long caseReference  = createFullCaseSolicitor("AAT_AUTH_15");
         final Long caseReference1 = createFullCaseSolicitor1("AAT_AUTH_15");
 
-        asPrivateCaseworkerSolicitor(true)
+        LocalDate today = LocalDate.now();
+
+        asPrivateCaseworkerSolicitor1(true)
             .get()
             .given()
             .pathParam("jurisdiction", JURISDICTION)
@@ -214,12 +219,11 @@ class SearchCaseTest extends BaseTest {
             .contentType(ContentType.JSON)
 
             .when()
-            .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases")
-
+            .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases?created_date="
+                + today)
             .then()
-            .statusCode(200).assertThat().body("isEmpty()", Matchers.is(false));
-        //  .statusCode(200).assertThat();
-        //  .body("id", hasItem( caseReference ),true);
+            .statusCode(200).assertThat().body("isEmpty()", Matchers.is(false))
+            .body("id", hasItem(caseReference1));
     }
 
     @Test
@@ -237,7 +241,6 @@ class SearchCaseTest extends BaseTest {
 
             .when()
             .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases")
-
             .then()
             .statusCode(200).assertThat().body("isEmpty()", Matchers.is(true));
     }
@@ -249,7 +252,9 @@ class SearchCaseTest extends BaseTest {
         final Long caseReference  = createFullCaseLocalAuthority("AAT_AUTH_3");
         final Long caseReference1 = createFullCaseLocalAuthority1("AAT_AUTH_3");
 
-        asPrivateCaseworkerLocalAuthority(true)
+        LocalDate today = LocalDate.now();
+
+        asPrivateCaseworkerLocalAuthority1(true)
             .get()
             .given()
             .pathParam("jurisdiction", JURISDICTION)
@@ -257,10 +262,11 @@ class SearchCaseTest extends BaseTest {
             .contentType(ContentType.JSON)
 
             .when()
-            .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases")
-
+            .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases?created_date="
+                + today)
             .then()
-            .statusCode(200).assertThat().body("isEmpty()", Matchers.is(false));
+            .statusCode(200).assertThat().body("isEmpty()", Matchers.is(false))
+            .body("id", hasItem(caseReference1));
     }
 
     @Test
@@ -278,7 +284,6 @@ class SearchCaseTest extends BaseTest {
 
             .when()
             .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases")
-
             .then()
             .statusCode(200).assertThat().body("isEmpty()", Matchers.is(true));
     }
@@ -298,7 +303,6 @@ class SearchCaseTest extends BaseTest {
 
             .when()
             .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases")
-
             .then()
             .statusCode(200).assertThat().body("isEmpty()", Matchers.is(true));
     }
@@ -319,7 +323,6 @@ class SearchCaseTest extends BaseTest {
 
             .when()
             .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases")
-
             .then()
             .statusCode(200).assertThat().body("isEmpty()", Matchers.is(true));
     }
@@ -340,11 +343,9 @@ class SearchCaseTest extends BaseTest {
 
             .when()
             .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases")
-
             .then()
             .statusCode(200).assertThat().body("isEmpty()", Matchers.is(true));
     }
-
 
 
     /*

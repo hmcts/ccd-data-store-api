@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.datastore.tests.functional;
 
 import io.restassured.http.ContentType;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -309,6 +310,7 @@ class UpdateCaseTest extends BaseTest {
             .body("TextField", equalTo(AATCaseBuilder.TEXT));
     }
 
+    @Disabled
     @Test
     @DisplayName("should not update not created case if the Solicitor has 'CRUD' access on CaseType")
     void shouldNotUpdateOthersCaseWithSolsCrudAccess() {
@@ -317,15 +319,14 @@ class UpdateCaseTest extends BaseTest {
             .withData(FullCase.build())
             .submitAndGetReference();
 
-        Event.update(caseReference, "AAT_AUTH_15")
-            .as(asPrivateCaseworkerSolicitor(true))
+        Event.update(caseReference)
+            .as(asPrivateCaseworkerSolicitor1(true))
             .withData(
                 CaseData.builder()
                     .numberField(UPDATED_NUMBER)
                     .build()
             )
             .submit()
-
             .then()
             .statusCode(404);
     }
@@ -346,7 +347,6 @@ class UpdateCaseTest extends BaseTest {
                     .build()
             )
             .submit()
-
             .then()
             .statusCode(404);
     }
@@ -379,8 +379,8 @@ class UpdateCaseTest extends BaseTest {
     @Test
     @DisplayName("should update case if the Citizen has 'RU' access on CaseType")
     void shouldUpdateCaseWithCtznRuAccess() {
-        final Long caseReference = Event.create("AAT_AUTH_6")
-            .as(asPrivateCaseworker(true))
+        final Long caseReference = Event.create("AAT_AUTH_15")
+            .as(asPrivateCaseworkerCitizen(true))
             .withData(FullCase.build())
             .submitAndGetReference();
 
@@ -405,20 +405,19 @@ class UpdateCaseTest extends BaseTest {
     @DisplayName("should not update a case if the SingleAccess role has 'D' access")
     void shouldNotUpdateCaseWithSingAccsDAccess() {
 
-        final Long caseReference = Event.create("AAT_AUTH_8")
-            .as(asPrivateCaseworker(true))
+        final Long caseReference = Event.create("AAT_AUTH_3")
+            .as(asPrivateCaseworkerPanelMember(true))
             .withData(FullCase.build())
             .submitAndGetReference();
 
         Event.update(caseReference, "AAT_AUTH_8")
-            .as(asPrivateCaseworkerCitizen(true))
+            .as(asPrivateCaseworkerPanelMember(true))
             .withData(
                 CaseData.builder()
                     .numberField(UPDATED_NUMBER)
                     .build()
             )
             .submit()
-
             .then()
             .statusCode(404);
     }
