@@ -245,9 +245,9 @@ public class DocLinksRestoreService {
 
         newCaseAuditEventEntity.setEventId("SYSTEM_MAINTENANCE");
         newCaseAuditEventEntity.setEventName("System Maintenance");
-        newCaseAuditEventEntity.setSummary("Document links recovered because of a bug:" + recoveredFiles.keySet().size());
-        newCaseAuditEventEntity.setDescription("Between 20-08-2019 16:35:57 and 21-08-2019 13:40:05 a bug caused document links to disappear from case data."
-            + " This event recovers all documents lost during the bug period");
+        newCaseAuditEventEntity.setSummary("Checks required for reattached documents");
+        newCaseAuditEventEntity.setDescription("Documents removed from this case in error during maintenance between" +
+            " 20-08-2019 16:35 and 21-08-2019 13:41 have been reattached. Please check the documents attached to this case are as expected");
         return newCaseAuditEventEntity;
     }
 
