@@ -76,16 +76,16 @@ public class DocLinksRestoreService {
     }
 
     @Transactional(readOnly = true)
-    public void restoreWithDryRun(List<Long> caseReferences) {
-        restoreByCaseReferences(caseReferences, true);
+    public List<CaseDetailsEntity> restoreWithDryRun(List<Long> caseReferences) {
+        return restoreByCaseReferences(caseReferences, true);
     }
 
     @Transactional
-    public void restoreWithPersist(List<Long> caseReferences) {
-        restoreByCaseReferences(caseReferences, false);
+    public List<CaseDetailsEntity> restoreWithPersist(List<Long> caseReferences) {
+        return restoreByCaseReferences(caseReferences, false);
     }
 
-    private void restoreByCaseReferences(List<Long> caseReferences, boolean dryRun) {
+    private List<CaseDetailsEntity> restoreByCaseReferences(List<Long> caseReferences, boolean dryRun) {
         Query query = em.createNativeQuery(CASE_QUERY, CaseDetailsEntity.class).setParameter("caseReferences", caseReferences);
         List<CaseDetailsEntity> caseDetailsEntities = query.getResultList();
 
@@ -98,6 +98,7 @@ public class DocLinksRestoreService {
         if (CollectionUtils.isNotEmpty(newCases)) {
             restoreNewCasesBasedOnEventHistory(newCases, dryRun);
         }
+        return ListUtils.union(oldCases, newCases);
     }
 
     private void restoreOldCasesBasedOnEventHistory(List<CaseDetailsEntity> caseDetailsEntities, boolean dryRun) {
@@ -177,9 +178,6 @@ public class DocLinksRestoreService {
         dataClassificationRestoreService.deduceAndUpdateDataClassification(caseDetails);  // Data classification
         caseDetails.setLastModified(LocalDateTime.now(ZoneOffset.UTC));
         em.merge(caseDetails);
-        LOG.info("Restored case data for case:{} with data:{}", caseDetails.getReference(), getJsonString(caseDetails.getData()));
-        LOG.info("Restored classification data for case:{} with classification:{}", caseDetails.getReference(),
-            getJsonString(caseDetails.getDataClassification()));
 
         // 2. mark events
         markImpactedEvents(eventBeforeDocsLost);
@@ -189,7 +187,7 @@ public class DocLinksRestoreService {
         if (!dryRun) {
             em.persist(adminEvent);
         }
-        LOG.info("Created adminEvent with id:{}, summary:{} and data:{}", adminEvent.getId(), adminEvent.getSummary(), getJsonString(adminEvent.getData()));
+        LOG.info("Created adminEvent with id:{}, summary:{} and description:{}", adminEvent.getId(), adminEvent.getSummary(), adminEvent.getDescription());
     }
 
     private Map<String, CaseAuditEventEntity> findLinksToRecoverForACase(CaseDetailsEntity caseDetails, List<CaseAuditEventEntity> events) {
@@ -211,7 +209,7 @@ public class DocLinksRestoreService {
         List<CaseAuditEventEntity> eventsToMark = getEventsToMark(eventBeforeDocsLost);
         eventsToMark.forEach(e -> {
             String summary =  e.getSummary()
-                + " CCD Admin - In this event history if you see any missing document links please check history of the 'CCD Admin' event";
+                + " System Maintenance - In this event history if you see any missing document links please check history of the 'System Maintenance' event";
             e.setSummary(summary);
             em.merge(e);
         });
@@ -245,9 +243,9 @@ public class DocLinksRestoreService {
         newCaseAuditEventEntity.setUserLastName(idamUser.getSurname());
         newCaseAuditEventEntity.setUserFirstName(idamUser.getForename());
 
-        newCaseAuditEventEntity.setEventId("CCD_ADMIN");
-        newCaseAuditEventEntity.setEventName("CCD Admin");
-        newCaseAuditEventEntity.setSummary("Document links recovered because of a bug:" + recoveredFiles.keySet());
+        newCaseAuditEventEntity.setEventId("SYSTEM_MAINTENANCE");
+        newCaseAuditEventEntity.setEventName("System Maintenance");
+        newCaseAuditEventEntity.setSummary("Document links recovered because of a bug:" + recoveredFiles.keySet().size());
         newCaseAuditEventEntity.setDescription("Between 20-08-2019 16:35:57 and 21-08-2019 13:40:05 a bug caused document links to disappear from case data."
             + " This event recovers all documents lost during the bug period");
         return newCaseAuditEventEntity;

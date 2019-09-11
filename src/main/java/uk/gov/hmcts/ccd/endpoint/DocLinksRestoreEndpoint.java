@@ -9,6 +9,7 @@ import uk.gov.hmcts.ccd.domain.service.doclink.DocLinksRestoreService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,13 +35,25 @@ public class DocLinksRestoreEndpoint {
     }
 
     @PostMapping(value = "/doclinks/restore")
-    public void restoreDocLinks(@RequestBody List<Long> caseReferences,
-                                @RequestParam(value = "dryRun", required = false, defaultValue = "true") final Boolean dryRun) {
+    public List<CaseDetailsEntity> restoreDocLinks(@RequestBody List<Long> caseReferences,
+                                @RequestParam(value = "dryRun", required = false, defaultValue = "true") final Boolean dryRun,
+                                                   @RequestParam(value = "returnDataForCases", required = false) final String returnDataForCases) {
+        List<String> returnCaseReferenceList = StringUtils.isNotEmpty(returnDataForCases)
+            ? Arrays.asList(returnDataForCases.split(",")) : new ArrayList<>();
+
+        List<CaseDetailsEntity> recoveredCases;
+
         if (dryRun) {
-            docLinksRestoreService.restoreWithDryRun(caseReferences);
+            recoveredCases = docLinksRestoreService.restoreWithDryRun(caseReferences);
         } else {
-            docLinksRestoreService.restoreWithPersist(caseReferences);
+            recoveredCases = docLinksRestoreService.restoreWithPersist(caseReferences);
         }
+        if (!returnCaseReferenceList.isEmpty()) {
+            return recoveredCases.stream()
+                .filter(c -> returnCaseReferenceList.contains(String.valueOf(c.getReference())))
+                .collect(Collectors.toList());
+        }
+        return Collections.emptyList();
     }
 }
 
