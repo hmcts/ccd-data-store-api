@@ -18,6 +18,12 @@ java:
     DATA_STORE_DB_USERNAME: "{{ .Values.postgresql.postgresqlUsername}}"
     DATA_STORE_DB_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
 
+    AM_DB_HOST: "{{ .Release.Name }}-amPostgresql"
+    AM_DB_PORT: 5600
+    AM_DB_NAME: "{{ .Values.postgresql.amPostgresqlDatabase}}"
+    AM_DB_USERNAME: "{{ .Values.postgresql.amPostgresqlUsername}}"
+    AM_DB_PASSWORD: "{{ .Values.postgresql.amPostgresqlPassword}}"
+
     CCD_DM_DOMAIN: https?://dm-store.*
     
     CCD_DRAFT_TTL_DAYS: 180

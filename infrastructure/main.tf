@@ -116,6 +116,12 @@ module "ccd-data-store-api" {
     DATA_STORE_DB_MAX_POOL_SIZE = "${var.data_store_max_pool_size}"
     DATA_STORE_DB_OPTIONS = "?stringtype=unspecified&sslmode=require"
 
+    AM_DB_HOST = "${module.access-management-db.am_postgresql_host_name}"
+    AM_DB_PORT = "${module.access-management-db.am_postgresql_listen_port}"
+    AM_DB_NAME = "${module.access-management-db.am_postgresql_database}"
+    AM_DB_USERNAME = "${module.access-management-db.am_postgresql_user}"
+    AM_DB_PASSWORD = "${module.access-management-db.am_postgresql_pass}"
+
     ENABLE_DB_MIGRATE = "false"
 
     DEFINITION_STORE_HOST               = "${local.definition_store_host}"
@@ -182,6 +188,11 @@ module "data-store-db" {
   common_tags  = "${var.common_tags}"
 }
 
+module "access-management-db" {
+  am_postgresql_user = "${var.am_postgresql_user}"
+  am_database_name = "${var.am_postgresql_database}"
+}
+
 ////////////////////////////////
 // Populate Vault with DB info
 ////////////////////////////////
@@ -213,6 +224,36 @@ resource "azurerm_key_vault_secret" "POSTGRES_PORT" {
 resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
   name = "${var.component}-POSTGRES-DATABASE"
   value = "${module.data-store-db.postgresql_database}"
+  key_vault_id = "${data.azurerm_key_vault.ccd_shared_key_vault.id}"
+}
+
+resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
+  name = "AM-POSTGRES-DATABASE"
+  value = "${module.access-management-db.am_postgresql_database}"
+  key_vault_id = "${data.azurerm_key_vault.ccd_shared_key_vault.id}"
+}
+
+resource "azurerm_key_vault_secret" "AM-POSTGRES-USER" {
+  name = "AM-POSTGRES-USER"
+  value = "${module.access-management-db.am_postgresql_user}"
+  key_vault_id = "${data.azurerm_key_vault.ccd_shared_key_vault.id}"
+}
+
+resource "azurerm_key_vault_secret" "AM-POSTGRES-PASS" {
+  name = "AM-POSTGRES-PASS"
+  value = "${module.access-management-db.am_postgresql_pass}"
+  key_vault_id = "${data.azurerm_key_vault.ccd_shared_key_vault.id}"
+}
+
+resource "azurerm_key_vault_secret" "AM-POSTGRES_HOST" {
+  name = "AM-POSTGRES-HOST"
+  value = "${module.access-management-db.am_postgresql_host_name}"
+  key_vault_id = "${data.azurerm_key_vault.ccd_shared_key_vault.id}"
+}
+
+resource "azurerm_key_vault_secret" "AM-POSTGRES_PORT" {
+  name = "AM-POSTGRES-PORT"
+  value = "${module.access-management-db.am_postgresql_listen_port}"
   key_vault_id = "${data.azurerm_key_vault.ccd_shared_key_vault.id}"
 }
 

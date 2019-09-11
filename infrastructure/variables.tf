@@ -86,8 +86,16 @@ variable "postgresql_user" {
   default = "ccd"
 }
 
+variable "am_postgresql_user" {
+  default = "amuser"
+}
+
 variable "database_name" {
   default = "ccd_data_store"
+}
+
+variable "am_postgresql_database" {
+  default = "am"
 }
 
 variable "data_store_max_pool_size" {

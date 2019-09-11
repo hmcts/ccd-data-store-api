@@ -18,6 +18,11 @@ java:
     DATA_STORE_DB_NAME: ccd_data_store
     DATA_STORE_DB_OPTIONS: "?stringtype=unspecified&sslmode=require"
 
+    AM_DB_NAME: am
+    AM_DB_HOST: ccd-data-store-api-postgres-db-aat.postgres.database.azure.com
+    AM_DB_PORT: ccd@ccd-data-store-api-postgres-db-aat
+    AM_DB_USERNAME:
+
     IDAM_S2S_URL: http://rpe-service-auth-provider-java.software-engineering
     DEFINITION_STORE_HOST: http://ccd-definition-store-api-java.ccd
     USER_PROFILE_HOST: http://ccd-user-profile-api-java.ccd
