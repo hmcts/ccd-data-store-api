@@ -10,6 +10,7 @@ import com.github.tomakehurst.wiremock.common.Slf4jNotifier;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -30,6 +31,7 @@ import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.HttpUIDefinitionGateway;
 import uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
+import uk.gov.hmcts.ccd.data.helper.AccessManagementQueryHelper;
 import uk.gov.hmcts.ccd.data.user.DefaultUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
@@ -134,6 +136,11 @@ public abstract class BaseTest {
 
         // Force re-initialisation of base types for each test suite
         ReflectionTestUtils.setField(BaseType.class, "initialised", false);
+    }
+
+    @AfterEach
+    public void clearPostgres() {
+        AccessManagementQueryHelper.closePostgres();
     }
 
     @After

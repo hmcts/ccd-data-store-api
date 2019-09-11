@@ -2,6 +2,9 @@ package uk.gov.hmcts.ccd.data.helper;
 
 import com.opentable.db.postgres.embedded.EmbeddedPostgres;
 import org.flywaydb.core.Flyway;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -11,6 +14,9 @@ import java.io.IOException;
 
 @TestConfiguration
 public class AccessManagementQueryHelper {
+
+    private static final Logger LOG = LoggerFactory.getLogger(AccessManagementQueryHelper.class);
+
     private static DataSource dataSource;
     private static EmbeddedPostgres pg;
 
@@ -50,13 +56,13 @@ public class AccessManagementQueryHelper {
         return pg;
     }
 
-    public void closePostgres() {
+    public static void closePostgres() {
         try {
             if (pg != null) {
                 pg.close();
             }
         } catch (IOException e) {
-
+            LOG.info("Exception while closing the Embedded Postgres." + e.getMessage());
         }
     }
 }
