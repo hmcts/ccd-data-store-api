@@ -138,11 +138,6 @@ public abstract class BaseTest {
         ReflectionTestUtils.setField(BaseType.class, "initialised", false);
     }
 
-    @AfterEach
-    public void clearPostgres() {
-        AccessManagementQueryHelper.closePostgres();
-    }
-
     @After
     public void clearDownData() {
 

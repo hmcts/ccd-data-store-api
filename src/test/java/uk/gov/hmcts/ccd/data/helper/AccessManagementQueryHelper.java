@@ -8,9 +8,15 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
+import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.Properties;
 
 @TestConfiguration
 public class AccessManagementQueryHelper {
@@ -36,33 +42,44 @@ public class AccessManagementQueryHelper {
         jdbcTemplate.update(query);
     }
 
-    @Bean("amDataSource")
-    public static DataSource amDataSource() throws IOException {
-        dataSource = getPostgres().getPostgresDatabase();
+    public EmbeddedPostgres embeddedPostgres() throws IOException {
+        return EmbeddedPostgres
+            .builder()
+            .setPort(0)  // use next available port
+            .start();
+    }
 
+    public DataSource dataSource(final EmbeddedPostgres pg) throws SQLException {
+        final Properties props = new Properties();
+        // Instruct JDBC to accept JSON string for JSONB
+        props.setProperty("stringtype", "unspecified");
+        final Connection connection = DriverManager.getConnection(pg.getJdbcUrl("postgres", "postgres"), props);
+        LOG.info("Started Postgres, port number = {}", pg.getPort());
+        return new SingleConnectionDataSource(connection, true);
+    }
+
+    public void contextDestroyed(final EmbeddedPostgres pg) throws IOException {
+        if (null != pg) {
+            LOG.info("Closing down Postgres, port number = {}", pg.getPort());
+            pg.close();
+        }
+    }
+
+    @Bean("amDataSource")
+    DataSource dataSource() throws IOException, SQLException {
+        pg = embeddedPostgres();
+        dataSource = dataSource(pg);
         Flyway flyway = Flyway.configure()
             .dataSource(dataSource)
             .locations("db/migration")
             .load();
 
         flyway.migrate();
-        return dataSource;
+        return dataSource(pg);
     }
 
-    private static EmbeddedPostgres getPostgres() throws IOException {
-        if (pg == null) {
-            pg = EmbeddedPostgres.builder().start();
-        }
-        return pg;
-    }
-
-    public static void closePostgres() {
-        try {
-            if (pg != null) {
-                pg.close();
-            }
-        } catch (IOException e) {
-            LOG.info("Exception while closing the Embedded Postgres." + e.getMessage());
-        }
+    @PreDestroy
+    public void contextDestroyed() throws IOException {
+        contextDestroyed(pg);
     }
 }
