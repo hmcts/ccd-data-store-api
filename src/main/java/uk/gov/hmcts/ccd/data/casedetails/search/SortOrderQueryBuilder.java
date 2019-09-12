@@ -15,7 +15,7 @@ public class SortOrderQueryBuilder {
         StringBuilder sb = new StringBuilder();
         metaData.getSortOrderFields().forEach(sortOrderField -> {
             if (sortOrderField.isMetadata()) {
-                sb.append(sortOrderField.getCaseFieldId());
+                sb.append(getMataFieldName(sortOrderField.getCaseFieldId()));
             } else {
                 sb.append(convertFieldNameToJSONBsqlFormat(sortOrderField.getCaseFieldId()));
             }
@@ -26,6 +26,10 @@ public class SortOrderQueryBuilder {
         });
         // always sort with creation_date as a last order so that it supports cases where no values at all for the configured fields and also default fallback.
         return sb.append(CREATED_DATE + SPACE + SortDirection.fromOptionalString(metaData.getSortDirection())).toString();
+    }
+
+    private String getMataFieldName(String metaFieldName) {
+        return metaFieldName.startsWith("[") ? StringUtils.substringBetween(metaFieldName, "[", "]") : metaFieldName;
     }
 
     private static String convertFieldNameToJSONBsqlFormat(final String in) {
