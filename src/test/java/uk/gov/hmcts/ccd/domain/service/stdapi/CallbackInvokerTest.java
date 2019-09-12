@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.TextNode;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -54,6 +55,7 @@ class CallbackInvokerTest {
     private static final List<Integer> RETRIES_AFTER_SUBMIT = Collections.unmodifiableList(Arrays.asList(7, 8, 9));
     private static final List<Integer> RETRIES_MID_EVENT = Collections.unmodifiableList(Arrays.asList(10, 11, 12));
     private static final Boolean IGNORE_WARNINGS = FALSE;
+    private static final List<Integer> RETRIES_DISABLED = Lists.newArrayList(0);
 
     @Mock
     private CallbackService callbackService;
@@ -248,7 +250,7 @@ class CallbackInvokerTest {
         }
 
         @Test
-        @DisplayName("should send callback and get state and significant Item")
+        @DisplayName("should send callback and get state and significant Item with invalid URL")
         void sendCallbackAndGetStateAndSignificantDocumentWithInvalidURL() {
             final String expectedState = "uNiCORn";
             doReturn(ResponseEntity.of(Optional.of(mockCallbackResponseWithSignificantItem(expectedState)))).when(callbackService)
@@ -386,6 +388,22 @@ class CallbackInvokerTest {
                 IGNORE_WARNINGS);
 
             verify(callbackService).send(URL_MID_EVENT, RETRIES_MID_EVENT, caseEvent, caseDetailsBefore, caseDetails);
+        }
+
+        @Test
+        @DisplayName("should disable callback retries")
+        void shouldDisableCallbackRetries() {
+            wizardPage.setRetriesTimeoutMidEvent(RETRIES_DISABLED);
+
+            callbackInvoker.invokeMidEventCallback(wizardPage,
+                caseType,
+                caseEvent,
+                caseDetailsBefore,
+                caseDetails,
+                IGNORE_WARNINGS);
+
+            verify(callbackService).sendSingleRequest(URL_MID_EVENT, caseEvent, caseDetailsBefore, caseDetails, false);
+            verifyNoMoreInteractions(callbackService);
         }
     }
 

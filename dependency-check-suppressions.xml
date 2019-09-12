@@ -2,6 +2,14 @@
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
 
     <suppress>
+        <notes>
+            We've upgraded to Commons BeanUtils 1.9.4 but the dependecy check keeps flagging CVEs, thus mark as false positive.
+            More info: http://commons.apache.org/proper/commons-beanutils/index.html
+        </notes>
+        <cve>CVE-2019-10086</cve>
+    </suppress>
+
+    <suppress>
         <notes>See https://github.com/jeremylong/DependencyCheck/issues/1146 for Embedded Tomcat</notes>
         <cve>CVE-2017-12617</cve>
     </suppress>

@@ -18,6 +18,7 @@ import uk.gov.hmcts.ccd.domain.service.common.SecurityValidationService;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -125,6 +126,10 @@ public class CallbackInvoker {
         }
 
         return caseDetails;
+    }
+
+    private boolean isRetriesDisabled(final List<Integer> retriesTimeouts) {
+        return retriesTimeouts != null && retriesTimeouts.size() == 1 && retriesTimeouts.get(0) == 0;
     }
 
     private void validateAndSetFromAboutToStartCallback(CaseType caseType,
