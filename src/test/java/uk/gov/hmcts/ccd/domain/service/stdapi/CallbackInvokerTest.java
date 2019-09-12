@@ -390,21 +390,6 @@ class CallbackInvokerTest {
             verify(callbackService).send(URL_MID_EVENT, RETRIES_MID_EVENT, caseEvent, caseDetailsBefore, caseDetails);
         }
 
-        @Test
-        @DisplayName("should disable callback retries")
-        void shouldDisableCallbackRetries() {
-            wizardPage.setRetriesTimeoutMidEvent(RETRIES_DISABLED);
-
-            callbackInvoker.invokeMidEventCallback(wizardPage,
-                caseType,
-                caseEvent,
-                caseDetailsBefore,
-                caseDetails,
-                IGNORE_WARNINGS);
-
-            verify(callbackService).sendSingleRequest(URL_MID_EVENT, caseEvent, caseDetailsBefore, caseDetails, false);
-            verifyNoMoreInteractions(callbackService);
-        }
     }
 
     @Nested
