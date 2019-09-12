@@ -179,7 +179,7 @@ public class SearchQueryFactoryOperationTest {
     public void shouldGenerateOrderByWithSortQueryString() {
         MetaData metadata = new MetaData(TEST_CASE_TYPE_VALUE, null);
         SortOrderField sortOrderField = SortOrderField.sortOrderWith()
-            .caseFieldId("last_modified")
+            .caseFieldId("[LAST_MODIFIED_DATE]")
             .metadata(true)
             .direction("DESC")
             .build();

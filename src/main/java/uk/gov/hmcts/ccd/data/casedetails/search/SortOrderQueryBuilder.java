@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.data.casedetails.search;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField;
 
 @Component
 public class SortOrderQueryBuilder {
@@ -28,8 +29,9 @@ public class SortOrderQueryBuilder {
         return sb.append(CREATED_DATE + SPACE + SortDirection.fromOptionalString(metaData.getSortDirection())).toString();
     }
 
-    private String getMataFieldName(String metaFieldName) {
-        return metaFieldName.startsWith("[") ? StringUtils.substringBetween(metaFieldName, "[", "]") : metaFieldName;
+    private String getMataFieldName(String fieldName) {
+        String metaFieldName = fieldName.startsWith("[") ? StringUtils.substringBetween(fieldName, "[", "]") : fieldName;
+        return CaseField.valueOf(metaFieldName).getDbColumnName();
     }
 
     private static String convertFieldNameToJSONBsqlFormat(final String in) {

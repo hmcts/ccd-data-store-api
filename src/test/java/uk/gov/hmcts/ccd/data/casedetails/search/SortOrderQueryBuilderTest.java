@@ -33,14 +33,14 @@ public class SortOrderQueryBuilderTest {
     public void shouldReturnQueryStringWhenFieldIsMetaOne() {
         SortOrderField sortOrderField = SortOrderField.sortOrderWith()
             .metadata(true)
-            .caseFieldId("meta_field")
+            .caseFieldId("[CASE_REFERENCE]")
             .direction(DESC)
             .build();
         metaData.addSortOrderField(sortOrderField);
 
         String sortOrderClause = underTest.buildSortOrderClause(metaData);
 
-        assertThat(sortOrderClause, is("meta_field DESC, created_date ASC"));
+        assertThat(sortOrderClause, is("reference DESC, created_date ASC"));
     }
 
     @Test
@@ -61,7 +61,7 @@ public class SortOrderQueryBuilderTest {
     public void shouldReturnQueryStringWhenFieldsAreMixedType() {
         SortOrderField sortOrderField1 = SortOrderField.sortOrderWith()
             .metadata(true)
-            .caseFieldId("[meta_field]")
+            .caseFieldId("[CASE_REFERENCE]")
             .direction(DESC)
             .build();
         SortOrderField sortOrderField2 = SortOrderField.sortOrderWith()
@@ -75,6 +75,6 @@ public class SortOrderQueryBuilderTest {
 
         String sortOrderClause = underTest.buildSortOrderClause(metaData);
 
-        assertThat(sortOrderClause, is("meta_field DESC, data #>> '{data_field}' DESC, created_date ASC"));
+        assertThat(sortOrderClause, is("reference DESC, data #>> '{data_field}' DESC, created_date ASC"));
     }
 }
