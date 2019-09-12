@@ -437,6 +437,31 @@
             "type": "Document",
             "id": "Document"
           }
+        },
+        {
+          "id": "externalId",
+          "case_type_id": "TestAddressBookCase",
+          "label": "External Id",
+          "security_classification": "PUBLIC",
+          "acls": [
+            {
+              "role": "caseworker-probate-public",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-probate-private",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            }],
+          "field_type": {
+            "type": "Text",
+            "id": "externalId"
+          }
         }
       ]
     }

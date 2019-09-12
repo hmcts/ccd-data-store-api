@@ -211,6 +211,38 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
+    public void shouldFailWhenPostCreateCaseWithSameExternalId() throws Exception {
+        when(uidService.generateUID()).thenReturn(REFERENCE).thenReturn(REFERENCE_2);
+        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
+        final JsonNode DATA = mapper.readTree("{\"externalId\": \"someId\"}\n");
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(anEvent().build());
+        caseDetailsToSave.getEvent().setEventId(TEST_EVENT_ID);
+        caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
+        }));
+        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID
+        );
+        caseDetailsToSave.setToken(token);
+
+        // initial one returns 201
+        mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andReturn();
+
+        // this should give 201 as the retry should have REFERENCE_2
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andReturn();
+        assertEquals(mvcResult.getResponse().getContentAsString(), 500, mvcResult.getResponse().getStatus());
+
+        // we should still have one case in DB
+        final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
+        assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
+    }
+
+    @Test
     public void shouldReturn201WhenPostCreateCaseAndSameReferenceFirstTimeButRetryIsUniqueForCitizen() throws Exception {
         when(uidService.generateUID()).thenReturn(REFERENCE).thenReturn(REFERENCE).thenReturn(REFERENCE_2);
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";

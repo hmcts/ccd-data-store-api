@@ -8,7 +8,7 @@
              endDelimiter="\nGO"
              splitStatements="true"
              stripComments="true">
-            CREATE INDEX idx_case_data_case_external_id ON public.case_data USING BTREE ((TRIM(UPPER(data#>>'{externalId}'))));
+            CREATE UNIQUE INDEX idx_case_data_case_external_id ON public.case_data USING BTREE ((TRIM(UPPER(data#>>'{externalId}'))));
         </sql>
     </changeSet>
 </databaseChangeLog>

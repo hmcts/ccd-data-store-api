@@ -75,8 +75,10 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
             throw new CaseConcurrencyException("The case data has been altered outside of this transaction.");
         } catch (PersistenceException e) {
             LOG.warn("Failed to store case details", e);
-            if (e.getCause() instanceof ConstraintViolationException) {
+            if (e.getCause() instanceof ConstraintViolationException && ((ConstraintViolationException) e.getCause()).getConstraintName().equals("case_data_reference_key")) {
                 throw new CaseConcurrencyException(e.getMessage());
+            } else {
+                throw e;
             }
         }
         return caseDetailsMapper.entityToModel(mergedEntity);
