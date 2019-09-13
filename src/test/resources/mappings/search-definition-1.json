@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "url": "/api/display/search-result-definition/TestAddressBookCase?version=33"
+    "urlPath": "/api/display/search-result-definition/TestAddressBookCase"
   },
   "response": {
     "status": 200,

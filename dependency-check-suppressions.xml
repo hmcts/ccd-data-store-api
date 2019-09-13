@@ -193,6 +193,8 @@
         <packageUrl regex="true">^pkg:maven/org\.elasticsearch/elasticsearch@.*$</packageUrl>
         <vulnerabilityName>CVE-2019-7611</vulnerabilityName>
         <vulnerabilityName>CVE-2018-17244</vulnerabilityName>
+        <!-- Temporary suppression to ignore until it's fixed in master -->
+        <vulnerabilityName>CVE-2019-7614</vulnerabilityName>
     </suppress>
     <suppress>
         <notes>Temporary suppression of an issue related to the current stable elasticsearch 6.4.2. On a system with multiple users submitting requests, it could be possible
