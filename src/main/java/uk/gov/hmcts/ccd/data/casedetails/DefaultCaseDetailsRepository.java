@@ -40,6 +40,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultCaseDetailsRepository.class);
     public static final String QUALIFIER = "default";
+    public static final String CASE_DATA_REFERENCE_KEY = "case_data_reference_key";
 
     private final CaseDetailsMapper caseDetailsMapper;
 
@@ -75,7 +76,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
             throw new CaseConcurrencyException("The case data has been altered outside of this transaction.");
         } catch (PersistenceException e) {
             LOG.warn("Failed to store case details", e);
-            if (e.getCause() instanceof ConstraintViolationException && ((ConstraintViolationException) e.getCause()).getConstraintName().equals("case_data_reference_key")) {
+            if (e.getCause() instanceof ConstraintViolationException && ((ConstraintViolationException) e.getCause()).getConstraintName().equals(CASE_DATA_REFERENCE_KEY)) {
                 throw new CaseConcurrencyException(e.getMessage());
             } else {
                 throw e;
