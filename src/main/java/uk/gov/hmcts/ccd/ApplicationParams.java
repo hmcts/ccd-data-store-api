@@ -125,6 +125,8 @@ public class ApplicationParams {
     @Value("${http.client.max.total}")
     private int maxTotalHttpClient;
 
+    @Value("${ccd.case.search.jpa.criteria.enabled}")
+    private boolean jpaCriteriaSearchEnabled;
 
     public static String encode(final String stringToEncode) {
         try {
@@ -336,5 +338,9 @@ public class ApplicationParams {
 
     public List<String> getReadFromAMCaseTypes() {
         return readFromAMCaseTypes;
+    }
+
+    public boolean isJpaCriteriaSearchEnabled() {
+        return jpaCriteriaSearchEnabled;
     }
 }
