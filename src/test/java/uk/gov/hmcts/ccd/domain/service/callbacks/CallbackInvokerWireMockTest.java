@@ -129,7 +129,7 @@ public class CallbackInvokerWireMockTest {
 
         CallbackException callbackException = assertThrows(CallbackException.class, () ->
             callbackInvoker.invokeAboutToStartCallback(caseEvent, caseType, caseDetails, false));
-        Assert.assertThat(callbackException.getMessage(), is("Callback to service has been unsuccessful for event Test"));
+        Assert.assertThat(callbackException.getMessage(), is("Unsuccessful callback to url=http://localhost:" + wiremockPort + "/test-callbackGrrrr"));
         final Duration between = Duration.between(start, Instant.now());
         // 0s retryInterval + 0.5s readTimeout and no follow up retries
         assertThat((int) between.toMillis(), lessThan(1500));
