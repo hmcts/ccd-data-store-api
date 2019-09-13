@@ -57,7 +57,7 @@ public class AccessManagementQueryHelper {
         return new SingleConnectionDataSource(connection, true);
     }
 
-    public void contextDestroyed(final EmbeddedPostgres pg) throws IOException {
+    private void contextDestroyed(final EmbeddedPostgres pg) throws IOException {
         if (null != pg) {
             LOG.info("Closing down Postgres, port number = {}", pg.getPort());
             pg.close();
