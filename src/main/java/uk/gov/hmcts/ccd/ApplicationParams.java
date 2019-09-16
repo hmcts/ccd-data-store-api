@@ -119,15 +119,6 @@ public class ApplicationParams {
     @Value("${search.elastic.nodes.discovery.filter}")
     private String elasticsearchNodeDiscoveryFilter;
 
-    @Value("${am.datasource.url}")
-    private String amDBConnectionString;
-
-    @Value("${am.datasource.username}")
-    private String amDBUserName;
-
-    @Value("${am.datasource.password}")
-    private String amDBPassword;
-
     public static String encode(final String stringToEncode) {
         try {
             return URLEncoder.encode(stringToEncode, "UTF-8");
@@ -332,9 +323,4 @@ public class ApplicationParams {
         return readFromAMCaseTypes;
     }
 
-    public String getAmDBConnectionString() { return amDBConnectionString; }
-
-    public String getAmDBUserName() { return amDBUserName; }
-
-    public String getAmDBPassword() { return amDBPassword; }
 }
