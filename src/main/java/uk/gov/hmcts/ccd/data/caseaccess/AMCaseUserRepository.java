@@ -43,7 +43,7 @@ public class AMCaseUserRepository implements CaseUserRepository {
     @Transactional
     public void grantAccess(String jurisdictionId, String caseTypeId, String caseReference, Long caseId, String userId, String caseRole) {
         ResourceDefinition resourceDefinition =
-            new ResourceDefinition(jurisdictionId, CASE_CONSTANT, caseReference);
+            new ResourceDefinition(jurisdictionId, CASE_CONSTANT, caseTypeId);
 
         ExplicitAccessGrant explicitAccessGrant = ExplicitAccessGrant.builder()
             .accessorType(AccessorType.USER)
@@ -68,7 +68,7 @@ public class AMCaseUserRepository implements CaseUserRepository {
                 .relationship(caseRole)
                 .resourceId(caseId.toString())
                 .serviceName(jurisdictionId)
-                .resourceName(caseReference)
+                .resourceName(caseTypeId)
                 .resourceType(CASE_CONSTANT)
                 .build();
 
