@@ -31,7 +31,7 @@ import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 @SpringBootTest(classes = {AccessManagementQueryHelper.class})
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class AMCaseUserRepositoryComponentTest extends BaseTest {
+public class AMCaseUserRepositoryTest extends BaseTest {
 
     private static final String JURISDICTION_ID = "JURISDICTION";
     private static final String CASE_TYPE_ID = "CASE_TYPE";

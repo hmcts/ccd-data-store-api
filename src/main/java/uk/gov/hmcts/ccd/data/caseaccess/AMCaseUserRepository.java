@@ -27,10 +27,10 @@ import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 
 @Named
 @Singleton
-@Qualifier(AMCaseUserRepository.ACCESS_MANAGEMENT_QUALIFIER)
+@Qualifier(AMCaseUserRepository.QUALIFIER)
 public class AMCaseUserRepository implements CaseUserRepository {
 
-    public static final String ACCESS_MANAGEMENT_QUALIFIER = "accessManagement";
+    public static final String QUALIFIER = "accessManagement";
     private static final String CASE_CONSTANT = "case";
 
     private AccessManagementService accessManagementService;
@@ -43,7 +43,6 @@ public class AMCaseUserRepository implements CaseUserRepository {
     @Transactional
     public void grantAccess(String jurisdictionId, String caseTypeId, String caseReference, Long caseId, String userId, String caseRole) {
         ResourceDefinition resourceDefinition =
-            //TODO: What should be the resourceType and resourceName.
             new ResourceDefinition(jurisdictionId, CASE_CONSTANT, caseReference);
 
         ExplicitAccessGrant explicitAccessGrant = ExplicitAccessGrant.builder()
@@ -56,13 +55,6 @@ public class AMCaseUserRepository implements CaseUserRepository {
             .build();
 
         accessManagementService.grantExplicitResourceAccess(explicitAccessGrant);
-    }
-
-    private Map<JsonPointer, Set<Permission>> getAttributePermissions() {
-        Map<JsonPointer, Set<Permission>> attributePermissionMap = new HashMap<JsonPointer, Set<Permission>>();
-            //TODO: What should be the permission set? Just read or CRUD?
-        attributePermissionMap.put(JsonPointer.valueOf(""), ImmutableSet.of(READ));
-        return attributePermissionMap;
     }
 
     @Override
@@ -95,5 +87,11 @@ public class AMCaseUserRepository implements CaseUserRepository {
     public List<String> findCaseRoles(final String caseTypeId, final Long caseId, final String userId) {
         UserCaseRolesEnvelope envelope = accessManagementService.returnUserCaseRoles(caseId.toString(), userId);
         return envelope.getRoles();
+    }
+
+    private Map<JsonPointer, Set<Permission>> getAttributePermissions() {
+        Map<JsonPointer, Set<Permission>> attributePermissionMap = new HashMap<JsonPointer, Set<Permission>>();
+        attributePermissionMap.put(JsonPointer.valueOf(""), ImmutableSet.of(READ));
+        return attributePermissionMap;
     }
 }
