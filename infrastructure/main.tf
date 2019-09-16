@@ -116,11 +116,12 @@ module "ccd-data-store-api" {
     DATA_STORE_DB_MAX_POOL_SIZE = "${var.data_store_max_pool_size}"
     DATA_STORE_DB_OPTIONS = "?stringtype=unspecified&sslmode=require"
 
-    AM_DB_HOST = "${module.access-management-db.am_postgresql_host_name}"
-    AM_DB_PORT = "${module.access-management-db.am_postgresql_listen_port}"
-    AM_DB_NAME = "${module.access-management-db.am_postgresql_database}"
-    AM_DB_USERNAME = "${module.access-management-db.am_postgresql_user}"
-    AM_DB_PASSWORD = "${module.access-management-db.am_postgresql_pass}"
+    AM_DB_HOST = "${module.postgres-am-api.host_name}"
+    AM_DB_PORT = "${module.postgres-am-api.postgresql_listen_port}"
+    AM_DB_NAME = "${module.postgres-am-api.postgresql_database}"
+    AM_DB_USERNAME = "${module.postgres-am-api.user_name}"
+    AM_DB_PASSWORD = "${module.postgres-am-api.postgresql_password}"
+    AM_DB_PARAMS = "?sslmode=require"
 
     ENABLE_DB_MIGRATE = "false"
 
@@ -188,9 +189,29 @@ module "data-store-db" {
   common_tags  = "${var.common_tags}"
 }
 
-module "access-management-db" {
-  am_postgresql_user = "${var.am_postgresql_user}"
-  am_database_name = "${var.am_postgresql_database}"
+module "postgres-am-api" {
+  source              = "git@github.com:hmcts/moj-module-postgres?ref=master"
+  product             = "${var.am_product}-${var.am_component}"
+  env                 = "${var.env}"
+  location            = "${var.location_app}"
+  postgresql_user     = "${var.am_db_user}"
+  database_name       = "${var.am_db_name}"
+  postgresql_version  = "10"
+  common_tags         = "${var.common_tags}"
+  subscription        = "${var.subscription}"
+}
+
+module "am-vault-api" {
+  source              = "git@github.com:hmcts/moj-module-key-vault?ref=master"
+  //Need to check on the "local environment" in below line.
+  name                = "${var.am_raw_product}-${var.am_component}-${local.local_env}"
+  product             = "${var.am_product}"
+  env                 = "${var.env}"
+  tenant_id           = "${var.tenant_id}"
+  object_id           = "${var.jenkins_AAD_objectId}"
+  resource_group_name = "${azurerm_resource_group.rg.name}"
+  product_group_object_id = "${var.product_group_object_id}"
+  common_tags         = "${var.common_tags}"
 }
 
 ////////////////////////////////
@@ -227,34 +248,43 @@ resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
   key_vault_id = "${data.azurerm_key_vault.ccd_shared_key_vault.id}"
 }
 
-resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
-  name = "AM-POSTGRES-DATABASE"
-  value = "${module.access-management-db.am_postgresql_database}"
-  key_vault_id = "${data.azurerm_key_vault.ccd_shared_key_vault.id}"
-}
-
 resource "azurerm_key_vault_secret" "AM-POSTGRES-USER" {
-  name = "AM-POSTGRES-USER"
-  value = "${module.access-management-db.am_postgresql_user}"
-  key_vault_id = "${data.azurerm_key_vault.ccd_shared_key_vault.id}"
+  name      = "${var.am_product}-${var.am_component}-POSTGRES-USER"
+  value     = "${module.postgres-am-api.user_name}"
+  vault_uri = "${module.am-vault-api.key_vault_uri}"
 }
 
 resource "azurerm_key_vault_secret" "AM-POSTGRES-PASS" {
-  name = "AM-POSTGRES-PASS"
-  value = "${module.access-management-db.am_postgresql_pass}"
-  key_vault_id = "${data.azurerm_key_vault.ccd_shared_key_vault.id}"
+  name      = "${var.am_product}-${var.am_component}-POSTGRES-PASS"
+  value     = "${module.postgres-am-api.postgresql_password}"
+  vault_uri = "${module.am-vault-api.key_vault_uri}"
 }
 
 resource "azurerm_key_vault_secret" "AM-POSTGRES_HOST" {
-  name = "AM-POSTGRES-HOST"
-  value = "${module.access-management-db.am_postgresql_host_name}"
-  key_vault_id = "${data.azurerm_key_vault.ccd_shared_key_vault.id}"
+  name      = "${var.am_product}-${var.am_component}-POSTGRES-HOST"
+  value     = "${module.postgres-am-api.host_name}"
+  vault_uri = "${module.am-vault-api.key_vault_uri}"
 }
 
 resource "azurerm_key_vault_secret" "AM-POSTGRES_PORT" {
-  name = "AM-POSTGRES-PORT"
-  value = "${module.access-management-db.am_postgresql_listen_port}"
-  key_vault_id = "${data.azurerm_key_vault.ccd_shared_key_vault.id}"
+  name      = "${var.am_product}-${var.am_component}-POSTGRES-PORT"
+  value     = "${module.postgres-am-api.postgresql_listen_port}"
+  vault_uri = "${module.am-vault-api.key_vault_uri}"
+}
+
+resource "azurerm_key_vault_secret" "AM-POSTGRES_DATABASE" {
+  name      = "${var.am_product}-${var.am_component}-POSTGRES-DATABASE"
+  value     = "${module.postgres-am-api.postgresql_database}"
+  vault_uri = "${module.am-vault-api.key_vault_uri}"
+}
+
+resource "azurerm_resource_group" "rg" {
+  name     = "${var.am_product}-${var.am_component}-${var.env}"
+  location = "${var.location_app}"
+
+  tags = "${merge(var.common_tags,
+      map("lastUpdated", "${timestamp()}")
+      )}"
 }
 
 resource "azurerm_key_vault_secret" "ccd_draft_encryption_key" {

@@ -248,3 +248,40 @@ variable "additional_host_name" {
   description = "A custom domain name for this webapp."
   default = "null"
 }
+
+variable "am_product" {
+  type    = "string"
+  default     = "am"
+  description = "Access Management"
+}
+
+variable "am_component" {
+  type = "string"
+  default = "lib-test"
+}
+
+variable "location_app" {
+  type    = "string"
+  default = "UK South"
+}
+
+variable "am_db_user" {
+  type        = "string"
+  default     = "amuser"
+  description = "Database user name"
+}
+
+variable "am_db_name" {
+  type        = "string"
+  default     = "am"
+  description = "Database name"
+}
+
+variable "am_raw_product" {
+  default     = "am" // jenkins-library overrides product for PRs and adds e.g. pr-118-ccd
+}
+
+variable "product_group_object_id" {
+  default = "3e235565-1054-4b83-86c1-318d05dd4342"
+  description = "dcd_group_accessmanagement_v2"
+}
