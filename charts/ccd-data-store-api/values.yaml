@@ -36,7 +36,7 @@ java:
     ELASTIC_SEARCH_BLACKLIST: query_string
     ELASTIC_SEARCH_CASE_INDEX_NAME_FORMAT: '%s_cases'
     ELASTIC_SEARCH_CASE_INDEX_TYPE: _doc
-
+    ELASTIC_SEARCH_REQUEST_TIMEOUT: 6000
     JPA_CRITERIA_IN_SEARCH_ENABLED: false
 
     IDAM_S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
