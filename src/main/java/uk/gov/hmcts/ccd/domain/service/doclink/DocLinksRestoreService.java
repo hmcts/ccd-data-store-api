@@ -208,9 +208,13 @@ public class DocLinksRestoreService {
     private void markImpactedEvents(CaseAuditEventEntity eventBeforeDocsLost) {
         List<CaseAuditEventEntity> eventsToMark = getEventsToMark(eventBeforeDocsLost);
         eventsToMark.forEach(e -> {
-            String summary =  e.getSummary()
-                + " System Maintenance - In this event history if you see any missing document links please check history of the 'System Maintenance' event";
+            String summary =  StringUtils.defaultIfEmpty(e.getSummary(), "") + " Event contains erroneously removed documents.";
             e.setSummary(summary);
+
+            String description =  StringUtils.defaultIfEmpty(e.getDescription(), "")
+                + " This event had documents erroneously removed during system maintenance. They have been reattached in the above 'System Maintenance' event."
+                + " Please check the documents currently attached to the case are as expected";
+            e.setDescription(description);
             em.merge(e);
         });
     }
