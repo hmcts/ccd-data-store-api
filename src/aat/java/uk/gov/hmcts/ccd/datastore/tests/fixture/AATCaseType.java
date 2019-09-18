@@ -11,7 +11,7 @@ import lombok.Data;
  */
 public interface AATCaseType {
     String JURISDICTION = "AUTOTEST1";
-    String JURISDICTION_AUTOTEST2 = "AUTOTEST2";
+    String JURISDICTION_AUTOTEST2 = "AUTOTEST2" ;
     String CASE_TYPE = "AAT";
     String AAT_PRIVATE_CASE_TYPE = "AAT_PRIVATE";
     String AAT_PRIVATE2_CASE_TYPE = "AAT_PRIVATE2";

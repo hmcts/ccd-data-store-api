@@ -1,11 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.createcase;
 
-import javax.inject.Inject;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.apache.commons.lang3.StringUtils.isBlank;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
@@ -35,6 +29,12 @@ import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+
+import javax.inject.Inject;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Service
 @Qualifier("default")
@@ -78,9 +78,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
     }
 
     @Override
-    public CaseDetails createCaseDetails(final String uid,
-                                         final String jurisdictionId,
-                                         final String caseTypeId,
+    public CaseDetails createCaseDetails(final String caseTypeId,
                                          final CaseDataContent caseDataContent,
                                          final Boolean ignoreWarning) {
         Event event = caseDataContent.getEvent();
@@ -93,8 +91,8 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
             throw new ValidationException("Cannot find case type definition for " + caseTypeId);
         }
 
-        if (!caseTypeService.isJurisdictionValid(jurisdictionId, caseType)) {
-            throw new ValidationException("Cannot create case because of " + caseTypeId + " is not defined as case type for " + jurisdictionId);
+        if (!caseTypeService.isJurisdictionValid(caseType.getJurisdictionId(), caseType)) {
+            throw new ValidationException("Cannot create case because of " + caseTypeId + " is not defined as case type for " + caseType.getJurisdictionId());
         }
 
         final CaseEvent eventTrigger = eventTriggerService.findCaseEvent(caseType, event.getEventId());
@@ -107,7 +105,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         }
 
         String token = caseDataContent.getToken();
-        eventTokenService.validateToken(token, uid, eventTrigger, caseType.getJurisdiction(), caseType);
+        eventTokenService.validateToken(token, userRepository.getUserId(), eventTrigger, caseType.getJurisdiction(), caseType);
 
         Map<String, JsonNode> data = caseDataContent.getData();
         validateCaseFieldsOperation.validateCaseDetails(caseTypeId, caseDataContent);
@@ -115,7 +113,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         final CaseDetails newCaseDetails = new CaseDetails();
 
         newCaseDetails.setCaseTypeId(caseTypeId);
-        newCaseDetails.setJurisdiction(jurisdictionId);
+        newCaseDetails.setJurisdiction(caseType.getJurisdictionId());
         newCaseDetails.setState(eventTrigger.getPostState());
         newCaseDetails.setSecurityClassification(caseType.getSecurityClassification());
         newCaseDetails.setData(caseSanitiser.sanitise(caseType, data));
