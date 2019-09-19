@@ -91,10 +91,6 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
             throw new ValidationException("Cannot find case type definition for " + caseTypeId);
         }
 
-        if (!caseTypeService.isJurisdictionValid(caseType.getJurisdictionId(), caseType)) {
-            throw new ValidationException("Cannot create case because of " + caseTypeId + " is not defined as case type for " + caseType.getJurisdictionId());
-        }
-
         final CaseEvent eventTrigger = eventTriggerService.findCaseEvent(caseType, event.getEventId());
         if (eventTrigger == null) {
             throw new ValidationException(event.getEventId() + " is not a known event ID for the specified case type " + caseTypeId);

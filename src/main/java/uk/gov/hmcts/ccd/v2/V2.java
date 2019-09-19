@@ -38,12 +38,22 @@ public final class V2 {
     public final class Error {
         private Error() {}
 
+        public static final String NO_MATCHING_EVENT_TRIGGER = "Cannot find matching event trigger";
+        public static final String MISSING_EVENT_TOKEN = "Missing event token";
+        public static final String CASE_TYPE_NOT_FOUND = "Case type not found";
         public static final String CASE_NOT_FOUND = "Case not found";
+        public static final String USER_ROLE_NOT_FOUND = "User role not found";
+        public static final String CASE_DATA_NOT_FOUND = "Case data not found";
         public static final String EVENT_TRIGGER_NOT_FOUND = "Event trigger not found";
+        public static final String EVENT_TRIGGER_NOT_SPECIFIED = "Event trigger not specified";
+        public static final String EVENT_TRIGGER_NOT_KNOWN_FOR_CASE_TYPE = "Event trigger is not known for given case type";
+        public static final String EVENT_TRIGGER_HAS_PRE_STATE = "Event trigger has pre state defined";
         public static final String CASE_ID_INVALID = "Case ID is not valid";
         public static final String CASE_ALTERED = "Case altered outside of transaction";
         public static final String CASE_ROLE_REQUIRED = "Case role missing";
         public static final String CASE_ROLE_INVALID = "Case role does not exist";
         public static final String GRANT_FORBIDDEN = "Grant action is reserved to users with entire jurisdiction access";
+        public static final String CASE_FIELD_INVALID = "Cannot validate case field";
+        public static final String CALLBACK_EXCEPTION = "Unsuccessful callback";
     }
 }
