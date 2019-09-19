@@ -2,14 +2,12 @@ java:
   image: hmcts.azurecr.io/hmcts/ccd-data-store-api:latest
   applicationPort: 4452
   keyVaults:
-    s2s:
-      resourceGroup: rpe-service-auth-provider
-      secrets:
-        - microservicekey-ccd-data
     ccd:
       resourceGroup: ccd-shared
       secrets:
         - data-store-api-draftStoreEncryptionSecret
+        - ccd-data-s2s-secret
+        - data-store-api-POSTGRES-PASS
   environment:
     ENABLE_DB_MIGRATE: true
     DATA_STORE_DB_HOST: "{{ .Release.Name }}-postgresql"
