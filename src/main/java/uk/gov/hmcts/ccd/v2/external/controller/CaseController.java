@@ -191,12 +191,10 @@ public class CaseController {
         @ApiResponse(
             code = 422,
             message = V2.Error.EVENT_TRIGGER_NOT_KNOWN_FOR_CASE_TYPE
-
         ),
         @ApiResponse(
             code = 422,
             message = V2.Error.EVENT_TRIGGER_HAS_PRE_STATE
-
         ),
         @ApiResponse(
             code = 422,

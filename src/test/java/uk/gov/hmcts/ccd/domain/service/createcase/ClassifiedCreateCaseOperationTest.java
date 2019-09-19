@@ -24,9 +24,7 @@ class ClassifiedCreateCaseOperationTest {
     private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_TYPE_ID = "Grant";
     private static final CaseDataContent EVENT_DATA = newCaseDataContent().build();
-    //    private static final Map<String, JsonNode> DATA = new HashMap<>();
     private static final Boolean IGNORE = Boolean.FALSE;
-//    private static final String TOKEN = "eyvcdvsyvcdsyv";
 
     @Mock
     private CreateCaseOperation createCaseOperation;
