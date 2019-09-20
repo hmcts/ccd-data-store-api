@@ -7,5 +7,6 @@ java:
     DATA_STORE_DB_NAME: "{{ .Values.postgresql.postgresqlDatabase}}"
     DATA_STORE_DB_USERNAME: "{{ .Values.postgresql.postgresqlUsername}}"
     DATA_STORE_DB_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
+    DATA_STORE_DB_OPTIONS: "?stringtype=unspecified"
 postgresql:
   enabled: true  
