@@ -151,8 +151,8 @@ public class CaseController {
     )
     @ApiResponses({
         @ApiResponse(
-            code = 200,
-            message = "Success",
+            code = 201,
+            message = "Created",
             response = CaseResource.class
         ),
         @ApiResponse(
@@ -186,7 +186,6 @@ public class CaseController {
         @ApiResponse(
             code = 422,
             message = V2.Error.EVENT_TRIGGER_NOT_SPECIFIED
-
         ),
         @ApiResponse(
             code = 422,
