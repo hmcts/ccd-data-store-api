@@ -1,5 +1,11 @@
 java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
+  aadIdentityName:
+  environment:
+    DATA_STORE_DB_HOST: "{{ .Release.Name }}-postgresql"
+    DATA_STORE_DB_NAME: "{{ .Values.postgresql.postgresqlDatabase}}"
+    DATA_STORE_DB_USERNAME: "{{ .Values.postgresql.postgresqlUsername}}"
+    DATA_STORE_DB_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
 postgresql:
   enabled: true  
