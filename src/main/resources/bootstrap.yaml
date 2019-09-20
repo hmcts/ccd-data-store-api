@@ -8,4 +8,4 @@ spring:
         ccd.ccd-ELASTIC-SEARCH-URL: ELASTIC_SEARCH_HOSTS
         ccd.ccd-ELASTIC-SEARCH-DATA-NODES-URL: ELASTIC_SEARCH_DATA_NODES_HOSTS
         ccd.ccd-ELASTIC-SEARCH-PASSWORD: ELASTIC_SEARCH_PASSWORD
-        ccd.data-store-api-POSTGRES-PASS: spring.datasource.password
+        ccd.data-store-api-POSTGRES-PASS: DATA_STORE_DB_PASSWORD
