@@ -4,6 +4,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @NamedQueries({
     @NamedQuery(name = CaseDetailsEntity.FIND_BY_METADATA, query =
@@ -40,6 +41,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 })
 @Table(name = "case_data")
 @Entity
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class CaseDetailsEntity {
     static final String FIND_BY_METADATA = "CaseDataEntity_FIND_BY_PARAMS";
     static final String FIND_CASE = "CaseDataEntity_FIND_CASE";
@@ -59,8 +62,6 @@ public class CaseDetailsEntity {
     public static final String CREATED_DATE_FIELD_COL = "created_date";
     public static final String LAST_MODIFIED_FIELD_COL = "last_modified";
     public static final String SECURITY_CLASSIFICATION_FIELD_COL = "security_classification";
-
-
 
     @Id
     @Column(name = "id")
