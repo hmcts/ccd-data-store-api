@@ -8,7 +8,6 @@ java:
       secrets:
         - data-store-api-draftStoreEncryptionSecret
         - data-store-api-draft-key
-        - data-store-api-POSTGRES-PASS
         - ccd-data-s2s-secret
         - ccd-ELASTIC-SEARCH-URL
         - ccd-ELASTIC-SEARCH-DATA-NODES-URL
