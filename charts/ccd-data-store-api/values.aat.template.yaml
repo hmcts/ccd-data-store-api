@@ -3,15 +3,6 @@ java:
   useInterpodAntiAffinity: true
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
-  keyVaults:
-    ccd:
-      resourceGroup: ccd-shared
-      secrets:
-        - data-store-api-POSTGRES-PASS
   environment:
-    DATA_STORE_DB_HOST: ccd-data-store-api-postgres-db-aat.postgres.database.azure.com
-    DATA_STORE_DB_USERNAME: ccd@ccd-data-store-api-postgres-db-aat
-
     ELASTIC_SEARCH_ENABLED: 'true'
-
     HTTP_CLIENT_READ_TIMEOUT: '180000'

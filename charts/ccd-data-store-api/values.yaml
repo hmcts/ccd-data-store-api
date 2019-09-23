@@ -6,6 +6,7 @@ java:
     ccd:
       resourceGroup: ccd-shared
       secrets:
+        - data-store-api-POSTGRES-PASS
         - data-store-api-draftStoreEncryptionSecret
         - data-store-api-draft-key
         - ccd-data-s2s-secret
