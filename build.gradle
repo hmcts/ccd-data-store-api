@@ -107,7 +107,7 @@ ext {
     junitVintageVersion = '5.2.0'
     hibernateVersion = '5.2.17.Final'
     powermockVersion = '2.0.0-beta.5'
-    reformLogging = '5.0.1'
+    reformLogging = '5.1.0'
     swagger2Version = '2.9.2'
     limits = [
             'instruction': 90,
@@ -166,8 +166,8 @@ spotbugs {
 }
 
 dependencies {
-    compile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: reformLogging
-    compile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: reformLogging
+    compile group: 'uk.gov.hmcts.reform', name: 'logging', version: reformLogging
+    compile group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: reformLogging
     compile 'uk.gov.hmcts.reform:properties-volume-spring-boot-starter:0.0.4'
     compile 'uk.gov.hmcts.reform:health-spring-boot-starter:0.0.3'
     compile 'org.projectlombok:lombok:1.18.4'
