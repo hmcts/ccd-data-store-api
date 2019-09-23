@@ -210,7 +210,7 @@
         <vulnerabilityName>CVE-2019-7614</vulnerabilityName>
     </suppress>
     <suppress>
-        <notes>Ignoring temporarily until it's addressed in master branch</notes>
+        <notes>Ignoring temporarily until a fix is released</notes>
         <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
         <cve>CVE-2019-14540</cve>
         <cve>CVE-2019-16335</cve>
