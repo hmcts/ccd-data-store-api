@@ -10,6 +10,7 @@ properties(
 )
 
 @Library("Infrastructure")
+import uk.gov.hmcts.contino.AppPipelineDsl
 
 def type = "java"
 def product = "ccd"
@@ -71,6 +72,10 @@ withPipeline(type, product, component) {
     onPR {
         enableSlackNotifications('#ccd-pr-builds')
     }
+
+    enablePactAs([
+        AppPipelineDsl.PactRoles.PROVIDER
+    ])
 
     overrideVaultEnvironments(vaultOverrides)
     enableAksStagingDeployment()

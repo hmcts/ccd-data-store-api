@@ -812,6 +812,12 @@ task installDist(overwrite: true) {
     // documentation publication.
 }
 
+task runProviderPactVerification(type: Test){
+    logger.lifecycle("Runs pact Tests")
+    testClassesDirs = sourceSets.testPact.output.classesDirs
+    classpath = sourceSets.testPact.runtimeClasspath
+    
+}
 def getCheckedOutGitCommitHash() {
     'git rev-parse --verify --short HEAD'.execute().text.trim()
 }
