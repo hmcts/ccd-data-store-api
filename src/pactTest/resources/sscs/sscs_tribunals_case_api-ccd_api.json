@@ -1,0 +1,362 @@
+{
+  "provider": {
+    "name": "ccd"
+  },
+  "consumer": {
+    "name": "sscs_tribunals_case_api"
+  },
+  "interactions": [
+    {
+      "description": "Provider receives a read for caseworker request from an SSCS API",
+      "request": {
+        "method": "GET",
+        "path": "/caseworkers/1/jurisdictions/1/case-types/benefit/cases",
+        "headers": {
+          "Authorization": "Bearer UserAuthToken",
+          "ServiceAuthorization": "ServiceToken",
+          "Content-Type": "application/json",
+          "experimental": "true"
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json;charset=UTF-8"
+        },
+        "body": [
+          {
+            "jurisdiction": "PROBATE",
+            "created_date": null,
+            "state": "Draft",
+            "security_classifications": null,
+            "after_submit_callback_response": {
+              "confirmation_header": null,
+              "confirmation_body": "somebody"
+            },
+            "delete_draft_response_status_code": null,
+            "last_modified": null,
+            "security_classification": "PUBLIC",
+            "case_type_id": "BENEFIT",
+            "version": null,
+            "id": 654321,
+            "data_classification": null,
+            "delete_draft_response_status": null,
+            "case_data": {
+              "ccdCaseId": "123",
+              "region": "asd"
+            },
+            "callback_response_status_code": 200,
+            "callback_response_status": "CALLBACK_COMPLETED"
+          }
+        ],
+        "matchingRules": {
+          "header": {
+            "Content-Type": {
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "\\w+\\/[-+.\\w]+;charset=(utf|UTF)-8"
+                }
+              ],
+              "combine": "AND"
+            }
+          }
+        }
+      },
+      "providerStates": [
+        {
+          "name": "CCD reads for a caseworker"
+        }
+      ]
+    },
+    {
+      "description": "Provider receives a search for caseworker request from an SSCS API",
+      "request": {
+        "method": "GET",
+        "path": "/caseworkers/1/jurisdictions/1/case-types/benefit/cases/282",
+        "headers": {
+          "Authorization": "Bearer UserAuthToken",
+          "ServiceAuthorization": "ServiceToken",
+          "Content-Type": "application/json",
+          "experimental": "true"
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=UTF-8"
+        },
+        "body":  {
+          "jurisdiction": "PROBATE",
+          "created_date": null,
+          "state": "Draft",
+          "security_classifications": null,
+          "after_submit_callback_response": {
+            "confirmation_header": null,
+            "confirmation_body": "somebody"
+          },
+          "delete_draft_response_status_code": null,
+          "last_modified": null,
+          "security_classification": "PUBLIC",
+          "case_type_id": "BENEFIT",
+          "version": null,
+          "id": 654321,
+          "data_classification": null,
+          "delete_draft_response_status": null,
+          "case_data": {
+            "ccdCaseId": "123",
+            "region": "asd"
+          },
+          "callback_response_status_code": 200,
+          "callback_response_status": "CALLBACK_COMPLETED"
+        },
+        "matchingRules": {
+          "header": {
+            "Content-Type": {
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "application/json;\\s?charset=(utf|UTF)-8"
+                }
+              ],
+              "combine": "AND"
+            }
+          }
+        }
+      },
+      "providerStates": [
+        {
+          "name": "CCD searches for a caseworker"
+        }
+      ]
+    },
+    {
+      "description": "Provider receives a start case for caseworker request from an SSCS API",
+      "request": {
+        "method": "GET",
+        "path": "/caseworkers/1/jurisdictions/1/case-types/benefit/event-triggers/APPEAL_CREATED/token",
+        "headers": {
+          "Authorization": "Bearer UserAuthToken",
+          "ServiceAuthorization": "ServiceToken",
+          "Content-Type": "application/json",
+          "experimental": "true"
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=UTF-8"
+        },
+        "body": {
+          "event_id": "GOP_APPEAL_CREATED",
+          "token": "123234543456"
+        },
+        "matchingRules": {
+          "header": {
+            "Content-Type": {
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "application/json;\\s?charset=(utf|UTF)-8"
+                }
+              ],
+              "combine": "AND"
+            }
+          }
+        }
+      },
+      "providerStates": [
+        {
+          "name": "CCD starts a case for a caseworker"
+        }
+      ]
+    },
+    {
+      "description": "Provider receives a start event request from an SSCS API",
+      "request": {
+        "method": "GET",
+        "path": "/caseworkers/1/jurisdictions/1/case-types/benefit/cases/282/event-triggers/APPEAL_CREATED/token",
+        "headers": {
+          "Authorization": "Bearer UserAuthToken",
+          "ServiceAuthorization": "ServiceToken",
+          "Content-Type": "application/json",
+          "experimental": "true"
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=UTF-8"
+        },
+        "body":  {
+          "event_id": "GOP_APPEAL_CREATED",
+          "token": "123234543456"
+        },
+        "matchingRules": {
+          "header": {
+            "Content-Type": {
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "application/json;\\s?charset=(utf|UTF)-8"
+                }
+              ],
+              "combine": "AND"
+            }
+          }
+        }
+      },
+      "providerStates": [
+        {
+          "name": "CCD starts an event"
+        }
+      ]
+    },
+    {
+      "description": "Provider receives a submit event for caseworker request from an SSCS API",
+      "request": {
+        "method": "POST",
+        "path": "/caseworkers/1/jurisdictions/1/case-types/benefit/cases/282/events",
+        "headers": {
+          "Authorization": "Bearer UserAuthToken",
+          "ServiceAuthorization": "ServiceToken",
+          "Content-Type": "application/json",
+          "experimental": "true"
+        },
+        "body": {
+          "case_reference": "112",
+          "draft_id": "1",
+          "event_token": "event_token",
+          "data_classification": { "some":  "thing"},
+          "event_data": { "some":  "thing"}
+
+        }
+      },
+      "response": {
+        "status": 201,
+        "headers": {
+          "Content-Type": "application/json; charset=UTF-8"
+        },
+        "body": {
+          "jurisdiction": "PROBATE",
+          "created_date": null,
+          "state": "Draft",
+          "security_classifications": null,
+          "after_submit_callback_response": {
+            "confirmation_header": null,
+            "confirmation_body": "somebody"
+          },
+          "delete_draft_response_status_code": null,
+          "last_modified": null,
+          "security_classification": "PUBLIC",
+          "case_type_id": "BENEFIT",
+          "version": null,
+          "id": 654321,
+          "data_classification": null,
+          "delete_draft_response_status": null,
+          "case_data": {
+            "ccdCaseId": "123",
+            "region": "asd"
+          },
+          "callback_response_status_code": 200,
+          "callback_response_status": "CALLBACK_COMPLETED"
+        },
+        "matchingRules": {
+          "header": {
+            "Content-Type": {
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "application/json;\\s?charset=(utf|UTF)-8"
+                }
+              ],
+              "combine": "AND"
+            }
+          }
+        }
+      },
+      "providerStates": [
+        {
+          "name": "CCD submits an event for a caseworker"
+        }
+      ]
+    },
+    {
+      "description": "Provider receives a submit for caseworker request from an SSCS API",
+      "request": {
+        "method": "POST",
+        "path": "/caseworkers/1/jurisdictions/1/case-types/benefit/cases",
+        "headers": {
+          "Authorization": "Bearer UserAuthToken",
+          "ServiceAuthorization": "ServiceToken",
+          "Content-Type": "application/json",
+          "experimental": "true"
+        },
+        "body": {
+            "case_reference": "112",
+            "draft_id": "1",
+            "event_token": "event_token",
+            "data_classification": { "some":  "thing"},
+            "event_data": { "some":  "thing"}
+
+        }
+      },
+      "response": {
+        "status": 201,
+        "headers": {
+          "Content-Type": "application/json; charset=UTF-8"
+        },
+        "body": {
+          "jurisdiction": "PROBATE",
+          "created_date": null,
+          "state": "Draft",
+          "security_classifications": null,
+          "after_submit_callback_response": {
+            "confirmation_header": null,
+            "confirmation_body": "somebody"
+          },
+          "delete_draft_response_status_code": null,
+          "last_modified": null,
+          "security_classification": "PUBLIC",
+          "case_type_id": "BENEFIT",
+          "version": null,
+          "id": 654321,
+          "data_classification": null,
+          "delete_draft_response_status": null,
+          "case_data": {
+            "ccdCaseId": "123",
+            "region": "asd"
+          },
+          "callback_response_status_code": 200,
+          "callback_response_status": "CALLBACK_COMPLETED"
+        },
+        "matchingRules": {
+          "header": {
+            "Content-Type": {
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "application/json;\\s?charset=(utf|UTF)-8"
+                }
+              ],
+              "combine": "AND"
+            }
+          }
+        }
+      },
+      "providerStates": [
+        {
+          "name": "CCD submits for caseworker"
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "pactSpecification": {
+      "version": "3.0.0"
+    },
+    "pact-jvm": {
+      "version": "3.5.24"
+    }
+  }
+}

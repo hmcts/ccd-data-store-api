@@ -10,6 +10,7 @@ properties(
 )
 
 @Library("Infrastructure")
+import uk.gov.hmcts.contino.AppPipelineDsl
 
 def type = "java"
 def product = "ccd"
@@ -71,6 +72,10 @@ withPipeline(type, product, component) {
         env.OAUTH2_REDIRECT_URI = "https://www-ccd.aat.platform.hmcts.net/oauth2redirect"
         env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.service.core-compute-aat.internal"
     }
+
+    enablePactAs([
+        AppPipelineDsl.PactRoles.PROVIDER
+    ])
 
     overrideVaultEnvironments(vaultOverrides)
     loadVaultSecrets(secrets)
