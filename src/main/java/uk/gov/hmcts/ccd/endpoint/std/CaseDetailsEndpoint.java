@@ -380,17 +380,17 @@ public class CaseDetailsEndpoint {
 
     @Transactional
     @GetMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/documents")
-    @ApiOperation(value = "Get a list of printable documents for the given case type ")
+    @ApiOperation(value = "Get a list of printable documents for the given case id ")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Documents list for the given case type and id")
+        @ApiResponse(code = 200, message = "Documents list for the given case id")
     })
-    public List<Document> getDocumentsForEvent(
+    public List<Document> getDocumentsForCase(
         @PathVariable("uid") final String uid,
         @PathVariable("jid") String jid,
         @PathVariable("ctid") String ctid,
         @PathVariable("cid") String cid) {
         try {
-            return documentsOperation.getPrintableDocumentsForCase(jid, ctid, cid);
+            return documentsOperation.getPrintableDocumentsForCase(cid);
         } catch (NumberFormatException e) {
             throw new ApiException(String.format("Unrecognised Case Reference %s. Case Reference should be a number", cid));
         }
