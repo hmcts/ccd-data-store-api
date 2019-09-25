@@ -18,7 +18,7 @@ public class CaseTestDataLoaderExtension extends BaseTest implements BeforeAllCa
 
     private static boolean testExecutionStarted = false;
 
-    protected CaseTestDataLoaderExtension() {
+    public CaseTestDataLoaderExtension() {
         super(AATHelper.INSTANCE);
     }
 
@@ -43,7 +43,7 @@ public class CaseTestDataLoaderExtension extends BaseTest implements BeforeAllCa
        importDefinition(AUTO_TEST1_DEFINITION_FILE_NEW);
     }
 
-    private void importDefinition(String file) {
+    public void importDefinition(String file) {
         asAutoTestImporter()
             .given()
             .multiPart(new File(file))

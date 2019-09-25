@@ -12,6 +12,8 @@ import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event;
 import uk.gov.hmcts.ccd.datastore.tests.helper.CaseTestDataLoaderExtension;
 
+import java.util.concurrent.TimeUnit;
+
 import static org.hamcrest.Matchers.equalTo;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CASE_TYPE;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.JURISDICTION;
@@ -435,12 +437,18 @@ class GetCaseTest extends BaseTest {
 
     @Test
     @DisplayName("should not read case he has created if PanelMember role has U access on a case Type")
-    void shouldNotReadCasesIfPmRoleHasUAccessOnCaseType() {
+    void shouldNotReadCasesIfPmRoleHasUAccessOnCaseType() throws InterruptedException{
 
         // Prepare new case in known state
-        final Long caseReference  = createFullCasePanelMember("AAT_AUTH_15");
+        final Long caseReference  = createFullCasePanelMember("AAT_AUTH_4");
 
-        asPrivateCaseworkerPanelMember1(true)
+        new CaseTestDataLoaderExtension().importDefinition("src/aat/resources/CCD_CNP_RDM5118_5122_Extended_reupload.xlsx");
+
+
+        TimeUnit.SECONDS.sleep(5);
+
+
+        asPrivateCaseworkerPanelMember(true)
             .get()
             .given()
             .pathParam("jurisdiction", JURISDICTION)
