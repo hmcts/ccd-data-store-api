@@ -18,5 +18,8 @@ java:
     DATA_STORE_DB_USERNAME: "{{ .Values.postgresql.postgresqlUsername}}"
     DATA_STORE_DB_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
     DATA_STORE_DB_OPTIONS: "?stringtype=unspecified"
+
+    ELASTIC_SEARCH_ENABLED: false
+    ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: false
 postgresql:
   enabled: true

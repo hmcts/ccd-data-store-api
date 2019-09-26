@@ -4,5 +4,4 @@ java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
   environment:
-    ELASTIC_SEARCH_ENABLED: 'true'
     HTTP_CLIENT_READ_TIMEOUT: '180000'
