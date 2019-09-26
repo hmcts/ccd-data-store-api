@@ -38,7 +38,7 @@ public class DocLinksRestoreService {
     public static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public static final String START_TIME = "'2019-08-20 15:35:00.000'";
-    public static final String END_TIME = "'2019-08-21 12:41:00.000'";
+    public static final String END_TIME = "'2019-08-21 13:41:00.000'";
     public static final LocalDateTime BUG_START_TIME = LocalDateTime.parse("2019-08-20 15:35:00", formatter);
 
     public static final String BETWEEN_CLAUSE = "BETWEEN  " + START_TIME + " AND " + END_TIME;

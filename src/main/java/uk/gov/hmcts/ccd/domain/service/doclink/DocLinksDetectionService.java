@@ -30,7 +30,7 @@ public class DocLinksDetectionService {
     private static final Logger LOG = LoggerFactory.getLogger(DocLinksDetectionService.class);
 
     public static final String START_TIME = "'2019-08-20 15:35:00.000'";
-    public static final String END_TIME = "'2019-08-21 12:41:00.000'";
+    public static final String END_TIME = "'2019-08-21 13:41:00.000'";
     public static final String BETWEEN_CLAUSE = "BETWEEN  " + START_TIME + " AND " + END_TIME;
 
     public static final String OLD_CASE_QUERY = "SELECT * FROM case_data WHERE created_date < " + START_TIME + " AND id IN "
