@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.BaseTest;
+
 import java.io.File;
 
 import static org.junit.jupiter.api.extension.ExtensionContext.Namespace.GLOBAL;
@@ -40,7 +41,7 @@ public class CaseTestDataLoaderExtension extends BaseTest implements BeforeAllCa
     }
 
     protected void importDefinitions() {
-       importDefinition(AUTO_TEST1_DEFINITION_FILE_NEW);
+        importDefinition(AUTO_TEST1_DEFINITION_FILE_NEW);
     }
 
     private void importDefinition(String file) {
