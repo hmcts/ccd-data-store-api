@@ -394,7 +394,7 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public CaseDetailsBuilder withState(String state){
+        public CaseDetailsBuilder withState(String state) {
             caseDetails.setState(state);
             return this;
         }
