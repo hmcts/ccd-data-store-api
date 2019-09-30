@@ -18,6 +18,7 @@ import uk.gov.hmcts.ccd.domain.service.common.SecurityValidationService;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -56,7 +57,9 @@ public class CallbackInvoker {
                                            final Boolean ignoreWarning) {
         final Optional<CallbackResponse> callbackResponse = callbackService.send(
             caseEvent.getCallBackURLAboutToStartEvent(),
-            caseEvent, null, caseDetails, false);
+            caseEvent.getRetriesTimeoutAboutToStartEvent(),
+            caseEvent,
+            caseDetails);
 
         callbackResponse.ifPresent(response -> validateAndSetFromAboutToStartCallback(caseType,
                                                                                       caseDetails,
@@ -70,9 +73,14 @@ public class CallbackInvoker {
                                                                      final CaseType caseType,
                                                                      final Boolean ignoreWarning) {
 
-        final Optional<CallbackResponse> callbackResponse = callbackService.send(
+        final Optional<CallbackResponse> callbackResponse = Optional.ofNullable(callbackService.send(
             eventTrigger.getCallBackURLAboutToSubmitEvent(),
-            eventTrigger, caseDetailsBefore, caseDetails, ignoreWarning);
+            eventTrigger.getRetriesTimeoutURLAboutToSubmitEvent(),
+            eventTrigger,
+            caseDetailsBefore,
+            caseDetails,
+            CallbackResponse.class,
+            ignoreWarning).getBody());
 
         if (callbackResponse.isPresent()) {
             return validateAndSetFromAboutToSubmitCallback(caseType,
@@ -88,6 +96,7 @@ public class CallbackInvoker {
                                                                                final CaseDetails caseDetailsBefore,
                                                                                final CaseDetails caseDetails) {
         return callbackService.send(eventTrigger.getCallBackURLSubmittedEvent(),
+                                    eventTrigger.getRetriesTimeoutURLSubmittedEvent(),
                                     eventTrigger,
                                     caseDetailsBefore,
                                     caseDetails,
@@ -102,9 +111,10 @@ public class CallbackInvoker {
                                               final Boolean ignoreWarning) {
 
         Optional<CallbackResponse> callbackResponseOptional = callbackService.send(wizardPage.getCallBackURLMidEvent(),
+            wizardPage.getRetriesTimeoutMidEvent(),
             caseEvent,
             caseDetailsBefore,
-            caseDetails, false);
+            caseDetails);
 
         if (callbackResponseOptional.isPresent()) {
             CallbackResponse callbackResponse = callbackResponseOptional.get();
@@ -116,6 +126,10 @@ public class CallbackInvoker {
         }
 
         return caseDetails;
+    }
+
+    private boolean isRetriesDisabled(final List<Integer> retriesTimeouts) {
+        return retriesTimeouts != null && retriesTimeouts.size() == 1 && retriesTimeouts.get(0) == 0;
     }
 
     private void validateAndSetFromAboutToStartCallback(CaseType caseType,
@@ -159,7 +173,7 @@ public class CallbackInvoker {
 
 
     private boolean callbackResponseHasCaseAndDataClassification(CallbackResponse callbackResponse) {
-        return (callbackResponse.getSecurityClassification() != null && callbackResponse.getDataClassification() != null) ? true : false;
+        return callbackResponse.getSecurityClassification() != null && callbackResponse.getDataClassification() != null;
     }
 
     private Map<String, JsonNode> deduceDefaultClassificationForExistingFields(CaseType caseType,

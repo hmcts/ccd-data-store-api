@@ -58,6 +58,12 @@ data "azurerm_key_vault_secret" "ccd_data_s2s_key" {
   key_vault_id = "${data.azurerm_key_vault.s2s_vault.id}"
 }
 
+resource "azurerm_key_vault_secret" "ccd_data_s2s_secret" {
+  name = "ccd-data-s2s-secret"
+  value = "${data.azurerm_key_vault_secret.ccd_data_s2s_key.value}"
+  key_vault_id = "${data.azurerm_key_vault.ccd_shared_key_vault.id}"
+}
+
 // load balancer url. The load balancer will kill connections when idle for 5 min. Used by functional tests
 data "azurerm_key_vault_secret" "ccd_elastic_search_url" {
   count = "${var.elastic_search_enabled == "false" ? 0 : 1}"
@@ -163,6 +169,7 @@ module "ccd-data-store-api" {
     CCD_AM_WRITE_TO_BOTH                  = "${var.ccd_am_write_to_both}"
     CCD_AM_READ_FROM_CCD                  = "${var.ccd_am_read_from_ccd}"
     CCD_AM_READ_FROM_AM                   = "${var.ccd_am_read_from_am}"
+    JPA_CRITERIA_IN_SEARCH_ENABLED        = false
   }
 
 }
