@@ -217,4 +217,11 @@
         <cve>CVE-2019-16943</cve>
         <cve>CVE-2019-17531</cve>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: checkstyle-8.18.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.puppycrawl\.tools/checkstyle@.*$</packageUrl>
+        <cpe>cpe:/a:checkstyle:checkstyle</cpe>
+    </suppress>
 </suppressions>
