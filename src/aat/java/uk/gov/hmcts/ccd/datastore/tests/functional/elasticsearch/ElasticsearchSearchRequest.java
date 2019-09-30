@@ -3,6 +3,8 @@ package uk.gov.hmcts.ccd.datastore.tests.functional.elasticsearch;
 import com.google.common.annotations.VisibleForTesting;
 
 class ElasticsearchSearchRequest {
+    public ElasticsearchSearchRequest() {
+    }
 
     @VisibleForTesting
     static String exactMatch(String field, Object value) {
