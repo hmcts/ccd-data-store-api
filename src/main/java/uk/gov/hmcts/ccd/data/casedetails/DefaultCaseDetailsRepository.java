@@ -185,7 +185,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
 
     private Query getQuery(MetaData metadata, Map<String, String> dataSearchParams, boolean isCountQuery) {
         Query query;
-        if (dataSearchParams.isEmpty()) {
+        if (dataSearchParams.isEmpty() && applicationParams.isJpaCriteriaSearchEnabled()) {
             query = isCountQuery ? getCountQueryByMetaData(metadata) : getQueryByMetaData(metadata);
         } else {
             query = getQueryByParameters(metadata, dataSearchParams, isCountQuery);

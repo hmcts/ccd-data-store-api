@@ -1,314 +1,361 @@
 package uk.gov.hmcts.ccd.domain.service.callbacks;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
-import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
-import static com.github.tomakehurst.wiremock.client.WireMock.post;
-import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
-import static com.github.tomakehurst.wiremock.client.WireMock.verify;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.BDDMockito.given;
-
-import uk.gov.hmcts.ccd.ApplicationParams;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.google.common.collect.Lists;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.service.callbacks.retrycontext.CallbackRetryContext;
+import uk.gov.hmcts.ccd.domain.service.callbacks.retrycontext.CallbackRetryContextBuilder;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
+import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-import javax.inject.Inject;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CallbackResponseBuilder.aCallbackResponse;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DataClassificationBuilder.aClassificationBuilder;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.skyscreamer.jsonassert.JSONAssert;
-import org.skyscreamer.jsonassert.JSONCompareMode;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.web.client.RestTemplate;
-
-@ActiveProfiles("test")
-@RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource(properties =
-    {
-        "ccd.callback.timeouts=1,2,3"
-    })
-@AutoConfigureWireMock(port = 0)
-@DirtiesContext
 public class CallbackServiceTest {
-    private static final ObjectMapper mapper = new ObjectMapper();
 
-    @Inject
+    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
+    private static final ArrayList<Integer> NO_CALLBACKS_RETRIES_PROVIDED = null;
+    private static final int SECOND = 1;
+    private static final int TWO_SECONDS = 2;
+    private static final int THREE_SECONDS = 3;
+    private static final ArrayList<Integer> DISABLE_CUSTOM_RETRIES = Lists.newArrayList(0);
+    private static final ArrayList<Integer> TWO_CALLBACK_RETRY_TIMEOUTS = Lists.newArrayList(SECOND, TWO_SECONDS);
+    private static final ArrayList<Integer> THREE_CALLBACK_RETRY_TIMEOUTS = Lists.newArrayList(SECOND, TWO_SECONDS, THREE_SECONDS);
+    private static final Integer DEFAULT_CALLBACK_TIMEOUT = SECOND;
+
+    @Mock
+    private Authentication authentication;
+    @Mock
+    private SecurityUtils securityUtils;
+    @Mock
+    private RestTemplate restTemplate;
+    @Mock
+    private CallbackRetryContextBuilder callbackRetryContextBuilder;
+    @Mock
+    private SecurityContext securityContext;
+    @Mock
+    private ServiceAndUserDetails principal;
+    @Captor
+    private ArgumentCaptor<HttpEntity> argument;
+
+    private ExecutorService executorService = Executors.newFixedThreadPool(1);
+
     private CallbackService callbackService;
 
-    @Value("${wiremock.server.port}")
-    protected Integer wiremockPort;
+    private List<CallbackRetryContext> defaultCallbackRetryContext;
 
-    @Before
-    public void setUp() {
-        // IDAM
-        final SecurityUtils securityUtils = Mockito.mock(SecurityUtils.class);
-        Mockito.when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
-        ReflectionTestUtils.setField(callbackService, "securityUtils", securityUtils);
-    }
+    private final String testUrl = "http://localhost:/test-callback";
+    private final CaseDetails caseDetails = new CaseDetails();
+    private final CaseEvent caseEvent = new CaseEvent();
+    private final CallbackResponse callbackResponse = aCallbackResponse().build();
+    private ResponseEntity responseEntity;
+    private final ResponseEntity<CallbackResponse> response = ResponseEntity.ok(callbackResponse);
 
-    @Test
-    public void happyPathWithNoErrorsOrWarnings() throws Exception {
-        final String testUrl = "http://localhost:" + wiremockPort + "/test-callback";
+    @BeforeEach
+    public void setUp() throws IOException {
+        MockitoAnnotations.initMocks(this);
 
-        final CaseDetails caseDetails = new CaseDetails();
         caseDetails.setState("test state");
         caseDetails.setCaseTypeId("test case type");
 
-        final CaseEvent caseEvent = new CaseEvent();
         caseEvent.setId("TEST-EVENT");
 
-        final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setData(caseDetails.getData());
 
-        stubFor(post(urlMatching("/test-callback.*"))
-            .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
+        JsonNode textField0 = getTextNode("TextField0");
+        List<JsonNode> textFieldList = Lists.newArrayList();
+        textFieldList.add(textField0);
+        responseEntity = ResponseEntity.<CallbackResponse>ok(aCallbackResponse()
+            .withDataClassification(aClassificationBuilder()
+                .withData("TextField0", textFieldList)
+                .buildAsMap())
+            .build());
+        defaultCallbackRetryContext = Lists.newArrayList(new CallbackRetryContext(0, DEFAULT_CALLBACK_TIMEOUT),
+            new CallbackRetryContext(1, DEFAULT_CALLBACK_TIMEOUT),
+            new CallbackRetryContext(3, DEFAULT_CALLBACK_TIMEOUT));
+        doReturn(defaultCallbackRetryContext).when(callbackRetryContextBuilder).buildCallbackRetryContexts(Lists.newArrayList());
 
-        final Optional<CallbackResponse> result = callbackService.send(testUrl, caseEvent, null, caseDetails, false);
-        final CallbackResponse response = result.orElseThrow(() -> new AssertionError("Missing result"));
+        doReturn(new HttpHeaders()).when(securityUtils).authorizationHeaders();
+        doReturn(responseEntity).when(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(CallbackResponse.class));
 
-        assertTrue(response.getErrors().isEmpty());
-    }
+        caseEvent.setId("TEST-EVENT");
 
-    @org.junit.Ignore // TODO investigating socket issues in Azure
-    @Test
-    public void shouldRetryIfCallbackRespondsLate() throws Exception {
-        final String testUrl = "http://localhost:" + wiremockPort + "/test-callback";
-
-        final CaseDetails caseDetails = new CaseDetails();
         caseDetails.setState("test state");
         caseDetails.setCaseTypeId("test case type");
 
-        final CaseEvent caseEvent = new CaseEvent();
-        caseEvent.setId("TEST-EVENT");
-
-        final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setData(caseDetails.getData());
 
-        stubFor(post(urlMatching("/test-callback.*"))
-            .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200).withFixedDelay(1500)));
-
-        final Optional<CallbackResponse> result = callbackService.send(testUrl, caseEvent, null, caseDetails, false);
-
-        final CallbackResponse response = result.orElseThrow(() -> new AssertionError("Missing result"));
-        verify(exactly(2), postRequestedFor(urlMatching("/test-callback.*")));
-        assertTrue(response.getErrors().isEmpty());
+        initSecurityContext();
+        callbackService = new CallbackService(securityUtils, restTemplate, executorService, callbackRetryContextBuilder);
     }
 
-    @Test
-    public void failurePathWithErrors() throws Exception {
-        final String testUrl = "http://localhost:" + wiremockPort + "/test-callback";
+    @Nested
+    @DisplayName("Default Retry Context")
+    class DefaultRetryContext {
 
-        final CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setState("test state");
-        caseDetails.setCaseTypeId("test case type");
+        @Test
+        @DisplayName("Should return with no errors or warnings")
+        public void shouldReturnWithNoErrorsOrWarnings() {
+            final Optional<CallbackResponse> result = callbackService.send(testUrl, NO_CALLBACKS_RETRIES_PROVIDED, caseEvent, caseDetails);
+            final CallbackResponse response = result.orElseThrow(() -> new AssertionError("Missing result"));
 
-        final CaseEvent caseEvent = new CaseEvent();
-        caseEvent.setId("TEST-EVENT");
-
-        final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setErrors(Collections.singletonList("Test message"));
-        callbackResponse.setData(caseDetails.getData());
-        stubFor(post(urlMatching("/test-callback.*"))
-            .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
-
-        final Optional<CallbackResponse> result = callbackService.send(testUrl, caseEvent, null, caseDetails, false);
-        final CallbackResponse response = result.orElseThrow(() -> new AssertionError("Missing result"));
-
-        assertThat(response.getErrors(), Matchers.contains("Test message"));
-    }
-
-    @Test(expected = CallbackException.class)
-    public void notFoundFailurePath() throws Exception {
-        final String testUrl = "http://localhost";
-        final CaseDetails caseDetails = new CaseDetails();
-        final CaseEvent caseEvent = new CaseEvent();
-        caseEvent.setId("TEST-EVENT");
-
-        callbackService.send(testUrl, caseEvent, null, caseDetails, false);
-    }
-
-    @Test(expected = CallbackException.class)
-    public void serverError() throws Exception {
-        final String testUrl = "http://localhost:" + wiremockPort + "/test-callback";
-        final CallbackResponse callbackResponse = new CallbackResponse();
-        final CaseDetails caseDetails = new CaseDetails();
-        final CaseEvent caseEvent = new CaseEvent();
-        caseEvent.setId("TEST-EVENT");
-
-        stubFor(post(urlMatching("/test-callback.*"))
-            .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(500)));
-
-        callbackService.send(testUrl, caseEvent, null, caseDetails, false);
-    }
-
-    @Test
-    public void retryOnServerError() throws Exception {
-        final String testUrl = "http://localhost:" + wiremockPort + "/test-callbackGrrrr";
-        final CallbackResponse callbackResponse = new CallbackResponse();
-        final CaseDetails caseDetails = new CaseDetails();
-        final CaseEvent caseEvent = new CaseEvent();
-        caseEvent.setId("TEST-EVENT");
-
-        stubFor(post(urlMatching("/test-callbackGrrrr.*"))
-            .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(500)));
-
-        Instant start = Instant.now();
-        try {
-            callbackService.send(testUrl, caseEvent, null, caseDetails, false);
-        } catch (Exception e) {
+            Assertions.assertAll(
+                () -> assertTrue(response.getErrors().isEmpty()),
+                () -> assertTrue(response.getWarnings().isEmpty()),
+                () -> verify(restTemplate).exchange(eq(testUrl), eq(HttpMethod.POST), any(HttpEntity.class), any(Class.class)),
+                () -> verifyNoMoreInteractions(restTemplate)
+            );
         }
-        final Duration between = Duration.between(start, Instant.now());
-        assertThat((int) between.toMillis(), greaterThan(4000));
-        verify(exactly(3), postRequestedFor(urlMatching("/test-callbackGrrrr.*")));
+
+        @Test
+        @DisplayName("Should retry if callback responds late")
+        public void shouldRetryIfCallbackRespondsLate() throws IOException {
+            doThrow(RestClientException.class)
+                .doThrow(RestClientException.class)
+                .doReturn(responseEntity)
+                .when(restTemplate).exchange(eq(testUrl), eq(HttpMethod.POST), any(HttpEntity.class), any(Class.class));
+
+            Instant start = Instant.now();
+            callbackService.send(testUrl, NO_CALLBACKS_RETRIES_PROVIDED, caseEvent, caseDetails);
+
+            final Duration between = Duration.between(start, Instant.now());
+            Assertions.assertAll(
+                () -> verify(restTemplate, times(3)).exchange(eq(testUrl), eq(HttpMethod.POST), any(HttpEntity.class), any(Class.class)),
+                () -> verifyNoMoreInteractions(restTemplate),
+                () -> assertThat((int) between.toMillis(), greaterThan(4000))
+            );
+        }
     }
 
-    @Test(expected = CallbackException.class)
-    public void authorisationError() throws Exception {
-        final String testUrl = "http://localhost:" + wiremockPort + "/test-callback";
-        final CallbackResponse callbackResponse = new CallbackResponse();
-        final CaseDetails caseDetails = new CaseDetails();
-        final CaseEvent caseEvent = new CaseEvent();
-        caseEvent.setId("TEST-EVENT");
+    @Nested
+    @DisplayName("Custom Retry Context")
+    class CustomRetryContext {
 
-        stubFor(post(urlMatching("/test-callback.*"))
-            .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(401)));
+        @BeforeEach
+        void setUp() {
+            defaultCallbackRetryContext = Lists.newArrayList(new CallbackRetryContext(0, DEFAULT_CALLBACK_TIMEOUT));
+            doReturn(defaultCallbackRetryContext).when(callbackRetryContextBuilder).buildCallbackRetryContexts(DISABLE_CUSTOM_RETRIES);
+        }
 
-        callbackService.send(testUrl, caseEvent, null, caseDetails, false);
+        @Test
+        @DisplayName("Should disable callbacks")
+        public void shouldDisableCallbacks() {
+            final Optional<CallbackResponse> result = callbackService.send(testUrl, DISABLE_CUSTOM_RETRIES, caseEvent, caseDetails);
+            final CallbackResponse response = result.orElseThrow(() -> new AssertionError("Missing result"));
+
+            Assertions.assertAll(
+                () -> assertTrue(response.getErrors().isEmpty()),
+                () -> assertTrue(response.getWarnings().isEmpty()),
+                () -> verify(restTemplate).exchange(eq(testUrl), eq(HttpMethod.POST), any(HttpEntity.class), any(Class.class)),
+                () -> verifyNoMoreInteractions(restTemplate)
+            );
+        }
+
+        @Test
+        @DisplayName("Should return with no errors or warnings and callback respond on second try")
+        public void shouldReturnWithOneRetries() throws IOException {
+            defaultCallbackRetryContext = Lists.newArrayList(new CallbackRetryContext(0, SECOND), new CallbackRetryContext(1, TWO_SECONDS));
+            doReturn(defaultCallbackRetryContext).when(callbackRetryContextBuilder).buildCallbackRetryContexts(TWO_CALLBACK_RETRY_TIMEOUTS);
+            doThrow(RestClientException.class)
+                .doReturn(responseEntity)
+                .when(restTemplate).exchange(eq(testUrl), eq(HttpMethod.POST), any(HttpEntity.class), any(Class.class));
+
+            final Optional<CallbackResponse> result = callbackService.send(testUrl, TWO_CALLBACK_RETRY_TIMEOUTS, caseEvent, caseDetails);
+            final CallbackResponse response = result.orElseThrow(() -> new AssertionError("Missing result"));
+
+            Assertions.assertAll(
+                () -> assertTrue(response.getErrors().isEmpty()),
+                () -> assertTrue(response.getWarnings().isEmpty()),
+                () -> verify(restTemplate, times(2)).exchange(eq(testUrl), eq(HttpMethod.POST), any(HttpEntity.class), any(Class.class)),
+                () -> verifyNoMoreInteractions(restTemplate)
+            );
+        }
+
+        @Test
+        @DisplayName("Should return with no errors or warnings and callback respond on third retry")
+        public void shouldRetryIfCallbackRespondsAfterTwoRetries() throws IOException {
+            defaultCallbackRetryContext = Lists.newArrayList(new CallbackRetryContext(0, SECOND),
+                new CallbackRetryContext(1, TWO_SECONDS),
+                new CallbackRetryContext(3, THREE_SECONDS));
+            doReturn(defaultCallbackRetryContext).when(callbackRetryContextBuilder).buildCallbackRetryContexts(THREE_CALLBACK_RETRY_TIMEOUTS);
+
+            doThrow(RestClientException.class)
+                .doThrow(RestClientException.class)
+                .doReturn(responseEntity)
+                .when(restTemplate).exchange(eq(testUrl), eq(HttpMethod.POST), any(HttpEntity.class), any(Class.class));
+
+            final Optional<CallbackResponse> result = callbackService.send(testUrl, THREE_CALLBACK_RETRY_TIMEOUTS, caseEvent, caseDetails);
+            final CallbackResponse response = result.orElseThrow(() -> new AssertionError("Missing result"));
+
+            Assertions.assertAll(
+                () -> assertTrue(response.getErrors().isEmpty()),
+                () -> assertTrue(response.getWarnings().isEmpty()),
+                () -> verify(restTemplate, times(3)).exchange(eq(testUrl), eq(HttpMethod.POST), any(HttpEntity.class), any(Class.class)),
+                () -> verifyNoMoreInteractions(restTemplate)
+            );
+        }
     }
 
     @Test
-    public void validateCallbackErrorsAndWarningsHappyPath() throws Exception {
-        final CallbackResponse callbackResponse = new CallbackResponse();
+    public void shouldReturnWithErrorsOrWarningsIfExist() {
+        responseEntity = ResponseEntity.<CallbackResponse>ok(aCallbackResponse().withError("Test message").build());
+        doReturn(responseEntity).when(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(CallbackResponse.class));
+
+        final Optional<CallbackResponse> result = callbackService.send(testUrl, null, caseEvent, caseDetails);
+
+        final CallbackResponse response = result.orElseThrow(() -> new AssertionError("Missing result"));
+
+        assertThat(response.getErrors(), contains("Test message"));
+    }
+
+    @Test
+    public void shouldFailIfCallbackCallFailsForeverWithRestClientException() throws IOException {
+        doThrow(RestClientException.class)
+            .when(restTemplate).exchange(eq(testUrl), eq(HttpMethod.POST), any(HttpEntity.class), any(Class.class));
+
+        CallbackException callbackException = assertThrows(CallbackException.class, () -> callbackService.send(testUrl, null, caseEvent, caseDetails));
+        assertThat(callbackException.getMessage(), is(equalTo("Unsuccessful callback to url=http://localhost:/test-callback")));
+    }
+
+    @Test
+    public void shouldFailIfCallbackCallFailsFirstTimeWithNonRestClientException() throws IOException {
+        doThrow(IllegalStateException.class)
+            .doReturn(responseEntity)
+            .when(restTemplate).exchange(eq(testUrl), eq(HttpMethod.POST), any(HttpEntity.class), any(Class.class));
+
+        assertThrows(IllegalStateException.class, () -> callbackService.send(testUrl, null, caseEvent, caseDetails));
+    }
+
+    @Test
+    public void shouldPassValidationIfNoCallbackErrorsAndWarnings() {
         callbackService.validateCallbackErrorsAndWarnings(callbackResponse, false);
     }
 
-    @Test(expected = ApiException.class)
-    public void validateCallbackErrorsAndWarningsWithWarnings() throws Exception {
+    @Test
+    public void shouldFailValidationIfWarningsAndDoNotIgnoreWarnings() {
         final String TEST_WARNING_1 = "WARNING 1";
         final String TEST_WARNING_2 = "WARNING 2";
 
-        final CallbackResponse callbackResponse = new CallbackResponse();
         final List<String> warnings = new ArrayList<>();
         warnings.add(TEST_WARNING_1);
         warnings.add(TEST_WARNING_2);
-
         callbackResponse.setWarnings(warnings);
-        callbackService.validateCallbackErrorsAndWarnings(callbackResponse, false);
+
+        ApiException apiException = assertThrows(ApiException.class, () -> callbackService.validateCallbackErrorsAndWarnings(callbackResponse, false));
+        assertThat(apiException.getMessage(), is(equalTo("Unable to proceed because there are one or more callback Errors or Warnings")));
     }
 
-    @Test(expected = ApiException.class)
-    public void validateCallbackErrorsAndWarningsWithErrorsAndIgnore() throws Exception {
+    @Test
+    public void shouldPassValidationIfWarningsAndIgnoreWarnings() {
+        final String TEST_WARNING_1 = "WARNING 1";
+        final String TEST_WARNING_2 = "WARNING 2";
+
+        final List<String> warnings = new ArrayList<>();
+        warnings.add(TEST_WARNING_1);
+        warnings.add(TEST_WARNING_2);
+        callbackResponse.setWarnings(warnings);
+
+        callbackService.validateCallbackErrorsAndWarnings(callbackResponse, true);
+    }
+
+    @Test
+    public void shouldFailValidationIfErrorsAndIgnoreWarnings() {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setErrors(Collections.singletonList("an error"));
-        callbackResponse.setWarnings(Collections.singletonList("a warning"));
-        callbackService.validateCallbackErrorsAndWarnings(callbackResponse, true);
+        ApiException apiException = assertThrows(ApiException.class, () -> callbackService.validateCallbackErrorsAndWarnings(callbackResponse, true));
+        assertThat(apiException.getMessage(), is(equalTo("Unable to proceed because there are one or more callback Errors or Warnings")));
     }
 
-    @Test
-    public void validateCallbackErrorsAndWarningsWithWarningsAndIgnore() throws Exception {
-        final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackService.validateCallbackErrorsAndWarnings(callbackResponse, true);
+    @Nested
+    @DisplayName("Ignore warning flag")
+    class IgnoreWarningFlag {
 
-        final List<String> warnings = Collections.singletonList("Test");
-        callbackResponse.setWarnings(warnings);
-        callbackService.validateCallbackErrorsAndWarnings(callbackResponse, true);
-    }
+        @Test
+        @DisplayName("Should set ignore warning flag in callback request if set by client")
+        public void shouldSetIgnoreWarningsFlagInCallbackRequestIfSetByClient() throws Exception {
+            callbackService.send(testUrl, null, caseEvent, null, caseDetails, CallbackResponse.class, true);
 
-    @Test
-    public void shouldGetBodyInGeneric() throws Exception {
-        final String testUrl = "http://localhost:" + wiremockPort + "/test-callback-submitted";
-        final CallbackResponse callbackResponse = new CallbackResponse();
-        final CaseDetails caseDetails = new CaseDetails();
-        final CaseEvent caseEvent = new CaseEvent();
-        caseEvent.setId("TEST-EVENT");
-
-        stubFor(post(urlMatching("/test-callback-submitted.*")).willReturn(
-            okJson(mapper.writeValueAsString(callbackResponse)).withStatus(201)));
-
-        final ResponseEntity<String> result = callbackService.send(testUrl, caseEvent, null, caseDetails,
-            String.class);
-
-        assertAll(
-            () -> assertThat(result.getStatusCodeValue(), is(201)),
-            () -> JSONAssert.assertEquals(
-                "{\"data\":null,\"errors\":[],\"warnings\":[],\"data_classification\":null,\"security_classification\":null}",
-                result.getBody(),
-                JSONCompareMode.LENIENT)
-        );
-    }
-
-    @Test
-    public void shouldRetryOnError() throws Exception {
-        final String testUrl = "http://localhost:" + wiremockPort + "/test-callback-invaliddd";
-        final CallbackResponse callbackResponse = new CallbackResponse();
-        final CaseDetails caseDetails = new CaseDetails();
-        final CaseEvent caseEvent = new CaseEvent();
-        caseEvent.setId("TEST-EVENT");
-
-        stubFor(post(urlMatching("/test-callback-invaliddd.*")).willReturn(
-            okJson(mapper.writeValueAsString(callbackResponse)).withStatus(500)));
-
-        Instant start = Instant.now();
-        try {
-            callbackService.send(testUrl, caseEvent, null, caseDetails, String.class);
-        } catch (Exception e) {
-            e.printStackTrace();
+            verify(restTemplate).exchange(eq(testUrl), eq(HttpMethod.POST), argument.capture(), eq(CallbackResponse.class));
+            assertThat(argument.getValue().getBody(), hasProperty("ignoreWarning", is(true)));
         }
-        final Duration between = Duration.between(start, Instant.now());
-        assertThat((int) between.toMillis(), greaterThan(4000));
-        verify(exactly(3), postRequestedFor(urlMatching("/test-callback-invaliddd.*")));
-    }
 
-    @Test(expected = CallbackException.class)
-    public void shouldThrowCallbackException_whenSendInvalidUrlGetGenericBody() throws Exception {
-        final String testUrl = "http://localhost/invalid-test-callback";
-        final RestTemplate restTemplate = Mockito.mock(RestTemplate.class);
-        final ApplicationParams applicationParams = Mockito.mock(ApplicationParams.class);
-        given(applicationParams.getCallbackRetries()).willReturn(Arrays.asList(3, 5));
+        @Test
+        @DisplayName("Should not set ignore warning flag in callback request if not set by client")
+        public void shouldNotSetIgnoreWarningsFlagInCallbackRequestIfNotSetByClient() throws Exception {
+            callbackService.send(testUrl, null, caseEvent, null, caseDetails, CallbackResponse.class, false);
 
-        // Builds a new callback service to avoid wiremock exception to get in the way
-        final CallbackService underTest = new CallbackService(Mockito.mock(SecurityUtils.class), restTemplate);
-        final CaseDetails caseDetails = new CaseDetails();
-        final CaseEvent caseEvent = new CaseEvent();
-        caseEvent.setId("TEST-EVENT");
+            verify(restTemplate).exchange(eq(testUrl), eq(HttpMethod.POST), argument.capture(), eq(CallbackResponse.class));
+            assertThat(argument.getValue().getBody(), hasProperty("ignoreWarning", is(false)));
+        }
 
-        try {
-            underTest.send(testUrl, caseEvent, null, caseDetails, String.class);
-        } catch (CallbackException ex) {
-            assertThat(ex.getMessage(), is("Callback to service has been unsuccessful for event " + caseEvent.getName()));
-            throw ex;
+        @Test
+        @DisplayName("Should not set ignore warning flag in callback request if null set by client")
+        public void shouldNotSetIgnoreWarningsFlagInCallbackRequestIfNullSetByClient() throws Exception {
+            callbackService.send(testUrl, null, caseEvent, null, caseDetails, CallbackResponse.class, (Boolean) null);
+
+            verify(restTemplate).exchange(eq(testUrl), eq(HttpMethod.POST), argument.capture(), eq(CallbackResponse.class));
+            assertThat(argument.getValue().getBody(), hasProperty("ignoreWarning", nullValue()));
         }
     }
+
+    private JsonNode getTextNode(String value) {
+        return JSON_NODE_FACTORY.textNode(value);
+    }
+
+    private void initSecurityContext() {
+        doReturn(principal).when(authentication).getPrincipal();
+        doReturn(authentication).when(securityContext).getAuthentication();
+        SecurityContextHolder.setContext(securityContext);
+    }
+
 }
