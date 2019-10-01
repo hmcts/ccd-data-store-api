@@ -13,7 +13,7 @@ java:
         - ccd-ELASTIC-SEARCH-DATA-NODES-URL
         - ccd-ELASTIC-SEARCH-PASSWORD
   environment:
-    ENABLE_DB_MIGRATE: true
+    ENABLE_DB_MIGRATE: false
     DATA_STORE_DB_PORT: 5432
     DATA_STORE_DB_NAME: ccd_data_store
     DATA_STORE_DB_HOST: ccd-data-store-api-postgres-db-{{ .Values.global.environment }}.postgres.database.azure.com
