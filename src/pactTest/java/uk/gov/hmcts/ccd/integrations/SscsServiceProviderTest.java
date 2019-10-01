@@ -1,8 +1,6 @@
 package uk.gov.hmcts.ccd.integrations;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.swing.text.html.Option;
-import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.mockito.ArgumentMatchers.*;
@@ -10,16 +8,14 @@ import static org.mockito.Mockito.when;
 
 import au.com.dius.pact.provider.junit.Provider;
 import au.com.dius.pact.provider.junit.State;
-import au.com.dius.pact.provider.junit.loader.PactFolder;
+import au.com.dius.pact.provider.junit.loader.PactBroker;
+//import au.com.dius.pact.provider.junit.loader.PactFolder;
 import au.com.dius.pact.provider.junit.target.HttpTarget;
 import au.com.dius.pact.provider.junit.target.Target;
 import au.com.dius.pact.provider.junit.target.TestTarget;
 import au.com.dius.pact.provider.spring.SpringRestPactRunner;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.collect.Maps;
 import org.junit.Before;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
@@ -34,23 +30,18 @@ import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
-import uk.gov.hmcts.ccd.data.definition.CaseTypeDefinitionVersion;
 import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.DefaultUserRepository;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
-import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.createcase.AuthorisedCreateCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.createevent.AuthorisedCreateEventOperation;
-import uk.gov.hmcts.ccd.domain.service.getcase.AuthorisedGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.search.CreatorSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.startevent.AuthorisedStartEventOperation;
@@ -61,8 +52,8 @@ import uk.gov.hmcts.reform.auth.checker.core.user.User;
 import uk.gov.hmcts.reform.auth.checker.core.user.UserRequestAuthorizer;
 
 @Provider("ccd")
-//@PactBroker(scheme = "${pact.broker.scheme}",host = "${pact.broker.baseUrl}", port = "${pact.broker.port}", tags={"${pact.broker.consumer.tag}"})
-@PactFolder(value = "sscs")
+@PactBroker(scheme = "${pact.broker.scheme}",host = "${pact.broker.baseUrl}", port = "${pact.broker.port}", tags={"${pact.broker.consumer.tag}"})
+//@PactFolder(value = "sscs")
 @RunWith(SpringRestPactRunner.class)
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = {
@@ -149,7 +140,7 @@ public class SscsServiceProviderTest {
         when(serviceResolver.getTokenDetails(anyString())).thenReturn(service);
         when(serviceRequestAuthorizer.authorise(any(HttpServletRequest.class))).thenReturn(service);
         Set<String> roles = new HashSet<>();
-        User user = new User(PRINCIPAL,roles);
+        User user = new User(PRINCIPAL, roles);
         when(userRequestAuthorizer.authorise(any(HttpServletRequest.class))).thenReturn(user);
         // System.getProperties().setProperty("pact.verifier.publishResults", "true");
         //System.getProperties().setProperty("pact.provider.version", providerVersion);
@@ -187,7 +178,7 @@ public class SscsServiceProviderTest {
     }
 
     @State("CCD searches for a caseworker")
-    public void toCheckCaseWorkerSearchRequest(){
+    public void toCheckCaseWorkerSearchRequest() {
         Map<String, JsonNode> data = new HashMap<>();
         data.put("ccdCaseId", JSON_NODE_FACTORY.textNode("123"));
         data.put("region", JSON_NODE_FACTORY.textNode("asd"));
@@ -210,7 +201,7 @@ public class SscsServiceProviderTest {
     }
 
     @State("CCD starts a case for a caseworker")
-    public void toCheckStartCaseForCaseWorker(){
+    public void toCheckStartCaseForCaseWorker() {
         StartEventTrigger startEventTrigger = new StartEventTrigger();
         startEventTrigger.setEventId("GOP_APPEAL_CREATED");
         startEventTrigger.setToken("123234543456");
@@ -218,7 +209,7 @@ public class SscsServiceProviderTest {
     }
 
     @State("CCD starts an event")
-    public void toCheckStartEvent(){
+    public void toCheckStartEvent() {
         StartEventTrigger startEventTrigger = new StartEventTrigger();
         startEventTrigger.setEventId("GOP_APPEAL_CREATED");
         startEventTrigger.setToken("123234543456");
@@ -227,7 +218,7 @@ public class SscsServiceProviderTest {
     }
 
     @State("CCD submits an event for a caseworker")
-    public void toCheckEventForCaseWorkerIsSubmitted(){
+    public void toCheckEventForCaseWorkerIsSubmitted() {
         Map<String, JsonNode> data = new HashMap<>();
         data.put("ccdCaseId", JSON_NODE_FACTORY.textNode("123"));
         data.put("region", JSON_NODE_FACTORY.textNode("asd"));
@@ -246,15 +237,15 @@ public class SscsServiceProviderTest {
         caseDetails.setAfterSubmitCallbackResponseEntity(afterSubmitValue);
 
         LinkedHashMap<String, JsonNode> dataClassification = new LinkedHashMap<>();
-            dataClassification.put("some",JSON_NODE_FACTORY.textNode("thing"));
+        dataClassification.put("some", JSON_NODE_FACTORY.textNode("thing"));
         LinkedHashMap<String, JsonNode> eventData = new LinkedHashMap<>();
-        eventData.put("some",JSON_NODE_FACTORY.textNode("thing"));
+        eventData.put("some", JSON_NODE_FACTORY.textNode("thing"));
 
-            when(authorisedCreateEventOperation.createCaseEvent(eq("282"), any(CaseDataContent.class) )).thenReturn(caseDetails);
+        when(authorisedCreateEventOperation.createCaseEvent(eq("282"), any(CaseDataContent.class))).thenReturn(caseDetails);
     }
 
     @State("CCD submits for caseworker")
-    public void toCheckSubmitForCaseWorker(){
+    public void toCheckSubmitForCaseWorker() {
         Map<String, JsonNode> data = new HashMap<>();
         data.put("ccdCaseId", JSON_NODE_FACTORY.textNode("123"));
         data.put("region", JSON_NODE_FACTORY.textNode("asd"));
@@ -271,7 +262,7 @@ public class SscsServiceProviderTest {
         afterSubmitCallbackresponse.setConfirmationBody("somebody");
         when(afterSubmitValue.getBody()).thenReturn(afterSubmitCallbackresponse);
         caseDetails.setAfterSubmitCallbackResponseEntity(afterSubmitValue);
-        when(authorisedCreateCaseOperation.createCaseDetails(eq("1"),eq("1"),eq("benefit"),
+        when(authorisedCreateCaseOperation.createCaseDetails(eq("1"), eq("1"), eq("benefit"),
             any(CaseDataContent.class), eq(null))).thenReturn(caseDetails);
     }
 }

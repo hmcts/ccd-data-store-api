@@ -6,12 +6,11 @@ import java.util.*;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 
 import au.com.dius.pact.provider.junit.Provider;
 import au.com.dius.pact.provider.junit.State;
 import au.com.dius.pact.provider.junit.loader.PactBroker;
-import au.com.dius.pact.provider.junit.loader.PactFolder;
+//import au.com.dius.pact.provider.junit.loader.PactFolder;
 import au.com.dius.pact.provider.junit.target.HttpTarget;
 import au.com.dius.pact.provider.junit.target.Target;
 import au.com.dius.pact.provider.junit.target.TestTarget;
@@ -24,19 +23,13 @@ import com.google.common.collect.Maps;
 import org.junit.Before;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.OverrideAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.ccd.SecurityConfiguration;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
-import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseTypeDefinitionVersion;
@@ -54,9 +47,7 @@ import uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.createevent.AuthorisedCreateEventOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.AuthorisedGetCaseOperation;
-import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.startevent.AuthorisedStartEventOperation;
-import uk.gov.hmcts.reform.auth.checker.core.RequestAuthorizer;
 import uk.gov.hmcts.reform.auth.checker.core.SubjectResolver;
 import uk.gov.hmcts.reform.auth.checker.core.service.Service;
 import uk.gov.hmcts.reform.auth.checker.core.service.ServiceRequestAuthorizer;
@@ -64,7 +55,7 @@ import uk.gov.hmcts.reform.auth.checker.core.user.User;
 import uk.gov.hmcts.reform.auth.checker.core.user.UserRequestAuthorizer;
 
 @Provider("ccd")
-@PactBroker(scheme = "${pact.broker.scheme}",host = "${pact.broker.baseUrl}", port = "${pact.broker.port}", tags={"${pact.broker.consumer.tag}"})
+@PactBroker(scheme = "${pact.broker.scheme}", host = "${pact.broker.baseUrl}", port = "${pact.broker.port}", tags = {"${pact.broker.consumer.tag}"})
 //@PactFolder(value = "probate")
 @RunWith(SpringRestPactRunner.class)
 @ExtendWith(SpringExtension.class)
@@ -85,7 +76,6 @@ public class ProbateSubmitServiceProviderTest {
     @TestTarget
     @SuppressWarnings(value = "VisibilityModifier")
     public final Target target = new HttpTarget("http", "localhost", 8125, "/");
-
 
     private static final String PRINCIPAL = "ccd_data";
 
@@ -128,7 +118,6 @@ public class ProbateSubmitServiceProviderTest {
     @MockBean
     private AuthorisedCreateEventOperation authorisedCreateEventOperation;
 
-
     private Service service;
 
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
@@ -136,7 +125,6 @@ public class ProbateSubmitServiceProviderTest {
     //
 //    @Value("${pact.broker.version}")
 //    private String providerVersion;
-//
     @Before
     public void setUpTest() {
 
@@ -144,7 +132,7 @@ public class ProbateSubmitServiceProviderTest {
         when(serviceResolver.getTokenDetails(anyString())).thenReturn(service);
         when(serviceRequestAuthorizer.authorise(any(HttpServletRequest.class))).thenReturn(service);
         Set<String> roles = new HashSet<>();
-        User user = new User(PRINCIPAL,roles);
+        User user = new User(PRINCIPAL, roles);
         when(userRequestAuthorizer.authorise(any(HttpServletRequest.class))).thenReturn(user);
         // System.getProperties().setProperty("pact.verifier.publishResults", "true");
         //System.getProperties().setProperty("pact.provider.version", providerVersion);
@@ -155,7 +143,8 @@ public class ProbateSubmitServiceProviderTest {
         StartEventTrigger startEventTrigger = new StartEventTrigger();
         startEventTrigger.setEventId("GOP_UPDATE_DRAFT");
         startEventTrigger.setToken("123234543456");
-        when(authorisedStartEventOperation.triggerStartForCase("654321", "updateDraft", null)).thenReturn(startEventTrigger);
+        when(authorisedStartEventOperation.triggerStartForCase("654321", "updateDraft", null))
+            .thenReturn(startEventTrigger);
 
     }
 
@@ -366,7 +355,8 @@ public class ProbateSubmitServiceProviderTest {
         deceasedAliasNameList.add(deceasedAliasNameList2);
         data.put("deceasedAliasNameList", deceasedAliasNameList);
         FieldType fieldType = TestBuildersUtil.FieldTypeBuilder.aFieldType().withType("Label").build();
-        CaseField outsideUKGrantCopies = TestBuildersUtil.CaseFieldBuilder.newCaseField().withId("outsideUKGrantCopies").withSC(SecurityClassification.PUBLIC.name()).withFieldType(fieldType).build();
+        CaseField outsideUKGrantCopies = TestBuildersUtil.CaseFieldBuilder.newCaseField().withId("outsideUKGrantCopies")
+            .withSC(SecurityClassification.PUBLIC.name()).withFieldType(fieldType).build();
         CaseType caseType = TestBuildersUtil.CaseTypeBuilder.newCaseType().withId("GRANT_OF_REPRESENTATION")
             .withField(outsideUKGrantCopies)
             .withSecurityClassification(SecurityClassification.PUBLIC).build();
@@ -384,7 +374,6 @@ public class ProbateSubmitServiceProviderTest {
         executorsApplyingObjectContent1.set("applyingExecutorInvitationId", JSON_NODE_FACTORY.textNode("54321"));
         executorsApplyingObjectContent1.set("applyingExecutorOtherNamesReason", JSON_NODE_FACTORY.textNode("Divorce"));
         ObjectNode applyingExecutorAddress1 = JSON_NODE_FACTORY.objectNode();
-
 
         applyingExecutorAddress1.set("AddressLine2", JSON_NODE_FACTORY.textNode("Westeros"));
         applyingExecutorAddress1.set("AddressLine1", JSON_NODE_FACTORY.textNode("Winterfell"));
@@ -431,6 +420,5 @@ public class ProbateSubmitServiceProviderTest {
 
         when(caseDetailsRepository.findByReference(654321L)).thenReturn(caseDetails);
     }
-
 
 }
