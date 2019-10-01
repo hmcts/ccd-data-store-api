@@ -209,7 +209,7 @@ dependencies {
     compile group: 'io.springfox', name: 'springfox-swagger2', version: swagger2Version
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: swagger2Version
     compile group: 'org.liquibase', name: 'liquibase-core', version: '3.6.3'
-    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.5'
+    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.10'
     compile (group: 'uk.gov.hmcts.reform.auth', name: 'auth-checker-lib', version: '2.1.3') {
         // TODO remove when auth-checker-lib upgrades its dependency to spring boot 2.0.x
         exclude group: 'uk.gov.hmcts.reform', module: 'java-logging-spring'
@@ -278,6 +278,23 @@ dependencyManagement {
          // CVE-2019-10086
         dependencySet(group: 'commons-beanutils', version: '1.9.4') {
             entry 'commons-beanutils'
+        }
+        // CVE-2019-10086
+        dependencySet(group: 'commons-beanutils', version: '1.9.4') {
+            entry 'commons-beanutils'
+        }
+    }
+}
+
+configurations.all {
+    resolutionStrategy {
+        eachDependency { DependencyResolveDetails details ->
+            if (details.requested.group in ['com.fasterxml.jackson.core', 'com.fasterxml.jackson.module', 'com.fasterxml.jackson.datatype']) {
+                details.useVersion '2.9.10'
+            }
+            if (details.requested.name == 'jackson-databind') {
+                details.useVersion '2.9.10'
+            }
         }
     }
 }
