@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.datastore.tests;
 
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 import static java.lang.Boolean.TRUE;
@@ -8,9 +9,12 @@ import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.TestPropertySource;
+import uk.gov.hmcts.ccd.datastore.tests.helper.CaseTestDataLoaderExtension;
 import uk.gov.hmcts.ccd.datastore.tests.helper.idam.AuthenticatedUser;
 
 @ExtendWith(AATExtension.class)
+@TestPropertySource(locations = "classpath:functional-application.properties")
 public abstract class BaseTest {
     protected final AATHelper aat;
 
@@ -138,5 +142,17 @@ public abstract class BaseTest {
                                      .build())
             .header("Authorization", "Bearer " + caseworker.getAccessToken())
             .header("ServiceAuthorization", s2sToken);
+    }
+
+    protected void importCaseDefinitionToGiveUserCRUDPrivileges() throws InterruptedException {
+        new CaseTestDataLoaderExtension().importDefinition(
+            "src/aat/resources/CCD_CNP_RDM5118_5122_Extended_updated_to_CRUD.xlsx");
+        TimeUnit.SECONDS.sleep(0);
+    }
+
+    protected void importCaseDefinitionToGiveUserOriginalPrivileges() throws InterruptedException {
+        new CaseTestDataLoaderExtension().importDefinition(
+            "src/aat/resources/CCD_CNP_RDM5118_5122_Extended_updated_to_original.xlsx");
+        TimeUnit.SECONDS.sleep(30);
     }
 }

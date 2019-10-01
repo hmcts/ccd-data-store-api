@@ -148,7 +148,7 @@ class SearchCaseTest extends BaseTest {
         // Prepare new case in known state
         final Long caseReference = createFullCase("AAT_AUTH_4");
 
-        asAutoTestCaseworker()
+        asPrivateCaseworker(true)
             .get()
             .given()
             .pathParam("jurisdiction", JURISDICTION)
