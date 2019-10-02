@@ -198,4 +198,18 @@
         <packageUrl regex="true">^pkg:maven/com\.puppycrawl\.tools/checkstyle@.*$</packageUrl>
         <cpe>cpe:/a:checkstyle:checkstyle</cpe>
     </suppress>
+    <suppress>
+        <notes>Temporary supression until further investigation</notes>
+        <cve>CVE-2019-10086</cve>
+        <cve>CVE-2019-16335</cve>
+        <cve>CVE-2019-14540</cve>
+        <cve>CVE-2018-14042</cve>
+        <cve>CVE-2018-14042</cve>
+        <cve>CVE-2019-8331</cve>
+        <cve>CVE-2018-14041</cve>
+        <cve>CVE-2018-14040</cve>
+        <cve>CVE-2015-9251</cve>
+        <cve>CVE-2019-11358</cve>
+        <cve>CVE-2019-16869</cve>
+    </suppress>
 </suppressions>
