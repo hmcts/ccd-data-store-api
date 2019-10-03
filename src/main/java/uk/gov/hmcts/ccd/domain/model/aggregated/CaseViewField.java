@@ -11,7 +11,11 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 
 @ToString
-public class CaseViewField {
+public class CaseViewField implements CommonField {
+    public static final String READONLY = "READONLY";
+    public static final String MANDATORY = "MANDATORY";
+    public static final String OPTIONAL = "OPTIONAL";
+
     private String id;
     private String label;
     @JsonProperty("hint_text")

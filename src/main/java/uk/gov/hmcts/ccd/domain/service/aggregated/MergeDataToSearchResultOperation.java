@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
@@ -106,7 +107,9 @@ public class MergeDataToSearchResultOperation {
     }
 
     private FieldType buildCaseFieldType(SearchResultField searchResultField, CaseField caseField) {
-        return caseField.getComplexFieldNestedField(searchResultField.getCaseFieldPath()).getFieldType();
+        CommonField resultField = caseField.getComplexFieldNestedField(searchResultField.getCaseFieldPath())
+            .orElseThrow(() -> new BadRequestException(format("CaseField %s has no nested elements with code %s.", caseField.getId(), searchResultField.getCaseFieldPath())));
+        return resultField.getFieldType();
     }
 
     private SearchResultViewItem buildSearchResultViewItem(final CaseDetails caseDetails,
