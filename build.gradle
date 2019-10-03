@@ -350,8 +350,8 @@ dependencies {
     }
     
     //////////////////////////////////////////////
-    testPactCompile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: reformLogging
-    testPactCompile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: reformLogging
+    //testPactCompile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: reformLogging
+    //testPactCompile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: reformLogging
     testPactCompile 'uk.gov.hmcts.reform:properties-volume-spring-boot-starter:0.0.4'
     testPactCompile 'uk.gov.hmcts.reform:health-spring-boot-starter:0.0.3'
     testPactCompile 'org.projectlombok:lombok:1.18.4'
