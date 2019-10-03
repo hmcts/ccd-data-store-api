@@ -91,11 +91,6 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public CallbackResponseBuilder withError(String error) {
-            callbackResponse.setErrors(Lists.newArrayList(error));
-            return this;
-        }
-
         public CallbackResponse build() {
             return callbackResponse;
         }
