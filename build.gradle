@@ -186,9 +186,9 @@ sourceSets {
         java {
             compileClasspath += main.output
             runtimeClasspath += main.output
-            srcDir file('src/pactTest/java')
+            srcDir file('src/testPact/java')
         }
-        resources.srcDir file('src/pactTest/resources')
+        resources.srcDir file('src/testPact/resources')
     }
 }
 task smoke(type: Test) {
