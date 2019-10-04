@@ -12,6 +12,7 @@ java:
         - ccd-ELASTIC-SEARCH-URL
         - ccd-ELASTIC-SEARCH-DATA-NODES-URL
         - ccd-ELASTIC-SEARCH-PASSWORD
+        - AppInsightsInstrumentationKey
   environment:
     ENABLE_DB_MIGRATE: false
     DATA_STORE_DB_PORT: 5432
