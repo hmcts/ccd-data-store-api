@@ -11,10 +11,12 @@ properties(
 
 @Library("Infrastructure")
 import uk.gov.hmcts.contino.AppPipelineDsl
+import uk.gov.hmcts.contino.GradleBuilder
 
 def type = "java"
 def product = "ccd"
 def component = "data-store-api"
+GradleBuilder gradleBuilder = new GradleBuilder(this, product);
 
 def secrets = [
     'ccd-${env}': [
@@ -76,6 +78,17 @@ withPipeline(type, product, component) {
     enablePactAs([
         AppPipelineDsl.PactRoles.PROVIDER
     ])
+
+    after('test') {
+        // enable yarn audit and send message on master branch only
+        try {
+            gradleBuilder.gradle('runProviderPactVerification')
+        } catch (error) {
+            onMaster {
+                slackSend(channel: '#ccd-build-issues', color: 'warning', message: "Pact verification failed for the job ${env.JOB_NAME}.Build details here: <${env.RUN_DISPLAY_URL}|Build ${env.BUILD_DISPLAY_NAME}>.")
+            }
+        }
+    }
 
     overrideVaultEnvironments(vaultOverrides)
     enableAksStagingDeployment()
