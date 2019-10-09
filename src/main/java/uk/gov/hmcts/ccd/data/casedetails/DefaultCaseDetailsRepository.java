@@ -78,6 +78,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
             if (e.getCause() instanceof ConstraintViolationException) {
                 throw new CaseConcurrencyException(e.getMessage());
             }
+            throw e;
         }
         return caseDetailsMapper.entityToModel(mergedEntity);
     }
