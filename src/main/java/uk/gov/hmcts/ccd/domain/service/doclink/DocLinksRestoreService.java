@@ -51,7 +51,7 @@ public class DocLinksRestoreService {
 
     private static final String CASE_QUERY = "SELECT * FROM case_data where reference IN :caseReferences";
 
-    public static final String EVENTS_TO_MARK = "SELECT * FROM case_event WHERE case_data_id = :caseId AND id > :eventId";
+    public static final String EVENTS_TO_MARK = "SELECT * FROM case_event WHERE case_data_id = :caseId AND id > :eventId AND created_date < + " + END_TIME;
 
     public static final String LATEST_EVENT = "SELECT * FROM case_event WHERE case_data_id = :caseId ORDER BY id DESC LIMIT 1";
 
