@@ -192,10 +192,9 @@
         <vulnerabilityName>CVE-2019-7614</vulnerabilityName>
     </suppress>
     <suppress>
-        <notes><![CDATA[
-   file name: commons-beanutils-1.9.3.jar
-   ]]></notes>
-        <gav regex="true">^commons-beanutils:commons-beanutils:.*$</gav>
-        <cve>CVE-2019-10086</cve>
+        <notes><![CDATA[ file name: jackson-databind-2.9.10.jar ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
+        <cve>CVE-2019-16942</cve>
+        <cve>CVE-2019-16943</cve>
     </suppress>
 </suppressions>
