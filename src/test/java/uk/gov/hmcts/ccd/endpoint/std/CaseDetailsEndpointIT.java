@@ -67,6 +67,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private static final String CASE_TYPE = "TestAddressBookCase";
+    private static final String CASE_TYPE_CMC = "TestAddressBookCaseCMC";
     private static final String CASE_TYPE_NO_CREATE_CASE_ACCESS = "TestAddressBookCaseNoCreateCaseAccess";
     private static final String CASE_TYPE_NO_UPDATE_CASE_ACCESS = "TestAddressBookCaseNoUpdateCaseAccess";
     private static final String CASE_TYPE_NO_CREATE_EVENT_ACCESS = "TestAddressBookCaseNoCreateEventAccess";
@@ -75,6 +76,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private static final String CASE_TYPE_NO_READ_FIELD_ACCESS = "TestAddressBookCaseNoReadFieldAccess";
     private static final String CASE_TYPE_NO_READ_CASE_TYPE_ACCESS = "TestAddressBookCaseNoReadCaseTypeAccess";
     private static final String JURISDICTION = "PROBATE";
+    private static final String JURISDICTION_CMC = "CMC";
     private static final String TEST_EVENT_ID = "TEST_EVENT";
     private static final String CREATE_EVENT_ID = "Create2";
     private static final String PRE_STATES_EVENT_ID = "HAS_PRE_STATES_EVENT";
@@ -108,10 +110,41 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         doReturn(authentication).when(securityContext).getAuthentication();
         SecurityContextHolder.setContext(securityContext);
 
-        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
+        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, MockUtils.ROLE_CASEWORKER_CMC_PUBLIC);
 
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
         template = new JdbcTemplate(db);
+    }
+
+    @Test
+    public void shouldReturn409WhenPostCreateCaseAndNonUniqueExternalIdOccursTwiceForCaseworkerInCMCJurisdiction() throws Exception {
+        when(uidService.generateUID()).thenReturn(REFERENCE).thenReturn(REFERENCE_2);
+        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION_CMC + "/case-types/" + CASE_TYPE_CMC + "/cases";
+        final JsonNode DATA = mapper.readTree("{ \"BookTitle\": \"Test title\", \"externalId\": \"12345\"}\n");
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(anEvent().build());
+        caseDetailsToSave.getEvent().setEventId(TEST_EVENT_ID);
+        caseDetailsToSave.setData(mapper.convertValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {}));
+        final String token = generateEventTokenNewCase(UID, JURISDICTION_CMC, CASE_TYPE_CMC, TEST_EVENT_ID);
+        caseDetailsToSave.setToken(token);
+
+        // initial one returns 201
+        final MvcResult mvcResult1 = mockMvc.perform(post(URL)
+                .contentType(JSON_CONTENT_TYPE)
+                .content(mapper.writeValueAsBytes(caseDetailsToSave))
+                                                    ).andReturn();
+        assertEquals(mvcResult1.getResponse().getContentAsString(), 201, mvcResult1.getResponse().getStatus());
+
+        // this should give 409
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+                .contentType(JSON_CONTENT_TYPE)
+                .content(mapper.writeValueAsBytes(caseDetailsToSave))
+                                                   ).andReturn();
+        assertEquals(mvcResult.getResponse().getContentAsString(), 409, mvcResult.getResponse().getStatus());
+
+        // we should still have one case in DB
+        final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
+        assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
     }
 
     @Test

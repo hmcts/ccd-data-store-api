@@ -1,5 +1,10 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
+import org.hibernate.StaleObjectStateException;
+import org.hibernate.exception.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.query.CaseDetailsQueryBuilder;
 import uk.gov.hmcts.ccd.data.casedetails.query.CaseDetailsQueryBuilderFactory;
@@ -8,14 +13,8 @@ import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.data.casedetails.search.SearchQueryFactoryOperation;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ExternalIdConcurrencyException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
-
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -25,12 +24,12 @@ import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
-
-import org.hibernate.StaleObjectStateException;
-import org.hibernate.exception.ConstraintViolationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 
 @Named
@@ -39,7 +38,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultCaseDetailsRepository.class);
+
     public static final String QUALIFIER = "default";
+    private static final String UNIQUE_INDEX_EXTERNAL_ID_CONSTRAINT = "uidx_case_data_external_id";
 
     private final CaseDetailsMapper caseDetailsMapper;
 
@@ -66,7 +67,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     public CaseDetails set(final CaseDetails caseDetails) {
         final CaseDetailsEntity newCaseDetailsEntity = caseDetailsMapper.modelToEntity(caseDetails);
         newCaseDetailsEntity.setLastModified(LocalDateTime.now(ZoneOffset.UTC));
-        CaseDetailsEntity mergedEntity = null;
+        CaseDetailsEntity mergedEntity;
         try {
             mergedEntity = em.merge(newCaseDetailsEntity);
             em.flush();
@@ -76,8 +77,13 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
         } catch (PersistenceException e) {
             LOG.warn("Failed to store case details", e);
             if (e.getCause() instanceof ConstraintViolationException) {
-                throw new CaseConcurrencyException(e.getMessage());
+                LOG.warn("ConstraintViolationException happen for UUID={}. Cause: {}",
+                    caseDetails.getReference(), ((ConstraintViolationException) e.getCause()).getConstraintName());
+                if (((ConstraintViolationException) e.getCause()).getConstraintName().equals(UNIQUE_INDEX_EXTERNAL_ID_CONSTRAINT)) {
+                    throw new ExternalIdConcurrencyException(e.getMessage());
+                }
             }
+            throw new CaseConcurrencyException(e.getMessage());
         }
         return caseDetailsMapper.entityToModel(mergedEntity);
     }
@@ -155,10 +161,6 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
         sr.setTotalResultsCount(totalResults);
         sr.setTotalPagesCount((int) Math.ceil((double) sr.getTotalResultsCount() / pageSize));
         return sr;
-    }
-
-    public List<Object[]> getCasesCountByCaseType() {
-        return em.createNamedQuery(CaseDetailsEntity.CASES_COUNT_BY_CASE_TYPE).getResultList();
     }
 
     // TODO This accepts null values for backward compatibility. Once deprecated methods are removed, parameters should
