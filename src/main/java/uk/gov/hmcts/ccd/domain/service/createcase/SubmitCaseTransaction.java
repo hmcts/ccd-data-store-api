@@ -65,11 +65,6 @@ class SubmitCaseTransaction {
     }
 
     @Transactional(REQUIRES_NEW)
-    @Retryable(
-        value = {CaseConcurrencyException.class},
-        maxAttempts = 2,
-        backoff = @Backoff(delay = 50)
-    )
     public CaseDetails submitCase(Event event,
                                   CaseType caseType,
                                   IdamUser idamUser,
