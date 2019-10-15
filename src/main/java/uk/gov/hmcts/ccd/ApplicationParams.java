@@ -32,11 +32,8 @@ public class ApplicationParams {
     @Value("#{'${ccd.am.read.from_am}'.split(',')}")
     private List<String> readFromAMCaseTypes;
 
-    @Value("#{'${ccd.callback.retry.intervals}'.split(',')}")
-    private List<Integer> callbackRetryIntervalsInSeconds;
-
-    @Value("${ccd.default.callback.timeout}")
-    private Integer defaultCallbackTimeoutInSeconds;
+    @Value("#{'${ccd.callback.retries}'.split(',')}")
+    private List<Integer> callbackRetries;
 
     @Value("${ccd.token.secret}")
     private String tokenSecret;
@@ -124,9 +121,6 @@ public class ApplicationParams {
 
     @Value("${search.elastic.nodes.discovery.filter}")
     private String elasticsearchNodeDiscoveryFilter;
-
-    @Value("${http.client.max.total}")
-    private int maxTotalHttpClient;
 
     @Value("${ccd.case.search.jpa.criteria.enabled}")
     private boolean jpaCriteriaSearchEnabled;
@@ -235,12 +229,8 @@ public class ApplicationParams {
         return tokenSecret;
     }
 
-    public List<Integer> getCallbackRetryIntervalsInSeconds() {
-        return callbackRetryIntervalsInSeconds;
-    }
-
-    public Integer getDefaultCallbackTimeoutInSeconds() {
-        return defaultCallbackTimeoutInSeconds;
+    public List<Integer> getCallbackRetries() {
+        return callbackRetries;
     }
 
     public String getValidDMDomain() {
@@ -317,10 +307,6 @@ public class ApplicationParams {
 
     public String getElasticsearchNodeDiscoveryFilter() {
         return elasticsearchNodeDiscoveryFilter;
-    }
-
-    public int getMaxTotalHttpClient() {
-        return maxTotalHttpClient;
     }
 
     public List<String> getWriteToCCDCaseTypesOnly() {
