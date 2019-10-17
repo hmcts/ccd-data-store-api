@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 
 public class MockUtils {
 
-    public static final String ROLE_CASEWORKER_CMC_PUBLIC = "caseworker-cmc-public";
     public static final String ROLE_CASEWORKER_PUBLIC = "caseworker-probate-public";
     public static final String ROLE_CASEWORKER_PRIVATE = "caseworker-probate-private";
     public static final String ROLE_TEST_PUBLIC = "caseworker-test-public";

@@ -13,7 +13,7 @@ import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.data.casedetails.search.SearchQueryFactoryOperation;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ExternalIdConcurrencyException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ReferenceKeyConcurrencyException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 import javax.inject.Inject;
@@ -40,7 +40,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultCaseDetailsRepository.class);
 
     public static final String QUALIFIER = "default";
-    private static final String UNIQUE_INDEX_EXTERNAL_ID_CONSTRAINT = "uidx_case_data_external_id";
+    private static final String UNIQUE_REFERENCE_KEY_CONSTRAINT = "case_data_reference_key";
 
     private final CaseDetailsMapper caseDetailsMapper;
 
@@ -76,12 +76,14 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
             throw new CaseConcurrencyException("The case data has been altered outside of this transaction.");
         } catch (PersistenceException e) {
             LOG.warn("Failed to store case details", e);
-            if (e.getCause() instanceof ConstraintViolationException) {
+
+            if (e.getCause() instanceof ConstraintViolationException
+                && ((ConstraintViolationException) e.getCause()).getConstraintName()
+                .equals(UNIQUE_REFERENCE_KEY_CONSTRAINT)) {
+
                 LOG.warn("ConstraintViolationException happen for UUID={}. Cause: {}",
                     caseDetails.getReference(), ((ConstraintViolationException) e.getCause()).getConstraintName());
-                if (((ConstraintViolationException) e.getCause()).getConstraintName().equals(UNIQUE_INDEX_EXTERNAL_ID_CONSTRAINT)) {
-                    throw new ExternalIdConcurrencyException(e.getMessage());
-                }
+                throw new ReferenceKeyConcurrencyException(e.getMessage());
             }
             throw new CaseConcurrencyException(e.getMessage());
         }
