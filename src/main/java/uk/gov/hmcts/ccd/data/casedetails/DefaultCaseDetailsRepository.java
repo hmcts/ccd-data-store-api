@@ -81,8 +81,8 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
                 && ((ConstraintViolationException) e.getCause()).getConstraintName()
                 .equals(UNIQUE_REFERENCE_KEY_CONSTRAINT)) {
 
-                LOG.warn("ConstraintViolationException happen for UUID={}. Cause: {}",
-                    caseDetails.getReference(), ((ConstraintViolationException) e.getCause()).getConstraintName());
+                LOG.warn("ConstraintViolationException happen for UUID={}. ConstraintName: {}",
+                    caseDetails.getReference(), UNIQUE_REFERENCE_KEY_CONSTRAINT);
                 throw new ReferenceKeyConcurrencyException(e.getMessage());
             }
             throw new CaseConcurrencyException(e.getMessage());
