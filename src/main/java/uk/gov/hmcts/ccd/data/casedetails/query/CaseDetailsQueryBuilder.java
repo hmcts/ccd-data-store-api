@@ -123,7 +123,7 @@ public abstract class CaseDetailsQueryBuilder<T> {
 
     public CaseDetailsQueryBuilder orderBy(MetaData metadata) {
         String sortDirection = metadata.getSortDirection().orElse("asc");
-        String sortField = metadata.getSortField().orElse(CREATED_DATE);
+        String sortField = CREATED_DATE;
         if (sortDirection.equalsIgnoreCase("asc")) {
             orders.add(cb.asc(root.get(sortField)));
         } else {
