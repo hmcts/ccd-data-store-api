@@ -14,6 +14,9 @@ buildscript {
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
     }
+    dependencies {
+        classpath("net.serenity-bdd:serenity-gradle-plugin:2.0.11")
+    }
 }
 
 plugins {
@@ -45,6 +48,7 @@ apply plugin: 'com.github.kt3k.coveralls'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'se.patrikerdes.use-latest-versions'
 apply plugin: 'org.owasp.dependencycheck'
+apply plugin: 'net.serenity-bdd.aggregator'
 
 apply from: 'liquibase.gradle'
 
@@ -120,6 +124,7 @@ ext {
     ]
     appInsights = '2.0.1'
     springCloudVersion = 'Greenwich.RELEASE'
+    serenity = '2.0.11'
 }
 
 group 'uk.gov.hmcts.ccd'
@@ -246,6 +251,7 @@ dependencies {
     testCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.1.0'
     testCompile group: 'com.xebialabs.restito', name: 'restito', version: '0.9.3'
     testCompile 'io.github.openfeign:feign-jackson:9.7.0'
+    testCompile group: 'net.serenity-bdd', name: 'serenity-junit', version: serenity
 
     // for sonar analysis
     testCompile group: 'org.openid4java', name: 'openid4java', version: '1.0.0'
@@ -652,6 +658,7 @@ task functional(type: Test) {
     include "uk/gov/hmcts/ccd/datastore/tests/functional/**"
     include "uk/gov/hmcts/ccd/datastore/tests/v2/**"
     useJUnitPlatform()
+    finalizedBy aggregate
 }
 
 
