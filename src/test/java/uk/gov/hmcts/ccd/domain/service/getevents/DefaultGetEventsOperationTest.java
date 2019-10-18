@@ -72,12 +72,13 @@ class DefaultGetEventsOperationTest {
     @DisplayName("should find case details and retrieve events from repository")
     void shouldFindCaseDetailsAndDelegateCallToRepository() {
         doReturn(true).when(uidService).validateUID(CASE_REFERENCE);
-        doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
+        doReturn(EVENTS).when(auditEventRepository).findByCaseReference(Long.valueOf(CASE_REFERENCE));
+        EVENTS.add(event);
 
         final List<AuditEvent> events = listEventsOperation.getEvents(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
 
         assertAll(
-            () -> verify(auditEventRepository).findByCase(caseDetails),
+            () -> verify(auditEventRepository).findByCaseReference(Long.valueOf(CASE_REFERENCE)),
             () -> assertThat(events, sameInstance(EVENTS))
         );
     }

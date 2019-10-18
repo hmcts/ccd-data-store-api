@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -43,6 +44,13 @@ public class CaseAuditEventRepository {
     public List<AuditEvent> findByCase(final CaseDetails caseDetails) {
         final Query query = em.createNamedQuery(CaseAuditEventEntity.FIND_BY_CASE);
         query.setParameter(CaseAuditEventEntity.CASE_DATA_ID, Long.valueOf(caseDetails.getId()));
+
+        return caseAuditEventMapper.entityToModel(query.getResultList());
+    }
+
+    public List<AuditEvent> findByCaseReference(final long caseReference) {
+        final Query query = em.createNamedQuery(CaseAuditEventEntity.FIND_BY_CASE_REFERENCE);
+        query.setParameter(CaseAuditEventEntity.CASE_REFERENCE, caseReference);
 
         return caseAuditEventMapper.entityToModel(query.getResultList());
     }
