@@ -14,6 +14,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import javax.inject.Inject;
 import javax.sql.DataSource;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -32,12 +33,13 @@ public class CaseAuditEventRepositoryTest extends BaseTest {
     protected DataSource db;
 
     private static final Long CASE_DATA_ID = 69L;
+    private static final Long CASE_REFERENCE = 6969L;
 
     @Test
     @DisplayName("should return the earliest event as the 'create event'")
     public void databaseContainsThreeEventsForCaseDetails_getCreateEventCalled_EarliestEventReturned() {
 
-        setUpCaseData(CASE_DATA_ID);
+        setUpCaseData(CASE_DATA_ID, CASE_REFERENCE);
 
         String createEventSummary = "The Create Event";
 
@@ -55,6 +57,24 @@ public class CaseAuditEventRepositoryTest extends BaseTest {
     }
 
     @Test
+    @DisplayName("should return case events for a case reference")
+    public void shouldReturnCaseEventsForCaseReference() {
+
+        setUpCaseData(CASE_DATA_ID, CASE_REFERENCE);
+
+        String createEventSummary = "The Create Event";
+
+        setUpCaseEvent(CASE_DATA_ID, createEventSummary, "2017-09-28 08:46:16.258");
+        setUpCaseEvent(CASE_DATA_ID, "First Event after Create Event", "2017-09-28 08:46:16.259");
+        setUpCaseEvent(CASE_DATA_ID, "Second Event after Create Event", "2017-09-28 08:46:16.260");
+
+        List<AuditEvent> result = classUnderTest.findByCaseReference(CASE_REFERENCE);
+        assertEquals(3, result.size());
+        // Events should be ordered with creation event last since oldest.
+        assertEquals(createEventSummary, result.get(2).getSummary());
+    }
+
+    @Test
     @DisplayName("should return an empty optional if no events for CaseDetails")
     public void databaseContainsNoEventsForCaseDetails_getCreateEventCalled_EmptyOptionalReturned() {
 
@@ -69,7 +89,7 @@ public class CaseAuditEventRepositoryTest extends BaseTest {
     public void shouldReturnAuditEventForEventId() {
         String createEventSummary = "The Create Event";
 
-        setUpCaseData(100L);
+        setUpCaseData(100L, CASE_REFERENCE);
         Long eventId = setUpCaseEvent(100L, "The Create Event", "2017-09-28 08:46:16.258");
 
         Optional<AuditEvent> createEventOptional = classUnderTest.findByEventId(eventId);
@@ -84,14 +104,15 @@ public class CaseAuditEventRepositoryTest extends BaseTest {
         assertThrows(ResourceNotFoundException.class, () -> classUnderTest.findByEventId(10000L));
     }
 
-    private void setUpCaseData(Long caseDataId) {
+    private void setUpCaseData(Long caseDataId, Long caseReference) {
         new JdbcTemplate(db).update(
             String.format(
                 "INSERT INTO CASE_DATA "
                     + "(ID, CASE_TYPE_ID, JURISDICTION, STATE, DATA, REFERENCE, SECURITY_CLASSIFICATION) "
                 + "VALUES "
-                    + "(%s, 'CASE_TYPE_ID', 'JURISDICTION', 'STATE', '{}', '6969', 'PUBLIC')",
-                caseDataId
+                    + "(%s, 'CASE_TYPE_ID', 'JURISDICTION', 'STATE', '{}', %s, 'PUBLIC')",
+                caseDataId,
+                caseReference
             )
         );
     }

@@ -34,6 +34,12 @@ import static uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventEntity.FIND_BY_ID_
     ),
     @NamedQuery(name = CaseAuditEventEntity.FIND_BY_ID, query =
         FIND_BY_ID_HQL
+    ),
+    @NamedQuery(name = CaseAuditEventEntity.FIND_BY_CASE_REFERENCE, query =
+        "SELECT cae FROM CaseAuditEventEntity cae " +
+        "JOIN CaseDetailsEntity cd ON cae.caseDataId = cd.id " +
+        "WHERE cd.reference = :" + CaseAuditEventEntity.CASE_REFERENCE + " " +
+        "ORDER BY cae.createdDate DESC"
     )
 })
 @Table(name = "case_event")
@@ -52,9 +58,13 @@ public class CaseAuditEventEntity {
 
     static final String FIND_BY_ID = "CaseAuditEventEntity_FIND_BY_ID";
 
+    static final String FIND_BY_CASE_REFERENCE = "CaseAuditEventEntity_FIND_BY_CASE_REFERENCE";
+
     static final String CASE_DATA_ID = "CASE_DATA_ID";
 
     static final String EVENT_ID = "EVENT_ID";
+
+    static final String CASE_REFERENCE = "CASE_REFERENCE";
 
     @Id
     @Column(name = "id")

@@ -45,12 +45,11 @@ public class DefaultGetEventsOperation implements GetEventsOperation {
             throw new BadRequestException("Case reference " + caseReference + " is not valid");
         }
 
-        final CaseDetails caseDetails =
-            getCaseOperation.execute(caseReference)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                    String.format(RESOURCE_NOT_FOUND, jurisdiction, caseTypeId, caseReference)));
-
-        return getEvents(caseDetails);
+        List<AuditEvent> result = auditEventRepository.findByCaseReference(Long.valueOf(caseReference));
+        if (result.isEmpty()) {
+            throw new ResourceNotFoundException(String.format(RESOURCE_NOT_FOUND, jurisdiction, caseTypeId, caseReference));
+        }
+        return result;
     }
 
     @Override
