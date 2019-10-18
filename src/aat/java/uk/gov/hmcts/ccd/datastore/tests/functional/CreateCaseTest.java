@@ -1,8 +1,13 @@
 package uk.gov.hmcts.ccd.datastore.tests.functional;
 
+import static org.hamcrest.Matchers.equalTo;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.runner.RunWith;
+
+import net.serenitybdd.junit.runners.SerenityRunner;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.BaseTest;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder;
@@ -11,8 +16,7 @@ import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event;
 import uk.gov.hmcts.ccd.datastore.tests.helper.CaseTestDataLoaderExtension;
 
-import static org.hamcrest.Matchers.equalTo;
-
+@RunWith(SerenityRunner.class)
 @ExtendWith(CaseTestDataLoaderExtension.class)
 @DisplayName("Create case")
 class CreateCaseTest extends BaseTest {
