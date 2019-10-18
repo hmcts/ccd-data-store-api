@@ -13,7 +13,8 @@ import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.data.casedetails.search.SearchQueryFactoryOperation;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ReferenceKeyConcurrencyException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.CasePersistenceException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ReferenceKeyUniqueConstraintException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 import javax.inject.Inject;
@@ -83,9 +84,9 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
 
                 LOG.warn("ConstraintViolationException happen for UUID={}. ConstraintName: {}",
                     caseDetails.getReference(), UNIQUE_REFERENCE_KEY_CONSTRAINT);
-                throw new ReferenceKeyConcurrencyException(e.getMessage());
+                throw new ReferenceKeyUniqueConstraintException(e.getMessage());
             }
-            throw new CaseConcurrencyException(e.getMessage());
+            throw new CasePersistenceException(e.getMessage());
         }
         return caseDetailsMapper.entityToModel(mergedEntity);
     }

@@ -4,9 +4,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(code = HttpStatus.CONFLICT)
-public class ReferenceKeyConcurrencyException extends ApiException {
+public class ReferenceKeyUniqueConstraintException extends ApiException {
 
-    public ReferenceKeyConcurrencyException(String message) {
+    public ReferenceKeyUniqueConstraintException(String message) {
         super(message);
     }
 }

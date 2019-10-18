@@ -20,7 +20,7 @@ import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ReferenceKeyConcurrencyException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ReferenceKeyUniqueConstraintException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 
@@ -66,7 +66,7 @@ class SubmitCaseTransaction {
 
     @Transactional(REQUIRES_NEW)
     @Retryable(
-        value = {ReferenceKeyConcurrencyException.class},
+        value = {ReferenceKeyUniqueConstraintException.class},
         maxAttempts = 2,
         backoff = @Backoff(delay = 50)
     )
