@@ -19,15 +19,15 @@ import uk.gov.hmcts.ccd.datastore.tests.helper.CaseTestDataLoaderExtension;
 @RunWith(SerenityRunner.class)
 @ExtendWith(CaseTestDataLoaderExtension.class)
 @DisplayName("Create case")
-class CreateCaseTest extends BaseTest {
+public class CreateCaseTest extends BaseTest {
 
-    protected CreateCaseTest(AATHelper aat) {
-        super(aat);
+    public CreateCaseTest() {
+        super(AATHelper.INSTANCE);
     }
 
-    @Test
+    @org.junit.Test
     @DisplayName("should create a new empty case")
-    void shouldCreateEmptyCase() {
+    public void shouldCreateEmptyCase() {
         Event.create()
              .as(asAutoTestCaseworker())
              .withData(EmptyCase.build())
@@ -45,7 +45,7 @@ class CreateCaseTest extends BaseTest {
 
     @Test
     @DisplayName("should create a case if caseworker has 'CR' access on CaseType")
-    void shouldCreateCaseWithCRAccessForCaseType() {
+    public void shouldCreateCaseWithCRAccessForCaseType() {
         //Case Type with "CR" access to the role autoTestCaseWorker
         Event.create("AAT_AUTH_3")
             .as(asAutoTestCaseworker())
