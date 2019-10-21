@@ -76,17 +76,14 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
             LOG.info("Optimistic Lock Exception: Case data has been altered", e);
             throw new CaseConcurrencyException("The case data has been altered outside of this transaction.");
         } catch (PersistenceException e) {
-            LOG.warn("Failed to store case details", e);
-
-            if (e.getCause() instanceof ConstraintViolationException
-                && ((ConstraintViolationException) e.getCause()).getConstraintName()
-                .equals(UNIQUE_REFERENCE_KEY_CONSTRAINT)) {
-
+            if (e.getCause() instanceof ConstraintViolationException && isDuplicateReference(e)) {
                 LOG.warn("ConstraintViolationException happen for UUID={}. ConstraintName: {}",
                     caseDetails.getReference(), UNIQUE_REFERENCE_KEY_CONSTRAINT);
                 throw new ReferenceKeyUniqueConstraintException(e.getMessage());
+            } else {
+                LOG.warn("Failed to store case details", e);
+                throw new CasePersistenceException(e.getMessage());
             }
-            throw new CasePersistenceException(e.getMessage());
         }
         return caseDetailsMapper.entityToModel(mergedEntity);
     }
@@ -222,5 +219,10 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
         int firstResult = (page - 1) * pageSize;
         query.setFirstResult(firstResult);
         query.setMaxResults(pageSize);
+    }
+
+    private boolean isDuplicateReference(PersistenceException e) {
+        return ((ConstraintViolationException) e.getCause()).getConstraintName()
+            .equals(UNIQUE_REFERENCE_KEY_CONSTRAINT);
     }
 }
