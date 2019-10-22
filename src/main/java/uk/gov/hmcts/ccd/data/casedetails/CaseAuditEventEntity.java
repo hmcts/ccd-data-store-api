@@ -36,10 +36,10 @@ import static uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventEntity.FIND_BY_ID_
         FIND_BY_ID_HQL
     ),
     @NamedQuery(name = CaseAuditEventEntity.FIND_BY_CASE_REFERENCE, query =
-        "SELECT cae FROM CaseAuditEventEntity cae " +
-        "JOIN CaseDetailsEntity cd ON cae.caseDataId = cd.id " +
-        "WHERE cd.reference = :" + CaseAuditEventEntity.CASE_REFERENCE + " " +
-        "ORDER BY cae.createdDate DESC"
+        "SELECT cae FROM CaseAuditEventEntity cae "
+        + "JOIN CaseDetailsEntity cd ON cae.caseDataId = cd.id "
+        + "WHERE cd.reference = :" + CaseAuditEventEntity.CASE_REFERENCE + " "
+        + "ORDER BY cae.createdDate DESC"
     )
 })
 @Table(name = "case_event")
