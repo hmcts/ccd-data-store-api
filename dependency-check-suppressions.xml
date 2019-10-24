@@ -209,11 +209,13 @@
             for an attacker to gain access to response header containing sensitive data from another user.</notes>
         <vulnerabilityName>CVE-2019-7614</vulnerabilityName>
     </suppress>
-    <suppress until="2019-10-01">
-        <notes>Ignoring temporarily until a fix is released</notes>
+    <!-- RDM-6147 - should remove these suppressions -->
+    <suppress until="2019-10-31">
+        <notes><![CDATA[ file name: jackson-databind-2.9.10.jar ]]></notes>
         <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
-        <cve>CVE-2019-14540</cve>
-        <cve>CVE-2019-16335</cve>
+        <cve>CVE-2019-16942</cve>
+        <cve>CVE-2019-16943</cve>
+        <cve>CVE-2019-17531</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[
