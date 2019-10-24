@@ -1,5 +1,4 @@
+# config used by staging aat pod
 java:
-  replicas: 2
-  useInterpodAntiAffinity: true
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
