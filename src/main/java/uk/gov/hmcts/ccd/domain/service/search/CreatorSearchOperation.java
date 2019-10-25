@@ -10,7 +10,6 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.domain.service.search.CreatorSearchOperation.QUALIFIER;
 
