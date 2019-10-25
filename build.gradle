@@ -14,6 +14,9 @@ buildscript {
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
     }
+    dependencies {
+        classpath("net.serenity-bdd:serenity-gradle-plugin:2.0.80")
+    }
 }
 
 plugins {
@@ -45,6 +48,7 @@ apply plugin: 'com.github.kt3k.coveralls'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'se.patrikerdes.use-latest-versions'
 apply plugin: 'org.owasp.dependencycheck'
+apply plugin: 'net.serenity-bdd.aggregator'
 
 apply from: 'liquibase.gradle'
 
@@ -260,6 +264,12 @@ dependencies {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
     }
     compile 'org.jooq:jool-java-8:0.9.14'
+
+    // serenity for functional test reporting
+    compile group: 'net.serenity-bdd', name: 'serenity-core', version: '2.0.52'
+    compile group: 'net.serenity-bdd', name: 'serenity-junit', version: '2.0.52'
+    compile group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: '2.0.52'
+    compile group: 'net.serenity-bdd', name: 'serenity-spring', version: '2.0.52'
 }
 // end::dependencies[]
 
@@ -651,7 +661,7 @@ task functional(type: Test) {
     setClasspath(sourceSets.aat.runtimeClasspath)
     include "uk/gov/hmcts/ccd/datastore/tests/functional/**"
     include "uk/gov/hmcts/ccd/datastore/tests/v2/**"
-    useJUnitPlatform()
+    //useJUnitPlatform()
 }
 
 

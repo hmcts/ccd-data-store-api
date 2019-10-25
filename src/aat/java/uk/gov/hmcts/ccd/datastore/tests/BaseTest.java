@@ -1,24 +1,56 @@
 package uk.gov.hmcts.ccd.datastore.tests;
 
+import java.io.File;
 import java.util.function.Supplier;
 
 import static java.lang.Boolean.TRUE;
 
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.parsing.Parser;
 import io.restassured.specification.RequestSpecification;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import uk.gov.hmcts.ccd.datastore.tests.helper.CaseTestDataLoaderExtension;
 import uk.gov.hmcts.ccd.datastore.tests.helper.idam.AuthenticatedUser;
 
-@ExtendWith(AATExtension.class)
+//@ExtendWith(AATExtension.class)
 public abstract class BaseTest {
-    protected final AATHelper aat;
+    protected static AATHelper aat = AATHelper.INSTANCE;;
+
+    private static final Logger LOG = LoggerFactory.getLogger(BaseTest.class);
+    private static final String AUTO_TEST1_DEFINITION_FILE_NEW = "src/aat/resources/CCD_CNP_RDM5118.xlsx";
+
+    public BaseTest() {
+        RestAssured.baseURI = aat.getTestUrl();
+        RestAssured.defaultParser = Parser.JSON;
+        RestAssured.useRelaxedHTTPSValidation();
+    }
 
     protected BaseTest(AATHelper aat) {
         this.aat = aat;
         RestAssured.baseURI = aat.getTestUrl();
         RestAssured.useRelaxedHTTPSValidation();
     }
+
+    @BeforeClass
+    public static void start() {
+        LOG.info("Executing before all block for test data loader: BaseTest");
+        asAutoTestImporter()
+            .given()
+            .multiPart(new File(AUTO_TEST1_DEFINITION_FILE_NEW))
+            .expect()
+            .statusCode(201)
+            .when()
+            .post("/import");
+    }
+
+    @AfterClass
+    public static void tearDown() {}
 
     protected Supplier<RequestSpecification> asAutoTestCaseworker() {
         return asAutoTestCaseworker(TRUE);
@@ -68,7 +100,7 @@ public abstract class BaseTest {
         };
     }
 
-    protected RequestSpecification asAutoTestImporter() {
+    protected static RequestSpecification asAutoTestImporter() {
         AuthenticatedUser caseworker = aat.getIdamHelper().authenticate(aat.getImporterAutoTestEmail(),
                                                                         aat.getImporterAutoTestPassword());
 
