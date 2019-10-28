@@ -1,10 +1,8 @@
 package uk.gov.hmcts.ccd.datastore.tests.functional;
 
-
 import cucumber.api.Scenario;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
-
 import cucumber.api.java.en.When;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
@@ -21,13 +19,13 @@ public class CaseStepDef {
     Response response;
     private Scenario scenario = getScenario();
 
-    @Given("^A case is available in system$")
+    @Given("A case is available in system")
     public void aCaseIsAvailableInSystem() {
         caseReference = getCaseTest.createFullCase("AAT_AUTH_15");
-        scenario.write( "Created case reference : " + caseReference.toString() );
+        scenario.write("Created case reference : " + caseReference.toString());
     }
 
-    @When("^Send the request$")
+    @When("Send the request")
     public void sendTheRequest() {
         response = getCaseTest.asAutoTestCaseworker()
             .get()
@@ -38,13 +36,13 @@ public class CaseStepDef {
             .contentType(ContentType.JSON)
             .when()
             .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases/{caseReference}");
-        scenario.write( "status code: " + response.statusCode() );
+        scenario.write("status code: " + response.statusCode());
     }
 
-    @Then("^The case is returned$")
+    @Then("The case is returned")
     public void theCaseIsReturned() {
-        scenario.write( "response: " + response.prettyPrint() );
-         response.then()
+        scenario.write("response: " + response.prettyPrint());
+        response.then()
             .log().ifError()
             .statusCode(200)
             .assertThat()
