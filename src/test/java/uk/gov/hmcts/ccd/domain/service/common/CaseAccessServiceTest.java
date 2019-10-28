@@ -19,7 +19,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Sets;
-import org.assertj.core.util.Lists;
 import org.hamcrest.core.Is;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -508,9 +507,7 @@ class CaseAccessServiceTest {
         assertAll(
             () -> assertThat(caseAccessService.canUserAccess(caseDetails), is(granted)),
             () -> verify(userRepository).getUserRoles(),
-            () -> verify(caseUserRepository, withChecks ? atLeastOnce() : never()).findCasesUserIdHasAccessTo(USER_ID),
-            () -> assertThat(caseAccessService.filterByUserAccess(Lists.newArrayList(caseDetails)),
-                is(granted ? Lists.newArrayList(caseDetails) : Lists.newArrayList()))
+            () -> verify(caseUserRepository, withChecks ? atLeastOnce() : never()).findCasesUserIdHasAccessTo(USER_ID)
         );
     }
 

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.GrantedAuthority;
@@ -44,16 +43,7 @@ public class CaseAccessService {
     }
 
     public Boolean canUserAccess(CaseDetails caseDetails) {
-        return !canOnlyViewGrantedCases()
-            || accessGranted(caseDetails, caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId()));
-    }
-
-    public List<CaseDetails> filterByUserAccess(List<CaseDetails> cases) {
-        if (!canOnlyViewGrantedCases()) {
-            return cases;
-        }
-        List<Long> grantedCases = caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId());
-        return cases.stream().filter(x -> accessGranted(x, grantedCases)).collect(Collectors.toList());
+        return !canOnlyViewGrantedCases() || accessGranted(caseDetails);
     }
 
     public AccessLevel getAccessLevel(ServiceAndUserDetails serviceAndUserDetails) {
@@ -86,7 +76,9 @@ public class CaseAccessService {
         return userRoles;
     }
 
-    private Boolean accessGranted(CaseDetails caseDetails, List<Long> grantedCases) {
+    private Boolean accessGranted(CaseDetails caseDetails) {
+        final List<Long> grantedCases = caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId());
+
         if (null != grantedCases && grantedCases.contains(Long.valueOf(caseDetails.getId()))) {
             return Boolean.TRUE;
         }

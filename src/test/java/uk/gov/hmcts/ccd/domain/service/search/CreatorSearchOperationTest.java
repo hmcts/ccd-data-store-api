@@ -18,7 +18,6 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-import org.assertj.core.util.Lists;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -44,6 +43,57 @@ public class CreatorSearchOperationTest {
     @Before
     public void injectMocks() {
         MockitoAnnotations.initMocks(this);
+    }
+
+    @Test
+    @DisplayName("Should call the CreatorVisibilityService for each case returned from the SearchOperation and return those "
+        + "for which the CreatorVisibilityService returns true")
+    public void searchOperationReturnsListOfCases_solicitorVisibilityServiceCalledForEachCase_listOfVisibleCasesReturned() {
+
+        CaseDetails visibleCase1 = new CaseDetails();
+        CaseDetails invisibleCase1 = new CaseDetails();
+        CaseDetails invisibleCase2 = new CaseDetails();
+        CaseDetails visibleCase2 = new CaseDetails();
+        CaseDetails invisibleCase3 = new CaseDetails();
+        CaseDetails visibleCase3 = new CaseDetails();
+
+        when(searchOperation.execute(any(), any())).thenReturn(
+            Arrays.asList(visibleCase1,invisibleCase1,invisibleCase2,
+                visibleCase2, invisibleCase3, visibleCase3)
+        );
+
+        when(caseAccessService
+                .canUserAccess(argThat(matchesCaseIn(Arrays.asList(visibleCase1, visibleCase2, visibleCase3)))))
+            .thenReturn(true);
+        when(caseAccessService
+            .canUserAccess(argThat(matchesCaseIn(Arrays.asList(invisibleCase1, invisibleCase2, invisibleCase3)))))
+            .thenReturn(false);
+
+        MetaData metaData = new MetaData(null,null);
+        Map map = new HashMap();
+
+        List<CaseDetails> results = classUnderTest.execute(metaData, map);
+
+        assertEquals(3, results.size());
+        assertThat(results, allOf(
+            hasItem(visibleCase1),
+            hasItem(visibleCase2),
+            hasItem(visibleCase3)
+            )
+        );
+
+        verify(searchOperation).execute(same(metaData), same(map));
+
+        verify(caseAccessService).canUserAccess(same(visibleCase1));
+        verify(caseAccessService).canUserAccess(same(invisibleCase1));
+        verify(caseAccessService).canUserAccess(same(invisibleCase2));
+        verify(caseAccessService).canUserAccess(same(visibleCase2));
+        verify(caseAccessService).canUserAccess(same(invisibleCase3));
+        verify(caseAccessService).canUserAccess(same(visibleCase3));
+
+        verifyNoMoreInteractions(searchOperation);
+        verifyNoMoreInteractions(caseAccessService);
+
     }
 
     @Test

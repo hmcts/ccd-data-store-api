@@ -38,6 +38,8 @@ public class CreatorSearchOperation implements SearchOperation {
             return Lists.newArrayList();
         }
 
-        return caseAccessService.filterByUserAccess(results);
+        return results.stream()
+            .filter(caseAccessService::canUserAccess)
+            .collect(Collectors.toList());
     }
 }
