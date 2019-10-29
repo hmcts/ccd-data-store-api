@@ -94,23 +94,28 @@ public class MidEventCallback {
             }
         }
         final Map<String, JsonNode> finalData = data != null ? data : content.getData();
-        updateDataIfDynamicListAlreadyPresent(caseTypeId, content, finalData);
+        if (content.getEventData() != null) {
+            final CaseType caseType = getCaseType(caseTypeId);
+            Map<String, JsonNode> dynamicListFields = getDynamicListFieldsIfAlreadyPresent(caseType, content, finalData);
+            finalData.putAll(dynamicListFields);
+        }
         return dataJsonNode(finalData);
     }
 
-    private void updateDataIfDynamicListAlreadyPresent(final String caseTypeId, final CaseDataContent content, final Map<String, JsonNode> finalData) {
+    private Map<String, JsonNode> getDynamicListFieldsIfAlreadyPresent(final CaseType caseType, final CaseDataContent content, final Map<String, JsonNode> finalData) {
         // FE needs to have any dynamic list field value that is coming from previous pages (not this mid event callback) properly formatted i.e.
         // {value: {code:'xyz',label:'XYZ'}, list_items: [{code:'xyz',label:'XYZ'},{code:'abc',label:'ABC'}]}
+        Map<String, JsonNode> dynamicListFields = null;
         if (content.getEventData() != null) {
-            final CaseType caseType = getCaseType(caseTypeId);
             List<CaseField> caseFieldDefinitions = caseType.getCaseFields();
-            Map<String, JsonNode> dynamicListFields =
+            dynamicListFields =
                 content.getEventData().entrySet().stream()
                     .filter(caseEventDataPair -> !finalData.containsKey(caseEventDataPair.getKey()))
                     .filter(caseEventDataPair -> isFieldOfDynamicListType(caseEventDataPair, caseFieldDefinitions))
                     .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
             finalData.putAll(dynamicListFields);
         }
+        return dynamicListFields;
     }
 
     private boolean isFieldOfDynamicListType(final Map.Entry<String, JsonNode> caseEventDataPair, final List<CaseField> caseFieldDefinition) {
