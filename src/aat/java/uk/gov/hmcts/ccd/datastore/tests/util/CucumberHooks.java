@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.datastore.tests.util;
 
-import cucumber.api.Scenario;
+import io.cucumber.core.api.Scenario;
 import cucumber.api.java.Before;
 
 public class CucumberHooks {

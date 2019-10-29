@@ -1,9 +1,9 @@
 package uk.gov.hmcts.ccd.datastore.tests.functional;
 
-import cucumber.api.Scenario;
-import cucumber.api.java.en.Given;
-import cucumber.api.java.en.Then;
-import cucumber.api.java.en.When;
+import io.cucumber.core.api.Scenario;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
@@ -14,13 +14,13 @@ import static uk.gov.hmcts.ccd.datastore.tests.util.CucumberHooks.getScenario;
 
 public class CaseStepDef {
 
-    Long caseReference;
+    private Long caseReference;
     GetCaseTest getCaseTest = new GetCaseTest(AATHelper.INSTANCE);
     Response response;
     private Scenario scenario = getScenario();
 
-    @Given("A case is available in system")
-    public void aCaseIsAvailableInSystem() {
+    @Given("The case is available in system")
+    public void theCaseIsAvailableInSystem() {
         caseReference = getCaseTest.createFullCase("AAT_AUTH_15");
         scenario.write("Created case reference : " + caseReference.toString());
     }

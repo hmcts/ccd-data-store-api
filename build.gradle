@@ -146,9 +146,7 @@ configurations {
 
     aatCompile.extendsFrom(testCompile)
     aatRuntime.extendsFrom(testRuntime)
-    cucumberRuntime {
-        extendsFrom testImplementation
-    }
+    cucumberRuntime.extendsFrom(functionalRuntime)
 }
 
 checkstyle {
@@ -264,13 +262,9 @@ dependencies {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
     }
     compile 'org.jooq:jool-java-8:0.9.14'
-
-    //Added by CCD-AM Team
+    
     compile group: 'io.cucumber', name: 'cucumber-java', version: '4.8.0'
-    compile group: 'io.cucumber', name: 'cucumber-jvm-deps', version: '1.0.6'
     testCompile group: 'io.cucumber', name: 'cucumber-junit', version: '4.8.0'
-    compile group: 'io.cucumber', name: 'cucumber-picocontainer', version: '4.8.0'
-    compile group: 'net.masterthought', name: 'maven-cucumber-reporting', version: '4.10.0'
 }
 // end::dependencies[]
 
@@ -663,6 +657,13 @@ task functional(type: Test) {
     include "uk/gov/hmcts/ccd/datastore/tests/functional/**"
     include "uk/gov/hmcts/ccd/datastore/tests/v2/**"
     useJUnitPlatform()
+    doFirst {
+        javaexec {
+            main = "io.cucumber.core.cli.Main"
+            classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
+            args = ['--plugin', 'pretty', '--plugin', 'json:target/cucumber.json', '--glue', 'uk.gov.hmcts.ccd.datastore.tests', 'src/aat/resources/features']
+        }
+    }
 }
 
 
@@ -707,12 +708,6 @@ task sendCoverageToCodacy(type: JavaExec, dependsOn: jacocoTestReport) {
 task installDist(overwrite: true) {
     // This task must be overwritten to do as it's breaking JAR packaging and it's a mandatory step of swagger
     // documentation publication.
-}
-
-task executeFeatures(type: JavaExec, dependsOn: testClasses) {
-    main = "cucumber.api.cli.Main"
-    classpath += files(sourceSets.aat.runtimeClasspath, sourceSets.main.output,sourceSets.test.output)
-    args += ['--plugin', 'pretty', '--plugin', 'json:target/cucumber.json',  '-g', 'uk.gov.hmcts.ccd.datastore.tests', 'src/aat/resources/features']
 }
 
 cucumberReports {
