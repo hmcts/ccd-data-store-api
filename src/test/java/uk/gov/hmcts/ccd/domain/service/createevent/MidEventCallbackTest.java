@@ -1,17 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import static java.util.Arrays.asList;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,6 +22,26 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Arrays.asList;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.DYNAMIC_LIST;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 class MidEventCallbackTest {
 
@@ -65,8 +73,10 @@ class MidEventCallbackTest {
     private CaseType caseType;
     private Event event;
     private final Map<String, JsonNode> data = new HashMap<>();
+    private final Map<String, JsonNode> eventData = new HashMap<>();
     private CaseDetails caseDetails;
     private WizardPage wizardPageWithCallback;
+    private WizardPage wizardPageWithoutCallback ;
 
     @BeforeEach
     void setUp() {
@@ -78,11 +88,17 @@ class MidEventCallbackTest {
         given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(caseType);
         given(eventTriggerService.findCaseEvent(caseType, event.getEventId())).willReturn(caseEvent);
         given(caseType.getJurisdictionId()).willReturn(JURISDICTION_ID);
+        given(caseType.getCaseFields()).willReturn(newArrayList(newCaseField()
+                                                                    .withId("DynamicList")
+                                                                    .withFieldType(aFieldType()
+                                                                                       .withType(DYNAMIC_LIST)
+                                                                                       .build())
+                                                                    .build()));
         caseDetails = caseDetails(data);
         given(caseService.createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, data)).willReturn(caseDetails);
 
         wizardPageWithCallback = createWizardPage("createCase1", "http://some-callback-url.com");
-        WizardPage wizardPageWithoutCallback = createWizardPage("createCase2");
+        wizardPageWithoutCallback = createWizardPage("createCase2");
         given(uiDefinitionRepository.getWizardPageCollection(CASE_TYPE_ID, event.getEventId()))
             .willReturn(asList(wizardPageWithCallback, wizardPageWithoutCallback));
     }
@@ -156,7 +172,7 @@ class MidEventCallbackTest {
     }
 
     @Test
-    @DisplayName("test no interaction when pageId not present")
+    @DisplayName("test no interaction when pageId not present and no dynamic list fields in content")
     void testNoInteractionWhenMidEventCallbackUrlNotPresent() throws IOException {
         JsonNode result = midEventCallback.invoke(CASE_TYPE_ID,
             newCaseDataContent().withEvent(event).withData(data).withIgnoreWarning(IGNORE_WARNINGS).build(),
@@ -164,6 +180,108 @@ class MidEventCallbackTest {
 
         final JsonNode expectedResponse = MAPPER.readTree("{\"data\": {}}");
         assertThat("Data should stay unchanged", result, is(expectedResponse));
+        verifyNoMoreInteractions(callbackInvoker, caseDefinitionRepository, eventTriggerService,
+            uiDefinitionRepository, caseService);
+    }
+
+    @Test
+    @DisplayName("test dynamic list field updated when pageId not present")
+    void testDynamicListFieldUpdatedWhenPageIdNotPresent() throws IOException {
+        eventData.put("dynamicList", MAPPER.convertValue(MAPPER.readTree(
+            "{\n" +
+                "    \"value\": {\n" +
+                "        \"code\": \"xyz\",\n" +
+                "        \"label\": \"XYZ\"\n" +
+                "    },\n" +
+                "    \"list_items\": [\n" +
+                "        {\n" +
+                "            \"code\": \"xyz\",\n" +
+                "            \"label\": \"XYZ\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"code\": \"abc\",\n" +
+                "            \"label\": \"ABC\"\n" +
+                "        }\n" +
+                "    ]\n" +
+                "}"), STRING_JSON_MAP));
+        JsonNode result = midEventCallback.invoke(CASE_TYPE_ID,
+            newCaseDataContent().withEvent(event).withData(data).withEventData(eventData).withIgnoreWarning(IGNORE_WARNINGS).build(),
+            "");
+
+        final JsonNode expectedResponse = MAPPER.readTree("{\"data\": {\"dynamicList\": " +
+                                                              "                   {\n" +
+                                                              "                     \"value\": {\n" +
+                                                              "                         \"code\": \"xyz\",\n" +
+                                                              "                         \"label\": \"XYZ\"\n" +
+                                                              "                     },\n" +
+                                                              "                     \"list_items\": [\n" +
+                                                              "                         {\n" +
+                                                              "                             \"code\": \"xyz\",\n" +
+                                                              "                             \"label\": \"XYZ\"\n" +
+                                                              "                         },\n" +
+                                                              "                         {\n" +
+                                                              "                             \"code\": \"abc\",\n" +
+                                                              "                             \"label\": \"ABC\"\n" +
+                                                              "                         }\n" +
+                                                              "                     ]\n" +
+                                                              "                   }\n" +
+                                                              "       }\n" +
+                                                              "}");
+        assertThat("Data should stay unchanged", result, is(expectedResponse));
+        verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
+        verifyNoMoreInteractions(callbackInvoker, caseDefinitionRepository, eventTriggerService,
+            uiDefinitionRepository, caseService);
+    }
+
+    @Test
+    @DisplayName("test dynamic list field updated when no mid event callback url")
+    void testDynamicListFieldUpdatedWhenMidEventCallbackUrlNotPresent() throws IOException {
+        given(uiDefinitionRepository.getWizardPageCollection(CASE_TYPE_ID, event.getEventId()))
+            .willReturn(asList(wizardPageWithoutCallback));
+        eventData.put("dynamicList", MAPPER.convertValue(MAPPER.readTree(
+            "{\n" +
+                "    \"value\": {\n" +
+                "        \"code\": \"xyz\",\n" +
+                "        \"label\": \"XYZ\"\n" +
+                "    },\n" +
+                "    \"list_items\": [\n" +
+                "        {\n" +
+                "            \"code\": \"xyz\",\n" +
+                "            \"label\": \"XYZ\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"code\": \"abc\",\n" +
+                "            \"label\": \"ABC\"\n" +
+                "        }\n" +
+                "    ]\n" +
+                "}"), STRING_JSON_MAP));
+        JsonNode result = midEventCallback.invoke(CASE_TYPE_ID,
+            newCaseDataContent().withEvent(event).withData(data).withEventData(eventData).withIgnoreWarning(IGNORE_WARNINGS).build(),
+            "pageId");
+
+        final JsonNode expectedResponse = MAPPER.readTree("{\"data\": {\"dynamicList\": " +
+                                                              "                   {\n" +
+                                                              "                     \"value\": {\n" +
+                                                              "                         \"code\": \"xyz\",\n" +
+                                                              "                         \"label\": \"XYZ\"\n" +
+                                                              "                     },\n" +
+                                                              "                     \"list_items\": [\n" +
+                                                              "                         {\n" +
+                                                              "                             \"code\": \"xyz\",\n" +
+                                                              "                             \"label\": \"XYZ\"\n" +
+                                                              "                         },\n" +
+                                                              "                         {\n" +
+                                                              "                             \"code\": \"abc\",\n" +
+                                                              "                             \"label\": \"ABC\"\n" +
+                                                              "                         }\n" +
+                                                              "                     ]\n" +
+                                                              "                   }\n" +
+                                                              "       }\n" +
+                                                              "}");
+        assertThat("Data should stay unchanged", result, is(expectedResponse));
+        verify(caseDefinitionRepository, times(2)).getCaseType(CASE_TYPE_ID);
+        verify(uiDefinitionRepository).getWizardPageCollection(CASE_TYPE_ID, event.getEventId());
+        verify(eventTriggerService).findCaseEvent(caseType, event.getEventId());
         verifyNoMoreInteractions(callbackInvoker, caseDefinitionRepository, eventTriggerService,
             uiDefinitionRepository, caseService);
     }
@@ -211,6 +329,82 @@ class MidEventCallbackTest {
             () -> verify(callbackInvoker).invokeMidEventCallback(wizardPageWithCallback, caseType, caseEvent, null, caseDetails, IGNORE_WARNINGS),
             () -> verify(caseService, never()).createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, data),
             () -> verify(caseService).createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, eventData));
+    }
+
+
+    @Test
+    @DisplayName("test dynamic list field updated when mid event callback invoked")
+    void testDynamicListFieldUpdatedWhenMidEventCallbackInvoked() throws IOException {
+        Map<String, JsonNode> eventData = MAPPER.convertValue(MAPPER.readTree("{\"dynamicList\": " +
+                                                                      "                   {\n" +
+                                                                      "                     \"value\": {\n" +
+                                                                      "                         \"code\": \"xyz\",\n" +
+                                                                      "                         \"label\": \"XYZ\"\n" +
+                                                                      "                     },\n" +
+                                                                      "                     \"list_items\": [\n" +
+                                                                      "                         {\n" +
+                                                                      "                             \"code\": \"xyz\",\n" +
+                                                                      "                             \"label\": \"XYZ\"\n" +
+                                                                      "                         },\n" +
+                                                                      "                         {\n" +
+                                                                      "                             \"code\": \"abc\",\n" +
+                                                                      "                             \"label\": \"ABC\"\n" +
+                                                                      "                         }\n" +
+                                                                      "                     ]\n" +
+                                                                      "                   }\n" +
+                                                                      "       }"), STRING_JSON_MAP);
+
+        given(caseService.createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, eventData)).willReturn(caseDetails);
+
+        final Map<String, JsonNode> updatedData = MAPPER.convertValue(MAPPER.readTree(
+            "{\n"
+                + "  \"PersonFirstName\": \"First Name\",\n"
+                + "  \"PersonLastName\": \"Last Name\"\n"
+                + "}"), STRING_JSON_MAP);
+        CaseDetails updatedCaseDetails = caseDetails(updatedData);
+
+        when(callbackInvoker.invokeMidEventCallback(wizardPageWithCallback,
+                                                    caseType,
+                                                    caseEvent,
+                                                    null,
+                                                    caseDetails,
+                                                    IGNORE_WARNINGS)).thenReturn(updatedCaseDetails);
+
+        JsonNode result = midEventCallback.invoke(CASE_TYPE_ID,
+                                                  newCaseDataContent().withEvent(event).withData(data).withEventData(eventData).withIgnoreWarning(IGNORE_WARNINGS).build(),
+                                                  "createCase1");
+
+        final JsonNode expectedResponse = MAPPER.readTree("{\"data\": {"
+                                                              + "  \"PersonFirstName\": \"First Name\",\n"
+                                                              + "  \"PersonLastName\": \"Last Name\",\n"
+                                                              + "  \"dynamicList\": {\n"
+                                                              + "                     \"value\": {\n"
+                                                              + "                         \"code\": \"xyz\",\n"
+                                                              + "                         \"label\": \"XYZ\"\n"
+                                                              + "                     },\n"
+                                                              + "                     \"list_items\": [\n"
+                                                              + "                         {\n"
+                                                              + "                             \"code\": \"xyz\",\n"
+                                                              + "                             \"label\": \"XYZ\"\n"
+                                                              + "                         },\n"
+                                                              + "                         {\n"
+                                                              + "                             \"code\": \"abc\",\n"
+                                                              + "                             \"label\": \"ABC\"\n"
+                                                              + "                         }\n"
+                                                              + "                     ]\n"
+                                                              + "                   }\n"
+                                                              + "       }\n"
+                                                              + "}");
+        assertAll(
+            () -> assertThat(result, is(expectedResponse)),
+            () -> verify(caseDefinitionRepository, times(2)).getCaseType(CASE_TYPE_ID),
+            () -> verify(uiDefinitionRepository).getWizardPageCollection(CASE_TYPE_ID, event.getEventId()),
+            () -> verify(eventTriggerService).findCaseEvent(caseType, event.getEventId()),
+            () -> verify(callbackInvoker).invokeMidEventCallback(wizardPageWithCallback, caseType, caseEvent, null, caseDetails, IGNORE_WARNINGS),
+            () -> verify(caseService, never()).createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, data),
+            () -> verify(caseService).createNewCaseDetails(CASE_TYPE_ID, JURISDICTION_ID, eventData),
+            () -> verifyNoMoreInteractions(callbackInvoker, caseDefinitionRepository, eventTriggerService,
+                                           uiDefinitionRepository, caseService));
     }
 
     @Test

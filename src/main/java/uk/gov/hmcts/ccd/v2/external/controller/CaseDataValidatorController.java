@@ -11,9 +11,11 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.createevent.MidEventCallback;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseDataResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.UICaseViewResource;
@@ -72,6 +74,7 @@ public class CaseDataValidatorController {
         final JsonNode data = midEventCallback.invoke(caseTypeId,
                                                       content,
                                                       pageId);
+        
 
         content.setData(MAPPER.convertValue(data, STRING_JSON_MAP));
         return ResponseEntity.ok(new CaseDataResource(content, caseTypeId, pageId));

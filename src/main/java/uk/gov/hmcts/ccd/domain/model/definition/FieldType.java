@@ -14,6 +14,7 @@ import static java.util.Collections.emptyList;
 public class FieldType implements Serializable {
 
     public static final String COLLECTION = "Collection";
+    public static final String DYNAMIC_LIST = "DynamicList";
     public static final String COMPLEX = "Complex";
     public static final String LABEL = "Label";
     public static final String CASE_PAYMENT_HISTORY_VIEWER = "CasePaymentHistoryViewer";

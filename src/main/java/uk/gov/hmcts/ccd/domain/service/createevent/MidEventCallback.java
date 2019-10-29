@@ -1,10 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
-import java.util.Map;
-import java.util.Optional;
-
-import static org.apache.commons.lang3.StringUtils.isBlank;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -17,6 +12,7 @@ import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
@@ -25,6 +21,15 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.DYNAMIC_LIST;
 
 @Service
 public class MidEventCallback {
@@ -51,6 +56,7 @@ public class MidEventCallback {
     public JsonNode invoke(String caseTypeId,
                            CaseDataContent content,
                            String pageId) {
+        Map<String, JsonNode> data = null;
         if (!isBlank(pageId)) {
             Event event = content.getEvent();
             final CaseType caseType = getCaseType(caseTypeId);
@@ -70,24 +76,47 @@ public class MidEventCallback {
                     CaseDetails caseDetails = caseService.getCaseDetails(caseType.getJurisdictionId(), content.getCaseReference());
                     caseDetailsBefore = caseService.clone(caseDetails);
                     currentOrNewCaseDetails = caseService.populateCurrentCaseDetailsWithEventFields(content,
-                        caseDetails);
+                                                                                                    caseDetails);
 
                 } else {
                     currentOrNewCaseDetails = caseService.createNewCaseDetails(caseTypeId, caseType.getJurisdictionId(),
-                        content.getEventData() == null ? content.getData() : content.getEventData());
+                                                                               content.getEventData() == null ? content.getData() : content.getEventData());
                 }
 
                 CaseDetails caseDetailsFromMidEventCallback = callbackInvoker.invokeMidEventCallback(wizardPageOptional.get(),
-                    caseType,
-                    caseEvent,
-                    caseDetailsBefore,
-                    currentOrNewCaseDetails,
-                    content.getIgnoreWarning());
+                                                                                                     caseType,
+                                                                                                     caseEvent,
+                                                                                                     caseDetailsBefore,
+                                                                                                     currentOrNewCaseDetails,
+                                                                                                     content.getIgnoreWarning());
 
-                return dataJsonNode(caseDetailsFromMidEventCallback.getData());
+                data = caseDetailsFromMidEventCallback.getData();
             }
         }
-        return dataJsonNode(content.getData());
+        final Map<String, JsonNode> finalData = data != null ? data : content.getData();
+        updateDataIfDynamicListAlreadyPresent(caseTypeId, content, finalData);
+        return dataJsonNode(finalData);
+    }
+
+    private void updateDataIfDynamicListAlreadyPresent(final String caseTypeId, final CaseDataContent content, final Map<String, JsonNode> finalData) {
+        // FE needs to have any dynamic list field value that is coming from previous pages (not this mid event callback) properly formatted i.e.
+        // {value: {code:'xyz',label:'XYZ'}, list_items: [{code:'xyz',label:'XYZ'},{code:'abc',label:'ABC'}]}
+        if (content.getEventData() != null) {
+            final CaseType caseType = getCaseType(caseTypeId);
+            List<CaseField> caseFieldDefinitions = caseType.getCaseFields();
+            Map<String, JsonNode> dynamicListFields =
+                content.getEventData().entrySet().stream()
+                    .filter(caseEventDataPair -> !finalData.containsKey(caseEventDataPair.getKey()))
+                    .filter(caseEventDataPair -> isFieldOfDynamicListType(caseEventDataPair, caseFieldDefinitions))
+                    .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+            finalData.putAll(dynamicListFields);
+        }
+    }
+
+    private boolean isFieldOfDynamicListType(final Map.Entry<String, JsonNode> caseEventDataPair, final List<CaseField> caseFieldDefinition) {
+        return caseFieldDefinition.stream()
+            .anyMatch(caseField -> caseField.getId().equalsIgnoreCase(caseEventDataPair.getKey())
+                && caseField.getFieldType().getType().equals(DYNAMIC_LIST));
     }
 
     private JsonNode dataJsonNode(Map<String, JsonNode> data) {
