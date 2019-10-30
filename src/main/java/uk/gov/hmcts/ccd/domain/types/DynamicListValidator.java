@@ -1,14 +1,14 @@
 package uk.gov.hmcts.ccd.domain.types;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.commons.lang3.StringUtils;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import org.apache.commons.lang3.StringUtils;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 
 @Named
 @Singleton
@@ -33,11 +33,15 @@ public class DynamicListValidator implements BaseTypeValidator {
 
         dataValue.get(LIST_ITEMS).elements().forEachRemaining(node -> validateLength(results, node, dataFieldId));
         JsonNode value = dataValue.get(VALUE);
-        if (value != null) {
+        if (value != null && isNotEmptyObject(value)) {
             validateLength(results, value, dataFieldId);
         }
 
         return results;
+    }
+
+    private boolean isNotEmptyObject(final JsonNode value) {
+        return value.isObject() && !value.toString().trim().equals("{}");
     }
 
     private void validateLength(List<ValidationResult> results, JsonNode node, String dataFieldId) {

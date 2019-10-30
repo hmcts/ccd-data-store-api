@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.types;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
@@ -128,6 +129,11 @@ class DynamicListValidatorTest {
     @Test
     public void nullValue() {
         assertEquals(0, validator.validate(TEST_FIELD_ID, null, null).size(), "Did not catch NULL");
+    }
+
+    @Test
+    public void emptyObjectValue() throws IOException {
+        assertEquals(0, validator.validate(TEST_FIELD_ID, new ObjectMapper().readTree("{}"), null).size(), "Did not catch empty object");
     }
 
     @Test
