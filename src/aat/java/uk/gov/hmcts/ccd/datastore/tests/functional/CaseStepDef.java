@@ -15,8 +15,8 @@ import static uk.gov.hmcts.ccd.datastore.tests.util.CucumberHooks.getScenario;
 public class CaseStepDef {
 
     private Long caseReference;
-    GetCaseTest getCaseTest = new GetCaseTest(AATHelper.INSTANCE);
-    Response response;
+    private GetCaseTest getCaseTest = new GetCaseTest(AATHelper.INSTANCE);
+    private Response response;
     private Scenario scenario = getScenario();
 
     @Given("The case is available in system")
