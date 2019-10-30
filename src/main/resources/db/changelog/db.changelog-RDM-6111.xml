@@ -8,7 +8,7 @@
              endDelimiter="\nGO"
              splitStatements="true"
              stripComments="true">
-            CREATE UNIQUE INDEX idx_case_data_ethosCaseReference ON public.case_data USING BTREE (case_type_id,(TRIM(UPPER(data#>>'{ethosCaseReference}')))) where jurisdiction = 'EMPLOYMENT';
+            CREATE UNIQUE INDEX uidx_case_data_ethosCaseReference ON public.case_data USING BTREE (case_type_id,(TRIM(UPPER(data#>>'{ethosCaseReference}')))) where jurisdiction = 'EMPLOYMENT';
         </sql>
     </changeSet>
 </databaseChangeLog>
