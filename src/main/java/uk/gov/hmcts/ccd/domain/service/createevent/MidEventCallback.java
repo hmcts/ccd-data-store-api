@@ -103,22 +103,20 @@ public class MidEventCallback {
         final Map<String, JsonNode> finalData = data != null ? data : content.getData();
         if (content.getEventData() != null) {
             final CaseType caseType = getCaseType(caseTypeId);
-            Map<String, JsonNode> dynamicListFields = getDynamicListFieldsIfPresentInEventData(caseType, content, finalData);
+            Map<String, JsonNode> dynamicListFields = getDynamicListFields(caseType, content, finalData);
             finalData.putAll(dynamicListFields);
         }
         return finalData;
     }
 
-    private Map<String, JsonNode> getDynamicListFieldsIfPresentInEventData(final CaseType caseType, final CaseDataContent content, final Map<String, JsonNode> finalData) {
+    private Map<String, JsonNode> getDynamicListFields(final CaseType caseType, final CaseDataContent content, final Map<String, JsonNode> finalData) {
         Map<String, JsonNode> dynamicListFields = null;
-        if (content.getEventData() != null) {
-            List<CaseField> caseFieldDefinitions = caseType.getCaseFields();
-            dynamicListFields =
-                content.getEventData().entrySet().stream()
-                    .filter(caseEventDataPair -> !finalData.containsKey(caseEventDataPair.getKey()))
-                    .filter(caseEventDataPair -> isFieldOfDynamicListType(caseEventDataPair, caseFieldDefinitions))
-                    .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
-        }
+        List<CaseField> caseFieldDefinitions = caseType.getCaseFields();
+        dynamicListFields =
+            content.getEventData().entrySet().stream()
+                .filter(caseEventDataPair -> !finalData.containsKey(caseEventDataPair.getKey()))
+                .filter(caseEventDataPair -> isFieldOfDynamicListType(caseEventDataPair, caseFieldDefinitions))
+                .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
         return dynamicListFields;
     }
 
