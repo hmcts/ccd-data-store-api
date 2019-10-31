@@ -172,8 +172,8 @@ class MidEventCallbackTest {
     }
 
     @Test
-    @DisplayName("test no interaction when pageId not present and no dynamic list fields in content")
-    void testNoInteractionWhenMidEventCallbackUrlNotPresent() throws IOException {
+    @DisplayName("should not interact with data if no dynamic list field in event data and pageId not present")
+    void shouldNotInteractWithDataIfNoDynamicListFieldInEventDataAndPageIdNotPresent() throws IOException {
         JsonNode result = midEventCallback.invoke(CASE_TYPE_ID,
             newCaseDataContent().withEvent(event).withData(data).withIgnoreWarning(IGNORE_WARNINGS).build(),
             "");
@@ -185,8 +185,8 @@ class MidEventCallbackTest {
     }
 
     @Test
-    @DisplayName("test dynamic list field updated when pageId not present")
-    void testDynamicListFieldUpdatedWhenPageIdNotPresent() throws IOException {
+    @DisplayName("should update data if dynamic list field in event data and pageId not present")
+    void shouldUpdateDataIfDynamicListFieldInEventDataAndPageIdNotPresent() throws IOException {
         eventData.put("dynamicList", MAPPER.convertValue(MAPPER.readTree(
             "{\n" +
                 "    \"value\": {\n" +
@@ -234,8 +234,8 @@ class MidEventCallbackTest {
     }
 
     @Test
-    @DisplayName("test dynamic list field updated when no mid event callback url")
-    void testDynamicListFieldUpdatedWhenMidEventCallbackUrlNotPresent() throws IOException {
+    @DisplayName("should update data if dynamic list field in event data and no mid event callback url")
+    void shouldUpdateDataIfDynamicListFieldInEventDataAndNoMidEventCallbackUrlNotPresent() throws IOException {
         given(uiDefinitionRepository.getWizardPageCollection(CASE_TYPE_ID, event.getEventId()))
             .willReturn(asList(wizardPageWithoutCallback));
         eventData.put("dynamicList", MAPPER.convertValue(MAPPER.readTree(
@@ -333,8 +333,8 @@ class MidEventCallbackTest {
 
 
     @Test
-    @DisplayName("test dynamic list field updated when mid event callback invoked")
-    void testDynamicListFieldUpdatedWhenMidEventCallbackInvoked() throws IOException {
+    @DisplayName("should update data if dynamic list field in event data and mid event callback invoked")
+    void shouldUpdateDataIfDynamicListFieldInEventDataAndMidEventCallbackInvoked() throws IOException {
         Map<String, JsonNode> eventData = MAPPER.convertValue(MAPPER.readTree("{\"dynamicList\": " +
                                                                       "                   {\n" +
                                                                       "                     \"value\": {\n" +

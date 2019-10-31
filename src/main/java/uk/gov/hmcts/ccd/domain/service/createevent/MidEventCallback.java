@@ -93,18 +93,23 @@ public class MidEventCallback {
                 data = caseDetailsFromMidEventCallback.getData();
             }
         }
-        final Map<String, JsonNode> finalData = data != null ? data : content.getData();
-        if (content.getEventData() != null) {
-            final CaseType caseType = getCaseType(caseTypeId);
-            Map<String, JsonNode> dynamicListFields = getDynamicListFieldsIfAlreadyPresent(caseType, content, finalData);
-            finalData.putAll(dynamicListFields);
-        }
+        final Map<String, JsonNode> finalData = updateDataWithDynamicListValuesIfPresentInEventData(caseTypeId, content, data);
         return dataJsonNode(finalData);
     }
 
-    private Map<String, JsonNode> getDynamicListFieldsIfAlreadyPresent(final CaseType caseType, final CaseDataContent content, final Map<String, JsonNode> finalData) {
+    private Map<String, JsonNode> updateDataWithDynamicListValuesIfPresentInEventData(final String caseTypeId, final CaseDataContent content, final Map<String, JsonNode> data) {
         // FE needs to have any dynamic list field value that is coming from previous pages (not this mid event callback) properly formatted i.e.
         // {value: {code:'xyz',label:'XYZ'}, list_items: [{code:'xyz',label:'XYZ'},{code:'abc',label:'ABC'}]}
+        final Map<String, JsonNode> finalData = data != null ? data : content.getData();
+        if (content.getEventData() != null) {
+            final CaseType caseType = getCaseType(caseTypeId);
+            Map<String, JsonNode> dynamicListFields = getDynamicListFieldsIfPresentInEventData(caseType, content, finalData);
+            finalData.putAll(dynamicListFields);
+        }
+        return finalData;
+    }
+
+    private Map<String, JsonNode> getDynamicListFieldsIfPresentInEventData(final CaseType caseType, final CaseDataContent content, final Map<String, JsonNode> finalData) {
         Map<String, JsonNode> dynamicListFields = null;
         if (content.getEventData() != null) {
             List<CaseField> caseFieldDefinitions = caseType.getCaseFields();
