@@ -113,7 +113,6 @@ public class MidEventCallback {
                     .filter(caseEventDataPair -> !finalData.containsKey(caseEventDataPair.getKey()))
                     .filter(caseEventDataPair -> isFieldOfDynamicListType(caseEventDataPair, caseFieldDefinitions))
                     .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
-            finalData.putAll(dynamicListFields);
         }
         return dynamicListFields;
     }
