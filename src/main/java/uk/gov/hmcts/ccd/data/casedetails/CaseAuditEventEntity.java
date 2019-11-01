@@ -39,6 +39,11 @@ import static uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventEntity.FIND_BY_ID_
         "SELECT cae FROM CaseAuditEventEntity cae "
         + "JOIN CaseDetailsEntity cd ON cae.caseDataId = cd.id "
         + "WHERE cd.reference = :" + CaseAuditEventEntity.CASE_REFERENCE + " "
+        + "AND ("
+        +    "true = :" + CaseAuditEventEntity.ACCESS_ALL
+        +    " OR "
+        +    "cd.id in (select cu.casePrimaryKey.caseDataId from CaseUserEntity cu where cu.casePrimaryKey.userId = :" + CaseAuditEventEntity.USER_ID + ")"
+        + ")"
         + "ORDER BY cae.createdDate DESC"
     )
 })
@@ -63,6 +68,10 @@ public class CaseAuditEventEntity {
     static final String CASE_DATA_ID = "CASE_DATA_ID";
 
     static final String EVENT_ID = "EVENT_ID";
+
+    static final String USER_ID = "USER_ID";
+
+    static final String ACCESS_ALL = "ACCESS_ALL";
 
     static final String CASE_REFERENCE = "CASE_REFERENCE";
 

@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -47,9 +48,11 @@ public class CaseAuditEventRepository {
         return caseAuditEventMapper.entityToModel(query.getResultList());
     }
 
-    public List<AuditEvent> findByCaseReference(final long caseReference) {
+    public List<AuditEvent> findByCaseReference(final long caseReference, String userId, UserAuthorisation.AccessLevel accessLevel) {
         final Query query = em.createNamedQuery(CaseAuditEventEntity.FIND_BY_CASE_REFERENCE);
         query.setParameter(CaseAuditEventEntity.CASE_REFERENCE, caseReference);
+        query.setParameter(CaseAuditEventEntity.ACCESS_ALL, accessLevel == UserAuthorisation.AccessLevel.ALL);
+        query.setParameter(CaseAuditEventEntity.USER_ID, userId);
 
         return caseAuditEventMapper.entityToModel(query.getResultList());
     }

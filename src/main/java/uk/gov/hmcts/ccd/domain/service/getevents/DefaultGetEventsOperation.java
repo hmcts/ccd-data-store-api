@@ -7,10 +7,9 @@ import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
-import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
-import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,17 +19,17 @@ import java.util.Optional;
 public class DefaultGetEventsOperation implements GetEventsOperation {
 
     private final CaseAuditEventRepository auditEventRepository;
-    private final GetCaseOperation getCaseOperation;
     private final UIDService uidService;
     private static final String RESOURCE_NOT_FOUND //
         = "No case found ( jurisdiction = '%s', case type id = '%s', case reference = '%s' )";
     private static final String CASE_EVENT_NOT_FOUND = "Case event not found";
+    private final UserAuthorisation userAuthorisation;
 
     @Autowired
-    public DefaultGetEventsOperation(CaseAuditEventRepository auditEventRepository, @Qualifier(
-        CreatorGetCaseOperation.QUALIFIER) final GetCaseOperation getCaseOperation, UIDService uidService) {
+    public DefaultGetEventsOperation(CaseAuditEventRepository auditEventRepository,
+        UserAuthorisation userAuthorisation, UIDService uidService) {
         this.auditEventRepository = auditEventRepository;
-        this.getCaseOperation = getCaseOperation;
+        this.userAuthorisation = userAuthorisation;
         this.uidService = uidService;
     }
 
@@ -45,7 +44,8 @@ public class DefaultGetEventsOperation implements GetEventsOperation {
             throw new BadRequestException("Case reference " + caseReference + " is not valid");
         }
 
-        List<AuditEvent> result = auditEventRepository.findByCaseReference(Long.valueOf(caseReference));
+        List<AuditEvent> result = auditEventRepository.findByCaseReference(Long.valueOf(caseReference),
+            userAuthorisation.getUserId(), userAuthorisation.getAccessLevel());
         if (result.isEmpty()) {
             throw new ResourceNotFoundException(String.format(RESOURCE_NOT_FOUND, jurisdiction, caseTypeId, caseReference));
         }

@@ -10,6 +10,7 @@ import uk.gov.hmcts.ccd.BaseTest;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 import javax.inject.Inject;
 import javax.sql.DataSource;
@@ -34,6 +35,7 @@ public class CaseAuditEventRepositoryTest extends BaseTest {
 
     private static final Long CASE_DATA_ID = 69L;
     private static final Long CASE_REFERENCE = 6969L;
+    private static final String USER_ID = "123456";
 
     @Test
     @DisplayName("should return the earliest event as the 'create event'")
@@ -68,10 +70,30 @@ public class CaseAuditEventRepositoryTest extends BaseTest {
         setUpCaseEvent(CASE_DATA_ID, "First Event after Create Event", "2017-09-28 08:46:16.259");
         setUpCaseEvent(CASE_DATA_ID, "Second Event after Create Event", "2017-09-28 08:46:16.260");
 
-        List<AuditEvent> result = classUnderTest.findByCaseReference(CASE_REFERENCE);
+        List<AuditEvent> result = classUnderTest.findByCaseReference(CASE_REFERENCE, USER_ID, UserAuthorisation.AccessLevel.ALL);
         assertEquals(3, result.size());
         // Events should be ordered with creation event last since oldest.
         assertEquals(createEventSummary, result.get(2).getSummary());
+    }
+
+    @Test
+    @DisplayName("findByCaseReferenceGranted returns only cases granted to the user")
+    public void shouldNotReturnCaseEventsForUnauthorisedUser() {
+
+        setUpCaseData(CASE_DATA_ID, CASE_REFERENCE);
+        setUpCaseEvent(CASE_DATA_ID, "create case 1", "2017-09-28 08:46:16.258");
+
+        Long SECOND_CASE_REFERENCE = CASE_REFERENCE + 1;
+        setUpCaseData(CASE_DATA_ID + 1, SECOND_CASE_REFERENCE);
+        setUpCaseEvent(CASE_DATA_ID + 1, "create case 1", "2017-09-28 08:46:16.258");
+
+        grantUserAccessToCase(USER_ID, CASE_DATA_ID);
+        List<AuditEvent> result = classUnderTest.findByCaseReference(CASE_REFERENCE, USER_ID, UserAuthorisation.AccessLevel.GRANTED);
+        assertEquals(1, result.size());
+        assertEquals(result.get(0).getSummary(), "create case 1");
+
+        result = classUnderTest.findByCaseReference(SECOND_CASE_REFERENCE, USER_ID, UserAuthorisation.AccessLevel.GRANTED);
+        assertEquals(0, result.size());
     }
 
     @Test
@@ -115,6 +137,17 @@ public class CaseAuditEventRepositoryTest extends BaseTest {
                 caseReference
             )
         );
+    }
+
+    private void grantUserAccessToCase(String userId, Long caseDataId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("CASE_DATA_ID", caseDataId);
+        params.put("USER_ID", userId);
+        params.put("CASE_ROLE", "[CREATOR]");
+
+        new SimpleJdbcInsert(db)
+            .withTableName("CASE_USERS")
+            .execute(params);
     }
 
     private Long setUpCaseEvent(Long caseDataId, String summary, String timestamp) {
