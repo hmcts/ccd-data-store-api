@@ -29,4 +29,3 @@ nbdist/
 ### Gradle
 .gradle/
 out/
-functional/cucumber/

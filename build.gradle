@@ -584,7 +584,7 @@ jacocoTestReport {
 
 test {
     environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
-
+    generateCucumberReports.enabled = false
     useJUnitPlatform()
 
     testLogging {
@@ -658,10 +658,11 @@ task functional(type: Test) {
     include "uk/gov/hmcts/ccd/datastore/tests/v2/**"
     useJUnitPlatform()
     doFirst {
+        generateCucumberReports.enabled = true
         javaexec {
             main = "io.cucumber.core.cli.Main"
             classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
-            args = ['--plugin', 'pretty', '--plugin', 'json:functional/cucumber.json', '--glue', 'uk.gov.hmcts.ccd.datastore.tests', 'src/aat/resources/features']
+            args = ['--plugin', 'pretty', '--plugin', 'json:target/cucumber.json', '--glue', 'uk.gov.hmcts.ccd.datastore.tests', 'src/aat/resources/features']
         }
     }
 }
@@ -711,8 +712,8 @@ task installDist(overwrite: true) {
 }
 
 cucumberReports {
-    outputDir = file("${projectDir}/functional/cucumber")
+    outputDir = file("${projectDir}/target/cucumber")
     buildId = '0'
-    reports = files("${projectDir}/functional/cucumber.json")
+    reports = files("${projectDir}/target/cucumber.json")
 }
 
