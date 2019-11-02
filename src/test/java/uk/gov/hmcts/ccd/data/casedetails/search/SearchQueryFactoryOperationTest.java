@@ -34,6 +34,7 @@ public class SearchQueryFactoryOperationTest {
     private SearchQueryFactoryOperation subject;
     private SearchQueryFactoryOperation subjectWithUserAuthValues;
     private final CriterionFactory criterionFactory = new CriterionFactory();
+    private SortOrderQueryBuilder sortOrderQueryBuilder = new SortOrderQueryBuilder();
 
     @Mock
     EntityManager em;
@@ -63,14 +64,14 @@ public class SearchQueryFactoryOperationTest {
             em,
             mockApp,
             userAuthorisation,
-            authorisedCaseDefinitionDataService);
+            sortOrderQueryBuilder, authorisedCaseDefinitionDataService);
 
         subjectWithUserAuthValues = new SearchQueryFactoryOperation(
             criterionFactory,
             em,
             mockApp,
             userAuthorisationWithAccessLevel,
-            authorisedCaseDefinitionDataService);
+            sortOrderQueryBuilder, authorisedCaseDefinitionDataService);
 
         params = new HashMap<>();
     }
@@ -175,15 +176,19 @@ public class SearchQueryFactoryOperationTest {
     }
 
     @Test
-    public void shouldGenerateOrderByWithSortFieldAndSortDirection() {
+    public void shouldGenerateOrderByWithSortQueryString() {
         MetaData metadata = new MetaData(TEST_CASE_TYPE_VALUE, null);
-        metadata.setSortDirection(Optional.of("desc"));
-        metadata.setSortField("last_modified");
+        SortOrderField sortOrderField = SortOrderField.sortOrderWith()
+            .caseFieldId("[LAST_MODIFIED_DATE]")
+            .metadata(true)
+            .direction("DESC")
+            .build();
+        metadata.addSortOrderField(sortOrderField);
         when(em.createNativeQuery(any(String.class), any(Class.class))).thenReturn(mockQuery);
 
         subject.build(metadata, params, false);
 
-        verify(em, times(1)).createNativeQuery("SELECT * FROM case_data WHERE case_type_id = ?0 ORDER BY last_modified DESC", CaseDetailsEntity.class);
+        verify(em, times(1)).createNativeQuery("SELECT * FROM case_data WHERE case_type_id = ?0 ORDER BY last_modified DESC, created_date ASC", CaseDetailsEntity.class);
     }
 
 }
