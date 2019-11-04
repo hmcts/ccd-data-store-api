@@ -194,25 +194,6 @@
         <!-- Temporary suppression to ignore until it's fixed in master -->
         <vulnerabilityName>CVE-2019-7614</vulnerabilityName>
     </suppress>
-    <suppress>
-        <notes>Ignoring temporarily</notes>
-        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
-        <cve>CVE-2019-14540</cve>
-        <cve>CVE-2019-16335</cve>
-    </suppress>
-    <suppress>
-        <notes>Temporary suppression of an issue related to the current stable elasticsearch 6.4.2. On a system with multiple users submitting requests, it could be possible
-            for an attacker to gain access to response header containing sensitive data from another user.</notes>
-        <vulnerabilityName>CVE-2019-7614</vulnerabilityName>
-    </suppress>
-    <!-- RDM-6147 - should remove these suppressions -->
-    <suppress until="2019-10-31">
-        <notes><![CDATA[ file name: jackson-databind-2.9.10.jar ]]></notes>
-        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
-        <cve>CVE-2019-16942</cve>
-        <cve>CVE-2019-16943</cve>
-        <cve>CVE-2019-17531</cve>
-    </suppress>
     <!--These javascript CVEs relate to Liquibase's web based admin UI which we don't use or expose-->
     <suppress>
         <notes><![CDATA[file name: liquibase-core-3.6.3.jar: bootstrap.*]]></notes>
