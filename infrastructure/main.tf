@@ -58,6 +58,12 @@ data "azurerm_key_vault_secret" "ccd_data_s2s_key" {
   key_vault_id = "${data.azurerm_key_vault.s2s_vault.id}"
 }
 
+resource "azurerm_key_vault_secret" "ccd_data_s2s_secret" {
+  name = "ccd-data-s2s-secret"
+  value = "${data.azurerm_key_vault_secret.ccd_data_s2s_key.value}"
+  key_vault_id = "${data.azurerm_key_vault.ccd_shared_key_vault.id}"
+}
+
 // load balancer url. The load balancer will kill connections when idle for 5 min. Used by functional tests
 data "azurerm_key_vault_secret" "ccd_elastic_search_url" {
   count = "${var.elastic_search_enabled == "false" ? 0 : 1}"
@@ -163,6 +169,7 @@ module "ccd-data-store-api" {
     CCD_AM_WRITE_TO_BOTH                  = "${var.ccd_am_write_to_both}"
     CCD_AM_READ_FROM_CCD                  = "${var.ccd_am_read_from_ccd}"
     CCD_AM_READ_FROM_AM                   = "${var.ccd_am_read_from_am}"
+    JPA_CRITERIA_IN_SEARCH_ENABLED        = false
   }
 
 }
@@ -187,43 +194,43 @@ module "data-store-db" {
 ////////////////////////////////
 
 resource "azurerm_key_vault_secret" "POSTGRES-USER" {
-  name = "${local.app_full_name}-POSTGRES-USER"
+  name = "${var.component}-POSTGRES-USER"
   value = "${module.data-store-db.user_name}"
   key_vault_id = "${data.azurerm_key_vault.ccd_shared_key_vault.id}"
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES-PASS" {
-  name = "${local.app_full_name}-POSTGRES-PASS"
+  name = "${var.component}-POSTGRES-PASS"
   value = "${module.data-store-db.postgresql_password}"
   key_vault_id = "${data.azurerm_key_vault.ccd_shared_key_vault.id}"
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES_HOST" {
-  name = "${local.app_full_name}-POSTGRES-HOST"
+  name = "${var.component}-POSTGRES-HOST"
   value = "${module.data-store-db.host_name}"
   key_vault_id = "${data.azurerm_key_vault.ccd_shared_key_vault.id}"
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES_PORT" {
-  name = "${local.app_full_name}-POSTGRES-PORT"
+  name = "${var.component}-POSTGRES-PORT"
   value = "${module.data-store-db.postgresql_listen_port}"
   key_vault_id = "${data.azurerm_key_vault.ccd_shared_key_vault.id}"
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
-  name = "${local.app_full_name}-POSTGRES-DATABASE"
+  name = "${var.component}-POSTGRES-DATABASE"
   value = "${module.data-store-db.postgresql_database}"
   key_vault_id = "${data.azurerm_key_vault.ccd_shared_key_vault.id}"
 }
 
 resource "azurerm_key_vault_secret" "ccd_draft_encryption_key" {
-  name = "${local.app_full_name}-draftStoreEncryptionSecret"
+  name = "${var.component}-draftStoreEncryptionSecret"
   value = "${random_string.draft_encryption_key.result}"
   key_vault_id = "${data.azurerm_key_vault.ccd_shared_key_vault.id}"
 }
 
 resource "azurerm_key_vault_secret" "draft-store-key" {
-  name = "${local.app_full_name}-draft-key"
+  name = "${var.component}-draft-key"
   value = "${random_string.draft_encryption_key.result}"
   key_vault_id = "${data.azurerm_key_vault.ccd_shared_key_vault.id}"
 }

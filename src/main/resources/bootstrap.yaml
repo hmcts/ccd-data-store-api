@@ -1,11 +1,13 @@
 spring:
   cloud:
     propertiesvolume:
-      paths: /mnt/secrets/s2s,/mnt/secrets/ccd
+      paths: /mnt/secrets/ccd
+      prefixed: false
       aliases:
-        s2s.microservicekey-ccd-data: DATA_STORE_IDAM_KEY
-        ccd.ccd-data-store-api-draft-key: CCD_DRAFT_ENCRYPTION_KEY
-        ccd.ccd-ELASTIC-SEARCH-URL: ELASTIC_SEARCH_HOSTS
-        ccd.ccd-ELASTIC-SEARCH-DATA-NODES-URL: ELASTIC_SEARCH_DATA_NODES_HOSTS
-        ccd.ccd-ELASTIC-SEARCH-PASSWORD: ELASTIC_SEARCH_PASSWORD
-        ccd.ccd-data-store-api-POSTGRES-PASS: spring.datasource.password
+        ccd-data-s2s-secret: DATA_STORE_IDAM_KEY
+        data-store-api-draft-key: CCD_DRAFT_ENCRYPTION_KEY
+        ccd-ELASTIC-SEARCH-URL: ELASTIC_SEARCH_HOSTS
+        ccd-ELASTIC-SEARCH-DATA-NODES-URL: ELASTIC_SEARCH_DATA_NODES_HOSTS
+        ccd-ELASTIC-SEARCH-PASSWORD: ELASTIC_SEARCH_PASSWORD
+        data-store-api-POSTGRES-PASS: DATA_STORE_DB_PASSWORD
+        AppInsightsInstrumentationKey: azure.application-insights.instrumentation-key
