@@ -87,6 +87,7 @@ dependencyCheck {
         // Disable scanning of .NET related binaries
         assemblyEnabled = false
     }
+    skipConfigurations = ['codacy', 'spotbugs']
 }
 
 mainClassName = 'uk.gov.hmcts.ccd.CoreCaseDataApplication'
