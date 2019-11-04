@@ -107,7 +107,8 @@ ext {
     junitVintageVersion = '5.2.0'
     hibernateVersion = '5.2.17.Final'
     powermockVersion = '2.0.0-beta.5'
-    reformLogging = '5.0.1'
+    reformLogging = '5.1.0'
+    appInsightsVersion = '2.4.1'
     swagger2Version = '2.9.2'
     limits = [
             'instruction': 90,
