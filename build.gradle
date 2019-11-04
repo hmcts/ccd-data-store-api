@@ -272,6 +272,8 @@ dependencyManagement {
     }
 
     dependencies {
+        dependency 'com.google.guava:guava:24.1.1-jre'
+
         // CVE-2019-0232 - Java and Command Line injections in Windows
         dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.21') {
             entry 'tomcat-embed-core'
