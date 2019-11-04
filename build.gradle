@@ -289,15 +289,15 @@ dependencyManagement {
     }
 }
 
-configurations.all {
-    resolutionStrategy {
-        eachDependency { DependencyResolveDetails details ->
-            if (details.requested.group in ['com.fasterxml.jackson.module', 'com.fasterxml.jackson.datatype']) {
-                details.useVersion '2.9.10'
-            }
-        }
-    }
-}
+//configurations.all {
+//    resolutionStrategy {
+//        eachDependency { DependencyResolveDetails details ->
+//            if (details.requested.group in ['com.fasterxml.jackson.module', 'com.fasterxml.jackson.datatype']) {
+//                details.useVersion '2.9.10'
+//            }
+//        }
+//    }
+//}
 
 task projectVersion {
     description 'Prints the version of this project; used for publishing JAR file'
