@@ -105,7 +105,7 @@ repositories {
 ext {
     junitJupiterVersion = '5.2.0'
     junitVintageVersion = '5.2.0'
-    hibernateVersion = '5.2.17.Final'
+    hibernateVersion = '5.2.18.Final'
     powermockVersion = '2.0.0-beta.5'
     reformLogging = '5.1.0'
     appInsightsVersion = '2.4.1'
