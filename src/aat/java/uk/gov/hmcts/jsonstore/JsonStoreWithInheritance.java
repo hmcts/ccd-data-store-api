@@ -22,7 +22,7 @@ public abstract class JsonStoreWithInheritance {
     protected final String inheritanceFieldName;
 
     public JsonStoreWithInheritance() {
-        this("guid_", "extends_");
+        this("_guid_", "_extends_");
     }
 
     public JsonStoreWithInheritance(String idFieldName, String inheritanceFieldName) {

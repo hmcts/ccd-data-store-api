@@ -1,8 +1,13 @@
 package uk.gov.hmcts.ccd.fta.steps;
 
+import org.junit.Assert;
+
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import uk.gov.hmcts.ccd.fta.data.HttpTestData;
+import uk.gov.hmcts.ccd.fta.data.HttpTestDataSource;
+import uk.gov.hmcts.ccd.fta.data.JsonStoreHttpTestDataSource;
 
 public class BackEndFunctionalTestScenarioContext {
 
@@ -44,5 +49,13 @@ public class BackEndFunctionalTestScenarioContext {
     @Then("the response {}")
     public void theResponse(String responseAssertion) {
 
+    }
+
+    private String[] resourcePaths = { "features" };
+    private HttpTestDataSource dataSource = new JsonStoreHttpTestDataSource(resourcePaths);
+
+    public void loadTestData(String scenarioKey) {
+        HttpTestData testData = dataSource.getDataForScenario(scenarioKey);
+        Assert.assertEquals("S-129", testData.get_guid_());
     }
 }

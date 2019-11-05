@@ -44,7 +44,7 @@ public class JsonResourceStoreWithInheritance extends JsonStoreWithInheritance {
 
     private JsonNode buildObjectStoreInAResource(String resource) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
-        return mapper.readTree(Thread.currentThread().getContextClassLoader().getResourceAsStream(resource));
+        return mapper.readTree(this.getClass().getClassLoader().getResourceAsStream(resource));
     }
 
 }
