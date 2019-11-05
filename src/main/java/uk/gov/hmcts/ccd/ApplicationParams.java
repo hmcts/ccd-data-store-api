@@ -119,9 +119,6 @@ public class ApplicationParams {
     @Value("${search.elastic.nodes.discovery.filter}")
     private String elasticsearchNodeDiscoveryFilter;
 
-    @Value("${ccd.case.search.jpa.criteria.enabled}")
-    private boolean jpaCriteriaSearchEnabled;
-
     public static String encode(final String stringToEncode) {
         try {
             return URLEncoder.encode(stringToEncode, "UTF-8");
@@ -324,9 +321,5 @@ public class ApplicationParams {
 
     public List<String> getReadFromAMCaseTypes() {
         return readFromAMCaseTypes;
-    }
-
-    public boolean isJpaCriteriaSearchEnabled() {
-        return jpaCriteriaSearchEnabled;
     }
 }

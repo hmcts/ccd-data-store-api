@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ccd.data.casedetails.search;
 
-import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -27,28 +25,22 @@ public class MetaData {
 
     // Metadata case fields
     public enum CaseField {
-        JURISDICTION("jurisdiction", CaseDetailsEntity.JURISDICTION_FIELD_COL),
-        CASE_TYPE("case_type", CaseDetailsEntity.CASE_TYPE_ID_FIELD_COL),
-        STATE("state", CaseDetailsEntity.STATE_FIELD_COL),
-        CASE_REFERENCE("case_reference", CaseDetailsEntity.REFERENCE_FIELD_COL),
-        CREATED_DATE("created_date", CaseDetailsEntity.CREATED_DATE_FIELD_COL),
-        LAST_MODIFIED_DATE("last_modified_date", CaseDetailsEntity.LAST_MODIFIED_FIELD_COL),
-        SECURITY_CLASSIFICATION("security_classification", CaseDetailsEntity.SECURITY_CLASSIFICATION_FIELD_COL);
+        JURISDICTION("jurisdiction"),
+        CASE_TYPE("case_type"),
+        STATE("state"),
+        CASE_REFERENCE("case_reference"),
+        CREATED_DATE("created_date"),
+        LAST_MODIFIED_DATE("last_modified_date"),
+        SECURITY_CLASSIFICATION("security_classification");
 
         private final String parameterName;
-        private final String dbColumnName;
 
-        CaseField(String parameterName, String dbColumnName) {
+        CaseField(String parameterName) {
             this.parameterName = parameterName;
-            this.dbColumnName = dbColumnName;
         }
 
         public String getParameterName() {
             return parameterName;
-        }
-
-        public String getDbColumnName() {
-            return dbColumnName;
         }
 
         public String getReference() {
@@ -65,7 +57,7 @@ public class MetaData {
     private Optional<String> securityClassification = Optional.empty();
     private Optional<String> page = Optional.empty();
     private Optional<String> sortDirection = Optional.empty();
-    private List<SortOrderField> sortOrderFields = newArrayList();
+    private Optional<String> sortField = Optional.empty();
 
     public MetaData(String caseTypeId, String jurisdiction) {
         this.caseTypeId = caseTypeId;
@@ -136,16 +128,12 @@ public class MetaData {
         this.sortDirection = sortDirection;
     }
 
-    public List<SortOrderField> getSortOrderFields() {
-        return sortOrderFields;
+    public Optional<String> getSortField() {
+        return sortField;
     }
 
-    public void setSortOrderFields(List<SortOrderField> sortOrderFields) {
-        this.sortOrderFields = sortOrderFields;
-    }
-
-    public void addSortOrderField(SortOrderField sortOrderField) {
-        this.sortOrderFields.add(sortOrderField);
+    public void setSortField(String sortField) {
+        this.sortField = Optional.of(sortField);
     }
 
     public static List<String> unknownMetadata(List<String> parameters) {

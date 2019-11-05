@@ -28,26 +28,25 @@ public class SearchQueryFactoryOperation {
     @PersistenceContext
     private final EntityManager entityManager;
 
-    private static final String MAIN_QUERY = "SELECT * FROM case_data WHERE %s ORDER BY %s";
+    private static final String MAIN_QUERY = "SELECT * FROM case_data WHERE %s ORDER BY %s %s";
     private static final String MAIN_COUNT_QUERY = "SELECT count(*) FROM case_data WHERE %s";
+
+    private static final String CREATED_DATE = "created_date";
 
     private final CriterionFactory criterionFactory;
     private final ApplicationParams applicationParam;
     private final UserAuthorisation userAuthorisation;
-    private final SortOrderQueryBuilder sortOrderQueryBuilder;
     private final AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService;
 
     public SearchQueryFactoryOperation(CriterionFactory criterionFactory,
                                        EntityManager entityManager,
                                        ApplicationParams applicationParam,
                                        UserAuthorisation userAuthorisation,
-                                       SortOrderQueryBuilder sortOrderQueryBuilder,
                                        AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService) {
         this.criterionFactory = criterionFactory;
         this.entityManager = entityManager;
         this.applicationParam = applicationParam;
         this.userAuthorisation = userAuthorisation;
-        this.sortOrderQueryBuilder = sortOrderQueryBuilder;
         this.authorisedCaseDefinitionDataService = authorisedCaseDefinitionDataService;
     }
 
@@ -56,9 +55,10 @@ public class SearchQueryFactoryOperation {
 
         String queryToFormat = isCountQuery ? MAIN_COUNT_QUERY : MAIN_QUERY;
         String whereClausePart = secure(toClauses(criteria), metadata);
-        String sortClause = sortOrderQueryBuilder.buildSortOrderClause(metadata);
+        String sortField = metadata.getSortField().orElse(CREATED_DATE);
+        SortDirection direction = SortDirection.fromOptionalString(metadata.getSortDirection());
 
-        String queryString = String.format(queryToFormat, whereClausePart, sortClause);
+        String queryString = String.format(queryToFormat, whereClausePart, sortField, direction.name());
 
         Query query;
         if (isCountQuery) {

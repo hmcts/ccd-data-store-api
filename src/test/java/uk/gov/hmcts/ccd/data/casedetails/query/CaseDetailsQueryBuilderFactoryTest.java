@@ -95,8 +95,10 @@ class CaseDetailsQueryBuilderFactoryTest {
         @Test
         @DisplayName("should add order by clause to select query")
         void shouldAddOrderByClauseToSelectQuery() {
+            String sortField = "sortField";
             String sortDirection = "desc";
             MetaData metaData = new MetaData("caseType", "jurisdiction");
+            metaData.setSortField(sortField);
             metaData.setSortDirection(Optional.of(sortDirection));
 
             CaseDetailsQueryBuilder<CaseDetailsEntity> queryBuilder = factory.select(em, metaData);
@@ -104,7 +106,7 @@ class CaseDetailsQueryBuilderFactoryTest {
 
             assertAll(
                 () -> assertThat(queryBuilder, is(notNullValue())),
-                () -> verify(root).get("createdDate"),
+                () -> verify(root).get(sortField),
                 () -> verify(criteriaBuilder).desc(any())
             );
         }
