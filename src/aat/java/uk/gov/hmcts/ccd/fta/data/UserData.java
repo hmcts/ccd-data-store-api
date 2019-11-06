@@ -6,6 +6,8 @@ public class UserData {
 
     private String password;
 
+    private String token;
+
     public String getUsername() {
         return username;
     }
@@ -20,6 +22,14 @@ public class UserData {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
 }

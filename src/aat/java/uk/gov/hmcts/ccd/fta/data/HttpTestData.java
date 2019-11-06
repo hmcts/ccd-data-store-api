@@ -105,4 +105,8 @@ public class HttpTestData {
         this.expectedResponse = expectedResponse;
     }
 
+    public boolean meetsSpec(String specification) {
+        return specs.contains(specification);
+    }
+
 }
