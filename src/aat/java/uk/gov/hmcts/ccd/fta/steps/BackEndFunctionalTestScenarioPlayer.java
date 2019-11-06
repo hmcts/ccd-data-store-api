@@ -1,20 +1,14 @@
 package uk.gov.hmcts.ccd.fta.steps;
 
-import io.cucumber.core.api.Scenario;
-
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import uk.gov.hmcts.ccd.fta.data.HttpTestData;
-
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class BackEndFunctionalTestScenarioPlayer {
 
     private final BackEndFunctionalTestScenarioContext scenarioContext;
-    private HttpTestData testData;
 
     public BackEndFunctionalTestScenarioPlayer() {
         scenarioContext = new BackEndFunctionalTestScenarioContext();
@@ -22,17 +16,12 @@ public class BackEndFunctionalTestScenarioPlayer {
 
     @Given("an appropriate test context as detailed in the test data source")
     public void anAppropriateTestContextAsDetailedInTheTestDataSource() {
-        Scenario scenario = BackEndFunctionalTestScenarioHooks.getScenario();
-        String scenarioTag = scenario.getSourceTagNames().stream()
-            .filter(tag -> tag.startsWith("@S-"))
-            .collect(Collectors.joining())
-            .substring(1);
-        testData = scenarioContext.loadTestData(scenarioTag);
-        assertThat(testData.get_guid_()).isEqualTo(scenarioTag);
+        boolean isTestDataLoaded = scenarioContext.loadTestData();
+        assertThat(isTestDataLoaded).isTrue();
     }
 
-    @Given("a user with {} profile in CCD")
-    public void aUserWithProfileInCCD(String profileType) {
+    @Given("a user with {}")
+    public void aUserWithProfile(String profileType) {
 
     }
 
