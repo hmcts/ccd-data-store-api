@@ -1,8 +1,8 @@
 {
-   "_guid_": "S-129",
+   "_guid_": "S-110",
    "_extends_": "S-000-Base-Success",
    "title": "Scenario 1",
-   "specs": ["Spec 1", "Spec 2", "Spec 3"],
+   "specs": ["a detailed profile in CCD", "Spec 2", "Spec 3"],
    "productName": "S-129",
    "operationName": "S-129",
    "uri": "S-129",
@@ -10,7 +10,5 @@
       "headers": {
          "serviceToken": "s2s"
       }
-   },
-   "expectedResponse": {
    }
 }
