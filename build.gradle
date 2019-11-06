@@ -225,6 +225,8 @@ dependencies {
     compile group: 'com.jayway.jsonpath', name: 'json-path', version: '2.4.0'
     compile group: 'org.awaitility', name: 'awaitility', version: '3.1.6'
 
+    // CVE-2019-12086 - force update of jackson-databind - remove when dependencies move off <2.9.9
+    compile "com.fasterxml.jackson.core:jackson-databind:2.9.10.1"
 
     // FIXME 0.6 doesn't support jsonb; 0.7 doesn't work on Windows
 //    runtime group: 'com.impossibl.pgjdbc-ng', name: 'pgjdbc-ng', version: '0.6'
@@ -271,9 +273,6 @@ dependencyManagement {
     }
 
     dependencies {
-        // CVE-2019-12086 - force update of jackson-databind - remove when dependencies move off <2.9.9
-        dependency 'com.fasterxml.jackson.core:jackson-databind:2.9.10.1'
-
         // Versions prior to 24.1.1 vulnerable to CVE-2018-10237
         dependency 'com.google.guava:guava:24.1.1-jre'
 
@@ -289,6 +288,16 @@ dependencyManagement {
         }
     }
 }
+
+//configurations.all {
+//    resolutionStrategy {
+//        eachDependency { DependencyResolveDetails details ->
+//            if (details.requested.group in ['com.fasterxml.jackson.module', 'com.fasterxml.jackson.datatype']) {
+//                details.useVersion '2.9.10'
+//            }
+//        }
+//    }
+//}
 
 task projectVersion {
     description 'Prints the version of this project; used for publishing JAR file'
