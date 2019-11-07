@@ -51,7 +51,7 @@ import uk.gov.hmcts.ccd.domain.service.createevent.MidEventCallback;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
-import uk.gov.hmcts.ccd.domain.service.search.CreatorSearchOperation;
+import uk.gov.hmcts.ccd.domain.service.search.AuthorisedSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.PaginatedSearchMetaDataOperation;
 import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
 import uk.gov.hmcts.ccd.domain.service.startevent.StartEventOperation;
@@ -83,7 +83,7 @@ public class CaseDetailsEndpoint {
                                @Qualifier("authorised") final CreateCaseOperation createCaseOperation,
                                @Qualifier("authorised") final CreateEventOperation createEventOperation,
                                @Qualifier("authorised") final StartEventOperation startEventOperation,
-                               @Qualifier(CreatorSearchOperation.QUALIFIER) final SearchOperation searchOperation,
+                               @Qualifier(AuthorisedSearchOperation.QUALIFIER) final SearchOperation searchOperation,
                                final FieldMapSanitizeOperation fieldMapSanitizeOperation,
                                final ValidateCaseFieldsOperation validateCaseFieldsOperation,
                                final DocumentsOperation documentsOperation,
