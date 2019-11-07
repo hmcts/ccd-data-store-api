@@ -3,6 +3,8 @@ package uk.gov.hmcts.ccd.fta.steps;
 import java.util.stream.Collectors;
 
 import io.cucumber.core.api.Scenario;
+import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 import uk.gov.hmcts.ccd.fta.data.HttpTestData;
 import uk.gov.hmcts.ccd.fta.data.HttpTestDataSource;
 import uk.gov.hmcts.ccd.fta.data.JsonStoreHttpTestDataSource;
@@ -16,17 +18,17 @@ public class BackEndFunctionalTestScenarioContext {
 
     private HttpTestData testData;
     private Scenario scenario;
-    private UserData aUser;
-    private Object theRequest;
-    private ResponseData theResponse;
+    private UserData theUser;
+    private RequestSpecification theRequest;
+    private Response theResponse;
 
-    public void initilizeTestDataFor(Scenario scenario) {
+    public void initializeTestDataFor(Scenario scenario) {
         this.scenario = scenario;
         String scenarioTag = getCurrentScenarioTag();
         testData = DATA_SOURCE.getDataForScenario(scenarioTag);
     }
 
-    private String getCurrentScenarioTag() {
+    public String getCurrentScenarioTag() {
         return scenario.getSourceTagNames().stream()
             .filter(tag -> tag.startsWith("@S-"))
             .collect(Collectors.joining())
@@ -37,27 +39,27 @@ public class BackEndFunctionalTestScenarioContext {
         return testData;
     }
 
-    public UserData getAUser() {
-        return aUser;
+    public UserData getTheUser() {
+        return theUser;
     }
 
-    public void setAUser(UserData aUser) {
-        this.aUser = aUser;
+    public void setTheUser(UserData theUser) {
+        this.theUser = theUser;
     }
 
-    public void setTheRequest(Object theRequest) {
+    public void setTheRequest(RequestSpecification theRequest) {
         this.theRequest = theRequest;
     }
 
-    public Object getTheRequest() {
+    public RequestSpecification getTheRequest() {
         return theRequest;
     }
 
-    public ResponseData getTheResponse() {
+    public Response getTheResponse() {
         return theResponse;
     }
 
-    public void setTheResponse(ResponseData theResponse) {
+    public void setTheResponse(Response theResponse) {
         this.theResponse = theResponse;
     }
 }
