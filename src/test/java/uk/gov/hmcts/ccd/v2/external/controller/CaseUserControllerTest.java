@@ -107,7 +107,7 @@ class CaseUserControllerTest {
         }
 
         @Test
-        @DisplayName("should update when user has GRANTED access level")
+        @DisplayName("should update when user has jurisdiction role")
         void shouldUpdateWhenUserHasLimitedAccess() {
             final ArgumentCaptor<CaseUser> caseUserCaptor = ArgumentCaptor.forClass(CaseUser.class);
 
