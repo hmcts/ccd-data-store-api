@@ -10,7 +10,7 @@ public class ResponseData {
 
     private Map<String, Object> headers;
 
-    private byte[] body;
+    private String body;
 
     public int getResponseCode() {
         return responseCode;
@@ -36,11 +36,11 @@ public class ResponseData {
         this.headers = headers;
     }
 
-    public byte[] getBody() {
+    public String getBody() {
         return body;
     }
 
-    public void setBody(byte[] body) {
+    public void setBody(String body) {
         this.body = body;
     }
 

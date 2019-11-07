@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.fta.steps;
 
-public interface BackEndFunctionalTestAtuomationDSL {
+public interface BackEndFunctionalTestAutomationDSL {
 
     // DSL Element:
     // "an appropriate test context as detailed in the test data source"
