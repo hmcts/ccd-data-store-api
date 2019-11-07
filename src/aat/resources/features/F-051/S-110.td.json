@@ -2,7 +2,7 @@
   "_guid_": "S-110",
   "_extends_": "S-000-Base-Success",
   "title": "must return default user setting successfully for a user having a profile in CCD",
-  "specs": ["a detailed profile in CCD1"],
+  "specs": ["a detailed profile in CCD"],
   "productName": "CCD Data Store",
   "operationName": "Get default setting for user",
   "uri": "/caseworkers/{uid}/profile",
