@@ -40,6 +40,7 @@ public class CaseField implements Serializable, CommonField {
     private String liveFrom = null;
     @JsonProperty("live_until")
     private String liveUntil = null;
+    private Integer order;
     @JsonProperty("show_condition")
     private String showConditon = null;
     @JsonProperty("acls")
@@ -120,6 +121,14 @@ public class CaseField implements Serializable, CommonField {
 
     public void setLiveUntil(String liveUntil) {
         this.liveUntil = liveUntil;
+    }
+
+    public Integer getOrder() {
+        return order;
+    }
+
+    public void setOrder(final Integer order) {
+        this.order = order;
     }
 
     public String getShowConditon() {
