@@ -104,8 +104,7 @@ public class CaseUserController {
     }
 
     private Boolean accessUpdateAuthorised(CaseDetails caseDetails) {
-        return AccessLevel.ALL.equals(userAuthorisation.getAccessLevel()) &&
-            userAuthorisation.hasJurisdictionRole(caseDetails.getJurisdiction());
+        return userAuthorisation.hasJurisdictionRole(caseDetails.getJurisdiction());
     }
 
 }
