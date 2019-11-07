@@ -10,8 +10,8 @@ Feature: Get default setting for user
     Then a positive response is received
     And the response has all the details as expected
 
-
-  Scenario: S109: must return appropriate negative response for a user not having a profile in CCD
+  @S-109
+  Scenario: must return appropriate negative response for a user not having a profile in CCD
     Given:  an appropriate test context as detailed in the test data source,
     And: a user with no profile in CCD,
     When: a request is prepared with appropriate values,
