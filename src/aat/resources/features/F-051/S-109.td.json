@@ -1,0 +1,21 @@
+{
+  "_guid_": "S-109",
+  "_extends_": "S-000-Base-Success",
+  "title": "must return appropriate negative response for a user not having a profile in CCD",
+  "specs": ["no profile in CCD"],
+  "productName": "CCD Data Store",
+  "operationName": "Get default setting for user",
+  "user": {
+    "username": "auto.test.cnp123@gmail.com",
+    "password": "Pa55word11"
+  },
+  "uri": "/caseworkers/{uid}/profile",
+  "request": {
+    "headers": {
+      "serviceToken": "s2s"
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 403
+  }
+}
