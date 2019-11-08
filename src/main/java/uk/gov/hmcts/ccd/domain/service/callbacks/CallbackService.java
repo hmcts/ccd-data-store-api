@@ -50,6 +50,10 @@ public class CallbackService {
                                            final CaseDetails caseDetails,
                                            final Boolean ignoreWarning) {
 
+        return sendSingleRequest(url, caseEvent, caseDetailsBefore, caseDetails, ignoreWarning);
+    }
+
+    public Optional<CallbackResponse> sendSingleRequest(final String url, final CaseEvent caseEvent, final CaseDetails caseDetailsBefore, final CaseDetails caseDetails, final Boolean ignoreWarning) {
         if (url == null || url.isEmpty()) {
             return Optional.empty();
         }
@@ -68,7 +72,14 @@ public class CallbackService {
                                       final CaseDetails caseDetailsBefore,
                                       final CaseDetails caseDetails,
                                       final Class<T> clazz) {
+        return sendSingleRequest(url, caseEvent, caseDetailsBefore, caseDetails, clazz);
+    }
 
+    public <T> ResponseEntity<T> sendSingleRequest(final String url,
+                                               final CaseEvent caseEvent,
+                                               final CaseDetails caseDetailsBefore,
+                                               final CaseDetails caseDetails,
+                                               final Class<T> clazz) {
         final CallbackRequest callbackRequest = new CallbackRequest(caseDetails, caseDetailsBefore, caseEvent.getId());
         final Optional<ResponseEntity<T>> requestEntity = sendRequest(url, clazz, callbackRequest);
         return requestEntity.orElseThrow(() -> {

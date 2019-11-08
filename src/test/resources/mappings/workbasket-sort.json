@@ -1,0 +1,44 @@
+  {
+    "request": {
+      "method": "GET",
+      "url": "/api/display/work-basket-definition/TestAddressBookCase?version=34"
+    },
+    "response": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "jsonBody": {
+        "fields": [
+          {
+            "case_type_id": "TestAddressBookCase",
+            "case_field_id": "PersonFirstName",
+            "label": "First Name",
+            "order": 1,
+            "sort_order" : {
+              "direction": "ASC",
+              "priority": 1
+            }
+          },
+          {
+            "case_type_id": "TestAddressBookCase",
+            "case_field_id": "PersonLastName",
+            "label": "Last Name",
+            "order": 1
+          },
+          {
+            "case_type_id": "TestAddressBookCase",
+            "case_field_id": "PersonAddress",
+            "case_field_element_path": "Postcode",
+            "label": "Address",
+            "order": 1,
+            "role": "caseworker-test-public",
+            "sort_order" : {
+              "direction": "ASC",
+              "priority": 2
+            }
+          }
+        ]
+      }
+    }
+  }
