@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.fta.data;
 
+import com.google.gson.JsonObject;
+
 import java.util.Map;
 
 public class ResponseData {
