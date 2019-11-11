@@ -30,7 +30,7 @@ public class ReflectionUtils {
         if (fieldName == null || fieldName.length() == 0)
             throw new IllegalArgumentException("fieldName must be non-empty String.");
 
-        System.out.println("Will retrieve [" + fieldName + "] from [" + object + "] of type " + object.getClass());
+        //System.out.println("Will retrieve [" + fieldName + "] from [" + object + "] of type " + object.getClass());
 
         String getterName = "get" + StringUtils.firstLetterToUpperCase(fieldName);
 
