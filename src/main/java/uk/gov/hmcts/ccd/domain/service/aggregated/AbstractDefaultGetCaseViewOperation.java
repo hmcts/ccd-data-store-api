@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewFieldBuilder;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
@@ -19,6 +21,8 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -33,17 +37,20 @@ public abstract class AbstractDefaultGetCaseViewOperation {
     private final CaseTypeService caseTypeService;
     private final UIDService uidService;
     private final ObjectMapperService objectMapperService;
+    private final CaseViewFieldBuilder caseViewFieldBuilder;
 
     AbstractDefaultGetCaseViewOperation(GetCaseOperation getCaseOperation,
                                         UIDefinitionRepository uiDefinitionRepository,
                                         CaseTypeService caseTypeService,
                                         UIDService uidService,
-                                        ObjectMapperService objectMapperService) {
+                                        ObjectMapperService objectMapperService,
+                                        CaseViewFieldBuilder caseViewFieldBuilder) {
         this.getCaseOperation = getCaseOperation;
         this.uiDefinitionRepository = uiDefinitionRepository;
         this.caseTypeService = caseTypeService;
         this.uidService = uidService;
         this.objectMapperService = objectMapperService;
+        this.caseViewFieldBuilder = caseViewFieldBuilder;
     }
 
     void validateCaseReference(String caseReference) {
@@ -71,15 +78,22 @@ public abstract class AbstractDefaultGetCaseViewOperation {
 
     CaseViewTab[] getTabs(CaseDetails caseDetails, Map<String, ?> data, CaseTabCollection caseTabCollection) {
         return caseTabCollection.getTabs().stream().map(tab -> {
-            CaseViewField[] caseViewFields = tab.getTabFields().stream()
+            CommonField[] caseViewFields = tab.getTabFields().stream()
                 .filter(filterCaseTabFieldsBasedOnSecureData(caseDetails))
-                .map(field -> CaseViewField.createFrom(field, data))
+                .map(sortCaseFields())
+                .map(caseTypeTabField -> CaseViewField.createFrom(caseTypeTabField, data))
                 .toArray(CaseViewField[]::new);
-
-            return new CaseViewTab(tab.getId(), tab.getLabel(), tab.getDisplayOrder(), caseViewFields,
+            return new CaseViewTab(tab.getId(), tab.getLabel(), tab.getDisplayOrder(), (CaseViewField[])caseViewFields,
                                    tab.getShowCondition(), tab.getRole());
 
         }).toArray(CaseViewTab[]::new);
+    }
+
+    private Function<CaseTypeTabField, CaseTypeTabField> sortCaseFields() {
+        return field -> {
+            caseViewFieldBuilder.sortComplexCaseFields(field.getCaseField(), null);
+            return field;
+        };
     }
 
     CaseTabCollection getCaseTabCollection(String caseTypeId) {

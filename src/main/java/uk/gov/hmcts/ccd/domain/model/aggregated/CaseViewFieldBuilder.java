@@ -1,5 +1,10 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
+import com.google.common.collect.Lists;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldComplex;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.List;
@@ -7,10 +12,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static java.util.Comparator.comparingInt;
 import static java.util.Optional.ofNullable;
-
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEventField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 
 @Named
 @Singleton
@@ -20,6 +23,7 @@ public class CaseViewFieldBuilder {
         final CaseViewField field = new CaseViewField();
 
         field.setId(eventField.getCaseFieldId());
+        sortComplexCaseFields(caseField, eventField);
         field.setFieldType(caseField.getFieldType());
         field.setHidden(caseField.getHidden());
         field.setHintText(ofNullable(eventField.getHintText()).orElse(caseField.getHintText()));
@@ -36,6 +40,53 @@ public class CaseViewFieldBuilder {
         caseField.propagateACLsToNestedFields();
 
         return field;
+    }
+
+    public void sortComplexCaseFields(final CommonField caseField, final CaseEventField eventField) {
+        if (caseField.isCompound()) {
+            List<CaseField> children = caseField.getFieldType().getChildren();
+            children.forEach(childField -> {
+                if (childField.isCollectionFieldType()) {
+                    sortComplexCaseFields(childField, eventField);
+                } else if (childField.isComplexFieldType()) {
+                    sortComplexCaseFields(childField, eventField);
+                }
+            });
+            List<CaseField> sortedFields = getSortedComplexTypeFields(eventField, children);
+            if (!sortedFields.isEmpty()) {
+                caseField.getFieldType().setChildren(sortedFields);
+            }
+        }
+    }
+
+    private List<CaseField> getSortedComplexTypeFields(final CaseEventField eventField, final List<CaseField> children) {
+        final List<CaseField> sortedCaseFields = Lists.newArrayList();
+        final List<String> orderedEventComplexFieldReferences = getOrderingOfComplexFieldsForEventFieldIfPresent(eventField);
+        if (orderedEventComplexFieldReferences.isEmpty()) {
+            sortedCaseFields.addAll(children.stream()
+                                        .filter(field -> field.getOrder() != null)
+                                        .sorted(comparingInt(CaseField::getOrder))
+                                        .collect(Collectors.toList()));
+        } else {
+            final Map<String, CaseField> childrenCaseIdToCaseField = convertComplexTypeChildrenToMap(children);
+            orderedEventComplexFieldReferences.forEach(reference -> sortedCaseFields.add(childrenCaseIdToCaseField.get(reference)));
+        }
+        return sortedCaseFields;
+    }
+
+    private List<String> getOrderingOfComplexFieldsForEventFieldIfPresent(final CaseEventField eventField) {
+        if (eventField != null) {
+            return eventField.getCaseEventFieldComplex().stream()
+                .filter(field -> field.getOrder() != null)
+                .sorted(comparingInt(CaseEventFieldComplex::getOrder))
+                .map(CaseEventFieldComplex::getReference)
+                .collect(Collectors.toList());
+        }
+        return Lists.newArrayList();
+    }
+
+    private Map<String, CaseField> convertComplexTypeChildrenToMap(final List<CaseField> children) {
+        return children.stream().collect(Collectors.toMap(CaseField::getId, Function.identity()));
     }
 
     public CaseViewField build(CaseField caseField, CaseEventField eventField, Object value) {

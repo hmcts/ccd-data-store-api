@@ -8,8 +8,10 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
+import static java.util.Comparator.comparingInt;
 
 public class FieldType implements Serializable {
 
@@ -76,7 +78,7 @@ public class FieldType implements Serializable {
     public void setFixedListItems(List<FixedListItem> fixedListItems) {
         this.fixedListItems = fixedListItems;
     }
-    
+
     public List<CaseField> getComplexFields() {
         return complexFields;
     }
@@ -96,6 +98,17 @@ public class FieldType implements Serializable {
             return collectionFieldType.complexFields;
         } else {
             return emptyList();
+        }
+    }
+
+    @JsonIgnore
+    public void setChildren(List<CaseField> caseFields) {
+        if (type.equalsIgnoreCase(COMPLEX)) {
+            complexFields = caseFields;
+        } else if (type.equalsIgnoreCase(COLLECTION)) {
+            if (collectionFieldType != null) {
+                collectionFieldType.complexFields = caseFields;
+            }
         }
     }
 

@@ -121,7 +121,7 @@ public class AccessControlService {
         return true;
     }
 
-    public boolean canAccessCaseViewFieldWithCriteria(final CaseViewField caseViewField,
+    public boolean canAccessCaseViewFieldWithCriteria(final CommonField caseViewField,
                                                       final Set<String> userRoles,
                                                       final Predicate<AccessControlList> criteria) {
         return hasAccessControlList(userRoles, criteria, caseViewField.getAccessControlLists());

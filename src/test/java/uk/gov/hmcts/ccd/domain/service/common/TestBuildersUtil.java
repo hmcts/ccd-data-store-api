@@ -1035,6 +1035,11 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public CaseFieldBuilder withOrder(final int order) {
+            caseField.setOrder(order);
+            return this;
+        }
+
         public CaseField build() {
             caseField.setAccessControlLists(accessControlLists);
             caseField.setComplexACLs(complexACLs);

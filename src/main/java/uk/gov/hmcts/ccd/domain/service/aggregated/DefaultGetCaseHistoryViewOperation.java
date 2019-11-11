@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewFieldBuilder;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
@@ -34,9 +35,10 @@ public class DefaultGetCaseHistoryViewOperation extends AbstractDefaultGetCaseVi
         @Qualifier("authorised") GetEventsOperation getEventsOperation,
         UIDefinitionRepository uiDefinitionRepository, CaseTypeService caseTypeService,
         UIDService uidService,
-        DefaultObjectMapperService defaultObjectMapperService) {
+        DefaultObjectMapperService defaultObjectMapperService,
+        CaseViewFieldBuilder caseViewFieldBuilder) {
 
-        super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService, defaultObjectMapperService);
+        super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService, defaultObjectMapperService, caseViewFieldBuilder);
         this.getEventsOperation = getEventsOperation;
     }
 

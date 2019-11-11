@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewFieldBuilder;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
 import uk.gov.hmcts.ccd.domain.model.aggregated.ProfileCaseState;
@@ -44,8 +45,9 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
                                        CaseTypeService caseTypeService,
                                        EventTriggerService eventTriggerService,
                                        UIDService uidService,
-                                       ObjectMapperService objectMapperService) {
-        super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService, objectMapperService);
+                                       ObjectMapperService objectMapperService,
+                                       CaseViewFieldBuilder caseViewFieldBuilder) {
+        super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService, objectMapperService, caseViewFieldBuilder);
         this.getEventsOperation = getEventsOperation;
         this.caseTypeService = caseTypeService;
         this.eventTriggerService = eventTriggerService;
