@@ -5,6 +5,10 @@
   "specs": ["no profile in CCD"],
   "productName": "CCD Data Store",
   "operationName": "Get default setting for user",
+  "caller": {
+    "username": "auto.test.cnp@gmail.com",
+    "password": "Pa55word11"
+  },
   "user": {
     "username": "auto.test.cnp123@gmail.com",
     "password": "Pa55word11"
@@ -16,6 +20,7 @@
     }
   },
   "expectedResponse": {
-    "responseCode": 403
+    "responseCode": 403,
+    "body": {}
   }
 }

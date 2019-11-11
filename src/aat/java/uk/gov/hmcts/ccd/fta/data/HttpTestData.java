@@ -17,6 +17,8 @@ public class HttpTestData {
 
     private String operationName;
 
+    private UserData caller;
+
     private UserData user;
 
     private String uri;
@@ -71,6 +73,14 @@ public class HttpTestData {
 
     public void setOperationName(String operationName) {
         this.operationName = operationName;
+    }
+
+    public UserData getCaller() {
+        return caller;
+    }
+
+    public void setCaller(UserData caller) {
+        this.caller = caller;
     }
 
     public UserData getUser() {
