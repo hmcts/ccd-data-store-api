@@ -1,0 +1,25 @@
+{
+  "_guid_": "S-107",
+  "_extends_": "S-000-Base-Success",
+  "title": "must return 401 when request does not provide valid authentication credentials",
+  "specs": ["a detailed profile in CCD"],
+  "productName": "CCD Data Store",
+  "operationName": "Get default setting for user",
+  "user": {
+    "username": "auto.test.cnpSIVA@gmail.com",
+    "password": "Pa55word1123456"
+  },
+  "caller": {
+    "username": "auto.test.cnpSIVA@gmail.com",
+    "password": "Pa55word1123456"
+  },
+  "uri": "/caseworkers/{uid}/profile",
+  "request": {
+    "headers": {
+      "serviceToken": "s2s"
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 401
+  }
+}
