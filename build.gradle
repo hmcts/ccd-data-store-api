@@ -107,7 +107,8 @@ ext {
     junitVintageVersion = '5.2.0'
     hibernateVersion = '5.2.17.Final'
     powermockVersion = '2.0.0-beta.5'
-    reformLogging = '5.0.1'
+    reformLogging = '5.1.0'
+    appInsightsVersion = '2.4.1'
     swagger2Version = '2.9.2'
     limits = [
             'instruction': 90,
@@ -166,8 +167,14 @@ spotbugs {
 }
 
 dependencies {
-    compile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: reformLogging
-    compile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: reformLogging
+    compile group: 'uk.gov.hmcts.reform', name: 'logging', version: reformLogging
+    compile group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: reformLogging
+
+    // redefining with version 2.4.1 as applicationinsights-agent-2.5.0 has an open issue
+    // https://github.com/glowroot/instrumentation/issues/1
+    compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-logback', version: appInsightsVersion
+    compile group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: appInsightsVersion
+
     compile 'uk.gov.hmcts.reform:properties-volume-spring-boot-starter:0.0.4'
     compile 'uk.gov.hmcts.reform:health-spring-boot-starter:0.0.3'
     compile 'org.projectlombok:lombok:1.18.4'
@@ -202,7 +209,7 @@ dependencies {
     compile group: 'io.springfox', name: 'springfox-swagger2', version: swagger2Version
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: swagger2Version
     compile group: 'org.liquibase', name: 'liquibase-core', version: '3.6.3'
-    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.5'
+    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.10'
     compile (group: 'uk.gov.hmcts.reform.auth', name: 'auth-checker-lib', version: '2.1.3') {
         // TODO remove when auth-checker-lib upgrades its dependency to spring boot 2.0.x
         exclude group: 'uk.gov.hmcts.reform', module: 'java-logging-spring'
@@ -211,11 +218,13 @@ dependencies {
     compile group: 'com.sun.mail', name: 'mailapi', version: '1.6.1'
     compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
     compile group: 'commons-validator', name: 'commons-validator', version: '1.6'
+    // CVE-2019-10086 force update of commons-beanutils.
+    compile group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
     compile group: 'com.jayway.jsonpath', name: 'json-path', version: '2.4.0'
     compile group: 'org.awaitility', name: 'awaitility', version: '3.1.6'
 
     // CVE-2019-12086 - force update of jackson-databind - remove when dependencies move off <2.9.9
-    compile "com.fasterxml.jackson.core:jackson-databind:2.9.9"
+    compile "com.fasterxml.jackson.core:jackson-databind:2.9.10"
 
     // FIXME 0.6 doesn't support jsonb; 0.7 doesn't work on Windows
 //    runtime group: 'com.impossibl.pgjdbc-ng', name: 'pgjdbc-ng', version: '0.6'
@@ -267,6 +276,23 @@ dependencyManagement {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
+        }
+         // CVE-2019-10086
+        dependencySet(group: 'commons-beanutils', version: '1.9.4') {
+            entry 'commons-beanutils'
+        }
+    }
+}
+
+configurations.all {
+    resolutionStrategy {
+        eachDependency { DependencyResolveDetails details ->
+            if (details.requested.group in ['com.fasterxml.jackson.core', 'com.fasterxml.jackson.module', 'com.fasterxml.jackson.datatype']) {
+                details.useVersion '2.9.10'
+            }
+            if (details.requested.name == 'jackson-databind') {
+                details.useVersion '2.9.10'
+            }
         }
     }
 }
@@ -468,8 +494,9 @@ jacoco {
 
 sonarqube {
     properties {
-        property "sonar.exclusions", "build/generated-sources/**/*.java"
-        property "sonar.coverage.exclusions", "src/main/java/uk/gov/hmcts/ccd/data/definition/DefaultCaseDefinitionRepository.java,src/main/java/uk/gov/hmcts/ccd/AppInsights.java"
+        property "sonar.exclusions", "build/generated-sources/**/*.java,**/service/doclink/**"
+        property "sonar.coverage.exclusions", "src/main/java/uk/gov/hmcts/ccd/data/definition/DefaultCaseDefinitionRepository.java,src/main/java/uk/gov/hmcts/ccd/AppInsights.java," +
+                "**/DocLinksRestoreEndpoint.java,**/service/doclink/**"
         property "sonar.jacoco.reportPaths", "${project.buildDir}/jacoco/junitPlatformTest.exec"
         property "sonar.junit.reportPaths", "${project.buildDir}/test-results/junit-platform"
         property "sonar.projectName", "ccd-data-store-api"
@@ -500,7 +527,7 @@ jacocoTestReport {
 
     afterEvaluate {
         classDirectories = files(classDirectories.files.collect {
-            fileTree(dir: it, exclude: ['uk/gov/hmcts/ccd/domain/types/sanitiser/document/**'])
+            fileTree(dir: it, exclude: ['uk/gov/hmcts/ccd/domain/types/sanitiser/document/**', '**/service/doclink/**'])
         })
     }
 

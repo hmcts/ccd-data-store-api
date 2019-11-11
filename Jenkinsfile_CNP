@@ -53,6 +53,13 @@ def vaultOverrides = [
     'preview' : 'aat',
     'spreview': 'saat'
 ]
+// Vars needed for functional and smoke tests run against AKS
+env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
+env.S2S_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+env.CCD_GW_SERVICE_NAME = "ccd_gw"
+env.OAUTH2_CLIENT_ID = "ccd_gateway"
+env.OAUTH2_REDIRECT_URI = "https://www-ccd.aat.platform.hmcts.net/oauth2redirect"
+env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.service.core-compute-aat.internal"
 
 withPipeline(type, product, component) {
     onMaster {
@@ -63,18 +70,12 @@ withPipeline(type, product, component) {
     }
     onPR {
         enableSlackNotifications('#ccd-pr-builds')
-
-        env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
-        env.S2S_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
-        env.CCD_GW_SERVICE_NAME = "ccd_gw"
-        env.OAUTH2_CLIENT_ID = "ccd_gateway"
-        env.OAUTH2_REDIRECT_URI = "https://www-ccd.aat.platform.hmcts.net/oauth2redirect"
-        env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.service.core-compute-aat.internal"
     }
 
     overrideVaultEnvironments(vaultOverrides)
+    enableAksStagingDeployment()
     loadVaultSecrets(secrets)
-    enableDbMigration()
+    enableDbMigration('ccd')
     enableDockerBuild()
     installCharts()
 }

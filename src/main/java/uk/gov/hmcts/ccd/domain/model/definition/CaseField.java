@@ -1,24 +1,27 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
+import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import lombok.ToString;
-import org.apache.commons.lang3.StringUtils;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
-
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static java.lang.String.format;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
 
 @ToString
 @ApiModel(description = "")
-public class CaseField implements Serializable {
+public class CaseField implements Serializable, CommonField {
 
     private static final long serialVersionUID = -4257574164546267919L;
 
@@ -41,7 +44,11 @@ public class CaseField implements Serializable {
     private String showConditon = null;
     @JsonProperty("acls")
     private List<AccessControlList> accessControlLists;
+    @JsonProperty("complexACLs")
+    private List<ComplexACL> complexACLs = new ArrayList<>();
     private boolean metadata;
+    @JsonProperty("display_context")
+    private String displayContext;
 
     public String getId() {
         return id;
@@ -115,9 +122,13 @@ public class CaseField implements Serializable {
         this.liveUntil = liveUntil;
     }
 
-    public String getShowConditon() { return showConditon; }
+    public String getShowConditon() {
+        return showConditon;
+    }
 
-    public void setShowConditon(String showConditon) { this.showConditon = showConditon; }
+    public void setShowConditon(String showConditon) {
+        this.showConditon = showConditon;
+    }
 
     public List<AccessControlList> getAccessControlLists() {
         return accessControlLists;
@@ -125,6 +136,14 @@ public class CaseField implements Serializable {
 
     public void setAccessControlLists(List<AccessControlList> accessControlLists) {
         this.accessControlLists = accessControlLists;
+    }
+
+    public List<ComplexACL> getComplexACLs() {
+        return complexACLs;
+    }
+
+    public void setComplexACLs(List<ComplexACL> complexACLs) {
+        this.complexACLs = complexACLs;
     }
 
     public boolean isMetadata() {
@@ -135,62 +154,142 @@ public class CaseField implements Serializable {
         this.metadata = metadata;
     }
 
-    @JsonIgnore
-    public boolean isCollectionFieldType() {
-        return FieldType.COLLECTION.equalsIgnoreCase(fieldType.getType());
+    public String getDisplayContext() {
+        return displayContext;
+    }
+
+    public void setDisplayContext(String displayContext) {
+        this.displayContext = displayContext;
     }
 
     @JsonIgnore
     public void propagateACLsToNestedFields() {
         propagateACLsToNestedFields(this, this.accessControlLists);
+        applyComplexACLs();
+        clearACLsForMissingComplexACLs();
     }
 
-    /**
-     * Gets a Complex field nested caseField by specified path.
-     *
-     * @param path Path to a nested CaseField
-     * @return A nested CaseField or 'this' when path is blank
-     */
-    @JsonIgnore
-    public CaseField getComplexFieldNestedField(String path) {
-        if (StringUtils.isBlank(path)) {
-            return this;
-        }
-        //TODO: remove BadRequestException from here, it's a rest layer exception it does not belong here
-        if (this.getFieldType().getChildren().isEmpty()) {
-            throw new BadRequestException(format("CaseField %s has no nested elements.", this.id));
-        }
-        List<String> pathElements = Arrays.stream(path.trim().split("\\.")).collect(Collectors.toList());
+    private void applyComplexACLs() {
+        this.complexACLs.forEach(complexACL -> {
+            final CaseField nestedField = (CaseField) this.getComplexFieldNestedField(complexACL.getListElementCode())
+                .orElseThrow(() -> new RuntimeException(format("CaseField %s has no nested elements with code %s.", this.getId(), complexACL.getListElementCode())));
+            nestedField.getAccessControlListByRole(complexACL.getRole())
+                .ifPresent(accessControlList -> nestedField.accessControlLists.remove(accessControlList));
+            nestedField.getAccessControlLists().add(complexACL);
 
-        return reduce(this.getFieldType().getChildren(), pathElements);
+            propagateACLsToNestedFields(nestedField, nestedField.getAccessControlLists());
+        });
     }
 
-    @JsonIgnore
-    private CaseField reduce(List<CaseField> caseFields, List<String> pathElements) {
-        String firstPathElement = pathElements.get(0);
-
-        CaseField caseField = caseFields.stream().filter(e -> e.getId().equals(firstPathElement)).findFirst()
-            .orElseThrow(() -> new BadRequestException(format("Nested element not found for %s", firstPathElement)));
-
-        if (pathElements.size() == 1) {
-            return caseField;
-        } else {
-            List<CaseField> newCaseFields = caseField.getFieldType().getChildren();
-            List<String> tail = pathElements.subList(1, pathElements.size());
-
-            return reduce(newCaseFields, tail);
-        }
-    }
-
-    @JsonIgnore
-    private static void propagateACLsToNestedFields(CaseField caseField, List<AccessControlList> acls) {
-        if (caseField.getFieldType().getType().equalsIgnoreCase(COMPLEX) || caseField.getFieldType().getType().equalsIgnoreCase(COLLECTION)) {
-            caseField.getFieldType().getChildren().forEach(nestedField -> {
-                if (nestedField.getAccessControlLists() == null || nestedField.getAccessControlLists().isEmpty()) {
-                    nestedField.setAccessControlLists(acls);
+    private void clearACLsForMissingComplexACLs() {
+        if (this.isCompound()) {
+            final List<String> allPaths = buildAllDottedComplexFieldPossibilities(this.getFieldType().getChildren());
+            this.complexACLs.forEach(complexACL -> {
+                Optional<String> parentPath = getParentPath(complexACL.getListElementCode());
+                List<String> siblings;
+                if (parentPath.isPresent()) {
+                    siblings = filterSiblings(parentPath.get(), complexACL.getListElementCode(), allPaths);
+                } else {
+                    siblings = filterSiblings("", complexACL.getListElementCode(), allPaths);
                 }
+                removeACLS(findSiblingsWithNoComplexACLs(siblings), complexACL.getRole());
+            });
+        }
+    }
+
+    private void removeACLS(final List<String> siblingsWithNoComplexACLs, final String role) {
+        siblingsWithNoComplexACLs.stream().forEach(s -> {
+            final CaseField nestedElement = (CaseField) this.getComplexFieldNestedField(s)
+                .orElseThrow(() -> new RuntimeException(format("CaseField %s has no nested elements with code %s.", this.getId(), s)));
+            nestedElement.getAccessControlListByRole(role).ifPresent(acl -> nestedElement.getAccessControlLists().remove(acl));
+            propagateACLsToNestedFields(nestedElement, nestedElement.getAccessControlLists());
+        });
+    }
+
+    private List<String> findSiblingsWithNoComplexACLs(final List<String> siblings) {
+        return siblings
+            .stream()
+            .filter(s -> this.complexACLs.stream().noneMatch(complexACL -> complexACL.getListElementCode().equalsIgnoreCase(s)))
+            .collect(toList());
+    }
+
+    private List<String> filterSiblings(String parent, String me, List<String> allPaths) {
+        if (parent.equalsIgnoreCase("")) {
+            return allPaths
+                .stream()
+                .filter(s -> s.indexOf('.') == -1
+                    && !s.equalsIgnoreCase(me))
+                .collect(toList());
+        } else {
+            return allPaths
+                .stream()
+                .filter(s -> s.startsWith(parent)
+                    && !s.equalsIgnoreCase(parent)
+                    && !s.equalsIgnoreCase(me)
+                    && isNotAChild(parent, s))
+                .collect(toList());
+        }
+    }
+
+    private boolean isNotAChild(final String parent, final String s) {
+        return s.indexOf('.', parent.length()) == parent.length()
+            && (s.split("\\.").length == parent.split("\\.").length + 1);
+    }
+
+    private Optional<String> getParentPath(String path) {
+        return path.lastIndexOf('.') > 0 ? Optional.of(path.substring(0, path.lastIndexOf('.'))) : Optional.empty();
+    }
+
+    @JsonIgnore
+    Optional<AccessControlList> getAccessControlListByRole(String role) {
+        return this.accessControlLists.stream().filter(acl -> acl.getRole().equalsIgnoreCase(role)).findFirst();
+    }
+
+    private static void propagateACLsToNestedFields(CaseField caseField, List<AccessControlList> acls) {
+        if (caseField.isCompound()) {
+            caseField.getFieldType().getChildren().forEach(nestedField -> {
+                final List<AccessControlList> cloneACLs = acls.stream().map(AccessControlList::duplicate).collect(toList());
+                nestedField.setAccessControlLists(cloneACLs);
                 propagateACLsToNestedFields(nestedField, acls);
             });
         }
+    }
+
+    private List<String> buildAllDottedComplexFieldPossibilities(List<CaseField> caseFieldEntities) {
+        List<String> allSubTypePossibilities = new ArrayList<>();
+        List<CaseField> fieldEntities = caseFieldEntities.stream()
+            .filter(Objects::nonNull)
+            .collect(Collectors.<CaseField>toList());
+        prepare(allSubTypePossibilities, "", fieldEntities);
+        return allSubTypePossibilities;
+    }
+
+    private void prepare(List<String> allSubTypePossibilities,
+                         String startingString,
+                         List<CaseField> caseFieldEntities) {
+
+        String concatenationCharacter = isBlank(startingString) ? "" : ".";
+        caseFieldEntities.forEach(caseField -> {
+            allSubTypePossibilities.add(startingString + concatenationCharacter + caseField.getId());
+
+            List<CaseField> complexFields;
+            if (caseField.getFieldType() == null) {
+                complexFields = Collections.emptyList();
+            } else if (isCollection(caseField)) {
+                complexFields = caseField.getFieldType().getCollectionFieldType().getComplexFields();
+            } else {
+                complexFields = caseField.getFieldType().getComplexFields();
+            }
+
+            prepare(allSubTypePossibilities,
+                startingString + concatenationCharacter + caseField.getId(),
+                complexFields.stream().map(CaseField.class::cast).collect(toList()));
+        });
+    }
+
+    private boolean isCollection(CaseField caseField) {
+        return caseField.getFieldType().getCollectionFieldType() != null
+            && caseField.getFieldType().getCollectionFieldType().getComplexFields() != null
+            && !caseField.getFieldType().getCollectionFieldType().getComplexFields().isEmpty();
     }
 }

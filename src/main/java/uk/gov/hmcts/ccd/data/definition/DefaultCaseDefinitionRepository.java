@@ -26,6 +26,7 @@ import java.util.Map;
 
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
@@ -90,7 +91,9 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         LOG.debug("retrieving case type definition for case type: {}", caseTypeId);
         try {
             final HttpEntity requestEntity = new HttpEntity<CaseType>(securityUtils.authorizationHeaders());
-            return restTemplate.exchange(applicationParams.caseTypeDefURL(caseTypeId), HttpMethod.GET, requestEntity, CaseType.class).getBody();
+            final CaseType caseType = restTemplate.exchange(applicationParams.caseTypeDefURL(caseTypeId), HttpMethod.GET, requestEntity, CaseType.class).getBody();
+            caseType.getCaseFields().stream().forEach(CaseField::propagateACLsToNestedFields);
+            return caseType;
 
         } catch (Exception e) {
             LOG.warn("Error while retrieving case type", e);

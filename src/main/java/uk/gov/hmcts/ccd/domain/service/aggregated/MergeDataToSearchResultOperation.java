@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
-import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
@@ -35,23 +35,18 @@ import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.LABEL;
 @Named
 @Singleton
 public class MergeDataToSearchResultOperation {
-    protected static final String WORKBASKET_VIEW = "WORKBASKET";
     private static final String NESTED_ELEMENT_NOT_FOUND_FOR_PATH = "Nested element not found for path %s";
 
-    private final UIDefinitionRepository uiDefinitionRepository;
     private final UserRepository userRepository;
 
-    public MergeDataToSearchResultOperation(final UIDefinitionRepository uiDefinitionRepository,
-                                            @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository) {
-        this.uiDefinitionRepository = uiDefinitionRepository;
+    public MergeDataToSearchResultOperation(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     public SearchResultView execute(final CaseType caseType,
+                                    final SearchResult searchResult,
                                     final List<CaseDetails> caseDetails,
-                                    final String view,
                                     final String resultError) {
-        final SearchResult searchResult = getSearchResult(caseType, view);
 
         final List<SearchResultViewColumn> viewColumns = buildSearchResultViewColumn(caseType, searchResult);
 
@@ -106,7 +101,9 @@ public class MergeDataToSearchResultOperation {
     }
 
     private FieldType buildCaseFieldType(SearchResultField searchResultField, CaseField caseField) {
-        return caseField.getComplexFieldNestedField(searchResultField.getCaseFieldPath()).getFieldType();
+        CommonField resultField = caseField.getComplexFieldNestedField(searchResultField.getCaseFieldPath())
+            .orElseThrow(() -> new BadRequestException(format("CaseField %s has no nested elements with code %s.", caseField.getId(), searchResultField.getCaseFieldPath())));
+        return resultField.getFieldType();
     }
 
     private SearchResultViewItem buildSearchResultViewItem(final CaseDetails caseDetails,
@@ -172,11 +169,4 @@ public class MergeDataToSearchResultOperation {
             .collect(Collectors.toMap(CaseField::getId, caseField -> instance.textNode(caseField.getLabel())));
     }
 
-    private SearchResult getSearchResult(final CaseType caseType, final String view) {
-        if (WORKBASKET_VIEW.equalsIgnoreCase(view)) {
-            return uiDefinitionRepository.getWorkBasketResult(caseType.getId());
-        } else {
-            return uiDefinitionRepository.getSearchResult(caseType.getId());
-        }
-    }
 }

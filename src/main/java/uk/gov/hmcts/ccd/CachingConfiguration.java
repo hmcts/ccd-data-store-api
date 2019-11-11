@@ -19,6 +19,7 @@ public class CachingConfiguration {
     public Config hazelCastConfig() {
 
         Config config = new Config();
+        config.setProperty("hazelcast.phone.home.enabled", "false");
         NetworkConfig networkConfig = config.setInstanceName("hazelcast-instance-ccd").getNetworkConfig();
         networkConfig.getJoin().getMulticastConfig().setEnabled(false);
         networkConfig.getJoin().getTcpIpConfig().setEnabled(false);

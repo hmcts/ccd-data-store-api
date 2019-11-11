@@ -1,48 +1,60 @@
 java:
-  image: hmcts.azurecr.io/hmcts/ccd-data-store-api:latest
+  image: 'hmctspublic.azurecr.io/ccd/ccd-data-store-api:latest'
   applicationPort: 4452
+  aadIdentityName: ccd
   keyVaults:
-    s2s:
-      resourceGroup: rpe-service-auth-provider
-      secrets:
-        - microservicekey-ccd-data
     ccd:
-      resourceGroup: ccd-shared
       secrets:
-        - ccd-data-store-api-draftStoreEncryptionSecret
+        - data-store-api-POSTGRES-PASS
+        - data-store-api-draftStoreEncryptionSecret
+        - data-store-api-draft-key
+        - ccd-data-s2s-secret
+        - ccd-ELASTIC-SEARCH-URL
+        - ccd-ELASTIC-SEARCH-DATA-NODES-URL
+        - ccd-ELASTIC-SEARCH-PASSWORD
+        - AppInsightsInstrumentationKey
   environment:
-    ENABLE_DB_MIGRATE: true
-    DATA_STORE_DB_HOST: "{{ .Release.Name }}-postgresql"
+    ENABLE_DB_MIGRATE: false
     DATA_STORE_DB_PORT: 5432
-    DATA_STORE_DB_NAME: "{{ .Values.postgresql.postgresqlDatabase}}"
-    DATA_STORE_DB_USERNAME: "{{ .Values.postgresql.postgresqlUsername}}"
-    DATA_STORE_DB_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
+    DATA_STORE_DB_NAME: ccd_data_store
+    DATA_STORE_DB_HOST: ccd-data-store-api-postgres-db-{{ .Values.global.environment }}.postgres.database.azure.com
+    DATA_STORE_DB_USERNAME: ccd@ccd-data-store-api-postgres-db-{{ .Values.global.environment }}
+    DATA_STORE_DB_OPTIONS: "?stringtype=unspecified&sslmode=require"
+    DATA_STORE_DB_MAX_POOL_SIZE: 48
 
-    CCD_DM_DOMAIN: https?://dm-store.*
-    
     CCD_DRAFT_TTL_DAYS: 180
 
-    DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_data,ccd_gw,ccd_ps,probate_backend,divorce_ccd_submission,sscs,sscs_bulkscan,cmc,cmc_claim_store,cmc_claim_external_api,jui_webapp,pui_webapp,bulk_scan_orchestrator,fpl_case_service,iac,finrem_ccd_data_migrator,finrem_case_orchestration,employment_tribunals,ethos_repl_service
+    DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_data,ccd_gw,ccd_ps,probate_backend,divorce_ccd_submission,sscs,sscs_bulkscan,cmc,cmc_claim_store,cmc_claim_external_api,jui_webapp,pui_webapp,bulk_scan_orchestrator,fpl_case_service,iac,finrem_ccd_data_migrator,finrem_case_orchestration,employment_tribunals,ethos_repl_service,ccpay_bubble,ctsc_work_allocation,em_ccd_orchestrator,xui_webapp
 
     DEFINITION_CACHE_MAX_IDLE_SEC: 259200
     DEFINITION_CACHE_LATEST_VERSION_TTL_SEC: 1
     DEFINITION_CACHE_MAX_SIZE: 5000
     DEFINITION_CACHE_EVICTION_POLICY: NONE
 
-    ELASTIC_SEARCH_ENABLED: false
+    ELASTIC_SEARCH_ENABLED: true
     ELASTIC_SEARCH_HOSTS: ''
     ELASTIC_SEARCH_DATA_NODES_HOSTS: ''
     ELASTIC_SEARCH_PASSWORD: ''
     ELASTIC_SEARCH_BLACKLIST: query_string
     ELASTIC_SEARCH_CASE_INDEX_NAME_FORMAT: '%s_cases'
     ELASTIC_SEARCH_CASE_INDEX_TYPE: _doc
+    ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: 'true'
+    ELASTIC_SEARCH_NODES_DISCOVERY_FREQUENCY_MILLIS: '5000'
+    ELASTIC_SEARCH_NODES_DISCOVERY_FILTER: '_all'
 
-    IDAM_S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
-    DEFINITION_STORE_HOST: http://ccd-definition-store-api-aat.service.core-compute-aat.internal
-    USER_PROFILE_HOST: http://ccd-user-profile-api-aat.service.core-compute-aat.internal
+    JPA_CRITERIA_IN_SEARCH_ENABLED: false
+
+    IDAM_S2S_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    DEFINITION_STORE_HOST: http://ccd-definition-store-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    USER_PROFILE_HOST: http://ccd-user-profile-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     CCD_DM_DOMAIN: ^https?://(?:api-gateway\\.preprod\\.dm\\.reform\\.hmcts\\.net|dm-store-aat\\.service\\.core-compute-aat\\.internal(?::\\d+)?)
-    IDAM_USER_URL: https://idam-api.aat.platform.hmcts.net
-    CCD_DRAFT_STORE_URL: http://draft-store-service-aat.service.core-compute-aat.internal
+    IDAM_USER_URL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
+    CCD_DRAFT_STORE_URL: http://draft-store-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     CCD_DEFAULTPRINTURL: https://return-case-doc-ccd.nonprod.platform.hmcts.net/jurisdictions/:jid/case-types/:ctid/cases/:cid
-  postgresql:
-    postgresqlDatabase: ccd_data_store
+
+    HTTP_CLIENT_CONNECTION_TIMEOUT: '10000'
+    HTTP_CLIENT_READ_TIMEOUT: '60000'
+    HTTP_CLIENT_MAX_TOTAL: '200'
+    HTTP_CLIENT_SECONDS_IDLE_CONNECTION: '120'
+    HTTP_CLIENT_MAX_CLIENT_PER_ROUTE: '20'
+    HTTP_CLIENT_VALIDATE_AFTER_INACTIVITY: '0'
