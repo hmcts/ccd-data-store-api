@@ -1,0 +1,36 @@
+{
+  "_guid_": "S-133",
+  "_extends_": "S-000-Base-Success",
+  "title": "must return 400 if the sort direction in input parameters is not in ASC or DESC",
+  "specs": [
+    "a detailed profile in CCD"
+  ],
+  "productName": "CCD Data Store",
+  "operationName": "Get the pagination metadata for a case data search for Case Worker",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/pagination_metadata",
+  "request": {
+    "headers": {
+      "serviceToken": "s2s"
+    },
+    "pathParam": {
+      "jid": "AUTOTEST1",
+      "ctid" : "AAT"
+    }
+  },
+  "expectedResponse": {
+    "user": {
+      "idam": {
+        "id": "851ac816-c7dc-4ea7-b59e-ad96c9a8c862",
+        "email": "auto.test.cnp@gmail.com",
+        "forename": "testfirstname",
+        "surname": "testsurname",
+        "roles": [
+          "caseworker",
+          "caseworker-autotest1",
+          "ccd-import"
+        ],
+        "defaultService": null
+      }
+    }
+  }
+}
