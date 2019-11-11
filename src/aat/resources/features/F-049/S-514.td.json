@@ -1,0 +1,21 @@
+{
+  "_guid_": "S-514",
+  "_extends_": "S-000-Base-Success",
+  "title": "must return 404 when no case found for the given Event ID",
+  "specs": ["Start case creation as Case worker"],
+  "productName": "CCD Data Store",
+  "operationName": "Start case creation as Case worker",
+  "user": {
+    "username": "auto.test.cnp123@gmail.com",
+    "password": "Pa55word11"
+  },
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
+  "request": {
+    "headers": {
+      "serviceToken": "s2s"
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 404
+  }
+}
