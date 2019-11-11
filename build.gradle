@@ -146,7 +146,10 @@ configurations {
 
     aatCompile.extendsFrom(testCompile)
     aatRuntime.extendsFrom(testRuntime)
-    cucumberRuntime.extendsFrom(functionalRuntime)
+//    cucumberRuntime.extendsFrom(functionalRuntime)
+    cucumberRuntime {
+        extendsFrom testImplementation
+    }
 }
 
 checkstyle {
@@ -176,7 +179,9 @@ dependencies {
     // https://github.com/glowroot/instrumentation/issues/1
     compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-logback', version: appInsightsVersion
     compile group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: appInsightsVersion
-
+    compile group: 'io.cucumber', name: 'cucumber-core', version: '4.8.0'
+    compile group: 'io.cucumber', name: 'cucumber-html', version: '0.2.7'
+    compile group: 'net.masterthought', name: 'cucumber-reporting', version: '4.11.2'
     compile 'uk.gov.hmcts.reform:properties-volume-spring-boot-starter:0.0.4'
     compile 'uk.gov.hmcts.reform:health-spring-boot-starter:0.0.3'
     compile 'org.projectlombok:lombok:1.18.4'
@@ -235,6 +240,8 @@ dependencies {
 
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation('org.springframework.cloud:spring-cloud-starter-contract-stub-runner')
+    testImplementation 'io.cucumber:cucumber-java8:4.7.4'
+    testImplementation 'io.cucumber:cucumber-junit:4.7.4'
     testCompile ('com.opentable.components:otj-pg-embedded:0.12.0')
     testCompile ('com.github.tomakehurst:wiremock-jre8:2.21.0')
     testCompile ('org.springframework.cloud:spring-cloud-contract-wiremock:2.1.0.RELEASE')
@@ -267,6 +274,10 @@ dependencies {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
     }
     compile 'org.jooq:jool-java-8:0.9.14'
+}
+
+repositories {
+    mavenCentral()
 }
 // end::dependencies[]
 
@@ -659,17 +670,17 @@ task functional(type: Test) {
     setClasspath(sourceSets.aat.runtimeClasspath)
     include "uk/gov/hmcts/ccd/datastore/tests/functional/**"
     include "uk/gov/hmcts/ccd/datastore/tests/v2/**"
-    useJUnitPlatform()
+//    useJUnitPlatform()
 
-    doFirst {
-        generateCucumberReports.enabled = true
-        javaexec {
-            main = "io.cucumber.core.cli.Main"
-            classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
-            args = ['--plugin', 'pretty', '--plugin', "json:${projectDir}/target/cucumber.json", '--glue', 'uk.gov.hmcts.ccd.fta.steps', 'src/aat/resources/features']
-        }
-    }
-}
+     doFirst {
+         generateCucumberReports.enabled = true
+         javaexec {
+             main = "io.cucumber.core.cli.Main"
+             classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
+             args = ['--plugin', 'pretty', '--plugin', "json:${projectDir}/target/cucumber.json", '--glue', 'uk.gov.hmcts.ccd.fta.steps', 'src/aat/resources/features']
+         }
+     }
+ }
 
 cucumberReports {
     outputDir = file("${projectDir}/target/cucumber")
@@ -718,4 +729,14 @@ task sendCoverageToCodacy(type: JavaExec, dependsOn: jacocoTestReport) {
 task installDist(overwrite: true) {
     // This task must be overwritten to do as it's breaking JAR packaging and it's a mandatory step of swagger
     // documentation publication.
+}
+task cucumber() {
+    dependsOn assemble, compileTestJava
+    doLast {
+        javaexec {
+            main = "io.cucumber.core.cli.Main"
+            classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output
+            args = ['--plugin', 'pretty', '--glue', 'gradle.cucumber', 'src/aat/java/resources']
+        }
+    }
 }
