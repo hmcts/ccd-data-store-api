@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.fta.steps;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 public interface BackEndFunctionalTestAutomationDSL {
 
     // DSL Element:
@@ -12,7 +14,7 @@ public interface BackEndFunctionalTestAutomationDSL {
 
     // DSL Element:
     // "a request is prepared with appropriate values"
-    public void prepareARequestWithAppropriateValues();
+    public void prepareARequestWithAppropriateValues() throws JsonProcessingException;
 
     // DSL Element:
     // "it is submitted to call the {} operation of {}"
