@@ -17,8 +17,6 @@ public class HttpTestData {
 
     private String operationName;
 
-    private UserData caller;
-
     private UserData user;
 
     private String uri;
@@ -75,14 +73,6 @@ public class HttpTestData {
         this.operationName = operationName;
     }
 
-    public UserData getCaller() {
-        return caller;
-    }
-
-    public void setCaller(UserData caller) {
-        this.caller = caller;
-    }
-
     public UserData getUser() {
         return user;
     }
@@ -117,6 +107,10 @@ public class HttpTestData {
 
     public boolean meetsSpec(String specification) {
         return specs.contains(specification);
+    }
+
+    public boolean meetsOperationOfProduct(String operationName, String productName) {
+        return operationName.equals(this.operationName) && productName.equals(this.productName);
     }
 
 }

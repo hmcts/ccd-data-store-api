@@ -10,7 +10,7 @@ public class RequestData {
 
     private Map<String, Object> queryParams;
 
-    private byte[] body;
+    private Map<String, Object> body;
 
     public Map<String, Object> getHeaders() {
         return headers;
@@ -36,11 +36,11 @@ public class RequestData {
         this.queryParams = queryParams;
     }
 
-    public byte[] getBody() {
+    public Map<String, Object> getBody() {
         return body;
     }
 
-    public void setBody(byte[] body) {
+    public void setBody(Map<String, Object> body) {
         this.body = body;
     }
 
