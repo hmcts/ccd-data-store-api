@@ -1,16 +1,15 @@
 package uk.gov.hmcts.ccd.fta.steps;
 
-import org.junit.Assert;
-
-import java.util.List;
-
 import io.cucumber.core.api.Scenario;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import org.junit.Assert;
 import uk.gov.hmcts.ccd.fta.data.ResponseData;
 import uk.gov.hmcts.ccd.fta.data.UserData;
+
+import java.util.List;
 
 public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTestAtuomationDSL {
 
@@ -110,5 +109,76 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         boolean check = scenarioContext.getTestData().meetsSpec(responseSpecification);
         Assert.assertTrue(message, check);
     }
+
+    @Given("an appropriate test context as detailed in the test data source,")
+    public void an_appropriate_test_context_as_detailed_in_the_test_data_source() {
+
+    }
+
+    @Given("a user with an existing case in CCD,")
+    public void a_user_with_an_existing_case_in_CCD() {
+
+    }
+
+    @When("a request is prepared with appropriate values,")
+    public void a_request_is_prepared_with_appropriate_values() {
+
+    }
+
+    @When("failed to provide any authentication credentials within the request.")
+    public void failed_to_provide_any_authentication_credentials_within_the_request() {
+
+    }
+
+    @Then("a negative response is received,")
+    public void a_negative_response_is_received() {
+
+    }
+
+    @Then("the response has all the details as expected.")
+    public void the_response_has_all_the_details_as_expected() {
+
+    }
+
+    @When("a user Access Denied i.e. you don't have permission to access,")
+    public void a_user_Access_Denied_i_e_you_don_t_have_permission_to_access() {
+
+    }
+
+    @Given("a user with a non-existing Idam user ID in CCD,")
+    public void a_user_with_a_non_existing_Idam_user_ID_in_CCD() {
+
+    }
+
+    @When("the request body can't be parsed")
+    public void the_request_body_can_t_be_parsed() {
+
+    }
+
+    @Then("a positive response is received,")
+    public void a_positive_response_is_received() {
+
+    }
+
+    @Given("a user with a non-existing Jurisdiction ID in CCD,")
+    public void a_user_with_a_non_existing_Jurisdiction_ID_in_CCD() {
+
+    }
+
+    @Given("a user with a non-existing Case type ID in CCD,")
+    public void a_user_with_a_non_existing_Case_type_ID_in_CCD() {
+
+    }
+
+    @Given("a user with a non-existing Case ID in CCD,")
+    public void a_user_with_a_non_existing_Case_ID_in_CCD() {
+
+    }
+
+    @Given("a user with a non-existing Event ID in CCD,")
+    public void a_user_with_a_non_existing_Event_ID_in_CCD() {
+
+    }
+
 
 }

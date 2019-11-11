@@ -4,7 +4,7 @@ Feature: Start case creation as Case worker
   @S-231
   Scenario: must return 401 when request does not provide valid authentication credentials
     Given   an appropriate test context as detailed in the test data source,
-    And     a user with an existing case in CCD
+    And     a user with an existing case in CCD,
     When    a request is prepared with appropriate values,
     And     failed to provide any authentication credentials within the request.
     And        it is submitted to call the [Start case creation as Case worker] operation of [CCD Data Store],
@@ -14,7 +14,7 @@ Feature: Start case creation as Case worker
   @S-232
   Scenario: must return 403 when request provides authentic credentials without authorized access to the operation
     Given   an appropriate test context as detailed in the test data source,
-    And     a user with an existing case in CCD
+    And     a user with an existing case in CCD,
     When    a request is prepared with appropriate values,
     And     a user Access Denied i.e. you don't have permission to access,
     And        it is submitted to call the [Start case creation as Case worker] operation of [CCD Data Store],
@@ -33,7 +33,7 @@ Feature: Start case creation as Case worker
   @S-234
   Scenario: must return 422 when process could not be started
     Given   an appropriate test context as detailed in the test data source,
-    And     a user with an existing case in CCD
+    And     a user with an existing case in CCD,
     When    a request is prepared with appropriate values,
     And     the request body can't be parsed
     And     it is submitted to call the [Start case creation as Case worker] operation of [CCD Data Store],

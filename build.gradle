@@ -505,7 +505,7 @@ jsonSchema2Pojo {
 }
 
 jacoco {
-    toolVersion = "0.8.0"
+    toolVersion = "0.8.4"
 }
 
 sonarqube {
@@ -670,16 +670,16 @@ task functional(type: Test) {
     setClasspath(sourceSets.aat.runtimeClasspath)
     include "uk/gov/hmcts/ccd/datastore/tests/functional/**"
     include "uk/gov/hmcts/ccd/datastore/tests/v2/**"
-//    useJUnitPlatform()
+    useJUnitPlatform()
 
-     doFirst {
-         generateCucumberReports.enabled = true
-         javaexec {
-             main = "io.cucumber.core.cli.Main"
-             classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
-             args = ['--plugin', 'pretty', '--plugin', "json:${projectDir}/target/cucumber.json", '--glue', 'uk.gov.hmcts.ccd.fta.steps', 'src/aat/resources/features']
-         }
-     }
+//     doFirst {
+//         generateCucumberReports.enabled = true
+//         javaexec {
+//             main = "io.cucumber.core.cli.Main"
+//             classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
+//             args = ['--plugin', 'pretty', '--plugin', "json:${projectDir}/target/cucumber.json", '--glue', 'uk.gov.hmcts.ccd.fta.steps', 'src/aat/resources/features']
+//         }
+//     }
  }
 
 cucumberReports {
@@ -735,8 +735,10 @@ task cucumber() {
     doLast {
         javaexec {
             main = "io.cucumber.core.cli.Main"
-            classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output
-            args = ['--plugin', 'pretty', '--glue', 'gradle.cucumber', 'src/aat/java/resources']
+//            classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output
+//            args = ['--plugin', 'pretty', '--glue', 'gradle.cucumber', 'src/aat/java/resources']
+            classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
+             args = ['--plugin', 'pretty', '--plugin', "json:${projectDir}/target/cucumber.json", '--glue', 'uk.gov.hmcts.ccd.fta.steps', 'src/aat/resources/features']
         }
     }
 }
