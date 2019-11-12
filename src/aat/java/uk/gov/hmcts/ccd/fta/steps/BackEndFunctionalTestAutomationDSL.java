@@ -1,6 +1,10 @@
 package uk.gov.hmcts.ccd.fta.steps;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+
+import java.io.IOException;
 
 public interface BackEndFunctionalTestAutomationDSL {
 
@@ -14,11 +18,11 @@ public interface BackEndFunctionalTestAutomationDSL {
 
     // DSL Element:
     // "a request is prepared with appropriate values"
-    public void prepareARequestWithAppropriateValues() throws JsonProcessingException;
+    public void prepareARequestWithAppropriateValues() throws IOException;
 
     // DSL Element:
     // "it is submitted to call the {} operation of {}"
-    public void submitTheRequestToCallAnOperationOfAProduct(String operation, String productName);
+    public void submitTheRequestToCallAnOperationOfAProduct(String operation, String productName) throws IOException;
 
     // DSL Element:
     // "a positive response is received"
@@ -30,7 +34,7 @@ public interface BackEndFunctionalTestAutomationDSL {
 
     // DSL Element:
     // "the response has all the details as expected"
-    public void verifyThatTheResponseHasAllTheDetailsAsExpected();
+    public void verifyThatTheResponseHasAllTheDetailsAsExpected() throws IOException;
 
     // DSL Element:
     // "the response [{}]"

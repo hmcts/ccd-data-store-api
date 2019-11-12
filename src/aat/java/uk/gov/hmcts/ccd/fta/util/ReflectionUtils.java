@@ -1,4 +1,4 @@
-package uk.gov.hmcts.jsonstore;
+package uk.gov.hmcts.ccd.fta.util;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
