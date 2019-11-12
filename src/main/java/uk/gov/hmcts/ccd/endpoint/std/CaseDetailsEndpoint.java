@@ -267,7 +267,7 @@ public class CaseDetailsEndpoint {
         @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning,
         @RequestBody final CaseDataContent content) {
 
-        return createCaseOperation.createCaseDetails(uid, jurisdictionId, caseTypeId, content, ignoreWarning);
+        return createCaseOperation.createCaseDetails(caseTypeId, content, ignoreWarning);
     }
 
     @PostMapping(value = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases")
@@ -292,7 +292,7 @@ public class CaseDetailsEndpoint {
         @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning,
         @RequestBody final CaseDataContent content) {
 
-        return createCaseOperation.createCaseDetails(uid, jurisdictionId, caseTypeId, content, ignoreWarning);
+        return createCaseOperation.createCaseDetails(caseTypeId, content, ignoreWarning);
     }
 
     @PostMapping(value = {"/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/validate",

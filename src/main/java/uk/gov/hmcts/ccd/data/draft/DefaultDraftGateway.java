@@ -22,6 +22,7 @@ import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.DraftResponseToCaseDetailsBuilder;
 import uk.gov.hmcts.ccd.domain.model.draft.*;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
@@ -77,44 +78,45 @@ public class DefaultDraftGateway implements DraftGateway {
 
     @Override
     public DraftResponse update(final UpdateCaseDraftRequest draft, final String draftId) {
+        HttpHeaders headers = securityUtils.authorizationHeaders();
+        headers.add(DRAFT_ENCRYPTION_KEY_HEADER, applicationParams.getDraftEncryptionKey());
+        final HttpEntity requestEntity = new HttpEntity(draft, headers);
         try {
-            HttpHeaders headers = securityUtils.authorizationHeaders();
-            headers.add(DRAFT_ENCRYPTION_KEY_HEADER, applicationParams.getDraftEncryptionKey());
-            final HttpEntity requestEntity = new HttpEntity(draft, headers);
             restTemplate.exchange(applicationParams.draftURL(draftId), HttpMethod.PUT, requestEntity, HttpEntity.class);
-            final DraftResponse draftResponse = new DraftResponse();
-            draftResponse.setId(draftId);
-            return draftResponse;
         } catch (HttpClientErrorException e) {
             LOG.warn("Error while updating draftId={}", draftId, e);
             if (e.getRawStatusCode() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException(String.format(RESOURCE_NOT_FOUND_MSG, draftId));
             }
+            throw new ApiException(DRAFT_STORE_DOWN_ERR_MESSAGE, e);
         } catch (Exception e) {
             LOG.warn("Error while updating draftId={}", draftId, e);
             throw new ServiceException(DRAFT_STORE_DOWN_ERR_MESSAGE, e);
         }
-        return null;
+        final DraftResponse draftResponse = new DraftResponse();
+        draftResponse.setId(draftId);
+        return draftResponse;
     }
 
     @Override
     public DraftResponse get(final String draftId) {
+        HttpHeaders headers = securityUtils.authorizationHeaders();
+        headers.add(DRAFT_ENCRYPTION_KEY_HEADER, applicationParams.getDraftEncryptionKey());
+        final HttpEntity requestEntity = new HttpEntity(headers);
+        Draft draft = null;
         try {
-            HttpHeaders headers = securityUtils.authorizationHeaders();
-            headers.add(DRAFT_ENCRYPTION_KEY_HEADER, applicationParams.getDraftEncryptionKey());
-            final HttpEntity requestEntity = new HttpEntity(headers);
-            Draft draft = restTemplate.exchange(applicationParams.draftURL(draftId), HttpMethod.GET, requestEntity, Draft.class).getBody();
-            return assembleDraft(draft, getDraftExceptionConsumer());
+            draft = restTemplate.exchange(applicationParams.draftURL(draftId), HttpMethod.GET, requestEntity, Draft.class).getBody();
         } catch (HttpClientErrorException e) {
             LOG.warn("Error while getting draftId={}", draftId, e);
             if (e.getRawStatusCode() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException(String.format(RESOURCE_NOT_FOUND_MSG, draftId));
             }
+            throw new ApiException(DRAFT_STORE_DOWN_ERR_MESSAGE, e);
         } catch (Exception e) {
             LOG.warn("Error while getting draftId={}", draftId, e);
             throw new ServiceException(DRAFT_STORE_DOWN_ERR_MESSAGE, e);
         }
-        return null;
+        return assembleDraft(draft, getDraftExceptionConsumer());
     }
 
     @Override
@@ -135,8 +137,9 @@ public class DefaultDraftGateway implements DraftGateway {
             if (e.getRawStatusCode() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException(String.format(RESOURCE_NOT_FOUND_MSG, draftId));
             }
+            throw new ApiException(DRAFT_STORE_DOWN_ERR_MESSAGE, e);
         } catch (Exception e) {
-            LOG.warn("Error while getting draftId=" + draftId, e);
+            LOG.warn("Error while deleting draftId=" + draftId, e);
             throw new ServiceException(DRAFT_STORE_DOWN_ERR_MESSAGE, e);
         }
     }

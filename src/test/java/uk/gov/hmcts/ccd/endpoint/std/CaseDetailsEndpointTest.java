@@ -190,9 +190,7 @@ class CaseDetailsEndpointTest {
     @Test
     void createCaseForCaseWorker() {
         final CaseDetails toBeReturned = new CaseDetails();
-        doReturn(toBeReturned).when(createCaseOperation).createCaseDetails(UID,
-                                                                           JURISDICTION_ID,
-                                                                           CASE_TYPE_ID,
+        doReturn(toBeReturned).when(createCaseOperation).createCaseDetails(CASE_TYPE_ID,
                                                                            EVENT_DATA,
                                                                            IGNORE_WARNING);
 
@@ -204,9 +202,7 @@ class CaseDetailsEndpointTest {
 
         assertAll(
             () -> assertThat(output, sameInstance(toBeReturned)),
-            () -> verify(createCaseOperation).createCaseDetails(UID,
-                                                                JURISDICTION_ID,
-                                                                CASE_TYPE_ID,
+            () -> verify(createCaseOperation).createCaseDetails(CASE_TYPE_ID,
                                                                 EVENT_DATA,
                                                                 IGNORE_WARNING)
         );
