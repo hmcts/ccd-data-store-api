@@ -3,19 +3,40 @@ package uk.gov.hmcts.ccd.fta.steps;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class MapVerifierTest {
 
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldThrowExceptionFoprNegativeMaxDepth() {
+        MapVerifier.verifyMap(null, null, -1);
+    }
+
     @Test
-    public void shouldVerifyNullMaps() {
+    public void shouldVerifyNullVsNulCase() {
         List<String> messages = MapVerifier.verifyMap(null, null, 0);
         Assert.assertEquals(0, messages.size());
         messages = MapVerifier.verifyMap(null, null, 1);
         Assert.assertEquals(0, messages.size());
         messages = MapVerifier.verifyMap(null, null, 2);
         Assert.assertEquals(0, messages.size());
-        MapVerifier.verifyMap(null, null, 1000);
+        messages = MapVerifier.verifyMap(null, null, 1000);
         Assert.assertEquals(0, messages.size());
     }
+
+    @Test
+    public void shouldNotVerifyNullVsNonNullCase() {
+        List<String> messages = MapVerifier.verifyMap(new HashMap<String, Object>(), null, 999);
+        Assert.assertArrayEquals(new Object[] { "Map is expected to be non-null, but is actuall null." },
+                messages.toArray());
+    }
+
+    @Test
+    public void shouldNotVerifyNoneNullVsNullCase() {
+        List<String> messages = MapVerifier.verifyMap(null, new HashMap<String, Object>(), 999);
+        Assert.assertArrayEquals(new Object[] { "Map is expected to be null, but is actuall not." },
+                messages.toArray());
+    }
+
 }
