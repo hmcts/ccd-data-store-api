@@ -1,7 +1,7 @@
 {
-  "_guid_": "S-133",
+  "_guid_": "S-134",
   "_extends_": "S-000-Base-Success",
-  "title": "must return 400 if the sort direction in input parameters is not in ASC or DESC",
+  "title": "must return 401 when request does not provide valid authentication credentials",
   "specs": [
     "a detailed profile in CCD"
   ],
@@ -23,6 +23,6 @@
     }
   },
   "expectedResponse": {
-    "responseCode": 400
+    "responseCode": 401
   }
 }

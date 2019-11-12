@@ -1,7 +1,7 @@
 {
-  "_guid_": "S-133",
+  "_guid_": "S-515",
   "_extends_": "S-000-Base-Success",
-  "title": "must return 400 if the sort direction in input parameters is not in ASC or DESC",
+  "title": "must return 400 when casefields do not start with “case.”",
   "specs": [
     "a detailed profile in CCD"
   ],

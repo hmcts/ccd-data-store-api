@@ -1,7 +1,7 @@
 {
-  "_guid_": "S-133",
+  "_guid_": "S-516",
   "_extends_": "S-000-Base-Success",
-  "title": "must return 400 if the sort direction in input parameters is not in ASC or DESC",
+  "title": "must return 400 when security classification in input parameters is present and invalid",
   "specs": [
     "a detailed profile in CCD"
   ],
@@ -19,7 +19,7 @@
       "ctid": "AAT"
     },
     "queryParams" : {
-      "sortDirection" : "someInvalidSortDirection"
+      "securityClassification" : "someInvalidSecurityClassification"
     }
   },
   "expectedResponse": {
