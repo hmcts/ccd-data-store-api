@@ -11,6 +11,7 @@ public final class V2 {
 
         // External API
         public static final String CASE = "application/vnd.uk.gov.hmcts.ccd-data-store-api.case.v2+json;charset=UTF-8";
+        public static final String CASE_DOCUMENTS = "application/vnd.uk.gov.hmcts.ccd-data-store-api.case-documents.v2+json;charset=UTF-8";
         public static final String CREATE_EVENT = "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-event.v2+json;charset=UTF-8";
         public static final String CREATE_CASE = "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-case.v2+json;charset=UTF-8";
         public static final String START_CASE_TRIGGER = "application/vnd.uk.gov.hmcts.ccd-data-store-api.start-case-trigger.v2+json;charset=UTF-8";
@@ -44,6 +45,7 @@ public final class V2 {
         public static final String CASE_NOT_FOUND = "Case not found";
         public static final String USER_ROLE_NOT_FOUND = "User role not found";
         public static final String CASE_DATA_NOT_FOUND = "Case data not found";
+        public static final String PRINTABLE_DOCUMENTS_ENDPOINT_DOWN = "Print documents endpoint is down";
         public static final String EVENT_TRIGGER_NOT_FOUND = "Event trigger not found";
         public static final String EVENT_TRIGGER_NOT_SPECIFIED = "Event trigger not specified";
         public static final String EVENT_TRIGGER_NOT_KNOWN_FOR_CASE_TYPE = "Event trigger is not known for given case type";
