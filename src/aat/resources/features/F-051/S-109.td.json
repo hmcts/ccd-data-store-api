@@ -4,15 +4,19 @@
   "title": "must return appropriate negative response for a user not having a profile in CCD",
   "specs": ["no profile in CCD"],
   "productName": "CCD Data Store",
-  "operationName": "Get default setting for user",
+  "operationName": "Get default settings for user",
   "user": {
-    "username": "auto.test.cnp123@gmail.com",
+    "username": "auto.test.cnp@gmail.com",
     "password": "Pa55word11"
   },
   "uri": "/caseworkers/{uid}/profile",
   "request": {
     "headers": {
-      "serviceToken": "s2s"
+      "Authorization": "{~}",
+      "ServiceAuthorization": "{~}"
+    },
+    "pathVariables": {
+      "uid": "some id"
     }
   },
   "expectedResponse": {

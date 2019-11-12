@@ -109,4 +109,8 @@ public class HttpTestData {
         return specs.contains(specification);
     }
 
+    public boolean meetsOperationOfProduct(String operationName, String productName) {
+        return operationName.equals(this.operationName) && productName.equals(this.productName);
+    }
+
 }

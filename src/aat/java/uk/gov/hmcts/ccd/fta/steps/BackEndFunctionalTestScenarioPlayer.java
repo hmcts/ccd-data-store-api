@@ -1,17 +1,17 @@
 package uk.gov.hmcts.ccd.fta.steps;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.junit.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
+import java.util.Map;
 
 import io.cucumber.core.api.Scenario;
 import io.cucumber.java.Before;
@@ -22,10 +22,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.helper.idam.AuthenticatedUser;
+import uk.gov.hmcts.ccd.fta.data.RequestData;
 import uk.gov.hmcts.ccd.fta.data.ResponseData;
 import uk.gov.hmcts.ccd.fta.data.UserData;
 
 public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTestAutomationDSL {
+
+    private static final String DYNAMIC_CONTENT_PLACEHOLDER = "{~}";
 
     private final BackEndFunctionalTestScenarioContext scenarioContext;
     private final AATHelper aat;
@@ -83,89 +86,176 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
 
     @Override
     @When("a request is prepared with appropriate values")
-    public void prepareARequestWithAppropriateValues() {
+    public void prepareARequestWithAppropriateValues() throws JsonProcessingException {
         UserData theUser = scenarioContext.getTheUser();
         String s2sToken = aat.getS2SHelper().getToken();
-        String uid = scenarioContext.getTheUser().getUid();
 
-        if (uid == null) {
-            uid = "someId";
+        RequestSpecification aRequest = RestAssured.given();
+        RequestData requestData = scenarioContext.getTestData().getRequest();
+
+        if (requestData.getHeaders() != null) {
+            requestData.getHeaders().forEach((header, value) -> {
+                if (value.toString().equals(DYNAMIC_CONTENT_PLACEHOLDER)) {
+                    // ADD DYNAMIC DATA HERE
+                    if (header.equals("Authorization")) {
+                        aRequest.header(header, "Bearer " + theUser.getToken());
+                    } else if (header.equals("ServiceAuthorization")) {
+                        aRequest.header(header, s2sToken);
+                    }
+                } else {
+                    aRequest.header(header, value);
+                }
+            });
         }
 
-        String callerUsername = "auto.test.cnp@gmail.com";
-        String callerPassword = "Pa55word11";
-        String callerToken = aat.getIdamHelper().authenticate(callerUsername, callerPassword).getAccessToken();
+        if (requestData.getPathVariables() != null) {
+            requestData.getPathVariables().forEach((pathVariable, value) -> {
+                if (value.toString().equals(DYNAMIC_CONTENT_PLACEHOLDER)) {
+                    // ADD DYNAMIC DATA HERE
+                    if (pathVariable.equals("uid")) {
+                        aRequest.pathParam(pathVariable, theUser.getUid());
+                    }
+                } else {
+                    aRequest.pathParam(pathVariable, value);
+                }
+            });
+        }
 
-        Assert.assertNotNull("Caller not authenticated, request cannot be created", callerToken);
+        if (requestData.getQueryParams() != null) {
+            requestData.getQueryParams().forEach((queryParam, value) -> {
+                if (value.toString().equals(DYNAMIC_CONTENT_PLACEHOLDER)) {
+                    // ADD DYNAMIC DATA HERE
+                } else {
+                    aRequest.queryParam(queryParam, value);
+                }
+            });
+        }
 
-        RequestSpecification aRequest = RestAssured.given()
-                .header("Authorization", "Bearer " + callerToken)
-                .header("ServiceAuthorization", s2sToken)
-                .pathParam("uid", uid);
+        if (requestData.getBody() != null) {
+            aRequest.body(new ObjectMapper().writeValueAsBytes(requestData.getBody()));
+        }
 
         scenarioContext.setTheRequest(aRequest);
+        scenario.write(aRequest.toString());
     }
 
     @Override
-    @When("it is submitted to call the {} operation of {}")
+    @When("it is submitted to call the [{}] operation of [{}]")
     public void submitTheRequestToCallAnOperationOfAProduct(String operation, String productName) {
+        boolean isCorrectOperation = scenarioContext.getTestData().meetsOperationOfProduct(operation, productName);
+        String errorMessage = "Test data does not confirm it is calling the following operation of a product: "
+            + operation + " -> " + productName;
+        Assert.assertTrue(errorMessage, isCorrectOperation);
+
         RequestSpecification theRequest = scenarioContext.getTheRequest();
         String uri = scenarioContext.getTestData().getUri();
-        System.out.println("URI: " + RestAssured.baseURI + uri);
         Response response = theRequest.get(uri);
         scenarioContext.setTheResponse(response);
+        scenario.write(response.toString());
     }
 
     @Override
     @Then("a positive response is received")
     public void verifyThatAPositiveResponseWasReceived() {
         int responseCode = scenarioContext.getTheResponse().getStatusCode();
-        String message = "Response code is not a success code. It is: " + responseCode;
-        Assert.assertEquals(message, 2, responseCode / 100);
+        String errorMessage = "Response code is not a success code. It is: " + responseCode;
+        Assert.assertEquals(errorMessage, 2, responseCode / 100);
     }
 
     @Override
     @Then("a negative response is received")
     public void verifyThatANegativeResponseWasReceived() {
         int code = scenarioContext.getTheResponse().getStatusCode();
-        String message = "Response code is not a negative one. It is: " + code;
-        Assert.assertNotEquals(message, 2, code / 100);
+        String errorMessage = "Response code is not a negative one. It is: " + code;
+        Assert.assertNotEquals(errorMessage, 2, code / 100);
     }
 
     @Override
     @Then("the response has all the details as expected")
     public void verifyThatTheResponseHasAllTheDetailsAsExpected() {
-        Response theResponse = scenarioContext.getTheResponse();
-        ResponseData actualResponse = new ResponseData();
-        actualResponse.setResponseCode(theResponse.getStatusCode());
-        actualResponse.setBody(theResponse.getBody().print());
+        Response actualResponse = scenarioContext.getTheResponse();
         ResponseData expectedResponse = scenarioContext.getTestData().getExpectedResponse();
         List<String> validationErrors = compareResponses(actualResponse, expectedResponse);
-        String message = "Actual and expected responses do not match: " + validationErrors;
-        Assert.assertTrue(message, validationErrors.isEmpty());
+        String errorMessage = "Actual and expected responses do not match: " + validationErrors;
+        Assert.assertTrue(errorMessage, validationErrors.isEmpty());
     }
 
-    private List<String> compareResponses(ResponseData actualResponse, ResponseData expectedResponse) {
+    private List<String> compareResponses(Response actualResponse, ResponseData expectedResponse) {
         List<String> validationErrors = new ArrayList<>();
-        if (expectedResponse.getResponseCode() != actualResponse.getResponseCode()) {
+
+        if (expectedResponse.getResponseCode() != actualResponse.getStatusCode()) {
             validationErrors.add("Response code mismatch, expected: " + expectedResponse.getResponseCode()
-                + ", actual: " + actualResponse.getResponseCode());
+                + ", actual: " + actualResponse.getStatusCode());
         }
-        /*System.out.println("expected body: " + expectedResponse.getBody());
-        System.out.println("actual body: " + actualResponse.getBody());
-        if (!actualResponse.getBody().contains(expectedResponse.getBody())) {
-            validationErrors.add("Response body mismatch\nexpected:\n" + expectedResponse.getBody()
-                + "\nactual:\n" + actualResponse.getBody());
-        }*/
+
+        if (expectedResponse.getBody() != null) {
+            compareResponseBodyItem(actualResponse.getBody().jsonPath(), expectedResponse.getBody(),
+                "", validationErrors);
+        }
+
         return validationErrors;
+    }
+
+    private void compareResponseBodyItem(JsonPath actualResponseBody,
+                                         Map<String, Object> expectedResponseBody,
+                                         String expectedResponseBodyPrefix,
+                                         List<String> validationErrors) {
+
+        expectedResponseBody.forEach((expectedResponseBodyKey, expectedResponseBodyValue) -> {
+            String currentPath = expectedResponseBodyPrefix + expectedResponseBodyKey;
+            Object actualResponseBodyValue = actualResponseBody.get(currentPath);
+
+            if (expectedResponseBodyValue instanceof Map) {
+                compareResponseBodyItem(actualResponseBody, (Map)expectedResponseBodyValue, currentPath + ".",
+                    validationErrors);
+            }
+
+            else if (expectedResponseBodyValue instanceof List) {
+                List<?> expectedList = (List)expectedResponseBodyValue;
+                String actualListAsString = actualResponseBodyValue.toString();
+                expectedList.forEach(expectedListItem -> {
+                    if (!actualListAsString.contains(expectedListItem.toString())) {
+                        validationErrors.add("Response body item mismatch, expected " + currentPath + "="
+                            + actualListAsString + " to contain " + expectedListItem.toString() + " but does not");
+                    }
+                });
+            }
+
+            else if (expectedResponseBodyValue instanceof String) {
+                if (!actualResponseBodyValue.toString().equals(expectedResponseBodyValue.toString())) {
+                    validationErrors.add("Response body item mismatch, expected: " + currentPath + "="
+                        + expectedResponseBodyValue.toString() + ", actual: " + currentPath + "="
+                        + actualResponseBodyValue.toString());
+                }
+            }
+
+            else if (expectedResponseBodyValue instanceof Integer) {
+                if (actualResponseBodyValue != expectedResponseBodyValue) {
+                    validationErrors.add("Response body item mismatch, expected: " + currentPath + "="
+                        + expectedResponseBodyValue + ", actual: " + currentPath + "=" + actualResponseBodyValue);
+                }
+            }
+
+            else if (expectedResponseBodyValue == null) {
+                if (actualResponseBodyValue != null) {
+                    validationErrors.add("Response body item mismatch, expected: " + currentPath + "=null, actual: "
+                        + currentPath + "=" + actualResponseBodyValue);
+                }
+            }
+
+            else {
+                validationErrors.add("Response body item error, unknown type at: " + currentPath);
+            }
+        });
+
     }
 
     @Override
     @Then("the response [{}]")
     public void verifyTheResponseInTheContextWithAParticularSpecification(String responseSpecification) {
-        String message = "Test data does not confirm it meets the specification about the response: "
+        String errorMessage = "Test data does not confirm it meets the specification about the response: "
                 + responseSpecification;
         boolean check = scenarioContext.getTestData().meetsSpec(responseSpecification);
-        Assert.assertTrue(message, check);
+        Assert.assertTrue(errorMessage, check);
     }
 }

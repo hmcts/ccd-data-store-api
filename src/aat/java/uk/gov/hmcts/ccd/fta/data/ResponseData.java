@@ -12,7 +12,7 @@ public class ResponseData {
 
     private Map<String, Object> headers;
 
-    private String body;
+    private Map<String, Object> body;
 
     public int getResponseCode() {
         return responseCode;
@@ -38,11 +38,11 @@ public class ResponseData {
         this.headers = headers;
     }
 
-    public String getBody() {
+    public Map<String, Object> getBody() {
         return body;
     }
 
-    public void setBody(String body) {
+    public void setBody(Map<String, Object> body) {
         this.body = body;
     }
 
