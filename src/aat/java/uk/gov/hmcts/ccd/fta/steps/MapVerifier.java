@@ -15,22 +15,33 @@ public class MapVerifier {
     // If the Maps are all equal, then the return an empty list.
     public static List<String> verifyMap(Map<String, Object> expectedMap, Map<String, Object> actualMap,
             int maxMessageDepth) {
-        if (maxMessageDepth <= 1)
-            throw new IllegalArgumentException("Max depth must be at least 0.");
+        if (maxMessageDepth < 0)
+            throw new IllegalArgumentException("Max depth cannot be negative.");
         return verifyMap("actualResponse", expectedMap, actualMap, 0, maxMessageDepth);
     }
 
     private static List<String> verifyMap(String fieldPrefix, Map<String, Object> expectedMap,
             Map<String, Object> actualMap, int currentDepth, int maxMessageDepth) {
+
         boolean shouldReportAnyDifference = currentDepth <= maxMessageDepth;
         boolean shouldReportOnlySummary = currentDepth == maxMessageDepth;
+
+        ArrayList<String> differences = new ArrayList<>();
+        if (expectedMap == actualMap) {
+            return differences;
+        } else if (expectedMap == null) {
+            differences.add("Map is expected to be null, but is actuall not.");
+            return differences;
+        } else if (actualMap == null) {
+            differences.add("Map is expected to be non-null, but is actuall null.");
+            return differences;
+        }
 
         List<String> unexpectedFields = checkForUnenexpectedlyAvailableFields(expectedMap, actualMap);
         List<String> unavailableFields = checkForUnenexpectedlyUnavailableFields(expectedMap, actualMap);
         List<String> badValueMessages = collectBadValueMessages(expectedMap, actualMap, fieldPrefix, currentDepth,
                 maxMessageDepth);
 
-        ArrayList<String> differences = new ArrayList<>();
         if (shouldReportAnyDifference) {
             reportUnexpectedlyAvailables(unexpectedFields, differences, fieldPrefix, shouldReportOnlySummary);
             reportUnexpectedlyUnavailables(unavailableFields, differences, fieldPrefix, shouldReportOnlySummary);
