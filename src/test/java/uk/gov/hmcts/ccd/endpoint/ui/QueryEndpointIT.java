@@ -58,6 +58,8 @@ public class QueryEndpointIT extends WireMockBaseTest {
     private static final String GET_COMPLEX_CASE = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestComplexAddressBookCase/cases/1504259907353537";
     private static final String GET_EVENT_TRIGGER_FOR_CASE_TYPE_VALID = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/event-triggers" +
         "/NO_PRE_STATES_EVENT";
+    private static final String GET_EVENT_TRIGGER_FOR_CASE_TYPE = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/CaseRolesCase/event-triggers" +
+        "/CREATE-CASE";
     private static final String GET_EVENT_TRIGGER_FOR_CASE_VALID = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/1504259907353545/event" +
         "-triggers/HAS_PRE_STATES_EVENT";
     private static final String GET_EVENT_TRIGGER_FOR_CASE_PRIVATE = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/1504259907353545/event" +
@@ -1197,6 +1199,42 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertThat(field2.getFieldType().getType(), equalTo("Text"));
         assertThat(field2.getId(), equalTo("PersonLastName"));
         assertThat(field2.getDisplayContext(), equalTo("OPTIONAL"));
+    }
+
+    @Test
+    public void getEventTriggerForCaseType_shouldAddFieldsWithCERATORCaseRole() throws Exception {
+
+        final MvcResult result = mockMvc.perform(get(GET_EVENT_TRIGGER_FOR_CASE_TYPE)
+            .contentType(JSON_CONTENT_TYPE)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(200))
+            .andReturn();
+
+        final CaseEventTrigger eventTrigger = mapper.readValue(result.getResponse().getContentAsString(),
+            CaseEventTrigger.class);
+        assertNotNull("Event Trigger is null", eventTrigger);
+
+        assertThat("Unexpected Case ID", eventTrigger.getCaseId(), is(nullValue()));
+        assertEquals("Unexpected Event ID", "CREATE-CASE", eventTrigger.getId());
+        assertEquals("Unexpected Event Name", "CREATE-CASE", eventTrigger.getName());
+        assertEquals("Unexpected Event Show Event Notes", true, eventTrigger.getShowEventNotes());
+        assertEquals("Unexpected Event Description", "Creation event", eventTrigger.getDescription());
+        assertEquals("Unexpected Case Fields", 1, eventTrigger.getCaseFields().size());
+
+        final CaseViewField field1 = eventTrigger.getCaseFields().get(0);
+        assertThat(field1.getId(), equalTo("PersonFirstName"));
+
+        assertThat(field1.getAccessControlLists().get(0).getRole(), equalTo("caseworker-probate-public"));
+        assertThat(field1.getAccessControlLists().get(0).isCreate(), is(false));
+        assertThat(field1.getAccessControlLists().get(0).isRead(), is(false));
+        assertThat(field1.getAccessControlLists().get(0).isUpdate(), is(false));
+        assertThat(field1.getAccessControlLists().get(0).isDelete(), is(false));
+
+        assertThat(field1.getAccessControlLists().get(1).getRole(), equalTo("[CREATOR]"));
+        assertThat(field1.getAccessControlLists().get(1).isCreate(), is(true));
+        assertThat(field1.getAccessControlLists().get(1).isRead(), is(true));
+        assertThat(field1.getAccessControlLists().get(1).isUpdate(), is(true));
+        assertThat(field1.getAccessControlLists().get(1).isDelete(), is(false));
     }
 
     @Test

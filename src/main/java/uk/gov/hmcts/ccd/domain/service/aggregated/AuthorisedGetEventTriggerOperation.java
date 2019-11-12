@@ -1,15 +1,10 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import java.util.Set;
-import java.util.function.Supplier;
-
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.*;
-
 import com.google.common.collect.Sets;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
@@ -28,6 +23,17 @@ import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+
+import java.util.Set;
+import java.util.function.Supplier;
+
+import static java.util.Collections.singleton;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CASE_STATE_FOUND;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CASE_TYPE_FOUND;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_EVENT_FOUND;
 
 @Service
 @Qualifier(AuthorisedGetEventTriggerOperation.QUALIFIER)
@@ -63,7 +69,7 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
     public CaseEventTrigger executeForCaseType(String caseTypeId, String eventTriggerId, Boolean ignoreWarning) {
         final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
 
-        Set<String> userRoles = caseAccessService.getUserRoles();
+        Set<String> userRoles = Sets.union(caseAccessService.getUserRoles(), singleton(GlobalCaseRole.CREATOR.getRole()));
 
         verifyRequiredAccessExistsForCaseType(eventTriggerId, caseType, userRoles);
 
