@@ -5,16 +5,8 @@
   "specs": ["a detailed profile in CCD"],
   "productName": "CCD Data Store",
   "operationName": "Get default settings for user",
-  "user": {
-    "username": "auto.test.cnp@gmail.com",
-    "password": "Pa55word11"
-  },
   "uri": "/caseworkers/{uid}/profile",
   "request": {
-    "headers": {
-      "Authorization": "{~}",
-      "ServiceAuthorization": "{~}"
-    },
     "pathVariables": {
       "uid": "{~}"
     }
