@@ -10,6 +10,7 @@ import io.restassured.specification.RequestSpecification;
 import org.junit.Assert;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -188,15 +189,25 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
                 + ", actual: " + actualResponse.getStatusCode());
         }
 
+        if (expectedResponse.getHeaders() != null) {
+            expectedResponse.getHeaders().forEach((expectedHeader, expectedValue) -> {
+                if (!actualResponse.getHeader(expectedHeader).equals(expectedValue)) {
+                    validationErrors.add("Response header mismatch, expected: " + expectedHeader + "="
+                        + expectedValue + ", actual: " + expectedHeader + "="
+                        + actualResponse.getHeader(expectedHeader));
+                }
+            });
+        }
+
         if (expectedResponse.getBody() != null) {
-            compareResponseBodyItem(actualResponse.getBody().jsonPath(), expectedResponse.getBody(),
+            compareResponseBodyItems(actualResponse.getBody().jsonPath(), expectedResponse.getBody(),
                 "", validationErrors);
         }
 
         return validationErrors;
     }
 
-    private void compareResponseBodyItem(JsonPath actualResponseBody,
+    private void compareResponseBodyItems(JsonPath actualResponseBody,
                                          Map<String, Object> expectedResponseBody,
                                          String expectedResponseBodyPrefix,
                                          List<String> validationErrors) {
@@ -206,7 +217,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
             Object actualResponseBodyValue = actualResponseBody.get(currentPath);
 
             if (expectedResponseBodyValue instanceof Map) {
-                compareResponseBodyItem(actualResponseBody, (Map)expectedResponseBodyValue, currentPath + ".",
+                compareResponseBodyItems(actualResponseBody, (Map)expectedResponseBodyValue, currentPath + ".",
                     validationErrors);
             }
 
@@ -229,17 +240,13 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
                 }
             }
 
-            else if (expectedResponseBodyValue instanceof Integer) {
+            else if (expectedResponseBodyValue instanceof Integer
+                || expectedResponseBodyValue instanceof Double
+                || expectedResponseBodyValue instanceof Date
+                || expectedResponseBodyValue == null) {
                 if (actualResponseBodyValue != expectedResponseBodyValue) {
                     validationErrors.add("Response body item mismatch, expected: " + currentPath + "="
                         + expectedResponseBodyValue + ", actual: " + currentPath + "=" + actualResponseBodyValue);
-                }
-            }
-
-            else if (expectedResponseBodyValue == null) {
-                if (actualResponseBodyValue != null) {
-                    validationErrors.add("Response body item mismatch, expected: " + currentPath + "=null, actual: "
-                        + currentPath + "=" + actualResponseBodyValue);
                 }
             }
 

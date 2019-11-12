@@ -1,20 +1,12 @@
 {
   "_guid_": "S-109",
-  "_extends_": "S-000-Base-Success",
+  "_extends_": "S-000-Base-Root",
   "title": "must return appropriate negative response for a user not having a profile in CCD",
   "specs": ["no profile in CCD"],
   "productName": "CCD Data Store",
   "operationName": "Get default settings for user",
-  "user": {
-    "username": "auto.test.cnp@gmail.com",
-    "password": "Pa55word11"
-  },
   "uri": "/caseworkers/{uid}/profile",
   "request": {
-    "headers": {
-      "Authorization": "{~}",
-      "ServiceAuthorization": "{~}"
-    },
     "pathVariables": {
       "uid": "some id"
     }
