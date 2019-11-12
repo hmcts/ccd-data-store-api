@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import uk.gov.hmcts.ccd.fta.util.ReflectionUtils;
+
 public abstract class JsonStoreWithInheritance {
 
     protected JsonNode rootNode;
