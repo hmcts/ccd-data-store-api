@@ -11,6 +11,8 @@ import uk.gov.hmcts.ccd.fta.data.JsonStoreHttpTestDataSource;
 import uk.gov.hmcts.ccd.fta.data.ResponseData;
 import uk.gov.hmcts.ccd.fta.data.UserData;
 
+import javax.xml.crypto.Data;
+
 public class BackEndFunctionalTestScenarioContext {
 
     private static final String[] TEST_DATA_RESOURCE_PACKAGES = { "features" };
@@ -20,7 +22,7 @@ public class BackEndFunctionalTestScenarioContext {
     private Scenario scenario;
     private UserData theUser;
     private RequestSpecification theRequest;
-    private Response theResponse;
+    private ResponseData theResponse;
 
     public void initializeTestDataFor(Scenario scenario) {
         this.scenario = scenario;
@@ -55,11 +57,11 @@ public class BackEndFunctionalTestScenarioContext {
         return theRequest;
     }
 
-    public Response getTheResponse() {
+    public ResponseData getTheResponse() {
         return theResponse;
     }
 
-    public void setTheResponse(Response theResponse) {
+    public void setTheResponse(ResponseData theResponse) {
         this.theResponse = theResponse;
     }
 }

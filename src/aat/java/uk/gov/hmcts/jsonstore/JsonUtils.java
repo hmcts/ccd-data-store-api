@@ -32,4 +32,9 @@ public class JsonUtils {
         ObjectMapper mapper = new ObjectMapper();
         return mapper.writeValueAsString(object);
     }
+
+    public static String getPrettyJsonFromObject(Object object) throws JsonParseException, JsonMappingException, IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
+    }
 }
