@@ -4,7 +4,7 @@
   "title": "must return appropriate negative response for a user not having a profile in CCD",
   "specs": ["no profile in CCD"],
   "productName": "CCD Data Store",
-  "operationName": "Get default settings for user",
+  "operationName": "get default settings for user",
   "user": {
     "username": "auto.test.cnp@gmail.com",
     "password": "Pa55word11"
