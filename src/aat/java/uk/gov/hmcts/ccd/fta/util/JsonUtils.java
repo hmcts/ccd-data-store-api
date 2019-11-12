@@ -1,4 +1,4 @@
-package uk.gov.hmcts.jsonstore;
+package uk.gov.hmcts.ccd.fta.util;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;

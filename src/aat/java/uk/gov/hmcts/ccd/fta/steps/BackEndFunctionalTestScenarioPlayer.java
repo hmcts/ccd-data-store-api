@@ -1,9 +1,5 @@
 package uk.gov.hmcts.ccd.fta.steps;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import io.restassured.RestAssured;
@@ -33,7 +29,7 @@ import uk.gov.hmcts.ccd.datastore.tests.helper.idam.AuthenticatedUser;
 import uk.gov.hmcts.ccd.fta.data.RequestData;
 import uk.gov.hmcts.ccd.fta.data.ResponseData;
 import uk.gov.hmcts.ccd.fta.data.UserData;
-import uk.gov.hmcts.jsonstore.JsonUtils;
+import uk.gov.hmcts.ccd.fta.util.JsonUtils;
 
 public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTestAutomationDSL {
 
@@ -155,7 +151,6 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     @Override
     @When("it is submitted to call the [{}] operation of [{}]")
     public void submitTheRequestToCallAnOperationOfAProduct(String operation, String productName) throws IOException {
-
         boolean isCorrectOperation = scenarioContext.getTestData().meetsOperationOfProduct(operation, productName);
         String errorMessage = "Test data does not confirm it is calling the following operation of a product: "
             + operation + " -> " + productName;
@@ -204,10 +199,11 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         List<String> validationErrors = compareResponses(actualResponse, expectedResponse);
         String errorMessage = "Actual and expected responses do not match: " + validationErrors;
         Assert.assertTrue(errorMessage, validationErrors.isEmpty());*/
+        // TODO: write response comparison logic
         scenario.write(JsonUtils.getPrettyJsonFromObject(scenarioContext.getTheResponse()));
     }
 
-    private List<String> compareResponses(Response actualResponse, ResponseData expectedResponse) {
+    /*private List<String> compareResponses(Response actualResponse, ResponseData expectedResponse) {
         List<String> validationErrors = new ArrayList<>();
 
         if (expectedResponse.getResponseCode() != actualResponse.getStatusCode()) {
@@ -281,7 +277,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
             }
         });
 
-    }
+    }*/
 
     @Override
     @Then("the response [{}]")

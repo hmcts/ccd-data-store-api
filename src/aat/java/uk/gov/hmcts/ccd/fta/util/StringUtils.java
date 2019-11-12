@@ -1,4 +1,4 @@
-package uk.gov.hmcts.jsonstore;
+package uk.gov.hmcts.ccd.fta.util;
 
 public class StringUtils {
 
