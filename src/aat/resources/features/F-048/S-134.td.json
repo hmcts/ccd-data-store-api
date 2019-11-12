@@ -8,7 +8,7 @@
   "productName": "CCD Data Store",
   "operationName": "Get the pagination metadata for a case data search for Case Worker",
   "user": {
-    "username": "auto.test.cnp@gmail.com",
+    "username": "auto.test.cnp.invalid@gmail.com",
     "password": "Pa55word11"
   },
   "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/pagination_metadata",
@@ -17,9 +17,6 @@
       "uid" : "{~}",
       "jid" : "AUTOTEST1",
       "ctid": "AAT"
-    },
-    "queryParams" : {
-      "sortDirection" : "someInvalidSortDirection"
     }
   },
   "expectedResponse": {

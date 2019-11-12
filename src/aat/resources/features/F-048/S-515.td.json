@@ -19,7 +19,7 @@
       "ctid": "AAT"
     },
     "queryParams" : {
-      "sortDirection" : "someInvalidSortDirection"
+      "caseInvalidCaseParam.PersonFirstName" : "someInvalidParam"
     }
   },
   "expectedResponse": {

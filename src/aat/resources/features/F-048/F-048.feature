@@ -10,23 +10,23 @@ Feature: Get the pagination metadata for a case data search for Case Worker
     Then a negative response is received
     And the response has all the details as expected
 
-#  @S-134
-#  Scenario: must return 401 when request does not provide valid authentication credentials
-#    Given an appropriate test context as detailed in the test data source
-#    And a user with [no profile in CCD]
-#    When a request is prepared with appropriate values
-#    And it is submitted to call the [Get the pagination metadata for a case data search for Case Worker] of [CCD Data Store]
-#    Then a negative response is received
-#    And the response has all the details as expected
+  @S-134
+  Scenario: must return 401 when request does not provide valid authentication credentials
+    Given an appropriate test context as detailed in the test data source
+    And a user with [no profile in CCD]
+    When a request is prepared with appropriate values
+    And it is submitted to call the [Get the pagination metadata for a case data search for Case Worker] of [CCD Data Store]
+    Then a negative response is received
+    And the response has all the details as expected
 
-  #  @S-135
-#  Scenario: must return 403 when request provides authentic credentials without authorized access to the operation
-#    Given an appropriate test context as detailed in the test data source
-#    And a user with [no profile in CCD]
-#    When a request is prepared with appropriate values
-#    And it is submitted to call the [Get the pagination metadata for a case data search for Case Worker] of [CCD Data Store]
-#    Then a negative response is received
-#    And the response has all the details as expected
+    @S-135
+  Scenario: must return 403 when request provides authentic credentials without authorized access to the operation
+    Given an appropriate test context as detailed in the test data source
+    And a user with [no profile in CCD]
+    When a request is prepared with appropriate values
+    And it is submitted to call the [Get the pagination metadata for a case data search for Case Worker] of [CCD Data Store]
+    Then a negative response is received
+    And the response has all the details as expected
 
   @S-136
   Scenario: must return pagination metadata successfully for correct inputs
