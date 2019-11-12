@@ -4,7 +4,9 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MapVerifierTest {
 
@@ -37,6 +39,15 @@ public class MapVerifierTest {
         List<String> messages = MapVerifier.verifyMap(null, new HashMap<String, Object>(), 999);
         Assert.assertArrayEquals(new Object[] { "Map is expected to be null, but is actuall not." },
                 messages.toArray());
+    }
+
+    @Test
+    public void shouldVerifyEmptyVsEmptyCase() {
+        List<String> messages = MapVerifier.verifyMap(new HashMap<String, Object>(), new HashMap<String, Object>(), 0);
+        Assert.assertEquals(0, messages.size());
+        messages = MapVerifier.verifyMap(new ConcurrentHashMap<String, Object>(), new LinkedHashMap<String, Object>(),
+                0);
+        Assert.assertEquals(0, messages.size());
     }
 
 }
