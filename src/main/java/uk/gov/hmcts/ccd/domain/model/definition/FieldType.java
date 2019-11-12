@@ -8,10 +8,8 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
-import static java.util.Comparator.comparingInt;
 
 public class FieldType implements Serializable {
 
