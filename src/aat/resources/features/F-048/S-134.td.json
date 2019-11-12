@@ -17,6 +17,9 @@
       "uid" : "{~}",
       "jid" : "AUTOTEST1",
       "ctid": "AAT"
+    },
+    "queryParams" : {
+      "sortDirection" : "ASC"
     }
   },
   "expectedResponse": {
