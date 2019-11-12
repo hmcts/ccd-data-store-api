@@ -146,7 +146,7 @@ public class MapVerifier {
 
     private static Object compareValues(String fieldPrefix, String commonKey, Object expectedValue,
             Object actualValue, int currentDepth, int maxMessageDepth) {
-        boolean justCompare = currentDepth <= maxMessageDepth;
+        boolean justCompare = currentDepth > maxMessageDepth;
         if (expectedValue == actualValue) {
             return justCompare ? Boolean.TRUE : null;
         }
