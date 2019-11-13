@@ -7,6 +7,7 @@
   ],
   "productName": "CCD Data Store",
   "operationName": "Get the pagination metadata for a case data search for Case Worker",
+  "method": "GET",
   "user": {
     "username": "auto.test.cnp@gmail.com",
     "password": "Pa55word11"
@@ -17,6 +18,9 @@
       "uid" : "[[DYNAMIC]]",
       "jid" : "AUTOTEST1",
       "ctid": "AAT"
+    },
+    "headers": {
+      "Content-Type" : "application/json"
     }
   },
   "expectedResponse": {
