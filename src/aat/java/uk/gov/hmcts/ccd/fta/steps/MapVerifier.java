@@ -138,8 +138,6 @@ public class MapVerifier {
     }
 
     private static boolean isExpectedToBeAvaiableInActual(Object expectedValue) {
-        if (expectedValue instanceof String)
-            return !DONT_CARE.equalsIgnoreCase((String) expectedValue);
         return true;
     }
 
