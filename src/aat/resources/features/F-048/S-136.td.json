@@ -26,8 +26,8 @@
   "expectedResponse": {
     "responseCode": 200,
     "body" : {
-      "total_results_count" : 11,
-      "total_pages_count" : 1
+      "total_results_count" : "[[DONT_CARE]]",
+      "total_pages_count" : "[[DONT_CARE]]"
     }
   }
 }
