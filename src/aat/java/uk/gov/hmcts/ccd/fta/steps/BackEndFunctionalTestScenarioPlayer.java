@@ -20,6 +20,7 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.helper.idam.AuthenticatedUser;
 import uk.gov.hmcts.ccd.fta.data.RequestData;
@@ -102,11 +103,11 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
                         String authToken = "Bearer " + theUser.getToken();
                         aRequest.header(header, authToken);
                         scenarioContext.getTestData().getRequest().getHeaders().put(
-                            "Authorization", authToken.substring(0, 20));
+                            "Authorization", authToken.substring(0, 25) + "...");
                     } else if (header.equals("ServiceAuthorization")) {
                         aRequest.header(header, s2sToken);
                         scenarioContext.getTestData().getRequest().getHeaders().put(
-                            "ServiceAuthorization", s2sToken.substring(0, 20));
+                            "ServiceAuthorization", s2sToken.substring(0, 25) + "...");
                     }
                 } else {
                     aRequest.header(header, value);
@@ -163,6 +164,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
 
         ResponseData responseData = new ResponseData();
         responseData.setResponseCode(response.getStatusCode());
+        responseData.setResponseMessage(HttpStatus.valueOf(response.getStatusCode()).getReasonPhrase());
         responseData.setHeaders(responseHeaders);
         responseData.setBody(JsonUtils.readObjectFromJsonText(response.getBody().asString(), Map.class));
         scenarioContext.setTheResponse(responseData);
@@ -192,95 +194,14 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     @Override
     @Then("the response has all the details as expected")
     public void verifyThatTheResponseHasAllTheDetailsAsExpected() throws IOException {
-        /*Response actualResponse = scenarioContext.getTheResponse();
-        ResponseData expectedResponse = scenarioContext.getTestData().getExpectedResponse();
-        List<String> validationErrors = compareResponses(actualResponse, expectedResponse);
-        String errorMessage = "Actual and expected responses do not match: " + validationErrors;
-        Assert.assertTrue(errorMessage, validationErrors.isEmpty());*/
         // TODO: write response comparison logic
         Map<String, Object> expectedResponseBody = scenarioContext.getTestData().getExpectedResponse().getBody();
         Map<String, Object> actualResponseBody = scenarioContext.getTheResponse().getBody();
         MapVerificationResult mapVerificationResult = MapVerifier.verifyMap(expectedResponseBody, actualResponseBody, 10);
-        System.out.println(mapVerificationResult.getAllIssues());
+        logger.info("Response body issues: " + mapVerificationResult.getAllIssues().toString());
 
         scenario.write(JsonUtils.getPrettyJsonFromObject(scenarioContext.getTheResponse()));
     }
-
-    /*private List<String> compareResponses(Response actualResponse, ResponseData expectedResponse) {
-        List<String> validationErrors = new ArrayList<>();
-
-        if (expectedResponse.getResponseCode() != actualResponse.getStatusCode()) {
-            validationErrors.add("Response code mismatch, expected: " + expectedResponse.getResponseCode()
-                + ", actual: " + actualResponse.getStatusCode());
-        }
-
-        if (expectedResponse.getHeaders() != null) {
-            expectedResponse.getHeaders().forEach((expectedHeader, expectedValue) -> {
-                if (!actualResponse.getHeader(expectedHeader).equals(expectedValue)) {
-                    validationErrors.add("Response header mismatch, expected: " + expectedHeader + "="
-                        + expectedValue + ", actual: " + expectedHeader + "="
-                        + actualResponse.getHeader(expectedHeader));
-                }
-            });
-        }
-
-        if (expectedResponse.getBody() != null) {
-            compareResponseBodyItems(actualResponse.getBody().jsonPath(), expectedResponse.getBody(),
-                "", validationErrors);
-        }
-
-        return validationErrors;
-    }
-
-    private void compareResponseBodyItems(JsonPath actualResponseBody,
-                                         Map<String, Object> expectedResponseBody,
-                                         String expectedResponseBodyPrefix,
-                                         List<String> validationErrors) {
-
-        expectedResponseBody.forEach((expectedResponseBodyKey, expectedResponseBodyValue) -> {
-            String currentPath = expectedResponseBodyPrefix + expectedResponseBodyKey;
-            Object actualResponseBodyValue = actualResponseBody.get(currentPath);
-
-            if (expectedResponseBodyValue instanceof Map) {
-                compareResponseBodyItems(actualResponseBody, (Map)expectedResponseBodyValue, currentPath + ".",
-                    validationErrors);
-            }
-
-            else if (expectedResponseBodyValue instanceof List) {
-                List<?> expectedList = (List)expectedResponseBodyValue;
-                String actualListAsString = actualResponseBodyValue.toString();
-                expectedList.forEach(expectedListItem -> {
-                    if (!actualListAsString.contains(expectedListItem.toString())) {
-                        validationErrors.add("Response body item mismatch, expected " + currentPath + "="
-                            + actualListAsString + " to contain " + expectedListItem.toString() + " but does not");
-                    }
-                });
-            }
-
-            else if (expectedResponseBodyValue instanceof String) {
-                if (!actualResponseBodyValue.toString().equals(expectedResponseBodyValue.toString())) {
-                    validationErrors.add("Response body item mismatch, expected: " + currentPath + "="
-                        + expectedResponseBodyValue.toString() + ", actual: " + currentPath + "="
-                        + actualResponseBodyValue.toString());
-                }
-            }
-
-            else if (expectedResponseBodyValue instanceof Integer
-                || expectedResponseBodyValue instanceof Double
-                || expectedResponseBodyValue instanceof Date
-                || expectedResponseBodyValue == null) {
-                if (actualResponseBodyValue != expectedResponseBodyValue) {
-                    validationErrors.add("Response body item mismatch, expected: " + currentPath + "="
-                        + expectedResponseBodyValue + ", actual: " + currentPath + "=" + actualResponseBodyValue);
-                }
-            }
-
-            else {
-                validationErrors.add("Response body item error, unknown type at: " + currentPath);
-            }
-        });
-
-    }*/
 
     @Override
     @Then("the response [{}]")
