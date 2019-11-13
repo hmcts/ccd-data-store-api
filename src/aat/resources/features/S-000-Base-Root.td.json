@@ -6,8 +6,8 @@
   },
   "request": {
     "headers": {
-      "Authorization": "{~}",
-      "ServiceAuthorization": "{~}"
+      "Authorization": "[[DYNAMIC]]",
+      "ServiceAuthorization": "[[DYNAMIC]]"
     }
   }
 }

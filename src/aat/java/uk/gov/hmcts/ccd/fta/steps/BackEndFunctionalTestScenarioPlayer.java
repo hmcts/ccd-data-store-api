@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.fta.steps;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import io.restassured.RestAssured;
-import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import io.restassured.specification.QueryableRequestSpecification;
 import io.restassured.specification.RequestSpecification;
@@ -11,10 +10,7 @@ import io.restassured.specification.SpecificationQuerier;
 import org.junit.Assert;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import io.cucumber.core.api.Scenario;
@@ -33,7 +29,7 @@ import uk.gov.hmcts.ccd.fta.util.JsonUtils;
 
 public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTestAutomationDSL {
 
-    private static final String DYNAMIC_CONTENT_PLACEHOLDER = "{~}";
+    private static final String DYNAMIC_CONTENT_PLACEHOLDER = "[[DYNAMIC]]";
 
     private final BackEndFunctionalTestScenarioContext scenarioContext;
     private final AATHelper aat;
@@ -105,10 +101,12 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
                     if (header.equals("Authorization")) {
                         String authToken = "Bearer " + theUser.getToken();
                         aRequest.header(header, authToken);
-                        scenarioContext.getTestData().getRequest().getHeaders().put("Authorization", authToken);
+                        scenarioContext.getTestData().getRequest().getHeaders().put(
+                            "Authorization", authToken.substring(0, 20));
                     } else if (header.equals("ServiceAuthorization")) {
                         aRequest.header(header, s2sToken);
-                        scenarioContext.getTestData().getRequest().getHeaders().put("ServiceAuthorization", s2sToken);
+                        scenarioContext.getTestData().getRequest().getHeaders().put(
+                            "ServiceAuthorization", s2sToken.substring(0, 20));
                     }
                 } else {
                     aRequest.header(header, value);
@@ -170,7 +168,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         scenarioContext.setTheResponse(responseData);
 
         QueryableRequestSpecification queryableRequest = SpecificationQuerier.query(theRequest);
-        scenario.write("URI: " + queryableRequest.getURI());
+        scenario.write(queryableRequest.getMethod() + " " + queryableRequest.getURI());
     }
 
     @Override
@@ -179,7 +177,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         int responseCode = scenarioContext.getTheResponse().getResponseCode();
         String errorMessage = "Response code is not a success code. It is: " + responseCode;
         Assert.assertEquals(errorMessage, 2, responseCode / 100);
-        scenario.write("Response code: " + scenarioContext.getTheResponse().getResponseCode());
+        scenario.write("" + scenarioContext.getTheResponse().getResponseCode());
     }
 
     @Override
@@ -188,7 +186,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         int code = scenarioContext.getTheResponse().getResponseCode();
         String errorMessage = "Response code is not a negative one. It is: " + code;
         Assert.assertNotEquals(errorMessage, 2, code / 100);
-        scenario.write("Response code: " + scenarioContext.getTheResponse().getResponseCode());
+        scenario.write("" + scenarioContext.getTheResponse().getResponseCode());
     }
 
     @Override
@@ -200,6 +198,11 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         String errorMessage = "Actual and expected responses do not match: " + validationErrors;
         Assert.assertTrue(errorMessage, validationErrors.isEmpty());*/
         // TODO: write response comparison logic
+        Map<String, Object> expectedResponseBody = scenarioContext.getTestData().getExpectedResponse().getBody();
+        Map<String, Object> actualResponseBody = scenarioContext.getTheResponse().getBody();
+        MapVerificationResult mapVerificationResult = MapVerifier.verifyMap(expectedResponseBody, actualResponseBody, 10);
+        System.out.println(mapVerificationResult.getAllIssues());
+
         scenario.write(JsonUtils.getPrettyJsonFromObject(scenarioContext.getTheResponse()));
     }
 
