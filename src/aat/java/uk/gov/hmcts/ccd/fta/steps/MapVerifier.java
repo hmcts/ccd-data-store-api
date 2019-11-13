@@ -13,40 +13,65 @@ public class MapVerifier {
     // TODO: Compare 2 maps and return any differences they may have as a list of
     // Strings, each String to describe a particular difference.
     // If the Maps are all equal, then the return an empty list.
-    public static List<String> verifyMap(Map<String, Object> expectedMap, Map<String, Object> actualMap,
+    public static MapVerificationResult verifyMap(Map<String, Object> expectedMap, Map<String, Object> actualMap,
             int maxMessageDepth) {
         if (maxMessageDepth < 0)
             throw new IllegalArgumentException("Max depth cannot be negative.");
         return verifyMap("actualResponse", expectedMap, actualMap, 0, maxMessageDepth);
     }
 
-    private static List<String> verifyMap(String fieldPrefix, Map<String, Object> expectedMap,
+    private static MapVerificationResult verifyMap(String fieldPrefix, Map<String, Object> expectedMap,
             Map<String, Object> actualMap, int currentDepth, int maxMessageDepth) {
 
         boolean shouldReportAnyDifference = currentDepth <= maxMessageDepth;
-        boolean shouldReportOnlySummary = currentDepth == maxMessageDepth;
 
-        ArrayList<String> differences = new ArrayList<>();
         if (expectedMap == actualMap) {
-            return differences;
+            return MapVerificationResult.DEFAULT_VERIFIED;
         } else if (expectedMap == null) {
-            differences.add("Map is expected to be null, but is actuall not.");
-            return differences;
+            return new MapVerificationResult(fieldPrefix, false,
+                    shouldReportAnyDifference ? "Map is expected to be null, but is actuall not." : null, currentDepth,  maxMessageDepth);
         } else if (actualMap == null) {
-            differences.add("Map is expected to be non-null, but is actuall null.");
-            return differences;
+            return new MapVerificationResult(fieldPrefix, false,
+                    shouldReportAnyDifference ? "Map is expected to be non-null, but is actuall null." : null,
+                    currentDepth, maxMessageDepth);
         }
 
         List<String> unexpectedFields = checkForUnenexpectedlyAvailableFields(expectedMap, actualMap);
         List<String> unavailableFields = checkForUnenexpectedlyUnavailableFields(expectedMap, actualMap);
         List<String> badValueMessages = collectBadValueMessages(expectedMap, actualMap, fieldPrefix, currentDepth,
                 maxMessageDepth);
+        List<MapVerificationResult> badSubmaps = collectBadSubmaps(expectedMap, actualMap, fieldPrefix,
+                currentDepth, maxMessageDepth);
+
+        if (unavailableFields.size() == 0 && unavailableFields.size() == 0 && badValueMessages.size() == 0
+                && badSubmaps.size() == 0)
+            return MapVerificationResult.minimalVerifiedResult(fieldPrefix, currentDepth, maxMessageDepth);
 
         if (shouldReportAnyDifference) {
-            reportUnexpectedlyAvailables(unexpectedFields, differences, fieldPrefix, shouldReportOnlySummary);
-            reportUnexpectedlyUnavailables(unavailableFields, differences, fieldPrefix, shouldReportOnlySummary);
-            reportBadValues(badValueMessages, differences, fieldPrefix, shouldReportOnlySummary);
+            return new MapVerificationResult(fieldPrefix, false, null, unexpectedFields,
+                    unavailableFields,
+                    badValueMessages, badSubmaps, currentDepth, maxMessageDepth);
         }
+        return MapVerificationResult.minimalUnverifiedResult(fieldPrefix, currentDepth, maxMessageDepth);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<MapVerificationResult> collectBadSubmaps(Map<String, Object> expectedMap,
+            Map<String, Object> actualMap, String fieldPrefix, int currentDepth, int maxMessageDepth) {
+        ArrayList<MapVerificationResult> differences = new ArrayList<>();
+        expectedMap.keySet().stream().filter(keyOfExpected -> actualMap.containsKey(keyOfExpected))
+                .forEach(commonKey -> {
+                    Object expectedValue = expectedMap.get(commonKey);
+                    Object actualValue = actualMap.get(commonKey);
+                    if (expectedValue instanceof Map && actualValue instanceof Map) {
+                        MapVerificationResult subresult = verifyMap(fieldPrefix + "." + commonKey,
+                                (Map<String, Object>) expectedValue,
+                                (Map<String, Object>) actualValue, currentDepth + 1, maxMessageDepth);
+                        if (subresult != MapVerificationResult.DEFAULT_VERIFIED) {
+                            differences.add(subresult);
+                        }
+                    }
+                });
         return differences;
     }
 
@@ -56,42 +81,10 @@ public class MapVerifier {
                 .collect(Collectors.toList());
     }
 
-    private static void reportUnexpectedlyAvailables(List<String> unexpectedFields, ArrayList<String> differences,
-            String fieldPrefix, boolean shouldReportOnlySummary) {
-        for (String unexpectedField : unexpectedFields) {
-            if (!shouldReportOnlySummary) {
-                    String message = (fieldPrefix + "." + unexpectedField)
-                            + " is unexpected. This may be an undesirable information exposure!";
-                    differences.add(message);
-                }
-        }
-        if (unexpectedFields.size() > 0 && shouldReportOnlySummary) {
-            String message = fieldPrefix + " has unexpected field(s): " + unexpectedFields
-                    + " This may be an undesirable information exposure!";
-            differences.add(message);
-        }
-    }
-
     private static List<String> checkForUnenexpectedlyUnavailableFields(Map<String, Object> expectedMap,
             Map<String, Object> actualMap) {
         return expectedMap.keySet().stream().filter(keyOfExpected -> !actualMap.containsKey(keyOfExpected)
                 && isExpectedToBeAvaiableInActual(expectedMap.get(keyOfExpected))).collect(Collectors.toList());
-    }
-
-    private static void reportUnexpectedlyUnavailables(List<String> unavailableFields,
-            ArrayList<String> differences, String fieldPrefix, boolean shouldReportOnlySummary) {
-        for (String unavailableField : unavailableFields) {
-            if (!shouldReportOnlySummary) {
-                String message = (fieldPrefix + "." + unavailableField)
-                        + " is unavaiable though it was expected to be there";
-                differences.add(message);
-            }
-        }
-        if (unavailableFields.size() > 0 && shouldReportOnlySummary) {
-            String message = fieldPrefix + " lacks " + unavailableFields
-                    + " field(s) that was/were actually expected to be there.";
-            differences.add(message);
-        }
     }
 
     private static List<String> collectBadValueMessages(Map<String, Object> expectedMap, Map<String, Object> actualMap,
@@ -99,7 +92,6 @@ public class MapVerifier {
         List<String> badValueMessages = new ArrayList<>();
         expectedMap.keySet().stream().filter(keyOfExpected -> actualMap.containsKey(keyOfExpected))
                 .forEach(commonKey -> {
-
                     Object expectedValue = expectedMap.get(commonKey);
                     Object actualValue = actualMap.get(commonKey);
                     if (expectedValue == actualValue) {
@@ -108,40 +100,14 @@ public class MapVerifier {
                         badValueMessages.add("Must be null: " + commonKey);
                     } else if (actualValue == null) {
                         badValueMessages.add("Must not be null: " + commonKey);
-                    }
-                    else {
-                       if(expectedValue instanceof Map && actualValue instanceof Map) {
-                            @SuppressWarnings("unchecked")
-                            List<String> messagesFromSubmap = collectBadValueMessages(
-                                    (Map<String, Object>) expectedValue,
-                                    (Map<String, Object>) actualValue,
-                                    fieldPrefix + "." + commonKey, currentDepth + 1, maxMessageDepth);
-                            badValueMessages.addAll(messagesFromSubmap);
-                       }
+                    } else if (!(expectedValue instanceof Map && actualValue instanceof Map)) {
                         Object outcome = compareValues(fieldPrefix, commonKey, expectedValue, actualValue,
                                 currentDepth, maxMessageDepth);
                         if (outcome instanceof String)
                             badValueMessages.add((String) outcome);
                     }
-
         });
         return badValueMessages;
-    }
-
-    private static void reportBadValues(List<String> badValueMessages, ArrayList<String> differences,
-            String fieldPrefix, boolean shouldReportOnlySummary) {
-        for (String badValueMessage : badValueMessages) {
-            if (!shouldReportOnlySummary) {
-                String message = fieldPrefix + " contains a bad value: " + badValueMessage;
-                differences.add(message);
-            }
-        }
-        if (badValueMessages.size() > 0 && shouldReportOnlySummary) {
-            String message = fieldPrefix + " contains " + badValueMessages.size() + " bad value(s): "
-                    + badValueMessages;
-            differences.add(message);
-        }
-
     }
 
     private static Object compareValues(String fieldPrefix, String commonKey, Object expectedValue,
