@@ -82,7 +82,7 @@ public class MapVerificationResult {
     }
 
     public List<String> getAllIssues() {
-        boolean shouldReportOnlySummary = currentDepth == maxMessageDepth;
+        boolean shouldReportOnlySummary = currentDepth >= maxMessageDepth;
         ArrayList<String> allIssues = new ArrayList<>();
         if (!isVerified() && summary != null) {
             allIssues.add(summary);

@@ -225,8 +225,15 @@ public class MapVerifierTest {
         subsubmap1.put("subsubmapfield2", "subsubmapfield2_value");
         subsubmap2.put("subsubmapfield2", "subsubmapfield2_value_bad");
 
+        subsubmap1.put("subsubmapfield3a", "subsubmapfield3");
+        subsubmap2.put("subsubmapfield3b", "subsubmapfield3");
+
         MapVerificationResult result = MapVerifier.verifyMap(expected, actual, 0);
-        result.getAllIssues();
+        Assert.assertArrayEquals(new Object[] {
+                "actualResponse.submap.subsubmap has unexpected field(s): [subsubmapfield3b] This may be an undesirable information exposure!",
+                "actualResponse.submap.subsubmap lacks [subsubmapfield3a] field(s) that was/were actually expected to be there.",
+                "actualResponse.submap.subsubmap contains 2 bad value(s): [actualResponse.submap.subsubmap.subsubmapfield1, actualResponse.submap.subsubmap.subsubmapfield2]" },
+                result.getAllIssues().toArray());
         Assert.assertFalse(result.isVerified());
     }
 
