@@ -19,6 +19,8 @@ public class HttpTestData {
 
     private UserData user;
 
+    private String method;
+
     private String uri;
 
     private RequestData request;
@@ -79,6 +81,14 @@ public class HttpTestData {
 
     public void setUser(UserData user) {
         this.user = user;
+    }
+
+    public String getMethod() {
+        return method;
+    }
+
+    public void setMethod(String method) {
+        this.method = method;
     }
 
     public String getUri() {
