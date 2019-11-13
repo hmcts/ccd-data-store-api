@@ -8,7 +8,7 @@
   "uri": "/caseworkers/{uid}/profile",
   "request": {
     "pathVariables": {
-      "uid": "{~}"
+      "uid": "[[DYNAMIC]]"
     }
   },
   "expectedResponse": {
