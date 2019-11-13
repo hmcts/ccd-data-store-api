@@ -9,7 +9,7 @@
   "uri": "/caseworkers/{uid}/profile",
   "request": {
     "pathVariables": {
-     , "uid": "some id"
+      "uid": "some id"
     }
   },
   "expectedResponse": {
