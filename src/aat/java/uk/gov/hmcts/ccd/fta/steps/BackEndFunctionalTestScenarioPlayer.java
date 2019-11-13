@@ -240,14 +240,11 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
             issues.put("body", bodyVerification.getAllIssues());
         }
 
-        logger.info("[DEBUG] Response issues: " + JsonUtils.getPrettyJsonFromObject(issues));
-        scenario.write("[DEBUG] Response issues: " + JsonUtils.getPrettyJsonFromObject(issues) + "\n\n");
         scenario.write(JsonUtils.getPrettyJsonFromObject(scenarioContext.getTheResponse()));
 
-        // TODO: fail on issues
-        // if (issues.get("responseCode") != null || issues.get("headers") != null || issues.get("body") != null) {
-        //     Assert.fail("Response failures: " + JsonUtils.getPrettyJsonFromObject(issues));
-        // }
+        if (issues.get("responseCode") != null || issues.get("headers") != null || issues.get("body") != null) {
+            Assert.fail("Response failures: " + JsonUtils.getPrettyJsonFromObject(issues));
+        }
     }
 
     @Override
