@@ -14,7 +14,7 @@
   "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/pagination_metadata",
   "request": {
     "pathVariables": {
-      "uid" : "{~}",
+      "uid" : "[[DYNAMIC]]",
       "jid" : "AUTOTEST1",
       "ctid": "AAT"
     }

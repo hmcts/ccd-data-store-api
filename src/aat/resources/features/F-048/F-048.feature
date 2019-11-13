@@ -19,7 +19,7 @@ Feature: Get the pagination metadata for a case data search for Case Worker
     Then a negative response is received
     And the response has all the details as expected
 
-    @S-135
+  @S-135
   Scenario: must return 403 when request provides authentic credentials without authorized access to the operation
     Given an appropriate test context as detailed in the test data source
     And a user with [a detailed profile in CCD]
