@@ -21,9 +21,6 @@
     },
     "queryParams" : {
       "sortDirection" : "someInvalidSortDirection"
-    },
-    "headers": {
-      "Content-Type" : "application/json"
     }
   },
   "expectedResponse": {

@@ -18,9 +18,6 @@
       "uid" : "[[DYNAMIC]]",
       "jid" : "AUTOTEST1",
       "ctid": "AAT"
-    },
-    "headers": {
-      "Content-Type" : "application/json"
     }
   },
   "expectedResponse": {

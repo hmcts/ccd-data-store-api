@@ -19,9 +19,6 @@
       "jid" : "AUTOTEST1",
       "ctid": "AAT"
     },
-    "headers": {
-      "Content-Type" : "application/json"
-    },
     "queryParams" : {
       "caseInvalidCaseParam.PersonFirstName" : "someInvalidParam"
     }

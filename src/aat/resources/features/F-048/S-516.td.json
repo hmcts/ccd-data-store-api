@@ -21,9 +21,6 @@
     },
     "queryParams" : {
       "securityClassification" : "someInvalidSecurityClassification"
-    },
-    "headers": {
-      "Content-Type" : "application/json"
     }
   },
   "expectedResponse": {
