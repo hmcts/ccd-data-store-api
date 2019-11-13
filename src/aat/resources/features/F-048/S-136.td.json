@@ -24,6 +24,10 @@
     }
   },
   "expectedResponse": {
-    "responseCode": 200
+    "responseCode": 200,
+    "body" : {
+      "total_results_count" : 11,
+      "total_pages_count" : 1
+    }
   }
 }

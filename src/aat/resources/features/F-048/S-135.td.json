@@ -9,7 +9,7 @@
   "operationName": "Get the pagination metadata for a case data search for Case Worker",
   "method": "GET",
   "user": {
-    "username": "auto.test.cnp@gmail.com",
+    "username": "auto.test.cnp123@gmail.com",
     "password": "Pa55word11"
   },
   "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/pagination_metadata",
@@ -18,6 +18,9 @@
       "uid" : "[[DYNAMIC]]",
       "jid" : "AUTOTEST1",
       "ctid": "AAT"
+    },
+    "headers": {
+      "Content-Type" : "application/json"
     }
   },
   "expectedResponse": {

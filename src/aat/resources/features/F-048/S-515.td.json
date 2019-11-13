@@ -19,11 +19,25 @@
       "jid" : "AUTOTEST1",
       "ctid": "AAT"
     },
+    "headers": {
+      "Content-Type" : "application/json"
+    },
     "queryParams" : {
       "caseInvalidCaseParam.PersonFirstName" : "someInvalidParam"
     }
   },
   "expectedResponse": {
-    "responseCode": 400
+    "responseCode": 400,
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+      "timestamp" : "2019-11-13T13:45:20.841",
+      "status" : 400,
+      "error" : "Bad Request",
+      "message" : "unknown metadata search parameters: caseInvalidCaseParam.PersonFirstName",
+      "path" : "/caseworkers/bfb6eeaa-cbcd-466d-aafa-07fe99e7462b/jurisdictions/AUTOTEST1/case-types/AAT/cases/pagination_metadata",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
   }
 }
