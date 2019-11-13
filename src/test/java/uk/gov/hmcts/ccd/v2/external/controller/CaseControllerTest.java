@@ -23,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.createcase.CreateCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.createevent.CreateEventOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
@@ -32,12 +33,16 @@ import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 @DisplayName("CaseController")
 class CaseControllerTest {
     private static final String CASE_REFERENCE = "1234123412341238";
+    private static final String CASE_TYPE_ID = "Grant";
+    private static final Boolean IGNORE_WARNING = true;
     private static final CaseDataContent CASE_DATA_CONTENT = newCaseDataContent().build();
 
     @Mock
     private GetCaseOperation getCaseOperation;
     @Mock
     private CreateEventOperation createEventOperation;
+    @Mock
+    private CreateCaseOperation createCaseOperation;
 
     @Mock
     private UIDService caseReferenceService;
@@ -57,6 +62,7 @@ class CaseControllerTest {
         when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(TRUE);
         when(getCaseOperation.execute(CASE_REFERENCE)).thenReturn(Optional.of(caseDetails));
         when(createEventOperation.createCaseEvent(CASE_REFERENCE, CASE_DATA_CONTENT)).thenReturn(caseDetails);
+        when(createCaseOperation.createCaseDetails(CASE_TYPE_ID, CASE_DATA_CONTENT, IGNORE_WARNING)).thenReturn(caseDetails);
     }
 
     @Nested
@@ -107,12 +113,12 @@ class CaseControllerTest {
     class PostCaseEvent {
 
         @Test
-        @DisplayName("should return 200 when case event created")
+        @DisplayName("should return 201 when case event created")
         void caseEventCreated() {
             final ResponseEntity<CaseResource> response = caseController.createEvent(CASE_REFERENCE, CASE_DATA_CONTENT);
 
             assertAll(
-                () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
+                () -> assertThat(response.getStatusCode(), is(HttpStatus.CREATED)),
                 () -> assertThat(response.getBody().getReference(), is(CASE_REFERENCE))
             );
         }
@@ -133,6 +139,31 @@ class CaseControllerTest {
 
             assertThrows(Exception.class,
                 () -> caseController.createEvent(CASE_REFERENCE, CASE_DATA_CONTENT));
+        }
+    }
+
+    @Nested
+    @DisplayName("POST /case-types/{caseTypeId}/cases")
+    class PostCase {
+
+        @Test
+        @DisplayName("should return 201 when case created")
+        void caseEventCreated() {
+            final ResponseEntity<CaseResource> response = caseController.createCase(CASE_TYPE_ID, CASE_DATA_CONTENT, IGNORE_WARNING);
+
+            assertAll(
+                () -> assertThat(response.getStatusCode(), is(HttpStatus.CREATED)),
+                () -> assertThat(response.getBody().getReference(), is(CASE_REFERENCE))
+            );
+        }
+
+        @Test
+        @DisplayName("should propagate exception")
+        void shouldPropagateExceptionWhenThrown() {
+            when(createCaseOperation.createCaseDetails(CASE_TYPE_ID, CASE_DATA_CONTENT, IGNORE_WARNING)).thenThrow(RuntimeException.class);
+
+            assertThrows(Exception.class,
+                () -> caseController.createCase(CASE_TYPE_ID, CASE_DATA_CONTENT, IGNORE_WARNING));
         }
     }
 }

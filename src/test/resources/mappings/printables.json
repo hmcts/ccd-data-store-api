@@ -1,0 +1,26 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/printables"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": [
+      {
+        "url": "http://remote_host/print/cases/1565620330684549?jwt=test",
+        "name": "Claimant ID",
+        "type": "ID",
+        "description": "Document identifying identity"
+      },
+      {
+        "url": "http://remote_host/print/cases/1565620330684549?jwt=test",
+        "name": "Claimant Address",
+        "type": "Address",
+        "description": "Document identifying address"
+      }
+    ]
+  }
+}
