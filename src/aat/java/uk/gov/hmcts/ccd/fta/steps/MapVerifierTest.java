@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class MapVerifierTest {
 
     @Test(expected = IllegalArgumentException.class)
-    public void shouldThrowExceptionFoprNegativeMaxDepth() {
+    public void shouldThrowExceptionForNegativeMaxDepth() {
         MapVerifier.verifyMap(null, null, -1);
     }
 
@@ -30,14 +30,14 @@ public class MapVerifierTest {
     @Test
     public void shouldNotVerifyNullVsNonNullCase() {
         MapVerificationResult result = MapVerifier.verifyMap(new HashMap<String, Object>(), null, 999);
-        Assert.assertArrayEquals(new Object[] { "Map is expected to be non-null, but is actuall null." },
+        Assert.assertArrayEquals(new Object[] { "Map is expected to be non-null, but is actually null." },
                 result.getAllIssues().toArray());
     }
 
     @Test
     public void shouldNotVerifyNoneNullVsNullCase() {
         MapVerificationResult result = MapVerifier.verifyMap(null, new HashMap<String, Object>(), 999);
-        Assert.assertArrayEquals(new Object[] { "Map is expected to be null, but is actuall not." },
+        Assert.assertArrayEquals(new Object[] { "Map is expected to be null, but is actually not." },
                 result.getAllIssues().toArray());
     }
 
@@ -60,7 +60,7 @@ public class MapVerifierTest {
     }
 
     @Test
-    public void shouldVerifySimpleMapsOfSameConentWithoutWildcards() {
+    public void shouldVerifySimpleMapsOfSameContentWithoutWildcards() {
         Map<String, Object> expected = new HashMap<String, Object>();
         Map<String, Object> actual = new ConcurrentHashMap<String, Object>();
 

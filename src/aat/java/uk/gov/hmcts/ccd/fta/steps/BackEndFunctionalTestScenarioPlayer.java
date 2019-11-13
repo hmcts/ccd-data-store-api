@@ -12,8 +12,11 @@ import org.apache.commons.collections.MapUtils;
 import org.junit.Assert;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import io.cucumber.core.api.Scenario;
@@ -160,6 +163,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         String uri = scenarioContext.getTestData().getUri();
 
         Response response = null;
+        Assert.assertNotNull("No request method in data file", scenarioContext.getTestData().getMethod());
         switch (scenarioContext.getTestData().getMethod()) {
             case "GET":
                 response = theRequest.get(uri);
@@ -215,17 +219,33 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     @Override
     @Then("the response has all the details as expected")
     public void verifyThatTheResponseHasAllTheDetailsAsExpected() throws IOException {
-        // TODO: write response comparison logic
-        Map<String, Object> expectedResponseBody = scenarioContext.getTestData().getExpectedResponse().getBody();
-        Map<String, Object> actualResponseBody = scenarioContext.getTheResponse().getBody();
-        MapVerificationResult mapVerificationResult = MapVerifier.verifyMap(expectedResponseBody, actualResponseBody, 10);
+        ResponseData expectedResponse = scenarioContext.getTestData().getExpectedResponse();
+        ResponseData actualResponse = scenarioContext.getTheResponse();
+        Map<String, List> issues = new HashMap<>();
 
-        String issues = mapVerificationResult.getAllIssues().toString();
-        logger.info("Response body issues: " + issues);
+        int expectedResponseCode = expectedResponse.getResponseCode();
+        int actualResponseCode = actualResponse.getResponseCode();
+        if (actualResponseCode != expectedResponseCode) {
+            issues.put("responseCode", Collections.singletonList("Response code mismatch, expected: "
+                + expectedResponseCode + ", actual: " + actualResponseCode));
+        }
 
-        scenario.write("Response body issues: " + issues + "\n\n");
+        Map<String, Object> expectedHeaders = expectedResponse.getHeaders();
+        Map<String, Object> actualHeaders = actualResponse.getHeaders();
+        MapVerificationResult headerVerification = MapVerifier.verifyMap(expectedHeaders, actualHeaders, 1);
+        issues.put("headers", headerVerification.getAllIssues());
+
+        Map<String, Object> expectedResponseBody = expectedResponse.getBody();
+        Map<String, Object> actualResponseBody = actualResponse.getBody();
+        MapVerificationResult bodyVerification = MapVerifier.verifyMap(expectedResponseBody, actualResponseBody, 10);
+        issues.put("body", bodyVerification.getAllIssues());
+
+        logger.info("[DEBUG] Response issues: " + JsonUtils.getPrettyJsonFromObject(issues));
+
+        scenario.write("[DEBUG] Response issues: " + JsonUtils.getPrettyJsonFromObject(issues) + "\n\n");
         scenario.write(JsonUtils.getPrettyJsonFromObject(scenarioContext.getTheResponse()));
 
+        // TODO: fail on issues
         //Assert.assertEquals("", issues);
     }
 

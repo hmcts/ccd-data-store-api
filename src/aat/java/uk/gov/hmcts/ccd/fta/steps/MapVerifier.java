@@ -7,8 +7,8 @@ import java.util.stream.Collectors;
 
 public class MapVerifier {
 
-    public static final String DONT_CARE = "[[DONT_CARE]]";
-    public static final String NONE_NULL = "[[NONE_NULL]]";
+    public static final String ANY = "[[ANY]]";
+    public static final String NOT_NULL = "[[NOT_NULL]]";
 
     // TODO: Compare 2 maps and return any differences they may have as a list of
     // Strings, each String to describe a particular difference.
@@ -29,15 +29,15 @@ public class MapVerifier {
             return MapVerificationResult.DEFAULT_VERIFIED;
         } else if (expectedMap == null) {
             return new MapVerificationResult(fieldPrefix, false,
-                    shouldReportAnyDifference ? "Map is expected to be null, but is actuall not." : null, currentDepth,  maxMessageDepth);
+                    shouldReportAnyDifference ? "Map is expected to be null, but is actually not." : null, currentDepth,  maxMessageDepth);
         } else if (actualMap == null) {
             return new MapVerificationResult(fieldPrefix, false,
-                    shouldReportAnyDifference ? "Map is expected to be non-null, but is actuall null." : null,
+                    shouldReportAnyDifference ? "Map is expected to be non-null, but is actually null." : null,
                     currentDepth, maxMessageDepth);
         }
 
-        List<String> unexpectedFields = checkForUnenexpectedlyAvailableFields(expectedMap, actualMap);
-        List<String> unavailableFields = checkForUnenexpectedlyUnavailableFields(expectedMap, actualMap);
+        List<String> unexpectedFields = checkForUnexpectedlyAvailableFields(expectedMap, actualMap);
+        List<String> unavailableFields = checkForUnexpectedlyUnavailableFields(expectedMap, actualMap);
         List<String> badValueMessages = collectBadValueMessages(expectedMap, actualMap, fieldPrefix, currentDepth,
                 maxMessageDepth);
         List<MapVerificationResult> badSubmaps = collectBadSubmaps(expectedMap, actualMap, fieldPrefix,
@@ -72,16 +72,16 @@ public class MapVerifier {
         return differences;
     }
 
-    private static List<String> checkForUnenexpectedlyAvailableFields(Map<String, Object> expectedMap,
-            Map<String, Object> actualMap) {
+    private static List<String> checkForUnexpectedlyAvailableFields(Map<String, Object> expectedMap,
+                                                                    Map<String, Object> actualMap) {
         return actualMap.keySet().stream().filter(keyOfActual -> !expectedMap.containsKey(keyOfActual))
                 .collect(Collectors.toList());
     }
 
-    private static List<String> checkForUnenexpectedlyUnavailableFields(Map<String, Object> expectedMap,
-            Map<String, Object> actualMap) {
+    private static List<String> checkForUnexpectedlyUnavailableFields(Map<String, Object> expectedMap,
+                                                                      Map<String, Object> actualMap) {
         return expectedMap.keySet().stream().filter(keyOfExpected -> !actualMap.containsKey(keyOfExpected)
-                && isExpectedToBeAvaiableInActual(expectedMap.get(keyOfExpected))).collect(Collectors.toList());
+                && isExpectedToBeAvailableInActual(expectedMap.get(keyOfExpected))).collect(Collectors.toList());
     }
 
     private static List<String> collectBadValueMessages(Map<String, Object> expectedMap, Map<String, Object> actualMap,
@@ -134,9 +134,9 @@ public class MapVerifier {
                 : fieldName + ": expected '" + expectedValue + "' but got '" + actualValue + "'";
     }
 
-    private static boolean isExpectedToBeAvaiableInActual(Object expectedValue) {
+    private static boolean isExpectedToBeAvailableInActual(Object expectedValue) {
         if (expectedValue instanceof String)
-            return !DONT_CARE.equalsIgnoreCase((String) expectedValue);
+            return !ANY.equalsIgnoreCase((String) expectedValue);
         return true;
     }
 
@@ -144,7 +144,7 @@ public class MapVerifier {
         if (!(expectedValue instanceof String)) {
             return Boolean.FALSE;
         }
-        return !NONE_NULL.equalsIgnoreCase((String) expectedValue);
+        return !NOT_NULL.equalsIgnoreCase((String) expectedValue);
     }
 
 }
