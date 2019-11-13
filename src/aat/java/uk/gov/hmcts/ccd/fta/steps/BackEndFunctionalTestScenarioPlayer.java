@@ -1,19 +1,15 @@
 package uk.gov.hmcts.ccd.fta.steps;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Iterables;
 import feign.FeignException;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import io.restassured.specification.QueryableRequestSpecification;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.SpecificationQuerier;
-import org.apache.commons.collections.MapUtils;
 import org.junit.Assert;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -233,20 +229,25 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         Map<String, Object> expectedHeaders = expectedResponse.getHeaders();
         Map<String, Object> actualHeaders = actualResponse.getHeaders();
         MapVerificationResult headerVerification = MapVerifier.verifyMap(expectedHeaders, actualHeaders, 1);
-        issues.put("headers", headerVerification.getAllIssues());
+        if (!headerVerification.isVerified()) {
+            issues.put("headers", headerVerification.getAllIssues());
+        }
 
         Map<String, Object> expectedResponseBody = expectedResponse.getBody();
         Map<String, Object> actualResponseBody = actualResponse.getBody();
         MapVerificationResult bodyVerification = MapVerifier.verifyMap(expectedResponseBody, actualResponseBody, 10);
-        issues.put("body", bodyVerification.getAllIssues());
+        if (!bodyVerification.isVerified()) {
+            issues.put("body", bodyVerification.getAllIssues());
+        }
 
         logger.info("[DEBUG] Response issues: " + JsonUtils.getPrettyJsonFromObject(issues));
-
         scenario.write("[DEBUG] Response issues: " + JsonUtils.getPrettyJsonFromObject(issues) + "\n\n");
         scenario.write(JsonUtils.getPrettyJsonFromObject(scenarioContext.getTheResponse()));
 
         // TODO: fail on issues
-        //Assert.assertEquals("", issues);
+        // Assert.assertNull("Response code assertion issues", issues.get("responseCode"));
+        // Assert.assertNull("Response header assertion issues", issues.get("headers"));
+        // Assert.assertNull("Response body assertion issues", issues.get("body"));
     }
 
     @Override
