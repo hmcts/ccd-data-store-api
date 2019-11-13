@@ -183,7 +183,10 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         responseData.setResponseCode(response.getStatusCode());
         responseData.setResponseMessage(HttpStatus.valueOf(response.getStatusCode()).getReasonPhrase());
         responseData.setHeaders(responseHeaders);
-        responseData.setBody(JsonUtils.readObjectFromJsonText(response.getBody().asString(), Map.class));
+
+        if (!response.getBody().asString().isEmpty()) {
+            responseData.setBody(JsonUtils.readObjectFromJsonText(response.getBody().asString(), Map.class));
+        }
 
         scenarioContext.setTheResponse(responseData);
     }
