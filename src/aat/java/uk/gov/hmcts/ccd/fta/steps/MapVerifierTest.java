@@ -81,6 +81,46 @@ public class MapVerifierTest {
     }
 
     @Test
+    public void shouldVerifySimpleMapOfAcceptableConentWithWildcards() {
+        Map<String, Object> expected = new HashMap<String, Object>();
+        Map<String, Object> expectedBody = new HashMap<String, Object>();
+        Map<String, Object> actual = new ConcurrentHashMap<String, Object>();
+        Map<String, Object> actualBody = new HashMap<String, Object>();
+
+        expected.put("responseCode", 400);
+        expected.put("body", expectedBody);
+        expectedBody.put("exception", "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException");
+        expectedBody.put("timestamp", "[[DONT_CARE]]");
+        expectedBody.put("status", 400);
+        expectedBody.put("error", "Bad Request");
+        expectedBody.put("message", "Unknown sort direction: someInvalidSortDirection");
+        expectedBody.put("path", "[[DONT_CARE]]");
+        expectedBody.put("details", null);
+        expectedBody.put("callbackErrors", null);
+        expectedBody.put("callbackWarnings", null);
+
+
+
+        actual.put("responseCode", 400);
+        actual.put("body", actualBody);
+        actualBody.put("exception", "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException");
+        actualBody.put("timestamp", "2019-11-13T14:02:43.431");
+        actualBody.put("status", 400);
+        actualBody.put("error", "Bad Request");
+        actualBody.put("message", "Unknown sort direction: someInvalidSortDirection");
+        actualBody.put("path",
+                "/caseworkers/bfb6eeaa-cbcd-466d-aafa-07fe99e7462b/jurisdictions/AUTOTEST1/case-types/AAT/cases/pagination_metadata");
+        actualBody.put("details", null);
+        actualBody.put("callbackErrors", null);
+        actualBody.put("callbackWarnings", null);
+
+        
+        MapVerificationResult result = MapVerifier.verifyMap(expected, actual, 0);
+        Assert.assertEquals(0, result.getAllIssues().size());
+        Assert.assertTrue(result.isVerified());
+    }
+
+    @Test
     public void shouldNotVerifySimpleMapsWithUnexpectedFields() {
         Map<String, Object> expected = new HashMap<String, Object>();
         Map<String, Object> actual = new ConcurrentHashMap<String, Object>();

@@ -64,7 +64,7 @@ public class MapVerifier {
                         MapVerificationResult subresult = verifyMap(fieldPrefix + "." + commonKey,
                                 (Map<String, Object>) expectedValue,
                                 (Map<String, Object>) actualValue, currentDepth + 1, maxMessageDepth);
-                        if (subresult != MapVerificationResult.DEFAULT_VERIFIED) {
+                        if (!subresult.isVerified()) {
                             differences.add(subresult);
                         }
                     }
@@ -114,7 +114,10 @@ public class MapVerifier {
     private static Object compareValues(String fieldPrefix, String commonKey, Object expectedValue,
             Object actualValue, int currentDepth, int maxMessageDepth) {
         boolean justCompare = currentDepth > maxMessageDepth;
-        if (expectedValue == actualValue) {
+        if (expectedValue instanceof String && DONT_CARE.equalsIgnoreCase((String) expectedValue)) {
+            return Boolean.TRUE;
+        }
+        else if (expectedValue == actualValue) {
             return Boolean.TRUE;
         }
         else if (expectedValue == null) {
