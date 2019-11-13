@@ -1,15 +1,18 @@
 package uk.gov.hmcts.ccd.fta.steps;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Iterables;
 import feign.FeignException;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import io.restassured.specification.QueryableRequestSpecification;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.SpecificationQuerier;
+import org.apache.commons.collections.MapUtils;
 import org.junit.Assert;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -216,9 +219,14 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         Map<String, Object> expectedResponseBody = scenarioContext.getTestData().getExpectedResponse().getBody();
         Map<String, Object> actualResponseBody = scenarioContext.getTheResponse().getBody();
         MapVerificationResult mapVerificationResult = MapVerifier.verifyMap(expectedResponseBody, actualResponseBody, 10);
-        logger.info("Response body issues: " + mapVerificationResult.getAllIssues().toString());
 
+        String issues = mapVerificationResult.getAllIssues().toString();
+        logger.info("Response body issues: " + issues);
+
+        scenario.write("Response body issues: " + issues + "\n\n");
         scenario.write(JsonUtils.getPrettyJsonFromObject(scenarioContext.getTheResponse()));
+
+        //Assert.assertEquals("", issues);
     }
 
     @Override
