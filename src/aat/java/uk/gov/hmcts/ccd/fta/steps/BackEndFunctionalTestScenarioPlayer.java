@@ -245,9 +245,9 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         scenario.write(JsonUtils.getPrettyJsonFromObject(scenarioContext.getTheResponse()));
 
         // TODO: fail on issues
-        // Assert.assertNull("Response code assertion issues", issues.get("responseCode"));
-        // Assert.assertNull("Response header assertion issues", issues.get("headers"));
-        // Assert.assertNull("Response body assertion issues", issues.get("body"));
+        // if (issues.get("responseCode") != null || issues.get("headers") != null || issues.get("body") != null) {
+        //     Assert.fail("Response failures: " + JsonUtils.getPrettyJsonFromObject(issues));
+        // }
     }
 
     @Override
