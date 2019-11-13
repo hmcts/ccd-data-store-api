@@ -100,13 +100,13 @@ public class MapVerificationResult {
 
     public static final MapVerificationResult minimalVerifiedResult(String field, int currentDepth,
             int maxMessageDepth) {
-        return new MapVerificationResult(field, true, field + "Map has expected content.", currentDepth,
+        return new MapVerificationResult(field, true, field + ": Map has expected content.", currentDepth,
                 maxMessageDepth);
     }
 
     public static final MapVerificationResult minimalUnverifiedResult(String field, int currentDepth,
             int maxMessageDepth) {
-        return new MapVerificationResult(field, false, field + "Map does not have expected content.", currentDepth,
+        return new MapVerificationResult(field, false, field + ": Map does not have expected content.", currentDepth,
                 maxMessageDepth);
     }
 
