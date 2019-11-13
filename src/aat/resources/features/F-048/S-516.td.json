@@ -30,7 +30,7 @@
     "responseCode": 400,
     "body" : {
       "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
-      "timestamp" : "2019-11-13T13:45:20.929",
+      "timestamp" : "[[DONT_CARE]]",
       "status" : 400,
       "error" : "Bad Request",
       "message" : "unknown metadata search parameters: securityClassification",
