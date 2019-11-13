@@ -86,6 +86,9 @@ class AuthorisedGetEventTriggerOperationTest {
     private final List<CaseField> caseFields = Lists.newArrayList();
     private final Set<String> userRoles = Sets.newHashSet(CASEWORKER_DIVORCE,
         CASEWORKER_PROBATE_LOA1,
+        CASEWORKER_PROBATE_LOA3);
+    private final Set<String> createCaseUserRoles = Sets.newHashSet(CASEWORKER_DIVORCE,
+        CASEWORKER_PROBATE_LOA1,
         CASEWORKER_PROBATE_LOA3,
         GlobalCaseRole.CREATOR.getRole());
     private final List<CaseEvent> events = Lists.newArrayList();
@@ -113,6 +116,7 @@ class AuthorisedGetEventTriggerOperationTest {
         caseDetails.setId(CASE_ID);
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseType);
         when(caseAccessService.getUserRoles()).thenReturn(userRoles);
+        when(caseAccessService.getCaseCreationCaseRoles()).thenReturn(createCaseUserRoles);
         when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseType),
                                                                 eq(userRoles),
                                                                 eq(CAN_CREATE))).thenReturn(true);
@@ -142,22 +146,22 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                                          EVENT_TRIGGER_ID,
                                                                                          IGNORE);
             doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(caseType,
-                                                                                    userRoles,
+                                                                                    createCaseUserRoles,
                                                                                     CAN_READ);
             doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(caseType,
-                                                                                    userRoles,
+                                                                                    createCaseUserRoles,
                                                                                     CAN_CREATE);
             doReturn(true).when(accessControlService).canAccessCaseEventWithCriteria(EVENT_TRIGGER_ID,
                                                                                      events,
-                                                                                     userRoles,
+                                                                                     createCaseUserRoles,
                                                                                      CAN_CREATE);
             doReturn(caseEventTrigger).when(accessControlService).setReadOnlyOnCaseViewFieldsIfNoAccess(caseEventTrigger,
                                                                                                         caseFields,
-                                                                                                        userRoles,
+                                                                                                        createCaseUserRoles,
                                                                                                         CAN_CREATE);
             doReturn(caseEventTrigger).when(accessControlService).filterCaseViewFieldsByAccess(caseEventTrigger,
                                                                                                caseFields,
-                                                                                               userRoles,
+                                                                                               createCaseUserRoles,
                                                                                                CAN_CREATE);
         }
 
@@ -192,20 +196,20 @@ class AuthorisedGetEventTriggerOperationTest {
             assertAll(
                 () -> assertThat(output, sameInstance(caseEventTrigger)),
                 () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
-                () -> inOrder.verify(caseAccessService).getUserRoles(),
+                () -> inOrder.verify(caseAccessService).getCaseCreationCaseRoles(),
                 () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseType),
-                                                                                         eq(userRoles),
+                                                                                         eq(createCaseUserRoles),
                                                                                          eq(CAN_CREATE)),
                 () -> inOrder.verify(accessControlService).canAccessCaseEventWithCriteria(eq(EVENT_TRIGGER_ID),
                                                                                           eq(caseType.getEvents()),
-                                                                                          eq(userRoles),
+                                                                                          eq(createCaseUserRoles),
                                                                                           eq(CAN_CREATE)),
                 () -> inOrder.verify(getEventTriggerOperation).executeForCaseType(CASE_TYPE_ID,
                                                                                   EVENT_TRIGGER_ID,
                                                                                   IGNORE),
                 () -> inOrder.verify(accessControlService).filterCaseViewFieldsByAccess(eq(caseEventTrigger),
                                                                                         eq(caseFields),
-                                                                                        eq(userRoles),
+                                                                                        eq(createCaseUserRoles),
                                                                                         eq(CAN_CREATE))
             );
         }
@@ -214,7 +218,7 @@ class AuthorisedGetEventTriggerOperationTest {
         @DisplayName("should fail if no read access on case type")
         void shouldFailIfNoReadAccessOnCaseType() {
             doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(caseType,
-                                                                                     userRoles,
+                                                                                     createCaseUserRoles,
                                                                                      CAN_READ);
 
             assertThrows(
@@ -228,7 +232,7 @@ class AuthorisedGetEventTriggerOperationTest {
         @DisplayName("should fail if no create access on case type")
         void shouldFailIfNoCreateAccessOnCaseType() {
             doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(caseType,
-                                                                                     userRoles,
+                                                                                     createCaseUserRoles,
                                                                                      CAN_CREATE);
 
             assertThrows(
@@ -243,7 +247,7 @@ class AuthorisedGetEventTriggerOperationTest {
         void shouldFailIfNoCreateAccessOnCaseEvent() {
             doReturn(false).when(accessControlService).canAccessCaseEventWithCriteria(EVENT_TRIGGER_ID,
                                                                                       events,
-                                                                                      userRoles,
+                                                                                      createCaseUserRoles,
                                                                                       CAN_CREATE);
 
             assertThrows(

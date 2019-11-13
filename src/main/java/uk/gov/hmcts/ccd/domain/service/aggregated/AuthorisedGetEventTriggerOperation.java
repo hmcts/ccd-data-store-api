@@ -4,7 +4,6 @@ import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
@@ -27,7 +26,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import static java.util.Collections.singleton;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
@@ -69,7 +67,7 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
     public CaseEventTrigger executeForCaseType(String caseTypeId, String eventTriggerId, Boolean ignoreWarning) {
         final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
 
-        Set<String> userRoles = Sets.union(caseAccessService.getUserRoles(), singleton(GlobalCaseRole.CREATOR.getRole()));
+        Set<String> userRoles = caseAccessService.getCaseCreationCaseRoles();
 
         verifyRequiredAccessExistsForCaseType(eventTriggerId, caseType, userRoles);
 
