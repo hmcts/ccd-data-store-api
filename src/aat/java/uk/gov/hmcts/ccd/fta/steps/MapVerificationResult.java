@@ -87,10 +87,10 @@ public class MapVerificationResult {
         if (!isVerified() && summary != null) {
             allIssues.add(summary);
         }
-        reportUnexpectedlyAvailables(unexpectedFields, field, shouldReportOnlySummary);
-        reportUnexpectedlyUnavailables(unavailableFields, field, shouldReportOnlySummary);
-        reportBadValues(badValueFields, field, shouldReportOnlySummary);
-        reportBadSubmaps(badSubmaps, field, shouldReportOnlySummary);
+        reportUnexpectedlyAvailables(allIssues, unexpectedFields, field, shouldReportOnlySummary);
+        reportUnexpectedlyUnavailables(allIssues, unavailableFields, field, shouldReportOnlySummary);
+        reportBadValues(allIssues, badValueFields, field, shouldReportOnlySummary);
+        reportBadSubmaps(allIssues, badSubmaps, field, shouldReportOnlySummary);
         return allIssues;
     }
 
@@ -110,66 +110,66 @@ public class MapVerificationResult {
                 maxMessageDepth);
     }
 
-    private void reportUnexpectedlyAvailables(List<String> unexpectedFields,
+    private void reportUnexpectedlyAvailables(List<String> allIssues, List<String> unexpectedFields,
             String fieldPrefix, boolean shouldReportOnlySummary) {
-        ArrayList<String> differences = new ArrayList<>();
         for (String unexpectedField : unexpectedFields) {
             if (!shouldReportOnlySummary) {
                 String message = (fieldPrefix + "." + unexpectedField)
                         + " is unexpected. This may be an undesirable information exposure!";
-                differences.add(message);
+                allIssues.add(message);
             }
         }
         if (unexpectedFields.size() > 0 && shouldReportOnlySummary) {
             String message = fieldPrefix + " has unexpected field(s): " + unexpectedFields
                     + " This may be an undesirable information exposure!";
-            differences.add(message);
+            allIssues.add(message);
         }
-        this.setUnexpectedFields(differences);
     }
 
-    private void reportUnexpectedlyUnavailables(List<String> unavailableFields,
+    private void reportUnexpectedlyUnavailables(List<String> allIssues, List<String> unavailableFields,
             String fieldPrefix, boolean shouldReportOnlySummary) {
-        ArrayList<String> differences = new ArrayList<>();
         for (String unavailableField : unavailableFields) {
             if (!shouldReportOnlySummary) {
                 String message = (fieldPrefix + "." + unavailableField)
                         + " is unavaiable though it was expected to be there";
-                differences.add(message);
+                allIssues.add(message);
             }
         }
         if (unavailableFields.size() > 0 && shouldReportOnlySummary) {
             String message = fieldPrefix + " lacks " + unavailableFields
                     + " field(s) that was/were actually expected to be there.";
-            differences.add(message);
+            allIssues.add(message);
         }
-        this.setUnexpectedFields(differences);
     }
 
-    private void reportBadValues(List<String> badValueMessages, String fieldPrefix,
+    private void reportBadValues(List<String> allIssues, List<String> badValueMessages, String fieldPrefix,
             boolean shouldReportOnlySummary) {
-        ArrayList<String> differences = new ArrayList<>();
         for (String badValueMessage : badValueMessages) {
             if (!shouldReportOnlySummary) {
                 String message = fieldPrefix + " contains a bad value: " + badValueMessage;
-                differences.add(message);
+                allIssues.add(message);
             }
         }
         if (badValueMessages.size() > 0 && shouldReportOnlySummary) {
             String message = fieldPrefix + " contains " + badValueMessages.size() + " bad value(s): "
                     + badValueMessages;
-            differences.add(message);
+            allIssues.add(message);
         }
-        this.setBadValueFields(differences);
     }
 
-    private void reportBadSubmaps(List<MapVerificationResult> badSubmapResults, 
+    private void reportBadSubmaps(List<String> allIssues, List<MapVerificationResult> badSubmapResults,
             String fieldPrefix, boolean shouldReportOnlySummary) {
         for (MapVerificationResult badResult : badSubmapResults) {
-            reportUnexpectedlyAvailables(badResult.getUnexpectedFields(), fieldPrefix, shouldReportOnlySummary);
-            reportUnexpectedlyUnavailables(badResult.getUnavailableFields(), fieldPrefix,
-                    shouldReportOnlySummary);
-            reportBadValues(badResult.getBadValueFields(), fieldPrefix, shouldReportOnlySummary);
+            allIssues.addAll(badResult.getAllIssues());
+            // reportUnexpectedlyAvailables(allIssues, badResult.getUnexpectedFields(),
+            // fieldPrefix,
+            // shouldReportOnlySummary);
+            // reportUnexpectedlyUnavailables(allIssues, badResult.getUnavailableFields(),
+            // fieldPrefix,
+            // shouldReportOnlySummary);
+            // reportBadValues(allIssues, badResult.getBadValueFields(), fieldPrefix,
+            // shouldReportOnlySummary);
+
         }
     }
 }

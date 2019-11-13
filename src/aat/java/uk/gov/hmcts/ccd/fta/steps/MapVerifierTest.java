@@ -48,7 +48,7 @@ public class MapVerifierTest {
         Assert.assertEquals(0, result.getAllIssues().size());
         result = MapVerifier.verifyMap(new ConcurrentHashMap<String, Object>(), new LinkedHashMap<String, Object>(),
                 0);
-        Assert.assertEquals(0, result.getAllIssues().size());
+        Assert.assertTrue(result.isVerified());
     }
 
     @Test
@@ -56,7 +56,7 @@ public class MapVerifierTest {
         Map<String, Object> expected = new HashMap<String, Object>();
         expected.put("key", "value");
         MapVerificationResult result = MapVerifier.verifyMap(expected, expected, 0);
-        Assert.assertEquals(0, result.getAllIssues().size());
+        Assert.assertTrue(result.isVerified());
     }
 
     @Test
@@ -77,7 +77,7 @@ public class MapVerifierTest {
         expected.put("key3", 333.333);
         actual.put("key3", 333.333);
         result = MapVerifier.verifyMap(expected, actual, 0);
-        Assert.assertEquals(0, result.getAllIssues().size());
+        Assert.assertTrue(result.isVerified());
     }
 
     @Test
@@ -152,6 +152,7 @@ public class MapVerifierTest {
         expected.put("key2", "value2");
         actual.put("key2", "value2_bad");
         MapVerificationResult result = MapVerifier.verifyMap(expected, actual, 0);
+        Assert.assertFalse(result.isVerified());
         Assert.assertArrayEquals(
                 new Object[] {
                         "actualResponse contains 1 bad value(s): [key2: expected 'value2' but got 'value2_bad']" },
@@ -196,7 +197,7 @@ public class MapVerifierTest {
         subsubmap.put("subsubfield2", "subsubfield2_value");
 
         MapVerificationResult result = MapVerifier.verifyMap(expected, actual, 0);
-        Assert.assertEquals(0, result.getAllIssues().size());
+        Assert.assertTrue(result.isVerified());
     }
 
     // @Ignore
@@ -219,11 +220,14 @@ public class MapVerifierTest {
         Map<String, Object> subsubmap2 = new ConcurrentHashMap<String, Object>();
         submap1.put("subsubmap", subsubmap1);
         submap2.put("subsubmap", subsubmap2);
-        subsubmap1.put("subsubmapfield", "subsubmapfield_value");
-        subsubmap2.put("subsubmapfield", "subsubmapfield_value_bad");
+        subsubmap1.put("subsubmapfield1", "subsubmapfield1_value");
+        subsubmap2.put("subsubmapfield1", "subsubmapfield1_value_bad");
+        subsubmap1.put("subsubmapfield2", "subsubmapfield2_value");
+        subsubmap2.put("subsubmapfield2", "subsubmapfield2_value_bad");
 
         MapVerificationResult result = MapVerifier.verifyMap(expected, actual, 0);
-        Assert.assertEquals(0, result.getAllIssues().size());
+        result.getAllIssues();
+        Assert.assertFalse(result.isVerified());
     }
 
 }

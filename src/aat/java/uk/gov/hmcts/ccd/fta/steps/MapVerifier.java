@@ -43,16 +43,13 @@ public class MapVerifier {
         List<MapVerificationResult> badSubmaps = collectBadSubmaps(expectedMap, actualMap, fieldPrefix,
                 currentDepth, maxMessageDepth);
 
-        if (unavailableFields.size() == 0 && unavailableFields.size() == 0 && badValueMessages.size() == 0
-                && badSubmaps.size() == 0)
+        if (unexpectedFields.size() == 0 && unavailableFields.size() == 0 && badValueMessages.size() == 0
+                && badSubmaps.size() == 0) {
             return MapVerificationResult.minimalVerifiedResult(fieldPrefix, currentDepth, maxMessageDepth);
-
-        if (shouldReportAnyDifference) {
-            return new MapVerificationResult(fieldPrefix, false, null, unexpectedFields,
+        }
+        return new MapVerificationResult(fieldPrefix, false, null, unexpectedFields,
                     unavailableFields,
                     badValueMessages, badSubmaps, currentDepth, maxMessageDepth);
-        }
-        return MapVerificationResult.minimalUnverifiedResult(fieldPrefix, currentDepth, maxMessageDepth);
     }
 
     @SuppressWarnings("unchecked")
@@ -103,8 +100,12 @@ public class MapVerifier {
                     } else if (!(expectedValue instanceof Map && actualValue instanceof Map)) {
                         Object outcome = compareValues(fieldPrefix, commonKey, expectedValue, actualValue,
                                 currentDepth, maxMessageDepth);
-                        if (outcome instanceof String)
-                            badValueMessages.add((String) outcome);
+                        if (!Boolean.TRUE.equals(outcome)) {
+                            if (outcome instanceof String)
+                                badValueMessages.add((String) outcome);
+                            else
+                                badValueMessages.add(fieldPrefix + "." + commonKey);
+                        }
                     }
         });
         return badValueMessages;
@@ -114,7 +115,7 @@ public class MapVerifier {
             Object actualValue, int currentDepth, int maxMessageDepth) {
         boolean justCompare = currentDepth > maxMessageDepth;
         if (expectedValue == actualValue) {
-            return justCompare ? Boolean.TRUE : null;
+            return Boolean.TRUE;
         }
         else if (expectedValue == null) {
             return justCompare ? Boolean.FALSE : "Must be null: " + commonKey;
@@ -128,7 +129,7 @@ public class MapVerifier {
     private static Object compareNonNullLiteral(String fieldName, Object expectedValue, Object actualValue,
             boolean justCompare) {
         if (expectedValue.equals(actualValue))
-            return justCompare ? Boolean.TRUE : null;
+            return Boolean.TRUE;
         return justCompare ? Boolean.FALSE
                 : fieldName + ": expected '" + expectedValue + "' but got '" + actualValue + "'";
     }
