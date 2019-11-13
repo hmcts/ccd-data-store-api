@@ -102,12 +102,10 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
                     if (header.equals("Authorization")) {
                         String authToken = "Bearer " + theUser.getToken();
                         aRequest.header(header, authToken);
-                        scenarioContext.getTestData().getRequest().getHeaders().put(
-                            "Authorization", authToken.substring(0, 25) + "...");
+                        scenarioContext.getTestData().getRequest().getHeaders().put("Authorization", authToken);
                     } else if (header.equals("ServiceAuthorization")) {
                         aRequest.header(header, s2sToken);
-                        scenarioContext.getTestData().getRequest().getHeaders().put(
-                            "ServiceAuthorization", s2sToken.substring(0, 25) + "...");
+                        scenarioContext.getTestData().getRequest().getHeaders().put("ServiceAuthorization", s2sToken);
                     }
                 } else {
                     aRequest.header(header, value);
@@ -157,20 +155,37 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
 
         RequestSpecification theRequest = scenarioContext.getTheRequest();
         String uri = scenarioContext.getTestData().getUri();
-        Response response = theRequest.get(uri);
+
+        Response response = null;
+        switch (scenarioContext.getTestData().getMethod()) {
+            case "GET":
+                response = theRequest.get(uri);
+                break;
+            case "POST":
+                response = theRequest.post(uri);
+                break;
+            case "PUT":
+                response = theRequest.put(uri);
+                break;
+            case "DELETE":
+                response = theRequest.delete(uri);
+                break;
+            default:
+                Assert.fail("Unknown request method in data file");
+        }
+
+        QueryableRequestSpecification queryableRequest = SpecificationQuerier.query(theRequest);
+        scenario.write(queryableRequest.getMethod() + " " + queryableRequest.getURI());
 
         Map<String, Object> responseHeaders = new HashMap<>();
         response.getHeaders().forEach(header -> responseHeaders.put(header.getName(), header.getValue()));
-
         ResponseData responseData = new ResponseData();
         responseData.setResponseCode(response.getStatusCode());
         responseData.setResponseMessage(HttpStatus.valueOf(response.getStatusCode()).getReasonPhrase());
         responseData.setHeaders(responseHeaders);
         responseData.setBody(JsonUtils.readObjectFromJsonText(response.getBody().asString(), Map.class));
-        scenarioContext.setTheResponse(responseData);
 
-        QueryableRequestSpecification queryableRequest = SpecificationQuerier.query(theRequest);
-        scenario.write(queryableRequest.getMethod() + " " + queryableRequest.getURI());
+        scenarioContext.setTheResponse(responseData);
     }
 
     @Override

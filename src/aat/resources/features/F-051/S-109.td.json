@@ -5,6 +5,7 @@
   "specs": ["no profile in CCD"],
   "productName": "CCD Data Store",
   "operationName": "Get default settings for user",
+  "method": "GET",
   "uri": "/caseworkers/{uid}/profile",
   "request": {
     "pathVariables": {
