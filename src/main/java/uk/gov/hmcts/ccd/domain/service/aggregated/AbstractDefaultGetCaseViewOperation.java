@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.Lists;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
@@ -91,7 +92,7 @@ public abstract class AbstractDefaultGetCaseViewOperation {
 
     private Function<CaseTypeTabField, CaseTypeTabField> sortCaseFields() {
         return field -> {
-            caseViewFieldBuilder.sortComplexCaseFields(field.getCaseField(), null);
+            caseViewFieldBuilder.sortComplexCaseFields(field.getCaseField(), Lists.newArrayList(), "");
             return field;
         };
     }

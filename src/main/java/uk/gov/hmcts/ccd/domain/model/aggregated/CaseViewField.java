@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.domain.model.aggregated;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
 import lombok.ToString;
@@ -19,7 +18,6 @@ import java.util.Map;
 @ToString
 public class CaseViewField implements CommonField {
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
 
     public static final String READONLY = "READONLY";
     public static final String MANDATORY = "MANDATORY";
@@ -212,8 +210,8 @@ public class CaseViewField implements CommonField {
                 List<CaseField> children = caseField.getFieldType().getChildren();
                 children.forEach(childField -> {
                     if (childField.isCollectionFieldType()) {
-                        for (int index = 0; index < data.size(); index++) {
-                            sortDataValues(childField, data.get(index).get("value").get(childField.getId()));
+                        for (int index = 0; index < data.get(childField.getId()).size(); index++) {
+                            sortDataValues(childField, data.get(childField.getId()).get(index).get("value"));
                         }
                     } else if (childField.isComplexFieldType()) {
                         sortDataValues(childField, data.get(childField.getId()));
@@ -225,17 +223,8 @@ public class CaseViewField implements CommonField {
     }
 
     private static void setOrderForComplexTypeFields(final CommonField caseField, final JsonNode data, final List<CaseField> children) {
-        if (caseField.isCollectionFieldType()) {
-            for (int index = 0; index < data.size(); index++) {
-                JsonNode value = data.get(index).get("value");
-                LinkedHashMap valueMap = Maps.newLinkedHashMap();
-                for (CaseField field : children) {
-                    valueMap.put(field.getId(), value.get(field.getId()));
-                }
-                ((ObjectNode) data.get(index)).set("value", MAPPER.convertValue(valueMap, JsonNode.class));
-            }
-        } else if (caseField.isComplexFieldType()) {
-            for (CaseField field : children) {
+        for (CaseField field : children) {
+            if (data.get(field.getId()) != null) {
                 ((ObjectNode) data).set(field.getId(), data.get(field.getId()));
             }
         }
