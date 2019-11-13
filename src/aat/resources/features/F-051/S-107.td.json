@@ -4,26 +4,19 @@
   "title": "must return 401 when request does not provide valid authentication credentials",
   "specs": ["a detailed profile in CCD"],
   "productName": "CCD Data Store",
-  "operationName": "get default settings for user",
+  "operationName": "Get default settings for user",
   "user": {
     "username": "auto.test.cnpSIVA@gmail.com",
     "password": "Pa55word1123456"
   },
-  "caller": {
-    "username": "auto.test.cnpSIVA@gmail.com",
-    "password": "Pa55word1123456"
-  },
+  "method": "GET",
   "uri": "/caseworkers/{uid}/profile",
   "request": {
-    "headers": {
-      "Authorization": "SIVA",
-      "ServiceAuthorization": "{~}"
-    },
     "pathVariables": {
-      "uid": "{~}"
+      "uid": "someid"
     }
   },
   "expectedResponse": {
-    "responseCode": 401
+    "responseCode": 403
   }
 }
