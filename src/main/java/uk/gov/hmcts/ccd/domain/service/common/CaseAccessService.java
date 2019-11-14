@@ -78,7 +78,7 @@ public class CaseAccessService {
         return userRoles;
     }
 
-    public Set<String> getCreateCaseRoles() {
+    public Set<String> getCreateRoles() {
         return Sets.union(getUserRoles(), Sets.newHashSet(GlobalCaseRole.CREATOR.getRole()));
     }
 

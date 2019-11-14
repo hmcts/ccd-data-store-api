@@ -503,7 +503,7 @@ class CaseAccessServiceTest {
         @Test
         @DisplayName("should return create user roles")
         void getCreateCaseRoles() {
-            Set<String> caseRoles = caseAccessService.getCreateCaseRoles();
+            Set<String> caseRoles = caseAccessService.getCreateRoles();
 
             assertAll(
                 () -> assertThat(caseRoles.size(), Is.is(3)),
@@ -516,7 +516,7 @@ class CaseAccessServiceTest {
         void getCreateCaseRolesThrows() {
             doReturn(null).when(userRepository).getUserRoles();
 
-            assertThrows(ValidationException.class, () -> caseAccessService.getCreateCaseRoles());
+            assertThrows(ValidationException.class, () -> caseAccessService.getCreateRoles());
         }
     }
 

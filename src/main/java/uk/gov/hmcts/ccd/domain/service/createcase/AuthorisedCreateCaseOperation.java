@@ -64,7 +64,7 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
             throw new ValidationException("Cannot find case type definition for  " + caseTypeId);
         }
 
-        Set<String> userRoles = caseAccessService.getCreateCaseRoles();
+        Set<String> userRoles = caseAccessService.getCreateRoles();
 
         Event event = caseDataContent.getEvent();
         Map<String, JsonNode> data = caseDataContent.getData();
