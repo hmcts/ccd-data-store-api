@@ -8,6 +8,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import uk.gov.hmcts.ccd.fta.data.HttpTestDataSource;
+import uk.gov.hmcts.ccd.fta.data.JsonStoreHttpTestDataSource;
+
 public class MapVerifierTest {
 
     @Test(expected = IllegalArgumentException.class)
@@ -128,13 +131,13 @@ public class MapVerifierTest {
         actual.put("key1", "value1");
         MapVerificationResult result = MapVerifier.verifyMap(expected, actual, 0);
         Assert.assertArrayEquals(new Object[] {
-                "actualResponse has unexpected field(s): [key1] This may be an undesirable information exposure!" },
+                "actualResponse.body has unexpected field(s): [key1] This may be an undesirable information exposure!" },
                 result.getAllIssues().toArray());
 
         actual.put("number", 15);
         result = MapVerifier.verifyMap(expected, actual, 0);
         Assert.assertArrayEquals(new Object[] {
-                "actualResponse has unexpected field(s): [key1, number] This may be an undesirable information exposure!" },
+                "actualResponse.body has unexpected field(s): [key1, number] This may be an undesirable information exposure!" },
                 result.getAllIssues().toArray());
     }
 
@@ -146,13 +149,13 @@ public class MapVerifierTest {
         expected.put("key1", "value1");
         MapVerificationResult result = MapVerifier.verifyMap(expected, actual, 0);
         Assert.assertArrayEquals(new Object[] {
-                "actualResponse lacks [key1] field(s) that was/were actually expected to be there." },
+                "actualResponse.body lacks [key1] field(s) that was/were actually expected to be there." },
                 result.getAllIssues().toArray());
 
         expected.put("number", 15);
         result = MapVerifier.verifyMap(expected, actual, 0);
         Assert.assertArrayEquals(new Object[] {
-                "actualResponse lacks [key1, number] field(s) that was/were actually expected to be there." },
+                "actualResponse.body lacks [key1, number] field(s) that was/were actually expected to be there." },
                 result.getAllIssues().toArray());
     }
 
@@ -168,8 +171,8 @@ public class MapVerifierTest {
         MapVerificationResult result = MapVerifier.verifyMap(expected, actual, 0);
         Assert.assertArrayEquals(
                 new Object[] {
-                        "actualResponse has unexpected field(s): [key21] This may be an undesirable information exposure!",
-                        "actualResponse lacks [key20] field(s) that was/were actually expected to be there." },
+                        "actualResponse.body has unexpected field(s): [key21] This may be an undesirable information exposure!",
+                        "actualResponse.body lacks [key20] field(s) that was/were actually expected to be there." },
                 result.getAllIssues().toArray());
 
         expected.put("key30", "samevalue");
@@ -177,8 +180,8 @@ public class MapVerifierTest {
         result = MapVerifier.verifyMap(expected, actual, 0);
         Assert.assertArrayEquals(
                 new Object[] {
-                        "actualResponse has unexpected field(s): [key21, key31] This may be an undesirable information exposure!",
-                        "actualResponse lacks [key20, key30] field(s) that was/were actually expected to be there." },
+                        "actualResponse.body has unexpected field(s): [key21, key31] This may be an undesirable information exposure!",
+                        "actualResponse.body lacks [key20, key30] field(s) that was/were actually expected to be there." },
                 result.getAllIssues().toArray());
     }
 
@@ -195,7 +198,7 @@ public class MapVerifierTest {
         Assert.assertFalse(result.isVerified());
         Assert.assertArrayEquals(
                 new Object[] {
-                        "actualResponse contains 1 bad value(s): [key2: expected 'value2' but got 'value2_bad']" },
+                        "actualResponse.body contains 1 bad value(s): [key2: expected 'value2' but got 'value2_bad']" },
                 result.getAllIssues().toArray());
 
         expected.put("key3", "value3");
@@ -203,16 +206,16 @@ public class MapVerifierTest {
         result = MapVerifier.verifyMap(expected, actual, 0);
         Assert.assertArrayEquals(
                 new Object[] {
-                        "actualResponse contains 2 bad value(s): [key2: expected 'value2' but got 'value2_bad', key3: expected 'value3' but got 'value3_bad']" },
+                        "actualResponse.body contains 2 bad value(s): [key2: expected 'value2' but got 'value2_bad', key3: expected 'value3' but got 'value3_bad']" },
                 result.getAllIssues().toArray());
 
         expected.put("key30", "samevalue");
         actual.put("key31", "samevalue");
         result = MapVerifier.verifyMap(expected, actual, 0);
         Assert.assertArrayEquals(new Object[] {
-                "actualResponse has unexpected field(s): [key31] This may be an undesirable information exposure!",
-                "actualResponse lacks [key30] field(s) that was/were actually expected to be there.",
-                "actualResponse contains 2 bad value(s): [key2: expected 'value2' but got 'value2_bad', key3: expected 'value3' but got 'value3_bad']"
+                "actualResponse.body has unexpected field(s): [key31] This may be an undesirable information exposure!",
+                "actualResponse.body lacks [key30] field(s) that was/were actually expected to be there.",
+                "actualResponse.body contains 2 bad value(s): [key2: expected 'value2' but got 'value2_bad', key3: expected 'value3' but got 'value3_bad']"
                 },
                 result.getAllIssues().toArray());
     }
@@ -240,7 +243,6 @@ public class MapVerifierTest {
         Assert.assertTrue(result.isVerified());
     }
 
-    // @Ignore
     @Test
     public void shouldNotVerifyCascadedMapsWithSameValuesWithoutWildcards() {
         Map<String, Object> expected = new HashMap<String, Object>();
@@ -270,11 +272,32 @@ public class MapVerifierTest {
 
         MapVerificationResult result = MapVerifier.verifyMap(expected, actual, 0);
         Assert.assertArrayEquals(new Object[] {
-                "actualResponse.submap.subsubmap has unexpected field(s): [subsubmapfield3b] This may be an undesirable information exposure!",
-                "actualResponse.submap.subsubmap lacks [subsubmapfield3a] field(s) that was/were actually expected to be there.",
-                "actualResponse.submap.subsubmap contains 2 bad value(s): [actualResponse.submap.subsubmap.subsubmapfield1, actualResponse.submap.subsubmap.subsubmapfield2]" },
+                "actualResponse.body.submap.subsubmap has unexpected field(s): [subsubmapfield3b] This may be an undesirable information exposure!",
+                "actualResponse.body.submap.subsubmap lacks [subsubmapfield3a] field(s) that was/were actually expected to be there.",
+                "actualResponse.body.submap.subsubmap contains 2 bad value(s): [actualResponse.body.submap.subsubmap.subsubmapfield1, actualResponse.body.submap.subsubmap.subsubmapfield2]" },
                 result.getAllIssues().toArray());
         Assert.assertFalse(result.isVerified());
+    }
+
+    private static final String[] TEST_DATA_RESOURCE_PACKAGES = { "framework-test-data" };
+    private static final HttpTestDataSource DATA_SOURCE = new JsonStoreHttpTestDataSource(TEST_DATA_RESOURCE_PACKAGES);
+
+    @Test
+    public void shouldVerifyABigRealResponseBodyAgainstItselfWithoutWildcards() {
+
+        HashMap<String, Object> expected = (HashMap<String, Object>) DATA_SOURCE
+                .getDataForScenario("HttpTestData-with-a-Big-ExpectedResponseBody_expected")
+                .getExpectedResponse().getBody();
+        HashMap<String, Object> actual = (HashMap<String, Object>) DATA_SOURCE
+                .getDataForScenario("HttpTestData-with-a-Big-ExpectedResponseBody_actual")
+                .getExpectedResponse().getBody();
+
+        MapVerificationResult result = MapVerifier.verifyMap(expected, actual, 5);
+        Assert.assertArrayEquals(new Object[] {
+                "actualResponse.body.user contains a bad value: idam[0] contains a bad value: jurisdiction: expected 'AUTOTEST1' but got 'AUTOTEST1_x'" },
+                result.getAllIssues().toArray());
+        Assert.assertFalse(result.isVerified());
+
     }
 
 }

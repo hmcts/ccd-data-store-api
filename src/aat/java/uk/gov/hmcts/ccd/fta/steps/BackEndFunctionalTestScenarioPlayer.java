@@ -2,17 +2,24 @@ package uk.gov.hmcts.ccd.fta.steps;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
-import io.cucumber.core.api.Scenario;
-import io.cucumber.java.Before;
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.Then;
-import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import io.restassured.specification.QueryableRequestSpecification;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.SpecificationQuerier;
 import org.junit.Assert;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import io.cucumber.core.api.Scenario;
+import io.cucumber.java.Before;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -22,10 +29,6 @@ import uk.gov.hmcts.ccd.fta.data.RequestData;
 import uk.gov.hmcts.ccd.fta.data.ResponseData;
 import uk.gov.hmcts.ccd.fta.data.UserData;
 import uk.gov.hmcts.ccd.fta.util.JsonUtils;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTestAutomationDSL {
 
@@ -98,13 +101,15 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
             requestData.getHeaders().forEach((header, value) -> {
                 if (value.toString().equals(DYNAMIC_CONTENT_PLACEHOLDER)) {
                     // ADD DYNAMIC DATA HERE
-                    if (header.equals("Authorization")) {
+                    if (header.equals("Authorization") && theUser.getToken() != null) {
                         String authToken = "Bearer " + theUser.getToken();
                         aRequest.header(header, authToken);
                         scenarioContext.getTestData().getRequest().getHeaders().put("Authorization", authToken);
-                    } else if (header.equals("ServiceAuthorization")) {
+                    } else if (header.equals("ServiceAuthorization") && s2sToken != null) {
                         aRequest.header(header, s2sToken);
                         scenarioContext.getTestData().getRequest().getHeaders().put("ServiceAuthorization", s2sToken);
+                    } else {
+                        Assert.fail("Dynamic value for request header '" + header + "' does not exist");
                     }
                 } else {
                     aRequest.header(header, value);
@@ -116,9 +121,11 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
             requestData.getPathVariables().forEach((pathVariable, value) -> {
                 if (value.toString().equals(DYNAMIC_CONTENT_PLACEHOLDER)) {
                     // ADD DYNAMIC DATA HERE
-                    if (pathVariable.equals("uid")) {
+                    if (pathVariable.equals("uid") && theUser.getUid() != null) {
                         aRequest.pathParam(pathVariable, theUser.getUid());
                         scenarioContext.getTestData().getRequest().getPathVariables().put("uid", theUser.getUid());
+                    } else {
+                        Assert.fail("Dynamic value for request path variable '" + pathVariable + "' does not exist");
                     }
                 } else {
                     aRequest.pathParam(pathVariable, value);
@@ -130,6 +137,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
             requestData.getQueryParams().forEach((queryParam, value) -> {
                 if (value.toString().equals(DYNAMIC_CONTENT_PLACEHOLDER)) {
                     // ADD DYNAMIC DATA HERE
+                    Assert.fail("Dynamic value for request query parameter '" + queryParam + "' does not exist");
                 } else {
                     aRequest.queryParam(queryParam, value);
                 }
@@ -156,6 +164,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         String uri = scenarioContext.getTestData().getUri();
 
         Response response = null;
+        Assert.assertNotNull("No request method in data file", scenarioContext.getTestData().getMethod());
         switch (scenarioContext.getTestData().getMethod()) {
             case "GET":
                 response = theRequest.get(uri);
@@ -194,7 +203,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     @Then("a positive response is received")
     public void verifyThatAPositiveResponseWasReceived() {
         int responseCode = scenarioContext.getTheResponse().getResponseCode();
-        String errorMessage = "Response code is not a success code. It is: " + responseCode;
+        String errorMessage = "Response code '" + responseCode + "' is not a success code";
         Assert.assertEquals(errorMessage, 2, responseCode / 100);
         scenario.write("" + scenarioContext.getTheResponse().getResponseCode());
     }
@@ -202,27 +211,41 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     @Override
     @Then("a negative response is received")
     public void verifyThatANegativeResponseWasReceived() {
-        int code = scenarioContext.getTheResponse().getResponseCode();
-        String errorMessage = "Response code is not a negative one. It is: " + code;
-        Assert.assertNotEquals(errorMessage, 2, code / 100);
+        int responseCode = scenarioContext.getTheResponse().getResponseCode();
+        String errorMessage = "Response code '" + responseCode + "' is not a negative code";
+        Assert.assertNotEquals(errorMessage, 2, responseCode / 100);
         scenario.write("" + scenarioContext.getTheResponse().getResponseCode());
     }
 
     @Override
     @Then("the response has all the details as expected")
     public void verifyThatTheResponseHasAllTheDetailsAsExpected() throws IOException {
-        // TODO: write response comparison logic
-        Map<String, Object> expectedResponseBody = scenarioContext.getTestData().getExpectedResponse().getBody();
-        Map<String, Object> actualResponseBody = scenarioContext.getTheResponse().getBody();
-        MapVerificationResult mapVerificationResult = MapVerifier.verifyMap(expectedResponseBody, actualResponseBody, 10);
+        ResponseData expectedResponse = scenarioContext.getTestData().getExpectedResponse();
+        ResponseData actualResponse = scenarioContext.getTheResponse();
+        Map<String, List> issues = new HashMap<>();
 
-        String issues = mapVerificationResult.getAllIssues().toString();
-        logger.info("Response body issues: " + issues);
+        if (actualResponse.getResponseCode() != expectedResponse.getResponseCode()) {
+            issues.put("responseCode", Collections.singletonList("Response code mismatch, expected: "
+                + expectedResponse.getResponseCode() + ", actual: " + actualResponse.getResponseCode()));
+        }
 
-        scenario.write("Response body issues: " + issues + "\n\n");
+        MapVerificationResult headerVerification = MapVerifier.verifyMap(expectedResponse.getHeaders(),
+            actualResponse.getHeaders(), 1);
+        if (!headerVerification.isVerified()) {
+            issues.put("headers", headerVerification.getAllIssues());
+        }
+
+        MapVerificationResult bodyVerification = MapVerifier.verifyMap(expectedResponse.getBody(),
+            actualResponse.getBody(), 20);
+        if (!bodyVerification.isVerified()) {
+            issues.put("body", bodyVerification.getAllIssues());
+        }
+
         scenario.write(JsonUtils.getPrettyJsonFromObject(scenarioContext.getTheResponse()));
 
-        //Assert.assertEquals("", issues);
+        if (issues.get("responseCode") != null || issues.get("headers") != null || issues.get("body") != null) {
+            Assert.fail("Response failures: " + JsonUtils.getPrettyJsonFromObject(issues));
+        }
     }
 
     @Override

@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ccd.fta.steps;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -17,7 +19,7 @@ public class MapVerifier {
             int maxMessageDepth) {
         if (maxMessageDepth < 0)
             throw new IllegalArgumentException("Max depth cannot be negative.");
-        return verifyMap("actualResponse", expectedMap, actualMap, 0, maxMessageDepth);
+        return verifyMap("actualResponse.body", expectedMap, actualMap, 0, maxMessageDepth);
     }
 
     private static MapVerificationResult verifyMap(String fieldPrefix, Map<String, Object> expectedMap,
@@ -38,7 +40,8 @@ public class MapVerifier {
 
         List<String> unexpectedFields = checkForUnenexpectedlyAvailableFields(expectedMap, actualMap);
         List<String> unavailableFields = checkForUnenexpectedlyUnavailableFields(expectedMap, actualMap);
-        List<String> badValueMessages = collectBadValueMessages(expectedMap, actualMap, fieldPrefix, currentDepth,
+        List<String> badValueMessages = collectBadValueMessagesFromMap(expectedMap, actualMap, fieldPrefix,
+                currentDepth,
                 maxMessageDepth);
         List<MapVerificationResult> badSubmaps = collectBadSubmaps(expectedMap, actualMap, fieldPrefix,
                 currentDepth, maxMessageDepth);
@@ -84,7 +87,8 @@ public class MapVerifier {
                 && isExpectedToBeAvaiableInActual(expectedMap.get(keyOfExpected))).collect(Collectors.toList());
     }
 
-    private static List<String> collectBadValueMessages(Map<String, Object> expectedMap, Map<String, Object> actualMap,
+    private static List<String> collectBadValueMessagesFromMap(Map<String, Object> expectedMap,
+            Map<String, Object> actualMap,
             String fieldPrefix, int currentDepth, int maxMessageDepth) {
         List<String> badValueMessages = new ArrayList<>();
         expectedMap.keySet().stream().filter(keyOfExpected -> actualMap.containsKey(keyOfExpected))
@@ -98,17 +102,59 @@ public class MapVerifier {
                     } else if (actualValue == null) {
                         badValueMessages.add("Must not be null: " + commonKey);
                     } else if (!(expectedValue instanceof Map && actualValue instanceof Map)) {
-                        Object outcome = compareValues(fieldPrefix, commonKey, expectedValue, actualValue,
+                        if (expectedValue instanceof Collection<?> && actualValue instanceof Collection<?>) {
+                            collectBadValueMessagesFromCollection(fieldPrefix + "." + commonKey, commonKey,
+                                    (Collection<?>) expectedValue,
+                                    (Collection<?>) actualValue, currentDepth, maxMessageDepth, badValueMessages);
+                        } else {
+                            Object outcome = compareValues(fieldPrefix, commonKey, expectedValue, actualValue,
                                 currentDepth, maxMessageDepth);
-                        if (!Boolean.TRUE.equals(outcome)) {
-                            if (outcome instanceof String)
-                                badValueMessages.add((String) outcome);
-                            else
-                                badValueMessages.add(fieldPrefix + "." + commonKey);
+                            if (!Boolean.TRUE.equals(outcome)) {
+                                if (outcome instanceof String)
+                                    badValueMessages.add((String) outcome);
+                                else
+                                    badValueMessages.add(fieldPrefix + "." + commonKey);
+                            }
                         }
                     }
         });
         return badValueMessages;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void collectBadValueMessagesFromCollection(String fieldPrefix, String field,
+            Collection<?> expectedCollection,
+            Collection<?> actualCollection, int currentDepth, int maxMessageDepth, List<String> badValueMessages) {
+        Iterator<?> e1 = expectedCollection.iterator();
+        Iterator<?> e2 = actualCollection.iterator();
+        int i = 0;
+        while (e1.hasNext() && e2.hasNext()) {
+            Object o1 = e1.next();
+            Object o2 = e2.next();
+            String subfield = field + "[" + i + "]";
+            if (o1 instanceof Map && o2 instanceof Map) {
+                MapVerificationResult subresult = verifyMap(subfield, (Map<String, Object>) o1,
+                        (Map<String, Object>) o2,
+                        currentDepth + 1, maxMessageDepth);
+                if (!subresult.isVerified()) {
+                    badValueMessages.addAll(subresult.getAllIssues());
+                }
+            } else if (o1 instanceof Collection && o2 instanceof Collection) {
+                collectBadValueMessagesFromCollection(fieldPrefix, subfield, (Collection<?>) o1, (Collection<?>) o2,
+                        currentDepth + 1, maxMessageDepth, badValueMessages);
+            } else {
+                Object outcome = compareValues(subfield, subfield, o1, o2, currentDepth + 1,
+                        maxMessageDepth);
+                if (!Boolean.TRUE.equals(outcome)) {
+                    if (outcome instanceof String)
+                        badValueMessages.add((String) outcome);
+                    else
+                        badValueMessages.add(subfield);
+                }
+                
+            }
+            i++;
+        }
     }
 
     private static Object compareValues(String fieldPrefix, String commonKey, Object expectedValue,
