@@ -1,0 +1,55 @@
+{
+  "_guid_": "S-133",
+  "_extends_": "S-000-Base-Success",
+  "title": "must return 400 if the sort direction in input parameters is not in ASC or DESC",
+  "specs": [
+    "a detailed profile in CCD"
+  ],
+  "productName": "CCD Data Store",
+  "operationName": "Get the pagination metadata for a case data search for Case Worker",
+  "method": "GET",
+  "user": {
+    "username": "auto.test.cnp@gmail.com",
+    "password": "Pa55word11"
+  },
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/pagination_metadata",
+  "request": {
+    "pathVariables": {
+      "uid": "[[DYNAMIC]]",
+      "jid": "AUTOTEST1",
+      "ctid": "AAT"
+    },
+    "queryParams": {
+      "sortDirection": "someInvalidSortDirection"
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 400,
+    "responseMessage": "Bad Request",
+    "headers": {
+      "X-Frame-Options": "DENY",
+      "Transfer-Encoding": "chunked",
+      "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+      "vary": "accept-encoding",
+      "X-Content-Type-Options": "nosniff",
+      "Content-Encoding": "gzip",
+      "Connection": "close",
+      "Pragma": "no-cache",
+      "Expires": "0",
+      "X-XSS-Protection": "1; mode=block",
+      "Date": "[[DONT_CARE]]",
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+      "timestamp": "[[DONT_CARE]]",
+      "status": 400,
+      "error": "Bad Request",
+      "message": "Unknown sort direction: someInvalidSortDirection",
+      "path": "/caseworkers/bfb6eeaa-cbcd-466d-aafa-07fe99e7462b/jurisdictions/AUTOTEST1/case-types/AAT/cases/pagination_metadata",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}
