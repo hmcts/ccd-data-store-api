@@ -11,28 +11,39 @@
   "user": {
     "username": "auto.test.cnp_invalid@gmail.com",
     "password": "Pa55word12_wrong",
-    "token" : "fakeToken",
-    "uid" : "dummyval"
+    "token": "fakeToken",
+    "uid": "dummyval"
   },
   "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/pagination_metadata",
   "request": {
     "pathVariables": {
-      "uid" : "[[DYNAMIC]]",
-      "jid" : "AUTOTEST1",
+      "uid": "Some_wrong_uid",
+      "jid": "AUTOTEST1",
       "ctid": "AAT"
-    },
-    "queryParams" : {
-      "sortDirection" : "ASC"
     }
   },
   "expectedResponse": {
-    "responseCode": 401,
-    "body" : {
-      "timestamp" : "[[DONT_CARE]]",
-      "status" : 401,
-      "error" : "Forbidden",
-      "message" : "Access Denied",
-      "path" : "/caseworkers/dummyval/jurisdictions/AUTOTEST1/case-types/AAT/cases/pagination_metadata"
+    "responseCode": 403,
+    "responseMessage": "Forbidden",
+    "headers": {
+      "X-Frame-Options": "DENY",
+      "Transfer-Encoding": "chunked",
+      "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+      "vary": "accept-encoding",
+      "X-Content-Type-Options": "nosniff",
+      "Content-Encoding": "gzip",
+      "Pragma": "no-cache",
+      "Expires": "0",
+      "X-XSS-Protection": "1; mode=block",
+      "Date": "[[DONT_CARE]]",
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "body": {
+      "timestamp": "[[DONT_CARE]]",
+      "status": 403,
+      "error": "Forbidden",
+      "message": "Access Denied",
+      "path": "/caseworkers/Some_wrong_uid/jurisdictions/AUTOTEST1/case-types/AAT/cases/pagination_metadata"
     }
   }
 }
