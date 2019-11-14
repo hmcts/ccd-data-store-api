@@ -203,7 +203,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     @Then("a positive response is received")
     public void verifyThatAPositiveResponseWasReceived() {
         int responseCode = scenarioContext.getTheResponse().getResponseCode();
-        String errorMessage = "Response code is not a success code. It is: " + responseCode;
+        String errorMessage = "Response code '" + responseCode + "' is not a success code";
         Assert.assertEquals(errorMessage, 2, responseCode / 100);
         scenario.write("" + scenarioContext.getTheResponse().getResponseCode());
     }
@@ -211,9 +211,9 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     @Override
     @Then("a negative response is received")
     public void verifyThatANegativeResponseWasReceived() {
-        int code = scenarioContext.getTheResponse().getResponseCode();
-        String errorMessage = "Response code is not a negative one. It is: " + code;
-        Assert.assertNotEquals(errorMessage, 2, code / 100);
+        int responseCode = scenarioContext.getTheResponse().getResponseCode();
+        String errorMessage = "Response code '" + responseCode + "' is not a negative code";
+        Assert.assertNotEquals(errorMessage, 2, responseCode / 100);
         scenario.write("" + scenarioContext.getTheResponse().getResponseCode());
     }
 
@@ -224,23 +224,19 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         ResponseData actualResponse = scenarioContext.getTheResponse();
         Map<String, List> issues = new HashMap<>();
 
-        int expectedResponseCode = expectedResponse.getResponseCode();
-        int actualResponseCode = actualResponse.getResponseCode();
-        if (actualResponseCode != expectedResponseCode) {
+        if (actualResponse.getResponseCode() != expectedResponse.getResponseCode()) {
             issues.put("responseCode", Collections.singletonList("Response code mismatch, expected: "
-                + expectedResponseCode + ", actual: " + actualResponseCode));
+                + expectedResponse.getResponseCode() + ", actual: " + actualResponse.getResponseCode()));
         }
 
-        Map<String, Object> expectedHeaders = expectedResponse.getHeaders();
-        Map<String, Object> actualHeaders = actualResponse.getHeaders();
-        MapVerificationResult headerVerification = MapVerifier.verifyMap(expectedHeaders, actualHeaders, 1);
+        MapVerificationResult headerVerification = MapVerifier.verifyMap(expectedResponse.getHeaders(),
+            actualResponse.getHeaders(), 1);
         if (!headerVerification.isVerified()) {
             issues.put("headers", headerVerification.getAllIssues());
         }
 
-        Map<String, Object> expectedResponseBody = expectedResponse.getBody();
-        Map<String, Object> actualResponseBody = actualResponse.getBody();
-        MapVerificationResult bodyVerification = MapVerifier.verifyMap(expectedResponseBody, actualResponseBody, 10);
+        MapVerificationResult bodyVerification = MapVerifier.verifyMap(expectedResponse.getBody(),
+            actualResponse.getBody(), 20);
         if (!bodyVerification.isVerified()) {
             issues.put("body", bodyVerification.getAllIssues());
         }
