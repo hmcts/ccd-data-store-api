@@ -1,5 +1,9 @@
 package uk.gov.hmcts.ccd.fta.data;
 
+import feign.FeignException;
+import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
+import uk.gov.hmcts.ccd.datastore.tests.helper.idam.AuthenticatedUser;
+
 public class UserData {
 
     private String username;
@@ -7,6 +11,8 @@ public class UserData {
     private String password;
 
     private String token;
+
+    private String uid;
 
     public String getUsername() {
         return username;
@@ -30,6 +36,14 @@ public class UserData {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
 }

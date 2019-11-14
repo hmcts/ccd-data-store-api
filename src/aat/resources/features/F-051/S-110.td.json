@@ -2,28 +2,32 @@
   "_guid_": "S-110",
   "_extends_": "S-000-Base-Success",
   "title": "must return default user setting successfully for a user having a profile in CCD",
-  "specs": ["a detailed profile in CCD1"],
+  "specs": ["a detailed profile in CCD"],
   "productName": "CCD Data Store",
-  "operationName": "Get default setting for user",
+  "operationName": "Get default settings for user",
+  "method": "GET",
   "uri": "/caseworkers/{uid}/profile",
   "request": {
-    "headers": {
-      "serviceToken": "s2s"
+    "pathVariables": {
+      "uid": "[[DYNAMIC]]"
     }
   },
   "expectedResponse": {
-    "user": {
-      "idam": {
-        "id": "851ac816-c7dc-4ea7-b59e-ad96c9a8c862",
-        "email": "auto.test.cnp@gmail.com",
-        "forename": "testfirstname",
-        "surname": "testsurname",
-        "roles": [
-          "caseworker",
-          "caseworker-autotest1",
-          "ccd-import"
-        ],
-        "defaultService": null
+    "responseCode": 200,
+    "body": {
+      "user": {
+        "idam": {
+          "id": "17d598ca-ccf6-49ba-b0ff-2565f53630f1",
+          "email": "auto.test.cnp@gmail.com",
+          "forename": "testfirstname",
+          "surname": "testsurname",
+          "roles": [
+            "caseworker",
+            "caseworker-autotest1",
+            "ccd-import"
+          ],
+          "defaultService": null
+        }
       }
     }
   }
