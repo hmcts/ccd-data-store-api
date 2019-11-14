@@ -15,16 +15,30 @@
   "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/pagination_metadata",
   "request": {
     "pathVariables": {
-      "uid" : "[[DYNAMIC]]",
-      "jid" : "AUTOTEST1",
+      "uid": "[[DYNAMIC]]",
+      "jid": "AUTOTEST1",
       "ctid": "AAT"
     }
   },
   "expectedResponse": {
     "responseCode": 200,
-    "body" : {
-      "total_results_count" : "[[DONT_CARE]]",
-      "total_pages_count" : "[[DONT_CARE]]"
+    "responseMessage": "OK",
+    "headers": {
+      "X-Frame-Options": "DENY",
+      "Transfer-Encoding": "chunked",
+      "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+      "vary": "accept-encoding",
+      "X-Content-Type-Options": "nosniff",
+      "Content-Encoding": "gzip",
+      "Pragma": "no-cache",
+      "Expires": "0",
+      "X-XSS-Protection": "1; mode=block",
+      "Date": "[[DONT_CARE]]",
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "body": {
+      "total_results_count": "[[DONT_CARE]]",
+      "total_pages_count": "[[DONT_CARE]]"
     }
   }
 }

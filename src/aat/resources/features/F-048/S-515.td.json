@@ -15,26 +15,41 @@
   "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/pagination_metadata",
   "request": {
     "pathVariables": {
-      "uid" : "[[DYNAMIC]]",
-      "jid" : "AUTOTEST1",
+      "uid": "[[DYNAMIC]]",
+      "jid": "AUTOTEST1",
       "ctid": "AAT"
     },
-    "queryParams" : {
-      "caseInvalidCaseParam.PersonFirstName" : "someInvalidParam"
+    "queryParams": {
+      "caseInvalidCaseParam.PersonFirstName": "someInvalidParam"
     }
   },
   "expectedResponse": {
     "responseCode": 400,
-    "body" : {
-      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
-      "timestamp" : "[[DONT_CARE]]",
-      "status" : 400,
-      "error" : "Bad Request",
-      "message" : "unknown metadata search parameters: caseInvalidCaseParam.PersonFirstName",
-      "path" : "/caseworkers/bfb6eeaa-cbcd-466d-aafa-07fe99e7462b/jurisdictions/AUTOTEST1/case-types/AAT/cases/pagination_metadata",
-      "details" : null,
-      "callbackErrors" : null,
-      "callbackWarnings" : null
+    "responseMessage": "Bad Request",
+    "headers": {
+      "X-Frame-Options": "DENY",
+      "Transfer-Encoding": "chunked",
+      "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+      "vary": "accept-encoding",
+      "X-Content-Type-Options": "nosniff",
+      "Content-Encoding": "gzip",
+      "Connection": "close",
+      "Pragma": "no-cache",
+      "Expires": "0",
+      "X-XSS-Protection": "1; mode=block",
+      "Date": "[[DONT_CARE]]",
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+      "timestamp": "[[DONT_CARE]]",
+      "status": 400,
+      "error": "Bad Request",
+      "message": "unknown metadata search parameters: caseInvalidCaseParam.PersonFirstName",
+      "path": "/caseworkers/bfb6eeaa-cbcd-466d-aafa-07fe99e7462b/jurisdictions/AUTOTEST1/case-types/AAT/cases/pagination_metadata",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
     }
   }
 }
