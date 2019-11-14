@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.fta.data;
 
-
 import java.util.List;
 
 public class HttpTestData {
