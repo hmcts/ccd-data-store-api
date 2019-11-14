@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd;
 
+import liquibase.configuration.GlobalConfiguration;
+import liquibase.configuration.LiquibaseConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
@@ -23,7 +25,10 @@ public class CoreCaseDataApplication {
     }
 
     public static void main(String[] args) {
-
+        //Setting Liquibase DB Lock property before Spring starts up.
+        LiquibaseConfiguration.getInstance()
+            .getConfiguration(GlobalConfiguration.class)
+            .setUseDbLock(true);
         if (System.getProperty(LOGGING_LEVEL_CCD) != null) {
 //            Configurator.setLevel(LOGGING_LEVEL_CCD, Level.valueOf(System.getProperty(LOGGING_LEVEL_CCD).toUpperCase()));
         }
