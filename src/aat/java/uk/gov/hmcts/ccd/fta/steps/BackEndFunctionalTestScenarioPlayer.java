@@ -30,6 +30,7 @@ import uk.gov.hmcts.ccd.fta.data.ResponseData;
 import uk.gov.hmcts.ccd.fta.data.UserData;
 import uk.gov.hmcts.ccd.fta.util.JsonUtils;
 
+@SuppressWarnings({"LocalVariableName"})
 public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTestAutomationDSL {
 
     private static final String DYNAMIC_CONTENT_PLACEHOLDER = "[[DYNAMIC]]";

@@ -114,14 +114,12 @@ public class MapVerificationResult {
             String fieldPrefix, boolean shouldReportOnlySummary) {
         for (String unexpectedField : unexpectedFields) {
             if (!shouldReportOnlySummary) {
-                String message = (fieldPrefix + "." + unexpectedField)
-                        + " is unexpected. This may be an undesirable information exposure!";
+                String message = fieldPrefix + "." + unexpectedField + " is unexpected.";
                 allIssues.add(message);
             }
         }
         if (unexpectedFields.size() > 0 && shouldReportOnlySummary) {
-            String message = fieldPrefix + " has unexpected field(s): " + unexpectedFields
-                    + " This may be an undesirable information exposure!";
+            String message = fieldPrefix + " has unexpected field(s): " + unexpectedFields;
             allIssues.add(message);
         }
     }
@@ -131,7 +129,7 @@ public class MapVerificationResult {
         for (String unavailableField : unavailableFields) {
             if (!shouldReportOnlySummary) {
                 String message = (fieldPrefix + "." + unavailableField)
-                        + " is unavaiable though it was expected to be there";
+                        + " is unavailable though it was expected to be there";
                 allIssues.add(message);
             }
         }
