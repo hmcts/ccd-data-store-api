@@ -1,9 +1,5 @@
 package uk.gov.hmcts.ccd.fta.data;
 
-import feign.FeignException;
-import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
-import uk.gov.hmcts.ccd.datastore.tests.helper.idam.AuthenticatedUser;
-
 public class UserData {
 
     private String username;
