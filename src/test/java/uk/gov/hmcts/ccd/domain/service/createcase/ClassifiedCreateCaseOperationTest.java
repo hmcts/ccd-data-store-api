@@ -24,9 +24,7 @@ class ClassifiedCreateCaseOperationTest {
     private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_TYPE_ID = "Grant";
     private static final CaseDataContent EVENT_DATA = newCaseDataContent().build();
-//    private static final Map<String, JsonNode> DATA = new HashMap<>();
     private static final Boolean IGNORE = Boolean.FALSE;
-//    private static final String TOKEN = "eyvcdvsyvcdsyv";
 
     @Mock
     private CreateCaseOperation createCaseOperation;
@@ -43,9 +41,7 @@ class ClassifiedCreateCaseOperationTest {
         MockitoAnnotations.initMocks(this);
 
         caseDetails = new CaseDetails();
-        doReturn(caseDetails).when(createCaseOperation).createCaseDetails(UID,
-                                                                          JURISDICTION_ID,
-                                                                          CASE_TYPE_ID,
+        doReturn(caseDetails).when(createCaseOperation).createCaseDetails(CASE_TYPE_ID,
                                                                           EVENT_DATA,
                                                                           IGNORE);
 
@@ -58,23 +54,19 @@ class ClassifiedCreateCaseOperationTest {
     @Test
     @DisplayName("should call decorated operation")
     void shouldCallDecoratedOperation() {
-        classifiedCreateCaseOperation.createCaseDetails(UID, JURISDICTION_ID, CASE_TYPE_ID, EVENT_DATA, IGNORE);
+        classifiedCreateCaseOperation.createCaseDetails(CASE_TYPE_ID, EVENT_DATA, IGNORE);
 
-        verify(createCaseOperation).createCaseDetails(UID, JURISDICTION_ID, CASE_TYPE_ID, EVENT_DATA, IGNORE);
+        verify(createCaseOperation).createCaseDetails(CASE_TYPE_ID, EVENT_DATA, IGNORE);
     }
 
     @Test
     @DisplayName("should return null when decorated operation returns null")
     void shouldReturnNullWhenOperationReturnsNull() {
-        doReturn(null).when(createCaseOperation).createCaseDetails(UID,
-                                                                   JURISDICTION_ID,
-                                                                   CASE_TYPE_ID,
+        doReturn(null).when(createCaseOperation).createCaseDetails(CASE_TYPE_ID,
                                                                    EVENT_DATA,
                                                                    IGNORE);
 
-        final CaseDetails output = classifiedCreateCaseOperation.createCaseDetails(UID,
-                                                                                   JURISDICTION_ID,
-                                                                                   CASE_TYPE_ID,
+        final CaseDetails output = classifiedCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,
                                                                                    EVENT_DATA,
                                                                                    IGNORE);
 
@@ -85,9 +77,7 @@ class ClassifiedCreateCaseOperationTest {
     @DisplayName("should return classified case detail")
     void shouldReturnClassifiedCaseDetails() {
 
-        final CaseDetails output = classifiedCreateCaseOperation.createCaseDetails(UID,
-                                                                                   JURISDICTION_ID,
-                                                                                   CASE_TYPE_ID,
+        final CaseDetails output = classifiedCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,
                                                                                    EVENT_DATA,
                                                                                    IGNORE);
 
@@ -103,9 +93,7 @@ class ClassifiedCreateCaseOperationTest {
 
         doReturn(Optional.empty()).when(classificationService).applyClassification(caseDetails);
 
-        final CaseDetails output = classifiedCreateCaseOperation.createCaseDetails(UID,
-                                                                                   JURISDICTION_ID,
-                                                                                   CASE_TYPE_ID,
+        final CaseDetails output = classifiedCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,
                                                                                    EVENT_DATA,
                                                                                    IGNORE);
 
