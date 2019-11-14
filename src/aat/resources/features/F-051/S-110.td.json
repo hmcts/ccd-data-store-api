@@ -46,281 +46,46 @@
       "channels": null,
       "jurisdictions": [
         {
-          "id": "AUTOTEST1",
-          "name": "Auto Test 1",
-          "description": "Content for the Test Jurisdiction.",
+          "id": "[[DONT_CARE]]",
+          "name": "[[DONT_CARE]]",
+          "description": "[[DONT_CARE]]",
           "caseTypes": [
             {
-              "id": "AAT",
-              "description": "Demonstrate everything CCD can do!",
+              "id": "[[DONT_CARE]]",
+              "description": "[[DONT_CARE]]",
               "version": null,
               "name": "Demo case",
               "jurisdiction": null,
               "events": [
-                {
-                  "id": "COMPLETE",
-                  "name": "Mark as done",
-                  "description": null,
-                  "order": null,
-                  "case_fields": [],
-                  "pre_states": [
-                    "IN_PROGRESS"
-                  ],
-                  "post_state": null,
-                  "callback_url_about_to_start_event": null,
-                  "retries_timeout_about_to_start_event": null,
-                  "callback_url_about_to_submit_event": null,
-                  "retries_timeout_url_about_to_submit_event": null,
-                  "callback_url_submitted_event": null,
-                  "retries_timeout_url_submitted_event": null,
-                  "security_classification": null,
-                  "show_summary": null,
-                  "show_event_notes": null,
-                  "end_button_label": null,
-                  "can_save_draft": null,
-                  "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": false
-                    }
-                  ]
-                },
-                {
-                  "id": "STOP_PROGRESS",
-                  "name": "Stop",
-                  "description": null,
-                  "order": null,
-                  "case_fields": [],
-                  "pre_states": [
-                    "IN_PROGRESS"
-                  ],
-                  "post_state": null,
-                  "callback_url_about_to_start_event": null,
-                  "retries_timeout_about_to_start_event": null,
-                  "callback_url_about_to_submit_event": null,
-                  "retries_timeout_url_about_to_submit_event": null,
-                  "callback_url_submitted_event": null,
-                  "retries_timeout_url_submitted_event": null,
-                  "security_classification": null,
-                  "show_summary": null,
-                  "show_event_notes": null,
-                  "end_button_label": null,
-                  "can_save_draft": null,
-                  "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": false
-                    }
-                  ]
-                },
-                {
-                  "id": "START_PROGRESS",
-                  "name": "Start",
-                  "description": null,
-                  "order": null,
-                  "case_fields": [],
-                  "pre_states": [
-                    "TODO"
-                  ],
-                  "post_state": null,
-                  "callback_url_about_to_start_event": null,
-                  "retries_timeout_about_to_start_event": null,
-                  "callback_url_about_to_submit_event": null,
-                  "retries_timeout_url_about_to_submit_event": null,
-                  "callback_url_submitted_event": null,
-                  "retries_timeout_url_submitted_event": null,
-                  "security_classification": null,
-                  "show_summary": null,
-                  "show_event_notes": null,
-                  "end_button_label": null,
-                  "can_save_draft": null,
-                  "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": false
-                    }
-                  ]
-                },
-                {
-                  "id": "CREATE",
-                  "name": "Create a new case",
-                  "description": null,
-                  "order": null,
-                  "case_fields": [],
-                  "pre_states": [],
-                  "post_state": null,
-                  "callback_url_about_to_start_event": null,
-                  "retries_timeout_about_to_start_event": null,
-                  "callback_url_about_to_submit_event": null,
-                  "retries_timeout_url_about_to_submit_event": null,
-                  "callback_url_submitted_event": null,
-                  "retries_timeout_url_submitted_event": null,
-                  "security_classification": null,
-                  "show_summary": null,
-                  "show_event_notes": null,
-                  "end_button_label": null,
-                  "can_save_draft": null,
-                  "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": false
-                    }
-                  ]
-                },
-                {
-                  "id": "REVIEW",
-                  "name": "Review",
-                  "description": null,
-                  "order": null,
-                  "case_fields": [],
-                  "pre_states": [
-                    "*"
-                  ],
-                  "post_state": null,
-                  "callback_url_about_to_start_event": null,
-                  "retries_timeout_about_to_start_event": null,
-                  "callback_url_about_to_submit_event": null,
-                  "retries_timeout_url_about_to_submit_event": null,
-                  "callback_url_submitted_event": null,
-                  "retries_timeout_url_submitted_event": null,
-                  "security_classification": null,
-                  "show_summary": null,
-                  "show_event_notes": null,
-                  "end_button_label": null,
-                  "can_save_draft": null,
-                  "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": false
-                    }
-                  ]
-                },
-                {
-                  "id": "UPDATE",
-                  "name": "Update",
-                  "description": null,
-                  "order": null,
-                  "case_fields": [],
-                  "pre_states": [
-                    "*"
-                  ],
-                  "post_state": null,
-                  "callback_url_about_to_start_event": null,
-                  "retries_timeout_about_to_start_event": null,
-                  "callback_url_about_to_submit_event": null,
-                  "retries_timeout_url_about_to_submit_event": null,
-                  "callback_url_submitted_event": null,
-                  "retries_timeout_url_submitted_event": null,
-                  "security_classification": null,
-                  "show_summary": null,
-                  "show_event_notes": null,
-                  "end_button_label": null,
-                  "can_save_draft": null,
-                  "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": false
-                    }
-                  ]
-                }
+                "[[DONT_CARE]]"
               ],
               "states": [
-                {
-                  "id": "TODO",
-                  "name": "To do",
-                  "description": null,
-                  "order": 1,
-                  "title_display": null,
-                  "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": false
-                    }
-                  ]
-                },
-                {
-                  "id": "IN_PROGRESS",
-                  "name": "In progress",
-                  "description": null,
-                  "order": 2,
-                  "title_display": null,
-                  "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": false
-                    }
-                  ]
-                },
-                {
-                  "id": "DONE",
-                  "name": "Done",
-                  "description": null,
-                  "order": 3,
-                  "title_display": null,
-                  "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": false
-                    }
-                  ]
-                }
+                "[[DONT_CARE]]"
               ],
               "searchAliasFields": [],
               "security_classification": null,
               "case_fields": [],
               "printable_document_url": null,
               "acls": [
-                {
-                  "role": "caseworker-autotest1",
-                  "create": true,
-                  "read": true,
-                  "update": true,
-                  "delete": false
-                }
+                "[[DONT_CARE]]"
               ]
             },
             {
-              "id": "MAPPER",
-              "description": "Demonstrate Mapper's capability",
+              "id": "[[DONT_CARE]]",
+              "description": "[[DONT_CARE]]",
               "version": null,
-              "name": "Case type for Mapper",
+              "name": "[[DONT_CARE]]",
               "jurisdiction": null,
               "events": [
+                "[[DONT_CARE]]",
                 {
-                  "id": "COMPLETE",
-                  "name": "Mark as done",
+                  "id": "[[DONT_CARE]]",
+                  "name": "[[DONT_CARE]]",
                   "description": null,
                   "order": null,
                   "case_fields": [],
                   "pre_states": [
-                    "IN_PROGRESS"
+                    "[[DONT_CARE]]"
                   ],
                   "post_state": null,
                   "callback_url_about_to_start_event": null,
@@ -335,80 +100,13 @@
                   "end_button_label": null,
                   "can_save_draft": null,
                   "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": false
-                    }
+                    "[[DONT_CARE]]"
                   ]
                 },
+                "[[DONT_CARE]]",
                 {
-                  "id": "STOP_PROGRESS",
-                  "name": "Stop",
-                  "description": null,
-                  "order": null,
-                  "case_fields": [],
-                  "pre_states": [
-                    "IN_PROGRESS"
-                  ],
-                  "post_state": null,
-                  "callback_url_about_to_start_event": null,
-                  "retries_timeout_about_to_start_event": null,
-                  "callback_url_about_to_submit_event": null,
-                  "retries_timeout_url_about_to_submit_event": null,
-                  "callback_url_submitted_event": null,
-                  "retries_timeout_url_submitted_event": null,
-                  "security_classification": null,
-                  "show_summary": null,
-                  "show_event_notes": null,
-                  "end_button_label": null,
-                  "can_save_draft": null,
-                  "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": false
-                    }
-                  ]
-                },
-                {
-                  "id": "START_PROGRESS",
-                  "name": "Start",
-                  "description": null,
-                  "order": null,
-                  "case_fields": [],
-                  "pre_states": [
-                    "TODO"
-                  ],
-                  "post_state": null,
-                  "callback_url_about_to_start_event": null,
-                  "retries_timeout_about_to_start_event": null,
-                  "callback_url_about_to_submit_event": null,
-                  "retries_timeout_url_about_to_submit_event": null,
-                  "callback_url_submitted_event": null,
-                  "retries_timeout_url_submitted_event": null,
-                  "security_classification": null,
-                  "show_summary": null,
-                  "show_event_notes": null,
-                  "end_button_label": null,
-                  "can_save_draft": null,
-                  "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": false
-                    }
-                  ]
-                },
-                {
-                  "id": "CREATE",
-                  "name": "Create a new case",
+                  "id": "[[DONT_CARE]]",
+                  "name": "[[DONT_CARE]]",
                   "description": null,
                   "order": null,
                   "case_fields": [],
@@ -426,23 +124,17 @@
                   "end_button_label": null,
                   "can_save_draft": null,
                   "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": false
-                    }
+                    "[[DONT_CARE]]"
                   ]
                 },
                 {
-                  "id": "REVIEW",
-                  "name": "Review",
+                  "id": "[[DONT_CARE]]",
+                  "name": "[[DONT_CARE]]",
                   "description": null,
                   "order": null,
                   "case_fields": [],
                   "pre_states": [
-                    "*"
+                    "[[DONT_CARE]]"
                   ],
                   "post_state": null,
                   "callback_url_about_to_start_event": null,
@@ -457,23 +149,17 @@
                   "end_button_label": null,
                   "can_save_draft": null,
                   "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": false
-                    }
+                    "[[DONT_CARE]]"
                   ]
                 },
                 {
-                  "id": "UPDATE",
-                  "name": "Update",
+                  "id": "[[DONT_CARE]]",
+                  "name": "[[DONT_CARE]]",
                   "description": null,
                   "order": null,
                   "case_fields": [],
                   "pre_states": [
-                    "*"
+                    "[[DONT_CARE]]"
                   ],
                   "post_state": null,
                   "callback_url_about_to_start_event": null,
@@ -488,63 +174,39 @@
                   "end_button_label": null,
                   "can_save_draft": null,
                   "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": false
-                    }
+                    "[[DONT_CARE]]"
                   ]
                 }
               ],
               "states": [
                 {
-                  "id": "TODO",
-                  "name": "To do",
+                  "id": "[[DONT_CARE]]",
+                  "name": "[[DONT_CARE]]",
                   "description": null,
                   "order": 1,
                   "title_display": null,
                   "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": false
-                    }
+                    "[[DONT_CARE]]"
                   ]
                 },
                 {
-                  "id": "IN_PROGRESS",
-                  "name": "In progress",
+                  "id": "[[DONT_CARE]]",
+                  "name": "[[DONT_CARE]]",
                   "description": null,
                   "order": 2,
                   "title_display": null,
                   "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": false
-                    }
+                    "[[DONT_CARE]]"
                   ]
                 },
                 {
-                  "id": "DONE",
-                  "name": "Done",
+                  "id": "[[DONT_CARE]]",
+                  "name": "[[DONT_CARE]]",
                   "description": null,
                   "order": 3,
                   "title_display": null,
                   "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": false
-                    }
+                    "[[DONT_CARE]]"
                   ]
                 }
               ],
@@ -553,20 +215,14 @@
               "case_fields": [],
               "printable_document_url": null,
               "acls": [
-                {
-                  "role": "caseworker-autotest1",
-                  "create": true,
-                  "read": true,
-                  "update": true,
-                  "delete": false
-                }
+                "[[DONT_CARE]]"
               ]
             },
             {
-              "id": "AAT_PRIVATE",
-              "description": "Demonstrate AAT_PRIVATE's capability",
+              "id": "[[DONT_CARE]]",
+              "description": "[[DONT_CARE]]",
               "version": null,
-              "name": "Case type for AAT_PRIVATE",
+              "name": "[[DONT_CARE]]",
               "jurisdiction": null,
               "events": [],
               "states": [],
@@ -575,51 +231,27 @@
               "case_fields": [],
               "printable_document_url": null,
               "acls": [
-                {
-                  "role": "caseworker-autotest1",
-                  "create": true,
-                  "read": true,
-                  "update": true,
-                  "delete": false
-                },
-                {
-                  "role": "caseworker-autotest1-private",
-                  "create": true,
-                  "read": true,
-                  "update": true,
-                  "delete": false
-                },
-                {
-                  "role": "caseworker-autotest1-senior",
-                  "create": true,
-                  "read": true,
-                  "update": true,
-                  "delete": true
-                },
-                {
-                  "role": "caseworker-autotest1-solicitor",
-                  "create": true,
-                  "read": true,
-                  "update": true,
-                  "delete": true
-                }
+                "[[DONT_CARE]]",
+                "[[DONT_CARE]]",
+                "[[DONT_CARE]]",
+                "[[DONT_CARE]]"
               ]
             },
             {
-              "id": "AAT_AUTH_15",
-              "description": "Demonstrate everything CCD can do!",
+              "id": "[[DONT_CARE]]",
+              "description": "[[DONT_CARE]]",
               "version": null,
-              "name": "Demo case AAT_AUTH_15",
+              "name": "[[DONT_CARE]]",
               "jurisdiction": null,
               "events": [
                 {
-                  "id": "REVIEW",
-                  "name": "Review",
+                  "id": "[[DONT_CARE]]",
+                  "name": "[[DONT_CARE]]",
                   "description": null,
                   "order": null,
                   "case_fields": [],
                   "pre_states": [
-                    "*"
+                    "[[DONT_CARE]]"
                   ],
                   "post_state": null,
                   "callback_url_about_to_start_event": null,
@@ -634,30 +266,18 @@
                   "end_button_label": null,
                   "can_save_draft": null,
                   "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    },
-                    {
-                      "role": "caseworker-autotest1-private",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    }
+                    "[[DONT_CARE]]",
+                    "[[DONT_CARE]]"
                   ]
                 },
                 {
-                  "id": "UPDATE",
-                  "name": "Update",
+                  "id": "[[DONT_CARE]]",
+                  "name": "[[DONT_CARE]]",
                   "description": null,
                   "order": null,
                   "case_fields": [],
                   "pre_states": [
-                    "*"
+                    "[[DONT_CARE]]"
                   ],
                   "post_state": null,
                   "callback_url_about_to_start_event": null,
@@ -672,30 +292,18 @@
                   "end_button_label": null,
                   "can_save_draft": null,
                   "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    },
-                    {
-                      "role": "caseworker-autotest1-private",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    }
+                    "[[DONT_CARE]]",
+                    "[[DONT_CARE]]"
                   ]
                 },
                 {
-                  "id": "COMPLETE",
-                  "name": "Mark as done",
+                  "id": "[[DONT_CARE]]",
+                  "name": "[[DONT_CARE]]",
                   "description": null,
                   "order": null,
                   "case_fields": [],
                   "pre_states": [
-                    "IN_PROGRESS"
+                    "[[DONT_CARE]]"
                   ],
                   "post_state": null,
                   "callback_url_about_to_start_event": null,
@@ -710,30 +318,18 @@
                   "end_button_label": null,
                   "can_save_draft": null,
                   "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    },
-                    {
-                      "role": "caseworker-autotest1-private",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    }
+                    "[[DONT_CARE]]",
+                    "[[DONT_CARE]]"
                   ]
                 },
                 {
-                  "id": "STOP_PROGRESS",
-                  "name": "Stop",
+                  "id": "[[DONT_CARE]]",
+                  "name": "[[DONT_CARE]]",
                   "description": null,
                   "order": null,
                   "case_fields": [],
                   "pre_states": [
-                    "IN_PROGRESS"
+                    "[[DONT_CARE]]"
                   ],
                   "post_state": null,
                   "callback_url_about_to_start_event": null,
@@ -748,30 +344,18 @@
                   "end_button_label": null,
                   "can_save_draft": null,
                   "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    },
-                    {
-                      "role": "caseworker-autotest1-private",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    }
+                    "[[DONT_CARE]]",
+                    "[[DONT_CARE]]"
                   ]
                 },
                 {
-                  "id": "START_PROGRESS",
-                  "name": "Start",
+                  "id": "[[DONT_CARE]]",
+                  "name": "[[DONT_CARE]]",
                   "description": null,
                   "order": null,
                   "case_fields": [],
                   "pre_states": [
-                    "TODO"
+                    "[[DONT_CARE]]"
                   ],
                   "post_state": null,
                   "callback_url_about_to_start_event": null,
@@ -786,25 +370,13 @@
                   "end_button_label": null,
                   "can_save_draft": null,
                   "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    },
-                    {
-                      "role": "caseworker-autotest1-private",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    }
+                    "[[DONT_CARE]]",
+                    "[[DONT_CARE]]"
                   ]
                 },
                 {
-                  "id": "CREATE",
-                  "name": "Create a new case",
+                  "id": "[[DONT_CARE]]",
+                  "name": "[[DONT_CARE]]",
                   "description": null,
                   "order": null,
                   "case_fields": [],
@@ -822,91 +394,43 @@
                   "end_button_label": null,
                   "can_save_draft": null,
                   "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    },
-                    {
-                      "role": "caseworker-autotest1-private",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    }
+                    "[[DONT_CARE]]",
+                    "[[DONT_CARE]]"
                   ]
                 }
               ],
               "states": [
                 {
-                  "id": "TODO",
-                  "name": "To do",
+                  "id": "[[DONT_CARE]]",
+                  "name": "[[DONT_CARE]]",
                   "description": null,
                   "order": 1,
                   "title_display": null,
                   "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    },
-                    {
-                      "role": "caseworker-autotest1-private",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    }
+                    "[[DONT_CARE]]",
+                    "[[DONT_CARE]]"
                   ]
                 },
                 {
-                  "id": "IN_PROGRESS",
-                  "name": "In progress",
+                  "id": "[[DONT_CARE]]",
+                  "name": "[[DONT_CARE]]",
                   "description": null,
                   "order": 2,
                   "title_display": null,
                   "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    },
-                    {
-                      "role": "caseworker-autotest1-private",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    }
+                    "[[DONT_CARE]]",
+                    "[[DONT_CARE]]"
                   ]
                 },
                 {
-                  "id": "DONE",
-                  "name": "Done",
+                  "id": "[[DONT_CARE]]",
+                  "name": "[[DONT_CARE]]",
                   "description": null,
                   "order": 3,
                   "title_display": null,
                   "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    },
-                    {
-                      "role": "caseworker-autotest1-private",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    }
+                    "[[DONT_CARE]]",
+                    "[[DONT_CARE]]"
                   ]
                 }
               ],
@@ -915,37 +439,25 @@
               "case_fields": [],
               "printable_document_url": null,
               "acls": [
-                {
-                  "role": "caseworker-autotest1",
-                  "create": true,
-                  "read": true,
-                  "update": true,
-                  "delete": true
-                },
-                {
-                  "role": "caseworker-autotest1-private",
-                  "create": true,
-                  "read": true,
-                  "update": true,
-                  "delete": true
-                }
+                "[[DONT_CARE]]",
+                "[[DONT_CARE]]"
               ]
             },
             {
-              "id": "AAT_AUTH_3",
-              "description": "Demonstrate AAT_AUTH_3's capability",
+              "id": "[[DONT_CARE]]",
+              "description": "[[DONT_CARE]]",
               "version": null,
-              "name": "Demo case AAT_AUTH_3",
+              "name": "[[DONT_CARE]]",
               "jurisdiction": null,
               "events": [
                 {
-                  "id": "REVIEW",
-                  "name": "Review",
+                  "id": "[[DONT_CARE]]",
+                  "name": "[[DONT_CARE]]",
                   "description": null,
                   "order": null,
                   "case_fields": [],
                   "pre_states": [
-                    "*"
+                    "[[DONT_CARE]]"
                   ],
                   "post_state": null,
                   "callback_url_about_to_start_event": null,
@@ -960,30 +472,18 @@
                   "end_button_label": null,
                   "can_save_draft": null,
                   "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    },
-                    {
-                      "role": "caseworker-autotest1-private",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    }
+                    "[[DONT_CARE]]",
+                    "[[DONT_CARE]]"
                   ]
                 },
                 {
-                  "id": "UPDATE",
-                  "name": "Update",
+                  "id": "[[DONT_CARE]]",
+                  "name": "[[DONT_CARE]]",
                   "description": null,
                   "order": null,
                   "case_fields": [],
                   "pre_states": [
-                    "*"
+                    "[[DONT_CARE]]"
                   ],
                   "post_state": null,
                   "callback_url_about_to_start_event": null,
@@ -998,139 +498,16 @@
                   "end_button_label": null,
                   "can_save_draft": null,
                   "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    },
-                    {
-                      "role": "caseworker-autotest1-private",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    }
+                    "[[DONT_CARE]]",
+                    "[[DONT_CARE]]"
                   ]
                 },
+                "[[DONT_CARE]]",
+                "[[DONT_CARE]]",
+                "[[DONT_CARE]]",
                 {
-                  "id": "COMPLETE",
-                  "name": "Mark as done",
-                  "description": null,
-                  "order": null,
-                  "case_fields": [],
-                  "pre_states": [
-                    "IN_PROGRESS"
-                  ],
-                  "post_state": null,
-                  "callback_url_about_to_start_event": null,
-                  "retries_timeout_about_to_start_event": null,
-                  "callback_url_about_to_submit_event": null,
-                  "retries_timeout_url_about_to_submit_event": null,
-                  "callback_url_submitted_event": null,
-                  "retries_timeout_url_submitted_event": null,
-                  "security_classification": null,
-                  "show_summary": null,
-                  "show_event_notes": null,
-                  "end_button_label": null,
-                  "can_save_draft": null,
-                  "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    },
-                    {
-                      "role": "caseworker-autotest1-private",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    }
-                  ]
-                },
-                {
-                  "id": "STOP_PROGRESS",
-                  "name": "Stop",
-                  "description": null,
-                  "order": null,
-                  "case_fields": [],
-                  "pre_states": [
-                    "IN_PROGRESS"
-                  ],
-                  "post_state": null,
-                  "callback_url_about_to_start_event": null,
-                  "retries_timeout_about_to_start_event": null,
-                  "callback_url_about_to_submit_event": null,
-                  "retries_timeout_url_about_to_submit_event": null,
-                  "callback_url_submitted_event": null,
-                  "retries_timeout_url_submitted_event": null,
-                  "security_classification": null,
-                  "show_summary": null,
-                  "show_event_notes": null,
-                  "end_button_label": null,
-                  "can_save_draft": null,
-                  "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    },
-                    {
-                      "role": "caseworker-autotest1-private",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    }
-                  ]
-                },
-                {
-                  "id": "START_PROGRESS",
-                  "name": "Start",
-                  "description": null,
-                  "order": null,
-                  "case_fields": [],
-                  "pre_states": [
-                    "TODO"
-                  ],
-                  "post_state": null,
-                  "callback_url_about_to_start_event": null,
-                  "retries_timeout_about_to_start_event": null,
-                  "callback_url_about_to_submit_event": null,
-                  "retries_timeout_url_about_to_submit_event": null,
-                  "callback_url_submitted_event": null,
-                  "retries_timeout_url_submitted_event": null,
-                  "security_classification": null,
-                  "show_summary": null,
-                  "show_event_notes": null,
-                  "end_button_label": null,
-                  "can_save_draft": null,
-                  "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    },
-                    {
-                      "role": "caseworker-autotest1-private",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    }
-                  ]
-                },
-                {
-                  "id": "CREATE",
-                  "name": "Create a new case",
+                  "id": "[[DONT_CARE]]",
+                  "name": "[[DONT_CARE]]",
                   "description": null,
                   "order": null,
                   "case_fields": [],
@@ -1148,91 +525,43 @@
                   "end_button_label": null,
                   "can_save_draft": null,
                   "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    },
-                    {
-                      "role": "caseworker-autotest1-private",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    }
+                    "[[DONT_CARE]]",
+                    "[[DONT_CARE]]"
                   ]
                 }
               ],
               "states": [
                 {
-                  "id": "TODO",
-                  "name": "To do",
+                  "id": "[[DONT_CARE]]",
+                  "name": "[[DONT_CARE]]",
                   "description": null,
                   "order": 1,
                   "title_display": null,
                   "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    },
-                    {
-                      "role": "caseworker-autotest1-private",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    }
+                    "[[DONT_CARE]]",
+                    "[[DONT_CARE]]"
                   ]
                 },
                 {
-                  "id": "IN_PROGRESS",
-                  "name": "In progress",
+                  "id": "[[DONT_CARE]]",
+                  "name": "[[DONT_CARE]]",
                   "description": null,
                   "order": 2,
                   "title_display": null,
                   "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    },
-                    {
-                      "role": "caseworker-autotest1-private",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    }
+                    "[[DONT_CARE]]",
+                    "[[DONT_CARE]]"
                   ]
                 },
                 {
-                  "id": "DONE",
-                  "name": "Done",
+                  "id": "[[DONT_CARE]]",
+                  "name": "[[DONT_CARE]]",
                   "description": null,
                   "order": 3,
                   "title_display": null,
                   "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    },
-                    {
-                      "role": "caseworker-autotest1-private",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    }
+                    "[[DONT_CARE]]",
+                    "[[DONT_CARE]]"
                   ]
                 }
               ],
@@ -1241,37 +570,53 @@
               "case_fields": [],
               "printable_document_url": null,
               "acls": [
-                {
-                  "role": "caseworker-autotest1",
-                  "create": true,
-                  "read": true,
-                  "update": false,
-                  "delete": false
-                },
-                {
-                  "role": "caseworker-autotest1-private",
-                  "create": true,
-                  "read": true,
-                  "update": true,
-                  "delete": true
-                }
+                "[[DONT_CARE]]",
+                "[[DONT_CARE]]"
               ]
             },
             {
-              "id": "AAT_AUTH_6",
-              "description": "Demonstrate everything CCD can do!",
+              "id": "[[DONT_CARE]]",
+              "description": "[[DONT_CARE]]",
               "version": null,
-              "name": "Demo case AAT_AUTH_6",
+              "name": "[[DONT_CARE]]",
+              "jurisdiction": null,
+              "events": [
+                "[[DONT_CARE]]",
+                "[[DONT_CARE]]",
+                "[[DONT_CARE]]",
+                "[[DONT_CARE]]",
+                "[[DONT_CARE]]",
+                "[[DONT_CARE]]"
+              ],
+              "states": [
+                "[[DONT_CARE]]",
+                "[[DONT_CARE]]",
+                "[[DONT_CARE]]"
+              ],
+              "searchAliasFields": [],
+              "security_classification": null,
+              "case_fields": [],
+              "printable_document_url": null,
+              "acls": [
+                "[[DONT_CARE]]",
+                "[[DONT_CARE]]"
+              ]
+            },
+            {
+              "id": "[[DONT_CARE]]",
+              "description": "[[DONT_CARE]]",
+              "version": null,
+              "name": "[[DONT_CARE]]",
               "jurisdiction": null,
               "events": [
                 {
-                  "id": "REVIEW",
-                  "name": "Review",
+                  "id": "[[DONT_CARE]]",
+                  "name": "[[DONT_CARE]]",
                   "description": null,
                   "order": null,
                   "case_fields": [],
                   "pre_states": [
-                    "*"
+                    "[[DONT_CARE]]"
                   ],
                   "post_state": null,
                   "callback_url_about_to_start_event": null,
@@ -1286,30 +631,18 @@
                   "end_button_label": null,
                   "can_save_draft": null,
                   "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    },
-                    {
-                      "role": "caseworker-autotest1-private",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    }
+                    "[[DONT_CARE]]",
+                    "[[DONT_CARE]]"
                   ]
                 },
                 {
-                  "id": "UPDATE",
-                  "name": "Update",
+                  "id": "[[DONT_CARE]]",
+                  "name": "[[DONT_CARE]]",
                   "description": null,
                   "order": null,
                   "case_fields": [],
                   "pre_states": [
-                    "*"
+                    "[[DONT_CARE]]"
                   ],
                   "post_state": null,
                   "callback_url_about_to_start_event": null,
@@ -1324,30 +657,18 @@
                   "end_button_label": null,
                   "can_save_draft": null,
                   "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    },
-                    {
-                      "role": "caseworker-autotest1-private",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    }
+                    "[[DONT_CARE]]",
+                    "[[DONT_CARE]]"
                   ]
                 },
                 {
-                  "id": "COMPLETE",
-                  "name": "Mark as done",
+                  "id": "[[DONT_CARE]]",
+                  "name": "[[DONT_CARE]]",
                   "description": null,
                   "order": null,
                   "case_fields": [],
                   "pre_states": [
-                    "IN_PROGRESS"
+                    "[[DONT_CARE]]"
                   ],
                   "post_state": null,
                   "callback_url_about_to_start_event": null,
@@ -1362,101 +683,13 @@
                   "end_button_label": null,
                   "can_save_draft": null,
                   "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    },
-                    {
-                      "role": "caseworker-autotest1-private",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    }
+                    "[[DONT_CARE]]",
+                    "[[DONT_CARE]]"
                   ]
                 },
                 {
-                  "id": "STOP_PROGRESS",
-                  "name": "Stop",
-                  "description": null,
-                  "order": null,
-                  "case_fields": [],
-                  "pre_states": [
-                    "IN_PROGRESS"
-                  ],
-                  "post_state": null,
-                  "callback_url_about_to_start_event": null,
-                  "retries_timeout_about_to_start_event": null,
-                  "callback_url_about_to_submit_event": null,
-                  "retries_timeout_url_about_to_submit_event": null,
-                  "callback_url_submitted_event": null,
-                  "retries_timeout_url_submitted_event": null,
-                  "security_classification": null,
-                  "show_summary": null,
-                  "show_event_notes": null,
-                  "end_button_label": null,
-                  "can_save_draft": null,
-                  "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    },
-                    {
-                      "role": "caseworker-autotest1-private",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    }
-                  ]
-                },
-                {
-                  "id": "START_PROGRESS",
-                  "name": "Start",
-                  "description": null,
-                  "order": null,
-                  "case_fields": [],
-                  "pre_states": [
-                    "TODO"
-                  ],
-                  "post_state": null,
-                  "callback_url_about_to_start_event": null,
-                  "retries_timeout_about_to_start_event": null,
-                  "callback_url_about_to_submit_event": null,
-                  "retries_timeout_url_about_to_submit_event": null,
-                  "callback_url_submitted_event": null,
-                  "retries_timeout_url_submitted_event": null,
-                  "security_classification": null,
-                  "show_summary": null,
-                  "show_event_notes": null,
-                  "end_button_label": null,
-                  "can_save_draft": null,
-                  "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    },
-                    {
-                      "role": "caseworker-autotest1-private",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    }
-                  ]
-                },
-                {
-                  "id": "CREATE",
-                  "name": "Create a new case",
+                  "id": "[[DONT_CARE]]",
+                  "name": "[[DONT_CARE]]",
                   "description": null,
                   "order": null,
                   "case_fields": [],
@@ -1474,91 +707,95 @@
                   "end_button_label": null,
                   "can_save_draft": null,
                   "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    },
-                    {
-                      "role": "caseworker-autotest1-private",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    }
+                    "[[DONT_CARE]]",
+                    "[[DONT_CARE]]"
+                  ]
+                },
+                {
+                  "id": "[[DONT_CARE]]",
+                  "name": "[[DONT_CARE]]",
+                  "description": null,
+                  "order": null,
+                  "case_fields": [],
+                  "pre_states": [
+                    "[[DONT_CARE]]"
+                  ],
+                  "post_state": null,
+                  "callback_url_about_to_start_event": null,
+                  "retries_timeout_about_to_start_event": null,
+                  "callback_url_about_to_submit_event": null,
+                  "retries_timeout_url_about_to_submit_event": null,
+                  "callback_url_submitted_event": null,
+                  "retries_timeout_url_submitted_event": null,
+                  "security_classification": null,
+                  "show_summary": null,
+                  "show_event_notes": null,
+                  "end_button_label": null,
+                  "can_save_draft": null,
+                  "acls": [
+                    "[[DONT_CARE]]",
+                    "[[DONT_CARE]]"
+                  ]
+                },
+                {
+                  "id": "[[DONT_CARE]]",
+                  "name": "[[DONT_CARE]]",
+                  "description": null,
+                  "order": null,
+                  "case_fields": [],
+                  "pre_states": [
+                    "[[DONT_CARE]]"
+                  ],
+                  "post_state": null,
+                  "callback_url_about_to_start_event": null,
+                  "retries_timeout_about_to_start_event": null,
+                  "callback_url_about_to_submit_event": null,
+                  "retries_timeout_url_about_to_submit_event": null,
+                  "callback_url_submitted_event": null,
+                  "retries_timeout_url_submitted_event": null,
+                  "security_classification": null,
+                  "show_summary": null,
+                  "show_event_notes": null,
+                  "end_button_label": null,
+                  "can_save_draft": null,
+                  "acls": [
+                    "[[DONT_CARE]]",
+                    "[[DONT_CARE]]"
                   ]
                 }
               ],
               "states": [
                 {
-                  "id": "TODO",
-                  "name": "To do",
+                  "id": "[[DONT_CARE]]",
+                  "name": "[[DONT_CARE]]",
                   "description": null,
                   "order": 1,
                   "title_display": null,
                   "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    },
-                    {
-                      "role": "caseworker-autotest1-private",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    }
+                    "[[DONT_CARE]]",
+                    "[[DONT_CARE]]"
                   ]
                 },
                 {
-                  "id": "IN_PROGRESS",
-                  "name": "In progress",
+                  "id": "[[DONT_CARE]]",
+                  "name": "[[DONT_CARE]]",
                   "description": null,
                   "order": 2,
                   "title_display": null,
                   "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    },
-                    {
-                      "role": "caseworker-autotest1-private",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    }
+                    "[[DONT_CARE]]",
+                    "[[DONT_CARE]]"
                   ]
                 },
                 {
-                  "id": "DONE",
-                  "name": "Done",
+                  "id": "[[DONT_CARE]]",
+                  "name": "[[DONT_CARE]]",
                   "description": null,
                   "order": 3,
                   "title_display": null,
                   "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    },
-                    {
-                      "role": "caseworker-autotest1-private",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    }
+                    "[[DONT_CARE]]",
+                    "[[DONT_CARE]]"
                   ]
                 }
               ],
@@ -1567,346 +804,8 @@
               "case_fields": [],
               "printable_document_url": null,
               "acls": [
-                {
-                  "role": "caseworker-autotest1",
-                  "create": false,
-                  "read": true,
-                  "update": true,
-                  "delete": false
-                },
-                {
-                  "role": "caseworker-autotest1-private",
-                  "create": true,
-                  "read": true,
-                  "update": true,
-                  "delete": true
-                }
-              ]
-            },
-            {
-              "id": "AAT_AUTH_2",
-              "description": "Demonstrate AAT_AUTH_3's capability",
-              "version": null,
-              "name": "Demo case AAT_AUTH_2",
-              "jurisdiction": null,
-              "events": [
-                {
-                  "id": "COMPLETE",
-                  "name": "Mark as done",
-                  "description": null,
-                  "order": null,
-                  "case_fields": [],
-                  "pre_states": [
-                    "IN_PROGRESS"
-                  ],
-                  "post_state": null,
-                  "callback_url_about_to_start_event": null,
-                  "retries_timeout_about_to_start_event": null,
-                  "callback_url_about_to_submit_event": null,
-                  "retries_timeout_url_about_to_submit_event": null,
-                  "callback_url_submitted_event": null,
-                  "retries_timeout_url_submitted_event": null,
-                  "security_classification": null,
-                  "show_summary": null,
-                  "show_event_notes": null,
-                  "end_button_label": null,
-                  "can_save_draft": null,
-                  "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    },
-                    {
-                      "role": "caseworker-autotest1-private",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    }
-                  ]
-                },
-                {
-                  "id": "STOP_PROGRESS",
-                  "name": "Stop",
-                  "description": null,
-                  "order": null,
-                  "case_fields": [],
-                  "pre_states": [
-                    "IN_PROGRESS"
-                  ],
-                  "post_state": null,
-                  "callback_url_about_to_start_event": null,
-                  "retries_timeout_about_to_start_event": null,
-                  "callback_url_about_to_submit_event": null,
-                  "retries_timeout_url_about_to_submit_event": null,
-                  "callback_url_submitted_event": null,
-                  "retries_timeout_url_submitted_event": null,
-                  "security_classification": null,
-                  "show_summary": null,
-                  "show_event_notes": null,
-                  "end_button_label": null,
-                  "can_save_draft": null,
-                  "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    },
-                    {
-                      "role": "caseworker-autotest1-private",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    }
-                  ]
-                },
-                {
-                  "id": "START_PROGRESS",
-                  "name": "Start",
-                  "description": null,
-                  "order": null,
-                  "case_fields": [],
-                  "pre_states": [
-                    "TODO"
-                  ],
-                  "post_state": null,
-                  "callback_url_about_to_start_event": null,
-                  "retries_timeout_about_to_start_event": null,
-                  "callback_url_about_to_submit_event": null,
-                  "retries_timeout_url_about_to_submit_event": null,
-                  "callback_url_submitted_event": null,
-                  "retries_timeout_url_submitted_event": null,
-                  "security_classification": null,
-                  "show_summary": null,
-                  "show_event_notes": null,
-                  "end_button_label": null,
-                  "can_save_draft": null,
-                  "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    },
-                    {
-                      "role": "caseworker-autotest1-private",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    }
-                  ]
-                },
-                {
-                  "id": "CREATE",
-                  "name": "Create a new case",
-                  "description": null,
-                  "order": null,
-                  "case_fields": [],
-                  "pre_states": [],
-                  "post_state": null,
-                  "callback_url_about_to_start_event": null,
-                  "retries_timeout_about_to_start_event": null,
-                  "callback_url_about_to_submit_event": null,
-                  "retries_timeout_url_about_to_submit_event": null,
-                  "callback_url_submitted_event": null,
-                  "retries_timeout_url_submitted_event": null,
-                  "security_classification": null,
-                  "show_summary": null,
-                  "show_event_notes": null,
-                  "end_button_label": null,
-                  "can_save_draft": null,
-                  "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    },
-                    {
-                      "role": "caseworker-autotest1-private",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    }
-                  ]
-                },
-                {
-                  "id": "REVIEW",
-                  "name": "Review",
-                  "description": null,
-                  "order": null,
-                  "case_fields": [],
-                  "pre_states": [
-                    "*"
-                  ],
-                  "post_state": null,
-                  "callback_url_about_to_start_event": null,
-                  "retries_timeout_about_to_start_event": null,
-                  "callback_url_about_to_submit_event": null,
-                  "retries_timeout_url_about_to_submit_event": null,
-                  "callback_url_submitted_event": null,
-                  "retries_timeout_url_submitted_event": null,
-                  "security_classification": null,
-                  "show_summary": null,
-                  "show_event_notes": null,
-                  "end_button_label": null,
-                  "can_save_draft": null,
-                  "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    },
-                    {
-                      "role": "caseworker-autotest1-private",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    }
-                  ]
-                },
-                {
-                  "id": "UPDATE",
-                  "name": "Update",
-                  "description": null,
-                  "order": null,
-                  "case_fields": [],
-                  "pre_states": [
-                    "*"
-                  ],
-                  "post_state": null,
-                  "callback_url_about_to_start_event": null,
-                  "retries_timeout_about_to_start_event": null,
-                  "callback_url_about_to_submit_event": null,
-                  "retries_timeout_url_about_to_submit_event": null,
-                  "callback_url_submitted_event": null,
-                  "retries_timeout_url_submitted_event": null,
-                  "security_classification": null,
-                  "show_summary": null,
-                  "show_event_notes": null,
-                  "end_button_label": null,
-                  "can_save_draft": null,
-                  "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    },
-                    {
-                      "role": "caseworker-autotest1-private",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    }
-                  ]
-                }
-              ],
-              "states": [
-                {
-                  "id": "TODO",
-                  "name": "To do",
-                  "description": null,
-                  "order": 1,
-                  "title_display": null,
-                  "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    },
-                    {
-                      "role": "caseworker-autotest1-private",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    }
-                  ]
-                },
-                {
-                  "id": "IN_PROGRESS",
-                  "name": "In progress",
-                  "description": null,
-                  "order": 2,
-                  "title_display": null,
-                  "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    },
-                    {
-                      "role": "caseworker-autotest1-private",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    }
-                  ]
-                },
-                {
-                  "id": "DONE",
-                  "name": "Done",
-                  "description": null,
-                  "order": 3,
-                  "title_display": null,
-                  "acls": [
-                    {
-                      "role": "caseworker-autotest1",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    },
-                    {
-                      "role": "caseworker-autotest1-private",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": true
-                    }
-                  ]
-                }
-              ],
-              "searchAliasFields": [],
-              "security_classification": null,
-              "case_fields": [],
-              "printable_document_url": null,
-              "acls": [
-                {
-                  "role": "caseworker-autotest1",
-                  "create": false,
-                  "read": true,
-                  "update": false,
-                  "delete": false
-                },
-                {
-                  "role": "caseworker-autotest1-private",
-                  "create": true,
-                  "read": true,
-                  "update": true,
-                  "delete": true
-                }
+                "[[DONT_CARE]]",
+                "[[DONT_CARE]]"
               ]
             }
           ]
@@ -1914,9 +813,9 @@
       ],
       "default": {
         "workbasket": {
-          "jurisdiction_id": "AUTOTEST1",
-          "case_type_id": "AAT_AUTH_15",
-          "state_id": "TODO"
+          "jurisdiction_id": "[[DONT_CARE]]",
+          "case_type_id": "[[DONT_CARE]]",
+          "state_id": "[[DONT_CARE]]"
         }
       }
     }

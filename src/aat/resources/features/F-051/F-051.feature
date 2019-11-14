@@ -21,7 +21,7 @@ Feature: Get default settings for user
     And the response has all the details as expected
 
   @S-107
-  Scenario: must return 401 when request does not provide valid authentication credentials
+  Scenario: must return 4xx when request does not provide valid authentication credentials
     Given an appropriate test context as detailed in the test data source
     And a user with [a detailed profile in CCD]
     When a request is prepared with appropriate values

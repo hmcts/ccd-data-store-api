@@ -7,7 +7,7 @@
   "operationName": "Get default settings for user",
   "request": {
     "headers": {
-      "Authorization": "SIVA"
+      "Authorization": "TESTAUTH"
     },
     "pathVariables": {
       "uid": "some id"
