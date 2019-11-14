@@ -3,15 +3,12 @@ package uk.gov.hmcts.ccd.fta.steps;
 import java.util.stream.Collectors;
 
 import io.cucumber.core.api.Scenario;
-import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import uk.gov.hmcts.ccd.fta.data.HttpTestData;
 import uk.gov.hmcts.ccd.fta.data.HttpTestDataSource;
 import uk.gov.hmcts.ccd.fta.data.JsonStoreHttpTestDataSource;
 import uk.gov.hmcts.ccd.fta.data.ResponseData;
 import uk.gov.hmcts.ccd.fta.data.UserData;
-
-import javax.xml.crypto.Data;
 
 public class BackEndFunctionalTestScenarioContext {
 

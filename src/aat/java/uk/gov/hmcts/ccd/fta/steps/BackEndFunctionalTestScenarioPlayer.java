@@ -30,6 +30,7 @@ import uk.gov.hmcts.ccd.fta.data.ResponseData;
 import uk.gov.hmcts.ccd.fta.data.UserData;
 import uk.gov.hmcts.ccd.fta.util.JsonUtils;
 
+@SuppressWarnings({"LocalVariableName"})
 public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTestAutomationDSL {
 
     private static final String DYNAMIC_CONTENT_PLACEHOLDER = "[[DYNAMIC]]";
@@ -68,14 +69,16 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     @Given("a user with [{}]")
     public void verifyThatThereIsAUserInTheContextWithAParticularSpecification(String specificationAboutAUser) {
         UserData aUser = scenarioContext.getTestData().getUser();
-
         String logPrefix = scenarioContext.getCurrentScenarioTag() + ": User ";
         try {
-            AuthenticatedUser authenticatedUserMetadata = aat.getIdamHelper().authenticate(
-                aUser.getUsername(), aUser.getPassword());
-            aUser.setToken(authenticatedUserMetadata.getAccessToken());
-            aUser.setUid(authenticatedUserMetadata.getId());
-            logger.info(logPrefix + "authenticated");
+            if (aUser.getToken() == null) {
+                AuthenticatedUser authenticatedUserMetadata = aat.getIdamHelper().authenticate(
+                    aUser.getUsername(), aUser.getPassword());
+                aUser.setToken(authenticatedUserMetadata.getAccessToken());
+                aUser.setUid(authenticatedUserMetadata.getId());
+                logger.info(logPrefix + "authenticated");
+            }
+
         } catch (FeignException ex) {
             logger.info(logPrefix + "credentials do not exist");
         }
@@ -252,7 +255,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     @Then("the response [{}]")
     public void verifyTheResponseInTheContextWithAParticularSpecification(String responseSpecification) {
         String errorMessage = "Test data does not confirm it meets the specification about the response: "
-                + responseSpecification;
+            + responseSpecification;
         boolean check = scenarioContext.getTestData().meetsSpec(responseSpecification);
         Assert.assertTrue(errorMessage, check);
     }

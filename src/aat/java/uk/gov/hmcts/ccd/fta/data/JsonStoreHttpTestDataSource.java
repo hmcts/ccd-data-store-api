@@ -22,8 +22,7 @@ public class JsonStoreHttpTestDataSource implements HttpTestDataSource {
                 String packagePath = this.getClass().getClassLoader().getResource(resourcePackage).getPath();
                 Resource[] resources = resolver
                         .getResources("classpath*:" + resourcePackage + "/**/*.json");
-                for (Resource resource : resources)
-                {
+                for (Resource resource : resources) {
                     String resourcePath = resource.getURL().getPath();
                     resourcePaths.add(resourcePackage + resourcePath.substring(packagePath.length()));
                 }
