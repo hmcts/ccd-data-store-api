@@ -2,22 +2,17 @@
   "_guid_": "S-231",
   "_extends_": "S-000-Base-Success",
   "title": "must return 401 when request does not provide valid authentication credentials",
-  "specs": ["an existing case in CCD"],
+  "specs": ["Start case creation as Case worker"],
   "productName": "CCD Data Store",
   "operationName": "Start case creation as Case worker",
   "user": {
     "username": "auto.test.cnp123@gmail.com",
-    "password": "Pa55word1166"
+    "password": "Pa55word11"
   },
-  "method" : "GET",
   "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
   "request": {
-    "pathVariables": {
-      "uid": "[[DYNAMIC]]",
-      "jid": "AUTOTEST1",
-      "ctid": "AAT_AUTH_15",
-      "cid": "[1573512086143178]",
-      "etid": "CREATE"
+    "headers": {
+      "serviceToken": "s2s"
     }
   },
   "expectedResponse": {

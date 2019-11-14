@@ -1,7 +1,7 @@
-@F-049
-Feature: Start case creation as Case worker
+@F-058
+Feature: Start case creation as Citizen
 
-  @S-231
+  @S-237
   Scenario: must return 401 when request does not provide valid authentication credentials
     Given   an appropriate test context as detailed in the test data source
     And     a user with [an existing case in CCD]
@@ -11,8 +11,8 @@ Feature: Start case creation as Case worker
     Then    a negative response is received
     And     the response has all the details as expected
 
-  @S-232
-  Scenario: must return 403 when request provides authentic credentials without authorized access to the operation
+  @S-238
+  Scenario: must return 403 when request provides authentic credentials without authorised access to the operation
     Given   an appropriate test context as detailed in the test data source
     And     a user with [an existing case in CCD]
     When    a request is prepared with appropriate values
@@ -21,8 +21,8 @@ Feature: Start case creation as Case worker
     Then    a negative response is received
     And     the response has all the details as expected
 
-  @S-233
-  Scenario: must return 404 when no case found for the given Idam user ID
+  @S-239
+  Scenario: must return 404 when no case found for the given Idam user ID
     Given   an appropriate test context as detailed in the test data source
     And     a user with [an existing case in CCD]
     When    a request is prepared with appropriate values
@@ -31,8 +31,8 @@ Feature: Start case creation as Case worker
     Then    a negative response is received
     And     the response has all the details as expected
 
-  @S-234
-  Scenario: must return 422 when process could not be started
+  @S-240
+  Scenario: must return 422 when process could not be started
     Given   an appropriate test context as detailed in the test data source
     And     a user with [an existing case in CCD]
     When    a request is prepared with appropriate values
@@ -41,8 +41,8 @@ Feature: Start case creation as Case worker
     Then    a negative response is received
     And     the response has all the details as expected
 
-  @S-235
-  Scenario: must start case creation process successfully for correct inputs
+  @S-241
+  Scenario: must start case creation process successfully for correct inputs
     Given   an appropriate test context as detailed in the test data source
     And     a user with [an existing case in CCD]
     When    a request is prepared with appropriate values
@@ -50,7 +50,7 @@ Feature: Start case creation as Case worker
     Then    a positive response is received
     And     the response has all the details as expected
 
-  @S-511
+  @S-517
   Scenario: must return 404 when no case found for the given Jurisdiction ID
     Given   an appropriate test context as detailed in the test data source
     And     a user with [an existing case in CCD]
@@ -60,7 +60,7 @@ Feature: Start case creation as Case worker
     Then    a negative response is received
     And     the response has all the details as expected
 
-  @S-512
+  @S-518
   Scenario: must return 404 when no case found for the given Case type ID
     Given   an appropriate test context as detailed in the test data source
     And     a user with [an existing case in CCD]
@@ -70,7 +70,7 @@ Feature: Start case creation as Case worker
     Then    a negative response is received
     And     the response has all the details as expected
 
-  @S-513
+  @S-519
   Scenario: must return 404 when no case found for the given Case ID
     Given   an appropriate test context as detailed in the test data source
     And     a user with [an existing case in CCD]
@@ -80,8 +80,7 @@ Feature: Start case creation as Case worker
     Then    a negative response is received
     And     the response has all the details as expected
 
-
-  @S-514
+  @S-520
   Scenario: must return 404 when no case found for the given Event ID
     Given   an appropriate test context as detailed in the test data source
     And     a user with [an existing case in CCD]
@@ -91,5 +90,6 @@ Feature: Start case creation as Case worker
     Then    a negative response is received
     And     the response has all the details as expected
 
-
+  @S-236
+  Scenario: <More tests out of further analysis>
 
