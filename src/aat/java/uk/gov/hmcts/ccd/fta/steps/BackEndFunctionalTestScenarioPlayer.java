@@ -101,13 +101,15 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
             requestData.getHeaders().forEach((header, value) -> {
                 if (value.toString().equals(DYNAMIC_CONTENT_PLACEHOLDER)) {
                     // ADD DYNAMIC DATA HERE
-                    if (header.equals("Authorization")) {
+                    if (header.equals("Authorization") && theUser.getToken() != null) {
                         String authToken = "Bearer " + theUser.getToken();
                         aRequest.header(header, authToken);
                         scenarioContext.getTestData().getRequest().getHeaders().put("Authorization", authToken);
-                    } else if (header.equals("ServiceAuthorization")) {
+                    } else if (header.equals("ServiceAuthorization") && s2sToken != null) {
                         aRequest.header(header, s2sToken);
                         scenarioContext.getTestData().getRequest().getHeaders().put("ServiceAuthorization", s2sToken);
+                    } else {
+                        Assert.fail("Dynamic value for request header '" + header + "' does not exist");
                     }
                 } else {
                     aRequest.header(header, value);
@@ -119,9 +121,11 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
             requestData.getPathVariables().forEach((pathVariable, value) -> {
                 if (value.toString().equals(DYNAMIC_CONTENT_PLACEHOLDER)) {
                     // ADD DYNAMIC DATA HERE
-                    if (pathVariable.equals("uid")) {
+                    if (pathVariable.equals("uid") && theUser.getUid() != null) {
                         aRequest.pathParam(pathVariable, theUser.getUid());
                         scenarioContext.getTestData().getRequest().getPathVariables().put("uid", theUser.getUid());
+                    } else {
+                        Assert.fail("Dynamic value for request path variable '" + pathVariable + "' does not exist");
                     }
                 } else {
                     aRequest.pathParam(pathVariable, value);
@@ -133,6 +137,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
             requestData.getQueryParams().forEach((queryParam, value) -> {
                 if (value.toString().equals(DYNAMIC_CONTENT_PLACEHOLDER)) {
                     // ADD DYNAMIC DATA HERE
+                    Assert.fail("Dynamic value for request query parameter '" + queryParam + "' does not exist");
                 } else {
                     aRequest.queryParam(queryParam, value);
                 }
