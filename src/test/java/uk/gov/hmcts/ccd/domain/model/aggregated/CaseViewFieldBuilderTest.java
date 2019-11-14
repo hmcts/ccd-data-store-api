@@ -379,7 +379,7 @@ public class CaseViewFieldBuilderTest {
                                             .withCollectionFieldType(collectionComplexFieldType)
                                             .build());
 
-                fieldBuilder.sortComplexCaseFields(CASE_FIELD, null);
+                fieldBuilder.sortComplexCaseFields(CASE_FIELD, Lists.newArrayList(), "");
 
                 List<CaseField> complexFields = CASE_FIELD.getFieldType().getCollectionFieldType().getComplexFields();
                 hasCorrectComplexField(complexFields, Lists.newArrayList("Three", "Two", "One"));
@@ -399,7 +399,7 @@ public class CaseViewFieldBuilderTest {
                                             .withComplexField(newCaseField().withFieldType(complexOfSimpleFieldTypes3).build())
                                             .build());
 
-                fieldBuilder.sortComplexCaseFields(CASE_FIELD, null);
+                fieldBuilder.sortComplexCaseFields(CASE_FIELD, Lists.newArrayList(), "");
 
                 List<CaseField> complexFields = CASE_FIELD.getFieldType().getComplexFields();
                 List<CaseField> complexFields1 = complexFields.get(0).getFieldType().getComplexFields();
@@ -428,7 +428,7 @@ public class CaseViewFieldBuilderTest {
                                             .withCollectionFieldType(collectionComplexFieldType)
                                             .build());
 
-                fieldBuilder.sortComplexCaseFields(CASE_FIELD, null);
+                fieldBuilder.sortComplexCaseFields(CASE_FIELD, Lists.newArrayList(), "");
 
                 List<CaseField> complexFields = CASE_FIELD.getFieldType().getCollectionFieldType().getComplexFields();
                 List<CaseField> complexFields1 = complexFields.get(0).getFieldType().getComplexFields();
