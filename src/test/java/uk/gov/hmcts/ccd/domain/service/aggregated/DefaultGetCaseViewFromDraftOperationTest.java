@@ -11,7 +11,7 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewFieldBuilder;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
@@ -85,7 +85,7 @@ class DefaultGetCaseViewFromDraftOperationTest {
     private ObjectMapperService objectMapperService;
 
     @Mock
-    private CaseViewFieldBuilder caseViewFieldBuilder;
+    private CompoundFieldOrderService compoundFieldOrderService;
 
     private GetCaseViewOperation getDraftViewOperation;
 
@@ -152,7 +152,7 @@ class DefaultGetCaseViewFromDraftOperationTest {
                                                                          draftGateway,
                                                                          draftResponseToCaseDetailsBuilder,
                                                                          objectMapperService,
-                                                                         caseViewFieldBuilder);
+                                                                         compoundFieldOrderService);
     }
 
     @Test

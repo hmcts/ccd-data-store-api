@@ -4,14 +4,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.collect.Maps;
 import lombok.ToString;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -197,35 +195,31 @@ public class CaseViewField implements CommonField {
         caseViewField.setSecurityLabel(caseField.getSecurityLabel());
         caseViewField.setValidationExpression(caseField.getFieldType().getRegularExpression());
         caseViewField.setAccessControlLists(caseField.getAccessControlLists());
-        sortDataValues(caseField, MAPPER.convertValue(data.get(caseField.getId()), JsonNode.class));
+        sortDataWithCaseFieldEncounterOrder(caseField, MAPPER.convertValue(data.get(caseField.getId()), JsonNode.class));
         caseViewField.setValue(data.get(caseField.getId()));
         caseViewField.setMetadata(caseField.isMetadata());
 
         return caseViewField;
     }
 
-    private static void sortDataValues(final CommonField caseField, JsonNode data) {
+    private static void sortDataWithCaseFieldEncounterOrder(final CommonField caseField, JsonNode data) {
         if (data != null) {
             if (caseField.isCompound()) {
                 List<CaseField> children = caseField.getFieldType().getChildren();
                 children.forEach(childField -> {
                     if (childField.isCollectionFieldType()) {
                         for (int index = 0; index < data.get(childField.getId()).size(); index++) {
-                            sortDataValues(childField, data.get(childField.getId()).get(index).get("value"));
+                            sortDataWithCaseFieldEncounterOrder(childField, data.get(childField.getId()).get(index).get("value"));
                         }
                     } else if (childField.isComplexFieldType()) {
-                        sortDataValues(childField, data.get(childField.getId()));
+                        sortDataWithCaseFieldEncounterOrder(childField, data.get(childField.getId()));
                     }
                 });
-                setOrderForComplexTypeFields(caseField, data, children);
-            }
-        }
-    }
-
-    private static void setOrderForComplexTypeFields(final CommonField caseField, final JsonNode data, final List<CaseField> children) {
-        for (CaseField field : children) {
-            if (data.get(field.getId()) != null) {
-                ((ObjectNode) data).set(field.getId(), data.get(field.getId()));
+                for (CaseField field : children) {
+                    if (data.get(field.getId()) != null) {
+                        ((ObjectNode) data).set(field.getId(), data.get(field.getId()));
+                    }
+                }
             }
         }
     }

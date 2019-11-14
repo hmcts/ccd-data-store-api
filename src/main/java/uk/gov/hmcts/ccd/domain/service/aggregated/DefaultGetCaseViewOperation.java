@@ -5,9 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewFieldBuilder;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
 import uk.gov.hmcts.ccd.domain.model.aggregated.ProfileCaseState;
@@ -46,8 +46,8 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
                                        EventTriggerService eventTriggerService,
                                        UIDService uidService,
                                        ObjectMapperService objectMapperService,
-                                       CaseViewFieldBuilder caseViewFieldBuilder) {
-        super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService, objectMapperService, caseViewFieldBuilder);
+                                       CompoundFieldOrderService compoundFieldOrderService) {
+        super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService, objectMapperService, compoundFieldOrderService);
         this.getEventsOperation = getEventsOperation;
         this.caseTypeService = caseTypeService;
         this.eventTriggerService = eventTriggerService;

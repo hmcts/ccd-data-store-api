@@ -897,11 +897,6 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public WizardPageComplexFieldOverrideBuilder withOrder(Integer order) {
-            this.wizardPageComplexFieldOverride.setOrder(order);
-            return this;
-        }
-
         public WizardPageComplexFieldOverrideBuilder withLabel(String label) {
             this.wizardPageComplexFieldOverride.setLabel(label);
             return this;

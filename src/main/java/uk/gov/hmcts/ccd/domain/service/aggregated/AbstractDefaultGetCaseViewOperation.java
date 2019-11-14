@@ -3,9 +3,9 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewFieldBuilder;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -22,7 +22,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -38,20 +37,20 @@ public abstract class AbstractDefaultGetCaseViewOperation {
     private final CaseTypeService caseTypeService;
     private final UIDService uidService;
     private final ObjectMapperService objectMapperService;
-    private final CaseViewFieldBuilder caseViewFieldBuilder;
+    private final CompoundFieldOrderService compoundFieldOrderService;
 
     AbstractDefaultGetCaseViewOperation(GetCaseOperation getCaseOperation,
                                         UIDefinitionRepository uiDefinitionRepository,
                                         CaseTypeService caseTypeService,
                                         UIDService uidService,
                                         ObjectMapperService objectMapperService,
-                                        CaseViewFieldBuilder caseViewFieldBuilder) {
+                                        CompoundFieldOrderService compoundFieldOrderService) {
         this.getCaseOperation = getCaseOperation;
         this.uiDefinitionRepository = uiDefinitionRepository;
         this.caseTypeService = caseTypeService;
         this.uidService = uidService;
         this.objectMapperService = objectMapperService;
-        this.caseViewFieldBuilder = caseViewFieldBuilder;
+        this.compoundFieldOrderService = compoundFieldOrderService;
     }
 
     void validateCaseReference(String caseReference) {
@@ -92,7 +91,7 @@ public abstract class AbstractDefaultGetCaseViewOperation {
 
     private Function<CaseTypeTabField, CaseTypeTabField> sortCaseFields() {
         return field -> {
-            caseViewFieldBuilder.sortComplexCaseFields(field.getCaseField(), Lists.newArrayList(), "");
+            compoundFieldOrderService.sortNestedFields(field.getCaseField(), Lists.newArrayList(), "");
             return field;
         };
     }
