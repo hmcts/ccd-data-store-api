@@ -84,7 +84,7 @@ public class CaseViewFieldBuilder {
                                         .sorted(comparingInt(CaseField::getOrder))
                                         .collect(Collectors.toList()));
         } else {
-            final Map<String, CaseField> childrenCaseIdToCaseField = convertComplexTypeChildrenToMap(children);
+            final Map<String, CaseField> childrenCaseIdToCaseField = convertComplexTypeChildrenToOrderedMap(children);
             orderedEventComplexFieldReferences.forEach(reference -> sortedCaseFields.add(childrenCaseIdToCaseField.remove(getReference(listElementCode, reference))));
             addRemainingInEncounterOrder(sortedCaseFields, childrenCaseIdToCaseField);
         }
@@ -115,7 +115,7 @@ public class CaseViewFieldBuilder {
             !field.getReference().contains(".") : !substringAfterLast(field.getReference(), listElementCode + ".").contains(".");
     }
 
-    private Map<String, CaseField> convertComplexTypeChildrenToMap(final List<CaseField> children) {
+    private Map<String, CaseField> convertComplexTypeChildrenToOrderedMap(final List<CaseField> children) {
         return children.stream().collect(Collectors.toMap(CaseField::getId,
                                                           Function.identity(),
                                                           (v1, v2) -> v1,
