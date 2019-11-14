@@ -13,6 +13,26 @@
     }
   },
   "expectedResponse": {
-    "responseCode": 403
+    "responseCode": 403,
+    "headers" : {
+      "X-Frame-Options" : "DENY",
+      "Transfer-Encoding" : "chunked",
+      "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
+      "vary" : "accept-encoding",
+      "X-Content-Type-Options" : "nosniff",
+      "Content-Encoding" : "gzip",
+      "Pragma" : "no-cache",
+      "Expires" : "0",
+      "X-XSS-Protection" : "1; mode=block",
+      "Date" : "[[DONT_CARE]]",
+      "Content-Type" : "application/json;charset=UTF-8"
+    },
+    "body" : {
+      "timestamp" : "[[DONT_CARE]]",
+      "status" : 403,
+      "error" : "Forbidden",
+      "message" : "Access Denied",
+      "path" : "/caseworkers/some%20id/profile"
+    }
   }
 }
