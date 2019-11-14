@@ -2,7 +2,7 @@
   "_guid_": "S-513",
   "_extends_": "S-000-Base-Success",
   "title": "must return 404 when no case found for the given Case ID",
-  "specs": ["a non-existing Case ID in CCD","return 404 when no"],
+  "specs": ["an existing case in CCD"],
   "productName": "CCD Data Store",
   "operationName": "Start case creation as Case worker",
   "method" : "GET",

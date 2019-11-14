@@ -1,12 +1,16 @@
 {
-  "_guid_": "S-233",
+  "_guid_": "S-237",
   "_extends_": "S-000-Base-Success",
-  "title": "must return 404 when no case found for the given Idam user ID",
+  "title": "must return 401 when request does not provide valid authentication credentials",
   "specs": ["an existing case in CCD"],
   "productName": "CCD Data Store",
   "operationName": "Start case creation as Case worker",
+  "user": {
+    "username": "auto.test.cnp123@gmail.com",
+    "password": "Pa55word1166"
+  },
   "method" : "GET",
-  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
+  "uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
   "request": {
     "pathVariables": {
       "uid": "[[DYNAMIC]]",
@@ -16,8 +20,7 @@
       "etid": "CREATE"
     }
   },
-
   "expectedResponse": {
-    "responseCode": 404
+    "responseCode": 401
   }
 }

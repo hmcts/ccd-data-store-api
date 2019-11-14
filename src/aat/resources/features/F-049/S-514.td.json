@@ -2,7 +2,7 @@
   "_guid_": "S-514",
   "_extends_": "S-000-Base-Success",
   "title": "must return 404 when no case found for the given Event ID",
-  "specs": ["a non-existing Event ID in CCD"],
+  "specs": ["an existing case in CCD"],
   "productName": "CCD Data Store",
   "operationName": "Start case creation as Case worker",
   "method" : "GET",

@@ -1,23 +1,22 @@
 {
-  "_guid_": "S-233",
+  "_guid_": "S-241",
   "_extends_": "S-000-Base-Success",
-  "title": "must return 404 when no case found for the given Idam user ID",
+  "title": "must start case creation process successfully for correct inputs",
   "specs": ["an existing case in CCD"],
   "productName": "CCD Data Store",
   "operationName": "Start case creation as Case worker",
   "method" : "GET",
-  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
+  "uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
   "request": {
     "pathVariables": {
       "uid": "[[DYNAMIC]]",
       "jid": "AUTOTEST1",
       "ctid": "AAT_AUTH_15",
-      "cid": "[1573512086143178]",
+      "cid": "[1573730672698575]",
       "etid": "CREATE"
     }
   },
-
   "expectedResponse": {
-    "responseCode": 404
+    "responseCode": 200
   }
 }
