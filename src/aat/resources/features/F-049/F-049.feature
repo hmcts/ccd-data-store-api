@@ -2,7 +2,7 @@
 Feature: Start case creation as Case worker
 
   @S-231
-  Scenario: must return 401 when request does not provide valid authentication credentials
+  Scenario: must return 403 when request does not provide valid authentication credentials
     Given   an appropriate test context as detailed in the test data source
     And     a user with [an existing case in CCD]
     When    a request is prepared with appropriate values
@@ -22,7 +22,7 @@ Feature: Start case creation as Case worker
     And     the response has all the details as expected
 
   @S-233
-  Scenario: must return 404 when no case found for the given Idam user ID
+  Scenario: must return 403 when no case found for the given Idam user ID
     Given   an appropriate test context as detailed in the test data source
     And     a user with [an existing case in CCD]
     When    a request is prepared with appropriate values
@@ -61,7 +61,7 @@ Feature: Start case creation as Case worker
     And     the response has all the details as expected
 
   @S-512
-  Scenario: must return 404 when no case found for the given Case type ID
+  Scenario: must return 422 when no case found for the given Case type ID
     Given   an appropriate test context as detailed in the test data source
     And     a user with [an existing case in CCD]
     When    a request is prepared with appropriate values
@@ -71,7 +71,7 @@ Feature: Start case creation as Case worker
     And     the response has all the details as expected
 
   @S-513
-  Scenario: must return 404 when no case found for the given Case ID
+  Scenario: must return 400 when no case found for the given Case ID
     Given   an appropriate test context as detailed in the test data source
     And     a user with [an existing case in CCD]
     When    a request is prepared with appropriate values

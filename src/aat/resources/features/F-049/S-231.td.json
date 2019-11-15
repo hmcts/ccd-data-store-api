@@ -1,26 +1,47 @@
 {
   "_guid_": "S-231",
   "_extends_": "S-000-Base-Success",
-  "title": "must return 401 when request does not provide valid authentication credentials",
+  "title": "must return 403 when request does not provide valid authentication credentials",
   "specs": ["an existing case in CCD"],
   "productName": "CCD Data Store",
   "operationName": "Start case creation as Case worker",
   "user": {
-    "username": "auto.test.cnp123@gmail.com",
-    "password": "Pa55word1166"
+    "username": "auto.test.cnp@gmail.com",
+    "password": "Pa55word11"
   },
   "method" : "GET",
   "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
   "request": {
     "pathVariables": {
-      "uid": "[[DYNAMIC]]",
+      "uid": "dummy",
       "jid": "AUTOTEST1",
-      "ctid": "AAT_AUTH_15",
-      "cid": "[1573512086143178]",
+      "ctid": "AAT",
+      "cid": "1573751648840703",
       "etid": "CREATE"
     }
   },
   "expectedResponse": {
-    "responseCode": 401
+    "responseCode" : 403,
+    "responseMessage" : "Forbidden",
+    "headers" : {
+      "X-Frame-Options" : "DENY",
+      "Transfer-Encoding" : "chunked",
+      "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
+      "vary" : "accept-encoding",
+      "X-Content-Type-Options" : "nosniff",
+      "Content-Encoding" : "gzip",
+      "Pragma" : "no-cache",
+      "Expires" : "0",
+      "X-XSS-Protection" : "1; mode=block",
+      "Date" : "[[ANY]]",
+      "Content-Type" : "application/json;charset=UTF-8"
+    },
+    "body" : {
+      "timestamp" : "[[ANY]]",
+      "status" : 403,
+      "error" : "Forbidden",
+      "message" : "Access Denied",
+      "path" : "[[ANY]]"
+    }
   }
 }
