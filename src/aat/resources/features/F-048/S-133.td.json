@@ -37,12 +37,12 @@
       "Pragma": "no-cache",
       "Expires": "0",
       "X-XSS-Protection": "1; mode=block",
-      "Date": "[[DONT_CARE]]",
+      "Date": "[[ANY]]",
       "Content-Type": "application/json;charset=UTF-8"
     },
     "body": {
       "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
-      "timestamp": "[[DONT_CARE]]",
+      "timestamp": "[[ANY]]",
       "status": 400,
       "error": "Bad Request",
       "message": "Unknown sort direction: someInvalidSortDirection",

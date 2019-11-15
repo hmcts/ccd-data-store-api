@@ -89,11 +89,11 @@ public class MapVerifierTest {
         expected.put("responseCode", 400);
         expected.put("body", expectedBody);
         expectedBody.put("exception", "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException");
-        expectedBody.put("timestamp", "[[DONT_CARE]]");
+        expectedBody.put("timestamp", "[[ANY]]");
         expectedBody.put("status", 400);
         expectedBody.put("error", "Bad Request");
         expectedBody.put("message", "Unknown sort direction: someInvalidSortDirection");
-        expectedBody.put("path", "[[DONT_CARE]]");
+        expectedBody.put("path", "[[ANY]]");
         expectedBody.put("details", null);
         expectedBody.put("callbackErrors", null);
         expectedBody.put("callbackWarnings", null);

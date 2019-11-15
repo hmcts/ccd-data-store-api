@@ -33,12 +33,12 @@
       "Pragma": "no-cache",
       "Expires": "0",
       "X-XSS-Protection": "1; mode=block",
-      "Date": "[[DONT_CARE]]",
+      "Date": "[[ANY]]",
       "Content-Type": "application/json;charset=UTF-8"
     },
     "body": {
-      "total_results_count": "[[DONT_CARE]]",
-      "total_pages_count": "[[DONT_CARE]]"
+      "total_results_count": "[[ANY]]",
+      "total_pages_count": "[[ANY]]"
     }
   }
 }
