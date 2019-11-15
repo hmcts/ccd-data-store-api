@@ -1,9 +1,10 @@
-package uk.gov.hmcts.ccd.endpoint.ui;
+package uk.gov.hmcts.ccd.v2;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,8 +14,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
+import uk.gov.hmcts.ccd.v2.internal.resource.UIStartTriggerResource;
 
 import javax.inject.Inject;
 
@@ -30,8 +31,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class CaseRolesIT extends WireMockBaseTest {
-    private static final String GET_EVENT_TRIGGER_FOR_CASE_TYPE = "/aggregated/caseworkers/0/jurisdictions/PROBATE" +
-        "/case-types/CaseRolesCase/event-triggers/CREATE-CASE";
+    private static final String GET_EVENT_TRIGGER_FOR_CASE_TYPE = "/internal/case-types/CaseRolesCase/event-triggers" +
+        "/CREATE-CASE";
 
     @Inject
     private WebApplicationContext wac;
@@ -57,26 +58,30 @@ public class CaseRolesIT extends WireMockBaseTest {
     }
 
     @Test
-    public void getEventTriggerForCaseType_200_shouldAddFieldsWithCREATORCaseRole() throws Exception {
+    public void getStartCaseTrigger_200_shouldAddFieldsWithCREATORCaseRole() throws Exception {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(AUTHORIZATION, "Bearer user1");
+        headers.add(V2.EXPERIMENTAL_HEADER, "true");
 
         final MvcResult result = mockMvc.perform(get(GET_EVENT_TRIGGER_FOR_CASE_TYPE)
             .contentType(JSON_CONTENT_TYPE)
-            .header(AUTHORIZATION, "Bearer user1"))
+            .accept(V2.MediaType.UI_START_CASE_TRIGGER)
+            .headers(headers))
             .andExpect(status().is(200))
             .andReturn();
 
-        final CaseEventTrigger eventTrigger = mapper.readValue(result.getResponse().getContentAsString(),
-            CaseEventTrigger.class);
-        assertNotNull("Event Trigger is null", eventTrigger);
+        final UIStartTriggerResource uiStartTriggerResource =
+            mapper.readValue(result.getResponse().getContentAsString(), UIStartTriggerResource.class);
+        assertNotNull("UI Start Trigger Resource is null", uiStartTriggerResource);
 
-        assertThat("Unexpected Case ID", eventTrigger.getCaseId(), is(nullValue()));
-        assertEquals("Unexpected Event ID", "CREATE-CASE", eventTrigger.getId());
-        assertEquals("Unexpected Event Name", "CREATE-CASE", eventTrigger.getName());
-        assertEquals("Unexpected Event Show Event Notes", true, eventTrigger.getShowEventNotes());
-        assertEquals("Unexpected Event Description", "Creation event", eventTrigger.getDescription());
-        assertEquals("Unexpected Case Fields", 1, eventTrigger.getCaseFields().size());
+        assertThat("Unexpected Case ID", uiStartTriggerResource.getCaseEventTrigger().getCaseId(), is(nullValue()));
+        assertEquals("Unexpected Event ID", "CREATE-CASE", uiStartTriggerResource.getCaseEventTrigger().getId());
+        assertEquals("Unexpected Event Name", "CREATE-CASE", uiStartTriggerResource.getCaseEventTrigger().getName());
+        assertEquals("Unexpected Event Show Event Notes", true, uiStartTriggerResource.getCaseEventTrigger().getShowEventNotes());
+        assertEquals("Unexpected Event Description", "Creation event", uiStartTriggerResource.getCaseEventTrigger().getDescription());
+        assertEquals("Unexpected Case Fields", 1, uiStartTriggerResource.getCaseEventTrigger().getCaseFields().size());
 
-        final CaseViewField field1 = eventTrigger.getCaseFields().get(0);
+        final CaseViewField field1 = uiStartTriggerResource.getCaseEventTrigger().getCaseFields().get(0);
         assertThat(field1.getId(), equalTo("PersonFirstName"));
 
         assertThat(field1.getAccessControlLists().get(0).getRole(), equalTo("caseworker-probate-public"));
