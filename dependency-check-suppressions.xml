@@ -54,6 +54,11 @@
         <cpe>cpe:/a:jcraft:jsch</cpe>
     </suppress>
     <suppress>
+        <notes>Dependencies brough in by codacy report; not used in production</notes>
+        <gav regex="true">^com\.typesafe\.play:play-(json|functional)_2\.11:.*$</gav>
+        <cpe>cpe:/a:playframework:play_framework</cpe>
+    </suppress>
+    <suppress>
         <notes>We do not use: Spring Framework 5.0.5.RELEASE + Spring Security (any version), see https://pivotal.io/security/cve-2018-1258</notes>
         <cve>CVE-2018-1258</cve>
     </suppress>
