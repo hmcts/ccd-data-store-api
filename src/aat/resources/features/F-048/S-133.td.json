@@ -46,7 +46,7 @@
       "status": 400,
       "error": "Bad Request",
       "message": "Unknown sort direction: someInvalidSortDirection",
-      "path": "/caseworkers/bfb6eeaa-cbcd-466d-aafa-07fe99e7462b/jurisdictions/AUTOTEST1/case-types/AAT/cases/pagination_metadata",
+      "path": "[[ANY]]",
       "details": null,
       "callbackErrors": null,
       "callbackWarnings": null
