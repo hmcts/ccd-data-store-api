@@ -19,6 +19,7 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 
 import javax.inject.Inject;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.doReturn;
@@ -118,26 +119,18 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         assertNotNull("Content Should not be null", content);
         CaseResource savedCaseResource = mapper.readValue(content, CaseResource.class);
         assertNotNull("Saved Case Details should not be null", savedCaseResource);
-
-//        assertTrue("Incorrect Case Reference", uidService.validateUID(String.valueOf(savedCaseDetails.getReference())));
-//        assertEquals("Incorrect Case Type", CASE_TYPE_CREATOR_ROLE, savedCaseDetails.getCaseTypeId());
-//        assertEquals("Incorrect Data content", "{}", savedCaseDetails.getData().toString());
-//        assertEquals("state3", savedCaseDetails.getState());
     }
 
     @Test
     public void shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccessOnCreatorRole() throws Exception {
-        shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccess(CASE_TYPE_CREATOR_ROLE_NO_CREATE_ACCESS);
-    }
-
-    private void shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccess(String caseType) throws Exception {
-        final String URL =  "/case-types/" + caseType + "/cases";
+        final String URL =  "/case-types/" + CASE_TYPE_CREATOR_ROLE_NO_CREATE_ACCESS + "/cases";
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
 
         mockMvc.perform(post(URL)
+            .header(EXPERIMENTAL_HEADER, "experimental")
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+            .content(mapper.writeValueAsString(caseDetailsToSave))
         ).andExpect(status().is(404))
             .andReturn();
     }
