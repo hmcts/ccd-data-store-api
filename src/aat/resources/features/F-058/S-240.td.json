@@ -13,6 +13,9 @@
       "jid": "AUTOTEST1",
       "ctid": "AAT_AUTH_15",
       "etid": "CREATE"
+    },
+    "headers": {
+      "Content-Type": "application/xml"
     }
   },
   "expectedResponse": {

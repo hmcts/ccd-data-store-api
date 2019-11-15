@@ -653,7 +653,7 @@ task functional(type: Test) {
     include "uk/gov/hmcts/ccd/datastore/tests/v2/**"
     useJUnitPlatform()
 
-    doFirst {
+    doLast {
         generateCucumberReports.enabled = true
         javaexec {
             main = "io.cucumber.core.cli.Main"
@@ -710,4 +710,14 @@ task sendCoverageToCodacy(type: JavaExec, dependsOn: jacocoTestReport) {
 task installDist(overwrite: true) {
     // This task must be overwritten to do as it's breaking JAR packaging and it's a mandatory step of swagger
     // documentation publication.
+}
+task cucumber() {
+    doLast {
+        generateCucumberReports.enabled = true
+        javaexec {
+            main = "io.cucumber.core.cli.Main"
+            classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
+            args = ['--plugin', "json:${projectDir}/target/cucumber.json", '--glue', 'uk.gov.hmcts.ccd.fta.steps', 'src/aat/resources/features']
+        }
+    }
 }
