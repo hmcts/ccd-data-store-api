@@ -71,9 +71,12 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         UserData aUser = scenarioContext.getTestData().getUser();
 
         String logPrefix = scenarioContext.getCurrentScenarioTag() + ": User ";
+        logger.info("USERNAME: [[" + aUser.getUsername() + "]], PASSWORD: [[" + aUser.getPassword() + "]]");
         try {
             AuthenticatedUser authenticatedUserMetadata = aat.getIdamHelper().authenticate(
                 aUser.getUsername(), aUser.getPassword());
+            logger.info("TOKEN: [[" + authenticatedUserMetadata.getAccessToken() + "]], UID: [["
+                + authenticatedUserMetadata.getId() + "]]");
             aUser.setToken(authenticatedUserMetadata.getAccessToken());
             aUser.setUid(authenticatedUserMetadata.getId());
             logger.info(logPrefix + "authenticated");
