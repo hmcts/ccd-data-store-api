@@ -78,7 +78,7 @@ public interface CommonField {
 
         Optional<CaseField> optionalCaseField = caseFields.stream().filter(e -> e.getId().equals(firstPathElement)).findFirst();
         if (optionalCaseField.isPresent()) {
-            CaseField caseField = optionalCaseField.get();
+            CommonField caseField = optionalCaseField.get();
 
             if (pathElements.size() == 1) {
                 return Optional.of(caseField);

@@ -254,7 +254,7 @@ public class CaseField implements Serializable, CommonField {
         return this.accessControlLists.stream().filter(acl -> acl.getRole().equalsIgnoreCase(role)).findFirst();
     }
 
-    private static void propagateACLsToNestedFields(CaseField caseField, List<AccessControlList> acls) {
+    private static void propagateACLsToNestedFields(CommonField caseField, List<AccessControlList> acls) {
         if (caseField.isCompound()) {
             caseField.getFieldType().getChildren().forEach(nestedField -> {
                 final List<AccessControlList> cloneACLs = acls.stream().map(AccessControlList::duplicate).collect(toList());
@@ -296,7 +296,7 @@ public class CaseField implements Serializable, CommonField {
         });
     }
 
-    private boolean isCollection(CaseField caseField) {
+    private boolean isCollection(CommonField caseField) {
         return caseField.getFieldType().getCollectionFieldType() != null
             && caseField.getFieldType().getCollectionFieldType().getComplexFields() != null
             && !caseField.getFieldType().getCollectionFieldType().getComplexFields().isEmpty();

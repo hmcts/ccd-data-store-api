@@ -238,7 +238,7 @@ public class CaseViewFieldBuilderTest {
 
     @Nested
     @DisplayName("ACL tests")
-    class CaseViewFieldTest {
+    class CaseViewFieldACLTest {
         private static final String YESNO_TYPE = "YesOrNo";
 
         private static final String FAMILY = "Family";
@@ -334,6 +334,8 @@ public class CaseViewFieldBuilderTest {
             verify(caseFieldMock).propagateACLsToNestedFields();
         }
     }
+
+
 
 
 }

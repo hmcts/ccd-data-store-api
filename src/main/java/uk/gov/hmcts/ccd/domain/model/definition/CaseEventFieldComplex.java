@@ -1,7 +1,10 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
+import lombok.Builder;
+
 import java.io.Serializable;
 
+@Builder
 public class CaseEventFieldComplex implements Serializable {
 
     private String reference;

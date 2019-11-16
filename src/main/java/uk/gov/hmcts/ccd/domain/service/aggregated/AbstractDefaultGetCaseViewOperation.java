@@ -26,6 +26,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService.ROOT;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.CASE_HISTORY_VIEWER;
 
 public abstract class AbstractDefaultGetCaseViewOperation {
@@ -91,7 +92,7 @@ public abstract class AbstractDefaultGetCaseViewOperation {
 
     private Function<CaseTypeTabField, CaseTypeTabField> sortCaseFields() {
         return field -> {
-            compoundFieldOrderService.sortNestedFields(field.getCaseField(), Lists.newArrayList(), "");
+            compoundFieldOrderService.sortNestedFields(field.getCaseField(), Lists.newArrayList(), ROOT);
             return field;
         };
     }

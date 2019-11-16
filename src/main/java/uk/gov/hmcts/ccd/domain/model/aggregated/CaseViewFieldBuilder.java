@@ -11,6 +11,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService.ROOT;
 
 @Named
 @Singleton
@@ -45,7 +46,7 @@ public class CaseViewFieldBuilder {
     }
 
     private void buildFieldType(final CaseField caseField, final CaseEventField eventField, final CaseViewField field) {
-        compoundFieldOrderService.sortNestedFields(caseField, eventField.getCaseEventFieldComplex(), "");
+        compoundFieldOrderService.sortNestedFields(caseField, eventField.getCaseEventFieldComplex(), ROOT);
         field.setFieldType(caseField.getFieldType());
     }
 
