@@ -335,7 +335,4 @@ public class CaseViewFieldBuilderTest {
         }
     }
 
-
-
-
 }
