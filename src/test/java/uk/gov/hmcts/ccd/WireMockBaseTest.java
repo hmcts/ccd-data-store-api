@@ -1,8 +1,5 @@
 package uk.gov.hmcts.ccd;
 
-import javax.inject.Inject;
-import java.io.IOException;
-
 import org.junit.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +7,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.util.ReflectionTestUtils;
+
+import javax.inject.Inject;
+import java.io.IOException;
 
 @DirtiesContext  // required for Jenkins agent
 @AutoConfigureWireMock(port = 0)
