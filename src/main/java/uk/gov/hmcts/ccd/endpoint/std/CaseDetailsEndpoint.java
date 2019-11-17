@@ -51,7 +51,7 @@ import uk.gov.hmcts.ccd.domain.service.createevent.MidEventCallback;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
-import uk.gov.hmcts.ccd.domain.service.search.CreatorSearchOperation;
+import uk.gov.hmcts.ccd.domain.service.search.AuthorisedSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.PaginatedSearchMetaDataOperation;
 import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
 import uk.gov.hmcts.ccd.domain.service.startevent.StartEventOperation;
@@ -83,7 +83,7 @@ public class CaseDetailsEndpoint {
                                @Qualifier("authorised") final CreateCaseOperation createCaseOperation,
                                @Qualifier("authorised") final CreateEventOperation createEventOperation,
                                @Qualifier("authorised") final StartEventOperation startEventOperation,
-                               @Qualifier(CreatorSearchOperation.QUALIFIER) final SearchOperation searchOperation,
+                               @Qualifier(AuthorisedSearchOperation.QUALIFIER) final SearchOperation searchOperation,
                                final FieldMapSanitizeOperation fieldMapSanitizeOperation,
                                final ValidateCaseFieldsOperation validateCaseFieldsOperation,
                                final DocumentsOperation documentsOperation,
@@ -267,7 +267,7 @@ public class CaseDetailsEndpoint {
         @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning,
         @RequestBody final CaseDataContent content) {
 
-        return createCaseOperation.createCaseDetails(uid, jurisdictionId, caseTypeId, content, ignoreWarning);
+        return createCaseOperation.createCaseDetails(caseTypeId, content, ignoreWarning);
     }
 
     @PostMapping(value = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases")
@@ -292,7 +292,7 @@ public class CaseDetailsEndpoint {
         @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning,
         @RequestBody final CaseDataContent content) {
 
-        return createCaseOperation.createCaseDetails(uid, jurisdictionId, caseTypeId, content, ignoreWarning);
+        return createCaseOperation.createCaseDetails(caseTypeId, content, ignoreWarning);
     }
 
     @PostMapping(value = {"/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/validate",
@@ -380,17 +380,17 @@ public class CaseDetailsEndpoint {
 
     @Transactional
     @GetMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/documents")
-    @ApiOperation(value = "Get a list of printable documents for the given case type ")
+    @ApiOperation(value = "Get a list of printable documents for the given case id ")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Documents list for the given case type and id")
+        @ApiResponse(code = 200, message = "Documents list for the given case id")
     })
-    public List<Document> getDocumentsForEvent(
+    public List<Document> getDocumentsForCase(
         @PathVariable("uid") final String uid,
         @PathVariable("jid") String jid,
         @PathVariable("ctid") String ctid,
         @PathVariable("cid") String cid) {
         try {
-            return documentsOperation.getPrintableDocumentsForCase(jid, ctid, cid);
+            return documentsOperation.getPrintableDocumentsForCase(cid);
         } catch (NumberFormatException e) {
             throw new ApiException(String.format("Unrecognised Case Reference %s. Case Reference should be a number", cid));
         }

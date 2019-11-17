@@ -7,6 +7,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Map;
 
 import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.samePropertyValuesAs;
 import static org.junit.Assert.assertThat;
@@ -44,6 +45,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.DraftResponseToCaseDetailsBuilde
 import uk.gov.hmcts.ccd.domain.model.draft.*;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
@@ -158,7 +160,7 @@ class DefaultDraftGatewayTest {
     }
 
     @Test
-    void shouldFailToCreateDraft() {
+    void shouldFailToCreateDraftWhenConnectivityIssue() {
         Exception exception = new RestClientException("connectivity issue");
         doThrow(exception).when(createDraftRestTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(HttpEntity.class));
 
@@ -187,6 +189,17 @@ class DefaultDraftGatewayTest {
 
         final ServiceException actualException = assertThrows(ServiceException.class, () -> draftGateway.update(updateCaseDraftRequest, DID));
         assertThat(actualException.getMessage(), is("The draft service is currently down, please refresh your browser or try again later"));
+        assertThat(actualException.getCause(), is(exception));
+    }
+
+    @Test
+    void shouldFailToUpdateToDraftWhenOtherClientError() {
+        Exception exception = new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
+        doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(HttpEntity.class));
+
+        final ApiException actualException = assertThrows(ApiException.class, () -> draftGateway.update(updateCaseDraftRequest, DID));
+        assertThat(actualException.getMessage(), is("The draft service is currently down, please refresh your browser or try again later"));
+        assertThat(actualException.getCause(), is(instanceOf(HttpClientErrorException.class)));
         assertThat(actualException.getCause(), is(exception));
     }
 
@@ -233,7 +246,6 @@ class DefaultDraftGatewayTest {
         );
     }
 
-
     @Test
     void shouldFailToGetFromDraftWhenConnectivityIssue() {
         Exception exception = new RestClientException("connectivity issue");
@@ -241,6 +253,17 @@ class DefaultDraftGatewayTest {
 
         final ServiceException actualException = assertThrows(ServiceException.class, () -> draftGateway.get(DID));
         assertThat(actualException.getMessage(), is("The draft service is currently down, please refresh your browser or try again later"));
+        assertThat(actualException.getCause(), is(exception));
+    }
+
+    @Test
+    void shouldFailToGetFromDraftWhenOtherClientError() {
+        Exception exception = new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
+        doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(Draft.class));
+
+        final ApiException actualException = assertThrows(ApiException.class, () -> draftGateway.get(DID));
+        assertThat(actualException.getMessage(), is("The draft service is currently down, please refresh your browser or try again later"));
+        assertThat(actualException.getCause(), is(instanceOf(HttpClientErrorException.class)));
         assertThat(actualException.getCause(), is(exception));
     }
 
@@ -269,6 +292,17 @@ class DefaultDraftGatewayTest {
 
         final ServiceException actualException = assertThrows(ServiceException.class, () -> draftGateway.delete(DID));
         assertThat(actualException.getMessage(), is("The draft service is currently down, please refresh your browser or try again later"));
+        assertThat(actualException.getCause(), is(exception));
+    }
+
+    @Test
+    void shouldFailToDeleteFromDraftWhenOtherClientError() {
+        Exception exception = new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
+        doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.DELETE), any(HttpEntity.class), eq(Draft.class));
+
+        final ApiException actualException = assertThrows(ApiException.class, () -> draftGateway.delete(DID));
+        assertThat(actualException.getMessage(), is("The draft service is currently down, please refresh your browser or try again later"));
+        assertThat(actualException.getCause(), is(instanceOf(HttpClientErrorException.class)));
         assertThat(actualException.getCause(), is(exception));
     }
 
