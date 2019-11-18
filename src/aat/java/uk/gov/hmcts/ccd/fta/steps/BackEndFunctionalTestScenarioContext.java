@@ -12,7 +12,7 @@ import uk.gov.hmcts.ccd.fta.data.UserData;
 
 public class BackEndFunctionalTestScenarioContext {
 
-    private static final String[] TEST_DATA_RESOURCE_PACKAGES = { "features" };
+    private static final String[] TEST_DATA_RESOURCE_PACKAGES = { "framework-test-data" };
     private static final HttpTestDataSource DATA_SOURCE = new JsonStoreHttpTestDataSource(TEST_DATA_RESOURCE_PACKAGES);
 
     private HttpTestData testData;
