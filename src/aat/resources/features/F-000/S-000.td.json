@@ -31,7 +31,7 @@
     },
     "body": {
       "user": "[[ANY]]",
-      "channels": "[[ANY]]",
+      "channels": null,
       "jurisdictions": "[[ANY]]",
       "default": "[[ANY]]"
     }
