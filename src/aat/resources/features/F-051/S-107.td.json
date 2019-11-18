@@ -1,17 +1,20 @@
 {
-  "_guid_": "S-109",
+  "_guid_": "S-107",
   "_extends_": "S-000-Base-Root",
-  "title": "must return appropriate negative response for a user not having a profile in CCD",
-  "specs": ["no profile in CCD"],
+  "title": "must return 401 when request does not provide valid authentication credentials",
+  "specs": ["a detailed profile in CCD"],
   "productName": "CCD Data Store",
   "operationName": "Get default settings for user",
-  "method": "GET",
-  "uri": "/caseworkers/{uid}/profile",
   "request": {
+    "headers": {
+      "Authorization": "TESTAUTH"
+    },
     "pathVariables": {
       "uid": "some id"
     }
   },
+  "method": "GET",
+  "uri": "/caseworkers/{uid}/profile",
   "expectedResponse": {
     "responseCode": 403,
     "headers" : {
