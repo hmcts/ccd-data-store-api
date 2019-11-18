@@ -101,6 +101,9 @@ public class ApplicationParams {
     @Value("#{'${search.elastic.data.hosts}'.split(',')}")
     private List<String> elasticSearchDataHosts;
 
+    @Value("${search.elastic.request.timeout}")
+    private Integer elasticSearchRequestTimeout;
+
     @Value("#{'${search.blacklist}'.split(',')}")
     private List<String> searchBlackList;
 
@@ -328,5 +331,9 @@ public class ApplicationParams {
 
     public boolean isJpaCriteriaSearchEnabled() {
         return jpaCriteriaSearchEnabled;
+    }
+
+    public Integer getElasticSearchRequestTimeout() {
+        return elasticSearchRequestTimeout;
     }
 }

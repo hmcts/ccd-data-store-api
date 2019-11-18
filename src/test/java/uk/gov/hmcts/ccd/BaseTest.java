@@ -37,6 +37,7 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackService;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.stdapi.DocumentsOperation;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.client.DocumentManagementRestClient;
 
@@ -96,6 +97,8 @@ public abstract class BaseTest {
     private EventTokenService eventTokenService;
     @Inject
     private DocumentManagementRestClient documentManagementRestClient;
+    @Inject
+    private DocumentsOperation documentsOperation;
 
     @Before
     public void initMock() throws IOException {
@@ -110,6 +113,7 @@ public abstract class BaseTest {
         ReflectionTestUtils.setField(callbackService, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(documentManagementRestClient, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(draftGateway, "securityUtils", securityUtils);
+        ReflectionTestUtils.setField(documentsOperation, "securityUtils", securityUtils);
 
         // Reset static field `caseDefinitionRepository`
         ReflectionTestUtils.setField(BaseType.class, "caseDefinitionRepository", caseDefinitionRepository);
