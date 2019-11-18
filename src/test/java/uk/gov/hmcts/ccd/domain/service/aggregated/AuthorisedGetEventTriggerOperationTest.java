@@ -116,7 +116,7 @@ class AuthorisedGetEventTriggerOperationTest {
         caseDetails.setId(CASE_ID);
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseType);
         when(caseAccessService.getUserRoles()).thenReturn(userRoles);
-        when(caseAccessService.getCaseCreationCaseRoles()).thenReturn(createCaseUserRoles);
+        when(caseAccessService.getCaseCreationRoles()).thenReturn(createCaseUserRoles);
         when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseType),
                                                                 eq(userRoles),
                                                                 eq(CAN_CREATE))).thenReturn(true);
@@ -196,7 +196,7 @@ class AuthorisedGetEventTriggerOperationTest {
             assertAll(
                 () -> assertThat(output, sameInstance(caseEventTrigger)),
                 () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
-                () -> inOrder.verify(caseAccessService).getCaseCreationCaseRoles(),
+                () -> inOrder.verify(caseAccessService).getCaseCreationRoles(),
                 () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseType),
                                                                                          eq(createCaseUserRoles),
                                                                                          eq(CAN_CREATE)),

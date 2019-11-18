@@ -486,7 +486,7 @@ class CaseAccessServiceTest {
         @Test
         @DisplayName("should return case creation user roles")
         void getCaseCreationCaseRoles() {
-            Set<String> caseRoles = caseAccessService.getCaseCreationCaseRoles();
+            Set<String> caseRoles = caseAccessService.getCaseCreationRoles();
 
             assertAll(
                 () -> assertThat(caseRoles.size(), Is.is(3)),

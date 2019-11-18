@@ -1,18 +1,11 @@
 package uk.gov.hmcts.ccd.domain.service.startevent;
 
-import java.util.HashMap;
-import java.util.Set;
-
-import static com.google.common.collect.Maps.newHashMap;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
@@ -29,6 +22,12 @@ import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+
+import java.util.HashMap;
+import java.util.Set;
+
+import static com.google.common.collect.Maps.newHashMap;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
 @Service
 @Qualifier("authorised")
@@ -103,12 +102,11 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
 
     private Set<String> getCaseRoles(CaseDetails caseDetails) {
         if (caseDetails == null || caseDetails.getId() == null || Draft.isDraft(caseDetails.getId())) {
-            return GlobalCaseRole.getCaseCreationRoles();
+            return caseAccessService.getCaseCreationCaseRoles();
         } else {
             return caseAccessService.getCaseRoles(caseDetails.getId());
         }
     }
-
 
     private StartEventTrigger verifyReadAccess(final String caseTypeId, final StartEventTrigger startEventTrigger) {
 
