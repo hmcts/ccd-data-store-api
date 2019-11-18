@@ -19,8 +19,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import static java.util.Collections.singleton;
-
 /**
  * Check access to a case for the current user.
  * <p>
@@ -73,7 +71,7 @@ public class CaseAccessService {
     }
 
     public Set<String> getCaseCreationCaseRoles() {
-        return Sets.union(getUserRoles(), singleton(GlobalCaseRole.CREATOR.getRole()));
+        return Sets.union(getUserRoles(), GlobalCaseRole.getCaseCreationRoles());
     }
 
     public Set<String> getUserRoles() {

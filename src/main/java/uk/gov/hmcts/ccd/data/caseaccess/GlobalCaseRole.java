@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.data.caseaccess;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -23,6 +24,10 @@ public enum GlobalCaseRole {
         return Arrays.stream(GlobalCaseRole.values())
                      .map(GlobalCaseRole::getRole)
                      .collect(Collectors.toSet());
+    }
+
+    public static Set<String> getCaseCreationRoles() {
+        return Collections.singleton(CREATOR.getRole());
     }
 
     /**

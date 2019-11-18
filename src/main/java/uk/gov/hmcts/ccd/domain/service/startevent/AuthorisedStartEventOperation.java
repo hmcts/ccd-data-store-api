@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.startevent;
 
-import java.util.Collections;
-
 import java.util.HashMap;
 import java.util.Set;
 
@@ -105,7 +103,7 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
 
     private Set<String> getCaseRoles(CaseDetails caseDetails) {
         if (caseDetails == null || caseDetails.getId() == null || Draft.isDraft(caseDetails.getId())) {
-            return Collections.singleton(GlobalCaseRole.CREATOR.getRole());
+            return GlobalCaseRole.getCaseCreationRoles();
         } else {
             return caseAccessService.getCaseRoles(caseDetails.getId());
         }
