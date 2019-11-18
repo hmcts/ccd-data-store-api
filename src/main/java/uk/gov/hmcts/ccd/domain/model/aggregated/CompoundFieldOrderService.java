@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.model.aggregated;
 import com.google.common.collect.Lists;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldComplex;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.FixedListItem;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -15,6 +16,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.lang.Integer.valueOf;
+import static java.util.Comparator.comparing;
 import static java.util.Comparator.comparingInt;
 import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -39,10 +42,27 @@ public class CompoundFieldOrderService {
             children.forEach(childField -> {
                 String newListElementCode = isBlank(listElementCode) ? childField.getId() : listElementCode + "." + childField.getId();
                 sortNestedFields(childField, getNestedComplexFields(caseEventComplexFields, newListElementCode), newListElementCode);
+                sortIfFixedListType(childField);
             });
             List<CaseField> sortedFields = getSortedCompoundTypeFields(caseEventComplexFields, children, listElementCode);
             caseField.getFieldType().setChildren(sortedFields);
+        } else sortIfFixedListType(caseField);
+    }
+
+    private void sortIfFixedListType(final CaseField childField) {
+        if (childField.isOneOfFixedListType()) {
+            List<FixedListItem> sortedItems = getSortedFixedListItems(childField.getFieldType().getFixedListItems());
+            childField.getFieldType().setFixedListItems(sortedItems);
         }
+    }
+
+    private List<FixedListItem> getSortedFixedListItems(final List<FixedListItem> fixedListItems) {
+        final List<FixedListItem> sortedItems = Lists.newArrayList();
+        sortedItems.addAll(fixedListItems.stream()
+                                    .filter(field -> field.getOrder() != null)
+                                    .sorted(comparing(field -> valueOf(field.getOrder())))
+                                    .collect(Collectors.toList()));
+        return sortedItems;
     }
 
     private List<CaseEventFieldComplex> getNestedComplexFields(final List<CaseEventFieldComplex> caseEventComplexFields, final String listElementCode) {
@@ -76,7 +96,7 @@ public class CompoundFieldOrderService {
                                     .filter(field -> field.getOrder() != null)
                                     .sorted(comparingInt(CaseField::getOrder))
                                     .collect(Collectors.toList()));
-        return sortedCaseFields.isEmpty()? children : sortedCaseFields;
+        return sortedCaseFields.isEmpty() ? children : sortedCaseFields;
     }
 
     private String getReference(final String listElementCode, final String reference) {

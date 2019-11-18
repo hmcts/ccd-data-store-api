@@ -1,13 +1,7 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
-import static java.util.stream.Collectors.toList;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.PREDEFINED_COMPLEX_ADDRESS_GLOBAL;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.PREDEFINED_COMPLEX_ADDRESS_GLOBAL_UK;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.PREDEFINED_COMPLEX_ADDRESS_UK;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.PREDEFINED_COMPLEX_CASELINK;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.PREDEFINED_COMPLEX_ORDER_SUMMARY;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
@@ -16,8 +10,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.apache.commons.lang3.StringUtils;
+import static java.util.stream.Collectors.toList;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.FIXED_LIST;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.FIXED_RADIO_LIST;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.MULTI_SELECT_LIST;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.PREDEFINED_COMPLEX_ADDRESS_GLOBAL;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.PREDEFINED_COMPLEX_ADDRESS_GLOBAL_UK;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.PREDEFINED_COMPLEX_ADDRESS_UK;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.PREDEFINED_COMPLEX_CASELINK;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.PREDEFINED_COMPLEX_ORDER_SUMMARY;
 
 public interface CommonField {
 
@@ -37,6 +39,18 @@ public interface CommonField {
     @JsonIgnore
     default boolean isComplexFieldType() {
         return COMPLEX.equalsIgnoreCase(getFieldType().getType());
+    }
+
+    @JsonIgnore
+    default boolean isMultiSelectListType() {
+        return MULTI_SELECT_LIST.equalsIgnoreCase(getFieldType().getType());
+    }
+
+    @JsonIgnore
+    default boolean isOneOfFixedListType() {
+        return MULTI_SELECT_LIST.equalsIgnoreCase(getFieldType().getType()) ||
+            FIXED_LIST.equalsIgnoreCase(getFieldType().getType()) ||
+            FIXED_RADIO_LIST.equalsIgnoreCase(getFieldType().getType());
     }
 
     @JsonIgnore

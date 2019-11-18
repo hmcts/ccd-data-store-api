@@ -13,6 +13,7 @@ import org.mockito.Spy;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
@@ -33,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.fasterxml.jackson.databind.node.JsonNodeFactory.instance;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
@@ -84,6 +86,9 @@ class DefaultGetCaseViewOperationTest {
 
     @Mock
     private ObjectMapperService objectMapperService;
+
+    @Mock
+    private CompoundFieldOrderService compoundFieldOrderService;
 
     @Spy
     @InjectMocks
@@ -170,7 +175,7 @@ class DefaultGetCaseViewOperationTest {
             assertAll(() -> assertThat(caseView.getTabs(), arrayWithSize(1)),
                       () -> assertThat(caseView.getTabs()[0].getFields(), arrayWithSize(1)),
                       () -> assertThat(caseView.getTabs()[0].getFields()[0], hasProperty("id", equalTo(CASE_HISTORY_VIEWER))),
-                      () -> assertThat(caseView.getTabs()[0].getFields()[0], hasProperty("value", equalTo(eventsNode))),
+                      () -> assertThat(caseView.getTabs()[0].getFields()[0], hasProperty("value", equalTo(instance.nullNode()))),
                       () -> assertThat(caseView.getEvents(), arrayWithSize(2)),
                       () -> assertThat(caseView.getEvents(),
                                        hasItemInArray(hasProperty("summary", equalTo(EVENT_SUMMARY_1)))),
@@ -246,7 +251,7 @@ class DefaultGetCaseViewOperationTest {
                                    hasItemInArray(allOf(hasProperty("id", equalTo("dataTestField2")),
                                                         hasProperty("showCondition",
                                                                     equalTo("dataTestField2-fieldShowCondition"))))),
-                  () -> assertThat(caseView.getMetadataFields().get(0).getValue(), equalTo(CASE_TYPE_ID)),
+                  () -> assertThat(caseView.getMetadataFields().get(0).getValue(), equalTo(JSON_NODE_FACTORY.textNode(CASE_TYPE_ID))),
                   () -> assertThat(caseView.getEvents(), arrayWithSize(2)),
                   () -> assertThat(caseView.getEvents(),
                                    hasItemInArray(hasProperty("summary", equalTo(EVENT_SUMMARY_1)))),

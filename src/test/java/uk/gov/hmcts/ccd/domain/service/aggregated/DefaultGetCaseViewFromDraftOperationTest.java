@@ -26,6 +26,7 @@ import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+import static com.fasterxml.jackson.databind.node.JsonNodeFactory.instance;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
@@ -228,7 +229,7 @@ class DefaultGetCaseViewFromDraftOperationTest {
             assertAll(() -> assertThat(caseView.getTabs(), arrayWithSize(1)),
                       () -> assertThat(caseView.getTabs()[0].getFields(), arrayWithSize(1)),
                       () -> assertThat(caseView.getTabs()[0].getFields()[0], hasProperty("id", equalTo(CASE_HISTORY_VIEWER))),
-                      () -> assertThat(caseView.getTabs()[0].getFields()[0], hasProperty("value", equalTo(eventsNode))),
+                      () -> assertThat(caseView.getTabs()[0].getFields()[0], hasProperty("value", equalTo(instance.nullNode()))),
                       () -> assertThat(caseView.getEvents(), arrayWithSize(2)),
                       () -> assertThat(caseView.getEvents()[0],
                                        allOf(hasProperty("eventId", equalTo("Draft updated")),

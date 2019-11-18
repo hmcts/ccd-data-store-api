@@ -34,6 +34,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTab;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
 import uk.gov.hmcts.ccd.domain.model.definition.ComplexACL;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.FixedListItem;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
@@ -1043,6 +1044,32 @@ public class TestBuildersUtil {
         }
     }
 
+    public static class FixedListItemBuilder {
+        private final FixedListItem fixedListItem;
+
+        public FixedListItemBuilder() {
+            this.fixedListItem = new FixedListItem();
+        }
+
+        public static FixedListItemBuilder aFixedListItem() {
+            return new FixedListItemBuilder();
+        }
+
+        public FixedListItemBuilder withCode(String code) {
+            this.fixedListItem.setCode(code);
+            return this;
+        }
+
+        public FixedListItemBuilder withOrder(String order) {
+            this.fixedListItem.setOrder(order);
+            return this;
+        }
+
+        public FixedListItem build() {
+            return fixedListItem;
+        }
+    }
+
     public static class FieldTypeBuilder {
         private final FieldType fieldType;
         private final List<CaseField> complexFields;
@@ -1081,6 +1108,16 @@ public class TestBuildersUtil {
                 .withComplexField(complexField)
                 .withType(COMPLEX)
                 .build());
+            return this;
+        }
+
+        public FieldTypeBuilder withFixedListItems(final FixedListItem... fixedListItems) {
+            fieldType.setFixedListItems(Lists.newArrayList(fixedListItems));
+            return this;
+        }
+
+        public FieldTypeBuilder withFixedListItems(final List<FixedListItem> fixedListItems) {
+            fieldType.setFixedListItems(fixedListItems);
             return this;
         }
 

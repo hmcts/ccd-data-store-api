@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldComplex;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.FixedListItem;
 
 import java.util.List;
 
@@ -21,8 +22,12 @@ import static uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService
 import static uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldComplex.builder;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.FIXED_LIST;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.FIXED_RADIO_LIST;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.MULTI_SELECT_LIST;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FixedListItemBuilder.aFixedListItem;
 
 class CompoundFieldOrderServiceTest {
 
@@ -41,12 +46,42 @@ class CompoundFieldOrderServiceTest {
 
         @Test
         @DisplayName("should build field type for collection containing complex type of simple fields")
+        void shouldOrderCaseFieldsAsOneOfFixedListTypes() {
+            FieldType multiSelectFixedListType = aFieldType()
+                .withType(MULTI_SELECT_LIST)
+                .withFixedListItems(fixedListItem("item3", 2),
+                                    fixedListItem("item1", 3),
+                                    fixedListItem("item2", 1))
+                .build();
+            CASE_FIELD.setFieldType(multiSelectFixedListType);
+
+            compoundFieldOrderService.sortNestedFields(CASE_FIELD, Lists.newArrayList(), ROOT);
+
+            List<FixedListItem> fixedListItems = CASE_FIELD.getFieldType().getFixedListItems();
+            assertThat(fixedListItems, contains(hasProperty("code", is("item2")),
+                                                hasProperty("code", is("item3")),
+                                                hasProperty("code", is("item1"))));
+        }
+
+        @Test
+        @DisplayName("should build field type for collection containing complex type of simple fields")
         void shouldOrderCaseFieldsInComplexTypeOfCollectionField() {
             FieldType collectionComplexFieldType = aFieldType()
                 .withType(COMPLEX)
-                .withComplexField(complexField("One", 3))
-                .withComplexField(complexField("Two", 2))
-                .withComplexField(complexField("Three", 1))
+                .withComplexField(complexField("One", 5))
+                .withComplexField(simpleMultiSelectListField("Two", 4,
+                                                             fixedListItem("item3", 2),
+                                                             fixedListItem("item1", 3),
+                                                             fixedListItem("item2", 1)))
+                .withComplexField(simpleFixedRadioListField("Five", 1,
+                                                            fixedListItem("item6", 3),
+                                                            fixedListItem("item5", 2),
+                                                            fixedListItem("item4", 1)))
+                .withComplexField(complexField("Three", 3))
+                .withComplexField(simpleFixedListField("Four", 2,
+                                                       fixedListItem("item9", 1),
+                                                       fixedListItem("item7", 3),
+                                                       fixedListItem("item8", 2)))
                 .build();
 
             CASE_FIELD.setFieldType(aFieldType()
@@ -57,7 +92,31 @@ class CompoundFieldOrderServiceTest {
             compoundFieldOrderService.sortNestedFields(CASE_FIELD, Lists.newArrayList(), ROOT);
 
             List<CaseField> complexFields = CASE_FIELD.getFieldType().getCollectionFieldType().getComplexFields();
-            hasCorrectComplexField(complexFields, Lists.newArrayList("Three", "Two", "One"));
+            assertThat(complexFields, contains(allOf(hasProperty("id", is("Five")),
+                                                     hasProperty("order", is(1)),
+                                                     hasProperty("fieldType",
+                                                                 hasProperty("fixedListItems",
+                                                                             contains(hasProperty("code", is("item4")),
+                                                                                      hasProperty("code", is("item5")),
+                                                                                      hasProperty("code", is("item6")))))),
+                                               allOf(hasProperty("id", is("Four")),
+                                                     hasProperty("order", is(2)),
+                                                     hasProperty("fieldType",
+                                                                 hasProperty("fixedListItems",
+                                                                             contains(hasProperty("code", is("item9")),
+                                                                                      hasProperty("code", is("item8")),
+                                                                                      hasProperty("code", is("item7")))))),
+                                               allOf(hasProperty("id", is("Three")),
+                                                     hasProperty("order", is(3))),
+                                               allOf(hasProperty("id", is("Two")),
+                                                     hasProperty("order", is(4)),
+                                                     hasProperty("fieldType",
+                                                                 hasProperty("fixedListItems",
+                                                                             contains(hasProperty("code", is("item2")),
+                                                                                      hasProperty("code", is("item3")),
+                                                                                      hasProperty("code", is("item1")))))),
+                                               allOf(hasProperty("id", is("One")),
+                                                     hasProperty("order", is(5)))));
         }
 
         @Test
@@ -366,16 +425,38 @@ class CompoundFieldOrderServiceTest {
         }
     }
 
-    private void hasCorrectComplexField(final List<CaseField> complexFields, final List<String> ids) {
-        for (int index = 0; index < ids.size(); index++) {
-            assertThat(complexFields.get(index), hasCorrectCaseField(ids.get(index), index + 1));
-        }
-    }
-
     private Matcher<? super CaseField> hasCorrectCaseField(String id, int order) {
         return allOf(
             hasProperty("id", is(id)),
             hasProperty("order", is(order)));
+    }
+
+    private FixedListItem fixedListItem(final String value, final int order) {
+        return aFixedListItem().withCode(value).withOrder(String.valueOf(order)).build();
+    }
+
+    private CaseField simpleMultiSelectListField(final String id, final Integer order, FixedListItem... fixedListItems) {
+        return newCaseField()
+            .withId(id)
+            .withFieldType(multiSelectListType(Lists.newArrayList(fixedListItems)))
+            .withOrder(order)
+            .build();
+    }
+
+    private CaseField simpleFixedRadioListField(final String id, final Integer order, FixedListItem... fixedListItems) {
+        return newCaseField()
+            .withId(id)
+            .withFieldType(fixedRadioListType(Lists.newArrayList(fixedListItems)))
+            .withOrder(order)
+            .build();
+    }
+
+    private CaseField simpleFixedListField(final String id, final Integer order, FixedListItem... fixedListItems) {
+        return newCaseField()
+            .withId(id)
+            .withFieldType(fixedListType(Lists.newArrayList(fixedListItems)))
+            .withOrder(order)
+            .build();
     }
 
     private CaseField simpleField(final String id, final Integer order) {
@@ -392,6 +473,18 @@ class CompoundFieldOrderServiceTest {
             .withFieldType(complexType())
             .withOrder(order)
             .build();
+    }
+
+    private FieldType fixedListType(final List<FixedListItem> fixedListItems) {
+        return aFieldType().withType(FIXED_LIST).withFixedListItems(fixedListItems).build();
+    }
+
+    private FieldType fixedRadioListType(final List<FixedListItem> fixedListItems) {
+        return aFieldType().withType(FIXED_RADIO_LIST).withFixedListItems(fixedListItems).build();
+    }
+
+    private FieldType multiSelectListType(final List<FixedListItem> fixedListItems) {
+        return aFieldType().withType(MULTI_SELECT_LIST).withFixedListItems(fixedListItems).build();
     }
 
     private FieldType simpleType() {

@@ -15,6 +15,9 @@ public class FieldType implements Serializable {
 
     public static final String COLLECTION = "Collection";
     public static final String COMPLEX = "Complex";
+    public static final String MULTI_SELECT_LIST = "MultiSelectList";
+    public static final String FIXED_LIST = "FixedList";
+    public static final String FIXED_RADIO_LIST = "FixedRadioList";
     public static final String LABEL = "Label";
     public static final String CASE_PAYMENT_HISTORY_VIEWER = "CasePaymentHistoryViewer";
     public static final String CASE_HISTORY_VIEWER = "CaseHistoryViewer";
