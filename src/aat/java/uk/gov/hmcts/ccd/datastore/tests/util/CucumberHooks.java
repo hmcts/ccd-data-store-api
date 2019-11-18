@@ -1,9 +1,9 @@
-package uk.gov.hmcts.ccd.fta.steps;
+package uk.gov.hmcts.ccd.datastore.tests.util;
 
+import cucumber.api.java.Before;
 import io.cucumber.core.api.Scenario;
-import io.cucumber.java.Before;
 
-public class BackEndFunctionalTestScenarioHooks {
+public class CucumberHooks {
 
     private static Scenario scenario;
 
@@ -13,6 +13,6 @@ public class BackEndFunctionalTestScenarioHooks {
 
     @Before()
     public void prepare(Scenario scenario) {
-        BackEndFunctionalTestScenarioHooks.scenario = scenario;
+        this.scenario = scenario;
     }
 }

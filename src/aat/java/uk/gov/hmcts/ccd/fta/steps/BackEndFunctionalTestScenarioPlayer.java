@@ -1,13 +1,11 @@
 package uk.gov.hmcts.ccd.fta.steps;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import feign.FeignException;
-import io.restassured.RestAssured;
-import io.restassured.response.Response;
-import io.restassured.specification.QueryableRequestSpecification;
-import io.restassured.specification.RequestSpecification;
-import io.restassured.specification.SpecificationQuerier;
 import org.junit.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -15,14 +13,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import feign.FeignException;
 import io.cucumber.core.api.Scenario;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
+import io.restassured.specification.QueryableRequestSpecification;
+import io.restassured.specification.RequestSpecification;
+import io.restassured.specification.SpecificationQuerier;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.helper.idam.AuthenticatedUser;
 import uk.gov.hmcts.ccd.fta.data.RequestData;
@@ -30,6 +31,7 @@ import uk.gov.hmcts.ccd.fta.data.ResponseData;
 import uk.gov.hmcts.ccd.fta.data.UserData;
 import uk.gov.hmcts.ccd.fta.util.JsonUtils;
 
+@SuppressWarnings({ "LocalVariableName" })
 public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTestAutomationDSL {
 
     private static final String DYNAMIC_CONTENT_PLACEHOLDER = "[[DYNAMIC]]";
@@ -70,9 +72,12 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         UserData aUser = scenarioContext.getTestData().getUser();
 
         String logPrefix = scenarioContext.getCurrentScenarioTag() + ": User ";
+        logger.info("USERNAME: [[" + aUser.getUsername() + "]], PASSWORD: [[" + aUser.getPassword() + "]]");
         try {
             AuthenticatedUser authenticatedUserMetadata = aat.getIdamHelper().authenticate(
                 aUser.getUsername(), aUser.getPassword());
+            logger.info("TOKEN: [[" + authenticatedUserMetadata.getAccessToken() + "]], UID: [["
+                    + authenticatedUserMetadata.getId() + "]]");
             aUser.setToken(authenticatedUserMetadata.getAccessToken());
             aUser.setUid(authenticatedUserMetadata.getId());
             logger.info(logPrefix + "authenticated");
