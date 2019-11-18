@@ -1,0 +1,12 @@
+{
+   "_guid_": "S-000-Base-Root",
+   "user": {
+      "username": "auto.test.cnp@gmail.com",
+      "password": "Monday123"
+   },
+   "request": {
+      "headers": {
+         "Bearer": "user token"
+      }
+   }
+}
