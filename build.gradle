@@ -87,8 +87,10 @@ dependencyCheck {
         // Disable scanning of .NET related binaries
         assemblyEnabled = false
     }
+    // These are non-runtime configurations used during the build.
+    skipConfigurations = ['codacy', 'spotbugs']
 }
-
+    
 mainClassName = 'uk.gov.hmcts.ccd.CoreCaseDataApplication'
 
 // tag::repositories[]
@@ -105,7 +107,7 @@ repositories {
 ext {
     junitJupiterVersion = '5.2.0'
     junitVintageVersion = '5.2.0'
-    hibernateVersion = '5.2.17.Final'
+    hibernateVersion = '5.2.18.Final'
     powermockVersion = '2.0.0-beta.5'
     reformLogging = '5.1.0'
     appInsightsVersion = '2.4.1'
@@ -224,7 +226,7 @@ dependencies {
     compile group: 'org.awaitility', name: 'awaitility', version: '3.1.6'
 
     // CVE-2019-12086 - force update of jackson-databind - remove when dependencies move off <2.9.9
-    compile "com.fasterxml.jackson.core:jackson-databind:2.9.10"
+    compile "com.fasterxml.jackson.core:jackson-databind:2.9.10.1"
 
     // FIXME 0.6 doesn't support jsonb; 0.7 doesn't work on Windows
 //    runtime group: 'com.impossibl.pgjdbc-ng', name: 'pgjdbc-ng', version: '0.6'
@@ -271,6 +273,9 @@ dependencyManagement {
     }
 
     dependencies {
+        // Versions prior to 24.1.1 vulnerable to CVE-2018-10237
+        dependency 'com.google.guava:guava:24.1.1-jre'
+
         // CVE-2019-0232 - Java and Command Line injections in Windows
         dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.21') {
             entry 'tomcat-embed-core'
@@ -280,19 +285,6 @@ dependencyManagement {
          // CVE-2019-10086
         dependencySet(group: 'commons-beanutils', version: '1.9.4') {
             entry 'commons-beanutils'
-        }
-    }
-}
-
-configurations.all {
-    resolutionStrategy {
-        eachDependency { DependencyResolveDetails details ->
-            if (details.requested.group in ['com.fasterxml.jackson.core', 'com.fasterxml.jackson.module', 'com.fasterxml.jackson.datatype']) {
-                details.useVersion '2.9.10'
-            }
-            if (details.requested.name == 'jackson-databind') {
-                details.useVersion '2.9.10'
-            }
         }
     }
 }
