@@ -1,0 +1,120 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/data/case-type/CaseRolesCase"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "id": "CaseRolesCase",
+      "version": {
+        "number": 1,
+        "live_from": "2017-01-01"
+      },
+      "name": "Test Case Roles Case",
+      "description": "Test Case Roles Case",
+      "jurisdiction": {
+        "id": "PROBATE",
+        "name": "Test",
+        "description": "Test Jurisdiction"
+      },
+      "security_classification": "PUBLIC",
+      "acls": [
+        {
+          "role": "caseworker-probate-public",
+          "create": true,
+          "read": true,
+          "update": true,
+          "delete": false
+        },
+        {
+          "role": "caseworker-probate-private",
+          "create": true,
+          "read": true,
+          "update": true,
+          "delete": false
+        },
+        {
+          "role": "citizen",
+          "create": true,
+          "read": true,
+          "update": true,
+          "delete": false
+        }],
+      "events": [
+        {
+          "id": "CREATE-CASE",
+          "name": "CREATE-CASE",
+          "description": "Creation event",
+          "order": 1,
+          "case_fields": [
+            {
+              "case_field_id": "PersonFirstName",
+              "display_context": "OPTIONAL",
+              "show_summary_content_option": 2
+            }
+          ],
+          "pre_states": [],
+          "post_state": "CaseCreated",
+          "security_classification": "PRIVATE",
+          "acls": [
+            {
+              "role": "caseworker-probate-public",
+              "create": true,
+              "read": true,
+              "update": false,
+              "delete": false
+            }
+          ],
+          "show_event_notes": true,
+          "can_save_draft": true
+        }
+      ],
+      "states": [
+        {
+          "id": "CaseCreated",
+          "name": "Case Created",
+          "acls": [
+            {
+              "role": "caseworker-probate-public",
+              "create": false,
+              "read": true,
+              "update": true,
+              "delete": false
+            }]
+        }
+      ],
+      "case_fields": [
+        {
+          "id": "PersonFirstName",
+          "case_type_id": "CaseRolesCase",
+          "label": "First name",
+          "security_classification": "PUBLIC",
+          "acls": [
+            {
+              "role": "caseworker-probate-public",
+              "create": false,
+              "read": false,
+              "update": false,
+              "delete": false
+            },
+            {
+              "role": "[CREATOR]",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            }
+          ],
+          "field_type": {
+            "type": "Text",
+            "id": "Text"
+          }
+        }
+      ]
+    }
+  }
+}

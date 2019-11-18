@@ -1,11 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.regex.Pattern;
-
+import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
@@ -16,6 +11,15 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.regex.Pattern;
+
+import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
 /**
  * Check access to a case for the current user.
@@ -66,6 +70,14 @@ public class CaseAccessService {
 
     public Set<String> getCaseRoles(String caseId) {
         return new HashSet<>(caseUserRepository.findCaseRoles(Long.valueOf(caseId), userRepository.getUserId()));
+    }
+
+    public Set<String> getCaseCreationCaseRoles() {
+        return Collections.singleton(CREATOR.getRole());
+    }
+
+    public Set<String> getCaseCreationRoles() {
+        return Sets.union(getUserRoles(), getCaseCreationCaseRoles());
     }
 
     public Set<String> getUserRoles() {
