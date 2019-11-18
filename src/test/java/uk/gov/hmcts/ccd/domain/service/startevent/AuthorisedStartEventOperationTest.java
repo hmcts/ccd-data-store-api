@@ -30,6 +30,7 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
@@ -89,7 +90,8 @@ class AuthorisedStartEventOperationTest {
     private final List<CaseField> caseFields = Lists.newArrayList();
     private final Set<String> userRoles = Sets.newHashSet(CASEWORKER_DIVORCE,
         CASEWORKER_PROBATE_LOA1,
-        CASEWORKER_PROBATE_LOA3);
+        CASEWORKER_PROBATE_LOA3,
+        GlobalCaseRole.CREATOR.getRole());
 
     @BeforeEach
     void setUp() {

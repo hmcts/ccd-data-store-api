@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.v2;
+package uk.gov.hmcts.ccd.v2.internal.controller;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -15,6 +15,7 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
+import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.internal.resource.UIStartTriggerResource;
 
 import javax.inject.Inject;
@@ -30,9 +31,9 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class CaseRolesIT extends WireMockBaseTest {
-    private static final String GET_EVENT_TRIGGER_FOR_CASE_TYPE = "/internal/case-types/CaseRolesCase/event-triggers" +
-        "/CREATE-CASE";
+public class UIStartTriggerControllerCaseRolesIT extends WireMockBaseTest {
+    private static final String GET_EVENT_TRIGGER_FOR_CASE_TYPE_INTERNAL = "/internal/case-types/CaseRolesCase" +
+        "/event-triggers/CREATE-CASE";
 
     @Inject
     private WebApplicationContext wac;
@@ -58,12 +59,12 @@ public class CaseRolesIT extends WireMockBaseTest {
     }
 
     @Test
-    public void getStartCaseTrigger_200_shouldAddFieldsWithCREATORCaseRole() throws Exception {
+    public void internalGetStartCaseTrigger_200_shouldAddFieldsWithCREATORCaseRole() throws Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.add(AUTHORIZATION, "Bearer user1");
         headers.add(V2.EXPERIMENTAL_HEADER, "true");
 
-        final MvcResult result = mockMvc.perform(get(GET_EVENT_TRIGGER_FOR_CASE_TYPE)
+        final MvcResult result = mockMvc.perform(get(GET_EVENT_TRIGGER_FOR_CASE_TYPE_INTERNAL)
             .contentType(JSON_CONTENT_TYPE)
             .accept(V2.MediaType.UI_START_CASE_TRIGGER)
             .headers(headers))

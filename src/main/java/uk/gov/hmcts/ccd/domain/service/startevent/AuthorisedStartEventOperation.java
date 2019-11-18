@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
@@ -104,7 +105,7 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
 
     private Set<String> getCaseRoles(CaseDetails caseDetails) {
         if (caseDetails == null || caseDetails.getId() == null || Draft.isDraft(caseDetails.getId())) {
-            return Collections.emptySet();
+            return Collections.singleton(GlobalCaseRole.CREATOR.getRole());
         } else {
             return caseAccessService.getCaseRoles(caseDetails.getId());
         }
