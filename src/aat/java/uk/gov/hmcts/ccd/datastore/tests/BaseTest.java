@@ -20,7 +20,7 @@ public abstract class BaseTest {
         RestAssured.useRelaxedHTTPSValidation();
     }
 
-    protected Supplier<RequestSpecification> asAutoTestCaseworker() {
+    public Supplier<RequestSpecification> asAutoTestCaseworker() {
         return asAutoTestCaseworker(TRUE);
     }
 
