@@ -27,7 +27,7 @@ plugins {
     id 'org.owasp.dependencycheck' version '5.1.0'
     id 'com.github.spotbugs' version '1.6.9'
     id 'net.ltgt.apt' version '0.21'
-    id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.14'
+    id "com.github.spacialcircumstances.gradle-cucumber-reporting" version "0.1.14"
 }
 
 apply plugin: 'java'
@@ -253,9 +253,6 @@ dependencies {
     testCompile group: 'com.xebialabs.restito', name: 'restito', version: '0.9.3'
     testCompile 'io.github.openfeign:feign-jackson:9.7.0'
 
-    compile group: 'io.cucumber', name: 'cucumber-java', version: '4.8.0'
-    testCompile group: 'io.cucumber', name: 'cucumber-junit', version: '4.8.0'
-
     // for sonar analysis
     testCompile group: 'org.openid4java', name: 'openid4java', version: '1.0.0'
     // remove me once insights is in
@@ -269,6 +266,8 @@ dependencies {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
     }
     compile 'org.jooq:jool-java-8:0.9.14'
+    compile group: 'io.cucumber', name: 'cucumber-java', version: '4.8.0'
+    testCompile group: 'io.cucumber', name: 'cucumber-junit', version: '4.8.0'
 }
 // end::dependencies[]
 
@@ -579,7 +578,6 @@ jacocoTestReport {
 test {
     environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
     generateCucumberReports.enabled = false
-
     useJUnitPlatform()
 
     testLogging {
@@ -609,8 +607,8 @@ sourceSets {
     aat {
         java {
             srcDir('src/aat/java')
-            compileClasspath += main.output + test.output
-            runtimeClasspath += main.output + test.output
+            compileClasspath += main.output
+            runtimeClasspath += main.output
         }
         resources {
             srcDir('src/aat/resources')
@@ -663,11 +661,6 @@ task functional(type: Test) {
     }
 }
 
-cucumberReports {
-    outputDir = file("${projectDir}/target/cucumber")
-    buildId = '0'
-    reports = files("${projectDir}/target/cucumber.json")
-}
 
 def timestamp() {
     def date = new Date()
@@ -705,6 +698,12 @@ task sendCoverageToCodacy(type: JavaExec, dependsOn: jacocoTestReport) {
             "-r",
             "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"
     ]
+}
+
+cucumberReports {
+    outputDir = file("${projectDir}/target/cucumber")
+    buildId = '0'
+    reports = files("${projectDir}/target/cucumber.json")
 }
 
 task installDist(overwrite: true) {
