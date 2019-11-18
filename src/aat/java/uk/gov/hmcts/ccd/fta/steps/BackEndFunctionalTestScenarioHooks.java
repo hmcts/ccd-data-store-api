@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.fta.steps;
 
-import io.cucumber.core.api.Scenario;
 import io.cucumber.java.Before;
+import io.cucumber.java.Scenario;
 
 public class BackEndFunctionalTestScenarioHooks {
 

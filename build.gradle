@@ -27,7 +27,7 @@ plugins {
     id 'org.owasp.dependencycheck' version '5.1.0'
     id 'com.github.spotbugs' version '1.6.9'
     id 'net.ltgt.apt' version '0.21'
-    id "com.github.spacialcircumstances.gradle-cucumber-reporting" version "0.1.14"
+    id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.14'
 }
 
 apply plugin: 'java'
@@ -61,18 +61,6 @@ dependencyUpdates.resolutionStrategy = {
             }
             if (rejected) {
                 selection.reject('Release candidate')
-            }
-        }
-    }
-}
-
-configurations.all {
-    resolutionStrategy {
-        eachDependency { DependencyResolveDetails details ->
-            // Wiremock requires old jetty because it still support java 7
-            // spring bom is currenty upgrading it
-            if (details.requested.group == 'org.eclipse.jetty') {
-                details.useVersion '9.2.24.v20180105'
             }
         }
     }
@@ -266,8 +254,8 @@ dependencies {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
     }
     compile 'org.jooq:jool-java-8:0.9.14'
-    compile group: 'io.cucumber', name: 'cucumber-java', version: '4.8.0'
-    testCompile group: 'io.cucumber', name: 'cucumber-junit', version: '4.8.0'
+    compile group: 'io.cucumber', name: 'cucumber-java', version: '5.0.0-RC1'
+    testCompile group: 'io.cucumber', name: 'cucumber-junit', version: '5.0.0-RC1'
 }
 // end::dependencies[]
 
@@ -578,6 +566,7 @@ jacocoTestReport {
 test {
     environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
     generateCucumberReports.enabled = false
+    
     useJUnitPlatform()
 
     testLogging {
