@@ -71,6 +71,18 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         UserData aUser = scenarioContext.getTestData().getUser();
 
         // TESTING
+        String username = aUser.getUsername();
+        if (username.equals(aat.getCaseworkerAutoTestEmail())) {
+
+        } else if (username.equals(aat.getPrivateCaseworkerEmail())) {
+
+        } else if (username.equals(aat.getRestrictedCaseworkerEmail())) {
+
+        } else {
+
+        }
+
+
         aUser.setUsername(aat.getCaseworkerAutoTestEmail());
         aUser.setPassword(aat.getCaseworkerAutoTestPassword());
 
