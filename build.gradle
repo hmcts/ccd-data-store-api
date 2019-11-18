@@ -66,25 +66,6 @@ dependencyUpdates.resolutionStrategy = {
     }
 }
 
-
-configurations.all {
-    resolutionStrategy {
-        eachDependency { DependencyResolveDetails details ->
-            if (details.requested.group in ['com.fasterxml.jackson.core', 'com.fasterxml.jackson.module', 'com.fasterxml.jackson.datatype']) {
-                details.useVersion '2.9.10'
-            }
-            if (details.requested.name == 'jackson-databind') {
-                details.useVersion '2.9.10.1'
-            }
-            // Wiremock requires old jetty because it still support java 7
-            // spring bom is currenty upgrading it
-            if (details.requested.group == 'org.eclipse.jetty') {
-                details.useVersion '9.2.24.v20180105'
-            }
-        }
-    }
-}
-
 // https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html
 dependencyCheck {
     // Specifies if the build should be failed if a CVSS score above a specified level is identified.
