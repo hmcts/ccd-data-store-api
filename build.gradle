@@ -645,7 +645,7 @@ task functional(type: Test) {
         javaexec {
             main = "io.cucumber.core.cli.Main"
             classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
-            args = ['--plugin', 'json:${projectDir}/target/cucumber.json', '--tags', 'not @Ignore', '--glue',
+            args = ['--plugin', "json:${projectDir}/target/cucumber.json", '--tags', 'not @Ignore', '--glue',
                     'uk.gov.hmcts.ccd.fta.steps', 'src/aat/resources/features']
         }
     }
