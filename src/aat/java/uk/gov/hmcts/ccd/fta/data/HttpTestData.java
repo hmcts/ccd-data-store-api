@@ -19,8 +19,6 @@ public class HttpTestData {
 
     private UserData user;
 
-    private String method;
-
     private String uri;
 
     private RequestData request;
@@ -83,14 +81,6 @@ public class HttpTestData {
         this.user = user;
     }
 
-    public String getMethod() {
-        return method;
-    }
-
-    public void setMethod(String method) {
-        this.method = method;
-    }
-
     public String getUri() {
         return uri;
     }
@@ -113,14 +103,6 @@ public class HttpTestData {
 
     public void setExpectedResponse(ResponseData expectedResponse) {
         this.expectedResponse = expectedResponse;
-    }
-
-    public boolean meetsSpec(String specification) {
-        return specs.contains(specification);
-    }
-
-    public boolean meetsOperationOfProduct(String operationName, String productName) {
-        return operationName.equals(this.operationName) && productName.equals(this.productName);
     }
 
 }
