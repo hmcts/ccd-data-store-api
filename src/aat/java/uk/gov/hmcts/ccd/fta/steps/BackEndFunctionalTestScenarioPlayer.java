@@ -70,35 +70,25 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     @Given("a user with [{}]")
     public void verifyThatThereIsAUserInTheContextWithAParticularSpecification(String specificationAboutAUser) {
         UserData aUser = scenarioContext.getTestData().getUser();
-
-        // TESTING
         String username = aUser.getUsername();
+
+        // ADD MORE IDAM USERS HERE
         if (username.equals(aat.getCaseworkerAutoTestEmail())) {
-
-        } else if (username.equals(aat.getPrivateCaseworkerEmail())) {
-
-        } else if (username.equals(aat.getRestrictedCaseworkerEmail())) {
-
+            aUser.setPassword(aat.getCaseworkerAutoTestPassword());
         } else {
-
+            logger.info(scenarioContext.getCurrentScenarioTag() + ": Idam user not recognised by FTA player");
         }
 
-
-        aUser.setUsername(aat.getCaseworkerAutoTestEmail());
-        aUser.setPassword(aat.getCaseworkerAutoTestPassword());
-
-        String logPrefix = scenarioContext.getCurrentScenarioTag() + ": User ";
-        logger.info("USERNAME: [[" + aUser.getUsername() + "]], PASSWORD: [[" + aUser.getPassword() + "]]");
+        String logPrefix = scenarioContext.getCurrentScenarioTag() + ": Idam user [" + aUser.getUsername()
+            + "][" + aUser.getPassword() + "] ";
         try {
             AuthenticatedUser authenticatedUserMetadata = aat.getIdamHelper().authenticate(
                 aUser.getUsername(), aUser.getPassword());
-            logger.info("TOKEN: [[" + authenticatedUserMetadata.getAccessToken() + "]], UID: [["
-                + authenticatedUserMetadata.getId() + "]]");
             aUser.setToken(authenticatedUserMetadata.getAccessToken());
             aUser.setUid(authenticatedUserMetadata.getId());
             logger.info(logPrefix + "authenticated");
         } catch (FeignException ex) {
-            logger.info(logPrefix + "credentials do not exist");
+            logger.info(logPrefix + "credentials invalid");
         }
 
         scenarioContext.setTheUser(aUser);
