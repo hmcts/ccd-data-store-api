@@ -6,5 +6,5 @@ Feature: Get case by reference
     Given The case is available in system
     When Send the request
     Then The case is returned
-    
-    
+
+
