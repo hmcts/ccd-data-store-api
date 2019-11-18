@@ -2,7 +2,7 @@ package uk.gov.hmcts.ccd.fta.steps;
 
 import java.util.stream.Collectors;
 
-import io.cucumber.core.api.Scenario;
+import io.cucumber.java.Scenario;
 import io.restassured.specification.RequestSpecification;
 import uk.gov.hmcts.ccd.fta.data.HttpTestData;
 import uk.gov.hmcts.ccd.fta.data.HttpTestDataSource;
