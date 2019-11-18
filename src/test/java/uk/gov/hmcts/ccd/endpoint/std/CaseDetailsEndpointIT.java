@@ -31,32 +31,17 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 
 import javax.inject.Inject;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isEmptyString;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.collection.IsIn.isIn;
 import static org.hamcrest.core.Every.everyItem;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -90,8 +75,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private static final String UID = "123";
     private static final String DRAFT_ID = "5";
     private static final int NUMBER_OF_CASES = 18;
-    private static final String CASE_TYPE_CREATOR_ROLE = "TestAddressBookCreatorCase";
-    private static final String CASE_TYPE_CREATOR_ROLE_NO_CREATE_ACCESS = "TestAddressBookCreatorNoCreateAccessCase";
 
     @Inject
     private WebApplicationContext wac;
@@ -4006,10 +3989,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertCaseDataResultSetSize();
 
         final MvcResult result = mockMvc.perform(get(GET_CASES_AS_CASEWORKER)
-                                                     .contentType(JSON_CONTENT_TYPE)
-                                                     .param("case.PersonAddress.Country", "EnglanD")  // expects this
-                                                     // to be sanitized
-                                                     .header(AUTHORIZATION, "Bearer user1"))
+            .contentType(JSON_CONTENT_TYPE)
+            .param("case.PersonAddress.Country", "EnglanD")  // expects this
+            // to be sanitized
+            .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(200))
             .andReturn();
 
@@ -4019,122 +4002,6 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(caseDetails, hasSize(2));
         assertThat(responseAsString, containsString("Janet"));
         assertThat(responseAsString, containsString("Peter"));
-    }
-
-    @Test
-    public void shouldReturn201WhenPostCreateCaseWithCreatorRoleWithNoDataForCaseworker() throws Exception {
-        final String DESCRIPTION = "A very long comment.......";
-        final String SUMMARY = "Short comment";
-
-        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_CREATOR_ROLE + "/cases";
-
-        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
-        final Event triggeringEvent = anEvent().build();
-        triggeringEvent.setEventId(TEST_EVENT_ID);
-        triggeringEvent.setDescription(DESCRIPTION);
-        triggeringEvent.setSummary(SUMMARY);
-        caseDetailsToSave.setEvent(triggeringEvent);
-        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_CREATOR_ROLE, TEST_EVENT_ID);
-        caseDetailsToSave.setToken(token);
-
-
-        final MvcResult mvcResult = mockMvc.perform(post(URL)
-            .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(caseDetailsToSave))
-        ).andExpect(status().is(201))
-            .andReturn();
-
-        assertEquals("Expected empty case data", "", mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").asText());
-
-        final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
-
-        final CaseDetails savedCaseDetails = caseDetailsList.get(0);
-        assertTrue("Incorrect Case Reference", uidService.validateUID(String.valueOf(savedCaseDetails.getReference())));
-        assertEquals("Incorrect Case Type", CASE_TYPE_CREATOR_ROLE, savedCaseDetails.getCaseTypeId());
-        assertEquals("Incorrect Data content", "{}", savedCaseDetails.getData().toString());
-        assertEquals("state3", savedCaseDetails.getState());
-
-        final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
-        assertEquals("Incorrect number of case events", 1, caseAuditEventList.size());
-
-        final AuditEvent caseAuditEvent = caseAuditEventList.get(0);
-        assertEquals("123", caseAuditEvent.getUserId());
-        assertEquals(savedCaseDetails.getId(), caseAuditEvent.getCaseDataId());
-        assertEquals(savedCaseDetails.getCaseTypeId(), caseAuditEvent.getCaseTypeId());
-        assertEquals(1, caseAuditEvent.getCaseTypeVersion().intValue());
-        assertEquals(savedCaseDetails.getState(), caseAuditEvent.getStateId());
-        assertEquals("Case in state 3", caseAuditEvent.getStateName());
-        assertEquals(savedCaseDetails.getCreatedDate(), caseAuditEvent.getCreatedDate());
-        assertEquals(savedCaseDetails.getData(), caseAuditEvent.getData());
-        assertEquals("Event ID", TEST_EVENT_ID, caseAuditEvent.getEventId());
-        assertEquals("Description", DESCRIPTION, caseAuditEvent.getDescription());
-        assertEquals("Summary", SUMMARY, caseAuditEvent.getSummary());
-        assertTrue(caseAuditEvent.getDataClassification().isEmpty());
-        assertThat(caseAuditEvent.getSecurityClassification(), equalTo(PRIVATE));
-    }
-
-    @Test
-    public void shouldReturn201WhenPostCreateCaseWithCreatorRoleWithNoDataForCitizen() throws Exception {
-        final String DESCRIPTION = "A very long comment.......";
-        final String SUMMARY = "Short comment";
-
-        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_CREATOR_ROLE + "/cases";
-
-        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
-        final Event triggeringEvent = anEvent().build();
-        triggeringEvent.setEventId(TEST_EVENT_ID);
-        triggeringEvent.setDescription(DESCRIPTION);
-        triggeringEvent.setSummary(SUMMARY);
-        caseDetailsToSave.setEvent(triggeringEvent);
-        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_CREATOR_ROLE, TEST_EVENT_ID);
-        caseDetailsToSave.setToken(token);
-
-
-        final MvcResult mvcResult = mockMvc.perform(post(URL)
-            .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(caseDetailsToSave))
-        ).andExpect(status().is(201))
-            .andReturn();
-
-        assertEquals("Expected empty case data", "", mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").asText());
-
-        final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
-
-        final CaseDetails savedCaseDetails = caseDetailsList.get(0);
-        assertTrue("Incorrect Case Reference", uidService.validateUID(String.valueOf(savedCaseDetails.getReference())));
-        assertEquals("Incorrect Case Type", CASE_TYPE_CREATOR_ROLE, savedCaseDetails.getCaseTypeId());
-        assertEquals("Incorrect Data content", "{}", savedCaseDetails.getData().toString());
-        assertEquals("state3", savedCaseDetails.getState());
-
-        final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
-        assertEquals("Incorrect number of case events", 1, caseAuditEventList.size());
-
-        final AuditEvent caseAuditEvent = caseAuditEventList.get(0);
-        assertEquals("123", caseAuditEvent.getUserId());
-        assertEquals(savedCaseDetails.getId(), caseAuditEvent.getCaseDataId());
-        assertEquals(savedCaseDetails.getCaseTypeId(), caseAuditEvent.getCaseTypeId());
-        assertEquals(1, caseAuditEvent.getCaseTypeVersion().intValue());
-        assertEquals(savedCaseDetails.getState(), caseAuditEvent.getStateId());
-        assertEquals("Case in state 3", caseAuditEvent.getStateName());
-        assertEquals(savedCaseDetails.getCreatedDate(), caseAuditEvent.getCreatedDate());
-        assertEquals(savedCaseDetails.getData(), caseAuditEvent.getData());
-        assertEquals("Event ID", TEST_EVENT_ID, caseAuditEvent.getEventId());
-        assertEquals("Description", DESCRIPTION, caseAuditEvent.getDescription());
-        assertEquals("Summary", SUMMARY, caseAuditEvent.getSummary());
-        assertTrue(caseAuditEvent.getDataClassification().isEmpty());
-        assertThat(caseAuditEvent.getSecurityClassification(), equalTo(PRIVATE));
-    }
-
-    @Test
-    public void shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccessOnCreatorRoleForCaseworker() throws Exception {
-        shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccess("caseworkers", CASE_TYPE_CREATOR_ROLE_NO_CREATE_ACCESS);
-    }
-
-    @Test
-    public void shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccessOnCreatorRoleForCitizen() throws Exception {
-        shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccess("citizens", CASE_TYPE_CREATOR_ROLE_NO_CREATE_ACCESS);
     }
 
     /**
