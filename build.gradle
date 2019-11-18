@@ -27,7 +27,7 @@ plugins {
     id 'org.owasp.dependencycheck' version '5.1.0'
     id 'com.github.spotbugs' version '1.6.9'
     id 'net.ltgt.apt' version '0.21'
-    id "com.github.spacialcircumstances.gradle-cucumber-reporting" version "0.1.14"
+    id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.14'
 }
 
 apply plugin: 'java'
@@ -66,9 +66,16 @@ dependencyUpdates.resolutionStrategy = {
     }
 }
 
+
 configurations.all {
     resolutionStrategy {
         eachDependency { DependencyResolveDetails details ->
+            if (details.requested.group in ['com.fasterxml.jackson.core', 'com.fasterxml.jackson.module', 'com.fasterxml.jackson.datatype']) {
+                details.useVersion '2.9.10.1'
+            }
+            if (details.requested.name == 'jackson-databind') {
+                details.useVersion '2.9.10.1'
+            }
             // Wiremock requires old jetty because it still support java 7
             // spring bom is currenty upgrading it
             if (details.requested.group == 'org.eclipse.jetty') {
@@ -578,6 +585,7 @@ jacocoTestReport {
 test {
     environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
     generateCucumberReports.enabled = false
+    
     useJUnitPlatform()
 
     testLogging {
@@ -650,12 +658,13 @@ task functional(type: Test) {
     include "uk/gov/hmcts/ccd/datastore/tests/functional/**"
     include "uk/gov/hmcts/ccd/datastore/tests/v2/**"
     useJUnitPlatform()
-        doFirst {
+
+    doLast {
         generateCucumberReports.enabled = true
         javaexec {
             main = "io.cucumber.core.cli.Main"
             classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
-            args = ['--plugin', 'pretty', '--plugin', 'json:target/cucumber.json', '--glue', 'uk.gov.hmcts.ccd.datastore.tests', 'src/aat/resources/features']
+            args = ['--plugin', "json:${projectDir}/target/cucumber.json", '--glue', 'uk.gov.hmcts.ccd.fta.steps', '--tags', 'not @Ignore', 'src/aat/resources/features']
         }
     }
 }
