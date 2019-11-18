@@ -1,5 +1,6 @@
 description: Helm chart for the HMCTS CCD Data Store
 name: ccd-data-store-api
+apiVersion: v1
 home: https://github.com/hmcts/ccd-data-store-api
 version: 1.2.7
 maintainers:
