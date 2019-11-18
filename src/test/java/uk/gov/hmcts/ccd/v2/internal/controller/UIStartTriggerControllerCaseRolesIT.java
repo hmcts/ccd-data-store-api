@@ -76,7 +76,6 @@ public class UIStartTriggerControllerCaseRolesIT extends WireMockBaseTest {
         assertNotNull("UI Start Trigger Resource is null", uiStartTriggerResource);
 
         assertThat("Unexpected Case ID", uiStartTriggerResource.getCaseEventTrigger().getCaseId(), is(nullValue()));
-        assertEquals("Unexpected Event ID", "CREATE-CASE", uiStartTriggerResource.getCaseEventTrigger().getId());
         assertEquals("Unexpected Event Name", "CREATE-CASE", uiStartTriggerResource.getCaseEventTrigger().getName());
         assertEquals("Unexpected Event Show Event Notes", true, uiStartTriggerResource.getCaseEventTrigger().getShowEventNotes());
         assertEquals("Unexpected Event Description", "Creation event", uiStartTriggerResource.getCaseEventTrigger().getDescription());

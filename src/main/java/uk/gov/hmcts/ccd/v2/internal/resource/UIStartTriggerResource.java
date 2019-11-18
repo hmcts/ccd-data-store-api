@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.v2.internal.resource;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -37,11 +36,6 @@ public class UIStartTriggerResource extends ResourceSupport {
 
     public static UIStartTriggerResource forDraft(@NonNull CaseEventTrigger caseEventTrigger, String draftId, Boolean ignoreWarning) {
         return new UIStartTriggerResource(caseEventTrigger, draftId, ignoreWarning, Origin.DRAFT);
-    }
-
-    @JsonProperty("id")
-    public String getEventId() {
-        return caseEventTrigger.getId();
     }
 
     @JsonIgnore
