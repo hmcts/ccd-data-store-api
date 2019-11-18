@@ -650,13 +650,12 @@ task functional(type: Test) {
     include "uk/gov/hmcts/ccd/datastore/tests/functional/**"
     include "uk/gov/hmcts/ccd/datastore/tests/v2/**"
     useJUnitPlatform()
-
-    doLast {
+        doFirst {
         generateCucumberReports.enabled = true
         javaexec {
             main = "io.cucumber.core.cli.Main"
             classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
-            args = ['--plugin', "json:${projectDir}/target/cucumber.json", '--glue', 'uk.gov.hmcts.ccd.fta.steps', '--tags', 'not @Ignore', 'src/aat/resources/features']
+            args = ['--plugin', 'pretty', '--plugin', 'json:target/cucumber.json', '--glue', 'uk.gov.hmcts.ccd.datastore.tests', 'src/aat/resources/features']
         }
     }
 }
