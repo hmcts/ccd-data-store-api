@@ -70,6 +70,10 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     public void verifyThatThereIsAUserInTheContextWithAParticularSpecification(String specificationAboutAUser) {
         UserData aUser = scenarioContext.getTestData().getUser();
 
+        // TESTING
+        aUser.setUsername(aat.getCaseworkerAutoTestEmail());
+        aUser.setPassword(aat.getCaseworkerAutoTestPassword());
+
         String logPrefix = scenarioContext.getCurrentScenarioTag() + ": User ";
         logger.info("USERNAME: [[" + aUser.getUsername() + "]], PASSWORD: [[" + aUser.getPassword() + "]]");
         try {
