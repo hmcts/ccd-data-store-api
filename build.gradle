@@ -486,7 +486,7 @@ jsonSchema2Pojo {
 }
 
 jacoco {
-    toolVersion = "0.8.0"
+    toolVersion = "0.8.4"
 }
 
 sonarqube {
@@ -651,7 +651,7 @@ task functional(type: Test) {
     setClasspath(sourceSets.aat.runtimeClasspath)
     include "uk/gov/hmcts/ccd/datastore/tests/functional/**"
     include "uk/gov/hmcts/ccd/datastore/tests/v2/**"
-    useJUnitPlatform()
+//    useJUnitPlatform()
 
     doLast {
         generateCucumberReports.enabled = true
@@ -711,13 +711,13 @@ task installDist(overwrite: true) {
     // This task must be overwritten to do as it's breaking JAR packaging and it's a mandatory step of swagger
     // documentation publication.
 }
-task cucumber() {
-    doLast {
-        generateCucumberReports.enabled = true
-        javaexec {
-            main = "io.cucumber.core.cli.Main"
-            classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
-            args = ['--plugin', "json:${projectDir}/target/cucumber.json", '--glue', 'uk.gov.hmcts.ccd.fta.steps', 'src/aat/resources/features']
+task cucumber(type: Test) {
+        doFirst {
+            generateCucumberReports.enabled = true
+            javaexec {
+                main = "io.cucumber.core.cli.Main"
+                classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
+                args = ['--plugin', "json:${projectDir}/target/cucumber.json", '--glue', 'uk.gov.hmcts.ccd.fta.steps', '--tags', 'not @Ignore', 'src/aat/resources/features']
+            }
         }
     }
-}

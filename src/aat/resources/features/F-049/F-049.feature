@@ -32,7 +32,7 @@ Feature: Start case creation as Case worker
     And     the response has all the details as expected
 
   @S-234
-  Scenario: must return 422 when process could not be started
+  Scenario: ignore must return 422 when process could not be started
     Given   an appropriate test context as detailed in the test data source
     And     a user with [an existing case in CCD]
     When    a request is prepared with appropriate values
