@@ -1,14 +1,13 @@
 package uk.gov.hmcts.ccd.datastore.tests;
 
-import static java.lang.Boolean.TRUE;
-
-import org.junit.jupiter.api.extension.ExtendWith;
-
 import java.util.function.Supplier;
+
+import static java.lang.Boolean.TRUE;
 
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
+import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.hmcts.ccd.datastore.tests.helper.idam.AuthenticatedUser;
 
 @ExtendWith(AATExtension.class)
@@ -21,7 +20,7 @@ public abstract class BaseTest {
         RestAssured.useRelaxedHTTPSValidation();
     }
 
-    protected Supplier<RequestSpecification> asAutoTestCaseworker() {
+    public Supplier<RequestSpecification> asAutoTestCaseworker() {
         return asAutoTestCaseworker(TRUE);
     }
 
