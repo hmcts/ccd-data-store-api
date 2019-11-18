@@ -35,19 +35,4 @@
         <cve>CVE-2019-11358</cve>
         <cve>CVE-2015-9251</cve>
     </suppress>
-    <!-- should remove these suppressions -->
-    <suppress>
-        <notes><![CDATA[ file name: jackson-databind-2.9.10.jar ]]></notes>
-        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
-        <cve>CVE-2019-12814</cve>
-        <cve>CVE-2019-12384</cve>
-        <cve>CVE-2019-14540</cve>
-        <cve>CVE-2019-16335</cve>
-        <cve>CVE-2019-16942</cve>
-        <cve>CVE-2019-16943</cve>
-        <cve>CVE-2019-17531</cve>
-        <cve>CVE-2019-14379</cve>
-        <cve>CVE-2019-14439</cve>
-        <cve>CVE-2019-17267</cve>
-    </suppress>
 </suppressions>
