@@ -13,7 +13,7 @@ import java.util.List;
 import static com.fasterxml.jackson.databind.node.JsonNodeFactory.instance;
 
 /**
- * This service sorts value of compound field based on given order of compound fields inside case field
+ * This service sorts value of compound field based on given order of compound fields inside case field (see {@link CompoundFieldOrderService})
  */
 @Named
 @Singleton

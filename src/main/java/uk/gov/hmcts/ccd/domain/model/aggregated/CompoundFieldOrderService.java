@@ -29,6 +29,8 @@ import static org.apache.commons.lang3.StringUtils.substringAfterLast;
  *      (EventToComplexTypes has at least one value for DisplayOrder column defined it will sort according to this column)
  * 2) If caseEventComplexFields is empty array then it will sort caseFields' children order values.
  *      (ComplexTypes tab's DisplayOrder column)
+ *
+ * Additionally it sorts the field type's FixedListItem list of case field of FixedList, FixedRadioList and MultiSelectList types.
  */
 @Named
 @Singleton
