@@ -1,8 +1,8 @@
-@F-051
-Feature: Get default settings for user
+@F-000
+Feature: [SAMPLE] Get default settings for user
 
-  @S-110
-  Scenario: must return default user setting successfully for a user having a profile in CCD
+  @S-000
+  Scenario: [SAMPLE] must return default user setting successfully for a user having a profile in CCD
     Given an appropriate test context as detailed in the test data source
     And a user with [a detailed profile in CCD]
     When a request is prepared with appropriate values
