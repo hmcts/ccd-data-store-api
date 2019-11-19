@@ -25,6 +25,7 @@ import io.restassured.specification.QueryableRequestSpecification;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.SpecificationQuerier;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
+import uk.gov.hmcts.ccd.datastore.tests.Env;
 import uk.gov.hmcts.ccd.datastore.tests.helper.idam.AuthenticatedUser;
 import uk.gov.hmcts.ccd.fta.data.RequestData;
 import uk.gov.hmcts.ccd.fta.data.ResponseData;
@@ -70,14 +71,10 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     @Given("a user with [{}]")
     public void verifyThatThereIsAUserInTheContextWithAParticularSpecification(String specificationAboutAUser) {
         UserData aUser = scenarioContext.getTestData().getUser();
-        String username = aUser.getUsername();
-
-        // ADD MORE IDAM USERS HERE
-        if (username.equals(aat.getCaseworkerAutoTestEmail())) {
-            aUser.setPassword(aat.getCaseworkerAutoTestPassword());
-        } else {
-            logger.info(scenarioContext.getCurrentScenarioTag() + ": Idam user not recognised by FTA player");
-        }
+        String resolvedUsername = resolveEnvironmentVariable(aUser.getUsername());
+        String resolvedPassword = resolveEnvironmentVariable(aUser.getPassword());
+        aUser.setUsername(resolvedUsername);
+        aUser.setPassword(resolvedPassword);
 
         String logPrefix = scenarioContext.getCurrentScenarioTag() + ": Idam user [" + aUser.getUsername()
             + "][" + aUser.getPassword() + "] ";
@@ -97,6 +94,20 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         String errorMessage = "Test data does not confirm it meets the specification about a user: "
             + specificationAboutAUser;
         Assert.assertTrue(errorMessage, doesTestDataMeetSpec);
+    }
+
+    private String resolveEnvironmentVariable(String key) {
+        if (key.startsWith("[[$")) {
+            String envKey = key.substring(3, key.length() - 2);
+            String envValue = Env.require(envKey);
+            String errorMessage = "Specified environment variable '" + envValue + "' not found";
+            Assert.assertNotNull(errorMessage, envValue);
+            return envValue;
+        } else {
+            logger.info(scenarioContext.getCurrentScenarioTag() + ": Expected environment variable declaration "
+                + "but found '" + key + "', may cause issues in higher environments");
+        }
+        return key;
     }
 
     @Override
