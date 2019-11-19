@@ -155,7 +155,7 @@ class CompoundFieldValueServiceTest {
         FieldType multipleNestedCompoundFieldType = aFieldType()
             .withType(COMPLEX)
             .withComplexField(newCaseField()
-                                  .withId("complex1")
+                                  .withId("collection1")
                                   .withFieldType(aFieldType()
                                                      .withType(COLLECTION)
                                                      .withCollectionFieldType(aFieldType()
@@ -204,7 +204,7 @@ class CompoundFieldValueServiceTest {
                 "               \"simple9\": \"value9\",\n" +
                 "               \"simple10\": \"value10\"\n" +
                 "            },\n" +
-                "            \"complex1\": [\n" +
+                "            \"collection1\": [\n" +
                 "               {\n" +
                 "                  \"id\": \"id2\",\n" +
                 "                  \"value\" : {\n" +
@@ -229,7 +229,7 @@ class CompoundFieldValueServiceTest {
             "    {\n" +
             "        \"id\": \"id1\",\n" +
             "        \"value\": {\n" +
-            "            \"complex1\": [\n" +
+            "            \"collection1\": [\n" +
             "                {\n" +
             "                    \"id\": \"id2\",\n" +
             "                    \"value\": {\n" +
