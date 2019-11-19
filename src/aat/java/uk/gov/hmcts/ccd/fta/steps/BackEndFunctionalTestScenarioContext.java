@@ -16,7 +16,7 @@ public class BackEndFunctionalTestScenarioContext {
     private static final HttpTestDataSource DATA_SOURCE = new JsonStoreHttpTestDataSource(TEST_DATA_RESOURCE_PACKAGES);
 
     private HttpTestData testData;
-    private Scenario scenario;
+    private io.cucumber.java.Scenario scenario;
     private UserData theUser;
     private RequestSpecification theRequest;
     private ResponseData theResponse;
