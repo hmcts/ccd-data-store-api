@@ -164,6 +164,15 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     }
 
     @Override
+    @Then("the request [{}]")
+    public void verifyTheRequestInTheContextWithAParticularSpecification(String requestSpecification) {
+        String errorMessage = "Test data does not confirm it meets the specification about the request: "
+            + requestSpecification;
+        boolean check = scenarioContext.getTestData().meetsSpec(requestSpecification);
+        Assert.assertTrue(errorMessage, check);
+    }
+
+    @Override
     @When("it is submitted to call the [{}] operation of [{}]")
     public void submitTheRequestToCallAnOperationOfAProduct(String operation, String productName) throws IOException {
         boolean isCorrectOperation = scenarioContext.getTestData().meetsOperationOfProduct(operation, productName);
