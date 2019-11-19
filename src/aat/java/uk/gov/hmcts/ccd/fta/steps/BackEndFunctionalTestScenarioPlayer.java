@@ -164,7 +164,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     }
 
     @Override
-    @Then("the request [{}]")
+    @When("the request [{}]")
     public void verifyTheRequestInTheContextWithAParticularSpecification(String requestSpecification) {
         String errorMessage = "Test data does not confirm it meets the specification about the request: "
             + requestSpecification;
