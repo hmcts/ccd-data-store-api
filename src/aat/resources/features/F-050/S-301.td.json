@@ -1,0 +1,93 @@
+{
+  "_guid_": "S-301",
+  "_extends_": "S-000-Base-Success",
+  "title": "must validate when all fields are valid",
+  "specs": ["a detailed profile in CCD"],
+  "productName": "CCD Data Store",
+  "operationName": "validation of a set of fields as Case worker",
+  "method": "POST",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/validate",
+  "request": {
+    "pathVariables": {
+      "uid": "[[DYNAMIC]]",
+      "jid" : "AUTOTEST1",
+      "ctid" : "AAT"
+    },
+    "body" : {
+      "data": {
+        "TextField": "Text",
+        "NumberField": null,
+        "YesOrNoField": "Yes",
+        "PhoneUKField": "01234123412",
+        "EmailField": "abc@gmail.com",
+        "MoneyGBPField": "100",
+        "DateField": null,
+        "DateTimeField": "",
+        "TextAreaField": null,
+        "FixedListField": null,
+        "FixedRadioListField": null,
+        "MultiSelectListField": [],
+        "ComplexField": {
+          "ComplexTextField": null,
+          "ComplexFixedListField": null,
+          "ComplexNestedField": {
+            "NestedNumberField": null,
+            "NestedCollectionTextField": []
+          }
+        },
+        "CollectionField": [],
+        "AddressUKField": {
+          "AddressLine1": null,
+          "AddressLine2": null,
+          "AddressLine3": null,
+          "PostTown": null,
+          "County": null,
+          "PostCode": null,
+          "Country": null
+        }
+      },
+      "event": {
+        "id": "CREATE",
+        "summary": "",
+        "description": ""
+      }
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 200,
+    "body": {
+      "data": {
+        "TextField": "Text",
+        "NumberField": null,
+        "YesOrNoField": "Yes",
+        "PhoneUKField": "01234123412",
+        "EmailField": "abc@gmail.com",
+        "MoneyGBPField": "100",
+        "DateField": null,
+        "DateTimeField": "",
+        "TextAreaField": null,
+        "FixedListField": null,
+        "FixedRadioListField": null,
+        "MultiSelectListField": [],
+        "ComplexField": {
+          "ComplexTextField": null,
+          "ComplexFixedListField": null,
+          "ComplexNestedField": {
+            "NestedNumberField": null,
+            "NestedCollectionTextField": []
+          }
+        },
+        "CollectionField": [],
+        "AddressUKField": {
+          "AddressLine1": null,
+          "AddressLine2": null,
+          "AddressLine3": null,
+          "PostTown": null,
+          "County": null,
+          "PostCode": null,
+          "Country": null
+        }
+      }
+    }
+  }
+}
