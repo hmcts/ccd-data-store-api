@@ -1,13 +1,11 @@
 package uk.gov.hmcts.ccd.fta.steps;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import feign.FeignException;
-import io.restassured.RestAssured;
-import io.restassured.response.Response;
-import io.restassured.specification.QueryableRequestSpecification;
-import io.restassured.specification.RequestSpecification;
-import io.restassured.specification.SpecificationQuerier;
 import org.junit.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -15,14 +13,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.cucumber.core.api.Scenario;
+import feign.FeignException;
 import io.cucumber.java.Before;
+import io.cucumber.java.Scenario;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
+import io.restassured.specification.QueryableRequestSpecification;
+import io.restassured.specification.RequestSpecification;
+import io.restassured.specification.SpecificationQuerier;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.helper.idam.AuthenticatedUser;
 import uk.gov.hmcts.ccd.fta.data.RequestData;
@@ -69,19 +70,25 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     @Given("a user with [{}]")
     public void verifyThatThereIsAUserInTheContextWithAParticularSpecification(String specificationAboutAUser) {
         UserData aUser = scenarioContext.getTestData().getUser();
+        String username = aUser.getUsername();
 
-        String logPrefix = scenarioContext.getCurrentScenarioTag() + ": User ";
-        logger.info("USERNAME: [[" + aUser.getUsername() + "]], PASSWORD: [[" + aUser.getPassword() + "]]");
+        // ADD MORE IDAM USERS HERE
+        if (username.equals(aat.getCaseworkerAutoTestEmail())) {
+            aUser.setPassword(aat.getCaseworkerAutoTestPassword());
+        } else {
+            logger.info(scenarioContext.getCurrentScenarioTag() + ": Idam user not recognised by FTA player");
+        }
+
+        String logPrefix = scenarioContext.getCurrentScenarioTag() + ": Idam user [" + aUser.getUsername()
+            + "][" + aUser.getPassword() + "] ";
         try {
             AuthenticatedUser authenticatedUserMetadata = aat.getIdamHelper().authenticate(
                 aUser.getUsername(), aUser.getPassword());
-            logger.info("TOKEN: [[" + authenticatedUserMetadata.getAccessToken() + "]], UID: [["
-                + authenticatedUserMetadata.getId() + "]]");
             aUser.setToken(authenticatedUserMetadata.getAccessToken());
             aUser.setUid(authenticatedUserMetadata.getId());
             logger.info(logPrefix + "authenticated");
         } catch (FeignException ex) {
-            logger.info(logPrefix + "credentials do not exist");
+            logger.info(logPrefix + "credentials invalid");
         }
 
         scenarioContext.setTheUser(aUser);
