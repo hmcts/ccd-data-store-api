@@ -33,7 +33,8 @@
       "Expires" : "[[ANY]]",
       "Pragma" : "[[ANY]]",
       "Date" : "[[ANY]]",
-      "Content-Type" : "[[ANY]]"
+      "Content-Type" : "[[ANY]]",
+      "Content-Length": "[[ANY]]"
     },
     "body": {
       "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
