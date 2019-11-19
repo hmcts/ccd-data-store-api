@@ -16,10 +16,16 @@ public class MapVerifier {
 
     public static MapVerificationResult verifyMap(Map<String, Object> expectedMap, Map<String, Object> actualMap,
             int maxMessageDepth) {
+        return verifyMap("actualResponse.body", expectedMap, actualMap, maxMessageDepth);
+    }
+
+    public static MapVerificationResult verifyMap(String fieldPrefix, Map<String, Object> expectedMap,
+            Map<String, Object> actualMap,
+            int maxMessageDepth) {
         if (maxMessageDepth < 0) {
             throw new IllegalArgumentException("Max depth cannot be negative.");
         }
-        return verifyMap("actualResponse.body", expectedMap, actualMap, 0, maxMessageDepth);
+        return verifyMap(fieldPrefix, expectedMap, actualMap, 0, maxMessageDepth);
     }
 
     private static MapVerificationResult verifyMap(String fieldPrefix, Map<String, Object> expectedMap,
