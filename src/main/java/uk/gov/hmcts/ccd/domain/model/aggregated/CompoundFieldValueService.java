@@ -21,10 +21,10 @@ public class CompoundFieldValueService {
 
     public static JsonNode getSortedValue(final CommonField caseField, JsonNode data) {
         if (data != null) {
-            if (caseField.isCompound()) {
+            if (caseField.isCompoundFieldType()) {
                 List<CaseField> children = caseField.getFieldType().getChildren();
                 children.forEach(childField -> {
-                    if (caseField.isCollectionFieldType()) {
+                    if (caseField.isCollectionOfAnyDisplayContextFieldType() && childField.isCompoundFieldType()) {
                         for (int index = 0; index < data.size(); index++) {
                             JsonNode newOrderData = getSortedValue(childField, data.get(index).get("value").get(childField.getId()));
                             if (newOrderData != null) {
@@ -60,7 +60,7 @@ public class CompoundFieldValueService {
     }
 
     private static JsonNode getOrderedData(final CommonField caseField, final JsonNode data, final List<CaseField> children) {
-        if (caseField.isCollectionFieldType()) {
+        if (caseField.isCollectionOfAnyDisplayContextFieldType()) {
             return getCollectionNodes(data, children);
         } else {
             return getValue(children, data);

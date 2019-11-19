@@ -191,7 +191,7 @@ public class CaseField implements Serializable, CommonField {
     }
 
     private void clearACLsForMissingComplexACLs() {
-        if (this.isCompound()) {
+        if (this.isCompoundFieldType()) {
             final List<String> allPaths = buildAllDottedComplexFieldPossibilities(this.getFieldType().getChildren());
             this.complexACLs.forEach(complexACL -> {
                 Optional<String> parentPath = getParentPath(complexACL.getListElementCode());
@@ -255,7 +255,7 @@ public class CaseField implements Serializable, CommonField {
     }
 
     private static void propagateACLsToNestedFields(CommonField caseField, List<AccessControlList> acls) {
-        if (caseField.isCompound()) {
+        if (caseField.isCompoundFieldType()) {
             caseField.getFieldType().getChildren().forEach(nestedField -> {
                 final List<AccessControlList> cloneACLs = acls.stream().map(AccessControlList::duplicate).collect(toList());
                 nestedField.setAccessControlLists(cloneACLs);

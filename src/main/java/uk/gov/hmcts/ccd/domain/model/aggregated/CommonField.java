@@ -29,6 +29,8 @@ public interface CommonField {
 
     List<AccessControlList> getAccessControlLists();
 
+    String getDisplayContext();
+
     void setDisplayContext(String displayContext);
 
     @JsonIgnore
@@ -54,7 +56,7 @@ public interface CommonField {
     }
 
     @JsonIgnore
-    default boolean isCompound() {
+    default boolean isCompoundFieldType() {
         return isCollectionFieldType() || isComplexFieldType();
     }
 
@@ -106,4 +108,15 @@ public interface CommonField {
             return Optional.empty();
         }
     }
+
+    @JsonIgnore
+    default boolean isComplexTableFieldType() {
+        return getFieldType() != null && getFieldType().getType().equals(COMPLEX) && getDisplayContext() != null;
+    }
+
+    @JsonIgnore
+    default boolean isCollectionOfAnyDisplayContextFieldType() {
+        return isCollectionFieldType() || isComplexTableFieldType();
+    }
+
 }

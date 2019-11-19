@@ -39,7 +39,7 @@ public class CompoundFieldOrderService {
     public static final String ROOT = "";
 
     public void sortNestedFields(final CaseField caseField, final List<CaseEventFieldComplex> caseEventComplexFields, final String listElementCode) {
-        if (caseField.isCompound()) {
+        if (caseField.isCompoundFieldType()) {
             List<CaseField> children = caseField.getFieldType().getChildren();
             children.forEach(childField -> {
                 String newListElementCode = isBlank(listElementCode) ? childField.getId() : listElementCode + "." + childField.getId();
