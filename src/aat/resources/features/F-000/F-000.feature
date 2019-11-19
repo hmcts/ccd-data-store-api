@@ -1,6 +1,9 @@
 @F-000
 Feature: [SAMPLE] Get default settings for user
 
+  Background:
+    Given an appropriate test context as detailed in the test data source
+
   @S-000
   Scenario: [SAMPLE] must return default user setting successfully for a user having a profile in CCD
     Given a user with [a detailed profile in CCD]

@@ -53,7 +53,11 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     @Before()
     public void prepare(Scenario scenario) {
         this.scenario = scenario;
+    }
 
+    @Override
+    @Given("an appropriate test context as detailed in the test data source")
+    public void initializeAppropriateTestContextAsDetailedInTheTestDataSource() {
         scenarioContext.initializeTestDataFor(scenario);
         String logPrefix = scenarioContext.getCurrentScenarioTag() + ": Test data ";
         if (scenarioContext.getTestData() != null) {
@@ -61,13 +65,6 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         } else {
             logger.info(logPrefix + "was not found");
         }
-    }
-
-    @Override
-    @Given("an appropriate test context as detailed in the test data source")
-    public void initializeAppropriateTestContextAsDetailedInTheTestDataSource() {
-        logger.info(scenarioContext.getCurrentScenarioTag() + ": Uses deprecated step 'an appropriate test context "
-            + "as detailed in the test data source', this step is now empty so can be removed safely");
     }
 
     @Override
