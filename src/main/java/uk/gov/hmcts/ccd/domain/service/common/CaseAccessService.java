@@ -1,10 +1,12 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
 import com.google.common.collect.Sets;
+import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
+import uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -87,6 +89,11 @@ public class CaseAccessService {
         }
         return userRoles;
     }
+
+    public Set<String> getCreateRoles() {
+        return Sets.union(getUserRoles(), Sets.newHashSet(GlobalCaseRole.CREATOR.getRole()));
+    }
+
 
     private Boolean accessGranted(CaseDetails caseDetails) {
         final List<Long> grantedCases = caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId());
