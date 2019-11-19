@@ -5,7 +5,7 @@ import uk.gov.hmcts.ccd.datastore.tests.Env;
 
 public class EnvUtils {
 
-    public static String resolveEnvironmentVariable(String key) {
+    public static String resolvePossibleEnvironmentVariable(String key) {
         if (key.startsWith("[[$")) {
             String envKey = key.substring(3, key.length() - 2);
             String envValue = Env.require(envKey);

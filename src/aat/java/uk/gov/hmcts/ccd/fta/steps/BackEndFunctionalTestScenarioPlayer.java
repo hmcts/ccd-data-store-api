@@ -72,14 +72,14 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     public void verifyThatThereIsAUserInTheContextWithAParticularSpecification(String specificationAboutAUser) {
         UserData aUser = scenarioContext.getTestData().getUser();
 
-        String resolvedUsername = EnvUtils.resolveEnvironmentVariable(aUser.getUsername());
+        String resolvedUsername = EnvUtils.resolvePossibleEnvironmentVariable(aUser.getUsername());
         if (resolvedUsername.equals(aUser.getUsername())) {
             logger.info(scenarioContext.getCurrentScenarioTag() + ": Expected environment variable declaration "
                 + "for user.username but found '" + resolvedUsername + "', which may cause issues in higher "
                 + "environments");
         }
 
-        String resolvedPassword = EnvUtils.resolveEnvironmentVariable(aUser.getPassword());
+        String resolvedPassword = EnvUtils.resolvePossibleEnvironmentVariable(aUser.getPassword());
         if (resolvedPassword.equals(aUser.getPassword())) {
             logger.info(scenarioContext.getCurrentScenarioTag() + ": Expected environment variable declaration "
                 + "for user.password but found '" + resolvedPassword + "', which may cause issues in higher "
@@ -88,6 +88,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
 
         aUser.setUsername(resolvedUsername);
         aUser.setPassword(resolvedPassword);
+        scenario.write("User: " + resolvedUsername);
 
         String logPrefix = scenarioContext.getCurrentScenarioTag() + ": Idam user [" + aUser.getUsername()
             + "][" + aUser.getPassword() + "] ";
