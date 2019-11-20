@@ -72,10 +72,6 @@ withPipeline(type, product, component) {
         enableSlackNotifications('#ccd-pr-builds')
     }
 
-    after('functionalTest:preview') {
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/serenity/**/*'
-    }
-
     overrideVaultEnvironments(vaultOverrides)
     enableAksStagingDeployment()
     loadVaultSecrets(secrets)
