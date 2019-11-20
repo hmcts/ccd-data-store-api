@@ -264,7 +264,4 @@ class CompoundFieldOrderServiceTest {
         return aFieldType().withType(TEXT_TYPE).build();
     }
 
-    private FieldType complexType() {
-        return aFieldType().withType(COMPLEX).build();
-    }
 }
