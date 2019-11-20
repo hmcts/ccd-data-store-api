@@ -1,0 +1,46 @@
+{
+  "_guid_": "S-034",
+  "_extends_": "S-000-Base-Root",
+  "title": "must return appropriate negative response for a user not having a profile in CCD",
+  "specs": ["no profile in CCD",
+    "has the 403 return code"],
+  "productName": "CCD Data Store",
+  "operationName": "Fetch a case for display for Case Worker",
+  "request": {
+    "headers": {
+      "Authorization": "[[DYNAMIC]]"
+    },
+    "pathVariables": {
+      "uid": "some id",
+      "jid": "AUTOTEST1",
+      "ctid": "AAT",
+      "cid": "1573751648840703"
+    }
+  },
+  "method": "GET",
+  "uri": "/aggregated/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}",
+  "expectedResponse": {
+    "responseCode" : 403,
+    "responseMessage" : "Forbidden",
+    "headers" : {
+      "X-Frame-Options" : "DENY",
+      "Transfer-Encoding" : "chunked",
+      "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
+      "vary" : "accept-encoding",
+      "X-Content-Type-Options" : "nosniff",
+      "Content-Encoding" : "gzip",
+      "Pragma" : "no-cache",
+      "Expires" : "0",
+      "X-XSS-Protection" : "1; mode=block",
+      "Date" : "[[ANY]]",
+      "Content-Type" : "application/json;charset=UTF-8"
+    },
+    "body" : {
+      "timestamp" : "[[ANY]]",
+      "status" : 403,
+      "error" : "Forbidden",
+      "message" : "Access Denied",
+      "path" : "[[ANY]]"
+    }
+  }
+}
