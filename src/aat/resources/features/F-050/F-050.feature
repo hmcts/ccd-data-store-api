@@ -18,12 +18,30 @@ Feature: Validate a set of fields as Case worker
 #    And it is submitted to call the [validation of a set of fields as Case worker] operation of [CCD Data Store]
 #    Then a negative response is received
 #    And the response has all the details as expected
-#
-#  @S-167
-#  Scenario: must not validate when field validation fails
-#    Given an appropriate test context as detailed in the test data source
-#    And a user with a detailed profile in CCD
-#    When a request is prepared with appropriate values
-#    And it is submitted to call the [validation of a set of fields as Case worker] operation of [CCD Data Store]
-#    Then a negative response is received
-#    And the response has all the details as expected
+
+  @S-298
+  Scenario: must not validate when field validation fails
+    Given an appropriate test context as detailed in the test data source
+    And a user with [a detailed profile in CCD]
+    When a request is prepared with appropriate values
+    And it is submitted to call the [validation of a set of fields as Case worker] operation of [CCD Data Store]
+    Then a negative response is received
+    And the response has all the details as expected
+
+  @S-300
+  Scenario: must return 403 when request provides authentic credentials without authorised access to the operation
+    Given an appropriate test context as detailed in the test data source
+    And a user with [a detailed profile in CCD]
+    When a request is prepared with appropriate values
+    And it is submitted to call the [validation of a set of fields as Case worker] operation of [CCD Data Store]
+    Then a negative response is received
+    And the response has all the details as expected
+
+  @S-299
+  Scenario: must return 4xx when request does not provide valid authentication credentials
+    Given an appropriate test context as detailed in the test data source
+    And a user with [a detailed profile in CCD]
+    When a request is prepared with appropriate values
+    And it is submitted to call the [validation of a set of fields as Case worker] operation of [CCD Data Store]
+    Then a negative response is received
+    And the response has all the details as expected
