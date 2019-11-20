@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ccd.fta.steps;
 
-import gherkin.Func;
-import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
