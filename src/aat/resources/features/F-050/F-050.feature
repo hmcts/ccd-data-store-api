@@ -1,10 +1,12 @@
 @F-050
 Feature: Validate a set of fields as Case worker
 
+  Background: Load test data for the scenario
+    Given an appropriate test context as detailed in the test data source
+
   @S-301
   Scenario: must validate when all fields are valid
-    Given an appropriate test context as detailed in the test data source
-    And a user with [a detailed profile in CCD]
+    Given a user with [a detailed profile in CCD]
     When a request is prepared with appropriate values
     And it is submitted to call the [validation of a set of fields as Case worker] operation of [CCD Data Store]
     Then a positive response is received
@@ -12,8 +14,7 @@ Feature: Validate a set of fields as Case worker
 
 #  @S-166
 #  Scenario: must not validate when CMC ExternalID is not unique / already exists
-#    Given an appropriate test context as detailed in the test data source
-#    And a user with a detailed profile in CCD
+#    Given a user with a detailed profile in CCD
 #    When a request is prepared with appropriate values
 #    And it is submitted to call the [validation of a set of fields as Case worker] operation of [CCD Data Store]
 #    Then a negative response is received
@@ -21,8 +22,7 @@ Feature: Validate a set of fields as Case worker
 
   @S-298
   Scenario: must not validate when field validation fails
-    Given an appropriate test context as detailed in the test data source
-    And a user with [a detailed profile in CCD]
+    Given a user with [a detailed profile in CCD]
     When a request is prepared with appropriate values
     And it is submitted to call the [validation of a set of fields as Case worker] operation of [CCD Data Store]
     Then a negative response is received
@@ -30,8 +30,7 @@ Feature: Validate a set of fields as Case worker
 
   @S-300
   Scenario: must return 403 when request provides authentic credentials without authorised access to the operation
-    Given an appropriate test context as detailed in the test data source
-    And a user with [a detailed profile in CCD]
+    Given a user with [a detailed profile in CCD]
     When a request is prepared with appropriate values
     And it is submitted to call the [validation of a set of fields as Case worker] operation of [CCD Data Store]
     Then a negative response is received
@@ -39,8 +38,7 @@ Feature: Validate a set of fields as Case worker
 
   @S-299
   Scenario: must return 4xx when request does not provide valid authentication credentials
-    Given an appropriate test context as detailed in the test data source
-    And a user with [a detailed profile in CCD]
+    Given a user with [a detailed profile in CCD]
     When a request is prepared with appropriate values
     And it is submitted to call the [validation of a set of fields as Case worker] operation of [CCD Data Store]
     Then a negative response is received
