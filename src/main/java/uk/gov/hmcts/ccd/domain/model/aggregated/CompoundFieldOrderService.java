@@ -23,9 +23,6 @@ import static org.apache.commons.lang3.StringUtils.substringAfterLast;
 /**
  * This service sorts nested fields of a compound field (complex or collection) according to caseEventComplexFields collection.
  * It will sort on its elements order values. No sorting is performed for empty collection.
- *
- * Additionally it sorts the field type's FixedListItem list of case field of FixedList,
- * FixedRadioList and MultiSelectList types.
  */
 @Named
 @Singleton
