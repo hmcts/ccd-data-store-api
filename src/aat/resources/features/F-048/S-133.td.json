@@ -3,7 +3,7 @@
   "_extends_": "S-000-Base-Success",
   "title": "must return 400 if the sort direction in input parameters is not in ASC or DESC",
   "specs": [
-    "a detailed profile in CCD"
+    "a detailed profile in CCD", "contains an error message : Unknown sort direction"
   ],
   "productName": "CCD Data Store",
   "operationName": "Get the pagination metadata for a case data search for Case Worker",

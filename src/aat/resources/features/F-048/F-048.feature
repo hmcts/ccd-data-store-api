@@ -9,6 +9,7 @@ Background: Load test data for the scenario
     When a request is prepared with appropriate values
     And it is submitted to call the [Get the pagination metadata for a case data search for Case Worker] operation of [CCD Data Store]
     Then a negative response is received
+    And the response [contains an error message : Unknown sort direction]
     And the response has all the details as expected
 
   @S-134
@@ -33,6 +34,7 @@ Background: Load test data for the scenario
     When a request is prepared with appropriate values
     And it is submitted to call the [Get the pagination metadata for a case data search for Case Worker] operation of [CCD Data Store]
     Then a positive response is received
+    And the response [returns the pagination metadata]
     And the response has all the details as expected
 
   @S-515
@@ -41,6 +43,7 @@ Background: Load test data for the scenario
     When a request is prepared with appropriate values
     And it is submitted to call the [Get the pagination metadata for a case data search for Case Worker] operation of [CCD Data Store]
     Then a negative response is received
+    And the response [contains an error message : unknown metadata search parameters]
     And the response has all the details as expected
 
   @S-516
@@ -49,4 +52,5 @@ Background: Load test data for the scenario
     When a request is prepared with appropriate values
     And it is submitted to call the [Get the pagination metadata for a case data search for Case Worker] operation of [CCD Data Store]
     Then a negative response is received
+    And the response [contains an error message : unknown security classification]
     And the response has all the details as expected

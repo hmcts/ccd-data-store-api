@@ -3,7 +3,8 @@
   "_extends_": "S-000-Base-Success",
   "title": "must return 400 when casefields do not start with “case.”",
   "specs": [
-    "a detailed profile in CCD"
+    "a detailed profile in CCD",
+    "contains an error message : unknown metadata search parameters"
   ],
   "productName": "CCD Data Store",
   "operationName": "Get the pagination metadata for a case data search for Case Worker",
@@ -23,17 +24,17 @@
     "responseCode": 400,
     "responseMessage": "Bad Request",
     "headers": {
-      "X-Frame-Options" : "[[ANY]]",
-      "Transfer-Encoding" : "[[ANY]]",
-      "Cache-Control" : "[[ANY]]",
-      "X-Content-Type-Options" : "[[ANY]]",
-      "X-Xss-Protection" : "[[ANY]]",
-      "Content-Encoding" : "[[ANY]]",
-      "Vary" : "[[ANY]]",
-      "Expires" : "[[ANY]]",
-      "Pragma" : "[[ANY]]",
-      "Date" : "[[ANY]]",
-      "Content-Type" : "[[ANY]]",
+      "X-Frame-Options": "[[ANY]]",
+      "Transfer-Encoding": "[[ANY]]",
+      "Cache-Control": "[[ANY]]",
+      "X-Content-Type-Options": "[[ANY]]",
+      "X-Xss-Protection": "[[ANY]]",
+      "Content-Encoding": "[[ANY]]",
+      "Vary": "[[ANY]]",
+      "Expires": "[[ANY]]",
+      "Pragma": "[[ANY]]",
+      "Date": "[[ANY]]",
+      "Content-Type": "[[ANY]]",
       "Content-Length": "[[ANY]]"
     },
     "body": {

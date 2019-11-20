@@ -3,7 +3,7 @@
   "_extends_": "S-000-Base-Success",
   "title": "must return 400 when security classification in input parameters is present and invalid",
   "specs": [
-    "a detailed profile in CCD"
+    "a detailed profile in CCD", "contains an error message : unknown security classification"
   ],
   "productName": "CCD Data Store",
   "operationName": "Get the pagination metadata for a case data search for Case Worker",
