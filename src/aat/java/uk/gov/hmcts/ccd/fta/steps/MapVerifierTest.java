@@ -296,4 +296,35 @@ public class MapVerifierTest {
 
         Assert.assertFalse(result.isVerified());
     }
+
+    @Test
+    public void shouldVerifyAResponseHeaderMapCaseInsensitively() {
+
+        Map<String, Object> expected = DATA_SOURCE
+                .getDataForScenario("HttpTestData-with-a-Big-ExpectedResponseBody_expected").getExpectedResponse()
+                .getHeaders();
+        Map<String, Object> actual = DATA_SOURCE
+                .getDataForScenario("HttpTestData-with-a-Big-ExpectedResponseBody_actual").getExpectedResponse()
+                .getHeaders();
+
+        MapVerificationResult result = MapVerifier.verifyMap(expected, actual, 5);
+
+        Assert.assertEquals(0, result.getAllIssues().size());
+        Assert.assertTrue(result.isVerified());
+    }
+
+    @Test
+    public void shoudlFailForCollectionsOfDifferentSizes() {
+        Map<String, Object> expected = DATA_SOURCE.getDataForScenario("MapWithArray_expected").getExpectedResponse()
+                .getBody();
+        Map<String, Object> actual = DATA_SOURCE.getDataForScenario("MapWithArray_actual").getExpectedResponse()
+                .getBody();
+
+        MapVerificationResult result = MapVerifier.verifyMap(expected, actual, 5);
+
+        Assert.assertArrayEquals(new Object[] {
+                "actualResponse.body.details contains a bad value: actualResponse.body.details.field_errors has unexpected number of elements. Expected: 1, but actual: 2." },
+                result.getAllIssues().toArray());
+
+    }
 }
