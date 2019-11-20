@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.fta.steps;
 
+import gherkin.Func;
 import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +30,7 @@ import uk.gov.hmcts.ccd.datastore.tests.helper.idam.AuthenticatedUser;
 import uk.gov.hmcts.ccd.fta.data.RequestData;
 import uk.gov.hmcts.ccd.fta.data.ResponseData;
 import uk.gov.hmcts.ccd.fta.data.UserData;
+import uk.gov.hmcts.ccd.fta.exception.FunctionalTestException;
 import uk.gov.hmcts.ccd.fta.util.JsonUtils;
 
 @SuppressWarnings({"LocalVariableName"})
@@ -94,9 +96,11 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         scenarioContext.setTheUser(aUser);
 
         boolean doesTestDataMeetSpec = scenarioContext.getTestData().meetsSpec(specificationAboutAUser);
-        String errorMessage = "Test data does not confirm it meets the specification about a user: "
-            + specificationAboutAUser;
-        Assert.assertTrue(errorMessage, doesTestDataMeetSpec);
+        if (!doesTestDataMeetSpec) {
+            String errorMessage = "Test data does not confirm it meets the specification about a user: "
+                + specificationAboutAUser;
+            throw new FunctionalTestException(errorMessage);
+        }
     }
 
     @Override
@@ -120,7 +124,8 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
                         aRequest.header(header, s2sToken);
                         scenarioContext.getTestData().getRequest().getHeaders().put("ServiceAuthorization", s2sToken);
                     } else {
-                        Assert.fail("Dynamic value for request header '" + header + "' does not exist");
+                        throw new FunctionalTestException("Dynamic value for request header '" + header
+                            + "' does not exist");
                     }
                 } else {
                     aRequest.header(header, value);
@@ -136,7 +141,8 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
                         aRequest.pathParam(pathVariable, theUser.getUid());
                         scenarioContext.getTestData().getRequest().getPathVariables().put("uid", theUser.getUid());
                     } else {
-                        Assert.fail("Dynamic value for request path variable '" + pathVariable + "' does not exist");
+                        throw new FunctionalTestException("Dynamic value for request path variable '"
+                            + pathVariable + "' does not exist");
                     }
                 } else {
                     aRequest.pathParam(pathVariable, value);
@@ -148,7 +154,8 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
             requestData.getQueryParams().forEach((queryParam, value) -> {
                 if (value.toString().equals(DYNAMIC_CONTENT_PLACEHOLDER)) {
                     // ADD DYNAMIC DATA HERE
-                    Assert.fail("Dynamic value for request query parameter '" + queryParam + "' does not exist");
+                    throw new FunctionalTestException("Dynamic value for request query parameter '"
+                        + queryParam + "' does not exist");
                 } else {
                     aRequest.queryParam(queryParam, value);
                 }
@@ -160,23 +167,30 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         }
 
         scenarioContext.setTheRequest(aRequest);
-        scenario.write(JsonUtils.getPrettyJsonFromObject(scenarioContext.getTestData().getRequest()));
+        scenario.write("Request prepared with the following variables: "
+            + JsonUtils.getPrettyJsonFromObject(scenarioContext.getTestData().getRequest()));
     }
 
     @Override
     @When("it is submitted to call the [{}] operation of [{}]")
     public void submitTheRequestToCallAnOperationOfAProduct(String operation, String productName) throws IOException {
         boolean isCorrectOperation = scenarioContext.getTestData().meetsOperationOfProduct(operation, productName);
-        String errorMessage = "Test data does not confirm it is calling the following operation of a product: "
-            + operation + " -> " + productName;
-        Assert.assertTrue(errorMessage, isCorrectOperation);
+        if (!isCorrectOperation) {
+            String errorMessage = "Test data does not confirm it is calling the following operation of a product: "
+                + operation + " -> " + productName;
+            throw new FunctionalTestException(errorMessage);
+        }
 
         RequestSpecification theRequest = scenarioContext.getTheRequest();
         String uri = scenarioContext.getTestData().getUri();
 
-        Response response = null;
-        Assert.assertNotNull("No request method in data file", scenarioContext.getTestData().getMethod());
-        switch (scenarioContext.getTestData().getMethod()) {
+        String method = scenarioContext.getTestData().getMethod();
+        if (method == null) {
+            throw new FunctionalTestException("No request method in data file");
+        }
+
+        Response response;
+        switch (method) {
             case "GET":
                 response = theRequest.get(uri);
                 break;
@@ -190,11 +204,11 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
                 response = theRequest.delete(uri);
                 break;
             default:
-                Assert.fail("Unknown request method in data file");
+                throw new FunctionalTestException("Unknown request method in data file");
         }
 
         QueryableRequestSpecification queryableRequest = SpecificationQuerier.query(theRequest);
-        scenario.write(queryableRequest.getMethod() + " " + queryableRequest.getURI());
+        scenario.write("Calling " + queryableRequest.getMethod() + " on " + queryableRequest.getURI());
 
         Map<String, Object> responseHeaders = new HashMap<>();
         response.getHeaders().forEach(header -> responseHeaders.put(header.getName(), header.getValue()));
@@ -214,18 +228,22 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     @Then("a positive response is received")
     public void verifyThatAPositiveResponseWasReceived() {
         int responseCode = scenarioContext.getTheResponse().getResponseCode();
-        String errorMessage = "Response code '" + responseCode + "' is not a success code";
-        Assert.assertEquals(errorMessage, 2, responseCode / 100);
-        scenario.write("" + scenarioContext.getTheResponse().getResponseCode());
+        scenario.write("Response code: " + responseCode);
+        if (responseCode / 100 != 2) {
+            String errorMessage = "Response code '" + responseCode + "' is not a success code";
+            throw new FunctionalTestException(errorMessage);
+        }
     }
 
     @Override
     @Then("a negative response is received")
     public void verifyThatANegativeResponseWasReceived() {
         int responseCode = scenarioContext.getTheResponse().getResponseCode();
-        String errorMessage = "Response code '" + responseCode + "' is not a negative code";
-        Assert.assertNotEquals(errorMessage, 2, responseCode / 100);
-        scenario.write("" + scenarioContext.getTheResponse().getResponseCode());
+        scenario.write("Response code: " + responseCode);
+        if (responseCode / 100 == 2) {
+            String errorMessage = "Response code '" + responseCode + "' is a success code";
+            throw new FunctionalTestException(errorMessage);
+        }
     }
 
     @Override
@@ -252,19 +270,22 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
             issues.put("body", bodyVerification.getAllIssues());
         }
 
-        scenario.write(JsonUtils.getPrettyJsonFromObject(scenarioContext.getTheResponse()));
+        scenario.write("Response: " + JsonUtils.getPrettyJsonFromObject(scenarioContext.getTheResponse()));
 
         if (issues.get("responseCode") != null || issues.get("headers") != null || issues.get("body") != null) {
-            Assert.fail("Response failures: " + JsonUtils.getPrettyJsonFromObject(issues));
+            String errorMessage = "Response failures: " + JsonUtils.getPrettyJsonFromObject(issues);
+            throw new FunctionalTestException(errorMessage);
         }
     }
 
     @Override
     @Then("the response [{}]")
     public void verifyTheResponseInTheContextWithAParticularSpecification(String responseSpecification) {
-        String errorMessage = "Test data does not confirm it meets the specification about the response: "
-                + responseSpecification;
         boolean check = scenarioContext.getTestData().meetsSpec(responseSpecification);
-        Assert.assertTrue(errorMessage, check);
+        if (!check) {
+            String errorMessage = "Test data does not confirm it meets the specification about the response: "
+                + responseSpecification;
+            throw new FunctionalTestException(errorMessage);
+        }
     }
 }
