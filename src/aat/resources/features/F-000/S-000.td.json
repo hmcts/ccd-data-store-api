@@ -23,7 +23,7 @@
       "X-Content-Type-Options" : "[[ANY]]",
       "X-XSS-Protection" : "[[ANY]]",
       "Content-Encoding" : "[[ANY]]",
-      "vary" : "[[ANY]]",
+      "Vary" : "[[ANY]]",
       "Expires" : "[[ANY]]",
       "Pragma" : "[[ANY]]",
       "Date" : "[[ANY]]",
