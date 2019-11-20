@@ -135,6 +135,10 @@ public class MapVerifier {
         Iterator<?> e1 = expectedCollection.iterator();
         Iterator<?> e2 = actualCollection.iterator();
         int i = 0;
+        if (expectedCollection.size() != actualCollection.size()) {
+            badValueMessages.add(fieldPrefix + " has unexpected number of elements. Expected: "
+                    + expectedCollection.size() + ", but actual: " + actualCollection.size() + ".");
+        }
         while (e1.hasNext() && e2.hasNext()) {
             Object o1 = e1.next();
             Object o2 = e2.next();

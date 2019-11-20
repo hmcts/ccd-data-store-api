@@ -312,4 +312,18 @@ public class MapVerifierTest {
         Assert.assertEquals(0, result.getAllIssues().size());
         Assert.assertTrue(result.isVerified());
     }
+
+    @Test
+    public void shoudlFail() {
+        Map<String, Object> expected = DATA_SOURCE.getDataForScenario("MapWithArray_expected").getExpectedResponse()
+                .getBody();
+        Map<String, Object> actual = DATA_SOURCE.getDataForScenario("MapWithArray_actual").getExpectedResponse()
+                .getBody();
+
+        MapVerificationResult result = MapVerifier.verifyMap(expected, actual, 5);
+
+        Assert.assertEquals(0, result.getAllIssues().size());
+        Assert.assertTrue(result.isVerified());
+
+    }
 }
