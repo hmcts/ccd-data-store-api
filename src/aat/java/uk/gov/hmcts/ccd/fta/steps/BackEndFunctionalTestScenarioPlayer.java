@@ -206,7 +206,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         }
 
         QueryableRequestSpecification queryableRequest = SpecificationQuerier.query(theRequest);
-        scenario.write("Calling " + queryableRequest.getMethod() + " on " + queryableRequest.getURI());
+        scenario.write("Calling " + queryableRequest.getMethod() + " " + queryableRequest.getURI());
 
         Map<String, Object> responseHeaders = new HashMap<>();
         response.getHeaders().forEach(header -> responseHeaders.put(header.getName(), header.getValue()));
