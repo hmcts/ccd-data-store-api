@@ -3,7 +3,8 @@
   "_extends_": "S-000-Base-Success",
   "title": "must return 4xx when request does not provide valid authentication credentials",
   "specs": [
-    "a detailed profile in CCD"
+    "a detailed profile in CCD",
+    "has the 403 return code"
   ],
   "productName": "CCD Data Store",
   "operationName": "Get the pagination metadata for a case data search for Citizen",
