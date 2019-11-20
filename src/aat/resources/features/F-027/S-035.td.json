@@ -2,7 +2,9 @@
   "_guid_": "S-035",
   "_extends_": "S-000-Base-Root",
   "title": "must return appropriate negative response when case-reference does not exists",
-  "specs": ["a detailed profile in CCD"],
+  "specs": ["a detailed profile in CCD",
+    "does not provide the valid case-reference in input parameters",
+    "has the 400 return code"],
   "productName": "CCD Data Store",
   "operationName": "Fetch a case for display for Case Worker",
   "request": {

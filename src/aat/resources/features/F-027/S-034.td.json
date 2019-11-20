@@ -2,7 +2,8 @@
   "_guid_": "S-034",
   "_extends_": "S-000-Base-Root",
   "title": "must return appropriate negative response for a user not having a profile in CCD",
-  "specs": ["no profile in CCD"],
+  "specs": ["no profile in CCD",
+    "has the 403 return code"],
   "productName": "CCD Data Store",
   "operationName": "Fetch a case for display for Case Worker",
   "request": {

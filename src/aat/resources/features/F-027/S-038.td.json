@@ -2,7 +2,9 @@
   "_guid_": "S-038",
   "_extends_": "S-000-Base-Root",
   "title": "must return status 200 along with the CaseView object successfully",
-  "specs": ["a detailed profile in CCD"],
+  "specs": ["a detailed profile in CCD",
+    "has a valid case-reference in input parameters",
+    "has the 200 return code"],
   "productName": "CCD Data Store",
   "operationName": "Fetch a case for display for Case Worker",
   "request": {

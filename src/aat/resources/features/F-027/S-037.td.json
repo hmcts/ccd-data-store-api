@@ -2,7 +2,9 @@
   "_guid_": "S-037",
   "_extends_": "S-000-Base-Root",
   "title": "must return 403 when request provides authentic credentials without authorised access to the operation",
-  "specs": ["a detailed profile in CCD"],
+  "specs": ["a detailed profile in CCD",
+    "does not provide the authorised access to the operation",
+    "has the 403 return code"],
   "productName": "CCD Data Store",
   "operationName": "Fetch a case for display for Case Worker",
   "request": {
