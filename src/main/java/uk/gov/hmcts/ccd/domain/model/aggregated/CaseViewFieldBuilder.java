@@ -46,7 +46,7 @@ public class CaseViewFieldBuilder {
     }
 
     private void buildFieldType(final CaseField caseField, final CaseEventField eventField, final CaseViewField field) {
-        compoundFieldOrderService.sortNestedFields(caseField, eventField.getCaseEventFieldComplex(), ROOT);
+        compoundFieldOrderService.sortNestedFieldsFromCaseEventComplexFields(caseField, eventField.getCaseEventFieldComplex(), ROOT);
         field.setFieldType(caseField.getFieldType());
     }
 

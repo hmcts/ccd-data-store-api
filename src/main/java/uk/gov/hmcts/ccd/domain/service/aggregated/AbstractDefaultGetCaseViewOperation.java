@@ -81,20 +81,12 @@ public abstract class AbstractDefaultGetCaseViewOperation {
         return caseTabCollection.getTabs().stream().map(tab -> {
             CommonField[] caseViewFields = tab.getTabFields().stream()
                 .filter(filterCaseTabFieldsBasedOnSecureData(caseDetails))
-                .map(sortCaseFields())
                 .map(caseTypeTabField -> CaseViewField.createFrom(caseTypeTabField, data))
                 .toArray(CaseViewField[]::new);
             return new CaseViewTab(tab.getId(), tab.getLabel(), tab.getDisplayOrder(), (CaseViewField[])caseViewFields,
                                    tab.getShowCondition(), tab.getRole());
 
         }).toArray(CaseViewTab[]::new);
-    }
-
-    private Function<CaseTypeTabField, CaseTypeTabField> sortCaseFields() {
-        return field -> {
-            compoundFieldOrderService.sortNestedFields(field.getCaseField(), Lists.newArrayList(), ROOT);
-            return field;
-        };
     }
 
     CaseTabCollection getCaseTabCollection(String caseTypeId) {
