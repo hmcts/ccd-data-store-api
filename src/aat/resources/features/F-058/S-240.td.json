@@ -1,0 +1,41 @@
+{
+  "_guid_": "S-240",
+  "_extends_": "S-000-Base-Success",
+  "title": "must return 422 when process could not be started",
+  "specs": ["an existing case in CCD","process could not be started","return 415"],
+  "productName": "CCD Data Store",
+  "operationName": "Start case creation as Case worker",
+  "user": {
+    "username": "auto.test.cnp+ctzn4@gmail.com",
+    "password": "Pa55word11"
+  },
+  "method" : "GET",
+  "uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token/",
+  "request": {
+    "pathVariables": {
+      "uid": "[[DYNAMIC]]",
+      "jid": "AUTOTEST1",
+      "ctid": "AAT",
+      "etid": "CREATE"
+    },
+    "headers": {
+      "Content-Type": "application/xml"
+    }
+  },
+  "expectedResponse": {
+    "responseCode" : 415,
+    "responseMessage" : "Unsupported Media Type",
+    "headers" : {
+      "X-Frame-Options" : "DENY",
+      "Accept" : "application/json",
+      "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
+      "X-Content-Type-Options" : "nosniff",
+      "Pragma" : "no-cache",
+      "Expires" : "0",
+      "X-XSS-Protection" : "1; mode=block",
+      "Content-Length" : "0",
+      "Date" : "[[ANY]]"
+    },
+    "body" : null
+  }
+}
