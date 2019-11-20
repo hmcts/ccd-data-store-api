@@ -88,7 +88,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
 
         aUser.setUsername(resolvedUsername);
         aUser.setPassword(resolvedPassword);
-        scenario.write("User: " + resolvedUsername);
+        scenario.write(resolvedUsername);
 
         String logPrefix = scenarioContext.getCurrentScenarioTag() + ": Idam user [" + aUser.getUsername()
             + "][" + aUser.getPassword() + "] ";
