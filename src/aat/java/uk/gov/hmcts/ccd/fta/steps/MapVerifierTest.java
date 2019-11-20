@@ -314,7 +314,7 @@ public class MapVerifierTest {
     }
 
     @Test
-    public void shoudlFail() {
+    public void shoudlFailForCollectionsOfDifferentSizes() {
         Map<String, Object> expected = DATA_SOURCE.getDataForScenario("MapWithArray_expected").getExpectedResponse()
                 .getBody();
         Map<String, Object> actual = DATA_SOURCE.getDataForScenario("MapWithArray_actual").getExpectedResponse()
