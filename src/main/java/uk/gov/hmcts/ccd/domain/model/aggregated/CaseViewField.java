@@ -1,8 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.ToString;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
@@ -12,11 +10,8 @@ import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import java.util.List;
 import java.util.Map;
 
-import static uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldValueService.getSortedValue;
-
 @ToString
 public class CaseViewField implements CommonField {
-    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     public static final String READONLY = "READONLY";
     public static final String MANDATORY = "MANDATORY";
@@ -196,8 +191,7 @@ public class CaseViewField implements CommonField {
         caseViewField.setSecurityLabel(caseField.getSecurityLabel());
         caseViewField.setValidationExpression(caseField.getFieldType().getRegularExpression());
         caseViewField.setAccessControlLists(caseField.getAccessControlLists());
-        JsonNode jsonNode = getSortedValue(caseField, MAPPER.convertValue(data.get(caseField.getId()), JsonNode.class));
-        caseViewField.setValue(jsonNode);
+        caseViewField.setValue(data.get(caseField.getId()));
         caseViewField.setMetadata(caseField.isMetadata());
 
         return caseViewField;
