@@ -1,17 +1,6 @@
 package uk.gov.hmcts.ccd.fta.steps;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import feign.FeignException;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
@@ -23,15 +12,25 @@ import io.restassured.response.Response;
 import io.restassured.specification.QueryableRequestSpecification;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.SpecificationQuerier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.helper.idam.AuthenticatedUser;
 import uk.gov.hmcts.ccd.fta.data.RequestData;
 import uk.gov.hmcts.ccd.fta.data.ResponseData;
 import uk.gov.hmcts.ccd.fta.data.UserData;
-import uk.gov.hmcts.ccd.fta.util.EnvUtils;
 import uk.gov.hmcts.ccd.fta.exception.FunctionalTestException;
+import uk.gov.hmcts.ccd.fta.util.EnvUtils;
 import uk.gov.hmcts.ccd.fta.util.JsonUtils;
 
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@SuppressWarnings({"LocalVariableName"})
 public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTestAutomationDSL {
 
     private static final String DYNAMIC_CONTENT_PLACEHOLDER = "[[DYNAMIC]]";

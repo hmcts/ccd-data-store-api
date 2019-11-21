@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ccd.fta.data;
 
-
 import java.util.List;
 
+@SuppressWarnings({"MemberName", "ParameterName"})
 public class HttpTestData {
 
     private String _guid_;
