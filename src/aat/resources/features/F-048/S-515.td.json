@@ -1,10 +1,10 @@
 {
   "_guid_": "S-515",
-  "_extends_": "S-000-Base-Success",
+  "_extends_": "Base_Expecting_400",
   "title": "must return 400 when casefields do not start with “case.”",
   "specs": [
     "a detailed profile in CCD",
-    "contains casefields that do not start with case.",
+    "contains case fields that do not start with case.",
     "contains an error message : unknown metadata search parameters"
   ],
   "productName": "CCD Data Store",

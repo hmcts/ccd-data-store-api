@@ -1,10 +1,10 @@
 {
   "_guid_": "S-133",
-  "_extends_": "S-000-Base-Success",
+  "_extends_": "Base_Expecting_400",
   "title": "must return 400 if the sort direction in input parameters is not in ASC or DESC",
   "specs": [
     "a detailed profile in CCD",
-    "contains invalid Sort Direction",
+    "contains an invalid Sort Direction",
     "contains an error message : Unknown sort direction"
   ],
   "productName": "CCD Data Store",

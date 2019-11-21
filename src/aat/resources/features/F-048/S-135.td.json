@@ -1,6 +1,6 @@
 {
   "_guid_": "S-135",
-  "_extends_": "S-000-Base-Success",
+  "_extends_": "Base_Expecting_403",
   "title": "must return 403 when request provides authentic credentials without authorized access to the operation",
   "specs": [
     "a detailed profile in CCD",

@@ -8,7 +8,7 @@ Feature: Get the pagination metadata for a case data search for Case Worker
   Scenario: must return pagination metadata successfully for correct inputs
     Given a user with [a detailed profile in CCD]
     When a request is prepared with appropriate values
-    #And the request [is prepared with valid Jurisdiction, Case ID and User ID]
+    And the request [is prepared with valid Jurisdiction, Case ID and User ID]
     And it is submitted to call the [Get the pagination metadata for a case data search for Case Worker] operation of [CCD Data Store]
     Then a positive response is received
     And the response [returns the pagination metadata]
@@ -18,7 +18,7 @@ Feature: Get the pagination metadata for a case data search for Case Worker
   Scenario: must return 400 if the sort direction in input parameters is not in ASC or DESC
     Given a user with [a detailed profile in CCD]
     When a request is prepared with appropriate values
-    #And the request [contains invalid Sort Direction]
+    And the request [contains an invalid Sort Direction]
     And it is submitted to call the [Get the pagination metadata for a case data search for Case Worker] operation of [CCD Data Store]
     Then a negative response is received
     And the response [contains an error message : Unknown sort direction]
@@ -28,7 +28,7 @@ Feature: Get the pagination metadata for a case data search for Case Worker
   Scenario: must return negative response when request does not provide valid authentication credentials
     Given a user with [a detailed profile in CCD]
     When a request is prepared with appropriate values
-    #And the request [does not provide valid authentication credentials]
+    And the request [does not provide a valid authentication credentials]
     And it is submitted to call the [Get the pagination metadata for a case data search for Case Worker] operation of [CCD Data Store]
     Then a negative response is received
     And the response has all the details as expected
@@ -37,7 +37,7 @@ Feature: Get the pagination metadata for a case data search for Case Worker
   Scenario: must return negative response when request provides authentic credentials without authorized access to the operation
     Given a user with [a detailed profile in CCD]
     When a request is prepared with appropriate values
-    #And the request [provides authentic credentials without authorized access to the operation]
+    And the request [provides authentic credentials without authorized access to the operation]
     And it is submitted to call the [Get the pagination metadata for a case data search for Case Worker] operation of [CCD Data Store]
     Then a negative response is received
     And the response has all the details as expected
@@ -46,7 +46,7 @@ Feature: Get the pagination metadata for a case data search for Case Worker
   Scenario: must return 400 when casefields do not start with “case.”
     Given a user with [a detailed profile in CCD]
     When a request is prepared with appropriate values
-    #And the request [contains casefields that do not start with case.]
+    And the request [contains case fields that do not start with case.]
     And it is submitted to call the [Get the pagination metadata for a case data search for Case Worker] operation of [CCD Data Store]
     Then a negative response is received
     And the response [contains an error message : unknown metadata search parameters]
@@ -56,7 +56,7 @@ Feature: Get the pagination metadata for a case data search for Case Worker
   Scenario: must return 400 when security classification in input parameters is present and invalid
     Given a user with [a detailed profile in CCD]
     When a request is prepared with appropriate values
-    #And the request [contains an invalid security classification]
+    And the request [contains an invalid security classification]
     And it is submitted to call the [Get the pagination metadata for a case data search for Case Worker] operation of [CCD Data Store]
     Then a negative response is received
     And the response [contains an error message : unknown security classification]

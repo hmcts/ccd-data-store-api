@@ -1,6 +1,6 @@
 {
   "_guid_": "S-136",
-  "_extends_": "S-000-Base-Success",
+  "_extends_": "Base_Expecting_200",
   "title": "must return pagination metadata successfully for correct inputs",
   "specs": [
     "a detailed profile in CCD",
