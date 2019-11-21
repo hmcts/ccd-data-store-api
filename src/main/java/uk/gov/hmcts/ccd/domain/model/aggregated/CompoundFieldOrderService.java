@@ -22,6 +22,7 @@ import static org.apache.commons.lang3.StringUtils.substringAfterLast;
 
 /**
  * This service sorts nested fields of a compound field (complex or collection) according to caseEventComplexFields collection.
+ * If partial set of nested fields is provided via caseEventComplexFields then the remaining fields are added at the end in encounter order.
  * It will sort on its elements order values. No sorting is performed for empty collection.
  */
 @Named
@@ -53,7 +54,7 @@ public class CompoundFieldOrderService {
     }
 
     private List<CaseField> getSortedCompoundTypeFields(final List<CaseEventFieldComplex> caseEventComplexFields, final List<CaseField> children, String listElementCode) {
-        final List<String> sortedFieldsFromEventFieldOverride = getSortedFieldsFromEventFieldOverride(caseEventComplexFields, listElementCode);
+        final List<String> sortedFieldsFromEventFieldOverride = getSortedFieldsFromEventFieldOverride(children, caseEventComplexFields, listElementCode);
         if (sortedFieldsFromEventFieldOverride.isEmpty()) {
             return children;
         } else {
@@ -77,10 +78,10 @@ public class CompoundFieldOrderService {
         sortedCaseFields.addAll(childrenCaseIdToCaseField.values());
     }
 
-    private List<String> getSortedFieldsFromEventFieldOverride(final List<CaseEventFieldComplex> caseEventComplexFields, String listElementCode) {
+    private List<String> getSortedFieldsFromEventFieldOverride(final List<CaseField> children, final List<CaseEventFieldComplex> caseEventComplexFields, String listElementCode) {
         if (isNotEmpty(caseEventComplexFields)) {
             return caseEventComplexFields.stream()
-                .filter(field -> hasOrderAndIsLeaf(listElementCode, field))
+                .filter(field -> hasOrderAndIsLeaf(children, listElementCode, field))
                 .sorted(comparingInt(CaseEventFieldComplex::getOrder))
                 .map(CaseEventFieldComplex::getReference)
                 .collect(Collectors.toList());
@@ -88,20 +89,25 @@ public class CompoundFieldOrderService {
         return Lists.newArrayList();
     }
 
-    private boolean hasOrderAndIsLeaf(final String listElementCode, final CaseEventFieldComplex field) {
-        return field.getOrder() != null && isFieldReferenceALeaf(listElementCode, field);
+    private boolean hasOrderAndIsLeaf(final List<CaseField> children, final String listElementCode, final CaseEventFieldComplex field) {
+        return field.getOrder() != null && isFieldReferenceALeaf(children, listElementCode, field);
     }
 
-    private boolean isFieldReferenceALeaf(final String listElementCode, final CaseEventFieldComplex field) {
-        return isBlank(listElementCode) ? isTopLevelLeaf(field) : isNotTopLevelLeaf(listElementCode, field);
+    private boolean doesAnyFieldContainReference(final List<CaseField> children, final String reference) {
+        return children.stream().anyMatch(caseField -> reference.equals(caseField.getId()));
+    }
+
+    private boolean isFieldReferenceALeaf(final List<CaseField> children, final String listElementCode, final CaseEventFieldComplex field) {
+        return isBlank(listElementCode) ? isTopLevelLeaf(children, field) : isNotTopLevelLeaf(listElementCode, field);
     }
 
     private boolean isNotTopLevelLeaf(final String listElementCode, final CaseEventFieldComplex field) {
-        return !substringAfterLast(field.getReference(), listElementCode + ".").contains(".");
+        String substringAfterLast = substringAfterLast(field.getReference(), listElementCode + ".");
+        return !isBlank(substringAfterLast) && !substringAfterLast.contains(".");
     }
 
-    private boolean isTopLevelLeaf(final CaseEventFieldComplex field) {
-        return !field.getReference().contains(".");
+    private boolean isTopLevelLeaf(final List<CaseField> children, final CaseEventFieldComplex field) {
+        return doesAnyFieldContainReference(children, field.getReference()) && !field.getReference().contains(".");
     }
 
     private Map<String, CaseField> convertComplexTypeChildrenToOrderedMap(final List<CaseField> children) {
