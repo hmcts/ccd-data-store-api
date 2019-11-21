@@ -40,6 +40,7 @@ class CaseAccessServiceTest {
 
     private static final String CASE_GRANTED_1_ID = "123";
     private static final String CASE_GRANTED_2_ID = "456";
+    private static final String CASE_ROLE_CREATOR_ID = "[CREATOR]";
     private static final String CASE_REVOKED_ID = "789";
 
     private static final List<Long> CASES_GRANTED = asList(Long.valueOf(CASE_GRANTED_1_ID), Long.valueOf(CASE_GRANTED_2_ID));
@@ -480,6 +481,16 @@ class CaseAccessServiceTest {
                 () -> assertThat(caseRoles.size(), Is.is(2)),
                 () -> assertThat(caseRoles, hasItems(CASE_GRANTED_1_ID, CASE_GRANTED_2_ID))
             );
+        }
+
+        @Test
+        @DisplayName("should return case creation user roles")
+        void getCaseCreationCaseRoles() {
+            Set<String> caseRoles = caseAccessService.getCaseCreationRoles();
+
+            assertAll(
+                () -> assertThat(caseRoles.size(), Is.is(3)),
+                () -> assertThat(caseRoles, hasItems(CASE_GRANTED_1_ID, CASE_GRANTED_2_ID, CASE_ROLE_CREATOR_ID)));
         }
 
         @Test
