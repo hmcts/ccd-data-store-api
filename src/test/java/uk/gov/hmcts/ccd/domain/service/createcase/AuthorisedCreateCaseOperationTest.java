@@ -105,7 +105,7 @@ class AuthorisedCreateCaseOperationTest {
         caseType.setEvents(events);
         caseType.setCaseFields(caseFields);
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseType);
-        when(caseAccessService.getCreateRoles()).thenReturn(userRoles);
+        when(caseAccessService.getCaseCreationRoles()).thenReturn(userRoles);
         when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseType), eq(userRoles), eq(CAN_CREATE))).thenReturn(true);
         when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseType), eq(userRoles), eq(CAN_READ))).thenReturn(true);
         when(accessControlService.canAccessCaseEventWithCriteria(eq(EVENT_ID), eq(events), eq(userRoles), eq(CAN_CREATE))).thenReturn(true);
@@ -165,7 +165,7 @@ class AuthorisedCreateCaseOperationTest {
         assertAll(
             () -> assertThat(output, sameInstance(classifiedCase)),
             () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
-            () -> inOrder.verify(caseAccessService).getCreateRoles(),
+            () -> inOrder.verify(caseAccessService).getCaseCreationRoles(),
             () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseType), eq(userRoles), eq(CAN_CREATE)),
             () -> inOrder.verify(accessControlService).canAccessCaseEventWithCriteria(eq(EVENT_ID), eq(events), eq(userRoles), eq(CAN_CREATE)),
             () -> inOrder.verify(accessControlService).canAccessCaseFieldsWithCriteria(any(JsonNode.class), eq(caseFields), eq(userRoles), eq(CAN_CREATE)),
@@ -205,7 +205,7 @@ class AuthorisedCreateCaseOperationTest {
     @DisplayName("should fail if user roles not found")
     void shouldFailIfNoUserRolesFound() {
 
-        doReturn(null).when(caseAccessService).getCreateRoles();
+        doReturn(null).when(caseAccessService).getCaseCreationRoles();
         when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseType), eq(null), eq(CAN_CREATE))).thenThrow(NullPointerException.class);
 
         assertThrows(NullPointerException.class, () -> authorisedCreateCaseOperation.createCaseDetails(UID,
@@ -219,7 +219,7 @@ class AuthorisedCreateCaseOperationTest {
     @DisplayName("should fail if empty user roles not found")
     void shouldFailIfEmptyUserRolesFound() {
 
-        doReturn(new HashSet<>()).when(caseAccessService).getCreateRoles();
+        doReturn(new HashSet<>()).when(caseAccessService).getCaseCreationRoles();
 
         assertThrows(ResourceNotFoundException.class, () -> authorisedCreateCaseOperation.createCaseDetails(UID,
             JURISDICTION_ID,

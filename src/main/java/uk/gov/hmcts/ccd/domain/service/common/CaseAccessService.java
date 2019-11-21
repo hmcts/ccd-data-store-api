@@ -90,10 +90,6 @@ public class CaseAccessService {
         return userRoles;
     }
 
-    public Set<String> getCreateRoles() {
-        return Sets.union(getUserRoles(), Sets.newHashSet(GlobalCaseRole.CREATOR.getRole()));
-    }
-
 
     private Boolean accessGranted(CaseDetails caseDetails) {
         final List<Long> grantedCases = caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId());
