@@ -1,0 +1,10 @@
+{
+	"_guid_": "Base_Expecting_422",
+	"_extends_": "Base-Root",
+	"request": {
+	},
+	"expectedResponse": {
+		"responseCode": 422,
+		"responseMessage": "Unprocessable Entity"
+	}
+}

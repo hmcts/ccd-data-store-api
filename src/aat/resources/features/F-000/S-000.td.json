@@ -1,6 +1,6 @@
 {
   "_guid_": "S-000",
-  "_extends_": "S-000-Base-Success",
+  "_extends_": "Base_Expecting_200",
   "title": "must return default user setting successfully for a user having a profile in CCD",
   "specs": [
     "a detailed profile in CCD"
@@ -15,13 +15,12 @@
     }
   },
   "expectedResponse": {
-    "responseCode": 200,
     "headers" : {
       "X-Frame-Options" : "[[ANY]]",
       "Transfer-Encoding" : "[[ANY]]",
       "Cache-Control" : "[[ANY]]",
       "X-Content-Type-Options" : "[[ANY]]",
-      "X-Xss-Protection" : "[[ANY]]",
+      "X-XSS-Protection" : "[[ANY]]",
       "Content-Encoding" : "[[ANY]]",
       "Vary" : "[[ANY]]",
       "Expires" : "[[ANY]]",
