@@ -21,7 +21,7 @@
       "Transfer-Encoding" : "[[ANY]]",
       "Cache-Control" : "[[ANY]]",
       "X-Content-Type-Options" : "[[ANY]]",
-      "X-Xss-Protection" : "[[ANY]]",
+      "X-XSS-Protection" : "[[ANY]]",
       "Content-Encoding" : "[[ANY]]",
       "Vary" : "[[ANY]]",
       "Expires" : "[[ANY]]",
