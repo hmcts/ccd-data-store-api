@@ -28,6 +28,7 @@ import uk.gov.hmcts.ccd.datastore.tests.helper.idam.AuthenticatedUser;
 import uk.gov.hmcts.ccd.fta.data.RequestData;
 import uk.gov.hmcts.ccd.fta.data.ResponseData;
 import uk.gov.hmcts.ccd.fta.data.UserData;
+import uk.gov.hmcts.ccd.fta.util.EnvUtils;
 import uk.gov.hmcts.ccd.fta.exception.FunctionalTestException;
 import uk.gov.hmcts.ccd.fta.util.JsonUtils;
 
@@ -69,14 +70,24 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     @Given("a user with [{}]")
     public void verifyThatThereIsAUserInTheContextWithAParticularSpecification(String specificationAboutAUser) {
         UserData aUser = scenarioContext.getTestData().getUser();
-        String username = aUser.getUsername();
 
-        // ADD MORE IDAM USERS HERE
-        if (username.equals(aat.getCaseworkerAutoTestEmail())) {
-            aUser.setPassword(aat.getCaseworkerAutoTestPassword());
-        } else {
-            logger.info(scenarioContext.getCurrentScenarioTag() + ": Idam user not recognised by FTA player");
+        String resolvedUsername = EnvUtils.resolvePossibleEnvironmentVariable(aUser.getUsername());
+        if (resolvedUsername.equals(aUser.getUsername())) {
+            logger.info(scenarioContext.getCurrentScenarioTag() + ": Expected environment variable declaration "
+                + "for user.username but found '" + resolvedUsername + "', which may cause issues in higher "
+                + "environments");
         }
+
+        String resolvedPassword = EnvUtils.resolvePossibleEnvironmentVariable(aUser.getPassword());
+        if (resolvedPassword.equals(aUser.getPassword())) {
+            logger.info(scenarioContext.getCurrentScenarioTag() + ": Expected environment variable declaration "
+                + "for user.password but found '" + resolvedPassword + "', which may cause issues in higher "
+                + "environments");
+        }
+
+        aUser.setUsername(resolvedUsername);
+        aUser.setPassword(resolvedPassword);
+        scenario.write("User: " + resolvedUsername);
 
         String logPrefix = scenarioContext.getCurrentScenarioTag() + ": Idam user [" + aUser.getUsername()
             + "][" + aUser.getPassword() + "] ";
@@ -166,6 +177,17 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         scenarioContext.setTheRequest(aRequest);
         scenario.write("Request prepared with the following variables: "
             + JsonUtils.getPrettyJsonFromObject(scenarioContext.getTestData().getRequest()));
+    }
+
+    @Override
+    @When("the request [{}]")
+    public void verifyTheRequestInTheContextWithAParticularSpecification(String requestSpecification) {
+        boolean check = scenarioContext.getTestData().meetsSpec(requestSpecification);
+        if (!check) {
+            String errorMessage = "Test data does not confirm it meets the specification about the request: "
+                + requestSpecification;
+            throw new FunctionalTestException(errorMessage);
+        }
     }
 
     @Override
