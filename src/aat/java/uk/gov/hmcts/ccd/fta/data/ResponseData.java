@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.fta.data;
 
 import java.util.Map;
+import java.util.TreeMap;
 
 public class ResponseData {
 
@@ -33,7 +34,8 @@ public class ResponseData {
     }
 
     public void setHeaders(Map<String, Object> headers) {
-        this.headers = headers;
+        this.headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        headers.putAll(headers);
     }
 
     public Map<String, Object> getBody() {

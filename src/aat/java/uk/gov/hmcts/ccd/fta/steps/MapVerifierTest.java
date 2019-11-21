@@ -89,11 +89,11 @@ public class MapVerifierTest {
         expected.put("responseCode", 400);
         expected.put("body", expectedBody);
         expectedBody.put("exception", "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException");
-        expectedBody.put("timestamp", "[[DONT_CARE]]");
+        expectedBody.put("timestamp", "[[ANY]]");
         expectedBody.put("status", 400);
         expectedBody.put("error", "Bad Request");
         expectedBody.put("message", "Unknown sort direction: someInvalidSortDirection");
-        expectedBody.put("path", "[[DONT_CARE]]");
+        expectedBody.put("path", "[[ANY]]");
         expectedBody.put("details", null);
         expectedBody.put("callbackErrors", null);
         expectedBody.put("callbackWarnings", null);
@@ -114,7 +114,7 @@ public class MapVerifierTest {
         actualBody.put("callbackErrors", null);
         actualBody.put("callbackWarnings", null);
 
-        MapVerificationResult result = MapVerifier.verifyMap(expected, actual, 0);
+        MapVerificationResult result = MapVerifier.verifyMap("actualResponse", expected, actual, 0);
         Assert.assertEquals(0, result.getAllIssues().size());
         Assert.assertTrue(result.isVerified());
     }
@@ -295,5 +295,36 @@ public class MapVerifierTest {
         }, result.getAllIssues().toArray());
 
         Assert.assertFalse(result.isVerified());
+    }
+
+    @Test
+    public void shouldVerifyAResponseHeaderMapCaseInsensitively() {
+
+        Map<String, Object> expected = DATA_SOURCE
+                .getDataForScenario("HttpTestData-with-a-Big-ExpectedResponseBody_expected").getExpectedResponse()
+                .getHeaders();
+        Map<String, Object> actual = DATA_SOURCE
+                .getDataForScenario("HttpTestData-with-a-Big-ExpectedResponseBody_actual").getExpectedResponse()
+                .getHeaders();
+
+        MapVerificationResult result = MapVerifier.verifyMap(expected, actual, 5);
+
+        Assert.assertEquals(0, result.getAllIssues().size());
+        Assert.assertTrue(result.isVerified());
+    }
+
+    @Test
+    public void shoudlFailForCollectionsOfDifferentSizes() {
+        Map<String, Object> expected = DATA_SOURCE.getDataForScenario("MapWithArray_expected").getExpectedResponse()
+                .getBody();
+        Map<String, Object> actual = DATA_SOURCE.getDataForScenario("MapWithArray_actual").getExpectedResponse()
+                .getBody();
+
+        MapVerificationResult result = MapVerifier.verifyMap(expected, actual, 5);
+
+        Assert.assertArrayEquals(new Object[] {
+                "actualResponse.body.details contains a bad value: actualResponse.body.details.field_errors has unexpected number of elements. Expected: 1, but actual: 2." },
+                result.getAllIssues().toArray());
+
     }
 }
