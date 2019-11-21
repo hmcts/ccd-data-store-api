@@ -1,0 +1,92 @@
+{
+  "_guid_": "S-297",
+  "_extends_": "S-000-Base-Root",
+  "title": "must not validate when CMC ExternalID is not unique / already exists",
+  "specs": ["a detailed profile in CCD"],
+  "productName": "CCD Data Store",
+  "operationName": "validation of a set of fields as Case worker",
+  "method": "POST",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/validate",
+  "request": {
+    "pathVariables": {
+      "uid": "[[DYNAMIC]]",
+      "jid" : "AUTOTEST1",
+      "ctid" : "AAT"
+    },
+    "body" : {
+      "data": {
+        "TextField": "Text",
+        "NumberField": null,
+        "YesOrNoField": "Yes",
+        "PhoneUKField": "01234123412",
+        "EmailField": "abc@gmail.com",
+        "MoneyGBPField": "100",
+        "DateField": null,
+        "DateTimeField": "",
+        "TextAreaField": null,
+        "FixedListField": null,
+        "FixedRadioListField": null,
+        "MultiSelectListField": [],
+        "ComplexField": {
+          "ComplexTextField": null,
+          "ComplexFixedListField": null,
+          "ComplexNestedField": {
+            "NestedNumberField": null,
+            "NestedCollectionTextField": []
+          }
+        },
+        "CollectionField": [],
+        "AddressUKField": {
+          "AddressLine1": null,
+          "AddressLine2": null,
+          "AddressLine3": null,
+          "PostTown": null,
+          "County": null,
+          "PostCode": null,
+          "Country": null
+        }
+      },
+      "event": {
+        "id": "CREATE",
+        "summary": "",
+        "description": ""
+      }
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 409,
+    "responseMessage" : "Case data validation failed",
+    "headers" : {
+      "X-Frame-Options" : "DENY",
+      "Transfer-Encoding" : "chunked",
+      "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
+      "vary" : "accept-encoding",
+      "X-Content-Type-Options" : "nosniff",
+      "Content-Encoding" : "gzip",
+      "Pragma" : "no-cache",
+      "Expires" : "0",
+      "X-XSS-Protection" : "1; mode=block",
+      "Date" : "[[ANY]]",
+      "Content-Type" : "application/json;charset=UTF-8"
+    },
+    "body": {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException",
+      "timestamp" : "[[ANY]]",
+      "status" : 409,
+      "error" : "Unprocessable Entity",
+      "message" : "Case data validation failed",
+      "path" : "/caseworkers/179ddeb6-e5ce-4f5d-b955-41041fcadc9e/jurisdictions/AUTOTEST1/case-types/AAT/validate",
+      "details" : {
+        "field_errors" : [ {
+          "id" : "$TextField£",
+          "message" : "Field is not recognised"
+        }, {
+            "id": "PhoneUKField",
+            "message": "The data entered is not valid for this type of field, please delete and re-enter using only valid data"
+        } ]
+      },
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}

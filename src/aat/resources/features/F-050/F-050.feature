@@ -12,13 +12,13 @@ Feature: Validate a set of fields as Case worker
     Then a positive response is received
     And the response has all the details as expected
 
-#  @S-166
-#  Scenario: must not validate when CMC ExternalID is not unique / already exists
-#    Given a user with a detailed profile in CCD
-#    When a request is prepared with appropriate values
-#    And it is submitted to call the [validation of a set of fields as Case worker] operation of [CCD Data Store]
-#    Then a negative response is received
-#    And the response has all the details as expected
+  @S-297
+  Scenario: must not validate when CMC ExternalID is not unique / already exists
+    Given a user with a detailed profile in CCD
+    When a request is prepared with appropriate values
+    And it is submitted to call the [validation of a set of fields as Case worker] operation of [CCD Data Store]
+    Then a negative response is received
+    And the response has all the details as expected
 
   @S-298
   Scenario: must not validate when field validation fails
