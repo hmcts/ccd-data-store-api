@@ -1,0 +1,43 @@
+{
+  "_guid_": "S-151",
+  "_extends_": "Base_Expecting_201",
+  "title": "must return 201 if the grant is successful for a user to a valid case ID",
+  "specs": [
+    "a detailed profile in CCD",
+    "has a valid case-reference in input parameters",
+    "has the 201 return code"
+  ],
+  "productName": "CCD Data Store",
+  "operationName": "Grant access to case",
+  "method": "POST",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/users",
+  "request": {
+    "pathVariables": {
+      "uid": "[[DYNAMIC]]",
+      "jid": "[[DYNAMIC]]",
+      "ctid": "[[DYNAMIC]]",
+      "cid": "[[DYNAMIC]]"
+    }
+  },
+  "expectedResponse": {
+    "headers" : {
+      "X-Frame-Options" : "[[ANY]]",
+      "Transfer-Encoding" : "[[ANY]]",
+      "Cache-Control" : "[[ANY]]",
+      "X-Content-Type-Options" : "[[ANY]]",
+      "X-XSS-Protection" : "[[ANY]]",
+      "Content-Encoding" : "[[ANY]]",
+      "Vary" : "[[ANY]]",
+      "Expires" : "[[ANY]]",
+      "Pragma" : "[[ANY]]",
+      "Date" : "[[ANY]]",
+      "Content-Type" : "[[ANY]]"
+    },
+    "body": {
+      "user": "[[ANY]]",
+      "channels": null,
+      "jurisdictions": "[[ANY]]",
+      "default": "[[ANY]]"
+    }
+  }
+}
