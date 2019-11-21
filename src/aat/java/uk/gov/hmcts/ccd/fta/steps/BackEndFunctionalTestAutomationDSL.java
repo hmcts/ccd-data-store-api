@@ -17,6 +17,10 @@ public interface BackEndFunctionalTestAutomationDSL {
     public void prepareARequestWithAppropriateValues() throws IOException;
 
     // DSL Element:
+    // "the response [{}]"
+    public void verifyTheRequestInTheContextWithAParticularSpecification(String requestSpecification);
+
+    // DSL Element:
     // "it is submitted to call the {} operation of {}"
     public void submitTheRequestToCallAnOperationOfAProduct(String operation, String productName) throws IOException;
 
