@@ -87,8 +87,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
     @Before
     public void setUp() throws Exception {
         final ApplicationParams applicationParams = mock(ApplicationParams.class);
-//        when(applicationParams.getValidDMDomain()).thenReturn("https://dm.reform.hmcts.net");
-        when(applicationParams.getValidDMDomain()).thenReturn("^https?://(?:api-gateway\\.preprod\\.dm\\.reform\\.hmcts\\.net|dm-store-aat\\.service\\.core-compute-aat\\.internal(?::\\d+)?)");
+        when(applicationParams.getValidDMDomain()).thenReturn("https://dm.reform.hmcts.net");
         validator = new DocumentValidator(applicationParams);
         caseField = MAPPER.readValue(CASE_FIELD_STRING, CaseField.class);
     }
