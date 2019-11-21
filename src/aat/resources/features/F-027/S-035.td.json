@@ -1,6 +1,6 @@
 {
   "_guid_": "S-035",
-  "_extends_": "S-000-Base-Root",
+  "_extends_": "Base_Expecting_400",
   "title": "must return appropriate negative response when case-reference does not exists",
   "specs": ["a detailed profile in CCD",
     "does not provide the valid case-reference in input parameters",
@@ -8,9 +8,6 @@
   "productName": "CCD Data Store",
   "operationName": "Fetch a case for display for Case Worker",
   "request": {
-    "headers": {
-      "Authorization": "[[DYNAMIC]]"
-    },
     "pathVariables": {
       "uid": "[[DYNAMIC]]",
       "jid": "AUTOTEST1",
@@ -21,22 +18,6 @@
   "method": "GET",
   "uri": "/aggregated/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}",
   "expectedResponse": {
-    "responseCode" : 400,
-    "responseMessage" : "Bad Request",
-    "headers" : {
-      "X-Frame-Options" : "DENY",
-      "Transfer-Encoding" : "chunked",
-      "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
-      "vary" : "accept-encoding",
-      "X-Content-Type-Options" : "nosniff",
-      "Content-Encoding" : "gzip",
-      "Connection" : "close",
-      "Pragma" : "no-cache",
-      "Expires" : "0",
-      "X-XSS-Protection" : "1; mode=block",
-      "Date" : "[[ANY]]",
-      "Content-Type" : "application/json;charset=UTF-8"
-    },
     "body" : {
       "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
       "timestamp" : "[[ANY]]",
