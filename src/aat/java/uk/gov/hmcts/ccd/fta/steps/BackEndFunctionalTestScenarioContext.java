@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ccd.fta.steps;
 
-import io.cucumber.core.api.Scenario;
+import java.util.stream.Collectors;
+
+import io.cucumber.java.Scenario;
 import io.restassured.specification.RequestSpecification;
 import uk.gov.hmcts.ccd.fta.data.HttpTestData;
 import uk.gov.hmcts.ccd.fta.data.HttpTestDataSource;
@@ -8,15 +10,13 @@ import uk.gov.hmcts.ccd.fta.data.JsonStoreHttpTestDataSource;
 import uk.gov.hmcts.ccd.fta.data.ResponseData;
 import uk.gov.hmcts.ccd.fta.data.UserData;
 
-import java.util.stream.Collectors;
-
 public class BackEndFunctionalTestScenarioContext {
 
     private static final String[] TEST_DATA_RESOURCE_PACKAGES = { "features" };
     private static final HttpTestDataSource DATA_SOURCE = new JsonStoreHttpTestDataSource(TEST_DATA_RESOURCE_PACKAGES);
 
     private HttpTestData testData;
-    private Scenario scenario;
+    private io.cucumber.java.Scenario scenario;
     private UserData theUser;
     private RequestSpecification theRequest;
     private ResponseData theResponse;

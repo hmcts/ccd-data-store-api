@@ -336,7 +336,7 @@ class GetCaseTest extends BaseTest {
        Method to create a Full Case with caseType param.
        This method uses 'privatecaseworker' as default user role
      */
-    private Long createFullCase(String caseType) {
+    public Long createFullCase(String caseType) {
 
         return Event.create(caseType)
             .as(asPrivateCaseworker(true))

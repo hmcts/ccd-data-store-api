@@ -54,7 +54,7 @@ class CreateEventTest extends BaseTest {
 
             .then()
             .log().ifError()
-            .statusCode(200)
+            .statusCode(201)
             .assertThat()
 
             // Metadata
@@ -160,15 +160,5 @@ class CreateEventTest extends BaseTest {
             .withToken(eventToken)
             .toCaseDataContent();
         return () -> MAPPER.convertValue(caseDataContent, JsonNode.class).toString();
-    }
-
-    private RequestSpecification callGetStartEventTrigger(String caseId, String eventTriggerId) {
-        return asAutoTestCaseworker(FALSE)
-            .get()
-            .given()
-            .pathParam("caseId", caseId)
-            .pathParam("triggerId", eventTriggerId)
-            .accept(V2.MediaType.START_EVENT_TRIGGER)
-            .header("experimental", "true");
     }
 }

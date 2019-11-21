@@ -6,13 +6,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import uk.gov.hmcts.ccd.fta.util.ReflectionUtils;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+
+import uk.gov.hmcts.ccd.fta.util.ReflectionUtils;
 
 public abstract class JsonStoreWithInheritance {
 

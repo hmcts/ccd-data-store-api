@@ -2,10 +2,11 @@ package uk.gov.hmcts.ccd.fta.data;
 
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import uk.gov.hmcts.jsonstore.JsonResourceStoreWithInheritance;
 
 import java.io.IOException;
 import java.util.ArrayList;
+
+import uk.gov.hmcts.jsonstore.JsonResourceStoreWithInheritance;
 
 public class JsonStoreHttpTestDataSource implements HttpTestDataSource {
 

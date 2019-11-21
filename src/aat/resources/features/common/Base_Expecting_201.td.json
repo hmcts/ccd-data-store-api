@@ -1,0 +1,10 @@
+{
+	"_guid_": "Base_Expecting_201",
+	"_extends_": "Base-Root",
+	"request": {
+	},
+	"expectedResponse": {
+		"responseCode": 201,
+		"responseMessage": "Created"
+	}
+}

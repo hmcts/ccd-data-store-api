@@ -161,14 +161,6 @@ public class MapVerificationResult {
             String fieldPrefix, boolean shouldReportOnlySummary) {
         for (MapVerificationResult badResult : badSubmapResults) {
             allIssues.addAll(badResult.getAllIssues());
-            // reportUnexpectedlyAvailables(allIssues, badResult.getUnexpectedFields(),
-            // fieldPrefix,
-            // shouldReportOnlySummary);
-            // reportUnexpectedlyUnavailables(allIssues, badResult.getUnavailableFields(),
-            // fieldPrefix,
-            // shouldReportOnlySummary);
-            // reportBadValues(allIssues, badResult.getBadValueFields(), fieldPrefix,
-            // shouldReportOnlySummary);
 
         }
     }
