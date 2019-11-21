@@ -218,9 +218,8 @@ public class CallbackInvoker {
                                     final CaseType caseType,
                                     final CaseDetails caseDetails,
                                     final Map<String, JsonNode> responseData) {
-        // TODO: Change this to caseAccessService.getCreateRoles();
         accessControlService.verifyCreateAccess(eventId, caseType,
-                                                caseAccessService.getUserRoles(),
+                                                caseAccessService.getCaseCreationRoles(),
                                                 MAPPER.convertValue(responseData, JsonNode.class));
         caseTypeService.validateData(responseData, caseType);
         caseDetails.setData(caseSanitiser.sanitise(caseType, responseData));
