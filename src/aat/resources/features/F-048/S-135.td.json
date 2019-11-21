@@ -27,20 +27,6 @@
   "expectedResponse": {
     "responseCode": 403,
     "responseMessage": "Forbidden",
-    "headers": {
-      "X-Frame-Options": "[[ANY]]",
-      "Transfer-Encoding": "[[ANY]]",
-      "Cache-Control": "[[ANY]]",
-      "X-Content-Type-Options": "[[ANY]]",
-      "X-Xss-Protection": "[[ANY]]",
-      "Content-Encoding": "[[ANY]]",
-      "Vary": "[[ANY]]",
-      "Expires": "[[ANY]]",
-      "Pragma": "[[ANY]]",
-      "Date": "[[ANY]]",
-      "Content-Type": "[[ANY]]",
-      "Content-Length": "[[ANY]]"
-    },
     "body": {
       "timestamp": "[[ANY]]",
       "status": 403,

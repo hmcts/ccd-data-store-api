@@ -21,20 +21,6 @@
   "expectedResponse": {
     "responseCode": 200,
     "responseMessage": "OK",
-    "headers": {
-      "X-Frame-Options": "[[ANY]]",
-      "Transfer-Encoding": "[[ANY]]",
-      "Cache-Control": "[[ANY]]",
-      "X-Content-Type-Options": "[[ANY]]",
-      "X-Xss-Protection": "[[ANY]]",
-      "Content-Encoding": "[[ANY]]",
-      "Vary": "[[ANY]]",
-      "Expires": "[[ANY]]",
-      "Pragma": "[[ANY]]",
-      "Date": "[[ANY]]",
-      "Content-Type": "[[ANY]]",
-      "Content-Length": "[[ANY]]"
-    },
     "body": {
       "total_results_count": "[[ANY]]",
       "total_pages_count": "[[ANY]]"
