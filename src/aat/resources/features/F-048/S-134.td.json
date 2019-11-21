@@ -1,0 +1,51 @@
+{
+  "_guid_": "S-134",
+  "_extends_": "S-000-Base-Success",
+  "title": "must return 401 when request does not provide valid authentication credentials",
+  "specs": [
+    "a detailed profile in CCD",
+    "does not provide valid authentication credentials"
+  ],
+  "productName": "CCD Data Store",
+  "operationName": "Get the pagination metadata for a case data search for Case Worker",
+  "method": "GET",
+  "user": {
+    "username": "auto.test.cnp_invalid@gmail.com",
+    "password": "Pa55word12_wrong",
+    "token": "fakeToken",
+    "uid": "dummyval"
+  },
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/pagination_metadata",
+  "request": {
+    "pathVariables": {
+      "uid": "Some_wrong_uid",
+      "jid": "AUTOTEST1",
+      "ctid": "AAT"
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 403,
+    "responseMessage": "Forbidden",
+    "headers": {
+      "X-Frame-Options": "[[ANY]]",
+      "Transfer-Encoding": "[[ANY]]",
+      "Cache-Control": "[[ANY]]",
+      "X-Content-Type-Options": "[[ANY]]",
+      "X-Xss-Protection": "[[ANY]]",
+      "Content-Encoding": "[[ANY]]",
+      "Vary": "[[ANY]]",
+      "Expires": "[[ANY]]",
+      "Pragma": "[[ANY]]",
+      "Date": "[[ANY]]",
+      "Content-Type": "[[ANY]]",
+      "Content-Length": "[[ANY]]"
+    },
+    "body": {
+      "timestamp": "[[ANY]]",
+      "status": 403,
+      "error": "Forbidden",
+      "message": "Access Denied",
+      "path": "/caseworkers/Some_wrong_uid/jurisdictions/AUTOTEST1/case-types/AAT/cases/pagination_metadata"
+    }
+  }
+}

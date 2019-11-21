@@ -1,0 +1,43 @@
+{
+  "_guid_": "S-136",
+  "_extends_": "S-000-Base-Success",
+  "title": "must return pagination metadata successfully for correct inputs",
+  "specs": [
+    "a detailed profile in CCD",
+    "is prepared with valid Jurisdiction, Case ID and User ID",
+    "returns the pagination metadata"
+  ],
+  "productName": "CCD Data Store",
+  "operationName": "Get the pagination metadata for a case data search for Case Worker",
+  "method": "GET",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/pagination_metadata",
+  "request": {
+    "pathVariables": {
+      "uid": "[[DYNAMIC]]",
+      "jid": "AUTOTEST1",
+      "ctid": "AAT"
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 200,
+    "responseMessage": "OK",
+    "headers": {
+      "X-Frame-Options": "[[ANY]]",
+      "Transfer-Encoding": "[[ANY]]",
+      "Cache-Control": "[[ANY]]",
+      "X-Content-Type-Options": "[[ANY]]",
+      "X-Xss-Protection": "[[ANY]]",
+      "Content-Encoding": "[[ANY]]",
+      "Vary": "[[ANY]]",
+      "Expires": "[[ANY]]",
+      "Pragma": "[[ANY]]",
+      "Date": "[[ANY]]",
+      "Content-Type": "[[ANY]]",
+      "Content-Length": "[[ANY]]"
+    },
+    "body": {
+      "total_results_count": "[[ANY]]",
+      "total_pages_count": "[[ANY]]"
+    }
+  }
+}
