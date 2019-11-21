@@ -1,11 +1,11 @@
 {
-  "_guid_": "S-151",
-  "_extends_": "Base_Expecting_201",
-  "title": "must return 201 if the grant is successful for a user to a valid case ID",
+  "_guid_": "S-550",
+  "_extends_": "Base_Expecting_400",
+  "title": "must return negative response when request body doesn't provide the mandatory field",
   "specs": [
     "a detailed profile in CCD",
-    "has a valid case-reference in input parameters",
-    "has the 201 return code"
+    "does not provide the mandatory field for the operation",
+    "has the 400 return code"
   ],
   "productName": "CCD Data Store",
   "operationName": "Grant access to case",
@@ -19,7 +19,7 @@
       "cid": "1573751648840703"
     },
     "body": {
-      "id": "Test User"
+      "id_test": "Test User"
     }
   }
 }

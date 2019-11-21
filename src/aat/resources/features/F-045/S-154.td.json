@@ -1,0 +1,37 @@
+{
+  "_guid_": "S-154",
+  "_extends_": "Base_Expecting_403",
+  "title": "must return negative response when request provides authentic credentials without authorized access to the operation",
+  "specs": [
+    "a detailed profile in CCD",
+    "does not provide the authorised access to the operation",
+    "has the 403 return code"
+  ],
+  "productName": "CCD Data Store",
+  "operationName": "Grant access to case",
+  "method": "POST",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/users",
+  "request": {
+    "headers": {
+      "Authorization": "TESTAUTH"
+    },
+    "pathVariables": {
+      "uid": "[[DYNAMIC]]",
+      "jid": "AUTOTEST1",
+      "ctid": "AAT",
+      "cid": "1573751648840703"
+    },
+    "body": {
+      "id": "Test User"
+    }
+  },
+  "expectedResponse": {
+    "body" : {
+      "timestamp" : "[[ANY]]",
+      "status" : 403,
+      "error" : "Forbidden",
+      "message" : "Access Denied",
+      "path" : "[[ANY]]"
+    }
+  }
+}
