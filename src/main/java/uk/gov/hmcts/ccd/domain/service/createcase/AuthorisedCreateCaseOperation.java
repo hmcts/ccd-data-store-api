@@ -7,13 +7,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
@@ -34,17 +33,18 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
     private final CreateCaseOperation createCaseOperation;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final AccessControlService accessControlService;
-    private final UserRepository userRepository;
+    private final CaseAccessService caseAccessService;
+
 
     public AuthorisedCreateCaseOperation(@Qualifier("classified") final CreateCaseOperation createCaseOperation,
                                          @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
                                          final AccessControlService accessControlService,
-                                         @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository) {
+                                         final CaseAccessService caseAccessService) {
 
         this.createCaseOperation = createCaseOperation;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.accessControlService = accessControlService;
-        this.userRepository = userRepository;
+        this.caseAccessService = caseAccessService;
 
     }
 
@@ -63,10 +63,8 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
             throw new ValidationException("Cannot find case type definition for  " + caseTypeId);
         }
 
-        Set<String> userRoles = userRepository.getUserRoles();
-        if (userRoles == null) {
-            throw new ValidationException("Cannot find user roles for the user");
-        }
+        // // TODO: Change this to caseAccessService.getCreateRoles();
+        Set<String> userRoles = caseAccessService.getUserRoles();
 
         Event event = caseDataContent.getEvent();
         Map<String, JsonNode> data = caseDataContent.getData();
