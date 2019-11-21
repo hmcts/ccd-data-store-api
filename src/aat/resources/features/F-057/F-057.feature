@@ -8,7 +8,7 @@ Feature: Get the pagination metadata for a case data search for Citizen
   Scenario: must return pagination metadata successfully for correct inputs
     Given a user with [a detailed profile in CCD]
     When a request is prepared with appropriate values
-    Given it is submitted to call the [Get the pagination metadata for a case data search for Citizen] operation of [CCD Data Store]
+    And it is submitted to call the [Get the pagination metadata for a case data search for Citizen] operation of [CCD Data Store]
     Then a positive response is received
     And the response [has the 200 return code]
     And the response has all the details as expected
@@ -28,7 +28,7 @@ Feature: Get the pagination metadata for a case data search for Citizen
     Given a user with [a detailed profile in CCD]
     When a request is prepared with appropriate values
     And the request [does not provide valid authentication credentials]
-    Given it is submitted to call the [Get the pagination metadata for a case data search for Citizen] operation of [CCD Data Store]
+    And it is submitted to call the [Get the pagination metadata for a case data search for Citizen] operation of [CCD Data Store]
     Then a negative response is received
     And the response [has the 403 return code]
     And the response has all the details as expected
@@ -38,7 +38,7 @@ Feature: Get the pagination metadata for a case data search for Citizen
     Given a user with [a detailed profile in CCD]
     When a request is prepared with appropriate values
     And the request [does not provide valid authorized access to the operation]
-    Given it is submitted to call the [Get the pagination metadata for a case data search for Citizen] operation of [CCD Data Store]
+    And it is submitted to call the [Get the pagination metadata for a case data search for Citizen] operation of [CCD Data Store]
     Then a negative response is received
     And the response [has the 403 return code]
     And the response has all the details as expected
@@ -48,7 +48,7 @@ Feature: Get the pagination metadata for a case data search for Citizen
     Given a user with [a detailed profile in CCD]
     When a request is prepared with appropriate values
     And the request [does not provide valid casefields which starts with “case.”]
-    Given it is submitted to call the [Get the pagination metadata for a case data search for Citizen] operation of [CCD Data Store]
+    And it is submitted to call the [Get the pagination metadata for a case data search for Citizen] operation of [CCD Data Store]
     Then a negative response is received
     And the response [has the 400 return code]
     And the response has all the details as expected
@@ -58,7 +58,7 @@ Feature: Get the pagination metadata for a case data search for Citizen
     Given a user with [a detailed profile in CCD]
     When a request is prepared with appropriate values
     And the request [does not provide valid security classification in input parameters]
-    Given it is submitted to call the [Get the pagination metadata for a case data search for Citizen] operation of [CCD Data Store]
+    And it is submitted to call the [Get the pagination metadata for a case data search for Citizen] operation of [CCD Data Store]
     Then a negative response is received
     And the response [has the 400 return code]
     And the response has all the details as expected

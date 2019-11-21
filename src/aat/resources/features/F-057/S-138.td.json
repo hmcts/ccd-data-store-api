@@ -1,9 +1,10 @@
 {
   "_guid_": "S-138",
-  "_extends_": "S-000-Base-Success",
+  "_extends_": "Base_Expecting_403",
   "title": "must return 4xx when request does not provide valid authentication credentials",
   "specs": [
     "a detailed profile in CCD",
+    "does not provide valid authentication credentials",
     "has the 403 return code"
   ],
   "productName": "CCD Data Store",
@@ -25,21 +26,6 @@
     }
   },
   "expectedResponse": {
-    "responseCode": 403,
-    "responseMessage": "Forbidden",
-    "headers": {
-      "X-Frame-Options": "DENY",
-      "Transfer-Encoding": "chunked",
-      "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
-      "vary": "accept-encoding",
-      "X-Content-Type-Options": "nosniff",
-      "Content-Encoding": "gzip",
-      "Pragma": "no-cache",
-      "Expires": "0",
-      "X-XSS-Protection": "1; mode=block",
-      "Date": "[[ANY]]",
-      "Content-Type": "application/json;charset=UTF-8"
-    },
     "body": {
       "timestamp": "[[ANY]]",
       "status": 403,

@@ -1,9 +1,10 @@
 {
   "_guid_": "S-522",
-  "_extends_": "S-000-Base-Success",
+  "_extends_": "Base_Expecting_400",
   "title": "must return 400 when security classification in input parameters is present and invalid",
   "specs": [
     "a detailed profile in CCD",
+    "does not provide valid security classification in input parameters",
     "has the 400 return code"
   ],
   "productName": "CCD Data Store",
@@ -25,22 +26,6 @@
     }
   },
   "expectedResponse": {
-    "responseCode": 400,
-    "responseMessage": "Bad Request",
-    "headers": {
-      "X-Frame-Options": "DENY",
-      "Transfer-Encoding": "chunked",
-      "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
-      "vary": "accept-encoding",
-      "X-Content-Type-Options": "nosniff",
-      "Content-Encoding": "gzip",
-      "Connection": "close",
-      "Pragma": "no-cache",
-      "Expires": "0",
-      "X-XSS-Protection": "1; mode=block",
-      "Date":"[[ANY]]",
-      "Content-Type": "application/json;charset=UTF-8"
-    },
     "body": {
       "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
       "timestamp": "[[ANY]]",
