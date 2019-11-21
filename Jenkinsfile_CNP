@@ -72,6 +72,12 @@ withPipeline(type, product, component) {
         enableSlackNotifications('#ccd-pr-builds')
     }
 
+    overrideVaultEnvironments(vaultOverrides)
+    enableAksStagingDeployment()
+    loadVaultSecrets(secrets)
+    enableDbMigration('ccd')
+    enableDockerBuild()
+    installCharts()
     after('functionalTest:preview') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/cucumber/**/*'
     }
@@ -79,11 +85,4 @@ withPipeline(type, product, component) {
     after('functionalTest:aat') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/cucumber/**/*'
     }
-
-    overrideVaultEnvironments(vaultOverrides)
-    enableAksStagingDeployment()
-    loadVaultSecrets(secrets)
-    enableDbMigration('ccd')
-    enableDockerBuild()
-    installCharts()
 }

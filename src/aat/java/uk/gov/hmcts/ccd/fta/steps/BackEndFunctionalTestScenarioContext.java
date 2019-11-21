@@ -2,7 +2,7 @@ package uk.gov.hmcts.ccd.fta.steps;
 
 import java.util.stream.Collectors;
 
-import io.cucumber.core.api.Scenario;
+import io.cucumber.java.Scenario;
 import io.restassured.specification.RequestSpecification;
 import uk.gov.hmcts.ccd.fta.data.HttpTestData;
 import uk.gov.hmcts.ccd.fta.data.HttpTestDataSource;
@@ -16,7 +16,7 @@ public class BackEndFunctionalTestScenarioContext {
     private static final HttpTestDataSource DATA_SOURCE = new JsonStoreHttpTestDataSource(TEST_DATA_RESOURCE_PACKAGES);
 
     private HttpTestData testData;
-    private Scenario scenario;
+    private io.cucumber.java.Scenario scenario;
     private UserData theUser;
     private RequestSpecification theRequest;
     private ResponseData theResponse;
