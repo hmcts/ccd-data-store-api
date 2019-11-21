@@ -3,7 +3,8 @@
   "_extends_": "S-000-Base-Success",
   "title": "must return default user setting successfully for a user having a profile in CCD",
   "specs": [
-    "a detailed profile in CCD"
+    "a detailed profile in CCD",
+    "uses a uid that exists in IDAM"
   ],
   "productName": "CCD Data Store",
   "operationName": "Get default settings for user",
@@ -23,7 +24,7 @@
       "X-Content-Type-Options" : "[[ANY]]",
       "X-XSS-Protection" : "[[ANY]]",
       "Content-Encoding" : "[[ANY]]",
-      "Vary" : "[[ANY]]",
+      "vary" : "[[ANY]]",
       "Expires" : "[[ANY]]",
       "Pragma" : "[[ANY]]",
       "Date" : "[[ANY]]",
