@@ -1,0 +1,10 @@
+{
+	"_guid_": "Base_Expecting_401",
+	"_extends_": "Base-Root",
+	"request": {
+	},
+	"expectedResponse": {
+		"responseCode": 401,
+		"responseMessage": "Unauthorized"
+	}
+}

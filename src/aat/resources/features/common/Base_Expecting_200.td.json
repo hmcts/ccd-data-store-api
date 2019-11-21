@@ -1,0 +1,10 @@
+{
+	"_guid_": "Base_Expecting_200",
+	"_extends_": "Base-Root",
+	"request": {
+	},
+	"expectedResponse": {
+		"responseCode": 200,
+		"responseMessage": "OK"
+	}
+}
