@@ -20,21 +20,15 @@
       "user": {
         "idam": {
           "id": "[[ANY]]",
-          "email": "auto.test.cnp@gmail.com",
-          "forename": "testfirstname",
-          "surname": "testsurname",
-          "roles": [
-            "caseworker",
-            "caseworker-autotest1",
-            "ccd-import"
-          ],
+          "email": "[[ANY]]",
+          "forename": "[[ANY]]",
+          "surname": "[[ANY]]",
+          "roles": "[[ANY]]",
           "defaultService": null
         }
       },
       "channels": null,
-      "jurisdictions": [
-        "[[ANY]]"
-      ],
+      "jurisdictions": "[[ANY]]",
       "default": {
         "workbasket": {
           "jurisdiction_id": "[[ANY]]",
