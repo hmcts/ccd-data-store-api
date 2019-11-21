@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.stdapi;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -12,9 +13,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackService;
-import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
-import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
-import uk.gov.hmcts.ccd.domain.service.common.SecurityValidationService;
+import uk.gov.hmcts.ccd.domain.service.common.*;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 
 import java.util.HashMap;
@@ -36,6 +35,9 @@ public class CallbackInvoker {
     private final CaseDataService caseDataService;
     private final CaseSanitiser caseSanitiser;
     private final SecurityValidationService securityValidationService;
+    private final AccessControlService accessControlService;
+    private final CaseAccessService caseAccessService;
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
 
     @Autowired
@@ -43,12 +45,16 @@ public class CallbackInvoker {
                            final CaseTypeService caseTypeService,
                            final CaseDataService caseDataService,
                            final CaseSanitiser caseSanitiser,
-                           final SecurityValidationService securityValidationService) {
+                           final SecurityValidationService securityValidationService,
+                           final AccessControlService accessControlService,
+                           final CaseAccessService caseAccessService) {
         this.callbackService = callbackService;
         this.caseTypeService = caseTypeService;
         this.caseDataService = caseDataService;
         this.caseSanitiser = caseSanitiser;
         this.securityValidationService = securityValidationService;
+        this.accessControlService = accessControlService;
+        this.caseAccessService = caseAccessService;
     }
 
     public void invokeAboutToStartCallback(final CaseEvent caseEvent,
@@ -65,7 +71,8 @@ public class CallbackInvoker {
                 caseEvent, null, caseDetails, false);
         }
 
-        callbackResponse.ifPresent(response -> validateAndSetFromAboutToStartCallback(caseType,
+        callbackResponse.ifPresent(response -> validateAndSetFromAboutToStartCallback(caseEvent,
+                                                                                      caseType,
                                                                                       caseDetails,
                                                                                       ignoreWarning,
                                                                                       response));
@@ -87,7 +94,8 @@ public class CallbackInvoker {
         }
 
         if (callbackResponse.isPresent()) {
-            return validateAndSetFromAboutToSubmitCallback(caseType,
+            return validateAndSetFromAboutToSubmitCallback(eventTrigger,
+                                                           caseType,
                                                            caseDetails,
                                                            ignoreWarning,
                                                            callbackResponse.get());
@@ -141,7 +149,7 @@ public class CallbackInvoker {
 
             callbackService.validateCallbackErrorsAndWarnings(callbackResponse, ignoreWarning);
             if (callbackResponse.getData() != null) {
-                validateAndSetData(caseType, caseDetails, callbackResponse.getData());
+                validateAndSetData(caseEvent.getId(), caseType, caseDetails, callbackResponse.getData());
             }
         }
 
@@ -152,18 +160,19 @@ public class CallbackInvoker {
         return retriesTimeouts != null && retriesTimeouts.size() == 1 && retriesTimeouts.get(0) == 0;
     }
 
-    private void validateAndSetFromAboutToStartCallback(CaseType caseType,
+    private void validateAndSetFromAboutToStartCallback(CaseEvent caseEvent, CaseType caseType,
                                                         CaseDetails caseDetails,
                                                         Boolean ignoreWarning,
                                                         CallbackResponse callbackResponse) {
         callbackService.validateCallbackErrorsAndWarnings(callbackResponse, ignoreWarning);
 
         if (callbackResponse.getData() != null) {
-            validateAndSetData(caseType, caseDetails, callbackResponse.getData());
+            validateAndSetData(caseEvent.getId(), caseType, caseDetails, callbackResponse.getData());
         }
     }
 
-    private AboutToSubmitCallbackResponse validateAndSetFromAboutToSubmitCallback(final CaseType caseType,
+    private AboutToSubmitCallbackResponse validateAndSetFromAboutToSubmitCallback(final CaseEvent caseEvent,
+                                                                                  final CaseType caseType,
                                                                                   final CaseDetails caseDetails,
                                                                                   final Boolean ignoreWarning,
                                                                                   final CallbackResponse callbackResponse) {
@@ -173,7 +182,7 @@ public class CallbackInvoker {
         validateSignificantItem(aboutToSubmitCallbackResponse, callbackResponse);
         callbackService.validateCallbackErrorsAndWarnings(callbackResponse, ignoreWarning);
         if (callbackResponse.getData() != null) {
-            validateAndSetData(caseType, caseDetails, callbackResponse.getData());
+            validateAndSetData(caseEvent.getId(), caseType, caseDetails, callbackResponse.getData());
             if (callbackResponseHasCaseAndDataClassification(callbackResponse)) {
                 securityValidationService.setClassificationFromCallbackIfValid(callbackResponse,
                                                                                caseDetails,
@@ -205,9 +214,14 @@ public class CallbackInvoker {
         return defaultSecurityClassifications;
     }
 
-    private void validateAndSetData(final CaseType caseType,
+    private void validateAndSetData(final String eventId,
+                                    final CaseType caseType,
                                     final CaseDetails caseDetails,
                                     final Map<String, JsonNode> responseData) {
+        // TODO: Change this to caseAccessService.getCreateRoles();
+        accessControlService.verifyCreateAccess(eventId, caseType,
+                                                caseAccessService.getUserRoles(),
+                                                MAPPER.convertValue(responseData, JsonNode.class));
         caseTypeService.validateData(responseData, caseType);
         caseDetails.setData(caseSanitiser.sanitise(caseType, responseData));
         deduceDataClassificationForNewFields(caseType, caseDetails);

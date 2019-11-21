@@ -1,5 +1,20 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
+import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -13,25 +28,8 @@ import static java.util.Objects.nonNull;
 import static java.util.Spliterators.spliteratorUnknownSize;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.util.CollectionUtils.isEmpty;
-import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.MANDATORY;
-import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.OPTIONAL;
-import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.READONLY;
+import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.*;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
-import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
 @Service
 public class AccessControlService {
@@ -597,5 +595,30 @@ public class AccessControlService {
             .stream()
             .filter(acls -> userRoles.contains(acls.getRole()))
             .anyMatch(criteria);
+    }
+
+    public void verifyCreateAccess(String eventId, CaseType caseType, Set<String> userRoles, final JsonNode caseFields) {
+        if (!canAccessCaseTypeWithCriteria(
+            caseType,
+            userRoles,
+            CAN_CREATE)) {
+            throw new ResourceNotFoundException(NO_CASE_TYPE_FOUND);
+        }
+
+        if (!canAccessCaseEventWithCriteria(
+            eventId,
+            caseType.getEvents(),
+            userRoles,
+            CAN_CREATE)) {
+            throw new ResourceNotFoundException(NO_EVENT_FOUND);
+        }
+
+        if (!canAccessCaseFieldsWithCriteria(
+            caseFields,
+            caseType.getCaseFields(),
+            userRoles,
+            CAN_CREATE)) {
+            throw new ResourceNotFoundException(NO_FIELD_FOUND);
+        }
     }
 }
