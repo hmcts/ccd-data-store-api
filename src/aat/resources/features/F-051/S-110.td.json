@@ -1,6 +1,6 @@
 {
   "_guid_": "S-110",
-  "_extends_": "S-000-Base-Success",
+  "_extends_": "Base_Expecting_200",
   "title": "must return default user setting successfully for a user having a profile in CCD",
   "specs": ["a detailed profile in CCD"],
   "productName": "CCD Data Store",
@@ -13,21 +13,6 @@
     }
   },
   "expectedResponse": {
-    "responseCode": 200,
-    "responseMessage": "OK",
-    "headers": {
-      "X-Frame-Options": "DENY",
-      "Transfer-Encoding": "chunked",
-      "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
-      "vary": "accept-encoding",
-      "X-Content-Type-Options": "nosniff",
-      "Content-Encoding": "gzip",
-      "Pragma": "no-cache",
-      "Expires": "0",
-      "X-XSS-Protection": "1; mode=block",
-      "Date": "[[DONT_CARE]]",
-      "Content-Type": "application/json;charset=UTF-8"
-    },
     "body": {
       "user": {
         "idam": {
