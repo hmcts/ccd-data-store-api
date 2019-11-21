@@ -5,6 +5,6 @@
 	},
 	"expectedResponse": {
 		"responseCode": 412,
-		"responseMessage": "Forbidden"
+		"responseMessage": "Precondition Failed"
 	}
 }

@@ -5,6 +5,6 @@
 	},
 	"expectedResponse": {
 		"responseCode": 409,
-		"responseMessage": "Not Found"
+		"responseMessage": "Conflict"
 	}
 }
