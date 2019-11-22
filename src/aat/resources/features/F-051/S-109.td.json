@@ -2,7 +2,10 @@
   "_guid_": "S-109",
   "_extends_": "Base_Expecting_403",
   "title": "must return appropriate negative response for a user not having a profile in CCD",
-  "specs": ["no profile in CCD"],
+  "specs": ["no profile in CCD",
+    "uses a Case ID that doesn’t exist in CCD",
+    "has the 403 return code"
+  ],
   "productName": "CCD Data Store",
   "operationName": "Get default settings for user",
   "method": "GET",
@@ -14,7 +17,7 @@
   },
   "expectedResponse": {
     "body" : {
-      "timestamp" : "[[DONT_CARE]]",
+      "timestamp" : "[[ANY]]",
       "status" : 403,
       "error" : "Forbidden",
       "message" : "Access Denied",
