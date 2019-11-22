@@ -12,6 +12,8 @@ Feature: Validate a set of fields as Case worker
     Then a positive response is received
     And the response has all the details as expected
 
+  @Ignore
+  #To be completed on https://tools.hmcts.net/jira/browse/RDM-6654
   @S-297
   Scenario: must not validate when CMC ExternalID is not unique / already exists
     Given a user with a detailed profile in CCD
