@@ -2,7 +2,11 @@
   "_guid_": "S-300",
   "_extends_": "S-000-Base-Root",
   "title": "must return 403 when request provides authentic credentials without authorised access to the operation",
-  "specs": ["a detailed profile in CCD"],
+  "specs": ["a detailed profile in CCD",
+    "uses the Case ID of the case just created",
+    "uses the invalid authorization",
+    "has the 403 return code"
+  ],
   "productName": "CCD Data Store",
   "operationName": "validation of a set of fields as Case worker",
   "method": "POST",

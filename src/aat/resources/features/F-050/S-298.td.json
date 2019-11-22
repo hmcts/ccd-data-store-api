@@ -2,7 +2,11 @@
   "_guid_": "S-298",
   "_extends_": "S-000-Base-Root",
   "title": "must not validate when field validation fails",
-  "specs": ["a detailed profile in CCD"],
+    "specs": ["a detailed profile in CCD",
+    "uses a field that doesn’t exist",
+    "uses a value that exceeds the field max limit",
+    "has the 422 return code"
+  ],
   "productName": "CCD Data Store",
   "operationName": "validation of a set of fields as Case worker",
   "method": "POST",

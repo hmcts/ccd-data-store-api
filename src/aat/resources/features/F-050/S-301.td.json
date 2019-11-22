@@ -2,7 +2,10 @@
   "_guid_": "S-301",
   "_extends_": "S-000-Base-Success",
   "title": "must validate when all fields are valid",
-  "specs": ["a detailed profile in CCD"],
+  "specs": ["a detailed profile in CCD",
+    "uses the Case ID of the case just created",
+    "has the 200 return code"
+  ],
   "productName": "CCD Data Store",
   "operationName": "validation of a set of fields as Case worker",
   "method": "POST",
