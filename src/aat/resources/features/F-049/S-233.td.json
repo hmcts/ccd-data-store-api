@@ -1,0 +1,35 @@
+{
+  "_guid_": "S-233",
+  "_extends_": "Base_Expecting_403",
+  "title": "must return 403 when no case found for the given Idam user ID",
+  "specs": [
+    "an existing case in CCD",
+    "uses a non-existing Idam user ID in CCD",
+    "Start case creation as Case worker",
+    "CCD Data Store",
+    "return 403"
+  ],
+  "productName": "CCD Data Store",
+  "operationName": "Start case creation as Case worker",
+  "method" : "GET",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
+  "request": {
+    "pathVariables": {
+      "uid": "[1574079355345891]",
+      "jid": "AUTOTEST1",
+      "ctid": "AAT",
+      "cid": "1574079355345891",
+      "etid": "CREATE"
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "timestamp" : "[[ANY]]",
+      "status" : 403,
+      "error" : "Forbidden",
+      "message" : "Access Denied",
+      "path" : "[[ANY]]"
+    }
+  }
+}

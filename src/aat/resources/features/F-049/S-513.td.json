@@ -1,0 +1,38 @@
+{
+  "_guid_": "S-513",
+  "_extends_": "Base_Expecting_400",
+  "title": "must return 400 when no case found for the given Case ID",
+  "specs": [
+    "an existing case in CCD",
+    "a non-existing Case ID in CCD",
+    "Start case creation as Case worker",
+    "CCD Data Store",
+    "return 400"
+  ],
+  "productName": "CCD Data Store",
+  "operationName": "Start case creation as Case worker",
+  "method" : "GET",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
+  "request": {
+    "pathVariables": {
+      "uid": "[[DYNAMIC]]",
+      "jid": "AUTOTEST1",
+      "ctid": "AAT",
+      "cid": "157407935534589100",
+      "etid": "CREATE"
+    }
+  },
+  "expectedResponse": {
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+      "timestamp" : "[[ANY]]",
+      "status" : 400,
+      "error" : "Bad Request",
+      "message" : "Case reference is not valid",
+      "path" : "[[ANY]]",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}

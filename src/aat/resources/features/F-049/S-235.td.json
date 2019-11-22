@@ -1,0 +1,137 @@
+{
+  "_guid_": "S-235",
+  "_extends_": "Base_Expecting_200",
+  "title": "must start case creation process successfully for correct inputs",
+  "specs": [
+    "an existing case in CCD",
+    "Start case creation as Case worker",
+    "CCD Data Store",
+    "return 200"
+  ],
+  "productName": "CCD Data Store",
+  "operationName": "Start case creation as Case worker",
+  "method": "GET",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
+  "request": {
+    "pathVariables": {
+      "uid": "[[DYNAMIC]]",
+      "jid": "AUTOTEST1",
+      "ctid": "AAT",
+      "cid": "1574079355345891",
+      "etid": "UPDATE"
+    }
+  },
+  "expectedResponse": {
+    "body" : {
+      "token" : "[[ANY]]",
+      "case_details" : {
+        "id" : 1574079355345891,
+        "jurisdiction" : "AUTOTEST1",
+        "state" : "TODO",
+        "version" : 0,
+        "case_type_id" : "AAT",
+        "created_date" : "[[ANY]]",
+        "last_modified" : "[[ANY]]",
+        "security_classification" : "PUBLIC",
+        "case_data" : {
+          "MoneyGBPField" : null,
+          "FixedListField" : null,
+          "AddressUKField" : {
+            "County" : null,
+            "Country" : null,
+            "PostCode" : null,
+            "PostTown" : null,
+            "AddressLine1" : null,
+            "AddressLine2" : null,
+            "AddressLine3" : null
+          },
+          "ComplexField" : {
+            "ComplexTextField" : null,
+            "ComplexNestedField" : {
+              "NestedNumberField" : null,
+              "NestedCollectionTextField" : [ ]
+            },
+            "ComplexFixedListField" : null
+          },
+          "FixedRadioListField" : null,
+          "DateTimeField" : null,
+          "PhoneUKField" : null,
+          "NumberField" : null,
+          "MultiSelectListField" : [ ],
+          "YesOrNoField" : null,
+          "EmailField" : null,
+          "TextField" : null,
+          "DateField" : null,
+          "TextAreaField" : null,
+          "CollectionField" : [ ]
+        },
+        "data_classification" : {
+          "MoneyGBPField" : "PUBLIC",
+          "FixedListField" : "PUBLIC",
+          "AddressUKField" : {
+            "value" : {
+              "County" : "PUBLIC",
+              "Country" : "PUBLIC",
+              "PostCode" : "PUBLIC",
+              "PostTown" : "PUBLIC",
+              "AddressLine1" : "PUBLIC",
+              "AddressLine2" : "PUBLIC",
+              "AddressLine3" : "PUBLIC"
+            },
+            "classification" : "PUBLIC"
+          },
+          "FixedRadioListField" : "PUBLIC",
+          "DateTimeField" : "PUBLIC",
+          "PhoneUKField" : "PUBLIC",
+          "NumberField" : "PUBLIC",
+          "MultiSelectListField" : "PUBLIC",
+          "YesOrNoField" : "PUBLIC",
+          "EmailField" : "PUBLIC",
+          "TextField" : "PUBLIC",
+          "DateField" : "PUBLIC",
+          "TextAreaField" : "PUBLIC",
+          "CollectionField" : {
+            "value" : [ ],
+            "classification" : "PUBLIC"
+          }
+        },
+        "after_submit_callback_response" : null,
+        "callback_response_status_code" : null,
+        "callback_response_status" : null,
+        "delete_draft_response_status_code" : null,
+        "delete_draft_response_status" : null,
+        "security_classifications" : {
+          "MoneyGBPField" : "PUBLIC",
+          "FixedListField" : "PUBLIC",
+          "AddressUKField" : {
+            "value" : {
+              "County" : "PUBLIC",
+              "Country" : "PUBLIC",
+              "PostCode" : "PUBLIC",
+              "PostTown" : "PUBLIC",
+              "AddressLine1" : "PUBLIC",
+              "AddressLine2" : "PUBLIC",
+              "AddressLine3" : "PUBLIC"
+            },
+            "classification" : "PUBLIC"
+          },
+          "FixedRadioListField" : "PUBLIC",
+          "DateTimeField" : "PUBLIC",
+          "PhoneUKField" : "PUBLIC",
+          "NumberField" : "PUBLIC",
+          "MultiSelectListField" : "PUBLIC",
+          "YesOrNoField" : "PUBLIC",
+          "EmailField" : "PUBLIC",
+          "TextField" : "PUBLIC",
+          "DateField" : "PUBLIC",
+          "TextAreaField" : "PUBLIC",
+          "CollectionField" : {
+            "value" : [ ],
+            "classification" : "PUBLIC"
+          }
+        }
+      },
+      "event_id" : "UPDATE"
+    }
+  }
+}

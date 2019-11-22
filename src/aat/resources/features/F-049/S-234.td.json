@@ -1,0 +1,38 @@
+{
+  "_guid_": "S-234",
+  "_extends_": "Base_Expecting_422",
+  "title": "must return 422 when process could not be started",
+  "specs": [
+    "an existing case in CCD",
+    "process could not be started",
+    "Start case creation as Case worker",
+    "CCD Data Store",
+    "return 422"
+  ],
+  "productName": "CCD Data Store",
+  "operationName": "Start case creation as Case worker",
+  "method" : "GET",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
+  "request": {
+    "pathVariables": {
+      "uid": "[[DYNAMIC]]",
+      "jid": "AUTOTEST1",
+      "ctid": "AAT4",
+      "cid": "1574079355345891",
+      "etid": "CREATE"
+    }
+  },
+  "expectedResponse": {
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException",
+      "timestamp" : "[[ANY]]",
+      "status" : 422,
+      "error" : "Unprocessable Entity",
+      "message" : "The case status did not qualify for the event",
+      "path" : "[[ANY]]",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}
