@@ -1,0 +1,46 @@
+{
+  "_guid_": "S-517",
+  "_extends_": "Base_Expecting_200",
+  "title": "must return 404 when no case found for the given Jurisdiction ID",
+  "specs": ["an existing case in CCD","uses a non-existing Jurisdiction ID in CCD","return 200"],
+  "productName": "CCD Data Store",
+  "operationName": "Start case creation as Case worker",
+  "user": {
+    "username": "auto.test.cnp+ctzn4@gmail.com",
+    "password": "Pa55word11"
+  },
+  "method" : "GET",
+  "uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
+  "request": {
+    "pathVariables": {
+      "uid": "[[DYNAMIC]]",
+      "jid": "MISSINGJIDsumit",
+      "ctid": "AAT",
+      "etid": "CREATE"
+    }
+  },
+  "expectedResponse": {
+    "body" : {
+      "token" : "[[ANY]]",
+      "case_details" : {
+        "id" : null,
+        "jurisdiction" : "AUTOTEST1",
+        "state" : null,
+        "version" : null,
+        "case_type_id" : "AAT",
+        "created_date" : null,
+        "last_modified" : null,
+        "security_classification" : null,
+        "case_data" : { },
+        "data_classification" : { },
+        "after_submit_callback_response" : null,
+        "callback_response_status_code" : null,
+        "callback_response_status" : null,
+        "delete_draft_response_status_code" : null,
+        "delete_draft_response_status" : null,
+        "security_classifications" : { }
+      },
+      "event_id" : "CREATE"
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "_guid_": "S-237",
+  "_extends_": "Base_Expecting_403",
+  "title": "must return 401 when request does not provide valid authentication credentials",
+  "specs": ["an existing case in CCD","does not provide valid authentication credentials in CCD","return 403"],
+  "productName": "CCD Data Store",
+  "operationName": "Start case creation as Case worker",
+  "user": {
+    "username": "auto.test.cnp+ctzn4@gmail.com",
+    "password": "Pa55word11"
+  },
+  "method" : "GET",
+  "uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
+  "request": {
+    "headers": {
+      "Authorization": "invalid"
+    },
+    "pathVariables": {
+      "uid": "[[DYNAMIC]]",
+      "jid": "AUTOTEST1",
+      "ctid": "AAT",
+      "etid": "CREATE"
+    }
+  },
+  "expectedResponse": {
+    "body" : {
+      "timestamp" : "[[ANY]]",
+      "status" : 403,
+      "error" : "Forbidden",
+      "message" : "Access Denied",
+      "path" : "[[ANY]]"
+    }
+  }
+}

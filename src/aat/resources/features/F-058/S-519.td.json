@@ -1,0 +1,35 @@
+{
+  "_guid_": "S-519",
+  "_extends_": "Base_Expecting_404",
+  "title": "must return 404 when no case found for the given Event ID",
+  "specs": ["an existing case in CCD","a non-existing Event ID in CCD","return 404"],
+  "productName": "CCD Data Store",
+  "operationName": "Start case creation as Case worker",
+  "user": {
+    "username": "auto.test.cnp+ctzn4@gmail.com",
+    "password": "Pa55word11"
+  },
+  "method" : "GET",
+  "uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
+  "request": {
+    "pathVariables": {
+      "uid": "[[DYNAMIC]]",
+      "jid": "AUTOTEST1",
+      "ctid": "AAT",
+      "etid": "CREATE6"
+    }
+  },
+  "expectedResponse": {
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "timestamp" : "[[ANY]]",
+      "status" : 404,
+      "error" : "Not Found",
+      "message" : "Cannot find event CREATE6 for case type AAT",
+      "path" : "[[ANY]]",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "_guid_": "S-239",
+  "_extends_": "Base_Expecting_403",
+  "title": "must return 404 when no case found for the given Idam user ID",
+  "specs": ["an existing case in CCD","uses a non-existing Idam user ID in CCD","return 404"],
+  "productName": "CCD Data Store",
+  "operationName": "Start case creation as Case worker",
+  "user": {
+    "username": "auto.test.cnp@gmail.com",
+    "password": "Pa55word11"
+  },
+  "method" : "GET",
+  "uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
+  "request": {
+    "pathVariables": {
+      "uid": "MISSINGUID",
+      "jid": "AUTOTEST1",
+      "ctid": "AAT",
+      "etid": "CREATE"
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "timestamp" : "[[ANY]]",
+      "status" : 403,
+      "error" : "Forbidden",
+      "message" : "Access Denied",
+      "path" : "[[ANY]]"
+    }
+  }
+}

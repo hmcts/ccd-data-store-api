@@ -1,0 +1,31 @@
+{
+  "_guid_": "S-238",
+  "_extends_": "Base_Expecting_403",
+  "title": "must return 403 when request provides authentic credentials without authorized access to the operation",
+  "specs": ["an existing case in CCD","uses a provides authentic credentials without authorized access to the operation in CCD","return 403"],
+  "productName": "CCD Data Store",
+  "operationName": "Start case creation as Case worker",
+  "user": {
+    "username": "auto.test.cnp+ctzn@gmail.com",
+    "password": "Pa55word11"
+  },
+  "method" : "GET",
+  "uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
+  "request": {
+    "pathVariables": {
+      "uid": "[[DYNAMIC]]",
+      "jid": "AUTOTEST1",
+      "ctid": "AAT",
+      "etid": "CREATE"
+    }
+  },
+  "expectedResponse": {
+    "body" : {
+      "timestamp" : "[[ANY]]",
+      "status" : 403,
+      "error" : "Forbidden",
+      "message" : "Access Denied",
+      "path" : "[[ANY]]"
+    }
+  }
+}
