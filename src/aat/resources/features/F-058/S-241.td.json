@@ -1,6 +1,6 @@
 {
   "_guid_": "S-241",
-  "_extends_": "S-000-Base-Success",
+  "_extends_": "Base_Expecting_200",
   "title": "must start case creation process successfully for correct inputs",
   "specs": ["an existing case in CCD","return 200"],
   "productName": "CCD Data Store",
@@ -20,21 +20,6 @@
     }
   },
   "expectedResponse": {
-    "responseCode" : 200,
-    "responseMessage" : "OK",
-    "headers" : {
-      "X-Frame-Options" : "DENY",
-      "Transfer-Encoding" : "chunked",
-      "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
-      "vary" : "accept-encoding",
-      "X-Content-Type-Options" : "nosniff",
-      "Content-Encoding" : "gzip",
-      "Pragma" : "no-cache",
-      "Expires" : "0",
-      "X-XSS-Protection" : "1; mode=block",
-      "Date" : "[[ANY]]",
-      "Content-Type" : "application/json;charset=UTF-8"
-    },
     "body" : {
       "token" : "[[ANY]]",
       "case_details" : {

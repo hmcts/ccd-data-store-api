@@ -1,6 +1,6 @@
 {
   "_guid_": "S-238",
-  "_extends_": "S-000-Base-Success",
+  "_extends_": "Base_Expecting_403",
   "title": "must return 403 when request provides authentic credentials without authorized access to the operation",
   "specs": ["an existing case in CCD","uses a provides authentic credentials without authorized access to the operation in CCD","return 403"],
   "productName": "CCD Data Store",
@@ -20,27 +20,12 @@
     }
   },
   "expectedResponse": {
-    "responseCode" : 403,
-    "responseMessage" : "Forbidden",
-    "headers" : {
-      "X-Frame-Options" : "DENY",
-      "Transfer-Encoding" : "chunked",
-      "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
-      "vary" : "accept-encoding",
-      "X-Content-Type-Options" : "nosniff",
-      "Content-Encoding" : "gzip",
-      "Pragma" : "no-cache",
-      "Expires" : "0",
-      "X-XSS-Protection" : "1; mode=block",
-      "Date" : "[[ANY]]",
-      "Content-Type" : "application/json;charset=UTF-8"
-    },
     "body" : {
       "timestamp" : "[[ANY]]",
       "status" : 403,
       "error" : "Forbidden",
       "message" : "Access Denied",
-      "path" : "/citizens/25dac087-e52c-41e4-87ff-506bdc531f4f/jurisdictions/AUTOTEST1/case-types/AAT/event-triggers/CREATE/token"
+      "path" : "[[ANY]]"
     }
   }
 }

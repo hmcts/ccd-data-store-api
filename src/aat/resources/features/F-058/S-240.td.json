@@ -1,6 +1,6 @@
 {
   "_guid_": "S-240",
-  "_extends_": "S-000-Base-Success",
+  "_extends_": "Base_Expecting_404",
   "title": "must return 422 when process could not be started",
   "specs": ["an existing case in CCD","process could not be started","return 415"],
   "productName": "CCD Data Store",
@@ -15,27 +15,24 @@
     "pathVariables": {
       "uid": "[[DYNAMIC]]",
       "jid": "AUTOTEST1",
-      "ctid": "AAT",
+      "ctid": "AAT4",
       "etid": "CREATE"
     },
     "headers": {
-      "Content-Type": "application/xml"
+      "Content-Type": "application/json"
     }
   },
   "expectedResponse": {
-    "responseCode" : 415,
-    "responseMessage" : "Unsupported Media Type",
-    "headers" : {
-      "X-Frame-Options" : "DENY",
-      "Accept" : "application/json",
-      "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
-      "X-Content-Type-Options" : "nosniff",
-      "Pragma" : "no-cache",
-      "Expires" : "0",
-      "X-XSS-Protection" : "1; mode=block",
-      "Content-Length" : "0",
-      "Date" : "[[ANY]]"
-    },
-    "body" : null
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "timestamp": "[[ANY]]",
+      "status": 404,
+      "error": "Not Found",
+      "message": "Resource not found when getting case type version for AAT4 because of 404 ",
+      "path": "[[ANY]]",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
   }
 }

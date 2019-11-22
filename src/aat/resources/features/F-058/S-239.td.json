@@ -1,6 +1,6 @@
 {
   "_guid_": "S-239",
-  "_extends_": "S-000-Base-Success",
+  "_extends_": "Base_Expecting_403",
   "title": "must return 404 when no case found for the given Idam user ID",
   "specs": ["an existing case in CCD","uses a non-existing Idam user ID in CCD","return 404"],
   "productName": "CCD Data Store",
@@ -21,27 +21,12 @@
   },
 
   "expectedResponse": {
-    "responseCode" : 403,
-    "responseMessage" : "Forbidden",
-    "headers" : {
-      "X-Frame-Options" : "DENY",
-      "Transfer-Encoding" : "chunked",
-      "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
-      "vary" : "accept-encoding",
-      "X-Content-Type-Options" : "nosniff",
-      "Content-Encoding" : "gzip",
-      "Pragma" : "no-cache",
-      "Expires" : "0",
-      "X-XSS-Protection" : "1; mode=block",
-      "Date" : "[[ANY]]",
-      "Content-Type" : "application/json;charset=UTF-8"
-    },
     "body" : {
       "timestamp" : "[[ANY]]",
       "status" : 403,
       "error" : "Forbidden",
       "message" : "Access Denied",
-      "path" : "/citizens/MISSINGUID/jurisdictions/AUTOTEST1/case-types/AAT/event-triggers/CREATE/token"
+      "path" : "[[ANY]]"
     }
   }
 }
