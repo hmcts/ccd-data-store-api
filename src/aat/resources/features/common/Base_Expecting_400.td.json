@@ -5,6 +5,9 @@
 	},
 	"expectedResponse": {
 		"responseCode": 400,
-		"responseMessage": "Bad Request"
-	}
+		"responseMessage": "Bad Request",
+    "headers" : {
+      "Connection" : "close"
+    }
+  }
 }
