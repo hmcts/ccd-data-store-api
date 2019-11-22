@@ -1,8 +1,14 @@
 {
   "_guid_": "S-232",
-  "_extends_": "S-000-Base-Success",
+  "_extends_": "Base_Expecting_403",
   "title": "must return 403 when request provides authentic credentials without authorized access to the operation",
-  "specs": ["an existing case in CCD"],
+  "specs": [
+    "an existing case in CCD",
+    "uses a provides authentic credentials without authorized access to the operation in CCD",
+    "Start case creation as Case worker",
+    "CCD Data Store",
+    "return 403"
+  ],
   "productName": "CCD Data Store",
   "operationName": "Start case creation as Case worker",
   "method" : "GET",
@@ -17,21 +23,6 @@
     }
   },
   "expectedResponse": {
-    "responseCode" : 403,
-    "responseMessage" : "Forbidden",
-    "headers" : {
-      "X-Frame-Options" : "DENY",
-      "Transfer-Encoding" : "chunked",
-      "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
-      "vary" : "accept-encoding",
-      "X-Content-Type-Options" : "nosniff",
-      "Content-Encoding" : "gzip",
-      "Pragma" : "no-cache",
-      "Expires" : "0",
-      "X-XSS-Protection" : "1; mode=block",
-      "Date" : "[[ANY]]",
-      "Content-Type" : "application/json;charset=UTF-8"
-    },
     "body" : {
       "timestamp" : "[[ANY]]",
       "status" : 403,

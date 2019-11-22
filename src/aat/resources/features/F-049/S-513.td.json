@@ -1,8 +1,14 @@
 {
   "_guid_": "S-513",
-  "_extends_": "S-000-Base-Success",
+  "_extends_": "Base_Expecting_400",
   "title": "must return 400 when no case found for the given Case ID",
-  "specs": ["an existing case in CCD"],
+  "specs": [
+    "an existing case in CCD",
+    "a non-existing Case ID in CCD",
+    "Start case creation as Case worker",
+    "CCD Data Store",
+    "return 400"
+  ],
   "productName": "CCD Data Store",
   "operationName": "Start case creation as Case worker",
   "method" : "GET",
@@ -17,22 +23,6 @@
     }
   },
   "expectedResponse": {
-    "responseCode" : 400,
-    "responseMessage" : "Bad Request",
-    "headers" : {
-      "X-Frame-Options" : "DENY",
-      "Transfer-Encoding" : "chunked",
-      "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
-      "vary" : "accept-encoding",
-      "X-Content-Type-Options" : "nosniff",
-      "Content-Encoding" : "gzip",
-      "Connection" : "close",
-      "Pragma" : "no-cache",
-      "Expires" : "0",
-      "X-XSS-Protection" : "1; mode=block",
-      "Date" : "[[ANY]]",
-      "Content-Type" : "application/json;charset=UTF-8"
-    },
     "body" : {
       "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
       "timestamp" : "[[ANY]]",
