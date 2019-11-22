@@ -158,6 +158,15 @@ class CompoundFieldOrderServiceTest {
                                                      .build())
                                   .withOrder(2)
                                   .build())
+            .withComplexField(newCaseField()
+                                  .withId("complex4")
+                                  .withFieldType(aFieldType()
+                                                     .withType(COMPLEX)
+                                                     .withComplexField(simpleField("simple11", 1))
+                                                     .withComplexField(simpleField("simple12", 2))
+                                                     .build())
+                                  .withOrder(3)
+                                  .build())
             .build();
 
         CASE_FIELD.setFieldType(aFieldType()
@@ -200,6 +209,12 @@ class CompoundFieldOrderServiceTest {
                                                     hasProperty("order", is(2))),
                                               allOf(hasProperty("id", is("simple4")),
                                                     hasProperty("order", is(1)))));
+        List<CaseField> complex4Children = complexChildren.get(2).getFieldType().getChildren();
+        assertThat(complex4Children, contains(allOf(hasProperty("id", is("simple11")),
+                                                    hasProperty("order", is(1))),
+                                              allOf(hasProperty("id", is("simple12")),
+                                                    hasProperty("order", is(2)))));
+
     }
 
     @Test

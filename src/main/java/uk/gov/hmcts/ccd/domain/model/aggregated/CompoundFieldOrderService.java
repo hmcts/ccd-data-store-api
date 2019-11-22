@@ -79,14 +79,11 @@ public class CompoundFieldOrderService {
     }
 
     private List<String> getSortedFieldsFromEventFieldOverride(final List<CaseField> children, final List<CaseEventFieldComplex> caseEventComplexFields, String listElementCode) {
-        if (isNotEmpty(caseEventComplexFields)) {
-            return caseEventComplexFields.stream()
-                .filter(field -> hasOrderAndIsLeaf(children, listElementCode, field))
-                .sorted(comparingInt(CaseEventFieldComplex::getOrder))
-                .map(CaseEventFieldComplex::getReference)
-                .collect(Collectors.toList());
-        }
-        return Lists.newArrayList();
+        return caseEventComplexFields.stream()
+            .filter(field -> hasOrderAndIsLeaf(children, listElementCode, field))
+            .sorted(comparingInt(CaseEventFieldComplex::getOrder))
+            .map(CaseEventFieldComplex::getReference)
+            .collect(Collectors.toList());
     }
 
     private boolean hasOrderAndIsLeaf(final List<CaseField> children, final String listElementCode, final CaseEventFieldComplex field) {
