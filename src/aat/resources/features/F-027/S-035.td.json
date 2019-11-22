@@ -1,0 +1,33 @@
+{
+  "_guid_": "S-035",
+  "_extends_": "Base_Expecting_400",
+  "title": "must return appropriate negative response when case-reference does not exists",
+  "specs": ["a detailed profile in CCD",
+    "does not provide the valid case-reference in input parameters",
+    "has the 400 return code"],
+  "productName": "CCD Data Store",
+  "operationName": "Fetch a case for display for Case Worker",
+  "request": {
+    "pathVariables": {
+      "uid": "[[DYNAMIC]]",
+      "jid": "AUTOTEST1",
+      "ctid": "AAT",
+      "cid": "DummyReferenceNumber"
+    }
+  },
+  "method": "GET",
+  "uri": "/aggregated/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}",
+  "expectedResponse": {
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+      "timestamp" : "[[ANY]]",
+      "status" : 400,
+      "error" : "Bad Request",
+      "message" : "Case reference DummyReferenceNumber is not valid",
+      "path" : "[[ANY]]",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}
