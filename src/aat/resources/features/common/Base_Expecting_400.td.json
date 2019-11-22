@@ -1,0 +1,10 @@
+{
+	"_guid_": "Base_Expecting_400",
+	"_extends_": "Base-Root",
+	"request": {
+	},
+	"expectedResponse": {
+		"responseCode": 400,
+		"responseMessage": "Bad Request"
+	}
+}
