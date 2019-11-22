@@ -35,7 +35,7 @@ public class ResponseData {
 
     public void setHeaders(Map<String, Object> headers) {
         this.headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-        headers.putAll(headers);
+        this.headers.putAll(headers);
     }
 
     public Map<String, Object> getBody() {
