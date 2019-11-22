@@ -13,6 +13,16 @@ Feature: Start case creation as Case worker
     And     the response [return 200]
     And     the response has all the details as expected
 
+  @S-231 @Ignore
+  Scenario: must return 401 when request does not provide valid authentication credentials
+    Given   a user with [an existing case in CCD]
+    When    a request is prepared with appropriate values
+    And     the request [does not provide valid authentication credentials in CCD]
+    And     it is submitted to call the [Start case creation as Case worker] operation of [CCD Data Store]
+    Then    a negative response is received
+    And     the response [return 401]
+    And     the response has all the details as expected
+
   @S-231
   Scenario: must return 403 when request does not provide valid authentication credentials
     Given   a user with [an existing case in CCD]
@@ -28,6 +38,16 @@ Feature: Start case creation as Case worker
     Given   a user with [an existing case in CCD]
     When    a request is prepared with appropriate values
     And     the request [uses a provides authentic credentials without authorized access to the operation in CCD]
+    And     it is submitted to call the [Start case creation as Case worker] operation of [CCD Data Store]
+    Then    a negative response is received
+    And     the response [return 403]
+    And     the response has all the details as expected
+
+  @S-233 @Ignore
+  Scenario: must return 404 when no case found for the given Idam user ID
+    Given   a user with [an existing case in CCD]
+    When    a request is prepared with appropriate values
+    And     the request [uses a non-existing Idam user ID in CCD]
     And     it is submitted to call the [Start case creation as Case worker] operation of [CCD Data Store]
     Then    a negative response is received
     And     the response [return 403]
@@ -63,6 +83,16 @@ Feature: Start case creation as Case worker
     And     the response [return 404]
     And     the response has all the details as expected
 
+  @S-512 @Ignore
+  Scenario: must return 404 when no case found for the given Case type ID
+    Given   a user with [an existing case in CCD]
+    When    a request is prepared with appropriate values
+    And     the request [uses a non-existing Case type ID in CCD]
+    And     it is submitted to call the [Start case creation as Case worker] operation of [CCD Data Store]
+    Then    a negative response is received
+    And     the response [return 404]
+    And     the response has all the details as expected
+
   @S-512
   Scenario: must return 422 when no case found for the given Case type ID
     Given   a user with [an existing case in CCD]
@@ -71,6 +101,16 @@ Feature: Start case creation as Case worker
     And     it is submitted to call the [Start case creation as Case worker] operation of [CCD Data Store]
     Then    a negative response is received
     And     the response [return 422]
+    And     the response has all the details as expected
+
+  @S-513 @Ignore
+  Scenario: must return 404 when no case found for the given Case ID
+    Given   a user with [an existing case in CCD]
+    When    a request is prepared with appropriate values
+    And     the request [a non-existing Case ID in CCD]
+    And     it is submitted to call the [Start case creation as Case worker] operation of [CCD Data Store]
+    Then    a negative response is received
+    And     the response [return 404]
     And     the response has all the details as expected
 
   @S-513
@@ -93,6 +133,3 @@ Feature: Start case creation as Case worker
     Then    a negative response is received
     And     the response [return 404]
     And     the response has all the details as expected
-
-
-
