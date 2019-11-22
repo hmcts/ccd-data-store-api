@@ -1,0 +1,15 @@
+{
+	"_guid_": "Base_Expecting_404",
+	"_extends_": "Base-Root",
+	"request": {
+		
+	},
+	"expectedResponse": {
+		"responseCode": 404,
+		"responseMessage": "Not Found",
+		"body": {
+			"status": 404,
+			"error": "Not Found"
+		}
+	}
+}
