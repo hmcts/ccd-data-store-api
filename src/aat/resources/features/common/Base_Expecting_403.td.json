@@ -2,9 +2,14 @@
 	"_guid_": "Base_Expecting_403",
 	"_extends_": "Base-Root",
 	"request": {
+		
 	},
 	"expectedResponse": {
 		"responseCode": 403,
-		"responseMessage": "Forbidden"
+		"responseMessage": "Forbidden",
+		"body": {
+			"status": 403,
+			"error": "Forbidden"
+		}
 	}
 }
