@@ -12,14 +12,6 @@ import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.FIXED_LIST;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.FIXED_RADIO_LIST;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.MULTI_SELECT_LIST;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.PREDEFINED_COMPLEX_ADDRESS_GLOBAL;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.PREDEFINED_COMPLEX_ADDRESS_GLOBAL_UK;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.PREDEFINED_COMPLEX_ADDRESS_UK;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.PREDEFINED_COMPLEX_CASELINK;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.PREDEFINED_COMPLEX_ORDER_SUMMARY;
 
 public interface CommonField {
 
@@ -44,29 +36,8 @@ public interface CommonField {
     }
 
     @JsonIgnore
-    default boolean isMultiSelectListType() {
-        return MULTI_SELECT_LIST.equalsIgnoreCase(getFieldType().getType());
-    }
-
-    @JsonIgnore
-    default boolean isOneOfFixedListType() {
-        return MULTI_SELECT_LIST.equalsIgnoreCase(getFieldType().getType()) ||
-            FIXED_LIST.equalsIgnoreCase(getFieldType().getType()) ||
-            FIXED_RADIO_LIST.equalsIgnoreCase(getFieldType().getType());
-    }
-
-    @JsonIgnore
     default boolean isCompoundFieldType() {
         return isCollectionFieldType() || isComplexFieldType();
-    }
-
-    @JsonIgnore
-    default boolean isPredefinedComplexType() {
-        return PREDEFINED_COMPLEX_ADDRESS_GLOBAL.equalsIgnoreCase(getFieldType().getId()) ||
-            PREDEFINED_COMPLEX_ADDRESS_GLOBAL_UK.equalsIgnoreCase(getFieldType().getId()) ||
-            PREDEFINED_COMPLEX_ADDRESS_UK.equalsIgnoreCase(getFieldType().getId()) ||
-            PREDEFINED_COMPLEX_ORDER_SUMMARY.equalsIgnoreCase(getFieldType().getId()) ||
-            PREDEFINED_COMPLEX_CASELINK.equalsIgnoreCase(getFieldType().getId());
     }
 
     /**
@@ -107,16 +78,6 @@ public interface CommonField {
         } else {
             return Optional.empty();
         }
-    }
-
-    @JsonIgnore
-    default boolean isComplexTableFieldType() {
-        return getFieldType() != null && getFieldType().getType().equals(COMPLEX) && getDisplayContext() != null;
-    }
-
-    @JsonIgnore
-    default boolean isCollectionOfAnyDisplayContextFieldType() {
-        return isCollectionFieldType() || isComplexTableFieldType();
     }
 
 }

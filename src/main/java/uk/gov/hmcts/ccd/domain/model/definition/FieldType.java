@@ -106,10 +106,8 @@ public class FieldType implements Serializable {
     public void setChildren(List<CaseField> caseFields) {
         if (type.equalsIgnoreCase(COMPLEX)) {
             complexFields = caseFields;
-        } else if (type.equalsIgnoreCase(COLLECTION)) {
-            if (collectionFieldType != null) {
-                collectionFieldType.complexFields = caseFields;
-            }
+        } else if (type.equalsIgnoreCase(COLLECTION) && collectionFieldType != null) {
+            collectionFieldType.complexFields = caseFields;
         }
     }
 
