@@ -4,6 +4,7 @@ import java.util.stream.Collectors;
 
 import io.cucumber.java.Scenario;
 import io.restassured.specification.RequestSpecification;
+import uk.gov.hmcts.ccd.fta.data.CaseData;
 import uk.gov.hmcts.ccd.fta.data.HttpTestData;
 import uk.gov.hmcts.ccd.fta.data.HttpTestDataSource;
 import uk.gov.hmcts.ccd.fta.data.JsonStoreHttpTestDataSource;
@@ -12,11 +13,12 @@ import uk.gov.hmcts.ccd.fta.data.UserData;
 
 public class BackEndFunctionalTestScenarioContext {
 
-    private static final String[] TEST_DATA_RESOURCE_PACKAGES = { "features" };
+    private static final String[] TEST_DATA_RESOURCE_PACKAGES = { "features", "cases" };
     private static final HttpTestDataSource DATA_SOURCE = new JsonStoreHttpTestDataSource(TEST_DATA_RESOURCE_PACKAGES);
 
-    private HttpTestData testData;
     private Scenario scenario;
+    private HttpTestData testData;
+    private CaseData caseData;
     private Long theCaseReference;
     private UserData theUser;
     private RequestSpecification theRequest;
@@ -28,6 +30,10 @@ public class BackEndFunctionalTestScenarioContext {
         testData = DATA_SOURCE.getDataForScenario(scenarioTag);
     }
 
+    public void initializeCaseFor(String scenarioKey) {
+        caseData = DATA_SOURCE.getCaseForScenario(scenarioKey);
+    }
+
     public String getCurrentScenarioTag() {
         return scenario.getSourceTagNames().stream()
             .filter(tag -> tag.startsWith("@S-"))
@@ -37,6 +43,10 @@ public class BackEndFunctionalTestScenarioContext {
 
     public HttpTestData getTestData() {
         return testData;
+    }
+
+    public CaseData getCaseData() {
+        return caseData;
     }
 
     public Long getTheCaseReference() {

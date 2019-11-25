@@ -75,13 +75,11 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
 
     @Override
     @Given("a case has just been created as in [{}]")
-    public void prepareACase(String caseSpecification) {
-        CaseData caseMetadata = scenarioContext.getTestData().getCaseMetadata();
-        String jurisdiction = caseMetadata.getJurisdiction();
-        String caseType = caseMetadata.getCaseType();
-        String event = caseMetadata.getEvent();
+    public void prepareACase(String caseDataId) {
+        scenarioContext.initializeCaseFor(caseDataId);
+        CaseData caseData = scenarioContext.getCaseData();
 
-        UserData caseCreator = scenarioContext.getTestData().getCaseCreator();
+        UserData caseCreator = caseData.getUser();
         resolveUserData("caseCreator", caseCreator);
         authenticateUser("caseCreator", caseCreator);
 
@@ -90,6 +88,9 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
             .header("ServiceAuthorization", aat.getS2SHelper().getToken())
             .pathParam("user", caseCreator.getUid());
 
+        String jurisdiction = caseData.getJurisdiction();
+        String caseType = caseData.getCaseType();
+        String event = caseData.getEvent();
         String eventToken = aat.getCcdHelper().generateTokenCreateCase(asCaseCreator, jurisdiction, caseType, event);
         Long caseReference = new CCDEventBuilder(jurisdiction, caseType, event)
             .as(asCaseCreator)

@@ -10,7 +10,7 @@ public interface BackEndFunctionalTestAutomationDSL {
 
     // DSL Element:
     // "a case has just been created as in [<some test data unique id>]"
-    void prepareACase(String caseSpecification);
+    void prepareACase(String caseDataId);
 
     // DSL Element:
     // "a user with [<some specification about user data>]"

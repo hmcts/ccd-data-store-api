@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Definition of case type AUTOTEST1/AAT as code.
@@ -18,6 +20,8 @@ public interface AATCaseType {
 
     @Data
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     @JsonInclude(JsonInclude.Include.NON_NULL)
     class CaseData {
         @JsonProperty("TextField")
@@ -132,6 +136,7 @@ public interface AATCaseType {
     }
 
     @Data
+    @NoArgsConstructor
     @AllArgsConstructor
     class CollectionItem {
         @JsonProperty("id")
@@ -142,6 +147,7 @@ public interface AATCaseType {
     }
 
     @Data
+    @NoArgsConstructor
     @AllArgsConstructor
     class ComplexType {
         @JsonProperty("ComplexTextField")
@@ -153,6 +159,8 @@ public interface AATCaseType {
 
     @Data
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     class AddressUKField {
         @JsonProperty("AddressLine1")
         private String addressLine1;

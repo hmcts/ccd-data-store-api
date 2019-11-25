@@ -8,15 +8,6 @@
   ],
   "productName": "CCD Data Store",
   "operationName": "Get default settings for user",
-  "caseCreator": {
-    "username": "[[$CCD_CASEWORKER_AUTOTEST_EMAIL]]",
-    "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
-  },
-  "caseMetadata": {
-    "jurisdiction": "AUTOTEST1",
-    "caseType": "AAT",
-    "event": "CREATE"
-  },
   "method": "GET",
   "uri": "/caseworkers/{uid}/profile",
   "request": {

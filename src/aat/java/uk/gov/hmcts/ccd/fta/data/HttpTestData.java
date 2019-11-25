@@ -19,10 +19,6 @@ public class HttpTestData {
 
     private UserData user;
 
-    private UserData caseCreator;
-
-    private CaseData caseMetadata;
-
     private String method;
 
     private String uri;
@@ -85,22 +81,6 @@ public class HttpTestData {
 
     public void setUser(UserData user) {
         this.user = user;
-    }
-
-    public UserData getCaseCreator() {
-        return caseCreator;
-    }
-
-    public void setCaseCreator(UserData caseCreator) {
-        this.caseCreator = caseCreator;
-    }
-
-    public CaseData getCaseMetadata() {
-        return caseMetadata;
-    }
-
-    public void setCaseMetadata(CaseData caseMetadata) {
-        this.caseMetadata = caseMetadata;
     }
 
     public String getMethod() {

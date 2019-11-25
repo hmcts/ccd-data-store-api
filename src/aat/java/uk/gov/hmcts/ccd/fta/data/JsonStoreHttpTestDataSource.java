@@ -42,6 +42,16 @@ public class JsonStoreHttpTestDataSource implements HttpTestDataSource {
         }
     }
 
+    @Override
+    public CaseData getCaseForScenario(String scenarioKey) {
+        loadDataStoreIfNotAlreadyLoaded();
+        try {
+            return jsonStore.getObjectWithId(scenarioKey, CaseData.class);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private void loadDataStoreIfNotAlreadyLoaded() {
         jsonStore = new JsonResourceStoreWithInheritance(resourcePaths.toArray(new String[0]));
     }
