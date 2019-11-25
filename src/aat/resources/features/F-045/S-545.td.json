@@ -12,6 +12,11 @@
   "method": "POST",
   "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/users",
   "request": {
+    "headers": {
+      "Authorization": "[[DYNAMIC]]",
+      "ServiceAuthorization": "[[DYNAMIC]]",
+      "Content-Type": "application/json"
+    },
     "pathVariables": {
       "uid": "[[DYNAMIC]]",
       "jid": "AUTOTEST1",
@@ -23,6 +28,10 @@
     }
   },
   "expectedResponse": {
+    "headers" : {
+      "Transfer-Encoding" : "chunked",
+      "Connection" : "close"
+    },
     "body" : {
       "exception" : "java.lang.NumberFormatException",
       "timestamp" : "[[ANY]]",

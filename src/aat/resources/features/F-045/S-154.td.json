@@ -26,6 +26,9 @@
     }
   },
   "expectedResponse": {
+    "headers" : {
+      "Transfer-Encoding" : "chunked"
+    },
     "body" : {
       "timestamp" : "[[ANY]]",
       "status" : 403,

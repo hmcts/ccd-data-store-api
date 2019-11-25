@@ -5,9 +5,6 @@
 	},
 	"expectedResponse": {
 		"responseCode": 500,
-		"responseMessage": "Internal Server Error",
-    "headers": {
-      "Connection" : "close"
-    }
+		"responseMessage": "Internal Server Error"
 	}
 }

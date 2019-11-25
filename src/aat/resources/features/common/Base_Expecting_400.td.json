@@ -1,29 +1,15 @@
 {
 	"_guid_": "Base_Expecting_400",
-  "user": {
-    "username": "auto.test.cnp@gmail.com",
-    "password": "Pa55word11"
-  },
-  "request": {
-    "headers": {
-      "Authorization": "[[DYNAMIC]]",
-      "ServiceAuthorization": "[[DYNAMIC]]",
-      "Content-Type": "application/json"
-    }
-  },
+	"_extends_": "Base-Root",
+	"request": {
+
+	},
 	"expectedResponse": {
 		"responseCode": 400,
 		"responseMessage": "Bad Request",
-    "headers": {
-      "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
-      "Connection" : "close",
-      "Content-Length" : "0",
-      "Date" : "[[ANY]]",
-      "Expires" : "0",
-      "Pragma" : "no-cache",
-      "X-Content-Type-Options" : "nosniff",
-      "X-Frame-Options" : "DENY",
-      "X-XSS-Protection" : "1; mode=block"
-    }
+		"body": {
+			"status": 400,
+			"error": "Bad Request"
+		}
 	}
 }

@@ -23,7 +23,9 @@
     }
   },
   "expectedResponse": {
-
+    "headers" : {
+      "Transfer-Encoding" : "chunked"
+    },
     "body" : {
       "exception" : "uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException",
       "timestamp" : "[[ANY]]",

@@ -1,6 +1,5 @@
 {
   "_guid_": "S-544",
-  "_extends_": "Base_Expecting_400",
   "title": "must return negative response when request body doesn't provide the mandatory field",
   "specs": [
     "a detailed profile in CCD",
@@ -9,9 +8,18 @@
   ],
   "productName": "CCD Data Store",
   "operationName": "Grant access to case",
+  "user": {
+    "username": "[[$CCD_CASEWORKER_AUTOTEST_EMAIL]]",
+    "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+  },
   "method": "POST",
   "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/users",
   "request": {
+    "headers": {
+      "Authorization": "[[DYNAMIC]]",
+      "ServiceAuthorization": "[[DYNAMIC]]",
+      "Content-Type": "application/json"
+    },
     "pathVariables": {
       "uid": "[[DYNAMIC]]",
       "jid": "AUTOTEST1",
@@ -20,6 +28,21 @@
     },
     "body": {
       "id_test": "Test User"
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 400,
+    "responseMessage": "Bad Request",
+    "headers": {
+      "X-Frame-Options": "DENY",
+      "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+      "X-Content-Type-Options": "nosniff",
+      "Pragma": "no-cache",
+      "Expires": "0",
+      "X-XSS-Protection": "1; mode=block",
+      "Date": "[[ANY]]",
+      "Connection" : "close",
+      "Content-Length" : "[[ANY]]"
     }
   }
 }
