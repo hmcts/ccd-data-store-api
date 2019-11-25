@@ -14,7 +14,6 @@
 	"expectedResponse": {
 		"headers": {
 			"X-Frame-Options": "DENY",
-			"Transfer-Encoding": "chunked",
 			"Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
 			"vary": "accept-encoding",
 			"X-Content-Type-Options": "nosniff",
