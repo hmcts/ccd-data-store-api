@@ -16,6 +16,9 @@
     }
   },
   "expectedResponse": {
+    "headers" : {
+      "Transfer-Encoding" : "chunked"
+    },
     "body": {
       "user": {
         "idam": {

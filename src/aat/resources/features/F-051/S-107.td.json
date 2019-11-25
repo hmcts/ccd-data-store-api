@@ -20,6 +20,9 @@
   "method": "GET",
   "uri": "/caseworkers/{uid}/profile",
   "expectedResponse": {
+    "headers" : {
+      "Transfer-Encoding" : "chunked"
+    },
     "body" : {
       "timestamp" : "[[ANY]]",
       "status" : 403,
