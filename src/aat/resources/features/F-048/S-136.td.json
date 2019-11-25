@@ -21,6 +21,9 @@
   "expectedResponse": {
     "responseCode": 200,
     "responseMessage": "OK",
+    "headers": {
+      "Content-Length": "[[ANY]]"
+    },
     "body": {
       "total_results_count": "[[ANY]]",
       "total_pages_count": "[[ANY]]"

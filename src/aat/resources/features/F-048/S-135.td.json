@@ -27,6 +27,9 @@
   "expectedResponse": {
     "responseCode": 403,
     "responseMessage": "Forbidden",
+    "headers": {
+      "Content-Length": "[[ANY]]"
+    },
     "body": {
       "timestamp": "[[ANY]]",
       "status": 403,
