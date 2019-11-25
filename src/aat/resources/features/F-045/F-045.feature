@@ -1,4 +1,4 @@
-@F-000
+@F-045
 Feature: Grant access to case
 
   Background:
@@ -44,7 +44,7 @@ Feature: Grant access to case
     And the response [has the 403 return code]
     And the response has all the details as expected
 
-  @S-550
+  @S-544
   Scenario: must return negative response when request body doesn't provide the mandatory field
     Given a user with [a detailed profile in CCD]
     When a request is prepared with appropriate values
@@ -54,7 +54,7 @@ Feature: Grant access to case
     And the response [has the 400 return code]
     And the response has all the details as expected
 
-  @S-551
+  @S-545
   Scenario: must return negative response when case id contains some non-numeric characters
     Given a user with [a detailed profile in CCD]
     When a request is prepared with appropriate values

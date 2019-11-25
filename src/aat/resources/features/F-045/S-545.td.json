@@ -1,5 +1,5 @@
 {
-  "_guid_": "S-551",
+  "_guid_": "S-545",
   "_extends_": "Base_Expecting_500",
   "title": "must return negative response when case id contains some non-numeric characters",
   "specs": [

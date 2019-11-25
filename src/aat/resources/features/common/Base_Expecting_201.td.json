@@ -1,10 +1,28 @@
 {
 	"_guid_": "Base_Expecting_201",
-	"_extends_": "Base-Root",
-	"request": {
-	},
-	"expectedResponse": {
-		"responseCode": 201,
-		"responseMessage": "Created"
-	}
+  "user": {
+    "username": "auto.test.cnp@gmail.com",
+    "password": "Pa55word11"
+  },
+  "request": {
+    "headers": {
+      "Authorization": "[[DYNAMIC]]",
+      "ServiceAuthorization": "[[DYNAMIC]]",
+      "Content-Type": "application/json"
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 201,
+    "responseMessage": "Created",
+    "headers" : {
+      "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
+      "Content-Length" : "0",
+      "Date" : "[[ANY]]",
+      "Expires" : "0",
+      "Pragma" : "no-cache",
+      "X-Content-Type-Options" : "nosniff",
+      "X-Frame-Options" : "DENY",
+      "X-XSS-Protection" : "1; mode=block"
+    }
+  }
 }
