@@ -9,6 +9,10 @@ public interface BackEndFunctionalTestAutomationDSL {
     void initializeAppropriateTestContextAsDetailedInTheTestDataSource();
 
     // DSL Element:
+    // "a case has just been created as in [{}]"
+    public void prepareACase(String caseSpecification);
+
+    // DSL Element:
     // "a user with [<some specification about user data>]"
     void verifyThatThereIsAUserInTheContextWithAParticularSpecification(String specificationAboutAUser);
 

@@ -17,6 +17,7 @@ public class BackEndFunctionalTestScenarioContext {
 
     private HttpTestData testData;
     private Scenario scenario;
+    private Long theCaseReference;
     private UserData theUser;
     private RequestSpecification theRequest;
     private ResponseData theResponse;
@@ -36,6 +37,14 @@ public class BackEndFunctionalTestScenarioContext {
 
     public HttpTestData getTestData() {
         return testData;
+    }
+
+    public Long getTheCaseReference() {
+        return theCaseReference;
+    }
+
+    public void setTheCaseReference(Long theCaseReference) {
+        this.theCaseReference = theCaseReference;
     }
 
     public UserData getTheUser() {
