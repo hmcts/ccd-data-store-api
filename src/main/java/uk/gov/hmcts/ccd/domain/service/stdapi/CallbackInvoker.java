@@ -55,6 +55,7 @@ public class CallbackInvoker {
         this.securityValidationService = securityValidationService;
         this.accessControlService = accessControlService;
         this.caseAccessService = caseAccessService;
+
     }
 
     public void invokeAboutToStartCallback(final CaseEvent caseEvent,
