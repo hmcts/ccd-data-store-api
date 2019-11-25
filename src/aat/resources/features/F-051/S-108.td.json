@@ -21,7 +21,7 @@
   },
   "expectedResponse": {
     "headers" : {
-      "Transfer-Encoding" : "chunked"
+      "Content-Length": "[[ANY]]"
     },
     "body" : {
       "timestamp" : "[[ANY]]",
