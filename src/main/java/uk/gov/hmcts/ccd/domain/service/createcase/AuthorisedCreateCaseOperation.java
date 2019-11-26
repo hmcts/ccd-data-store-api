@@ -13,14 +13,13 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.*;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
 @Service
 @Qualifier("authorised")
@@ -67,7 +66,8 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
 
         Event event = caseDataContent.getEvent();
         Map<String, JsonNode> data = caseDataContent.getData();
-        verifyCreateAccess(event, data, caseType, userRoles);
+        String eventId = event == null ? null : event.getEventId();
+        this.accessControlService.verifyCreateAccess(eventId, caseType, userRoles, MAPPER.convertValue(data, JsonNode.class));
 
         final CaseDetails caseDetails = createCaseOperation.createCaseDetails(uid,
                                                                               jurisdictionId,
@@ -106,28 +106,4 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
         return caseDetails;
     }
 
-    private void verifyCreateAccess(Event event, Map<String, JsonNode> data, CaseType caseType, Set<String> userRoles) {
-        if (!accessControlService.canAccessCaseTypeWithCriteria(
-            caseType,
-            userRoles,
-            CAN_CREATE)) {
-            throw new ResourceNotFoundException(NO_CASE_TYPE_FOUND);
-        }
-
-        if (event == null || !accessControlService.canAccessCaseEventWithCriteria(
-            event.getEventId(),
-            caseType.getEvents(),
-            userRoles,
-            CAN_CREATE)) {
-            throw new ResourceNotFoundException(NO_EVENT_FOUND);
-        }
-
-        if (!accessControlService.canAccessCaseFieldsWithCriteria(
-            MAPPER.convertValue(data, JsonNode.class),
-            caseType.getCaseFields(),
-            userRoles,
-            CAN_CREATE)) {
-            throw new ResourceNotFoundException(NO_FIELD_FOUND);
-        }
-    }
 }

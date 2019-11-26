@@ -21,6 +21,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
@@ -68,7 +69,8 @@ class AuthorisedCreateCaseOperationTest {
     private AccessControlService accessControlService;
 
     @Mock
-    private UserRepository userRepository;
+    private CaseAccessService caseAccessService;
+
 
     private AuthorisedCreateCaseOperation authorisedCreateCaseOperation;
     private CaseDetails classifiedCase;
@@ -82,7 +84,7 @@ class AuthorisedCreateCaseOperationTest {
         MockitoAnnotations.initMocks(this);
 
         authorisedCreateCaseOperation = new AuthorisedCreateCaseOperation(
-            classifiedCreateCaseOperation, caseDefinitionRepository, accessControlService, userRepository);
+            classifiedCreateCaseOperation, caseDefinitionRepository, accessControlService, caseAccessService);
         classifiedCase = new CaseDetails();
         classifiedCase.setData(Maps.newHashMap());
         EVENT.setEventId(EVENT_ID);
@@ -95,7 +97,7 @@ class AuthorisedCreateCaseOperationTest {
         caseType.setEvents(events);
         caseType.setCaseFields(caseFields);
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseType);
-        when(userRepository.getUserRoles()).thenReturn(userRoles);
+        when(caseAccessService.getCaseCreationRoles()).thenReturn(userRoles);
         when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseType), eq(userRoles), eq(CAN_CREATE))).thenReturn(true);
         when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseType), eq(userRoles), eq(CAN_READ))).thenReturn(true);
         when(accessControlService.canAccessCaseEventWithCriteria(eq(EVENT_ID), eq(events), eq(userRoles), eq(CAN_CREATE))).thenReturn(true);
@@ -145,17 +147,19 @@ class AuthorisedCreateCaseOperationTest {
     @DisplayName("should return authorised case detail if relevant create and read access granted")
     void shouldReturnAuthorisedCaseDetailsIfCreateAndReadAccessGranted() {
 
+        doCallRealMethod().when(accessControlService).verifyCreateAccess(any(), any(), anySet(), any());
+
         final CaseDetails output = authorisedCreateCaseOperation.createCaseDetails(UID,
                                                                                    JURISDICTION_ID,
                                                                                    CASE_TYPE_ID,
                                                                                    EVENT_DATA,
                                                                                    IGNORE);
 
-        InOrder inOrder = inOrder(caseDefinitionRepository, userRepository, classifiedCreateCaseOperation, accessControlService);
+        InOrder inOrder = inOrder(caseDefinitionRepository, caseAccessService, classifiedCreateCaseOperation, accessControlService);
         assertAll(
             () -> assertThat(output, sameInstance(classifiedCase)),
             () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
-            () -> inOrder.verify(userRepository).getUserRoles(),
+            () -> inOrder.verify(caseAccessService).getCaseCreationRoles(),
             () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseType), eq(userRoles), eq(CAN_CREATE)),
             () -> inOrder.verify(accessControlService).canAccessCaseEventWithCriteria(eq(EVENT_ID), eq(events), eq(userRoles), eq(CAN_CREATE)),
             () -> inOrder.verify(accessControlService).canAccessCaseFieldsWithCriteria(any(JsonNode.class), eq(caseFields), eq(userRoles), eq(CAN_CREATE)),
@@ -195,7 +199,7 @@ class AuthorisedCreateCaseOperationTest {
     @DisplayName("should fail if user roles not found")
     void shouldFailIfNoUserRolesFound() {
 
-        doReturn(null).when(userRepository).getUserRoles();
+        doThrow(ValidationException.class).when(caseAccessService).getCaseCreationRoles();
 
         assertThrows(ValidationException.class, () -> authorisedCreateCaseOperation.createCaseDetails(UID,
                                                                                                       JURISDICTION_ID,
@@ -207,6 +211,8 @@ class AuthorisedCreateCaseOperationTest {
     @Test
     @DisplayName("should fail if no create case access")
     void shouldFailIfNoCreateCaseAccess() {
+
+        doCallRealMethod().when(accessControlService).verifyCreateAccess(any(), any(), anySet(), any());
 
         when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseType), eq(userRoles), eq(CAN_CREATE))).thenReturn(false);
 
@@ -231,6 +237,7 @@ class AuthorisedCreateCaseOperationTest {
     @Test
     @DisplayName("should fail if no event provided")
     void shouldFailIfNoEventProvided() {
+        doCallRealMethod().when(accessControlService).verifyCreateAccess(any(), any(), anySet(), any());
         assertThrows(ResourceNotFoundException.class, () -> authorisedCreateCaseOperation.createCaseDetails(UID,
                                                                                                             JURISDICTION_ID,
                                                                                                             CASE_TYPE_ID,
@@ -241,6 +248,8 @@ class AuthorisedCreateCaseOperationTest {
     @Test
     @DisplayName("should fail if no create event access")
     void shouldFailIfNoCreateEventAccess() {
+
+        doCallRealMethod().when(accessControlService).verifyCreateAccess(any(), any(), anySet(), any());
 
         when(accessControlService.canAccessCaseEventWithCriteria(eq(EVENT_ID), eq(events), eq(userRoles), eq(CAN_CREATE))).thenReturn(false);
 
@@ -254,6 +263,8 @@ class AuthorisedCreateCaseOperationTest {
     @Test
     @DisplayName("should fail if no create field access")
     void shouldFailIfNoCreateFieldAccess() {
+
+        doCallRealMethod().when(accessControlService).verifyCreateAccess(any(), any(), anySet(), any());
 
         when(accessControlService.canAccessCaseFieldsWithCriteria(any(JsonNode.class), eq(caseFields), eq(userRoles), eq(CAN_CREATE))).thenReturn(false);
 

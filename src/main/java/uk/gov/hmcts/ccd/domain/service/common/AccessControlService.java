@@ -605,7 +605,7 @@ public class AccessControlService {
             throw new ResourceNotFoundException(NO_CASE_TYPE_FOUND);
         }
 
-        if (!canAccessCaseEventWithCriteria(
+        if (eventId == null || !canAccessCaseEventWithCriteria(
             eventId,
             caseType.getEvents(),
             userRoles,

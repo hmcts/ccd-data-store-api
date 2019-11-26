@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -14,20 +15,22 @@ import org.mockito.*;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
-import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItemType;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
+import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItemType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackService;
-import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
-import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
-import uk.gov.hmcts.ccd.domain.service.common.SecurityValidationService;
+import uk.gov.hmcts.ccd.domain.service.common.*;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
@@ -36,11 +39,11 @@ import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_FIELD_FOUND;
 
 class CallbackInvokerTest {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
@@ -66,6 +69,12 @@ class CallbackInvokerTest {
 
     @Mock
     private SecurityValidationService securityValidationService;
+
+    @Mock
+    private AccessControlService accessControlService;
+
+    @Mock
+    private CaseAccessService caseAccessService;
 
     @InjectMocks
     private CallbackInvoker callbackInvoker;
@@ -520,6 +529,34 @@ class CallbackInvokerTest {
                                                                                                                   any())
                 );
             }
+
+            @DisplayName("validate call back response and there are errors in call back validation with respect to case create role access")
+            @Test
+            void validateAndSetDataMetCaseRoleAccessError() {
+                final CallbackResponse callbackResponse = new CallbackResponse();
+                when(callbackService.send(caseEvent.getCallBackURLAboutToStartEvent(),
+                    caseEvent,
+                    null,
+                    caseDetails,
+                    false)).thenReturn(Optional.of(callbackResponse));
+                final Map<String, JsonNode> data = new HashMap<>();
+                callbackResponse.setData(data);
+
+                doThrow(new ResourceNotFoundException(NO_FIELD_FOUND)).when(accessControlService).verifyCreateAccess(any(), any(), anySet(), any());
+
+                final ResourceNotFoundException resourceNotFoundException =
+                    assertThrows(ResourceNotFoundException.class, () -> callbackInvoker.invokeAboutToStartCallback(caseEvent,
+                        caseType,
+                        caseDetails,
+                        TRUE));
+
+                assertThat(resourceNotFoundException.getMessage(), Matchers.containsString(NO_FIELD_FOUND));
+
+                assertAll(
+                    () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE),
+                    () -> inOrder.verify(caseTypeService, never()).validateData(any(), any())
+                );
+            }
         }
 
         @Nested
@@ -677,6 +714,22 @@ class CallbackInvokerTest {
                                                                                                                   any())
                 );
             }
+
+            @DisplayName("validate call back response and there are errors in call back validation with respect to case create role access")
+            @Test
+            void validateAndSetDataMetCaseRoleAccessError() {
+
+                doThrow(new ResourceNotFoundException(NO_FIELD_FOUND)).when(accessControlService).verifyCreateAccess(any(), any(), anySet(), any());
+
+                final ResourceNotFoundException resourceNotFoundException =
+                    assertThrows(ResourceNotFoundException.class, () -> callbackInvoker.invokeAboutToSubmitCallback(caseEvent,
+                        caseDetailsBefore,
+                        caseDetails,
+                        caseType,
+                        TRUE));
+
+                assertThat(resourceNotFoundException.getMessage(), Matchers.containsString(NO_FIELD_FOUND));
+            }
         }
 
         @Nested
@@ -777,6 +830,36 @@ class CallbackInvokerTest {
                     () -> inOrder.verify(caseDataService, never()).getDefaultSecurityClassifications(any(), any(), any()),
                     () -> inOrder.verify(securityValidationService, never()).setClassificationFromCallbackIfValid(any(), any(), any())
                          );
+            }
+
+            @DisplayName("validate call back response and there are errors in call back validation with respect to case create role access")
+            @Test
+            void validateAndSetDataMetCaseRoleAccessError() {
+                final CallbackResponse callbackResponse = new CallbackResponse();
+                final Map<String, JsonNode> data = new HashMap<>();
+                callbackResponse.setData(data);
+                when(callbackService.send(wizardPage.getCallBackURLMidEvent(),
+                    caseEvent,
+                    caseDetailsBefore,
+                    caseDetails, false)).thenReturn(Optional.of(callbackResponse));
+
+                doThrow(new ResourceNotFoundException(NO_FIELD_FOUND)).when(accessControlService).verifyCreateAccess(any(), any(), anySet(), any());
+
+                final ResourceNotFoundException resourceNotFoundException =
+                    assertThrows(ResourceNotFoundException.class,
+                        () -> callbackInvoker.invokeMidEventCallback(wizardPage,
+                            caseType,
+                            caseEvent,
+                            caseDetailsBefore,
+                            caseDetails,
+                            IGNORE_WARNINGS));
+
+                assertThat(resourceNotFoundException.getMessage(), Matchers.containsString(NO_FIELD_FOUND));
+
+                assertAll(
+                    () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, FALSE),
+                    () -> inOrder.verify(caseTypeService, never()).validateData(any(), any())
+                );
             }
         }
 
