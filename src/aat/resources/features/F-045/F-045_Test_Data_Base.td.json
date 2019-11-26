@@ -20,6 +20,6 @@
 		}
 	},
 	"expectedResponse": {
-		"_extends_": "Common_201_Expected_Response"
+		"_extends_": "Common_201_Response"
 	}
 }
