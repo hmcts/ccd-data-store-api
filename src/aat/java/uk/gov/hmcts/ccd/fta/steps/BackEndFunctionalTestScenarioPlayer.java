@@ -322,7 +322,6 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
             aat.getImporterAutoTestPassword());
 
         String s2sToken = aat.getS2SHelper().getToken();
-
         return RestAssured.given(new RequestSpecBuilder()
             .setBaseUri(aat.getDefinitionStoreUrl())
             .build())
