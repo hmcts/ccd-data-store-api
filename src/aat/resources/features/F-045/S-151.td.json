@@ -3,7 +3,7 @@
   "title": "must return 201 if the grant is successful for a user to a valid case ID",
   "specs": [
     "a detailed profile in CCD",
-    "has a valid case-reference in input parameters",
+    "has a valid case-reference existing in CCD",
     "has the 201 return code"
   ],
   "productName": "CCD Data Store",

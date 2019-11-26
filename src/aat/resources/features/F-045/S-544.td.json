@@ -1,9 +1,9 @@
 {
   "_guid_": "S-544",
-  "title": "must return negative response when request body doesn't provide the mandatory field",
+  "title": "must return negative response when request body doesn't provide a mandatory field",
   "specs": [
     "a detailed profile in CCD",
-    "does not provide the mandatory field for the operation",
+    "does not provide a mandatory field for the operation",
     "has the 400 return code"
   ],
   "productName": "CCD Data Store",

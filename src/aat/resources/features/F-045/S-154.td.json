@@ -1,10 +1,10 @@
 {
   "_guid_": "S-154",
   "_extends_": "Base_Expecting_403",
-  "title": "must return negative response when request provides authentic credentials without authorized access to the operation",
+  "title": "must return negative response when request provides authentic credentials without authorized access",
   "specs": [
     "a detailed profile in CCD",
-    "does not provide the authorised access to the operation",
+    "does not provide authorised access to the operation",
     "has the 403 return code"
   ],
   "productName": "CCD Data Store",

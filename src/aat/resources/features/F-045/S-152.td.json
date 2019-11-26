@@ -4,7 +4,7 @@
   "title": "must return 404 when case id is structurally valid but not existing in CCD",
   "specs": [
     "a detailed profile in CCD",
-    "contains structurally valid but non existing case-reference in input parameters",
+    "contains in input parameters a structurally valid but non-existing case-reference",
     "has the 404 return code"
   ],
   "productName": "CCD Data Store",
