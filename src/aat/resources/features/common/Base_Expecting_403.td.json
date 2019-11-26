@@ -7,6 +7,9 @@
 	"expectedResponse": {
 		"responseCode": 403,
 		"responseMessage": "Forbidden",
+		"headers": {
+			"_extends_": "Common_403_Response_Headers"
+		},
 		"body": {
 			"status": 403,
 			"error": "Forbidden"
