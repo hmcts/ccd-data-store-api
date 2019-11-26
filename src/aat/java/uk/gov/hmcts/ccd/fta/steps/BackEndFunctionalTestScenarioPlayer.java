@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.fta.steps;
 
+import io.restassured.http.Method;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
+import java.util.function.Supplier;
 
 import feign.FeignException;
 import io.cucumber.java.Before;
@@ -24,7 +27,10 @@ import io.restassured.specification.QueryableRequestSpecification;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.SpecificationQuerier;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
+import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType;
+import uk.gov.hmcts.ccd.datastore.tests.fixture.CCDEventBuilder;
 import uk.gov.hmcts.ccd.datastore.tests.helper.idam.AuthenticatedUser;
+import uk.gov.hmcts.ccd.fta.data.HttpTestData;
 import uk.gov.hmcts.ccd.fta.data.RequestData;
 import uk.gov.hmcts.ccd.fta.data.ResponseData;
 import uk.gov.hmcts.ccd.fta.data.UserData;
@@ -68,40 +74,51 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     }
 
     @Override
+    @Given("a case has just been created as in [{}]")
+    public void createCaseWithTheDataProvidedInATestDataObject(String caseDataId) {
+        scenarioContext.initializeCaseCreationDataFor(caseDataId);
+        HttpTestData caseData = scenarioContext.getCaseCreationData();
+
+        UserData caseCreator = caseData.getUser();
+        resolveUserData("caseCreator", caseCreator);
+        authenticateUser("caseCreator", caseCreator);
+
+        Supplier<RequestSpecification> asCaseCreator = () -> RestAssured.given()
+            .header("Authorization", "Bearer " + caseCreator.getToken())
+            .header("ServiceAuthorization", aat.getS2SHelper().getToken())
+            .pathParam("user", caseCreator.getUid());
+
+        Map<String, Object> caseVariables = caseData.getRequest().getPathVariables();
+        String jurisdiction = caseVariables.get("jurisdiction").toString();
+        String caseType = caseVariables.get("caseType").toString();
+        String event = caseVariables.get("event").toString();
+        AATCaseType.CaseData data;
+        try {
+            data = new ObjectMapper().convertValue(caseData.getRequest().getBody(), AATCaseType.CaseData.class);
+        } catch (IllegalArgumentException ex) {
+            String errorMessage = "Cannot map '" + caseDataId + "' -> request.body to AATCaseType.CaseData object";
+            throw new FunctionalTestException(errorMessage);
+        }
+
+        String eventToken = aat.getCcdHelper().generateTokenCreateCase(asCaseCreator, jurisdiction, caseType, event);
+        Long caseReference = new CCDEventBuilder(jurisdiction, caseType, event)
+            .as(asCaseCreator)
+            .withData(data)
+            .withEventId(event)
+            .withToken(eventToken)
+            .submitAndGetReference();
+
+        scenarioContext.setTheCaseReference(caseReference);
+        scenario.write("Created a case with reference: " + caseReference);
+    }
+
+    @Override
     @Given("a user with [{}]")
     public void verifyThatThereIsAUserInTheContextWithAParticularSpecification(String specificationAboutAUser) {
         UserData aUser = scenarioContext.getTestData().getUser();
-
-        String resolvedUsername = EnvUtils.resolvePossibleEnvironmentVariable(aUser.getUsername());
-        if (resolvedUsername.equals(aUser.getUsername())) {
-            logger.info(scenarioContext.getCurrentScenarioTag() + ": Expected environment variable declaration "
-                + "for user.username but found '" + resolvedUsername + "', which may cause issues in higher "
-                + "environments");
-        }
-
-        String resolvedPassword = EnvUtils.resolvePossibleEnvironmentVariable(aUser.getPassword());
-        if (resolvedPassword.equals(aUser.getPassword())) {
-            logger.info(scenarioContext.getCurrentScenarioTag() + ": Expected environment variable declaration "
-                + "for user.password but found '" + resolvedPassword + "', which may cause issues in higher "
-                + "environments");
-        }
-
-        aUser.setUsername(resolvedUsername);
-        aUser.setPassword(resolvedPassword);
-        scenario.write("User: " + resolvedUsername);
-
-        String logPrefix = scenarioContext.getCurrentScenarioTag() + ": Idam user [" + aUser.getUsername()
-            + "][" + aUser.getPassword() + "] ";
-        try {
-            AuthenticatedUser authenticatedUserMetadata = aat.getIdamHelper().authenticate(
-                aUser.getUsername(), aUser.getPassword());
-            aUser.setToken(authenticatedUserMetadata.getAccessToken());
-            aUser.setUid(authenticatedUserMetadata.getId());
-            logger.info(logPrefix + "authenticated");
-        } catch (FeignException ex) {
-            logger.info(logPrefix + "credentials invalid");
-        }
-
+        resolveUserData("user", aUser);
+        scenario.write("User: " + aUser.getUsername());
+        authenticateUser("user", aUser);
         scenarioContext.setTheUser(aUser);
 
         boolean doesTestDataMeetSpec = scenarioContext.getTestData().meetsSpec(specificationAboutAUser);
@@ -203,34 +220,20 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
 
         RequestSpecification theRequest = scenarioContext.getTheRequest();
         String uri = scenarioContext.getTestData().getUri();
-
-        String method = scenarioContext.getTestData().getMethod();
-        if (method == null) {
-            throw new FunctionalTestException("No request method in data file");
+        String methodAsString = scenarioContext.getTestData().getMethod();
+        Method method;
+        try {
+            method = Method.valueOf(methodAsString.toUpperCase());
+        } catch (IllegalArgumentException ex) {
+            String errorMessage = "Method '" + methodAsString + "' in test data file not recognised";
+            throw new FunctionalTestException(errorMessage);
         }
 
-        Response response;
-        switch (method) {
-            case "GET":
-                response = theRequest.get(uri);
-                break;
-            case "POST":
-                response = theRequest.post(uri);
-                break;
-            case "PUT":
-                response = theRequest.put(uri);
-                break;
-            case "DELETE":
-                response = theRequest.delete(uri);
-                break;
-            default:
-                throw new FunctionalTestException("Unknown request method in data file");
-        }
-
+        Response response = theRequest.request(method, uri);
         QueryableRequestSpecification queryableRequest = SpecificationQuerier.query(theRequest);
         scenario.write("Calling " + queryableRequest.getMethod() + " " + queryableRequest.getURI());
 
-        Map<String, Object> responseHeaders = new HashMap<>();
+        Map<String, Object> responseHeaders = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         response.getHeaders().forEach(header -> responseHeaders.put(header.getName(), header.getValue()));
         ResponseData responseData = new ResponseData();
         responseData.setResponseCode(response.getStatusCode());
@@ -268,6 +271,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
 
     @Override
     @Then("the response has all the details as expected")
+    @Then("the response has all other details as expected")
     public void verifyThatTheResponseHasAllTheDetailsAsExpected() throws IOException {
         ResponseData expectedResponse = scenarioContext.getTestData().getExpectedResponse();
         ResponseData actualResponse = scenarioContext.getTheResponse();
@@ -306,6 +310,39 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
             String errorMessage = "Test data does not confirm it meets the specification about the response: "
                 + responseSpecification;
             throw new FunctionalTestException(errorMessage);
+        }
+    }
+
+    private void resolveUserData(String prefix, UserData aUser) {
+        String resolvedUsername = EnvUtils.resolvePossibleEnvironmentVariable(aUser.getUsername());
+        if (resolvedUsername.equals(aUser.getUsername())) {
+            logger.info(scenarioContext.getCurrentScenarioTag() + ": Expected environment variable declaration "
+                + "for " + prefix + ".username but found '" + resolvedUsername + "', which may cause issues "
+                + "in higher environments");
+        }
+
+        String resolvedPassword = EnvUtils.resolvePossibleEnvironmentVariable(aUser.getPassword());
+        if (resolvedPassword.equals(aUser.getPassword())) {
+            logger.info(scenarioContext.getCurrentScenarioTag() + ": Expected environment variable declaration "
+                + "for " + prefix + ".password but found '" + resolvedPassword + "', which may cause issues "
+                + "in higher environments");
+        }
+
+        aUser.setUsername(resolvedUsername);
+        aUser.setPassword(resolvedPassword);
+    }
+
+    private void authenticateUser(String prefix, UserData aUser) {
+        String logPrefix = scenarioContext.getCurrentScenarioTag() + ": " + prefix + " [" + aUser.getUsername()
+            + "][" + aUser.getPassword() + "] ";
+        try {
+            AuthenticatedUser authenticatedUserMetadata = aat.getIdamHelper().authenticate(
+                aUser.getUsername(), aUser.getPassword());
+            aUser.setToken(authenticatedUserMetadata.getAccessToken());
+            aUser.setUid(authenticatedUserMetadata.getId());
+            logger.info(logPrefix + "authenticated");
+        } catch (FeignException ex) {
+            logger.info(logPrefix + "credentials invalid");
         }
     }
 }
