@@ -1,19 +1,6 @@
 package uk.gov.hmcts.ccd.fta.steps;
 
-import io.restassured.builder.RequestSpecBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import feign.FeignException;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
@@ -21,17 +8,29 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.response.Response;
 import io.restassured.specification.QueryableRequestSpecification;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.SpecificationQuerier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.helper.idam.AuthenticatedUser;
 import uk.gov.hmcts.ccd.fta.data.RequestData;
 import uk.gov.hmcts.ccd.fta.data.ResponseData;
 import uk.gov.hmcts.ccd.fta.data.UserData;
 import uk.gov.hmcts.ccd.fta.exception.FunctionalTestException;
+import uk.gov.hmcts.ccd.fta.util.EnvUtils;
 import uk.gov.hmcts.ccd.fta.util.JsonUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings({"LocalVariableName"})
 public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTestAutomationDSL {
@@ -80,14 +79,24 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     @Given("a user with [{}]")
     public void verifyThatThereIsAUserInTheContextWithAParticularSpecification(String specificationAboutAUser) {
         UserData aUser = scenarioContext.getTestData().getUser();
-        String username = aUser.getUsername();
 
-        // ADD MORE IDAM USERS HERE
-        if (username.equals(aat.getCaseworkerAutoTestEmail())) {
-            aUser.setPassword(aat.getCaseworkerAutoTestPassword());
-        } else {
-            logger.info(scenarioContext.getCurrentScenarioTag() + ": Idam user not recognised by FTA player");
+        String resolvedUsername = EnvUtils.resolvePossibleEnvironmentVariable(aUser.getUsername());
+        if (resolvedUsername.equals(aUser.getUsername())) {
+            logger.info(scenarioContext.getCurrentScenarioTag() + ": Expected environment variable declaration "
+                + "for user.username but found '" + resolvedUsername + "', which may cause issues in higher "
+                + "environments");
         }
+
+        String resolvedPassword = EnvUtils.resolvePossibleEnvironmentVariable(aUser.getPassword());
+        if (resolvedPassword.equals(aUser.getPassword())) {
+            logger.info(scenarioContext.getCurrentScenarioTag() + ": Expected environment variable declaration "
+                + "for user.password but found '" + resolvedPassword + "', which may cause issues in higher "
+                + "environments");
+        }
+
+        aUser.setUsername(resolvedUsername);
+        aUser.setPassword(resolvedPassword);
+        scenario.write("User: " + resolvedUsername);
 
         String logPrefix = scenarioContext.getCurrentScenarioTag() + ": Idam user [" + aUser.getUsername()
             + "][" + aUser.getPassword() + "] ";
@@ -177,6 +186,17 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         scenarioContext.setTheRequest(aRequest);
         scenario.write("Request prepared with the following variables: "
             + JsonUtils.getPrettyJsonFromObject(scenarioContext.getTestData().getRequest()));
+    }
+
+    @Override
+    @When("the request [{}]")
+    public void verifyTheRequestInTheContextWithAParticularSpecification(String requestSpecification) {
+        boolean check = scenarioContext.getTestData().meetsSpec(requestSpecification);
+        if (!check) {
+            String errorMessage = "Test data does not confirm it meets the specification about the request: "
+                + requestSpecification;
+            throw new FunctionalTestException(errorMessage);
+        }
     }
 
     @Override

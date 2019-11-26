@@ -2,9 +2,14 @@
 	"_guid_": "Base_Expecting_412",
 	"_extends_": "Base-Root",
 	"request": {
+		
 	},
 	"expectedResponse": {
 		"responseCode": 412,
-		"responseMessage": "Precondition Failed"
+		"responseMessage": "Precondition Failed",
+		"body": {
+			"status": 412,
+			"error": "Precondition Failed"
+		}
 	}
 }

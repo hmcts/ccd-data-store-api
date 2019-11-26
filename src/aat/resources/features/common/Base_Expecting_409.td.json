@@ -2,9 +2,14 @@
 	"_guid_": "Base_Expecting_409",
 	"_extends_": "Base-Root",
 	"request": {
+		
 	},
 	"expectedResponse": {
 		"responseCode": 409,
-		"responseMessage": "Conflict"
+		"responseMessage": "Conflict",
+		"body": {
+			"status": 409,
+			"error": "Conflict"
+		}
 	}
 }
