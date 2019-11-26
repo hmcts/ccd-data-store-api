@@ -1,41 +1,24 @@
 {
-  "_guid_": "S-152",
-  "_extends_": "Base_Expecting_404",
-  "title": "must return 404 when case id is structurally valid but not existing in CCD",
-  "specs": [
-    "a detailed profile in CCD",
-    "contains in input parameters a structurally valid but non-existing case-reference",
-    "has the 404 return code"
-  ],
-  "productName": "CCD Data Store",
-  "operationName": "Grant access to case",
-  "method": "POST",
-  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/users",
-  "request": {
-    "pathVariables": {
-      "uid": "[[DYNAMIC]]",
-      "jid": "AUTOTEST1",
-      "ctid": "AAT",
-      "cid": "157375164884070312"
-    },
-    "body": {
-      "id": "Test User"
-    }
-  },
-  "expectedResponse": {
-    "headers" : {
-      "Transfer-Encoding" : "chunked"
-    },
-    "body" : {
-      "exception" : "uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException",
-      "timestamp" : "[[ANY]]",
-      "status" : 404,
-      "error" : "Not Found",
-      "message" : "[[ANY]]",
-      "path" : "[[ANY]]",
-      "details" : null,
-      "callbackErrors" : null,
-      "callbackWarnings" : null
-    }
-  }
+	"title": "must return 404 when case id is structurally valid but not existing in CCD",
+	"_guid_": "S-152",
+	"_extends_": "F-045_Test_Data_Base",
+
+	"specs": [
+		"a detailed profile in CCD",
+		"contains in input parameters a structurally valid but non-existing case-reference",
+		"has the 404 return code"
+	],
+	"request": {
+		"pathVariables": {
+			"cid": "157375164884070312"
+		}
+	},
+	"expectedResponse": {
+		"headers": {
+			"Transfer-Encoding": "chunked"
+		},
+		"body": {
+			"_extends_": "Common_404_Response_Body"
+		}
+	}
 }
