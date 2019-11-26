@@ -317,7 +317,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         }
     }
 
-    protected RequestSpecification asAutoTestImporter() {
+    private RequestSpecification asAutoTestImporter() {
         AuthenticatedUser caseworker = aat.getIdamHelper().authenticate(aat.getImporterAutoTestEmail(),
             aat.getImporterAutoTestPassword());
 
@@ -330,7 +330,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
             .header("ServiceAuthorization", s2sToken);
     }
 
-    protected void importDefinitions() {
+    private void importDefinitions() {
         importDefinition(BE_FTA_FILE_JURISDICTION1);
         importDefinition(BE_FTA_FILE_JURISDICTION2);
         importDefinition(BE_FTA_FILE_JURISDICTION3);
@@ -345,5 +345,4 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
             .when()
             .post("/import");
     }
-
 }
