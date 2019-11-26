@@ -17,7 +17,7 @@ public class BackEndFunctionalTestScenarioContext {
 
     private Scenario scenario;
     private HttpTestData testData;
-    private HttpTestData caseData;
+    private HttpTestData caseCreationData;
     private Long theCaseReference;
     private UserData theUser;
     private RequestSpecification theRequest;
@@ -29,8 +29,8 @@ public class BackEndFunctionalTestScenarioContext {
         testData = DATA_SOURCE.getDataForScenario(scenarioTag);
     }
 
-    public void initializeCaseDataFor(String scenarioCaseKey) {
-        caseData = DATA_SOURCE.getDataForScenario(scenarioCaseKey);
+    public void initializeCaseCreationDataFor(String testDataKey) {
+        caseCreationData = DATA_SOURCE.getDataForScenario(testDataKey);
     }
 
     public String getCurrentScenarioTag() {
@@ -44,8 +44,8 @@ public class BackEndFunctionalTestScenarioContext {
         return testData;
     }
 
-    public HttpTestData getCaseData() {
-        return caseData;
+    public HttpTestData getCaseCreationData() {
+        return caseCreationData;
     }
 
     public Long getTheCaseReference() {

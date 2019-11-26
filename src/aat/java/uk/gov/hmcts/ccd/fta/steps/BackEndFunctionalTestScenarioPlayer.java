@@ -75,9 +75,9 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
 
     @Override
     @Given("a case has just been created as in [{}]")
-    public void initializeAppropriateCaseContextAndCreateCaseInDataStore(String caseDataId) {
-        scenarioContext.initializeCaseDataFor(caseDataId);
-        HttpTestData caseData = scenarioContext.getCaseData();
+    public void createCaseWithTheDataProvidedInATestDataObject(String caseDataId) {
+        scenarioContext.initializeCaseCreationDataFor(caseDataId);
+        HttpTestData caseData = scenarioContext.getCaseCreationData();
 
         UserData caseCreator = caseData.getUser();
         resolveUserData("caseCreator", caseCreator);

@@ -10,7 +10,7 @@ public interface BackEndFunctionalTestAutomationDSL {
 
     // DSL Element:
     // "a case has just been created as in [<some test data unique id>]"
-    void initializeAppropriateCaseContextAndCreateCaseInDataStore(String caseDataId);
+    void createCaseWithTheDataProvidedInATestDataObject(String caseDataId);
 
     // DSL Element:
     // "a user with [<some specification about user data>]"
@@ -21,7 +21,7 @@ public interface BackEndFunctionalTestAutomationDSL {
     void prepareARequestWithAppropriateValues() throws IOException;
 
     // DSL Element:
-    // "the request [{}]"
+    // "the request [<some specification about request data>]"
     void verifyTheRequestInTheContextWithAParticularSpecification(String requestSpecification);
 
     // DSL Element:
