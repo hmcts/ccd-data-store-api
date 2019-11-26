@@ -17,6 +17,7 @@ import uk.gov.hmcts.ccd.fta.util.ReflectionUtils;
 
 public abstract class JsonStoreWithInheritance {
 
+    private static final String INHERITANCE_APPLIED = "inheritanceApplied";
     protected JsonNode rootNode;
     protected Map<String, JsonNode> nodeLibrary = new HashMap<>();
     protected Map<Class<?>, Map<String, ?>> objectLibraryPerTypes = new HashMap<>();
@@ -50,7 +51,7 @@ public abstract class JsonStoreWithInheritance {
             addToLibrary(rootNode);
             for (String id : nodeLibrary.keySet())
                 overwriteInheritedValuesOf(nodeLibrary.get(id));
-            removeInheritanceAppliedFields(rootNode);
+            removeInheritanceMechanismFields(rootNode);
         } catch (Throwable t) {
             t.printStackTrace();
             throw new RuntimeException(t);
@@ -86,13 +87,20 @@ public abstract class JsonStoreWithInheritance {
         return getMapWithIds(clazz).get(id);
     }
 
-    private void removeInheritanceAppliedFields(JsonNode node) {
-        if (node.has("inheritanceApplied"))
-            ((ObjectNode) node).remove("inheritanceApplied");
+    private void removeInheritanceMechanismFields(JsonNode node) {
+        if (node.has(INHERITANCE_APPLIED)) {
+            ((ObjectNode) node).remove(INHERITANCE_APPLIED);
+        }
+        if (node.has(idFieldName)) {
+            ((ObjectNode) node).remove(idFieldName);
+        }
+        if (node.has(inheritanceFieldName)) {
+            ((ObjectNode) node).remove(inheritanceFieldName);
+        }
 
         Iterator<JsonNode> fields = node.iterator();
         while (fields.hasNext())
-            removeInheritanceAppliedFields(fields.next());
+            removeInheritanceMechanismFields(fields.next());
     }
 
     protected abstract void buildObjectStore() throws Exception;
@@ -100,7 +108,7 @@ public abstract class JsonStoreWithInheritance {
     private void overwriteInheritedValuesOf(JsonNode object) {
         if (object == null || !object.isContainerNode())
             return;
-        if (object.has("inheritanceApplied"))
+        if (object.has(INHERITANCE_APPLIED))
             return;
         JsonNode parentIdField = object.get(inheritanceFieldName);
         if (parentIdField != null) {
@@ -113,7 +121,7 @@ public abstract class JsonStoreWithInheritance {
             while (parentIterator.hasNext()) {
                 String fieldName = parentIterator.next();
                 if (!fieldName.equalsIgnoreCase(idFieldName) && !fieldName.equalsIgnoreCase(inheritanceFieldName)
-                        && !fieldName.equalsIgnoreCase("inheritanceApplied")) {
+                        && !fieldName.equalsIgnoreCase(INHERITANCE_APPLIED)) {
                     overwriteInheritedValuesOf(parentNode.get(fieldName));
                     JsonNode parentFieldCopy = parentNode.get(fieldName).deepCopy();
                     if (object.has(fieldName)) {
@@ -135,7 +143,7 @@ public abstract class JsonStoreWithInheritance {
         }
 
         if (object instanceof ObjectNode)
-            ((ObjectNode) object).set("inheritanceApplied", BooleanNode.TRUE);
+            ((ObjectNode) object).set(INHERITANCE_APPLIED, BooleanNode.TRUE);
     }
 
     private void underlayFor(JsonNode under, JsonNode over) {
