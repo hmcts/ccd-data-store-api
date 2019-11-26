@@ -1,8 +1,8 @@
 {
 	"_guid_": "Base-Root",
 	"user": {
-    "username": "[[$CCD_CASEWORKER_AUTOTEST_EMAIL]]",
-    "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+		"username": "[[$CCD_CASEWORKER_AUTOTEST_EMAIL]]",
+		"password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
 	},
 	"request": {
 		"headers": {
