@@ -7,7 +7,7 @@ Feature: [SAMPLE] Get default settings for user
   @S-000
   Scenario: [SAMPLE] must return default user setting successfully for a user having a profile in CCD
     Given a user with [a detailed profile in CCD]
-    And a case has just been created as in [S-000-Case]
+    And a case has just been created as in [Standard_Full_Case]
     When a request is prepared with appropriate values
     And the request [uses a uid that exists in IDAM]
     And it is submitted to call the [Get default settings for user] operation of [CCD Data Store]
