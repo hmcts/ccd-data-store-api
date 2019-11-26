@@ -72,8 +72,9 @@ public abstract class JsonStoreWithInheritance {
                 String jsonText = om.writeValueAsString(nodeInLibrary);
                 T anOnject = om.readValue(jsonText, clazz);
                 try {
-                    if (ReflectionUtils.retrieveFieldInObject(anOnject, idFieldName) != null)
+                    if (ReflectionUtils.retrieveFieldInObject(anOnject, idFieldName) != null) {
                         objectLibrary.put(key, anOnject);
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -90,9 +91,6 @@ public abstract class JsonStoreWithInheritance {
     private void removeInheritanceMechanismFields(JsonNode node) {
         if (node.has(INHERITANCE_APPLIED)) {
             ((ObjectNode) node).remove(INHERITANCE_APPLIED);
-        }
-        if (node.has(idFieldName)) {
-            ((ObjectNode) node).remove(idFieldName);
         }
         if (node.has(inheritanceFieldName)) {
             ((ObjectNode) node).remove(inheritanceFieldName);
