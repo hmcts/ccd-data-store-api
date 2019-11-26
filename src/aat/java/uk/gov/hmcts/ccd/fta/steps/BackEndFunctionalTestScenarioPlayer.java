@@ -159,7 +159,6 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
             });
         }
 
-        Long theCaseReference = scenarioContext.getTheCaseReference();
         if (requestData.getPathVariables() != null) {
             requestData.getPathVariables().forEach((pathVariable, value) -> {
                 if (value.toString().equals(DYNAMIC_CONTENT_PLACEHOLDER)) {
@@ -167,7 +166,8 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
                     if (pathVariable.equals("uid") && theUser.getUid() != null) {
                         aRequest.pathParam(pathVariable, theUser.getUid());
                         scenarioContext.getTestData().getRequest().getPathVariables().put("uid", theUser.getUid());
-                    } else if (pathVariable.equals("cid") && theCaseReference != null) {
+                    } else if (pathVariable.equals("cid") && scenarioContext.getTheCaseReference() != null) {
+                        Long theCaseReference = scenarioContext.getTheCaseReference();
                         aRequest.pathParam(pathVariable, theCaseReference);
                         scenarioContext.getTestData().getRequest().getPathVariables().put("cid", theCaseReference);
                     } else {
