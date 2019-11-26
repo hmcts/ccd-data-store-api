@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -16,6 +17,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
+import com.google.common.collect.Maps;
 import org.hamcrest.MatcherAssert;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.BaseTest;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
+import uk.gov.hmcts.ccd.data.casedetails.search.SortOrderField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
@@ -130,10 +133,46 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
+    public void getFindByMetadataReturnCorrectRecords() {
+        assumeDataInitialised();
+
+        MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
+        final PaginatedSearchMetadata byMetaData = caseDetailsRepository.getPaginatedSearchMetadata(metadata, Maps.newHashMap());
+        assertThat(byMetaData.getTotalResultsCount(), is(7));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
+    public void getFindByMetadataAndFieldDataSortDesc() {
+        assumeDataInitialised();
+
+        MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
+        metadata.setSortDirection(Optional.of("Asc"));
+        SortOrderField sortOrderField = SortOrderField.sortOrderWith()
+            .caseFieldId("[LAST_MODIFIED_DATE]")
+            .metadata(true)
+            .direction("DESC")
+            .build();
+        metadata.addSortOrderField(sortOrderField);
+
+        HashMap<String, String> searchParams = new HashMap<>();
+        searchParams.put("PersonFirstName", "Janet");
+        final List<CaseDetails> byMetaDataAndFieldData = caseDetailsRepository.findByMetaDataAndFieldData(metadata,
+            searchParams);
+
+        // See the timestamps in insert_cases.sql.
+        // Should be ordered by last modified desc, creation date asc.
+        assertThat(byMetaDataAndFieldData.get(0).getId(), is("16"));
+        assertThat(byMetaDataAndFieldData.get(1).getId(), is("1"));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
     public void getFindByMetadataAndFieldDataReturnCorrectRecords() {
         assumeDataInitialised();
 
         MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
+
         HashMap<String, String> searchParams = new HashMap<>();
         searchParams.put("PersonFirstName", "Janet");
         final List<CaseDetails> byMetaDataAndFieldData = caseDetailsRepository.findByMetaDataAndFieldData(metadata,
@@ -238,6 +277,23 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
                 hasProperty("reference", equalTo(1504254784737847L))
             )))
         );
+        assertThat(caseDetailsRepository.getPaginatedSearchMetadata(metadata, searchParams).getTotalResultsCount(), is(1));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {
+        "classpath:sql/insert_cases.sql",
+        "classpath:sql/insert_case_with_restricted_state.sql"
+    })
+    public void searchWithParams_restrictedStates() {
+        when(authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds("PROBATE", "TestAddressBookCase", CAN_READ))
+            .thenReturn(asList("CaseRestricted"));
+
+        MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
+        final List<CaseDetails> results = caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap());
+
+        assertThat(results.size(), is(1));
+        assertThat(results.get(0).getReference(), is(1504254784737848l));
     }
 
     @Test
