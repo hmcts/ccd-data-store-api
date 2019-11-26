@@ -1,10 +1,10 @@
 {
   "_guid_": "S-152",
   "_extends_": "Base_Expecting_404",
-  "title": "must return 404 if case id is invalid",
+  "title": "must return 404 when case id is structurally valid but not existing in CCD",
   "specs": [
     "a detailed profile in CCD",
-    "doesn't provide a valid case-reference in input parameters",
+    "contains structurally valid but non existing case-reference in input parameters",
     "has the 404 return code"
   ],
   "productName": "CCD Data Store",

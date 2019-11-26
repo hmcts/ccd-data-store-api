@@ -15,10 +15,10 @@ Feature: Grant access to case
     And the response has all the details as expected
 
   @S-152
-  Scenario: must return 404 if case id is invalid
+  Scenario: must return 404 when case id is structurally valid but not exist in CCD
     Given a user with [a detailed profile in CCD]
     When a request is prepared with appropriate values
-    And the request [doesn't provide a valid case-reference in input parameters]
+    And the request [contains structurally valid but non existing case-reference in input parameters]
     And it is submitted to call the [Grant access to case] operation of [CCD Data Store]
     Then a negative response is received
     And the response [has the 404 return code]
