@@ -27,7 +27,6 @@ import io.restassured.specification.QueryableRequestSpecification;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.SpecificationQuerier;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
-import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.CCDEventBuilder;
 import uk.gov.hmcts.ccd.datastore.tests.helper.idam.AuthenticatedUser;
@@ -97,9 +96,10 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         try {
             data = new ObjectMapper().convertValue(caseData.getRequest().getBody(), AATCaseType.CaseData.class);
         } catch (IllegalArgumentException ex) {
-            String errorMessage = "Illegal case data body in " + caseDataId + " -> request.body";
+            String errorMessage = "Cannot map '" + caseDataId + "' -> request.body to AATCaseType.CaseData object";
             throw new FunctionalTestException(errorMessage);
         }
+
         String eventToken = aat.getCcdHelper().generateTokenCreateCase(asCaseCreator, jurisdiction, caseType, event);
         Long caseReference = new CCDEventBuilder(jurisdiction, caseType, event)
             .as(asCaseCreator)
