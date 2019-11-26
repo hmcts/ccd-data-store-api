@@ -1,5 +1,5 @@
 {
-  "_guid_": "S-000-Base-Root-Case",
+  "_guid_": "Standard_Full_Case",
   "user": {
     "username": "[[$CCD_CASEWORKER_AUTOTEST_EMAIL]]",
     "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
