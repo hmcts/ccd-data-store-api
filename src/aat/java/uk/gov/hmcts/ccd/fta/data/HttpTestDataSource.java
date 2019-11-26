@@ -4,6 +4,4 @@ public interface HttpTestDataSource {
 
     HttpTestData getDataForScenario(String scenarioKey);
 
-    CaseData getCaseForScenario(String scenarioKey);
-
 }

@@ -28,9 +28,10 @@ import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.SpecificationQuerier;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder;
+import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.CCDEventBuilder;
 import uk.gov.hmcts.ccd.datastore.tests.helper.idam.AuthenticatedUser;
-import uk.gov.hmcts.ccd.fta.data.CaseData;
+import uk.gov.hmcts.ccd.fta.data.HttpTestData;
 import uk.gov.hmcts.ccd.fta.data.RequestData;
 import uk.gov.hmcts.ccd.fta.data.ResponseData;
 import uk.gov.hmcts.ccd.fta.data.UserData;
@@ -76,8 +77,8 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     @Override
     @Given("a case has just been created as in [{}]")
     public void initializeAppropriateCaseContextAndCreateCaseInDataStore(String caseDataId) {
-        scenarioContext.initializeCaseFor(caseDataId);
-        CaseData caseData = scenarioContext.getCaseData();
+        scenarioContext.initializeCaseDataFor(caseDataId);
+        HttpTestData caseData = scenarioContext.getCaseData();
 
         UserData caseCreator = caseData.getUser();
         resolveUserData("caseCreator", caseCreator);
@@ -88,13 +89,21 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
             .header("ServiceAuthorization", aat.getS2SHelper().getToken())
             .pathParam("user", caseCreator.getUid());
 
-        String jurisdiction = caseData.getJurisdiction();
-        String caseType = caseData.getCaseType();
-        String event = caseData.getEvent();
+        Map<String, Object> caseVariables = caseData.getRequest().getPathVariables();
+        String jurisdiction = caseVariables.get("jurisdiction").toString();
+        String caseType = caseVariables.get("caseType").toString();
+        String event = caseVariables.get("event").toString();
+        AATCaseType.CaseData data;
+        try {
+            data = new ObjectMapper().convertValue(caseData.getRequest().getBody(), AATCaseType.CaseData.class);
+        } catch (IllegalArgumentException ex) {
+            String errorMessage = "Illegal case data body in " + caseDataId + " -> request.body";
+            throw new FunctionalTestException(errorMessage);
+        }
         String eventToken = aat.getCcdHelper().generateTokenCreateCase(asCaseCreator, jurisdiction, caseType, event);
         Long caseReference = new CCDEventBuilder(jurisdiction, caseType, event)
             .as(asCaseCreator)
-            .withData(AATCaseBuilder.FullCase.build())
+            .withData(data)
             .withEventId(event)
             .withToken(eventToken)
             .submitAndGetReference();
