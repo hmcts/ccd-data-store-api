@@ -1,11 +1,13 @@
 package uk.gov.hmcts.ccd.fta.steps;
 
+import io.restassured.builder.RequestSpecBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -35,6 +37,11 @@ import uk.gov.hmcts.ccd.fta.util.JsonUtils;
 public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTestAutomationDSL {
 
     private static final String DYNAMIC_CONTENT_PLACEHOLDER = "[[DYNAMIC]]";
+    private static boolean isTestDataLoaded = false;
+
+    private final String BE_FTA_FILE_JURISDICTION1 = "src/aat/resources/CCD_BE_FTA_JURISDICTION1.xlsx";
+    private final String BE_FTA_FILE_JURISDICTION2 = "src/aat/resources/CCD_BE_FTA_JURISDICTION2.xlsx";
+    private final String BE_FTA_FILE_JURISDICTION3 = "src/aat/resources/CCD_BE_FTA_JURISDICTION3.xlsx";
 
     private final BackEndFunctionalTestScenarioContext scenarioContext;
     private final AATHelper aat;
@@ -52,6 +59,9 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     @Before()
     public void prepare(Scenario scenario) {
         this.scenario = scenario;
+        if (!isTestDataLoaded) {
+            importDefinitions();
+        }
     }
 
     @Override
@@ -286,4 +296,34 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
             throw new FunctionalTestException(errorMessage);
         }
     }
+
+    protected RequestSpecification asAutoTestImporter() {
+        AuthenticatedUser caseworker = aat.getIdamHelper().authenticate(aat.getImporterAutoTestEmail(),
+            aat.getImporterAutoTestPassword());
+
+        String s2sToken = aat.getS2SHelper().getToken();
+
+        return RestAssured.given(new RequestSpecBuilder()
+            .setBaseUri(aat.getDefinitionStoreUrl())
+            .build())
+            .header("Authorization", "Bearer " + caseworker.getAccessToken())
+            .header("ServiceAuthorization", s2sToken);
+    }
+
+    protected void importDefinitions() {
+        importDefinition(BE_FTA_FILE_JURISDICTION1);
+        importDefinition(BE_FTA_FILE_JURISDICTION2);
+        importDefinition(BE_FTA_FILE_JURISDICTION3);
+    }
+
+    private void importDefinition(String file) {
+        asAutoTestImporter()
+            .given()
+            .multiPart(new File(file))
+            .expect()
+            .statusCode(201)
+            .when()
+            .post("/import");
+    }
+
 }
