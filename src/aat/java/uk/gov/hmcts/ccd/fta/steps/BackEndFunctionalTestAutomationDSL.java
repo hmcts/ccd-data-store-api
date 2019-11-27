@@ -9,34 +9,38 @@ public interface BackEndFunctionalTestAutomationDSL {
     void initializeAppropriateTestContextAsDetailedInTheTestDataSource();
 
     // DSL Element:
+    // "a case has just been created as in [<some test data unique id>]"
+    void createCaseWithTheDataProvidedInATestDataObject(String caseDataId);
+
+    // DSL Element:
     // "a user with [<some specification about user data>]"
     void verifyThatThereIsAUserInTheContextWithAParticularSpecification(String specificationAboutAUser);
 
     // DSL Element:
     // "a request is prepared with appropriate values"
-    public void prepareARequestWithAppropriateValues() throws IOException;
+    void prepareARequestWithAppropriateValues() throws IOException;
 
     // DSL Element:
-    // "the response [{}]"
-    public void verifyTheRequestInTheContextWithAParticularSpecification(String requestSpecification);
+    // "the request [<some specification about request data>]"
+    void verifyTheRequestInTheContextWithAParticularSpecification(String requestSpecification);
 
     // DSL Element:
-    // "it is submitted to call the {} operation of {}"
-    public void submitTheRequestToCallAnOperationOfAProduct(String operation, String productName) throws IOException;
+    // "it is submitted to call the [<some operation name>] operation of [<some application / api product name>]"
+    void submitTheRequestToCallAnOperationOfAProduct(String operation, String productName) throws IOException;
 
     // DSL Element:
     // "a positive response is received"
-    public void verifyThatAPositiveResponseWasReceived();
+    void verifyThatAPositiveResponseWasReceived();
 
     // DSL Element:
     // "a negative response is received"
-    public void verifyThatANegativeResponseWasReceived();
+    void verifyThatANegativeResponseWasReceived();
 
     // DSL Element:
     // "the response has all the details as expected"
-    public void verifyThatTheResponseHasAllTheDetailsAsExpected() throws IOException;
+    void verifyThatTheResponseHasAllTheDetailsAsExpected() throws IOException;
 
     // DSL Element:
-    // "the response [{}]"
-    public void verifyTheResponseInTheContextWithAParticularSpecification(String responseSpecification);
+    // "the response [<some specification about response data>]"
+    void verifyTheResponseInTheContextWithAParticularSpecification(String responseSpecification);
 }
