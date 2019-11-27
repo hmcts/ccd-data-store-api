@@ -317,6 +317,15 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         }
     }
 
+    @Override
+    @Given("a successful call [{}] as in [{}]")
+    @Given("another successful call [{}] as in [{}]")
+    @Then("a call [{}] will get the expected response as in [{}]")
+    @Then("another call [{}] will get the expected response as in [{}]")
+    public void performAndVerifyTheExpectedResponseForAnApiCall(String testDataSpec, String testDataId) {
+
+    }
+
     private void resolveUserData(String prefix, UserData aUser) {
         String resolvedUsername = EnvUtils.resolvePossibleEnvironmentVariable(aUser.getUsername());
         if (resolvedUsername.equals(aUser.getUsername())) {
