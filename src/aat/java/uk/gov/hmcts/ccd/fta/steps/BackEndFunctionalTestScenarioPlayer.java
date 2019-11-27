@@ -38,9 +38,9 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     private static final String DYNAMIC_CONTENT_PLACEHOLDER = "[[DYNAMIC]]";
     private static boolean isTestDataLoaded = false;
 
-    private final String BE_FTA_FILE_JURISDICTION1 = "src/aat/resources/CCD_BE_FTA_JURISDICTION1.xlsx";
-    private final String BE_FTA_FILE_JURISDICTION2 = "src/aat/resources/CCD_BE_FTA_JURISDICTION2.xlsx";
-    private final String BE_FTA_FILE_JURISDICTION3 = "src/aat/resources/CCD_BE_FTA_JURISDICTION3.xlsx";
+    private final String BE_FTA_FILE_JURISDICTION1 = "src/aat/resources/CCD_BEFTA_JURISDICTION1.xlsx";
+    private final String BE_FTA_FILE_JURISDICTION2 = "src/aat/resources/CCD_BEFTA_JURISDICTION2.xlsx";
+    private final String BE_FTA_FILE_JURISDICTION3 = "src/aat/resources/CCD_BEFTA_JURISDICTION3.xlsx";
 
     private final BackEndFunctionalTestScenarioContext scenarioContext;
     private final AATHelper aat;
