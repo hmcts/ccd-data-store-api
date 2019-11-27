@@ -132,6 +132,22 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
     }
 
     @Test
+    public void sanitisesInputs() {
+        String evil = "foo');insert into case users values(1,2,3);--";
+        when(authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds("PROBATE", "TestAddressBookCase", CAN_READ))
+            .thenReturn(asList(evil));
+
+        when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.GRANTED);
+        when(userAuthorisation.getUserId()).thenReturn(evil);
+
+        MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
+        final PaginatedSearchMetadata byMetaData = caseDetailsRepository.getPaginatedSearchMetadata(metadata, Maps.newHashMap());
+
+        // If any input is not correctly sanitized it will cause an exception since query result structure will not be as hibernate expects.
+        assertThat(byMetaData.getTotalResultsCount(), is(0));
+    }
+
+    @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
     public void getFindByMetadataReturnCorrectRecords() {
         assumeDataInitialised();
@@ -293,7 +309,7 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
         final List<CaseDetails> results = caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap());
 
         assertThat(results.size(), is(1));
-        assertThat(results.get(0).getReference(), is(1504254784737848l));
+        assertThat(results.get(0).getReference(), is(1504254784737848L));
     }
 
     @Test
