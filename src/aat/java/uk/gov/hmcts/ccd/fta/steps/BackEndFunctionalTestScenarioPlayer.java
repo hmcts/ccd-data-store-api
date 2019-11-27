@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.fta.steps;
 
-import io.restassured.http.Method;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -22,6 +21,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
+import io.restassured.http.Method;
 import io.restassured.response.Response;
 import io.restassured.specification.QueryableRequestSpecification;
 import io.restassured.specification.RequestSpecification;
@@ -34,8 +34,8 @@ import uk.gov.hmcts.ccd.fta.data.HttpTestData;
 import uk.gov.hmcts.ccd.fta.data.RequestData;
 import uk.gov.hmcts.ccd.fta.data.ResponseData;
 import uk.gov.hmcts.ccd.fta.data.UserData;
-import uk.gov.hmcts.ccd.fta.util.EnvUtils;
 import uk.gov.hmcts.ccd.fta.exception.FunctionalTestException;
+import uk.gov.hmcts.ccd.fta.util.EnvUtils;
 import uk.gov.hmcts.ccd.fta.util.JsonUtils;
 
 @SuppressWarnings({"LocalVariableName"})
@@ -79,7 +79,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         scenarioContext.initializeCaseCreationDataFor(caseDataId);
         HttpTestData caseData = scenarioContext.getCaseCreationData();
 
-        UserData caseCreator = caseData.getUser();
+        UserData caseCreator = caseData.getInvokingUser();
         resolveUserData("caseCreator", caseCreator);
         authenticateUser("caseCreator", caseCreator);
 
@@ -115,7 +115,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     @Override
     @Given("a user with [{}]")
     public void verifyThatThereIsAUserInTheContextWithAParticularSpecification(String specificationAboutAUser) {
-        UserData aUser = scenarioContext.getTestData().getUser();
+        UserData aUser = scenarioContext.getTestData().getInvokingUser();
         resolveUserData("user", aUser);
         scenario.write("User: " + aUser.getUsername());
         authenticateUser("user", aUser);
