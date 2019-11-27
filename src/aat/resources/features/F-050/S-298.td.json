@@ -1,59 +1,17 @@
 {
-  "_guid_": "S-298",
-  "_extends_": "Base_Expecting_422",
   "title": "must not validate when field validation fails",
-    "specs": ["a detailed profile in CCD",
-    "uses a field that doesn’t exist",
+  "_guid_": "S-298",
+  "_extends_": "F-050_Test_Data_Base",
+
+  "specs": [
+    "a detailed profile in CCD",
     "uses a value that exceeds the field max limit",
     "has the 422 return code"
   ],
-  "productName": "CCD Data Store",
-  "operationName": "validation of a set of fields as Case worker",
-  "method": "POST",
-  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/validate",
   "request": {
-    "pathVariables": {
-      "uid": "[[DYNAMIC]]",
-      "jid" : "AUTOTEST1",
-      "ctid" : "AAT"
-    },
     "body" : {
       "data": {
-        "$TextField£": "Text",
-        "NumberField": null,
-        "YesOrNoField": "Yes",
-        "PhoneUKField": "012341234123",
-        "EmailField": "abc@gmail.com",
-        "MoneyGBPField": "100",
-        "DateField": null,
-        "DateTimeField": "",
-        "TextAreaField": null,
-        "FixedListField": null,
-        "FixedRadioListField": null,
-        "MultiSelectListField": [],
-        "ComplexField": {
-          "ComplexTextField": null,
-          "ComplexFixedListField": null,
-          "ComplexNestedField": {
-            "NestedNumberField": null,
-            "NestedCollectionTextField": []
-          }
-        },
-        "CollectionField": [],
-        "AddressUKField": {
-          "AddressLine1": null,
-          "AddressLine2": null,
-          "AddressLine3": null,
-          "PostTown": null,
-          "County": null,
-          "PostCode": null,
-          "Country": null
-        }
-      },
-      "event": {
-        "id": "CREATE",
-        "summary": "",
-        "description": ""
+        "PhoneUKField": "012341234123"
       }
     }
   },
@@ -61,18 +19,15 @@
     "body": {
       "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException",
       "timestamp" : "[[ANY]]",
-      "status" : 422,
-      "error" : "Unprocessable Entity",
       "message" : "Case data validation failed",
-      "path" : "/caseworkers/179ddeb6-e5ce-4f5d-b955-41041fcadc9e/jurisdictions/AUTOTEST1/case-types/AAT/validate",
+      "path" : "[[ANY]]",
       "details" : {
-        "field_errors" : [ {
-          "id" : "$TextField£",
-          "message" : "Field is not recognised"
-        }, {
+        "field_errors" : [
+          {
             "id": "PhoneUKField",
             "message": "The data entered is not valid for this type of field, please delete and re-enter using only valid data"
-        } ]
+          }
+        ]
       },
       "callbackErrors" : null,
       "callbackWarnings" : null
