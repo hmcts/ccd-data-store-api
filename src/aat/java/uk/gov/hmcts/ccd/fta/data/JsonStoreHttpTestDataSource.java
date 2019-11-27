@@ -33,10 +33,10 @@ public class JsonStoreHttpTestDataSource implements HttpTestDataSource {
     }
 
     @Override
-    public HttpTestData getDataForScenario(String scenarioKey) {
+    public HttpTestData getDataForTestCall(String testDataId) {
         loadDataStoreIfNotAlreadyLoaded();
         try {
-            return jsonStore.getObjectWithId(scenarioKey, HttpTestData.class);
+            return jsonStore.getObjectWithId(testDataId, HttpTestData.class);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
