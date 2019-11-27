@@ -7,6 +7,9 @@
 	"expectedResponse": {
 		"responseCode": 422,
 		"responseMessage": "Unprocessable Entity",
+		"headers": {
+			"_extends_": "Common_422_Response_Headers"
+		},
 		"body": {
 			"status": 422,
 			"error": "Unprocessable Entity"

@@ -5,6 +5,9 @@
 	},
 	"expectedResponse": {
 		"responseCode": 201,
-		"responseMessage": "Created"
+		"responseMessage": "Created",
+		"headers": {
+			"_extends_": "Common_201_Response_Headers"
+		}
 	}
 }

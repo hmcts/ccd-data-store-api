@@ -5,6 +5,9 @@
 	},
 	"expectedResponse": {
 		"responseCode": 202,
-		"responseMessage": "Accepted"
+		"responseMessage": "Accepted",
+		"headers": {
+			"_extends_": "Common_202_Response_Headers"
+		}
 	}
 }
