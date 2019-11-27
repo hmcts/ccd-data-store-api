@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static java.util.Arrays.asList;
@@ -25,7 +26,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.BaseTest;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
@@ -58,6 +61,9 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
     @Inject
     @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
     private CaseDetailsRepository caseDetailsRepository;
+
+    @Inject
+    private ApplicationParams applicationParams;
 
     @Before
     public void setUp() {
@@ -145,6 +151,19 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
 
         // If any input is not correctly sanitized it will cause an exception since query result structure will not be as hibernate expects.
         assertThat(byMetaData.getTotalResultsCount(), is(0));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
+    public void findByWildcardReturnCorrectRecords() {
+        ReflectionTestUtils.setField(applicationParams, "wildcardSearchAllowed", true);
+        MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
+
+        Map<String, String> params = Maps.newHashMap();
+        params.put("PersonFirstName", "%An%");
+        final PaginatedSearchMetadata byMetaData = caseDetailsRepository.getPaginatedSearchMetadata(metadata, params);
+        // See case types and citizen names in insert_cases.sql to understand this result.
+        assertThat(byMetaData.getTotalResultsCount(), is(5));
     }
 
     @Test
