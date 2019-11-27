@@ -61,6 +61,7 @@ public class SearchQueryFactoryOperation {
         String sortClause = sortOrderQueryBuilder.buildSortOrderClause(metadata);
 
         String queryString = String.format(queryToFormat, whereClausePart, sortClause);
+
         Query query;
         if (isCountQuery) {
             query = entityManager.createNativeQuery(queryString);
@@ -68,7 +69,6 @@ public class SearchQueryFactoryOperation {
             query = entityManager.createNativeQuery(queryString, CaseDetailsEntity.class);
         }
         queryParams.forEach((k, v) -> query.setParameter(k, v));
-
         addParameters(query, criteria);
         return query;
     }

@@ -188,7 +188,6 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
         assumeDataInitialised();
 
         MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
-
         HashMap<String, String> searchParams = new HashMap<>();
         searchParams.put("PersonFirstName", "Janet");
         final List<CaseDetails> byMetaDataAndFieldData = caseDetailsRepository.findByMetaDataAndFieldData(metadata,
