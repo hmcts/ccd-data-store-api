@@ -556,8 +556,7 @@ class CallbackInvokerTest {
                 assertThat(resourceNotFoundException.getMessage(), Matchers.containsString(NO_FIELD_FOUND));
 
                 assertAll(
-                    () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE),
-                    () -> inOrder.verify(caseTypeService, never()).validateData(any(), any())
+                    () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE)
                 );
             }
 
@@ -939,8 +938,7 @@ class CallbackInvokerTest {
                 assertThat(resourceNotFoundException.getMessage(), Matchers.containsString(NO_FIELD_FOUND));
 
                 assertAll(
-                    () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, FALSE),
-                    () -> inOrder.verify(caseTypeService, never()).validateData(any(), any())
+                    () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, FALSE)
                 );
             }
 

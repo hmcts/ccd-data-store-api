@@ -219,10 +219,10 @@ public class CallbackInvoker {
                                     final CaseType caseType,
                                     final CaseDetails caseDetails,
                                     final Map<String, JsonNode> responseData) {
-        accessControlService.verifyCreateAccess(eventId, caseType,
-                                                caseAccessService.getCaseCreationRoles(),
-                                                MAPPER.convertValue(responseData, JsonNode.class));
         caseTypeService.validateData(responseData, caseType);
+        accessControlService.verifyCreateAccess(eventId, caseType,
+            caseAccessService.getCaseCreationRoles(),
+            MAPPER.convertValue(responseData, JsonNode.class));
         caseDetails.setData(caseSanitiser.sanitise(caseType, responseData));
         deduceDataClassificationForNewFields(caseType, caseDetails);
     }
