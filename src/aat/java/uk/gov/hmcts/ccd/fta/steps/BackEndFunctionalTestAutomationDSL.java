@@ -49,5 +49,5 @@ public interface BackEndFunctionalTestAutomationDSL {
     //
     // a call [<some spec about the overall call data>] will get the expected response as in [<some test data unique id>]
     // another call [<some spec about the overall call data>] will get the expected response as in [<some test data unique id>]
-    void performAndVerifyTheExpectedResponseForAnApiCall(String testDataSpec, String testDataId);
+    void performAndVerifyTheExpectedResponseForAnApiCall(String testDataSpec, String testDataId) throws IOException;
 }
