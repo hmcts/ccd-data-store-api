@@ -1,7 +1,7 @@
 {
   "_guid_": "S-297",
   "_extends_": "Base_Expecting_409",
-  "title": "must not validate when CMC ExternalID is not unique / already exists",
+  "title": "must not validate when CMC ExternalID is not unique or already exists",
   "specs": ["a detailed profile in CCD"],
   "productName": "CCD Data Store",
   "operationName": "validation of a set of fields as Case worker",

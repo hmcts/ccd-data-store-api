@@ -4,7 +4,7 @@
   "title": "must return 403 when request provides authentic credentials without authorised access to the operation",
   "specs": ["a detailed profile in CCD",
     "uses the Case ID of the case just created",
-    "uses the invalid authorization",
+    "uses an invalid authorization",
     "has the 403 return code"
   ],
   "productName": "CCD Data Store",
