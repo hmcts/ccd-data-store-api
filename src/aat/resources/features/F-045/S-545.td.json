@@ -1,47 +1,24 @@
 {
-  "_guid_": "S-545",
-  "_extends_": "Base_Expecting_500",
   "title": "must return negative response when case id contains some non-numeric characters",
+  "_guid_": "S-545",
+  "_extends_": "F-045_Test_Data_Base",
+
   "specs": [
     "a detailed profile in CCD",
     "does not provide the numeric case id for the operation",
-    "has the 500 return code"
+    "has the 400 return code"
   ],
-  "productName": "CCD Data Store",
-  "operationName": "Grant access to case",
-  "method": "POST",
-  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/users",
-  "request": {
-    "headers": {
-      "Authorization": "[[DYNAMIC]]",
-      "ServiceAuthorization": "[[DYNAMIC]]",
-      "Content-Type": "application/json"
-    },
+   "request": {
     "pathVariables": {
-      "uid": "[[DYNAMIC]]",
-      "jid": "AUTOTEST1",
-      "ctid": "AAT",
       "cid": "1573751648840703AA"
-    },
-    "body": {
-      "id": "Test User"
     }
   },
+
   "expectedResponse": {
-    "headers" : {
-      "Transfer-Encoding" : "chunked",
-      "Connection" : "close"
-    },
-    "body" : {
-      "exception" : "java.lang.NumberFormatException",
-      "timestamp" : "[[ANY]]",
-      "status" : 500,
-      "error" : "Unexpected Error",
-      "message" : "[[ANY]]",
-      "path" : "[[ANY]]",
-      "details" : null,
-      "callbackErrors" : null,
-      "callbackWarnings" : null
+    "_extends_": "Common_400_Response",
+    "headers": {
+      "Connection" : "close",
+      "Content-Length" : "[[ANY]]"
     }
   }
 }

@@ -5,7 +5,13 @@
 
 	"specs": [
 		"a detailed profile in CCD",
-		"has a valid case-reference existing in CCD",
+		"contains as input a valid case-reference that exists in CCD",
 		"has the 201 return code"
-	]
+	],
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "headers" : {
+      "Content-Length" : "[[ANY]]"
+    }
+  }
 }
