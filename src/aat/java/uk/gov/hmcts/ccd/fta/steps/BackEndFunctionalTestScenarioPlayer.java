@@ -227,7 +227,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     public void submitTheRequestToCallAnOperationOfAProduct(String operation, String productName) throws IOException {
         boolean isCorrectOperation = scenarioContext.getTestData().meetsOperationOfProduct(operation, productName);
         if (!isCorrectOperation) {
-            String  errorMessage = "Test data does not confirm it is calling the following operation of a product: "
+            String errorMessage = "Test data does not confirm it is calling the following operation of a product: "
                 + operation + " -> " + productName;
             throw new FunctionalTestException(errorMessage);
         }
