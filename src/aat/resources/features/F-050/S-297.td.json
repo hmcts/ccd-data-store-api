@@ -54,6 +54,7 @@
     }
   },
   "expectedResponse": {
+    "_extends_": "Common_409_Response",
     "body": {
       "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException",
       "timestamp" : "[[ANY]]",
