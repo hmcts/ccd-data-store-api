@@ -1,28 +1,25 @@
 {
-  "_guid_": "S-034",
-  "_extends_": "Base_Expecting_403",
   "title": "must return appropriate negative response for a user not having a profile in CCD",
+  "_guid_": "S-034",
+  "_extends_": "F-027_Test_Data_Base",
+
   "specs": ["no profile in CCD",
     "has the 403 return code"],
-  "productName": "CCD Data Store",
-  "operationName": "Fetch a case for display for Case Worker",
   "request": {
     "pathVariables": {
-      "uid": "some id",
-      "jid": "AUTOTEST1",
-      "ctid": "AAT",
-      "cid": "1573751648840703"
+      "uid": "some id"
     }
   },
-  "method": "GET",
-  "uri": "/aggregated/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}",
   "expectedResponse": {
+    "_extends_": "Common_403_Response",
+    "headers" : {
+      "Transfer-Encoding": "chunked"
+    },
     "body" : {
       "timestamp" : "[[ANY]]",
-      "status" : 403,
-      "error" : "Forbidden",
       "message" : "Access Denied",
       "path" : "[[ANY]]"
     }
   }
 }
+
