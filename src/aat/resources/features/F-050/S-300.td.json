@@ -14,6 +14,10 @@
     }
   },
   "expectedResponse": {
+    "_extends_": "Common_403_Response",
+    "headers": {
+      "Transfer-Encoding" : "chunked"
+    },
     "body": {
       "timestamp" : "[[ANY]]",
       "message" : "Access Denied",
