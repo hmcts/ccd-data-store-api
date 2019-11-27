@@ -17,20 +17,14 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItemType;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
+import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackService;
 import uk.gov.hmcts.ccd.domain.service.common.*;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
@@ -44,6 +38,10 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_FIELD_FOUND;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 
 class CallbackInvokerTest {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
@@ -54,6 +52,9 @@ class CallbackInvokerTest {
     private static final String URL_MID_EVENT = "http://mid-event";
     private static final Boolean IGNORE_WARNINGS = FALSE;
     private static final List<Integer> RETRIES_DISABLED = Lists.newArrayList(0);
+    static final String ROLE_IN_USER_ROLES = "caseworker-probate-loa1";
+    static final String ROLE_CREATOR = "[CREATOR]";
+
 
     @Mock
     private CallbackService callbackService;
@@ -111,7 +112,9 @@ class CallbackInvokerTest {
                           caseTypeService,
                           caseDataService,
                           securityValidationService,
-                          caseSanitiser);
+                          caseSanitiser,
+                          accessControlService,
+                          caseAccessService);
     }
 
     @Nested
@@ -557,6 +560,48 @@ class CallbackInvokerTest {
                     () -> inOrder.verify(caseTypeService, never()).validateData(any(), any())
                 );
             }
+
+            @DisplayName("validate call back response and there are errors in call back validation with respect to case create role access")
+            @Test
+            void validateAndSetResponseDataMetCaseRoleAccessError() {
+                // Create CaseEvent with ACLs
+                createCaseEventWithAcls();
+                // Create CaseType with ACLs
+                createCaseTypeWithAcls();
+
+                final CallbackResponse callbackResponse = new CallbackResponse();
+                when(callbackService.send(caseEvent.getCallBackURLAboutToStartEvent(),
+                    caseEvent,
+                    null,
+                    caseDetails,
+                    false)).thenReturn(Optional.of(callbackResponse));
+                final Map<String, JsonNode> data = new HashMap<>();
+                data.put("defendantBirthDate", TextNode.valueOf("1989-01-25"));
+                callbackResponse.setData(data);
+
+                doCallRealMethod().when(accessControlService).verifyCreateAccess(any(), any(), anySet(), any());
+                doCallRealMethod().when(accessControlService).canAccessCaseTypeWithCriteria(any(), anySet(), any());
+                doCallRealMethod().when(accessControlService).canAccessCaseEventWithCriteria(any(), anyList(), anySet(), any());
+                doCallRealMethod().when(accessControlService).canAccessCaseFieldsWithCriteria(any(), anyList(), anySet(), any());
+                Set<String> userRoles = new HashSet<>();
+                userRoles.add(ROLE_CREATOR);
+                userRoles.add(ROLE_IN_USER_ROLES);
+                when(caseAccessService.getCaseCreationRoles()).thenReturn(userRoles);
+
+                final ResourceNotFoundException resourceNotFoundException =
+                    assertThrows(ResourceNotFoundException.class, () -> callbackInvoker.invokeAboutToStartCallback(caseEvent,
+                        caseType,
+                        caseDetails,
+                        TRUE));
+
+                assertThat(resourceNotFoundException.getMessage(), Matchers.containsString(NO_FIELD_FOUND));
+
+                assertAll(
+                    () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE),
+                    () -> inOrder.verify(accessControlService).verifyCreateAccess(any(), any(), anySet(), any()),
+                    () -> inOrder.verify(caseTypeService, never()).validateData(any(), any())
+                );
+            }
         }
 
         @Nested
@@ -730,6 +775,43 @@ class CallbackInvokerTest {
 
                 assertThat(resourceNotFoundException.getMessage(), Matchers.containsString(NO_FIELD_FOUND));
             }
+
+            @DisplayName("validate call back response and there are errors in call back validation with respect to case create role access")
+            @Test
+            void validateAndSetResponseDataMetCaseRoleAccessError() {
+                // Create CaseEvent with ACLs
+                createCaseEventWithAcls();
+                // Create CaseType with ACLs
+                createCaseTypeWithAcls();
+
+                final CallbackResponse callbackResponse = new CallbackResponse();
+                when(callbackService.send(caseEvent.getCallBackURLAboutToSubmitEvent(),
+                    caseEvent,
+                    caseDetailsBefore,
+                    caseDetails,
+                    TRUE)).thenReturn(Optional.of(callbackResponse));
+                final Map<String, JsonNode> data = new HashMap<>();
+                data.put("defendantBirthDate", TextNode.valueOf("1989-01-25"));
+                callbackResponse.setData(data);
+
+                doCallRealMethod().when(accessControlService).verifyCreateAccess(any(), any(), anySet(), any());
+                doCallRealMethod().when(accessControlService).canAccessCaseTypeWithCriteria(any(), anySet(), any());
+                doCallRealMethod().when(accessControlService).canAccessCaseEventWithCriteria(any(), anyList(), anySet(), any());
+                doCallRealMethod().when(accessControlService).canAccessCaseFieldsWithCriteria(any(), anyList(), anySet(), any());
+                Set<String> userRoles = new HashSet<>();
+                userRoles.add(ROLE_CREATOR);
+                userRoles.add(ROLE_IN_USER_ROLES);
+                when(caseAccessService.getCaseCreationRoles()).thenReturn(userRoles);
+
+                final ResourceNotFoundException resourceNotFoundException =
+                    assertThrows(ResourceNotFoundException.class, () -> callbackInvoker.invokeAboutToSubmitCallback(caseEvent,
+                        caseDetailsBefore,
+                        caseDetails,
+                        caseType,
+                        TRUE));
+
+                assertThat(resourceNotFoundException.getMessage(), Matchers.containsString(NO_FIELD_FOUND));
+            }
         }
 
         @Nested
@@ -861,6 +943,44 @@ class CallbackInvokerTest {
                     () -> inOrder.verify(caseTypeService, never()).validateData(any(), any())
                 );
             }
+
+            @DisplayName("validate call back response and there are errors in call back validation with respect to case create role access")
+            @Test
+            void validateAndSetResponseDataMetCaseRoleAccessError() {
+                // Create CaseEvent with ACLs
+                createCaseEventWithAcls();
+                // Create CaseType with ACLs
+                createCaseTypeWithAcls();
+
+                final CallbackResponse callbackResponse = new CallbackResponse();
+                final Map<String, JsonNode> data = new HashMap<>();
+                data.put("defendantBirthDate", TextNode.valueOf("1989-01-25"));
+                callbackResponse.setData(data);
+                when(callbackService.send(wizardPage.getCallBackURLMidEvent(),
+                    caseEvent,
+                    caseDetailsBefore,
+                    caseDetails, false)).thenReturn(Optional.of(callbackResponse));
+
+                doCallRealMethod().when(accessControlService).verifyCreateAccess(any(), any(), anySet(), any());
+                doCallRealMethod().when(accessControlService).canAccessCaseTypeWithCriteria(any(), anySet(), any());
+                doCallRealMethod().when(accessControlService).canAccessCaseEventWithCriteria(any(), anyList(), anySet(), any());
+                doCallRealMethod().when(accessControlService).canAccessCaseFieldsWithCriteria(any(), anyList(), anySet(), any());
+                Set<String> userRoles = new HashSet<>();
+                userRoles.add(ROLE_CREATOR);
+                userRoles.add(ROLE_IN_USER_ROLES);
+                when(caseAccessService.getCaseCreationRoles()).thenReturn(userRoles);
+
+                final ResourceNotFoundException resourceNotFoundException =
+                    assertThrows(ResourceNotFoundException.class,
+                        () -> callbackInvoker.invokeMidEventCallback(wizardPage,
+                            caseType,
+                            caseEvent,
+                            caseDetailsBefore,
+                            caseDetails,
+                            IGNORE_WARNINGS));
+
+                assertThat(resourceNotFoundException.getMessage(), Matchers.containsString(NO_FIELD_FOUND));
+            }
         }
 
         @DisplayName("state is filtered in json map")
@@ -892,5 +1012,55 @@ class CallbackInvokerTest {
             assertAll(() -> assertFalse(state.isPresent()),
                       () -> assertThat(data.keySet(), hasSize(0)));
         }
+    }
+
+    private void createCaseTypeWithAcls() {
+        caseType = newCaseType()
+            .withAcl(anAcl()
+                .withRole(ROLE_IN_USER_ROLES)
+                .withCreate(true)
+                .build())
+            .withAcl(anAcl()
+                .withRole(ROLE_CREATOR)
+                .withCreate(true)
+                .withRead(true)
+                .withUpdate(true)
+                .build())
+            .withEvent(caseEvent)
+            .withCaseFields(createCaseFieldsWithAcls())
+            .build();
+    }
+
+    private List<CaseField> createCaseFieldsWithAcls() {
+        AccessControlList acl1 = anAcl().withRole(ROLE_CREATOR).withCreate(true).withRead(true).withUpdate(true).withDelete(false).build();
+        AccessControlList acl2 = anAcl().withRole(ROLE_IN_USER_ROLES).withRead(true).withUpdate(true).withDelete(false).build();
+        AccessControlList acl3 = anAcl().withRole(ROLE_IN_USER_ROLES).withRead(true).build();
+        List<CaseField> caseFields = new ArrayList<>();
+        caseFields.add(newCaseField().withId("FirstName")
+            .withAcl(acl1).withAcl(acl2).build());
+        caseFields.add(newCaseField().withId("LastName")
+            .withAcl(acl1).withAcl(acl2).build());
+        caseFields.add(newCaseField().withId("defendantBirthDate")
+            .withAcl(acl3).build());
+        return caseFields;
+    }
+
+    private void createCaseEventWithAcls() {
+        caseEvent = newCaseEvent()
+            .withAcl(anAcl()
+                .withRole(ROLE_IN_USER_ROLES)
+                .withCreate(true)
+                .build())
+            .withAcl(anAcl()
+                .withRole(ROLE_CREATOR)
+                .withCreate(true)
+                .withRead(true)
+                .withUpdate(true)
+                .build())
+            .withId("EventId123")
+            .build();
+        caseEvent.setCallBackURLAboutToStartEvent(URL_ABOUT_TO_START);
+        caseEvent.setCallBackURLAboutToSubmitEvent(URL_ABOUT_TO_SUBMIT);
+        caseEvent.setCallBackURLSubmittedEvent(URL_AFTER_SUBMIT);
     }
 }
