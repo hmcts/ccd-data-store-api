@@ -1,7 +1,36 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.google.common.collect.Sets;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
+import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -36,35 +65,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.ComplexACL
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageBuilder.newWizardPage;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageComplexFieldOverrideBuilder.newWizardPageComplexFieldOverride;
-
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
-import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.google.common.collect.Sets;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.mockito.MockitoAnnotations;
 
 public class AccessControlServiceTest {
 
@@ -1117,7 +1117,7 @@ public class AccessControlServiceTest {
             final CaseType caseType = new CaseType();
             CaseEvent eventDefinition = new CaseEvent();
             eventDefinition.setId(EVENT_ID);
-            caseType.setEvents(Collections.singletonList(eventDefinition));
+            caseType.setEvents(singletonList(eventDefinition));
 
             assertThat(
                 accessControlService.canAccessCaseEventWithCriteria(
@@ -1139,7 +1139,7 @@ public class AccessControlServiceTest {
             accessControlList.setCreate(true);
             List<AccessControlList> accessControlLists = newArrayList(accessControlList);
             eventDefinition.setAccessControlLists(accessControlLists);
-            caseType.setEvents(Collections.singletonList(eventDefinition));
+            caseType.setEvents(singletonList(eventDefinition));
 
             assertThat(
                 accessControlService.canAccessCaseEventWithCriteria(
@@ -2490,8 +2490,62 @@ public class AccessControlServiceTest {
         }
 
         @Test
+        @DisplayName("Should set readonly flag for top level field overrides if relevant acl is missing")
+        void shouldSetReadonlyFlagForWizardPageAndItsOverrideIfRelevantAclMissing() {
+            final CaseType caseType = newCaseType()
+                .withField(newCaseField()
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES_2)
+                        .withCreate(true)
+                        .withUpdate(false)
+                        .withRead(true)
+                        .build())
+                    .build())
+                .build();
+
+            CaseViewField caseViewField1 = aViewField()
+                .withFieldType(aFieldType().withType("Text").build())
+                .withId("Addresses")
+                .build();
+
+            CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
+                .withId("eventId")
+                .withField(caseViewField1)
+                .withWizardPage(
+                    newWizardPage()
+                        .withId("Page One")
+                        .withField(caseViewField1, OPTIONAL, singletonList(
+                            newWizardPageComplexFieldOverride()
+                                .withComplexFieldId("Addresses")
+                                .withDisplayContext(OPTIONAL)
+                                .build()))
+                        .build())
+                .build();
+
+            CaseEventTrigger eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                caseEventTrigger,
+                caseType.getCaseFields(),
+                USER_ROLES,
+                CAN_UPDATE);
+
+            assertAll(
+                () -> assertThat("CaseField displayContext should change to READONLY",
+                    eventTrigger.getCaseFields().get(0).getDisplayContext(), is(READONLY)),
+                () -> assertThat("WizardPage CaseField displayContext should change to READONLY",
+                    eventTrigger.getWizardPages().get(0).getWizardPageFields().get(0).getDisplayContext(), is(READONLY)),
+                () -> assertThat("WizardPage CaseField Override should be size 1",
+                    eventTrigger.getWizardPages().get(0).getWizardPageFields().get(0).getComplexFieldOverrides().size(), is(1)),
+                () -> assertThat("WizardPage CaseField Override displayContext should change to READONLY",
+                    eventTrigger.getWizardPages().get(0).getWizardPageFields().get(0).getComplexFieldOverrides().get(1).getDisplayContext(), is(READONLY))
+             );
+
+        }
+
+        @Test
         @DisplayName("Should set readonly flag for complex children and complex field overrides if relevant acl is missing")
-        void shouldSetReadonlyFlagForComplexChildrenIfRelevantAclIsMissing() throws IOException {
+        void shouldSetReadonlyFlagForComplexChildrenIfRelevantAclIsMissing() {
             final CaseType caseType = newCaseType()
                 .withField(newCaseField()
                     .withFieldType(aFieldType()
@@ -2536,7 +2590,7 @@ public class AccessControlServiceTest {
                             .build())
                     .build())
                 .build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseType.getCaseFields().forEach(CaseField::propagateACLsToNestedFields);
 
             final CaseViewField caseViewField1 = aViewField()
                 .withFieldType(aFieldType()

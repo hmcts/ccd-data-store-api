@@ -4,6 +4,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageFieldBuilder.newWizardPageField;
 
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
@@ -966,28 +967,78 @@ public class TestBuildersUtil {
         }
 
         public WizardPageBuilder withField(CaseViewField caseField) {
-            WizardPageField wizardPageField = new WizardPageField();
-            wizardPageField.setCaseFieldId(caseField.getId());
-            wizardPageField.setPageColumnNumber(1);
-            wizardPageField.setOrder(1);
-            wizardPageField.setComplexFieldOverrides(emptyList());
-            wizardPageFields.add(wizardPageField);
+            wizardPageFields.add(newWizardPageField(caseField.getId(), "OPTIONAL", emptyList()).build());
             return this;
         }
 
-        public WizardPageBuilder withField(CaseViewField caseField, List<WizardPageComplexFieldOverride> complexFieldOverrides) {
-            WizardPageField wizardPageField = new WizardPageField();
-            wizardPageField.setCaseFieldId(caseField.getId());
-            wizardPageField.setPageColumnNumber(1);
-            wizardPageField.setOrder(1);
-            wizardPageField.setComplexFieldOverrides(complexFieldOverrides);
-            wizardPageFields.add(wizardPageField);
+        public WizardPageBuilder withField(CaseViewField caseField,
+                                           List<WizardPageComplexFieldOverride> complexFieldOverrides) {
+            wizardPageFields.add(newWizardPageField(caseField.getId(), "OPTIONAL", complexFieldOverrides).build());
+            return this;
+        }
+
+        public WizardPageBuilder withField(CaseViewField caseField,
+                                           String displayContext,
+                                           List<WizardPageComplexFieldOverride> complexFieldOverrides) {
+            wizardPageFields.add(newWizardPageField(caseField.getId(), displayContext, complexFieldOverrides).build());
             return this;
         }
 
         public WizardPage build() {
             this.wizardPage.setWizardPageFields(this.wizardPageFields);
             return wizardPage;
+        }
+    }
+
+    public static class WizardPageFieldBuilder {
+        private final WizardPageField wizardPageField;
+
+        private WizardPageFieldBuilder() {
+            this.wizardPageField = new WizardPageField();
+        }
+
+        public static WizardPageFieldBuilder newWizardPageField() {
+            return new WizardPageFieldBuilder();
+        }
+
+        public static WizardPageFieldBuilder newWizardPageField(String caseFieldId,
+                                                                String displayContext,
+                                                                List<WizardPageComplexFieldOverride> complexFieldOverrides) {
+            return newWizardPageField()
+                .withCaseFieldId(caseFieldId)
+                .withPageColumnNumber(1)
+                .withOrder(1)
+                .withDisplayContext(displayContext)
+                .withComplexFieldOverrides(complexFieldOverrides);
+        }
+
+        public WizardPageFieldBuilder withCaseFieldId(String caseFieldId) {
+            wizardPageField.setCaseFieldId(caseFieldId);
+            return this;
+        }
+
+        public WizardPageFieldBuilder withOrder(Integer order) {
+            wizardPageField.setOrder(order);
+            return this;
+        }
+
+        public WizardPageFieldBuilder withPageColumnNumber(Integer number) {
+            wizardPageField.setPageColumnNumber(number);
+            return this;
+        }
+
+        public WizardPageFieldBuilder withDisplayContext(String displayContext) {
+            wizardPageField.setDisplayContext(displayContext);
+            return this;
+        }
+
+        public WizardPageFieldBuilder withComplexFieldOverrides(List<WizardPageComplexFieldOverride> complexFieldOverrides) {
+            wizardPageField.setComplexFieldOverrides(complexFieldOverrides);
+            return this;
+        }
+
+        public WizardPageField build() {
+            return wizardPageField;
         }
     }
 
