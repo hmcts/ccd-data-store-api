@@ -7,7 +7,7 @@
   "request": {
     "pathVariables": {
       "jurisdiction": "AUTOTEST1",
-      "caseType": "AAT",
+      "caseType": "AAT_AUTH_15",
       "event": "CREATE"
     },
     "body": {
