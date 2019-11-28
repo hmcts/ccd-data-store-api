@@ -1,32 +1,24 @@
 {
   "_guid_": "S-231",
-  "_extends_": "Base_Expecting_403",
-  "title": "must return 403 when request does not provide valid authentication credentials",
+  "_extends_": "F-049_Test_Data_Base",
+  "title": "must return 403 when request provide invalid authentication credentials",
   "specs": [
-    "an existing case in CCD",
-    "does not provide valid authentication credentials in CCD",
+    "a detailed profile in CCD",
     "Start case creation as Case worker",
     "CCD Data Store",
-    "return 403"
+    "provide invalid authentication credentials",
+    "code is HTTP-403"
   ],
-  "productName": "CCD Data Store",
-  "operationName": "Start case creation as Case worker",
-  "user": {
-    "username": "auto.test.cnp@gmail.com",
-    "password": "Pa55word11"
-  },
-  "method" : "GET",
-  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
   "request": {
     "pathVariables": {
-      "uid": "dummy",
-      "jid": "AUTOTEST1",
-      "ctid": "AAT",
-      "cid": "1574079355345891",
-      "etid": "CREATE"
+      "uid": "dummy"
     }
   },
   "expectedResponse": {
+    "_extends_": "Common_403_Response",
+    "headers" : {
+      "Transfer-Encoding": "chunked"
+    },
     "body" : {
       "timestamp" : "[[ANY]]",
       "status" : 403,

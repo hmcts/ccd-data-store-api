@@ -5,131 +5,111 @@ Feature: Start case creation as Case worker
     Given an appropriate test context as detailed in the test data source
 
   @S-235
-  Scenario: must start case creation process successfully for correct inputs
-    Given   a user with [an existing case in CCD]
+  Scenario: must start case creation process successfully for correct inputs
+    Given   a user with [a detailed profile in CCD]
     When    a request is prepared with appropriate values
+    And     the request [provide valid details]
     And     it is submitted to call the [Start case creation as Case worker] operation of [CCD Data Store]
     Then    a positive response is received
-    And     the response [return 200]
+    And     the response [code is HTTP-200]
     And     the response has all the details as expected
 
   @S-231 @Ignore
-  Scenario: must return 401 when request does not provide valid authentication credentials
-    Given   a user with [an existing case in CCD]
+  Scenario: must return 401 when request provide invalid authentication credentials
+    Given   a user with [a detailed profile in CCD]
     When    a request is prepared with appropriate values
-    And     the request [does not provide valid authentication credentials in CCD]
+    And     the request [provide invalid authentication credentials]
     And     it is submitted to call the [Start case creation as Case worker] operation of [CCD Data Store]
     Then    a negative response is received
-    And     the response [return 401]
+    And     the response [code is HTTP-401]
     And     the response has all the details as expected
 
   @S-231
-  Scenario: must return 403 when request does not provide valid authentication credentials
-    Given   a user with [an existing case in CCD]
+  Scenario: must return 403 when request provide invalid authentication credentials
+    Given   a user with [a detailed profile in CCD]
     When    a request is prepared with appropriate values
-    And     the request [does not provide valid authentication credentials in CCD]
+    And     the request [provide invalid authentication credentials]
     And     it is submitted to call the [Start case creation as Case worker] operation of [CCD Data Store]
     Then    a negative response is received
-    And     the response [return 403]
+    And     the response [code is HTTP-403]
     And     the response has all the details as expected
 
   @S-232
-  Scenario: must return 403 when request provides authentic credentials without authorized access to the operation
-    Given   a user with [an existing case in CCD]
+  Scenario: must return 403 when request provide unauthorized access
+    Given   a user with [a detailed profile in CCD]
     When    a request is prepared with appropriate values
-    And     the request [uses a provides authentic credentials without authorized access to the operation in CCD]
+    And     the request [provide unauthorized access]
     And     it is submitted to call the [Start case creation as Case worker] operation of [CCD Data Store]
     Then    a negative response is received
-    And     the response [return 403]
+    And     the response [code is HTTP-403]
     And     the response has all the details as expected
 
   @S-233 @Ignore
-  Scenario: must return 404 when no case found for the given Idam user ID
-    Given   a user with [an existing case in CCD]
+  Scenario: must return 404 when request provide invalid Idam user ID in CCD
+    Given   a user with [a detailed profile in CCD]
     When    a request is prepared with appropriate values
-    And     the request [uses a non-existing Idam user ID in CCD]
+    And     the request [provide invalid Idam user ID]
     And     it is submitted to call the [Start case creation as Case worker] operation of [CCD Data Store]
     Then    a negative response is received
-    And     the response [return 403]
+    And     the response [code is HTTP-403]
     And     the response has all the details as expected
 
   @S-233
-  Scenario: must return 403 when no case found for the given Idam user ID
-    Given   a user with [an existing case in CCD]
+  Scenario: must return 403 when request provide invalid Idam user ID in CCD
+    Given   a user with [a detailed profile in CCD]
     When    a request is prepared with appropriate values
-    And     the request [uses a non-existing Idam user ID in CCD]
+    And     the request [provide invalid Idam user ID]
     And     it is submitted to call the [Start case creation as Case worker] operation of [CCD Data Store]
     Then    a negative response is received
-    And     the response [return 403]
+    And     the response [code is HTTP-403]
     And     the response has all the details as expected
 
   @S-234
-  Scenario: ignore must return 422 when process could not be started
-    Given   a user with [an existing case in CCD]
+  Scenario: must return 400 when request provide special character for Case type ID in CCD
+    Given   a user with [a detailed profile in CCD]
     When    a request is prepared with appropriate values
-    And     the request [process could not be started]
+    And     the request [provide Special character for Case type ID]
     And     it is submitted to call the [Start case creation as Case worker] operation of [CCD Data Store]
     Then    a negative response is received
-    And     the response [return 422]
+    And     the response [code is HTTP-400]
+    And     the response has all the details as expected
+
+  @S-511 @Ignore
+  Scenario: must return 404 when request provide invalid Jurisdiction ID in CCD
+    Given   a user with [a detailed profile in CCD]
+    When    a request is prepared with appropriate values
+    And     the request [provide invalid Jurisdiction ID]
+    And     it is submitted to call the [Start case creation as Case worker] operation of [CCD Data Store]
+    Then    a negative response is received
+    And     the response [code is HTTP-404]
     And     the response has all the details as expected
 
   @S-511
-  Scenario: must return 404 when no case found for the given Jurisdiction ID
-    Given   a user with [an existing case in CCD]
+  Scenario: must return 403 when request provide invalid Jurisdiction ID in CCD
+    Given   a user with [a detailed profile in CCD]
     When    a request is prepared with appropriate values
-    And     the request [uses a non-existing Jurisdiction ID in CCD]
+    And     the request [provide invalid Jurisdiction ID]
     And     it is submitted to call the [Start case creation as Case worker] operation of [CCD Data Store]
     Then    a negative response is received
-    And     the response [return 404]
-    And     the response has all the details as expected
-
-  @S-512 @Ignore
-  Scenario: must return 404 when no case found for the given Case type ID
-    Given   a user with [an existing case in CCD]
-    When    a request is prepared with appropriate values
-    And     the request [uses a non-existing Case type ID in CCD]
-    And     it is submitted to call the [Start case creation as Case worker] operation of [CCD Data Store]
-    Then    a negative response is received
-    And     the response [return 404]
+    And     the response [code is HTTP-403]
     And     the response has all the details as expected
 
   @S-512
-  Scenario: must return 422 when no case found for the given Case type ID
-    Given   a user with [an existing case in CCD]
+  Scenario: must return 404 when request provide invalid Case type ID in CCD
+    Given   a user with [a detailed profile in CCD]
     When    a request is prepared with appropriate values
-    And     the request [uses a non-existing Case type ID in CCD]
+    And     the request [provide invalid Case type ID]
     And     it is submitted to call the [Start case creation as Case worker] operation of [CCD Data Store]
     Then    a negative response is received
-    And     the response [return 422]
-    And     the response has all the details as expected
-
-  @S-513 @Ignore
-  Scenario: must return 404 when no case found for the given Case ID
-    Given   a user with [an existing case in CCD]
-    When    a request is prepared with appropriate values
-    And     the request [a non-existing Case ID in CCD]
-    And     it is submitted to call the [Start case creation as Case worker] operation of [CCD Data Store]
-    Then    a negative response is received
-    And     the response [return 404]
+    And     the response [code is HTTP-404]
     And     the response has all the details as expected
 
   @S-513
-  Scenario: must return 400 when no case found for the given Case ID
-    Given   a user with [an existing case in CCD]
+  Scenario: must return 404 when provide invalid Event ID in CCD
+    Given   a user with [a detailed profile in CCD]
     When    a request is prepared with appropriate values
-    And     the request [a non-existing Case ID in CCD]
+    And     the request [provide invalid Event ID]
     And     it is submitted to call the [Start case creation as Case worker] operation of [CCD Data Store]
     Then    a negative response is received
-    And     the response [return 400]
-    And     the response has all the details as expected
-
-
-  @S-514
-  Scenario: must return 404 when no case found for the given Event ID
-    Given   a user with [an existing case in CCD]
-    When    a request is prepared with appropriate values
-    And     the request [a non-existing Event ID in CCD]
-    And     it is submitted to call the [Start case creation as Case worker] operation of [CCD Data Store]
-    Then    a negative response is received
-    And     the response [return 404]
+    And     the response [code is HTTP-404]
     And     the response has all the details as expected
