@@ -2,11 +2,10 @@ package uk.gov.hmcts.ccd.fta.data;
 
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import uk.gov.hmcts.jsonstore.JsonResourceStoreWithInheritance;
 
 import java.io.IOException;
 import java.util.ArrayList;
-
-import uk.gov.hmcts.jsonstore.JsonResourceStoreWithInheritance;
 
 public class JsonStoreHttpTestDataSource implements HttpTestDataSource {
 
@@ -33,10 +32,10 @@ public class JsonStoreHttpTestDataSource implements HttpTestDataSource {
     }
 
     @Override
-    public HttpTestData getDataForScenario(String scenarioKey) {
+    public HttpTestData getDataForTestCall(String testDataId) {
         loadDataStoreIfNotAlreadyLoaded();
         try {
-            return jsonStore.getObjectWithId(scenarioKey, HttpTestData.class);
+            return jsonStore.getObjectWithId(testDataId, HttpTestData.class);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
