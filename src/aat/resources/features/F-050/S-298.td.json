@@ -18,7 +18,7 @@
   "expectedResponse": {
     "_extends_": "Common_422_Response",
     "headers": {
-      "Transfer-Encoding" : "chunked"
+      "Content-Length" : "[[ANY]]"
     },
     "body": {
       "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException",

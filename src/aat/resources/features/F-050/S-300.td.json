@@ -16,7 +16,7 @@
   "expectedResponse": {
     "_extends_": "Common_403_Response",
     "headers": {
-      "Transfer-Encoding" : "chunked"
+      "Content-Length" : "[[ANY]]"
     },
     "body": {
       "timestamp" : "[[ANY]]",
