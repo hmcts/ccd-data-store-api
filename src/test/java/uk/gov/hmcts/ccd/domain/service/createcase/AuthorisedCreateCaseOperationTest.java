@@ -13,7 +13,6 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
@@ -21,20 +20,31 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
@@ -68,7 +78,7 @@ class AuthorisedCreateCaseOperationTest {
     private AccessControlService accessControlService;
 
     @Mock
-    private UserRepository userRepository;
+    private CaseAccessService caseAccessService;
 
     private AuthorisedCreateCaseOperation authorisedCreateCaseOperation;
     private CaseDetails classifiedCase;
@@ -82,7 +92,7 @@ class AuthorisedCreateCaseOperationTest {
         MockitoAnnotations.initMocks(this);
 
         authorisedCreateCaseOperation = new AuthorisedCreateCaseOperation(
-            classifiedCreateCaseOperation, caseDefinitionRepository, accessControlService, userRepository);
+            classifiedCreateCaseOperation, caseDefinitionRepository, accessControlService, caseAccessService);
         classifiedCase = new CaseDetails();
         classifiedCase.setData(Maps.newHashMap());
         EVENT.setEventId(EVENT_ID);
@@ -95,7 +105,7 @@ class AuthorisedCreateCaseOperationTest {
         caseType.setEvents(events);
         caseType.setCaseFields(caseFields);
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseType);
-        when(userRepository.getUserRoles()).thenReturn(userRoles);
+        when(caseAccessService.getCaseCreationRoles()).thenReturn(userRoles);
         when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseType), eq(userRoles), eq(CAN_CREATE))).thenReturn(true);
         when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseType), eq(userRoles), eq(CAN_READ))).thenReturn(true);
         when(accessControlService.canAccessCaseEventWithCriteria(eq(EVENT_ID), eq(events), eq(userRoles), eq(CAN_CREATE))).thenReturn(true);
@@ -151,11 +161,11 @@ class AuthorisedCreateCaseOperationTest {
                                                                                    EVENT_DATA,
                                                                                    IGNORE);
 
-        InOrder inOrder = inOrder(caseDefinitionRepository, userRepository, classifiedCreateCaseOperation, accessControlService);
+        InOrder inOrder = inOrder(caseDefinitionRepository, caseAccessService, classifiedCreateCaseOperation, accessControlService);
         assertAll(
             () -> assertThat(output, sameInstance(classifiedCase)),
             () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
-            () -> inOrder.verify(userRepository).getUserRoles(),
+            () -> inOrder.verify(caseAccessService).getCaseCreationRoles(),
             () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseType), eq(userRoles), eq(CAN_CREATE)),
             () -> inOrder.verify(accessControlService).canAccessCaseEventWithCriteria(eq(EVENT_ID), eq(events), eq(userRoles), eq(CAN_CREATE)),
             () -> inOrder.verify(accessControlService).canAccessCaseFieldsWithCriteria(any(JsonNode.class), eq(caseFields), eq(userRoles), eq(CAN_CREATE)),
@@ -195,13 +205,27 @@ class AuthorisedCreateCaseOperationTest {
     @DisplayName("should fail if user roles not found")
     void shouldFailIfNoUserRolesFound() {
 
-        doReturn(null).when(userRepository).getUserRoles();
+        doReturn(null).when(caseAccessService).getCaseCreationRoles();
+        when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseType), eq(null), eq(CAN_CREATE))).thenThrow(NullPointerException.class);
 
-        assertThrows(ValidationException.class, () -> authorisedCreateCaseOperation.createCaseDetails(UID,
+        assertThrows(NullPointerException.class, () -> authorisedCreateCaseOperation.createCaseDetails(UID,
                                                                                                       JURISDICTION_ID,
                                                                                                       CASE_TYPE_ID,
                                                                                                       EVENT_DATA,
                                                                                                       IGNORE));
+    }
+
+    @Test
+    @DisplayName("should fail if empty user roles not found")
+    void shouldFailIfEmptyUserRolesFound() {
+
+        doReturn(new HashSet<>()).when(caseAccessService).getCaseCreationRoles();
+
+        assertThrows(ResourceNotFoundException.class, () -> authorisedCreateCaseOperation.createCaseDetails(UID,
+            JURISDICTION_ID,
+            CASE_TYPE_ID,
+            EVENT_DATA,
+            IGNORE));
     }
 
     @Test

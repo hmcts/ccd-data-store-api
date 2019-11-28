@@ -28,6 +28,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
+import uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
@@ -499,6 +500,34 @@ class CaseAccessServiceTest {
             doReturn(null).when(userRepository).getUserRoles();
 
             assertThrows(ValidationException.class, () -> caseAccessService.getUserRoles());
+        }
+    }
+
+    @Nested
+    @DisplayName("create case roles")
+    class CreateCaseRolesTest {
+        @BeforeEach
+        void setUp() {
+            doReturn(Sets.newHashSet(CASE_GRANTED_1_ID, CASE_GRANTED_2_ID)).when(userRepository).getUserRoles();
+        }
+
+        @Test
+        @DisplayName("should return create user roles")
+        void getCreateCaseRoles() {
+            Set<String> caseRoles = caseAccessService.getCaseCreationRoles();
+
+            assertAll(
+                () -> assertThat(caseRoles.size(), Is.is(3)),
+                () -> assertThat(caseRoles, hasItems(CASE_GRANTED_1_ID, CASE_GRANTED_2_ID, GlobalCaseRole.CREATOR.getRole()))
+            );
+        }
+
+        @Test
+        @DisplayName("should throw exception when no user role found")
+        void getCreateCaseRolesThrows() {
+            doReturn(null).when(userRepository).getUserRoles();
+
+            assertThrows(ValidationException.class, () -> caseAccessService.getCaseCreationRoles());
         }
     }
 
