@@ -1,41 +1,16 @@
 {
-  "_guid_": "S-140",
-  "_extends_": "Base_Expecting_200",
   "title": "must return pagination metadata successfully for correct inputs",
+  "_guid_": "S-140",
+  "_extends_": "F-057_Test_Data_Base",
+
   "specs": [
     "a detailed profile in CCD",
     "has the 200 return code"
   ],
-  "productName": "CCD Data Store",
-  "operationName": "Get the pagination metadata for a case data search for Citizen",
-  "method": "GET",
-  "user": {
-    "username": "auto.test.cnp+ctzn4@gmail.com",
-    "password": "Pa55word11"
-  },
-  "uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/pagination_metadata",
-  "request": {
-    "pathVariables": {
-      "uid": "[[DYNAMIC]]",
-      "jid": "AUTOTEST1",
-      "ctid": "AAT"
-    }
-  },
   "expectedResponse": {
-    "responseCode": 200,
-    "responseMessage": "OK",
-    "headers": {
-      "X-Frame-Options": "DENY",
-      "Transfer-Encoding": "chunked",
-      "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
-      "vary": "accept-encoding",
-      "X-Content-Type-Options": "nosniff",
-      "Content-Encoding": "gzip",
-      "Pragma": "no-cache",
-      "Expires": "0",
-      "X-XSS-Protection": "1; mode=block",
-      "Date": "[[ANY]]",
-      "Content-Type": "application/json;charset=UTF-8"
+    "_extends_": "Common_200_Response",
+    "headers" : {
+      "Transfer-Encoding" : "chunked"
     },
     "body": {
       "total_results_count": "[[ANY]]",

@@ -1,31 +1,24 @@
 {
-  "_guid_": "S-522",
-  "_extends_": "Base_Expecting_400",
   "title": "must return 400 when security classification in input parameters is present and invalid",
+  "_guid_": "S-522",
+  "_extends_": "F-057_Test_Data_Base",
+
   "specs": [
     "a detailed profile in CCD",
     "does not provide valid security classification in input parameters",
     "has the 400 return code"
   ],
-  "productName": "CCD Data Store",
-  "operationName": "Get the pagination metadata for a case data search for Citizen",
-  "method": "GET",
-  "user": {
-    "username": "auto.test.cnp+ctzn4@gmail.com",
-    "password": "Pa55word11"
-  },
-  "uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/pagination_metadata",
   "request": {
-    "pathVariables": {
-      "uid": "[[DYNAMIC]]",
-      "jid": "AUTOTEST1",
-      "ctid": "AAT"
-    },
     "queryParams": {
       "security_classification": "someInvalidSecurityClassification"
     }
   },
   "expectedResponse": {
+    "_extends_": "Common_400_Response",
+    "headers" : {
+      "Transfer-Encoding" : "chunked",
+      "Connection" : "close"
+    },
     "body": {
       "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
       "timestamp": "[[ANY]]",
