@@ -8,7 +8,6 @@
 		"_extends_": "Common_401_Response_Headers"
 	},
 	"body": {
-		"status": 401,
-		"error": "Unauthorized"
+		"_extends_": "Common_401_Response_Body"
 	}
 }
