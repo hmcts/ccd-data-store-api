@@ -8,7 +8,6 @@
 		"_extends_": "Common_404_Response_Headers"
 	},
 	"body": {
-		"status": 404,
-		"error": "Not Found"
+		"_extends_": "Common_404_Response_Body"
 	}
 }

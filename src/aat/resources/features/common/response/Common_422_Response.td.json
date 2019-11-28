@@ -8,7 +8,6 @@
 		"_extends_": "Common_422_Response_Headers"
 	},
 	"body": {
-		"status": 422,
-		"error": "Unprocessable Entity"
+		"_extends_": "Common_422_Response_Body"
 	}
 }
