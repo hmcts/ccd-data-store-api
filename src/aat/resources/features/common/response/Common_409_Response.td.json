@@ -1,0 +1,14 @@
+{
+	"_guid_": "Common_409_Response",
+	"_extends_": "Common_Response",
+
+	"responseCode": 409,
+	"responseMessage": "Conflict",
+	"headers": {
+		"_extends_": "Common_409_Response_Headers"
+	},
+	"body": {
+		"status": 409,
+		"error": "Conflict"
+	}
+}
