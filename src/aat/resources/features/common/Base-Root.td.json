@@ -1,29 +1,14 @@
 {
 	"_guid_": "Base-Root",
 	"user": {
-		"username": "auto.test.cnp@gmail.com",
-		"password": "Pa55word11"
+		"_extends_": "Common_User_For_Request"
 	},
 	"request": {
-		"headers": {
-			"Authorization": "[[DYNAMIC]]",
-			"ServiceAuthorization": "[[DYNAMIC]]",
-			"Content-Type": "application/json"
-		}
+		"_extends_": "Common_Request"
 	},
 	"expectedResponse": {
 		"headers": {
-			"X-Frame-Options": "DENY",
-			"Transfer-Encoding": "chunked",
-			"Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
-			"vary": "accept-encoding",
-			"X-Content-Type-Options": "nosniff",
-			"Content-Encoding": "gzip",
-			"Pragma": "no-cache",
-			"Expires": "0",
-			"X-XSS-Protection": "1; mode=block",
-			"Date": "[[ANY]]",
-			"Content-Type": "application/json;charset=UTF-8"
+			"_extends_": "Common_Response_Headers"
 		}
 	}
 }

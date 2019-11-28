@@ -5,6 +5,9 @@
 	},
 	"expectedResponse": {
 		"responseCode": 204,
-		"responseMessage": "No content"
+		"responseMessage": "No content",
+		"headers": {
+			"_extends_": "Common_204_Response_Headers"
+		}
 	}
 }

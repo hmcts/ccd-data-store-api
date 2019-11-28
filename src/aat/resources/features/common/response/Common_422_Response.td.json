@@ -1,0 +1,14 @@
+{
+	"_guid_": "Common_422_Response",
+	"_extends_": "Common_Response",
+
+	"responseCode": 422,
+	"responseMessage": "Unprocessable Entity",
+	"headers": {
+		"_extends_": "Common_422_Response_Headers"
+	},
+	"body": {
+		"status": 422,
+		"error": "Unprocessable Entity"
+	}
+}
