@@ -1,0 +1,35 @@
+{
+  "_guid_": "S-512",
+  "_extends_": "F-049_Test_Data_Base",
+  "title": "must return 404 when request provide invalid Case type ID in CCD",
+  "specs": [
+    "a detailed profile in CCD",
+    "Start case creation as Case worker",
+    "CCD Data Store",
+    "provide invalid Case type ID",
+    "code is HTTP-404"
+  ],
+  "request": {
+    "pathVariables": {
+      "ctid": "DUMMY"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "headers": {
+      "Transfer-Encoding": "chunked"
+    },
+  "body" : {
+    "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+    "timestamp" : "[[ANY]]",
+    "status" : 404,
+    "error" : "Not Found",
+    "message" : "Resource not found when getting case type version for DUMMY because of 404 ",
+    "path" : "[[ANY]]",
+    "details" : null,
+    "callbackErrors" : null,
+    "callbackWarnings" : null
+  }
+}
+}
+

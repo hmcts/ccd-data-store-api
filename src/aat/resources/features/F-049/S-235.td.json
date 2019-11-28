@@ -1,0 +1,40 @@
+{
+  "_guid_": "S-235",
+  "_extends_": "F-049_Test_Data_Base",
+  "title": "must start case creation process successfully for correct inputs",
+  "specs": [
+    "a detailed profile in CCD",
+    "Start case creation as Case worker",
+    "provide valid details",
+    "CCD Data Store",
+    "code is HTTP-200"
+  ],
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers" : {
+      "Transfer-Encoding": "chunked"
+    },
+    "body": {
+      "token": "[[ANY]]",
+      "case_details": {
+        "id": null,
+        "jurisdiction": "AUTOTEST1",
+        "state": null,
+        "version": null,
+        "case_type_id": "AAT",
+        "created_date": null,
+        "last_modified": null,
+        "security_classification": null,
+        "case_data": {},
+        "data_classification": {},
+        "after_submit_callback_response": null,
+        "callback_response_status_code": null,
+        "callback_response_status": null,
+        "delete_draft_response_status_code": null,
+        "delete_draft_response_status": null,
+        "security_classifications": {}
+      },
+      "event_id": "CREATE"
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "_guid_": "S-511",
+  "_extends_": "F-049_Test_Data_Base",
+  "title": "must return 403 when request provide invalid Jurisdiction ID in CCD",
+  "specs": [
+    "a detailed profile in CCD",
+    "Start case creation as Case worker",
+    "CCD Data Store",
+    "provide invalid Jurisdiction ID",
+    "code is HTTP-403"
+  ],
+  "request": {
+    "pathVariables": {
+      "jid": "@@@@@@@"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_403_Response",
+    "headers": {
+      "Transfer-Encoding": "chunked"
+    },
+    "body" : {
+      "timestamp" : "[[ANY]]",
+      "status" : 403,
+      "error" : "Forbidden",
+      "message" : "Access Denied",
+      "path" : "[[ANY]]"
+    }
+  }
+}
