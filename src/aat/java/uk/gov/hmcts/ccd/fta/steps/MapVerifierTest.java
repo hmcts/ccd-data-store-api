@@ -282,10 +282,10 @@ public class MapVerifierTest {
     public void shouldVerifyABigRealResponseBodyAgainstItselfWithoutWildcards() {
 
         HashMap<String, Object> expected = (HashMap<String, Object>) DATA_SOURCE
-                .getDataForScenario("HttpTestData-with-a-Big-ExpectedResponseBody_expected")
+                .getDataForTestCall("HttpTestData-with-a-Big-ExpectedResponseBody_expected")
                 .getExpectedResponse().getBody();
         HashMap<String, Object> actual = (HashMap<String, Object>) DATA_SOURCE
-                .getDataForScenario("HttpTestData-with-a-Big-ExpectedResponseBody_actual")
+                .getDataForTestCall("HttpTestData-with-a-Big-ExpectedResponseBody_actual")
                 .getExpectedResponse().getBody();
 
         MapVerificationResult result = MapVerifier.verifyMap(expected, actual, 5);
@@ -301,10 +301,10 @@ public class MapVerifierTest {
     public void shouldVerifyAResponseHeaderMapCaseInsensitively() {
 
         Map<String, Object> expected = DATA_SOURCE
-                .getDataForScenario("HttpTestData-with-a-Big-ExpectedResponseBody_expected").getExpectedResponse()
+                .getDataForTestCall("HttpTestData-with-a-Big-ExpectedResponseBody_expected").getExpectedResponse()
                 .getHeaders();
         Map<String, Object> actual = DATA_SOURCE
-                .getDataForScenario("HttpTestData-with-a-Big-ExpectedResponseBody_actual").getExpectedResponse()
+                .getDataForTestCall("HttpTestData-with-a-Big-ExpectedResponseBody_actual").getExpectedResponse()
                 .getHeaders();
 
         MapVerificationResult result = MapVerifier.verifyMap(expected, actual, 5);
@@ -315,9 +315,9 @@ public class MapVerifierTest {
 
     @Test
     public void shoudlFailForCollectionsOfDifferentSizes() {
-        Map<String, Object> expected = DATA_SOURCE.getDataForScenario("MapWithArray_expected").getExpectedResponse()
+        Map<String, Object> expected = DATA_SOURCE.getDataForTestCall("MapWithArray_expected").getExpectedResponse()
                 .getBody();
-        Map<String, Object> actual = DATA_SOURCE.getDataForScenario("MapWithArray_actual").getExpectedResponse()
+        Map<String, Object> actual = DATA_SOURCE.getDataForTestCall("MapWithArray_actual").getExpectedResponse()
                 .getBody();
 
         MapVerificationResult result = MapVerifier.verifyMap(expected, actual, 5);
