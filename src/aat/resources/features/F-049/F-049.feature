@@ -64,7 +64,7 @@ Feature: Start case creation as Case worker
     And     the response [code is HTTP-403]
     And     the response has all the details as expected
 
-  @S-234
+  @S-234 @Ignore
   Scenario: must return 400 when request provide special character for Case type ID in CCD
     Given   a user with [a detailed profile in CCD]
     When    a request is prepared with appropriate values
