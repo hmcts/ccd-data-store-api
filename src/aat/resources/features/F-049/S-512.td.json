@@ -16,9 +16,6 @@
   },
   "expectedResponse": {
     "_extends_": "Common_404_Response",
-    "headers": {
-      "Transfer-Encoding": "chunked"
-    },
   "body" : {
     "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
     "timestamp" : "[[ANY]]",
