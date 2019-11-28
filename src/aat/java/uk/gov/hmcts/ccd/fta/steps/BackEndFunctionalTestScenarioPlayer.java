@@ -339,12 +339,6 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
             .header("ServiceAuthorization", s2sToken);
     }
 
-    private void importDefinitions() {
-        importDefinition(BE_FTA_FILE_JURISDICTION1);
-        importDefinition(BE_FTA_FILE_JURISDICTION2);
-        importDefinition(BE_FTA_FILE_JURISDICTION3);
-    }
-
     private void importDefinition(String file) {
         asAutoTestImporter()
             .given()
@@ -386,5 +380,11 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         } catch (FeignException ex) {
             logger.info(logPrefix + "credentials invalid");
         }
+    }
+
+    private void importDefinitions() {
+        importDefinition(BE_FTA_FILE_JURISDICTION1);
+        importDefinition(BE_FTA_FILE_JURISDICTION2);
+        importDefinition(BE_FTA_FILE_JURISDICTION3);
     }
 }
