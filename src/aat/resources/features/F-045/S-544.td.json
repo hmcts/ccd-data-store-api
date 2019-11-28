@@ -15,9 +15,18 @@
     }
   },
   "expectedResponse": {
-    "_extends_": "Common_400_Response",
-    "headers": {
-      "Content-Length" : "[[ANY]]"
+    "responseCode" : 400,
+    "responseMessage" : "Bad Request",
+    "headers" : {
+      "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
+      "Content-Length" : "[[ANY]]",
+      "Date" : "[[ANY]]",
+      "Expires" : "[[ANY]]",
+      "Pragma" : "no-cache",
+      "Vary" : "[[ANY]]",
+      "X-Content-Type-Options" : "nosniff",
+      "X-Frame-Options" : "DENY",
+      "X-Xss-Protection" : "1; mode=block"
     }
   }
 }
