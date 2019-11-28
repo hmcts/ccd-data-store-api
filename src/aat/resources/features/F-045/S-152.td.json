@@ -16,7 +16,7 @@
 	"expectedResponse": {
     "_extends_": "Common_404_Response",
 		"headers": {
-			"Transfer-Encoding": "chunked"
+      "Content-Length" : "[[ANY]]"
 		},
 		"body": {
 			"_extends_": "Common_404_Response_Body"
