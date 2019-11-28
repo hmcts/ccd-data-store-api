@@ -17,25 +17,22 @@
       "jid": "AUTOTEST1",
       "ctid": "AAT",
       "cid": "1234567890123456",
-      "idToDelete": "1234567890123456"
+      "idToDelete": "[[DYNAMIC]]"
     }
   },
   "expectedResponse": {
     "responseCode": 400,
     "responseMessage": "Bad Request",
     "headers": {
-      "Content-Length": "[[ANY]]"
+      "Content-Length": "[[ANY]]",
+      "Transfer-Encoding" : "chunked"
     },
     "body": {
-      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
       "timestamp": "[[ANY]]",
       "status": 400,
       "error": "Not Found",
       "message": "No case found for reference: 1234567890123456",
-      "path": "[[ANY]]",
-      "details": null,
-      "callbackErrors": null,
-      "callbackWarnings": null
+      "path": "[[ANY]]"
     }
   }
 }

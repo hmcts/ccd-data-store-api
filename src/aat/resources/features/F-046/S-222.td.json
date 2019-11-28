@@ -1,0 +1,30 @@
+{
+  "_guid_": "S-222",
+  "_extends_": "Base_Expecting_204",
+  "title": "must return 204 if access is successfully revoked for a user on a case ID",
+  "specs": [
+    "a detailed profile in CCD",
+    "contains a valid case id",
+    "has a 204 no content code"
+  ],
+  "productName": "CCD Data Store",
+  "operationName": "Revoke access to case",
+  "method": "DELETE",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/users/{idToDelete}",
+  "request": {
+    "pathVariables": {
+      "uid": "[[DYNAMIC]]",
+      "jid": "AUTOTEST1",
+      "ctid": "AAT",
+      "cid": "[[DYNAMIC]]",
+      "idToDelete": "[[DYNAMIC]]"
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 204,
+    "responseMessage": "No content",
+    "headers": {
+      "Content-Length": "[[ANY]]"
+    }
+  }
+}
