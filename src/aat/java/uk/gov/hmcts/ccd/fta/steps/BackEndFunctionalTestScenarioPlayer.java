@@ -68,6 +68,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         this.scenario = scenario;
         if (!isTestDataLoaded) {
             importDefinitions();
+            isTestDataLoaded = true;
         }
     }
 
