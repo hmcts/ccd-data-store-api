@@ -14,8 +14,7 @@
   "expectedResponse": {
     "_extends_": "Common_400_Response",
     "headers" : {
-      "Transfer-Encoding": "chunked",
-      "Connection" : "close"
+      "Content-Length" : "[[ANY]]"
     },
     "body" : {
       "exception" : "[[ANY]]",
