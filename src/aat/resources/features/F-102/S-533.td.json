@@ -1,0 +1,36 @@
+{
+  "_guid_": "S-533",
+  "_extends_": "Base_Expecting_200",
+  "title": "Get jurisdictions available to the user",
+  "specs": [
+    "a detailed profile in CCD having create case access for a jurisdiction",
+    "has CREATE as case access",
+    "contains the list of jurisdictions a user has access to"
+  ],
+  "productName": "CCD Data Store",
+  "operationName": "Get jurisdictions available to the user",
+  "method": "GET",
+  "uri": "/caseworkers/{uid}/jurisdictions",
+  "user" : {
+    "username": "befta_solicitor_3@gmail.com",
+    "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+  },
+  "request": {
+    "pathVariables": {
+      "uid": "[[DYNAMIC]]"
+    },
+    "queryParams" : {
+      "access": "create"
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 200,
+    "responseMessage": "OK",
+    "headers": {
+      "Content-Length": "[[ANY]]"
+    },
+    "body": {
+
+    }
+  }
+}
