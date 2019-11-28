@@ -1,0 +1,41 @@
+{
+  "_guid_": "S-223",
+  "_extends_": "Base_Expecting_400",
+  "title": "must return 400 when an invalid case id is provided",
+  "specs": [
+    "a detailed profile in CCD",
+    "contains an invalid case id",
+    "has a 400 bad request code"
+  ],
+  "productName": "CCD Data Store",
+  "operationName": "Revoke access to case",
+  "method": "DELETE",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/users/{idToDelete}",
+  "request": {
+    "pathVariables": {
+      "uid": "[[DYNAMIC]]",
+      "jid": "AUTOTEST1",
+      "ctid": "AAT",
+      "cid": "1234567890123456",
+      "idToDelete": "1234567890123456"
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 400,
+    "responseMessage": "Bad Request",
+    "headers": {
+      "Content-Length": "[[ANY]]"
+    },
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+      "timestamp": "[[ANY]]",
+      "status": 400,
+      "error": "Not Found",
+      "message": "No case found for reference: 1234567890123456",
+      "path": "[[ANY]]",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}

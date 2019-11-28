@@ -1,0 +1,41 @@
+{
+  "_guid_": "S-224",
+  "_extends_": "Base_Expecting_401",
+  "title": "must return 401 when request does not provide valid authentication credentials",
+  "specs": [
+    "a detailed profile in CCD",
+    "does not provide valid authentication credentials in CCD",
+    "has a 401 Unauthorized code"
+  ],
+  "productName": "CCD Data Store",
+  "operationName": "Revoke access to case",
+  "method": "DELETE",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/users/{idToDelete}",
+  "request": {
+    "pathVariables": {
+      "uid": "dummyValue",
+      "jid": "AUTOTEST1",
+      "ctid": "AAT",
+      "cid": "1234567890123456",
+      "idToDelete": "1234567890123456"
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 401,
+    "responseMessage": "Bad Request",
+    "headers": {
+      "Content-Length": "[[ANY]]"
+    },
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+      "timestamp": "[[ANY]]",
+      "status": 401,
+      "error": "Not Found",
+      "message": "No case found for reference: 1234567890123456",
+      "path": "[[ANY]]",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}
