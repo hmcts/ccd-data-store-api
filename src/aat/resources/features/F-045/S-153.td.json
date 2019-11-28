@@ -1,30 +1,24 @@
 {
-  "_guid_": "S-153",
-  "_extends_": "Base_Expecting_403",
   "title": "must return negative response when request does not provide valid authentication credentials",
+  "_guid_": "S-153",
+  "_extends_": "F-045_Test_Data_Base",
+
   "specs": [
     "a detailed profile in CCD",
     "does not provide valid authentication credentials",
     "has the 403 return code"
   ],
-  "productName": "CCD Data Store",
-  "operationName": "Grant access to case",
-  "method": "POST",
-  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/users",
+
   "request": {
     "pathVariables": {
-      "uid": "some id",
-      "jid": "AUTOTEST1",
-      "ctid": "AAT",
-      "cid": "1573751648840703"
-    },
-    "body": {
-      "id": "Test User"
+      "uid": "some id"
     }
   },
+
   "expectedResponse": {
-    "headers" : {
-      "Transfer-Encoding" : "chunked"
+    "_extends_": "Common_403_Response",
+    "headers": {
+      "Content-Length" : "[[ANY]]"
     },
     "body" : {
       "timestamp" : "[[ANY]]",

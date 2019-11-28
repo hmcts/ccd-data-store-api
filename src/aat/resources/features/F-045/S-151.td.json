@@ -5,7 +5,23 @@
 
 	"specs": [
 		"a detailed profile in CCD",
-		"has a valid case-reference existing in CCD",
+		"contains as input a valid case-reference that exists in CCD",
 		"has the 201 return code"
-	]
+	],
+  "expectedResponse": {
+
+    "responseCode" : 201,
+    "responseMessage" : "Created",
+    "headers" : {
+      "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
+      "Content-Length" : "[[ANY]]",
+      "Date" : "[[ANY]]",
+      "Expires" : "0",
+      "Pragma" : "no-cache",
+      "Vary" : "Accept-Encoding",
+      "X-Content-Type-Options" : "nosniff",
+      "X-Frame-Options" : "DENY",
+      "X-Xss-Protection" : "1; mode=block"
+    }
+  }
 }
