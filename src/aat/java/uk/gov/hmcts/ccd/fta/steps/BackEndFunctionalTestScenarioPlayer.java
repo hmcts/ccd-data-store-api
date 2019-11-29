@@ -245,10 +245,17 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         responseData.setHeaders(responseHeaders);
 
         if (!response.getBody().asString().isEmpty()) {
-            responseData.setBody(JsonUtils.readObjectFromJsonText(response.getBody().asString(), Map.class));
+            String apiResponse = formatResponse(response.getBody().asString());
+            responseData.setBody(JsonUtils.readObjectFromJsonText(apiResponse, Map.class));
         }
-
         scenarioContext.setTheResponse(responseData);
+    }
+
+    private String formatResponse(String apiResponse) {
+        if (apiResponse.startsWith("[") && apiResponse.endsWith("]")) {
+            apiResponse = apiResponse.substring(1, apiResponse.length() - 1);
+        }
+        return apiResponse;
     }
 
     @Override
