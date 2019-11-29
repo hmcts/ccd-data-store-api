@@ -2536,11 +2536,8 @@ public class AccessControlServiceTest {
                 () -> assertThat("WizardPage CaseField displayContext should change to READONLY",
                     eventTrigger.getWizardPages().get(0).getWizardPageFields().get(0).getDisplayContext(), is(READONLY)),
                 () -> assertThat("WizardPage CaseField Override should be size 1",
-                    eventTrigger.getWizardPages().get(0).getWizardPageFields().get(0).getComplexFieldOverrides().size(), is(1)),
-                () -> assertThat("WizardPage CaseField Override displayContext should change to READONLY",
-                    eventTrigger.getWizardPages().get(0).getWizardPageFields().get(0).getComplexFieldOverrides().get(1).getDisplayContext(), is(READONLY))
+                    eventTrigger.getWizardPages().get(0).getWizardPageFields().get(0).getComplexFieldOverrides().size(), is(1))
              );
-
         }
 
         @Test
