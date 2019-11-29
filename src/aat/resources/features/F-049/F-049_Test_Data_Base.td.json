@@ -18,7 +18,7 @@
 	},
   "expectedResponse": {
     "headers" : {
-      "Content-Length": "[[ANY]]"
+      "Transfer-Encoding" : "chunked"
     }
   }
 }

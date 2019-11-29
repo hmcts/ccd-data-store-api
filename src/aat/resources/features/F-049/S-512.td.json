@@ -6,7 +6,7 @@
     "a detailed profile in CCD",
     "Start case creation as Case worker",
     "CCD Data Store",
-    "provide invalid Case type ID",
+    "provide an invalid Case type ID in CCD",
     "code is HTTP-404"
   ],
   "request": {
@@ -19,8 +19,6 @@
   "body" : {
     "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
     "timestamp" : "[[ANY]]",
-    "status" : 404,
-    "error" : "Not Found",
     "message" : "Resource not found when getting case type version for DUMMY because of 404 ",
     "path" : "[[ANY]]",
     "details" : null,

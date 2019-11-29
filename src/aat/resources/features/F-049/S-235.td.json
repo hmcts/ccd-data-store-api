@@ -5,12 +5,14 @@
   "specs": [
     "a detailed profile in CCD",
     "Start case creation as Case worker",
-    "provide valid details",
     "CCD Data Store",
     "code is HTTP-200"
   ],
   "expectedResponse": {
     "_extends_": "Common_200_Response",
+    "headers" : {
+      "Transfer-Encoding" : "chunked"
+    },
     "body": {
       "token": "[[ANY]]",
       "case_details": {

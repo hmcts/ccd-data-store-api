@@ -11,18 +11,13 @@
   ],
   "request": {
     "pathVariables": {
-      "uid": "[[DYNAMIC]]",
-      "jid": "AUTOTEST11",
-      "ctid": "AAT",
-      "etid": "CREATE"
+      "jid": "AUTOTEST11"
     }
   },
   "expectedResponse": {
     "_extends_": "Common_403_Response",
     "body" : {
       "timestamp" : "[[ANY]]",
-      "status" : 403,
-      "error" : "Forbidden",
       "message" : "Access Denied",
       "path" : "[[ANY]]"
     }

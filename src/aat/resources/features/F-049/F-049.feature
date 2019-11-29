@@ -67,7 +67,7 @@ Feature: Start case creation as Case worker
   Scenario: must return 400 when request provide special character for Case type ID in CCD
     Given   a user with [a detailed profile in CCD]
     When    a request is prepared with appropriate values
-    And     the request [provide Special character for Case type ID]
+    And     the request [provide special character for Case type ID in CCD]
     And     it is submitted to call the [Start case creation as Case worker] operation of [CCD Data Store]
     Then    a negative response is received
     And     the response [code is HTTP-400]
@@ -77,7 +77,7 @@ Feature: Start case creation as Case worker
   Scenario: must return 404 when request provide a jurisdiction id not existing in ccd
     Given   a user with [a detailed profile in CCD]
     When    a request is prepared with appropriate values
-    And     the request [provide invalid Jurisdiction ID]
+    And     the request [provide a jurisdiction id not existing in ccd]
     And     it is submitted to call the [Start case creation as Case worker] operation of [CCD Data Store]
     Then    a negative response is received
     And     the response [code is HTTP-404]
@@ -87,7 +87,7 @@ Feature: Start case creation as Case worker
   Scenario: must return 403 when request provide a jurisdiction id not existing in ccd
     Given   a user with [a detailed profile in CCD]
     When    a request is prepared with appropriate values
-    And     the request [provide invalid Jurisdiction ID]
+    And     the request [provide a jurisdiction id not existing in ccd]
     And     it is submitted to call the [Start case creation as Case worker] operation of [CCD Data Store]
     Then    a negative response is received
     And     the response [code is HTTP-403]
@@ -97,7 +97,7 @@ Feature: Start case creation as Case worker
   Scenario: must return 404 when request provide an invalid Case type ID in CCD
     Given   a user with [a detailed profile in CCD]
     When    a request is prepared with appropriate values
-    And     the request [provide invalid Case type ID]
+    And     the request [provide an invalid Case type ID in CCD]
     And     it is submitted to call the [Start case creation as Case worker] operation of [CCD Data Store]
     Then    a negative response is received
     And     the response [code is HTTP-404]
@@ -107,7 +107,7 @@ Feature: Start case creation as Case worker
   Scenario: must return 404 when provide an invalid Event ID in CCD
     Given   a user with [a detailed profile in CCD]
     When    a request is prepared with appropriate values
-    And     the request [provide invalid Event ID]
+    And     the request [provide an invalid Event ID in CCD]
     And     it is submitted to call the [Start case creation as Case worker] operation of [CCD Data Store]
     Then    a negative response is received
     And     the response [code is HTTP-404]

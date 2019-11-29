@@ -6,7 +6,7 @@
     "a detailed profile in CCD",
     "Start case creation as Case worker",
     "CCD Data Store",
-    "provide Special character for Case type ID",
+    "provide special character for Case type ID in CCD",
     "code is HTTP-400"
   ],
   "request": {
@@ -15,32 +15,6 @@
     }
   },
   "expectedResponse": {
-    "responseCode" : 500,
-    "responseMessage" : "Internal Server Error",
-    "headers" : {
-      "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
-      "Connection" : "close",
-      "Content-Encoding" : "gzip",
-      "Content-Type" : "application/json;charset=UTF-8",
-      "Date" : "[[ANY]]",
-      "Expires" : "0",
-      "Pragma" : "no-cache",
-      "Transfer-Encoding" : "chunked",
-      "vary" : "accept-encoding",
-      "X-Content-Type-Options" : "nosniff",
-      "X-Frame-Options" : "DENY",
-      "X-XSS-Protection" : "1; mode=block"
-    },
-    "body" : {
-      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException",
-      "timestamp" : "[[ANY]]",
-      "status" : 500,
-      "error" : "Unexpected Error",
-      "message" : "Problem getting case type version for @@@@@ because of 500 ",
-      "path" : "[[ANY]]",
-      "details" : null,
-      "callbackErrors" : null,
-      "callbackWarnings" : null
-    }
+    "_extends_": "Common_400_Response"
   }
 }

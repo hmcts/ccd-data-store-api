@@ -6,7 +6,7 @@
     "a detailed profile in CCD",
     "Start case creation as Case worker",
     "CCD Data Store",
-    "provide invalid Idam user ID",
+    "provide non-existing Idam user ID in CCD",
     "code is HTTP-403"
   ],
   "request": {
@@ -19,8 +19,6 @@
     "_extends_": "Common_403_Response",
     "body" : {
       "timestamp" : "[[ANY]]",
-      "status" : 403,
-      "error" : "Forbidden",
       "message" : "Access Denied",
       "path" : "[[ANY]]"
     }
