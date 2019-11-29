@@ -44,20 +44,20 @@ Feature: Start case creation as Case worker
     And     the response has all the details as expected
 
   @S-233 @Ignore
-  Scenario: must return 404 when request provide a Idam user ID not existing in CCD
+  Scenario: must return 404 when request provide non-existing Idam user ID in CCD
     Given   a user with [a detailed profile in CCD]
     When    a request is prepared with appropriate values
-    And     the request [provide invalid Idam user ID]
+    And     the request [provide non-existing Idam user ID in CCD]
     And     it is submitted to call the [Start case creation as Case worker] operation of [CCD Data Store]
     Then    a negative response is received
     And     the response [code is HTTP-403]
     And     the response has all the details as expected
 
   @S-233
-  Scenario: must return 403 when request provide a Idam user ID not existing in CCD
+  Scenario: must return 403 when request provide non-existing Idam user ID in CCD
     Given   a user with [a detailed profile in CCD]
     When    a request is prepared with appropriate values
-    And     the request [provide invalid Idam user ID]
+    And     the request [provide non-existing Idam user ID in CCD]
     And     it is submitted to call the [Start case creation as Case worker] operation of [CCD Data Store]
     Then    a negative response is received
     And     the response [code is HTTP-403]
