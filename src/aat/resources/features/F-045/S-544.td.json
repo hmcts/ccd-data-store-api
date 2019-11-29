@@ -18,16 +18,9 @@
     "responseCode" : 400,
     "responseMessage" : "Bad Request",
     "headers" : {
-      "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
+      "_extends_": "Common_Response_Headers",
       "Connection" : "close",
-      "Content-Length" : "[[ANY]]",
-      "Date" : "[[ANY]]",
-      "Expires" : "[[ANY]]",
-      "Pragma" : "no-cache",
-      "Vary" : "[[ANY]]",
-      "X-Content-Type-Options" : "nosniff",
-      "X-Frame-Options" : "DENY",
-      "X-Xss-Protection" : "1; mode=block"
+      "Content-Length" : "[[ANY]]"
     }
   }
 }

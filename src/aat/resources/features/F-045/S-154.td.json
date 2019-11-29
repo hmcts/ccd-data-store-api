@@ -15,19 +15,15 @@
     }
   },
   "expectedResponse": {
-    "responseCode" : 403,
-    "responseMessage" : "Forbidden",
+    "_extends_": "Common_403_Response",
     "headers": {
-      "_extends_": "Common_403_Response_Headers",
       "Content-Length" : "[[ANY]]",
-      "Transfer-Encoding" : "chunked"
+      "Content-Encoding" : "gzip",
+      "Content-Type" : "application/json;charset=UTF-8",
+      "vary" : "accept-encoding"
     },
     "body" : {
-      "timestamp" : "[[ANY]]",
-      "status" : 403,
-      "error" : "Forbidden",
-      "message" : "Access Denied",
-      "path" : "[[ANY]]"
+      "message" : "Access Denied"
     }
   }
 }
