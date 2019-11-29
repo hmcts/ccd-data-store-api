@@ -1,0 +1,21 @@
+{
+  "title": "must not validate when CMC ExternalID is not unique or already exists",
+  "_guid_": "S-297",
+  "_extends_": "F-050_Test_Data_Base",
+
+  "specs": [
+    "a detailed profile in CCD",
+    "has the 409 return code"
+  ],
+
+  "expectedResponse": {
+    "_extends_": "Common_409_Response",
+    "body": {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException",
+      "timestamp" : "[[ANY]]",
+      "path" : "[[ANY]]",
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}

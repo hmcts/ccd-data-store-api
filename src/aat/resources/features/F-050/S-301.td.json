@@ -1,0 +1,51 @@
+{
+  "title": "must validate when all fields are valid",
+  "_guid_": "S-301",
+  "_extends_": "F-050_Test_Data_Base",
+
+  "specs": [
+    "a detailed profile in CCD",
+    "has the 200 return code"
+  ],
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Length" : "[[ANY]]"
+    },
+    "body": {
+      "data": {
+        "TextField": "Text",
+        "NumberField": null,
+        "YesOrNoField": "Yes",
+        "PhoneUKField": "01234123412",
+        "EmailField": "abc@gmail.com",
+        "MoneyGBPField": "100",
+        "DateField": null,
+        "DateTimeField": "",
+        "TextAreaField": null,
+        "FixedListField": null,
+        "FixedRadioListField": null,
+        "MultiSelectListField": [],
+        "ComplexField": {
+          "ComplexTextField": null,
+          "ComplexFixedListField": null,
+          "ComplexNestedField": {
+            "NestedNumberField": null,
+            "NestedCollectionTextField": []
+          }
+        },
+        "CollectionField": [],
+        "AddressUKField": {
+          "AddressLine1": null,
+          "AddressLine2": null,
+          "AddressLine3": null,
+          "PostTown": null,
+          "County": null,
+          "PostCode": null,
+          "Country": null
+        }
+      }
+    }
+  }
+}

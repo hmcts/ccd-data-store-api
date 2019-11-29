@@ -1,0 +1,31 @@
+{
+  "title": "must return 4xx when request does not provide valid authentication credentials",
+  "_guid_": "S-299",
+  "_extends_": "F-050_Test_Data_Base",
+
+  "specs": [
+    "a detailed profile in CCD",
+    "uses a Case ID that doesn’t exist in CCD",
+    "uses an invalid authorization",
+    "has the 403 return code"
+  ],
+  "request": {
+    "headers": {
+      "Authorization": "InvalidAuthorization"
+    },
+    "pathVariables": {
+      "uid": "xxxxxxxx"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_403_Response",
+    "headers": {
+      "Content-Length" : "[[ANY]]"
+    },
+    "body": {
+      "timestamp" : "[[ANY]]",
+      "message" : "Access Denied",
+      "path" : "[[ANY]]"
+    }
+  }
+}
