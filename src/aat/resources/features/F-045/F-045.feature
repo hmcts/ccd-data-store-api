@@ -7,7 +7,7 @@ Feature: Grant access to case
   @S-151
   Scenario: must return 201 if the grant is successful for a user to a valid case ID
     Given a user with [a detailed profile in CCD]
-    And a case has just been created as in [Standard_Full_Case]
+    And a case that has just been created as in [Standard_Full_Case]
     When a request is prepared with appropriate values
     And the request [contains as input a valid case-reference that exists in CCD]
     And it is submitted to call the [Grant access to case] operation of [CCD Data Store]
@@ -28,7 +28,7 @@ Feature: Grant access to case
   @S-153
   Scenario: must return negative response when request does not provide valid authentication credentials
     Given a user with [a detailed profile in CCD]
-    And a case has just been created as in [Standard_Full_Case]
+    And a case that has just been created as in [Standard_Full_Case]
     When a request is prepared with appropriate values
     And the request [does not provide valid authentication credentials]
     And it is submitted to call the [Grant access to case] operation of [CCD Data Store]
@@ -39,7 +39,7 @@ Feature: Grant access to case
   @S-154
   Scenario: must return negative response when request does not provide an authorized access
     Given a user with [a detailed profile in CCD]
-    And a case has just been created as in [Standard_Full_Case]
+    And a case that has just been created as in [Standard_Full_Case]
     When a request is prepared with appropriate values
     And the request [does not provide authorised access to the operation]
     And it is submitted to call the [Grant access to case] operation of [CCD Data Store]
@@ -50,7 +50,7 @@ Feature: Grant access to case
   @S-544
   Scenario: must return negative response when request body doesn't provide a mandatory field
     Given a user with [a detailed profile in CCD]
-    And a case has just been created as in [Standard_Full_Case]
+    And a case that has just been created as in [Standard_Full_Case]
     When a request is prepared with appropriate values
     And the request [does not provide a mandatory field for the operation]
     And it is submitted to call the [Grant access to case] operation of [CCD Data Store]
@@ -61,7 +61,7 @@ Feature: Grant access to case
   @S-545 @Ignore
   Scenario: must return negative response when case id contains some non-numeric characters
     Given a user with [a detailed profile in CCD]
-    And a case has just been created as in [Standard_Full_Case]
+    And a case that has just been created as in [Standard_Full_Case]
     When a request is prepared with appropriate values
     And the request [does not provide the numeric case id for the operation]
     And it is submitted to call the [Grant access to case] operation of [CCD Data Store]
