@@ -384,7 +384,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
             .multiPart(new File(file))
             .when()
             .post("/import");
-        String message = "Import failed with response body: " + response.getBody().toString();
+        String message = "Import failed with response body: " + response.body().prettyPrint();
         message += "\nand http code: " + response.statusCode();
         Assert.assertEquals(message, 201, response.getStatusCode());
     }
