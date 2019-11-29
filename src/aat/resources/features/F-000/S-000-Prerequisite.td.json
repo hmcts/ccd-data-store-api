@@ -2,6 +2,13 @@
   "_guid_": "S-000-Prerequisite",
   "_extends_": "S-000-Base-Success",
 
+  "users": {
+    "invokingUser": {
+      "username":"[[$CCD_PRIVATE_CASEWORKER_EMAIL]]",
+      "password":"[[$CCD_PRIVATE_CASEWORKER_PASSWORD]]"
+    }
+  },
+
   "specs": [
     "to retrieve a user profile"
   ],
