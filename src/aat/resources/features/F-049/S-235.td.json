@@ -3,7 +3,7 @@
   "_extends_": "F-049_Test_Data_Base",
   "title": "must start case creation process successfully for correct inputs",
   "specs": [
-    "a detailed profile in CCD",
+    "an active profile in CCD",
     "Start case creation as Case worker",
     "CCD Data Store",
     "code is HTTP-200"

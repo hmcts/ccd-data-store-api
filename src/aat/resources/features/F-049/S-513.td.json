@@ -3,15 +3,15 @@
   "_extends_": "F-049_Test_Data_Base",
   "title": "must return 404 when provide invalid Event ID in CCD",
   "specs": [
-    "a detailed profile in CCD",
+    "an active profile in CCD",
     "Start case creation as Case worker",
     "CCD Data Store",
-    "provide an invalid Event ID in CCD",
+    "provides a dummy Event ID",
     "code is HTTP-404"
   ],
   "request": {
     "pathVariables": {
-      "etid": "DUMMY"
+      "etid": "Dummy"
     }
   },
   "expectedResponse": {

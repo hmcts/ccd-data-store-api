@@ -3,15 +3,15 @@
   "_extends_": "F-049_Test_Data_Base",
   "title": "must return 403 when request provide invalid Jurisdiction ID in CCD",
   "specs": [
-    "a detailed profile in CCD",
+    "an active profile in CCD",
     "Start case creation as Case worker",
     "CCD Data Store",
-    "provide a jurisdiction id not existing in ccd",
+    "provides a dummy jurisdiction id",
     "code is HTTP-403"
   ],
   "request": {
     "pathVariables": {
-      "jid": "@@@@@@@"
+      "jid": "Dummy"
     }
   },
   "expectedResponse": {

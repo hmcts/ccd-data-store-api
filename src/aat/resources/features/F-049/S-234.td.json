@@ -3,10 +3,10 @@
   "_extends_": "F-049_Test_Data_Base",
   "title": "must return 400 when request provide Special character for Case type ID in CCD",
   "specs": [
-    "a detailed profile in CCD",
+    "an active profile in CCD",
     "Start case creation as Case worker",
     "CCD Data Store",
-    "provide special character for Case type ID in CCD",
+    "provides only special character for a Case type ID",
     "code is HTTP-400"
   ],
   "request": {
