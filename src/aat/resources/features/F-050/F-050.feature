@@ -6,7 +6,7 @@ Feature: Validate a set of fields as Case worker
 
   @S-301
   Scenario: must validate when all fields are valid
-    Given a user with [a detailed profile in CCD]
+    Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
     And it is submitted to call the [validation of a set of fields as Case worker] operation of [CCD Data Store]
     Then a positive response is received
@@ -15,9 +15,9 @@ Feature: Validate a set of fields as Case worker
 
   @S-298
   Scenario: must not validate when field validation fails
-    Given a user with [a detailed profile in CCD]
+    Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
-    And the request [uses a value that exceeds the field max limit]
+    And the request [uses a value that exceeds the field's max limit]
     And it is submitted to call the [validation of a set of fields as Case worker] operation of [CCD Data Store]
     Then a negative response is received
     And the response [has the 422 return code]
@@ -25,7 +25,7 @@ Feature: Validate a set of fields as Case worker
 
   @S-300
   Scenario: must return 403 when request provides authentic credentials without authorised access to the operation
-    Given a user with [a detailed profile in CCD]
+    Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
     And the request [uses an invalid authorization]
     And it is submitted to call the [validation of a set of fields as Case worker] operation of [CCD Data Store]
@@ -34,10 +34,10 @@ Feature: Validate a set of fields as Case worker
     And the response has all other details as expected
 
   @S-299
-  Scenario: must return 4xx when request does not provide valid authentication credentials
-    Given a user with [a detailed profile in CCD]
+  Scenario: must return negative response when request does not provide valid authentication credentials
+    Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
-    And the request [uses a Case ID that doesn’t exist in CCD]
+    And the request [uses an invalid user Id that doesn’t exist in CCD]
     And the request [uses an invalid authorization]
     And it is submitted to call the [validation of a set of fields as Case worker] operation of [CCD Data Store]
     Then a negative response is received
@@ -48,10 +48,11 @@ Feature: Validate a set of fields as Case worker
   #To be completed on https://tools.hmcts.net/jira/browse/RDM-6654
   @S-297
   Scenario: must not validate when CMC ExternalID is not unique or already exists
-    Given a user with [a detailed profile in CCD]
+    Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
-    And the request [uses the existing CMC External Id]
+    And the request [uses an existing CMC External Id]
     And it is submitted to call the [validation of a set of fields as Case worker] operation of [CCD Data Store]
     Then a negative response is received
     And the response [has the 409 return code]
     And the response has all other details as expected
+

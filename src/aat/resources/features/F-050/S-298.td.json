@@ -4,8 +4,8 @@
   "_extends_": "F-050_Test_Data_Base",
 
   "specs": [
-    "a detailed profile in CCD",
-    "uses a value that exceeds the field max limit",
+    "an active profile in CCD",
+    "uses a value that exceeds the field's max limit",
     "has the 422 return code"
   ],
   "request": {
@@ -22,9 +22,7 @@
     },
     "body": {
       "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException",
-      "timestamp" : "[[ANY]]",
       "message" : "Case data validation failed",
-      "path" : "[[ANY]]",
       "details" : {
         "field_errors" : [
           {
@@ -32,9 +30,7 @@
             "message": "The data entered is not valid for this type of field, please delete and re-enter using only valid data"
           }
         ]
-      },
-      "callbackErrors" : null,
-      "callbackWarnings" : null
+      }
     }
   }
 }

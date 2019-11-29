@@ -4,7 +4,7 @@
   "_extends_": "F-050_Test_Data_Base",
 
   "specs": [
-    "a detailed profile in CCD",
+    "an active profile in CCD",
     "uses an invalid authorization",
     "has the 403 return code"
   ],
@@ -19,9 +19,7 @@
       "Content-Length" : "[[ANY]]"
     },
     "body": {
-      "timestamp" : "[[ANY]]",
-      "message" : "Access Denied",
-      "path" : "[[ANY]]"
+      "message" : "Access Denied"
     }
   }
 }
