@@ -9,7 +9,7 @@ public interface BackEndFunctionalTestAutomationDSL {
     void initializeAppropriateTestContextAsDetailedInTheTestDataSource();
 
     // DSL Element:
-    // "a case has just been created as in [<some test data unique id>]"
+    // "a case that has just been created as in [<some test data unique id>]"
     void createCaseWithTheDataProvidedInATestDataObject(String caseDataId);
 
     // DSL Element:
@@ -43,4 +43,11 @@ public interface BackEndFunctionalTestAutomationDSL {
     // DSL Element:
     // "the response [<some specification about response data>]"
     void verifyTheResponseInTheContextWithAParticularSpecification(String responseSpecification);
+
+    // And a successful call [<some spec about the overall call data>] as in [<some test data unique id>],
+    // And another successful call [<some spec about the overall call data>] as in [<some test data unique id>],
+    //
+    // a call [<some spec about the overall call data>] will get the expected response as in [<some test data unique id>]
+    // another call [<some spec about the overall call data>] will get the expected response as in [<some test data unique id>]
+    void performAndVerifyTheExpectedResponseForAnApiCall(String testDataSpec, String testDataId) throws IOException;
 }

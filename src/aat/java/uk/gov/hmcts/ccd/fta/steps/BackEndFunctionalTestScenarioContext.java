@@ -26,11 +26,15 @@ public class BackEndFunctionalTestScenarioContext {
     public void initializeTestDataFor(Scenario scenario) {
         this.scenario = scenario;
         String scenarioTag = getCurrentScenarioTag();
-        testData = DATA_SOURCE.getDataForScenario(scenarioTag);
+        initializeTestDataFor(scenarioTag);
     }
 
-    public void initializeCaseCreationDataFor(String testDataKey) {
-        caseCreationData = DATA_SOURCE.getDataForScenario(testDataKey);
+    public void initializeTestDataFor(String testDataId) {
+        testData = DATA_SOURCE.getDataForTestCall(testDataId);
+    }
+
+    public void initializeCaseCreationDataFor(String testDataId) {
+        caseCreationData = DATA_SOURCE.getDataForTestCall(testDataId);
     }
 
     public String getCurrentScenarioTag() {

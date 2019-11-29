@@ -8,7 +8,6 @@
 		"_extends_": "Common_403_Response_Headers"
 	},
 	"body": {
-		"status": 403,
-		"error": "Forbidden"
+		"_extends_": "Common_403_Response_Body"
 	}
 }

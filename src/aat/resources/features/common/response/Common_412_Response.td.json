@@ -8,7 +8,6 @@
 		"_extends_": "Common_412_Response_Headers"
 	},
 	"body": {
-		"status": 412,
-		"error": "Precondition Failed"
+		"_extends_": "Common_412_Response_Body"
 	}
 }
