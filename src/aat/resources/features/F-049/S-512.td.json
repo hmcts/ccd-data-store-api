@@ -18,9 +18,7 @@
     "_extends_": "Common_404_Response",
   "body" : {
     "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
-    "timestamp" : "[[ANY]]",
     "message" : "Resource not found when getting case type version for DUMMY because of 404 ",
-    "path" : "[[ANY]]",
     "details" : null,
     "callbackErrors" : null,
     "callbackWarnings" : null

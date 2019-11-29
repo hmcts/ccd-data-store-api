@@ -18,9 +18,7 @@
   "expectedResponse": {
     "_extends_": "Common_403_Response",
     "body" : {
-      "timestamp" : "[[ANY]]",
-      "message" : "Access Denied",
-      "path" : "[[ANY]]"
+      "message" : "Access Denied"
     }
   }
 }
