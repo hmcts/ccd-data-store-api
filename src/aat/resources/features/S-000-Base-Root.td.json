@@ -1,14 +1,17 @@
 {
-  "_guid_": "S-000-Base-Root",
-  "user": {
-    "username": "[[$CCD_CASEWORKER_AUTOTEST_EMAIL]]",
-    "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
-  },
-  "request": {
-    "headers": {
-      "Authorization": "[[DYNAMIC]]",
-      "ServiceAuthorization": "[[DYNAMIC]]",
-      "Content-Type": "application/json"
-    }
-  }
+	"_guid_": "S-000-Base-Root",
+
+	"users": {
+		"invokingUser": {
+			"username": "[[$CCD_CASEWORKER_AUTOTEST_EMAIL]]",
+			"password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+		}
+	},
+	"request": {
+		"headers": {
+			"Authorization": "[[DYNAMIC]]",
+			"ServiceAuthorization": "[[DYNAMIC]]",
+			"Content-Type": "application/json"
+		}
+	}
 }

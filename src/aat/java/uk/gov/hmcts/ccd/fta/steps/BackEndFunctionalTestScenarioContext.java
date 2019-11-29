@@ -19,18 +19,22 @@ public class BackEndFunctionalTestScenarioContext {
     private HttpTestData testData;
     private HttpTestData caseCreationData;
     private Long theCaseReference;
-    private UserData theUser;
+    private UserData theInvokingUser;
     private RequestSpecification theRequest;
     private ResponseData theResponse;
 
     public void initializeTestDataFor(Scenario scenario) {
         this.scenario = scenario;
         String scenarioTag = getCurrentScenarioTag();
-        testData = DATA_SOURCE.getDataForScenario(scenarioTag);
+        initializeTestDataFor(scenarioTag);
     }
 
-    public void initializeCaseCreationDataFor(String testDataKey) {
-        caseCreationData = DATA_SOURCE.getDataForScenario(testDataKey);
+    public void initializeTestDataFor(String testDataId) {
+        testData = DATA_SOURCE.getDataForTestCall(testDataId);
+    }
+
+    public void initializeCaseCreationDataFor(String testDataId) {
+        caseCreationData = DATA_SOURCE.getDataForTestCall(testDataId);
     }
 
     public String getCurrentScenarioTag() {
@@ -56,12 +60,12 @@ public class BackEndFunctionalTestScenarioContext {
         this.theCaseReference = theCaseReference;
     }
 
-    public UserData getTheUser() {
-        return theUser;
+    public UserData getTheInvokingUser() {
+        return theInvokingUser;
     }
 
-    public void setTheUser(UserData theUser) {
-        this.theUser = theUser;
+    public void setTheInvokingUser(UserData theInvokingUser) {
+        this.theInvokingUser = theInvokingUser;
     }
 
     public void setTheRequest(RequestSpecification theRequest) {
