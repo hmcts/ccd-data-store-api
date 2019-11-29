@@ -3,33 +3,40 @@
   "_extends_": "Base_Expecting_400",
   "title": "must return 404 for if no jurisdiction is found",
   "specs": [
-   "detailed profile in CCD having CRU access",
-    "has DELETE as case access"
+    "a detailed profile in CCD having create case access for a jurisdiction",
+    "returns the error message : Access can only be 'create', 'read' or 'update",
+    "has DELETE as case access parameter"
   ],
   "productName": "CCD Data Store",
   "operationName": "Get jurisdictions available to the user",
   "method": "GET",
-  "uri": "/caseworkers/{uid}/jurisdictions",
-  "user" : {
-    "username": "befta_solicitor_3@gmail.com",
-    "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
-  },
+  "uri": "/aggregated/caseworkers/{uid}/jurisdictions",
   "request": {
     "pathVariables": {
       "uid": "[[DYNAMIC]]"
     },
-    "queryParams" : {
-      "access": "create"
+    "queryParams": {
+      "access": "delete"
     }
   },
   "expectedResponse": {
-    "responseCode": 200,
+    "responseCode": 400,
     "responseMessage": "OK",
     "headers": {
-      "Content-Length": "[[ANY]]"
+      "Content-Length": "[[ANY]]",
+      "Transfer-Encoding": "[[ANY]]",
+      "Connection" : "[[ANY]]"
     },
     "body": {
-
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+      "timestamp": "[[ANY]]",
+      "status": 400,
+      "error": "Bad Request",
+      "message": "Access can only be 'create', 'read' or 'update'",
+      "path": "/aggregated/caseworkers/5c9aaa65-4c34-47c7-9b4e-b1d1af1726ed/jurisdictions",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
     }
   }
 }
