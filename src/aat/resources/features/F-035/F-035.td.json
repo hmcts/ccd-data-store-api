@@ -21,7 +21,7 @@
   "expectedResponse": {
     "headers": {
       "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
-      "Content-Type" : "application/vnd.uk.gov.hmcts.ccd-data-store-api.case.v2+json;charset=UTF-8",
+      "Content-Type" : "application/json;charset=UTF-8",
       "Date" : "[[ANY]]",
       "Expires" : "0",
       "Pragma" : "no-cache",

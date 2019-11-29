@@ -1,0 +1,32 @@
+{
+  "title": "must return 401 when request does not provide valid authentication credentials",
+
+  "_guid_": "S-155",
+  "_extends_": "F-035",
+
+  "specs": [
+    "a detailed profile in CCD",
+    "contains an invalid user authorisation token",
+    "has a 403 Forbidden code"
+  ],
+  "request": {
+    "headers": {
+      "Authorization": "invalid token"
+    }
+  },
+
+  "expectedResponse": {
+    "responseCode": 403,
+    "headers": {
+      "Content-Encoding" : "gzip",
+      "vary" : "accept-encoding"
+    },
+    "body": {
+      "timestamp" : "[[ANY]]",
+      "status" : 403,
+      "error" : "Forbidden",
+      "message" : "Access Denied",
+      "path" : "[[ANY]]"
+    }
+  }
+}
