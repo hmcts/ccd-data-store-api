@@ -4,8 +4,7 @@
   "title": "must return 404 for if no jurisdiction is found",
   "specs": [
    "detailed profile in CCD having CRU access",
-    "has DELETE as case access",
-
+    "has DELETE as case access"
   ],
   "productName": "CCD Data Store",
   "operationName": "Get jurisdictions available to the user",
