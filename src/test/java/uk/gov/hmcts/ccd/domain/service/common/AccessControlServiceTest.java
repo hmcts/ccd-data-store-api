@@ -2908,8 +2908,10 @@ public class AccessControlServiceTest {
                 CAN_UPDATE);
 
             assertAll(
+                () -> assertThat(eventTrigger.getCaseFields().size(), is(1)),
                 () -> assertThat("CaseField displayContext should change to READONLY",
                     eventTrigger.getCaseFields().get(0).getDisplayContext(), is(READONLY)),
+                () -> assertThat(eventTrigger.getWizardPages().get(0).getWizardPageFields().size(), is(1)),
                 () -> assertThat("WizardPage CaseField displayContext should change to READONLY",
                     eventTrigger.getWizardPages().get(0).getWizardPageFields().get(0).getDisplayContext(), is(READONLY))
                      );
