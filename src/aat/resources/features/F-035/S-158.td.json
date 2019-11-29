@@ -19,13 +19,11 @@
   "expectedResponse": {
     "_extends_": "Common_400_Response",
     "headers": {
-      "Connection": "close"
+      "Connection": "close",
+      "Content-Encoding": "gzip"
     },
     "body" : {
       "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
-      "timestamp": "[[ANY]]",
-      "status": 400,
-      "error": "Bad Request",
       "message": "Case ID is not valid",
       "path": "/cases/1234567890123456",
       "details": null,

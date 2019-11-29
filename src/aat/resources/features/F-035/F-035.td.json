@@ -9,6 +9,7 @@
   "operationName": "retrieve a case by id",
   "method": "GET",
   "uri": "/cases/{cid}",
+
   "request": {
     "headers": {
       "_extends_": "Common_Request_Headers",
@@ -18,17 +19,12 @@
       "cid": "[[DYNAMIC]]"
     }
   },
+
   "expectedResponse": {
     "headers": {
-      "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
+      "_extends_": "Common_Response_Headers",
       "Content-Type" : "application/json;charset=UTF-8",
-      "Date" : "[[ANY]]",
-      "Expires" : "0",
-      "Pragma" : "no-cache",
-      "Transfer-Encoding" : "chunked",
-      "X-Content-Type-Options" : "nosniff",
-      "X-Frame-Options" : "DENY",
-      "X-XSS-Protection" : "1; mode=block"
+      "Transfer-Encoding" : "chunked"
     }
   }
 }

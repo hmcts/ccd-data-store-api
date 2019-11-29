@@ -9,24 +9,20 @@
     "contains an invalid user authorisation token",
     "has a 403 Forbidden code"
   ],
+
   "request": {
     "headers": {
-      "Authorization": "invalid token"
+      "Authorization": "abc"
     }
   },
 
   "expectedResponse": {
-    "responseCode": 403,
+    "_extends_": "Common_403_Response",
     "headers": {
-      "Content-Encoding" : "gzip",
-      "vary" : "accept-encoding"
+      "Content-Encoding" : "gzip"
     },
     "body": {
-      "timestamp" : "[[ANY]]",
-      "status" : 403,
-      "error" : "Forbidden",
-      "message" : "Access Denied",
-      "path" : "[[ANY]]"
+      "message" : "Access Denied"
     }
   }
 }
