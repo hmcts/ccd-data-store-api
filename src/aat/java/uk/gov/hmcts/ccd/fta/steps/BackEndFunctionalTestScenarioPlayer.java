@@ -387,6 +387,12 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
             .post("/import");
     }
 
+    private void importDefinitions() {
+        importDefinition(BE_FTA_FILE_JURISDICTION1);
+        importDefinition(BE_FTA_FILE_JURISDICTION2);
+        importDefinition(BE_FTA_FILE_JURISDICTION3);
+    }
+
     private void resolveUserData(String prefix, UserData aUser) {
         String resolvedUsername = EnvUtils.resolvePossibleEnvironmentVariable(aUser.getUsername());
         if (resolvedUsername.equals(aUser.getUsername())) {
@@ -418,11 +424,5 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         } catch (FeignException ex) {
             logger.info(logPrefix + "credentials invalid");
         }
-    }
-
-    private void importDefinitions() {
-        importDefinition(BE_FTA_FILE_JURISDICTION1);
-        importDefinition(BE_FTA_FILE_JURISDICTION2);
-        importDefinition(BE_FTA_FILE_JURISDICTION3);
     }
 }
