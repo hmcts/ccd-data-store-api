@@ -27,7 +27,7 @@ Feature: Validate a set of fields as Case worker
   Scenario: must return 403 when request provides authentic credentials without authorised access to the operation
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
-    And the request [uses an invalid authorization]
+    And the request [uses a dummy authorization token]
     And it is submitted to call the [validation of a set of fields as Case worker] operation of [CCD Data Store]
     Then a negative response is received
     And the response [has the 403 return code]
@@ -38,7 +38,7 @@ Feature: Validate a set of fields as Case worker
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
     And the request [uses an invalid user Id that doesn’t exist in CCD]
-    And the request [uses an invalid authorization]
+    And the request [uses a dummy authorization token]
     And it is submitted to call the [validation of a set of fields as Case worker] operation of [CCD Data Store]
     Then a negative response is received
     And the response [has the 403 return code]
@@ -55,4 +55,3 @@ Feature: Validate a set of fields as Case worker
     Then a negative response is received
     And the response [has the 409 return code]
     And the response has all other details as expected
-

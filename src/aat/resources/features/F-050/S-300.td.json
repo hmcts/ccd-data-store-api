@@ -5,7 +5,7 @@
 
   "specs": [
     "an active profile in CCD",
-    "uses an invalid authorization",
+    "uses a dummy authorization token",
     "has the 403 return code"
   ],
   "request": {
@@ -16,10 +16,10 @@
   "expectedResponse": {
     "_extends_": "Common_403_Response",
     "headers": {
-      "Content-Length" : "[[ANY]]"
+      "Content-Length": "[[ANY]]"
     },
     "body": {
-      "message" : "Access Denied"
+      "message": "Access Denied"
     }
   }
 }

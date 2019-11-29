@@ -7,44 +7,14 @@
     "an active profile in CCD",
     "has the 200 return code"
   ],
-
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "headers": {
-      "Content-Length" : "[[ANY]]"
+      "Content-Length": "[[ANY]]"
     },
     "body": {
       "data": {
-        "TextField": "Text",
-        "NumberField": null,
-        "YesOrNoField": "Yes",
-        "PhoneUKField": "01234123412",
-        "EmailField": "abc@gmail.com",
-        "MoneyGBPField": "100",
-        "DateField": null,
-        "DateTimeField": "",
-        "TextAreaField": null,
-        "FixedListField": null,
-        "FixedRadioListField": null,
-        "MultiSelectListField": [],
-        "ComplexField": {
-          "ComplexTextField": null,
-          "ComplexFixedListField": null,
-          "ComplexNestedField": {
-            "NestedNumberField": null,
-            "NestedCollectionTextField": []
-          }
-        },
-        "CollectionField": [],
-        "AddressUKField": {
-          "AddressLine1": null,
-          "AddressLine2": null,
-          "AddressLine3": null,
-          "PostTown": null,
-          "County": null,
-          "PostCode": null,
-          "Country": null
-        }
+        "_extends_": "F-050_Common_Data_In_Body"
       }
     }
   }
