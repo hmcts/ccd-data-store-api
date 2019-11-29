@@ -2882,10 +2882,22 @@ public class AccessControlServiceTest {
                         .build())
                     .build())
                 .build();
+
+            CaseViewField differentCaseViewField = aViewField()
+                .withId("DifferentAddresses")
+                .build();
+
             CaseEventTrigger caseEventTrigger = newCaseEventTrigger()
                 .withField(
-                    aViewField()
-                        .withId("DifferentAddresses")
+                    differentCaseViewField)
+                .withWizardPage(
+                    newWizardPage()
+                        .withId("Page One")
+                        .withField(differentCaseViewField, OPTIONAL, singletonList(
+                            newWizardPageComplexFieldOverride()
+                                .withComplexFieldId("Addresses")
+                                .withDisplayContext(OPTIONAL)
+                                .build()))
                         .build())
                 .build();
 
@@ -2895,7 +2907,12 @@ public class AccessControlServiceTest {
                 USER_ROLES,
                 CAN_UPDATE);
 
-            assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext", is(READONLY))));
+            assertAll(
+                () -> assertThat("CaseField displayContext should change to READONLY",
+                    eventTrigger.getCaseFields().get(0).getDisplayContext(), is(READONLY)),
+                () -> assertThat("WizardPage CaseField displayContext should change to READONLY",
+                    eventTrigger.getWizardPages().get(0).getWizardPageFields().get(0).getDisplayContext(), is(READONLY))
+                     );
         }
 
         @Test
