@@ -2,7 +2,5 @@
 	"_guid_": "Common_4XX_Response_Body",
 
 	"timestamp": "[[ANY]]",
-	"path": "[[ANY]]",
-	"callbackErrors": null,
-	"callbackWarnings": null
+	"path": "[[ANY]]"
 }
