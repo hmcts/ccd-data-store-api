@@ -1,0 +1,36 @@
+{
+  "title": "should get 400 when case reference invalid",
+
+  "_guid_": "S-157",
+  "_extends_": "F-035",
+
+  "specs": [
+    "a detailed profile in CCD",
+    "contains an invalid case reference",
+    "has a 400 Bad Request code"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "cid": "abc"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_400_Response",
+    "headers": {
+      "Connection": "close"
+    },
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+      "timestamp": "[[ANY]]",
+      "status": 400,
+      "error": "Bad Request",
+      "message": "Case ID is not valid",
+      "path": "/cases/abc",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "title": "must return 403 when request provides authentic credentials without authorized access to the operation",
+
+  "_guid_": "S-156",
+  "_extends_": "F-035",
+
+  "specs": [
+    "a detailed profile in CCD",
+    "contains a valid user authorisation token without access to the operation",
+    "has a 404 Not Found code"
+  ],
+
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "body": {
+      "exception" : "uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException",
+      "timestamp" : "[[ANY]]",
+      "status" : 404,
+      "error" : "Not Found",
+      "message" : "[[ANY]]",
+      "path" : "[[ANY]]",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}

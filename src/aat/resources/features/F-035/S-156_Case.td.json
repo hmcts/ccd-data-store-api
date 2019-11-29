@@ -1,0 +1,15 @@
+{
+  "_guid_": "S-156_Case",
+  "_extends_": "Standard_Full_Case",
+
+  "user": {
+    "username": "[[$CCD_PRIVATE_CASEWORKER_EMAIL]]",
+    "password": "[[$CCD_PRIVATE_CASEWORKER_PASSWORD]]"
+  },
+
+  "request": {
+    "pathVariables": {
+      "caseType": "AAT_AUTH_8"
+    }
+  }
+}
