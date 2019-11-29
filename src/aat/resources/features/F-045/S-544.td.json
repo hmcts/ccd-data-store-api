@@ -4,7 +4,7 @@
   "_extends_": "F-045_Test_Data_Base",
 
   "specs": [
-    "a active profile in CCD",
+    "an active profile in CCD",
     "does not provide a mandatory field for the operation",
     "has the 400 return code"
   ],
@@ -19,7 +19,6 @@
     "responseMessage" : "Bad Request",
     "headers" : {
       "_extends_": "Common_Response_Headers",
-      "Connection" : "close",
       "Content-Length" : "[[ANY]]"
     }
   }
