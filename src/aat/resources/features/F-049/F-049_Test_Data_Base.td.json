@@ -17,8 +17,5 @@
 		}
 	},
   "expectedResponse": {
-    "headers" : {
-      "Transfer-Encoding" : "chunked"
-    }
   }
 }
