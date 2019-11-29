@@ -11,15 +11,15 @@
   "operationName": "Get jurisdictions available to the user",
   "method": "GET",
   "uri": "/caseworkers/{uid}/jurisdictions",
-  "user" : {
+  "user": {
     "username": "befta_solicitor_3@gmail.com",
-    "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+    "password": ""
   },
   "request": {
     "pathVariables": {
       "uid": "[[DYNAMIC]]"
     },
-    "queryParams" : {
+    "queryParams": {
       "access": "create"
     }
   },
@@ -30,7 +30,6 @@
       "Content-Length": "[[ANY]]"
     },
     "body": {
-
     }
   }
 }
