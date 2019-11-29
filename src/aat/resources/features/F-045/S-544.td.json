@@ -1,0 +1,33 @@
+{
+  "title": "must return negative response when request body doesn't provide a mandatory field",
+  "_guid_": "S-544",
+  "_extends_": "F-045_Test_Data_Base",
+
+  "specs": [
+    "a active profile in CCD",
+    "does not provide a mandatory field for the operation",
+    "has the 400 return code"
+  ],
+
+  "request": {
+    "body": {
+      "id_wrong_filed_name": "Test User"
+    }
+  },
+  "expectedResponse": {
+    "responseCode" : 400,
+    "responseMessage" : "Bad Request",
+    "headers" : {
+      "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
+      "Connection" : "close",
+      "Content-Length" : "[[ANY]]",
+      "Date" : "[[ANY]]",
+      "Expires" : "[[ANY]]",
+      "Pragma" : "no-cache",
+      "Vary" : "[[ANY]]",
+      "X-Content-Type-Options" : "nosniff",
+      "X-Frame-Options" : "DENY",
+      "X-Xss-Protection" : "1; mode=block"
+    }
+  }
+}
