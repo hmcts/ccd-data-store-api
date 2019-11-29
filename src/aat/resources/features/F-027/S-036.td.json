@@ -1,0 +1,23 @@
+{
+  "title": "must return 4xx when request does not provide valid authentication credentials",
+  "_guid_": "S-036",
+  "_extends_": "F-027_Test_Data_Base",
+
+  "specs": ["a detailed profile in CCD",
+    "does not provide valid authentication credentials",
+    "has the 403 return code"],
+  "request": {
+    "pathVariables": {
+      "uid": "some id"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_403_Response",
+    "headers" : {
+      "Content-Length" : "[[ANY]]"
+    },
+    "body" : {
+      "message" : "Access Denied"
+    }
+  }
+}

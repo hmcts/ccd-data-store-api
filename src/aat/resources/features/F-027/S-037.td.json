@@ -1,0 +1,23 @@
+{
+  "title": "must return 403 when request provides authentic credentials without authorised access to the operation",
+  "_guid_": "S-037",
+  "_extends_": "F-027_Test_Data_Base",
+
+  "specs": ["a detailed profile in CCD",
+    "does not provide authorised access to the operation",
+    "has the 403 return code"],
+  "request": {
+    "headers": {
+      "Authorization": "Dummy_Authorization"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_403_Response",
+    "headers" : {
+      "Content-Length" : "[[ANY]]"
+    },
+    "body" : {
+      "message" : "Access Denied"
+    }
+  }
+}
