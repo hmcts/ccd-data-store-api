@@ -253,7 +253,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
 
     private String convertArrayJsonToMapJson(String apiResponse) {
         if (apiResponse.startsWith("[") && apiResponse.endsWith("]")) {
-            apiResponse = "{\"arrayInMap\":"+apiResponse +"}";
+            apiResponse = "{\"arrayInMap\":" + apiResponse + "}";
         }
         return apiResponse;
     }
