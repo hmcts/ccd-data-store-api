@@ -148,7 +148,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     }
 
     private void prepareARequestWithAppropriateValues(BackEndFunctionalTestScenarioContext scenarioContext)
-            throws IOException {
+        throws IOException {
         UserData theUser = scenarioContext.getTheUser();
         String s2sToken = aat.getS2SHelper().getToken();
 
@@ -225,11 +225,11 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     }
 
     private void verifyTheRequestInTheContextWithAParticularSpecification(
-            BackEndFunctionalTestScenarioContext scenarioContext, String requestSpecification) {
+        BackEndFunctionalTestScenarioContext scenarioContext, String requestSpecification) {
         boolean check = scenarioContext.getTestData().meetsSpec(requestSpecification);
         if (!check) {
             String errorMessage = "Test data does not confirm it meets the specification about the request: "
-                    + requestSpecification;
+                + requestSpecification;
             throw new FunctionalTestException(errorMessage);
         }
     }
@@ -242,7 +242,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
 
     @SuppressWarnings("unchecked")
     private void submitTheRequestToCallAnOperationOfAProduct(BackEndFunctionalTestScenarioContext scenarioContext,
-            String operation, String productName) throws IOException {
+                                                             String operation, String productName) throws IOException {
         boolean isCorrectOperation = scenarioContext.getTestData().meetsOperationOfProduct(operation, productName);
         if (!isCorrectOperation) {
             String errorMessage = "Test data does not confirm it is calling the following operation of a product: "
@@ -309,7 +309,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     }
 
     private void verifyThatTheResponseHasAllTheDetailsAsExpected(BackEndFunctionalTestScenarioContext scenarioContext)
-            throws IOException {
+        throws IOException {
         ResponseData expectedResponse = scenarioContext.getTestData().getExpectedResponse();
         ResponseData actualResponse = scenarioContext.getTheResponse();
         Map<String, List<?>> issues = new HashMap<>();
@@ -356,13 +356,13 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     @Then("a call [{}] will get the expected response as in [{}]")
     @Then("another call [{}] will get the expected response as in [{}]")
     public void performAndVerifyTheExpectedResponseForAnApiCall(String testDataSpec, String testDataId)
-            throws IOException {
+        throws IOException {
         BackEndFunctionalTestScenarioContext subcontext = new BackEndFunctionalTestScenarioContext();
         subcontext.initializeTestDataFor(testDataId);
         prepareARequestWithAppropriateValues(subcontext);
         verifyTheRequestInTheContextWithAParticularSpecification(subcontext, testDataSpec);
         submitTheRequestToCallAnOperationOfAProduct(subcontext, subcontext.getTestData().getOperationName(),
-                subcontext.getTestData().getProductName());
+            subcontext.getTestData().getProductName());
         verifyThatTheResponseHasAllTheDetailsAsExpected(subcontext);
     }
 
@@ -390,8 +390,8 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     }
 
     private void importDefinitions() {
-        importDefinition(BE_FTA_FILE_JURISDICTION1);
         importDefinition(BE_FTA_FILE_JURISDICTION2);
+        importDefinition(BE_FTA_FILE_JURISDICTION1);
         importDefinition(BE_FTA_FILE_JURISDICTION3);
     }
 
