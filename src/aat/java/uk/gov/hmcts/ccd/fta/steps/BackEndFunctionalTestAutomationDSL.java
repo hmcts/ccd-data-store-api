@@ -9,7 +9,7 @@ public interface BackEndFunctionalTestAutomationDSL {
     void initializeAppropriateTestContextAsDetailedInTheTestDataSource();
 
     // DSL Element:
-    // "a case has just been created as in [<some test data unique id>]"
+    // "a case that has just been created as in [<some test data unique id>]"
     void createCaseWithTheDataProvidedInATestDataObject(String caseDataId);
 
     // DSL Element:
