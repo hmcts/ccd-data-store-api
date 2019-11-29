@@ -8,7 +8,6 @@
 		"_extends_": "Common_400_Response_Headers"
 	},
 	"body": {
-		"status": 400,
-		"error": "Bad Request"
+		"_extends_": "Common_400_Response_Body"
 	}
 }

@@ -8,7 +8,6 @@
 		"_extends_": "Common_409_Response_Headers"
 	},
 	"body": {
-		"status": 409,
-		"error": "Conflict"
+		"_extends_": "Common_409_Response_Body"
 	}
 }

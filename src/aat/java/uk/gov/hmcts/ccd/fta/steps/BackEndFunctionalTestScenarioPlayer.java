@@ -74,12 +74,12 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     }
 
     @Override
-    @Given("a case has just been created as in [{}]")
+    @Given("a case that has just been created as in [{}]")
     public void createCaseWithTheDataProvidedInATestDataObject(String caseDataId) {
         scenarioContext.initializeCaseCreationDataFor(caseDataId);
         HttpTestData caseData = scenarioContext.getCaseCreationData();
 
-        UserData caseCreator = caseData.getUser();
+        UserData caseCreator = caseData.getInvokingUser();
         resolveUserData("caseCreator", caseCreator);
         authenticateUser("caseCreator", caseCreator);
 
@@ -115,7 +115,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     @Override
     @Given("a user with [{}]")
     public void verifyThatThereIsAUserInTheContextWithAParticularSpecification(String specificationAboutAUser) {
-        UserData aUser = scenarioContext.getTestData().getUser();
+        UserData aUser = scenarioContext.getTestData().getInvokingUser();
         resolveUserData("user", aUser);
         scenario.write("User: " + aUser.getUsername());
         authenticateUser("user", aUser);
@@ -132,6 +132,11 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     @Override
     @When("a request is prepared with appropriate values")
     public void prepareARequestWithAppropriateValues() throws IOException {
+        prepareARequestWithAppropriateValues(this.scenarioContext);
+    }
+
+    private void prepareARequestWithAppropriateValues(BackEndFunctionalTestScenarioContext scenarioContext)
+            throws IOException {
         UserData theUser = scenarioContext.getTheUser();
         String s2sToken = aat.getS2SHelper().getToken();
 
@@ -204,10 +209,15 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     @Override
     @When("the request [{}]")
     public void verifyTheRequestInTheContextWithAParticularSpecification(String requestSpecification) {
+        verifyTheRequestInTheContextWithAParticularSpecification(this.scenarioContext, requestSpecification);
+    }
+
+    private void verifyTheRequestInTheContextWithAParticularSpecification(
+            BackEndFunctionalTestScenarioContext scenarioContext, String requestSpecification) {
         boolean check = scenarioContext.getTestData().meetsSpec(requestSpecification);
         if (!check) {
             String errorMessage = "Test data does not confirm it meets the specification about the request: "
-                + requestSpecification;
+                    + requestSpecification;
             throw new FunctionalTestException(errorMessage);
         }
     }
@@ -215,6 +225,12 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     @Override
     @When("it is submitted to call the [{}] operation of [{}]")
     public void submitTheRequestToCallAnOperationOfAProduct(String operation, String productName) throws IOException {
+        submitTheRequestToCallAnOperationOfAProduct(this.scenarioContext, operation, productName);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void submitTheRequestToCallAnOperationOfAProduct(BackEndFunctionalTestScenarioContext scenarioContext,
+            String operation, String productName) throws IOException {
         boolean isCorrectOperation = scenarioContext.getTestData().meetsOperationOfProduct(operation, productName);
         if (!isCorrectOperation) {
             String errorMessage = "Test data does not confirm it is calling the following operation of a product: "
@@ -245,15 +261,15 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         responseData.setHeaders(responseHeaders);
 
         if (!response.getBody().asString().isEmpty()) {
-            String apiResponse = formatResponse(response.getBody().asString());
+            String apiResponse = convertArrayJsonToMapJson(response.getBody().asString());
             responseData.setBody(JsonUtils.readObjectFromJsonText(apiResponse, Map.class));
         }
         scenarioContext.setTheResponse(responseData);
     }
 
-    private String formatResponse(String apiResponse) {
+    private String convertArrayJsonToMapJson(String apiResponse) {
         if (apiResponse.startsWith("[") && apiResponse.endsWith("]")) {
-            apiResponse = apiResponse.substring(1, apiResponse.length() - 1);
+            apiResponse = "{\"arrayInMap\":"+apiResponse +"}";
         }
         return apiResponse;
     }
@@ -284,9 +300,14 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     @Then("the response has all the details as expected")
     @Then("the response has all other details as expected")
     public void verifyThatTheResponseHasAllTheDetailsAsExpected() throws IOException {
+        verifyThatTheResponseHasAllTheDetailsAsExpected(this.scenarioContext);
+    }
+
+    private void verifyThatTheResponseHasAllTheDetailsAsExpected(BackEndFunctionalTestScenarioContext scenarioContext)
+            throws IOException {
         ResponseData expectedResponse = scenarioContext.getTestData().getExpectedResponse();
         ResponseData actualResponse = scenarioContext.getTheResponse();
-        Map<String, List> issues = new HashMap<>();
+        Map<String, List<?>> issues = new HashMap<>();
 
         if (actualResponse.getResponseCode() != expectedResponse.getResponseCode()) {
             issues.put("responseCode", Collections.singletonList("Response code mismatch, expected: "
@@ -322,6 +343,22 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
                 + responseSpecification;
             throw new FunctionalTestException(errorMessage);
         }
+    }
+
+    @Override
+    @Given("a successful call [{}] as in [{}]")
+    @Given("another successful call [{}] as in [{}]")
+    @Then("a call [{}] will get the expected response as in [{}]")
+    @Then("another call [{}] will get the expected response as in [{}]")
+    public void performAndVerifyTheExpectedResponseForAnApiCall(String testDataSpec, String testDataId)
+            throws IOException {
+        BackEndFunctionalTestScenarioContext subcontext = new BackEndFunctionalTestScenarioContext();
+        subcontext.initializeTestDataFor(testDataId);
+        prepareARequestWithAppropriateValues(subcontext);
+        verifyTheRequestInTheContextWithAParticularSpecification(subcontext, testDataSpec);
+        submitTheRequestToCallAnOperationOfAProduct(subcontext, subcontext.getTestData().getOperationName(),
+                subcontext.getTestData().getProductName());
+        verifyThatTheResponseHasAllTheDetailsAsExpected(subcontext);
     }
 
     private void resolveUserData(String prefix, UserData aUser) {
