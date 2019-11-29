@@ -8,7 +8,6 @@ Feature: Start case creation as Case worker
   Scenario: must start case creation process successfully for correct inputs
     Given   a user with [a detailed profile in CCD]
     When    a request is prepared with appropriate values
-    And     the request [provide valid details]
     And     it is submitted to call the [Start case creation as Case worker] operation of [CCD Data Store]
     Then    a positive response is received
     And     the response [code is HTTP-200]
@@ -75,7 +74,7 @@ Feature: Start case creation as Case worker
     And     the response has all the details as expected
 
   @S-511 @Ignore
-  Scenario: must return 404 when request provide invalid Jurisdiction ID in CCD
+  Scenario: must return 404 when request provide a jurisdiction id not existing in ccd
     Given   a user with [a detailed profile in CCD]
     When    a request is prepared with appropriate values
     And     the request [provide invalid Jurisdiction ID]
@@ -85,7 +84,7 @@ Feature: Start case creation as Case worker
     And     the response has all the details as expected
 
   @S-511
-  Scenario: must return 403 when request provide invalid Jurisdiction ID in CCD
+  Scenario: must return 403 when request provide a jurisdiction id not existing in ccd
     Given   a user with [a detailed profile in CCD]
     When    a request is prepared with appropriate values
     And     the request [provide invalid Jurisdiction ID]
@@ -95,7 +94,7 @@ Feature: Start case creation as Case worker
     And     the response has all the details as expected
 
   @S-512
-  Scenario: must return 404 when request provide invalid Case type ID in CCD
+  Scenario: must return 404 when request provide an invalid Case type ID in CCD
     Given   a user with [a detailed profile in CCD]
     When    a request is prepared with appropriate values
     And     the request [provide invalid Case type ID]
@@ -105,7 +104,7 @@ Feature: Start case creation as Case worker
     And     the response has all the details as expected
 
   @S-513
-  Scenario: must return 404 when provide invalid Event ID in CCD
+  Scenario: must return 404 when provide an invalid Event ID in CCD
     Given   a user with [a detailed profile in CCD]
     When    a request is prepared with appropriate values
     And     the request [provide invalid Event ID]
