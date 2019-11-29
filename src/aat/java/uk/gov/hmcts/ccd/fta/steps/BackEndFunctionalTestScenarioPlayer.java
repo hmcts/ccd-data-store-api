@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.fta.steps;
 
+import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -378,13 +379,14 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     }
 
     private void importDefinition(String file) {
-        asAutoTestImporter()
+        Response response = asAutoTestImporter()
             .given()
             .multiPart(new File(file))
-            .expect()
-            .statusCode(201)
             .when()
             .post("/import");
+        String message = "Import failed with response body: " + response.getBody().toString();
+        message += "\nand http code: " + response.statusCode();
+        Assert.assertEquals(message, 201, response.getStatusCode());
     }
 
     private void importDefinitions() {
