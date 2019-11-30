@@ -1,0 +1,38 @@
+{
+  "_guid_": "S-550",
+  "_extends_": "Base_Expecting_403",
+  "title": "must return appropriate negative response when Jurisdiction is invalid",
+  "specs": [
+    "a detailed profile in CCD",
+    "contains invalid Jurisdiction id",
+    "has the 403 return code"
+  ],
+  "productName": "CCD Data Store",
+  "operationName": "Fetch an event trigger in the context of a case for Case Worker",
+  "method": "GET",
+  "uri": "/aggregated/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}",
+  "request": {
+    "pathVariables": {
+      "uid": "[[DYNAMIC]]",
+      "jid": "AUTOTEST123",
+      "ctid": "AAT",
+      "cid": "1573751648840703",
+      "etid": "UPDATE"
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 403,
+    "responseMessage": "Forbidden",
+    "headers": {
+      "Content-Length": "[[ANY]]",
+      "Transfer-Encoding" : "chunked"
+    },
+    "body": {
+      "timestamp": "[[ANY]]",
+      "status": 403,
+      "error": "Forbidden",
+      "message": "Access Denied",
+      "path": "[[ANY]]"
+    }
+  }
+}
