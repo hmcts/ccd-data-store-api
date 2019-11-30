@@ -24,7 +24,7 @@ Feature: Start case creation as Case worker
     And     the response has all the details as expected
 
   @S-231
-  Scenario: must return 403 when request provides invalid authentication credentials
+  Scenario: must return 403 when the request contains a dummy user id
     Given   a user with [an active profile in CCD]
     When    a request is prepared with appropriate values
     And     the request [contains a dummy user-id]
