@@ -19,7 +19,8 @@
     "responseMessage" : "Bad Request",
     "headers" : {
       "_extends_": "Common_Response_Headers",
-      "Content-Length" : "[[ANY]]"
+      "Content-Length" : "[[ANY]]",
+      "Vary" : "Accept-Encoding"
     }
   }
 }
