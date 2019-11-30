@@ -4,8 +4,6 @@
   "title": "must return 400 when request contains only special character for Case type ID",
   "specs": [
     "an active profile in CCD",
-    "Start case creation as Case worker",
-    "CCD Data Store",
     "contains only special character for a Case type ID",
     "code is HTTP-400"
   ],

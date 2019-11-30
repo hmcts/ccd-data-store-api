@@ -4,8 +4,6 @@
   "title": "must start the case creation process successfully for correct inputs",
   "specs": [
     "an active profile in CCD",
-    "Start case creation as Case worker",
-    "CCD Data Store",
     "code is HTTP-200"
   ],
   "expectedResponse": {

@@ -4,8 +4,6 @@
   "title": "must return 404 when request contains a non-existing jurisdiction ID",
   "specs": [
     "an active profile in CCD",
-    "Start case creation as Case worker",
-    "CCD Data Store",
     "contains a dummy jurisdiction id",
     "code is HTTP-403"
   ],
