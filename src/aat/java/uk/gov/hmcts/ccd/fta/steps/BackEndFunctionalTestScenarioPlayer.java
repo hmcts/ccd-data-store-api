@@ -278,10 +278,17 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         responseData.setHeaders(responseHeaders);
 
         if (!response.getBody().asString().isEmpty()) {
-            responseData.setBody(JsonUtils.readObjectFromJsonText(response.getBody().asString(), Map.class));
+            String apiResponse = convertArrayJsonToMapJson(response.getBody().asString());
+            responseData.setBody(JsonUtils.readObjectFromJsonText(apiResponse, Map.class));
         }
-
         scenarioContext.setTheResponse(responseData);
+    }
+
+    private String convertArrayJsonToMapJson(String apiResponse) {
+        if (apiResponse.startsWith("[") && apiResponse.endsWith("]")) {
+            apiResponse = "{\"arrayInMap\":" + apiResponse + "}";
+        }
+        return apiResponse;
     }
 
     @Override
