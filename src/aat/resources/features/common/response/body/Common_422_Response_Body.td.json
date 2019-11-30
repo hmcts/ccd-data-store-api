@@ -3,5 +3,7 @@
 	"_extends_": "Common_4XX_Response_Body",
 
 	"status": 422,
-	"error": "Unprocessable Entity"
+	"error": "Unprocessable Entity",
+	"callbackErrors": null,
+	"callbackWarnings": null
 }
