@@ -116,10 +116,10 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     @Given("a user with [{}]")
     public void verifyThatThereIsAUserInTheContextWithAParticularSpecification(String specificationAboutAUser) {
         UserData aUser = scenarioContext.getTestData().getInvokingUser();
-        resolveUserData("user", aUser);
-        scenario.write("User: " + aUser.getUsername());
-        authenticateUser("user", aUser);
-        scenarioContext.setTheUser(aUser);
+        resolveUserData("users.invokingUser", aUser);
+        scenario.write("Invoking user: " + aUser.getUsername());
+        authenticateUser("users.invokingUser", aUser);
+        scenarioContext.setTheInvokingUser(aUser);
 
         boolean doesTestDataMeetSpec = scenarioContext.getTestData().meetsSpec(specificationAboutAUser);
         if (!doesTestDataMeetSpec) {
@@ -137,7 +137,13 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
 
     private void prepareARequestWithAppropriateValues(BackEndFunctionalTestScenarioContext scenarioContext)
             throws IOException {
-        UserData theUser = scenarioContext.getTheUser();
+        if (scenarioContext.getTheInvokingUser() == null) {
+            UserData anInvokingUser = scenarioContext.getTestData().getInvokingUser();
+            resolveUserData("users.invokingUser", anInvokingUser);
+            authenticateUser("users.invokingUser", anInvokingUser);
+            scenarioContext.setTheInvokingUser(anInvokingUser);
+        }
+        UserData theInvokingUser = scenarioContext.getTheInvokingUser();
         String s2sToken = aat.getS2SHelper().getToken();
 
         RequestSpecification aRequest = RestAssured.given();
@@ -147,8 +153,8 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
             requestData.getHeaders().forEach((header, value) -> {
                 if (value.toString().equals(DYNAMIC_CONTENT_PLACEHOLDER)) {
                     // ADD DYNAMIC DATA HERE
-                    if (header.equals("Authorization") && theUser.getToken() != null) {
-                        String authToken = "Bearer " + theUser.getToken();
+                    if (header.equals("Authorization") && theInvokingUser.getToken() != null) {
+                        String authToken = "Bearer " + theInvokingUser.getToken();
                         aRequest.header(header, authToken);
                         scenarioContext.getTestData().getRequest().getHeaders().put("Authorization", authToken);
                     } else if (header.equals("ServiceAuthorization") && s2sToken != null) {
@@ -168,9 +174,10 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
             requestData.getPathVariables().forEach((pathVariable, value) -> {
                 if (value.toString().equals(DYNAMIC_CONTENT_PLACEHOLDER)) {
                     // ADD DYNAMIC DATA HERE
-                    if (pathVariable.equals("uid") && theUser.getUid() != null) {
-                        aRequest.pathParam(pathVariable, theUser.getUid());
-                        scenarioContext.getTestData().getRequest().getPathVariables().put("uid", theUser.getUid());
+                    if (pathVariable.equals("uid") && theInvokingUser.getUid() != null) {
+                        aRequest.pathParam(pathVariable, theInvokingUser.getUid());
+                        scenarioContext.getTestData().getRequest().getPathVariables().put("uid",
+                            theInvokingUser.getUid());
                     } else if (pathVariable.equals("cid") && scenarioContext.getTheCaseReference() != null) {
                         Long theCaseReference = scenarioContext.getTheCaseReference();
                         aRequest.pathParam(pathVariable, theCaseReference);
@@ -269,7 +276,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
 
     private String convertArrayJsonToMapJson(String apiResponse) {
         if (apiResponse.startsWith("[") && apiResponse.endsWith("]")) {
-            apiResponse = "{\"arrayInMap\":"+apiResponse +"}";
+            apiResponse = "{\"arrayInMap\":" + apiResponse + "}";
         }
         return apiResponse;
     }
