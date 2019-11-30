@@ -1,11 +1,13 @@
 package uk.gov.hmcts.ccd.fta.steps;
 
+import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,6 +23,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.Method;
 import io.restassured.response.Response;
 import io.restassured.specification.QueryableRequestSpecification;
@@ -42,6 +45,11 @@ import uk.gov.hmcts.ccd.fta.util.JsonUtils;
 public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTestAutomationDSL {
 
     private static final String DYNAMIC_CONTENT_PLACEHOLDER = "[[DYNAMIC]]";
+    private static boolean isTestDataLoaded = false;
+
+    private final String BE_FTA_FILE_JURISDICTION1 = "src/aat/resources/CCD_BEFTA_JURISDICTION1.xlsx";
+    private final String BE_FTA_FILE_JURISDICTION2 = "src/aat/resources/CCD_BEFTA_JURISDICTION2.xlsx";
+    private final String BE_FTA_FILE_JURISDICTION3 = "src/aat/resources/CCD_BEFTA_JURISDICTION3.xlsx";
 
     private final BackEndFunctionalTestScenarioContext scenarioContext;
     private final AATHelper aat;
@@ -59,6 +67,15 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     @Before()
     public void prepare(Scenario scenario) {
         this.scenario = scenario;
+        if (!isTestDataLoaded) {
+            try {
+                importDefinitions();
+            } catch (Exception e) {
+                throw e;
+            } finally {
+                isTestDataLoaded = true;
+            }
+        }
     }
 
     @Override
@@ -136,7 +153,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     }
 
     private void prepareARequestWithAppropriateValues(BackEndFunctionalTestScenarioContext scenarioContext)
-            throws IOException {
+        throws IOException {
         UserData theUser = scenarioContext.getTheUser();
         String s2sToken = aat.getS2SHelper().getToken();
 
@@ -213,11 +230,11 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     }
 
     private void verifyTheRequestInTheContextWithAParticularSpecification(
-            BackEndFunctionalTestScenarioContext scenarioContext, String requestSpecification) {
+        BackEndFunctionalTestScenarioContext scenarioContext, String requestSpecification) {
         boolean check = scenarioContext.getTestData().meetsSpec(requestSpecification);
         if (!check) {
             String errorMessage = "Test data does not confirm it meets the specification about the request: "
-                    + requestSpecification;
+                + requestSpecification;
             throw new FunctionalTestException(errorMessage);
         }
     }
@@ -230,7 +247,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
 
     @SuppressWarnings("unchecked")
     private void submitTheRequestToCallAnOperationOfAProduct(BackEndFunctionalTestScenarioContext scenarioContext,
-            String operation, String productName) throws IOException {
+                                                             String operation, String productName) throws IOException {
         boolean isCorrectOperation = scenarioContext.getTestData().meetsOperationOfProduct(operation, productName);
         if (!isCorrectOperation) {
             String errorMessage = "Test data does not confirm it is calling the following operation of a product: "
@@ -304,7 +321,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     }
 
     private void verifyThatTheResponseHasAllTheDetailsAsExpected(BackEndFunctionalTestScenarioContext scenarioContext)
-            throws IOException {
+        throws IOException {
         ResponseData expectedResponse = scenarioContext.getTestData().getExpectedResponse();
         ResponseData actualResponse = scenarioContext.getTheResponse();
         Map<String, List<?>> issues = new HashMap<>();
@@ -351,14 +368,43 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     @Then("a call [{}] will get the expected response as in [{}]")
     @Then("another call [{}] will get the expected response as in [{}]")
     public void performAndVerifyTheExpectedResponseForAnApiCall(String testDataSpec, String testDataId)
-            throws IOException {
+        throws IOException {
         BackEndFunctionalTestScenarioContext subcontext = new BackEndFunctionalTestScenarioContext();
         subcontext.initializeTestDataFor(testDataId);
         prepareARequestWithAppropriateValues(subcontext);
         verifyTheRequestInTheContextWithAParticularSpecification(subcontext, testDataSpec);
         submitTheRequestToCallAnOperationOfAProduct(subcontext, subcontext.getTestData().getOperationName(),
-                subcontext.getTestData().getProductName());
+            subcontext.getTestData().getProductName());
         verifyThatTheResponseHasAllTheDetailsAsExpected(subcontext);
+    }
+
+    private RequestSpecification asAutoTestImporter() {
+        AuthenticatedUser caseworker = aat.getIdamHelper().authenticate(aat.getImporterAutoTestEmail(),
+            aat.getImporterAutoTestPassword());
+
+        String s2sToken = aat.getS2SHelper().getToken();
+        return RestAssured.given(new RequestSpecBuilder()
+            .setBaseUri(aat.getDefinitionStoreUrl())
+            .build())
+            .header("Authorization", "Bearer " + caseworker.getAccessToken())
+            .header("ServiceAuthorization", s2sToken);
+    }
+
+    private void importDefinition(String file) {
+        Response response = asAutoTestImporter()
+            .given()
+            .multiPart(new File(file))
+            .when()
+            .post("/import");
+        String message = "Import failed with response body: " + response.body().prettyPrint();
+        message += "\nand http code: " + response.statusCode();
+        Assert.assertEquals(message, 201, response.getStatusCode());
+    }
+
+    private void importDefinitions() {
+        importDefinition(BE_FTA_FILE_JURISDICTION1);
+        importDefinition(BE_FTA_FILE_JURISDICTION2);
+        importDefinition(BE_FTA_FILE_JURISDICTION3);
     }
 
     private void resolveUserData(String prefix, UserData aUser) {
