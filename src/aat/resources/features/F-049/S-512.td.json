@@ -1,12 +1,12 @@
 {
   "_guid_": "S-512",
   "_extends_": "F-049_Test_Data_Base",
-  "title": "must return 404 when request provide invalid Case type ID in CCD",
+  "title": "must return 404 when request contains a non-existing Case type ID",
   "specs": [
     "an active profile in CCD",
     "Start case creation as Case worker",
     "CCD Data Store",
-    "provides a dummy Case type id",
+    "contains a dummy Case type id",
     "code is HTTP-404"
   ],
   "request": {

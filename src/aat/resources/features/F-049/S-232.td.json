@@ -1,12 +1,12 @@
 {
   "_guid_": "S-232",
   "_extends_": "F-049_Test_Data_Base",
-  "title": "must return 403 when request provide unauthorized access",
+  "title": "must return 403 when the request has unauthorized access",
   "specs": [
     "an active profile in CCD",
     "Start case creation as Case worker",
     "CCD Data Store",
-    "provides unauthorized jurisdiction id",
+    "has unauthorized jurisdiction id",
     "code is HTTP-403"
   ],
   "request": {
