@@ -9,7 +9,7 @@
 	],
 	"request": {
 		"pathVariables": {
-			"etid": "Dummy"
+			"etid": "D_u_m_m_y"
 		}
 	},
 	"expectedResponse": {
@@ -20,7 +20,7 @@
 		},
 		"body": {
 			"exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
-			"message": "Cannot find event DUMMY for case type AAT",
+			"message": "Cannot find event D_u_m_m_y for case type AAT",
 			"details": null,
 			"callbackErrors": null,
 			"callbackWarnings": null
