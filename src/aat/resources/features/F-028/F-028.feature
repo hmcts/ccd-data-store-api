@@ -18,7 +18,6 @@ Feature: Fetch an event trigger in the context of a case for Case Worker
   @S-045
   Scenario: must return negative response when request does not provide valid authentication credentials
     Given a user with [an active profile in CCD]
-    And a case that has just been created as in [Standard_Full_Case]
     When a request is prepared with appropriate values
     And the request [does not provide valid authentication credentials]
     And it is submitted to call the [Fetch an event trigger in the context of a case for Case Worker] operation of [CCD Data Store]
@@ -29,7 +28,6 @@ Feature: Fetch an event trigger in the context of a case for Case Worker
   @S-046
   Scenario: must return negative response when request provides authentic credentials without authorized access to the operation
     Given a user with [an active profile in CCD]
-    And a case that has just been created as in [Standard_Full_Case]
     When a request is prepared with appropriate values
     And the request [does not provide authorised access to the operation]
     And it is submitted to call the [Fetch an event trigger in the context of a case for Case Worker] operation of [CCD Data Store]
@@ -40,7 +38,6 @@ Feature: Fetch an event trigger in the context of a case for Case Worker
   @S-547
   Scenario: must return appropriate negative response when case-reference does not exists
     Given a user with [an active profile in CCD]
-    And a case that has just been created as in [Standard_Full_Case]
     When a request is prepared with appropriate values
     And the request [contains a structurally valid but non-existing case-reference]
     And it is submitted to call the [Fetch an event trigger in the context of a case for Case Worker] operation of [CCD Data Store]
@@ -51,7 +48,6 @@ Feature: Fetch an event trigger in the context of a case for Case Worker
   @S-548
   Scenario: must return appropriate negative response when event-id does not exists
     Given a user with [an active profile in CCD]
-    And a case that has just been created as in [Standard_Full_Case]
     When a request is prepared with appropriate values
     And the request [contains invalid event-id]
     And it is submitted to call the [Fetch an event trigger in the context of a case for Case Worker] operation of [CCD Data Store]
@@ -62,7 +58,6 @@ Feature: Fetch an event trigger in the context of a case for Case Worker
   @S-549
   Scenario: must return appropriate negative response when case-reference is non-numeric
     Given a user with [an active profile in CCD]
-    And a case that has just been created as in [Standard_Full_Case]
     When a request is prepared with appropriate values
     And the request [contains non-numeric case-reference number]
     And it is submitted to call the [Fetch an event trigger in the context of a case for Case Worker] operation of [CCD Data Store]
@@ -73,7 +68,6 @@ Feature: Fetch an event trigger in the context of a case for Case Worker
   @S-550
   Scenario: must return appropriate negative response when Jurisdiction is invalid
     Given a user with [an active profile in CCD]
-    And a case that has just been created as in [Standard_Full_Case]
     When a request is prepared with appropriate values
     And the request [contains invalid Jurisdiction id]
     And it is submitted to call the [Fetch an event trigger in the context of a case for Case Worker] operation of [CCD Data Store]

@@ -10,7 +10,8 @@
   ],
   "request": {
     "pathVariables": {
-      "jid": "AUTOTEST123"
+      "jid": "AUTOTEST123",
+      "cid": "1573751648840703"
     }
   },
   "expectedResponse": {

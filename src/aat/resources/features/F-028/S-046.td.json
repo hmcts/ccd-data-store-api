@@ -11,6 +11,9 @@
   "request": {
     "headers": {
       "Authorization": "Invalid_Authorization"
+    },
+    "pathVariables": {
+      "cid": "1573751648840703"
     }
   },
   "expectedResponse": {

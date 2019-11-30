@@ -10,7 +10,8 @@
   ],
   "request": {
     "pathVariables": {
-      "etid": "UPDATE123"
+      "etid": "UPDATE123",
+      "cid": "157375164884070311"
     }
   },
   "expectedResponse": {
@@ -22,7 +23,7 @@
     },
     "body": {
       "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
-      "message" : "Cannot find event UPDATE123 for case type AAT",
+      "message" : "[[ANY]]",
       "details" : null,
       "callbackErrors" : null,
       "callbackWarnings" : null

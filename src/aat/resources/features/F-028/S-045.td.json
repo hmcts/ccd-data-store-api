@@ -10,7 +10,8 @@
   ],
   "request": {
     "pathVariables": {
-      "uid": "some_id"
+      "uid": "some_id",
+      "cid": "1573751648840703"
     }
   },
   "expectedResponse": {
