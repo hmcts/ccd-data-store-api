@@ -23,8 +23,8 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
-import io.restassured.http.Method;
 import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.http.Method;
 import io.restassured.response.Response;
 import io.restassured.specification.QueryableRequestSpecification;
 import io.restassured.specification.RequestSpecification;
@@ -68,8 +68,13 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     public void prepare(Scenario scenario) {
         this.scenario = scenario;
         if (!isTestDataLoaded) {
-            importDefinitions();
-            isTestDataLoaded = true;
+            try {
+                importDefinitions();
+            } catch (Exception e) {
+                throw e;
+            } finally {
+                isTestDataLoaded = true;
+            }
         }
     }
 
@@ -390,8 +395,8 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     }
 
     private void importDefinitions() {
-        importDefinition(BE_FTA_FILE_JURISDICTION2);
         importDefinition(BE_FTA_FILE_JURISDICTION1);
+        importDefinition(BE_FTA_FILE_JURISDICTION2);
         importDefinition(BE_FTA_FILE_JURISDICTION3);
     }
 
