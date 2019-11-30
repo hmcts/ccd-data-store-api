@@ -12,8 +12,7 @@
 		"pathVariables": {
 			"uid": "[[DYNAMIC]]",
 			"jid": "AUTOTEST1",
-			"ctid": "AAT",
-			"cid": "[[DYNAMIC]]"
+			"ctid": "AAT"
 		},
 		"body": {
 			"id": "Test User"

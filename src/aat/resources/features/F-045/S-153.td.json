@@ -11,7 +11,8 @@
 
   "request": {
     "pathVariables": {
-      "uid": "some id"
+      "uid": "some id",
+      "cid": "157375164884070312"
     }
   },
 

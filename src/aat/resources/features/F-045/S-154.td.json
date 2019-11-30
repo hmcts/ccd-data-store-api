@@ -12,7 +12,10 @@
    "request": {
     "headers": {
       "Authorization": "TESTAUTH"
-    }
+    },
+     "pathVariables": {
+       "cid": "157375164884070312"
+     }
   },
   "expectedResponse": {
     "_extends_": "Common_403_Response",

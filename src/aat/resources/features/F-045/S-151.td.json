@@ -8,6 +8,12 @@
 		"contains as input a valid case-reference that exists in CCD",
 		"has the 201 return code"
 	],
+  "request": {
+    "pathVariables": {
+      "cid": "[[DYNAMIC]]"
+    }
+  },
+
   "expectedResponse": {
     "responseCode" : 201,
     "responseMessage" : "Created",

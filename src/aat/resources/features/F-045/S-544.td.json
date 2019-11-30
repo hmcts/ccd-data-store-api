@@ -10,6 +10,9 @@
   ],
 
   "request": {
+    "pathVariables": {
+      "cid": "157375164884070312"
+    },
     "body": {
       "id_wrong_filed_name": "Test User"
     }
