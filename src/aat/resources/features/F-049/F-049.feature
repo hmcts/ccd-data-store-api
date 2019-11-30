@@ -54,7 +54,7 @@ Feature: Start case creation as Case worker
     And     the response has all the details as expected
 
   @S-233
-  Scenario: must return 404 when request contains only special character for Idam user ID
+  Scenario: must return 403 when request contains only special character for Idam user ID
     Given   a user with [an active profile in CCD]
     When    a request is prepared with appropriate values
     And     the request [contains only special character for Idam user ID]
