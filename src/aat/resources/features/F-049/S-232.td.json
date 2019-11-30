@@ -4,7 +4,7 @@
   "title": "must return 403 when the request has unauthorized access",
   "specs": [
     "an active profile in CCD",
-    "has unauthorized jurisdiction id",
+    "contains a jurisdiction id user is unauthorised to access",
     "code is HTTP-403"
   ],
   "request": {
