@@ -19,7 +19,7 @@ public class BackEndFunctionalTestScenarioContext {
     private Scenario scenario;
     private HttpTestData caseCreationData;
     private Long theCaseReference;
-    private UserData theUser;
+    private UserData theInvokingUser;
     private RequestSpecification theRequest;
     private ResponseData theResponse;
 
@@ -60,12 +60,12 @@ public class BackEndFunctionalTestScenarioContext {
         this.theCaseReference = theCaseReference;
     }
 
-    public UserData getTheUser() {
-        return theUser;
+    public UserData getTheInvokingUser() {
+        return theInvokingUser;
     }
 
-    public void setTheUser(UserData theUser) {
-        this.theUser = theUser;
+    public void setTheInvokingUser(UserData theInvokingUser) {
+        this.theInvokingUser = theInvokingUser;
     }
 
     public void setTheRequest(RequestSpecification theRequest) {
