@@ -1,35 +1,28 @@
 {
-  "_guid_": "S-547",
-  "_extends_": "Base_Expecting_404",
   "title": "must return appropriate negative response when case-reference does not exists",
+  "_guid_": "S-547",
+  "_extends_": "F-028_Test_Data_Base",
+
   "specs": [
-    "a detailed profile in CCD",
-    "contains invalid case-reference number",
+    "an active profile in CCD",
+    "contains a structurally valid but non-existing case-reference",
     "has the 404 return code"
   ],
-  "productName": "CCD Data Store",
-  "operationName": "Fetch an event trigger in the context of a case for Case Worker",
-  "method": "GET",
-  "uri": "/aggregated/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}",
   "request": {
     "pathVariables": {
-      "uid": "[[DYNAMIC]]",
-      "jid": "AUTOTEST1",
-      "ctid": "AAT",
-      "cid": "157375164884070311",
-      "etid": "UPDATE"
+      "cid": "157375164884070311"
     }
   },
   "expectedResponse": {
+    "_extends_": "Common_404_Response",
     "headers": {
       "Content-Length": "[[ANY]]",
-      "Transfer-Encoding" : "chunked"
+      "Content-Encoding" : "gzip",
+      "Content-Type" : "application/json;charset=UTF-8"
     },
     "body": {
       "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
-      "timestamp": "[[ANY]]",
       "message" : "No case exist with id=157375164884070311",
-      "path": "[[ANY]]",
       "details" : null,
       "callbackErrors" : null,
       "callbackWarnings" : null

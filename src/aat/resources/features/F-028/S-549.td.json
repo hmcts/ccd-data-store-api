@@ -1,39 +1,32 @@
 {
-  "_guid_": "S-549",
-  "_extends_": "Base_Expecting_400",
   "title": "must return appropriate negative response when case-reference is non-numeric",
+  "_guid_": "S-549",
+  "_extends_": "F-028_Test_Data_Base",
+
   "specs": [
-    "a detailed profile in CCD",
+    "an active profile in CCD",
     "contains non-numeric case-reference number",
     "has the 400 return code"
   ],
-  "productName": "CCD Data Store",
-  "operationName": "Fetch an event trigger in the context of a case for Case Worker",
-  "method": "GET",
-  "uri": "/aggregated/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}",
   "request": {
     "pathVariables": {
-      "uid": "[[DYNAMIC]]",
-      "jid": "AUTOTEST1",
-      "ctid": "AAT",
-      "cid": "1573751648840703AA",
-      "etid": "UPDATE"
+      "cid": "1573751648840703AA"
     }
   },
   "expectedResponse": {
+    "_extends_": "Common_400_Response",
     "headers": {
       "Content-Length": "[[ANY]]",
-      "Transfer-Encoding" : "chunked",
-      "Connection" : "close"
+      "Content-Encoding" : "gzip",
+      "Content-Type" : "application/json;charset=UTF-8",
+      "Connection": "close"
     },
     "body": {
-      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
-      "timestamp": "[[ANY]]",
-      "message" : "Case reference is not valid",
-      "path": "[[ANY]]",
-      "details" : null,
-      "callbackErrors" : null,
-      "callbackWarnings" : null
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+      "message": "Case reference is not valid",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
     }
   }
 }
