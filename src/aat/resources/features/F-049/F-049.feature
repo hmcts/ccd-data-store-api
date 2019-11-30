@@ -27,7 +27,7 @@ Feature: Start case creation as Case worker
   Scenario: must return 403 when the request contains a dummy user id
     Given   a user with [an active profile in CCD]
     When    a request is prepared with appropriate values
-    And     the request [contains a dummy user-id]
+    And     the request [contains a dummy user id]
     And     it is submitted to call the [Start case creation as Case worker] operation of [CCD Data Store]
     Then    a negative response is received
     And     the response [code is HTTP-403]
