@@ -43,16 +43,6 @@ Feature: Start case creation as Case worker
     And     the response [code is HTTP-403]
     And     the response has all the details as expected
 
-  @S-233 @Ignore
-  Scenario: must return 404 when request contains only special character for Idam user ID
-    Given   a user with [an active profile in CCD]
-    When    a request is prepared with appropriate values
-    And     the request [contains only special character for Idam user ID]
-    And     it is submitted to call the [Start case creation as Case worker] operation of [CCD Data Store]
-    Then    a negative response is received
-    And     the response [code is HTTP-403]
-    And     the response has all the details as expected
-
   @S-233
   Scenario: must return 403 when request contains a malformed user ID
     Given   a user with [an active profile in CCD]
