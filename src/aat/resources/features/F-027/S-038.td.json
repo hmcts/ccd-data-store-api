@@ -5,7 +5,11 @@
 
   "specs": ["an active profile in CCD",
     "contains the details of the case just created"],
-
+  "request": {
+    "pathVariables": {
+      "cid": "[[DYNAMIC]]"
+    }
+  },
     "expectedResponse": {
       "_extends_": "Common_200_Response",
       "headers" : {
