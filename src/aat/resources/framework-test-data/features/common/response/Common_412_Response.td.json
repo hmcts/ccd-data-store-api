@@ -1,0 +1,13 @@
+{
+	"_guid_": "Common_412_Response",
+	"_extends_": "Common_Response",
+
+	"responseCode": 412,
+	"responseMessage": "Precondition Failed",
+	"headers": {
+		"_extends_": "Common_412_Response_Headers"
+	},
+	"body": {
+		"_extends_": "Common_412_Response_Body"
+	}
+}
