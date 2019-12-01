@@ -5,7 +5,7 @@
 
   "specs": [
     "an active profile in CCD",
-    "contains non-numeric case-reference number",
+    "contains a non-numeric case-reference number",
     "has the 400 return code"
   ],
   "request": {

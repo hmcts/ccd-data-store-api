@@ -5,7 +5,7 @@
 
   "specs": [
     "an active profile in CCD",
-    "does not provide authorised access to the operation",
+    "provides a dummy authorisation token to the operation",
     "has the 403 return code"
   ],
   "request": {

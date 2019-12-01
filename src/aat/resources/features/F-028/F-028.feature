@@ -29,7 +29,7 @@ Feature: F-028: Fetch an event trigger in the context of a case for Case Worker
   Scenario: must return negative response when request provides authentic credentials without authorized access to the operation
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
-    And the request [does not provide authorised access to the operation]
+    And the request [provides a dummy authorisation token to the operation]
     And it is submitted to call the [Fetch an event trigger in the context of a case for Case Worker] operation of [CCD Data Store]
     Then a negative response is received
     And the response [has the 403 return code]
@@ -59,7 +59,7 @@ Feature: F-028: Fetch an event trigger in the context of a case for Case Worker
   Scenario: must return appropriate negative response when case-reference is non-numeric
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
-    And the request [contains non-numeric case-reference number]
+    And the request [contains a non-numeric case-reference number]
     And it is submitted to call the [Fetch an event trigger in the context of a case for Case Worker] operation of [CCD Data Store]
     Then a negative response is received
     And the response [has the 400 return code]
@@ -69,7 +69,7 @@ Feature: F-028: Fetch an event trigger in the context of a case for Case Worker
   Scenario: must return appropriate negative response when Jurisdiction is invalid
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
-    And the request [contains invalid Jurisdiction id]
+    And the request [contains an invalid Jurisdiction id]
     And it is submitted to call the [Fetch an event trigger in the context of a case for Case Worker] operation of [CCD Data Store]
     Then a negative response is received
     And the response [has the 403 return code]

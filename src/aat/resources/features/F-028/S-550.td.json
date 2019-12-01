@@ -5,7 +5,7 @@
 
   "specs": [
     "an active profile in CCD",
-    "contains invalid Jurisdiction id",
+    "contains an invalid Jurisdiction id",
     "has the 403 return code"
   ],
   "request": {
