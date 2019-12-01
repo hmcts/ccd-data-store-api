@@ -1,5 +1,5 @@
 @F-048
-Feature: F-048: Get the pagination metadata for a case data search for Case Worker
+Feature: Get the pagination metadata for a case data search for Case Worker
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source

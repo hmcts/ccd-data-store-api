@@ -1,5 +1,5 @@
 @F-050
-Feature: F-050: Validate a set of fields as Case worker
+Feature: Validate a set of fields as Case worker
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
