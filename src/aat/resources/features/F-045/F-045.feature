@@ -1,5 +1,5 @@
 @F-045
-Feature: Grant access to case
+Feature: F-045: Grant access to case
 
   Background:
     Given an appropriate test context as detailed in the test data source
