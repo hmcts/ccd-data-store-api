@@ -4,9 +4,12 @@
   "_extends_": "F-027_Test_Data_Base",
 
   "specs": ["an active profile in CCD",
-    "contains as input a valid case-reference that exists in CCD",
-    "has the 200 return code"],
-
+    "contains the details of the case just created"],
+  "request": {
+    "pathVariables": {
+      "cid": "[[DYNAMIC]]"
+    }
+  },
     "expectedResponse": {
       "_extends_": "Common_200_Response",
       "headers" : {
@@ -18,7 +21,7 @@
         "tabs" : [ {
           "id" : "FirstTab",
           "label" : "First tab",
-          "order" : "[[ANY]]",
+          "order" : 1,
           "fields" : [ {
             "id" : "TextField",
             "label" : "A `Text` field",
@@ -38,24 +41,30 @@
             },
             "validation_expr" : null,
             "security_label" : "PUBLIC",
-            "order" : "[[ANY]]",
+            "order" : 1,
             "display_context" : null,
             "display_context_parameter" : null,
             "show_condition" : null,
             "show_summary_change_option" : null,
             "show_summary_content_option" : null,
             "acls" : [ {
-              "role" : "[[ANY]]",
+              "role" : "caseworker-autotest1",
               "create" : true,
               "read" : true,
               "update" : true,
-              "delete" : false
+              "delete" : true
+            }, {
+              "role" : "caseworker-autotest1-private",
+              "create" : true,
+              "read" : true,
+              "update" : true,
+              "delete" : true
             } ]
           }, {
             "id" : "NumberField",
             "label" : "A `Number` field",
             "hidden" : false,
-            "value" : "[[ANY]]",
+            "value" : "164528",
             "metadata" : false,
             "hint_text" : "A numeric data.",
             "field_type" : {
@@ -70,18 +79,24 @@
             },
             "validation_expr" : null,
             "security_label" : "PUBLIC",
-            "order" : "[[ANY]]",
+            "order" : 2,
             "display_context" : null,
             "display_context_parameter" : null,
             "show_condition" : null,
             "show_summary_change_option" : null,
             "show_summary_content_option" : null,
             "acls" : [ {
-              "role" : "[[ANY]]",
+              "role" : "caseworker-autotest1",
               "create" : true,
               "read" : true,
               "update" : true,
-              "delete" : false
+              "delete" : true
+            }, {
+              "role" : "caseworker-autotest1-private",
+              "create" : true,
+              "read" : true,
+              "update" : true,
+              "delete" : true
             } ]
           }, {
             "id" : "YesOrNoField",
@@ -102,18 +117,24 @@
             },
             "validation_expr" : null,
             "security_label" : "PUBLIC",
-            "order" : "[[ANY]]",
+            "order" : 3,
             "display_context" : null,
             "display_context_parameter" : null,
             "show_condition" : null,
             "show_summary_change_option" : null,
             "show_summary_content_option" : null,
             "acls" : [ {
-              "role" : "[[ANY]]",
+              "role" : "caseworker-autotest1",
               "create" : true,
               "read" : true,
               "update" : true,
-              "delete" : false
+              "delete" : true
+            }, {
+              "role" : "caseworker-autotest1-private",
+              "create" : true,
+              "read" : true,
+              "update" : true,
+              "delete" : true
             } ]
           }, {
             "id" : "PhoneUKField",
@@ -134,24 +155,30 @@
             },
             "validation_expr" : "^(((\\+44\\s?\\d{4}|\\(?0\\d{4}\\)?)\\s?\\d{3}\\s?\\d{3})|((\\+44\\s?\\d{3}|\\(?0\\d{3}\\)?)\\s?\\d{3}\\s?\\d{4})|((\\+44\\s?\\d{2}|\\(?0\\d{2}\\)?)\\s?\\d{4}\\s?\\d{4}))(\\s?\\#(\\d{4}|\\d{3}))?$",
             "security_label" : "PUBLIC",
-            "order" : "[[ANY]]",
+            "order" : 4,
             "display_context" : null,
             "display_context_parameter" : null,
             "show_condition" : null,
             "show_summary_change_option" : null,
             "show_summary_content_option" : null,
             "acls" : [ {
-              "role" : "[[ANY]]",
+              "role" : "caseworker-autotest1",
               "create" : true,
               "read" : true,
               "update" : true,
-              "delete" : false
+              "delete" : true
+            }, {
+              "role" : "caseworker-autotest1-private",
+              "create" : true,
+              "read" : true,
+              "update" : true,
+              "delete" : true
             } ]
           }, {
             "id" : "EmailField",
             "label" : "An `Email` field",
             "hidden" : false,
-            "value" : "[[ANY]]",
+            "value" : "ccd@hmcts.net",
             "metadata" : false,
             "hint_text" : "A valid email address.",
             "field_type" : {
@@ -166,18 +193,24 @@
             },
             "validation_expr" : null,
             "security_label" : "PUBLIC",
-            "order" : "[[ANY]]",
+            "order" : 5,
             "display_context" : null,
             "display_context_parameter" : null,
             "show_condition" : null,
             "show_summary_change_option" : null,
             "show_summary_content_option" : null,
             "acls" : [ {
-              "role" : "[[ANY]]",
+              "role" : "caseworker-autotest1",
               "create" : true,
               "read" : true,
               "update" : true,
-              "delete" : false
+              "delete" : true
+            }, {
+              "role" : "caseworker-autotest1-private",
+              "create" : true,
+              "read" : true,
+              "update" : true,
+              "delete" : true
             } ]
           } ],
           "role" : null,
@@ -185,23 +218,23 @@
         }, {
           "id" : "HistoryTab",
           "label" : "History Tab",
-          "order" : "[[ANY]]",
+          "order" : 4,
           "fields" : [ {
             "id" : "HistoryComponentField",
             "label" : "A `HistoryComponent` field",
             "hidden" : false,
             "value" : [ {
-              "id" : "[[ANY]]",
+              "id" : 69,
               "timestamp" : "[[ANY]]",
               "summary" : null,
               "comment" : null,
-              "event_id" : "[[ANY]]",
-              "event_name" : "[[ANY]]",
+              "event_id" : "CREATE",
+              "event_name" : "Create a new case",
               "user_id" : "[[ANY]]",
-              "user_last_name" : "[[ANY]]",
-              "user_first_name" : "[[ANY]]",
-              "state_name" : "[[ANY]]",
-              "state_id" : "[[ANY]]",
+              "user_last_name" : "Auto Test",
+              "user_first_name" : "CCD",
+              "state_name" : "To do",
+              "state_id" : "TODO",
               "significant_item" : null
             } ],
             "metadata" : false,
@@ -218,18 +251,24 @@
             },
             "validation_expr" : null,
             "security_label" : "PUBLIC",
-            "order" : "[[ANY]]",
+            "order" : 1,
             "display_context" : null,
             "display_context_parameter" : null,
             "show_condition" : null,
             "show_summary_change_option" : null,
             "show_summary_content_option" : null,
             "acls" : [ {
-              "role" : "[[ANY]]",
+              "role" : "caseworker-autotest1",
               "create" : true,
               "read" : true,
               "update" : true,
-              "delete" : false
+              "delete" : true
+            }, {
+              "role" : "caseworker-autotest1-private",
+              "create" : true,
+              "read" : true,
+              "update" : true,
+              "delete" : true
             } ]
           } ],
           "role" : null,
@@ -237,12 +276,12 @@
         }, {
           "id" : "SecondTab",
           "label" : "Second tab",
-          "order" : "[[ANY]]",
+          "order" : 2,
           "fields" : [ {
             "id" : "MoneyGBPField",
             "label" : "A `MoneyGBP` field",
             "hidden" : false,
-            "value" : "[[ANY]]",
+            "value" : "4200",
             "metadata" : false,
             "hint_text" : "A monetary value.",
             "field_type" : {
@@ -257,18 +296,24 @@
             },
             "validation_expr" : null,
             "security_label" : "PUBLIC",
-            "order" : "[[ANY]]",
+            "order" : 1,
             "display_context" : null,
             "display_context_parameter" : null,
             "show_condition" : null,
             "show_summary_change_option" : null,
             "show_summary_content_option" : null,
             "acls" : [ {
-              "role" : "[[ANY]]",
+              "role" : "caseworker-autotest1",
               "create" : true,
               "read" : true,
               "update" : true,
-              "delete" : false
+              "delete" : true
+            }, {
+              "role" : "caseworker-autotest1-private",
+              "create" : true,
+              "read" : true,
+              "update" : true,
+              "delete" : true
             } ]
           }, {
             "id" : "DateField",
@@ -289,24 +334,30 @@
             },
             "validation_expr" : null,
             "security_label" : "PUBLIC",
-            "order" : "[[ANY]]",
+            "order" : 2,
             "display_context" : null,
             "display_context_parameter" : null,
             "show_condition" : null,
             "show_summary_change_option" : null,
             "show_summary_content_option" : null,
             "acls" : [ {
-              "role" : "[[ANY]]",
+              "role" : "caseworker-autotest1",
               "create" : true,
               "read" : true,
               "update" : true,
-              "delete" : false
+              "delete" : true
+            }, {
+              "role" : "caseworker-autotest1-private",
+              "create" : true,
+              "read" : true,
+              "update" : true,
+              "delete" : true
             } ]
           }, {
             "id" : "DateTimeField",
             "label" : "A `DateTime` field",
             "hidden" : false,
-            "value" : "[[ANY]]",
+            "value" : "1988-07-07T22:20:00",
             "metadata" : false,
             "hint_text" : "A temporal value with time.",
             "field_type" : {
@@ -321,18 +372,24 @@
             },
             "validation_expr" : null,
             "security_label" : "PUBLIC",
-            "order" : "[[ANY]]",
+            "order" : 3,
             "display_context" : null,
             "display_context_parameter" : null,
             "show_condition" : null,
             "show_summary_change_option" : null,
             "show_summary_content_option" : null,
             "acls" : [ {
-              "role" : "[[ANY]]",
+              "role" : "caseworker-autotest1",
               "create" : true,
               "read" : true,
               "update" : true,
-              "delete" : false
+              "delete" : true
+            }, {
+              "role" : "caseworker-autotest1-private",
+              "create" : true,
+              "read" : true,
+              "update" : true,
+              "delete" : true
             } ]
           }, {
             "id" : "TextAreaField",
@@ -353,18 +410,24 @@
             },
             "validation_expr" : null,
             "security_label" : "PUBLIC",
-            "order" : "[[ANY]]",
+            "order" : 4,
             "display_context" : null,
             "display_context_parameter" : null,
             "show_condition" : null,
             "show_summary_change_option" : null,
             "show_summary_content_option" : null,
             "acls" : [ {
-              "role" : "[[ANY]]",
+              "role" : "caseworker-autotest1",
               "create" : true,
               "read" : true,
               "update" : true,
-              "delete" : false
+              "delete" : true
+            }, {
+              "role" : "caseworker-autotest1-private",
+              "create" : true,
+              "read" : true,
+              "update" : true,
+              "delete" : true
             } ]
           }, {
             "id" : "FixedListField",
@@ -397,18 +460,24 @@
             },
             "validation_expr" : null,
             "security_label" : "PUBLIC",
-            "order" : "[[ANY]]",
+            "order" : 5,
             "display_context" : null,
             "display_context_parameter" : null,
             "show_condition" : null,
             "show_summary_change_option" : null,
             "show_summary_content_option" : null,
             "acls" : [ {
-              "role" : "[[ANY]]",
+              "role" : "caseworker-autotest1",
               "create" : true,
               "read" : true,
               "update" : true,
-              "delete" : false
+              "delete" : true
+            }, {
+              "role" : "caseworker-autotest1-private",
+              "create" : true,
+              "read" : true,
+              "update" : true,
+              "delete" : true
             } ]
           }, {
             "id" : "MultiSelectListField",
@@ -449,18 +518,24 @@
             },
             "validation_expr" : null,
             "security_label" : "PUBLIC",
-            "order" : "[[ANY]]",
+            "order" : 7,
             "display_context" : null,
             "display_context_parameter" : null,
             "show_condition" : null,
             "show_summary_change_option" : null,
             "show_summary_content_option" : null,
             "acls" : [ {
-              "role" : "[[ANY]]",
+              "role" : "caseworker-autotest1",
               "create" : true,
               "read" : true,
               "update" : true,
-              "delete" : false
+              "delete" : true
+            }, {
+              "role" : "caseworker-autotest1-private",
+              "create" : true,
+              "read" : true,
+              "update" : true,
+              "delete" : true
             } ]
           } ],
           "role" : null,
@@ -468,7 +543,7 @@
         }, {
           "id" : "ThirdTab",
           "label" : "Third tab",
-          "order" : "[[ANY]]",
+          "order" : 3,
           "fields" : [ {
             "id" : "CollectionField",
             "label" : "A `Collection` of `Text` fields",
@@ -503,18 +578,24 @@
             },
             "validation_expr" : null,
             "security_label" : "PUBLIC",
-            "order" : "[[ANY]]",
+            "order" : 2,
             "display_context" : null,
             "display_context_parameter" : null,
             "show_condition" : null,
             "show_summary_change_option" : null,
             "show_summary_content_option" : null,
             "acls" : [ {
-              "role" : "[[ANY]]",
+              "role" : "caseworker-autotest1",
               "create" : true,
               "read" : true,
               "update" : true,
-              "delete" : false
+              "delete" : true
+            }, {
+              "role" : "caseworker-autotest1-private",
+              "create" : true,
+              "read" : true,
+              "update" : true,
+              "delete" : true
             } ]
           }, {
             "id" : "ComplexField",
@@ -679,31 +760,37 @@
             },
             "validation_expr" : null,
             "security_label" : "PUBLIC",
-            "order" : "[[ANY]]",
+            "order" : 1,
             "display_context" : null,
             "display_context_parameter" : null,
             "show_condition" : null,
             "show_summary_change_option" : null,
             "show_summary_content_option" : null,
             "acls" : [ {
-              "role" : "[[ANY]]",
+              "role" : "caseworker-autotest1",
               "create" : true,
               "read" : true,
               "update" : true,
-              "delete" : false
+              "delete" : true
+            }, {
+              "role" : "caseworker-autotest1-private",
+              "create" : true,
+              "read" : true,
+              "update" : true,
+              "delete" : true
             } ]
           }, {
             "id" : "AddressUKField",
             "label" : "A `AddressUK` field",
             "hidden" : false,
             "value" : {
-              "County" : "[[ANY]]",
-              "Country" : "[[ANY]]",
-              "PostCode" : "[[ANY]]",
-              "PostTown" : "[[ANY]]",
-              "AddressLine1" : "[[ANY]]",
-              "AddressLine2" : "[[ANY]]",
-              "AddressLine3" : "[[ANY]]"
+              "County" : "Greater London",
+              "Country" : "UK",
+              "PostCode" : "SW1H 9AJ",
+              "PostTown" : "Westminster",
+              "AddressLine1" : "102 Petty France",
+              "AddressLine2" : "CCD",
+              "AddressLine3" : "c/o HMCTS Reform"
             },
             "metadata" : false,
             "hint_text" : "A UK address.",
@@ -725,7 +812,7 @@
                   "id" : "TextMax150",
                   "type" : "Text",
                   "min" : null,
-                  "max" : "[[ANY]]",
+                  "max" : 150,
                   "regular_expression" : null,
                   "fixed_list_items" : [ ],
                   "complex_fields" : [ ],
@@ -749,7 +836,7 @@
                   "id" : "TextMax50",
                   "type" : "Text",
                   "min" : null,
-                  "max" : "[[ANY]]",
+                  "max" : 50,
                   "regular_expression" : null,
                   "fixed_list_items" : [ ],
                   "complex_fields" : [ ],
@@ -773,7 +860,7 @@
                   "id" : "TextMax50",
                   "type" : "Text",
                   "min" : null,
-                  "max" : "[[ANY]]",
+                  "max" : 50,
                   "regular_expression" : null,
                   "fixed_list_items" : [ ],
                   "complex_fields" : [ ],
@@ -797,7 +884,7 @@
                   "id" : "TextMax50",
                   "type" : "Text",
                   "min" : null,
-                  "max" : "[[ANY]]",
+                  "max" : 50,
                   "regular_expression" : null,
                   "fixed_list_items" : [ ],
                   "complex_fields" : [ ],
@@ -821,7 +908,7 @@
                   "id" : "TextMax50",
                   "type" : "Text",
                   "min" : null,
-                  "max" : "[[ANY]]",
+                  "max" : 50,
                   "regular_expression" : null,
                   "fixed_list_items" : [ ],
                   "complex_fields" : [ ],
@@ -845,7 +932,7 @@
                   "id" : "TextMax14",
                   "type" : "Text",
                   "min" : null,
-                  "max" : "[[ANY]]",
+                  "max" : 14,
                   "regular_expression" : null,
                   "fixed_list_items" : [ ],
                   "complex_fields" : [ ],
@@ -869,7 +956,7 @@
                   "id" : "TextMax50",
                   "type" : "Text",
                   "min" : null,
-                  "max" : "[[ANY]]",
+                  "max" : 50,
                   "regular_expression" : null,
                   "fixed_list_items" : [ ],
                   "complex_fields" : [ ],
@@ -887,18 +974,24 @@
             },
             "validation_expr" : null,
             "security_label" : "PUBLIC",
-            "order" : "[[ANY]]",
+            "order" : 3,
             "display_context" : null,
             "display_context_parameter" : null,
             "show_condition" : null,
             "show_summary_change_option" : null,
             "show_summary_content_option" : null,
             "acls" : [ {
-              "role" : "[[ANY]]",
+              "role" : "caseworker-autotest1",
               "create" : true,
               "read" : true,
               "update" : true,
-              "delete" : false
+              "delete" : true
+            }, {
+              "role" : "caseworker-autotest1-private",
+              "create" : true,
+              "read" : true,
+              "update" : true,
+              "delete" : true
             } ]
           } ],
           "role" : null,
@@ -912,7 +1005,7 @@
           "metadata" : true,
           "hint_text" : null,
           "field_type" : {
-            "id" : "FixedList-AAT[STATE]",
+            "id" : "FixedList-AAT_AUTH_15[STATE]",
             "type" : "FixedList",
             "min" : null,
             "max" : null,
@@ -944,9 +1037,9 @@
           "acls" : [ ]
         }, {
           "id" : "[JURISDICTION]",
-          "label" : "[[ANY]]",
+          "label" : "Jurisdiction",
           "hidden" : false,
-          "value" : "[[ANY]]",
+          "value" : "AUTOTEST1",
           "metadata" : true,
           "hint_text" : null,
           "field_type" : {
@@ -1107,28 +1200,28 @@
         },
         "channels" : [ "CaseWorker", "CaseWorker", "CaseWorker", "CaseWorker" ],
         "triggers" : [ {
-          "id" : "START_PROGRESS",
-          "name" : "Start",
-          "description" : null,
-          "order" : "[[ANY]]"
-        }, {
           "id" : "REVIEW",
           "name" : "Review",
           "description" : null,
-          "order" : "[[ANY]]"
+          "order" : 6
         }, {
           "id" : "UPDATE",
           "name" : "Update",
           "description" : null,
-          "order" : "[[ANY]]"
+          "order" : 5
+        }, {
+          "id" : "START_PROGRESS",
+          "name" : "Start",
+          "description" : null,
+          "order" : 2
         } ],
         "events" : [ {
-          "id" : "[[ANY]]",
+          "id" : 69,
           "timestamp" : "[[ANY]]",
           "summary" : null,
           "comment" : null,
-          "event_id" : "[[ANY]]",
-          "event_name" : "[[ANY]]",
+          "event_id" : "CREATE",
+          "event_name" : "Create a new case",
           "user_id" : "[[ANY]]",
           "user_last_name" : "Auto Test",
           "user_first_name" : "CCD",
@@ -1140,14 +1233,13 @@
         "case_type" : {
           "id" : "[[ANY]]",
           "name" : "[[ANY]]",
-          "description" : "[[ANY]]",
+          "description" : "Demonstrate everything CCD can do!",
           "jurisdiction" : {
             "id" : "[[ANY]]",
             "name" : "[[ANY]]",
-            "description" : "[[ANY]]"
+            "description" : "Content for the Test Jurisdiction."
           },
           "printEnabled" : false
         }
-      }
   }
 }
