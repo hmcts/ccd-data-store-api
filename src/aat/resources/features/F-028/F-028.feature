@@ -1,5 +1,5 @@
 @F-028
-Feature: Fetch an event trigger in the context of a case for Case Worker
+Feature: F-028: Fetch an event trigger in the context of a case for Case Worker
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
