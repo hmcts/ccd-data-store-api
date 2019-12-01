@@ -1,0 +1,7 @@
+{
+	"_guid_": "Common_Response",
+	
+	"headers":{
+		"_extends_": "Common_Response_Headers"
+	}
+}
