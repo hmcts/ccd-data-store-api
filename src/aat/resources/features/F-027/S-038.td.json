@@ -1202,7 +1202,7 @@
       "channels" : "[[ANY]]",
       "triggers" : [ {
         "id" : "[[ANY]]",
-        "name" : "[[ANY]]",,
+        "name" : "[[ANY]]",
         "description" : null,
         "order" : "[[ANY]]"
       }, {
