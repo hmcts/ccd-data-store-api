@@ -1,5 +1,5 @@
 @F-051
-Feature: Get default settings for user
+Feature: F-051: Get default settings for user
 
 Background:
     Given an appropriate test context as detailed in the test data source
