@@ -5,7 +5,7 @@
   "_extends_": "F-035",
 
   "specs": [
-    "a detailed profile in CCD",
+    "an active profile in CCD",
     "contains an invalid user authorisation token",
     "has a 403 Forbidden code"
   ],

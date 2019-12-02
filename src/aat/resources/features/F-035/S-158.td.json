@@ -5,7 +5,7 @@
   "_extends_": "F-035",
 
   "specs": [
-    "a detailed profile in CCD",
+    "an active profile in CCD",
     "contains a case reference that does not exist",
     "has a 400 Bad Request code"
   ],

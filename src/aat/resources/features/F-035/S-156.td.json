@@ -5,7 +5,7 @@
   "_extends_": "F-035",
 
   "specs": [
-    "a detailed profile in CCD",
+    "an active profile in CCD",
     "contains a valid user authorisation token without access to the operation",
     "has a 404 Not Found code"
   ],
