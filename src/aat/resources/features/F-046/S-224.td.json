@@ -25,7 +25,7 @@
     "responseMessage": "Forbidden",
     "headers": {
       "Content-Length": "[[ANY]]",
-      "Transfer-Encoding" : "chunked"
+      "Content-Type" : "application/json;charset=UTF-8"
     },
     "body": {
       "timestamp": "[[ANY]]",
