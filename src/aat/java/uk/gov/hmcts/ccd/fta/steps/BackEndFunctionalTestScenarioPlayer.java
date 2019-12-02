@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.fta.steps;
 
-import io.restassured.builder.RequestSpecBuilder;
 import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +23,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.Method;
 import io.restassured.response.Response;
 import io.restassured.specification.QueryableRequestSpecification;
@@ -442,8 +442,16 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     }
 
     private void importDefinitions() {
+        logger.info("Importing {}...", BE_FTA_FILE_JURISDICTION1);
         importDefinition(BE_FTA_FILE_JURISDICTION1);
+        logger.info("Imported {}.", BE_FTA_FILE_JURISDICTION1);
+
+        logger.info("Importing {}...", BE_FTA_FILE_JURISDICTION2);
         importDefinition(BE_FTA_FILE_JURISDICTION2);
+        logger.info("Imported {}.", BE_FTA_FILE_JURISDICTION2);
+
+        logger.info("Importing {}...", BE_FTA_FILE_JURISDICTION3);
         importDefinition(BE_FTA_FILE_JURISDICTION3);
+        logger.info("Imported {}", BE_FTA_FILE_JURISDICTION3);
     }
 }
