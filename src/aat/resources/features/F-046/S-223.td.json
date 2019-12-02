@@ -1,11 +1,11 @@
 {
   "_guid_": "S-223",
-  "_extends_": "Base_Expecting_400",
+  "_extends_": "Base_Expecting_404",
   "title": "must return 400 when an invalid case id is provided",
   "specs": [
     "a detailed profile in CCD",
     "contains an invalid case id",
-    "has a 400 bad request code"
+    "has a 404 not found code"
   ],
   "productName": "CCD Data Store",
   "operationName": "Revoke access to case",
