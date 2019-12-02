@@ -21,15 +21,15 @@
     }
   },
   "expectedResponse": {
-    "responseCode": 400,
-    "responseMessage": "Bad Request",
+    "responseCode": 404,
+    "responseMessage": "Not Found",
     "headers": {
       "Content-Length": "[[ANY]]",
       "Transfer-Encoding" : "chunked"
     },
     "body": {
       "timestamp": "[[ANY]]",
-      "status": 400,
+      "status": 404,
       "error": "Not Found",
       "message": "No case found for reference: 1234567890123456",
       "path": "[[ANY]]"

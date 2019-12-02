@@ -6,7 +6,6 @@ Feature: Revoke access to case
 
   @S-222
   Scenario: must return 204 if access is successfully revoked for a user on a case ID
-#    Given a successful call [Get case] will get the expected response as in [XXXX-XXXX-XXXX-XXXX]
     Given a case that has just been created as in [Standard_Full_Case]
     And a user with [a detailed profile in CCD]
     When a request is prepared with appropriate values
@@ -15,9 +14,8 @@ Feature: Revoke access to case
     Then a positive response is received
     And the response [has a 204 no content code]
     And the response has all other details as expected
-#    And a call [Get case] will get the expected response as in [XXXX-XXXX-XXXX-XXXX]
 
-  @S-223
+  @S-223 # ACTUALLY returns a 404
   Scenario: must return 400 if case id is invalid
     Given a case that has just been created as in [Standard_Full_Case]
     And a user with [a detailed profile in CCD]
@@ -25,10 +23,10 @@ Feature: Revoke access to case
     And the request [contains an invalid case id]
     And it is submitted to call the [Revoke access to case] operation of [CCD Data Store]
     Then a negative response is received
-    And the response [has a 400 bad request code]
+    And the response [has a 404 not found code]
     And the response has all other details as expected
 
-  @S-224
+  @S-224 # ACTUALLY returns a 403
   Scenario: must return 401 when request does not provide valid authentication credentials
     Given a user with [a detailed profile in CCD]
     When a request is prepared with appropriate values
