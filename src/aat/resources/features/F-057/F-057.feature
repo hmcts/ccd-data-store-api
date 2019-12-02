@@ -1,5 +1,5 @@
 @F-057
-Feature: Get the pagination metadata for a case data search for Citizen
+Feature: F-057: Get the pagination metadata for a case data search for Citizen
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
@@ -8,13 +8,14 @@ Feature: Get the pagination metadata for a case data search for Citizen
   Scenario: must return pagination metadata successfully for correct inputs
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
+    And the request [provides correct inputs]
     And it is submitted to call the [Get the pagination metadata for a case data search for Citizen] operation of [CCD Data Store]
     Then a positive response is received
     And the response [has the 200 return code]
     And the response has all other details as expected
 
   @S-137
-  Scenario: must return 400 if sort direction in input parameters is not in ASC or DESC
+  Scenario: must return appropriate negative response when request does not provide a valid sort direction
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
     And the request [does not provide a valid sort direction]
@@ -24,27 +25,27 @@ Feature: Get the pagination metadata for a case data search for Citizen
     And the response has all other details as expected
 
   @S-138
-  Scenario: must return 4xx response when request does not provide valid authentication credentials
+  Scenario: must return appropriate negative response when request does not provide a valid authentication credentials
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
-    And the request [does not provide valid authentication credentials]
+    And the request [does not provide a valid authentication credentials]
     And it is submitted to call the [Get the pagination metadata for a case data search for Citizen] operation of [CCD Data Store]
     Then a negative response is received
     And the response [has the 403 return code]
     And the response has all other details as expected
 
   @S-139
-  Scenario: must return negative response when request provides authentic credentials without authorized access to the operation
+  Scenario: must return appropriate negative response when request does not provide an authorized access
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
-    And the request [does not provide valid authorized access to the operation]
+    And the request [does not provide an authorized access to the operation]
     And it is submitted to call the [Get the pagination metadata for a case data search for Citizen] operation of [CCD Data Store]
     Then a negative response is received
     And the response [has the 403 return code]
     And the response has all other details as expected
 
   @S-521
-  Scenario: must return 400 when casefields do not start with “case.”
+  Scenario: must return appropriate negative response when casefields do not start with “case.”
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
     And the request [does not provide a valid case-field which starts with “case.”]
@@ -54,10 +55,10 @@ Feature: Get the pagination metadata for a case data search for Citizen
     And the response has all other details as expected
 
   @S-522
-  Scenario: must return 400 when security classification in input parameters is present and invalid
+  Scenario: must return appropriate negative response when request does not provide a invalid security classification
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
-    And the request [does not provide valid security classification]
+    And the request [does not provide a valid security classification]
     And it is submitted to call the [Get the pagination metadata for a case data search for Citizen] operation of [CCD Data Store]
     Then a negative response is received
     And the response [has the 400 return code]

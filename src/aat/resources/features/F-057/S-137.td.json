@@ -1,5 +1,5 @@
 {
-  "title": "must return 400 if the sort direction in input parameters is not in ASC or DESC",
+  "title": "must return appropriate negative response when request does not provide a valid sort direction",
   "_guid_": "S-137",
   "_extends_": "F-057_Test_Data_Base",
 

@@ -5,6 +5,7 @@
 
   "specs": [
     "an active profile in CCD",
+    "provides correct inputs",
     "has the 200 return code"
   ],
   "expectedResponse": {
