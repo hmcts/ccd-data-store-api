@@ -1,0 +1,10 @@
+{
+	"_guid_": "Common_202_Response",
+	"_extends_": "Common_Response",
+
+	"responseCode": 202,
+	"responseMessage": "Accepted",
+	"headers": {
+		"_extends_": "Common_202_Response_Headers"
+	}
+}
