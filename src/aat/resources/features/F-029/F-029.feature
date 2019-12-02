@@ -35,7 +35,7 @@ Feature: @F-029: Fetch an event trigger in the context of a case type
      And the response has all the details as expected
 
    @S-052
-   Scenario: must return appropriate negative response when case-type does not exists
+   Scenario: must return appropriate negative response when case-type does not exist
      Given a user with [an active profile in CCD]
      When a request is prepared with appropriate values
      And the request [contains a non-existing case-type]
@@ -45,7 +45,7 @@ Feature: @F-029: Fetch an event trigger in the context of a case type
      And the response has all the details as expected
 
    @S-053
-   Scenario: must return appropriate negative response when event-id does not exists
+   Scenario: must return appropriate negative response when event-id does not exist
      Given a user with [an active profile in CCD]
      When a request is prepared with appropriate values
      And the request [contains a non-existing event-id]
@@ -55,7 +55,7 @@ Feature: @F-029: Fetch an event trigger in the context of a case type
      And the response has all the details as expected
 
    @S-551
-   Scenario: must return appropriate negative response when Jurisdiction is invalid
+   Scenario: must return appropriate negative response when Jurisdiction does not exist
      Given a user with [an active profile in CCD]
      When a request is prepared with appropriate values
      And the request [contains a non-existing Jurisdiction id]

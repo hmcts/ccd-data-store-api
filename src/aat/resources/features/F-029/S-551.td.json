@@ -1,5 +1,5 @@
 {
-  "title": "must return appropriate negative response when Jurisdiction does not exists",
+  "title": "must return appropriate negative response when Jurisdiction does not exist",
   "_guid_": "S-551",
   "_extends_": "F-029_Test_Data_Base",
 
