@@ -4,7 +4,7 @@
   "operationName": "Get the pagination metadata for a case data search for Citizen",
   "method": "GET",
   "user": {
-    "username": "befta_citizen3@gmail.com",
+    "username": "befta.citizen3@gmail.com",
     "password": "Pa55word11"
   },
   "uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/pagination_metadata",
