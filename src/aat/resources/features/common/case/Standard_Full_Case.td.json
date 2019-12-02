@@ -1,9 +1,13 @@
 {
   "_guid_": "Standard_Full_Case",
-  "user": {
-    "username": "[[$CCD_CASEWORKER_AUTOTEST_EMAIL]]",
-    "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+
+  "users": {
+    "invokingUser": {
+      "username": "[[$CCD_CASEWORKER_AUTOTEST_EMAIL]]",
+      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+    }
   },
+
   "request": {
     "pathVariables": {
       "jurisdiction": "AUTOTEST1",

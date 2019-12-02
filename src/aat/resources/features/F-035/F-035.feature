@@ -1,5 +1,5 @@
 @F-035
-Feature: Retrieve a case by id
+Feature: F-035: Retrieve a case by id
 
   Background:
     Given an appropriate test context as detailed in the test data source

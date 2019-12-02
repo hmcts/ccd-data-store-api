@@ -19,7 +19,6 @@
   "expectedResponse": {
     "_extends_": "Common_400_Response",
     "headers": {
-      "Connection": "close",
       "Content-Encoding": "gzip"
     },
     "body" : {
