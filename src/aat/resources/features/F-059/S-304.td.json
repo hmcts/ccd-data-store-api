@@ -18,7 +18,9 @@
   "expectedResponse": {
     "_extends_": "Common_422_Response",
     "headers": {
-      "Content-Length": "[[ANY]]"
+      "Content-Length": "[[ANY]]",
+      "Content-Encoding" : "gzip",
+      "Content-Type" : "application/json;charset=UTF-8"
     },
     "body": {
       "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException",
