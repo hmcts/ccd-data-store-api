@@ -23,6 +23,7 @@
   "expectedResponse": {
     "responseCode": 204,
     "responseMessage": "No content",
+    "Vary" : "Accept-Encoding",
     "headers": {
       "Content-Length": "[[ANY]]"
     }
