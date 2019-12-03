@@ -255,13 +255,10 @@ public class AccessControlService {
 
     private void setReadonlyOnWizardPageFieldDisplayContext(List<WizardPage> wizardPages,
                                                             String caseViewFieldId) {
-        wizardPages.forEach(wizardPage -> {
-            wizardPage.getWizardPageFields().stream()
-                .filter(wizardPageField -> wizardPageField.getCaseFieldId().equals(caseViewFieldId)).collect(toList())
-                .forEach(wizardPageField -> {
-                    wizardPageField.setDisplayContext(READONLY);
-                });
-        });
+       wizardPages.forEach(wizardPage -> {
+           Optional<WizardPageField> wizardPageField = wizardPage.getWizardPageField(caseViewFieldId);
+           wizardPageField.ifPresent(field -> field.setDisplayContext(READONLY));
+       });
     }
 
     private void setChildrenAsReadOnlyIfNoAccess(final List<WizardPage> wizardPages, final String rootFieldId, final CaseField caseField, final Predicate<AccessControlList> access, final Set<String> userRoles, final CommonField caseViewField) {
