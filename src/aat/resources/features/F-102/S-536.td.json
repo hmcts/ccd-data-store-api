@@ -1,10 +1,10 @@
 {
-  "_guid_": "S-535",
+  "_guid_": "S-536",
   "_extends_": "Base_Expecting_403",
-  "title": "must return appropriate negative response for a user not having a profile in CCD",
+  "title": "must return 404 for if no jurisdiction is found",
   "specs": [
-    "no profile in CCD",
-    "has CREATE as case access",
+    "a detailed profile in CCD",
+    "uses the invalid authorization",
     "has the 403 return code"
   ],
   "productName": "CCD Data Store",
@@ -12,14 +12,11 @@
   "method": "GET",
   "uri": "/aggregated/caseworkers/{uid}/jurisdictions",
   "request": {
-    "headers": {
-      "Authorization": "Dummy_Authorization"
-    },
     "pathVariables": {
-      "uid": "[[DYNAMIC]]"
+      "uid": "some UID"
     },
     "queryParams": {
-      "access": "create"
+      "access": "delete"
     }
   },
   "expectedResponse": {
@@ -27,7 +24,7 @@
       "Content-Encoding": "gzip",
       "Content-Type": "application/json;charset=UTF-8",
       "Content-Length": "[[ANY]]",
-      "Transfer-Encoding": "[[ANY]]"
+      "Transfer-Encoding" : "[[ANY]]"
     },
     "body": {
       "timestamp": "[[ANY]]",

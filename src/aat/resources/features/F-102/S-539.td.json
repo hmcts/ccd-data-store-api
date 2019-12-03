@@ -1,0 +1,48 @@
+{
+  "_guid_": "S-539",
+  "_extends_": "Base_Expecting_404",
+  "title": "must return 404 for if no jurisdiction is found",
+  "specs": [
+    "a detailed profile in CCD having CR case access for a jurisdiction",
+    "returns the error message : No jurisdictions found for given access criteria",
+    "has UPDATE as case access parameter"
+  ],
+  "productName": "CCD Data Store",
+  "operationName": "Get jurisdictions available to the user",
+  "method": "GET",
+  "uri": "/aggregated/caseworkers/{uid}/jurisdictions",
+  "user": {
+    "username": "befta.citizen.2@gmail.com",
+    "password": "Pa55word11"
+  },
+  "request": {
+    "pathVariables": {
+      "uid": "[[DYNAMIC]]"
+    },
+    "queryParams": {
+      "access": "update"
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 404,
+    "responseMessage": "Bad Request",
+    "headers": {
+      "Content-Length": "[[ANY]]",
+      "Transfer-Encoding": "[[ANY]]",
+      "Connection": "[[ANY]]",
+      "Content-Type": "[[ANY]]",
+      "Content-Encoding": "[[ANY]]"
+    },
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+      "timestamp": "[[ANY]]",
+      "status": 400,
+      "error": "Bad Request",
+      "message": "No jurisdictions found for given access criteria'",
+      "path": "[[ANY]]",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}
