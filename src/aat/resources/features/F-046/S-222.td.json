@@ -25,7 +25,7 @@
     "responseMessage": "No content",
     "headers": {
       "Content-Length": "[[ANY]]",
-      "Vary" : "Accept-Encoding"
+      "Vary" : "[[ANY]]"
     }
   }
 }
