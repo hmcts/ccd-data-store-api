@@ -25,7 +25,9 @@
     "headers": {
       "Content-Length": "[[ANY]]",
       "Transfer-Encoding": "[[ANY]]",
-      "Connection" : "[[ANY]]"
+      "Connection": "[[ANY]]",
+      "Content-Type": "[[ANY]]",
+      "Content-Encoding": "[[ANY]]"
     },
     "body": {
       "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
@@ -33,7 +35,7 @@
       "status": 400,
       "error": "Bad Request",
       "message": "Access can only be 'create', 'read' or 'update'",
-      "path": "/aggregated/caseworkers/5c9aaa65-4c34-47c7-9b4e-b1d1af1726ed/jurisdictions",
+      "path": "[[ANY]]",
       "details": null,
       "callbackErrors": null,
       "callbackWarnings": null
