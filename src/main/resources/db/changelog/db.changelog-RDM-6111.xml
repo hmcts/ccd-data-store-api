@@ -1,0 +1,14 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+
+    <changeSet id="rdm-6111" author="daniel.lysiak1@hmcts.net">
+        <sql dbms="postgresql"
+             endDelimiter="\nGO"
+             splitStatements="true"
+             stripComments="true">
+            CREATE UNIQUE INDEX uidx_case_data_ethosCaseReference ON public.case_data USING BTREE (case_type_id,(TRIM(UPPER(data#>>'{ethosCaseReference}')))) where jurisdiction = 'EMPLOYMENT';
+        </sql>
+    </changeSet>
+</databaseChangeLog>
