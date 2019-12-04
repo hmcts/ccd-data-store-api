@@ -121,7 +121,7 @@ public class AccessControlService {
         return true;
     }
 
-    public boolean canAccessCaseViewFieldWithCriteria(final CaseViewField caseViewField,
+    public boolean canAccessCaseViewFieldWithCriteria(final CommonField caseViewField,
                                                       final Set<String> userRoles,
                                                       final Predicate<AccessControlList> criteria) {
         return hasAccessControlList(userRoles, criteria, caseViewField.getAccessControlLists());
@@ -168,7 +168,7 @@ public class AccessControlService {
 
     private JsonNode filterChildren(final CaseField caseField, final JsonNode jsonNode, final Set<String> userRoles,
                                     final Predicate<AccessControlList> access, boolean isClassification) {
-        if (caseField.isCompound()) {
+        if (caseField.isCompoundFieldType()) {
             caseField.getFieldType().getChildren().stream().forEach(childField -> {
                 if (!hasAccessControlList(userRoles, access, childField.getAccessControlLists())) {
                     locateAndRemoveChildNode(caseField, jsonNode, childField);
@@ -229,7 +229,7 @@ public class AccessControlService {
                     if (!hasAccessControlList(userRoles, access, field.getAccessControlLists())) {
                         caseViewField.setDisplayContext(READONLY);
                     }
-                    if (field.isCompound()) {
+                    if (field.isCompoundFieldType()) {
                         setChildrenAsReadOnlyIfNoAccess(caseEventTrigger.getWizardPages(), field.getId(), field, access, userRoles, caseViewField);
                     }
                 } else {
@@ -240,7 +240,7 @@ public class AccessControlService {
     }
 
     private void setChildrenAsReadOnlyIfNoAccess(final List<WizardPage> wizardPages, final String rootFieldId, final CaseField caseField, final Predicate<AccessControlList> access, final Set<String> userRoles, final CommonField caseViewField) {
-        if (caseField.isCompound()) {
+        if (caseField.isCompoundFieldType()) {
             caseField.getFieldType().getChildren().stream().forEach(childField -> {
                 if (!hasAccessControlList(userRoles, access, childField.getAccessControlLists())) {
                     findNestedField(caseViewField, childField.getId()).setDisplayContext(READONLY);
@@ -249,7 +249,7 @@ public class AccessControlService {
                         setOverrideAsReadOnlyIfNotReadOnly(optionalWizardPageField.get(), rootFieldId, childField);
                     }
                 }
-                if (childField.isCompound()) {
+                if (childField.isCompoundFieldType()) {
                     setChildrenAsReadOnlyIfNoAccess(wizardPages, rootFieldId, childField, access, userRoles, findNestedField(caseViewField, childField.getId()));
                 }
             });
@@ -328,11 +328,11 @@ public class AccessControlService {
                                 final Predicate<AccessControlList> access) {
         if (!hasAccessControlList(userRoles, access, caseField.getAccessControlLists())) {
             locateAndRemoveCaseField(caseField, caseViewField);
-        } else if (caseField.isCompound()) {
+        } else if (caseField.isCompoundFieldType()) {
             caseField.getFieldType().getChildren().stream().forEach(childField -> {
                 if (!hasAccessControlList(userRoles, access, childField.getAccessControlLists())) {
                     locateAndRemoveChildField(findNestedField(caseViewField, caseField.getId()), childField, caseField.isCollectionFieldType());
-                } else if (childField.isCompound()) {
+                } else if (childField.isCompoundFieldType()) {
                     traverseAndFilterCompoundChildField(findNestedField(caseViewField, caseField.getId()), userRoles, access, childField);
                 }
             });
@@ -473,7 +473,7 @@ public class AccessControlService {
     }
 
     private CaseField checkIfChildFilteringRequired(final CaseField caseField, final Set<String> userRoles, final Predicate<AccessControlList> access) {
-        return (caseField.isCompound() && !caseField.getComplexACLs().isEmpty()) ? determineFieldTypeAndCheckChildAccess(caseField, userRoles, access) : caseField;
+        return (caseField.isCompoundFieldType() && !caseField.getComplexACLs().isEmpty()) ? determineFieldTypeAndCheckChildAccess(caseField, userRoles, access) : caseField;
     }
 
     private CaseField determineFieldTypeAndCheckChildAccess(final CaseField caseField, final Set<String> userRoles, final Predicate<AccessControlList> access) {
@@ -490,7 +490,7 @@ public class AccessControlService {
             .getChildren()
             .stream()
             .filter(childField -> hasAccessControlList(userRoles, access, childField.getAccessControlLists()))
-            .map(subField -> subField.isCompound() ? determineFieldTypeAndCheckChildAccess(subField, userRoles, access) : subField)
+            .map(subField -> subField.isCompoundFieldType() ? determineFieldTypeAndCheckChildAccess(subField, userRoles, access) : subField)
             .collect(toList());
     }
 
@@ -532,7 +532,7 @@ public class AccessControlService {
         Optional<CaseField> fieldOptional = getCaseFieldType(caseFieldDefinitions, newFieldName);
         if (fieldOptional.isPresent()) {
             CaseField caseField = fieldOptional.get();
-            if (!caseField.isCompound()) {
+            if (!caseField.isCompoundFieldType()) {
                 return hasCaseFieldAccess(caseFieldDefinitions, userRoles, CAN_UPDATE, newFieldName);
             } else {
                 return compoundAccessControlService.hasAccessForAction(newData, existingData, caseField, userRoles);
