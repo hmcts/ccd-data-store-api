@@ -22,6 +22,10 @@
       "access": "create"
     }
   },
+  "user": {
+    "username": "befta.caseworker.3@gmail.com",
+    "password": "Pa55word11"
+  },
   "expectedResponse": {
     "headers": {
       "Content-Encoding": "gzip",

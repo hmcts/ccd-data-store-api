@@ -19,6 +19,10 @@
       "access": "delete"
     }
   },
+  "user": {
+    "username": "befta.solicitor.3@gmail.com",
+    "password": "Pa55word11"
+  },
   "expectedResponse": {
     "headers": {
       "Content-Encoding": "gzip",
