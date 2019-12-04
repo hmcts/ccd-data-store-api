@@ -13,9 +13,8 @@
 		"pathVariables": {
 			"uid": "[[DYNAMIC]]",
 			"jid": "AUTOTEST1",
-			"ctid": "AAT",
-			"etid": "CREATE"
-		}
+			"ctid": "AAT"
+    }
 	},
 	"expectedResponse": {
 		"headers": {

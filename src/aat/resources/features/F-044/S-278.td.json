@@ -8,7 +8,50 @@
 		"code is HTTP-201"
 	],
 	"request": {
-
+    "pathVariables": {
+      "cid": "[[DYNAMIC]]"
+    },
+    "body": {
+      "data": {
+        "MoneyGBPField": null,
+        "FixedListField": null,
+        "AddressUKField": {
+          "County": null,
+          "Country": null,
+          "PostCode": null,
+          "PostTown": null,
+          "AddressLine1": null,
+          "AddressLine2": null,
+          "AddressLine3": null
+        },
+        "ComplexField": {
+          "ComplexTextField": null,
+          "ComplexNestedField": {
+            "NestedNumberField": null,
+            "NestedCollectionTextField": []
+          },
+          "ComplexFixedListField": null
+        },
+        "FixedRadioListField": null,
+        "DateTimeField": null,
+        "PhoneUKField": null,
+        "NumberField": null,
+        "MultiSelectListField": [],
+        "YesOrNoField": null,
+        "EmailField": null,
+        "TextField": null,
+        "DateField": null,
+        "TextAreaField": null,
+        "CollectionField": []
+      },
+      "event": {
+        "id": "UPDATE",
+        "summary": "",
+        "description": ""
+      },
+      "event_token" : "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI3amJkNGJjaXNycGlqbGxkNzVmdTh2ZTQ1bSIsInN1YiI6IjdmNTRmZTQ1LTM2NDMtNDc1OC05YjIwLWNhZGIyMWRmZGRiZiIsImlhdCI6MTU3NTQ2MjkxMiwiY2FzZS1pZCI6IjIwNCIsImV2ZW50LWlkIjoiVVBEQVRFIiwiY2FzZS10eXBlLWlkIjoiQUFUIiwianVyaXNkaWN0aW9uLWlkIjoiQVVUT1RFU1QxIiwiY2FzZS1zdGF0ZSI6IlRPRE8iLCJjYXNlLXZlcnNpb24iOiJhYTRmNmY5ODZmZTRjM2MxYzEzNjEyZGU0NmViN2JmMzNlZDAwZmE2IiwiZW50aXR5LXZlcnNpb24iOjB9.KfK9fAeKkextTveppGto2kAtl2FTHac7AjTnuOnijbc",
+      "ignore_warning": true
+    }
 	},
 	"expectedResponse": {
 		"_extends_": "Common_201_Response",
