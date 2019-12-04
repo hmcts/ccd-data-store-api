@@ -1,5 +1,5 @@
 java:
-  image: 'hmctspublic.azurecr.io/ccd/ccd-data-store-api:latest'
+  image: 'hmctspublic.azurecr.io/ccd/data-store-api:latest'
   ingressHost: ccd-data-store-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
   applicationPort: 4452
   aadIdentityName: ccd
