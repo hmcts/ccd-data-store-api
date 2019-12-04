@@ -15,5 +15,12 @@
       "ctid": "AAT",
       "etid": "CREATE"
     }
+  },
+  "expectedResponse": {
+    "headers": {
+      "Content-Length": "[[ANY]]",
+      "Content-Encoding" : "gzip",
+      "Content-Type" : "application/json;charset=UTF-8"
+    }
   }
 }

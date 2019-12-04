@@ -1,5 +1,5 @@
 @F-029
-Feature: @F-029: Fetch an event trigger in the context of a case type
+Feature: F-029: Fetch an event trigger in the context of a case type
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
