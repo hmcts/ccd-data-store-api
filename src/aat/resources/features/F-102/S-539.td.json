@@ -12,7 +12,7 @@
   "method": "GET",
   "uri": "/aggregated/caseworkers/{uid}/jurisdictions",
   "user": {
-    "username": "befta.citizen.2@gmail.com",
+    "username": "befta.caseworker.2@gmail.com",
     "password": "Pa55word11"
   },
   "request": {
@@ -20,7 +20,7 @@
       "uid": "[[DYNAMIC]]"
     },
     "queryParams": {
-      "access": "update"
+      "access": "create"
     }
   },
   "expectedResponse": {

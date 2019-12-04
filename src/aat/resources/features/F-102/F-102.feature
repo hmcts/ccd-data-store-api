@@ -24,7 +24,7 @@ Feature: Get jurisdictions available to the user
     And the response [returns the error message : Access can only be 'create', 'read' or 'update]
     And the response has all the details as expected
 
-  @S-539 @Ignore
+  @S-539
   Scenario: must return 404 if no jurisdictions found for given access criteria
     Given a user with [a detailed profile in CCD having CR case access for a jurisdiction]
     When a request is prepared with appropriate values
