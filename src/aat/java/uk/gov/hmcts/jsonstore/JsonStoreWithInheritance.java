@@ -17,6 +17,7 @@ import uk.gov.hmcts.ccd.fta.util.ReflectionUtils;
 
 public abstract class JsonStoreWithInheritance {
 
+    private static final String INHERITANCE_APPLIED = "inheritanceApplied";
     protected JsonNode rootNode;
     protected Map<String, JsonNode> nodeLibrary = new HashMap<>();
     protected Map<Class<?>, Map<String, ?>> objectLibraryPerTypes = new HashMap<>();
@@ -50,7 +51,7 @@ public abstract class JsonStoreWithInheritance {
             addToLibrary(rootNode);
             for (String id : nodeLibrary.keySet())
                 overwriteInheritedValuesOf(nodeLibrary.get(id));
-            removeInheritanceAppliedFields(rootNode);
+            removeInheritanceMechanismFields(rootNode);
         } catch (Throwable t) {
             t.printStackTrace();
             throw new RuntimeException(t);
@@ -71,8 +72,9 @@ public abstract class JsonStoreWithInheritance {
                 String jsonText = om.writeValueAsString(nodeInLibrary);
                 T anOnject = om.readValue(jsonText, clazz);
                 try {
-                    if (ReflectionUtils.retrieveFieldInObject(anOnject, idFieldName) != null)
+                    if (ReflectionUtils.retrieveFieldInObject(anOnject, idFieldName) != null) {
                         objectLibrary.put(key, anOnject);
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -86,56 +88,78 @@ public abstract class JsonStoreWithInheritance {
         return getMapWithIds(clazz).get(id);
     }
 
-    private void removeInheritanceAppliedFields(JsonNode node) {
-        if (node.has("inheritanceApplied"))
-            ((ObjectNode) node).remove("inheritanceApplied");
+    private void removeInheritanceMechanismFields(JsonNode node) {
+        if (node.has(INHERITANCE_APPLIED)) {
+            ((ObjectNode) node).remove(INHERITANCE_APPLIED);
+        }
+        if (node.has(inheritanceFieldName)) {
+            ((ObjectNode) node).remove(inheritanceFieldName);
+        }
 
         Iterator<JsonNode> fields = node.iterator();
         while (fields.hasNext())
-            removeInheritanceAppliedFields(fields.next());
+            removeInheritanceMechanismFields(fields.next());
     }
 
     protected abstract void buildObjectStore() throws Exception;
 
     private void overwriteInheritedValuesOf(JsonNode object) {
-        if (object == null || !object.isContainerNode())
-            return;
-        if (object.has("inheritanceApplied"))
+        if (!shouldApplyInheritanceOn(object))
             return;
         JsonNode parentIdField = object.get(inheritanceFieldName);
         if (parentIdField != null) {
             String parentId = parentIdField.asText();
             JsonNode parentNode = nodeLibrary.get(parentId);
-            if (parentNode == null)
-                throw new RuntimeException("Parent node not found with key " + parentId);
+            throwExceptionIfParentNotFound(object, parentNode, parentId);
             overwriteInheritedValuesOf(parentNode);
             Iterator<String> parentIterator = parentNode.fieldNames();
             while (parentIterator.hasNext()) {
-                String fieldName = parentIterator.next();
-                if (!fieldName.equalsIgnoreCase(idFieldName) && !fieldName.equalsIgnoreCase(inheritanceFieldName)
-                        && !fieldName.equalsIgnoreCase("inheritanceApplied")) {
-                    overwriteInheritedValuesOf(parentNode.get(fieldName));
-                    JsonNode parentFieldCopy = parentNode.get(fieldName).deepCopy();
-                    if (object.has(fieldName)) {
-                        JsonNode thisField = object.get(fieldName);
+                String fieldNameInParent = parentIterator.next();
+                if (!isInheritanceMechanismField(fieldNameInParent)) {
+                    overwriteInheritedValuesOf(parentNode.get(fieldNameInParent));
+                    JsonNode parentFieldCopy = parentNode.get(fieldNameInParent).deepCopy();
+                    if (object.has(fieldNameInParent)) {
+                        JsonNode thisField = object.get(fieldNameInParent);
                         if (thisField.isContainerNode()) {
                             overwriteInheritedValuesOf(thisField);
-                            ((ObjectNode) object).set(fieldName, parentFieldCopy);
+                            ((ObjectNode) object).set(fieldNameInParent, parentFieldCopy);
                             underlayFor(parentFieldCopy, thisField);
                         }
                     } else {
-                        ((ObjectNode) object).set(fieldName, parentFieldCopy);
+                        ((ObjectNode) object).set(fieldNameInParent, parentFieldCopy);
                     }
                 }
             }
-        } else {
-            Iterator<JsonNode> fields = object.iterator();
-            while (fields.hasNext())
-                overwriteInheritedValuesOf(fields.next());
         }
 
+        Iterator<JsonNode> fields = object.iterator();
+        while (fields.hasNext())
+            overwriteInheritedValuesOf(fields.next());
+
         if (object instanceof ObjectNode)
-            ((ObjectNode) object).set("inheritanceApplied", BooleanNode.TRUE);
+            ((ObjectNode) object).set(INHERITANCE_APPLIED, BooleanNode.TRUE);
+    }
+
+    private boolean shouldApplyInheritanceOn(JsonNode object) {
+        if (object == null || !object.isContainerNode())
+            return false;
+        if (object.has(INHERITANCE_APPLIED))
+            return false;
+        return true;
+    }
+
+    boolean containsAnyMechanismFields(JsonNode object) {
+        return object.has(idFieldName) || object.has(inheritanceFieldName) || object.has(INHERITANCE_APPLIED);
+    }
+
+    private void throwExceptionIfParentNotFound(JsonNode object, JsonNode parentNode, String parentId) {
+        if (parentNode == null) {
+            String idPart = "an object without a " + idFieldName + " value specified";
+            if (object.has(idFieldName)) {
+                idPart = object.get(idFieldName).asText();
+            }
+            throw new RuntimeException("Parent object with key " + parentId + " not found for " + idPart + ".");
+        }
     }
 
     private void underlayFor(JsonNode under, JsonNode over) {
@@ -143,16 +167,23 @@ public abstract class JsonStoreWithInheritance {
         } else {
             Iterator<String> overFields = over.fieldNames();
             while (overFields.hasNext()) {
-                String subbfieldName = overFields.next();
-                JsonNode overField = over.get(subbfieldName);
-                JsonNode underField = under.get(subbfieldName);
-                if (underField != null && underField.isContainerNode()) {
-                    underlayFor(underField, overField);
-                } else {
-                    ((ObjectNode) under).set(subbfieldName, overField);
+                String subfieldName = overFields.next();
+                if (!isInheritanceMechanismField(subfieldName)) {
+                    JsonNode overField = over.get(subfieldName);
+                    JsonNode underField = under.get(subfieldName);
+                    if (underField != null && underField.isContainerNode()) {
+                        underlayFor(underField, overField);
+                    } else {
+                        ((ObjectNode) under).set(subfieldName, overField);
+                    }
                 }
             }
         }
+    }
+
+    private boolean isInheritanceMechanismField(String fieldName) {
+        return fieldName.equalsIgnoreCase(idFieldName) || fieldName.equalsIgnoreCase(inheritanceFieldName)
+                || fieldName.equalsIgnoreCase(INHERITANCE_APPLIED);
     }
 
     private void addToLibrary(JsonNode object) throws Exception {

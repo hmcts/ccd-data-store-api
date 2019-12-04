@@ -1,9 +1,13 @@
 package uk.gov.hmcts.ccd.fta.data;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-@SuppressWarnings({"MemberName", "ParameterName"})
+@SuppressWarnings({ "MemberName", "ParameterName" })
 public class HttpTestData {
+
+    private static final String KEY_INVOKING_USER = "invokingUser";
 
     private String _guid_;
 
@@ -17,8 +21,6 @@ public class HttpTestData {
 
     private String operationName;
 
-    private UserData user;
-
     private String method;
 
     private String uri;
@@ -26,6 +28,8 @@ public class HttpTestData {
     private RequestData request;
 
     private ResponseData expectedResponse;
+
+    private Map<String, UserData> users = new HashMap<>();
 
     public String get_guid_() {
         return _guid_;
@@ -75,14 +79,6 @@ public class HttpTestData {
         this.operationName = operationName;
     }
 
-    public UserData getUser() {
-        return user;
-    }
-
-    public void setUser(UserData user) {
-        this.user = user;
-    }
-
     public String getMethod() {
         return method;
     }
@@ -123,4 +119,31 @@ public class HttpTestData {
         return operationName.equals(this.operationName) && productName.equals(this.productName);
     }
 
+    public UserData getInvokingUser() {
+        return getUsers().get(KEY_INVOKING_USER);
+    }
+
+    public void setInvokingUser(UserData invokingUser) {
+        getUsers().put(KEY_INVOKING_USER, invokingUser);
+    }
+
+    private UserData userSet = null;
+
+    public void setUser(UserData user) {
+        setInvokingUser(user);
+        userSet = user;
+    }
+
+    public Map<String, UserData> getUsers() {
+        return users;
+    }
+
+    public void setUsers(Map<String, UserData> users) {
+        if (users == null)
+            throw new IllegalArgumentException("User map cannot be null.");
+        this.users = users;
+        if (userSet != null) {
+            setInvokingUser(userSet);
+        }
+    }
 }

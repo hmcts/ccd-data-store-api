@@ -1,5 +1,8 @@
 {
 	"_guid_": "MapWithArray_expected",
+
+	"user": {
+	},
 	"expectedResponse": {
 		"body": {
 			"exception": "uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException",
