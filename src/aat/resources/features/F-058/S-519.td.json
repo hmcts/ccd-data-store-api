@@ -9,15 +9,11 @@
   ],
   "request": {
     "pathVariables": {
-      "etid": "Dummy"
+      "etid": "eyJhbGciOiJIUzUxMiJ9"
     }
   },
   "expectedResponse": {
     "_extends_": "Common_404_Response",
-    "headers": {
-      "Content-Encoding": "gzip",
-      "Content-Type": "application/json;charset=UTF-8"
-    },
     "body": {
       "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
       "message": "Cannot find event Dummy for case type AAT",
@@ -27,4 +23,3 @@
     }
   }
 }
-
