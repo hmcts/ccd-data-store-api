@@ -45,5 +45,3 @@ Feature: Revoke access to case
     Then a negative response is received
     And the response [has a 403 Forbidden code]
     And the response has all other details as expected
-
-

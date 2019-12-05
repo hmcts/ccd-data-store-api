@@ -21,8 +21,6 @@
     }
   },
   "expectedResponse": {
-    "responseCode": 204,
-    "responseMessage": "No content",
     "headers": {
       "Content-Length": "[[ANY]]",
       "Vary" : "[[ANY]]"

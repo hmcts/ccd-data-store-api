@@ -21,8 +21,6 @@
     }
   },
   "expectedResponse": {
-    "responseCode": 403,
-    "responseMessage": "Forbidden",
     "headers": {
       "Content-Length": "[[ANY]]",
       "Content-Type" : "application/json;charset=UTF-8",
@@ -30,8 +28,6 @@
     },
     "body": {
       "timestamp": "[[ANY]]",
-      "status": 403,
-      "error": "Forbidden",
       "message": "Access Denied",
       "path": "[[ANY]]"
     }
