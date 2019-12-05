@@ -34,10 +34,10 @@ Feature: start case creation as citizen
     And     the response has all other details as expected
 
   @S-238 @Ignore # Response code mismatch, expected: 403, actual: 200
-  Scenario: must return 403 when the request contains a jurisdiction id user is unauthorised to access
+  Scenario: must return 403 when the request contains a jurisdiction id that the user is unauthorized to access
     Given   a user with [an active profile in CCD]
     When    a request is prepared with appropriate values
-    And     the request [contains a jurisdiction id user is unauthorised to access]
+    And     the request [contains a jurisdiction id that the user is unauthorized to access]
     And     it is submitted to call the [start case creation as citizen] operation of [CCD Data Store]
     Then    a negative response is received
     And     the response [code is HTTP-403]
