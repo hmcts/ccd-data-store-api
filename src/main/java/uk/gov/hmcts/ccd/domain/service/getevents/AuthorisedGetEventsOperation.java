@@ -1,8 +1,11 @@
 package uk.gov.hmcts.ccd.domain.service.getevents;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
@@ -28,17 +31,20 @@ public class AuthorisedGetEventsOperation implements GetEventsOperation {
     private final AccessControlService accessControlService;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final UserRepository userRepository;
+    private final CaseUserRepository caseUserRepository;
 
     public AuthorisedGetEventsOperation(@Qualifier("classified") GetEventsOperation getEventsOperation,
                                         @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                             CaseDefinitionRepository caseDefinitionRepository,
                                         AccessControlService accessControlService,
-                                        @Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository) {
+                                        @Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
+                                        CaseUserRepository caseUserRepository) {
 
         this.getEventsOperation = getEventsOperation;
         this.accessControlService = accessControlService;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.userRepository = userRepository;
+        this.caseUserRepository = caseUserRepository;
     }
 
     @Override
@@ -46,12 +52,17 @@ public class AuthorisedGetEventsOperation implements GetEventsOperation {
 
         final List<AuditEvent> events = getEventsOperation.getEvents(caseDetails);
 
-        return secureEvents(caseDetails.getCaseTypeId(), events);
+
+        return secureEvents(caseDetails.getCaseTypeId(), getUserRoles(caseDetails.getId()), events);
     }
 
     @Override
     public List<AuditEvent> getEvents(String jurisdiction, String caseTypeId, String caseReference) {
-        return secureEvents(caseTypeId, getEventsOperation.getEvents(jurisdiction, caseTypeId, caseReference));
+        List<AuditEvent> auditEvents = getEventsOperation.getEvents(jurisdiction, caseTypeId, caseReference);
+        Set<String> caseUserRoles = auditEvents != null && auditEvents.size() > 0
+                                    ? getUserRoles(auditEvents.get(0).getCaseDataId())
+                                    : userRepository.getUserRoles();
+        return secureEvents(caseTypeId, caseUserRoles,  auditEvents);
     }
 
     @Override
@@ -61,10 +72,10 @@ public class AuthorisedGetEventsOperation implements GetEventsOperation {
     }
 
     private Optional<AuditEvent> secureEvent(String caseTypeId, AuditEvent event) {
-        return secureEvents(caseTypeId, singletonList(event)).stream().findFirst();
+        return secureEvents(caseTypeId, getUserRoles(event.getCaseDataId()), singletonList(event)).stream().findFirst();
     }
 
-    private List<AuditEvent> secureEvents(String caseTypeId, List<AuditEvent> events) {
+    private List<AuditEvent> secureEvents(String caseTypeId, Set<String> caseUserRoles, List<AuditEvent> events) {
         if (null == events) {
             return Lists.newArrayList();
         }
@@ -74,12 +85,19 @@ public class AuthorisedGetEventsOperation implements GetEventsOperation {
             throw new ValidationException("Cannot find case type definition for  " + caseTypeId);
         }
 
-        Set<String> userRoles = userRepository.getUserRoles();
-        if (userRoles == null || userRoles.isEmpty()) {
+        if (caseUserRoles == null || caseUserRoles.isEmpty()) {
             throw new ValidationException("Cannot find user roles for the user");
         }
 
-        return verifyReadAccess(events, userRoles, caseType);
+        return verifyReadAccess(events, caseUserRoles, caseType);
+    }
+
+    private Set<String> getUserRoles(String caseId) {
+        return Sets.union(userRepository.getUserRoles(),
+            caseUserRepository
+                .findCaseRoles(Long.valueOf(caseId), userRepository.getUserId())
+                .stream()
+                .collect(Collectors.toSet()));
     }
 
     private List<AuditEvent> verifyReadAccess(List<AuditEvent> events, Set<String> userRoles, CaseType caseType) {
