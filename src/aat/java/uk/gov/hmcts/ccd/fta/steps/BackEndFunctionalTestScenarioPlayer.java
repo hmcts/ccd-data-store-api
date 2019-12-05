@@ -199,6 +199,10 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
                         Long theCaseReference = scenarioContext.getTheCaseReference();
                         aRequest.pathParam(pathVariable, theCaseReference);
                         scenarioContext.getTestData().getRequest().getPathVariables().put("cid", theCaseReference);
+                    } else if (pathVariable.equals("caseId") && scenarioContext.getTheCaseReference() != null) {
+                        Long theCaseReference = scenarioContext.getTheCaseReference();
+                        aRequest.pathParam(pathVariable, theCaseReference);
+                        scenarioContext.getTestData().getRequest().getPathVariables().put("caseId", theCaseReference);
                     } else {
                         throw new FunctionalTestException("Dynamic value for request path variable '"
                             + pathVariable + "' does not exist");

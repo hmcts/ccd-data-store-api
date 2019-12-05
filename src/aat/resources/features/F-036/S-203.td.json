@@ -1,0 +1,47 @@
+{
+  "_guid_": "S-203",
+  "_extends_": "Base_Expecting_404",
+  "title": "must return 404 when event trigger is not found",
+  "specs": [
+    "an active profile in CCD",
+    "contains an invalid event trigger id",
+    "has a 404 not found code"
+  ],
+  "productName": "CCD Data Store",
+  "operationName": "Retrieve a trigger for case by ID",
+  "method": "GET",
+  "uri": "cases/{caseId}/event-triggers/{triggerId}",
+  "request": {
+    "headers" : {
+      "experimental" : "true",
+      "Content-Type": "application/json"
+    },
+    "pathVariables": {
+      "caseId": "[[DYNAMIC]]",
+      "triggerId": "INVALID_TRIGGER_ID"
+    }
+  },
+  "expectedResponse": {
+    "headers" : {
+      "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
+      "Content-Encoding" : "gzip",
+      "Content-Type" : "application/json;charset=UTF-8",
+      "Date" : "[[ANY]]",
+      "Expires" : "0",
+      "Pragma" : "no-cache",
+      "Transfer-Encoding" : "chunked",
+      "X-Content-Type-Options" : "nosniff",
+      "X-Frame-Options" : "DENY",
+      "X-XSS-Protection" : "1; mode=block"
+    },
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "timestamp" : "[[ANY]]",
+      "message" : "Cannot find event INVALID_TRIGGER_ID for case type AAT_AUTH_15",
+      "path" : "[[ANY]]",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}

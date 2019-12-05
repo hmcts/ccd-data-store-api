@@ -1,0 +1,49 @@
+{
+  "_guid_": "S-202",
+  "title": "must return 401 when request does not provide valid authentication credentials",
+  "specs": [
+    "an active profile in CCD",
+    "does not provide valid authentication credentials in CCD",
+    "has a 403 Forbidden code"
+  ],
+  "users": {
+    "invokingUser" : {
+      "username": "befta.citizen.3@gmail.com",
+      "password": "InvalidPassword"
+    }
+  },
+  "productName": "CCD Data Store",
+  "operationName": "Retrieve a trigger for case by ID",
+  "method": "GET",
+  "uri": "cases/{caseId}/event-triggers/{triggerId}",
+  "request": {
+    "headers" : {
+      "Content-Type": "application/json"
+    },
+    "pathVariables": {
+      "caseId": "[[DYNAMIC]]",
+      "triggerId": "CREATE"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Base_Expecting_403",
+    "headers": {
+      "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
+      "Date" : "[[ANY]]",
+      "Expires" : "0",
+      "Pragma" : "no-cache",
+      "Transfer-Encoding" : "chunked",
+      "X-Content-Type-Options" : "nosniff",
+      "X-Frame-Options" : "DENY",
+      "X-XSS-Protection" : "1; mode=block",
+      "Content-Length": "[[ANY]]",
+      "Content-Type" : "application/json;charset=UTF-8",
+      "Content-Encoding" : "gzip"
+    },
+    "body": {
+      "timestamp": "[[ANY]]",
+      "message": "Access Denied",
+      "path": "[[ANY]]"
+    }
+  }
+}

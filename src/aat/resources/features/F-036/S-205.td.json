@@ -1,0 +1,47 @@
+{
+  "_guid_": "S-205",
+  "_extends_": "Base_Expecting_422",
+  "title": "must return 200 and a StartTriggerResource object when case id and event trigger id are provided",
+  "specs": [
+    "an active profile in CCD",
+    "contains validation errors",
+    "has a 422 Unprocessable Entity code"
+  ],
+  "productName": "CCD Data Store",
+  "operationName": "Retrieve a trigger for case by ID",
+  "method": "GET",
+  "uri": "cases/{caseId}/event-triggers/{triggerId}",
+  "request": {
+    "headers" : {
+      "experimental" : "true",
+      "Content-Type": "application/json"
+    },
+    "pathVariables": {
+      "caseId": "[[DYNAMIC]]",
+      "triggerId": "START_PROGRESS"
+    }
+  },
+  "expectedResponse": {
+    "headers" : {
+      "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
+      "Content-Encoding" : "gzip",
+      "Content-Type" : "application/json;charset=UTF-8",
+      "Date" : "[[ANY]]",
+      "Expires" : "0",
+      "Pragma" : "no-cache",
+      "Transfer-Encoding" : "chunked",
+      "X-Content-Type-Options" : "nosniff",
+      "X-Frame-Options" : "DENY",
+      "X-XSS-Protection" : "1; mode=block"
+    },
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException",
+      "timestamp" : "[[ANY]]",
+      "message" : "The case status did not qualify for the event",
+      "path" : "[[ANY]]",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}
