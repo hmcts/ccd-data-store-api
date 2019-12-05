@@ -1,0 +1,89 @@
+{
+	"_guid_": "F-037_Test_Data_Base",
+	"productName": "CCD Data Store",
+	"operationName": "Create event (V2)",
+	"method": "POST",
+	"uri": "/cases/{cid}/events",
+
+	"user": {
+		"_extends_": "Common_User_For_Request"
+	},
+	"request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers",
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-event.v2+json",
+      "experimental": true
+    },
+    "body": {
+      "data":   {
+        "TextField": "Joe Bloggs",
+        "NumberField": "18",
+        "YesOrNoField": "Yes",
+        "PhoneUKField": "07895123456",
+        "EmailField": "test@gmail.com",
+        "MoneyGBPField": "123400",
+        "DateField": "2012-11-10",
+        "DateTimeField": "2013-11-10T10:11:12.000",
+        "TextAreaField": "Happy Birthday",
+        "FixedListField": "VALUE1",
+        "MultiSelectListField": ["OPTION5"],
+        "ComplexField":     {
+          "ComplexTextField": "Complex Stuff",
+          "ComplexFixedListField": "VALUE3",
+          "ComplexNestedField":       {
+            "NestedNumberField": "100",
+            "NestedCollectionTextField":         [
+              {
+                "id": "a6677950-5f7b-4508-8d57-a82c999b5417",
+                "value": "First"
+              },
+              {
+                "id": "c03ea7d3-f582-4ddc-8117-1bf4e7f6c6d4",
+                "value": "Second"
+              },
+              {
+                "id": "ed8b4b79-d57b-4d57-91cc-aed676847aaa",
+                "value": "Third"
+              }
+            ]
+          }
+        },
+        "CollectionField":     [
+          {
+            "id": "e3767354-3bfd-42c2-982b-7495661c2ddb",
+            "value": "Beginning"
+          },
+          {
+            "id": "243e6af4-f6b6-43ab-8f8e-ce5254ac4983",
+            "value": "Middle"
+          },
+          {
+            "id": "d05c8b68-67a9-490e-8e3c-f42b0591e900",
+            "value": "End"
+          }
+        ],
+        "AddressUKField":     {
+          "AddressLine1": "1 Street",
+          "AddressLine2": null,
+          "AddressLine3": null,
+          "PostTown": "London",
+          "County": "Middex",
+          "PostCode": "HA7 1NG",
+          "Country": "UK"
+        }
+      },
+      "event":   {
+        "id": "UPDATE",
+        "summary": "",
+        "description": ""
+      },
+      "event_token": "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJmajJwczJ0c2VsMWZxaGc0aTE5bjkzN2dlNyIsInN1YiI6IjdmNTRmZTQ1LTM2NDMtNDc1OC05YjIwLWNhZGIyMWRmZGRiZiIsImlhdCI6MTU3NTU1MjYzNiwiY2FzZS1pZCI6IjIwNCIsImV2ZW50LWlkIjoiU1RBUlRfUFJPR1JFU1MiLCJjYXNlLXR5cGUtaWQiOiJBQVQiLCJqdXJpc2RpY3Rpb24taWQiOiJBVVRPVEVTVDEiLCJjYXNlLXN0YXRlIjoiVE9ETyIsImNhc2UtdmVyc2lvbiI6IjY3NGQ1NjdlYmZkMTllZTExNjQ1OWQyZDRkOTVmYzk5MGYyMmQ0YjIiLCJlbnRpdHktdmVyc2lvbiI6OX0.Yd8gkLqofvFglUYALW1--nNbQ1CD0WZ3IibFT6UnMjg",
+      "ignore_warning": false
+    }
+	},
+  "expectedResponse": {
+    "headers": {
+      "Content-Type": "[[ANY]]"
+    }
+  }
+}

@@ -1,0 +1,133 @@
+{
+  "title": "should create event successfully for correct inputs",
+	"_guid_": "S-024",
+	"_extends_": "F-037_Test_Data_Base",
+
+	"specs": [
+		"an active profile in CCD",
+		"has the 200 return code"
+	],
+	"request": {
+    "pathVariables": {
+      "cid": "1573751648840703"
+    },
+    "body": {
+      "event_token": "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJmajJwczJ0c2VsMWZxaGc0aTE5bjkzN2dlNyIsInN1YiI6IjdmNTRmZTQ1LTM2NDMtNDc1OC05YjIwLWNhZGIyMWRmZGRiZiIsImlhdCI6MTU3NTU1MjYzNiwiY2FzZS1pZCI6IjIwNCIsImV2ZW50LWlkIjoiU1RBUlRfUFJPR1JFU1MiLCJjYXNlLXR5cGUtaWQiOiJBQVQiLCJqdXJpc2RpY3Rpb24taWQiOiJBVVRPVEVTVDEiLCJjYXNlLXN0YXRlIjoiVE9ETyIsImNhc2UtdmVyc2lvbiI6IjY3NGQ1NjdlYmZkMTllZTExNjQ1OWQyZDRkOTVmYzk5MGYyMmQ0YjIiLCJlbnRpdHktdmVyc2lvbiI6OX0.Yd8gkLqofvFglUYALW1--nNbQ1CD0WZ3IibFT6UnMjg"
+    }
+	},
+	"expectedResponse": {
+    "responseCode" : 200,
+    "responseMessage" : "OK",
+    "headers":{
+      "_extends_": "Common_Response_Headers"
+    },
+    "body" : {
+      "_links" : {
+        "self" : {
+          "href" : "[[ANY]]"
+        }
+      },
+      "id" : "[[ANY]]",
+      "jurisdiction" : "[[ANY]]",
+      "case_type" : "[[ANY]]",
+      "created_on" : "[[ANY]]",
+      "last_modified_on" : "[[ANY]]",
+      "state" : "[[ANY]]",
+      "security_classification" : "[[ANY]]",
+      "data" : {
+        "MoneyGBPField" : "[[ANY]]",
+        "FixedListField" : "[[ANY]]",
+        "AddressUKField" : {
+          "AddressLine1" : "[[ANY]]",
+          "AddressLine2" : null,
+          "AddressLine3" : null,
+          "PostTown" : "[[ANY]]",
+          "County" : "[[ANY]]",
+          "PostCode" : "[[ANY]]",
+          "Country" : "[[ANY]]"
+        },
+        "ComplexField" : {
+          "ComplexTextField" : "Complex Stuff",
+          "ComplexFixedListField" : "[[ANY]]",
+          "ComplexNestedField" : {
+            "NestedNumberField" : "[[ANY]]",
+            "NestedCollectionTextField" : [ {
+              "value" : "First",
+              "id" : "[[ANY]]"
+            }, {
+              "value" : "Second",
+              "id" : "[[ANY]]"
+            }, {
+              "value" : "Third",
+              "id" : "[[ANY]]"
+            } ]
+          }
+        },
+        "FixedRadioListField" : null,
+        "DateTimeField" : "[[ANY]]",
+        "PhoneUKField" : "[[ANY]]",
+        "NumberField" : "[[ANY]]",
+        "MultiSelectListField" : "[[ANY]]",
+        "YesOrNoField" : "[[ANY]]",
+        "EmailField" : "[[ANY]]",
+        "TextField" : "[[ANY]]",
+        "DateField" : "[[ANY]]",
+        "TextAreaField" : "[[ANY]]",
+        "CollectionField" : [ {
+          "value" : "[[ANY]]",
+          "id" : "[[ANY]]"
+        }, {
+          "value" : "[[ANY]]",
+          "id" : "[[ANY]]"
+        }, {
+          "value" : "[[ANY]]",
+          "id" : "[[ANY]]"
+        } ]
+      },
+      "data_classification" : {
+        "MoneyGBPField" : "PUBLIC",
+        "FixedListField" : "PUBLIC",
+        "AddressUKField" : {
+          "classification" : "PUBLIC",
+          "value" : {
+            "AddressLine1" : "PUBLIC",
+            "AddressLine2" : "PUBLIC",
+            "AddressLine3" : "PUBLIC",
+            "PostTown" : "PUBLIC",
+            "County" : "PUBLIC",
+            "PostCode" : "PUBLIC",
+            "Country" : "PUBLIC"
+          }
+        },
+        "FixedRadioListField" : "PUBLIC",
+        "DateTimeField" : "PUBLIC",
+        "PhoneUKField" : "PUBLIC",
+        "NumberField" : "PUBLIC",
+        "MultiSelectListField" : "PUBLIC",
+        "YesOrNoField" : "PUBLIC",
+        "EmailField" : "PUBLIC",
+        "TextField" : "PUBLIC",
+        "DateField" : "PUBLIC",
+        "TextAreaField" : "PUBLIC",
+        "CollectionField" : {
+          "classification" : "PUBLIC",
+          "value" : [ {
+            "id" : "[[ANY]]",
+            "classification" : "PUBLIC"
+          }, {
+            "id" : "[[ANY]]",
+            "classification" : "PUBLIC"
+          }, {
+            "id" : "[[ANY]]",
+            "classification" : "PUBLIC"
+          } ]
+        }
+      },
+      "after_submit_callback_response" : null,
+      "callback_response_status_code" : null,
+      "callback_response_status" : null,
+      "delete_draft_response_status_code" : null,
+      "delete_draft_response_status" : null
+    }
+	}
+}

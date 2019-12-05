@@ -1,0 +1,34 @@
+{
+  "title": "must return negative response when request contains an invalid case reference",
+	"_guid_": "S-025",
+	"_extends_": "F-037_Test_Data_Base",
+
+	"specs": [
+		"an active profile in CCD",
+		"contains an invalid case-reference",
+		"has the 400 return code"
+	],
+  "request": {
+    "pathVariables": {
+      "cid": "eyJhbGciOiJIUzI1NiJ9"
+    },
+    "body": {
+      "event_token": "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJmajJwczJ0c2VsMWZxaGc0aTE5bjkzN2dlNyIsInN1YiI6IjdmNTRmZTQ1LTM2NDMtNDc1OC05YjIwLWNhZGIyMWRmZGRiZiIsImlhdCI6MTU3NTU1MjYzNiwiY2FzZS1pZCI6IjIwNCIsImV2ZW50LWlkIjoiU1RBUlRfUFJPR1JFU1MiLCJjYXNlLXR5cGUtaWQiOiJBQVQiLCJqdXJpc2RpY3Rpb24taWQiOiJBVVRPVEVTVDEiLCJjYXNlLXN0YXRlIjoiVE9ETyIsImNhc2UtdmVyc2lvbiI6IjY3NGQ1NjdlYmZkMTllZTExNjQ1OWQyZDRkOTVmYzk5MGYyMmQ0YjIiLCJlbnRpdHktdmVyc2lvbiI6OX0.Yd8gkLqofvFglUYALW1--nNbQ1CD0WZ3IibFT6UnMjg"
+    }
+  },
+	"expectedResponse": {
+    "_extends_": "Common_400_Response",
+		"headers": {
+      "Content-Length" : "[[ANY]]",
+      "Content-Encoding" : "gzip",
+      "Connection" : "close"
+    },
+    "body" : {
+      "exception" : "[[ANY]]",
+      "message" : "Case ID is not valid",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}
