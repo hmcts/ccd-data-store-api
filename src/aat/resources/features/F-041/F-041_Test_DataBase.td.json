@@ -1,0 +1,15 @@
+{
+  "_guid_": "F-041_Test_Data_Base",
+  "_extends_": "Base-Root",
+  "productName": "CCD Data Store",
+  "operationName": "Get a list of printable documents for the given case type",
+  "request": {
+    "pathVariables": {
+      "uid": "[[DYNAMIC]]",
+      "jid": "AUTOTEST1",
+      "ctid": "AAT"
+    }
+  },
+  "method": "GET",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/documents"
+}
