@@ -2,12 +2,12 @@
   "title": "must return 401 when request does not provide valid authentication credentials",
 
   "_guid_": "S-155",
-  "_extends_": "F-035",
+  "_extends_": "F-035_Base_Test_Data",
 
   "specs": [
     "an active profile in CCD",
     "contains an invalid user authorisation token",
-    "has a 403 Forbidden code"
+    "contains an HTTP-401 Unauthorized"
   ],
 
   "request": {
@@ -17,12 +17,6 @@
   },
 
   "expectedResponse": {
-    "_extends_": "Common_403_Response",
-    "headers": {
-      "Content-Encoding" : "gzip"
-    },
-    "body": {
-      "message" : "Access Denied"
-    }
+    "_extends_": "Common_401_Response"
   }
 }

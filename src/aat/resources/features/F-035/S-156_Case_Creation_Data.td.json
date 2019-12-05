@@ -1,6 +1,6 @@
 {
-  "_guid_": "S-156_Case",
-  "_extends_": "Standard_Full_Case",
+  "_guid_": "S-156_Case_Creation_Data",
+  "_extends_": "Standard_Full_Case_Creation_Data",
 
   "users": {
     "invokingUser": {

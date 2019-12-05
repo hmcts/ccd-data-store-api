@@ -2,12 +2,12 @@
   "title": "should retrieve case when the case reference exists",
 
   "_guid_": "S-159",
-  "_extends_": "F-035",
+  "_extends_": "F-035_Base_Test_Data",
 
   "specs": [
     "an active profile in CCD",
-    "contains a valid case reference",
-    "contains the correct case with a 200 OK code"
+    "contains the case reference of the case just created",
+    "contains the details of the case just created, along with an HTTP-200 OK"
   ],
 
   "expectedResponse": {
@@ -32,37 +32,7 @@
       "state" : "TODO",
       "security_classification" : "PUBLIC",
       "data" : {
-        "MoneyGBPField" : "4200",
-        "FixedListField" : "VALUE3",
-        "AddressUKField" : {
-          "County" : "Greater London",
-          "Country" : "UK",
-          "PostCode" : "SW1H 9AJ",
-          "PostTown" : "Westminster",
-          "AddressLine1" : "102 Petty France",
-          "AddressLine2" : "CCD",
-          "AddressLine3" : "c/o HMCTS Reform"
-        },
-        "ComplexField" : {
-          "ComplexTextField" : "Nested text",
-          "ComplexFixedListField" : "VALUE2"
-        },
-        "DateTimeField" : "1988-07-07T22:20:00",
-        "PhoneUKField" : "07123456789",
-        "NumberField" : "164528",
-        "MultiSelectListField" : [ "OPTION2", "OPTION4" ],
-        "YesOrNoField" : "Yes",
-        "EmailField" : "ccd@hmcts.net",
-        "TextField" : "Some Text",
-        "DateField" : "2017-02-13",
-        "TextAreaField" : "Line1\nLine2",
-        "CollectionField" : [ {
-          "id" : "[[ANY]]",
-          "value" : "Alias 1"
-        }, {
-          "id" : "[[ANY]]",
-          "value" : "Alias 2"
-        } ]
+        "_extends_": "Standard_Full_Case_Data"
       },
       "data_classification" : {
         "MoneyGBPField" : "PUBLIC",

@@ -1,13 +1,13 @@
 {
-  "title": "should get 404 when case reference does NOT exist",
+  "title": "should get 404 when case reference does not exist",
 
   "_guid_": "S-158",
-  "_extends_": "F-035",
+  "_extends_": "F-035_Base_Test_Data",
 
   "specs": [
     "an active profile in CCD",
     "contains a case reference that does not exist",
-    "has a 400 Bad Request code"
+    "contains an HTTP-404 Not Found"
   ],
 
   "request": {
@@ -17,17 +17,6 @@
   },
 
   "expectedResponse": {
-    "_extends_": "Common_400_Response",
-    "headers": {
-      "Content-Encoding": "gzip"
-    },
-    "body" : {
-      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
-      "message": "Case ID is not valid",
-      "path": "/cases/1234567890123456",
-      "details": null,
-      "callbackErrors": null,
-      "callbackWarnings": null
-    }
+    "_extends_": "Common_404_Response"
   }
 }
