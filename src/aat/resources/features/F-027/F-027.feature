@@ -7,7 +7,7 @@ Feature: F-027: Fetch a case for display for Case Worker
   @S-038
   Scenario: must return status 200 along with the case-view object successfully
     Given a user with [an active profile in CCD]
-    And a case that has just been created as in [Standard_Full_Case]
+    And a case that has just been created as in [Standard_Full_Case_Creation_Data]
     When a request is prepared with appropriate values
     And the request [uses the case-reference of the case just created]
     And it is submitted to call the [Fetch a case for display for Case Worker] operation of [CCD Data Store]
