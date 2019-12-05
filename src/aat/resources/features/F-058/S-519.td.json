@@ -16,7 +16,7 @@
     "_extends_": "Common_404_Response",
     "body": {
       "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
-      "message": "Cannot find event Dummy for case type AAT",
+      "message": "Cannot find event eyJhbGciOiJIUzUxMiJ9 for case type AAT",
       "details": null,
       "callbackErrors": null,
       "callbackWarnings": null
