@@ -1,0 +1,21 @@
+{
+  "_guid_": "Standard_Full_Case_Creation_Data",
+
+  "users": {
+    "invokingUser": {
+      "username": "[[$CCD_CASEWORKER_AUTOTEST_EMAIL]]",
+      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "jurisdiction": "AUTOTEST1",
+      "caseType": "AAT_AUTH_15",
+      "event": "CREATE"
+    },
+    "body": {
+      "_extends_": "Standard_Full_Case_Data"
+    }
+  }
+}
