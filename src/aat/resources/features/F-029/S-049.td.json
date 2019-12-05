@@ -348,50 +348,6 @@
           "delete" : false
         } ]
       }, {
-        "id" : "FixedRadioListField",
-        "label" : "A `FixedRadioList` field",
-        "hidden" : false,
-        "value" : null,
-        "metadata" : false,
-        "hint_text" : "A fixed radio list",
-        "field_type" : {
-          "id" : "FixedRadioList-FixedRadioListType",
-          "type" : "FixedRadioList",
-          "min" : null,
-          "max" : null,
-          "regular_expression" : null,
-          "fixed_list_items" : [ {
-            "code" : "[[ANY]]",
-            "label" : "[[ANY]]",
-            "order" : null
-          }, {
-            "code" : "[[ANY]]",
-            "label" : "[[ANY]]",
-            "order" : null
-          }, {
-            "code" : "[[ANY]]",
-            "label" : "[[ANY]]",
-            "order" : null
-          } ],
-          "complex_fields" : [ ],
-          "collection_field_type" : null
-        },
-        "validation_expr" : null,
-        "security_label" : "PUBLIC",
-        "order" : null,
-        "display_context" : "OPTIONAL",
-        "display_context_parameter" : null,
-        "show_condition" : null,
-        "show_summary_change_option" : true,
-        "show_summary_content_option" : null,
-        "acls" : [ {
-          "role" : "caseworker-autotest1",
-          "create" : true,
-          "read" : true,
-          "update" : true,
-          "delete" : false
-        } ]
-      }, {
         "id" : "MultiSelectListField",
         "label" : "A `MultiSelectList` field",
         "hidden" : false,
@@ -435,6 +391,47 @@
         "display_context_parameter" : null,
         "show_condition" : null,
         "show_summary_change_option" : true,
+        "show_summary_content_option" : null,
+        "acls" : [ {
+          "role" : "caseworker-autotest1",
+          "create" : true,
+          "read" : true,
+          "update" : true,
+          "delete" : false
+        } ]
+      }, {
+        "id" : "CollectionField",
+        "label" : "A `Collection` of `Text` fields",
+        "hidden" : false,
+        "value" : null,
+        "metadata" : false,
+        "hint_text" : "Zero to many items, here of type `Text`",
+        "field_type" : {
+          "id" : "[[ANY]]",
+          "type" : "Collection",
+          "min" : null,
+          "max" : null,
+          "regular_expression" : null,
+          "fixed_list_items" : [ ],
+          "complex_fields" : [ ],
+          "collection_field_type" : {
+            "id" : "Text",
+            "type" : "Text",
+            "min" : null,
+            "max" : null,
+            "regular_expression" : null,
+            "fixed_list_items" : [ ],
+            "complex_fields" : [ ],
+            "collection_field_type" : null
+          }
+        },
+        "validation_expr" : null,
+        "security_label" : "PUBLIC",
+        "order" : null,
+        "display_context" : "OPTIONAL",
+        "display_context_parameter" : null,
+        "show_condition" : null,
+        "show_summary_change_option" : false,
         "show_summary_content_option" : null,
         "acls" : [ {
           "role" : "caseworker-autotest1",
@@ -633,47 +630,6 @@
             "display_context" : null
           } ],
           "collection_field_type" : null
-        },
-        "validation_expr" : null,
-        "security_label" : "PUBLIC",
-        "order" : null,
-        "display_context" : "OPTIONAL",
-        "display_context_parameter" : null,
-        "show_condition" : null,
-        "show_summary_change_option" : false,
-        "show_summary_content_option" : null,
-        "acls" : [ {
-          "role" : "caseworker-autotest1",
-          "create" : true,
-          "read" : true,
-          "update" : true,
-          "delete" : false
-        } ]
-      }, {
-        "id" : "CollectionField",
-        "label" : "A `Collection` of `Text` fields",
-        "hidden" : false,
-        "value" : null,
-        "metadata" : false,
-        "hint_text" : "Zero to many items, here of type `Text`",
-        "field_type" : {
-          "id" : "[[ANY]]",
-          "type" : "Collection",
-          "min" : null,
-          "max" : null,
-          "regular_expression" : null,
-          "fixed_list_items" : [ ],
-          "complex_fields" : [ ],
-          "collection_field_type" : {
-            "id" : "Text",
-            "type" : "Text",
-            "min" : null,
-            "max" : null,
-            "regular_expression" : null,
-            "fixed_list_items" : [ ],
-            "complex_fields" : [ ],
-            "collection_field_type" : null
-          }
         },
         "validation_expr" : null,
         "security_label" : "PUBLIC",
@@ -964,6 +920,50 @@
           "update" : true,
           "delete" : false
         } ]
+      }, {
+        "id" : "FixedRadioListField",
+        "label" : "A `FixedRadioList` field",
+        "hidden" : false,
+        "value" : null,
+        "metadata" : false,
+        "hint_text" : "A fixed radio list",
+        "field_type" : {
+          "id" : "FixedRadioList-FixedRadioListType",
+          "type" : "FixedRadioList",
+          "min" : null,
+          "max" : null,
+          "regular_expression" : null,
+          "fixed_list_items" : [ {
+            "code" : "RADIOVALUE3",
+            "label" : "Radio Value 3",
+            "order" : null
+          }, {
+            "code" : "RADIOVALUE2",
+            "label" : "Radio Value 2",
+            "order" : null
+          }, {
+            "code" : "RADIOVALUE1",
+            "label" : "Radio Value 1",
+            "order" : null
+          } ],
+          "complex_fields" : [ ],
+          "collection_field_type" : null
+        },
+        "validation_expr" : null,
+        "security_label" : "PUBLIC",
+        "order" : null,
+        "display_context" : "OPTIONAL",
+        "display_context_parameter" : null,
+        "show_condition" : null,
+        "show_summary_change_option" : true,
+        "show_summary_content_option" : null,
+        "acls" : [ {
+          "role" : "caseworker-autotest1",
+          "create" : true,
+          "read" : true,
+          "update" : true,
+          "delete" : false
+        } ]
       } ],
       "event_token" : "[[ANY]]",
       "wizard_pages" : [ {
@@ -1059,7 +1059,7 @@
         "label" : "Third page",
         "order" : "[[ANY]]",
         "wizard_page_fields" : [ {
-          "case_field_id" : "CollectionField",
+          "case_field_id" : "[[ANY]]",
           "order" : "[[ANY]]",
           "page_column_no" : null,
           "display_context" : "OPTIONAL",

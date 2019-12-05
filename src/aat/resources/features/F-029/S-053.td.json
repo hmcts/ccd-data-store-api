@@ -1,5 +1,5 @@
 {
-  "title": "must return appropriate negative response when event-id does not exist",
+  "title": "must return appropriate negative response when request contains a non-existing event-id",
   "_guid_": "S-053",
   "_extends_": "F-029_Test_Data_Base",
 
@@ -10,7 +10,7 @@
   ],
   "request": {
     "pathVariables": {
-      "etid": "CREATE123"
+      "etid": "eyJhbGciOiJIUzI1NiJ9"
     }
   },
   "expectedResponse": {
