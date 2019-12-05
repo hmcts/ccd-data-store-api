@@ -1,31 +1,25 @@
 {
   "_guid_": "S-238",
-  "_extends_": "Base_Expecting_403",
-  "title": "must return 403 when request provides authentic credentials without authorized access to the operation",
-  "specs": ["an existing case in CCD","uses a provides authentic credentials without authorized access to the operation in CCD","return 403"],
-  "productName": "CCD Data Store",
-  "operationName": "Start case creation as Case worker",
-  "user": {
-    "username": "auto.test.cnp+ctzn@gmail.com",
-    "password": "Pa55word11"
-  },
-  "method" : "GET",
-  "uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
+  "_extends_": "F-058_Test_Data_Base",
+  "title": "must return 403 when the request contains a jurisdiction id user is unauthorised to access",
+  "specs": [
+    "an active profile in CCD",
+    "contains a jurisdiction id user is unauthorised to access",
+    "code is HTTP-403"
+  ],
   "request": {
     "pathVariables": {
-      "uid": "[[DYNAMIC]]",
-      "jid": "AUTOTEST1",
-      "ctid": "AAT",
-      "etid": "CREATE"
+      "jid": "AUTOTEST11"
     }
   },
   "expectedResponse": {
-    "body" : {
-      "timestamp" : "[[ANY]]",
-      "status" : 403,
-      "error" : "Forbidden",
-      "message" : "Access Denied",
-      "path" : "[[ANY]]"
+    "_extends_": "Common_403_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "body": {
+      "message": "Access Denied"
     }
   }
 }

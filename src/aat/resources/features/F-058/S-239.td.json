@@ -1,32 +1,27 @@
 {
   "_guid_": "S-239",
-  "_extends_": "Base_Expecting_403",
-  "title": "must return 404 when no case found for the given Idam user ID",
-  "specs": ["an existing case in CCD","uses a non-existing Idam user ID in CCD","return 404"],
-  "productName": "CCD Data Store",
-  "operationName": "Start case creation as Case worker",
-  "user": {
-    "username": "auto.test.cnp@gmail.com",
-    "password": "Pa55word11"
-  },
-  "method" : "GET",
-  "uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
+  "_extends_": "F-058_Test_Data_Base",
+
+  "title": "must return 403 when request contains a malformed user ID",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains a malformed user id",
+    "code is HTTP-403"
+  ],
   "request": {
     "pathVariables": {
-      "uid": "MISSINGUID",
-      "jid": "AUTOTEST1",
-      "ctid": "AAT",
-      "etid": "CREATE"
+      "uid": "@@@@@@@@@@"
     }
   },
-
   "expectedResponse": {
-    "body" : {
-      "timestamp" : "[[ANY]]",
-      "status" : 403,
-      "error" : "Forbidden",
-      "message" : "Access Denied",
-      "path" : "[[ANY]]"
+    "_extends_": "Common_403_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "body": {
+      "message": "Access Denied"
     }
   }
 }
