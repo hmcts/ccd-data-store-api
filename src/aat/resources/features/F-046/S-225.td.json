@@ -3,7 +3,7 @@
   "_extends_": "Base_Expecting_403",
   "title": "must return 403 when request does not provide valid authentication credentials",
   "specs": [
-    "a detailed profile in CCD",
+    "an active profile in CCD",
     "does not provide valid authentication credentials in CCD",
     "has a 403 Forbidden code"
   ],

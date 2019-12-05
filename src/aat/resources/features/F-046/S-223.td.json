@@ -3,7 +3,7 @@
   "_extends_": "Base_Expecting_404",
   "title": "must return 400 when an invalid case id is provided",
   "specs": [
-    "a detailed profile in CCD",
+    "an active profile in CCD",
     "contains an invalid case id",
     "has a 404 not found code"
   ],

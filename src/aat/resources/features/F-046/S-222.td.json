@@ -3,7 +3,7 @@
   "_extends_": "Base_Expecting_204",
   "title": "must return 204 if access is successfully revoked for a user on a case ID",
   "specs": [
-    "a detailed profile in CCD",
+    "an active profile in CCD",
     "contains a valid case id",
     "has a 204 no content code"
   ],
