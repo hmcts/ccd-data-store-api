@@ -13,7 +13,6 @@ Feature: Start case creation as Citizen
     And     the response [code is HTTP-200]
     And     the response has all the details as expected
 
-
   @S-237 @Ignore # Response code mismatch, expected: 401, actual: 403
   Scenario: must return 401 when request provides invalid authentication credentials
     Given   a user with [an active profile in CCD]
@@ -24,7 +23,6 @@ Feature: Start case creation as Citizen
     And     the response [code is HTTP-401]
     And     the response has all the details as expected
 
-
   @S-237
   Scenario: must return 403 when the request contains a dummy user id
     Given   a user with [an active profile in CCD]
@@ -34,7 +32,6 @@ Feature: Start case creation as Citizen
     Then    a negative response is received
     And     the response [code is HTTP-403]
     And     the response has all the details as expected
-
 
   @S-238 @Ignore # Response code mismatch, expected: 403, actual: 200
   Scenario: must return 403 when the request contains a jurisdiction id user is unauthorised to access
@@ -66,7 +63,6 @@ Feature: Start case creation as Citizen
     And     the response [code is HTTP-400]
     And     the response has all the details as expected
 
-
   @S-517 @Ignore # Response code mismatch, expected: 404, actual: 200
   Scenario: must return 404 when request contains a non-existing jurisdiction ID
     Given   a user with [an active profile in CCD]
@@ -76,7 +72,6 @@ Feature: Start case creation as Citizen
     Then    a negative response is received
     And     the response [code is HTTP-404]
     And     the response has all the details as expected
-
 
   @S-518
   Scenario: must return 404 when request contains a non-existing Case type ID
