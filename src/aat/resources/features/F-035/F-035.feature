@@ -23,11 +23,11 @@ Feature: F-035: Retrieve a case by id
     And the request [contains an invalid user authorisation token]
     And it is submitted to call the [retrieve a case by id] operation of [CCD Data Store]
     Then a negative response is received
-    And the response [contains an HTTP-401 Unauthorized]
+    And the response [contains an HTTP-401 Unauthorised]
     And the response has all other details as expected
 
   @S-156
-  Scenario: must return 404 when request provides authentic credentials without authorized access to the operation
+  Scenario: must return 404 when request provides authentic credentials without authorised access to the operation
     Given a case that has just been created as in [S-156_Case_Creation_Data]
     And a user with [an active profile in CCD]
     When a request is prepared with appropriate values
