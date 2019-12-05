@@ -25,6 +25,17 @@ Feature: F-042: Trigger "aboutToStart" event as a Case worker
     And the response [has the 400 return code]
     And the response has all other details as expected
 
+  @S-247 @Ignore #Probable bug. If case type ID is invalid, we are getting 200 instead of 404
+  Scenario: Trigger the aboutToStart callback event for a caseworker for an invalid Case Type ID
+    Given a user with [an active profile in CCD]
+    And a case that has just been created as in [Caseworker1_Full_Case]
+    When a request is prepared with appropriate values
+    And the request [is prepared with an invalid Case Type ID]
+    And it is submitted to call the [Start the event creation process for a new case for a Case Worker] operation of [CCD Data Store]
+    Then a negative response is received
+    And the response [has the 400 return code]
+    And the response has all other details as expected
+
 
 #  @S-045
 #  Scenario: must return negative response when request does not provide valid authentication credentials
