@@ -10,6 +10,9 @@
   ],
   "expectedResponse": {
     "_extends_": "Common_200_Response",
+    "headers": {
+      "Transfer-Encoding" : "chunked"
+    },
     "body" : {
       "id" : "CREATE",
       "name" : "Create a new case",
