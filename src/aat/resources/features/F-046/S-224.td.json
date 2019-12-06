@@ -14,7 +14,7 @@
     }
   },
   "expectedResponse": {
-    "_extends_": "Base_Expecting_403",
+    "_extends_": "Common_403_Response",
     "headers": {
       "Content-Length": "[[ANY]]",
       "Content-Type" : "application/json;charset=UTF-8",

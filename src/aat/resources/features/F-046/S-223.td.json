@@ -13,7 +13,7 @@
     }
   },
   "expectedResponse": {
-    "_extends_": "Base_Expecting_404",
+    "_extends_": "Common_404_Response",
     "headers": {
       "Content-Length": "[[ANY]]",
       "Content-Encoding" : "gzip",
