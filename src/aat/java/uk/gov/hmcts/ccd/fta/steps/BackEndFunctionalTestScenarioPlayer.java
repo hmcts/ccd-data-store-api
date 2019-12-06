@@ -1,21 +1,6 @@
 package uk.gov.hmcts.ccd.fta.steps;
 
-import org.junit.Assert;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.function.Supplier;
-
 import feign.FeignException;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
@@ -29,6 +14,10 @@ import io.restassured.response.Response;
 import io.restassured.specification.QueryableRequestSpecification;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.SpecificationQuerier;
+import org.junit.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.CCDEventBuilder;
@@ -40,6 +29,11 @@ import uk.gov.hmcts.ccd.fta.data.UserData;
 import uk.gov.hmcts.ccd.fta.exception.FunctionalTestException;
 import uk.gov.hmcts.ccd.fta.util.EnvUtils;
 import uk.gov.hmcts.ccd.fta.util.JsonUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import java.util.function.Supplier;
 
 @SuppressWarnings({"LocalVariableName"})
 public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTestAutomationDSL {
@@ -222,6 +216,19 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         }
 
         if (requestData.getBody() != null) {
+            requestData.getBody().forEach((bodyField, value) -> {
+                if (value.toString().equals(DYNAMIC_CONTENT_PLACEHOLDER)) {
+                    // ADD DYNAMIC DATA HERE
+                    if (bodyField.equals("event_token") && scenarioContext.getTheEventToken() != null) {
+                        Map<String, Object> updateBodyMap = requestData.getBody();
+                        updateBodyMap.put("event_token", scenarioContext.getTheEventToken());
+                        requestData.setBody(updateBodyMap);
+                    } else {
+                        throw new FunctionalTestException("Dynamic value for request path variable '"
+                            + bodyField + "' does not exist");
+                    }
+                }
+            });
             aRequest.body(new ObjectMapper().writeValueAsBytes(requestData.getBody()));
         }
 
@@ -378,11 +385,14 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
             throws IOException {
         BackEndFunctionalTestScenarioContext subcontext = new BackEndFunctionalTestScenarioContext();
         subcontext.initializeTestDataFor(testDataId);
+        subcontext.setTheCaseReference(scenarioContext.getTheCaseReference());
         prepareARequestWithAppropriateValues(subcontext);
         verifyTheRequestInTheContextWithAParticularSpecification(subcontext, testDataSpec);
         submitTheRequestToCallAnOperationOfAProduct(subcontext, subcontext.getTestData().getOperationName(),
                 subcontext.getTestData().getProductName());
         verifyThatTheResponseHasAllTheDetailsAsExpected(subcontext);
+        String eventToken = (String) subcontext.getTheResponse().getBody().get("token");
+        scenarioContext.setTheEventToken(eventToken);
     }
 
     private void resolveUserData(String prefix, UserData aUser) {

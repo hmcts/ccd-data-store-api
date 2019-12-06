@@ -1,14 +1,10 @@
 package uk.gov.hmcts.ccd.fta.steps;
 
-import java.util.stream.Collectors;
-
 import io.cucumber.java.Scenario;
 import io.restassured.specification.RequestSpecification;
-import uk.gov.hmcts.ccd.fta.data.HttpTestData;
-import uk.gov.hmcts.ccd.fta.data.HttpTestDataSource;
-import uk.gov.hmcts.ccd.fta.data.JsonStoreHttpTestDataSource;
-import uk.gov.hmcts.ccd.fta.data.ResponseData;
-import uk.gov.hmcts.ccd.fta.data.UserData;
+import uk.gov.hmcts.ccd.fta.data.*;
+
+import java.util.stream.Collectors;
 
 public class BackEndFunctionalTestScenarioContext {
 
@@ -19,6 +15,16 @@ public class BackEndFunctionalTestScenarioContext {
     private HttpTestData testData;
     private HttpTestData caseCreationData;
     private Long theCaseReference;
+    private String theEventToken;
+
+    public String getTheEventToken() {
+        return theEventToken;
+    }
+
+    public void setTheEventToken(String theEventToken) {
+        this.theEventToken = theEventToken;
+    }
+
     private UserData theInvokingUser;
     private RequestSpecification theRequest;
     private ResponseData theResponse;
