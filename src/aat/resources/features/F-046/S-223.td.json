@@ -1,26 +1,19 @@
 {
   "_guid_": "S-223",
-  "_extends_": "Base_Expecting_404",
+  "_extends_": "F-046_Base_Request_Data",
   "title": "must return 400 when an invalid case id is provided",
   "specs": [
     "an active profile in CCD",
     "contains an invalid case id",
     "has a 404 not found code"
   ],
-  "productName": "CCD Data Store",
-  "operationName": "Revoke access to case",
-  "method": "DELETE",
-  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/users/{idToDelete}",
   "request": {
     "pathVariables": {
-      "uid": "[[DYNAMIC]]",
-      "jid": "AUTOTEST1",
-      "ctid": "AAT",
-      "cid": "1234567890123456",
-      "idToDelete": "[[DYNAMIC]]"
+      "cid": "1234567890123456"
     }
   },
   "expectedResponse": {
+    "_extends_": "Base_Expecting_404",
     "headers": {
       "Content-Length": "[[ANY]]",
       "Content-Encoding" : "gzip",

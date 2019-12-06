@@ -1,26 +1,20 @@
 {
   "_guid_": "S-224",
-  "_extends_": "Base_Expecting_403",
+  "_extends_": "F-046_Base_Request_Data",
   "title": "must return 401 when request does not provide valid authentication credentials",
   "specs": [
     "an active profile in CCD",
     "does not provide valid authentication credentials in CCD",
     "has a 401 Unauthorized code"
   ],
-  "productName": "CCD Data Store",
-  "operationName": "Revoke access to case",
-  "method": "DELETE",
-  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/users/{idToDelete}",
   "request": {
     "pathVariables": {
-      "uid": "dummyValue",
-      "jid": "AUTOTEST1",
-      "ctid": "AAT",
-      "cid": "1234567890123456",
-      "idToDelete": "1234567890123456"
+      "uid": "UserId",
+      "idToDelete": "UserIdToDelete"
     }
   },
   "expectedResponse": {
+    "_extends_": "Base_Expecting_403",
     "headers": {
       "Content-Length": "[[ANY]]",
       "Content-Type" : "application/json;charset=UTF-8",
