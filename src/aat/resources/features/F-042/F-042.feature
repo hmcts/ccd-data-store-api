@@ -36,18 +36,6 @@ Feature: F-042: Trigger "aboutToStart" event as a Case worker
     And the response [has the 400 return code]
     And the response has all other details as expected
 
-  @S-247 @Ignore #Probable bug. If case type ID is invalid, we are getting 200 instead of 404
-    #Also, it is to be noted that the endpoint does not mentions about this scenario. So, CCD QA may chose to disqualify this test case.
-  Scenario: Trigger the aboutToStart callback event for a caseworker for an invalid Case Type ID
-    Given a user with [an active profile in CCD]
-    And a case that has just been created as in [Caseworker1_Full_Case]
-    When a request is prepared with appropriate values
-    And the request [is prepared with an invalid Case Type ID]
-    And it is submitted to call the [Start the event creation process for a new case for a Case Worker] operation of [CCD Data Store]
-    Then a negative response is received
-    And the response [has the 400 return code]
-    And the response has all other details as expected
-
   @S-248
   Scenario: Trigger the aboutToStart callback event for a caseworker for an invalid Jurisdiction ID
     Given a user with [an active profile in CCD]
@@ -87,7 +75,7 @@ Feature: F-042: Trigger "aboutToStart" event as a Case worker
     Given a user with [an active profile in CCD]
     And a case that has just been created as in [Caseworker1_Full_Case]
     When a request is prepared with appropriate values
-    And the request [does not provide valid authentication credentials in CCD]
+    And the request [does not provide valid authorization credentials for an operation in CCD]
     And it is submitted to call the [Start the event creation process for a new case for a Case Worker] operation of [CCD Data Store]
     Then a negative response is received
     And the response [has a 403 Forbidden code]

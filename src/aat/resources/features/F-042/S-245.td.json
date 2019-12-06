@@ -4,7 +4,7 @@
   "title": "must return 403 when request does not provide valid authentication credentials",
   "specs": [
     "an active profile in CCD",
-    "does not provide valid authentication credentials in CCD",
+    "does not provide valid authorization credentials for an operation in CCDD",
     "has a 403 Forbidden code"
   ],
   "request": {
