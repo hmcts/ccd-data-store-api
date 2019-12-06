@@ -55,9 +55,9 @@ public class SearchQueryFactoryOperation {
     public Query build(MetaData metadata, Map<String, String> params, boolean isCountQuery) {
         final List<Criterion> criteria = criterionFactory.build(metadata, params);
 
-        Map<String, Object> queryParams = Maps.newHashMap();
+        Map<String, Object> parametersToBind = Maps.newHashMap();
         String queryToFormat = isCountQuery ? MAIN_COUNT_QUERY : MAIN_QUERY;
-        String whereClausePart = secure(toClauses(criteria), metadata, queryParams);
+        String whereClausePart = secure(toClauses(criteria), metadata, parametersToBind);
         String sortClause = sortOrderQueryBuilder.buildSortOrderClause(metadata);
 
         String queryString = String.format(queryToFormat, whereClausePart, sortClause);
@@ -68,7 +68,7 @@ public class SearchQueryFactoryOperation {
         } else {
             query = entityManager.createNativeQuery(queryString, CaseDetailsEntity.class);
         }
-        queryParams.forEach((k, v) -> query.setParameter(k, v));
+        parametersToBind.forEach((k, v) -> query.setParameter(k, v));
         addParameters(query, criteria);
         return query;
     }
