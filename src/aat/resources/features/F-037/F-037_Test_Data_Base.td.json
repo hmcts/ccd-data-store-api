@@ -16,68 +16,50 @@
     },
     "body": {
       "data":   {
-        "TextField": "Joe Bloggs",
-        "NumberField": "18",
-        "YesOrNoField": "Yes",
-        "PhoneUKField": "07895123456",
-        "EmailField": "test@gmail.com",
-        "MoneyGBPField": "123400",
-        "DateField": "2012-11-10",
-        "DateTimeField": "2013-11-10T10:11:12.000",
-        "TextAreaField": "Happy Birthday",
-        "FixedListField": "VALUE1",
-        "MultiSelectListField": ["OPTION5"],
-        "ComplexField":     {
-          "ComplexTextField": "Complex Stuff",
-          "ComplexFixedListField": "VALUE3",
-          "ComplexNestedField":       {
-            "NestedNumberField": "100",
-            "NestedCollectionTextField":         [
-              {
-                "id": "a6677950-5f7b-4508-8d57-a82c999b5417",
-                "value": "First"
-              },
-              {
-                "id": "c03ea7d3-f582-4ddc-8117-1bf4e7f6c6d4",
-                "value": "Second"
-              },
-              {
-                "id": "ed8b4b79-d57b-4d57-91cc-aed676847aaa",
-                "value": "Third"
-              }
-            ]
-          }
+        "MoneyGBPField": "4200",
+        "FixedListField": "VALUE3",
+        "AddressUKField": {
+          "County": "Greater London",
+          "Country": "UK",
+          "PostCode": "SW1H 9AJ",
+          "PostTown": "Westminster",
+          "AddressLine1": "102 Petty France",
+          "AddressLine2": "CCD",
+          "AddressLine3": "c/o HMCTS Reform"
         },
-        "CollectionField":     [
-          {
-            "id": "e3767354-3bfd-42c2-982b-7495661c2ddb",
-            "value": "Beginning"
-          },
-          {
-            "id": "243e6af4-f6b6-43ab-8f8e-ce5254ac4983",
-            "value": "Middle"
-          },
-          {
-            "id": "d05c8b68-67a9-490e-8e3c-f42b0591e900",
-            "value": "End"
-          }
+        "ComplexField": {
+          "ComplexTextField": "Nested text",
+          "ComplexFixedListField": "VALUE2"
+        },
+        "DateTimeField": "1988-07-07T22:20:00",
+        "PhoneUKField": "07123456789",
+        "NumberField": "164528",
+        "MultiSelectListField": [
+          "OPTION2",
+          "OPTION4"
         ],
-        "AddressUKField":     {
-          "AddressLine1": "1 Street",
-          "AddressLine2": null,
-          "AddressLine3": null,
-          "PostTown": "London",
-          "County": "Middex",
-          "PostCode": "HA7 1NG",
-          "Country": "UK"
-        }
+        "YesOrNoField": "Yes",
+        "EmailField": "ccd@hmcts.net",
+        "TextField": "Some Text",
+        "DateField": "2017-02-13",
+        "TextAreaField": "Line1\nLine2",
+        "CollectionField": [
+          {
+            "id": "4926d94c-1fa3-4c16-b5ba-5a122d8c622d",
+            "value": "Alias 1"
+          },
+          {
+            "id": "936b6a65-a179-474f-bdff-1d4f961e9a8c",
+            "value": "Alias 2"
+          }
+        ]
       },
       "event":   {
         "id": "UPDATE",
         "summary": "",
         "description": ""
       },
-      "event_token": "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJmajJwczJ0c2VsMWZxaGc0aTE5bjkzN2dlNyIsInN1YiI6IjdmNTRmZTQ1LTM2NDMtNDc1OC05YjIwLWNhZGIyMWRmZGRiZiIsImlhdCI6MTU3NTU1MjYzNiwiY2FzZS1pZCI6IjIwNCIsImV2ZW50LWlkIjoiU1RBUlRfUFJPR1JFU1MiLCJjYXNlLXR5cGUtaWQiOiJBQVQiLCJqdXJpc2RpY3Rpb24taWQiOiJBVVRPVEVTVDEiLCJjYXNlLXN0YXRlIjoiVE9ETyIsImNhc2UtdmVyc2lvbiI6IjY3NGQ1NjdlYmZkMTllZTExNjQ1OWQyZDRkOTVmYzk5MGYyMmQ0YjIiLCJlbnRpdHktdmVyc2lvbiI6OX0.Yd8gkLqofvFglUYALW1--nNbQ1CD0WZ3IibFT6UnMjg",
+      "event_token": "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJrNHZpNHZwMGhyNmk4MTNoZmZnYWpncmJrdiIsInN1YiI6IjdmNTRmZTQ1LTM2NDMtNDc1OC05YjIwLWNhZGIyMWRmZGRiZiIsImlhdCI6MTU3NTYzMTQ5MiwiY2FzZS1pZCI6IjI0NTEiLCJldmVudC1pZCI6IlNUQVJUX1BST0dSRVNTIiwiY2FzZS10eXBlLWlkIjoiQUFUX0FVVEhfMTUiLCJqdXJpc2RpY3Rpb24taWQiOiJBVVRPVEVTVDEiLCJjYXNlLXN0YXRlIjoiVE9ETyIsImNhc2UtdmVyc2lvbiI6IjE1NDQ1NGIxYTJmNzczYTg0NjU5YmVjYzc3ZjYyODdjNDVlYTE4MzgiLCJlbnRpdHktdmVyc2lvbiI6MH0.gwKtIzJ-JGp-luGbTDXBBlbQ6iqbHY-dcAJaubhrBRM",
       "ignore_warning": false
     }
 	},
