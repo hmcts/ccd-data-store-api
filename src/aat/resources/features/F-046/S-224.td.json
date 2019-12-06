@@ -10,7 +10,8 @@
   "request": {
     "pathVariables": {
       "uid": "UserId",
-      "idToDelete": "UserIdToDelete"
+      "idToDelete": "UserIdToDelete",
+      "cid": "0123456789123456"
     }
   },
   "expectedResponse": {
