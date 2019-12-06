@@ -223,6 +223,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
                         Map<String, Object> updateBodyMap = requestData.getBody();
                         updateBodyMap.put("event_token", scenarioContext.getTheEventToken());
                         requestData.setBody(updateBodyMap);
+
                     } else {
                         throw new FunctionalTestException("Dynamic value for request path variable '"
                             + bodyField + "' does not exist");
