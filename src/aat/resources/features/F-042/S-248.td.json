@@ -9,7 +9,8 @@
   ],
   "request": {
     "pathVariables": {
-      "jid": "invalidJurisdictionID"
+      "jid": "invalidJurisdictionID",
+      "cid" : "[[DYNAMIC]]"
     }
   },
   "expectedResponse": {

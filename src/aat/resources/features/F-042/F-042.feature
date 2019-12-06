@@ -70,3 +70,25 @@ Feature: F-042: Trigger "aboutToStart" event as a Case worker
     Then a negative response is received
     And the response [has the 422 return code]
     And the response has all other details as expected
+
+  @S-244 # ACTUALLY returns a 403
+  Scenario: must return 401 when request does not provide valid authentication credentials
+    Given a user with [an active profile in CCD]
+    And a case that has just been created as in [Caseworker1_Full_Case]
+    When a request is prepared with appropriate values
+    And the request [does not provide valid authentication credentials in CCD]
+    And it is submitted to call the [Start the event creation process for a new case for a Case Worker] operation of [CCD Data Store]
+    Then a negative response is received
+    And the response [has a 401 Unauthorized code]
+    And the response has all other details as expected
+
+  @S-245
+  Scenario: must return 403 when request provides authentic credentials without authorized access to the operation
+    Given a user with [an active profile in CCD]
+    And a case that has just been created as in [Caseworker1_Full_Case]
+    When a request is prepared with appropriate values
+    And the request [does not provide valid authentication credentials in CCD]
+    And it is submitted to call the [Start the event creation process for a new case for a Case Worker] operation of [CCD Data Store]
+    Then a negative response is received
+    And the response [has a 403 Forbidden code]
+    And the response has all other details as expected

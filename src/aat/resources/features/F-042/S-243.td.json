@@ -7,6 +7,12 @@
     "is prepared with a valid User ID, Jurisdiction, Case ID, Case Type ID and Event Trigger ID",
     "has the 200 return code"
   ],
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "cid": "[[DYNAMIC]]"
+    }
+  },
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "headers": {
