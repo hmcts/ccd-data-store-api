@@ -11,9 +11,6 @@
   "request": {
     "pathVariables": {
       "cid": "eyJhbGciOiJIUzI1NiJ9"
-    },
-    "body": {
-      "event_token": "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJmajJwczJ0c2VsMWZxaGc0aTE5bjkzN2dlNyIsInN1YiI6IjdmNTRmZTQ1LTM2NDMtNDc1OC05YjIwLWNhZGIyMWRmZGRiZiIsImlhdCI6MTU3NTU1MjYzNiwiY2FzZS1pZCI6IjIwNCIsImV2ZW50LWlkIjoiU1RBUlRfUFJPR1JFU1MiLCJjYXNlLXR5cGUtaWQiOiJBQVQiLCJqdXJpc2RpY3Rpb24taWQiOiJBVVRPVEVTVDEiLCJjYXNlLXN0YXRlIjoiVE9ETyIsImNhc2UtdmVyc2lvbiI6IjY3NGQ1NjdlYmZkMTllZTExNjQ1OWQyZDRkOTVmYzk5MGYyMmQ0YjIiLCJlbnRpdHktdmVyc2lvbiI6OX0.Yd8gkLqofvFglUYALW1--nNbQ1CD0WZ3IibFT6UnMjg"
     }
   },
 	"expectedResponse": {

@@ -5,7 +5,6 @@
 
 	"specs": [
 		"an active profile in CCD",
-    "to create an event token",
 		"has the 200 return code"
 	],
 	"request": {
