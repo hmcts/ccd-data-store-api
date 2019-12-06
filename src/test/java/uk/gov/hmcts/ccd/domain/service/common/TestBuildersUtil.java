@@ -34,6 +34,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTab;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
 import uk.gov.hmcts.ccd.domain.model.definition.ComplexACL;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.FixedListItem;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
@@ -897,11 +898,6 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public WizardPageComplexFieldOverrideBuilder withOrder(Integer order) {
-            this.wizardPageComplexFieldOverride.setOrder(order);
-            return this;
-        }
-
         public WizardPageComplexFieldOverrideBuilder withLabel(String label) {
             this.wizardPageComplexFieldOverride.setLabel(label);
             return this;
@@ -1035,11 +1031,47 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public CaseFieldBuilder withOrder(final int order) {
+            caseField.setOrder(order);
+            return this;
+        }
+
+        public CaseFieldBuilder withDisplayContextParameter(final String displayContextParameter) {
+            caseField.setDisplayContext(displayContextParameter);
+            return this;
+        }
+
         public CaseField build() {
             caseField.setAccessControlLists(accessControlLists);
             caseField.setComplexACLs(complexACLs);
             caseField.setFieldType(caseFieldType);
             return caseField;
+        }
+    }
+
+    public static class FixedListItemBuilder {
+        private final FixedListItem fixedListItem;
+
+        public FixedListItemBuilder() {
+            this.fixedListItem = new FixedListItem();
+        }
+
+        public static FixedListItemBuilder aFixedListItem() {
+            return new FixedListItemBuilder();
+        }
+
+        public FixedListItemBuilder withCode(String code) {
+            this.fixedListItem.setCode(code);
+            return this;
+        }
+
+        public FixedListItemBuilder withOrder(String order) {
+            this.fixedListItem.setOrder(order);
+            return this;
+        }
+
+        public FixedListItem build() {
+            return fixedListItem;
         }
     }
 
@@ -1081,6 +1113,16 @@ public class TestBuildersUtil {
                 .withComplexField(complexField)
                 .withType(COMPLEX)
                 .build());
+            return this;
+        }
+
+        public FieldTypeBuilder withFixedListItems(final FixedListItem... fixedListItems) {
+            fieldType.setFixedListItems(Lists.newArrayList(fixedListItems));
+            return this;
+        }
+
+        public FieldTypeBuilder withFixedListItems(final List<FixedListItem> fixedListItems) {
+            fieldType.setFixedListItems(fixedListItems);
             return this;
         }
 
