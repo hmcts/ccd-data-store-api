@@ -22,15 +22,14 @@
     }
   },
   "expectedResponse": {
-    "_extends_": "Common_422_Response",
     "headers" : {
       "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
       "Content-Encoding" : "gzip",
       "Content-Type" : "application/json;charset=UTF-8",
       "Date" : "[[ANY]]",
+      "Content-Length" : "[[ANY]]",
       "Expires" : "0",
       "Pragma" : "no-cache",
-      "Transfer-Encoding" : "chunked",
       "X-Content-Type-Options" : "nosniff",
       "X-Frame-Options" : "DENY",
       "X-XSS-Protection" : "1; mode=block"
