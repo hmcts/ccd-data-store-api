@@ -1,6 +1,5 @@
 {
   "_guid_": "S-200",
-  "_extends_": "Base_Expecting_400",
   "title": "must return 400 when case reference does not exists",
   "specs": [
     "an active profile in CCD",
@@ -22,6 +21,7 @@
     }
   },
   "expectedResponse": {
+    "_extends_": "Common_400_Response",
     "headers" : {
       "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
       "Connection" : "close",

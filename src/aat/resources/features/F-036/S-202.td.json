@@ -26,7 +26,7 @@
     }
   },
   "expectedResponse": {
-    "_extends_": "Base_Expecting_403",
+    "_extends_": "Common_403_Response",
     "headers": {
       "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
       "Date" : "[[ANY]]",

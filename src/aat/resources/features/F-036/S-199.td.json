@@ -1,6 +1,5 @@
 {
   "_guid_": "S-199",
-  "_extends_": "Base_Expecting_200",
   "title": "must return 200 and a StartTriggerResource object when case id and event trigger id are provided",
   "specs": [
     "an active profile in CCD",
@@ -21,6 +20,7 @@
     }
   },
   "expectedResponse": {
+    "_extends_": "Common_200_Response",
     "headers": {
       "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.start-event-trigger.v2+json;charset=UTF-8",
       "Transfer-Encoding": "chunked"

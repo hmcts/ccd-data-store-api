@@ -1,6 +1,5 @@
 {
   "_guid_": "S-201",
-
   "title": "must return 401 when request does not provide valid authentication credentials",
   "specs": [
     "an active profile in CCD",
@@ -29,7 +28,7 @@
     }
   },
   "expectedResponse": {
-    "_extends_": "Base_Expecting_403",
+    "_extends_": "Common_403_Response",
     "headers": {
       "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
       "Date" : "[[ANY]]",
