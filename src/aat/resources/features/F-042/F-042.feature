@@ -5,7 +5,7 @@ Feature: F-042: Trigger "aboutToStart" event as a Case worker
     Given an appropriate test context as detailed in the test data source
 
   @S-243
-  Scenario: Trigger the aboutToStart callback event for a caseworker for a new case which has not started yet.
+  Scenario: Trigger the aboutToStart callback event for a caseworker for a new case which has not been started yet.
     Given a user with [an active profile in CCD]
     And a case that has just been created as in [Caseworker1_Full_Case]
     When a request is prepared with appropriate values
@@ -53,7 +53,7 @@ Feature: F-042: Trigger "aboutToStart" event as a Case worker
     And a case that has just been created as in [Caseworker1_Full_Case]
     And a successful call [to fire a START_PROGRESS event on the case just created] as in [S-249_Update_Case_State]
     When a request is prepared with appropriate values
-    And the request [is prepared with an invalid case event]
+    And the request [is prepared with an invalid START_EVENT]
     And it is submitted to call the [Start the event creation process for a new case for a Case Worker] operation of [CCD Data Store]
     Then a negative response is received
     And the response [has the 422 return code]

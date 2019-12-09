@@ -9,8 +9,7 @@
   ],
   "request": {
     "pathVariables": {
-      "uid": "UserId",
-      "cid": "[[DYNAMIC]]"
+      "uid": "UserId"
     }
   },
   "expectedResponse": {

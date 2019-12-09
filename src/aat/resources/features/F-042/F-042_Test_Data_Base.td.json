@@ -14,7 +14,8 @@
       "uid": "[[DYNAMIC]]",
       "jid": "BEFTA_JURISDICTION_1",
       "ctid": "BEFTA_CASETYPE_1_1",
-      "etid": "START_PROGRESS"
+      "etid": "START_PROGRESS",
+      "cid": "[[DYNAMIC]]"
     }
   }
 }

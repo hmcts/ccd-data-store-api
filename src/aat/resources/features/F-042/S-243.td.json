@@ -8,10 +8,7 @@
     "has the 200 return code"
   ],
   "request": {
-    "_extends_": "Common_Request",
-    "pathVariables": {
-      "cid": "[[DYNAMIC]]"
-    }
+    "_extends_": "Common_Request"
   },
   "expectedResponse": {
     "_extends_": "Common_200_Response",

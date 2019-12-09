@@ -4,18 +4,11 @@
   "_extends_": "F-042_Test_Data_Base",
   "specs": [
     "an active profile in CCD",
-    "is prepared with an invalid case event",
+    "is prepared with an invalid START_EVENT",
     "has the 422 return code"
   ],
   "request": {
-    "_extends_": "Common_Request",
-    "pathVariables": {
-      "uid": "[[DYNAMIC]]",
-      "cid": "[[DYNAMIC]]",
-      "jid": "BEFTA_JURISDICTION_1",
-      "ctid": "BEFTA_CASETYPE_1_1",
-      "etid": "CREATE"
-    }
+    "_extends_": "Common_Request"
   },
   "expectedResponse": {
     "_extends_": "Common_422_Response",
