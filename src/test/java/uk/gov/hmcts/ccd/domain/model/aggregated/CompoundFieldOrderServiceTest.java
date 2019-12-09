@@ -12,6 +12,7 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.junit.Assert.assertThat;
@@ -166,6 +167,7 @@ class CompoundFieldOrderServiceTest {
         compoundFieldOrderService.sortNestedFieldsFromCaseEventComplexFields(CASE_FIELD, caseEventComplexFields, ROOT);
 
         List<CaseField> complexFields = CASE_FIELD.getFieldType().getChildren();
+        assertThat(complexFields, is(hasSize(3)));
         assertThat(complexFields, contains(allOf(hasProperty("id", is("Three")),
                                                  hasProperty("order", is(3))),
                                            allOf(hasProperty("id", is("Two")),
