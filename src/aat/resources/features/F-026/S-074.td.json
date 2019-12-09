@@ -1,6 +1,6 @@
 {
-  "title": "must return 412 when the case type is not present in Definition store workbasket input fields",
-  "_guid_": "S-076",
+  "title": "must return appropriate negative response when request does not provide valid authentication credentials",
+  "_guid_": "S-074",
   "_extends_": "F-026_Test_Data_Base",
 
   "specs": [
