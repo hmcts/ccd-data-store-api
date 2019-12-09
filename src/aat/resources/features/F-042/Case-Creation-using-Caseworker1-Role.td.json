@@ -13,7 +13,7 @@
       "event": "CREATE"
     },
     "body": {
-      "_extends_": "case_data_body"
+      "_extends_": "Case_Data_Body"
     }
   }
 }

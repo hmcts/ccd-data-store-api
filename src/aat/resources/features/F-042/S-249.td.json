@@ -26,14 +26,9 @@
     },
     "body": {
       "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException",
-      "timestamp": "[[ANY]]",
-      "status": 422,
       "error": "Unprocessable Entity",
       "message": "The case status did not qualify for the event",
-      "path": "[[ANY]]",
-      "details": null,
-      "callbackErrors": null,
-      "callbackWarnings": null
+      "details": null
     }
   }
 }
