@@ -4,7 +4,7 @@ Feature: F-026: Get a case data with UI layout
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
-  @S-078 @Ignore
+  @S-078
   Scenario: must return the list of cases and status code 200 for correct inputs
     Given a case that has just been created as in [Standard_Full_Case_Creation_Data]
     And a user with [an active profile in CCD]

@@ -8,11 +8,6 @@
     "uses the case-reference of the case just created",
     "contains the details of the case just created, along with an HTTP-200 OK"
   ],
-  "request": {
-    "pathVariables": {
-      "cid": "[[DYNAMIC]]"
-    }
-  },
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "headers": {

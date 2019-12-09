@@ -8,8 +8,7 @@
     "has an HTTP-403 return code"],
   "request": {
     "pathVariables": {
-      "uid": "InvalidUID",
-      "cid": "1234567890"
+      "uid": "InvalidUID"
     }
   },
   "expectedResponse": {

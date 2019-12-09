@@ -10,8 +10,7 @@
   ],
   "request": {
     "pathVariables": {
-      "cid": "[[DYNAMIC]]",
-      "ctid": "CTNotInCCD"
+      "ctid": "AAT_AUTH_5"
     }
   },
   "expectedResponse": {
@@ -22,7 +21,9 @@
       "Transfer-Encoding": "chunked"
     },
     "body": {
-
+      "columns": [],
+      "results": [],
+      "result_error": null
     }
   }
 }
