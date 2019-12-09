@@ -7,7 +7,7 @@ Feature: F-028: Fetch an event trigger in the context of a case for Case Worker
   @S-044
   Scenario: must return event trigger data successfully for valid pre-state conditions
     Given a user with [an active profile in CCD]
-    And a case that has just been created as in [Standard_Full_Case]
+    And a case that has just been created as in [Standard_Full_Case_Creation_Data]
     When a request is prepared with appropriate values
     And the request [is prepared with valid Jurisdiction, Case ID and User ID]
     And it is submitted to call the [Fetch an event trigger in the context of a case for Case Worker] operation of [CCD Data Store]
