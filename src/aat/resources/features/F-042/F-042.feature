@@ -9,7 +9,7 @@ Feature: F-042: Trigger "aboutToStart" event as a Case worker
     Given a user with [an active profile in CCD]
     And a case that has just been created as in [Caseworker1_Full_Case]
     When a request is prepared with appropriate values
-    And the request [is prepared with a valid User ID, Jurisdiction, Case ID, Case Type ID and Event Trigger ID]
+    And the request [is prepared with a valid User ID, Jurisdiction, Case Type ID and Event Trigger ID and Case ID just created]
     And it is submitted to call the [Start the event creation process for a new case for a Case Worker] operation of [CCD Data Store]
     Then a positive response is received
     And the response [has the 200 return code]
