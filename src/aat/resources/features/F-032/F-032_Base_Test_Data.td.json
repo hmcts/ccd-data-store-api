@@ -1,0 +1,24 @@
+{
+  "_guid_": "F-032_Base_Test_Data",
+
+  "user": {
+    "_extends_": "Common_User_For_Request"
+  },
+
+  "productName": "CCD Data Store",
+  "operationName": "get printable documents",
+  "method": "POST",
+  "uri": "/callback/jurisdictions/{jid}/case-types/{ctid}/documents",
+
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "jid": "AUTOTEST1",
+      "ctid": "AAT_AUTH_15"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_Response"
+  }
+}

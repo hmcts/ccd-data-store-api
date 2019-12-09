@@ -1,0 +1,10 @@
+{
+  "_guid_": "S-124_Case_Creation_Data_With_Document",
+  "_extends_": "Standard_Full_Case_Creation_Data",
+
+  "request": {
+    "body": {
+      "_extends_": "Sample_Document_Data"
+    }
+  }
+}
