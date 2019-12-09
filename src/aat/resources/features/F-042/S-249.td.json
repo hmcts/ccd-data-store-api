@@ -8,7 +8,14 @@
     "has the 422 return code"
   ],
   "request": {
-    "_extends_": "Common_Request"
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "uid": "[[DYNAMIC]]",
+      "cid": "[[DYNAMIC]]",
+      "jid": "BEFTA_JURISDICTION_1",
+      "ctid": "BEFTA_CASETYPE_1_1",
+      "etid": "CREATE"
+    }
   },
   "expectedResponse": {
     "_extends_": "Common_422_Response",
