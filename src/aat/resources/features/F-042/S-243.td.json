@@ -30,12 +30,7 @@
         "last_modified": "[[ANY]]",
         "security_classification": "PUBLIC",
         "case_data": {
-          "MoneyGBPField": "4200",
-          "YesOrNoField": "Yes",
-          "EmailField": "ccd@hmcts.net",
-          "TextField": "Some Text",
-          "PhoneUKField": "07123456789",
-          "NumberField": "164528"
+          "_extends_": "case_data_body"
         },
         "data_classification": {
           "MoneyGBPField": "PUBLIC",
