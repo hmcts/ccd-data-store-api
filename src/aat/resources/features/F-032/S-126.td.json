@@ -1,0 +1,25 @@
+{
+  "title": "must return 403 when request provides authentic credentials without authorised access to the operation",
+
+  "_guid_": "S-126",
+  "_extends_": "F-032_Base_Test_Data",
+
+  "specs": [
+    "an active profile in CCD but without read access to the case just created",
+    "contains an authorised user token for the user without access to the operation",
+    "contains a HTTP 403 Forbidden"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "ctid": "AAT_AUTH_1"
+    },
+    "body": {
+      "id": 1575906921048949
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_403_Response"
+  }
+}

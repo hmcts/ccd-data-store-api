@@ -15,6 +15,9 @@
     "pathVariables": {
       "jid": "AUTOTEST1",
       "ctid": "AAT_AUTH_15"
+    },
+    "body": {
+      "id": 1575901743247852
     }
   },
 

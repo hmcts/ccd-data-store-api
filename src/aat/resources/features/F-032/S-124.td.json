@@ -10,12 +10,6 @@
     "contains a link to the printable documents that were uploaded to the case just created, along with a HTTP 200 OK"
   ],
 
-  "request": {
-    "body": {
-      "id": 1575901743247852
-    }
-  },
-
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "headers": {
