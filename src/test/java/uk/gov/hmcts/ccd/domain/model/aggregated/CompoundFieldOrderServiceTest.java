@@ -143,8 +143,8 @@ class CompoundFieldOrderServiceTest {
     }
 
     @Test
-    @DisplayName("should override top level case fields order from case event complex fields order")
-    void shouldOverrideTopLevelCaseFieldsOrderFromCaseEventComplexFieldsOrder() {
+    @DisplayName("should override top level case fields order from case event complex fields order even if duplicates exist")
+    void shouldOverrideTopLevelCaseFieldsOrderFromCaseEventComplexFieldsOrderEvenIfDuplicatesExist() {
         FieldType collectionComplexFieldType = aFieldType()
             .withType(COMPLEX)
             .withComplexField(simpleField("One", 1))
@@ -159,6 +159,8 @@ class CompoundFieldOrderServiceTest {
 
         List<CaseEventFieldComplex> caseEventComplexFields = Lists.newArrayList(builder().reference("One").order(3).build(),
                                                                                 builder().reference("Two").order(2).build(),
+                                                                                builder().reference("One").order(4).build(),
+                                                                                builder().reference("Two").order(3).build(),
                                                                                 builder().reference("Three").order(1).build());
 
         compoundFieldOrderService.sortNestedFieldsFromCaseEventComplexFields(CASE_FIELD, caseEventComplexFields, ROOT);

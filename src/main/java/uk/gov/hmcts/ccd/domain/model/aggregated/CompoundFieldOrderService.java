@@ -59,9 +59,18 @@ public class CompoundFieldOrderService {
     private List<CaseField> getSortedFieldsFromEventFieldOverride(final List<CaseField> children, final String listElementCode, final List<String> orderedEventComplexFieldReferences) {
         final List<CaseField> sortedCaseFields = Lists.newArrayList();
         final Map<String, CaseField> childrenCaseIdToCaseField = convertComplexTypeChildrenToOrderedMap(children);
-        orderedEventComplexFieldReferences.forEach(reference -> sortedCaseFields.add(childrenCaseIdToCaseField.remove(getReference(listElementCode, reference))));
-        addRemainingInEncounterOrder(sortedCaseFields, childrenCaseIdToCaseField);
+        orderedEventComplexFieldReferences.stream()
+            .filter(reference -> areChildrenRemaining(children, sortedCaseFields))
+            .forEach(reference -> sortedCaseFields.add(childrenCaseIdToCaseField.remove(getReference(listElementCode, reference))));
+        if (areChildrenRemaining(children, sortedCaseFields)) {
+            addRemainingInEncounterOrder(sortedCaseFields, childrenCaseIdToCaseField);
+        }
         return sortedCaseFields;
+    }
+
+    private boolean areChildrenRemaining(final List<CaseField> children, final List<CaseField> sortedCaseFields) {
+        // check is needed in case there are duplicate entries defined in EventToComplexTypes tab for same ListElementCode
+        return sortedCaseFields.size() < children.size();
     }
 
     private String getReference(final String listElementCode, final String reference) {
