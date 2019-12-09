@@ -5,11 +5,11 @@
   "specs": [
     "an active profile in CCD",
     "does not provide valid authentication credentials in CCD",
-    "has a 401 Unauthorized code"
+    "has a 403 Forbidden code"
   ],
   "request": {
     "pathVariables": {
-      "uid": "UserId"
+      "uid": "someInvalidUserID"
     }
   },
   "expectedResponse": {

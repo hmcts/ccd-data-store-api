@@ -8,8 +8,8 @@
     "has a 403 Forbidden code"
   ],
   "request": {
-    "pathVariables": {
-      "uid": "UserId"
+    "headers": {
+      "Authorization": "Invalid_Authorization"
     }
   },
   "expectedResponse": {
