@@ -2,6 +2,7 @@
   "title": "must return an empty SearchResultView envelope and status code 200 if case type is not found",
   "_guid_": "S-077",
   "_extends_": "F-026_Test_Data_Base",
+
   "specs": [
     "an active profile in CCD",
     "uses the case-reference of the case just created",

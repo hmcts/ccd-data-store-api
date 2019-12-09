@@ -46,3 +46,13 @@ Feature: F-026: Get a case data with UI layout
     Then a negative response is received
     And the response [has an HTTP-403 return code]
     And the response has all other details as expected
+
+  @S-076
+  Scenario: must return 412 when the case type is not present in Definition store workbasket input fields
+    Given a user with [an active profile in CCD]
+    When a request is prepared with appropriate values
+    And the request [the case type is not present in Definition store workbasket]
+    And it is submitted to call the [Get a case data with UI layout] operation of [CCD Data Store]
+    Then a negative response is received
+    And the response [has an HTTP-412 return code]
+    And the response has all other details as expected
