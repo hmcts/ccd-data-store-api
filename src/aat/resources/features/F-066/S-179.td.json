@@ -1,0 +1,35 @@
+{
+  "title": "must return negative response when request contains a non-existing Event-Id",
+	"_guid_": "S-179",
+	"_extends_": "F-066_Test_Data_Base",
+
+	"specs": [
+		"an active profile in CCD",
+    "contains a non-existing Event-Id",
+    "has the 404 return code"
+	],
+	"request": {
+    "pathVariables": {
+      "cid": "1573751648840703"
+    },
+    "body": {
+      "event":   {
+        "id": "UPDATE123"
+      }
+    }
+	},
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "headers": {
+      "Content-Length" : "[[ANY]]",
+      "Content-Encoding" : "gzip"
+    },
+    "body" : {
+      "exception" : "[[ANY]]",
+      "message" : "No event found",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}
