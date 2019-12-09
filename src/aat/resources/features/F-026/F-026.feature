@@ -26,3 +26,23 @@ Feature: F-026: Get a case data with UI layout
     Then a positive response is received
     And the response [contains an empty SearchResultView, along with an HTTP-200 OK]
     And the response has all other details as expected
+
+  @S-074
+  Scenario: must return appropriate negative response when request does not provide valid authentication credentials
+    Given a user with [an active profile in CCD]
+    When a request is prepared with appropriate values
+    And the request [does not provide valid authentication credentials]
+    And it is submitted to call the [Get a case data with UI layout] operation of [CCD Data Store]
+    Then a negative response is received
+    And the response [has an HTTP-403 return code]
+    And the response has all other details as expected
+
+  @S-075
+  Scenario: must return 403 when request provides authentic credentials without authorised access to the operation
+    Given a user with [an active profile in CCD]
+    When a request is prepared with appropriate values
+    And the request [does not provide authorised access to the operation]
+    And it is submitted to call the [Get a case data with UI layout] operation of [CCD Data Store]
+    Then a negative response is received
+    And the response [has an HTTP-403 return code]
+    And the response has all other details as expected

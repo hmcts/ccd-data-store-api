@@ -20,6 +20,8 @@
       "Content-Type": "application/json;charset=UTF-8",
       "Transfer-Encoding": "chunked"
     },
-    "body": ["[[ANY]]"]
+    "body":{
+      "arrayInMap": ["[[ANY]]"]
+    }
   }
 }
