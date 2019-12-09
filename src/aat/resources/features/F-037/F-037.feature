@@ -7,7 +7,7 @@ Feature: F-037: Create event (V2)
   @S-024
   Scenario: should create event successfully for correct inputs
     Given a user with [an active profile in CCD]
-    And a case that has just been created as in [Standard_Full_Case]
+    And a case that has just been created as in [Standard_Full_Case_Creation_Data]
     And a successful call [to get an event token for just created case] as in [S-024-Prerequisite]
     When a request is prepared with appropriate values
     And it is submitted to call the [Create event (V2)] operation of [CCD Data Store]

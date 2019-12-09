@@ -20,13 +20,9 @@
 	},
   "expectedResponse": {
     "_extends_": "Common_404_Response",
-    "headers": {
-      "Content-Length" : "[[ANY]]",
-      "Content-Encoding" : "gzip"
-    },
     "body" : {
       "exception" : "[[ANY]]",
-      "message" : "No event found",
+      "message" : "[[ANY]]",
       "details" : null,
       "callbackErrors" : null,
       "callbackWarnings" : null
