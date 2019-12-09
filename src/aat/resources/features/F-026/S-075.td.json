@@ -9,9 +9,6 @@
   "request": {
     "headers": {
       "Authorization": "Dummy_Authorization"
-    },
-    "pathVariables": {
-      "cid": "1234567890"
     }
   },
   "expectedResponse": {

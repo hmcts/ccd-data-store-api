@@ -13,12 +13,12 @@
     "headers": {
       "Content-Encoding": "gzip",
       "Content-Type": "application/json;charset=UTF-8",
-      "Transfer-Encoding": "chunked"
+      "Content-Length" : "[[ANY]]"
     },
     "body": {
-      "arrayInMap": [
-        "[[ANY]]"
-      ]
+      "columns" :"[[ANY]]",
+      "results" : "[[ANY]]",
+      "result_error" : null
     }
   }
 }

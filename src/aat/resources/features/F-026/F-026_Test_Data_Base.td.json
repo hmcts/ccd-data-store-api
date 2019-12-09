@@ -7,7 +7,7 @@
     "pathVariables": {
       "uid": "[[DYNAMIC]]",
       "jid": "AUTOTEST1",
-      "ctid": "AAT"
+      "ctid": "AAT_AUTH_15"
     }
   },
   "method": "GET",
