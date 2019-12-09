@@ -1,8 +1,10 @@
 {
-  "_guid_": "Caseworker1_Full_Case",
-  "user": {
-    "username": "befta.caseworker.1@gmail.com",
-    "password": "Pa55word11"
+  "_guid_": "Case-Creation-using-Caseworker1-Role",
+  "users": {
+    "invokingUser": {
+      "username": "befta.caseworker.1@gmail.com",
+      "password": "Pa55word11"
+    }
   },
   "request": {
     "pathVariables": {
