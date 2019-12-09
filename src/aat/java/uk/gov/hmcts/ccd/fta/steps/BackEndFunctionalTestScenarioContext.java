@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.fta.steps;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import io.cucumber.java.Scenario;
@@ -16,12 +18,33 @@ public class BackEndFunctionalTestScenarioContext {
     private static final HttpTestDataSource DATA_SOURCE = new JsonStoreHttpTestDataSource(TEST_DATA_RESOURCE_PACKAGES);
 
     private Scenario scenario;
-    private HttpTestData testData;
+    protected HttpTestData testData;
     private HttpTestData caseCreationData;
     private Long theCaseReference;
     private UserData theInvokingUser;
     private RequestSpecification theRequest;
     private ResponseData theResponse;
+
+    private BackEndFunctionalTestScenarioContext parentContext;
+    private Map<String, BackEndFunctionalTestScenarioContext> childContexts = new HashMap<>();
+
+
+    public void addChildContext(BackEndFunctionalTestScenarioContext childContext) {
+        childContext.setParentContext(this);
+        childContexts.put(childContext.getTestData().get_guid_(), childContext);
+    }
+
+    public BackEndFunctionalTestScenarioContext getParentContext() {
+        return parentContext;
+    }
+
+    public void setParentContext(BackEndFunctionalTestScenarioContext parentContext) {
+        this.parentContext = parentContext;
+    }
+
+    public Map<String, BackEndFunctionalTestScenarioContext> getChildContexts() {
+        return childContexts;
+    }
 
     public void initializeTestDataFor(Scenario scenario) {
         this.scenario = scenario;
