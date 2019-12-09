@@ -4,8 +4,9 @@
   "_extends_": "F-042_Test_Data_Base",
   "specs": [
     "an active profile in CCD",
-    "is prepared with a valid User ID, Jurisdiction, Case Type ID and Event Trigger ID and Case ID just created",
-    "has the 200 return code"
+    "is prepared with a valid User ID, Jurisdiction, Case Type ID and Event Trigger ID and the Case ID just created",
+    "has the HTTP 200 OK return code",
+    "returns the START_EVENT trigger along with the event token"
   ],
   "request": {
     "_extends_": "Common_Request"
