@@ -69,8 +69,9 @@ public class DynamicValueInjector {
                 }
             } else if (key.equalsIgnoreCase("uid") && theInvokingUser.getUid() != null) {
                 return theInvokingUser.getUid();
-            } else if (key.equalsIgnoreCase("cid") && scenarioContext.getTheCaseReference() != null) {
-                return scenarioContext.getTheCaseReference();
+            } else if (key.equalsIgnoreCase("cid")) {
+                return calculateFromContext(scenarioContext,
+                        "${[scenarioContext][childContexts][Standard_Full_Case_Creation_Data][testData][actualResponse][body][caseReference]}");
             }
             throw new FunctionalTestException("Dynamic value for '" + path + "." + key + "' does not exist!");
         } else if (isFormula(valueString)) {
