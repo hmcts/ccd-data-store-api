@@ -4,8 +4,8 @@
   "title": "must return 404 for if no jurisdiction is found",
   "specs": [
     "a detailed profile in CCD",
-    "uses the invalid authorization",
-    "has the 403 return code"
+    "contains an invalid authorization token",
+    "contains the HTTP 403 Forbidden"
   ],
   "request": {
     "_extends_": "Common_Request",
