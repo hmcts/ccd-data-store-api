@@ -10,7 +10,7 @@ public interface BackEndFunctionalTestAutomationDSL {
 
     // DSL Element:
     // "a case that has just been created as in [<some test data unique id>]"
-    void createCaseWithTheDataProvidedInATestDataObject(String caseDataId);
+    void createCaseWithTheDataProvidedInATestDataObject(String caseDataId) throws IOException;
 
     // DSL Element:
     // "a user with [<some specification about user data>]"
