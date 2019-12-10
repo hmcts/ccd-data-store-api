@@ -63,7 +63,7 @@ public class UICaseControllerCaseRolesIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases_event_access_case_roles.sql" })
-    public void shouldNotReturnEventDataForCitizenWhoHasNoAccessToEvents() throws Exception {
+    public void shouldNotReturnEventHistoryDataForCitizenWhoHasNoAccessToEvents() throws Exception {
 
         assertCaseDataResultSetSize();
 
@@ -88,7 +88,7 @@ public class UICaseControllerCaseRolesIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases_event_access_case_roles.sql" })
-    public void shouldReturnEventDataForCitizenWhoHasCaseRoleAccess() throws Exception {
+    public void shouldReturnEventHistoryDataForCitizenWhoHasCaseRoleAccess() throws Exception {
 
         assertCaseDataResultSetSize();
         MockUtils.setSecurityAuthorities(UID_WITH_EVENT_ACCESS, authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);

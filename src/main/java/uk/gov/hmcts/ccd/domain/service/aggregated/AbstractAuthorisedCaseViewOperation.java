@@ -1,8 +1,11 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CASE_TYPE_FOUND_DETAILS;
-
+import com.google.common.collect.Sets;
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import org.apache.commons.lang.StringUtils;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
@@ -16,13 +19,8 @@ import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import com.google.common.collect.Sets;
-import org.apache.commons.lang.StringUtils;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CASE_TYPE_FOUND_DETAILS;
 
 public abstract class AbstractAuthorisedCaseViewOperation {
 
