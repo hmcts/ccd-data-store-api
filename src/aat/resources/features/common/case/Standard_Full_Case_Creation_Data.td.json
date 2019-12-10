@@ -1,25 +1,27 @@
 {
 	"_guid_": "Standard_Full_Case_Creation_Data",
-	
+
 	"productName": "CCD Data Store",
-    "operationName": "Submit case creation as Case worker",
-    "method": "POST",
-    "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
+	"operationName": "Submit case creation as Case worker",
+	"method": "POST",
+	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
 
 	"specs": [
 		"to create a full case"
 	],
+
 	"users": {
 		"invokingUser": {
 			"username": "[[$CCD_CASEWORKER_AUTOTEST_EMAIL]]",
 			"password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
 		}
 	},
+
 	"request": {
 		"pathVariables": {
-			"jurisdiction": "AUTOTEST1",
-			"caseType": "AAT_AUTH_15",
-			"event": "CREATE"
+			"uid": "[[DYNAMIC]]",
+			"jid": "AUTOTEST1",
+			"ctid": "AAT_AUTH_15"
 		},
 		"body": {
 			"_extends_": "Standard_Full_Case_Data",

@@ -16,11 +16,13 @@
 			"password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
 		}
 	},
+
 	"request": {
 		"pathVariables": {
-			"jurisdiction": "AUTOTEST1",
-			"caseType": "AAT_AUTH_15",
-			"event": "CREATE"
+			"uid": "[[DYNAMIC]]",
+			"jid": "AUTOTEST1",
+			"ctid": "AAT_AUTH_15",
+			"etid": "CREATE"
 		},
 		"body": {
 			"_extends_": "Standard_Full_Case_Data"
