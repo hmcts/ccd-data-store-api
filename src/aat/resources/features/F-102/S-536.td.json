@@ -1,37 +1,36 @@
 {
   "_guid_": "S-536",
-  "_extends_": "Base_Expecting_403",
+  "_extends_": "F-102_Test_Data_Base",
   "title": "must return 404 for if no jurisdiction is found",
   "specs": [
     "a detailed profile in CCD",
     "uses the invalid authorization",
     "has the 403 return code"
   ],
-  "productName": "CCD Data Store",
-  "operationName": "Get jurisdictions available to the user",
-  "method": "GET",
-  "uri": "/aggregated/caseworkers/{uid}/jurisdictions",
   "request": {
+    "_extends_": "Common_Request",
+    "headers": {
+      "Authorization": "Dummy_Authorization"
+    },
     "pathVariables": {
-      "uid": "some UID"
+      "uid": "[[DYNAMIC]]"
     },
     "queryParams": {
-      "access": "delete"
-    }
-  },
-  "expectedResponse": {
-    "headers": {
-      "Content-Encoding": "gzip",
-      "Content-Type": "application/json;charset=UTF-8",
-      "Content-Length": "[[ANY]]",
-      "Transfer-Encoding" : "[[ANY]]"
+      "access": "create"
     },
-    "body": {
-      "timestamp": "[[ANY]]",
-      "status": 403,
-      "error": "Forbidden",
-      "message": "Access Denied",
-      "path": "[[ANY]]"
+    "expectedResponse": {
+      "_extends_": "Common_403_Response",
+      "headers": {
+        "Content-Encoding": "gzip",
+        "Content-Length": "[[ANY]]",
+        "Transfer-Encoding": "[[ANY]]",
+        "Content-Type": "[[ANY]]"
+      },
+      "body": {
+        "timestamp": "[[ANY]]",
+        "message": "Access Denied",
+        "path": "[[ANY]]"
+      }
     }
   }
 }

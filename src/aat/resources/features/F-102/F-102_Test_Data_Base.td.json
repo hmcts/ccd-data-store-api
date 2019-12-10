@@ -16,7 +16,6 @@
     "password": "Pa55word11"
   },
   "expectedResponse": {
-    "_extends_": "Common_200_Response",
     "headers": {
       "_extends_": "Common_Response_Headers"
     }
