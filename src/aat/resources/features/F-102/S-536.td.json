@@ -17,20 +17,20 @@
     },
     "queryParams": {
       "access": "create"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_403_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "Content-Length": "[[ANY]]",
+      "Transfer-Encoding": "[[ANY]]",
+      "Content-Type": "[[ANY]]"
     },
-    "expectedResponse": {
-      "_extends_": "Common_403_Response",
-      "headers": {
-        "Content-Encoding": "gzip",
-        "Content-Length": "[[ANY]]",
-        "Transfer-Encoding": "[[ANY]]",
-        "Content-Type": "[[ANY]]"
-      },
-      "body": {
-        "timestamp": "[[ANY]]",
-        "message": "Access Denied",
-        "path": "[[ANY]]"
-      }
+    "body": {
+      "timestamp": "[[ANY]]",
+      "message": "Access Denied",
+      "path": "[[ANY]]"
     }
   }
 }
