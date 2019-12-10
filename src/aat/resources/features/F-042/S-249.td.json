@@ -5,7 +5,7 @@
   "specs": [
     "an active profile in CCD",
     "is prepared with an invalid START_EVENT",
-    "has the 422 return code"
+    "contains a HTTP 422 Forbidden"
   ],
   "request": {
     "_extends_": "Common_Request",
