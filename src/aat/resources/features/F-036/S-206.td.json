@@ -18,7 +18,7 @@
     },
     "pathVariables": {
       "caseId": "[[DYNAMIC]]",
-      "triggerId": "EVENT_NONE"
+      "triggerId": "EVENT_D"
     }
   },
   "expectedResponse": {

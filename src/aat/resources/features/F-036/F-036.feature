@@ -82,7 +82,7 @@ Feature: F-036: Retrieve a trigger for case by ID
 
   @S-206
   Scenario: must return 422 when user role is missing
-    Given a case that has just been created as in [Standard_Full_Case_Creation_Data]
+    Given a case that has just been created as in [Standard_Full_Case_Creation_Data_BEFTA_Jurisdiction_3]
     And a user with [an active profile in CCD]
     When a request is prepared with appropriate values
     And the request [where the user has insufficient privilege]
