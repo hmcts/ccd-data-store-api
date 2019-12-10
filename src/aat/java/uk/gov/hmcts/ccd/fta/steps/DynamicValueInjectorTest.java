@@ -50,6 +50,7 @@ public class DynamicValueInjectorTest {
 
         Assert.assertEquals("token value", testData.getRequest().getPathVariables().get("token"));
         Assert.assertEquals("token value at index 2", testData.getRequest().getPathVariables().get("token_2"));
+        Assert.assertEquals("token value", testData.getRequest().getBody().get("event_token"));
 
         // Assert.assertEquals("[[DYNAMIC]]",
         // testData.getRequest().getHeaders().get("uid"));
