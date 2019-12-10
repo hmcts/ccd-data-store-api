@@ -25,7 +25,7 @@ public class CCDHelper {
                      .contentType(ContentType.JSON)
                      .body(casePayload)
                      .when()
-                     .post("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases");
+                     .post("/citizens/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases");
     }
 
 
@@ -42,7 +42,7 @@ public class CCDHelper {
             .pathParam("event", event)
             .contentType(ContentType.JSON)
             .when()
-            .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/event-triggers/{event}/token")
+            .get("/citizens/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/event-triggers/{event}/token")
             .then()
             .statusCode(200)
             .extract()

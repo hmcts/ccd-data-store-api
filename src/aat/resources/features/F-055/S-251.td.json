@@ -1,0 +1,16 @@
+{
+  "title": "must return 200 if start event trigger is successful for a case",
+
+  "_guid_": "S-251",
+  "_extends_": "F-055_Base_Test_Data",
+
+  "specs": [
+    "an active profile in CCD",
+    "includes case data matching the case just created",
+    "contains an event token for the triggered event, along with a HTTP 200 OK"
+  ],
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response"
+  }
+}
