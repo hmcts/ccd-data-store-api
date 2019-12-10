@@ -5,41 +5,41 @@
       Given an appropriate test context as detailed in the test data source
 
     @S-165
-    Scenario: should retrieve case view when the case reference exists
+    Scenario: must return case view when the case reference exists
       Given a case that has just been created as in [Standard_Full_Case_Creation_Data]
       And a user with [an active profile in CCD]
       When a request is prepared with appropriate values
-      And the request [uses the case-reference of the case just created]
+      And the request [uses case-reference of the case just created]
       And it is submitted to call the [Retrieve a case by ID for dynamic display] operation of [CCD Data Store]
       Then a positive response is received
-      And the response [contains the details of the case just created, along with an HTTP-200 OK]
+      And the response [contains details of the case just created, along with an HTTP-200 OK]
       And the response has all other details as expected
 
     @S-164 @Ignore #RDM-6874
-    Scenario: should retrieve case view history when the case reference exists
+    Scenario: must return case view history when the case reference exists
       Given a case that has just been created as in [Standard_Full_Case_Creation_Data]
       And a user with [an active profile in CCD]
       When a request is prepared with appropriate values
-      And the request [uses the case-reference of the case just created]
+      And the request [uses case-reference of the case just created]
       And it is submitted to call the [Retrieve a case by ID for dynamic display] operation of [CCD Data Store]
       Then a positive response is received
-      And the response [contains the details of the case just created, along with an HTTP-200 OK]
+      And the response [contains details of the case just created, along with an HTTP-200 OK]
       And the response [contains the case view history]
       And the response has all other details as expected
 
     @S-163
-    Scenario: should get 404 when case reference does NOT exist
+    Scenario: must return 404 when case reference does NOT exist
       Given a case that has just been created as in [Standard_Full_Case_Creation_Data]
       And a user with [an active profile in CCD]
       When a request is prepared with appropriate values
-      And the request [uses the case-reference which is not exist in CCD]
+      And the request [uses case-reference which is not exist in CCD]
       And it is submitted to call the [Retrieve a case by ID for dynamic display] operation of [CCD Data Store]
       Then a negative response is received
       And the response [has an HTTP-404 code]
       And the response has all other details as expected
 
     @S-162
-    Scenario: should get 400 when case reference invalid
+    Scenario: must return 400 when case reference is invalid
       Given a case that has just been created as in [Standard_Full_Case_Creation_Data]
       And a user with [an active profile in CCD]
       When a request is prepared with appropriate values

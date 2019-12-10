@@ -1,5 +1,5 @@
 {
-  "title": "should get 400 when case reference invalid",
+  "title": "must return 400 when case reference is invalid",
   "_guid_": "S-162",
   "_extends_": "F-065_Test_Data_Base",
 

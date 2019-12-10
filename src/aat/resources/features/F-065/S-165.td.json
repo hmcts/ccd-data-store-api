@@ -1,12 +1,12 @@
 {
-  "title": "should retrieve case view when the case reference exists",
+  "title": "must return case view when the case reference exists",
   "_guid_": "S-165",
   "_extends_": "F-065_Test_Data_Base",
 
   "specs": [
     "an active profile in CCD",
-    "uses the case-reference of the case just created",
-    "contains the details of the case just created, along with an HTTP-200 OK"
+    "uses case-reference of the case just created",
+    "contains details of the case just created, along with an HTTP-200 OK"
   ],
   "expectedResponse": {
     "_extends_": "Common_200_Response",
