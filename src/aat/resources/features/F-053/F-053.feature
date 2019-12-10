@@ -60,7 +60,7 @@ Feature: F-053: Submit case creation as Citizen
 
   @S-275
   Scenario: must return negative response HTTP-403 when request contains a non-existing user ID
-    Given a user with [an active profile in CCD]
+    Given a user with [an inactive profile in CCD]
     And   a successful call [to create an event token] as in [F-053-Prerequisite]
     When a request is prepared with appropriate values
     And the request [contains a non-existing user ID]
