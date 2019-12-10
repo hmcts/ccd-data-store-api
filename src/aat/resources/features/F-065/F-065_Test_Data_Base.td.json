@@ -10,8 +10,9 @@
   },
 
   "request": {
+    "_extends_": "Common_Request",
     "headers": {
-      "_extends_": "Common_Request_Headers"
+      "experimental": true
     },
     "pathVariables": {
       "cid": "[[DYNAMIC]]"
