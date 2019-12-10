@@ -1,6 +1,6 @@
 {
   "_guid_": "S-202",
-  "_extends_": "Base_Expecting_403",
+  "_extends_": "F-036_Base_Test_Data",
   "title": "must return 401 when request does not provide valid authentication credentials",
   "specs": [
     "an active profile in CCD",
@@ -13,21 +13,16 @@
       "password": "InvalidPassword"
     }
   },
-  "productName": "CCD Data Store",
-  "operationName": "Retrieve a trigger for case by ID",
-  "method": "GET",
-  "uri": "cases/{caseId}/event-triggers/{triggerId}",
   "request": {
     "headers" : {
-      "Content-Type": "application/json",
       "Authorization": "invalidToken"
     },
     "pathVariables": {
-      "caseId": "[[DYNAMIC]]",
       "triggerId": "CREATE"
     }
   },
   "expectedResponse": {
+    "_extends_": "Common_403_Response",
     "headers": {
       "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
       "Date" : "[[ANY]]",

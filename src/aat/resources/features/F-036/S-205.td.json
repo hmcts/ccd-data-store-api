@@ -1,27 +1,15 @@
 {
   "_guid_": "S-205",
-  "_extends_": "Base_Expecting_422",
-  "title": "must return 200 and a StartTriggerResource object when case id and event trigger id are provided",
+  "_extends_": "F-036_Base_Test_Data",
+  "title": "must return 422 when case event has validation errors",
   "specs": [
     "an active profile in CCD",
     "contains validation errors",
     "has a 422 Unprocessable Entity code"
   ],
-  "productName": "CCD Data Store",
-  "operationName": "Retrieve a trigger for case by ID",
-  "method": "GET",
-  "uri": "cases/{caseId}/event-triggers/{triggerId}",
-  "request": {
-    "headers" : {
-      "experimental" : "true",
-      "Content-Type": "application/json"
-    },
-    "pathVariables": {
-      "caseId": "[[DYNAMIC]]",
-      "triggerId": "START_PROGRESS"
-    }
-  },
+
   "expectedResponse": {
+    "_extends_": "Common_422_Response",
     "headers" : {
       "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
       "Content-Encoding" : "gzip",
