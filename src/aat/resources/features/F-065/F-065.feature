@@ -50,13 +50,14 @@
       And the response has all other details as expected
 
     @S-161
-    Scenario: must return 403 when request provides authentic credentials without authorised access to the operation
-      Given a user with [an active profile in CCD]
+    Scenario: must return 404 when request provides authentic credentials without authorised access to the operation
+      Given a case that has just been created as in [S-161_Case_Creation_Data]
+      And a user with [an active profile in CCD]
       When a request is prepared with appropriate values
-      And the request [does not provide valid authentication credentials]
+      And the request [contains a valid user authorisation token without access to the operation]
       And it is submitted to call the [Retrieve a case by ID for dynamic display] operation of [CCD Data Store]
       Then a negative response is received
-      And the response [has an HTTP-403 code]
+      And the response [contains an HTTP-404 Not Found]
       And the response has all other details as expected
 
     @S-160 @Ignore # defect RDM-6628

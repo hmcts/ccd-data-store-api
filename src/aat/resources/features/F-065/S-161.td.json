@@ -1,24 +1,24 @@
 {
-  "title": "must return 403 when request provides authentic credentials without authorised access to the operation",
+  "title": "must return 404 when request provides authentic credentials without authorised access to the operation",
   "_guid_": "S-161",
   "_extends_": "F-065_Test_Data_Base",
 
   "specs": [
     "an active profile in CCD",
-    "does not provide valid authentication credentials",
-    "has an HTTP-403 code"
+    "contains a valid user authorisation token without access to the operation",
+    "contains an HTTP-404 Not Found"
   ],
-  "request": {
-    "headers": {
-      "Authorization": "Dummy_Authorization"
-    }
-  },
-
   "expectedResponse": {
-    "_extends_": "Common_403_Response",
-
-    "body" : {
-      "message" : "Access Denied"
+    "_extends_": "Common_404_Response",
+    "headers": {
+      "Content-Encoding": "gzip"
+    },
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException",
+      "message": "[[ANY]]",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
     }
   }
 }
