@@ -9,7 +9,7 @@ Feature: F-026: Get a case data with UI layout
     Given a case that has just been created as in [Standard_Full_Case_Creation_Data]
     And a user with [an active profile in CCD]
     When a request is prepared with appropriate values
-    And the request [uses the case-reference of the case just created]
+    And the request [uses case-reference of the case just created]
     And it is submitted to call the [Get a case data with UI layout] operation of [CCD Data Store]
     Then a positive response is received
     And the response [contains the details of the case just created, along with an HTTP-200 OK]
@@ -20,8 +20,8 @@ Feature: F-026: Get a case data with UI layout
     Given a case that has just been created as in [Standard_Full_Case_Creation_Data]
     And a user with [an active profile in CCD]
     When a request is prepared with appropriate values
-    And the request [uses the case-reference of the case just created]
-    And the request [uses a case-type which is not in CCD]
+    And the request [uses case-reference of the case just created]
+    And the request [uses an existing case-type which doesn't have any associated cases]
     And it is submitted to call the [Get a case data with UI layout] operation of [CCD Data Store]
     Then a positive response is received
     And the response [contains an empty SearchResultView, along with an HTTP-200 OK]
@@ -51,7 +51,7 @@ Feature: F-026: Get a case data with UI layout
   Scenario: must return 412 when the case type is not present in Definition store workbasket input fields
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
-    And the request [the case type is not present in Definition store workbasket]
+    And the request [uses case type which is not present in Definition store workbasket]
     And it is submitted to call the [Get a case data with UI layout] operation of [CCD Data Store]
     Then a negative response is received
     And the response [has an HTTP-412 return code]

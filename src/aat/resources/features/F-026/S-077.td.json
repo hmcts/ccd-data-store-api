@@ -5,8 +5,8 @@
 
   "specs": [
     "an active profile in CCD",
-    "uses the case-reference of the case just created",
-    "uses a case-type which is not in CCD",
+    "uses case-reference of the case just created",
+    "uses an existing case-type which doesn't have any associated cases",
     "contains an empty SearchResultView, along with an HTTP-200 OK"
   ],
   "request": {
@@ -16,11 +16,6 @@
   },
   "expectedResponse": {
     "_extends_": "Common_200_Response",
-    "headers": {
-      "Content-Encoding": "gzip",
-      "Content-Type": "application/json;charset=UTF-8",
-      "Content-Length" : "[[ANY]]"
-    },
     "body": {
       "columns": [],
       "results": [],
