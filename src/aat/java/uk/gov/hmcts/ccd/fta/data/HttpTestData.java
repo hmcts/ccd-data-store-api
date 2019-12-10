@@ -29,6 +29,8 @@ public class HttpTestData {
 
     private ResponseData expectedResponse;
 
+    private ResponseData actualResponse;
+
     private Map<String, UserData> users = new HashMap<>();
 
     public String get_guid_() {
@@ -109,6 +111,14 @@ public class HttpTestData {
 
     public void setExpectedResponse(ResponseData expectedResponse) {
         this.expectedResponse = expectedResponse;
+    }
+
+    public ResponseData getActualResponse() {
+        return actualResponse;
+    }
+
+    public void setActualResponse(ResponseData actualResponse) {
+        this.actualResponse = actualResponse;
     }
 
     public boolean meetsSpec(String specification) {
