@@ -41,7 +41,7 @@ Feature: F-066: Retrieve a start event trigger by ID for dynamic display
     And the request [contains an invalid case reference]
     And it is submitted to call the [Retrieve a start event trigger by ID for dynamic display] operation of [CCD Data Store]
     Then a negative response is received
-    And the response [has the 400 return code]
+    And the response [includes a HTTP 400 'Bad Request']
     And the response has all the details as expected
 
   @S-178 @Ignore # This scenario is returning 400 instead of expected 404, Need to raise defect JIRA
@@ -51,7 +51,7 @@ Feature: F-066: Retrieve a start event trigger by ID for dynamic display
     And the request [contains a non-existing case reference]
     And it is submitted to call the [Retrieve a start event trigger by ID for dynamic display] operation of [CCD Data Store]
     Then a negative response is received
-    And the response [has the 404 return code]
+    And the response [includes a HTTP 404 'Not Found']
     And the response has all the details as expected
 
 
@@ -63,7 +63,7 @@ Feature: F-066: Retrieve a start event trigger by ID for dynamic display
       And the request [contains an invalid event trigger]
       And it is submitted to call the [Retrieve a start event trigger by ID for dynamic display] operation of [CCD Data Store]
       Then a negative response is received
-      And the response [has the 404 return code]
+      And the response [includes a HTTP 404 'Not Found']
       And the response has all the details as expected
 
 

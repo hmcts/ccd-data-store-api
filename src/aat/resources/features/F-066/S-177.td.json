@@ -6,7 +6,7 @@
 	"specs": [
 		"an active profile in CCD",
 		"contains an invalid case reference",
-		"has the 400 return code"
+		"includes a HTTP 400 'Bad Request'"
 	],
   "request": {
     "pathVariables": {
