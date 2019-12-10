@@ -27,5 +27,10 @@
 			"_extends_": "Standard_Full_Case_Data",
 			"token": "${[scenarioContext][childContexts][Standard_Token_Creation_Data_For_Case_Creation][testData][actualResponse][body][token]}"
 		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_200_Response"
 	}
+
 }

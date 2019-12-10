@@ -27,5 +27,10 @@
 		"body": {
 			"_extends_": "Standard_Full_Case_Data"
 		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_200_Response"
 	}
+
 }
