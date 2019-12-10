@@ -19,17 +19,6 @@ public class BackEndFunctionalTestScenarioContext {
 
     private Scenario scenario;
     protected HttpTestData testData;
-    private HttpTestData caseCreationData;
-    private Long theCaseReference;
-    private String theEventToken;
-
-    public String getTheEventToken() {
-        return theEventToken;
-    }
-
-    public void setTheEventToken(String theEventToken) {
-        this.theEventToken = theEventToken;
-    }
 
     private UserData theInvokingUser;
     private RequestSpecification theRequest;
@@ -66,10 +55,6 @@ public class BackEndFunctionalTestScenarioContext {
         testData = DATA_SOURCE.getDataForTestCall(testDataId);
     }
 
-    public void initializeCaseCreationDataFor(String testDataId) {
-        caseCreationData = DATA_SOURCE.getDataForTestCall(testDataId);
-    }
-
     public String getCurrentScenarioTag() {
         return scenario.getSourceTagNames().stream()
             .filter(tag -> tag.startsWith("@S-"))
@@ -79,18 +64,6 @@ public class BackEndFunctionalTestScenarioContext {
 
     public HttpTestData getTestData() {
         return testData;
-    }
-
-    public HttpTestData getCaseCreationData() {
-        return caseCreationData;
-    }
-
-    public Long getTheCaseReference() {
-        return theCaseReference;
-    }
-
-    public void setTheCaseReference(Long theCaseReference) {
-        this.theCaseReference = theCaseReference;
     }
 
     public UserData getTheInvokingUser() {
