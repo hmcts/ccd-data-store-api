@@ -18,6 +18,9 @@
 	},
 
 	"request": {
+		"headers":{
+			"_extends_": "Common_Request_Headers"
+		},
 		"pathVariables": {
 			"uid": "[[DYNAMIC]]",
 			"jid": "AUTOTEST1",
