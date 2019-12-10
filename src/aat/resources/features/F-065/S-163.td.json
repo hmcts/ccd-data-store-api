@@ -1,0 +1,19 @@
+{
+  "title": "should get 404 when case reference does NOT exist",
+  "_guid_": "S-163",
+  "_extends_": "F-065_Base_Test_Data",
+
+  "specs": [
+    "an active profile in CCD",
+    "uses the case-reference which is not exist in CCD",
+    "has an HTTP-404 code"
+  ],
+  "request": {
+    "pathVariables": {
+      "cid": "9999999999999999"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_404_Response"
+  }
+}
