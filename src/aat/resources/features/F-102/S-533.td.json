@@ -1,114 +1,40 @@
 {
   "_guid_": "S-533",
-  "_extends_": "Base_Expecting_200",
+  "_extends_": "F-102_Test_Data_Base",
   "title": "Get jurisdictions available to the user",
   "specs": [
     "a detailed profile in CCD having create case access for a jurisdiction",
     "has CREATE as case access",
     "contains the list of jurisdictions a user has access to"
   ],
-  "productName": "CCD Data Store",
-  "operationName": "Get jurisdictions available to the user",
-  "method": "GET",
-  "uri": "/aggregated/caseworkers/{uid}/jurisdictions",
   "request": {
-    "pathVariables": {
-      "uid": "[[DYNAMIC]]"
-    },
+    "_extends_": "Common_Request",
     "queryParams": {
       "access": "create"
     }
   },
-  "user": {
-    "username": "befta.citizen.3@gmail.com",
-    "password": "Pa55word11"
-  },
   "expectedResponse": {
-    "responseCode": 200,
-    "responseMessage": "OK",
+    "_extends_": "Common_200_Response",
     "headers": {
-      "Content-Length": "[[ANY]]",
       "Transfer-Encoding": "[[ANY]]",
-      "Connection": "[[ANY]]",
-      "Content-Type": "[[ANY]]",
-      "Content-Encoding": "[[ANY]]"
+      "Content-Length": "[[ANY]]",
+      "Content-Encoding" : "gzip",
+      "Content-Type" : "application/json;charset=UTF-8"
     },
     "body": {
       "arrayInMap": [
         {
-          "id": "BEFTA_JURISDICTION_3",
-          "name": "BEFTA Jurisdiction 3",
-          "description": "Content for the Test Jurisdiction 3.",
+          "id": "BEFTA_JURISDICTION_1",
+          "name": "BEFTA_JURISDICTION_1",
+          "description": "Content for the Test Jurisdiction.",
           "caseTypes": [
             {
-              "id": "BEFTA_CASETYPE_3_2",
-              "description": "Demo Case BEFTA CASETYPE 3 2",
+              "id": "BEFTA_CASETYPE_1_1",
+              "description": "Create a case of type BEFTA_CASETYPE_1_1",
               "version": null,
-              "name": "Demo Case BEFTA CASETYPE 3 2",
+              "name": "BEFTA Case Type 1 1",
               "jurisdiction": null,
               "events": [
-                {
-                  "id": "REVIEW",
-                  "name": "Review",
-                  "description": null,
-                  "order": null,
-                  "case_fields": [],
-                  "pre_states": [
-                    "*"
-                  ],
-                  "post_state": null,
-                  "callback_url_about_to_start_event": null,
-                  "retries_timeout_about_to_start_event": null,
-                  "callback_url_about_to_submit_event": null,
-                  "retries_timeout_url_about_to_submit_event": null,
-                  "callback_url_submitted_event": null,
-                  "retries_timeout_url_submitted_event": null,
-                  "security_classification": null,
-                  "show_summary": null,
-                  "show_event_notes": null,
-                  "end_button_label": null,
-                  "can_save_draft": null,
-                  "acls": [
-                    {
-                      "role": "citizen",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": false
-                    }
-                  ]
-                },
-                {
-                  "id": "UPDATE",
-                  "name": "Update",
-                  "description": null,
-                  "order": null,
-                  "case_fields": [],
-                  "pre_states": [
-                    "*"
-                  ],
-                  "post_state": null,
-                  "callback_url_about_to_start_event": null,
-                  "retries_timeout_about_to_start_event": null,
-                  "callback_url_about_to_submit_event": null,
-                  "retries_timeout_url_about_to_submit_event": null,
-                  "callback_url_submitted_event": null,
-                  "retries_timeout_url_submitted_event": null,
-                  "security_classification": null,
-                  "show_summary": null,
-                  "show_event_notes": null,
-                  "end_button_label": null,
-                  "can_save_draft": null,
-                  "acls": [
-                    {
-                      "role": "citizen",
-                      "create": true,
-                      "read": true,
-                      "update": true,
-                      "delete": false
-                    }
-                  ]
-                },
                 {
                   "id": "COMPLETE",
                   "name": "Mark as done",
@@ -132,7 +58,7 @@
                   "can_save_draft": null,
                   "acls": [
                     {
-                      "role": "citizen",
+                      "role": "caseworker-befta_jurisdiction_1",
                       "create": true,
                       "read": true,
                       "update": true,
@@ -163,7 +89,7 @@
                   "can_save_draft": null,
                   "acls": [
                     {
-                      "role": "citizen",
+                      "role": "caseworker-befta_jurisdiction_1",
                       "create": true,
                       "read": true,
                       "update": true,
@@ -194,7 +120,7 @@
                   "can_save_draft": null,
                   "acls": [
                     {
-                      "role": "citizen",
+                      "role": "caseworker-befta_jurisdiction_1",
                       "create": true,
                       "read": true,
                       "update": true,
@@ -223,7 +149,69 @@
                   "can_save_draft": null,
                   "acls": [
                     {
-                      "role": "citizen",
+                      "role": "caseworker-befta_jurisdiction_1",
+                      "create": true,
+                      "read": true,
+                      "update": true,
+                      "delete": false
+                    }
+                  ]
+                },
+                {
+                  "id": "REVIEW",
+                  "name": "Review",
+                  "description": null,
+                  "order": null,
+                  "case_fields": [],
+                  "pre_states": [
+                    "*"
+                  ],
+                  "post_state": null,
+                  "callback_url_about_to_start_event": null,
+                  "retries_timeout_about_to_start_event": null,
+                  "callback_url_about_to_submit_event": null,
+                  "retries_timeout_url_about_to_submit_event": null,
+                  "callback_url_submitted_event": null,
+                  "retries_timeout_url_submitted_event": null,
+                  "security_classification": null,
+                  "show_summary": null,
+                  "show_event_notes": null,
+                  "end_button_label": null,
+                  "can_save_draft": null,
+                  "acls": [
+                    {
+                      "role": "caseworker-befta_jurisdiction_1",
+                      "create": true,
+                      "read": true,
+                      "update": true,
+                      "delete": false
+                    }
+                  ]
+                },
+                {
+                  "id": "UPDATE",
+                  "name": "Update",
+                  "description": null,
+                  "order": null,
+                  "case_fields": [],
+                  "pre_states": [
+                    "*"
+                  ],
+                  "post_state": null,
+                  "callback_url_about_to_start_event": null,
+                  "retries_timeout_about_to_start_event": null,
+                  "callback_url_about_to_submit_event": null,
+                  "retries_timeout_url_about_to_submit_event": null,
+                  "callback_url_submitted_event": null,
+                  "retries_timeout_url_submitted_event": null,
+                  "security_classification": null,
+                  "show_summary": null,
+                  "show_event_notes": null,
+                  "end_button_label": null,
+                  "can_save_draft": null,
+                  "acls": [
+                    {
+                      "role": "caseworker-befta_jurisdiction_1",
                       "create": true,
                       "read": true,
                       "update": true,
@@ -241,7 +229,7 @@
                   "title_display": null,
                   "acls": [
                     {
-                      "role": "citizen",
+                      "role": "caseworker-befta_jurisdiction_1",
                       "create": true,
                       "read": true,
                       "update": true,
@@ -257,7 +245,7 @@
                   "title_display": null,
                   "acls": [
                     {
-                      "role": "citizen",
+                      "role": "caseworker-befta_jurisdiction_1",
                       "create": true,
                       "read": true,
                       "update": true,
@@ -273,7 +261,7 @@
                   "title_display": null,
                   "acls": [
                     {
-                      "role": "citizen",
+                      "role": "caseworker-befta_jurisdiction_1",
                       "create": true,
                       "read": true,
                       "update": true,
@@ -288,11 +276,11 @@
               "printable_document_url": null,
               "acls": [
                 {
-                  "role": "citizen",
+                  "role": "caseworker-befta_jurisdiction_1",
                   "create": true,
                   "read": true,
                   "update": true,
-                  "delete": true
+                  "delete": false
                 }
               ]
             }

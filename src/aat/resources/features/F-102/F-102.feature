@@ -7,6 +7,7 @@ Feature: Get jurisdictions available to the user
   @S-533
   Scenario: must return a list of jurisdictions for a valid user
     Given a user with [a detailed profile in CCD having create case access for a jurisdiction]
+    And a case that has just been created as in [Case_Creation_using_Caseworker1_Role]
     When a request is prepared with appropriate values
     And the request [has CREATE as case access]
     And it is submitted to call the [Get jurisdictions available to the user] operation of [CCD Data Store]
@@ -22,16 +23,6 @@ Feature: Get jurisdictions available to the user
     And it is submitted to call the [Get jurisdictions available to the user] operation of [CCD Data Store]
     Then a negative response is received
     And the response [returns the error message : Access can only be 'create', 'read' or 'update]
-    And the response has all the details as expected
-
-  @S-539
-  Scenario: must return 404 if no jurisdictions found for given access criteria
-    Given a user with [a detailed profile in CCD having CR case access for a jurisdiction]
-    When a request is prepared with appropriate values
-    And the request [has UPDATE as case access parameter]
-    And it is submitted to call the [Get jurisdictions available to the user] operation of [CCD Data Store]
-    Then a negative response is received
-    And the response [returns the error message : No jurisdictions found for given access criteria]
     And the response has all the details as expected
 
   @S-535
