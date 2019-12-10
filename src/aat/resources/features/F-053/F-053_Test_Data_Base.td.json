@@ -70,7 +70,6 @@
   },
   "expectedResponse": {
     "headers": {
-      "Transfer-Encoding" : "chunked",
       "Content-Encoding": "gzip",
       "Content-Type": "application/json;charset=UTF-8"
     }
