@@ -1,16 +1,12 @@
 {
   "_guid_": "S-535",
-  "_extends_": "Base_Expecting_403",
+  "_extends_": "F-102_Test_Data_Base",
   "title": "must return appropriate negative response for a user not having a profile in CCD",
   "specs": [
     "no profile in CCD",
     "has CREATE as case access",
     "has the 403 return code"
   ],
-  "productName": "CCD Data Store",
-  "operationName": "Get jurisdictions available to the user",
-  "method": "GET",
-  "uri": "/aggregated/caseworkers/{uid}/jurisdictions",
   "request": {
     "headers": {
       "Authorization": "Dummy_Authorization"
