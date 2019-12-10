@@ -3,7 +3,7 @@
 	
 	"productName": "CCD Data Store",
     "operationName": "Start event creation as Case worker",
-    "method": "POST",
+    "method": "GET",
     "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
 
 	"specs": [
@@ -23,9 +23,6 @@
 			"jid": "AUTOTEST1",
 			"ctid": "AAT_AUTH_15",
 			"etid": "CREATE"
-		},
-		"body": {
-			"_extends_": "Standard_Full_Case_Data"
 		}
 	},
 
