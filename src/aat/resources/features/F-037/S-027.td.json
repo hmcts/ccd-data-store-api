@@ -20,6 +20,9 @@
 	},
   "expectedResponse": {
     "_extends_": "Common_404_Response",
+    "headers": {
+      "Content-Encoding" : "gzip"
+    },
     "body" : {
       "exception" : "[[ANY]]",
       "message" : "[[ANY]]",

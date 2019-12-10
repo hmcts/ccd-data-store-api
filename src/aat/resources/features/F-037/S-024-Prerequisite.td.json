@@ -23,8 +23,8 @@
     "pathVariables": {
       "uid": "[[DYNAMIC]]",
       "jid": "AUTOTEST1",
-      "ctid": "AAT",
-      "cid": "[[DYNAMIC]]",
+      "ctid": "AAT_AUTH_15",
+      "cid": "${[scenarioContext][parentContext][childContexts][Standard_Full_Case_Creation_Data][testData][actualResponse][body][id]}",
       "etid": "UPDATE"
     }
   },

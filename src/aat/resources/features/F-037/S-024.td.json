@@ -5,7 +5,7 @@
 
 	"specs": [
 		"an active profile in CCD",
-		"has the 200 return code"
+		"includes the case detail for the updated case, along with a HTTP 200 OK"
 	],
 
 	"request": {

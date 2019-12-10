@@ -15,6 +15,9 @@
   },
 	"expectedResponse": {
     "_extends_": "Common_400_Response",
+    "headers": {
+      "Content-Encoding" : "gzip"
+    },
     "body" : {
       "exception" : "[[ANY]]",
       "message" : "Case ID is not valid",
