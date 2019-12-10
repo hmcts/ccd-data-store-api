@@ -5,7 +5,7 @@
 
 	"specs": [
 		"an active profile in CCD",
-		"has the 200 return code"
+		"includes the event start trigger for the case just created, along with a HTTP 200 OK"
 	],
 	"request": {
     "pathVariables": {

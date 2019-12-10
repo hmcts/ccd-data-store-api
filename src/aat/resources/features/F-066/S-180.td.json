@@ -5,7 +5,7 @@
 
 	"specs": [
 		"an active profile in CCD",
-		"contains an invalid event-trigger",
+		"contains an invalid event trigger",
 		"has the 404 return code"
 	],
   "request": {

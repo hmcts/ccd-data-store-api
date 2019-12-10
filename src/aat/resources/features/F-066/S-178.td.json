@@ -1,16 +1,16 @@
 {
-  "title": "must return negative response when request contains an invalid case reference",
+  "title": "must return negative response when request contains a non-existing case reference",
 	"_guid_": "S-178",
 	"_extends_": "F-066_Test_Data_Base",
 
 	"specs": [
 		"an active profile in CCD",
-		"contains a non-existing case-reference",
+		"contains a non-existing case reference",
 		"has the 400 return code"
 	],
   "request": {
     "pathVariables": {
-      "cid": "1234567890"
+      "cid": "1234567890123456"
     }
   },
 	"expectedResponse": {
