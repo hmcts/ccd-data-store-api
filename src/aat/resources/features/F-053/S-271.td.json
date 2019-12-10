@@ -1,0 +1,21 @@
+{
+  "_guid_": "S-271",
+  "_extends_": "F-053_Test_Data_Base",
+  "title": "must return negative response HTTP-403 when request does not provide valid authentication credentials",
+  "specs": [
+    "an active profile in CCD",
+    "does not provide valid authentication credentials",
+    "code is HTTP-403"
+  ],
+  "request": {
+    "headers": {
+      "Authorization": "eyJhbGciOiJIUzI1NiJ9"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_403_Response",
+    "body": {
+      "message": "Access Denied"
+    }
+  }
+}

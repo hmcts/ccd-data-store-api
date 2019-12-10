@@ -1,0 +1,18 @@
+{
+  "_guid_": "S-267",
+  "_extends_": "F-053_Test_Data_Base",
+  "title": "must return negative response HTTP-400 when request contains a malformed case type ID",
+  "specs": [
+    "an active profile in CCD",
+    "contains a malformed case type ID",
+    "code is HTTP-400"
+  ],
+  "request": {
+    "pathVariables": {
+      "ctid": "@£$%  ^&*(@£$  %^&*("
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_400_Response"
+  }
+}

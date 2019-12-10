@@ -1,0 +1,23 @@
+{
+  "_guid_": "S-273",
+  "_extends_": "F-053_Test_Data_Base",
+  "title": "must return negative response HTTP-422 when request contains an invalid jurisdiction ID",
+  "specs": [
+    "an active profile in CCD",
+    "contains an invalid jurisdiction ID",
+    "code is HTTP-422"
+  ],
+  "request": {
+    "pathVariables": {
+      "jid": "eyJhbGciOiJIUzI1NiJ9"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_422_Response",
+    "body": {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException",
+      "message" : "Cannot create case because of BEFTA_CASETYPE_3_2 is not defined as case type for eyJhbGciOiJIUzI1NiJ9",
+      "details" : null
+    }
+  }
+}
