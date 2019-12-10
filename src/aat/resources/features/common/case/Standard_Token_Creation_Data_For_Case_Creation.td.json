@@ -1,8 +1,13 @@
 {
 	"_guid_": "Standard_Token_Creation_Data_For_Case_Creation",
+	
+	"productName": "CCD Data Store",
+    "operationName": "Token Creation ???",
+	
 	"specs": [
 		"to create a token for case creation"
 	],
+
 	"users": {
 		"invokingUser": {
 			"username": "[[$CCD_CASEWORKER_AUTOTEST_EMAIL]]",

@@ -1,5 +1,9 @@
 {
 	"_guid_": "Standard_Full_Case_Creation_Data",
+	
+	"productName": "CCD Data Store",
+    "operationName": "Case Creation ???",
+
 	"specs": [
 		"to create a full case"
 	],
