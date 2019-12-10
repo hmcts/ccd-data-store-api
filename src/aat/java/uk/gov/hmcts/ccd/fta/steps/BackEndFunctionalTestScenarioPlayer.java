@@ -222,6 +222,20 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         }
 
         if (requestData.getBody() != null) {
+            requestData.getBody().forEach((bodyField, value) -> {
+                if (value.toString().equals(DYNAMIC_CONTENT_PLACEHOLDER)) {
+                    // ADD DYNAMIC DATA HERE
+                    if (bodyField.equals("event_token") && scenarioContext.getTheEventToken() != null) {
+                        Map<String, Object> updateBodyMap = requestData.getBody();
+                        updateBodyMap.put("event_token", scenarioContext.getTheEventToken());
+                        requestData.setBody(updateBodyMap);
+
+                    } else {
+                        throw new FunctionalTestException("Dynamic value for request path variable '"
+                            + bodyField + "' does not exist");
+                    }
+                }
+            });
             aRequest.body(new ObjectMapper().writeValueAsBytes(requestData.getBody()));
         }
 
@@ -378,11 +392,14 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
             throws IOException {
         BackEndFunctionalTestScenarioContext subcontext = new BackEndFunctionalTestScenarioContext();
         subcontext.initializeTestDataFor(testDataId);
+        subcontext.setTheCaseReference(scenarioContext.getTheCaseReference());
         prepareARequestWithAppropriateValues(subcontext);
         verifyTheRequestInTheContextWithAParticularSpecification(subcontext, testDataSpec);
         submitTheRequestToCallAnOperationOfAProduct(subcontext, subcontext.getTestData().getOperationName(),
                 subcontext.getTestData().getProductName());
         verifyThatTheResponseHasAllTheDetailsAsExpected(subcontext);
+        String eventToken = (String) subcontext.getTheResponse().getBody().get("token");
+        scenarioContext.setTheEventToken(eventToken);
     }
 
     private void resolveUserData(String prefix, UserData aUser) {

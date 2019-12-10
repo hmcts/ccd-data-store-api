@@ -5,7 +5,7 @@
 
 	"specs": [
 		"an active profile in CCD",
-		"code is HTTP-201"
+		"includes the updated case details, along with a HTTP 201 Created"
 	],
 	"request": {
     "pathVariables": {
@@ -49,7 +49,7 @@
         "summary": "",
         "description": ""
       },
-      "event_token" : "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI3amJkNGJjaXNycGlqbGxkNzVmdTh2ZTQ1bSIsInN1YiI6IjdmNTRmZTQ1LTM2NDMtNDc1OC05YjIwLWNhZGIyMWRmZGRiZiIsImlhdCI6MTU3NTQ2MjkxMiwiY2FzZS1pZCI6IjIwNCIsImV2ZW50LWlkIjoiVVBEQVRFIiwiY2FzZS10eXBlLWlkIjoiQUFUIiwianVyaXNkaWN0aW9uLWlkIjoiQVVUT1RFU1QxIiwiY2FzZS1zdGF0ZSI6IlRPRE8iLCJjYXNlLXZlcnNpb24iOiJhYTRmNmY5ODZmZTRjM2MxYzEzNjEyZGU0NmViN2JmMzNlZDAwZmE2IiwiZW50aXR5LXZlcnNpb24iOjB9.KfK9fAeKkextTveppGto2kAtl2FTHac7AjTnuOnijbc",
+      "event_token" : "[[DYNAMIC]]",
       "ignore_warning": true
     }
 	},
@@ -57,7 +57,8 @@
 		"_extends_": "Common_201_Response",
 		"headers": {
 			"Content-Encoding": "gzip",
-			"Content-Type": "application/json;charset=UTF-8"
-		}
+			"Content-Type": "application/json;charset=UTF-8",
+      "vary" : "accept-encoding"
+    }
 	}
 }

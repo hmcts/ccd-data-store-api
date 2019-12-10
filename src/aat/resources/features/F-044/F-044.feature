@@ -7,11 +7,12 @@ Feature: F-044: Submit event creation as Case worker
   @S-278
   Scenario: must submit the event creation successfully for correct inputs
     Given a user with [an active profile in CCD]
+    And a case that has just been created as in [Standard_Full_Case_Creation_Data]
+    And a successful call [to get an event token for just created case] as in [S-044-Prerequisite]
     When a request is prepared with appropriate values
-    And a case that has just been created as in [Standard_Full_Case]
     And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
     Then a positive response is received
-    And the response [has the 201 return code]
+    And the response [includes the updated case details, along with a HTTP 201 code Created]
     And the response has all other details as expected
 
   @S-279 @Ignore

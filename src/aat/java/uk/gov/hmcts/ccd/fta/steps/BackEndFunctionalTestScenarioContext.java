@@ -19,6 +19,16 @@ public class BackEndFunctionalTestScenarioContext {
     private HttpTestData testData;
     private HttpTestData caseCreationData;
     private Long theCaseReference;
+    private String theEventToken;
+
+    public String getTheEventToken() {
+        return theEventToken;
+    }
+
+    public void setTheEventToken(String theEventToken) {
+        this.theEventToken = theEventToken;
+    }
+
     private UserData theInvokingUser;
     private RequestSpecification theRequest;
     private ResponseData theResponse;
