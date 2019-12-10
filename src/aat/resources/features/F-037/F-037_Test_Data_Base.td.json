@@ -1,7 +1,7 @@
 {
 	"_guid_": "F-037_Test_Data_Base",
 	"productName": "CCD Data Store",
-	"operationName": "Create event (V2)",
+	"operationName": "Submit event for an existing case (V2)",
 	"method": "POST",
 	"uri": "/cases/{cid}/events",
 
