@@ -19,7 +19,8 @@
   "uri": "cases/{caseId}/event-triggers/{triggerId}",
   "request": {
     "headers" : {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "Authorization": "invalidToken"
     },
     "pathVariables": {
       "caseId": "[[DYNAMIC]]",

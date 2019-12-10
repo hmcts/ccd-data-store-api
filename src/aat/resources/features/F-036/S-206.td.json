@@ -1,6 +1,6 @@
 {
   "_guid_": "S-206",
-  "_extends_": "S-206_Request_Data",
+  "_extends_": "Base_Expecting_422",
   "title": "must return 200 and a StartTriggerResource object when case id and event trigger id are provided",
   "specs": [
     "an active profile in CCD",
@@ -11,12 +11,6 @@
   "operationName": "Retrieve a trigger for case by ID",
   "method": "GET",
   "uri": "cases/{caseId}/event-triggers/{triggerId}",
-  "users": {
-    "invokingUser": {
-      "username": "[[$CCD_PRIVATE_CASEWORKER_EMAIL]]",
-      "password": "[[$CCD_PRIVATE_CASEWORKER_PASSWORD]]"
-    }
-  },
   "request": {
     "headers" : {
       "experimental" : "true",
@@ -24,11 +18,10 @@
     },
     "pathVariables": {
       "caseId": "[[DYNAMIC]]",
-      "triggerId": "START_PROGRESS"
+      "triggerId": "EVENT_NONE"
     }
   },
   "expectedResponse": {
-    "_extends_": "Common_422_Response",
     "headers" : {
       "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
       "Content-Encoding" : "gzip",
