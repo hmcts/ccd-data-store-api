@@ -199,7 +199,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
                         Long theCaseReference = scenarioContext.getTheCaseReference();
                         aRequest.pathParam(pathVariable, theCaseReference);
                         scenarioContext.getTestData().getRequest().getPathVariables().put("cid", theCaseReference);
-                    } else if (pathVariable.equals("idToDelete") && theInvokingUser.getUid() != null) {
+                    } else if (pathVariable.equals("idToRevoke") && theInvokingUser.getUid() != null) {
                         aRequest.pathParam(pathVariable, theInvokingUser.getUid());
                         scenarioContext.getTestData().getRequest().getPathVariables().put("idToDelete", theInvokingUser.getUid());
                     } else {

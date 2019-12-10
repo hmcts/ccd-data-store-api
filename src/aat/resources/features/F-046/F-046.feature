@@ -1,5 +1,5 @@
 @F-048
-Feature: Revoke access to case
+Feature: F-048: Revoke access to case
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
