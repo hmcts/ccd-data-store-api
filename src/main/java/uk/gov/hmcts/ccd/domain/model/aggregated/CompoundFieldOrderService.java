@@ -10,6 +10,7 @@ import javax.inject.Singleton;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -60,17 +61,11 @@ public class CompoundFieldOrderService {
         final List<CaseField> sortedCaseFields = Lists.newArrayList();
         final Map<String, CaseField> childrenCaseIdToCaseField = convertComplexTypeChildrenToOrderedMap(children);
         orderedEventComplexFieldReferences.stream()
-            .filter(reference -> areChildrenRemaining(children, sortedCaseFields))
-            .forEach(reference -> sortedCaseFields.add(childrenCaseIdToCaseField.remove(getReference(listElementCode, reference))));
-        if (areChildrenRemaining(children, sortedCaseFields)) {
-            addRemainingInEncounterOrder(sortedCaseFields, childrenCaseIdToCaseField);
-        }
+            .map(reference -> childrenCaseIdToCaseField.remove(getReference(listElementCode, reference)))
+            .filter(Objects::nonNull)
+            .forEach(sortedCaseFields::add);
+        addRemainingInEncounterOrder(sortedCaseFields, childrenCaseIdToCaseField);
         return sortedCaseFields;
-    }
-
-    private boolean areChildrenRemaining(final List<CaseField> children, final List<CaseField> sortedCaseFields) {
-        // check is needed in case there are duplicate entries defined in EventToComplexTypes tab for same ListElementCode
-        return sortedCaseFields.size() < children.size();
     }
 
     private String getReference(final String listElementCode, final String reference) {

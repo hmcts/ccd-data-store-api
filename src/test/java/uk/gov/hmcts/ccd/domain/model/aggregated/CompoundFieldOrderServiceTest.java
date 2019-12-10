@@ -158,10 +158,10 @@ class CompoundFieldOrderServiceTest {
                                     .withCollectionFieldType(collectionComplexFieldType)
                                     .build());
 
-        List<CaseEventFieldComplex> caseEventComplexFields = Lists.newArrayList(builder().reference("One").order(3).build(),
-                                                                                builder().reference("Two").order(2).build(),
-                                                                                builder().reference("One").order(4).build(),
+        List<CaseEventFieldComplex> caseEventComplexFields = Lists.newArrayList(builder().reference("One").order(5).build(),
+                                                                                builder().reference("One").order(6).build(),
                                                                                 builder().reference("Two").order(3).build(),
+                                                                                builder().reference("Two").order(4).build(),
                                                                                 builder().reference("Three").order(1).build());
 
         compoundFieldOrderService.sortNestedFieldsFromCaseEventComplexFields(CASE_FIELD, caseEventComplexFields, ROOT);
