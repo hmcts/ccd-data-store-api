@@ -1,16 +1,18 @@
 {
   "_guid_": "F-065_Test_Data_Base",
-
-  "user": {
-    "_extends_": "Common_User_For_Request"
-  },
-
   "productName": "CCD Data Store",
   "operationName": "Retrieve a case by ID for dynamic display",
   "method": "GET",
   "uri": "/internal/cases/{cid}",
 
+  "user": {
+    "_extends_": "Common_User_For_Request"
+  },
+
   "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
     "pathVariables": {
       "cid": "[[DYNAMIC]]"
     }
