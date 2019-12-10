@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.function.Supplier;
 
 import feign.FeignException;
 import io.cucumber.java.Before;
@@ -27,8 +26,6 @@ import io.restassured.specification.QueryableRequestSpecification;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.SpecificationQuerier;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
-import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType;
-import uk.gov.hmcts.ccd.datastore.tests.fixture.CCDEventBuilder;
 import uk.gov.hmcts.ccd.datastore.tests.helper.idam.AuthenticatedUser;
 import uk.gov.hmcts.ccd.fta.data.HttpTestData;
 import uk.gov.hmcts.ccd.fta.data.RequestData;
@@ -37,6 +34,7 @@ import uk.gov.hmcts.ccd.fta.data.UserData;
 import uk.gov.hmcts.ccd.fta.exception.FunctionalTestException;
 import uk.gov.hmcts.ccd.fta.util.EnvUtils;
 import uk.gov.hmcts.ccd.fta.util.JsonUtils;
+
 
 @SuppressWarnings({ "LocalVariableName" })
 public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTestAutomationDSL {
@@ -75,36 +73,10 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
 
     @Override
     @Given("a case that has just been created as in [{}]")
-    public void createCaseWithTheDataProvidedInATestDataObject(String caseDataId) {
-        scenarioContext.initializeCaseCreationDataFor(caseDataId);
-        HttpTestData caseData = scenarioContext.getCaseCreationData();
+    public void createCaseWithTheDataProvidedInATestDataObject(String caseCreationDataId) throws IOException {
 
-        UserData caseCreator = caseData.getInvokingUser();
-        resolveUserData("caseCreator", caseCreator);
-        authenticateUser("caseCreator", caseCreator);
-
-        Supplier<RequestSpecification> asCaseCreator = () -> RestAssured.given()
-                .header("Authorization", "Bearer " + caseCreator.getToken())
-                .header("ServiceAuthorization", aat.getS2SHelper().getToken()).pathParam("user", caseCreator.getUid());
-
-        Map<String, Object> caseVariables = caseData.getRequest().getPathVariables();
-        String jurisdiction = caseVariables.get("jurisdiction").toString();
-        String caseType = caseVariables.get("caseType").toString();
-        String event = caseVariables.get("event").toString();
-        AATCaseType.CaseData data;
-        try {
-            data = new ObjectMapper().convertValue(caseData.getRequest().getBody(), AATCaseType.CaseData.class);
-        } catch (IllegalArgumentException ex) {
-            String errorMessage = "Cannot map '" + caseDataId + "' -> request.body to AATCaseType.CaseData object";
-            throw new FunctionalTestException(errorMessage);
-        }
-
-        String eventToken = aat.getCcdHelper().generateTokenCreateCase(asCaseCreator, jurisdiction, caseType, event);
-        Long caseReference = new CCDEventBuilder(jurisdiction, caseType, event).as(asCaseCreator).withData(data)
-                .withEventId(event).withToken(eventToken).submitAndGetReference();
-
-        scenarioContext.setTheCaseReference(caseReference);
-        scenario.write("Created a case with reference: " + caseReference);
+        performAndVerifyTheExpectedResponseForAnApiCall("to create a token for case creation", "Standard_Token_Creation_Data_For_Case_Creation");
+        performAndVerifyTheExpectedResponseForAnApiCall("to create a full case", caseCreationDataId);
     }
 
     @Override
