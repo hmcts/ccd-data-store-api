@@ -6,7 +6,7 @@
 
   "specs": [
     "an active profile in CCD but without read access to the case just created",
-    "contains an authorised user token for the user without access to the operation",
+    "contains the case data of the case just created",
     "contains a HTTP 403 Forbidden"
   ],
 
@@ -15,7 +15,7 @@
       "ctid": "AAT_AUTH_1"
     },
     "body": {
-      "id": 1575906921048949
+      "id": "${[scenarioContext][childContexts][S-126_Superuser_Case_Creation_Data_With_Document][testData][actualResponse][body][id]}"
     }
   },
 
