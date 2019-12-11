@@ -23,10 +23,10 @@
       },
       "case_details": {
         "id": "[[ANY]]",
-        "jurisdiction": "AUTOTEST1",
+        "jurisdiction": "BEFTA_JURISDICTION_3",
         "state": "TODO",
         "version": 0,
-        "case_type_id": "AAT_AUTH_15",
+        "case_type_id": "BEFTA_CASETYPE_3_1",
         "created_date": "[[ANY]]",
         "last_modified": "[[ANY]]",
         "security_classification": "PUBLIC",
