@@ -11,6 +11,123 @@
   ],
 
   "expectedResponse": {
-    "_extends_": "Common_200_Response"
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "Content-Length": "[[ANY]]",
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "body": {
+      "token": "[[ANY]]",
+      "case_details": {
+        "id": "[[ANY]]",
+        "jurisdiction": "BEFTA_JURISDICTION_3",
+        "state": "TODO",
+        "version": 0,
+        "case_type_id": "BEFTA_CASETYPE_3_2",
+        "created_date": "[[ANY]]",
+        "last_modified": "[[ANY]]",
+        "security_classification": "PUBLIC",
+        "case_data": {
+          "_extends_": "Standard_Full_Case_Data"
+        },
+        "data_classification": {
+          "MoneyGBPField": "PUBLIC",
+          "FixedListField": "PUBLIC",
+          "AddressUKField": {
+            "value": {
+              "County": "PUBLIC",
+              "Country": "PUBLIC",
+              "PostCode": "PUBLIC",
+              "PostTown": "PUBLIC",
+              "AddressLine1": "PUBLIC",
+              "AddressLine2": "PUBLIC",
+              "AddressLine3": "PUBLIC"
+            },
+            "classification": "PUBLIC"
+          },
+          "ComplexField": {
+            "value": {
+              "ComplexTextField": "PUBLIC",
+              "ComplexFixedListField": "PUBLIC"
+            },
+            "classification": "PUBLIC"
+          },
+          "DateTimeField": "PUBLIC",
+          "PhoneUKField": "PUBLIC",
+          "NumberField": "PUBLIC",
+          "MultiSelectListField": "PUBLIC",
+          "YesOrNoField": "PUBLIC",
+          "EmailField": "PUBLIC",
+          "TextField": "PUBLIC",
+          "DateField": "PUBLIC",
+          "TextAreaField": "PUBLIC",
+          "CollectionField": {
+            "value": [
+              {
+                "id": "CollectionField1",
+                "classification": "PUBLIC"
+              },
+              {
+                "id": "CollectionField2",
+                "classification": "PUBLIC"
+              }
+            ],
+            "classification": "PUBLIC"
+          }
+        },
+        "after_submit_callback_response": null,
+        "callback_response_status_code": null,
+        "callback_response_status": null,
+        "delete_draft_response_status_code": null,
+        "delete_draft_response_status": null,
+        "security_classifications": {
+          "MoneyGBPField": "PUBLIC",
+          "FixedListField": "PUBLIC",
+          "AddressUKField": {
+            "value": {
+              "County": "PUBLIC",
+              "Country": "PUBLIC",
+              "PostCode": "PUBLIC",
+              "PostTown": "PUBLIC",
+              "AddressLine1": "PUBLIC",
+              "AddressLine2": "PUBLIC",
+              "AddressLine3": "PUBLIC"
+            },
+            "classification": "PUBLIC"
+          },
+          "ComplexField": {
+            "value": {
+              "ComplexTextField": "PUBLIC",
+              "ComplexFixedListField": "PUBLIC"
+            },
+            "classification": "PUBLIC"
+          },
+          "DateTimeField": "PUBLIC",
+          "PhoneUKField": "PUBLIC",
+          "NumberField": "PUBLIC",
+          "MultiSelectListField": "PUBLIC",
+          "YesOrNoField": "PUBLIC",
+          "EmailField": "PUBLIC",
+          "TextField": "PUBLIC",
+          "DateField": "PUBLIC",
+          "TextAreaField": "PUBLIC",
+          "CollectionField": {
+            "value": [
+              {
+                "id": "CollectionField1",
+                "classification": "PUBLIC"
+              },
+              {
+                "id": "CollectionField2",
+                "classification": "PUBLIC"
+              }
+            ],
+            "classification": "PUBLIC"
+          }
+        }
+      },
+      "event_id": "UPDATE"
+    }
   }
 }
