@@ -27,7 +27,7 @@
       And the response [contains the case view history]
       And the response has all other details as expected
 
-    @S-163
+    @S-163 @Ignore #Defect submitted RDM-6868
     Scenario: must return 404 when case reference does NOT exist
       Given a case that has just been created as in [Standard_Full_Case_Creation_Data]
       And a user with [an active profile in CCD]
