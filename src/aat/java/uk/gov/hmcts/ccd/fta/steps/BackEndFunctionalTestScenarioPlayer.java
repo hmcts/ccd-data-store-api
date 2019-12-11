@@ -1,13 +1,11 @@
 package uk.gov.hmcts.ccd.fta.steps;
 
-import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -22,7 +20,6 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
-import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.Method;
 import io.restassured.response.Response;
 import io.restassured.specification.QueryableRequestSpecification;
@@ -42,16 +39,7 @@ import uk.gov.hmcts.ccd.fta.util.JsonUtils;
 @SuppressWarnings({ "LocalVariableName" })
 public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTestAutomationDSL {
 
-<<<<<<< HEAD
-    private static final String DYNAMIC_CONTENT_PLACEHOLDER = "[[DYNAMIC]]";
-    private static boolean isTestDataLoaded = false;
 
-    private final String BE_FTA_FILE_JURISDICTION1 = "src/aat/resources/CCD_BEFTA_JURISDICTION1.xlsx";
-    private final String BE_FTA_FILE_JURISDICTION2 = "src/aat/resources/CCD_BEFTA_JURISDICTION2.xlsx";
-    private final String BE_FTA_FILE_JURISDICTION3 = "src/aat/resources/CCD_BEFTA_JURISDICTION3.xlsx";
-=======
-
->>>>>>> refs/remotes/origin/RDM-6155_Functional_TA_Umbrella_Epic
 
     private final BackEndFunctionalTestScenarioContext scenarioContext;
     private final AATHelper aat;
@@ -69,15 +57,6 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     @Before()
     public void prepare(Scenario scenario) {
         this.scenario = scenario;
-        if (!isTestDataLoaded) {
-            try {
-                importDefinitions();
-            } catch (Exception e) {
-                throw e;
-            } finally {
-                isTestDataLoaded = true;
-            }
-        }
     }
 
     @Override
@@ -152,32 +131,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         }
 
         if (requestData.getPathVariables() != null) {
-<<<<<<< HEAD
-            requestData.getPathVariables().forEach((pathVariable, value) -> {
-                if (value.toString().equals(DYNAMIC_CONTENT_PLACEHOLDER)) {
-                    // ADD DYNAMIC DATA HERE
-                    if (pathVariable.equals("uid") && theInvokingUser.getUid() != null) {
-                        aRequest.pathParam(pathVariable, theInvokingUser.getUid());
-                        scenarioContext.getTestData().getRequest().getPathVariables().put("uid",
-                            theInvokingUser.getUid());
-                    } else if (pathVariable.equals("cid") && scenarioContext.getTheCaseReference() != null) {
-                        Long theCaseReference = scenarioContext.getTheCaseReference();
-                        aRequest.pathParam(pathVariable, theCaseReference);
-                        scenarioContext.getTestData().getRequest().getPathVariables().put("cid", theCaseReference);
-                    } else if (pathVariable.equals("idToDelete") && theInvokingUser.getUid() != null) {
-                        aRequest.pathParam(pathVariable, theInvokingUser.getUid());
-                        scenarioContext.getTestData().getRequest().getPathVariables().put("idToDelete", theInvokingUser.getUid());
-                    } else {
-                        throw new FunctionalTestException("Dynamic value for request path variable '"
-                            + pathVariable + "' does not exist");
-                    }
-                } else {
-                    aRequest.pathParam(pathVariable, value);
-                }
-            });
-=======
             requestData.getPathVariables().forEach((pathVariable, value) -> aRequest.pathParam(pathVariable, value));
->>>>>>> refs/remotes/origin/RDM-6155_Functional_TA_Umbrella_Epic
         }
 
         if (requestData.getQueryParams() != null) {
@@ -339,11 +293,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
             throws IOException {
         BackEndFunctionalTestScenarioContext subcontext = new BackEndFunctionalTestScenarioContext();
         subcontext.initializeTestDataFor(testDataId);
-<<<<<<< HEAD
-        subcontext.setTheCaseReference(scenarioContext.getTheCaseReference());
-=======
         this.scenarioContext.addChildContext(subcontext);
->>>>>>> refs/remotes/origin/RDM-6155_Functional_TA_Umbrella_Epic
         prepareARequestWithAppropriateValues(subcontext);
         verifyTheRequestInTheContextWithAParticularSpecification(subcontext, testDataSpec);
         submitTheRequestToCallAnOperationOfAProduct(subcontext, subcontext.getTestData().getOperationName(),
@@ -382,42 +332,5 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         } catch (FeignException ex) {
             logger.info(logPrefix + "credentials invalid");
         }
-    }
-
-    private RequestSpecification asAutoTestImporter() {
-        AuthenticatedUser caseworker = aat.getIdamHelper().authenticate(aat.getImporterAutoTestEmail(),
-            aat.getImporterAutoTestPassword());
-
-        String s2sToken = aat.getS2SHelper().getToken();
-        return RestAssured.given(new RequestSpecBuilder()
-            .setBaseUri(aat.getDefinitionStoreUrl())
-            .build())
-            .header("Authorization", "Bearer " + caseworker.getAccessToken())
-            .header("ServiceAuthorization", s2sToken);
-    }
-
-    private void importDefinition(String file) {
-        Response response = asAutoTestImporter()
-            .given()
-            .multiPart(new File(file))
-            .when()
-            .post("/import");
-        String message = "Import failed with response body: " + response.body().prettyPrint();
-        message += "\nand http code: " + response.statusCode();
-        Assert.assertEquals(message, 201, response.getStatusCode());
-    }
-
-    private void importDefinitions() {
-        logger.info("Importing {}...", BE_FTA_FILE_JURISDICTION1);
-        importDefinition(BE_FTA_FILE_JURISDICTION1);
-        logger.info("Imported {}.", BE_FTA_FILE_JURISDICTION1);
-
-        logger.info("Importing {}...", BE_FTA_FILE_JURISDICTION2);
-        importDefinition(BE_FTA_FILE_JURISDICTION2);
-        logger.info("Imported {}.", BE_FTA_FILE_JURISDICTION2);
-
-        logger.info("Importing {}...", BE_FTA_FILE_JURISDICTION3);
-        importDefinition(BE_FTA_FILE_JURISDICTION3);
-        logger.info("Imported {}", BE_FTA_FILE_JURISDICTION3);
     }
 }
