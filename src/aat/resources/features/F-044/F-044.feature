@@ -22,37 +22,40 @@ Feature: F-044: Submit event creation as Case worker
     And the request [does not provide valid authentication credentials]
     And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
     Then a negative response is received
-    And the response [has the 403 return code]
+    And the response [includes a HTTP 403 Forbidden]
     And the response has all other details as expected
 
-  @S-280 @Ignore
+  @S-280
   Scenario: must return negative response when request does not provide an authorised access
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
     And the request [does not provide authorised access to the operation]
     And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
     Then a negative response is received
-    And the response [has the 403 return code]
+    And the response [includes a HTTP 403 Forbidden]
     And the response has all other details as expected
 
-  @S-281 @Ignore
-  Scenario: must return 404 when request contains a non-existing jurisdiction ID
+  @S-281 @Ignore # This scenario is returning 400 instead of expected 404, linked to defect JIRA-6868
+  Scenario: must return negative response when request contains a non-existing case reference
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
-    And the request [contains a non-existing jurisdiction ID]
+    And the request [contains a non-existing case reference]
     And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
     Then a negative response is received
-    And the response [code is HTTP-403]
+    And the response [includes a HTTP 404 'Bad Request']
     And the response has all the details as expected
 
-  @S-282 @Ignore
-  Scenario: must return 404 when request contains a non-existing Case type ID
+  @S-282
+  Scenario: must return 409 when case is altered out of the transaction
     Given a user with [an active profile in CCD]
+    And a case that has just been created as in [Standard_Full_Case_Creation_Data]
+    And a successful call [to get an event token for just created case] as in [S-044-Prerequisite]
+    And another successful call [to update case with the token just created] as in [S-044-Prerequisite_CaseUpdate]
     When a request is prepared with appropriate values
-    And the request [contains a non-existing Case type ID]
+    And the request [contains an update token valid for previous version of case]
     And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
     Then a negative response is received
-    And the response [code is HTTP-404]
+    And the response [includes a HTTP 409 'Conflict']
     And the response has all the details as expected
 
   @S-283 @Ignore
@@ -62,7 +65,7 @@ Feature: F-044: Submit event creation as Case worker
     And the request [contains a non-existing Event ID]
     And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
     Then a negative response is received
-    And the response [code is HTTP-404]
+    And the response [includes a HTTP 404 'Not Found']
     And the response has all the details as expected
 
   @S-552 @Ignore
@@ -72,7 +75,7 @@ Feature: F-044: Submit event creation as Case worker
     And the request [contains a non-existing jurisdiction ID]
     And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
     Then a negative response is received
-    And the response [code is HTTP-404]
+    And the response [includes a HTTP 404 'Not Found']
     And the response has all the details as expected
 
 
