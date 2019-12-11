@@ -4,7 +4,7 @@
   "title": "must return 200 and a StartTriggerResource object when case id and event trigger id are provided",
   "specs": [
     "an active profile in CCD",
-    "has a 200 code"
+    "contains HTTP 200 OK"
   ],
   "expectedResponse": {
     "_extends_": "Common_200_Response",

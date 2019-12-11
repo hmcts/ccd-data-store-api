@@ -5,7 +5,7 @@
   "specs": [
     "an active profile in CCD",
     "where the user has insufficient privilege",
-    "has a 422 Unprocessable Entity code"
+    "contains HTTP 422 Unprocessable Entity code"
   ],
 
   "request": {
@@ -16,16 +16,8 @@
   "expectedResponse": {
     "_extends_": "Common_422_Response",
     "headers" : {
-      "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
       "Content-Encoding" : "gzip",
-      "Content-Type" : "application/json;charset=UTF-8",
-      "Date" : "[[ANY]]",
-      "Expires" : "0",
-      "Pragma" : "no-cache",
-      "Transfer-Encoding" : "chunked",
-      "X-Content-Type-Options" : "nosniff",
-      "X-Frame-Options" : "DENY",
-      "X-XSS-Protection" : "1; mode=block"
+      "Content-Type" : "application/json;charset=UTF-8"
     },
     "body" : {
       "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException",

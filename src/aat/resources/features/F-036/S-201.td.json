@@ -5,14 +5,8 @@
   "specs": [
     "an active profile in CCD",
     "does not provide valid authentication credentials in CCD",
-    "has a 403 Unauthorized code"
+    "contains HTTP 403 Unauthorized code"
   ],
-  "users": {
-    "invokingUser" : {
-      "username": "[[$CCD_CASEWORKER_AUTOTEST_EMAIL]]",
-      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
-    }
-  },
   "request": {
     "headers" : {
       "Authorization": "invalidTokenId"
@@ -24,13 +18,6 @@
   "expectedResponse": {
     "_extends_": "Common_403_Response",
     "headers": {
-      "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
-      "Date" : "[[ANY]]",
-      "Expires" : "0",
-      "Pragma" : "no-cache",
-      "X-Content-Type-Options" : "nosniff",
-      "X-Frame-Options" : "DENY",
-      "X-XSS-Protection" : "1; mode=block",
       "Content-Length": "[[ANY]]",
       "Content-Type" : "application/json;charset=UTF-8",
       "Content-Encoding" : "gzip"
