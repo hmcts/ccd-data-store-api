@@ -22,7 +22,7 @@
     "body" : {
       "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
       "timestamp" : "[[ANY]]",
-      "message" : "Cannot find event INVALID_TRIGGER_ID for case type AAT_AUTH_15",
+      "message" : "Cannot find event INVALID_TRIGGER_ID for case type BEFTA_CASETYPE_3_1",
       "path" : "[[ANY]]",
       "details" : null,
       "callbackErrors" : null,
