@@ -12,9 +12,6 @@
 
   "expectedResponse": {
     "_extends_": "Common_200_Response",
-    "headers": {
-      "Content-Length": "[[ANY]]"
-    },
     "body": {
       "token": "[[ANY]]",
       "case_details": {
