@@ -11,9 +11,6 @@
   "request": {
     "headers": {
       "ServiceAuthorization": "eyJhbGciOiJIUzI1NiJ9"
-    },
-    "pathVariables": {
-      "cid": "1573751648840703"
     }
   },
 	"expectedResponse": {

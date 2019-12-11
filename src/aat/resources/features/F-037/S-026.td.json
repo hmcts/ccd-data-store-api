@@ -8,11 +8,6 @@
 		"contains a non-existing case-reference",
 		"includes a HTTP 404 'Not Found'"
 	],
-  "request": {
-    "pathVariables": {
-      "cid": "1234567890"
-    }
-  },
 	"expectedResponse": {
     "_extends_": "Common_404_Response",
     "headers": {
