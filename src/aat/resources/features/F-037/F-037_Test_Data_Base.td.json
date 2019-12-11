@@ -68,7 +68,8 @@
   "expectedResponse": {
     "headers": {
       "Content-Type": "[[ANY]]",
-      "Content-Length": "[[ANY]]"
+      "Content-Length": "[[ANY]]",
+      "Content-Encoding" : "gzip"
     }
   }
 }

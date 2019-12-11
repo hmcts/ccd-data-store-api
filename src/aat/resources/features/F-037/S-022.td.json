@@ -14,9 +14,6 @@
   },
   "expectedResponse": {
     "_extends_": "Common_403_Response",
-    "headers": {
-      "Content-Encoding": "gzip"
-    },
     "body": {
       "message": "Access Denied"
     }

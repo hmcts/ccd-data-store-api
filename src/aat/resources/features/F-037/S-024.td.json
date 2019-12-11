@@ -15,10 +15,11 @@
     }
   },
   "expectedResponse": {
-    "responseCode": 200,
+    "responseCode": 201,
     "responseMessage": "OK",
     "headers": {
-      "_extends_": "Common_Response_Headers"
+      "_extends_": "Common_Response_Headers",
+      "Vary" : "Accept-Encoding"
     },
     "body": {
       "_links": {
