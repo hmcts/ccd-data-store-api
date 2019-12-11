@@ -5,7 +5,7 @@
   "specs": [
     "an active profile in CCD",
     "does not provide a valid authentication credentials",
-    "has the 403 forbidden code"
+    "contains a HTTP 403 Forbidden"
   ],
   "request": {
     "headers": {

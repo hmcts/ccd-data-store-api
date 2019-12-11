@@ -11,7 +11,7 @@ Feature: F-056: Submit event creation as Citizen
     And the request [does not provide an authorized access to the operation]
     And it is submitted to call the [Submit case creation as Citizen] operation of [CCD Data Store]
     Then a negative response is received
-    And the response [has the 403 forbidden code]
+    And the response [contains a HTTP 403 Forbidden]
     And the response has all other details as expected
 
   @S-285
@@ -21,7 +21,7 @@ Feature: F-056: Submit event creation as Citizen
     And the request [does not provide a valid authentication credentials]
     And it is submitted to call the [Submit case creation as Citizen] operation of [CCD Data Store]
     Then a negative response is received
-    And the response [has the 403 forbidden code]
+    And the response [contains a 403 Forbidden]
     And the response has all other details as expected
 
   @S-286
@@ -51,5 +51,5 @@ Feature: F-056: Submit event creation as Citizen
     When a request is prepared with appropriate values
     And it is submitted to call the [Submit case creation as Citizen] operation of [CCD Data Store]
     Then a positive response is received
-    And the response [has the 201 code]
+    And the response [contains a HTTP 201 Created]
     And the response has all other details as expected

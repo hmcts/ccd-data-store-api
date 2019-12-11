@@ -5,7 +5,7 @@
   "specs": [
     "an active profile in CCD",
     "does not provide an authorized access to the operation",
-    "has the 403 forbidden code"
+    "contains a HTTP 403 Forbidden"
   ],
   "request": {
     "_extends_": "Common_Request",
