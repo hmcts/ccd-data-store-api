@@ -1,5 +1,5 @@
 @F-102
-Feature: Get jurisdictions available to the user
+Feature: F-102: Get jurisdictions available to the user
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
@@ -25,7 +25,7 @@ Feature: Get jurisdictions available to the user
     And it is submitted to call the [Get jurisdictions available to the user] operation of [CCD Data Store]
     Then a negative response is received
     And the response [contains HTTP 400 Bad Request]
-    And the response [contains an error message : Access can only be 'create', 'read' or 'update]
+    And the response [contains an error message : Access can only be 'create', 'read' or 'update']
     And the response has all other details as expected
 
   @S-535
