@@ -1,18 +1,12 @@
 {
   "_guid_": "S-202",
   "_extends_": "F-036_Base_Test_Data",
-  "title": "must return 401 when request does not provide valid authentication credentials",
+  "title": "must return 403 when request provides authentic credentials without authorised access to the operation",
   "specs": [
     "an active profile in CCD",
     "does not provide valid authentication credentials in CCD",
     "contains HTTP 403 Forbidden"
   ],
-  "users": {
-    "invokingUser" : {
-      "username": "befta.citizen.3@gmail.com",
-      "password": "InvalidPassword"
-    }
-  },
   "request": {
     "headers" : {
       "Authorization": "invalidToken"

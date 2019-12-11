@@ -7,9 +7,15 @@
     "does not provide valid authentication credentials in CCD",
     "contains HTTP 403 Unauthorized"
   ],
+  "users": {
+    "invokingUser" : {
+      "username": "befta.citizen.3@gmail.com",
+      "password": "InvalidPassword"
+    }
+  },
   "request": {
     "headers" : {
-      "Authorization": "invalidTokenId"
+      "Authorization": "TokenId"
     },
     "pathVariables": {
       "triggerId": "CREATE"
