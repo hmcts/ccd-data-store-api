@@ -1,0 +1,17 @@
+{
+  "title": "must start event creation process for appropriate inputs",
+  "_guid_": "S-288",
+  "_extends_": "F-056_Test_Data_Base",
+  "specs": [
+    "an active profile in CCD",
+    "has the 201 code"
+  ],
+  "request": {
+    "body": {
+      "_extends_": "Standard_Full_Case_Data"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_201_Response"
+  }
+}
