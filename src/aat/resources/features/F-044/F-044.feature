@@ -12,11 +12,11 @@ Feature: F-044: Submit event creation as Case worker
     When a request is prepared with appropriate values
     And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
     Then a positive response is received
-    And the response [includes the updated case details, along with a HTTP 201 code Created]
+    And the response [includes the updated case details, along with a HTTP 201 Created]
     And the response has all other details as expected
 
-  @S-279 @Ignore
-  Scenario: must return negative response when request does not provide a valid authentication credentials
+  @S-279
+  Scenario: must return negative response when request does not provide valid authentication credentials
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
     And the request [does not provide valid authentication credentials]
