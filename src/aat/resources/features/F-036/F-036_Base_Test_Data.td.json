@@ -4,13 +4,16 @@
   "operationName": "Retrieve a trigger for case by ID",
   "method": "GET",
   "uri": "cases/{caseId}/event-triggers/{triggerId}",
-  "user": {
-    "_extends_": "Common_User_For_Request"
+  "users": {
+    "invokingUser": {
+      "username": "befta.caseworker.3@gmail.com",
+      "password": "Pa55word11"
+    }
   },
   "request": {
     "_extends_": "Common_Request",
-    "headers" : {
-      "experimental" : "true",
+    "headers": {
+      "experimental": "true",
       "Content-Type": "application/json"
     },
     "pathVariables": {
