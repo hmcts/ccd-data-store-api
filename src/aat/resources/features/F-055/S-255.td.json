@@ -17,6 +17,11 @@
   },
 
   "expectedResponse": {
-    "_extends_": "Common_422_Response"
+    "_extends_": "Common_422_Response",
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException",
+      "message": "The case status did not qualify for the event",
+      "details": null
+    }
   }
 }

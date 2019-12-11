@@ -6,7 +6,8 @@ Feature: F-055: Start event creation as Citizen
 
   @S-251
   Scenario: must return 200 if start event trigger is successful for a case
-    Given a case that has just been created as in [F-055_Case_Creation_Data]
+    Given a successful call [to create a token for case creation as a citizen] as in [Citizen_Token_Creation_Data_For_Case_Creation]
+    And another successful call [to create a full case as a citizen] as in [Citizen_Full_Case_Creation_Data]
     And a user with [an active profile in CCD]
     When a request is prepared with appropriate values
     And the request [includes case data matching the case just created]
@@ -27,7 +28,8 @@ Feature: F-055: Start event creation as Citizen
 
   @S-253
   Scenario: must return 403 when request provides authentic credentials without authorised access to the operation
-    Given a case that has just been created as in [F-055_Case_Creation_Data]
+    Given a successful call [to create a token for case creation as a citizen] as in [Citizen_Token_Creation_Data_For_Case_Creation]
+    And another successful call [to create a full case as a citizen] as in [Citizen_Full_Case_Creation_Data]
     And a user with [an active profile in CCD]
     When a request is prepared with appropriate values
     And the request [includes an valid user authorisation token that does not have access to the operation]
@@ -48,7 +50,8 @@ Feature: F-055: Start event creation as Citizen
 
   @S-255
   Scenario: must return 422 when start event trigger has failed
-    Given a case that has just been created as in [F-055_Case_Creation_Data]
+    Given a successful call [to create a token for case creation as a citizen] as in [Citizen_Token_Creation_Data_For_Case_Creation]
+    And another successful call [to create a full case as a citizen] as in [Citizen_Full_Case_Creation_Data]
     And a user with [an active profile in CCD]
     When a request is prepared with appropriate values
     And the request [includes unprocessable case data]

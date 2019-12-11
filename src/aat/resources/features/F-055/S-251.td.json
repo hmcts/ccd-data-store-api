@@ -13,9 +13,7 @@
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "headers": {
-      "Content-Encoding": "gzip",
-      "Content-Length": "[[ANY]]",
-      "Content-Type": "application/json;charset=UTF-8"
+      "Content-Length": "[[ANY]]"
     },
     "body": {
       "token": "[[ANY]]",

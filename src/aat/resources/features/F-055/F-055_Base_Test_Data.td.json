@@ -19,12 +19,17 @@
       "uid": "[[DYNAMIC]]",
       "jid": "BEFTA_JURISDICTION_3",
       "ctid": "BEFTA_CASETYPE_3_2",
-      "cid": "[[DYNAMIC]]",
+      "cid": "${[scenarioContext][childContexts][Citizen_Full_Case_Creation_Data][testData][actualResponse][body][id]}",
       "etid": "UPDATE"
     }
   },
 
   "expectedResponse": {
-    "_extends_": "Common_Response"
+    "_extends_": "Common_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "Content-Type": "application/json;charset=UTF-8",
+      "Transfer-Encoding" : "chunked"
+    }
   }
 }
