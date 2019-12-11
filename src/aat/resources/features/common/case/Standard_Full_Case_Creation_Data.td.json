@@ -11,7 +11,8 @@
 
 	"request": {
 		"pathVariables": {
-			"uid": "[[DYNAMIC]]"
+			"jid": "AUTOTEST1",
+			"ctid": "AAT_AUTH_15"
 		},
 		"body": {
 			"data": {
