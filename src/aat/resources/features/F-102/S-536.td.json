@@ -22,10 +22,7 @@
   "expectedResponse": {
     "_extends_": "Common_403_Response",
     "headers": {
-      "Content-Encoding": "gzip",
-      "Content-Length": "[[ANY]]",
-      "Transfer-Encoding": "[[ANY]]",
-      "Content-Type": "[[ANY]]"
+      "Content-Encoding": "gzip"
     },
     "body": {
       "timestamp": "[[ANY]]",

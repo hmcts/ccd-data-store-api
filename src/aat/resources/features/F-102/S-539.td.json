@@ -24,10 +24,7 @@
   "expectedResponse": {
     "_extends_": "Common_400_Response",
     "headers": {
-      "Content-Length": "[[ANY]]",
-      "Transfer-Encoding": "[[ANY]]",
       "Connection": "[[ANY]]",
-      "Content-Type": "[[ANY]]",
       "Content-Encoding": "[[ANY]]"
     },
     "body": {

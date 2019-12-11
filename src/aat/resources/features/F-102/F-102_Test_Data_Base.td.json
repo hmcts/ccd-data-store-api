@@ -17,7 +17,10 @@
   },
   "expectedResponse": {
     "headers": {
-      "_extends_": "Common_Response_Headers"
+      "_extends_": "Common_Response_Headers",
+      "Content-Length": "[[ANY]]",
+      "Transfer-Encoding": "[[ANY]]",
+      "Content-Type": "[[ANY]]"
     }
   }
 }
