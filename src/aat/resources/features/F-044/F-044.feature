@@ -43,7 +43,7 @@ Feature: F-044: Submit event creation as Case worker
     And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
     Then a negative response is received
     And the response [includes a HTTP 404 'Bad Request']
-    And the response has all the details as expected
+    And the response has all other details as expected
 
   @S-282
   Scenario: must return 409 when case is altered out of the transaction
@@ -56,17 +56,18 @@ Feature: F-044: Submit event creation as Case worker
     And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
     Then a negative response is received
     And the response [includes a HTTP 409 'Conflict']
-    And the response has all the details as expected
+    And the response has all other details as expected
 
-  @S-283 @Ignore
-  Scenario: must return 404 when request contains a non-existing Event ID
+  @S-283
+  Scenario: must return 422 when event submission has failed
     Given a user with [an active profile in CCD]
+    And a case that has just been created as in [Standard_Full_Case_Creation_Data]
+    And a successful call [to get an event token for just created case] as in [S-044-Prerequisite]
     When a request is prepared with appropriate values
-    And the request [contains a non-existing Event ID]
     And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
     Then a negative response is received
-    And the response [includes a HTTP 404 'Not Found']
-    And the response has all the details as expected
+    And the response [includes a HTTP 422 'Unprocessable Entity']
+    And the response has all other details as expected
 
   @S-552 @Ignore
   Scenario: must return 404 when request contains a non-existing jurisdiction ID
@@ -79,33 +80,10 @@ Feature: F-044: Submit event creation as Case worker
     And the response has all the details as expected
 
 
-    @S-279 @Ignore
-    Scenario: must return 401 when request does not provide valid authentication credentials
-    <>
-
-    @S-280 @Ignore
-    Scenario: must return 403 when request provides authentic credentials without authorised access to the operation
-    <>
-
     @S-277 @Ignore
     Scenario: <More tests out of further analysis>
     <>
 
-    @S-278 @Ignore
-    Scenario: must return 201 and Case Details object when Jurisdiction ID, case type ID and case id is valid
-    <>
-
-    @S-281 @Ignore
-    Scenario: must return 404 when case is not found
-    <>
-
-    @S-282 @Ignore
-    Scenario: must return 409 when case is altered out of the transaction
-    <>
-
-    @S-283 @Ignore
-    Scenario: must return 422 when event submission has failed
-    <>
 
     @S-113 @Ignore
     Scenario: should not update a case if the caseworker has 'C' access on CaseType
