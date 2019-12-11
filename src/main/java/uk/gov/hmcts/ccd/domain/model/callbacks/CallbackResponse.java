@@ -21,6 +21,7 @@ public class CallbackResponse {
     private SecurityClassification securityClassification;
     @JsonProperty("significant_item")
     private SignificantItem significantItem;
+    private String state;
 
     private List<String> errors;
     private List<String> warnings;
@@ -83,5 +84,13 @@ public class CallbackResponse {
     @Override
     public String toString() {
         return ReflectionToStringBuilder.toString(this);
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
     }
 }
