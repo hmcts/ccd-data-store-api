@@ -73,9 +73,6 @@ public class CaseAccessService {
     }
 
     public Set<String> getAccessRoles(String caseId) {
-        if (caseId == null || caseId.trim().length() == 0) {
-            return userRepository.getUserRoles();
-        }
         return Sets.union(userRepository.getUserRoles(), getCaseRoles(caseId));
     }
 

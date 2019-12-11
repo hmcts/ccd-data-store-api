@@ -48,8 +48,7 @@ public class AuthorisedGetEventsOperation implements GetEventsOperation {
     @Override
     public List<AuditEvent> getEvents(String jurisdiction, String caseTypeId, String caseReference) {
         List<AuditEvent> auditEvents = getEventsOperation.getEvents(jurisdiction, caseTypeId, caseReference);
-        String caseId = auditEvents != null && auditEvents.size() > 0 ? auditEvents.get(0).getCaseDataId() : "";
-        return secureEvents(caseTypeId, caseId,  auditEvents);
+        return secureEvents(caseTypeId, auditEvents.get(0).getCaseDataId(),  auditEvents);
     }
 
     @Override
