@@ -5,7 +5,7 @@
   "specs": [
     "an active profile in CCD",
     "contains an invalid case id",
-    "contains HTTP 400 bad request code"
+    "contains HTTP 400 Bad Request"
   ],
 
   "request": {

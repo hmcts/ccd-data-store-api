@@ -5,7 +5,7 @@
   "specs": [
     "an active profile in CCD",
     "where the user has insufficient privilege",
-    "contains HTTP 422 Unprocessable Entity code"
+    "contains HTTP 422 Unprocessable Entity"
   ],
 
   "request": {

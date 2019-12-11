@@ -5,7 +5,7 @@
   "specs": [
     "an active profile in CCD",
     "contains an event trigger id with NO pre state",
-    "contains HTTP 422 Unprocessable Entity code"
+    "contains HTTP 422 Unprocessable Entity"
   ],
   "request": {
     "pathVariables": {

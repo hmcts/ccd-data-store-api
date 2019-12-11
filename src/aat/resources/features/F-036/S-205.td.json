@@ -5,7 +5,7 @@
   "specs": [
     "an active profile in CCD",
     "contains validation errors",
-    "contains HTTP 422 Unprocessable Entity code"
+    "contains HTTP 422 Unprocessable Entity"
   ],
 
   "expectedResponse": {

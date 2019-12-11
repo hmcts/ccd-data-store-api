@@ -5,7 +5,7 @@
   "specs": [
     "an active profile in CCD",
     "does not provide valid authentication credentials in CCD",
-    "contains HTTP 403 Forbidden code"
+    "contains HTTP 403 Forbidden"
   ],
   "users": {
     "invokingUser" : {

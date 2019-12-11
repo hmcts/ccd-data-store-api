@@ -5,7 +5,7 @@
   "specs": [
     "an active profile in CCD",
     "contains an invalid event trigger id",
-    "contains HTTP 404 not found code"
+    "contains HTTP 404 Not Found"
   ],
   "request": {
     "pathVariables": {

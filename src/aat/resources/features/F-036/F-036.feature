@@ -33,7 +33,7 @@ Feature: F-036: Retrieve a trigger for case by ID
     And the request [does not provide valid authentication credentials in CCD]
     And it is submitted to call the [Retrieve a trigger for case by ID] operation of [CCD Data Store]
     Then a negative response is received
-    And the response [contains HTTP 403 Unauthorized code]
+    And the response [contains HTTP 403 Unauthorized]
     And the response has all other details as expected
 
   @S-202
@@ -44,7 +44,7 @@ Feature: F-036: Retrieve a trigger for case by ID
     And the request [does not provide valid authentication credentials in CCD]
     And it is submitted to call the [Retrieve a trigger for case by ID] operation of [CCD Data Store]
     Then a negative response is received
-    And the response [contains HTTP 403 Forbidden code]
+    And the response [contains HTTP 403 Forbidden]
     And the response has all other details as expected
 
   @S-203
@@ -55,7 +55,7 @@ Feature: F-036: Retrieve a trigger for case by ID
     And the request [contains an invalid event trigger id]
     And it is submitted to call the [Retrieve a trigger for case by ID] operation of [CCD Data Store]
     Then a negative response is received
-    And the response [contains HTTP 404 not found code]
+    And the response [contains HTTP 404 Not Found]
     And the response has all other details as expected
 
   @S-204
@@ -66,7 +66,7 @@ Feature: F-036: Retrieve a trigger for case by ID
     And the request [contains an event trigger id with NO pre state]
     And it is submitted to call the [Retrieve a trigger for case by ID] operation of [CCD Data Store]
     Then a negative response is received
-    And the response [contains HTTP 422 Unprocessable Entity code]
+    And the response [contains HTTP 422 Unprocessable Entity]
     And the response has all other details as expected
 
   @S-205 @Ignore #Ignoring test whilst we determine how call back validation should work on GET cases
@@ -77,7 +77,7 @@ Feature: F-036: Retrieve a trigger for case by ID
     And the request [contains validation errors]
     And it is submitted to call the [Retrieve a trigger for case by ID] operation of [CCD Data Store]
     Then a negative response is received
-    And the response [contains HTTP 422 Unprocessable Entity code]
+    And the response [contains HTTP 422 Unprocessable Entity]
     And the response has all other details as expected
 
   @S-206 @Ignore #Ignoring test Returns 500 raised RDM-6891
@@ -88,5 +88,5 @@ Feature: F-036: Retrieve a trigger for case by ID
     And the request [where the user has insufficient privilege]
     And it is submitted to call the [Retrieve a trigger for case by ID] operation of [CCD Data Store]
     Then a negative response is received
-    And the response [contains HTTP 422 Unprocessable Entity code]
+    And the response [contains HTTP 422 Unprocessable Entity]
     And the response has all other details as expected
