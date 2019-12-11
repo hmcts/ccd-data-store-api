@@ -7,9 +7,7 @@
     "has the 201 code"
   ],
   "request": {
-    "body": {
-      "_extends_": "Standard_Full_Case_Data"
-    }
+    "_extends_": "S-288_Case_Data"
   },
   "expectedResponse": {
     "_extends_": "Common_201_Response"

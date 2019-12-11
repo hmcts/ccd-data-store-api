@@ -47,6 +47,7 @@ Feature: F-056: Submit event creation as Citizen
   @S-288
   Scenario: must return 201 when start event creation process for appropriate inputs
     Given a user with [an active profile in CCD]
+    And a successful call [to create a token for case creation as a citizen] as in [Citizen_Token_Creation_Data_For_Case_Creation]
     When a request is prepared with appropriate values
     And it is submitted to call the [Submit case creation as Citizen] operation of [CCD Data Store]
     Then a positive response is received
