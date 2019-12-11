@@ -8,6 +8,11 @@
     "contains a valid user authorisation token without access to the operation",
     "contains an HTTP-404 Not Found"
   ],
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][Standard_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
+    }
+  },
   "expectedResponse": {
     "_extends_": "Common_404_Response",
     "headers": {
