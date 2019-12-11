@@ -31,8 +31,7 @@
 
     @S-163 @Ignore #Defect submitted RDM-6868
     Scenario: must return 404 when case reference does NOT exist
-      Given a case that has just been created as in [Standard_Full_Case_Creation_Data]
-      And a user with [an active profile in CCD]
+      Given a user with [an active profile in CCD]
       When a request is prepared with appropriate values
       And the request [uses case-reference which is not exist in CCD]
       And it is submitted to call the [Retrieve a case by ID for dynamic display] operation of [CCD Data Store]
@@ -42,8 +41,7 @@
 
     @S-162
     Scenario: must return 400 when case reference is invalid
-      Given a case that has just been created as in [Standard_Full_Case_Creation_Data]
-      And a user with [an active profile in CCD]
+      Given a user with [an active profile in CCD]
       When a request is prepared with appropriate values
       And the request [uses an invalid case-reference]
       And it is submitted to call the [Retrieve a case by ID for dynamic display] operation of [CCD Data Store]
