@@ -33,8 +33,6 @@
     "body": {
       "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
       "timestamp": "[[ANY]]",
-      "status": 400,
-      "error": "Bad Request",
       "message": "No jurisdictions found for given access criteria'",
       "path": "[[ANY]]",
       "details": null,
