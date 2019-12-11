@@ -41,6 +41,6 @@ public class CachedCaseUserRepository implements CaseUserRepository {
 
     @Override
     public List<String> findCaseRoles(final Long caseId, final String userId) {
-        return caseUserRoles.computeIfAbsent(userId + userId, e -> caseUserRepository.findCaseRoles(caseId, userId));
+        return caseUserRoles.computeIfAbsent(caseId + userId, e -> caseUserRepository.findCaseRoles(caseId, userId));
     }
 }
