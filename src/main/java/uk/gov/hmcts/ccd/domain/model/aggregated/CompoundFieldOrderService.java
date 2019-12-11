@@ -10,6 +10,7 @@ import javax.inject.Singleton;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -59,7 +60,10 @@ public class CompoundFieldOrderService {
     private List<CaseField> getSortedFieldsFromEventFieldOverride(final List<CaseField> children, final String listElementCode, final List<String> orderedEventComplexFieldReferences) {
         final List<CaseField> sortedCaseFields = Lists.newArrayList();
         final Map<String, CaseField> childrenCaseIdToCaseField = convertComplexTypeChildrenToOrderedMap(children);
-        orderedEventComplexFieldReferences.forEach(reference -> sortedCaseFields.add(childrenCaseIdToCaseField.remove(getReference(listElementCode, reference))));
+        orderedEventComplexFieldReferences.stream()
+            .map(reference -> childrenCaseIdToCaseField.remove(getReference(listElementCode, reference)))
+            .filter(Objects::nonNull)
+            .forEach(sortedCaseFields::add);
         addRemainingInEncounterOrder(sortedCaseFields, childrenCaseIdToCaseField);
         return sortedCaseFields;
     }
