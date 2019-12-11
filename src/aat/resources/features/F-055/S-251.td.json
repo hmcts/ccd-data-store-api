@@ -30,49 +30,7 @@
           "_extends_": "Standard_Full_Case_Data"
         },
         "data_classification": {
-          "MoneyGBPField": "PUBLIC",
-          "FixedListField": "PUBLIC",
-          "AddressUKField": {
-            "value": {
-              "County": "PUBLIC",
-              "Country": "PUBLIC",
-              "PostCode": "PUBLIC",
-              "PostTown": "PUBLIC",
-              "AddressLine1": "PUBLIC",
-              "AddressLine2": "PUBLIC",
-              "AddressLine3": "PUBLIC"
-            },
-            "classification": "PUBLIC"
-          },
-          "ComplexField": {
-            "value": {
-              "ComplexTextField": "PUBLIC",
-              "ComplexFixedListField": "PUBLIC"
-            },
-            "classification": "PUBLIC"
-          },
-          "DateTimeField": "PUBLIC",
-          "PhoneUKField": "PUBLIC",
-          "NumberField": "PUBLIC",
-          "MultiSelectListField": "PUBLIC",
-          "YesOrNoField": "PUBLIC",
-          "EmailField": "PUBLIC",
-          "TextField": "PUBLIC",
-          "DateField": "PUBLIC",
-          "TextAreaField": "PUBLIC",
-          "CollectionField": {
-            "value": [
-              {
-                "id": "CollectionField1",
-                "classification": "PUBLIC"
-              },
-              {
-                "id": "CollectionField2",
-                "classification": "PUBLIC"
-              }
-            ],
-            "classification": "PUBLIC"
-          }
+          "_extends_": "Standard_Full_Case_Data_Classification"
         },
         "after_submit_callback_response": null,
         "callback_response_status_code": null,
@@ -80,49 +38,7 @@
         "delete_draft_response_status_code": null,
         "delete_draft_response_status": null,
         "security_classifications": {
-          "MoneyGBPField": "PUBLIC",
-          "FixedListField": "PUBLIC",
-          "AddressUKField": {
-            "value": {
-              "County": "PUBLIC",
-              "Country": "PUBLIC",
-              "PostCode": "PUBLIC",
-              "PostTown": "PUBLIC",
-              "AddressLine1": "PUBLIC",
-              "AddressLine2": "PUBLIC",
-              "AddressLine3": "PUBLIC"
-            },
-            "classification": "PUBLIC"
-          },
-          "ComplexField": {
-            "value": {
-              "ComplexTextField": "PUBLIC",
-              "ComplexFixedListField": "PUBLIC"
-            },
-            "classification": "PUBLIC"
-          },
-          "DateTimeField": "PUBLIC",
-          "PhoneUKField": "PUBLIC",
-          "NumberField": "PUBLIC",
-          "MultiSelectListField": "PUBLIC",
-          "YesOrNoField": "PUBLIC",
-          "EmailField": "PUBLIC",
-          "TextField": "PUBLIC",
-          "DateField": "PUBLIC",
-          "TextAreaField": "PUBLIC",
-          "CollectionField": {
-            "value": [
-              {
-                "id": "CollectionField1",
-                "classification": "PUBLIC"
-              },
-              {
-                "id": "CollectionField2",
-                "classification": "PUBLIC"
-              }
-            ],
-            "classification": "PUBLIC"
-          }
+          "_extends_": "Standard_Full_Case_Data_Classification"
         }
       },
       "event_id": "UPDATE"
