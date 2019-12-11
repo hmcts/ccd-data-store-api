@@ -24,8 +24,7 @@
   "expectedResponse": {
     "_extends_": "Common_400_Response",
     "headers": {
-      "Connection": "[[ANY]]",
-      "Content-Encoding": "[[ANY]]"
+      "Connection": "[[ANY]]"
     },
     "body": {
       "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
