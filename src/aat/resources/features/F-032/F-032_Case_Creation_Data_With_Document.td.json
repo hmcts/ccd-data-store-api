@@ -4,7 +4,23 @@
 
   "request": {
     "body": {
-      "_extends_": "Sample_Document_Data"
+      "data": {
+        "_extends_": "Standard_Full_Case_Data_With_Document"
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_data": {
+        "_extends_": "Standard_Full_Case_Data_With_Document"
+      },
+      "data_classification": {
+        "DocumentField": "PUBLIC"
+      },
+      "security_classifications": {
+        "DocumentField": "PUBLIC"
+      }
     }
   }
 }
