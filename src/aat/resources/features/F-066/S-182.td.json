@@ -1,0 +1,43 @@
+{
+  "title": "should retrieve trigger when the case and event exists",
+	"_guid_": "S-182",
+	"_extends_": "F-066_Test_Data_Base",
+
+	"specs": [
+		"an active profile in CCD",
+		"includes the event start trigger for the case just created, along with a HTTP 200 OK"
+	],
+	"request": {
+    "pathVariables": {
+      "cid": "[[DYNAMIC]]"
+    }
+	},
+	"expectedResponse": {
+    "responseCode" : 200,
+    "responseMessage" : "OK",
+    "headers":{
+      "_extends_": "Common_Response_Headers",
+      "Content-Encoding" : "gzip",
+      "Content-Length" : "[[ANY]]",
+      "Vary" : "Accept-Encoding"
+    },
+    "body" : {
+      "id" : "[[ANY]]",
+      "name" : "[[ANY]]",
+      "description" : null,
+      "case_id" : "[[ANY]]",
+      "case_fields" : [ ],
+      "event_token" : "[[ANY]]",
+      "wizard_pages" : [ ],
+      "show_summary" : true,
+      "show_event_notes" : null,
+      "end_button_label" : null,
+      "can_save_draft" : null,
+      "_links" : {
+        "self" : {
+          "href" : "[[ANY]]"
+        }
+      }
+    }
+	}
+}
