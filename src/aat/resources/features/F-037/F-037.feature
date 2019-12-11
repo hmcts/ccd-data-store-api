@@ -22,7 +22,7 @@ Feature: F-037: Submit event for an existing case (V2)
     And the request [does not provide valid authentication credentials]
     And it is submitted to call the [Submit event for an existing case (V2)] operation of [CCD Data Store]
     Then a negative response is received
-    And the response [has the 403 return code]
+    And the response [includes a HTTP 403 Forbidden]
     And the response has all other details as expected
 
   @S-023
@@ -32,7 +32,7 @@ Feature: F-037: Submit event for an existing case (V2)
     And the request [does not provide an authorised access to the operation]
     And it is submitted to call the [Submit event for an existing case (V2)] operation of [CCD Data Store]
     Then a negative response is received
-    And the response [has the 403 return code]
+    And the response [includes a HTTP 403 Forbidden]
     And the response has all other details as expected
 
   @S-025
@@ -42,7 +42,7 @@ Feature: F-037: Submit event for an existing case (V2)
     And the request [contains an invalid case-reference]
     And it is submitted to call the [Submit event for an existing case (V2)] operation of [CCD Data Store]
     Then a negative response is received
-    And the response [has the 400 return code]
+    And the response [includes a HTTP 400 'Bad Request']
     And the response has all the details as expected
 
   @S-026 @Ignore #This scenario is returning 400 instead of expected 404, Need to raise defect JIRA
@@ -52,7 +52,7 @@ Feature: F-037: Submit event for an existing case (V2)
     And the request [contains a non-existing case-reference]
     And it is submitted to call the [Submit event for an existing case (V2)] operation of [CCD Data Store]
     Then a negative response is received
-    And the response [has the 404 return code]
+    And the response [includes a HTTP 404 'Not Found']
     And the response has all the details as expected
 
   @S-027
@@ -62,5 +62,5 @@ Feature: F-037: Submit event for an existing case (V2)
     And the request [contains a non-existing Event-Id]
     And it is submitted to call the [Submit event for an existing case (V2)] operation of [CCD Data Store]
     Then a negative response is received
-    And the response [has the 404 return code]
+    And the response [includes a HTTP 404 'Not Found']
     And the response has all the details as expected
