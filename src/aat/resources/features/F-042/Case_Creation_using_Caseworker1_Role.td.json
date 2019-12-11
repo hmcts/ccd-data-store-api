@@ -1,19 +1,69 @@
 {
-  "_guid_": "Case_Creation_using_Caseworker1_Role",
-  "users": {
-    "invokingUser": {
-      "username": "befta.caseworker.1@gmail.com",
-      "password": "Pa55word11"
-    }
-  },
-  "request": {
-    "pathVariables": {
-      "jurisdiction": "BEFTA_JURISDICTION_1",
-      "caseType": "BEFTA_CASETYPE_1_1",
-      "event": "CREATE"
-    },
-    "body": {
-      "_extends_": "Case_Data_Body"
-    }
-  }
+	"_guid_": "Case_Creation_using_Caseworker1_Role",
+
+	"productName": "CCD Data Store",
+	"operationName": "Submit case creation as Case worker",
+	"method": "POST",
+	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
+
+	"specs": [
+		"to create a full case"
+	],
+
+	"users": {
+		"invokingUser": {
+			"username": "befta.caseworker.1@gmail.com",
+			"password": "Pa55word11"
+		}
+	},
+
+	"request": {
+		"headers": {
+			"_extends_": "Common_Request_Headers"
+		},
+		"pathVariables": {
+			"jid": "BEFTA_JURISDICTION_1",
+			"ctid": "BEFTA_CASETYPE_1_1",
+			"event": "CREATE"
+		},
+		"body": {
+			"_extends_": "Case_Data_Body",
+			"event": {
+				"id": "CREATE",
+				"summary": "",
+				"description": ""
+			},
+			"event_token": "${[scenarioContext][parentContext][childContexts][Standard_Token_Creation_Data_For_Case_Creation][testData][actualResponse][body][token]}",
+			"ignore_warning": false,
+			"draft_id": null
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_201_Response",
+		"headers": {
+			"Content-Encoding": "gzip",
+			"Content-Type": "application/json;charset=UTF-8",
+			"vary": "accept-encoding",
+			"Content-Length": "[[ANY]]"
+		},
+		"body": {
+			"id": "[[ANY]]",
+			"jurisdiction": "BEFTA_JURISDICTION_1",
+			"state": "TODO",
+			"version": 0,
+			"case_type_id": "BEFTA_CASETYPE_1_1",
+			"created_date": "[[ANY]]",
+			"last_modified": "[[ANY]]",
+			"security_classification": "PUBLIC",
+			"case_data": "[[ANY]]",
+			"data_classification": "[[ANY]]",
+			"after_submit_callback_response": null,
+			"callback_response_status_code": null,
+			"callback_response_status": null,
+			"delete_draft_response_status_code": null,
+			"delete_draft_response_status": null,
+			"security_classifications": "[[ANY]]"
+		}
+	}
 }
