@@ -199,6 +199,9 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
                         Long theCaseReference = scenarioContext.getTheCaseReference();
                         aRequest.pathParam(pathVariable, theCaseReference);
                         scenarioContext.getTestData().getRequest().getPathVariables().put("cid", theCaseReference);
+                    } else if (pathVariable.equals("idToDelete") && theInvokingUser.getUid() != null) {
+                        aRequest.pathParam(pathVariable, theInvokingUser.getUid());
+                        scenarioContext.getTestData().getRequest().getPathVariables().put("idToDelete", theInvokingUser.getUid());
                     } else if (pathVariable.equals("caseId") && scenarioContext.getTheCaseReference() != null) {
                         Long theCaseReference = scenarioContext.getTheCaseReference();
                         aRequest.pathParam(pathVariable, theCaseReference);
@@ -382,6 +385,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
             throws IOException {
         BackEndFunctionalTestScenarioContext subcontext = new BackEndFunctionalTestScenarioContext();
         subcontext.initializeTestDataFor(testDataId);
+        subcontext.setTheCaseReference(scenarioContext.getTheCaseReference());
         prepareARequestWithAppropriateValues(subcontext);
         verifyTheRequestInTheContextWithAParticularSpecification(subcontext, testDataSpec);
         submitTheRequestToCallAnOperationOfAProduct(subcontext, subcontext.getTestData().getOperationName(),
