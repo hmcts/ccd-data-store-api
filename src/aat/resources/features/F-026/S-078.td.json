@@ -5,8 +5,7 @@
 
   "specs": [
     "an active profile in CCD",
-    "uses case-reference of the case just created",
-    "contains the details of the case just created, along with an HTTP-200 OK"
+    "contains details of existing cases associated, along with an HTTP-200 OK"
   ],
   "expectedResponse": {
     "_extends_": "Common_200_Response",
