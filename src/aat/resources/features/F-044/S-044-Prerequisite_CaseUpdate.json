@@ -9,7 +9,7 @@
   "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events",
 
   "specs": [
-    "to update case with the token just created"
+    "to update that case with the token just created"
   ],
 
   "user": {

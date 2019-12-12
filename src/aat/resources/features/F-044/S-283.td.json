@@ -5,6 +5,9 @@
 
   "specs": [
     "an active profile in CCD",
+    "contains a case Id for just created case",
+    "contains a token created as in S-044-Prerequisite",
+    "contains an invalid event Id as pre-state conditions",
     "includes a HTTP 422 'Unprocessable Entity'"
   ],
   "request": {

@@ -1,16 +1,16 @@
 {
-	"_guid_": "S-512",
-	"_extends_": "F-049_Test_Data_Base",
-	"title": "must return 404 when request contains a non-existing Case type ID",
+	"_guid_": "S-277",
+	"_extends_": "F-044_Test_Data_Base",
+	"title": "must return 404 when request contains a non-existing jurisdiction Id",
 	"specs": [
 		"an active profile in CCD",
-		"contains a non-existing Case type ID",
-		"code is HTTP-404"
+		"contains a non-existing jurisdiction Id",
+		"includes a HTTP 404 'Not Found'"
 	],
 	"request": {
 		"pathVariables": {
-			"ctid": "Dummy"
-		}
+      "jid": "Invalid_JID"
+    }
 	},
 	"expectedResponse": {
 		"_extends_": "Common_404_Response",
@@ -20,7 +20,7 @@
 		},
 		"body": {
 			"exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
-			"message": "Resource not found when getting case type version for Dummy because of 404 ",
+			"message": "[[ANY]]",
 			"details": null,
 			"callbackErrors": null,
 			"callbackWarnings": null

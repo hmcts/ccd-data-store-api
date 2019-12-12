@@ -6,7 +6,8 @@
 
 	"specs": [
 		"an active profile in CCD",
-		"contains an update token valid for previous version of case",
+    "contains a case Id for just updated case",
+		"contains token (created in 'S-044-Prerequisite') which is no longer valid for current version of case",
     "includes a HTTP 409 'Conflict'"
 	],
   "request": {

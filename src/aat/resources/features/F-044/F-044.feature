@@ -10,6 +10,8 @@ Feature: F-044: Submit event creation as Case worker
     And a case that has just been created as in [Standard_Full_Case_Creation_Data]
     And a successful call [to get an event token for just created case] as in [S-044-Prerequisite]
     When a request is prepared with appropriate values
+    And the request [contains a case Id for just created case]
+    And the request [contains a token created as in S-044-Prerequisite]
     And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
     Then a positive response is received
     And the response [includes the updated case details, along with a HTTP 201 Created]
@@ -50,9 +52,10 @@ Feature: F-044: Submit event creation as Case worker
     Given a user with [an active profile in CCD]
     And a case that has just been created as in [Standard_Full_Case_Creation_Data]
     And a successful call [to get an event token for just created case] as in [S-044-Prerequisite]
-    And another successful call [to update case with the token just created] as in [S-044-Prerequisite_CaseUpdate]
+    And another successful call [to update that case with the token just created] as in [S-044-Prerequisite_CaseUpdate]
     When a request is prepared with appropriate values
-    And the request [contains an update token valid for previous version of case]
+    And the request [contains a case Id for just updated case]
+    And the request [contains token (created in 'S-044-Prerequisite') which is no longer valid for current version of case]
     And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
     Then a negative response is received
     And the response [includes a HTTP 409 'Conflict']
@@ -64,26 +67,33 @@ Feature: F-044: Submit event creation as Case worker
     And a case that has just been created as in [Standard_Full_Case_Creation_Data]
     And a successful call [to get an event token for just created case] as in [S-044-Prerequisite]
     When a request is prepared with appropriate values
+    And the request [contains a case Id for just created case]
+    And the request [contains a token created as in S-044-Prerequisite]
+    And the request [contains an invalid event Id as pre-state conditions]
     And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
     Then a negative response is received
     And the response [includes a HTTP 422 'Unprocessable Entity']
     And the response has all other details as expected
 
-  @S-552 @Ignore
-  Scenario: must return 404 when request contains a non-existing jurisdiction ID
+  @S-277 @Ignore # This scenario is returning 403 instead of expected 404, linked to defect JIRA-6917
+  Scenario: must return 404 when request contains a non-existing jurisdiction Id
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
-    And the request [contains a non-existing jurisdiction ID]
+    And the request [contains a non-existing jurisdiction Id]
     And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
     Then a negative response is received
     And the response [includes a HTTP 404 'Not Found']
     And the response has all the details as expected
 
-
-    @S-277 @Ignore
-    Scenario: <More tests out of further analysis>
-    <>
-
+  @S-550 @Ignore # This scenario is returning 400 instead of expected 404, linked to defect JIRA-6918
+    Scenario: must return 404 when request contains a non-existing case type
+    Given a user with [an active profile in CCD]
+    When a request is prepared with appropriate values
+    And the request [contains a non-existing case type]
+    And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
+    Then a negative response is received
+    And the response [includes a HTTP 404 'Not Found']
+    And the response has all the details as expected
 
     @S-113 @Ignore
     Scenario: should not update a case if the caseworker has 'C' access on CaseType
@@ -97,31 +107,31 @@ Feature: F-044: Submit event creation as Case worker
     Scenario: should not update a case if the caseworker has 'D' access on CaseType
     <already implemented previously. will be refactored later.>
 
-    @S-116
+    @S-116 @Ignore
     Scenario: should not update a case if the caseworker has 'R' access on CaseType
     <already implemented previously. will be refactored later.>
 
-    @S-117
+    @S-117 @Ignore
     Scenario: should progress case state
     <already implemented previously. will be refactored later.>
 
-    @S-118
+    @S-118 @Ignore
     Scenario: should update a case if the caseworker has 'CRUD' access on CaseType
     <already implemented previously. will be refactored later.>
 
-    @S-119
+    @S-119 @Ignore
     Scenario: should update a case if the caseworker has 'CU' access on CaseType
     <already implemented previously. will be refactored later.>
 
-    @S-120
+    @S-120 @Ignore
     Scenario: should update a case if the caseworker has 'RU' access on CaseType
     <already implemented previously. will be refactored later.>
 
-    @S-121
+    @S-121 @Ignore
     Scenario: should update a case if the caseworker has 'U' access on CaseType
     <already implemented previously. will be refactored later.>
 
-    @S-122
+    @S-122 @Ignore
     Scenario: should update a single case field
     <already implemented previously. will be refactored later.>
 
