@@ -134,4 +134,3 @@ Feature: F-044: Submit event creation as Case worker
     @S-122 @Ignore
     Scenario: should update a single case field
     <already implemented previously. will be refactored later.>
-
