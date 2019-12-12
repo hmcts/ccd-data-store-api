@@ -7,11 +7,10 @@ Feature: F-064: Retrieve workbasket input details for dynamic display
   @S-217
   Scenario: should retrieve trigger when the case and event exists
     Given a user with [an active profile in CCD]
-    And a case that has just been created as in [Standard_Full_Case_Creation_Data]
     When a request is prepared with appropriate values
     And it is submitted to call the [retrieve workbasket input details for dynamic display] operation of [CCD Data Store]
     Then a positive response is received
-    And the response [includes the event start trigger for the case just created, along with an HTTP 200 OK]
+    And the response [code is HTTP-200 OK]
     And the response has all other details as expected
 
   @S-218
