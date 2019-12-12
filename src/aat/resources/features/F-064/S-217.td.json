@@ -5,7 +5,7 @@
 	"specs": [
 		"an inactive profile in CCD",
 		"does not provide valid authentication credentials",
-		"code is HTTP-403 Forbidden"
+		"code is HTTP-401 Unauthorised"
 	],
   "request": {
     "headers": {
@@ -13,7 +13,7 @@
     }
   },
 	"expectedResponse": {
-		"_extends_": "Common_403_Response",
+		"_extends_": "Common_401_Response",
     "headers": {
       "Content-Encoding" : "gzip"
     },
