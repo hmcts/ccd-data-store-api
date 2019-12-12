@@ -38,14 +38,15 @@ import uk.gov.hmcts.ccd.fta.exception.FunctionalTestException;
 import uk.gov.hmcts.ccd.fta.util.EnvUtils;
 import uk.gov.hmcts.ccd.fta.util.JsonUtils;
 
+
 @SuppressWarnings({ "LocalVariableName" })
 public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTestAutomationDSL {
-
-    private static boolean isTestDataLoaded = false;
 
     private final String BE_FTA_FILE_JURISDICTION1 = "src/aat/resources/CCD_BEFTA_JURISDICTION1.xlsx";
     private final String BE_FTA_FILE_JURISDICTION2 = "src/aat/resources/CCD_BEFTA_JURISDICTION2.xlsx";
     private final String BE_FTA_FILE_JURISDICTION3 = "src/aat/resources/CCD_BEFTA_JURISDICTION3.xlsx";
+
+    private static boolean isTestDataLoaded = false;
 
     private final BackEndFunctionalTestScenarioContext scenarioContext;
     private final AATHelper aat;
@@ -59,6 +60,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         RestAssured.useRelaxedHTTPSValidation();
         scenarioContext = new BackEndFunctionalTestScenarioContext();
     }
+
 
     @Before()
     public void prepare(Scenario scenario) {
@@ -349,29 +351,6 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         }
     }
 
-    private RequestSpecification asAutoTestImporter() {
-        AuthenticatedUser caseworker = aat.getIdamHelper().authenticate(aat.getImporterAutoTestEmail(),
-            aat.getImporterAutoTestPassword());
-
-        String s2sToken = aat.getS2SHelper().getToken();
-        return RestAssured.given(new RequestSpecBuilder()
-            .setBaseUri(aat.getDefinitionStoreUrl())
-            .build())
-            .header("Authorization", "Bearer " + caseworker.getAccessToken())
-            .header("ServiceAuthorization", s2sToken);
-    }
-
-    private void importDefinition(String file) {
-        Response response = asAutoTestImporter()
-            .given()
-            .multiPart(new File(file))
-            .when()
-            .post("/import");
-        String message = "Import failed with response body: " + response.body().prettyPrint();
-        message += "\nand http code: " + response.statusCode();
-        Assert.assertEquals(message, 201, response.getStatusCode());
-    }
-
     private void importDefinitions() {
         logger.info("Importing {}...", BE_FTA_FILE_JURISDICTION1);
         importDefinition(BE_FTA_FILE_JURISDICTION1);
@@ -384,5 +363,22 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         logger.info("Importing {}...", BE_FTA_FILE_JURISDICTION3);
         importDefinition(BE_FTA_FILE_JURISDICTION3);
         logger.info("Imported {}", BE_FTA_FILE_JURISDICTION3);
+    }
+
+    private void importDefinition(String file) {
+        Response response = asAutoTestImporter().given().multiPart(new File(file)).when().post("/import");
+        String message = "Import failed with response body: " + response.body().prettyPrint();
+        message += "\nand http code: " + response.statusCode();
+        Assert.assertEquals(message, 201, response.getStatusCode());
+    }
+
+    private RequestSpecification asAutoTestImporter() {
+        AuthenticatedUser caseworker = aat.getIdamHelper().authenticate(aat.getImporterAutoTestEmail(),
+                aat.getImporterAutoTestPassword());
+
+        String s2sToken = aat.getS2SHelper().getToken();
+        return RestAssured.given(new RequestSpecBuilder().setBaseUri(aat.getDefinitionStoreUrl()).build())
+                .header("Authorization", "Bearer " + caseworker.getAccessToken())
+                .header("ServiceAuthorization", s2sToken);
     }
 }

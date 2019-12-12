@@ -71,7 +71,7 @@ public class DynamicValueInjector {
                 return theInvokingUser.getUid();
             } else if (key.equalsIgnoreCase("cid")) {
                 return calculateFromContext(scenarioContext,
-                        "${[scenarioContext][childContexts][Standard_Full_Case_Creation_Data][testData][actualResponse][body][caseReference]}");
+                        "${[scenarioContext][childContexts][Standard_Full_Case_Creation_Data][testData][actualResponse][body][id]}");
             }
             throw new FunctionalTestException("Dynamic value for '" + path + "." + key + "' does not exist!");
         } else if (isFormula(valueString)) {
