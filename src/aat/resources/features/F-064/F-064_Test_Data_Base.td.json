@@ -10,7 +10,7 @@
 	"request": {
     "headers": {
       "_extends_": "Common_Request_Headers",
-      "experimental": true,
+      "experimental": true
     },
     "pathVariables": {
       "ctid": "AAT"
