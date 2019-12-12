@@ -1,50 +1,24 @@
 {
   "_guid_": "S-217",
   "_extends_": "F-064_Test_Data_Base",
-  "title": "should retrieve trigger when the case and event exists",
+  "title": "must return 401 when request does not provide valid authentication credentials",
 	"specs": [
-		"an active profile in CCD",
-		"code is HTTP-200 OK"
+		"an inactive profile in CCD",
+		"does not provide valid authentication credentials",
+		"code is HTTP-403 Forbidden"
 	],
-	"expectedResponse": {
-    "responseCode" : 200,
-    "responseMessage" : "OK",
-    "headers" : {
-      "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
-      "Content-Type" : "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-workbasket-input-details.v2+json;charset=UTF-8",
-      "Date" : "[[ANY]]",
-      "Expires" : "0",
-      "Pragma" : "no-cache",
-      "Transfer-Encoding" : "chunked",
-      "X-Content-Type-Options" : "nosniff",
-      "X-Frame-Options" : "DENY",
-      "X-XSS-Protection" : "1; mode=block"
-    },
-    "body" : {
-      "workbasketInputs" : [ {
-        "label" : "Search `Text` field",
-        "order" : 1,
-        "field" : {
-          "id" : "TextField",
-          "elementPath" : null,
-          "metadata" : false,
-          "field_type" : {
-            "id" : "Text",
-            "type" : "Text",
-            "min" : null,
-            "max" : null,
-            "regular_expression" : null,
-            "fixed_list_items" : [ ],
-            "complex_fields" : [ ],
-            "collection_field_type" : null
-          }
-        }
-      } ],
-      "_links" : {
-        "self" : {
-          "href" : "[[ANY]]"
-        }
-      }
+  "request": {
+    "headers": {
+      "Authorization": "eyJhbGciOiJIUzI1NiJ9"
     }
+  },
+	"expectedResponse": {
+		"_extends_": "Common_403_Response",
+    "headers": {
+      "Content-Encoding" : "gzip"
+    },
+		"body": {
+			"message": "Access Denied"
+		}
 	}
 }

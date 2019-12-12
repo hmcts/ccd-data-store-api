@@ -1,28 +1,50 @@
 {
   "_guid_": "S-220",
   "_extends_": "F-064_Test_Data_Base",
-  "title": "must return negative response when request contains an invalid case type ID",
+  "title": "must retrieve workbasket inputs for valid case type ID",
 	"specs": [
 		"an active profile in CCD",
-		"contains an invalid case type ID",
-		"code is HTTP-404 'Bad Request'"
+		"code is HTTP-200 OK"
 	],
-  "request": {
-    "pathVariables": {
-      "ctid": "eyJhbGciOiJIUzI1NiJ9"
-    }
-  },
 	"expectedResponse": {
-    "_extends_": "Common_404_Response",
-    "headers": {
-      "Content-Encoding" : "gzip"
+    "responseCode" : 200,
+    "responseMessage" : "OK",
+    "headers" : {
+      "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
+      "Content-Type" : "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-workbasket-input-details.v2+json;charset=UTF-8",
+      "Date" : "[[ANY]]",
+      "Expires" : "0",
+      "Pragma" : "no-cache",
+      "Transfer-Encoding" : "chunked",
+      "X-Content-Type-Options" : "nosniff",
+      "X-Frame-Options" : "DENY",
+      "X-XSS-Protection" : "1; mode=block"
     },
     "body" : {
-      "exception" : "[[ANY]]",
-      "message" : "Resource not found when getting case type version for eyJhbGciOiJIUzI1NiJ9 because of 404 ",
-      "details" : null,
-      "callbackErrors" : null,
-      "callbackWarnings" : null
+      "workbasketInputs" : [ {
+        "label" : "Search `Text` field",
+        "order" : 1,
+        "field" : {
+          "id" : "TextField",
+          "elementPath" : null,
+          "metadata" : false,
+          "field_type" : {
+            "id" : "Text",
+            "type" : "Text",
+            "min" : null,
+            "max" : null,
+            "regular_expression" : null,
+            "fixed_list_items" : [ ],
+            "complex_fields" : [ ],
+            "collection_field_type" : null
+          }
+        }
+      } ],
+      "_links" : {
+        "self" : {
+          "href" : "[[ANY]]"
+        }
+      }
     }
-  }
+	}
 }

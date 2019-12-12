@@ -1,25 +1,28 @@
 {
-  "title": "must return negative response when request provides authentic credentials without authorised access",
-	"_guid_": "S-219",
-	"_extends_": "F-064_Test_Data_Base",
-
+  "_guid_": "S-219",
+  "_extends_": "F-064_Test_Data_Base",
+  "title": "must return a negative response when request contains an invalid case type ID",
 	"specs": [
 		"an active profile in CCD",
-		"does not provide authorised access to the operation",
-		"code is HTTP-403 Forbidden"
+		"contains an invalid case type ID",
+		"code is HTTP-404 'Bad Request'"
 	],
   "request": {
-    "headers": {
-      "ServiceAuthorization": "eyJhbGciOiJIUzI1NiJ9"
+    "pathVariables": {
+      "ctid": "eyJhbGciOiJIUzI1NiJ9"
     }
   },
 	"expectedResponse": {
-		"_extends_": "Common_403_Response",
+    "_extends_": "Common_404_Response",
     "headers": {
       "Content-Encoding" : "gzip"
     },
-		"body": {
-			"message": "Access Denied"
-		}
-	}
+    "body" : {
+      "exception" : "[[ANY]]",
+      "message" : "Resource not found when getting case type version for eyJhbGciOiJIUzI1NiJ9 because of 404 ",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
 }
