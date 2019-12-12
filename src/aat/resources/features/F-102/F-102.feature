@@ -7,7 +7,6 @@ Feature: F-102: Get jurisdictions available to the user
   @S-533
   Scenario: must return a list of jurisdictions for a valid user
     Given a user with [a detailed profile in CCD having create case access for a jurisdiction]
-    And a case that has just been created as in [Case_Creation_using_Caseworker1_Role]
     When a request is prepared with appropriate values
     And the request [has CREATE as case access parameter]
     And it is submitted to call the [Get jurisdictions available to the user] operation of [CCD Data Store]
@@ -19,7 +18,6 @@ Feature: F-102: Get jurisdictions available to the user
   @S-534
   Scenario: must return 400 for if access type is not in create, read or update
     Given a user with [a detailed profile in CCD having create case access for a jurisdiction]
-    And a case that has just been created as in [Case_Creation_using_Caseworker1_Role]
     When a request is prepared with appropriate values
     And the request [has DELETE as case access parameter]
     And it is submitted to call the [Get jurisdictions available to the user] operation of [CCD Data Store]
