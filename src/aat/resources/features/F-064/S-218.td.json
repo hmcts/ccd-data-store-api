@@ -1,5 +1,5 @@
 {
-  "title": "must return negative response when request provides authentic credentials without authorised access",
+  "title": "must return 403 when request provides authentic credentials without authorised access to the operation",
 	"_guid_": "S-218",
 	"_extends_": "F-064_Test_Data_Base",
 
