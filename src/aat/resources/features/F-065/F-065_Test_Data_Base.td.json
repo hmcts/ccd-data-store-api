@@ -15,7 +15,7 @@
       "experimental": true
     },
     "pathVariables": {
-      "cid": "[[DYNAMIC]]"
+      "cid": "1234567890123456"
     }
   },
   "expectedResponse": {

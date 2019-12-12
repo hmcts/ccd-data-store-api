@@ -71,7 +71,7 @@
         "summary": "",
         "description": ""
       },
-      "event_token": "${[scenarioContext][parentContext][childContexts][S-044-Prerequisite][testData][actualResponse][body][token]}",
+      "event_token": "${[scenarioContext][parentContext][childContexts][S-065-Prerequisite][testData][actualResponse][body][token]}",
       "ignore_warning": false
     }
   },
