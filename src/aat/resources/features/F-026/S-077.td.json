@@ -8,15 +8,20 @@
     "uses an existing case-type which doesn't have any associated cases",
     "contains an empty SearchResultView, along with an HTTP-200 OK"
   ],
+  "user": {
+    "username": "befta.caseworker.1@gmail.com",
+    "password": "Pa55word11"
+  },
   "request": {
     "pathVariables": {
-      "ctid": "AAT_AUTH_5"
+      "jid": "BEFTA_JURISDICTION_1",
+      "ctid": "DO_NOT_CREATE_CASES"
     }
   },
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "body": {
-      "columns": [],
+      "columns": "[[ANY]]",
       "results": [],
       "result_error": null
     }
