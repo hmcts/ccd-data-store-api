@@ -39,8 +39,10 @@
 			"Expires": "[[ANY]]",
 			"Pragma": "[[ANY]]",
 			"Date": "[[ANY]]",
-			"Content-Type": "[[ANY]]"
+			"Content-Type": "[[ANY]]",
+			"Content-Length": "[[ANY]]"
 		},
+
 		"body": {
 			"user": "[[ANY]]",
 			"channels": null,
