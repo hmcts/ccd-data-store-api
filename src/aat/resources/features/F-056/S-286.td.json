@@ -1,18 +1,14 @@
 {
   "title": "must start event creation process for appropriate inputs",
-  "_guid_": "S-287",
+  "_guid_": "S-286",
   "_extends_": "F-056_Test_Data_Base",
   "specs": [
     "an active profile in CCD",
     "contains a token created as in Citizen_Token_Creation_Data_For_Case_Creation",
-    "contains an invalid case data",
-    "contains a HTTP 422 Unprocessable Entity"
+    "contains a HTTP 409 Conflict"
   ],
   "request": {
     "body": {
-      "data": {
-        "NumberField": "abc"
-      },
       "event_token": "${[scenarioContext][childContexts][Citizen_Token_Creation_Data_For_Case_Creation][testData][actualResponse][body][token]}"
     }
   },

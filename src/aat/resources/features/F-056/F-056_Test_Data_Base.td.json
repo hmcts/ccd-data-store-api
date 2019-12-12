@@ -9,11 +9,26 @@
   },
   "uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
   "request": {
-    "_extends_": "Common_Request",
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
     "pathVariables": {
       "uid": "[[DYNAMIC]]",
       "jid": "BEFTA_JURISDICTION_3",
       "ctid": "BEFTA_CASETYPE_3_2"
+    },
+    "body": {
+      "data": {
+        "_extends_": "F-056_Case_Data_Base"
+      },
+      "event": {
+        "id": "CREATE",
+        "summary": "",
+        "description": ""
+      },
+      "event_token": "TOKENID",
+      "ignore_warning": false,
+      "draft_id": null
     }
   }
 }

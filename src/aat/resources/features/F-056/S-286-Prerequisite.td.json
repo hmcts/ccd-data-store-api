@@ -1,5 +1,5 @@
 {
-  "_guid_": "Citizen_Token_Creation_Data_For_Case_Creation",
+  "_guid_": "S-286-Prerequisite",
 
   "productName": "CCD Data Store",
   "operationName": "Start event creation as Citizen",
@@ -7,7 +7,7 @@
   "uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
 
   "specs": [
-    "to create a token for case creation as a citizen"
+    "invalidate the token"
   ],
 
   "users": {
@@ -25,7 +25,7 @@
       "uid": "[[DYNAMIC]]",
       "jid": "BEFTA_JURISDICTION_3",
       "ctid": "BEFTA_CASETYPE_3_2",
-      "etid": "CREATE"
+      "etid": "UPDATE"
     }
   },
 
@@ -57,7 +57,7 @@
         "delete_draft_response_status": null,
         "security_classifications": {}
       },
-      "event_id": "CREATE"
+      "event_id": "UPDATE"
     }
   }
 }
