@@ -13,7 +13,7 @@
     },
     "body": {
       "event": {
-        "id": "UPDATE123"
+        "id": "InvalidUpdateEvent"
       }
     }
   },
