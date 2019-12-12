@@ -1,7 +1,7 @@
 {
   "title": "must start event creation process for appropriate inputs",
   "_guid_": "S-288",
-  "_extends_": "F-056_Test_Data_Base",
+  "_extends_": "S-288_Case_Data",
   "specs": [
     "an active profile in CCD",
     "contains a HTTP 201 Created"
