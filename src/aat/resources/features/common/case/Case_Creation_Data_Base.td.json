@@ -1,5 +1,5 @@
 {
-	"_guid_": "Case_Creation_using_Caseworker1_Role",
+	"_guid_": "Case_Creation_Data_Base",
 
 	"productName": "CCD Data Store",
 	"operationName": "Submit case creation as Case worker",
@@ -10,24 +10,14 @@
 		"to create a full case"
 	],
 
-	"users": {
-		"invokingUser": {
-			"username": "befta.caseworker.1@gmail.com",
-			"password": "Pa55word11"
-		}
-	},
-
 	"request": {
 		"headers": {
 			"_extends_": "Common_Request_Headers"
 		},
 		"pathVariables": {
-			"jid": "BEFTA_JURISDICTION_1",
-			"ctid": "BEFTA_CASETYPE_1_1",
-			"event": "CREATE"
+			"uid": "[[DYNAMIC]]"
 		},
 		"body": {
-			"_extends_": "Case_Data_Body",
 			"event": {
 				"id": "CREATE",
 				"summary": "",
@@ -49,21 +39,16 @@
 		},
 		"body": {
 			"id": "[[ANY]]",
-			"jurisdiction": "BEFTA_JURISDICTION_1",
 			"state": "TODO",
 			"version": 0,
-			"case_type_id": "BEFTA_CASETYPE_1_1",
 			"created_date": "[[ANY]]",
 			"last_modified": "[[ANY]]",
 			"security_classification": "PUBLIC",
-			"case_data": "[[ANY]]",
-			"data_classification": "[[ANY]]",
 			"after_submit_callback_response": null,
 			"callback_response_status_code": null,
 			"callback_response_status": null,
 			"delete_draft_response_status_code": null,
-			"delete_draft_response_status": null,
-			"security_classifications": "[[ANY]]"
+			"delete_draft_response_status": null
 		}
 	}
 }
