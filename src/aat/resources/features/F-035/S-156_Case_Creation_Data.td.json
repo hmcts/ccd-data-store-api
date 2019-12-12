@@ -13,6 +13,13 @@
 		"pathVariables": {
 			"ctid": "AAT_AUTH_8"
 		}
+	},
+	
+	
+	"expectedResponse": {
+		"body": {
+			"case_type_id": "AAT_AUTH_8"
+		}
 	}
 
 }
