@@ -1,20 +1,6 @@
 package uk.gov.hmcts.ccd.fta.steps;
 
-import io.restassured.builder.*;
-import org.junit.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.io.*;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
 import feign.FeignException;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
@@ -22,11 +8,16 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.Method;
 import io.restassured.response.Response;
 import io.restassured.specification.QueryableRequestSpecification;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.SpecificationQuerier;
+import org.junit.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.helper.idam.AuthenticatedUser;
 import uk.gov.hmcts.ccd.fta.data.HttpTestData;
@@ -37,17 +28,24 @@ import uk.gov.hmcts.ccd.fta.exception.FunctionalTestException;
 import uk.gov.hmcts.ccd.fta.util.EnvUtils;
 import uk.gov.hmcts.ccd.fta.util.JsonUtils;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
 
 @SuppressWarnings({ "LocalVariableName" })
 public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTestAutomationDSL {
-
-    private static final String DYNAMIC_CONTENT_PLACEHOLDER = "[[DYNAMIC]]";
-    private static boolean isTestDataLoaded = false;
 
     private final String BE_FTA_FILE_JURISDICTION1 = "src/aat/resources/CCD_BEFTA_JURISDICTION1.xlsx";
     private final String BE_FTA_FILE_JURISDICTION2 = "src/aat/resources/CCD_BEFTA_JURISDICTION2.xlsx";
     private final String BE_FTA_FILE_JURISDICTION3 = "src/aat/resources/CCD_BEFTA_JURISDICTION3.xlsx";
     private final String BE_FTA_FILE_JURISDICTION4 = "src/aat/resources/CCD_BEFTA_JURISDICTION4.xlsx";
+
+    private static boolean isTestDataLoaded = false;
 
     private final BackEndFunctionalTestScenarioContext scenarioContext;
     private final AATHelper aat;
@@ -61,6 +59,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         RestAssured.useRelaxedHTTPSValidation();
         scenarioContext = new BackEndFunctionalTestScenarioContext();
     }
+
 
     @Before()
     public void prepare(Scenario scenario) {
@@ -351,29 +350,6 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         }
     }
 
-    private RequestSpecification asAutoTestImporter() {
-        AuthenticatedUser caseworker = aat.getIdamHelper().authenticate(aat.getImporterAutoTestEmail(),
-            aat.getImporterAutoTestPassword());
-
-        String s2sToken = aat.getS2SHelper().getToken();
-        return RestAssured.given(new RequestSpecBuilder()
-            .setBaseUri(aat.getDefinitionStoreUrl())
-            .build())
-            .header("Authorization", "Bearer " + caseworker.getAccessToken())
-            .header("ServiceAuthorization", s2sToken);
-    }
-
-    private void importDefinition(String file) {
-        Response response = asAutoTestImporter()
-            .given()
-            .multiPart(new File(file))
-            .when()
-            .post("/import");
-        String message = "Import failed with response body: " + response.body().prettyPrint();
-        message += "\nand http code: " + response.statusCode();
-        Assert.assertEquals(message, 201, response.getStatusCode());
-    }
-
     private void importDefinitions() {
         logger.info("Importing {}...", BE_FTA_FILE_JURISDICTION1);
         importDefinition(BE_FTA_FILE_JURISDICTION1);
@@ -390,5 +366,22 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         logger.info("Importing {}...", BE_FTA_FILE_JURISDICTION4);
         importDefinition(BE_FTA_FILE_JURISDICTION4);
         logger.info("Imported {}", BE_FTA_FILE_JURISDICTION4);
+    }
+
+    private void importDefinition(String file) {
+        Response response = asAutoTestImporter().given().multiPart(new File(file)).when().post("/import");
+        String message = "Import failed with response body: " + response.body().prettyPrint();
+        message += "\nand http code: " + response.statusCode();
+        Assert.assertEquals(message, 201, response.getStatusCode());
+    }
+
+    private RequestSpecification asAutoTestImporter() {
+        AuthenticatedUser caseworker = aat.getIdamHelper().authenticate(aat.getImporterAutoTestEmail(),
+                aat.getImporterAutoTestPassword());
+
+        String s2sToken = aat.getS2SHelper().getToken();
+        return RestAssured.given(new RequestSpecBuilder().setBaseUri(aat.getDefinitionStoreUrl()).build())
+                .header("Authorization", "Bearer " + caseworker.getAccessToken())
+                .header("ServiceAuthorization", s2sToken);
     }
 }
