@@ -1,9 +1,0 @@
-{
-  "_guid_": "Case_Data_Body",
-  "TextField": "Some Text",
-  "NumberField": "164528",
-  "YesOrNoField": "Yes",
-  "PhoneUKField": "07123456789",
-  "EmailField": "ccd@hmcts.net",
-  "MoneyGBPField": "4200"
-}
