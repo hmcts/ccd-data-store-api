@@ -15,7 +15,7 @@ Feature: F-064: Retrieve workbasket input details for dynamic display
 
   @S-217 @Ignore # Response code mismatch, expected: 401, actual: 403
   Scenario: must return 401 when request does not provide valid authentication credentials
-    Given a user with [an inactive profile in CCD]
+    Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
     And the request [does not provide valid authentication credentials]
     And it is submitted to call the [retrieve workbasket input details for dynamic display] operation of [CCD Data Store]
