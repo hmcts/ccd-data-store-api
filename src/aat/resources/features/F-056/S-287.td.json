@@ -1,0 +1,43 @@
+{
+  "title": "must start event creation process for appropriate inputs",
+  "_guid_": "S-287",
+  "_extends_": "F-056_Test_Data_Base",
+  "specs": [
+    "an active profile in CCD",
+    "contains a token created as in Citizen_Token_Creation_Data_For_Case_Creation",
+    "contains the token just generated and invalid case creation data",
+    "contains a HTTP 422 Unprocessable Entity"
+  ],
+  "request": {
+    "body": {
+      "data": {
+        "NumberField": "abc"
+      },
+      "event_token": "${[scenarioContext][childContexts][Citizen_Token_Creation_Data_For_Case_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_422_Response",
+    "headers" : {
+      "Content-Encoding" : "gzip",
+      "Content-Type" : "application/json;charset=UTF-8",
+      "Content-Length" : "[[ANY]]"
+    },
+    "body" : {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException",
+      "timestamp": "[[ANY]]",
+      "message": "Case data validation failed",
+      "path": "[[ANY]]",
+      "details": {
+        "field_errors": [
+          {
+            "id": "NumberField",
+            "message": "abc is not a number"
+          }
+        ]
+      },
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}
