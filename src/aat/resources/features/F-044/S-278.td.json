@@ -14,7 +14,7 @@
       "cid": "${[scenarioContext][childContexts][Standard_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
     },
     "body": {
-      "event_token" : "${[scenarioContext][childContexts][S-044-Prerequisite][testData][actualResponse][body][token]}"
+      "event_token" : "${[scenarioContext][childContexts][F-044-Prerequisite][testData][actualResponse][body][token]}"
     }
 	},
 	"expectedResponse": {
