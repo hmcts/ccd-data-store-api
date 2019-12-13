@@ -4,15 +4,15 @@
 
 	"users": {
 		"invokingUser": {
-			"username": "befta.caseworker.1@gmail.com",
-			"password": "Pa55word11"
+			"username": "[[$CCD_CASEWORKER_AUTOTEST_EMAIL]]",
+			"password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
 		}
 	},
 
 	"request": {
 		"pathVariables": {
-			"jid": "BEFTA_JURISDICTION_1",
-			"ctid": "BEFTA_CASETYPE_1_1"
+			"jid": "AUTOTEST1",
+			"ctid": "AAT_AUTH_15"
 		},
 		"body": {
 			"data": {
@@ -23,26 +23,86 @@
 
 	"expectedResponse": {
 		"body": {
-			"jurisdiction": "BEFTA_JURISDICTION_1",
-			"case_type_id": "BEFTA_CASETYPE_1_1",
+			"jurisdiction": "AUTOTEST1",
+			"case_type_id": "AAT_AUTH_15",
 			"case_data": {
 				"_extends_": "Standard_Full_Case_Data"
 			},
 			"data_classification": {
 				"MoneyGBPField": "PUBLIC",
+				"FixedListField": "PUBLIC",
+				"AddressUKField": {
+					"classification": "PUBLIC",
+					"value": {
+						"AddressLine1": "PUBLIC",
+						"AddressLine2": "PUBLIC",
+						"AddressLine3": "PUBLIC",
+						"PostTown": "PUBLIC",
+						"County": "PUBLIC",
+						"PostCode": "PUBLIC",
+						"Country": "PUBLIC"
+					}
+				},
+				"DateTimeField": "PUBLIC",
 				"PhoneUKField": "PUBLIC",
 				"NumberField": "PUBLIC",
+				"MultiSelectListField": "PUBLIC",
 				"YesOrNoField": "PUBLIC",
 				"EmailField": "PUBLIC",
-				"TextField": "PUBLIC"
+				"TextField": "PUBLIC",
+				"DateField": "PUBLIC",
+				"TextAreaField": "PUBLIC",
+				"CollectionField": {
+					"classification": "PUBLIC",
+					"value": [
+						{
+							"id": "CollectionField1",
+							"classification": "PUBLIC"
+						},
+						{
+							"id": "CollectionField2",
+							"classification": "PUBLIC"
+						}
+					]
+				}
 			},
 			"security_classifications": {
 				"MoneyGBPField": "PUBLIC",
+				"FixedListField": "PUBLIC",
+				"AddressUKField": {
+					"classification": "PUBLIC",
+					"value": {
+						"AddressLine1": "PUBLIC",
+						"AddressLine2": "PUBLIC",
+						"AddressLine3": "PUBLIC",
+						"PostTown": "PUBLIC",
+						"County": "PUBLIC",
+						"PostCode": "PUBLIC",
+						"Country": "PUBLIC"
+					}
+				},
+				"DateTimeField": "PUBLIC",
 				"PhoneUKField": "PUBLIC",
 				"NumberField": "PUBLIC",
+				"MultiSelectListField": "PUBLIC",
 				"YesOrNoField": "PUBLIC",
 				"EmailField": "PUBLIC",
-				"TextField": "PUBLIC"
+				"TextField": "PUBLIC",
+				"DateField": "PUBLIC",
+				"TextAreaField": "PUBLIC",
+				"CollectionField": {
+					"classification": "PUBLIC",
+					"value": [
+						{
+							"id": "CollectionField1",
+							"classification": "PUBLIC"
+						},
+						{
+							"id": "CollectionField2",
+							"classification": "PUBLIC"
+						}
+					]
+				}
 			}
 		}
 	}
