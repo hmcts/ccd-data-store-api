@@ -16,7 +16,10 @@
   },
   "expectedResponse": {
     "_extends_": "Common_200_Response",
-
+    "headers": {
+      "Vary" : "Accept-Encoding",
+      "Transfer-Encoding" : "chunked"
+    },
     "body": {
       "_links": {
         "self": {
