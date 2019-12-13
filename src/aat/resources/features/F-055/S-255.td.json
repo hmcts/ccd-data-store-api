@@ -1,0 +1,27 @@
+{
+  "title": "must return 422 when start event trigger has failed",
+
+  "_guid_": "S-255",
+  "_extends_": "F-055_Base_Test_Data",
+
+  "specs": [
+    "an active profile in CCD",
+    "includes unprocessable case data",
+    "contains a HTTP 422 Unprocessable Entity"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "etid": "STOP_PROGRESS"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_422_Response",
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException",
+      "message": "The case status did not qualify for the event",
+      "details": null
+    }
+  }
+}
