@@ -5,7 +5,7 @@
   "specs": [
     "an active profile in CCD",
     "contains a non-existing case-reference",
-    "includes a HTTP 404 'Not Found'"
+    "contains a HTTP 404 'Not Found'"
   ],
   "expectedResponse": {
     "_extends_": "Common_404_Response",

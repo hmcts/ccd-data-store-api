@@ -5,7 +5,7 @@
   "specs": [
     "an active profile in CCD",
     "contains a non-existing Event-Id",
-    "includes a HTTP 404 'Not Found'"
+    "contains a HTTP 404 'Not Found'"
   ],
   "request": {
     "pathVariables": {
