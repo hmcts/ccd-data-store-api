@@ -6,6 +6,7 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import uk.gov.hmcts.ccd.fta.data.HttpTestDataSource;
@@ -19,40 +20,40 @@ public class MapVerifierTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldThrowExceptionForNegativeMaxDepth() {
-        MapVerifier.verifyMap(null, null, -1);
+        new MapVerifier("", -1).verifyMap(null, null);
     }
 
     @Test
     public void shouldVerifyNullVsNullCase() {
-        MapVerificationResult result = MapVerifier.verifyMap(null, null, 0);
+        MapVerificationResult result = new MapVerifier("").verifyMap(null, null);
         Assert.assertTrue(result.isVerified());
-        result = MapVerifier.verifyMap(null, null, 1);
+        result = new MapVerifier("", 1).verifyMap(null, null);
         Assert.assertTrue(result.isVerified());
-        result = MapVerifier.verifyMap(null, null, 2);
+        result = new MapVerifier("", 2).verifyMap(null, null);
         Assert.assertTrue(result.isVerified());
-        result = MapVerifier.verifyMap(null, null, 1000);
+        result = new MapVerifier("", 1000).verifyMap(null, null);
         Assert.assertTrue(result.isVerified());
     }
 
     @Test
     public void shouldNotVerifyNullVsNonNullCase() {
-        MapVerificationResult result = MapVerifier.verifyMap(new HashMap<String, Object>(), null, 999);
+        MapVerificationResult result = new MapVerifier("", 999).verifyMap(new HashMap<String, Object>(), null);
         Assert.assertArrayEquals(new Object[] { "Map is expected to be non-null, but is actually null." },
                 result.getAllIssues().toArray());
     }
 
     @Test
     public void shouldNotVerifyNonNullVsNullCase() {
-        MapVerificationResult result = MapVerifier.verifyMap(null, new HashMap<String, Object>(), 999);
+        MapVerificationResult result = new MapVerifier("", 999).verifyMap(null, new HashMap<String, Object>());
         Assert.assertArrayEquals(new Object[] { "Map is expected to be null, but is actually not." },
                 result.getAllIssues().toArray());
     }
 
     @Test
     public void shouldVerifyEmptyVsEmptyCase() {
-        MapVerificationResult result = MapVerifier.verifyMap(new HashMap<>(), new HashMap<>(), 0);
+        MapVerificationResult result = new MapVerifier("", 0).verifyMap(new HashMap<>(), new HashMap<>());
         Assert.assertEquals(0, result.getAllIssues().size());
-        result = MapVerifier.verifyMap(new ConcurrentHashMap<>(), new LinkedHashMap<>(), 0);
+        result = new MapVerifier("", 0).verifyMap(new ConcurrentHashMap<>(), new LinkedHashMap<>());
         Assert.assertTrue(result.isVerified());
     }
 
@@ -60,7 +61,7 @@ public class MapVerifierTest {
     public void shouldVerifySimpleMapObjectWithItself() {
         Map<String, Object> expected = new HashMap<>();
         expected.put("key", "value");
-        MapVerificationResult result = MapVerifier.verifyMap(expected, expected, 0);
+        MapVerificationResult result = new MapVerifier("", 0).verifyMap(expected, expected);
         Assert.assertTrue(result.isVerified());
     }
 
@@ -71,17 +72,17 @@ public class MapVerifierTest {
 
         expected.put("key", "value");
         actual.put("key", "value");
-        MapVerificationResult result = MapVerifier.verifyMap(expected, actual, 0);
+        MapVerificationResult result = new MapVerifier("", 0).verifyMap(expected, actual);
         Assert.assertEquals(0, result.getAllIssues().size());
 
         expected.put("key2", "value2");
         actual.put("key2", "value2");
-        result = MapVerifier.verifyMap(expected, actual, 0);
+        result = new MapVerifier("", 0).verifyMap(expected, actual);
         Assert.assertEquals(0, result.getAllIssues().size());
 
         expected.put("key3", 333.333);
         actual.put("key3", 333.333);
-        result = MapVerifier.verifyMap(expected, actual, 0);
+        result = new MapVerifier("", 0).verifyMap(expected, actual);
         Assert.assertTrue(result.isVerified());
     }
 
@@ -118,7 +119,26 @@ public class MapVerifierTest {
         actualBody.put("callbackErrors", null);
         actualBody.put("callbackWarnings", null);
 
-        MapVerificationResult result = MapVerifier.verifyMap("actualResponse", expected, actual, 0);
+        MapVerificationResult result = new MapVerifier("actualResponse", 0).verifyMap(expected, actual);
+        Assert.assertEquals(0, result.getAllIssues().size());
+        Assert.assertTrue(result.isVerified());
+    }
+
+    @Test
+    public void shouldVerifySimpleMapOfAcceptableContentCaseInsensitively() {
+        Map<String, Object> expected = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+
+        expected.put("Vary", "accept-encoding");
+
+        Map<String, Object> actual = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+
+        actual.put("vary", "AccEpt-EncoDing");
+
+        MapVerificationResult result = new MapVerifier("actualResponse.headers", 1).verifyMap(expected, actual);
+        Assert.assertEquals(1, result.getAllIssues().size());
+        Assert.assertTrue(!result.isVerified());
+
+        result = new MapVerifier("actualResponse.headers", 1, false).verifyMap(expected, actual);
         Assert.assertEquals(0, result.getAllIssues().size());
         Assert.assertTrue(result.isVerified());
     }
@@ -129,13 +149,13 @@ public class MapVerifierTest {
         Map<String, Object> actual = new ConcurrentHashMap<>();
 
         actual.put("key1", "value1");
-        MapVerificationResult result = MapVerifier.verifyMap(expected, actual, 0);
+        MapVerificationResult result = new MapVerifier("actualResponse.body", 0).verifyMap(expected, actual);
         Assert.assertArrayEquals(new Object[] {
             "actualResponse.body has unexpected field(s): [key1]"
         }, result.getAllIssues().toArray());
 
         actual.put("number", 15);
-        result = MapVerifier.verifyMap(expected, actual, 0);
+        result = new MapVerifier("actualResponse.body", 0).verifyMap(expected, actual);
         Assert.assertArrayEquals(new Object[] {
             "actualResponse.body has unexpected field(s): [key1, number]"
         }, result.getAllIssues().toArray());
@@ -147,13 +167,13 @@ public class MapVerifierTest {
         Map<String, Object> actual = new ConcurrentHashMap<>();
 
         expected.put("key1", "value1");
-        MapVerificationResult result = MapVerifier.verifyMap(expected, actual, 0);
+        MapVerificationResult result = new MapVerifier("actualResponse.body", 0).verifyMap(expected, actual);
         Assert.assertArrayEquals(new Object[] {
             "actualResponse.body lacks [key1] field(s) that was/were actually expected to be there."
         }, result.getAllIssues().toArray());
 
         expected.put("number", 15);
-        result = MapVerifier.verifyMap(expected, actual, 0);
+        result = new MapVerifier("actualResponse.body", 0).verifyMap(expected, actual);
         Assert.assertArrayEquals(new Object[] {
             "actualResponse.body lacks [key1, number] field(s) that was/were actually expected to be there."
         }, result.getAllIssues().toArray());
@@ -168,7 +188,7 @@ public class MapVerifierTest {
         actual.put("key1", "value1");
         expected.put("key20", "samevalue");
         actual.put("key21", "samevalue");
-        MapVerificationResult result = MapVerifier.verifyMap(expected, actual, 0);
+        MapVerificationResult result = new MapVerifier("actualResponse.body", 0).verifyMap(expected, actual);
         Assert.assertArrayEquals(new Object[] {
             "actualResponse.body has unexpected field(s): [key21]",
             "actualResponse.body lacks [key20] field(s) that was/were actually expected to be there."
@@ -176,7 +196,7 @@ public class MapVerifierTest {
 
         expected.put("key30", "samevalue");
         actual.put("key31", "samevalue");
-        result = MapVerifier.verifyMap(expected, actual, 0);
+        result = new MapVerifier("actualResponse.body", 0).verifyMap(expected, actual);
         Assert.assertArrayEquals(new Object[] {
             "actualResponse.body has unexpected field(s): [key21, key31]",
             "actualResponse.body lacks [key20, key30] field(s) that was/were actually expected to be there."
@@ -192,7 +212,7 @@ public class MapVerifierTest {
         actual.put("key1", "value1");
         expected.put("key2", "value2");
         actual.put("key2", "value2_bad");
-        MapVerificationResult result = MapVerifier.verifyMap(expected, actual, 0);
+        MapVerificationResult result = new MapVerifier("actualResponse.body", 0).verifyMap(expected, actual);
         Assert.assertFalse(result.isVerified());
         Assert.assertArrayEquals(new Object[] {
             "actualResponse.body contains 1 bad value(s): [key2: expected 'value2' but got 'value2_bad']"
@@ -200,7 +220,7 @@ public class MapVerifierTest {
 
         expected.put("key3", "value3");
         actual.put("key3", "value3_bad");
-        result = MapVerifier.verifyMap(expected, actual, 0);
+        result = new MapVerifier("actualResponse.body", 0).verifyMap(expected, actual);
         Assert.assertArrayEquals(new Object[] {
             "actualResponse.body contains 2 bad value(s): [key2: expected 'value2' but got 'value2_bad', "
                 + "key3: expected 'value3' but got 'value3_bad']"
@@ -208,7 +228,7 @@ public class MapVerifierTest {
 
         expected.put("key30", "samevalue");
         actual.put("key31", "samevalue");
-        result = MapVerifier.verifyMap(expected, actual, 0);
+        result = new MapVerifier("actualResponse.body", 0).verifyMap(expected, actual);
         Assert.assertArrayEquals(new Object[] {
             "actualResponse.body has unexpected field(s): [key31]",
             "actualResponse.body lacks [key30] field(s) that was/were actually expected to be there.",
@@ -236,7 +256,7 @@ public class MapVerifierTest {
         subsubmap.put("subsubfield1", "subsubfield1_value");
         subsubmap.put("subsubfield2", "subsubfield2_value");
 
-        MapVerificationResult result = MapVerifier.verifyMap(expected, actual, 0);
+        MapVerificationResult result = new MapVerifier("", 0).verifyMap(expected, actual);
         Assert.assertTrue(result.isVerified());
     }
 
@@ -267,7 +287,7 @@ public class MapVerifierTest {
         subsubmap1.put("subsubmapfield3a", "subsubmapfield3");
         subsubmap2.put("subsubmapfield3b", "subsubmapfield3");
 
-        MapVerificationResult result = MapVerifier.verifyMap(expected, actual, 0);
+        MapVerificationResult result = new MapVerifier("actualResponse.body", 0).verifyMap(expected, actual);
         Assert.assertArrayEquals(new Object[] {
             "actualResponse.body.submap.subsubmap has unexpected field(s): [subsubmapfield3b]",
             "actualResponse.body.submap.subsubmap lacks [subsubmapfield3a] field(s) that was/were actually "
@@ -289,7 +309,7 @@ public class MapVerifierTest {
                 .getDataForTestCall("HttpTestData-with-a-Big-ExpectedResponseBody_actual")
                 .getExpectedResponse().getBody();
 
-        MapVerificationResult result = MapVerifier.verifyMap(expected, actual, 5);
+        MapVerificationResult result = new MapVerifier("actualResponse.body", 5).verifyMap(expected, actual);
         Assert.assertArrayEquals(new Object[] {
             "actualResponse.body.user contains a bad value: idam[0] contains a bad value: jurisdiction: "
                 + "expected 'AUTOTEST1' but got 'AUTOTEST1_x'"
@@ -308,7 +328,7 @@ public class MapVerifierTest {
                 .getDataForTestCall("HttpTestData-with-a-Big-ExpectedResponseBody_actual").getExpectedResponse()
                 .getHeaders();
 
-        MapVerificationResult result = MapVerifier.verifyMap(expected, actual, 5);
+        MapVerificationResult result = new MapVerifier("", 5).verifyMap(expected, actual);
 
         Assert.assertEquals(0, result.getAllIssues().size());
         Assert.assertTrue(result.isVerified());
@@ -322,7 +342,7 @@ public class MapVerifierTest {
         Map<String, Object> actual = TEST_DATA_RESOURCE.getDataForTestCall("MapWithArray_actual").getExpectedResponse()
                 .getBody();
 
-        MapVerificationResult result = MapVerifier.verifyMap(expected, actual, 5);
+        MapVerificationResult result = new MapVerifier("actualResponse.body", 5).verifyMap(expected, actual);
 
         Assert.assertArrayEquals(new Object[] {
                 "actualResponse.body.details contains a bad value: actualResponse.body.details.field_errors has unexpected number of elements. Expected: 1, but actual: 2." },
