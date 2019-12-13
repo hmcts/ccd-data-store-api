@@ -20,7 +20,6 @@ Feature: F-053: Submit case creation as Citizen
   @S-271 @Ignore # Response code mismatch, expected: 401, actual: 403
   Scenario: must return 401 when request does not provide valid authentication credentials
     Given a user with [an active profile in CCD]
-    And   a successful call [to create an event token] as in [F-053-Prerequisite]
     When  a request is prepared with appropriate values
     And   the request [does not provide valid authentication credentials]
     And   it is submitted to call the [submit case creation as citizen] operation of [CCD Data Store]
@@ -31,7 +30,6 @@ Feature: F-053: Submit case creation as Citizen
   @S-272
   Scenario: must return 403 when request provides authentic credentials without authorised access to the operation
     Given a user with [an active profile in CCD]
-    And   a successful call [to create an event token] as in [F-053-Prerequisite]
     When  a request is prepared with appropriate values
     And   the request [provides authentic credentials without authorised access to the operation]
     And   it is submitted to call the [submit case creation as citizen] operation of [CCD Data Store]
