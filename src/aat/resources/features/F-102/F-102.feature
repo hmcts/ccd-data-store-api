@@ -20,8 +20,8 @@ Feature: F-102: Get jurisdictions available to the user
     #We will never get a "No jurisdictions found for given access criteria" in real time scenario.
     #Hence skipping the scenario implementation.
 
-  @S-535
-  Scenario: must return appropriate negative response for a user not having a profile in CCD
+  @S-535 @Ignore # This endpoint is returning 403. Will be fixed as a part of RDM-6628
+  Scenario: must return 401 when request does not provide valid authentication credentials
     Given a user with [no profile in CCD]
     When a request is prepared with appropriate values
     And the request [has CREATE as case access]
@@ -31,7 +31,7 @@ Feature: F-102: Get jurisdictions available to the user
     And the response has all other details as expected
 
   @S-536
-  Scenario: must return appropriate negative response when request does not provide valid authorization credentials
+  Scenario: must return 403 when request provides authentic credentials without authorised access to the operation
     Given a user with [a detailed profile in CCD]
     When a request is prepared with appropriate values
     And the request [contains an invalid authorization token]

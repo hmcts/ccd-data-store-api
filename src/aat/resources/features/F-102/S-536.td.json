@@ -1,7 +1,7 @@
 {
   "_guid_": "S-536",
   "_extends_": "F-102_Test_Data_Base",
-  "title": "must return 404 for if no jurisdiction is found",
+  "title": "must return 403 when request provides authentic credentials without authorised access to the operation",
   "specs": [
     "a detailed profile in CCD",
     "contains an invalid authorization token",
