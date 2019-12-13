@@ -14,9 +14,6 @@
   },
   "expectedResponse": {
     "_extends_": "Common_201_Response",
-    "headers" : {
-      "Transfer-Encoding" : "chunked"
-    },
     "body" : {
       "id": "[[ANY]]",
       "jurisdiction": "BEFTA_JURISDICTION_3",
