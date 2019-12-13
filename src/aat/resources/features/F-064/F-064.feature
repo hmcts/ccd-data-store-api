@@ -49,12 +49,12 @@ Feature: F-064: Retrieve workbasket input details for dynamic display
     And the response [code is HTTP-404 'Bad Request']
     And the response has all the details as expected
 
-  @S-548 @Ignore # Response code mismatch, expected: 404, actual: 500"
+  @S-548 @Ignore # Response code mismatch, expected: 400, actual: 500"
   Scenario: must return a negative response when request contains a malformed case type id
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
     And the request [contains a malformed case type id]
     And it is submitted to call the [retrieve workbasket input details for dynamic display] operation of [CCD Data Store]
     Then a negative response is received
-    And the response [code is HTTP-404 'Bad Request']
+    And the response [code is HTTP-400]
     And the response has all the details as expected
