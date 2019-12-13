@@ -27,6 +27,7 @@ Feature: F-056: Submit event creation as a Citizen
   @S-286 @Ignore
 #    Code says "409" when case reference is not unique however we do not provide a case reference
 #    Scenario is when the case has been altered outside the transaction, as the endpoint doesnt allow for case ref to be passed in this scenario
+  #  to be ignored for now and investigated further later on
   Scenario: must return 409 for a case that has been altered outside of transaction
 
   @S-287
