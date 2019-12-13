@@ -15,6 +15,7 @@ Feature: F-053: Submit case creation as Citizen
     And   the response [code is HTTP-201]
     And   the response has all other details as expected
 
+
   @S-270 @Ignore # wrong scenario in Excel
   Scenario: must return 201 if event creation is successful for a citizen
 
@@ -57,59 +58,59 @@ Feature: F-053: Submit case creation as Citizen
   @S-267 @Ignore # Response code mismatch, expected: 400, actual: 500
   Scenario: must return negative response HTTP-400 when request contains a malformed case type ID
     Given a user with [an active profile in CCD]
-    When a request is prepared with appropriate values
-    And the request [contains a malformed case type ID]
-    And it is submitted to call the [submit case creation as citizen] operation of [CCD Data Store]
-    Then a negative response is received
-    And the response [code is HTTP-400]
-    And the response has all the details as expected
+    When  a request is prepared with appropriate values
+    And   the request [contains a malformed case type ID]
+    And   it is submitted to call the [submit case creation as citizen] operation of [CCD Data Store]
+    Then  a negative response is received
+    And   the response [code is HTTP-400]
+    And   the response has all other details as expected
 
   @S-268 @Ignore # Response code mismatch, expected: 400, actual: 500
   Scenario: must return negative response HTTP-400 when request contains a malformed jurisdiction ID
     Given a user with [an active profile in CCD]
-    When a request is prepared with appropriate values
-    And the request [contains a malformed jurisdiction ID]
-    And it is submitted to call the [submit case creation as citizen] operation of [CCD Data Store]
-    Then a negative response is received
-    And the response [code is HTTP-400]
-    And the response has all the details as expected
+    When  a request is prepared with appropriate values
+    And   the request [contains a malformed jurisdiction ID]
+    And   it is submitted to call the [submit case creation as citizen] operation of [CCD Data Store]
+    Then  a negative response is received
+    And   the response [code is HTTP-400]
+    And   the response has all other details as expected
 
   @S-550
   Scenario: must return negative response HTTP-422 when request contains a non-existing jurisdiction ID
     Given a user with [an active profile in CCD]
-    When a request is prepared with appropriate values
-    And the request [contains an invalid jurisdiction ID]
-    And it is submitted to call the [submit case creation as citizen] operation of [CCD Data Store]
-    Then a negative response is received
-    And the response [code is HTTP-422]
-    And the response has all the details as expected
+    When  a request is prepared with appropriate values
+    And   the request [contains an invalid jurisdiction ID]
+    And   it is submitted to call the [submit case creation as citizen] operation of [CCD Data Store]
+    Then  a negative response is received
+    And   the response [code is HTTP-422]
+    And   the response has all other details as expected
 
   @S-551
   Scenario: must return negative response HTTP-404 when request contains a non-existing case type ID
     Given a user with [an active profile in CCD]
-    When a request is prepared with appropriate values
-    And the request [contains a non-existing case type ID]
-    And it is submitted to call the [submit case creation as citizen] operation of [CCD Data Store]
-    Then a negative response is received
-    And the response [code is HTTP-404]
-    And the response has all the details as expected
+    When  a request is prepared with appropriate values
+    And   the request [contains a non-existing case type ID]
+    And   it is submitted to call the [submit case creation as citizen] operation of [CCD Data Store]
+    Then  a negative response is received
+    And   the response [code is HTTP-404]
+    And   the response has all other details as expected
 
   @S-552
   Scenario: must return negative response HTTP-403 when request contains a non-existing user ID
     Given a user with [an active profile in CCD]
-    When a request is prepared with appropriate values
-    And the request [contains a non-existing user ID]
-    And it is submitted to call the [submit case creation as citizen] operation of [CCD Data Store]
-    Then a negative response is received
-    And the response [code is HTTP-403]
-    And the response has all the details as expected
+    When  a request is prepared with appropriate values
+    And   the request [contains a non-existing user ID]
+    And   it is submitted to call the [submit case creation as citizen] operation of [CCD Data Store]
+    Then  a negative response is received
+    And   the response [code is HTTP-403]
+    And   the response has all other details as expected
 
   @S-553 @Ignore # Response code mismatch, expected: 400, actual: 500
   Scenario: must return negative response HTTP-400 when request contains a malformed user ID
     Given a user with [an active profile in CCD]
-    When a request is prepared with appropriate values
-    And the request [contains a malformed user ID]
-    And it is submitted to call the [submit case creation as citizen] operation of [CCD Data Store]
-    Then a negative response is received
-    And the response [code is HTTP-400]
-    And the response has all the details as expected
+    When  a request is prepared with appropriate values
+    And   the request [contains a malformed user ID]
+    And   it is submitted to call the [submit case creation as citizen] operation of [CCD Data Store]
+    Then  a negative response is received
+    And   the response [code is HTTP-400]
+    And   the response has all other details as expected
