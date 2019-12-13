@@ -17,7 +17,7 @@
       "Content-Type": "application/json"
     },
     "pathVariables": {
-      "caseId": "[[DYNAMIC]]",
+      "caseId": "${[scenarioContext][childContexts][Standard_Full_Case_Creation_Data_BEFTA_Jurisdiction_3][testData][actualResponse][body][id]}",
       "triggerId": "START_PROGRESS"
     }
   }
