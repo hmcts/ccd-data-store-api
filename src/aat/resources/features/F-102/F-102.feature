@@ -16,15 +16,9 @@ Feature: F-102: Get jurisdictions available to the user
     And the response has all other details as expected
 
   @S-534
-  Scenario: must return 400 for if access type is not in create, read or update
-    Given a user with [a detailed profile in CCD having create case access for a jurisdiction]
-    When a request is prepared with appropriate values
-    And the request [has DELETE as case access parameter]
-    And it is submitted to call the [Get jurisdictions available to the user] operation of [CCD Data Store]
-    Then a negative response is received
-    And the response [contains HTTP 400 Bad Request]
-    And the response [contains an error message : Access can only be 'create', 'read' or 'update']
-    And the response has all other details as expected
+  Scenario: No jurisdictions found for given access criteria
+    #We will never get a "No jurisdictions found for given access criteria" in real time scenario.
+    #Hence skipping the scenario implementation.
 
   @S-535
   Scenario: must return appropriate negative response for a user not having a profile in CCD
@@ -44,4 +38,15 @@ Feature: F-102: Get jurisdictions available to the user
     And it is submitted to call the [Get jurisdictions available to the user] operation of [CCD Data Store]
     Then a negative response is received
     And the response [contains the HTTP 403 Forbidden]
+    And the response has all other details as expected
+
+  @S-554
+  Scenario: must return 400 for if access type is not in create, read or update
+    Given a user with [a detailed profile in CCD having create case access for a jurisdiction]
+    When a request is prepared with appropriate values
+    And the request [has DELETE as case access parameter]
+    And it is submitted to call the [Get jurisdictions available to the user] operation of [CCD Data Store]
+    Then a negative response is received
+    And the response [contains HTTP 400 Bad Request]
+    And the response [contains an error message : Access can only be 'create', 'read' or 'update']
     And the response has all other details as expected
