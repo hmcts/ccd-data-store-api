@@ -97,7 +97,7 @@ Feature: F-053: Submit case creation as Citizen
 
   @S-552
   Scenario: must return negative response HTTP-403 when request contains a non-existing user ID
-    Given a user with [an active profile in CCD]
+    Given a user with [an inactive profile in CCD]
     When  a request is prepared with appropriate values
     And   the request [contains a non-existing user ID]
     And   it is submitted to call the [submit case creation as citizen] operation of [CCD Data Store]
@@ -107,7 +107,7 @@ Feature: F-053: Submit case creation as Citizen
 
   @S-553 @Ignore # Response code mismatch, expected: 400, actual: 500
   Scenario: must return negative response HTTP-400 when request contains a malformed user ID
-    Given a user with [an active profile in CCD]
+    Given a user with [an inactive profile in CCD]
     When  a request is prepared with appropriate values
     And   the request [contains a malformed user ID]
     And   it is submitted to call the [submit case creation as citizen] operation of [CCD Data Store]
