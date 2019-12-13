@@ -6,6 +6,7 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import uk.gov.hmcts.ccd.fta.data.HttpTestDataSource;
@@ -119,6 +120,25 @@ public class MapVerifierTest {
         actualBody.put("callbackWarnings", null);
 
         MapVerificationResult result = new MapVerifier("actualResponse", 0).verifyMap(expected, actual);
+        Assert.assertEquals(0, result.getAllIssues().size());
+        Assert.assertTrue(result.isVerified());
+    }
+
+    @Test
+    public void shouldVerifySimpleMapOfAcceptableContentCaseInsensitively() {
+        Map<String, Object> expected = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+
+        expected.put("Vary", "accept-encoding");
+
+        Map<String, Object> actual = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+
+        actual.put("vary", "AccEpt-EncoDing");
+
+        MapVerificationResult result = new MapVerifier("actualResponse.headers", 1).verifyMap(expected, actual);
+        Assert.assertEquals(1, result.getAllIssues().size());
+        Assert.assertTrue(!result.isVerified());
+
+        result = new MapVerifier("actualResponse.headers", 1, false).verifyMap(expected, actual);
         Assert.assertEquals(0, result.getAllIssues().size());
         Assert.assertTrue(result.isVerified());
     }

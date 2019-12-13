@@ -16,17 +16,28 @@ public class MapVerifier {
 
     private int maxMessageDepth;
 
+    private boolean caseSensitiveForStrings;
+
     public MapVerifier(String fieldPrefix) {
         this(fieldPrefix, 5);
     }
 
     public MapVerifier(String fieldPrefix, int maxMessageDepth) {
+        this(fieldPrefix, maxMessageDepth, true);
+    }
+
+    public MapVerifier(String fieldPrefix, boolean caseSensitiveForStrings) {
+        this(fieldPrefix, 5, caseSensitiveForStrings);
+    }
+
+    public MapVerifier(String fieldPrefix, int maxMessageDepth, boolean caseSensitiveForStrings) {
         super();
         if (maxMessageDepth < 0) {
             throw new IllegalArgumentException("Max depth cannot be negative.");
         }
         this.fieldPrefix = fieldPrefix;
         this.maxMessageDepth = maxMessageDepth;
+        this.caseSensitiveForStrings = caseSensitiveForStrings;
     }
 
     public MapVerificationResult verifyMap(Map<String, Object> expectedMap,
@@ -193,6 +204,10 @@ public class MapVerifier {
 
     private Object compareNonNullLiteral(String fieldName, Object expectedValue, Object actualValue,
             boolean justCompare) {
+        if (!caseSensitiveForStrings && expectedValue instanceof String && actualValue instanceof String
+                && ((String) expectedValue).equalsIgnoreCase((String) actualValue)) {
+            return Boolean.TRUE;
+        }
         if (expectedValue.equals(actualValue)) {
             return Boolean.TRUE;
         }
