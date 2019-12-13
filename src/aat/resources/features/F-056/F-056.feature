@@ -24,7 +24,9 @@ Feature: F-056: Submit event creation as a Citizen
     And the response [contains a HTTP 403 Forbidden]
     And the response has all other details as expected
 
-  @S-286 @Ignore #Code says "409" when case reference is not unique however we do not provide a case reference
+  @S-286 @Ignore
+#    Code says "409" when case reference is not unique however we do not provide a case reference
+#    Scenario is when the case has been altered outside the transaction, as the endpoint doesnt allow for case ref to be passed in this scenario
   Scenario: must return 409 for a case that has been altered outside of transaction
 
   @S-287
@@ -32,7 +34,7 @@ Feature: F-056: Submit event creation as a Citizen
     Given a user with [an active profile in CCD]
     And a successful call [to create a token for case creation as a citizen] as in [Citizen_Token_Creation_Data_For_Case_Creation]
     When a request is prepared with appropriate values
-    And the request [contains an invalid case data]
+    And the request [contains the token just generated and invalid case creation data]
     And it is submitted to call the [Submit case creation as Citizen] operation of [CCD Data Store]
     Then a negative response is received
     And the response [contains a HTTP 422 Unprocessable Entity]

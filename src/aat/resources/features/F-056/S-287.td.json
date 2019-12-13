@@ -5,7 +5,7 @@
   "specs": [
     "an active profile in CCD",
     "contains a token created as in Citizen_Token_Creation_Data_For_Case_Creation",
-    "contains an invalid case data",
+    "contains the token just generated and invalid case creation data",
     "contains a HTTP 422 Unprocessable Entity"
   ],
   "request": {
