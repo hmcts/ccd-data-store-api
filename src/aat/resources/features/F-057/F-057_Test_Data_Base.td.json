@@ -12,8 +12,8 @@
     "_extends_": "Common_Request",
     "pathVariables": {
       "uid": "[[DYNAMIC]]",
-      "jid": "BEFTA_JURISDICTION_3",
-      "ctid": "BEFTA_CASETYPE_3_2"
+      "jid": "AUTOTEST1",
+      "ctid": "AAT"
     }
   }
 }
