@@ -270,14 +270,14 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
                     + expectedResponse.getResponseCode() + ", actual: " + actualResponse.getResponseCode()));
         }
 
-        MapVerificationResult headerVerification = MapVerifier.verifyMap("actualResponse.headers",
-                expectedResponse.getHeaders(), actualResponse.getHeaders(), 1);
+        MapVerificationResult headerVerification = new MapVerifier("actualResponse.headers", 1)
+                .verifyMap(expectedResponse.getHeaders(), actualResponse.getHeaders());
         if (!headerVerification.isVerified()) {
             issues.put("headers", headerVerification.getAllIssues());
         }
 
-        MapVerificationResult bodyVerification = MapVerifier.verifyMap("actualResponse.body",
-                expectedResponse.getBody(), actualResponse.getBody(), 20);
+        MapVerificationResult bodyVerification = new MapVerifier("actualResponse.body", 20)
+                .verifyMap(expectedResponse.getBody(), actualResponse.getBody());
         if (!bodyVerification.isVerified()) {
             issues.put("body", bodyVerification.getAllIssues());
         }
