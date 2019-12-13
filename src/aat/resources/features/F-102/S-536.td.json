@@ -3,7 +3,7 @@
   "_extends_": "F-102_Test_Data_Base",
   "title": "must return 403 when request provides authentic credentials without authorised access to the operation",
   "specs": [
-    "a detailed profile in CCD",
+    "an active profile in CCD",
     "contains an invalid authorization token",
     "contains the HTTP 403 Forbidden"
   ],

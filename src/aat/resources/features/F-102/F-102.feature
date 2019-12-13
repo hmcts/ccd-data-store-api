@@ -6,7 +6,7 @@ Feature: F-102: Get jurisdictions available to the user
 
   @S-533
   Scenario: must return a list of jurisdictions for a valid user
-    Given a user with [a detailed profile in CCD having create case access for a jurisdiction]
+    Given a user with [an active profile in CCD having create case access for a jurisdiction]
     When a request is prepared with appropriate values
     And the request [has CREATE as case access parameter]
     And it is submitted to call the [Get jurisdictions available to the user] operation of [CCD Data Store]
@@ -32,7 +32,7 @@ Feature: F-102: Get jurisdictions available to the user
 
   @S-536
   Scenario: must return 403 when request provides authentic credentials without authorised access to the operation
-    Given a user with [a detailed profile in CCD]
+    Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
     And the request [contains an invalid authorization token]
     And it is submitted to call the [Get jurisdictions available to the user] operation of [CCD Data Store]

@@ -3,7 +3,7 @@
   "_extends_": "F-102_Test_Data_Base",
   "title": "Get jurisdictions available to the user",
   "specs": [
-    "a detailed profile in CCD having create case access for a jurisdiction",
+    "an active profile in CCD having create case access for a jurisdiction",
     "has CREATE as case access parameter",
     "contains HTTP 200 Ok status code",
     "contains the list of jurisdictions a user has access to"
