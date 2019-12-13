@@ -15,7 +15,7 @@
   "request": {
     "pathVariables": {
       "jid": "BEFTA_JURISDICTION_1",
-      "ctid": "DO_NOT_CREATE_CASES"
+      "ctid": "CASE_TYPE_WITH_NO_CASES"
     }
   },
   "expectedResponse": {

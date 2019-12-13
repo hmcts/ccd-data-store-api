@@ -43,7 +43,6 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
     private final String BE_FTA_FILE_JURISDICTION1 = "src/aat/resources/CCD_BEFTA_JURISDICTION1.xlsx";
     private final String BE_FTA_FILE_JURISDICTION2 = "src/aat/resources/CCD_BEFTA_JURISDICTION2.xlsx";
     private final String BE_FTA_FILE_JURISDICTION3 = "src/aat/resources/CCD_BEFTA_JURISDICTION3.xlsx";
-    private final String BE_FTA_FILE_JURISDICTION4 = "src/aat/resources/CCD_BEFTA_JURISDICTION4.xlsx";
 
     private static boolean isTestDataLoaded = false;
 
@@ -362,10 +361,6 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         logger.info("Importing {}...", BE_FTA_FILE_JURISDICTION3);
         importDefinition(BE_FTA_FILE_JURISDICTION3);
         logger.info("Imported {}", BE_FTA_FILE_JURISDICTION3);
-
-        logger.info("Importing {}...", BE_FTA_FILE_JURISDICTION4);
-        importDefinition(BE_FTA_FILE_JURISDICTION4);
-        logger.info("Imported {}", BE_FTA_FILE_JURISDICTION4);
     }
 
     private void importDefinition(String file) {
