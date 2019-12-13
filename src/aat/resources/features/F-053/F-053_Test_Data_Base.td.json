@@ -64,7 +64,7 @@
         "summary": "",
         "description": ""
       },
-      "event_token": "[[DYNAMIC]]",
+      "event_token": "${[scenarioContext][childContexts][F-053-Prerequisite][testData][actualResponse][body][token]}",
       "ignore_warning": false
     }
   },
@@ -72,7 +72,8 @@
     "headers": {
       "Content-Length" : "[[ANY]]",
       "Content-Encoding": "gzip",
-      "Content-Type": "application/json;charset=UTF-8"
+      "Content-Type": "application/json;charset=UTF-8",
+      "Transfer-Encoding" : "chunked"
     }
   }
 }

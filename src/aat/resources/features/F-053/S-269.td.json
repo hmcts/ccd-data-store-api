@@ -4,6 +4,7 @@
   "title": "must create case successfully and return positive response HTTP-201 for correct inputs",
   "specs": [
     "an active profile in CCD",
+    "contains a token created as in F-053-Prerequisite",
     "code is HTTP-201"
   ],
   "expectedResponse": {
