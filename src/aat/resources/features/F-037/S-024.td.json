@@ -2,6 +2,7 @@
   "title": "should create event successfully for an existing case",
   "_guid_": "S-024",
   "_extends_": "F-037_Test_Data_Base",
+
   "specs": [
     "an active profile in CCD",
     "contains a case Id that has just been created as in Standard_Full_Case_Creation_Data",
