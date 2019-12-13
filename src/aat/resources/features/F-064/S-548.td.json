@@ -4,7 +4,7 @@
   "title": "must return a negative response when request contains a malformed case type id",
 		"specs": [
 		"an active profile in CCD",
-		"contains a malformed case type ID",
+		"contains a malformed case type id",
 		"code is HTTP-404 'Bad Request'"
 	],
   "request": {

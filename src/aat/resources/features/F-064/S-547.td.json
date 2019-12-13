@@ -4,7 +4,7 @@
   "title": "must return a negative response when request contains a non-existing case type id",
 	"specs": [
 		"an active profile in CCD",
-		"contains a non-existing case type ID",
+		"contains a non-existing case type id",
 		"code is HTTP-404 'Bad Request'"
 	],
   "request": {
