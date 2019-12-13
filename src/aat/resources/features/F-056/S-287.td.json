@@ -27,7 +27,7 @@
       "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException",
       "timestamp": "[[ANY]]",
       "message": "Case data validation failed",
-      "path": "/citizens/4cec101a-ea1e-40d1-b65e-407acebdc247/jurisdictions/BEFTA_JURISDICTION_3/case-types/BEFTA_CASETYPE_3_2/cases",
+      "path": "[[ANY]]",
       "details": {
         "field_errors": [
           {
