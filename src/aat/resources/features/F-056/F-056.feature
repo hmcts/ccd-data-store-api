@@ -9,7 +9,7 @@ Feature: F-056: Submit event creation as a Citizen
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
     And the request [does not provide an authorized access to the operation]
-    And it is submitted to call the [submit case creation as Citizen] operation of [CCD Data Store]
+    And it is submitted to call the [submit case creation as citizen] operation of [CCD Data Store]
     Then a negative response is received
     And the response [contains a HTTP 403 Forbidden]
     And the response has all other details as expected
@@ -19,7 +19,7 @@ Feature: F-056: Submit event creation as a Citizen
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
     And the request [does not provide a valid authentication credentials]
-    And it is submitted to call the [submit case creation as Citizen] operation of [CCD Data Store]
+    And it is submitted to call the [submit case creation as citizen] operation of [CCD Data Store]
     Then a negative response is received
     And the response [contains a HTTP 403 Forbidden]
     And the response has all other details as expected
@@ -36,7 +36,7 @@ Feature: F-056: Submit event creation as a Citizen
     And a successful call [to create a token for case creation as a citizen] as in [Citizen_Token_Creation_Data_For_Case_Creation]
     When a request is prepared with appropriate values
     And the request [contains the token just generated and invalid case creation data]
-    And it is submitted to call the [submit case creation as Citizen] operation of [CCD Data Store]
+    And it is submitted to call the [submit case creation as citizen] operation of [CCD Data Store]
     Then a negative response is received
     And the response [contains a HTTP 422 Unprocessable Entity]
     And the response has all other details as expected
@@ -47,7 +47,7 @@ Feature: F-056: Submit event creation as a Citizen
     And a successful call [to create a token for case creation as a citizen] as in [Citizen_Token_Creation_Data_For_Case_Creation]
     When a request is prepared with appropriate values
     And the request [contains a token created as in Citizen_Token_Creation_Data_For_Case_Creation]
-    And it is submitted to call the [submit case creation as Citizen] operation of [CCD Data Store]
+    And it is submitted to call the [submit case creation as citizen] operation of [CCD Data Store]
     Then a positive response is received
     And the response [includes the case detail for the updated case, along with a HTTP 200 OK]
     And the response has all other details as expected
