@@ -17,7 +17,7 @@
       "jid": "BEFTA_JURISDICTION_1",
       "ctid": "BEFTA_CASETYPE_1_1",
       "etid": "START_PROGRESS",
-      "cid": "[[DYNAMIC]]"
+      "cid": "${[scenarioContext][childContexts][Case_Creation_using_Caseworker1_Role][testData][actualResponse][body][id]}"
     }
   }
 }
