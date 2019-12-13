@@ -9,7 +9,8 @@ Feature: F-053: Submit case creation as Citizen
     Given a user with [an active profile in CCD]
     And   a successful call [to create an event token] as in [F-053-Prerequisite]
     When  a request is prepared with appropriate values
-    And   it is submitted to call the [start case creation as citizen] operation of [CCD Data Store]
+    And   the request [contains a token created as in F-053-Prerequisite]
+    And   it is submitted to call the [submit case creation as citizen] operation of [CCD Data Store]
     Then  a positive response is received
     And   the response [code is HTTP-201]
     And   the response has all other details as expected
@@ -23,7 +24,7 @@ Feature: F-053: Submit case creation as Citizen
     And   a successful call [to create an event token] as in [F-053-Prerequisite]
     When  a request is prepared with appropriate values
     And   the request [does not provide valid authentication credentials]
-    And   it is submitted to call the [start case creation as citizen] operation of [CCD Data Store]
+    And   it is submitted to call the [submit case creation as citizen] operation of [CCD Data Store]
     Then  a negative response is received
     And   the response [code is HTTP-401]
     And   the response has all other details as expected
@@ -34,7 +35,7 @@ Feature: F-053: Submit case creation as Citizen
     And   a successful call [to create an event token] as in [F-053-Prerequisite]
     When  a request is prepared with appropriate values
     And   the request [provides authentic credentials without authorised access to the operation]
-    And   it is submitted to call the [start case creation as citizen] operation of [CCD Data Store]
+    And   it is submitted to call the [submit case creation as citizen] operation of [CCD Data Store]
     Then  a negative response is received
     And   the response [code is HTTP-403]
     And   the response has all other details as expected
@@ -61,7 +62,7 @@ Feature: F-053: Submit case creation as Citizen
     And   a successful call [to create an event token] as in [F-053-Prerequisite]
     When a request is prepared with appropriate values
     And the request [contains a malformed case type ID]
-    And it is submitted to call the [start case creation as citizen] operation of [CCD Data Store]
+    And it is submitted to call the [submit case creation as citizen] operation of [CCD Data Store]
     Then a negative response is received
     And the response [code is HTTP-400]
     And the response has all the details as expected
@@ -72,18 +73,18 @@ Feature: F-053: Submit case creation as Citizen
     And   a successful call [to create an event token] as in [F-053-Prerequisite]
     When a request is prepared with appropriate values
     And the request [contains a malformed jurisdiction ID]
-    And it is submitted to call the [start case creation as citizen] operation of [CCD Data Store]
+    And it is submitted to call the [submit case creation as citizen] operation of [CCD Data Store]
     Then a negative response is received
     And the response [code is HTTP-400]
     And the response has all the details as expected
 
-  @S-550  #
+  @S-550
   Scenario: must return negative response HTTP-422 when request contains an invalid jurisdiction ID
     Given a user with [an active profile in CCD]
     And   a successful call [to create an event token] as in [F-053-Prerequisite]
     When a request is prepared with appropriate values
     And the request [contains an invalid jurisdiction ID]
-    And it is submitted to call the [start case creation as citizen] operation of [CCD Data Store]
+    And it is submitted to call the [submit case creation as citizen] operation of [CCD Data Store]
     Then a negative response is received
     And the response [code is HTTP-422]
     And the response has all the details as expected
@@ -94,7 +95,7 @@ Feature: F-053: Submit case creation as Citizen
     And   a successful call [to create an event token] as in [F-053-Prerequisite]
     When a request is prepared with appropriate values
     And the request [contains a non-existing case type ID]
-    And it is submitted to call the [start case creation as citizen] operation of [CCD Data Store]
+    And it is submitted to call the [submit case creation as citizen] operation of [CCD Data Store]
     Then a negative response is received
     And the response [code is HTTP-404]
     And the response has all the details as expected
@@ -105,7 +106,7 @@ Feature: F-053: Submit case creation as Citizen
     And   a successful call [to create an event token] as in [F-053-Prerequisite]
     When a request is prepared with appropriate values
     And the request [contains a non-existing user ID]
-    And it is submitted to call the [start case creation as citizen] operation of [CCD Data Store]
+    And it is submitted to call the [submit case creation as citizen] operation of [CCD Data Store]
     Then a negative response is received
     And the response [code is HTTP-403]
     And the response has all the details as expected
@@ -116,7 +117,7 @@ Feature: F-053: Submit case creation as Citizen
     And   a successful call [to create an event token] as in [F-053-Prerequisite]
     When a request is prepared with appropriate values
     And the request [contains a malformed user ID]
-    And it is submitted to call the [start case creation as citizen] operation of [CCD Data Store]
+    And it is submitted to call the [submit case creation as citizen] operation of [CCD Data Store]
     Then a negative response is received
     And the response [code is HTTP-400]
     And the response has all the details as expected
