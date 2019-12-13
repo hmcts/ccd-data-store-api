@@ -9,7 +9,7 @@ Feature: F-053: Submit case creation as Citizen
     Given a user with [an active profile in CCD]
     And   a successful call [to create an event token] as in [F-053-Prerequisite]
     When  a request is prepared with appropriate values
-    And   the request [contains a token created as in F-053-Prerequisite]
+    And   the request [contains the event token just created as above]
     And   it is submitted to call the [submit case creation as citizen] operation of [CCD Data Store]
     Then  a positive response is received
     And   the response [code is HTTP-201]
