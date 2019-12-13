@@ -10,11 +10,11 @@ Feature: F-044: Submit event creation as Case worker
     And a case that has just been created as in [Standard_Full_Case_Creation_Data]
     And a successful call [to get an event token for the case just created] as in [F-044-Prerequisite]
     When a request is prepared with appropriate values
-    And the request [contains a case Id for just created case]
+    And the request [contains a case Id that has just been created as in Standard_Full_Case_Creation_Data]
     And the request [contains a token created as in F-044-Prerequisite]
     And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
     Then a positive response is received
-    And the response [includes the updated case details, along with a HTTP 201 Created]
+    And the response [contains the updated case details, along with an HTTP 201 Created]
     And the response has all other details as expected
 
   @S-279
@@ -24,7 +24,7 @@ Feature: F-044: Submit event creation as Case worker
     And the request [does not provide valid authentication credentials]
     And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
     Then a negative response is received
-    And the response [includes a HTTP 403 Forbidden]
+    And the response [contains an HTTP 403 Forbidden]
     And the response has all other details as expected
 
   @S-280
@@ -34,7 +34,7 @@ Feature: F-044: Submit event creation as Case worker
     And the request [does not provide authorised access to the operation]
     And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
     Then a negative response is received
-    And the response [includes a HTTP 403 Forbidden]
+    And the response [contains an HTTP 403 Forbidden]
     And the response has all other details as expected
 
   @S-281 @Ignore # This scenario is returning 400 instead of expected 404, linked to defect JIRA-6868
@@ -44,7 +44,7 @@ Feature: F-044: Submit event creation as Case worker
     And the request [contains a non-existing case reference]
     And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
     Then a negative response is received
-    And the response [includes a HTTP 404 'Bad Request']
+    And the response [contains an HTTP 404 'Bad Request']
     And the response has all other details as expected
 
   @S-282
@@ -54,11 +54,11 @@ Feature: F-044: Submit event creation as Case worker
     And a successful call [to get an event token for the case just created] as in [F-044-Prerequisite]
     And another successful call [to update that case with the token just created] as in [F-044-Prerequisite_CaseUpdate]
     When a request is prepared with appropriate values
-    And the request [contains a case Id for just updated case]
+    And the request [contains a case Id that has just been updated as in F-044-Prerequisite_CaseUpdate]
     And the request [contains token (created in 'F-044-Prerequisite') which is no longer valid for current version of case]
     And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
     Then a negative response is received
-    And the response [includes a HTTP 409 'Conflict']
+    And the response [contains an HTTP 409 'Conflict']
     And the response has all other details as expected
 
   @S-283
@@ -67,12 +67,12 @@ Feature: F-044: Submit event creation as Case worker
     And a case that has just been created as in [Standard_Full_Case_Creation_Data]
     And a successful call [to get an event token for the case just created] as in [F-044-Prerequisite]
     When a request is prepared with appropriate values
-    And the request [contains a case Id for just created case]
+    And the request [contains a case Id that has just been created as in Standard_Full_Case_Creation_Data]
     And the request [contains a token created as in F-044-Prerequisite]
     And the request [contains an invalid event Id for the pre-state conditions]
     And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
     Then a negative response is received
-    And the response [includes a HTTP 422 'Unprocessable Entity']
+    And the response [contains an HTTP 422 'Unprocessable Entity']
     And the response has all other details as expected
 
   @S-277 @Ignore # This scenario is returning 403 instead of expected 404, linked to defect JIRA-6917
@@ -82,7 +82,7 @@ Feature: F-044: Submit event creation as Case worker
     And the request [contains a non-existing jurisdiction Id]
     And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
     Then a negative response is received
-    And the response [includes a HTTP 404 'Not Found']
+    And the response [contains an HTTP 404 'Not Found']
     And the response has all the details as expected
 
   @S-550 @Ignore # This scenario is returning 400 instead of expected 404, linked to defect JIRA-6918
@@ -92,7 +92,7 @@ Feature: F-044: Submit event creation as Case worker
     And the request [contains a non-existing case type]
     And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
     Then a negative response is received
-    And the response [includes a HTTP 404 'Not Found']
+    And the response [contains an HTTP 404 'Not Found']
     And the response has all the details as expected
 
     @S-113 @Ignore

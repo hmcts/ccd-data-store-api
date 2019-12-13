@@ -5,7 +5,7 @@
 	"specs": [
 		"an active profile in CCD",
 		"contains a non-existing case type",
-		"includes a HTTP 404 'Not Found'"
+		"contains an HTTP 404 'Not Found'"
 	],
 	"request": {
 		"pathVariables": {

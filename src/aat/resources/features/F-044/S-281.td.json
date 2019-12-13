@@ -7,7 +7,7 @@
 	"specs": [
 		"an active profile in CCD",
 		"contains a non-existing case reference",
-		"includes a HTTP 404 'Bad Request'"
+		"contains an HTTP 404 'Bad Request'"
 	],
 	"request": {
 		"pathVariables": {
@@ -15,6 +15,6 @@
 		}
 	},
 	"expectedResponse": {
-		"_extends_": "Common_400_Response"
+		"_extends_": "Common_404_Response"
 	}
 }
