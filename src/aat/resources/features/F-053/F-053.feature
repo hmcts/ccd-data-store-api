@@ -76,13 +76,13 @@ Feature: F-053: Submit case creation as Citizen
     And   the response has all other details as expected
 
   @S-550
-  Scenario: must return negative response HTTP-422 when request contains a non-existing jurisdiction ID
+  Scenario: must return negative response HTTP-400 when request contains a non-existing jurisdiction ID
     Given a user with [an active profile in CCD]
     When  a request is prepared with appropriate values
     And   the request [contains a non-existing jurisdiction ID]
     And   it is submitted to call the [submit case creation as citizen] operation of [CCD Data Store]
     Then  a negative response is received
-    And   the response [code is HTTP-422]
+    And   the response [code is HTTP-400]
     And   the response has all other details as expected
 
   @S-551
