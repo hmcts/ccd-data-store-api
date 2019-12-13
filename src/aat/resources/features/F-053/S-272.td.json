@@ -1,10 +1,10 @@
 {
   "_guid_": "S-272",
   "_extends_": "F-053_Test_Data_Base",
-  "title": "must return negative response when HTTP-403 request provides authentic credentials without authorised access",
+  "title": "must return 403 when request provides authentic credentials without authorised access to the operation",
   "specs": [
     "an active profile in CCD",
-    "does not provide an authorised access to the operation",
+    "provides authentic credentials without authorised access to the operation",
     "code is HTTP-403"
   ],
   "request": {

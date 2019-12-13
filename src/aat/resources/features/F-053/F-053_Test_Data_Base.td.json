@@ -70,6 +70,7 @@
   },
   "expectedResponse": {
     "headers": {
+      "Content-Length" : "552",
       "Content-Encoding": "gzip",
       "Content-Type": "application/json;charset=UTF-8"
     }

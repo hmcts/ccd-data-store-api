@@ -1,5 +1,5 @@
 {
-  "_guid_": "S-274",
+  "_guid_": "S-551",
   "_extends_": "F-053_Test_Data_Base",
   "title": "must return negative response HTTP-404 when request contains a non-existing case type ID",
   "specs": [

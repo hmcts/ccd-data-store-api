@@ -1,5 +1,5 @@
 {
-  "_guid_": "S-276",
+  "_guid_": "S-553",
   "_extends_": "F-053_Test_Data_Base",
   "title": "must return negative response HTTP-400 when request contains a malformed user ID",
   "specs": [
