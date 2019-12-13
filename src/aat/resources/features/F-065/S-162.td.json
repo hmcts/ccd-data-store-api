@@ -19,7 +19,7 @@
     "body": {
       "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
       "message": "Case ID is not valid",
-      "path": "/cases/dummyid",
+      "path": "/internal/cases/dummyid",
       "details": null,
       "callbackErrors": null,
       "callbackWarnings": null

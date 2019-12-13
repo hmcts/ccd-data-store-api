@@ -8,8 +8,18 @@
     "uses case-reference of the case just created",
     "contains details of the case just created, along with an HTTP-200 OK"
   ],
+  "request": {
+    "pathVariables": {
+      "cid": "[[DYNAMIC]]"
+    }
+  },
   "expectedResponse": {
     "_extends_": "Common_200_Response",
+    "headers": {
+      "Transfer-Encoding" : "chunked",
+      "Vary" : "Accept-Encoding",
+      "Content-Type" : "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-case-view.v2+json;charset=UTF-8"
+    },
     "body": {
       "_links": {
         "self": {
