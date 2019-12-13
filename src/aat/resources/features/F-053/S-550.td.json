@@ -16,7 +16,7 @@
     "_extends_": "Common_422_Response",
     "body": {
       "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException",
-      "message" : "Cannot create case because of BEFTA_CASETYPE_3_2 is not defined as case type for eyJhbGciOiJIUzI1NiJ9",
+      "message" : "Cannot create case because of BEFTA_CASETYPE_3_2 is not defined as case type for non-existing jurisdiction ID",
       "details" : null
     }
   }
