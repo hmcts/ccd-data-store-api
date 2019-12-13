@@ -37,6 +37,10 @@ class JurisdictionMapperTest {
         .withJurisdictionId("jid")
         .withName("name")
         .withDescription("description")
+        .withBannerEnabled(false)
+        .withBannerDescription("Test Banner Description")
+        .withBannerUrlText("click here to see it.>>>")
+        .withBannerUrl("http://localhost:3451/test")
         .withCaseType(caseType1)
         .withCaseType(caseType2)
         .build();
@@ -49,6 +53,10 @@ class JurisdictionMapperTest {
             () -> assertThat(response.getId(), is(equalTo(jurisdiction.getId()))),
             () -> assertThat(response.getName(), is(equalTo(jurisdiction.getName()))),
             () -> assertThat(response.getDescription(), is(equalTo(jurisdiction.getDescription()))),
+            () -> assertThat(response.getBannerEnabled(), is(equalTo(jurisdiction.getBannerEnabled()))),
+            () -> assertThat(response.getBannerDescription(), is(equalTo(jurisdiction.getBannerDescription()))),
+            () -> assertThat(response.getBannerUrlText(), is(equalTo(jurisdiction.getBannerUrlText()))),
+            () -> assertThat(response.getBannerUrl(), is(equalTo(jurisdiction.getBannerUrl()))),
             () -> assertThat(response.getCaseTypes().size(), is(2)),
             () -> assertThat(response.getCaseTypes().get(0).getStates().size(), is(1)),
             () -> assertThat(response.getCaseTypes().get(1).getStates().get(0).getId(), is(caseState2.getId()))

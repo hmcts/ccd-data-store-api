@@ -9,6 +9,10 @@ public class JurisdictionDisplayProperties {
     private String id;
     private String name;
     private String description;
+    private Boolean bannerEnabled = null;
+    private String bannerDescription = null;
+    private String bannerUrlText = null;
+    private String bannerUrl = null;
 
     private List<CaseType> caseTypes = new ArrayList<>();
 
@@ -42,5 +46,37 @@ public class JurisdictionDisplayProperties {
 
     public void setCaseTypes(List<CaseType> caseTypes) {
         this.caseTypes = caseTypes;
+    }
+
+    public Boolean getBannerEnabled() {
+        return bannerEnabled;
+    }
+
+    public void setBannerEnabled(Boolean bannerEnabled) {
+        this.bannerEnabled = bannerEnabled;
+    }
+
+    public String getBannerDescription() {
+        return bannerDescription;
+    }
+
+    public void setBannerDescription(String bannerDescription) {
+        this.bannerDescription = bannerDescription;
+    }
+
+    public String getBannerUrlText() {
+        return bannerUrlText;
+    }
+
+    public void setBannerUrlText(String bannerUrlText) {
+        this.bannerUrlText = bannerUrlText;
+    }
+
+    public String getBannerUrl() {
+        return bannerUrl;
+    }
+
+    public void setBannerUrl(String bannerUrl) {
+        this.bannerUrl = bannerUrl;
     }
 }

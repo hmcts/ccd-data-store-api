@@ -19,6 +19,10 @@ public class Jurisdiction implements Serializable {
     private String description = null;
     private Date liveFrom = null;
     private Date liveUntil = null;
+    private Boolean bannerEnabled = null;
+    private String bannerDescription = null;
+    private String bannerUrlText = null;
+    private String bannerUrl = null;
 
     private List<CaseType> caseTypes = new ArrayList<>();
 
@@ -94,4 +98,43 @@ public class Jurisdiction implements Serializable {
         this.caseTypes = caseTypes;
     }
 
+    @ApiModelProperty(value = "")
+    @JsonProperty("banner_enabled")
+    public Boolean getBannerEnabled() {
+        return bannerEnabled;
+    }
+
+    public void setBannerEnabled(Boolean bannerEnabled) {
+        this.bannerEnabled = bannerEnabled;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("banner_description")
+    public String getBannerDescription() {
+        return bannerDescription;
+    }
+
+    public void setBannerDescription(String bannerDescription) {
+        this.bannerDescription = bannerDescription;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("banner_url_text")
+    public String getBannerUrlText() {
+        return bannerUrlText;
+    }
+
+    public void setBannerUrlText(String bannerUrlText) {
+        this.bannerUrlText = bannerUrlText;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("banner_url")
+    public String getBannerUrl() {
+        return bannerUrl;
+    }
+
+    public void setBannerUrl(String bannerUrl) {
+        this.bannerUrl = bannerUrl;
+    }
 }

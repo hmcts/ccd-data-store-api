@@ -1219,6 +1219,26 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public JurisdictionBuilder withBannerEnabled(Boolean bannerEnabled) {
+            jurisdiction.setBannerEnabled(bannerEnabled);
+            return this;
+        }
+
+        public JurisdictionBuilder withBannerDescription(String bannerDescription) {
+            jurisdiction.setBannerDescription(bannerDescription);
+            return this;
+        }
+
+        public JurisdictionBuilder withBannerUrlText(String bannerUrlText) {
+            jurisdiction.setBannerUrlText(bannerUrlText);
+            return this;
+        }
+
+        public JurisdictionBuilder withBannerUrl(String bannerUrl) {
+            jurisdiction.setBannerUrl(bannerUrl);
+            return this;
+        }
+
         public Jurisdiction build() {
             return jurisdiction;
         }
