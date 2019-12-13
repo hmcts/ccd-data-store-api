@@ -9,7 +9,7 @@
   ],
   "request": {
     "pathVariables": {
-      "ctid": "eyJhbGciOiJIUzI1NiJ9"
+      "ctid": "non-existing case type ID"
     }
 },
   "expectedResponse": {

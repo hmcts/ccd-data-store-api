@@ -9,7 +9,7 @@
   ],
   "request": {
     "pathVariables": {
-      "uid": "eyJhbGciOiJIUzI1NiJ9"
+      "uid": "non-existing user ID"
     }
 },
   "expectedResponse": {
