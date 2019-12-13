@@ -1,6 +1,6 @@
 {
   "title": "should update an existing case with correct inputs",
-  "_guid_": "S-044-Prerequisite_CaseUpdate",
+  "_guid_": "F-044-Prerequisite_CaseUpdate",
 
   "productName": "CCD Data Store",
   "operationName": "Submit update case event",

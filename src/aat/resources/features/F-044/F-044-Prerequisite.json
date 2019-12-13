@@ -1,6 +1,6 @@
 {
   "title": "should create an event token for correct inputs",
-  "_guid_": "S-044-Prerequisite",
+  "_guid_": "F-044-Prerequisite",
 
   "productName": "CCD Data Store",
   "operationName": "Retrieve update token for an existing case",
@@ -9,7 +9,7 @@
   "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
 
   "specs": [
-    "to get an event token for just created case"
+    "to get an event token for the case just created"
   ],
 
   "user": {

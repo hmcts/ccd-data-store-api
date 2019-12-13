@@ -8,10 +8,10 @@ Feature: F-044: Submit event creation as Case worker
   Scenario: must submit the event creation successfully for correct inputs
     Given a user with [an active profile in CCD]
     And a case that has just been created as in [Standard_Full_Case_Creation_Data]
-    And a successful call [to get an event token for just created case] as in [S-044-Prerequisite]
+    And a successful call [to get an event token for the case just created] as in [F-044-Prerequisite]
     When a request is prepared with appropriate values
     And the request [contains a case Id for just created case]
-    And the request [contains a token created as in S-044-Prerequisite]
+    And the request [contains a token created as in F-044-Prerequisite]
     And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
     Then a positive response is received
     And the response [includes the updated case details, along with a HTTP 201 Created]
@@ -51,11 +51,11 @@ Feature: F-044: Submit event creation as Case worker
   Scenario: must return 409 when case is altered out of the transaction
     Given a user with [an active profile in CCD]
     And a case that has just been created as in [Standard_Full_Case_Creation_Data]
-    And a successful call [to get an event token for just created case] as in [S-044-Prerequisite]
-    And another successful call [to update that case with the token just created] as in [S-044-Prerequisite_CaseUpdate]
+    And a successful call [to get an event token for the case just created] as in [F-044-Prerequisite]
+    And another successful call [to update that case with the token just created] as in [F-044-Prerequisite_CaseUpdate]
     When a request is prepared with appropriate values
     And the request [contains a case Id for just updated case]
-    And the request [contains token (created in 'S-044-Prerequisite') which is no longer valid for current version of case]
+    And the request [contains token (created in 'F-044-Prerequisite') which is no longer valid for current version of case]
     And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
     Then a negative response is received
     And the response [includes a HTTP 409 'Conflict']
@@ -65,11 +65,11 @@ Feature: F-044: Submit event creation as Case worker
   Scenario: must return 422 when event submission has failed
     Given a user with [an active profile in CCD]
     And a case that has just been created as in [Standard_Full_Case_Creation_Data]
-    And a successful call [to get an event token for just created case] as in [S-044-Prerequisite]
+    And a successful call [to get an event token for the case just created] as in [F-044-Prerequisite]
     When a request is prepared with appropriate values
     And the request [contains a case Id for just created case]
-    And the request [contains a token created as in S-044-Prerequisite]
-    And the request [contains an invalid event Id as pre-state conditions]
+    And the request [contains a token created as in F-044-Prerequisite]
+    And the request [contains an invalid event Id for the pre-state conditions]
     And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
     Then a negative response is received
     And the response [includes a HTTP 422 'Unprocessable Entity']
