@@ -270,7 +270,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
                     + expectedResponse.getResponseCode() + ", actual: " + actualResponse.getResponseCode()));
         }
 
-        MapVerificationResult headerVerification = new MapVerifier("actualResponse.headers", 1)
+        MapVerificationResult headerVerification = new MapVerifier("actualResponse.headers", 1, false)
                 .verifyMap(expectedResponse.getHeaders(), actualResponse.getHeaders());
         if (!headerVerification.isVerified()) {
             issues.put("headers", headerVerification.getAllIssues());
