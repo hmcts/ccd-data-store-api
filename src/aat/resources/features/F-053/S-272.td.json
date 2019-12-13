@@ -9,7 +9,7 @@
   ],
   "request": {
     "headers": {
-      "ServiceAuthorization": "eyJhbGciOiJIUzI1NiJ9"
+      "Authorization": "eyJhbGciOiJIUzI1NiJ9"
     }
   },
   "expectedResponse": {

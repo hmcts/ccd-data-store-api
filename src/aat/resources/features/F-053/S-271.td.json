@@ -9,7 +9,7 @@
   ],
   "request": {
     "headers": {
-      "Authorization": "eyJhbGciOiJIUzI1NiJ9"
+      "uid": "not valid User id"
     }
   },
   "expectedResponse": {
