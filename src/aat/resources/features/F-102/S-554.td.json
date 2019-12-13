@@ -1,7 +1,7 @@
 {
   "_guid_": "S-554",
   "_extends_": "F-102_Test_Data_Base",
-  "title": "must return 404 for if no jurisdiction is found",
+  "title": "must return 400 if access type is not in create, read or update",
   "specs": [
     "a detailed profile in CCD having create case access for a jurisdiction",
     "contains HTTP 400 Bad Request",

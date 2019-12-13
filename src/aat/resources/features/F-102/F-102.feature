@@ -41,7 +41,7 @@ Feature: F-102: Get jurisdictions available to the user
     And the response has all other details as expected
 
   @S-554
-  Scenario: must return 400 for if access type is not in create, read or update
+  Scenario: must return 400 if access type is not in create, read or update
     Given a user with [a detailed profile in CCD having create case access for a jurisdiction]
     When a request is prepared with appropriate values
     And the request [has DELETE as case access parameter]
