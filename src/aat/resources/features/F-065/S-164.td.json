@@ -5,7 +5,7 @@
 
   "specs": [
     "an active profile in CCD",
-    "uses case-reference of the case just created",
+    "contains a case that has just been created as in Standard_Full_Case_Creation_Data",
     "contains details of the case just created, along with an HTTP-200 OK",
     "contains the case view history"
   ],
