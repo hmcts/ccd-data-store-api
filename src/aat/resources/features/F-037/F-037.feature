@@ -8,7 +8,7 @@ Feature: F-037: Submit event for an existing case (V2)
   Scenario: should create event successfully for an existing case
     Given a user with [an active profile in CCD]
     And a case that has just been created as in [Standard_Full_Case_Creation_Data]
-    And a successful call [to get an event token for just created case] as in [S-024-Prerequisite]
+    And a successful call [to get an event token for the case just created] as in [S-024-Prerequisite]
     When a request is prepared with appropriate values
     And the request [contains a case Id for just created case]
     And the request [contains a token created as in S-024-Prerequisite]
