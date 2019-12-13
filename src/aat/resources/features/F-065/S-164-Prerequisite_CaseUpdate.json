@@ -1,6 +1,6 @@
 {
   "title": "should update an existing case with correct inputs",
-  "_guid_": "S-065-Prerequisite_CaseUpdate",
+  "_guid_": "S-164-Prerequisite_CaseUpdate",
 
   "productName": "CCD Data Store",
   "operationName": "Submit update case event",
@@ -81,8 +81,7 @@
       "vary": "accept-encoding",
       "Content-Length": "[[ANY]]",
       "Content-Encoding": "gzip",
-      "Content-Type": "application/json;charset=UTF-8",
-      "Transfer-Encoding": "chunked"
+      "Content-Type": "application/json;charset=UTF-8"
     },
     "body" : {
       "id" : "[[ANY]]",
