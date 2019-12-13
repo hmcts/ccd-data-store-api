@@ -1,5 +1,5 @@
 @F-032
-Feature: F-032: Get printable documents for a case
+Feature: F-032: Get printable documents
 
   Background:
     Given an appropriate test context as detailed in the test data source
