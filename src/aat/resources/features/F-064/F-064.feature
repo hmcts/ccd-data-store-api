@@ -4,7 +4,7 @@ Feature: F-064: Retrieve workbasket input details for dynamic display
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
-  @S-549
+  @S-558
   Scenario: must retrieve workbasket input details for dynamic display successfully
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
@@ -39,7 +39,7 @@ Feature: F-064: Retrieve workbasket input details for dynamic display
   @S-220 @Ignore # this scenario will later be refactored from previous implementation.
   Scenario: should retrieve workbasket inputs
 
-  @S-547
+  @S-556
   Scenario: must return a negative response when request contains a non-existing case type id
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
@@ -49,7 +49,7 @@ Feature: F-064: Retrieve workbasket input details for dynamic display
     And the response [code is HTTP-404 'Bad Request']
     And the response has all the details as expected
 
-  @S-548 @Ignore # Response code mismatch, expected: 400, actual: 500"
+  @S-557 @Ignore # Response code mismatch, expected: 400, actual: 500"
   Scenario: must return a negative response when request contains a malformed case type id
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
