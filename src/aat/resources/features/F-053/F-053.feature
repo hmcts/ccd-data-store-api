@@ -75,7 +75,7 @@ Feature: F-053: Submit case creation as Citizen
     And   the response [code is HTTP-400]
     And   the response has all other details as expected
 
-  @S-550
+  @S-552
   Scenario: must return negative response HTTP-400 when request contains a non-existing jurisdiction ID
     Given a user with [an active profile in CCD]
     When  a request is prepared with appropriate values
@@ -85,7 +85,7 @@ Feature: F-053: Submit case creation as Citizen
     And   the response [code is HTTP-400]
     And   the response has all other details as expected
 
-  @S-551
+  @S-553
   Scenario: must return negative response HTTP-404 when request contains a non-existing case type ID
     Given a user with [an active profile in CCD]
     When  a request is prepared with appropriate values
@@ -95,7 +95,7 @@ Feature: F-053: Submit case creation as Citizen
     And   the response [code is HTTP-404]
     And   the response has all other details as expected
 
-  @S-552
+  @S-554
   Scenario: must return negative response HTTP-403 when request contains a non-existing user ID
     Given a user with [an inactive profile in CCD]
     When  a request is prepared with appropriate values
@@ -105,7 +105,7 @@ Feature: F-053: Submit case creation as Citizen
     And   the response [code is HTTP-403]
     And   the response has all other details as expected
 
-  @S-553 @Ignore # Response code mismatch, expected: 400, actual: 500
+  @S-555 @Ignore # Response code mismatch, expected: 400, actual: 500
   Scenario: must return negative response HTTP-400 when request contains a malformed user ID
     Given a user with [an inactive profile in CCD]
     When  a request is prepared with appropriate values
