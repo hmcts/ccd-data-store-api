@@ -25,8 +25,8 @@
     },
     "body": {
       "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
-      "message": "No case type found",
-      "details": "Unable to find the case type, please try a search or return to the case list overview page.",
+      "message": "Resource not found when getting case type version for abc because of 404 Not Found",
+      "details": null,
       "callbackErrors": null,
       "callbackWarnings": null
     }
