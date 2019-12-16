@@ -29,7 +29,6 @@ import static uk.gov.hmcts.ccd.domain.service.validate.ValidateSignificantDocume
 @Service
 public class CallbackInvoker {
 
-    private static final String CALLBACK_RESPONSE_KEY_STATE = "state";
     private static final HashMap<String, JsonNode> EMPTY_DATA_CLASSIFICATION = Maps.newHashMap();
     private final CallbackService callbackService;
     private final CaseTypeService caseTypeService;
@@ -172,8 +171,7 @@ public class CallbackInvoker {
 
         validateSignificantItem(aboutToSubmitCallbackResponse, callbackResponse);
         callbackService.validateCallbackErrorsAndWarnings(callbackResponse, ignoreWarning);
-        //it will work out the state value based on state priority.
-        updateCallbackSateBasedOnPriority(callbackResponse);
+        callbackResponse.updateCallbackStateBasedOnPriority();
         aboutToSubmitCallbackResponse.setState(Optional.ofNullable(callbackResponse.getState()));
         if (callbackResponse.getState() != null) {
             caseDetails.setState(callbackResponse.getState());
@@ -220,26 +218,5 @@ public class CallbackInvoker {
             ofNullable(caseDetails.getDataClassification()).orElse(
                 newHashMap()));
         caseDetails.setDataClassification(defaultSecurityClassifications);
-    }
-
-    Optional<String> filterCaseState(final Map<String, JsonNode> data) {
-        final Optional<JsonNode> jsonNode = ofNullable(data.get(CALLBACK_RESPONSE_KEY_STATE));
-        jsonNode.ifPresent(value -> data.remove(CALLBACK_RESPONSE_KEY_STATE));
-        return jsonNode.flatMap(value -> value.isTextual() ? Optional.of(value.textValue()) : Optional.empty());
-    }
-
-
-    void updateCallbackSateBasedOnPriority(final CallbackResponse callbackResponse) {
-        //it will work out the state value based on state priority.
-        //top level sate is the main priority. If there are defined states (top level and data state).
-        //the top level will take priority.
-        if ((callbackResponse.getState() == null || callbackResponse.getState().isEmpty())
-            && callbackResponse.getData() != null) {
-
-            final Optional<String> newCaseState = filterCaseState(callbackResponse.getData());
-            if (newCaseState.isPresent()) {
-                callbackResponse.setState(newCaseState.get());
-            }
-        }
     }
 }

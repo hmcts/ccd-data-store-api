@@ -10,8 +10,13 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
+import static java.util.Optional.ofNullable;
 
 public class CallbackResponse {
+
+    private static final String CALLBACK_RESPONSE_KEY_STATE = "state";
     @ApiModelProperty("Case data as defined in case type definition. See `docs/api/case-data.md` for data structure.")
     private Map<String, JsonNode> data;
     @JsonProperty("data_classification")
@@ -92,5 +97,23 @@ public class CallbackResponse {
 
     public void setState(String state) {
         this.state = state;
+    }
+
+    private Optional<String> filterCaseState(final Map<String, JsonNode> data) {
+        final Optional<JsonNode> jsonNode = ofNullable(data.get(CALLBACK_RESPONSE_KEY_STATE));
+        jsonNode.ifPresent(value -> data.remove(CALLBACK_RESPONSE_KEY_STATE));
+        return jsonNode.flatMap(value -> value.isTextual() ? Optional.of(value.textValue()) : Optional.empty());
+    }
+
+
+    public void updateCallbackStateBasedOnPriority() {
+        if ((this.getState() == null || this.getState().isEmpty())
+            && this.getData() != null) {
+
+            final Optional<String> newCaseState = filterCaseState(this.getData());
+            if (newCaseState.isPresent()) {
+                this.setState(newCaseState.get());
+            }
+        }
     }
 }

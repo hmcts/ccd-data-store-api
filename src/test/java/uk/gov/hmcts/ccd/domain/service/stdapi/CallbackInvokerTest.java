@@ -38,10 +38,8 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
 
 class CallbackInvokerTest {
@@ -820,7 +818,7 @@ class CallbackInvokerTest {
 
             assertThat("Before filter", data.keySet(), hasSize(2));
 
-            callbackInvoker.updateCallbackSateBasedOnPriority(callbackResponse);
+            callbackResponse.updateCallbackStateBasedOnPriority();
             final String stateResult = callbackResponse.getState();
 
             assertAll(
@@ -841,7 +839,7 @@ class CallbackInvokerTest {
 
             assertThat("Before filter", data.keySet(), hasSize(1));
 
-            callbackInvoker.updateCallbackSateBasedOnPriority(callbackResponse);
+            callbackResponse.updateCallbackStateBasedOnPriority();
             final String stateResult = callbackResponse.getState();
 
             assertAll(
@@ -863,7 +861,7 @@ class CallbackInvokerTest {
 
             assertThat("Before filter", data.keySet(), hasSize(2));
 
-            callbackInvoker.updateCallbackSateBasedOnPriority(callbackResponse);
+            callbackResponse.updateCallbackStateBasedOnPriority();
             final String stateResult = callbackResponse.getState();
 
             assertAll(
@@ -883,7 +881,7 @@ class CallbackInvokerTest {
 
             assertThat("Before filter", data.keySet(), hasSize(1));
 
-            callbackInvoker.updateCallbackSateBasedOnPriority(callbackResponse);
+            callbackResponse.updateCallbackStateBasedOnPriority();
             final String stateResult = callbackResponse.getState();
 
             assertAll(
@@ -892,48 +890,17 @@ class CallbackInvokerTest {
             );
         }
 
-        @DisplayName("Resolve no defined state.")
+        @DisplayName("Resolve no defined data and top leve state.")
         @Test
         void resolveNoDefinedStateAndDataSectionEmpty() {
             final CallbackResponse callbackResponse = new CallbackResponse();
 
-
-            callbackInvoker.updateCallbackSateBasedOnPriority(callbackResponse);
+            callbackResponse.updateCallbackStateBasedOnPriority();
             final String stateResult = callbackResponse.getState();
 
             assertAll(
                 () -> assertEquals(stateResult, null)
             );
-        }
-
-        @DisplayName("state is filtered in json map")
-        @Test
-        void filterCaseState() {
-            final Map<String, JsonNode> data = new HashMap<>();
-            data.put("state", TextNode.valueOf("ngitb"));
-            data.put("blah", IntNode.valueOf(678));
-
-            assertThat("Before filter", data.keySet(), hasSize(2));
-
-            final Optional<String> state = callbackInvoker.filterCaseState(data);
-
-            assertAll(() -> assertThat(state.get(), is("ngitb")),
-                () -> assertThat(data.keySet(), hasSize(1)),
-                () -> assertThat(data.get("blah").intValue(), is(678)));
-        }
-
-        @DisplayName("state is filtered but state is not returned when it is not a text value")
-        @Test
-        void filterCaseStateButNotReturned() {
-            final Map<String, JsonNode> data = new HashMap<>();
-            data.put("state", IntNode.valueOf(678));
-
-            assertThat("Before filter", data.keySet(), hasSize(1));
-
-            final Optional<String> state = callbackInvoker.filterCaseState(data);
-
-            assertAll(() -> assertFalse(state.isPresent()),
-                () -> assertThat(data.keySet(), hasSize(0)));
         }
     }
 }
