@@ -1,0 +1,168 @@
+{
+  "title": "must start event creation process for appropriate inputs",
+  "_guid_": "S-288",
+  "_extends_": "F-056_Test_Data_Base",
+  "specs": [
+    "an active profile in CCD",
+    "contains a token created as in Citizen_Token_Creation_Data_For_Case_Creation",
+    "includes the case detail for the updated case, along with a HTTP 200 OK"
+  ],
+  "request": {
+    "body": {
+      "event_token": "${[scenarioContext][childContexts][Citizen_Token_Creation_Data_For_Case_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "headers" : {
+      "Content-Length" : "[[ANY]]",
+      "Content-Encoding" : "gzip",
+      "Content-Type" : "application/json;charset=UTF-8",
+      "Vary" : "accept-encoding"
+    },
+    "body" : {
+      "id": "[[ANY]]",
+      "jurisdiction": "BEFTA_JURISDICTION_3",
+      "state": "TODO",
+      "version": 0,
+      "case_type_id": "BEFTA_CASETYPE_3_2",
+      "created_date": "[[ANY]]",
+      "last_modified": "[[ANY]]",
+      "security_classification": "PUBLIC",
+      "case_data": {
+        "MoneyGBPField": "4200",
+        "FixedListField": "VALUE3",
+        "AddressUKField": {
+          "AddressLine1": "102 Petty France",
+          "AddressLine2": "CCD",
+          "AddressLine3": "c/o HMCTS Reform",
+          "PostTown": "Westminster",
+          "County": "Greater London",
+          "PostCode": "SW1H 9AJ",
+          "Country": "UK"
+        },
+        "ComplexField": {
+          "ComplexTextField": "Nested text",
+          "ComplexFixedListField": "VALUE2"
+        },
+        "DateTimeField": "1988-07-07T22:20:00",
+        "PhoneUKField": "07123456789",
+        "NumberField": "164528",
+        "MultiSelectListField": [
+          "OPTION2",
+          "OPTION4"
+        ],
+        "YesOrNoField": "Yes",
+        "EmailField": "ccd@hmcts.net",
+        "TextField": "Some Text",
+        "DateField": "2017-02-13",
+        "TextAreaField": "Line1\nLine2",
+        "CollectionField": [
+          {
+            "value": "Alias 1",
+            "id": "CollectionField1"
+          },
+          {
+            "value": "Alias 2",
+            "id": "CollectionField2"
+          }
+        ]
+      },
+      "data_classification": {
+        "MoneyGBPField": "PUBLIC",
+        "FixedListField": "PUBLIC",
+        "AddressUKField": {
+          "classification": "PUBLIC",
+          "value": {
+            "AddressLine1": "PUBLIC",
+            "AddressLine2": "PUBLIC",
+            "AddressLine3": "PUBLIC",
+            "PostTown": "PUBLIC",
+            "County": "PUBLIC",
+            "PostCode": "PUBLIC",
+            "Country": "PUBLIC"
+          }
+        },
+        "ComplexField": {
+          "classification": "PUBLIC",
+          "value": {
+            "ComplexTextField": "PUBLIC",
+            "ComplexFixedListField": "PUBLIC"
+          }
+        },
+        "DateTimeField": "PUBLIC",
+        "PhoneUKField": "PUBLIC",
+        "NumberField": "PUBLIC",
+        "MultiSelectListField": "PUBLIC",
+        "YesOrNoField": "PUBLIC",
+        "EmailField": "PUBLIC",
+        "TextField": "PUBLIC",
+        "DateField": "PUBLIC",
+        "TextAreaField": "PUBLIC",
+        "CollectionField": {
+          "classification": "PUBLIC",
+          "value": [
+            {
+              "id": "CollectionField1",
+              "classification": "PUBLIC"
+            },
+            {
+              "id": "CollectionField2",
+              "classification": "PUBLIC"
+            }
+          ]
+        }
+      },
+      "after_submit_callback_response": null,
+      "callback_response_status_code": null,
+      "callback_response_status": null,
+      "delete_draft_response_status_code": null,
+      "delete_draft_response_status": null,
+      "security_classifications": {
+        "MoneyGBPField": "PUBLIC",
+        "FixedListField": "PUBLIC",
+        "AddressUKField": {
+          "classification": "PUBLIC",
+          "value": {
+            "AddressLine1": "PUBLIC",
+            "AddressLine2": "PUBLIC",
+            "AddressLine3": "PUBLIC",
+            "PostTown": "PUBLIC",
+            "County": "PUBLIC",
+            "PostCode": "PUBLIC",
+            "Country": "PUBLIC"
+          }
+        },
+        "ComplexField": {
+          "classification": "PUBLIC",
+          "value": {
+            "ComplexTextField": "PUBLIC",
+            "ComplexFixedListField": "PUBLIC"
+          }
+        },
+        "DateTimeField": "PUBLIC",
+        "PhoneUKField": "PUBLIC",
+        "NumberField": "PUBLIC",
+        "MultiSelectListField": "PUBLIC",
+        "YesOrNoField": "PUBLIC",
+        "EmailField": "PUBLIC",
+        "TextField": "PUBLIC",
+        "DateField": "PUBLIC",
+        "TextAreaField": "PUBLIC",
+        "CollectionField": {
+          "classification": "PUBLIC",
+          "value": [
+            {
+              "id": "CollectionField1",
+              "classification": "PUBLIC"
+            },
+            {
+              "id": "CollectionField2",
+              "classification": "PUBLIC"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

@@ -12,24 +12,41 @@ public class MapVerifier {
     private static final String ANY = "[[ANY]]";
     private static final String NOT_NULL = "[[NOT_NULL]]";
 
-    private MapVerifier() {}
+    private String fieldPrefix;
 
-    public static MapVerificationResult verifyMap(Map<String, Object> expectedMap, Map<String, Object> actualMap,
-            int maxMessageDepth) {
-        return verifyMap("actualResponse.body", expectedMap, actualMap, maxMessageDepth);
+    private int maxMessageDepth;
+
+    private boolean caseSensitiveForStrings;
+
+    public MapVerifier(String fieldPrefix) {
+        this(fieldPrefix, 5);
     }
 
-    public static MapVerificationResult verifyMap(String fieldPrefix, Map<String, Object> expectedMap,
-            Map<String, Object> actualMap,
-            int maxMessageDepth) {
+    public MapVerifier(String fieldPrefix, int maxMessageDepth) {
+        this(fieldPrefix, maxMessageDepth, true);
+    }
+
+    public MapVerifier(String fieldPrefix, boolean caseSensitiveForStrings) {
+        this(fieldPrefix, 5, caseSensitiveForStrings);
+    }
+
+    public MapVerifier(String fieldPrefix, int maxMessageDepth, boolean caseSensitiveForStrings) {
+        super();
         if (maxMessageDepth < 0) {
             throw new IllegalArgumentException("Max depth cannot be negative.");
         }
-        return verifyMap(fieldPrefix, expectedMap, actualMap, 0, maxMessageDepth);
+        this.fieldPrefix = fieldPrefix;
+        this.maxMessageDepth = maxMessageDepth;
+        this.caseSensitiveForStrings = caseSensitiveForStrings;
     }
 
-    private static MapVerificationResult verifyMap(String fieldPrefix, Map<String, Object> expectedMap,
-            Map<String, Object> actualMap, int currentDepth, int maxMessageDepth) {
+    public MapVerificationResult verifyMap(Map<String, Object> expectedMap,
+            Map<String, Object> actualMap) {
+        return verifyMap(fieldPrefix, expectedMap, actualMap, 0);
+    }
+
+    private MapVerificationResult verifyMap(String fieldPrefix, Map<String, Object> expectedMap,
+            Map<String, Object> actualMap, int currentDepth) {
 
         boolean shouldReportAnyDifference = currentDepth <= maxMessageDepth;
 
@@ -62,7 +79,7 @@ public class MapVerifier {
     }
 
     @SuppressWarnings("unchecked")
-    private static List<MapVerificationResult> collectBadSubmaps(Map<String, Object> expectedMap,
+    private List<MapVerificationResult> collectBadSubmaps(Map<String, Object> expectedMap,
             Map<String, Object> actualMap, String fieldPrefix, int currentDepth, int maxMessageDepth) {
         ArrayList<MapVerificationResult> differences = new ArrayList<>();
         expectedMap.keySet().stream().filter(keyOfExpected -> actualMap.containsKey(keyOfExpected))
@@ -72,7 +89,7 @@ public class MapVerifier {
                     if (expectedValue instanceof Map && actualValue instanceof Map) {
                         MapVerificationResult subresult = verifyMap(fieldPrefix + "." + commonKey,
                                 (Map<String, Object>) expectedValue,
-                                (Map<String, Object>) actualValue, currentDepth + 1, maxMessageDepth);
+                                (Map<String, Object>) actualValue, currentDepth + 1);
                         if (!subresult.isVerified()) {
                             differences.add(subresult);
                         }
@@ -81,19 +98,19 @@ public class MapVerifier {
         return differences;
     }
 
-    private static List<String> checkForUnexpectedlyAvailableFields(Map<String, Object> expectedMap,
+    private List<String> checkForUnexpectedlyAvailableFields(Map<String, Object> expectedMap,
                                                                     Map<String, Object> actualMap) {
         return actualMap.keySet().stream().filter(keyOfActual -> !expectedMap.containsKey(keyOfActual))
                 .collect(Collectors.toList());
     }
 
-    private static List<String> checkForUnexpectedlyUnavailableFields(Map<String, Object> expectedMap,
+    private List<String> checkForUnexpectedlyUnavailableFields(Map<String, Object> expectedMap,
                                                                       Map<String, Object> actualMap) {
         return expectedMap.keySet().stream().filter(keyOfExpected -> !actualMap.containsKey(keyOfExpected)
                 && isExpectedToBeAvailableInActual(expectedMap.get(keyOfExpected))).collect(Collectors.toList());
     }
 
-    private static List<String> collectBadValueMessagesFromMap(Map<String, Object> expectedMap,
+    private List<String> collectBadValueMessagesFromMap(Map<String, Object> expectedMap,
             Map<String, Object> actualMap,
             String fieldPrefix, int currentDepth, int maxMessageDepth) {
         List<String> badValueMessages = new ArrayList<>();
@@ -129,7 +146,7 @@ public class MapVerifier {
     }
 
     @SuppressWarnings("unchecked")
-    private static void collectBadValueMessagesFromCollection(String fieldPrefix, String field,
+    private void collectBadValueMessagesFromCollection(String fieldPrefix, String field,
             Collection<?> expectedCollection,
             Collection<?> actualCollection, int currentDepth, int maxMessageDepth, List<String> badValueMessages) {
         Iterator<?> e1 = expectedCollection.iterator();
@@ -146,7 +163,7 @@ public class MapVerifier {
             if (o1 instanceof Map && o2 instanceof Map) {
                 MapVerificationResult subresult = verifyMap(subfield, (Map<String, Object>) o1,
                         (Map<String, Object>) o2,
-                        currentDepth + 1, maxMessageDepth);
+                        currentDepth + 1);
                 if (!subresult.isVerified()) {
                     badValueMessages.addAll(subresult.getAllIssues());
                 }
@@ -169,7 +186,7 @@ public class MapVerifier {
         }
     }
 
-    private static Object compareValues(String fieldPrefix, String commonKey, Object expectedValue,
+    private Object compareValues(String fieldPrefix, String commonKey, Object expectedValue,
             Object actualValue, int currentDepth, int maxMessageDepth) {
         boolean justCompare = currentDepth > maxMessageDepth;
         if (expectedValue instanceof String && ANY.equalsIgnoreCase((String) expectedValue)) {
@@ -185,8 +202,12 @@ public class MapVerifier {
         }
     }
 
-    private static Object compareNonNullLiteral(String fieldName, Object expectedValue, Object actualValue,
+    private Object compareNonNullLiteral(String fieldName, Object expectedValue, Object actualValue,
             boolean justCompare) {
+        if (!caseSensitiveForStrings && expectedValue instanceof String && actualValue instanceof String
+                && ((String) expectedValue).equalsIgnoreCase((String) actualValue)) {
+            return Boolean.TRUE;
+        }
         if (expectedValue.equals(actualValue)) {
             return Boolean.TRUE;
         }
@@ -194,14 +215,14 @@ public class MapVerifier {
                 : fieldName + ": expected '" + expectedValue + "' but got '" + actualValue + "'";
     }
 
-    private static boolean isExpectedToBeAvailableInActual(Object expectedValue) {
+    private boolean isExpectedToBeAvailableInActual(Object expectedValue) {
         if (expectedValue instanceof String) {
             return !ANY.equalsIgnoreCase((String) expectedValue);
         }
         return true;
     }
 
-    private static Boolean canAcceptNullFor(Object expectedValue) {
+    private Boolean canAcceptNullFor(Object expectedValue) {
         if (!(expectedValue instanceof String)) {
             return Boolean.FALSE;
         }

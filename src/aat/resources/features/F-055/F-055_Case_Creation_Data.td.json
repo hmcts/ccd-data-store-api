@@ -1,0 +1,18 @@
+{
+  "_guid_": "F-055_Case_Creation_Data",
+  "_extends_": "Standard_Full_Case_Creation_Data",
+
+  "users": {
+    "invokingUser": {
+      "username": "befta.citizen.3@gmail.com",
+      "password": "Pa55word11"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "jurisdiction": "BEFTA_JURISDICTION_3",
+      "caseType": "BEFTA_CASETYPE_3_2"
+    }
+  }
+}
