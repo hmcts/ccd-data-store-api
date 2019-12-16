@@ -17,6 +17,18 @@
   },
 
   "expectedResponse": {
-    "_extends_": "Common_404_Response"
+    "_extends_": "Common_404_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "Content-Length": "[[ANY]]",
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "message": "No case type found",
+      "details": "Unable to find the case type, please try a search or return to the case list overview page.",
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
   }
 }

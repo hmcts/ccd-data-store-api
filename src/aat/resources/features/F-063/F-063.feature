@@ -35,13 +35,13 @@ Feature: F-063: Retrieve search input details for dynamic display
     And the response has all other details as expected
 
   @S-214
-  Scenario: must return 403 when request provides authentic credentials without authorized access to the operation
+  Scenario: must return 404 when request provides authentic credentials without authorized access to the operation
     And a user with [an active profile in CCD]
     When a request is prepared with appropriate values
     And the request [contains a user authentication token that does not have read access to the case type]
     And it is submitted to call the [Retrieve search input details for dynamic display] operation of [CCD Data Store]
     Then a negative response is received
-    And the response [contains a HTTP 403 Forbidden]
+    And the response [contains a HTTP 404 Not Found]
     And the response has all other details as expected
 
   @S-XXX
