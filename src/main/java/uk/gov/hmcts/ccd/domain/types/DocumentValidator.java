@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 
 
@@ -24,6 +25,12 @@ public class DocumentValidator implements BaseTypeValidator {
     private static final String DOCUMENT_BINARY_URL = "document_binary_url";
 
     private static final Logger LOG = LoggerFactory.getLogger(DocumentValidator.class);
+
+    private final ApplicationParams applicationParams;
+
+    public DocumentValidator(ApplicationParams applicationParams) {
+        this.applicationParams = applicationParams;
+    }
 
     @Override
     public BaseType getType() {
@@ -54,7 +61,7 @@ public class DocumentValidator implements BaseTypeValidator {
         }
 
         final String documentUrlValue = documentUrl.textValue();
-        final String urlPatternString = "http.*/documents/[A-Za-z0-9-]+(?:/binary)?";
+        final String urlPatternString = applicationParams.getValidDMDomain() + "/documents/[A-Za-z0-9-]+(?:/binary)?";
         final Pattern urlPattern = Pattern.compile(urlPatternString);
         final Matcher documentUrlMatcher = urlPattern.matcher(documentUrlValue);
 
