@@ -17,7 +17,7 @@ Feature: F-044: Submit event creation as Case worker
     And the response [contains the updated case details, along with an HTTP 201 Created]
     And the response has all other details as expected
 
-  @S-279 @ignore # Response code mismatch, expected: 401, actual: 403
+  @S-279 @Ignore # Response code mismatch, expected: 401, actual: 403
   Scenario: must return negative response when request does not provide valid authentication credentials
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
