@@ -105,7 +105,6 @@ public class CallbackResponse {
         return jsonNode.flatMap(value -> value.isTextual() ? Optional.of(value.textValue()) : Optional.empty());
     }
 
-
     public void updateCallbackStateBasedOnPriority() {
         if ((this.getState() == null || this.getState().isEmpty())
             && this.getData() != null) {
