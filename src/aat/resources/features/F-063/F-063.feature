@@ -38,13 +38,13 @@ Feature: F-063: Retrieve search input details for dynamic display
   Scenario: must return 404 when request provides authentic credentials without authorized access to the operation
     And a user with [an active profile in CCD]
     When a request is prepared with appropriate values
-    And the request [contains a user authentication token that does not have read access to the case type]
+    And the request [contains an authentication token for a user that does not have read access to the case type]
     And it is submitted to call the [Retrieve search input details for dynamic display] operation of [CCD Data Store]
     Then a negative response is received
     And the response [contains a HTTP 404 Not Found]
     And the response has all other details as expected
 
-  @S-XXX
+  @S-XXX # new scenario
   Scenario: must return 404 when case type does not exist
     And a user with [an active profile in CCD]
     When a request is prepared with appropriate values

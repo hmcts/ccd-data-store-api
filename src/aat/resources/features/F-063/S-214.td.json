@@ -6,7 +6,7 @@
 
   "specs": [
     "an active profile in CCD",
-    "contains a user authentication token that does not have read access to the case type",
+    "contains an authentication token for a user that does not have read access to the case type",
     "contains a HTTP 404 Not Found"
   ],
 
