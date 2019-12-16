@@ -1,5 +1,5 @@
 {
-	"_guid_": "S-550",
+	"_guid_": "S-560",
 	"_extends_": "F-044_Test_Data_Base",
 	"title": "must return 404 when request contains a non-existing case type",
 	"specs": [

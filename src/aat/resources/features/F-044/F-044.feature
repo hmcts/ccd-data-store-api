@@ -85,7 +85,7 @@ Feature: F-044: Submit event creation as Case worker
     And the response [contains an HTTP 404 'Not Found']
     And the response has all the details as expected
 
-  @S-550 @Ignore # This scenario is returning 400 instead of expected 404, linked to defect JIRA-6918
+  @S-560 @Ignore # This scenario is returning 400 instead of expected 404, linked to defect JIRA-6918
     Scenario: must return 404 when request contains a non-existing case type
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
