@@ -7,7 +7,7 @@
 	"specs": [
 		"an active profile in CCD",
 		"does not provide valid authentication credentials",
-		"contains an HTTP 403 Forbidden"
+		"contains an HTTP 401 Forbidden"
 	],
   "request": {
     "headers": {
@@ -15,9 +15,6 @@
     }
   },
 	"expectedResponse": {
-		"_extends_": "Common_403_Response",
-		"body": {
-			"message": "Access Denied"
-		}
+		"_extends_": "Common_401_Response"
 	}
 }
