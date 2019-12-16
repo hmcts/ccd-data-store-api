@@ -6,7 +6,7 @@
 	"specs": [
 		"an active profile in CCD",
     "contains a case Id that has just been created as in Standard_Full_Case_Creation_Data",
-    "contains a token created as in F-044-Prerequisite",
+    "contains an event token for the case just created above",
 		"contains the updated case details, along with an HTTP 201 Created"
 	],
 	"request": {

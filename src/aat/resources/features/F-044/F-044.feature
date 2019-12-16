@@ -11,8 +11,8 @@ Feature: F-044: Submit event creation as Case worker
     And a successful call [to get an event token for the case just created] as in [F-044-Prerequisite]
     When a request is prepared with appropriate values
     And the request [contains a case Id that has just been created as in Standard_Full_Case_Creation_Data]
-    And the request [contains a token created as in F-044-Prerequisite]
-    And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
+    And the request [contains an event token for the case just created above]
+    And it is submitted to call the [submit event creation as case worker] operation of [CCD Data Store]
     Then a positive response is received
     And the response [contains the updated case details, along with an HTTP 201 Created]
     And the response has all other details as expected
@@ -22,7 +22,7 @@ Feature: F-044: Submit event creation as Case worker
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
     And the request [does not provide valid authentication credentials]
-    And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
+    And it is submitted to call the [submit event creation as case worker] operation of [CCD Data Store]
     Then a negative response is received
     And the response [contains an HTTP 403 Forbidden]
     And the response has all other details as expected
@@ -32,7 +32,7 @@ Feature: F-044: Submit event creation as Case worker
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
     And the request [does not provide authorised access to the operation]
-    And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
+    And it is submitted to call the [submit event creation as case worker] operation of [CCD Data Store]
     Then a negative response is received
     And the response [contains an HTTP 403 Forbidden]
     And the response has all other details as expected
@@ -42,7 +42,7 @@ Feature: F-044: Submit event creation as Case worker
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
     And the request [contains a non-existing case reference]
-    And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
+    And it is submitted to call the [submit event creation as case worker] operation of [CCD Data Store]
     Then a negative response is received
     And the response [contains an HTTP 404 'Bad Request']
     And the response has all other details as expected
@@ -56,7 +56,7 @@ Feature: F-044: Submit event creation as Case worker
     When a request is prepared with appropriate values
     And the request [contains a case Id that has just been updated as in F-044-Prerequisite_CaseUpdate]
     And the request [contains token (created in 'F-044-Prerequisite') which is no longer valid for current version of case]
-    And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
+    And it is submitted to call the [submit event creation as case worker] operation of [CCD Data Store]
     Then a negative response is received
     And the response [contains an HTTP 409 'Conflict']
     And the response has all other details as expected
@@ -68,9 +68,9 @@ Feature: F-044: Submit event creation as Case worker
     And a successful call [to get an event token for the case just created] as in [F-044-Prerequisite]
     When a request is prepared with appropriate values
     And the request [contains a case Id that has just been created as in Standard_Full_Case_Creation_Data]
-    And the request [contains a token created as in F-044-Prerequisite]
+    And the request [contains an event token for the case just created above]
     And the request [contains an invalid event Id for the pre-state conditions]
-    And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
+    And it is submitted to call the [submit event creation as case worker] operation of [CCD Data Store]
     Then a negative response is received
     And the response [contains an HTTP 422 'Unprocessable Entity']
     And the response has all other details as expected
@@ -80,7 +80,7 @@ Feature: F-044: Submit event creation as Case worker
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
     And the request [contains a non-existing jurisdiction Id]
-    And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
+    And it is submitted to call the [submit event creation as case worker] operation of [CCD Data Store]
     Then a negative response is received
     And the response [contains an HTTP 404 'Not Found']
     And the response has all the details as expected
@@ -90,7 +90,7 @@ Feature: F-044: Submit event creation as Case worker
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
     And the request [contains a non-existing case type]
-    And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
+    And it is submitted to call the [submit event creation as case worker] operation of [CCD Data Store]
     Then a negative response is received
     And the response [contains an HTTP 404 'Not Found']
     And the response has all the details as expected
