@@ -7,8 +7,11 @@
 	"method": "GET",
 	"uri": "/internal/case-types/{ctid}/search-inputs",
 
-	"user": {
-		"_extends_": "Common_User_For_Request"
+	"users": {
+    "invokingUser": {
+      "username": "[[$CCD_CASEWORKER_AUTOTEST_EMAIL]]",
+      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+    }
 	},
 
 	"request": {
