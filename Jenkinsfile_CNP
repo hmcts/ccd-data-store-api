@@ -79,4 +79,5 @@ withPipeline(type, product, component) {
     enableDbMigration('ccd')
     enableDockerBuild()
     installCharts()
+    disableLegacyDeployment()
 }
