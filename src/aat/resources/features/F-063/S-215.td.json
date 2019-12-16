@@ -1,0 +1,16 @@
+{
+  "title": "should retrieve search inputs",
+
+  "_guid_": "S-215",
+  "_extends_": "F-063_Base_Test_Data",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains a valid case type",
+    "contains the correct search inputs for the given case type, along with an HTTP 200 OK"
+  ],
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response"
+  }
+}

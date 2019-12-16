@@ -1,0 +1,23 @@
+{
+	"_guid_": "F-063_Base_Test_Data",
+
+	"productName": "CCD Data Store",
+	"operationName": "Retrieve search input details for dynamic display",
+
+	"method": "GET",
+	"uri": "/internal/case-types/{ctid}/search-inputs",
+
+	"user": {
+		"_extends_": "Common_User_For_Request"
+	},
+
+	"request": {
+		"headers": {
+			"_extends_": "Common_Request_Headers",
+			"experimental": true
+		},
+		"pathVariables": {
+			"ctid": "AAT_AUTH_15"
+		}
+	}
+}
