@@ -7,7 +7,7 @@
     "an active profile in CCD",
     "contains a case Id that has just been created as in Standard_Full_Case_Creation_Data",
     "contains a token created as in F-044-Prerequisite",
-    "contains an invalid event Id as pre-state conditions",
+    "contains an invalid event Id for the pre-state conditions",
     "contains an HTTP 422 'Unprocessable Entity'"
   ],
   "request": {
