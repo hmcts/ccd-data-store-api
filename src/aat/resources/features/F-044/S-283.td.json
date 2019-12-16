@@ -20,7 +20,7 @@
         "summary": "",
         "description": ""
       },
-      "event_token" : "${[scenarioContext][childContexts][S-044-Prerequisite][testData][actualResponse][body][token]}"
+      "event_token" : "${[scenarioContext][childContexts][F-044-Prerequisite][testData][actualResponse][body][token]}"
     }
   },
   "expectedResponse": {
