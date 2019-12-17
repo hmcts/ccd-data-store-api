@@ -14,7 +14,7 @@ Feature: F-067: Retrieve a CaseView Event by case and event id for dynamic displ
     And the request [contains the reference of the case just created and the event id valid for that case]
     And it is submitted to call the [Retrieve an event by case and event IDs for dynamic display] operation of [CCD Data Store]
     Then a positive response is received
-    And the response [has Http 200 OK]
+    And the response [contains HTTP 200 Ok]
     And the response has all other details as expected
 
   @S-249 @Ignore

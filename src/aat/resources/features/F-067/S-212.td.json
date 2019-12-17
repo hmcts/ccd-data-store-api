@@ -5,17 +5,18 @@
 
 	"specs": [
 		"an active profile in CCD",
-		"contains as input a valid case-reference that exists in CCD",
-		"has the 201 return code"
+		"contains the reference of the case just created and the event id valid for that case",
+		"contains HTTP 200 Ok"
 	],
   "request": {
     "pathVariables": {
-      "cid": "[[DYNAMIC]]"
+      "cid": "${[scenarioContext][childContexts][Befta_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}",
+      "eventId": "${[scenarioContext][childContexts][S-212_Get_Case_Data][testData][actualResponse][body][events][0][id]}"
     }
   },
 
   "expectedResponse": {
-    "responseCode" : 201,
+    "responseCode" : 200,
     "responseMessage" : "Created",
     "headers" : {
       "_extends_": "Common_Response_Headers",
