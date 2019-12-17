@@ -1,10 +1,9 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
-import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
+import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
+import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 
 @Named
 @Singleton
@@ -15,10 +14,7 @@ public class JurisdictionMapper {
         result.setName(jurisdiction.getName());
         result.setDescription(jurisdiction.getDescription());
         result.setCaseTypes(jurisdiction.getCaseTypes());
-        result.setBannerDescription(jurisdiction.getBannerDescription());
-        result.setBannerEnabled(jurisdiction.getBannerEnabled());
-        result.setBannerUrlText(jurisdiction.getBannerUrlText());
-        result.setBannerUrl(jurisdiction.getBannerUrl());
+        result.setBanners(jurisdiction.getBanners());
         return result;
     }
 }

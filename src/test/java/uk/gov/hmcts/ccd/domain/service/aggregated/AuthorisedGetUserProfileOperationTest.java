@@ -25,6 +25,7 @@ import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.User;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
+import uk.gov.hmcts.ccd.domain.model.definition.Banner;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
@@ -42,6 +43,8 @@ class AuthorisedGetUserProfileOperationTest {
 
     private CaseType notAllowedCaseType = new CaseType();
 
+    private Banner banner = new Banner();
+
     @Mock
     private UserRepository userRepository;
 
@@ -58,12 +61,20 @@ class AuthorisedGetUserProfileOperationTest {
         MockitoAnnotations.initMocks(this);
         userProfile.setUser(user);
         userProfile.setJurisdictions(new JurisdictionDisplayProperties[]{test1JurisdictionDisplayProperties, test2JurisdictionDisplayProperties});
+        banner.setBannerUrlText("Click here to see it.>>>");
+        banner.setBannerUrl("http://localhost:3451/test");
+        banner.setBannerEnabled(true);
+        banner.setBannerDescription("Test Description");
 
         List<CaseType> caseTypes1 = Arrays.asList(notAllowedCaseType, new CaseType());
         List<CaseType> caseTypes2 = Arrays.asList(new CaseType(), notAllowedCaseType, new CaseType());
 
+        List<Banner> banners = Arrays.asList(banner);
+
         test1JurisdictionDisplayProperties.setCaseTypes(caseTypes1);
+        test1JurisdictionDisplayProperties.setBanners(banners);
         test2JurisdictionDisplayProperties.setCaseTypes(caseTypes2);
+        test2JurisdictionDisplayProperties.setBanners(banners);
 
         doReturn(userRoles).when(userRepository).getUserRoles();
         doReturn(userProfile).when(getUserProfileOperation).execute(CAN_READ);
@@ -86,7 +97,8 @@ class AuthorisedGetUserProfileOperationTest {
             () -> assertThat(userProfile.getJurisdictions()[0].getCaseTypes(), everyItem(not(isIn(Arrays.asList(notAllowedCaseType))))),
             () -> assertThat(userProfile.getJurisdictions()[1].getCaseTypes(), everyItem(not(isIn(Arrays.asList(notAllowedCaseType))))),
             () -> assertThat(userProfile.getJurisdictions()[0].getCaseTypes().get(0).getStates().size(), is(3)),
-            () -> assertThat(userProfile.getJurisdictions()[0].getCaseTypes().get(0).getEvents().size(), is(4))
+            () -> assertThat(userProfile.getJurisdictions()[0].getCaseTypes().get(0).getEvents().size(), is(4)),
+            () -> assertThat(userProfile.getJurisdictions()[0].getBanners().size(), is(1))
         );
     }
 
@@ -99,7 +111,9 @@ class AuthorisedGetUserProfileOperationTest {
 
         assertAll(
             () -> assertThat(userProfile.getJurisdictions()[0].getCaseTypes().size(), is(0)),
-            () -> assertThat(userProfile.getJurisdictions()[1].getCaseTypes().size(), is(0))
+            () -> assertThat(userProfile.getJurisdictions()[1].getCaseTypes().size(), is(0)),
+            () -> assertThat(userProfile.getJurisdictions()[0].getBanners().size(), is(1)),
+            () -> assertThat(userProfile.getJurisdictions()[1].getBanners().size(), is(1))
         );
     }
 

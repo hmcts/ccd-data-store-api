@@ -3,12 +3,11 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.ToString;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import lombok.ToString;
 
 @ApiModel(description = "")
 @ToString
@@ -19,12 +18,10 @@ public class Jurisdiction implements Serializable {
     private String description = null;
     private Date liveFrom = null;
     private Date liveUntil = null;
-    private Boolean bannerEnabled = null;
-    private String bannerDescription = null;
-    private String bannerUrlText = null;
-    private String bannerUrl = null;
 
     private List<CaseType> caseTypes = new ArrayList<>();
+
+    private List<Banner> banners = new ArrayList<>();
 
     /**
      **/
@@ -98,43 +95,15 @@ public class Jurisdiction implements Serializable {
         this.caseTypes = caseTypes;
     }
 
+    /**
+     **/
     @ApiModelProperty(value = "")
-    @JsonProperty("banner_enabled")
-    public Boolean getBannerEnabled() {
-        return bannerEnabled;
+    @JsonProperty("banners")
+    public List<Banner> getBanners() {
+        return banners;
     }
 
-    public void setBannerEnabled(Boolean bannerEnabled) {
-        this.bannerEnabled = bannerEnabled;
-    }
-
-    @ApiModelProperty(value = "")
-    @JsonProperty("banner_description")
-    public String getBannerDescription() {
-        return bannerDescription;
-    }
-
-    public void setBannerDescription(String bannerDescription) {
-        this.bannerDescription = bannerDescription;
-    }
-
-    @ApiModelProperty(value = "")
-    @JsonProperty("banner_url_text")
-    public String getBannerUrlText() {
-        return bannerUrlText;
-    }
-
-    public void setBannerUrlText(String bannerUrlText) {
-        this.bannerUrlText = bannerUrlText;
-    }
-
-    @ApiModelProperty(value = "")
-    @JsonProperty("banner_url")
-    public String getBannerUrl() {
-        return bannerUrl;
-    }
-
-    public void setBannerUrl(String bannerUrl) {
-        this.bannerUrl = bannerUrl;
+    public void setBanners(List<Banner> banners) {
+        this.banners = banners;
     }
 }
