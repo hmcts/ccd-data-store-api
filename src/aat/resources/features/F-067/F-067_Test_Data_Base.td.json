@@ -1,18 +1,22 @@
 {
 	"_guid_": "F-067_Test_Data_Base",
 	"productName": "CCD Data Store",
-	"operationName": "Grant access to case",
+	"operationName": "Retrieve a CaseView Event by case and event id for dynamic display",
 	"method": "POST",
 	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/users",
-	"user": {
-		"_extends_": "Common_User_For_Request"
-	},
+  "users": {
+    "invokingUser": {
+      "username": "befta.caseworker.1@gmail.com",
+      "password": "Pa55word11"
+    }
+  },
+
 	"request": {
 		"_extends_": "Common_Request",
 		"pathVariables": {
 			"uid": "[[DYNAMIC]]",
-			"jid": "AUTOTEST1",
-			"ctid": "AAT"
+			"jid": "BEFTA_JURISDICTION_1",
+			"ctid": "BEFTA_CASETYPE_1_1"
 		},
 		"body": {
 			"id": "Test User"

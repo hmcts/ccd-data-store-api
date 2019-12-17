@@ -1,6 +1,6 @@
 {
 	"title": "must return 201 if the grant is successful for a user to a valid case ID",
-	"_guid_": "S-1510",
+	"_guid_": "S-212",
 	"_extends_": "F-067_Test_Data_Base",
 
 	"specs": [
