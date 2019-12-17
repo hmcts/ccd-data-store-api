@@ -14,16 +14,6 @@ Feature: F-063: Retrieve search input details for dynamic display
     And the response [contains the correct search inputs for the given case type, along with an HTTP 200 OK]
     And the response has all other details as expected
 
-  @S-216 @Ignore # not relevant to this operation, should be included in F-064
-  Scenario: should retrieve workbasket inputs
-    Given a user with [an active profile in CCD]
-    When a request is prepared with appropriate values
-    And the request [contains a valid case type]
-    And it is submitted to call the [Retrieve search input details for dynamic display] operation of [CCD Data Store]
-    Then a positive response is received
-    And the response [contains the correct workbasket inputs for the given case type, along with an HTTP 200 OK]
-    And the response has all other details as expected
-
   @S-213 @Ignore # expected 401 but actually got 403 (defect RDM-6628)
   Scenario: must return 401 when request does not provide valid authentication credentials
     Given a user with [an active profile in CCD]
@@ -44,7 +34,7 @@ Feature: F-063: Retrieve search input details for dynamic display
     And the response [contains a HTTP 404 Not Found]
     And the response has all other details as expected
 
-  @S-XXX # new scenario
+  @S-561
   Scenario: must return 404 when case type does not exist
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
@@ -53,4 +43,3 @@ Feature: F-063: Retrieve search input details for dynamic display
     Then a negative response is received
     And the response [contains a HTTP 404 Not Found]
     And the response has all other details as expected
-
