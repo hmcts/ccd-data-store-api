@@ -1,0 +1,26 @@
+{
+  "title": "must return 403 when request provides authentic credentials without authorized access to the operation",
+  "_guid_": "S-057",
+  "_extends_": "F-041_Test_Data_Base",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains an invalid authorization token",
+    "contains an HTTP-403 Forbidden"
+  ],
+  "request": {
+    "headers": {
+      "Authorization": "Dummy_Authorization"
+    }
+  },
+  "user": {
+    "username": "befta.caseworker.1@gmail.com",
+    "password": "Pa55word11"
+  },
+  "expectedResponse": {
+    "_extends_": "Common_403_Response",
+    "body": {
+      "message": "Access Denied"
+    }
+  }
+}

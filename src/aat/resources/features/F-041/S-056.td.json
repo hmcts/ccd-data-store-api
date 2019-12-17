@@ -1,0 +1,22 @@
+{
+  "title": "must return 401 when request does not provide valid authentication credentials",
+
+  "_guid_": "S-056",
+  "_extends_": "F-041_Test_Data_Base",
+
+  "specs": [
+    "an active profile in CCD",
+    "does not provide valid authentication credentials to the operation",
+    "has an HTTP-401 Unauthorized"
+  ],
+
+  "request": {
+    "headers": {
+      "Authorization": "anInvalidAuthorizationString"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_401_Response"
+  }
+}
