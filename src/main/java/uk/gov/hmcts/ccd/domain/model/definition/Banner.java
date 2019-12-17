@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import lombok.ToString;
 
@@ -9,16 +8,12 @@ public class Banner implements Serializable {
 
     private String id;
 
-    @JsonProperty("banner_enabled")
     private Boolean bannerEnabled;
 
-    @JsonProperty("banner_description")
     private String bannerDescription;
 
-    @JsonProperty("banner_url_text")
     private String bannerUrlText;
 
-    @JsonProperty("banner_url")
     private String bannerUrl;
 
     private Jurisdiction jurisdiction;
