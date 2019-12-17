@@ -2,5 +2,5 @@
 	"_guid_": "Common_200_Response_Headers",
 	"_extends_": "Common_Response_Headers",
 
-	"vary": "accept-encoding"
+	"VaRy": "aCCept-EncodIng"
 }
