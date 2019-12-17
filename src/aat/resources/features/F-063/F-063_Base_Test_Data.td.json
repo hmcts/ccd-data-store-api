@@ -22,5 +22,12 @@
 		"pathVariables": {
 			"ctid": "AAT_AUTH_15"
 		}
-	}
+	},
+
+  "expectedResponse": {
+    "headers": {
+      "Content-Length": "[[ANY]]",
+      "Content-Type": "application/json;charset=UTF-8"
+    }
+  }
 }
