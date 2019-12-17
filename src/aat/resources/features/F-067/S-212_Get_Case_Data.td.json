@@ -1,0 +1,82 @@
+{
+  "_guid_": "S-212_Get_Case_Data",
+  "title": "to get the details about case event for the case just created",
+  "productName": "CCD Data Store",
+  "operationName": "to get the details about case event for the case just created",
+  "method": "GET",
+  "uri": "/internal/cases/{cid}",
+  "specs": [
+    "to get the details about case event for the case just created"
+  ],
+  "users": {
+    "invokingUser": {
+      "username": "befta.caseworker.1@gmail.com",
+      "password": "Pa55word11"
+    }
+  },
+  "request": {
+    "headers": {
+      "experimental": true,
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][childContexts][Befta_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 200,
+    "headers": {
+      "X-Frame-Options": "[[ANY]]",
+      "Transfer-Encoding": "[[ANY]]",
+      "Cache-Control": "[[ANY]]",
+      "X-Content-Type-Options": "[[ANY]]",
+      "X-XSS-Protection": "[[ANY]]",
+      "Content-Encoding": "[[ANY]]",
+      "vary": "[[ANY]]",
+      "Expires": "[[ANY]]",
+      "Pragma": "[[ANY]]",
+      "Date": "[[ANY]]",
+      "Content-Type": "[[ANY]]",
+      "Content-Length": "[[ANY]]"
+    },
+    "body": {
+      "_links": {
+        "self": {
+          "href": "[[ANY]]"
+        }
+      },
+      "case_id": "[[ANY]]",
+      "case_type": {
+        "id": "BEFTA_CASETYPE_1_1",
+        "name": "BEFTA Case Type 1 1",
+        "description": "Create a case of type BEFTA_CASETYPE_1_1",
+        "jurisdiction": {
+          "id": "BEFTA_JURISDICTION_1",
+          "name": "BEFTA_JURISDICTION_1",
+          "description": "Content for the Test Jurisdiction."
+        },
+        "printEnabled": false
+      },
+      "tabs": "[[ANY]]",
+      "metadataFields": "[[ANY]]",
+      "state": "[[ANY]]",
+      "triggers": "[[ANY]]",
+      "events": [
+        {
+          "id": "[[ANY]]",
+          "timestamp": "[[ANY]]",
+          "summary": "",
+          "comment": "",
+          "event_id": "CREATE",
+          "event_name": "Create a new case",
+          "user_id": "[[ANY]]",
+          "user_last_name": "Test",
+          "user_first_name": "User",
+          "state_name": "To do",
+          "state_id": "TODO",
+          "significant_item": null
+        }
+      ]
+    }
+  }
+}
