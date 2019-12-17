@@ -1,14 +1,8 @@
 package uk.gov.hmcts.ccd.data.caseaccess;
 
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.List;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Mockito.verify;
-import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +12,13 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.BaseTest;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
+import static org.mockito.Mockito.verify;
+
 @Transactional
-public class CaseUserRepositoryTest extends BaseTest {
+public class DefaultCaseUserRepositoryTest extends BaseTest {
 
     private static final String COUNT_CASE_USERS = "select count(*) from case_users where case_data_id = ? and user_id = ? and case_role = ?";
 
@@ -41,7 +40,7 @@ public class CaseUserRepositoryTest extends BaseTest {
     private CaseUserAuditRepository auditRepository;
 
     @Autowired
-    private CaseUserRepository repository;
+    private DefaultCaseUserRepository repository;
 
     @Before
     public void setUp() {

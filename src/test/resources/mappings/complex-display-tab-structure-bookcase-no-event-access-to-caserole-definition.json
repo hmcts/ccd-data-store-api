@@ -1,0 +1,248 @@
+{
+  "request" : {
+    "method" : "GET",
+    "url" : "/api/display/tab-structure/TestAddressBookNoEventAccessToCaseRole?version=33"
+  },
+  "response" : {
+    "status" : 200,
+    "headers" : {
+      "Content-Type" : "application/json"
+    },
+    "jsonBody" : {
+      "case_type_id" : "TestAddressBookNoEventAccessToCaseRole",
+      "channels" : [],
+      "tabs" : [{
+        "id" : "CompanyTab",
+        "label" : "Company",
+        "order" : 1,
+        "tab_fields" : [{
+          "case_field" : {
+            "id" : "Company",
+            "case_type_id" : "TestAddressBookNoEventAccessToCaseRole",
+            "label" : "Company",
+            "field_type" : {
+              "id" : "Company",
+              "type" : "Complex",
+              "fixed_list_items" : [],
+              "complex_fields" : [
+                {
+                  "id" : "Name",
+                  "label" : "Name",
+                  "field_type" : {
+                    "id" : "Text",
+                    "type" : "Text",
+                    "fixed_list_items" : [],
+                    "complex_fields" : []
+                  },
+                  "hidden" : false
+                }, {
+                  "id" : "PostalAddress",
+                  "label" : "Postal Address",
+                  "field_type" : {
+                    "id" : "Address",
+                    "type" : "Complex",
+                    "fixed_list_items" : [],
+                    "complex_fields" : [{
+                      "id" : "AddressLine1",
+                      "label" : "Address Line 1",
+                      "field_type" : {
+                        "id" : "Text",
+                        "type" : "Text",
+                        "fixed_list_items" : [],
+                        "complex_fields" : []
+                      },
+                      "hidden" : false
+                    }, {
+                      "id" : "AddressLine2",
+                      "label" : "Address Line 2",
+                      "field_type" : {
+                        "id" : "Text",
+                        "type" : "Text",
+                        "fixed_list_items" : [],
+                        "complex_fields" : []
+                      },
+                      "hidden" : false
+                    }, {
+                      "id" : "AddressLine3",
+                      "label" : "Address Line 3",
+                      "field_type" : {
+                        "id" : "Text",
+                        "type" : "Text",
+                        "fixed_list_items" : [],
+                        "complex_fields" : []
+                      },
+                      "hidden" : false
+                    }, {
+                      "id" : "Country",
+                      "label" : "Country",
+                      "field_type" : {
+                        "id" : "Text",
+                        "type" : "Text",
+                        "fixed_list_items" : [],
+                        "complex_fields" : []
+                      },
+                      "hidden" : false
+                    }, {
+                      "id" : "Postcode",
+                      "label" : "Postcode",
+                      "field_type" : {
+                        "id" : "Postcode",
+                        "type" : "Postcode",
+                        "fixed_list_items" : [],
+                        "complex_fields" : []
+                      },
+                      "hidden" : false
+                    }, {
+                      "id" : "Occupant",
+                      "label" : "Occupant",
+                      "field_type" : {
+                        "id" : "Person",
+                        "type" : "Complex",
+                        "fixed_list_items" : [],
+                        "complex_fields" : [
+                          {
+                            "id" : "Title",
+                            "label" : "Title",
+                            "field_type" : {
+                              "id" : "Text",
+                              "type" : "Text",
+                              "fixed_list_items" : [],
+                              "complex_fields" : []
+                            },
+                            "hidden" : false
+                          }, {
+                            "id" : "FirstName",
+                            "label" : "First Name",
+                            "field_type" : {
+                              "id" : "Text",
+                              "type" : "Text",
+                              "fixed_list_items" : [],
+                              "complex_fields" : []
+                            },
+                            "hidden" : false
+                          }, {
+                            "id" : "MiddleName",
+                            "label" : "Middle Name",
+                            "field_type" : {
+                              "id" : "Text",
+                              "type" : "Text",
+                              "fixed_list_items" : [],
+                              "complex_fields" : []
+                            },
+                            "hidden" : false
+                          }, {
+                            "id" : "LastName",
+                            "label" : "Last Name",
+                            "field_type" : {
+                              "id" : "Text",
+                              "type" : "Text",
+                              "fixed_list_items" : [],
+                              "complex_fields" : []
+                            },
+                            "hidden" : false
+                          }, {
+                            "id" : "DateOfBirth",
+                            "label" : "Date Of Birth",
+                            "field_type" : {
+                              "id" : "Date",
+                              "type" : "Date",
+                              "fixed_list_items" : [],
+                              "complex_fields" : []
+                            },
+                            "hidden" : false
+                          }, {
+                            "id" : "NationalInsuranceNumber",
+                            "label" : "National Insurance Number",
+                            "field_type" : {
+                              "id" : "Text",
+                              "type" : "Text",
+                              "fixed_list_items" : [],
+                              "complex_fields" : []
+                            },
+                            "hidden" : false
+                          }, {
+                            "id" : "MarritalStatus",
+                            "label" : "Marrital Status",
+                            "field_type" : {
+                              "id" : "FixedList",
+                              "type" : "FixedList",
+                              "fixed_list_items" : [{
+                                "code" : "MARRIAGE",
+                                "label" : "Marriage"
+                              }, {
+                                "code" : "CIVIL_PARTNERSHIP",
+                                "label" : "Civil Partnership"
+                              }, {
+                                "code" : "SINGLE",
+                                "label" : "Single"
+                              }, {
+                                "code" : "WIDOW",
+                                "label" : "Widow"
+                              }
+                              ],
+                              "complex_fields" : []
+                            },
+                            "hidden" : false
+                          }
+                        ]
+                      },
+                      "hidden" : false
+                    }
+                    ]
+                  },
+                  "hidden" : false
+                }
+              ]
+            },
+            "hidden" : false,
+            "security_label" : null,
+            "live_from" : null,
+            "live_until" : null,
+            "acls": [
+              {
+                "role": "caseworker-probate-public",
+                "create": true,
+                "read": true,
+                "update": true,
+                "delete": false
+              }
+            ]
+          },
+          "order" : 1
+        }
+        ]
+      },
+        {
+          "id" : "OtherInfoTab",
+          "label" : "Other Info",
+          "order" : 2,
+          "tab_fields" : [{
+            "case_field" : {
+              "id" : "OtherInfo",
+              "case_type_id" : "TestAddressBookNoEventAccessToCaseRole",
+              "label" : "Other Info",
+              "field_type" : {
+                "id" : "Text",
+                "type" : "Text",
+                "fixed_list_items" : [],
+                "complex_fields" : []
+              },
+              "hidden" : false,
+              "acls": [
+                {
+                  "role": "caseworker-probate-public",
+                  "create": true,
+                  "read": true,
+                  "update": true,
+                  "delete": false
+                }
+              ]
+            },
+            "order" : 1
+          }
+          ]
+        }
+      ]
+    }
+  }
+}

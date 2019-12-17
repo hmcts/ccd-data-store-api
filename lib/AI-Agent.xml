@@ -36,7 +36,7 @@
             <Method name="auditGrant"/>
             <Method name="auditRevoke"/>
         </Class>
-        <Class name="uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository">
+        <Class name="uk.gov.hmcts.ccd.data.caseaccess.DefaultCaseUserRepository">
             <Method name="grantAccess"/>
             <Method name="revokeAccess"/>
             <Method name="findCasesUserIdHasAccessTo"/>

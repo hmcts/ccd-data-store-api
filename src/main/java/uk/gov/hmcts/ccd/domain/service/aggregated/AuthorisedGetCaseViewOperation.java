@@ -1,8 +1,10 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
-
+import java.util.Arrays;
+import java.util.Set;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -17,11 +19,8 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
-import java.util.Arrays;
-import java.util.Set;
-
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
 
 @Service
 @Qualifier(AuthorisedGetCaseViewOperation.QUALIFIER)
@@ -36,7 +35,7 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
         @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
         final AccessControlService accessControlService,
         final @Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
-        final CaseUserRepository caseUserRepository,
+        final @Qualifier(CachedCaseUserRepository.QUALIFIER) CaseUserRepository caseUserRepository,
         final @Qualifier(CachedCaseDetailsRepository.QUALIFIER) CaseDetailsRepository caseDetailsRepository) {
         super(caseDefinitionRepository, accessControlService, userRepository, caseUserRepository, caseDetailsRepository);
         this.getCaseViewOperation = getCaseViewOperation;
