@@ -1,5 +1,5 @@
 {
-  "title": "should retrieve search inputs",
+  "title": "should retrieve search inputs for dynamic display",
 
   "_guid_": "S-215",
   "_extends_": "F-063_Base_Test_Data",

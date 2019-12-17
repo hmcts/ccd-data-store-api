@@ -5,7 +5,7 @@ Feature: F-063: Retrieve search input details for dynamic display
     Given an appropriate test context as detailed in the test data source
 
   @S-215
-  Scenario: should retrieve search inputs
+  Scenario: should retrieve search inputs for dynamic display
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
     And the request [contains a valid case type]
