@@ -7,7 +7,8 @@ Feature: F-067: Retrieve a CaseView Event by case and event id for dynamic displ
   @S-212
   Scenario: should retrieve case view when the case reference and case event exists
     Given a user with [an active profile in CCD]
-    And a case that has just been created as in [Befta_Default_Full_Case_Creation_Data]
+    Given a successful call [to create a token for case creation as Caseworker1] as in [Befta_Default_Token_Creation_Data_For_Case_Creation]
+    And another successful call [to create a full case as a Caseworker1] as in [Befta_Default_Full_Case_Creation_Data]
     And a successful call [to get the details about case event for the case just created] as in [some file]
     When a request is prepared with appropriate values
     And the request [contains the reference of the case just created and the event id valid for that case]
