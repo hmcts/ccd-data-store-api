@@ -24,18 +24,8 @@
     }
   },
   "expectedResponse": {
-    "responseCode": 200,
+    "_extends_": "Common_200_Response",
     "headers": {
-      "X-Frame-Options": "[[ANY]]",
-      "Transfer-Encoding": "[[ANY]]",
-      "Cache-Control": "[[ANY]]",
-      "X-Content-Type-Options": "[[ANY]]",
-      "X-XSS-Protection": "[[ANY]]",
-      "Content-Encoding": "[[ANY]]",
-      "vary": "[[ANY]]",
-      "Expires": "[[ANY]]",
-      "Pragma": "[[ANY]]",
-      "Date": "[[ANY]]",
       "Content-Type": "[[ANY]]",
       "Content-Length": "[[ANY]]"
     },
