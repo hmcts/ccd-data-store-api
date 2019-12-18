@@ -19,8 +19,7 @@
     }
   },
   "expectedResponse": {
-    "responseCode": 200,
-    "responseMessage": "Created",
+    "_extends_": "Common_200_Response",
     "headers": {
       "_extends_": "Common_Response_Headers",
       "Content-Length": "[[ANY]]",
