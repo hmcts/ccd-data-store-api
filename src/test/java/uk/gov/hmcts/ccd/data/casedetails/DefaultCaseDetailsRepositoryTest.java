@@ -6,8 +6,10 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -16,6 +18,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
+import com.google.common.collect.Maps;
 import org.hamcrest.MatcherAssert;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,10 +26,13 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.BaseTest;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
+import uk.gov.hmcts.ccd.data.casedetails.search.SortOrderField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
@@ -55,6 +61,9 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
     @Inject
     @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
     private CaseDetailsRepository caseDetailsRepository;
+
+    @Inject
+    private ApplicationParams applicationParams;
 
     @Before
     public void setUp() {
@@ -126,6 +135,70 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
             () -> assertThat(byReference.getData().get("PersonAddress").get("AddressLine2").asText(), is("Fake Street")),
             () -> assertThat(byReference.getData().get("PersonAddress").get("AddressLine3").asText(), is("Hexton"))
         );
+    }
+
+    @Test
+    public void sanitisesInputs() {
+        String evil = "foo');insert into case users values(1,2,3);--";
+        when(authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds("PROBATE", "TestAddressBookCase", CAN_READ))
+            .thenReturn(asList(evil));
+
+        when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.GRANTED);
+        when(userAuthorisation.getUserId()).thenReturn(evil);
+
+        MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
+        final PaginatedSearchMetadata byMetaData = caseDetailsRepository.getPaginatedSearchMetadata(metadata, Maps.newHashMap());
+
+        // If any input is not correctly sanitized it will cause an exception since query result structure will not be as hibernate expects.
+        assertThat(byMetaData.getTotalResultsCount(), is(0));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
+    public void findByWildcardReturnCorrectRecords() {
+        ReflectionTestUtils.setField(applicationParams, "wildcardSearchAllowed", true);
+        MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
+
+        Map<String, String> params = Maps.newHashMap();
+        params.put("PersonFirstName", "%An%");
+        final PaginatedSearchMetadata byMetaData = caseDetailsRepository.getPaginatedSearchMetadata(metadata, params);
+        // See case types and citizen names in insert_cases.sql to understand this result.
+        assertThat(byMetaData.getTotalResultsCount(), is(5));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
+    public void getFindByMetadataReturnCorrectRecords() {
+        assumeDataInitialised();
+
+        MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
+        final PaginatedSearchMetadata byMetaData = caseDetailsRepository.getPaginatedSearchMetadata(metadata, Maps.newHashMap());
+        assertThat(byMetaData.getTotalResultsCount(), is(7));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
+    public void getFindByMetadataAndFieldDataSortDesc() {
+        assumeDataInitialised();
+
+        MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
+        metadata.setSortDirection(Optional.of("Asc"));
+        SortOrderField sortOrderField = SortOrderField.sortOrderWith()
+            .caseFieldId("[LAST_MODIFIED_DATE]")
+            .metadata(true)
+            .direction("DESC")
+            .build();
+        metadata.addSortOrderField(sortOrderField);
+
+        HashMap<String, String> searchParams = new HashMap<>();
+        searchParams.put("PersonFirstName", "Janet");
+        final List<CaseDetails> byMetaDataAndFieldData = caseDetailsRepository.findByMetaDataAndFieldData(metadata,
+            searchParams);
+
+        // See the timestamps in insert_cases.sql.
+        // Should be ordered by last modified desc, creation date asc.
+        assertThat(byMetaDataAndFieldData.get(0).getId(), is("16"));
+        assertThat(byMetaDataAndFieldData.get(1).getId(), is("1"));
     }
 
     @Test
@@ -238,6 +311,23 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
                 hasProperty("reference", equalTo(1504254784737847L))
             )))
         );
+        assertThat(caseDetailsRepository.getPaginatedSearchMetadata(metadata, searchParams).getTotalResultsCount(), is(1));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {
+        "classpath:sql/insert_cases.sql",
+        "classpath:sql/insert_case_with_restricted_state.sql"
+    })
+    public void searchWithParams_restrictedStates() {
+        when(authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds("PROBATE", "TestAddressBookCase", CAN_READ))
+            .thenReturn(asList("CaseRestricted"));
+
+        MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
+        final List<CaseDetails> results = caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap());
+
+        assertThat(results.size(), is(1));
+        assertThat(results.get(0).getReference(), is(1504254784737848L));
     }
 
     @Test

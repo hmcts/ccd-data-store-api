@@ -12,6 +12,7 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.junit.Assert.assertThat;
@@ -143,8 +144,8 @@ class CompoundFieldOrderServiceTest {
     }
 
     @Test
-    @DisplayName("should override top level case fields order from case event complex fields order")
-    void shouldOverrideTopLevelCaseFieldsOrderFromCaseEventComplexFieldsOrder() {
+    @DisplayName("should override top level case fields order from case event complex fields order even if duplicates exist")
+    void shouldOverrideTopLevelCaseFieldsOrderFromCaseEventComplexFieldsOrderEvenIfDuplicatesExist() {
         FieldType collectionComplexFieldType = aFieldType()
             .withType(COMPLEX)
             .withComplexField(simpleField("One", 1))
@@ -157,13 +158,16 @@ class CompoundFieldOrderServiceTest {
                                     .withCollectionFieldType(collectionComplexFieldType)
                                     .build());
 
-        List<CaseEventFieldComplex> caseEventComplexFields = Lists.newArrayList(builder().reference("One").order(3).build(),
-                                                                                builder().reference("Two").order(2).build(),
+        List<CaseEventFieldComplex> caseEventComplexFields = Lists.newArrayList(builder().reference("One").order(5).build(),
+                                                                                builder().reference("One").order(6).build(),
+                                                                                builder().reference("Two").order(3).build(),
+                                                                                builder().reference("Two").order(4).build(),
                                                                                 builder().reference("Three").order(1).build());
 
         compoundFieldOrderService.sortNestedFieldsFromCaseEventComplexFields(CASE_FIELD, caseEventComplexFields, ROOT);
 
         List<CaseField> complexFields = CASE_FIELD.getFieldType().getChildren();
+        assertThat(complexFields, is(hasSize(3)));
         assertThat(complexFields, contains(allOf(hasProperty("id", is("Three")),
                                                  hasProperty("order", is(3))),
                                            allOf(hasProperty("id", is("Two")),
