@@ -22,8 +22,7 @@
     "_extends_": "Common_404_Response",
     "headers": {
       "Content-Length": "[[ANY]]",
-      "Content-Encoding": "gzip",
-      "Connection": "close"
+      "Content-Encoding": "gzip"
     },
     "body": {
       "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
