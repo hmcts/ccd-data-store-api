@@ -17,6 +17,9 @@ Feature: F-067: Retrieve a CaseView Event by case and event id for dynamic displ
     And the response [contains HTTP 200 Ok]
     And the response has all other details as expected
 
+  @S-211 @Ignore #This is an invalid scenario with respect to this endpoint.
+  Scenario: should retrieve case view history when the case reference exists
+
   @S-210
   Scenario: should get 404 when case reference does NOT exist
     Given a user with [an active profile in CCD]
