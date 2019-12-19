@@ -27,6 +27,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
@@ -60,6 +61,9 @@ class DefaultGetCaseHistoryViewOperationTest {
 
     @Mock
     private UIDService uidService;
+
+    @Mock
+    private CompoundFieldOrderService compoundFieldOrderService;
 
     @InjectMocks
     private DefaultGetCaseHistoryViewOperation defaultGetCaseHistoryViewOperation;
