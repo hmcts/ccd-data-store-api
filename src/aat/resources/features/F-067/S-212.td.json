@@ -22,16 +22,7 @@
     "responseCode": 200,
     "responseMessage": "OK",
     "headers": {
-      "Content-Length": "[[ANY]]",
-      "Content-Type": "[[ANY]]",
-      "Transfer-Encoding": "[[ANY]]",
-      "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
-      "Date" : "[[ANY]]",
-      "Expires" : "0",
-      "Pragma" : "no-cache",
-      "X-Content-Type-Options" : "nosniff",
-      "X-Frame-Options" : "DENY",
-      "X-XSS-Protection" : "1; mode=block"
+      "_extends_": "Common_Response_Headers"
     },
     "body": {
       "tabs": [

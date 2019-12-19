@@ -27,15 +27,8 @@
     "responseCode": 200,
     "responseMessage": "OK",
     "headers": {
-      "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
-      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-case-view.v2+json;charset=UTF-8",
-      "Date": "[[ANY]]",
-      "Expires": "0",
-      "Pragma": "no-cache",
-      "Transfer-Encoding": "chunked",
-      "X-Content-Type-Options": "nosniff",
-      "X-Frame-Options": "DENY",
-      "X-XSS-Protection": "1; mode=block"
+      "_extends_": "Common_Response_Headers",
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-case-view.v2+json;charset=UTF-8"
     },
     "body": {
       "_links": {
