@@ -5,7 +5,7 @@ Background:
     Given an appropriate test context as detailed in the test data source
 
   @S-070
-  Scenario: must return 200 and list of case data for the given search criteria
+  Scenario: must return 200 and a list of case data for the given search criteria
     Given a successful call [to create a token for case creation as a citizen] as in [Citizen_Token_Creation_Data_For_Case_Creation]
     And another successful call [to create a full case as a citizen] as in [Citizen_Full_Case_Creation_Data]
     And a user with [an active profile in CCD]
@@ -13,7 +13,7 @@ Background:
     And the request [contains correct input path variables]
     And it is submitted to call the [get case data for a given case type for citizen] operation of [CCD Data Store]
     Then a positive response is received
-    And the response [contains the case details, along with a HTTP 200 OK]
+    And the response [contains the case details, along with an HTTP 200 OK]
     And the response has all other details as expected
 
 
