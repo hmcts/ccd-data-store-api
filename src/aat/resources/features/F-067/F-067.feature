@@ -23,7 +23,7 @@ Feature: F-067: Retrieve a CaseView Event by case and event id for dynamic displ
   @S-210
   Scenario: should get 404 when case reference does NOT exist
     Given a user with [an active profile in CCD]
-    Given a successful call [to create a token for case creation as Caseworker1] as in [Befta_Default_Token_Creation_Data_For_Case_Creation]
+    And a successful call [to create a token for case creation as Caseworker1] as in [Befta_Default_Token_Creation_Data_For_Case_Creation]
     And another successful call [to create a full case as a Caseworker1] as in [Befta_Default_Full_Case_Creation_Data]
     When a request is prepared with appropriate values
     And it is submitted to call the [Retrieve an event by case and event IDs for dynamic display] operation of [CCD Data Store]
