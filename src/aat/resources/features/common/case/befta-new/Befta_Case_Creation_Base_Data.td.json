@@ -7,7 +7,7 @@
 	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
 
 	"specs": [
-		"to create a full case as a Caseworker1"
+		"to create a full case"
 	],
 
 	"request": {
