@@ -23,7 +23,7 @@
     "headers": {
       "Content-Length": "[[ANY]]",
       "Content-Encoding": "gzip",
-      "Connection": "close"
+      "Content-Type" : "[[ANY]]"
     },
     "body": {
       "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
