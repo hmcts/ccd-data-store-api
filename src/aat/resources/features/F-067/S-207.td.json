@@ -1,0 +1,31 @@
+{
+  "title": "must return negative response when request does not provide valid authentication credentials",
+	"_guid_": "S-207",
+	"_extends_": "F-067_Test_Data_Base",
+
+	"specs": [
+		"an active profile in CCD",
+		"does not provide valid authentication credentials",
+		"includes a HTTP 403 Forbidden"
+	],
+  "request": {
+    "headers": {
+      "Authorization": "eyJhbGciOiJIUzI1NiJ9"
+    },
+    "pathVariables": {
+      "cid": "AnInvalidCaseID",
+      "eventId": "SomeEventID"
+    }
+  },
+	"expectedResponse": {
+		"_extends_": "Common_403_Response",
+		"headers": {
+			"Content-Encoding": "gzip",
+			"Content-Type": "application/json;charset=UTF-8",
+      "Content-Length" : "[[ANY]]"
+    },
+		"body": {
+			"message": "Access Denied"
+		}
+	}
+}
