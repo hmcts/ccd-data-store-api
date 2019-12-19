@@ -1,0 +1,49 @@
+{
+  "title": "must return 201 if the grant is successful for a user to a valid case ID",
+  "_guid_": "S-210",
+  "_extends_": "F-067_Test_Data_Base",
+  "specs": [
+    "an active profile in CCD",
+    "contains the reference of the case just created and the event id valid for that case",
+    "contains HTTP 404 Not Found"
+  ],
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers",
+      "experimental": true,
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-event-view.v2+json;charset=UTF-8"
+    },
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][Befta_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}",
+      "eventId": "-999999999"
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 404,
+    "responseMessage": "Not Found",
+    "headers": {
+      "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+      "Content-Encoding": "gzip",
+      "Content-Type": "application/json;charset=UTF-8",
+      "Date": "Thu, 19 Dec 2019 10:24:24 GMT",
+      "Expires": "0",
+      "Pragma": "no-cache",
+      "Transfer-Encoding": "chunked",
+      "vary": "accept-encoding",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY",
+      "X-XSS-Protection": "1; mode=block"
+    },
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "timestamp": "[[ANY]]",
+      "status": 404,
+      "error": "Not Found",
+      "message": "Event not found",
+      "path": "/internal/cases/1576751064864879/events/-999999999",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}
