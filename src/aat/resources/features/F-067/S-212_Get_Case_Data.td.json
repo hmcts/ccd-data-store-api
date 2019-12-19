@@ -24,50 +24,51 @@
     }
   },
   "expectedResponse": {
-    "responseCode": 200,
-    "responseMessage": "OK",
+    "_extends_": "Common_200_Response",
     "headers": {
-      "_extends_": "Common_Response_Headers",
-      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-case-view.v2+json;charset=UTF-8"
-    },
-    "body": {
-      "_links": {
-        "self": {
-          "href": "[[ANY]]"
-        }
-      },
-      "case_id": "[[ANY]]",
-      "case_type": {
-        "id": "BEFTA_CASETYPE_1_1",
-        "name": "BEFTA Case Type 1 1",
-        "description": "Create a case of type BEFTA_CASETYPE_1_1",
-        "jurisdiction": {
-          "id": "BEFTA_JURISDICTION_1",
-          "name": "BEFTA_JURISDICTION_1",
-          "description": "Content for the Test Jurisdiction."
+      "Content-Length": "[[ANY]]",
+      "Content-Encoding": "gzip",
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-case-view.v2+json;charset=UTF-8",
+      "body": {
+        "_links": {
+          "self": {
+            "href": "[[ANY]]"
+          }
         },
-        "printEnabled": false
-      },
-      "tabs": "[[ANY]]",
-      "metadataFields": "[[ANY]]",
-      "state": "[[ANY]]",
-      "triggers": "[[ANY]]",
-      "events": [
-        {
-          "id": "[[ANY]]",
-          "timestamp": "[[ANY]]",
-          "summary": "",
-          "comment": "",
-          "event_id": "CREATE",
-          "event_name": "Create a new case",
-          "user_id": "[[ANY]]",
-          "user_last_name": "[[ANY]]",
-          "user_first_name": "[[ANY]]",
-          "state_name": "To do",
-          "state_id": "TODO",
-          "significant_item": null
-        }
-      ]
+        "case_id": "[[ANY]]",
+        "case_type": {
+          "id": "BEFTA_CASETYPE_1_1",
+          "name": "BEFTA Case Type 1 1",
+          "description": "Create a case of type BEFTA_CASETYPE_1_1",
+          "jurisdiction": {
+            "id": "BEFTA_JURISDICTION_1",
+            "name": "BEFTA_JURISDICTION_1",
+            "description": "Content for the Test Jurisdiction."
+          },
+          "printEnabled": false
+        },
+        "tabs": "[[ANY]]",
+        "metadataFields": "[[ANY]]",
+        "state": "[[ANY]]",
+        "triggers": "[[ANY]]",
+        "events": [
+          {
+            "id": "[[ANY]]",
+            "timestamp": "[[ANY]]",
+            "summary": "",
+            "comment": "",
+            "event_id": "CREATE",
+            "event_name": "Create a new case",
+            "user_id": "[[ANY]]",
+            "user_last_name": "[[ANY]]",
+            "user_first_name": "[[ANY]]",
+            "state_name": "To do",
+            "state_id": "TODO",
+            "significant_item": null
+          }
+        ]
+      }
     }
   }
 }
+
