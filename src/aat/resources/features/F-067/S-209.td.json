@@ -5,7 +5,7 @@
   "specs": [
     "an active profile in CCD",
     "contains the reference of the case just created and the event id valid for that case",
-    "contains HTTP 200 Ok"
+    "contains HTTP 400 Bad Request"
   ],
   "request": {
     "headers": {
