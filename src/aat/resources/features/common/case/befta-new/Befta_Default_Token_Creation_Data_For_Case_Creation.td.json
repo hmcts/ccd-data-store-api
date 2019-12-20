@@ -7,7 +7,7 @@
     "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
 
 	"specs": [
-		"to create a token for case creation as Caseworker1"
+		"to create a token for case creation"
 	],
 
 	"users": {
