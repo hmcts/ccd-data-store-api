@@ -1,0 +1,18 @@
+{
+  "_guid_": "F-047_Test_Data_Base",
+  "productName": "CCD Data Store",
+  "operationName": "Get case ids",
+  "method": "GET",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/ids?userId=F047UserIdSiva",
+  "user": {
+    "_extends_": "Common_User_For_Request"
+  },
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "uid": "[[DYNAMIC]]",
+      "jid": "AUTOTEST1",
+      "ctid": "AAT"
+    }
+  }
+}
