@@ -473,7 +473,7 @@ jsonSchema2Pojo {
 }
 
 jacoco {
-    toolVersion = "0.8.4"
+    toolVersion = "0.8.0"
 }
 
 sonarqube {
@@ -638,7 +638,7 @@ task functional(type: Test) {
     setClasspath(sourceSets.aat.runtimeClasspath)
     include "uk/gov/hmcts/ccd/datastore/tests/functional/**"
     include "uk/gov/hmcts/ccd/datastore/tests/v2/**"
-//    useJUnitPlatform()
+    useJUnitPlatform()
 
     doFirst {
         generateCucumberReports.enabled = true
@@ -646,10 +646,12 @@ task functional(type: Test) {
             main = "io.cucumber.core.cli.Main"
             classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
             args = ['--plugin', "json:${projectDir}/target/cucumber.json", '--tags', 'not @Ignore', '--glue',
-                    'uk.gov.hmcts.ccd.fta.steps', 'src/aat/resources/features/F-054']
+                    'uk.gov.hmcts.ccd.fta.steps', 'src/aat/resources/features']
         }
     }
 }
+
+
 def timestamp() {
     def date = new Date()
     return date.format('yyyy-MM-dd HH:mm:ss')
