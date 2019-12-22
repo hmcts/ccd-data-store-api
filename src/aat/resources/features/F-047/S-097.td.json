@@ -5,7 +5,6 @@
 
   "specs": [
     "an active profile in CCD",
-    "contains as input a valid case-reference that exists in CCD",
     "contains a list of case ids, along with an HTTP-200 OK"
   ],
 
@@ -13,11 +12,6 @@
     "responseCode" : 200,
     "responseMessage" : "OK",
     "headers" : {
-      "Content-Type" : "application/json;charset=UTF-8",
-      "Content-Encoding" : "gzip",
-      "Transfer-Encoding" : "chunked",
-      "_extends_": "Common_Response_Headers",
-      "Content-Length" : "[[ANY]]",
       "Vary" : "Accept-Encoding"
     },
     "body":  {
