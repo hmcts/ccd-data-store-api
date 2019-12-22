@@ -33,7 +33,7 @@ Feature: F-047: Get case ids
       And the request [does not provide valid authentication credentials]
       And it is submitted to call the [Get case ids] operation of [CCD Data Store]
       Then a negative response is received
-      And the response [has the 403 return code]
+      And the response [contains an HTTP 403 Forbidden]
       And the response has all other details as expected
 
     @S-100
@@ -43,6 +43,6 @@ Feature: F-047: Get case ids
       And the request [does not provide authorised access to the operation]
       And it is submitted to call the [Get case ids] operation of [CCD Data Store]
       Then a negative response is received
-      And the response [has the 403 return code]
+      And the response [contains an HTTP 403 Forbidden]
       And the response has all other details as expected
 
