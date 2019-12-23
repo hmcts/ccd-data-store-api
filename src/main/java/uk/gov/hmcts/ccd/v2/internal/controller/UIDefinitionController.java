@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.v2.internal.controller;
 
+import com.google.common.collect.Lists;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -131,7 +132,9 @@ public class UIDefinitionController {
         )
     })
     public ResponseEntity<UIBannerResource> getBanners(@RequestParam("ids") Optional<List<String>> idsOptional) {
-        List<Banner> listOfBanners = getBannerOperation.execute(idsOptional.get());
+        List<Banner> listOfBanners = idsOptional.isPresent()
+                                        ? getBannerOperation.execute(idsOptional.get())
+                                        : Lists.newArrayList();
         return ResponseEntity.ok(new UIBannerResource(listOfBanners));
     }
 }
