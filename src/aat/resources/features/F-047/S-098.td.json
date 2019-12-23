@@ -10,7 +10,7 @@
 
   "request": {
     "queryParams": {
-      "userid": "NoAccessGrantedForCase"
+      "userId": "NoAccessGrantedForCase"
     }
   },
   "expectedResponse": {

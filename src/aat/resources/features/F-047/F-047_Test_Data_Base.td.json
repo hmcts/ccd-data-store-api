@@ -15,7 +15,7 @@
       "ctid": "AAT"
     },
     "queryParams": {
-      "userid": "F047UserIdTest"
+      "userId": "F047UserIdTest"
     }
   },
   "expectedResponse": {
