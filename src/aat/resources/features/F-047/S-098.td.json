@@ -2,7 +2,6 @@
   "title": "must return 200 and an empty list of no case is found",
   "_guid_": "S-098",
   "_extends_": "F-047_Test_Data_Base",
-
   "specs": [
     "an active profile in CCD",
     "contains an userId which doesn't have access to the case",
@@ -15,13 +14,13 @@
     }
   },
   "expectedResponse": {
-    "responseCode" : 200,
-    "responseMessage" : "OK",
-    "headers" : {
-      "Vary" : "Accept-Encoding"
+    "responseCode": 200,
+    "responseMessage": "OK",
+    "headers": {
+      "Vary": "Accept-Encoding"
     },
-    "body":  {
-      "arrayInMap" : [ ]
+    "body": {
+      "arrayInMap": []
     }
   }
 }

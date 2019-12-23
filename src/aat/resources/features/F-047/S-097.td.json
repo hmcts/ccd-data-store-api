@@ -2,20 +2,19 @@
   "title": "must return 200 and a list of case ids a user has access to",
   "_guid_": "S-097",
   "_extends_": "F-047_Test_Data_Base",
-
   "specs": [
     "an active profile in CCD",
     "contains a list of case ids, along with an HTTP-200 OK"
   ],
 
   "expectedResponse": {
-    "responseCode" : 200,
-    "responseMessage" : "OK",
-    "headers" : {
-      "Vary" : "Accept-Encoding"
+    "responseCode": 200,
+    "responseMessage": "OK",
+    "headers": {
+      "Vary": "Accept-Encoding"
     },
-    "body":  {
-      "arrayInMap" : "[[ANY]]"
+    "body": {
+      "arrayInMap": "[[ANY]]"
     }
   }
 }
