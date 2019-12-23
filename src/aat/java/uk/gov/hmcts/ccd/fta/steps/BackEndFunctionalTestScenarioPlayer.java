@@ -148,6 +148,7 @@ public class BackEndFunctionalTestScenarioPlayer implements BackEndFunctionalTes
         }
 
         if (requestData.getPathVariables() != null) {
+            requestData.getPathVariables().forEach((pathVariable, value) -> scenario.write(pathVariable +"   :   value :   " + value));
             requestData.getPathVariables().forEach((pathVariable, value) -> aRequest.pathParam(pathVariable, value));
         }
 
