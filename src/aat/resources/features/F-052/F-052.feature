@@ -14,7 +14,6 @@ Background:
     And the response [contains the case details, along with an HTTP 200 OK]
     And the response has all other details as expected
 
-
   @S-071 @Ignore # Response code mismatch, expected: 401, actual: 403 RDM-6628
   Scenario: must return 401 when request does not provide valid authentication credentials
     Given a user with [an active profile in CCD]
@@ -44,4 +43,3 @@ Background:
     Then a negative response is received
     And the response [contains an HTTP 404 Not Found]
     And the response has all other details as expected
-
