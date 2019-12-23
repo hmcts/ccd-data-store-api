@@ -41,7 +41,6 @@ public class AuthorisedGetCaseOperation implements GetCaseOperation {
                                       @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
                                       final AccessControlService accessControlService,
                                       @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
-
                                       CaseUserRepository caseUserRepository) {
         this.getCaseOperation = getCaseOperation;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -89,11 +88,14 @@ public class AuthorisedGetCaseOperation implements GetCaseOperation {
             return Optional.empty();
         }
 
-        caseDetails.setData(
-            MAPPER.convertValue(
-            accessControlService.filterCaseFieldsByAccess(MAPPER.convertValue(caseDetails.getData(), JsonNode.class),
-                caseType.getCaseFields(), userRoles, CAN_READ, false), STRING_JSON_MAP));
-
+        caseDetails.setData(MAPPER.convertValue(
+            accessControlService.filterCaseFieldsByAccess(
+                MAPPER.convertValue(caseDetails.getData(), JsonNode.class),
+                caseType.getCaseFields(),
+                userRoles,
+                CAN_READ,
+                false),
+            STRING_JSON_MAP));
         caseDetails.setDataClassification(MAPPER.convertValue(
             accessControlService.filterCaseFieldsByAccess(
                 MAPPER.convertValue(caseDetails.getDataClassification(), JsonNode.class),
