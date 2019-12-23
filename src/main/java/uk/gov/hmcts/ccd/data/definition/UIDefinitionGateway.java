@@ -1,8 +1,6 @@
 package uk.gov.hmcts.ccd.data.definition;
 
 import java.util.List;
-
-import uk.gov.hmcts.ccd.domain.model.definition.Banner;
 import uk.gov.hmcts.ccd.domain.model.definition.BannersResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchInputDefinition;
