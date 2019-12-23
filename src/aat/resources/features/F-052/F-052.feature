@@ -17,7 +17,7 @@ Background:
     And the response has all other details as expected
 
 
-  @S-071 @Ignore # Response code mismatch, expected: 401, actual: 403
+  @S-071 @Ignore # Response code mismatch, expected: 401, actual: 403 RDM-6628
   Scenario: must return 401 when request does not provide valid authentication credentials
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
