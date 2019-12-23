@@ -5,7 +5,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import org.springframework.beans.factory.annotation.Qualifier;
-import uk.gov.hmcts.ccd.domain.model.definition.Banner;
 import uk.gov.hmcts.ccd.domain.model.definition.BannersResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchInputDefinition;
