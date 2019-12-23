@@ -12,6 +12,7 @@
       "cid": "${[scenarioContext][childContexts][Citizen_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
     }
   },
+
   "expectedResponse": {
     "_extends_": "Common_200_Response"
   }
