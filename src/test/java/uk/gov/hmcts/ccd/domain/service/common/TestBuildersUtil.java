@@ -1256,11 +1256,6 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public JurisdictionBuilder withBanner(Banner banner) {
-            jurisdiction.getBanners().add(banner);
-            return this;
-        }
-
         public Jurisdiction build() {
             return jurisdiction;
         }

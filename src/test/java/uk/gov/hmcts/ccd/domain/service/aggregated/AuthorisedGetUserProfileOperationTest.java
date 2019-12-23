@@ -72,9 +72,7 @@ class AuthorisedGetUserProfileOperationTest {
         List<Banner> banners = Arrays.asList(banner);
 
         test1JurisdictionDisplayProperties.setCaseTypes(caseTypes1);
-        test1JurisdictionDisplayProperties.setBanners(banners);
         test2JurisdictionDisplayProperties.setCaseTypes(caseTypes2);
-        test2JurisdictionDisplayProperties.setBanners(banners);
 
         doReturn(userRoles).when(userRepository).getUserRoles();
         doReturn(userProfile).when(getUserProfileOperation).execute(CAN_READ);
@@ -97,8 +95,7 @@ class AuthorisedGetUserProfileOperationTest {
             () -> assertThat(userProfile.getJurisdictions()[0].getCaseTypes(), everyItem(not(isIn(Arrays.asList(notAllowedCaseType))))),
             () -> assertThat(userProfile.getJurisdictions()[1].getCaseTypes(), everyItem(not(isIn(Arrays.asList(notAllowedCaseType))))),
             () -> assertThat(userProfile.getJurisdictions()[0].getCaseTypes().get(0).getStates().size(), is(3)),
-            () -> assertThat(userProfile.getJurisdictions()[0].getCaseTypes().get(0).getEvents().size(), is(4)),
-            () -> assertThat(userProfile.getJurisdictions()[0].getBanners().size(), is(1))
+            () -> assertThat(userProfile.getJurisdictions()[0].getCaseTypes().get(0).getEvents().size(), is(4))
         );
     }
 
@@ -111,9 +108,7 @@ class AuthorisedGetUserProfileOperationTest {
 
         assertAll(
             () -> assertThat(userProfile.getJurisdictions()[0].getCaseTypes().size(), is(0)),
-            () -> assertThat(userProfile.getJurisdictions()[1].getCaseTypes().size(), is(0)),
-            () -> assertThat(userProfile.getJurisdictions()[0].getBanners().size(), is(1)),
-            () -> assertThat(userProfile.getJurisdictions()[1].getBanners().size(), is(1))
+            () -> assertThat(userProfile.getJurisdictions()[1].getCaseTypes().size(), is(0))
         );
     }
 

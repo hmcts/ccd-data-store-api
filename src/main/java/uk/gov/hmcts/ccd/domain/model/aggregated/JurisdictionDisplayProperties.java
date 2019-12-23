@@ -13,8 +13,6 @@ public class JurisdictionDisplayProperties {
 
     private List<CaseType> caseTypes = new ArrayList<>();
 
-    private List<Banner> banners = new ArrayList<>();
-
     public String getId() {
         return id;
     }
@@ -45,13 +43,5 @@ public class JurisdictionDisplayProperties {
 
     public void setCaseTypes(List<CaseType> caseTypes) {
         this.caseTypes = caseTypes;
-    }
-
-    public List<Banner> getBanners() {
-        return banners;
-    }
-
-    public void setBanners(List<Banner> banners) {
-        this.banners = banners;
     }
 }

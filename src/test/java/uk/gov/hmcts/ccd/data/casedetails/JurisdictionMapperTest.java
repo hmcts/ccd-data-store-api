@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.data.casedetails;
 
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
-import uk.gov.hmcts.ccd.domain.model.definition.Banner;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
@@ -11,7 +10,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.BannerBuilder.newBanner;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseStateBuilder.newState;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.JurisdictionBuilder.newJurisdiction;
@@ -35,18 +33,10 @@ class JurisdictionMapperTest {
         .withState(caseState2)
         .build();
 
-    Banner banner = newBanner()
-        .withBannerDescription("Test Description")
-        .withBannerEnabled(true)
-        .withBannerUrlText("Click here to see it.>>>")
-        .withBannerUrl("http://localhost:3451/test")
-        .build();
-
     Jurisdiction jurisdiction = newJurisdiction()
         .withJurisdictionId("jid")
         .withName("name")
         .withDescription("description")
-        .withBanner(banner)
         .withCaseType(caseType1)
         .withCaseType(caseType2)
         .build();
@@ -59,10 +49,6 @@ class JurisdictionMapperTest {
             () -> assertThat(response.getId(), is(equalTo(jurisdiction.getId()))),
             () -> assertThat(response.getName(), is(equalTo(jurisdiction.getName()))),
             () -> assertThat(response.getDescription(), is(equalTo(jurisdiction.getDescription()))),
-            () -> assertThat(response.getBanners().get(0).getBannerEnabled(), is(equalTo(jurisdiction.getBanners().get(0).getBannerEnabled()))),
-            () -> assertThat(response.getBanners().get(0).getBannerDescription(), is(equalTo(jurisdiction.getBanners().get(0).getBannerDescription()))),
-            () -> assertThat(response.getBanners().get(0).getBannerUrl(), is(equalTo(jurisdiction.getBanners().get(0).getBannerUrl()))),
-            () -> assertThat(response.getBanners().get(0).getBannerUrlText(), is(equalTo(jurisdiction.getBanners().get(0).getBannerUrlText()))),
             () -> assertThat(response.getCaseTypes().size(), is(2)),
             () -> assertThat(response.getCaseTypes().get(0).getStates().size(), is(1)),
             () -> assertThat(response.getCaseTypes().get(1).getStates().get(0).getId(), is(caseState2.getId()))

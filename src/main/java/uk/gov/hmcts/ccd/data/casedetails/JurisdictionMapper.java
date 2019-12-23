@@ -14,7 +14,6 @@ public class JurisdictionMapper {
         result.setName(jurisdiction.getName());
         result.setDescription(jurisdiction.getDescription());
         result.setCaseTypes(jurisdiction.getCaseTypes());
-        result.setBanners(jurisdiction.getBanners());
         return result;
     }
 }

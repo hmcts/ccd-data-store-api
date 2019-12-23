@@ -21,8 +21,6 @@ public class Jurisdiction implements Serializable {
 
     private List<CaseType> caseTypes = new ArrayList<>();
 
-    private List<Banner> banners = new ArrayList<>();
-
     /**
      **/
     @ApiModelProperty(required = true, value = "")
@@ -95,15 +93,4 @@ public class Jurisdiction implements Serializable {
         this.caseTypes = caseTypes;
     }
 
-    /**
-     **/
-    @ApiModelProperty(value = "")
-    @JsonProperty("banners")
-    public List<Banner> getBanners() {
-        return banners;
-    }
-
-    public void setBanners(List<Banner> banners) {
-        this.banners = banners;
-    }
 }
