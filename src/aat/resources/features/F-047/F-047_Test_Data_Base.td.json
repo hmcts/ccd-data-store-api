@@ -3,7 +3,7 @@
   "productName": "CCD Data Store",
   "operationName": "Get case ids",
   "method": "GET",
-  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/ids?userId={userid}",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/ids?userId",
   "user": {
     "_extends_": "Common_User_For_Request"
   },
@@ -12,7 +12,9 @@
     "pathVariables": {
       "uid": "[[DYNAMIC]]",
       "jid": "AUTOTEST1",
-      "ctid": "AAT",
+      "ctid": "AAT"
+    },
+    "queryParams": {
       "userid": "F047UserIdTest"
     }
   },

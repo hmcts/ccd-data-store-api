@@ -10,7 +10,7 @@
   ],
 
   "request": {
-    "pathVariables": {
+    "queryParams": {
       "userid": "NoAccessGrantedForCase"
     }
   },
