@@ -41,6 +41,7 @@ public class AuthorisedGetCaseOperation implements GetCaseOperation {
                                       @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
                                       final AccessControlService accessControlService,
                                       @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
+
                                       CaseUserRepository caseUserRepository) {
         this.getCaseOperation = getCaseOperation;
         this.caseDefinitionRepository = caseDefinitionRepository;
