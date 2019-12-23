@@ -25,6 +25,7 @@
   "expectedResponse": {
     "_extends_": "Common_201_Response",
     "headers": {
+      "Vary" : "Accept-Encoding",
       "Content-Length": "[[ANY]]"
     }
   }
