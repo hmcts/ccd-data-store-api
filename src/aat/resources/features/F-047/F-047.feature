@@ -1,4 +1,4 @@
-@F-047 #Find case ids to which an user has grant access
+@F-047 #Find case ids to which an user has access to
 Feature: F-047: Get case ids
 
   Background: Load test data for the scenario
