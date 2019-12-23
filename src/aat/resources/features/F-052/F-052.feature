@@ -6,9 +6,7 @@ Background:
 
   @S-070
   Scenario: must return 200 and a list of case data for the given search criteria
-    Given a successful call [to create a token for case creation as a citizen] as in [Citizen_Token_Creation_Data_For_Case_Creation]
-    And another successful call [to create a full case as a citizen] as in [Citizen_Full_Case_Creation_Data]
-    And a user with [an active profile in CCD]
+    Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
     And the request [contains correct input path variables]
     And it is submitted to call the [get case data for a given case type for citizen] operation of [CCD Data Store]
