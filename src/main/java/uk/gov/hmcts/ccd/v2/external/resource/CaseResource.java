@@ -85,6 +85,12 @@ public class CaseResource extends ResourceSupport {
         add(linkTo(methodOn(CaseController.class).createEvent(reference, caseDataContent)).withSelfRel());
     }
 
+    public CaseResource(@NonNull CaseDetails caseDetails, @NotNull CaseDataContent caseDataContent, Boolean ignoreWarning) {
+        copyProperties(caseDetails);
+
+        add(linkTo(methodOn(CaseController.class).createCase(caseType, caseDataContent, ignoreWarning)).withSelfRel());
+    }
+
     private void copyProperties(CaseDetails caseDetails) {
         this.reference = caseDetails.getReference().toString();
         this.jurisdiction = caseDetails.getJurisdiction();
