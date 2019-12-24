@@ -6,7 +6,7 @@
   },
 
   "productName": "CCD Data Store",
-  "operationName": "get a list of printable documents for the given case type",
+  "operationName": "Get a list of printable documents for the given case id",
   "method": "GET",
   "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/documents",
 
