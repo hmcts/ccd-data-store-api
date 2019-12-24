@@ -1,0 +1,20 @@
+{
+  "_guid_": "S-071",
+  "_extends_": "F-052_Test_Data_Base",
+
+  "title": "must return 401 when request does not provide valid authentication credentials",
+
+  "specs": [
+    "an active profile in CCD",
+    "does not provide valid authentication credentials",
+    "contains an HTTP 401 Forbidden"
+  ],
+  "request": {
+    "pathVariables": {
+      "uid": "dummyAuthentication"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_401_Response"
+  }
+}
