@@ -1,0 +1,16 @@
+{
+  "title": "must return 200 when request does not provide valid authentication credentials",
+
+  "_guid_": "S-308",
+  "_extends_": "F-034_Test_Data_Base",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains an invalid user authentication token",
+    "contains a HTTP 200"
+  ],
+
+  "expectedResponse": {
+    "_extends_": "Common_401_Response"
+  }
+}
