@@ -62,8 +62,6 @@ Feature: F-054: Get case for Citizen
 
   @S-564
   Scenario: must return negative response HTTP-400 when request contains a non-existing case reference ID
-    Given a successful call [to create a token for case creation as a citizen] as in [Citizen_Token_Creation_Data_For_Case_Creation]
-    And   another successful call [to create a full case as a citizen] as in [Citizen_Full_Case_Creation_Data]
     And   a user with [an active profile in CCD]
     When  a request is prepared with appropriate values
     And   the request [contains a non-existing case reference ID]
@@ -110,8 +108,6 @@ Feature: F-054: Get case for Citizen
 
   @S-568
   Scenario: must return negative response HTTP-400 when request contains a malformed case reference ID
-    Given a successful call [to create a token for case creation as a citizen] as in [Citizen_Token_Creation_Data_For_Case_Creation]
-    And   another successful call [to create a full case as a citizen] as in [Citizen_Full_Case_Creation_Data]
     And   a user with [an active profile in CCD]
     When  a request is prepared with appropriate values
     And   the request [contains a malformed case reference ID]
