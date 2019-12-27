@@ -9,7 +9,7 @@
   ],
   "request": {
     "pathVariables": {
-      "cid": "∞§¶• ••¶§ ººª¶•∞"
+      "ctid": "∞§¶• ••¶§ ººª¶•∞"
     }
   },
   "expectedResponse": {

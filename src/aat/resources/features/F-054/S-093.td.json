@@ -18,127 +18,19 @@
       "created_date" : "[[ANY]]",
       "last_modified" : "[[ANY]]",
       "security_classification" : "PUBLIC",
-      "case_data" : {
-        "MoneyGBPField" : "4200",
-        "FixedListField" : "VALUE3",
-        "AddressUKField" : {
-          "County" : "Greater London",
-          "Country" : "UK",
-          "PostCode" : "SW1H 9AJ",
-          "PostTown" : "Westminster",
-          "AddressLine1" : "102 Petty France",
-          "AddressLine2" : "CCD",
-          "AddressLine3" : "c/o HMCTS Reform"
-        },
-        "ComplexField" : {
-          "ComplexTextField" : "Nested text",
-          "ComplexFixedListField" : "VALUE2"
-        },
-        "DateTimeField" : "[[ANY]]",
-        "PhoneUKField" : "[[ANY]]",
-        "NumberField" : "[[ANY]]",
-        "MultiSelectListField" : [ "OPTION2", "OPTION4" ],
-        "YesOrNoField" : "Yes",
-        "EmailField" : "ccd@hmcts.net",
-        "TextField" : "Some Text",
-        "DateField" : "[[ANY]]",
-        "TextAreaField" : "Line1\nLine2",
-        "CollectionField" : [ {
-          "id" : "CollectionField1",
-          "value" : "Alias 1"
-        }, {
-          "id" : "CollectionField2",
-          "value" : "Alias 2"
-        } ]
+      "case_data": {
+        "_extends_": "Standard_Full_Case_Data"
       },
-      "data_classification" : {
-        "MoneyGBPField" : "PUBLIC",
-        "FixedListField" : "PUBLIC",
-        "AddressUKField" : {
-          "value" : {
-            "County" : "PUBLIC",
-            "Country" : "PUBLIC",
-            "PostCode" : "PUBLIC",
-            "PostTown" : "PUBLIC",
-            "AddressLine1" : "PUBLIC",
-            "AddressLine2" : "PUBLIC",
-            "AddressLine3" : "PUBLIC"
-          },
-          "classification" : "PUBLIC"
-        },
-        "ComplexField" : {
-          "value" : {
-            "ComplexTextField" : "PUBLIC",
-            "ComplexFixedListField" : "PUBLIC"
-          },
-          "classification" : "PUBLIC"
-        },
-        "DateTimeField" : "PUBLIC",
-        "PhoneUKField" : "PUBLIC",
-        "NumberField" : "PUBLIC",
-        "MultiSelectListField" : "PUBLIC",
-        "YesOrNoField" : "PUBLIC",
-        "EmailField" : "PUBLIC",
-        "TextField" : "PUBLIC",
-        "DateField" : "PUBLIC",
-        "TextAreaField" : "PUBLIC",
-        "CollectionField" : {
-          "value" : [ {
-            "id" : "CollectionField1",
-            "classification" : "PUBLIC"
-          }, {
-            "id" : "CollectionField2",
-            "classification" : "PUBLIC"
-          } ],
-          "classification" : "PUBLIC"
-        }
+      "data_classification": {
+        "_extends_": "Standard_Full_Case_Data_Classification"
       },
       "after_submit_callback_response" : null,
       "callback_response_status_code" : null,
       "callback_response_status" : null,
       "delete_draft_response_status_code" : null,
       "delete_draft_response_status" : null,
-      "security_classifications" : {
-        "MoneyGBPField" : "PUBLIC",
-        "FixedListField" : "PUBLIC",
-        "AddressUKField" : {
-          "value" : {
-            "County" : "PUBLIC",
-            "Country" : "PUBLIC",
-            "PostCode" : "PUBLIC",
-            "PostTown" : "PUBLIC",
-            "AddressLine1" : "PUBLIC",
-            "AddressLine2" : "PUBLIC",
-            "AddressLine3" : "PUBLIC"
-          },
-          "classification" : "PUBLIC"
-        },
-        "ComplexField" : {
-          "value" : {
-            "ComplexTextField" : "PUBLIC",
-            "ComplexFixedListField" : "PUBLIC"
-          },
-          "classification" : "PUBLIC"
-        },
-        "DateTimeField" : "PUBLIC",
-        "PhoneUKField" : "PUBLIC",
-        "NumberField" : "PUBLIC",
-        "MultiSelectListField" : "PUBLIC",
-        "YesOrNoField" : "PUBLIC",
-        "EmailField" : "PUBLIC",
-        "TextField" : "PUBLIC",
-        "DateField" : "PUBLIC",
-        "TextAreaField" : "PUBLIC",
-        "CollectionField" : {
-          "value" : [ {
-            "id" : "CollectionField1",
-            "classification" : "PUBLIC"
-          }, {
-            "id" : "CollectionField2",
-            "classification" : "PUBLIC"
-          } ],
-          "classification" : "PUBLIC"
-        }
+      "security_classifications": {
+        "_extends_": "Standard_Full_Case_Data_Classification"
       }
     }
   }
