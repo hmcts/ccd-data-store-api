@@ -28,8 +28,6 @@ Feature: F-054: Get case for Citizen
 
   @S-095
   Scenario: must return 403 when request provides authentic credentials without authorized access to the operation
-    Given a successful call [to create a token for case creation as a citizen] as in [Citizen_Token_Creation_Data_For_Case_Creation]
-    And   another successful call [to create a full case as a citizen] as in [Citizen_Full_Case_Creation_Data]
     And   a user with [an active profile in CCD]
     When  a request is prepared with appropriate values
     And   the request [contains an valid user authorisation token that does not have access to the operation]
