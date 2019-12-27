@@ -38,7 +38,7 @@ Feature: F-054: Get case for Citizen
     And   the response [code is HTTP-403]
     And   the response has all other details as expected
 
-  @S-562 @Ignore # Response code mismatch, expected: 400, actual: 200
+  @S-562 @Ignore # Response code mismatch, expected: 400, actual: 200 /RDM-7066
   Scenario: must return negative response HTTP-400 when request contains a non-existing jurisdiction ID
     Given a successful call [to create a token for case creation as a citizen] as in [Citizen_Token_Creation_Data_For_Case_Creation]
     And   another successful call [to create a full case as a citizen] as in [Citizen_Full_Case_Creation_Data]
@@ -50,7 +50,7 @@ Feature: F-054: Get case for Citizen
     And   the response [code is HTTP-400]
     And   the response has all other details as expected
 
-  @S-563 @Ignore # Response code mismatch, expected: 400, actual: 200
+  @S-563 @Ignore # Response code mismatch, expected: 400, actual: 200 /RDM-7066
   Scenario: must return negative response HTTP-400 when request contains a non-existing case type ID
     Given a successful call [to create a token for case creation as a citizen] as in [Citizen_Token_Creation_Data_For_Case_Creation]
     And   another successful call [to create a full case as a citizen] as in [Citizen_Full_Case_Creation_Data]
@@ -86,7 +86,7 @@ Feature: F-054: Get case for Citizen
     And   the response [code is HTTP-403]
     And   the response has all other details as expected
 
-  @S-566 @Ignore # Response code mismatch, expected: 400, actual: 200
+  @S-566 @Ignore # Response code mismatch, expected: 400, actual: 200 / RDM-7066
   Scenario: must return negative response HTTP-400 when request contains a malformed jurisdiction ID
     Given a successful call [to create a token for case creation as a citizen] as in [Citizen_Token_Creation_Data_For_Case_Creation]
     And   another successful call [to create a full case as a citizen] as in [Citizen_Full_Case_Creation_Data]
