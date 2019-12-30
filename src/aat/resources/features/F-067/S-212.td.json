@@ -1,33 +1,14 @@
 {
-  "title": "must return 201 if the grant is successful for a user to a valid case ID",
   "_guid_": "S-212",
   "_extends_": "F-067_Test_Data_Base",
+  "title": "should retrieve case view with response code HTTP 200 when the case reference and case event exists",
   "specs": [
     "an active profile in CCD",
     "contains the reference of the case just created and the event id valid for that case",
     "contains HTTP 200 Ok"
   ],
-  "request": {
-    "headers": {
-      "_extends_": "Common_Request_Headers",
-      "experimental": true,
-      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-event-view.v2+json;charset=UTF-8"
-    },
-    "pathVariables": {
-      "cid": "${[scenarioContext][childContexts][Befta_Case_Data_Extension][testData][actualResponse][body][id]}",
-      "eventId": "${[scenarioContext][childContexts][S-212_Get_Case_Data][testData][actualResponse][body][events][0][id]}"
-    }
-  },
   "expectedResponse": {
-    "responseCode" : 200,
-    "responseMessage" : "OK",
-    "headers":{
-      "_extends_": "Common_Response_Headers",
-      "Content-Encoding" : "gzip",
-      "Content-Length" : "[[ANY]]",
-      "Content-Type" : "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-event-view.v2+json;charset=UTF-8",
-      "Vary" : "Accept-Encoding"
-    },
+    "_extends_": "Common_200_Response",
     "body": {
       "tabs": "[[ANY]]",
       "metadataFields": null,

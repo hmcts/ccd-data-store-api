@@ -1,35 +1,26 @@
 {
-  "title": "must return 201 if the grant is successful for a user to a valid case ID",
   "_guid_": "S-209",
   "_extends_": "F-067_Test_Data_Base",
+  "title": "should get 400 when request contains non-existing case reference",
   "specs": [
     "an active profile in CCD",
-    "contains the reference of the case just created and the event id valid for that case",
+    "contains a non-existing case reference",
     "contains HTTP 400 Bad Request"
   ],
   "request": {
-    "headers": {
-      "_extends_": "Common_Request_Headers",
-      "experimental": true,
-      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-event-view.v2+json;charset=UTF-8"
-    },
     "pathVariables": {
-      "cid": "AnInvalidCaseID",
-      "eventId": "SomeEventID"
+      "cid": "non-existing case reference"
     }
   },
   "expectedResponse": {
     "_extends_": "Common_400_Response",
     "headers": {
-      "Content-Length": "[[ANY]]",
-      "Content-Encoding": "gzip",
-      "Content-Type" : "[[ANY]]"
+      "Connection" : "close",
+      "Content-Encoding" : "gzip"
     },
     "body": {
       "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
-      "timestamp": "[[ANY]]",
       "message": "Case ID is not valid",
-      "path": "/internal/cases/AnInvalidCaseID/events/SomeEventID",
       "details": null,
       "callbackErrors": null,
       "callbackWarnings": null

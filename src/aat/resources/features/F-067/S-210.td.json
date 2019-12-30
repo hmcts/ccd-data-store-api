@@ -1,30 +1,19 @@
 {
-  "title": "must return 201 if the grant is successful for a user to a valid case ID",
   "_guid_": "S-210",
   "_extends_": "F-067_Test_Data_Base",
+  "title": "should get 400 when request contains non-existing event Id",
   "specs": [
     "an active profile in CCD",
-    "contains the reference of the case just created and the event id valid for that case",
-    "contains HTTP 404 Not Found"
+    "contains a non-existing event Id",
+    "contains HTTP 400 Not Found"
   ],
   "request": {
-    "headers": {
-      "_extends_": "Common_Request_Headers",
-      "experimental": true,
-      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-event-view.v2+json;charset=UTF-8"
-    },
     "pathVariables": {
-      "cid": "${[scenarioContext][childContexts][Befta_Case_Data_Extension][testData][actualResponse][body][id]}",
-      "eventId": "-999999999"
+      "eventId": "non-existing event Id"
     }
   },
   "expectedResponse": {
-    "_extends_": "Common_404_Response",
-    "headers": {
-      "Content-Length": "[[ANY]]",
-      "Content-Encoding": "gzip",
-      "Content-Type": "[[ANY]]"
-    },
+    "_extends_": "Common_400_Response",
     "body": {
       "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
       "timestamp": "[[ANY]]",

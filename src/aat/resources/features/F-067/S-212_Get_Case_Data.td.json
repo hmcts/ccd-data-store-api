@@ -6,7 +6,7 @@
   "method": "GET",
   "uri": "/internal/cases/{cid}",
   "specs": [
-    "to get the details about case event for the case just created"
+    "to get the details about case event for the case just created above"
   ],
   "users": {
     "invokingUser": {
@@ -27,8 +27,7 @@
     "_extends_": "Common_200_Response",
     "headers": {
       "Content-Length": "[[ANY]]",
-      "Content-Encoding": "gzip",
-      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-case-view.v2+json;charset=UTF-8"
+      "Content-Type": "[[ANY]]"
     },
     "body": {
       "_links": {
