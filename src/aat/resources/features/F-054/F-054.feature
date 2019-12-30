@@ -4,8 +4,8 @@ Feature: F-054: Get case for Citizen
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
-  @S-093 # must return 200 and ist of case data for the given case id
-  Scenario: must return 200 and  of case data for the given case id
+  @S-093 # must return 200 and list of case data for the given case id
+  Scenario: must return 200 and list of case data for the given case id
     Given a successful call [to create a token for case creation as a citizen] as in [Citizen_Token_Creation_Data_For_Case_Creation]
     And   another successful call [to create a full case as a citizen] as in [Citizen_Full_Case_Creation_Data]
     And   a user with [an active profile in CCD]
