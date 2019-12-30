@@ -7,8 +7,20 @@
     "contains the case data of the case just created",
     "contains  case just created, along with a HTTP 200 OK"
   ],
+  "request": {
+    "body": {
+      "event": {
+        "id": "UPDATE",
+        "summary": "",
+        "description": ""
+      }
+    }
+  },
   "expectedResponse": {
     "_extends_": "Common_200_Response",
+    "headers": {
+      "Transfer-Encoding" : "chunked"
+    },
     "body": {
       "data": {
         "MoneyGBPField": "4300",

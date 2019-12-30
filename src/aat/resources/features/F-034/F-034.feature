@@ -3,6 +3,53 @@ Feature: F-034: Validate case data
 
   Background: Validate the case data
     Given an appropriate test context as detailed in the test data source
+  @S-308
+  Scenario: must return 401 when request does not provide valid authentication credentials
+    Given a user with [an active profile in CCD]
+    When a request is prepared with appropriate values
+    And the request [contains an invalid user authentication token]
+    And it is submitted to call the [Validate case data] operation of [CCD Data Store]
+    Then a negative response is received
+    And the response [contains a HTTP 401 Unauthorised]
+    And the response has all other details as expected
+
+  @S-309
+  Scenario: must return 403 when request provides authentic credentials without authorized access to the operation
+    Given a user with [an active profile in CCD]
+    When a request is prepared with appropriate values
+    And the request [does not provide a valid authentication credentials]
+    And it is submitted to call the [Validate case data] operation of [CCD Data Store]
+    Then a negative response is received
+    And the response [contains a HTTP 403 Forbidden]
+    And the response has all other details as expected
+
+  @S-310
+  Scenario: should get 404 when case type does not exist
+    Given a user with [an active profile in CCD]
+    When a request is prepared with appropriate values
+    And the request [contains a non-existing case type id]
+    And it is submitted to call the [Validate case data] operation of [CCD Data Store]
+    Then a negative response is received
+    And the response [contains a HTTP 404 Not Found]
+    And the response has all other details as expected
+
+  @S-311 @Ignore #This scenario is return 500 instead of 404. Jira: RDM-7084
+  Scenario: should get 404 when event not provided
+    Given a user with [an active profile in CCD]
+    When a request is prepared with appropriate values
+    And the request [contains an invalid event id]
+    And it is submitted to call the [Validate case data] operation of [CCD Data Store]
+    Then a negative response is received
+    And the response [contains HTTP 404 Not Found]
+    And the response ha s all other details as expected
+
+  @S-312 @Ignore #This scenario is invalid. Jira: RDM-6410
+  Scenario: should get 422 when event trigger does not exist
+
+
+
+
+
 
   @S-314
   Scenario: should validate when the case type and event exists
