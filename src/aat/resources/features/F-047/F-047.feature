@@ -26,14 +26,14 @@ Feature: F-047: Get case ids
     And the response [contains an empty list of case ids, along with an HTTP-200 OK]
     And the response has all other details as expected
 
-  @S-099 # This endpoint is returning 403. Will be fixed as a part of RDM-6628
+  @S-099 @Ignore # Response code mismatch, expected: 401, actual: 403 Will be fixed as a part of RDM-6628
   Scenario: must return 401 when request does not provide valid authentication credentials
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
     And the request [does not provide valid authentication credentials]
     And it is submitted to call the [Get case ids] operation of [CCD Data Store]
     Then a negative response is received
-    And the response [contains an HTTP-403 Forbidden]
+    And the response [contains an HTTP-401 Unauthorized]
     And the response has all other details as expected
 
   @S-100
@@ -45,4 +45,65 @@ Feature: F-047: Get case ids
     Then a negative response is received
     And the response [contains an HTTP-403 Forbidden]
     And the response has all other details as expected
+
+  @S-570 @Ignore # Response code mismatch, expected: 400, actual: 500
+  Scenario: must return negative response HTTP-400 when request contains a malformed user ID
+    Given a user with [an inactive profile in CCD]
+    When  a request is prepared with appropriate values
+    And   the request [contains a malformed user ID]
+    And   it is submitted to call the [Get case ids] operation of [CCD Data Store]
+    Then  a negative response is received
+    And   the response [code is HTTP-400]
+    And   the response has all other details as expected
+
+  @S-571 @Ignore # Response code mismatch, expected: 400, actual: 500
+  Scenario: must return negative response HTTP-400 when request contains a malformed case type ID
+    Given a user with [an active profile in CCD]
+    When  a request is prepared with appropriate values
+    And   the request [contains a malformed case type ID]
+    And   it is submitted to call the [Get case ids] operation of [CCD Data Store]
+    Then  a negative response is received
+    And   the response [code is HTTP-400]
+    And   the response has all other details as expected
+
+  @S-572 @Ignore # Response code mismatch, expected: 400, actual: 403
+  Scenario: must return negative response HTTP-400 when request contains a malformed jurisdiction ID
+    Given a user with [an active profile in CCD]
+    When  a request is prepared with appropriate values
+    And   the request [contains a malformed jurisdiction ID]
+    And   it is submitted to call the [Get case ids] operation of [CCD Data Store]
+    Then  a negative response is received
+    And   the response [code is HTTP-400]
+    And   the response has all other details as expected
+
+  @S-573 @Ignore # Response code mismatch, expected: 400, actual: 403
+  Scenario: must return negative response HTTP-400 when request contains a non-existing jurisdiction ID
+    Given a user with [an active profile in CCD]
+    When  a request is prepared with appropriate values
+    And   the request [contains a non-existing jurisdiction ID]
+    And   it is submitted to call the [Get case ids] operation of [CCD Data Store]
+    Then  a negative response is received
+    And   the response [code is HTTP-400]
+    And   the response has all other details as expected
+
+  @S-574 @Ignore #Response code mismatch, expected: 400, actual: 200"
+  Scenario: must return negative response HTTP-404 when request contains a non-existing case type ID
+    Given a user with [an active profile in CCD]
+    When  a request is prepared with appropriate values
+    And   the request [contains a non-existing case type ID]
+    And   it is submitted to call the [Get case ids] operation of [CCD Data Store]
+    Then  a negative response is received
+    And   the response [code is HTTP-404]
+    And   the response has all other details as expected
+
+  @S-575
+  Scenario: must return negative response HTTP-403 when request contains a non-existing user ID
+    Given a user with [an inactive profile in CCD]
+    When  a request is prepared with appropriate values
+    And   the request [contains a non-existing user ID]
+    And   it is submitted to call the [Get case ids] operation of [CCD Data Store]
+    Then  a negative response is received
+    And   the response [code is HTTP-403]
+    And   the response has all other details as expected
+
 

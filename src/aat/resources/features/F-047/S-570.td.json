@@ -1,0 +1,18 @@
+{
+  "title": "must return negative response HTTP-400 when request contains a malformed user ID",
+  "_guid_": "S-570",
+  "_extends_": "F-047_Test_Data_Base",
+  "specs": [
+    "an inactive profile in CCD",
+    "contains a malformed user ID",
+    "code is HTTP-400"
+  ],
+  "request": {
+    "pathVariables": {
+      "uid": "@£$%^   &*(@£$%    ^&*("
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_400_Response"
+  }
+}
