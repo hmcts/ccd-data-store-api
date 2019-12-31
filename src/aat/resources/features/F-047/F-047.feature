@@ -18,7 +18,6 @@ Feature: F-047: Get case ids
   @S-098
   Scenario: must return 200 and an empty list if no case is found
     Given a user with [an active profile in CCD]
-    And a case that has just been created as in [Standard_Full_Case_Creation_Data]
     When a request is prepared with appropriate values
     And the request [contains an userId which doesn't have access to the case]
     And it is submitted to call the [Get case ids] operation of [CCD Data Store]
