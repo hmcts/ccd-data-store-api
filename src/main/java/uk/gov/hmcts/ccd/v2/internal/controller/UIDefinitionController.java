@@ -125,10 +125,6 @@ public class UIDefinitionController {
             code = 200,
             message = "Success",
             response = UIBannerResource.class
-        ),
-        @ApiResponse(
-            code = 404,
-            message = "Banners not found"
         )
     })
     public ResponseEntity<UIBannerResource> getBanners(@RequestParam("ids") Optional<List<String>> idsOptional) {
