@@ -4,8 +4,60 @@ Feature: F-040: Get Case for Case worker
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
-  @S-080
-  Scenario: must return 403 when request provides authentic credentials without authorized access to the operation
+  @S-576 @Ignore @WIP
+  Scenario: must return successfully all and only the respective fields with READ access for a Case Worker and a Solicitor
+
+  @S-577 @Ignore @WIP
+  Scenario: must return appropriate negative response for a jurisdiction id not existing in CCD
+
+  @S-578 @Ignore @WIP
+  Scenario: must return appropriate negative response for a case type id not existing in CCD
+
+  @S-579 @Ignore @WIP
+  Scenario: must return appropriate negative response for a case id not existing in CCD
+
+  @S-580 @Ignore @WIP
+  Scenario: must return a negative response for a request without a Bearer token
+    Given a user with [an active case worker profile in CCD]
+    When a request is prepared with appropriate values
+    And the request [does not contain a Bearer token]
+    And it is submitted to call the [Get Case for Case Worker] operation of [CCD Data Store]
+    Then a negative response is received
+    And the response [code is HTTP-403]
+    And the response has all other details as expected
+
+  @S-581 @Ignore @WIP
+  Scenario: must return a negative response for a request with a dummy Bearer token
+    Given a user with [an active case worker profile in CCD]
+    When a request is prepared with appropriate values
+    And the request [contains a dummy Bearer token]
+    And it is submitted to call the [Get Case for Case Worker] operation of [CCD Data Store]
+    Then a negative response is received
+    And the response [code is HTTP-403]
+    And the response has all other details as expected
+
+  @S-582 @Ignore @WIP
+  Scenario: must return a negative response for a request with an expired Bearer token
+    Given a user with [an active case worker profile in CCD]
+    When a request is prepared with appropriate values
+    And the request [contains an expired Bearer token]
+    And it is submitted to call the [Get Case for Case Worker] operation of [CCD Data Store]
+    Then a negative response is received
+    And the response [code is HTTP-403]
+    And the response has all other details as expected
+
+  @S-583 @Ignore @WIP
+  Scenario: must return a negative response for a request with a Bearer token issued to the name of an unrecognised user
+    Given a user with [an active case worker profile in CCD]
+    When a request is prepared with appropriate values
+    And the request [contains a Bearer token issued to the name of an unrecognised user]
+    And it is submitted to call the [Get Case for Case Worker] operation of [CCD Data Store]
+    Then a negative response is received
+    And the response [code is HTTP-403]
+    And the response has all other details as expected
+
+  @S-080 @Ignored @Ignore @WIP
+  Scenario: must return 403 when request provides authentic credentials without authorised access to the operation
 
   @S-081 @Ignore
   Scenario: should get 400 when case reference invalid
