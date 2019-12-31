@@ -7,15 +7,17 @@ Feature: F-040: Get Case for Case worker
   @S-576 @Ignore @WIP
   Scenario: must return successfully all and only the respective fields with READ access for a Case Worker and a Solicitor
     Given a user with [an active Case Worker profile in CCD with a specific variation of ACLs on a case type]
-    And a user with [an active solicitor profile in CCD with another specific variation of ACLs on the same case type]
+    And a user with [an active solicitor profile with another specific variation of ACLs on the same case type]
     And a successful call [by a privileged user with full ACL to create a case of this case type] as in [F-040_Prior_Case_Creation]
+    
     When a request is prepared with appropriate values
     And the request [contains values for all fields under the case type]
     And it is submitted to call the [Get Case for Case Worker] operation of [CCD Data Store]
+    
     Then a positive response is received
     And the response has all other details as expected
-    And a call [to get the case by the Solicitor] will get the expected response as in [F-040_Later_Case_Read_By_Solicitor]
-    And a call [to get the case by the Case Worker] will get the expected response as in [F-040_Later_Case_Read_By_Case_Worker]
+    And a call [to get the same case by the Solicitor] will get the expected response as in [F-040_Later_Case_Read_By_Solicitor]
+    And a call [to get the same case by the Case Worker] will get the expected response as in [F-040_Later_Case_Read_By_Case_Worker]
 
   @S-577 @Ignore @WIP
   Scenario: must return appropriate negative response for a jurisdiction id not existing in CCD
