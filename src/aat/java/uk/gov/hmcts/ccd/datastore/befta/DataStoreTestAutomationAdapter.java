@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.datastore.tests.befta;
+package uk.gov.hmcts.ccd.datastore.befta;
 
 
 import org.junit.Assert;
