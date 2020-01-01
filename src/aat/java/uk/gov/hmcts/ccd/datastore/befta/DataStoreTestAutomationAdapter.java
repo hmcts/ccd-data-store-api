@@ -10,7 +10,6 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import uk.gov.hmcts.befta.DefaultTestAutomationAdapter;
-import uk.gov.hmcts.befta.TestAutomationConfig;
 import uk.gov.hmcts.befta.data.UserData;
 import uk.gov.hmcts.befta.exception.FunctionalTestException;
 
@@ -21,10 +20,6 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
     private static final String BE_FTA_FILE_JURISDICTION_1 = "src/aat/resources/CCD_BEFTA_JURISDICTION1.xlsx";
     private static final String BE_FTA_FILE_JURISDICTION_2 = "src/aat/resources/CCD_BEFTA_JURISDICTION2.xlsx";
     private static final String BE_FTA_FILE_JURISDICTION_3 = "src/aat/resources/CCD_BEFTA_JURISDICTION3.xlsx";
-
-    public DataStoreTestAutomationAdapter(TestAutomationConfig config) {
-        super(config);
-    }
 
     @Override
     public void doLoadTestData() {
