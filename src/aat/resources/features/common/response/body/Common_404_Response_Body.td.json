@@ -1,7 +1,0 @@
-{
-	"_guid_": "Common_404_Response_Body",
-	"_extends_": "Common_4XX_Response_Body",
-
-	"status": 404,
-	"error": "Not Found"
-}
