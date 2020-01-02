@@ -9,6 +9,7 @@ import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import uk.gov.hmcts.befta.BeftaMain;
 import uk.gov.hmcts.befta.DefaultTestAutomationAdapter;
 import uk.gov.hmcts.befta.data.UserData;
 import uk.gov.hmcts.befta.exception.FunctionalTestException;
@@ -50,12 +51,12 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
     }
 
     private RequestSpecification asAutoTestImporter() {
-        UserData caseworker = authenticate(new UserData(getAutomationConfig().getImporterAutoTestEmail(),
-                getAutomationConfig().getImporterAutoTestPassword()));
+        UserData caseworker = authenticate(new UserData(BeftaMain.getConfig().getImporterAutoTestEmail(),
+                BeftaMain.getConfig().getImporterAutoTestPassword()));
 
         String s2sToken = getNewS2SToken();
         return RestAssured
-                .given(new RequestSpecBuilder().setBaseUri(getAutomationConfig().getDefinitionStoreUrl())
+                .given(new RequestSpecBuilder().setBaseUri(BeftaMain.getConfig().getDefinitionStoreUrl())
                         .build())
                 .header("Authorization", "Bearer " + caseworker.getAccessToken())
                 .header("ServiceAuthorization", s2sToken);
