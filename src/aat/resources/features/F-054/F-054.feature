@@ -6,7 +6,8 @@ Feature: F-054: Get case for Citizen
 
   @S-093 # must return 200 and list of case data for the given case id
   Scenario: must return 200 and list of case data for the given case id
-    Given a successful call [to create a token for case creation as a citizen] as in [Citizen_Token_Creation_Data_For_Case_Creation]
+    Given a user with [an active profile in CCD]
+    And   a successful call [to create a token for case creation as a citizen] as in [Citizen_Token_Creation_Data_For_Case_Creation]
     And   another successful call [to create a full case as a citizen] as in [Citizen_Full_Case_Creation_Data]
     And   a user with [an active profile in CCD]
     When  a request is prepared with appropriate values
@@ -28,7 +29,7 @@ Feature: F-054: Get case for Citizen
 
   @S-095
   Scenario: must return 403 when request provides authentic credentials without authorized access to the operation
-    And   a user with [an active profile in CCD]
+    Given a user with [an active profile in CCD]
     When  a request is prepared with appropriate values
     And   the request [contains an valid user authorisation token that does not have access to the operation]
     And   it is submitted to call the [get case for citizen] operation of [CCD Data Store]
@@ -36,43 +37,46 @@ Feature: F-054: Get case for Citizen
     And   the response [code is HTTP-403]
     And   the response has all other details as expected
 
-  @S-562 @Ignore # Response code mismatch, expected: 400, actual: 200 /RDM-7066
-  Scenario: must return negative response HTTP-400 when request contains a non-existing jurisdiction ID
-    Given a successful call [to create a token for case creation as a citizen] as in [Citizen_Token_Creation_Data_For_Case_Creation]
+  @S-562 @Ignore # Response code mismatch, expected: 404, actual: 200 /RDM-7066
+  Scenario: must return negative response HTTP-404 when request contains a non-existing jurisdiction ID
+    Given a user with [an active profile in CCD]
+    And   a successful call [to create a token for case creation as a citizen] as in [Citizen_Token_Creation_Data_For_Case_Creation]
     And   another successful call [to create a full case as a citizen] as in [Citizen_Full_Case_Creation_Data]
     And   a user with [an active profile in CCD]
     When  a request is prepared with appropriate values
     And   the request [contains a non-existing jurisdiction ID]
     And   it is submitted to call the [get case for citizen] operation of [CCD Data Store]
     Then  a negative response is received
-    And   the response [code is HTTP-400]
+    And   the response [code is HTTP-404]
     And   the response has all other details as expected
 
-  @S-563 @Ignore # Response code mismatch, expected: 400, actual: 200 /RDM-7066
-  Scenario: must return negative response HTTP-400 when request contains a non-existing case type ID
-    Given a successful call [to create a token for case creation as a citizen] as in [Citizen_Token_Creation_Data_For_Case_Creation]
+  @S-563 @Ignore # Response code mismatch, expected: 404, actual: 200 /RDM-7066
+  Scenario: must return negative response HTTP-404 when request contains a non-existing case type ID
+    Given a user with [an active profile in CCD]
+    And   a successful call [to create a token for case creation as a citizen] as in [Citizen_Token_Creation_Data_For_Case_Creation]
     And   another successful call [to create a full case as a citizen] as in [Citizen_Full_Case_Creation_Data]
     And   a user with [an active profile in CCD]
     When  a request is prepared with appropriate values
     And   the request [contains a non-existing case type ID]
     And   it is submitted to call the [get case for citizen] operation of [CCD Data Store]
     Then  a negative response is received
-    And   the response [code is HTTP-400]
+    And   the response [code is HTTP-404]
     And   the response has all other details as expected
 
   @S-564
-  Scenario: must return negative response HTTP-400 when request contains a non-existing case reference ID
-    And   a user with [an active profile in CCD]
+  Scenario: must return negative response HTTP-404 when request contains a non-existing case reference ID
+    Given a user with [an active profile in CCD]
     When  a request is prepared with appropriate values
     And   the request [contains a non-existing case reference ID]
     And   it is submitted to call the [get case for citizen] operation of [CCD Data Store]
     Then  a negative response is received
-    And   the response [code is HTTP-400]
+    And   the response [code is HTTP-404]
     And   the response has all other details as expected
 
   @S-565
   Scenario: must return negative response HTTP-403 when request contains a non-existing user ID
-    Given a successful call [to create a token for case creation as a citizen] as in [Citizen_Token_Creation_Data_For_Case_Creation]
+    Given a user with [an active profile in CCD]
+    And   a successful call [to create a token for case creation as a citizen] as in [Citizen_Token_Creation_Data_For_Case_Creation]
     And   another successful call [to create a full case as a citizen] as in [Citizen_Full_Case_Creation_Data]
     And   a user with [an active profile in CCD]
     When  a request is prepared with appropriate values
@@ -84,7 +88,8 @@ Feature: F-054: Get case for Citizen
 
   @S-566 @Ignore # Response code mismatch, expected: 400, actual: 200 / RDM-7066
   Scenario: must return negative response HTTP-400 when request contains a malformed jurisdiction ID
-    Given a successful call [to create a token for case creation as a citizen] as in [Citizen_Token_Creation_Data_For_Case_Creation]
+    Given a user with [an active profile in CCD]
+    And   a successful call [to create a token for case creation as a citizen] as in [Citizen_Token_Creation_Data_For_Case_Creation]
     And   another successful call [to create a full case as a citizen] as in [Citizen_Full_Case_Creation_Data]
     And   a user with [an active profile in CCD]
     When  a request is prepared with appropriate values
@@ -96,7 +101,8 @@ Feature: F-054: Get case for Citizen
 
   @S-567 @Ignore # Response code mismatch, expected: 400, actual: 200 / RDM-7066
   Scenario: must return negative response HTTP-400 when request contains a malformed case type ID
-    Given a successful call [to create a token for case creation as a citizen] as in [Citizen_Token_Creation_Data_For_Case_Creation]
+    Given a user with [an active profile in CCD]
+    And   a successful call [to create a token for case creation as a citizen] as in [Citizen_Token_Creation_Data_For_Case_Creation]
     And   another successful call [to create a full case as a citizen] as in [Citizen_Full_Case_Creation_Data]
     And   a user with [an active profile in CCD]
     When  a request is prepared with appropriate values
@@ -108,7 +114,7 @@ Feature: F-054: Get case for Citizen
 
   @S-568
   Scenario: must return negative response HTTP-400 when request contains a malformed case reference ID
-    And   a user with [an active profile in CCD]
+    Given a user with [an active profile in CCD]
     When  a request is prepared with appropriate values
     And   the request [contains a malformed case reference ID]
     And   it is submitted to call the [get case for citizen] operation of [CCD Data Store]

@@ -1,11 +1,11 @@
 {
   "_guid_": "S-563",
   "_extends_": "F-054_Base_Test_Data",
-  "title": "must return negative response HTTP-400 when request contains a non-existing case type ID",
+  "title": "must return negative response HTTP-404 when request contains a non-existing case type ID",
   "specs": [
     "an active profile in CCD",
     "contains a non-existing case type ID",
-    "code is HTTP-400"
+    "code is HTTP-404"
   ],
   "request": {
     "pathVariables": {
@@ -13,6 +13,6 @@
     }
   },
   "expectedResponse": {
-    "_extends_": "Common_400_Response"
+    "_extends_": "Common_404_Response"
   }
 }
