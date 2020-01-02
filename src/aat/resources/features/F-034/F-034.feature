@@ -4,7 +4,7 @@ Feature: F-034: Validate case data
   Background: Validate the case data
     Given an appropriate test context as detailed in the test data source
 
-  @S-308
+  @S-308 @Ignore #This scenario is return 403 instead of 401. Jira: RDM-6628
   Scenario: must return 401 when request does not provide valid authentication credentials
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values

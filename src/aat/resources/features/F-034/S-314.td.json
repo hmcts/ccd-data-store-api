@@ -19,7 +19,7 @@
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "headers": {
-      "Transfer-Encoding" : "chunked"
+      "Content-Type" : "application/vnd.uk.gov.hmcts.ccd-data-store-api.case-data-validate.v2+json;charset=UTF-8"
     },
     "body": {
       "data": {
@@ -63,7 +63,7 @@
       },
       "_links": {
         "self": {
-          "href": "http://localhost:4452/case-types/AAT/validate{?pageId}",
+          "href": "[[ANY]]",
           "templated": true
         }
       }

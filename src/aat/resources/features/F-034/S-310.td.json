@@ -20,9 +20,7 @@
     "body" : {
       "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
       "timestamp" : "[[ANY]]",
-      "status" : 404,
-      "error" : "Not Found",
-      "message" : "Resource not found when getting case type version for abc because of 404 ",
+      "message" : "Resource not found when getting case type version for abc because of 404 Not Found",
       "path" : "/case-types/abc/validate",
       "details" : null,
       "callbackErrors" : null,
