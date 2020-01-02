@@ -1,0 +1,23 @@
+{
+  "title": "must return successfully all and only the respective fields with READ access for a Case Worker and a Solicitor",
+  "_extends_": "F-040_Test_Data_Base",
+  "_guid_": "S-576",
+  "specs": [
+    "an active Case Worker profile in CCD with a specific variation of ACLs on a case type",
+    "an active solicitor profile with another specific variation of ACLs on the same case type"
+  ],
+  "user": {
+    "username": "befta.caseworker.2.solicitor.2@gmail.com",
+    "password": "Pa55word11"
+  },
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "body": {
+      "exception": "[[ANY]]",
+      "message": "[[ANY]]",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}
