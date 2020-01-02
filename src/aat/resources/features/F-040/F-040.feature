@@ -11,10 +11,11 @@ Feature: F-040: Get Case for Case worker
     And a successful call [by a privileged user with full ACL to create a case of this case type] as in [F-040_Prior_Case_Creation]
     
     When a request is prepared with appropriate values
-    And the request [contains values for all fields under the case type]
+    And the request [is prepared on behalf of the user creating the case above]
     And it is submitted to call the [Get Case for Case Worker] operation of [CCD Data Store]
     
     Then a positive response is received
+    And the response [contains values for all fields under the case type]
     And the response has all other details as expected
     And a call [to get the same case by the Solicitor] will get the expected response as in [F-040_Later_Case_Read_By_Solicitor]
     And a call [to get the same case by the Case Worker] will get the expected response as in [F-040_Later_Case_Read_By_Case_Worker]
