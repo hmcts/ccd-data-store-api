@@ -1,7 +1,7 @@
 {
   "_guid_": "S-312",
   "_extends_": "F-034_Test_Data_Base",
-  "title": "should get 422 when event trigger does not exist",
+  "title": "must return 422 when event trigger does not exist",
   "specs": [
     "an active profile in CCD",
     "contains an event trigger id with no pre state",

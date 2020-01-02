@@ -1,5 +1,5 @@
 {
-  "title": "should get 404 when event not provided",
+  "title": "must return 404 when event not provided",
   "_guid_": "S-311",
   "_extends_": "F-034_Test_Data_Base",
   "specs": [

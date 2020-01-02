@@ -1,5 +1,5 @@
 {
-  "title": "should get 404 when case type does not exist",
+  "title": "must return 404 when case type does not exist",
   "_guid_": "S-310",
   "_extends_": "F-034_Test_Data_Base",
 
