@@ -621,7 +621,7 @@ task smoke(type: Test) {
     //include "uk/gov/hmcts/ccd/datastore/tests/functional/**"
     //include "uk/gov/hmcts/ccd/datastore/tests/v2/**"
     useJUnitPlatform {
-        includeTags 'smoke_temp_bypass'
+        includeTags 'smoke_disable'
     }
 
 }
