@@ -4,7 +4,7 @@
   "title": "must return negative response HTTP-403 when request contains a malformed user ID",
   "specs": [
     "an active profile in CCD",
-    "contains a malformed user ID",
+    "contains the ID of above created case with a malformed user ID",
     "code is HTTP-403"
   ],
   "request": {

@@ -44,7 +44,7 @@ Feature: F-054: Get case for Citizen
     And   another successful call [to create a full case as a citizen] as in [Citizen_Full_Case_Creation_Data]
     And   a user with [an active profile in CCD]
     When  a request is prepared with appropriate values
-    And   the request [contains a non-existing jurisdiction ID]
+    And   the request [contains the ID of above created case with a non-existing jurisdiction ID]
     And   it is submitted to call the [get case for citizen] operation of [CCD Data Store]
     Then  a negative response is received
     And   the response [code is HTTP-404]
@@ -57,7 +57,7 @@ Feature: F-054: Get case for Citizen
     And   another successful call [to create a full case as a citizen] as in [Citizen_Full_Case_Creation_Data]
     And   a user with [an active profile in CCD]
     When  a request is prepared with appropriate values
-    And   the request [contains a non-existing case type ID]
+    And   the request [contains the ID of above created case with a non-existing case type ID]
     And   it is submitted to call the [get case for citizen] operation of [CCD Data Store]
     Then  a negative response is received
     And   the response [code is HTTP-404]
@@ -80,7 +80,7 @@ Feature: F-054: Get case for Citizen
     And   another successful call [to create a full case as a citizen] as in [Citizen_Full_Case_Creation_Data]
     And   a user with [an active profile in CCD]
     When  a request is prepared with appropriate values
-    And   the request [contains a non-existing user ID]
+    And   the request [contains the ID of above created case with a non-existing user ID]
     And   it is submitted to call the [get case for citizen] operation of [CCD Data Store]
     Then  a negative response is received
     And   the response [code is HTTP-403]
@@ -93,7 +93,7 @@ Feature: F-054: Get case for Citizen
     And   another successful call [to create a full case as a citizen] as in [Citizen_Full_Case_Creation_Data]
     And   a user with [an active profile in CCD]
     When  a request is prepared with appropriate values
-    And   the request [contains a malformed jurisdiction ID]
+    And   the request [contains the ID of above created case with a malformed jurisdiction ID]
     And   it is submitted to call the [get case for citizen] operation of [CCD Data Store]
     Then  a negative response is received
     And   the response [code is HTTP-400]
@@ -106,7 +106,7 @@ Feature: F-054: Get case for Citizen
     And   another successful call [to create a full case as a citizen] as in [Citizen_Full_Case_Creation_Data]
     And   a user with [an active profile in CCD]
     When  a request is prepared with appropriate values
-    And   the request [contains a malformed case type ID]
+    And   the request [contains the ID of above created case with a malformed case type ID]
     And   it is submitted to call the [get case for citizen] operation of [CCD Data Store]
     Then  a negative response is received
     And   the response [code is HTTP-400]
@@ -124,11 +124,12 @@ Feature: F-054: Get case for Citizen
 
   @S-569
   Scenario: must return negative response HTTP-403 when request contains a malformed user ID
-    Given a successful call [to create a token for case creation as a citizen] as in [Citizen_Token_Creation_Data_For_Case_Creation]
+    Given a user with [an active profile in CCD]
+    And   a successful call [to create a token for case creation as a citizen] as in [Citizen_Token_Creation_Data_For_Case_Creation]
     And   another successful call [to create a full case as a citizen] as in [Citizen_Full_Case_Creation_Data]
     And   a user with [an active profile in CCD]
     When  a request is prepared with appropriate values
-    And   the request [contains a malformed user ID]
+    And   the request [contains the ID of above created case with a malformed user ID]
     And   it is submitted to call the [get case for citizen] operation of [CCD Data Store]
     Then  a negative response is received
     And   the response [code is HTTP-403]

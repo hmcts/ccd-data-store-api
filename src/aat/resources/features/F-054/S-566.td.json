@@ -4,7 +4,7 @@
   "title": "must return negative response HTTP-400 when request contains a malformed jurisdiction ID",
   "specs": [
     "an active profile in CCD",
-    "contains a malformed jurisdiction ID",
+    "contains the ID of above created case with a malformed jurisdiction ID",
     "code is HTTP-400"
   ],
   "request": {
