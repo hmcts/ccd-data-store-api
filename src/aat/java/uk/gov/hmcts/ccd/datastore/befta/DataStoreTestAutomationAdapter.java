@@ -51,8 +51,9 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
     }
 
     private RequestSpecification asAutoTestImporter() {
-        UserData caseworker = authenticate(new UserData(BeftaMain.getConfig().getImporterAutoTestEmail(),
-                BeftaMain.getConfig().getImporterAutoTestPassword()));
+        UserData caseworker = new UserData(BeftaMain.getConfig().getImporterAutoTestEmail(),
+                BeftaMain.getConfig().getImporterAutoTestPassword());
+        authenticate(caseworker);
 
         String s2sToken = getNewS2SToken();
         return RestAssured
