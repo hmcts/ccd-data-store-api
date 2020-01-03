@@ -23,7 +23,8 @@
     "responseMessage": "OK",
     "headers": {
       "_extends_": "Common_Response_Headers",
-      "Vary": "Accept-Encoding"
+      "Vary": "Accept-Encoding",
+      "Transfer-Encoding" : "chunked"
     },
     "body": {
       "id": "[[ANY]]",
