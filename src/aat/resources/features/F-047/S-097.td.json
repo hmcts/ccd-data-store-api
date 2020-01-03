@@ -8,9 +8,6 @@
   ],
   "expectedResponse": {
     "_extends_": "Common_200_Response",
-    "headers": {
-      "Vary": "Accept-Encoding"
-    },
     "body": {
       "arrayInMap": "[[ANY]]"
     }
