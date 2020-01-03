@@ -18,9 +18,12 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
 
     private Logger logger = LoggerFactory.getLogger(DataStoreTestAutomationAdapter.class);
 
-    private static final String BE_FTA_FILE_JURISDICTION_1 = "src/aat/resources/CCD_BEFTA_JURISDICTION1.xlsx";
-    private static final String BE_FTA_FILE_JURISDICTION_2 = "src/aat/resources/CCD_BEFTA_JURISDICTION2.xlsx";
-    private static final String BE_FTA_FILE_JURISDICTION_3 = "src/aat/resources/CCD_BEFTA_JURISDICTION3.xlsx";
+    private static final String[] TEST_DEFINITIONS_NEEDED_FOR_TA = {
+            "src/aat/resources/CCD_CNP_27.xlsx",
+            "src/aat/resources/CCD_BEFTA_JURISDICTION1.xlsx",
+            "src/aat/resources/CCD_BEFTA_JURISDICTION2.xlsx",
+            "src/aat/resources/CCD_BEFTA_JURISDICTION3.xlsx"
+    };
 
     @Override
     public void doLoadTestData() {
@@ -28,17 +31,11 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
     }
 
     private void importDefinitions() {
-        logger.info("Importing {}...", BE_FTA_FILE_JURISDICTION_1);
-        importDefinition(BE_FTA_FILE_JURISDICTION_1);
-        logger.info("Imported {}.", BE_FTA_FILE_JURISDICTION_1);
-
-        logger.info("Importing {}...", BE_FTA_FILE_JURISDICTION_2);
-        importDefinition(BE_FTA_FILE_JURISDICTION_2);
-        logger.info("Imported {}.", BE_FTA_FILE_JURISDICTION_2);
-
-        logger.info("Importing {}...", BE_FTA_FILE_JURISDICTION_3);
-        importDefinition(BE_FTA_FILE_JURISDICTION_3);
-        logger.info("Imported {}", BE_FTA_FILE_JURISDICTION_3);
+        for (String fileName : TEST_DEFINITIONS_NEEDED_FOR_TA) {
+            logger.info("\n\nImporting {}...", fileName);
+            importDefinition(fileName);
+            logger.info("Imported {}.\n\n", fileName);
+        }
     }
 
     private void importDefinition(String file) {
