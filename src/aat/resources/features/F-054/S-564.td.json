@@ -1,0 +1,28 @@
+{
+  "_guid_": "S-564",
+  "_extends_": "F-054_Base_Test_Data",
+  "title": "must return negative response HTTP-404 when request contains a non-existing case reference ID",
+  "specs": [
+    "an active profile in CCD",
+    "contains a non-existing case reference ID",
+    "code is HTTP-404"
+  ],
+  "request": {
+    "pathVariables": {
+      "cid": "non-existing case reference ID"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "headers" : {
+      "Connection" : "close"
+    },
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+      "message" : "Case reference is not valid",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}
