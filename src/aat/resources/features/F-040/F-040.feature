@@ -16,8 +16,8 @@ Feature: F-040: Get Case for Case worker
     Then a positive response is received
     And the response [contains values for all fields under the case type]
     And the response has all other details as expected
-    And a call [to get the same case by the Case Worker] will get the expected response as in [F-040_Later_Case_Read_By_Case_Worker]
-    And a call [to get the same case by the Solicitor] will get the expected response as in [F-040_Later_Case_Read_By_Solicitor]
+    And a call [to get the same case by Solicitor 1] will get the expected response as in [F-040_Later_Case_Read_By_Solicitor_1]
+    And a call [to get the same case by Solicitor 3] will get the expected response as in [F-040_Later_Case_Read_By_Solicitor_3]
 
 
   @S-577 @Ignore @WIP

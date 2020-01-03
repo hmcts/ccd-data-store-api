@@ -1,9 +1,9 @@
 {
-  "title": "Get the case for read by a solicitor",
+  "title": "Get the case for read by a caseworker",
   "_extends_": "F-040_Test_Data_Base",
-  "_guid_": "F-040_Later_Case_Read_By_Solicitor",
+  "_guid_": "F-040_Later_Case_Read_By_Solicitor_1",
   "specs": [
-    "to get the same case by the Solicitor"
+    "to get the same case by Solicitor 1"
   ],
   "user": {
     "username": "befta.caseworker.2.solicitor.1@gmail.com",
@@ -22,7 +22,7 @@
     "headers": {
       "Content-Length": "[[ANY]]",
       "Content-Type": "[[ANY]]",
-      "Transfer-Encoding" : "chunked"
+      "Transfer-Encoding": "chunked"
     },
     "body": {
       "id": "[[ANY]]",
@@ -40,11 +40,6 @@
           "document_binary_url": "http://dm-store:8080/documents/e56f0aea-4a5f-46d5-82d3-01b536420870/binary"
         },
         "MoneyGBPField": "111100",
-        "DocumentField3": {
-          "document_url": "http://dm-store:8080/documents/68c9f85f-1d0c-4d02-b082-502a87c1ac6c",
-          "document_filename": "Screenshot 2019-11-13 at 9.52.02 am.png",
-          "document_binary_url": "http://dm-store:8080/documents/68c9f85f-1d0c-4d02-b082-502a87c1ac6c/binary"
-        },
         "FixedListField": "VALUE3",
         "AddressUKField": {
           "County": null,
@@ -55,11 +50,6 @@
           "AddressLine2": null,
           "AddressLine3": null
         },
-        "DocumentField6": {
-          "document_url": "http://dm-store:8080/documents/76976634-374f-472b-a819-a3a938b4cc83",
-          "document_filename": "Screenshot 2019-11-13 at 11.25.45 am.png",
-          "document_binary_url": "http://dm-store:8080/documents/76976634-374f-472b-a819-a3a938b4cc83/binary"
-        },
         "DocumentField5": {
           "document_url": "http://dm-store:8080/documents/f96735a6-8764-4778-978c-e7612a610a94",
           "document_filename": "Screenshot 2019-11-18 at 10.20.24 am.png",
@@ -69,11 +59,6 @@
           "document_url": "http://dm-store:8080/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
           "document_filename": "Elastic Search test Case.png",
           "document_binary_url": "http://dm-store:8080/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary"
-        },
-        "DocumentField1": {
-          "document_url": "http://dm-store:8080/documents/e636eef3-839a-48cd-96f0-dad43e66f5c4",
-          "document_filename": "Screenshot 2019-11-13 at 3.24.26 pm.png",
-          "document_binary_url": "http://dm-store:8080/documents/e636eef3-839a-48cd-96f0-dad43e66f5c4/binary"
         },
         "ComplexField": {
           "ComplexTextField": null,
@@ -107,7 +92,6 @@
       "data_classification": {
         "DocumentField4": "PUBLIC",
         "MoneyGBPField": "PUBLIC",
-        "DocumentField3": "PUBLIC",
         "FixedListField": "PUBLIC",
         "AddressUKField": {
           "value": {
@@ -121,10 +105,8 @@
           },
           "classification": "PUBLIC"
         },
-        "DocumentField6": "PUBLIC",
         "DocumentField5": "PUBLIC",
         "DocumentField2": "PUBLIC",
-        "DocumentField1": "PUBLIC",
         "FixedRadioListField": "PUBLIC",
         "DateTimeField": "PUBLIC",
         "PhoneUKField": "PUBLIC",
@@ -149,7 +131,6 @@
       "security_classifications": {
         "DocumentField4": "PUBLIC",
         "MoneyGBPField": "PUBLIC",
-        "DocumentField3": "PUBLIC",
         "FixedListField": "PUBLIC",
         "AddressUKField": {
           "value": {
@@ -163,10 +144,8 @@
           },
           "classification": "PUBLIC"
         },
-        "DocumentField6": "PUBLIC",
         "DocumentField5": "PUBLIC",
         "DocumentField2": "PUBLIC",
-        "DocumentField1": "PUBLIC",
         "FixedRadioListField": "PUBLIC",
         "DateTimeField": "PUBLIC",
         "PhoneUKField": "PUBLIC",
