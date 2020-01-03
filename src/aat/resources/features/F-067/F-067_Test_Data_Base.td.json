@@ -14,6 +14,7 @@
     "headers": {
       "_extends_": "Common_Request_Headers",
       "experimental": true,
+      "Content-Encoding": "gzip",
       "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-event-view.v2+json;charset=UTF-8"
     },
     "pathVariables": {
