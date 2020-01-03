@@ -1,7 +1,0 @@
-{
-	"_guid_": "Common_Request_Headers",
-
-	"Authorization": "[[DYNAMIC]]",
-	"ServiceAuthorization": "[[DYNAMIC]]",
-	"Content-Type": "application/json"
-}

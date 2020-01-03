@@ -16,7 +16,7 @@
       "jid": "AUTOTEST1",
       "ctid": "AAT",
       "cid": "[[DYNAMIC]]",
-      "idToDelete": "${[scenarioContext][theInvokingUser][uid]}"
+      "idToDelete": "${[scenarioContext][theInvokingUser][id]}"
     }
   }
 }

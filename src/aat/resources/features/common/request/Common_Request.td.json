@@ -1,7 +1,0 @@
-{
-	"_guid_": "Common_Request",
-
-	"headers": {
-		"_extends_": "Common_Request_Headers"
-	}
-}
