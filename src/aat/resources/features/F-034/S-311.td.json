@@ -10,8 +10,6 @@
   "request": {
     "pathVariables": {
       "ctid": "AAT"
-    },
-    "body": {
     }
   },
   "expectedResponse": {
