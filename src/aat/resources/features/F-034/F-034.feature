@@ -1,7 +1,7 @@
 @F-034
 Feature: F-034: Validate case data
 
-  Background: Validate the case data
+  Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
   @S-314
@@ -11,7 +11,7 @@ Feature: F-034: Validate case data
     And the request [contains the case type and event]
     And it is submitted to call the [Validate case data] operation of [CCD Data Store]
     Then a positive response is received
-    And the response [contains  case type and event, along with a HTTP 200 OK]
+    And the response [contains the case type and event, along with a HTTP 200 OK]
     And the response has all other details as expected
 
   @S-308 @Ignore #This scenario is return 403 instead of 401. Jira: RDM-6628
@@ -56,6 +56,4 @@ Feature: F-034: Validate case data
 
   @S-312 @Ignore #This scenario is invalid. Jira: RDM-6410
   Scenario: must return 422 when event trigger does not exist
-
-
 
