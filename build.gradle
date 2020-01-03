@@ -618,10 +618,10 @@ task smoke(type: Test) {
     description = 'Executes smoke tests against an AAT CCD Data Store instance'
     setTestClassesDirs(sourceSets.aat.output.classesDirs)
     setClasspath(sourceSets.aat.runtimeClasspath)
-    //include "uk/gov/hmcts/ccd/datastore/tests/functional/**"
-    //include "uk/gov/hmcts/ccd/datastore/tests/v2/**"
+    include "uk/gov/hmcts/ccd/datastore/tests/functional/**"
+    include "uk/gov/hmcts/ccd/datastore/tests/v2/**"
     useJUnitPlatform {
-        includeTags 'smoke_disable'
+        includeTags 'smoke'
     }
 
 }
