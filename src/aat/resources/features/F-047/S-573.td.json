@@ -13,13 +13,6 @@
     }
   },
   "expectedResponse": {
-    "_extends_": "Common_400_Response",
-    "body": {
-      "exception": "[[ANY]]",
-      "message": "Missing start trigger token",
-      "details": null,
-      "callbackErrors": null,
-      "callbackWarnings": null
-    }
+    "_extends_": "Common_400_Response"
   }
 }

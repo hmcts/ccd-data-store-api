@@ -45,7 +45,7 @@ Feature: F-047: Get case ids
     And the response [contains an HTTP-403 Forbidden]
     And the response has all other details as expected
 
-  @S-570 @Ignore # Response code mismatch, expected: 400, actual: 500
+  @S-570 @Ignore # Response code mismatch, expected: 400, actual: 500 /RDM-7085
   Scenario: must return negative response HTTP-400 when request contains a malformed user ID
     Given a user with [an inactive profile in CCD]
     When  a request is prepared with appropriate values
@@ -55,7 +55,7 @@ Feature: F-047: Get case ids
     And   the response [code is HTTP-400]
     And   the response has all other details as expected
 
-  @S-571 @Ignore # Response code mismatch, expected: 400, actual: 500
+  @S-571 @Ignore # Response code mismatch, expected: 400, actual: 500 RDM-7085
   Scenario: must return negative response HTTP-400 when request contains a malformed case type ID
     Given a user with [an active profile in CCD]
     When  a request is prepared with appropriate values
@@ -65,7 +65,7 @@ Feature: F-047: Get case ids
     And   the response [code is HTTP-400]
     And   the response has all other details as expected
 
-  @S-572 @Ignore # Response code mismatch, expected: 400, actual: 403
+  @S-572 @Ignore # Response code mismatch, expected: 400, actual: 403 / RDM-7106
   Scenario: must return negative response HTTP-400 when request contains a malformed jurisdiction ID
     Given a user with [an active profile in CCD]
     When  a request is prepared with appropriate values
@@ -75,7 +75,7 @@ Feature: F-047: Get case ids
     And   the response [code is HTTP-400]
     And   the response has all other details as expected
 
-  @S-573 @Ignore # Response code mismatch, expected: 400, actual: 403
+  @S-573 @Ignore # Response code mismatch, expected: 400, actual: 403 / RDM-7106
   Scenario: must return negative response HTTP-400 when request contains a non-existing jurisdiction ID
     Given a user with [an active profile in CCD]
     When  a request is prepared with appropriate values
@@ -85,7 +85,7 @@ Feature: F-047: Get case ids
     And   the response [code is HTTP-400]
     And   the response has all other details as expected
 
-  @S-574 @Ignore #Response code mismatch, expected: 400, actual: 200"
+  @S-574 @Ignore #Response code mismatch, expected: 404, actual: 200" / RDM-7066
   Scenario: must return negative response HTTP-404 when request contains a non-existing case type ID
     Given a user with [an active profile in CCD]
     When  a request is prepared with appropriate values
