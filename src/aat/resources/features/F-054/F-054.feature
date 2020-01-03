@@ -26,7 +26,7 @@ Feature: F-054: Get case for Citizen
     And   the response [code is HTTP-401]
     And   the response has all other details as expected
 
-  @S-095  @Ignore
+  @S-095  @Ignore # as discussed we are going to implement the generic test for this 
   Scenario: must return 403 when request provides authentic credentials without authorized access to the operation
     Given a user with [an active profile in CCD]
     When  a request is prepared with appropriate values
