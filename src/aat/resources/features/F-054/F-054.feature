@@ -9,7 +9,6 @@ Feature: F-054: Get case for Citizen
     Given a user with [an active profile in CCD]
     And   a successful call [to create a token for case creation as a citizen] as in [Citizen_Token_Creation_Data_For_Case_Creation]
     And   another successful call [to create a full case as a citizen] as in [Citizen_Full_Case_Creation_Data]
-    And   a user with [an active profile in CCD]
     When  a request is prepared with appropriate values
     And   the request [contains case data matching the case just created above]
     And   it is submitted to call the [get case for citizen] operation of [CCD Data Store]
@@ -27,7 +26,7 @@ Feature: F-054: Get case for Citizen
     And   the response [code is HTTP-401]
     And   the response has all other details as expected
 
-  @S-095
+  @S-095  @Ignore
   Scenario: must return 403 when request provides authentic credentials without authorized access to the operation
     Given a user with [an active profile in CCD]
     When  a request is prepared with appropriate values

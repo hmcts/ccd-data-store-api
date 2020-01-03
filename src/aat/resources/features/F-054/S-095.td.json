@@ -7,13 +7,9 @@
     "contains an valid user authorisation token that does not have access to the operation",
     "code is HTTP-403"
   ],
-  "request": {
-    "headers": {
-      "Authorization": "abc"
-    },
-    "pathVariables": {
-      "cid": "1234567890123456"
-    }
+  "user": {
+    "username": "auto.test.cnp@gmail.com",
+    "password": "Pa55word11"
   },
   "expectedResponse": {
     "_extends_": "Common_403_Response",

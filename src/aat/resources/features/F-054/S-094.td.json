@@ -8,9 +8,8 @@
     "contains a HTTP 401 Unauthorised"
   ],
   "request": {
-    "pathVariables": {
-      "cid": "1234567890123456",
-      "uid": "anInvalidUID"
+    "headers": {
+      "Authorization": "InvalidAuthorization"
     }
   },
   "expectedResponse": {
