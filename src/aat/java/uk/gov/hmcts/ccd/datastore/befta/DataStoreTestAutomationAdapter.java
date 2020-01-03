@@ -20,6 +20,10 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
 
     private static final String[] TEST_DEFINITIONS_NEEDED_FOR_TA = {
             "src/aat/resources/CCD_CNP_27.xlsx",
+            "src/aat/resources/CCD_CNP_27_AUTOTEST1.xlsx",
+            "src/aat/resources/CCD_CNP_27_AUTOTEST2.xlsx",
+            "src/aat/resources/CCD_CNP_RDM5118.xlsx",
+
             "src/aat/resources/CCD_BEFTA_JURISDICTION1.xlsx",
             "src/aat/resources/CCD_BEFTA_JURISDICTION2.xlsx",
             "src/aat/resources/CCD_BEFTA_JURISDICTION3.xlsx"
@@ -32,9 +36,13 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
 
     private void importDefinitions() {
         for (String fileName : TEST_DEFINITIONS_NEEDED_FOR_TA) {
-            logger.info("\n\nImporting {}...", fileName);
-            importDefinition(fileName);
-            logger.info("Imported {}.\n\n", fileName);
+            try {
+                logger.info("\n\nImporting {}...", fileName);
+                importDefinition(fileName);
+                logger.info("Imported {}.\n\n", fileName);
+            } catch (Exception e) {
+                logger.info("Couldn't import {} - Exception: {}.\n\n", fileName, e);
+            }
         }
     }
 
