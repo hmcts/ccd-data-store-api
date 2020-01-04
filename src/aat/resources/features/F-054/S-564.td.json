@@ -9,7 +9,7 @@
   ],
   "request": {
     "pathVariables": {
-      "cid": "non-existing case reference ID"
+      "cid": "4929751530762572"
     }
   },
   "expectedResponse": {
