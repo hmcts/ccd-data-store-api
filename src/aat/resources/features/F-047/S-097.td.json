@@ -7,13 +7,9 @@
     "contains a list of case ids, along with an HTTP-200 OK"
   ],
   "expectedResponse": {
-    "responseCode": 200,
-    "responseMessage": "OK",
-    "headers": {
-      "Vary": "Accept-Encoding"
-    },
+    "_extends_": "Common_200_Response",
     "body": {
-      "arrayInMap": []
+      "arrayInMap": "[[ANY]]"
     }
   }
 }
