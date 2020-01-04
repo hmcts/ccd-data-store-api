@@ -29,38 +29,9 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
             "src/aat/resources/CCD_BEFTA_JURISDICTION3.xlsx"
     };
 
-    private static final String[][] CCD_ROLES_NEEDED_FOR_TA = {
-            { "caseworker-autotest1", "PUBLIC" },
-            { "caseworker-autotest1-private", "PRIVATE" },
-            { "caseworker-autotest1-senior", "RESTRICTED" },
-            { "caseworker-autotest1-solicitor", "PRIVATE" },
-
-            { "caseworker-autotest2", "PUBLIC" },
-            { "caseworker-autotest2-private", "PRIVATE" },
-            { "caseworker-autotest2-senior", "RESTRICTED" },
-            { "caseworker-autotest2-solicitor", "PRIVATE" },
-    };
-
     @Override
     public void doLoadTestData() {
-        addCcdRoles();
         importDefinitions();
-    }
-
-    private void addCcdRoles() {
-        for (String[] roleInfo : CCD_ROLES_NEEDED_FOR_TA) {
-            try {
-                logger.info("\n\nAdding CCD Role {}, {}...", roleInfo[0], roleInfo[1]);
-                addCcdRole(roleInfo[0], roleInfo[1]);
-                logger.info("\n\nAdded CCD Role {}, {}...", roleInfo[0], roleInfo[1]);
-            } catch (Exception e) {
-                logger.info("\n\nCouldn't adding CCD Role {}, {} - Exception: {}.\\n\\n", roleInfo[0], roleInfo[1], e);
-            }
-        }
-    }
-
-    private void addCcdRole(String role, String classification) {
-
     }
 
     private void importDefinitions() {
