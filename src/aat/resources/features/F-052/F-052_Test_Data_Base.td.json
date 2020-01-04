@@ -1,0 +1,31 @@
+{
+	"_guid_": "F-052_Test_Data_Base",
+
+	"productName": "CCD Data Store",
+	"operationName": "get case data for a given case type for citizen",
+	"method": "GET",
+	"uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
+
+  "users": {
+    "invokingUser": {
+      "username": "befta.citizen.3@gmail.com",
+      "password": "Pa55word11"
+    }
+  },
+
+	"request": {
+		"_extends_": "Common_Request",
+		"pathVariables": {
+			"uid": "[[DYNAMIC]]",
+      "jid": "BEFTA_JURISDICTION_3",
+      "ctid": "BEFTA_CASETYPE_3_2"
+    }
+	},
+  "expectedResponse": {
+    "headers": {
+      "Content-Type": "[[ANY]]",
+      "Content-Length": "[[ANY]]",
+      "Content-Encoding" : "gzip"
+    }
+  }
+}

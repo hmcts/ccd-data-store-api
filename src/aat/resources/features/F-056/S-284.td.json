@@ -16,7 +16,7 @@
     "username": "auto.test.cnp_invalid@gmail.com",
     "password": "Pa55word12_wrong",
     "token": "fakeToken",
-    "uid": "dummyval"
+    "id": "dummyval"
   },
   "expectedResponse": {
     "_extends_": "Common_403_Response",
