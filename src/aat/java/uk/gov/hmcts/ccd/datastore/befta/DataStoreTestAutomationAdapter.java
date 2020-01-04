@@ -74,7 +74,7 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
         Response response = asAutoTestImporter().given()
                 .header("Content-type", "application/json").body(ccdRoleInfo).when()
                 .put("/api/user-role");
-        if (response.getStatusCode() != 205 && response.getStatusCode() != 215) {
+        if (response.getStatusCode() / 100 != 2) {
             String message = "Import failed with response body: " + response.body().prettyPrint();
             message += "\nand http code: " + response.statusCode();
             throw new FunctionalTestException(message);
