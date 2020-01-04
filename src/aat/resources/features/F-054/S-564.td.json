@@ -15,8 +15,8 @@
   "expectedResponse": {
     "_extends_": "Common_404_Response",
     "body" : {
-      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
-      "message" : "Case reference is not valid",
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "message" : "No case found",
       "details" : null,
       "callbackErrors" : null,
       "callbackWarnings" : null
