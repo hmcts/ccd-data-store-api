@@ -86,3 +86,4 @@ Feature: F-037: Submit event for an existing case (V2)
     And another successful call [to get an update event token for the case just created] as in [S-577-Prerequisite_Solicitor_3_Token_For_Update_Case]
     And a call [to update the same case by Solicitor 3] will get the expected response as in [S-577_Later_Case_Update_By_Solicitor_3]
     And a call [to get the same case by Solicitor 3] will get the expected response as in [S-577_Later_Case_Read_By_Solicitor_3]
+
