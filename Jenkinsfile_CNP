@@ -79,6 +79,7 @@ withPipeline(type, product, component) {
     enableDbMigration('ccd')
     enableDockerBuild()
     installCharts()
+    disableLegacyDeployment()
     after('functionalTest:preview') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/cucumber/**/*'
     }
