@@ -18,4 +18,3 @@ Feature: F-040: Get Case for Case worker
     And the response has all other details as expected
     And a call [to get the same case by Solicitor 1] will get the expected response as in [F-040_Later_Case_Read_By_Solicitor_1]
     And a call [to get the same case by Solicitor 3] will get the expected response as in [F-040_Later_Case_Read_By_Solicitor_3]
-
