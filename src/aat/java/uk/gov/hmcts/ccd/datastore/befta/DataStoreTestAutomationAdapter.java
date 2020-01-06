@@ -71,8 +71,10 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
         Map<String, String> ccdRoleInfo = new HashMap<>();
         ccdRoleInfo.put("role", role);
         ccdRoleInfo.put("security_classification", classification);
-        Response response = asAutoTestImporter().given().body(ccdRoleInfo).when().put("/api/user-role");
-        if (response.getStatusCode() != 205 && response.getStatusCode() != 215) {
+        Response response = asAutoTestImporter().given()
+                .header("Content-type", "application/json").body(ccdRoleInfo).when()
+                .put("/api/user-role");
+        if (response.getStatusCode() / 100 != 2) {
             String message = "Import failed with response body: " + response.body().prettyPrint();
             message += "\nand http code: " + response.statusCode();
             throw new FunctionalTestException(message);
