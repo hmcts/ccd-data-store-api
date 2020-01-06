@@ -43,8 +43,13 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
             { "caseworker-autotest2-solicitor", "PRIVATE" },
 
             { "caseworker-befta_jurisdiction_1", "PUBLIC" },
+
             { "caseworker-befta_jurisdiction_2", "PUBLIC" },
+            { "caseworker-befta_jurisdiction_2-solicitor_1", "PUBLIC" },
+            { "caseworker-befta_jurisdiction_2-solicitor_2", "PUBLIC" },
+            { "caseworker-befta_jurisdiction_2-solicitor_3", "PUBLIC" },
             { "citizen", "PUBLIC" },
+
             { "caseworker-befta_jurisdiction_3", "PUBLIC" },
             { "caseworker-befta_jurisdiction_3-solicitor", "PUBLIC" }
     };
