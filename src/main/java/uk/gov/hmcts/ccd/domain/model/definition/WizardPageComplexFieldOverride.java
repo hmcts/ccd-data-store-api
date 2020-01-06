@@ -9,7 +9,6 @@ import java.io.Serializable;
 public class WizardPageComplexFieldOverride implements Serializable {
     private String complexFieldElementId;
     private String displayContext;
-    private Integer order;
     private String label;
     private String hintText;
     private String showCondition;
@@ -30,15 +29,6 @@ public class WizardPageComplexFieldOverride implements Serializable {
 
     public void setDisplayContext(String displayContext) {
         this.displayContext = displayContext;
-    }
-
-    @JsonProperty("order")
-    public Integer getOrder() {
-        return order;
-    }
-
-    public void setOrder(Integer order) {
-        this.order = order;
     }
 
     @JsonProperty("label")
