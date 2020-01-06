@@ -257,7 +257,7 @@ dependencies {
     compile group: 'io.cucumber', name: 'cucumber-java', version: '5.0.0-RC1'
     testCompile group: 'io.cucumber', name: 'cucumber-junit', version: '5.0.0-RC1'
     
-    testCompile files('lib/befta-fw-1.0.8-SNAPSHOT.jar')
+    testCompile files('lib/befta-fw-1.0.9-SNAPSHOT.jar')
 }
 // end::dependencies[]
 
@@ -624,6 +624,14 @@ task smoke(type: Test) {
     include "uk/gov/hmcts/ccd/datastore/tests/v2/**"
     useJUnitPlatform {
         includeTags 'smoke'
+    }
+
+    doFirst {
+        javaexec {
+            main = "uk.gov.hmcts.ccd.datastore.befta.DataStoreTestDataLoader"
+            classpath += sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
+            args = ['']
+        }
     }
 
 }
