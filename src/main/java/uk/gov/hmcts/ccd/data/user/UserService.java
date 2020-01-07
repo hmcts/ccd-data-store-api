@@ -5,8 +5,8 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import uk.gov.hmcts.ccd.data.casedetails.JurisdictionMapper;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
@@ -41,10 +41,16 @@ public class UserService {
         UserDefault userDefault = userRepository.getUserDefaultSettings(userId);
         List<String> jurisdictionIds = userDefault.getJurisdictionsId();
 
-        List<Jurisdiction> jurisdictionsDefinition = jurisdictionIds.stream()
-                .map(id -> caseDefinitionRepository.getJurisdiction(id)).collect(Collectors.toList());
+        List<Jurisdiction> jurisdictions = new ArrayList<>();
 
-        return createUserProfile(idamProperties, userDefault, jurisdictionsDefinition);
+        jurisdictionIds.stream().forEach(id -> {
+            Jurisdiction jurisdiction = caseDefinitionRepository.getJurisdiction(id);
+            if (jurisdiction != null) {
+                jurisdictions.add(jurisdiction);
+            }
+        });
+
+        return createUserProfile(idamProperties, userDefault, jurisdictions);
     }
 
     private UserProfile createUserProfile(IDAMProperties idamProperties, UserDefault userDefault, List<Jurisdiction> jurisdictionsDefinition) {

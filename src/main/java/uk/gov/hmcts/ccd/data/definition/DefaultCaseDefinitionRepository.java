@@ -189,7 +189,11 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     public Jurisdiction getJurisdictionFromDefinitionStore(String jurisdictionId) {
-        return getJurisdictionsFromDefinitionStore(Arrays.asList(jurisdictionId)).get(0);
+        List<Jurisdiction> jurisdictions = getJurisdictionsFromDefinitionStore(Arrays.asList(jurisdictionId));
+        if (jurisdictions.isEmpty()) {
+            return null;
+        }
+        return jurisdictions.get(0);
     }
 
     private List<Jurisdiction> getJurisdictionsFromDefinitionStore(List<String> jurisdictionIds) {
@@ -200,7 +204,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             List<Jurisdiction> jurisdictionList = restTemplate.exchange(builder.build().encode().toUri(),
                     HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<Jurisdiction>>() {
                     }).getBody();
-            LOG.info("Jurisdiction IDs= {}. Retrieved jurisdiction objects: {}", jurisdictionIds, jurisdictionList);
+            LOG.debug("Jurisdiction IDs= {}. Retrieved jurisdiction objects: {}", jurisdictionIds, jurisdictionList);
             return jurisdictionList;
         } catch (Exception e) {
             LOG.warn("Error while retrieving jurisdictions definition", e);
