@@ -200,7 +200,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             List<Jurisdiction> jurisdictionList = restTemplate.exchange(builder.build().encode().toUri(),
                     HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<Jurisdiction>>() {
                     }).getBody();
-            LOG.debug("Retrieved jurisdiction definition: {}", jurisdictionList);
+            LOG.info("Jurisdiction IDs= {}. Retrieved jurisdiction objects: {}", jurisdictionIds, jurisdictionList);
             return jurisdictionList;
         } catch (Exception e) {
             LOG.warn("Error while retrieving jurisdictions definition", e);
