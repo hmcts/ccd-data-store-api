@@ -1,12 +1,5 @@
 package uk.gov.hmcts.ccd.data.definition;
 
-import javax.inject.Inject;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import static uk.gov.hmcts.ccd.ApplicationParams.encodeBase64;
 
 import org.apache.commons.lang3.StringUtils;
@@ -22,6 +15,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import javax.inject.Inject;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
@@ -190,7 +192,8 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             List<Jurisdiction> jurisdictionList = restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET,
                     requestEntity, new ParameterizedTypeReference<List<Jurisdiction>>() {
                     }).getBody();
-            LOG.debug("retrieved jurisdictions definition: {}", jurisdictionList);
+            LOG.info("Jurisdiction IDs= {}. Retrieved jurisdiction objects: {}", ids, jurisdictionList);
+
             return jurisdictionList;
         } catch (Exception e) {
             LOG.warn("Error while retrieving jurisdictions definition", e);
