@@ -35,8 +35,9 @@
 			"Content-Encoding": "gzip",
 			"Content-Type": "application/json;charset=UTF-8",
 			"vary": "accept-encoding",
-			"Content-Length": "[[ANY]]"
-		},
+			"Content-Length": "[[ANY]]",
+      "Transfer-Encoding" : "chunked"
+    },
 		"body": {
 			"id": "[[ANY]]",
 			"state": "TODO",

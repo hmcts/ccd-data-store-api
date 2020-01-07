@@ -36,10 +36,10 @@
       "security_classification": "PUBLIC",
       "case_data": {
         "_extends_": "Befta_Jurisdiction2_Default_Full_Case_Data"
-      }
-    },
-    "data_classification": {
-      "_extends_": "Befta_Jurisdiction2_Default_Full_Case_Data_Security_Classification",
+      },
+      "data_classification": {
+        "_extends_": "Befta_Jurisdiction2_Default_Full_Case_Data_Security_Classification"
+      },
       "after_submit_callback_response": null,
       "callback_response_status_code": null,
       "callback_response_status": null,

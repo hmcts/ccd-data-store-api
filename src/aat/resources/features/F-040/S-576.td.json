@@ -24,7 +24,8 @@
     "_extends_": "Common_200_Response",
     "headers": {
       "Content-Length": "[[ANY]]",
-      "Content-Type": "[[ANY]]"
+      "Content-Type": "[[ANY]]",
+      "Transfer-Encoding": "chunked"
     },
     "body": {
       "id": "[[ANY]]",
@@ -36,10 +37,10 @@
       "last_modified": "[[ANY]]",
       "security_classification": "PUBLIC",
       "case_data": {
-        "_extends_" : "Befta_Jurisdiction2_Default_Full_Case_Data"
+        "_extends_": "Befta_Jurisdiction2_Default_Full_Case_Data"
       },
       "data_classification": {
-        "_extends_" : "Befta_Jurisdiction2_Default_Full_Case_Data_Security_Classification"
+        "_extends_": "Befta_Jurisdiction2_Default_Full_Case_Data_Security_Classification"
       },
       "after_submit_callback_response": null,
       "callback_response_status_code": null,
@@ -47,7 +48,7 @@
       "delete_draft_response_status_code": null,
       "delete_draft_response_status": null,
       "security_classifications": {
-        "_extends_" : "Befta_Jurisdiction2_Default_Full_Case_Data_Security_Classification"
+        "_extends_": "Befta_Jurisdiction2_Default_Full_Case_Data_Security_Classification"
       }
     }
   }
