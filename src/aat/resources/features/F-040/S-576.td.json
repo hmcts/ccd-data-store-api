@@ -3,9 +3,9 @@
   "_extends_": "F-040_Test_Data_Base",
   "_guid_": "S-576",
   "specs": [
-    "an active Solicitor profile in CCD with a specific variation of ACLs on a case type",
-    "another active solicitor profile with different variation of ACLs on the same case type",
-    "is prepared on behalf of the user creating the case above",
+    "an active Solicitor 1 profile in CCD with limited permissions on certain fields for a given case type",
+    "another active solicitor 3 profile with different variation of ACLs on the same case type",
+    "is made by the privileged user who just created the case",
     "contains values for all fields under the case type"
   ],
   "user": {
