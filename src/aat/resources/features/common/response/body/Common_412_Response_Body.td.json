@@ -1,7 +1,0 @@
-{
-	"_guid_": "Common_412_Response_Body",
-	"_extends_": "Common_4XX_Response_Body",
-
-	"status": 412,
-	"error": "Precondition Failed"
-}
