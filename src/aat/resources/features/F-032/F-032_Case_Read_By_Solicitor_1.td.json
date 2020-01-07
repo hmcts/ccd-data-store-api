@@ -1,0 +1,12 @@
+{
+  "_guid_": "F-032_Case_Read_By_Solicitor_1",
+  "_extends_": "S-123",
+
+  "specs": [
+    "to get the same case by solicitor 1"
+  ],
+
+  "user": {
+    "username": "befta.caseworker.2.solicitor.1@gmail.com"
+  }
+}
