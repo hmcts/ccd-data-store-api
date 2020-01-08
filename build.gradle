@@ -90,7 +90,7 @@ dependencyCheck {
     // These are non-runtime configurations used during the build.
     skipConfigurations = ['codacy', 'spotbugs']
 }
-    
+
 mainClassName = 'uk.gov.hmcts.ccd.CoreCaseDataApplication'
 
 // tag::repositories[]
@@ -277,7 +277,7 @@ dependencyManagement {
         dependency 'com.google.guava:guava:24.1.1-jre'
 
         // CVE-2019-0232 - Java and Command Line injections in Windows
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.21') {
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.30') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
