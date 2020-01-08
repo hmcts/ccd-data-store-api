@@ -17,7 +17,7 @@
         "DocumentField2":{
           "document_url":"http://dm-store:8080/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
           "document_binary_url":"http://dm-store:8080/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
-          "document_filename":"Elastic Search test Case.png --> updated by Solicitor 2"
+          "document_filename":"Elastic Search test Case.png --> updated by Citizen"
         }
       }
     }
@@ -76,7 +76,7 @@
         "DocumentField2" : {
           "document_url" : "http://dm-store:8080/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
           "document_binary_url" : "http://dm-store:8080/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
-          "document_filename" : "Elastic Search test Case.png --> updated by Solicitor 2"
+          "document_filename" : "Elastic Search test Case.png --> updated by Citizen"
         },
         "DocumentField1" : {
           "document_url" : "http://dm-store:8080/documents/e636eef3-839a-48cd-96f0-dad43e66f5c4",

@@ -14,7 +14,7 @@
       "experimental": true
     },
     "pathVariables": {
-      "cid": "${[scenarioContext][childContexts][Befta_Jurisdiction2_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
+      "cid": "${[scenarioContext][childContexts][S-578_Citizen_Case_Creation_Data][testData][actualResponse][body][id]}"
     },
     "body": {
       "data": {
@@ -29,7 +29,7 @@
         "summary": "",
         "description": ""
       },
-      "event_token": "${[scenarioContext][childContexts][S-577-Prerequisite_Solicitor_2_Token_For_Update_Case][testData][actualResponse][body][token]}",
+      "event_token": "${[scenarioContext][childContexts][S-578-Prerequisite_Citizen_Token_For_Update_Case][testData][actualResponse][body][token]}",
       "ignore_warning": false
     }
   },
