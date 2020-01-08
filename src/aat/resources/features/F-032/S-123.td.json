@@ -4,6 +4,12 @@
   "_guid_": "S-123",
   "_extends_": "F-032_Base_Test_Data",
 
+  "users": {
+    "invokingUser": {
+      "username": "befta.caseworker.2.solicitor.2@gmail.com"
+    }
+  },
+
   "specs": [
     "an active solicitor 1 profile in CCD with read permissions on limited documents for a given case type",
     "another active solicitor 2 profile in CCD with all permissions on all documents for a given case type",

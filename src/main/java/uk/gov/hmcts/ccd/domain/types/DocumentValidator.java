@@ -68,8 +68,10 @@ public class DocumentValidator implements BaseTypeValidator {
         if (!documentUrlMatcher.matches()) {
             LOG.error("{} does not match Document Management domain or expected URL path {} {}",
                       documentUrlValue, urlPatternString, dataFieldId);
-            return Collections.singletonList(new ValidationResult(documentUrlValue
-                + " does not match Document Management domain or expected URL path", dataFieldId));
+            String errorMessage = documentUrlValue
+                + " does not match Document Management domain or expected URL path, expected domain "
+                + applicationParams.getValidDMDomain();
+            return Collections.singletonList(new ValidationResult(errorMessage, dataFieldId));
         }
 
         if (dataValue.has(DOCUMENT_BINARY_URL)) {
