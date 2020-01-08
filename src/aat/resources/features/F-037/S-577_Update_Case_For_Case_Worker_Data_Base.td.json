@@ -1,5 +1,6 @@
 {
   "_guid_": "S-577_Update_Case_For_Case_Worker_Data_Base",
+  "_extends_": "S-577_Response_Data_Base",
   "productName": "CCD Data Store",
   "operationName": "submit event for an existing case (V2)",
   "method": "POST",
@@ -19,8 +20,8 @@
     "body": {
       "data": {
         "DocumentField2":{
-          "document_url":"http://dm-store:8080/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
-          "document_binary_url":"http://dm-store:8080/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
+          "document_url":"http://dm-store-aat.service.core-compute-aat.internal/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
+          "document_binary_url":"http://dm-store-aat.service.core-compute-aat.internal/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
           "document_filename":"Elastic Search test Case.png"
         }
       },
@@ -31,13 +32,6 @@
       },
       "event_token": "${[scenarioContext][childContexts][S-577-Prerequisite_Solicitor_2_Token_For_Update_Case][testData][actualResponse][body][token]}",
       "ignore_warning": false
-    }
-  },
-  "expectedResponse": {
-    "headers": {
-      "_extends_": "Common_Response_Headers",
-      "Content-Type": "[[ANY]]",
-      "Content-Length": "[[ANY]]"
     }
   }
 }

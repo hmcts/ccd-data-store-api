@@ -1,6 +1,6 @@
 {
   "_guid_": "Befta_Jurisdiction2_Case_Creation_Base_Data",
-
+  "_extends_": "Befta_Case_Transfer_Encoding_Header",
   "productName": "CCD Data Store",
   "operationName": "Submit case creation as Case worker",
   "method": "POST",
@@ -34,7 +34,6 @@
     "headers": {
       "Content-Encoding": "gzip",
       "Content-Type": "application/json;charset=UTF-8",
-      "vary": "accept-encoding",
       "Content-Length": "[[ANY]]"
     },
     "body": {

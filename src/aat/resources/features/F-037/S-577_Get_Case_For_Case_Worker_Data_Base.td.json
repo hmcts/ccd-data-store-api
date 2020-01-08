@@ -1,5 +1,6 @@
 {
   "_guid_": "S-577_Get_Case_For_Case_Worker_Data_Base",
+  "_extends_": "S-577_Response_Data_Base",
   "productName": "CCD Data Store",
   "operationName": "Get Case for Case Worker",
   "method": "GET",
@@ -21,8 +22,6 @@
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "headers": {
-      "Content-Type": "[[ANY]]",
-      "Content-Length": "[[ANY]]",
       "Content-Encoding": "gzip"
     },
     "body" : {
