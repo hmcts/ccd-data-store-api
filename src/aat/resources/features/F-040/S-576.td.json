@@ -16,7 +16,7 @@
     "pathVariables": {
       "cid": "${[scenarioContext][childContexts][Befta_Jurisdiction2_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}",
       "uid": "[[DYNAMIC]]",
-      "jid": "BEFTA_JURISDICTION_2",
+      "jid":  "BEFTA_JURISDICTION_2",
       "ctid": "BEFTA_CASETYPE_2_1"
     }
   },
