@@ -43,8 +43,13 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
             { "caseworker-autotest2-solicitor", "PRIVATE" },
 
             { "caseworker-befta_jurisdiction_1", "PUBLIC" },
+
             { "caseworker-befta_jurisdiction_2", "PUBLIC" },
+            { "caseworker-befta_jurisdiction_2-solicitor_1", "PUBLIC" },
+            { "caseworker-befta_jurisdiction_2-solicitor_2", "PUBLIC" },
+            { "caseworker-befta_jurisdiction_2-solicitor_3", "PUBLIC" },
             { "citizen", "PUBLIC" },
+
             { "caseworker-befta_jurisdiction_3", "PUBLIC" },
             { "caseworker-befta_jurisdiction_3-solicitor", "PUBLIC" }
     };
@@ -56,6 +61,8 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
     }
 
     private void addCcdRoles() {
+        logger.info("{} roles will be added to '{}'.", CCD_ROLES_NEEDED_FOR_TA.length,
+                BeftaMain.getConfig().getDefinitionStoreUrl());
         for (String[] roleInfo : CCD_ROLES_NEEDED_FOR_TA) {
             try {
                 logger.info("\n\nAdding CCD Role {}, {}...", roleInfo[0], roleInfo[1]);
@@ -82,6 +89,8 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
     }
 
     private void importDefinitions() {
+        logger.info("{} definition files will be uploaded to '{}'.", TEST_DEFINITIONS_NEEDED_FOR_TA.length,
+                BeftaMain.getConfig().getDefinitionStoreUrl());
         for (String fileName : TEST_DEFINITIONS_NEEDED_FOR_TA) {
             try {
                 logger.info("\n\nImporting {}...", fileName);
