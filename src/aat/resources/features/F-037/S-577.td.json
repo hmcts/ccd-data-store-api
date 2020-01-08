@@ -3,9 +3,9 @@
   "_extends_": "S-577_Update_Case_For_Case_Worker_Data_Base",
   "_guid_": "S-577",
   "specs": [
-    "an active Case Worker profile in CCD with a specific variation of ACLs on a case type",
-    "an active solicitor profile with another specific variation of ACLs on the same case type",
-    "is prepared on behalf of the user creating the case above",
+    "an active Solicitor profile in CCD with a specific variation of ACLs on a case type",
+    "an active Solicitor profile having full permissions on the same case type",
+    "prompts an update to DocumentField2, made by the privileged user who just created the case",
     "contains updated values for DocumentField2"
   ],
   "user": {
@@ -110,41 +110,7 @@
         "CollectionField" : [ ]
       },
       "data_classification" : {
-        "DocumentField4" : "PUBLIC",
-        "MoneyGBPField" : "PUBLIC",
-        "DocumentField3" : "PUBLIC",
-        "FixedListField" : "PUBLIC",
-        "AddressUKField" : {
-          "classification" : "PUBLIC",
-          "value" : {
-            "County" : "PUBLIC",
-            "Country" : "PUBLIC",
-            "PostCode" : "PUBLIC",
-            "PostTown" : "PUBLIC",
-            "AddressLine1" : "PUBLIC",
-            "AddressLine2" : "PUBLIC",
-            "AddressLine3" : "PUBLIC"
-          }
-        },
-        "DocumentField6" : "PUBLIC",
-        "DocumentField5" : "PUBLIC",
-        "DocumentField2" : "PUBLIC",
-        "DocumentField1" : "PUBLIC",
-        "FixedRadioListField" : "PUBLIC",
-        "DateTimeField" : "PUBLIC",
-        "PhoneUKField" : "PUBLIC",
-        "DocumentField7" : "PUBLIC",
-        "NumberField" : "PUBLIC",
-        "MultiSelectListField" : "PUBLIC",
-        "YesOrNoField" : "PUBLIC",
-        "EmailField" : "PUBLIC",
-        "TextField" : "PUBLIC",
-        "DateField" : "PUBLIC",
-        "TextAreaField" : "PUBLIC",
-        "CollectionField" : {
-          "classification" : "PUBLIC",
-          "value" : [ ]
-        }
+        "_extends_": "Befta_Jurisdiction2_Default_Full_Case_Security_Classification"
       },
       "after_submit_callback_response" : null,
       "callback_response_status_code" : null,
