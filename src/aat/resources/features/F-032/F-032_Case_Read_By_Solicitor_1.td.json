@@ -8,5 +8,36 @@
 
   "user": {
     "username": "befta.caseworker.2.solicitor.1@gmail.com"
+  },
+
+  "expectedResponse": {
+    "body": {
+      "arrayInMap": [
+        {
+          "url": "[[ANY]]",
+          "name": "CCD Print",
+          "type": "CCD Print Type",
+          "description": "Printing for CCD"
+        },
+        {
+          "url": "[[ANY]]",
+          "name": "CCD Print",
+          "type": "CCD Print Type",
+          "description": "Printing for CCD"
+        },
+        {
+          "url": "[[ANY]]",
+          "name": "CCD Print",
+          "type": "CCD Print Type",
+          "description": "Printing for CCD"
+        },
+        {
+          "url": "[[ANY]]",
+          "name": "CCD Print",
+          "type": "CCD Print Type",
+          "description": "Printing for CCD"
+        }
+      ]
+    }
   }
 }
