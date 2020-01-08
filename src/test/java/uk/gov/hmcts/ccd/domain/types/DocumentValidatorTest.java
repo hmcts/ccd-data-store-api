@@ -75,7 +75,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
             caseField);
         assertThat(validDocumentUrlResult, hasSize(1));
         assertThat(validDocumentUrlResult.get(0).getErrorMessage(),
-            is(DOCUMENT_URL_WITH_PORT + " does not match Document Management domain or expected URL path"));
+            is(DOCUMENT_URL_WITH_PORT + " does not match Document Management domain or expected URL path, expected domain https://ng.reform.hmcts.net:7789"));
     }
 
     private DocumentValidator buildDocumentValidator(final String url) {
