@@ -114,3 +114,13 @@ Feature: F-053: Submit case creation as Citizen
     Then  a negative response is received
     And   the response [code is HTTP-400]
     And   the response has all other details as expected
+
+  @S-578
+  Scenario: must update successfully the respective fields with ACL permissions for a Citizen
+    Given a user with [an active Citizen profile in CCD with a specific variation of ACLs on a case type]
+    And a user with [an active citizen profile with another specific variation of ACLs on the same case type]
+    And a successful call [to create a token for case creation] as in [S-578_Citizen_Token_Creation_Data]
+    And another successful call [by a privileged user with full ACL to create a case of this case type] as in [S-578_Citizen_Case_Creation_Data]
+    When a request is prepared with appropriate values
+    Then a positive response is received
+    And the response [contains updated values for DocumentField2]
