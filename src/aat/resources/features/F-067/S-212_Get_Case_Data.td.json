@@ -27,7 +27,8 @@
     "_extends_": "Common_200_Response",
     "headers": {
       "Content-Length": "[[ANY]]",
-      "Content-Type": "[[ANY]]"
+      "Content-Type": "[[ANY]]",
+      "Content-Encoding" : "gzip"
     },
     "body": {
       "_links": {

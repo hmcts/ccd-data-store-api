@@ -256,6 +256,8 @@ dependencies {
     compile 'org.jooq:jool-java-8:0.9.14'
     compile group: 'io.cucumber', name: 'cucumber-java', version: '5.0.0-RC1'
     testCompile group: 'io.cucumber', name: 'cucumber-junit', version: '5.0.0-RC1'
+    
+    testCompile files('lib/befta-fw-1.0.9-SNAPSHOT.jar')
 }
 // end::dependencies[]
 
@@ -269,7 +271,7 @@ dependencyManagement {
         dependency 'com.google.guava:guava:24.1.1-jre'
 
         // CVE-2019-0232 - Java and Command Line injections in Windows
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.21') {
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.30') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
@@ -479,8 +481,7 @@ jacoco {
 sonarqube {
     properties {
         property "sonar.exclusions", "build/generated-sources/**/*.java,**/service/doclink/**"
-        property "sonar.coverage.exclusions", "src/main/java/uk/gov/hmcts/ccd/data/definition/DefaultCaseDefinitionRepository.java,src/main/java/uk/gov/hmcts/ccd/AppInsights.java," +
-                "**/DocLinksRestoreEndpoint.java,**/service/doclink/**"
+        property "sonar.coverage.exclusions", "src/main/java/uk/gov/hmcts/ccd/data/definition/DefaultCaseDefinitionRepository.java,src/main/java/uk/gov/hmcts/ccd/AppInsights.java,**/DocLinksRestoreEndpoint.java,**/service/doclink/**"
         property "sonar.jacoco.reportPaths", "${project.buildDir}/jacoco/junitPlatformTest.exec"
         property "sonar.junit.reportPaths", "${project.buildDir}/test-results/junit-platform"
         property "sonar.projectName", "ccd-data-store-api"
@@ -511,7 +512,10 @@ jacocoTestReport {
 
     afterEvaluate {
         classDirectories = files(classDirectories.files.collect {
-            fileTree(dir: it, exclude: ['uk/gov/hmcts/ccd/domain/types/sanitiser/document/**', '**/service/doclink/**'])
+            fileTree(dir: it, exclude: ['uk/gov/hmcts/ccd/domain/types/sanitiser/document/**',
+                                        '**/service/doclink/**',
+                                        '**/domain/model/definition/CaseEventFieldComplex**',
+                                        '**/domain/model/definition/DisplayContext**'])
         })
     }
 
@@ -622,6 +626,14 @@ task smoke(type: Test) {
         includeTags 'smoke'
     }
 
+    doFirst {
+        javaexec {
+            main = "uk.gov.hmcts.ccd.datastore.befta.DataStoreTestDataLoader"
+            classpath += sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
+            args = ['']
+        }
+    }
+
 }
 
 task functional(type: Test) {
@@ -643,10 +655,10 @@ task functional(type: Test) {
     doFirst {
         generateCucumberReports.enabled = true
         javaexec {
-            main = "io.cucumber.core.cli.Main"
+            main = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
             classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
             args = ['--plugin', "json:${projectDir}/target/cucumber.json", '--tags', 'not @Ignore', '--glue',
-                    'uk.gov.hmcts.ccd.fta.steps', 'src/aat/resources/features']
+                    'uk.gov.hmcts.befta.player', 'src/aat/resources/features']
         }
     }
 }
