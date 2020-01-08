@@ -1123,31 +1123,26 @@
           "case_field_id" : "TextField",
           "order" : 1,
           "page_column_no" : null,
-          "display_context" : "OPTIONAL",
           "complex_field_overrides" : [ ]
         }, {
           "case_field_id" : "NumberField",
           "order" : 2,
           "page_column_no" : null,
-          "display_context" : "OPTIONAL",
           "complex_field_overrides" : [ ]
         }, {
           "case_field_id" : "YesOrNoField",
           "order" : 3,
           "page_column_no" : null,
-          "display_context" : "OPTIONAL",
           "complex_field_overrides" : [ ]
         }, {
           "case_field_id" : "PhoneUKField",
           "order" : 4,
           "page_column_no" : null,
-          "display_context" : "OPTIONAL",
           "complex_field_overrides" : [ ]
         }, {
           "case_field_id" : "EmailField",
           "order" : 5,
           "page_column_no" : null,
-          "display_context" : "OPTIONAL",
           "complex_field_overrides" : [ ]
         } ],
         "show_condition" : null,
@@ -1161,37 +1156,31 @@
           "case_field_id" : "MoneyGBPField",
           "order" : 1,
           "page_column_no" : null,
-          "display_context" : "OPTIONAL",
           "complex_field_overrides" : [ ]
         }, {
           "case_field_id" : "DateField",
           "order" : 2,
           "page_column_no" : null,
-          "display_context" : "OPTIONAL",
           "complex_field_overrides" : [ ]
         }, {
           "case_field_id" : "DateTimeField",
           "order" : 3,
           "page_column_no" : null,
-          "display_context" : "OPTIONAL",
           "complex_field_overrides" : [ ]
         }, {
           "case_field_id" : "TextAreaField",
           "order" : 4,
           "page_column_no" : null,
-          "display_context" : "OPTIONAL",
           "complex_field_overrides" : [ ]
         }, {
           "case_field_id" : "FixedListField",
           "order" : 5,
           "page_column_no" : null,
-          "display_context" : "OPTIONAL",
           "complex_field_overrides" : [ ]
         }, {
           "case_field_id" : "MultiSelectListField",
           "order" : 6,
           "page_column_no" : null,
-          "display_context" : "OPTIONAL",
           "complex_field_overrides" : [ ]
         } ],
         "show_condition" : null,
@@ -1205,25 +1194,21 @@
           "case_field_id" : "CollectionField",
           "order" : 2,
           "page_column_no" : null,
-          "display_context" : "OPTIONAL",
           "complex_field_overrides" : [ ]
         }, {
           "case_field_id" : "ComplexField",
           "order" : 1,
           "page_column_no" : null,
-          "display_context" : "OPTIONAL",
           "complex_field_overrides" : [ ]
         }, {
           "case_field_id" : "AddressUKField",
           "order" : 3,
           "page_column_no" : null,
-          "display_context" : "OPTIONAL",
           "complex_field_overrides" : [ ]
         }, {
           "case_field_id" : "DocumentField",
           "order" : 4,
           "page_column_no" : null,
-          "display_context" : "OPTIONAL",
           "complex_field_overrides" : [ ]
         } ],
         "show_condition" : null,
