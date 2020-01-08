@@ -79,7 +79,7 @@ dependencyCheck {
     // These are non-runtime configurations used during the build.
     skipConfigurations = ['codacy', 'spotbugs']
 }
-    
+
 mainClassName = 'uk.gov.hmcts.ccd.CoreCaseDataApplication'
 
 // tag::repositories[]
