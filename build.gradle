@@ -233,6 +233,8 @@ dependencies {
     runtime group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
     runtime group: 'com.zaxxer', name: 'HikariCP', version: '2.7.9'
 
+    runtime group: 'com.h2database', name: 'h2', version: '1.4.197'
+
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation('org.springframework.cloud:spring-cloud-starter-contract-stub-runner')
     testCompile ('com.opentable.components:otj-pg-embedded:0.12.0')

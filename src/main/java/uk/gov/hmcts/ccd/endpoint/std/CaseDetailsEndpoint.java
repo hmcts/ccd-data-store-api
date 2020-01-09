@@ -28,14 +28,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.ccd.AppInsights;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.search.FieldMapSanitizeOperation;
@@ -59,8 +53,12 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.DocumentsOperation;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.validators.annotations.CaseID;
+import uk.gov.hmcts.ccd.validators.annotations.CcdAlphabeticId;
+import uk.gov.hmcts.ccd.validators.annotations.UuId;
 
 @RestController
+@Validated
 @RequestMapping(path = "/",
     consumes = MediaType.APPLICATION_JSON_VALUE,
     produces = MediaType.APPLICATION_JSON_VALUE)
@@ -112,12 +110,19 @@ public class CaseDetailsEndpoint {
         @ApiResponse(code = 404, message = "No case found for the given ID")
     })
     public CaseDetails findCaseDetailsForCaseworker(
+        @UuId
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
+
+        @CcdAlphabeticId
         @ApiParam(value = "Jurisdiction ID", required = true)
         @PathVariable("jid") final String jurisdictionId,
+
+        @CcdAlphabeticId
         @ApiParam(value = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
+
+        @CaseID
         @ApiParam(value = "Case ID", required = true)
         @PathVariable("cid") final String caseId) {
 
@@ -152,8 +157,11 @@ public class CaseDetailsEndpoint {
     }
 
     @Transactional
-    @GetMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token")
-    @ApiOperation(value = "Start event creation as Case worker", notes = "Start the event creation process for an existing case. Triggers `AboutToStart` callback.")
+    @GetMapping(
+        value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token")
+    @ApiOperation(
+        value = "Start event creation as Case worker",
+        notes = "Start the event creation process for an existing case. Triggers `AboutToStart` callback.")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Event creation process started"),
         @ApiResponse(code = 404, message = "No case found for the given ID"),
@@ -319,11 +327,11 @@ public class CaseDetailsEndpoint {
         @RequestBody final CaseDataContent content) {
 
         validateCaseFieldsOperation.validateCaseDetails(caseTypeId,
-                                                        content);
+            content);
 
         return midEventCallback.invoke(caseTypeId,
-                                       content,
-                                       pageId);
+            content,
+            pageId);
     }
 
     @Transactional
@@ -349,7 +357,7 @@ public class CaseDetailsEndpoint {
         @PathVariable("cid") final String caseId,
         @RequestBody final CaseDataContent content) {
         return createEventOperation.createCaseEvent(caseId,
-                                                    content);
+            content);
     }
 
     @Transactional
@@ -375,7 +383,7 @@ public class CaseDetailsEndpoint {
         @PathVariable("cid") final String caseId,
         @RequestBody final CaseDataContent content) {
         return createEventOperation.createCaseEvent(caseId,
-                                                    content);
+            content);
     }
 
     @Transactional
@@ -471,7 +479,7 @@ public class CaseDetailsEndpoint {
         List<String> metadataParams = queryParameters.keySet().stream().filter(p -> !FieldMapSanitizeOperation.isCaseFieldParameter(p)).collect(toList());
         if (!MetaData.unknownMetadata(metadataParams).isEmpty()) {
             throw new BadRequestException(String.format("unknown metadata search parameters: %s",
-                                                        String.join((","), MetaData.unknownMetadata(metadataParams))));
+                String.join((","), MetaData.unknownMetadata(metadataParams))));
         }
         param(queryParameters, SECURITY_CLASSIFICATION.getParameterName()).ifPresent(sc -> {
             if (!EnumUtils.isValidEnum(SecurityClassification.class, sc.toUpperCase())) {
