@@ -1,11 +1,11 @@
 {
-  "title": "must update successfully the respective fields with ACL permissions for a Citizen",
+  "title": "must create and update successfully the respective fields with ACL permissions for a Citizen",
   "_extends_": "S-578_Update_Case_For_Citizen_Data_Base",
   "_guid_": "S-578",
   "specs": [
-    "an active Citizen profile in CCD with a specific variation of ACLs on a case type",
+    "an active Citizen profile in CCD",
     "an active citizen profile with another specific variation of ACLs on the same case type",
-    "contains updated values for DocumentField2"
+    "contains updated values for DocumentField2, along with an HTTP-201 Created"
   ],
   "user": {
     "username": "befta.citizen.2@gmail.com",

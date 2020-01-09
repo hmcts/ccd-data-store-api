@@ -3,7 +3,8 @@
   "_extends_": "S-578_Update_Case_For_Citizen_Data_Base",
   "_guid_": "S-578_Later_Case_Update_By_Citizen",
   "specs": [
-    "to update the same case by Citizen"
+    "to update the DocumentField4 of same case by Citizen who doesn't have privilege to update DocumentField4",
+    "has an HTTP-404 code"
   ],
   "user": {
     "username": "befta.citizen.2@gmail.com",
