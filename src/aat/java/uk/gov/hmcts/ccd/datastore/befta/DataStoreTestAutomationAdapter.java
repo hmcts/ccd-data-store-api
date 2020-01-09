@@ -21,7 +21,7 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
     private Logger logger = LoggerFactory.getLogger(DataStoreTestAutomationAdapter.class);
 
     private static final String[] TEST_DEFINITIONS_NEEDED_FOR_TA = {
-            "src/aat/resources/CCD_CNP_27.xlsx",
+            // "src/aat/resources/CCD_CNP_27.xlsx",
             "src/aat/resources/CCD_CNP_27_AUTOTEST1.xlsx",
             "src/aat/resources/CCD_CNP_27_AUTOTEST2.xlsx",
             "src/aat/resources/CCD_CNP_RDM5118.xlsx",
