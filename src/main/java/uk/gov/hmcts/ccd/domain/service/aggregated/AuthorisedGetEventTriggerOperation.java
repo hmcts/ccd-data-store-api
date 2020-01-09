@@ -67,10 +67,13 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
 
         verifyRequiredAccessExistsForCaseType(eventTriggerId, caseType, userRoles);
 
-        return filterCaseFieldsByCreateAccess(caseType, userRoles, getEventTriggerOperation.executeForCaseType(caseTypeId,
-                                                                                                               eventTriggerId,
-                                                                                                               ignoreWarning));
+        CaseEventTrigger caseEventTrigger = filterCaseFieldsByCreateAccess(caseType,
+            userRoles,
+            getEventTriggerOperation.executeForCaseType(caseTypeId,
+                eventTriggerId,
+                ignoreWarning));
 
+        return accessControlService.updateCollectionDisplayContextParameterByAccess(caseEventTrigger, userRoles);
     }
 
     @Override
@@ -87,9 +90,10 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
 
         verifyMandatoryAccessForCase(eventTriggerId, caseDetails, caseType, userRoles);
 
-        return filterUpsertAccessForCase(caseType, userRoles, getEventTriggerOperation.executeForCase(caseReference,
+        CaseEventTrigger caseEventTrigger = filterUpsertAccessForCase(caseType, userRoles, getEventTriggerOperation.executeForCase(caseReference,
                                                                                                       eventTriggerId,
                                                                                                       ignoreWarning));
+        return accessControlService.updateCollectionDisplayContextParameterByAccess(caseEventTrigger, userRoles);
     }
 
     @Override
@@ -102,8 +106,9 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
 
         verifyRequiredAccessExistsForCaseType(draftResponse.getDocument().getEventTriggerId(), caseType, userRoles);
 
-        return filterCaseFieldsByCreateAccess(caseType, userRoles, getEventTriggerOperation.executeForDraft(draftReference,
+        CaseEventTrigger caseEventTrigger = filterCaseFieldsByCreateAccess(caseType, userRoles, getEventTriggerOperation.executeForDraft(draftReference,
                                                                                                             ignoreWarning));
+        return accessControlService.updateCollectionDisplayContextParameterByAccess(caseEventTrigger, userRoles);
     }
 
     private CaseDetails getCaseDetails(String caseReference) {

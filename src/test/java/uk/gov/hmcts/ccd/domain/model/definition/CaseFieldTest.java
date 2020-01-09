@@ -116,13 +116,6 @@ public class CaseFieldTest {
 
             family.propagateACLsToNestedFields();
 
-            CaseField fInfo = family.getFieldType().getChildren().stream()
-                .filter(e -> e.getId().equals(FAMILY_INFO)).findFirst().get();
-            CaseField fNames = fInfo.getFieldType().getChildren().stream()
-                .filter(e -> e.getId().equals(FAMILY_NAMES)).findFirst().get();
-            CaseField fName = fNames.getFieldType().getChildren().stream()
-                .filter(e -> e.getId().equals(FAMILY_NAME)).findFirst().get();
-
             CaseField members = family.getFieldType().getChildren().stream()
                 .filter(e -> e.getId().equals(MEMBERS)).findFirst().get();
             CaseField person = members.getFieldType().getChildren().stream()
