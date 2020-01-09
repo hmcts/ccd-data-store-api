@@ -22,8 +22,7 @@
     }
   },
   "expectedResponse": {
-    "responseCode": 201,
-    "responseMessage": "OK",
+    "_extends_": "Common_201_Response",
     "headers": {
       "_extends_": "Common_Response_Headers",
       "Vary": "Accept-Encoding"

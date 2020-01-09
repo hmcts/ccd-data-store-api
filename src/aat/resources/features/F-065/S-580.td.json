@@ -1,11 +1,11 @@
 {
-  "title": "must return successfully all and only the respective fields with READ access for a Case Worker and a Solicitor",
+  "title": "Must return the case view with only the respective fields with READ access for Solicitors",
   "_extends_": "F-065_Test_Data_Base",
   "_guid_": "S-580",
   "specs": [
     "an active Solicitor profile in CCD with a specific variation of ACLs on a case type",
     "another active solicitor profile with different variation of ACLs on the same case type",
-    "is prepared on behalf of the user creating the case above",
+    "is prepared on behalf of the privileged user creating the case above",
     "contains values for all fields under the case type"
   ],
   "user": {
