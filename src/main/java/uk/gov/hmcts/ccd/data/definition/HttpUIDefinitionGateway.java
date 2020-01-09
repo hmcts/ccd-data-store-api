@@ -19,6 +19,7 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.BannersResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigResult;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchInputDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
@@ -209,6 +210,29 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
         } catch (final Exception e) {
             throw new ServiceException(String.format(
                 "Problem getting banners for jurisdiction references: %s because of %s",
+                jurisdictionIds,
+                e.getMessage()));
+        }
+    }
+    
+    public JurisdictionUiConfigResult getJurisdictionUiConfigs(final List<String> jurisdictionIds) {
+        try {
+            final Instant start = Instant.now();
+            final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
+            final JurisdictionUiConfigResult
+                jurisdictionUiConfigResult =
+                restTemplate.exchange(withJurisdictionIds(applicationParams.jurisdictionUiConfigsURL(), jurisdictionIds),
+                    HttpMethod.GET,
+                    requestEntity,
+                    JurisdictionUiConfigResult.class).getBody();
+            final Duration duration = Duration.between(start, Instant.now());
+            LOG.debug("Rest API getJurisdictionUiConfigs called for {}, finished in {}",
+                jurisdictionIds,
+                duration.toMillis());
+            return jurisdictionUiConfigResult;
+        } catch (final Exception e) {
+            throw new ServiceException(String.format(
+                "Problem getting jurisdiction UI configs for jurisdiction references: %s because of %s",
                 jurisdictionIds,
                 e.getMessage()));
         }
