@@ -39,8 +39,7 @@
     "headers": {
       "_extends_": "Common_Response_Headers",
       "Content-Type": "[[ANY]]",
-      "Content-Length": "[[ANY]]",
-      "Transfer-Encoding" : "chunked"
+      "Content-Length": "[[ANY]]"
     }
   }
 }
