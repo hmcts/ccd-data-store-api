@@ -3,8 +3,8 @@
   "_extends_": "Standard_Full_Case_Data",
 
   "DocumentField": {
-    "document_url": "http://dm-store:8080/documents/1d9e2f5f-2114-4748-b01c-70481000ce6d",
-    "document_binary_url": "http://dm-store:8080/documents/1d9e2f5f-2114-4748-b01c-70481000ce6d/binary",
+    "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/1d9e2f5f-2114-4748-b01c-70481000ce6d",
+    "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/1d9e2f5f-2114-4748-b01c-70481000ce6d/binary",
     "document_filename": "Screenshot 2019-09-26 at 13.06.47.png"
   }
 }
