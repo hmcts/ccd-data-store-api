@@ -1,5 +1,5 @@
 {
-  "_guid_": "S-579_Update_Case_For_Case_Worker_Data_Base",
+  "_guid_": "S-579-Update_Case_For_Solicitor_Data_Base",
   "productName": "CCD Data Store",
   "operationName": "submit event creation as case worker",
   "method": "POST",
