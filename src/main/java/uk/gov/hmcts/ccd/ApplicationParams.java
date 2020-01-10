@@ -201,6 +201,10 @@ public class ApplicationParams {
         return caseDefinitionHost + "/api/data/jurisdictions";
     }
 
+    public String bannersURL() {
+        return uiDefinitionHost + "/api/display/banners";
+    }
+
     public String searchInputDefinition(final String caseTypeId) {
         return uiDefinitionHost + "/api/display/search-input-definition/" + encode(caseTypeId);
     }

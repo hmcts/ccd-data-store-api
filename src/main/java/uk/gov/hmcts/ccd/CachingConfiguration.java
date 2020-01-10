@@ -39,6 +39,7 @@ public class CachingConfiguration {
         config.addMapConfig(newMapConfigWithMaxIdle("userRolesCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("userCache", applicationParams.getUserCacheTTLSecs()));
         config.addMapConfig(newMapConfigWithTtl("caseTypeDefinitionLatestVersionCache", latestVersionTTL));
+        config.addMapConfig(newMapConfigWithMaxIdle("bannersCache", latestVersionTTL));
     }
 
     private MapConfig newMapConfigWithMaxIdle(final String name, final Integer maxIdle) {

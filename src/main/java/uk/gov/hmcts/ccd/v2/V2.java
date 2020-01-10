@@ -33,6 +33,8 @@ public final class V2 {
             "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-workbasket-input-details.v2+json;charset=UTF-8";
         public static final String UI_SEARCH_INPUT_DETAILS =
             "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-search-input-details.v2+json;charset=UTF-8";
+        public static final String UI_BANNERS =
+            "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-banners.v2+json;charset=UTF-8";
 
     }
 
