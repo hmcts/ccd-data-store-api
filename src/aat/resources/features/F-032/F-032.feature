@@ -62,7 +62,7 @@ Feature: F-032: Get printable documents
     And a user with [another active solicitor 2 profile in CCD with all permissions on all documents for a given case type]
     And a user with [another active solicitor 3 profile in CCD with read permissions on different limited documents for a given case type]
     And a successful call [to create a token for case creation] as in [Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Creation]
-    And another successful call [by solicitor 2 to create a case of this case type] as in [Befta_Jurisdiction2_Default_Full_Case_Creation_Data]
+    And another successful call [by a privileged user with full ACL to create a case of this case type] as in [Befta_Jurisdiction2_Default_Full_Case_Creation_Data]
     When a request is prepared with appropriate values
     And the request [is made by solicitor 2 who just created the case]
     And it is submitted to call the [Get Case for Case Worker] operation of [CCD Data Store]
