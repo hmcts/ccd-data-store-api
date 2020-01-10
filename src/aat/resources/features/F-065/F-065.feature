@@ -79,7 +79,7 @@
       And the request [is prepared on behalf of the privileged user creating the case above]
       And it is submitted to call the [Retrieve a case by ID for dynamic display] operation of [CCD Data Store]
       Then a positive response is received
-      And the response [contains values for all fields under the case type] for Solicitor 2
+      And the response [contains values for all fields under the case type for Solicitor 2]
       And the response has all other details as expected
       And a call [to get the same case by Solicitor 1] will get the expected response as in [F-065_Later_Case_Read_By_Solicitor_1]
       And a call [to get the same case by Solicitor 3] will get the expected response as in [F-065_Later_Case_Read_By_Solicitor_3]

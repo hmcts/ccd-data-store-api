@@ -6,7 +6,7 @@
     "an active Solicitor profile in CCD with a specific variation of ACLs on a case type",
     "another active solicitor profile with different variation of ACLs on the same case type",
     "is prepared on behalf of the privileged user creating the case above",
-    "contains values for all fields under the case type"
+    "contains values for all fields under the case type for Solicitor 2"
   ],
   "user": {
     "username": "befta.caseworker.2.solicitor.2@gmail.com",
@@ -23,7 +23,8 @@
       "Content-Length": "[[ANY]]",
       "Content-Type": "[[ANY]]",
       "Content-Encoding" : "[[ANY]]",
-      "VaRy" : "[[ANY]]"
+      "VaRy" : "[[ANY]]",
+      "Transfer-Encoding" : "[[ANY]]"
     },
     "body": {
       "_links": {
