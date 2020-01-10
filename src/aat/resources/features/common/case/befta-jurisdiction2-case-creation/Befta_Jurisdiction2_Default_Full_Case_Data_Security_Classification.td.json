@@ -1,0 +1,38 @@
+{
+  "_guid_": "Befta_Jurisdiction2_Default_Full_Case_Security_Classification",
+  "DocumentField4": "PUBLIC",
+  "MoneyGBPField": "PUBLIC",
+  "FixedListField": "PUBLIC",
+  "DocumentField3": "PUBLIC",
+  "AddressUKField": {
+    "classification": "PUBLIC",
+    "value": {
+      "AddressLine1": "PUBLIC",
+      "AddressLine2": "PUBLIC",
+      "AddressLine3": "PUBLIC",
+      "PostTown": "PUBLIC",
+      "County": "PUBLIC",
+      "PostCode": "PUBLIC",
+      "Country": "PUBLIC"
+    }
+  },
+  "DocumentField6": "PUBLIC",
+  "DocumentField5": "PUBLIC",
+  "DocumentField2": "PUBLIC",
+  "DocumentField1": "PUBLIC",
+  "FixedRadioListField": "PUBLIC",
+  "DateTimeField": "PUBLIC",
+  "PhoneUKField": "PUBLIC",
+  "DocumentField7": "PUBLIC",
+  "NumberField": "PUBLIC",
+  "MultiSelectListField": "PUBLIC",
+  "YesOrNoField": "PUBLIC",
+  "EmailField": "PUBLIC",
+  "TextField": "PUBLIC",
+  "DateField": "PUBLIC",
+  "TextAreaField": "PUBLIC",
+  "CollectionField": {
+    "classification": "PUBLIC",
+    "value": []
+  }
+}
