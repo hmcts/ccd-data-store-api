@@ -5,6 +5,7 @@
   "specs": [
     "an active Case Worker profile in CCD with a specific variation of ACLs on a case type",
     "an active solicitor profile with another specific variation of ACLs on the same case type",
+    "an active Solicitor profile having full permissions on the same case type",
     "is prepared on behalf of the user creating the case above",
     "contains values for all fields under the case type",
     "contains updated values for DocumentField2"

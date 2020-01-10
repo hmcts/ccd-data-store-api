@@ -99,6 +99,7 @@ Feature: F-044: Submit event creation as Case worker
   Scenario: must update successfully all and only the respective fields with update access for a Solicitor only
     Given a user with [an active Solicitor profile in CCD with a specific variation of ACLs on a case type]
     And   a user with [an active solicitor profile with another specific variation of ACLs on the same case type]
+    And   a user with [an active Solicitor profile having full permissions on the same case type]
     And   a successful call [to create a token for case creation] as in [Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Creation]
     And   another successful call [by a privileged user with full ACL to create a case of this case type] as in [Befta_Jurisdiction2_Default_Full_Case_Creation_Data]
     And   another successful call [to get an update event token for the case just created] as in [S-579-Prerequisite_Solicitor_2_Token_For_Update_Case]
