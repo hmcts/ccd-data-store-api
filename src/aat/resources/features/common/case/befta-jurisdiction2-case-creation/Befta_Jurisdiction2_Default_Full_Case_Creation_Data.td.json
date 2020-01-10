@@ -9,7 +9,7 @@
   },
   "request": {
     "pathVariables": {
-      "jid":  "BEFTA_JURISDICTION_2",
+      "jid": "BEFTA_JURISDICTION_2",
       "ctid": "BEFTA_CASETYPE_2_1"
     },
     "body": {
