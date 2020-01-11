@@ -23,7 +23,8 @@
       "Content-Length": "[[ANY]]",
       "Content-Type": "[[ANY]]",
       "Content-Encoding" : "[[ANY]]",
-      "VaRy" : "[[ANY]]"
+      "VaRy" : "[[ANY]]",
+      "Transfer-Encoding" : "[[ANY]]"
     },
     "body": {
       "_links": {

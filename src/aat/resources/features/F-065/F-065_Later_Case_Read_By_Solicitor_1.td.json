@@ -18,7 +18,8 @@
     "responseCode": 200,
     "headers": {
       "Transfer-Encoding" : "[[ANY]]",
-      "Content-Encoding" : "[[ANY]]"
+      "Content-Encoding" : "[[ANY]]",
+      "Vary" : "[[ANY]]"
 
     },
     "body": {
