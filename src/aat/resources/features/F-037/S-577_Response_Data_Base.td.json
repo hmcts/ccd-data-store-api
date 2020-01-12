@@ -4,7 +4,8 @@
     "headers": {
       "_extends_": "Common_Response_Headers",
       "Content-Type": "[[ANY]]",
-      "Content-Length": "[[ANY]]"
+      "Content-Length": "[[ANY]]",
+      "Content-Encoding" : "gzip"
     }
   }
 }
