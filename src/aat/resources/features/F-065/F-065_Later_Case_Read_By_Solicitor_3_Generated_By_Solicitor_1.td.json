@@ -19,8 +19,7 @@
     "headers": {
       "Transfer-Encoding" : "[[ANY]]",
       "Content-Encoding" : "[[ANY]]",
-      "Vary" : "[[ANY]]"
-
+      "Vary" : "Accept-Encoding"
     },
     "body": {
       "_links": {
