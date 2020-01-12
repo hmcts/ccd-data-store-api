@@ -25,8 +25,11 @@
     }
   },
   "expectedResponse": {
-    "responseCode": 200,
+    "responseCode": 201,
     "responseMessage": "OK",
+    "headers": {
+      "Vary" : "Accept-Encoding"
+    },
     "body" : {
       "_links" : {
         "self" : {
