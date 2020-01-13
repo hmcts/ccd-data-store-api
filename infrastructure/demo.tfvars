@@ -12,4 +12,4 @@ database_sku_name = "GP_Gen5_8"
 database_sku_capacity = "8"
 
 definition_cache_latest_version_ttl_sec = 30
-https://github.com/hmcts/ccd-data-store-api/pull/739
+enable_ase = true
