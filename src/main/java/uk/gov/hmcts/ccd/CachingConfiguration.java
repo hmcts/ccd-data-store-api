@@ -28,7 +28,8 @@ public class CachingConfiguration {
     }
 
     private void configCaches(Config config) {
-        int definitionCacheMaxIdle = applicationParams.getDefinitionCacheMaxIdleSecs();
+        final int definitionCacheMaxIdle = applicationParams.getDefinitionCacheMaxIdleSecs();
+        final int latestVersionTTL = applicationParams.getLatestVersionTTLSecs();
         config.addMapConfig(newMapConfigWithMaxIdle("caseTypeDefinitionsCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("workBasketResultCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("searchResultCache", definitionCacheMaxIdle));
@@ -38,7 +39,8 @@ public class CachingConfiguration {
         config.addMapConfig(newMapConfigWithMaxIdle("wizardPageCollectionCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("userRolesCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("userCache", applicationParams.getUserCacheTTLSecs()));
-        config.addMapConfig(newMapConfigWithTtl("caseTypeDefinitionLatestVersionCache", applicationParams.getLatestVersionTTLSecs()));  
+        config.addMapConfig(newMapConfigWithMaxIdle("bannersCache", latestVersionTTL));
+        config.addMapConfig(newMapConfigWithTtl("caseTypeDefinitionLatestVersionCache", latestVersionTTL));
         config.addMapConfig(newMapConfigWithTtl("jurisdictionCache", applicationParams.getJurisdictionTTLSecs()));
     }
 
