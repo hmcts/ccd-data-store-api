@@ -1,0 +1,19 @@
+{
+  "_guid_": "S-582_Citizen_Case_Creation_Data",
+  "_extends_": "Befta_Jurisdiction2_Default_Citizen_Case_Creation_Data",
+
+  "uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
+
+  "users": {
+    "invokingUser": {
+      "username": "befta.citizen.2@gmail.com",
+      "password": "Pa55word11"
+    }
+  },
+  "request": {
+
+    "body": {
+      "event_token": "${[scenarioContext][parentContext][childContexts][S-582_Citizen_Token_Creation_Data][testData][actualResponse][body][token]}"
+    }
+  }
+}
