@@ -18,24 +18,6 @@
           "name": "CCD Print",
           "type": "CCD Print Type",
           "description": "Printing for CCD"
-        },
-        {
-          "url": "[[ANY]]",
-          "name": "CCD Print",
-          "type": "CCD Print Type",
-          "description": "Printing for CCD"
-        },
-        {
-          "url": "[[ANY]]",
-          "name": "CCD Print",
-          "type": "CCD Print Type",
-          "description": "Printing for CCD"
-        },
-        {
-          "url": "[[ANY]]",
-          "name": "CCD Print",
-          "type": "CCD Print Type",
-          "description": "Printing for CCD"
         }
       ]
     }
