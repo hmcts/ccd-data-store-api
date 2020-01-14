@@ -163,6 +163,8 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                                                caseFields,
                                                                                                createCaseUserRoles,
                                                                                                CAN_CREATE);
+            doReturn(caseEventTrigger).when(accessControlService)
+                .updateCollectionDisplayContextParameterByAccess(caseEventTrigger, userRoles);
         }
 
         @Test
@@ -210,7 +212,9 @@ class AuthorisedGetEventTriggerOperationTest {
                 () -> inOrder.verify(accessControlService).filterCaseViewFieldsByAccess(eq(caseEventTrigger),
                                                                                         eq(caseFields),
                                                                                         eq(createCaseUserRoles),
-                                                                                        eq(CAN_CREATE))
+                                                                                        eq(CAN_CREATE)),
+                () -> inOrder.verify(accessControlService)
+                    .updateCollectionDisplayContextParameterByAccess(eq(caseEventTrigger), eq(userRoles))
             );
         }
 
@@ -288,6 +292,8 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                                                         caseFields,
                                                                                                         userRoles,
                                                                                                         CAN_UPDATE);
+            doReturn(caseEventTrigger).when(accessControlService)
+                .updateCollectionDisplayContextParameterByAccess(caseEventTrigger, userRoles);
         }
 
         @Test
@@ -336,7 +342,10 @@ class AuthorisedGetEventTriggerOperationTest {
                 () -> inOrder.verify(accessControlService).setReadOnlyOnCaseViewFieldsIfNoAccess(eq(caseEventTrigger),
                                                                                                  eq(caseFields),
                                                                                                  eq(userRoles),
-                                                                                                 eq(CAN_UPDATE)));
+                                                                                                 eq(CAN_UPDATE)),
+                () -> inOrder.verify(accessControlService)
+                    .updateCollectionDisplayContextParameterByAccess(eq(caseEventTrigger), eq(userRoles))
+                     );
         }
 
         @Test

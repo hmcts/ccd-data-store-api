@@ -1,6 +1,35 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import java.util.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
+import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPageComplexFieldOverride;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPageField;
+import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.Spliterator;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -17,21 +46,6 @@ import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.MANDATORY;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.OPTIONAL;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.READONLY;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
-import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
 @Service
 public class AccessControlService {
@@ -237,6 +251,45 @@ public class AccessControlService {
                 }
             });
         return caseEventTrigger;
+    }
+
+    public CaseEventTrigger updateCollectionDisplayContextParameterByAccess(final CaseEventTrigger caseEventTrigger,
+                                                                            final Set<String> userRoles) {
+        caseEventTrigger.getCaseFields()
+            .forEach(caseViewField -> {
+                if (caseViewField.isCollectionFieldType()) {
+                    caseViewField.setDisplayContextParameter(getCollectionAccess(userRoles, caseViewField));
+                }
+
+                setChildrenCollectionDisplayContextParameter(caseViewField.getFieldType().getChildren(), userRoles);
+            });
+        return caseEventTrigger;
+    }
+
+    private void setChildrenCollectionDisplayContextParameter(final List<CaseField> caseFields,
+                                                              final Set<String> userRoles) {
+        caseFields.forEach(childField -> {
+            if (childField.isCollectionFieldType()) {
+                childField.setDisplayContextParameter(getCollectionAccess(userRoles, childField));
+            }
+
+            setChildrenCollectionDisplayContextParameter(childField.getFieldType().getChildren(), userRoles);
+        });
+    }
+
+    private String getCollectionAccess(Set<String> userRoles, CommonField field) {
+        Set<String> collectionAccess = new HashSet<>();
+        if (hasAccessControlList(userRoles, CAN_CREATE, field.getAccessControlLists())) {
+            collectionAccess.add("allowInsert");
+        }
+        if (hasAccessControlList(userRoles, CAN_DELETE, field.getAccessControlLists())) {
+            collectionAccess.add("allowDelete");
+        }
+        if (hasAccessControlList(userRoles, CAN_UPDATE, field.getAccessControlLists())) {
+            collectionAccess.add("allowInsert");
+            collectionAccess.add("allowDelete");
+        }
+        return "#COLLECTION(".concat(StringUtils.join(collectionAccess, ",")).concat(")");
     }
 
     private void setChildrenAsReadOnlyIfNoAccess(final List<WizardPage> wizardPages, final String rootFieldId, final CaseField caseField, final Predicate<AccessControlList> access, final Set<String> userRoles, final CommonField caseViewField) {
