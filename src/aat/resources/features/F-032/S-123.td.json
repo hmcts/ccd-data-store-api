@@ -6,7 +6,8 @@
 
   "users": {
     "invokingUser": {
-      "username": "befta.caseworker.2.solicitor.2@gmail.com"
+      "username": "befta.caseworker.2.solicitor.2@gmail.com",
+      "password": "Pa55word11"
     }
   },
 

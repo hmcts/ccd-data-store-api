@@ -6,8 +6,10 @@
     "to get the same case by solicitor 1"
   ],
 
-  "user": {
-    "username": "befta.caseworker.2.solicitor.1@gmail.com"
+  "users": {
+    "invokingUser": {
+      "username": "befta.caseworker.2.solicitor.1@gmail.com"
+    }
   },
 
   "request": {
