@@ -19,10 +19,10 @@
     },
     "body": {
       "data": {
-        "DocumentField2":{
-          "document_url":"http://dm-store-aat.service.core-compute-aat.internal/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
-          "document_binary_url":"http://dm-store-aat.service.core-compute-aat.internal/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
-          "document_filename":"Elastic Search test Case.png"
+        "DocumentField2": {
+          "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
+          "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
+          "document_filename": "Elastic Search test Case.png"
         }
       },
       "event": {
