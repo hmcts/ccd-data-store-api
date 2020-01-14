@@ -23,8 +23,7 @@
     "headers": {
       "Content-Type": "[[ANY]]",
       "Content-Length": "[[ANY]]",
-      "Content-Encoding": "gzip",
-      "Transfer-Encoding" : "chunked"
+      "Content-Encoding": "gzip"
     },
     "body" : {
       "id": "[[ANY]]",
