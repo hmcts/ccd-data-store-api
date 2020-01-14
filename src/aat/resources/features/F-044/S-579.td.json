@@ -14,8 +14,7 @@
     "_extends_": "Common_201_Response",
     "headers": {
       "vary": "accept-encoding",
-      "Content-Encoding": "gzip",
-      "Transfer-Encoding": "chunked"
+      "Content-Encoding": "gzip"
     },
     "body": {
       "id": "[[ANY]]",
@@ -29,8 +28,8 @@
       "case_data": {
         "_extends_": "Befta_Jurisdiction2_Default_Full_Case_Data",
         "DocumentField2": {
-          "document_url": "http://dm-store:8080/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
-          "document_binary_url": "http://dm-store:8080/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
+          "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
+          "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
           "document_filename": "Elastic Search test Case.png --> updated by Solicitor 2"
         }
       },
