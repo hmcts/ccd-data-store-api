@@ -3,7 +3,7 @@
   "_extends_": "S-577_Get_Case_For_Case_Worker_Data_Base",
   "_guid_": "S-577_Later_Case_Read_By_Solicitor_3",
   "specs": [
-    "to get the same case by Solicitor 3"
+    "to get the same case by Solicitor 3, who doesn't have READ permission"
   ],
   "user": {
     "username": "befta.caseworker.2.solicitor.3@gmail.com",
@@ -43,72 +43,18 @@
         }
       },
       "data_classification": {
+        "_extends_": "S-577_Response_Data_Classification",
         "DocumentField4": "PUBLIC",
-        "MoneyGBPField": "PUBLIC",
         "DocumentField3": "PUBLIC",
-        "FixedListField": "PUBLIC",
-        "AddressUKField": {
-          "value": {
-            "County": "PUBLIC",
-            "Country": "PUBLIC",
-            "PostCode": "PUBLIC",
-            "PostTown": "PUBLIC",
-            "AddressLine1": "PUBLIC",
-            "AddressLine2": "PUBLIC",
-            "AddressLine3": "PUBLIC"
-          },
-          "classification": "PUBLIC"
-        },
         "DocumentField6": "PUBLIC",
-        "DocumentField1": "PUBLIC",
-        "FixedRadioListField": "PUBLIC",
-        "DateTimeField": "PUBLIC",
-        "PhoneUKField": "PUBLIC",
-        "NumberField": "PUBLIC",
-        "MultiSelectListField": "PUBLIC",
-        "YesOrNoField": "PUBLIC",
-        "EmailField": "PUBLIC",
-        "TextField": "PUBLIC",
-        "DateField": "PUBLIC",
-        "TextAreaField": "PUBLIC",
-        "CollectionField": {
-          "value": [],
-          "classification": "PUBLIC"
-        }
+        "DocumentField1": "PUBLIC"
       },
       "security_classifications": {
+        "_extends_": "S-577_Response_Data_Classification",
         "DocumentField4": "PUBLIC",
-        "MoneyGBPField": "PUBLIC",
         "DocumentField3": "PUBLIC",
-        "FixedListField": "PUBLIC",
-        "AddressUKField": {
-          "value": {
-            "County": "PUBLIC",
-            "Country": "PUBLIC",
-            "PostCode": "PUBLIC",
-            "PostTown": "PUBLIC",
-            "AddressLine1": "PUBLIC",
-            "AddressLine2": "PUBLIC",
-            "AddressLine3": "PUBLIC"
-          },
-          "classification": "PUBLIC"
-        },
         "DocumentField6": "PUBLIC",
-        "DocumentField1": "PUBLIC",
-        "FixedRadioListField": "PUBLIC",
-        "DateTimeField": "PUBLIC",
-        "PhoneUKField": "PUBLIC",
-        "NumberField": "PUBLIC",
-        "MultiSelectListField": "PUBLIC",
-        "YesOrNoField": "PUBLIC",
-        "EmailField": "PUBLIC",
-        "TextField": "PUBLIC",
-        "DateField": "PUBLIC",
-        "TextAreaField": "PUBLIC",
-        "CollectionField": {
-          "value": [],
-          "classification": "PUBLIC"
-        }
+        "DocumentField1": "PUBLIC"
       }
     }
   }
