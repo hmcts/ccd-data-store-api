@@ -1,0 +1,125 @@
+{
+  "title": "must create and update successfully the respective fields with ACL permissions for a Citizen",
+  "_extends_": "S-578_Update_Case_For_Citizen_Data_Base",
+  "_guid_": "S-578",
+  "specs": [
+    "an active Citizen profile in CCD",
+    "an active citizen profile with another specific variation of ACLs on the same case type",
+    "contains updated values for DocumentField2, along with an HTTP-201 Created"
+  ],
+  "user": {
+    "username": "befta.citizen.2@gmail.com",
+    "password": "Pa55word11"
+  },
+  "request": {
+    "body": {
+      "data": {
+        "DocumentField2":{
+          "document_url":"http://dm-store-aat.service.core-compute-aat.internal/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
+          "document_binary_url":"http://dm-store-aat.service.core-compute-aat.internal/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
+          "document_filename":"Elastic Search test Case.png --> updated by Citizen"
+        }
+      }
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 201,
+    "responseMessage": "OK",
+    "headers": {
+      "_extends_": "Common_Response_Headers"
+    },
+    "body" : {
+      "_links" : {
+        "self" : {
+          "href" : "[[ANY]]"
+        }
+      },
+      "id" : "[[ANY]]",
+      "jurisdiction" : "BEFTA_JURISDICTION_2",
+      "case_type" : "BEFTA_CASETYPE_2_1",
+      "created_on" : "[[ANY]]",
+      "last_modified_on" : "[[ANY]]",
+      "state" : "TODO",
+      "security_classification" : "PUBLIC",
+      "data" : {
+        "DocumentField4" : {
+          "document_url" : "http://dm-store-aat.service.core-compute-aat.internal/documents/e56f0aea-4a5f-46d5-82d3-01b536420870",
+          "document_filename" : "Screenshot 2019-11-14 at 1.57.32 pm.png",
+          "document_binary_url" : "http://dm-store-aat.service.core-compute-aat.internal/documents/e56f0aea-4a5f-46d5-82d3-01b536420870/binary"
+        },
+        "MoneyGBPField" : "111100",
+        "FixedListField" : "VALUE3",
+        "AddressUKField" : {
+          "County" : null,
+          "Country" : null,
+          "PostCode" : null,
+          "PostTown" : null,
+          "AddressLine1" : null,
+          "AddressLine2" : null,
+          "AddressLine3" : null
+        },
+        "DocumentField2" : {
+          "document_url" : "http://dm-store-aat.service.core-compute-aat.internal/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
+          "document_binary_url" : "http://dm-store-aat.service.core-compute-aat.internal/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
+          "document_filename" : "Elastic Search test Case.png --> updated by Citizen"
+        },
+        "ComplexField" : {
+          "ComplexTextField" : null,
+          "ComplexNestedField" : {
+            "NestedNumberField" : null,
+            "NestedCollectionTextField" : [ ]
+          },
+          "ComplexFixedListField" : null
+        },
+        "FixedRadioListField" : "RADIOVALUE2",
+        "DateTimeField" : null,
+        "PhoneUKField" : null,
+        "NumberField" : "111111222222",
+        "MultiSelectListField" : [ "OPTION5", "OPTION4", "OPTION3" ],
+        "YesOrNoField" : "Yes",
+        "EmailField" : "testemail@gmail.com",
+        "TextField" : "sometextfield",
+        "DateField" : "2222-01-02",
+        "TextAreaField" : "textarea",
+        "CollectionField" : [ ]
+      },
+      "data_classification" : {
+        "DocumentField4" : "PUBLIC",
+        "MoneyGBPField" : "PUBLIC",
+        "FixedListField" : "PUBLIC",
+        "AddressUKField" : {
+          "classification" : "PUBLIC",
+          "value" : {
+            "County" : "PUBLIC",
+            "Country" : "PUBLIC",
+            "PostCode" : "PUBLIC",
+            "PostTown" : "PUBLIC",
+            "AddressLine1" : "PUBLIC",
+            "AddressLine2" : "PUBLIC",
+            "AddressLine3" : "PUBLIC"
+          }
+        },
+        "DocumentField2" : "PUBLIC",
+        "FixedRadioListField" : "PUBLIC",
+        "DateTimeField" : "PUBLIC",
+        "PhoneUKField" : "PUBLIC",
+        "NumberField" : "PUBLIC",
+        "MultiSelectListField" : "PUBLIC",
+        "YesOrNoField" : "PUBLIC",
+        "EmailField" : "PUBLIC",
+        "TextField" : "PUBLIC",
+        "DateField" : "PUBLIC",
+        "TextAreaField" : "PUBLIC",
+        "CollectionField" : {
+          "classification" : "PUBLIC",
+          "value" : [ ]
+        }
+      },
+      "after_submit_callback_response" : null,
+      "callback_response_status_code" : null,
+      "callback_response_status" : null,
+      "delete_draft_response_status_code" : null,
+      "delete_draft_response_status" : null
+    }
+  }
+}
