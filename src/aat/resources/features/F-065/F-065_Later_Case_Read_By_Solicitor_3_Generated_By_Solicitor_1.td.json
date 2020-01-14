@@ -15,7 +15,7 @@
     }
   },
   "expectedResponse": {
-    "responseCode": 200,
+    "_extends_": "Common_200_Response",
     "headers": {
       "Transfer-Encoding" : "[[ANY]]",
       "Content-Encoding" : "[[ANY]]",
