@@ -6,9 +6,9 @@ Feature: F-040: Get Case for Case worker
 
   @S-576
   Scenario: must return successfully all and only the respective fields with READ access for Solicitors
-    Given a user with [an active Solicitor 1 profile in CCD with limited permissions on certain fields for a given case type]
-    And a user with [another active solicitor 3 profile with different variation of ACLs on the same case type]
-    And a successful call [to create a token for case creation] as in [Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Creation]
+    Given a user with [an active Solicitor profile in CCD with a specific variation of ACLs on a case type]
+    And a user with [an active solicitor profile with another specific variation of ACLs on the same case type]
+    And a user with [an active Solicitor profile having full permissions on the same case type]
     And another successful call [by a privileged user with full ACL to create a case of this case type] as in [Befta_Jurisdiction2_Default_Full_Case_Creation_Data]
     When a request is prepared with appropriate values
     And the request [is made by the privileged user who just created the case]
