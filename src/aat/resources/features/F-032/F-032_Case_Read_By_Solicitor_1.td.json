@@ -1,6 +1,6 @@
 {
   "_guid_": "F-032_Case_Read_By_Solicitor_1",
-  "_extends_": "S-123",
+  "_extends_": "S-123_Test_Data_Base",
 
   "specs": [
     "to get the same case by solicitor 1"
