@@ -17,6 +17,7 @@
       "ctid": "BEFTA_CASETYPE_2_1"
     }
   },
+
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "headers": {
