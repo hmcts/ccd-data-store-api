@@ -1,16 +1,15 @@
 {
-  "_guid_": "Befta_Jurisdiction2_Default_Token_Creation_Data_For_Citizen_Case_Creation",
+  "_guid_": "Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Creation_Solicitor_1",
   "productName": "CCD Data Store",
-  "operationName": "Start event creation as Citizen",
+  "operationName": "Start event creation as Case worker",
   "method": "GET",
-  "uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
-
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
   "specs": [
     "to create a token for case creation"
   ],
   "users": {
     "invokingUser": {
-      "username": "befta.citizen.2@gmail.com",
+      "username": "befta.caseworker.2.solicitor.1@gmail.com",
       "password": "Pa55word11"
     }
   },
@@ -31,6 +30,7 @@
       "Content-Encoding": "gzip",
       "Content-Type": "application/json;charset=UTF-8",
       "Content-Length": "[[ANY]]"
+
     },
     "body": {
       "token": "[[ANY]]",

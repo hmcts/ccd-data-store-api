@@ -1,22 +1,19 @@
 {
-  "_guid_": "Befta_Citizen_Data_Securities_Classification",
-
-  "DocumentField4": "PUBLIC",
+  "_guid_": "S-577_Response_Data_Classification",
   "MoneyGBPField": "PUBLIC",
   "FixedListField": "PUBLIC",
   "AddressUKField": {
     "classification": "PUBLIC",
     "value": {
+      "County": "PUBLIC",
+      "Country": "PUBLIC",
+      "PostCode": "PUBLIC",
+      "PostTown": "PUBLIC",
       "AddressLine1": "PUBLIC",
       "AddressLine2": "PUBLIC",
-      "AddressLine3": "PUBLIC",
-      "PostTown": "PUBLIC",
-      "County": "PUBLIC",
-      "PostCode": "PUBLIC",
-      "Country": "PUBLIC"
+      "AddressLine3": "PUBLIC"
     }
   },
-  "DocumentField2": "PUBLIC",
   "FixedRadioListField": "PUBLIC",
   "DateTimeField": "PUBLIC",
   "PhoneUKField": "PUBLIC",

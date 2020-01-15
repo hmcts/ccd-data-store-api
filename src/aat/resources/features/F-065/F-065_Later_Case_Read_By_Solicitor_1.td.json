@@ -1,0 +1,51 @@
+{
+  "title": "Get the case for read by a caseworker",
+  "_extends_": "F-065_Test_Data_Base",
+  "_guid_": "F-065_Later_Case_Read_By_Solicitor_1",
+  "specs": [
+    "to get the same case by Solicitor 1"
+  ],
+  "user": {
+    "username": "befta.caseworker.2.solicitor.1@gmail.com",
+    "password": "Pa55word11"
+  },
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][childContexts][Befta_Jurisdiction2_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Transfer-Encoding" : "[[ANY]]",
+      "Content-Encoding" : "[[ANY]]",
+      "Vary" : "[[ANY]]"
+
+    },
+    "body": {
+      "_links": {
+        "self": {
+          "href": "[[ANY]]"
+        }
+      },
+      "case_id": "[[ANY]]",
+      "case_type": {
+        "id": "BEFTA_CASETYPE_2_1",
+        "name": "Demo Case BEFTA CASETYPE 2 1",
+        "description": "Demo Case BEFTA CASETYPE 2 1",
+        "jurisdiction": {
+          "id": "BEFTA_JURISDICTION_2",
+          "name": "BEFTA JURISDICTION 2",
+          "description": "Content for the BEFTA Jurisdiction 2."
+        },
+        "printEnabled": false
+      },
+      "tabs": "[[ANY]]",
+      "metadataFields": "[[ANY]]",
+      "state": "[[ANY]]",
+      "triggers": "[[ANY]]",
+      "events": "[[ANY]]"
+    }
+  }
+
+}
