@@ -17,4 +17,6 @@ Feature: F-040: Get Case for Case worker
     And the response [contains values for all fields under the case type]
     And the response has all other details as expected
     And a call [to get the same case by Solicitor 1] will get the expected response as in [F-040_Later_Case_Read_By_Solicitor_1]
+    And the response [does not contain document fields 1,3,6 for Solicitor 1 as it does not has read access on these fields]
     And a call [to get the same case by Solicitor 3] will get the expected response as in [F-040_Later_Case_Read_By_Solicitor_3]
+    And the response [does not contain document fields 2,5,7 for Solicitor 3 as it does not has read access on these fields]
