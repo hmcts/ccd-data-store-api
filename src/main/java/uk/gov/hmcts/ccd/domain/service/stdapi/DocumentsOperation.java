@@ -1,5 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.stdapi;
 
+import com.google.common.collect.ImmutableList;
+import com.launchdarkly.client.LDClient;
+import com.launchdarkly.client.LDUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -36,40 +39,65 @@ public class DocumentsOperation {
     private final CaseTypeService caseTypeService;
     private final UIDService uidService;
 
+    private final LDClient ldClient;
+    private final LDUser ldUser;
+
     @Inject
     public DocumentsOperation(final SecurityUtils securityUtils,
                               final CaseTypeService caseTypeService,
                               @Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
-                              final UIDService uidService) {
+                              final UIDService uidService,
+                              final LDClient ldClient,
+                              final LDUser ldUser) {
         this.securityUtils = securityUtils;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseTypeService = caseTypeService;
         this.uidService = uidService;
+        this.ldClient = ldClient;
+        this.ldUser = ldUser;
     }
 
     public List<Document> getPrintableDocumentsForCase(final String caseReference) {
+
         if (!uidService.validateUID(caseReference)) {
             throw new BadRequestException("Invalid Case Reference");
         }
+
         CaseDetails caseDetails = getCaseDetails(caseReference);
         String caseTypeId = caseDetails.getCaseTypeId();
         String jurisdictionId = caseDetails.getJurisdiction();
-        try {
-            final CaseType caseType = caseTypeService.getCaseTypeForJurisdiction(caseTypeId, jurisdictionId);
-            final String documentListUrl = caseType.getPrintableDocumentsUrl();
-            final RestTemplate restTemplate = new RestTemplate();
-            final HttpHeaders headers = securityUtils.authorizationHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            final HttpEntity<CaseDetails> requestEntity = new HttpEntity<>(caseDetails, headers);
-            final Document[] documents = restTemplate.exchange(documentListUrl, HttpMethod.POST, requestEntity, Document[].class).getBody();
 
-            return Arrays.asList(documents);
-        } catch (Exception e) {
-            LOG.error(String.format(
-                "Cannot get documents for the Jurisdiction:%s, Case Type Id:%s, Case Reference:%s",
-                jurisdictionId, caseTypeId, caseReference), e);
-            throw new ServiceException(String.format("Cannot get documents for the Jurisdiction:%s, Case Type Id:%s, Case Reference:%s, because of %s",
-                jurisdictionId, caseTypeId, caseReference, e));
+        boolean isUsingCaseDocumentApi = ldClient.boolVariation("download-documents-using-case-document-api",
+            ldUser, false);
+
+        if (!isUsingCaseDocumentApi) {
+            ldClient.track("Downloaded document directly from doc store", ldUser);
+            try {
+                final CaseType caseType = caseTypeService.getCaseTypeForJurisdiction(caseTypeId, jurisdictionId);
+                final String documentListUrl = caseType.getPrintableDocumentsUrl();
+                final RestTemplate restTemplate = new RestTemplate();
+                final HttpHeaders headers = securityUtils.authorizationHeaders();
+                headers.setContentType(MediaType.APPLICATION_JSON);
+                final HttpEntity<CaseDetails> requestEntity = new HttpEntity<>(caseDetails, headers);
+                final Document[] documents = restTemplate.exchange(documentListUrl, HttpMethod.POST, requestEntity, Document[].class).getBody();
+
+                return Arrays.asList(documents);
+            } catch (Exception e) {
+                LOG.error(String.format(
+                    "Cannot get documents for the Jurisdiction:%s, Case Type Id:%s, Case Reference:%s",
+                    jurisdictionId, caseTypeId, caseReference), e);
+                throw new ServiceException(String.format("Cannot get documents for the Jurisdiction:%s, Case Type Id:%s, Case Reference:%s, because of %s",
+                    jurisdictionId, caseTypeId, caseReference, e));
+            }
+
+        } else {
+            ldClient.track("Downloaded document via Case Document Api", ldUser);
+            Document documentFromCaseDocumentApi = new Document();
+            documentFromCaseDocumentApi.setName("SAMPLE FROM CASE DOCUMENT API");
+            documentFromCaseDocumentApi.setDescription("SAMPLE FROM CASE DOCUMENT API");
+            documentFromCaseDocumentApi.setType("SAMPLE FROM CASE DOCUMENT API");
+            documentFromCaseDocumentApi.setUrl("SAMPLE FROM CASE DOCUMENT API");
+            return ImmutableList.of(documentFromCaseDocumentApi);
         }
     }
 
@@ -83,6 +111,5 @@ public class DocumentsOperation {
         }
         return caseDetails;
     }
-
 }
 

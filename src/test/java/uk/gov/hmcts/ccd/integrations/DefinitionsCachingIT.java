@@ -20,6 +20,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Matchers;
 import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -109,7 +111,7 @@ public class DefinitionsCachingIT {
 
     @Before
     public void setup() {
-        doReturn(aCaseTypeDefVersion(VERSION_1)).when(this.caseDefinitionRepository).doGetLatestVersion(ID_1);
+        doReturn(aCaseTypeDefVersion(VERSION_1)).when(this.caseDefinitionRepository).doGetLatestVersion(eq(ID_1));
         doReturn(aCaseTypeDefVersion(VERSION_2)).when(this.caseDefinitionRepository).doGetLatestVersion(ID_2);
         doReturn(aCaseTypeDefVersion(VERSION_3)).when(this.caseDefinitionRepository).doGetLatestVersion(ID_3);
         doReturn(mockCaseType).when(this.caseDefinitionRepository).getCaseType(ID_1);
