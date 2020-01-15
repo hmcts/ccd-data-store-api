@@ -11,7 +11,7 @@
   },
   "request": {
     "pathVariables": {
-      "cid": "${[scenarioContext][parentContext][childContexts][S-582_Citizen_Case_Creation_Data][testData][actualResponse][body][id]}"
+      "cid": "${[scenarioContext][parentContext][childContexts][Befta_Jurisdiction2_Default_Citizen_Case_Creation_Data][testData][actualResponse][body][id]}"
     },
     "body": {
       "data": {
