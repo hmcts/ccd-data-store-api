@@ -5,17 +5,11 @@
   "specs": [
     "to get the same case by Solicitor 3, who doesn't have READ permission"
   ],
-  "productName": "CCD Data Store",
-  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}",
-  "method": "GET",
   "user": {
     "username": "befta.caseworker.2.solicitor.3@gmail.com",
     "password": "Pa55word11"
   },
   "request": {
-    "headers": {
-      "_extends_": "Common_Request_Headers"
-    },
     "pathVariables": {
       "cid": "${[scenarioContext][parentContext][childContexts][Befta_Jurisdiction2_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}",
       "uid": "[[DYNAMIC]]",
