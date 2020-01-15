@@ -3,7 +3,8 @@
   "_extends_": "S-582_Update_Case_For_Citizen_Data_Base",
   "_guid_": "S-582",
   "specs": [
-    "an active Citizen profile in CCD with a specific variation of ACLs on a case type",
+    "an active citizen profile in CCD with update permissions for certain fields but not for others in a given case type",
+    "is made to update the document metadata in DocumentField2, which the user has update permissions for",
     "contains updated values for DocumentField2"
   ],
   "user": {

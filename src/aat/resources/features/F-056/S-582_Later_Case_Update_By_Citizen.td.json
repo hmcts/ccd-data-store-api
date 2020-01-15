@@ -3,7 +3,7 @@
   "_extends_": "S-582_Update_Case_For_Citizen_Data_Base",
   "_guid_": "S-582_Later_Case_Update_By_Citizen",
   "specs": [
-    "to update the same case by Citizen"
+    "to update the values for DocumentField4 from the same case, which the user does not have update permissions for"
   ],
   "user": {
     "username": "befta.citizen.2@gmail.com",
