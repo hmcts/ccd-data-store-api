@@ -28,7 +28,7 @@ The following environment variables are required:
 | DATA_STORE_TOKEN_SECRET | `<random string>` | Secret for generating internal JWT tokens for events |
 | DATA_STORE_IDAM_KEY | - | Definition store's IDAM S2S micro-service secret key. This must match the IDAM instance it's being run against. |
 | DATA_STORE_S2S_AUTHORISED_SERVICES | ccd_gw | Authorised micro-service names for S2S calls |
-| IDAM_USER_URL | - | Base URL for IdAM's User API service (idam-app). `http://localhost:5000` for the dockerised local instance or tunneled `dev` instance. |
+| IDAM_USER_URL | - | Base URL for IdAM's User API service (idam-app). `http://localhost:4501` for the dockerised local instance or tunneled `dev` instance. |
 | IDAM_S2S_URL | - | Base URL for IdAM's S2S API service (service-auth-provider). `http://localhost:4502` for the dockerised local instance or tunneled `dev` instance. |
 | USER_PROFILE_HOST | - | Base URL for the User Profile service. `http://localhost:4453` for the dockerised local instance. |
 | DEFINITION_STORE_HOST | - | Base URL for the Definition Store service. `http://localhost:4451` for the dockerised local instance. |
