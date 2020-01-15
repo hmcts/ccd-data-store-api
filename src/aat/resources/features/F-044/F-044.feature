@@ -109,7 +109,7 @@ Feature: F-044: Submit event creation as Case worker
     Then  a positive response is received
     And   the response [contains updated values for DocumentField2]
     And   the response has all other details as expected
-    And   a successful call [to get an update event token for the case just created] as in [S-579-Prerequisite_Solicitor_1_Token_For_Update_Case]
+    And   a successful call [to get an update event token for the case just created] as in [Befta_Jurisdiction2_Token_For_Update_Case]
     And   a call [to update the same case by Solicitor 1, who doesn't have UPDATE permission] will get the expected response as in [S-579_Later_Case_Update_By_Solicitor_1]
     And   a call [to get the same case by Solicitor 1] will get the expected response as in [S-579_Later_Case_Read_By_Solicitor_1]
     And   another successful call [to get an update event token for the case just created] as in [S-579-Prerequisite_Solicitor_3_Token_For_Update_Case]
