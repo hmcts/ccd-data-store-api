@@ -2,7 +2,7 @@
   "title": "Get the case for read by a solicitor",
   "_guid_": "S-579_Later_Case_Read_By_Solicitor_1",
   "specs": [
-    "to update the same case by Solicitor 1, who doesn't have UPDATE permission"
+    "to get the same case by Solicitor 1"
   ],
   "productName": "CCD Data Store",
   "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}",

@@ -3,7 +3,7 @@
   "_extends_": "S-579-Update_Case_For_Solicitor_Data_Base",
   "_guid_": "S-579_Later_Case_Update_By_Solicitor_1",
   "specs": [
-    "to update the same case by Solicitor 1"
+    "to update the same case by Solicitor 1, who doesn't have UPDATE permission"
   ],
   "user": {
     "username": "befta.caseworker.2.solicitor.1@gmail.com",
