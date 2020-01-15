@@ -164,7 +164,7 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                                                createCaseUserRoles,
                                                                                                CAN_CREATE);
             doReturn(caseEventTrigger).when(accessControlService)
-                .updateCollectionDisplayContextParameterByAccess(caseEventTrigger, userRoles);
+                .updateCollectionDisplayContextParameterByAccess(caseEventTrigger, createCaseUserRoles);
         }
 
         @Test
@@ -214,7 +214,7 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                                         eq(createCaseUserRoles),
                                                                                         eq(CAN_CREATE)),
                 () -> inOrder.verify(accessControlService)
-                    .updateCollectionDisplayContextParameterByAccess(eq(caseEventTrigger), eq(userRoles))
+                    .updateCollectionDisplayContextParameterByAccess(eq(caseEventTrigger), eq(createCaseUserRoles))
             );
         }
 
