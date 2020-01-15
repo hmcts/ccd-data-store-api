@@ -47,7 +47,7 @@ Feature: F-044: Submit event creation as Case worker
     And the response [contains an HTTP 404 'Bad Request']
     And the response has all other details as expected
 
-  @S-282  @Ignore # This scenario is returning 201 instead of expected 409,
+  @S-282  @Ignore # This scenario is returning 201 instead of expected 409, RDM-7127
   Scenario: must return 409 when case is altered out of the transaction
     Given a user with [an active profile in CCD]
     And a case that has just been created as in [Standard_Full_Case_Creation_Data]
