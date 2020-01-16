@@ -247,9 +247,9 @@ dependencies {
     testCompile "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
     testRuntime "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
     testRuntime "org.junit.vintage:junit-vintage-engine:${junitVintageVersion}"
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '2.24.0'
-    testCompile group: 'org.mockito', name: 'mockito-inline', version: '2.24.0'
-    testCompile group:'org.mockito', name: 'mockito-junit-jupiter', version:'2.24.0'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.2.4'
+    testCompile group: 'org.mockito', name: 'mockito-inline', version: '3.2.4'
+    testCompile group:'org.mockito', name: 'mockito-junit-jupiter', version:'3.2.4'
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: powermockVersion
     testCompile group: 'org.powermock', name: 'powermock-module-junit4', version: powermockVersion
     testCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.1.0'
