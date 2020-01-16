@@ -68,6 +68,11 @@ variable "definition_cache_latest_version_ttl_sec" {
   default = "1"
 }
 
+variable "definition_cache_jurisdiction_ttl_sec" {
+  type = "string"
+  default = "1"
+}
+
 variable "definition_cache_max_size" {
   type = "string"
   default = "5000"
@@ -186,7 +191,6 @@ variable "http_client_connection_timeout" {
 }
 
 variable "http_client_read_timeout" {
-  type = "string"
   default = "60000"
 }
 

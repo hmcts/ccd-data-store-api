@@ -2,14 +2,21 @@ package uk.gov.hmcts.ccd.data.user;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+
+import javax.inject.Inject;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import uk.gov.hmcts.ccd.data.casedetails.JurisdictionMapper;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.aggregated.*;
+import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
+import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
+import uk.gov.hmcts.ccd.domain.model.aggregated.UserDefault;
+import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
+import uk.gov.hmcts.ccd.domain.model.aggregated.WorkbasketDefault;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
-
-import javax.inject.Inject;
-import java.util.List;
 
 @Service
 public class UserService {
@@ -32,11 +39,18 @@ public class UserService {
         IDAMProperties idamProperties = userRepository.getUserDetails();
         String userId = idamProperties.getEmail();
         UserDefault userDefault = userRepository.getUserDefaultSettings(userId);
-        List<String> jurisdictionsId = userDefault.getJurisdictionsId();
+        List<String> jurisdictionIds = userDefault.getJurisdictionsId();
 
-        List<Jurisdiction> jurisdictionsDefinition = caseDefinitionRepository.getJurisdictions(jurisdictionsId);
+        List<Jurisdiction> jurisdictions = new ArrayList<>();
 
-        return createUserProfile(idamProperties, userDefault, jurisdictionsDefinition);
+        jurisdictionIds.stream().forEach(id -> {
+            Jurisdiction jurisdiction = caseDefinitionRepository.getJurisdiction(id);
+            if (jurisdiction != null) {
+                jurisdictions.add(jurisdiction);
+            }
+        });
+
+        return createUserProfile(idamProperties, userDefault, jurisdictions);
     }
 
     private UserProfile createUserProfile(IDAMProperties idamProperties, UserDefault userDefault, List<Jurisdiction> jurisdictionsDefinition) {
