@@ -11,6 +11,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
+import uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterUtil;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
@@ -278,7 +279,7 @@ public class AccessControlService {
     }
 
     private String getCollectionAccess(Set<String> userRoles, CommonField field) {
-        Set<String> collectionAccess = new HashSet<>();
+        List<String> collectionAccess = new ArrayList<>();
         if (hasAccessControlList(userRoles, CAN_CREATE, field.getAccessControlLists())) {
             collectionAccess.add("allowInsert");
         }
@@ -289,7 +290,8 @@ public class AccessControlService {
             collectionAccess.add("allowInsert");
             collectionAccess.add("allowDelete");
         }
-        return "#COLLECTION(".concat(StringUtils.join(collectionAccess, ",")).concat(")");
+        return DisplayContextParameterUtil.updateDisplayContextParameter(field.getDisplayContextParameter(),
+            DisplayContextParameterUtil.Parameter.COLLECTION, collectionAccess);
     }
 
     private void setChildrenAsReadOnlyIfNoAccess(final List<WizardPage> wizardPages, final String rootFieldId, final CaseField caseField, final Predicate<AccessControlList> access, final Set<String> userRoles, final CommonField caseViewField) {
