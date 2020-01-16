@@ -6,9 +6,9 @@ public enum CatalogueResponseGroup {
     VALIDATION("01"),
     CALLBACK("02");
 
-    String code;
+    final String code;
 
-    CatalogueResponseGroup(String code) {
+    CatalogueResponseGroup(final String code) {
         this.code = code;
     }
 
