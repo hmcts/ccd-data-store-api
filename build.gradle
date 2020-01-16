@@ -215,8 +215,8 @@ dependencies {
     compile group: 'com.jayway.jsonpath', name: 'json-path', version: '2.4.0'
     compile group: 'org.awaitility', name: 'awaitility', version: '3.1.6'
 
-    // CVE-2019-12086 - force update of jackson-databind - remove when dependencies move off <2.9.9
-    compile "com.fasterxml.jackson.core:jackson-databind:2.9.10.1"
+    // CVE-2019-12086 - force update of jackson-databind - remove when dependencies move off <2.9.9 (Jenkins error CVE-2019-20330)
+    compile "com.fasterxml.jackson.core:jackson-databind:2.9.10.2"
 
     // FIXME 0.6 doesn't support jsonb; 0.7 doesn't work on Windows
 //    runtime group: 'com.impossibl.pgjdbc-ng', name: 'pgjdbc-ng', version: '0.6'
@@ -256,7 +256,7 @@ dependencies {
     compile 'org.jooq:jool-java-8:0.9.14'
     compile group: 'io.cucumber', name: 'cucumber-java', version: '5.0.0-RC1'
     testCompile group: 'io.cucumber', name: 'cucumber-junit', version: '5.0.0-RC1'
-    
+
     testCompile files('lib/befta-fw-1.0.9-SNAPSHOT.jar')
 }
 // end::dependencies[]
