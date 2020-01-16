@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.common;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -8,6 +9,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+
+import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 
 public class HttpError<T extends Serializable> implements Serializable {
     public static final Integer DEFAULT_STATUS = HttpStatus.INTERNAL_SERVER_ERROR.value();
@@ -23,6 +26,8 @@ public class HttpError<T extends Serializable> implements Serializable {
     private List<String> callbackErrors;
     private List<String> callbackWarnings;
 
+    private final transient CatalogueResponse catalogueResponse;
+
     public HttpError(Exception exception, HttpServletRequest request) {
         final ResponseStatus responseStatus = exception.getClass().getAnnotation(ResponseStatus.class);
 
@@ -32,6 +37,12 @@ public class HttpError<T extends Serializable> implements Serializable {
         this.error = getErrorReason(responseStatus);
         this.message = exception.getMessage();
         this.path = request.getRequestURI();
+
+        if (exception instanceof ApiException) {
+            this.catalogueResponse = ((ApiException) exception).getCatalogueResponse();
+        } else {
+            this.catalogueResponse = null;
+        }
     }
 
     private Integer getStatus(ResponseStatus responseStatus) {
@@ -96,6 +107,11 @@ public class HttpError<T extends Serializable> implements Serializable {
 
     public T getDetails() {
         return details;
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public CatalogueResponse getCatalogueResponse() {
+        return this.catalogueResponse;
     }
 
     public HttpError<T> withDetails(T details) {
