@@ -171,7 +171,6 @@ module "ccd-data-store-api" {
     CCD_AM_WRITE_TO_BOTH                  = "${var.ccd_am_write_to_both}"
     CCD_AM_READ_FROM_CCD                  = "${var.ccd_am_read_from_ccd}"
     CCD_AM_READ_FROM_AM                   = "${var.ccd_am_read_from_am}"
-    JPA_CRITERIA_IN_SEARCH_ENABLED        = false
   }
 
 }
