@@ -3,14 +3,13 @@ package uk.gov.hmcts.ccd.domain.model.common;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
-
-import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 
 public class HttpError<T extends Serializable> implements Serializable {
     public static final Integer DEFAULT_STATUS = HttpStatus.INTERNAL_SERVER_ERROR.value();
@@ -28,24 +27,33 @@ public class HttpError<T extends Serializable> implements Serializable {
 
     private final transient CatalogueResponse catalogueResponse;
 
-    public HttpError(Exception exception, HttpServletRequest request) {
-        final ResponseStatus responseStatus = exception.getClass().getAnnotation(ResponseStatus.class);
 
+    public HttpError(final Exception exception, final HttpServletRequest request) {
+
+        this(exception, request, null);
+    }
+
+    public HttpError(final ApiException exception, final HttpServletRequest request) {
+
+        this(exception, request, exception.getCatalogueResponse());
+    }
+
+    public HttpError(
+        final Exception exception,
+        final HttpServletRequest request,
+        final CatalogueResponse catalogueResponse) {
+
+        final ResponseStatus responseStatus = exception.getClass().getAnnotation(ResponseStatus.class);
         this.exception = exception.getClass().getName();
         this.timestamp = LocalDateTime.now(ZoneOffset.UTC);
-        this.status = getStatus(responseStatus);
+        this.status = getStatusFromResponseStatus(responseStatus);
         this.error = getErrorReason(responseStatus);
         this.message = exception.getMessage();
         this.path = request.getRequestURI();
-
-        if (exception instanceof ApiException) {
-            this.catalogueResponse = ((ApiException) exception).getCatalogueResponse();
-        } else {
-            this.catalogueResponse = null;
-        }
+        this.catalogueResponse = catalogueResponse;
     }
 
-    private Integer getStatus(ResponseStatus responseStatus) {
+    private Integer getStatusFromResponseStatus(final ResponseStatus responseStatus) {
         if (null != responseStatus) {
             final HttpStatus httpStatus = getHttpStatus(responseStatus);
             if (null != httpStatus) {
@@ -56,7 +64,7 @@ public class HttpError<T extends Serializable> implements Serializable {
         return DEFAULT_STATUS;
     }
 
-    private HttpStatus getHttpStatus(ResponseStatus responseStatus) {
+    private HttpStatus getHttpStatus(final ResponseStatus responseStatus) {
         if (!HttpStatus.INTERNAL_SERVER_ERROR.equals(responseStatus.value())) {
             return responseStatus.value();
         } else if (!HttpStatus.INTERNAL_SERVER_ERROR.equals(responseStatus.code())) {
@@ -66,7 +74,7 @@ public class HttpError<T extends Serializable> implements Serializable {
         return null;
     }
 
-    private String getErrorReason(ResponseStatus responseStatus) {
+    private String getErrorReason(final ResponseStatus responseStatus) {
         if (null != responseStatus) {
             if (!responseStatus.reason().isEmpty()) {
                 return responseStatus.reason();
@@ -114,7 +122,7 @@ public class HttpError<T extends Serializable> implements Serializable {
         return this.catalogueResponse;
     }
 
-    public HttpError<T> withDetails(T details) {
+    public HttpError<T> withDetails(final T details) {
         this.details = details;
         return this;
     }
@@ -123,7 +131,7 @@ public class HttpError<T extends Serializable> implements Serializable {
         return callbackErrors;
     }
 
-    public HttpError withCallbackErrors(List<String> callbackErrors) {
+    public HttpError withCallbackErrors(final List<String> callbackErrors) {
         this.callbackErrors = callbackErrors;
         return this;
     }
@@ -132,7 +140,7 @@ public class HttpError<T extends Serializable> implements Serializable {
         return callbackWarnings;
     }
 
-    public HttpError withCallbackWarnings(List<String> callbackWarnings) {
+    public HttpError withCallbackWarnings(final List<String> callbackWarnings) {
         this.callbackWarnings = callbackWarnings;
         return this;
     }
