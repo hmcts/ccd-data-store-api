@@ -34,6 +34,7 @@ def secrets = [
         secret('ccd-restricted-cross-case-type-caseworker-email', 'CCD_RESTRICTED_CROSS_CASE_TYPE_CASEWORKER_EMAIL'),
         secret('ccd-restricted-cross-case-type-caseworker-password', 'CCD_RESTRICTED_CROSS_CASE_TYPE_CASEWORKER_PASSWORD'),
         secret('ccd-api-gateway-oauth2-client-secret', 'OAUTH2_CLIENT_SECRET'),
+        secret('poc-launchdarkly-sdk-key', 'LAUNCHDARKLY_SDK_KEY')
     ],
     's2s-${env}': [
         secret('microservicekey-ccd-gw', 'CCD_GW_SERVICE_SECRET')

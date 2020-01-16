@@ -10,4 +10,5 @@ spring:
         ccd-ELASTIC-SEARCH-DATA-NODES-URL: ELASTIC_SEARCH_DATA_NODES_HOSTS
         ccd-ELASTIC-SEARCH-PASSWORD: ELASTIC_SEARCH_PASSWORD
         data-store-api-POSTGRES-PASS: DATA_STORE_DB_PASSWORD
+        poc-launchdarkly-sdk-key: LAUNCHDARKLY_SDK_KEY
         AppInsightsInstrumentationKey: azure.application-insights.instrumentation-key

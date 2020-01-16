@@ -13,6 +13,7 @@ java:
         - ccd-ELASTIC-SEARCH-URL
         - ccd-ELASTIC-SEARCH-DATA-NODES-URL
         - ccd-ELASTIC-SEARCH-PASSWORD
+        - poc-launchdarkly-sdk-key
         - AppInsightsInstrumentationKey
   environment:
     ENABLE_DB_MIGRATE: false
