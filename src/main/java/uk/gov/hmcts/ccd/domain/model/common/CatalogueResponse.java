@@ -11,17 +11,17 @@ public class CatalogueResponse<T> {
     private final String message;
     private final T details;
 
-    private CatalogueResponse(String code, String message, T details) {
+    private CatalogueResponse(final String code, final String message, final T details) {
         this.code = code;
         this.message = message;
         this.details = details;
     }
 
-    public CatalogueResponse(CatalogueResponseCode responseCode, T details) {
+    public CatalogueResponse(final CatalogueResponseCode responseCode, final T details) {
         this(responseCode.getCode(), responseCode.getMessage(), details);
     }
 
-    public CatalogueResponse(CatalogueResponseCode responseCode) {
+    public CatalogueResponse(final CatalogueResponseCode responseCode) {
         this(responseCode, null);
     }
 
@@ -44,17 +44,17 @@ public class CatalogueResponse<T> {
         String message;
         T details;
 
-        Builder<T> withCode(String code) {
+        Builder<T> withCode(final String code) {
             this.code = code;
             return this;
         }
 
-        Builder<T> withMessage(String message) {
+        Builder<T> withMessage(final String message) {
             this.message = message;
             return this;
         }
 
-        Builder<T> withDetails(T details) {
+        Builder<T> withDetails(final T details) {
             this.details = details;
             return this;
         }

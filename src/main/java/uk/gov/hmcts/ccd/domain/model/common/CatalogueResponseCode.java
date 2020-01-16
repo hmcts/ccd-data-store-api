@@ -10,21 +10,23 @@ public enum CatalogueResponseCode {
     VALIDATION_INVALID_DATA(CatalogueResponseGroup.VALIDATION, "01", "Invalid data provided."),
 
     // CCD.02 Callback codes
-    CALLBACK_FAILURE(CatalogueResponseGroup.CALLBACK,"01", "Callback failure."),
-    CALLBACK_PAYMENT_REQUIRED(CatalogueResponseGroup.CALLBACK,"02", "Payment required by callback.");
+    CALLBACK_FAILURE(CatalogueResponseGroup.CALLBACK, "01", "Callback failure."),
+    CALLBACK_PAYMENT_REQUIRED(CatalogueResponseGroup.CALLBACK, "02", "Payment required by callback.");
 
-    CatalogueResponseGroup group;
-    String code;
-    String message;
+    final CatalogueResponseGroup group;
+    final String code;
+    final String message;
 
-    CatalogueResponseCode(CatalogueResponseGroup group, String code, String message) {
+    CatalogueResponseCode(final CatalogueResponseGroup group, final String code, final String message) {
         this.group = group;
         this.code = code;
         this.message = message;
     }
 
     @JsonIgnore
-    public CatalogueResponseGroup getGroup() { return group; }
+    public CatalogueResponseGroup getGroup() {
+        return group;
+    }
 
     public String getCode() {
         return String.format("%s.%s", group.getCode(), code);
