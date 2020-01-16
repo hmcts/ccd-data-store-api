@@ -23,3 +23,4 @@ public class CcdAlphabeticIdValidator implements ConstraintValidator<CcdAlphabet
         return true;
     }
 }
+
