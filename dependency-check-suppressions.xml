@@ -35,4 +35,15 @@
         <cve>CVE-2019-11358</cve>
         <cve>CVE-2015-9251</cve>
     </suppress>
+    <!-- temporary suppressions for launchdarkly poc -->
+    <suppress>
+        <notes><![CDATA[file name: launchdarkly-java-server-sdk-4.10.1.jar]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.google\.guava/guava@.*$</packageUrl>
+        <cve>CVE-2018-10237</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[file name: launchdarkly-java-server-sdk-4.10.1.jar]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.squareup\.okhttp3/okhttp@.*$</packageUrl>
+        <cve>CVE-2018-20200</cve>
+    </suppress>
 </suppressions>
