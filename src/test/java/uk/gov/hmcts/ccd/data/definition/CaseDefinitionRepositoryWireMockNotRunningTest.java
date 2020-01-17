@@ -11,7 +11,6 @@ import java.util.List;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
 
 public class CaseDefinitionRepositoryWireMockNotRunningTest extends BaseTest {
 
