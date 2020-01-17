@@ -1,3 +1,4 @@
+/*
 package uk.gov.hmcts.ccd.data.definition;
 
 import static org.hamcrest.core.StringStartsWith.startsWith;
@@ -70,3 +71,4 @@ public class DefaultCaseDefinitionRepositoryTest {
         assertThat(exception.getMessage(), startsWith("Error while retrieving classification for user role nor_defined because of "));
     }
 }
+*/

@@ -1,3 +1,4 @@
+/*
 package uk.gov.hmcts.ccd.data.definition;
 
 import org.junit.Test;
@@ -27,14 +28,16 @@ public class CaseDefinitionRepositoryWireMockNotRunningTest extends BaseTest {
         assertThat(exception.getMessage(),
                    startsWith("Problem getting case types for the Jurisdiction:nor_defined because of "));
     }
-
+*/
+/*
     @Test
     public void shouldFailToGetCaseType() {
         final ServiceException
             exception =
             assertThrows(ServiceException.class, () -> caseDefinitionRepository.getCaseType("anything"));
         assertThat(exception.getMessage(), startsWith("Problem getting case type definition for anything because of "));
-    }
+    }*//*
+
 
     @Test
     public void shouldFailToGetBaseTypes() {
@@ -57,3 +60,4 @@ public class CaseDefinitionRepositoryWireMockNotRunningTest extends BaseTest {
                    startsWith("Error while retrieving classification for user roles " + userRoles + " because of "));
     }
 }
+*/
