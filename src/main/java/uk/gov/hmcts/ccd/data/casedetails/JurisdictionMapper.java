@@ -1,10 +1,9 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
-import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
+import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
+import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 
 @Named
 @Singleton
