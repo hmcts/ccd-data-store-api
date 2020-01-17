@@ -536,7 +536,7 @@ public class TestBuildersUtil {
             return banner;
         }
     }
-    
+
     public static class JurisdictionUiConfigBuilder {
 
         private final JurisdictionUiConfig jurisdictionUiConfig;
@@ -556,6 +556,11 @@ public class TestBuildersUtil {
         
         public JurisdictionUiConfigBuilder withId(String id) {
             this.jurisdictionUiConfig.setId(id);
+            return this;
+        }
+
+        public JurisdictionUiConfigBuilder withName(String name) {
+            this.jurisdictionUiConfig.setName(name);
             return this;
         }
 

@@ -58,9 +58,17 @@ class UIDefinitionControllerTest {
                                         .withBannerDescription("Test Description2")
                                         .withBannerUrlText("Click here to see it.>>>")
                                         .withBannerUrl("http://localhost:3451/test").build();
-    
-    private JurisdictionUiConfig jurisdictionUiConfig1 = newJurisdictionUiConfig().withId("Reference 1").withShutteredEnabled(true).build();
-    private JurisdictionUiConfig jurisdictionUiConfig2 = newJurisdictionUiConfig().withId("Reference 2").withShutteredEnabled(false).build();
+
+    private JurisdictionUiConfig jurisdictionUiConfig1 = newJurisdictionUiConfig()
+                                                                    .withId("Reference 1")
+                                                                    .withName("Name 1")
+                                                                    .withShutteredEnabled(true)
+                                                                    .build();
+    private JurisdictionUiConfig jurisdictionUiConfig2 = newJurisdictionUiConfig()
+                                                                    .withId("Reference 2")
+                                                                    .withName("Name 2")
+                                                                    .withShutteredEnabled(false)
+                                                                    .build();
 
     private final List<WorkbasketInput> workbasketInputs = Lists.newArrayList(workbasketInput1, workbasketInput2);
     private final List<SearchInput> searchInputs = Lists.newArrayList(searchInput1, searchInput2);
@@ -176,7 +184,7 @@ class UIDefinitionControllerTest {
                 () -> uiDefinitionController.getBanners(Optional.of(jurisdictionReferenes)));
         }
     }
-    
+
     @Nested
     @DisplayName("GET /internal/jurisdiction-ui-configs")
     class GetJurisdictionUiConfigs {
@@ -190,8 +198,11 @@ class UIDefinitionControllerTest {
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
                 () -> {
                 	UIJurisdictionConfigResource uiJurisdictionConfigResource = response.getBody();
-                    assertThat(Lists.newArrayList(uiJurisdictionConfigResource.getConfigs()), hasItems(hasProperty("id", is("Reference 1")),
-                        hasProperty("id", is("Reference 2"))));
+                    assertThat(Lists.newArrayList(uiJurisdictionConfigResource.getConfigs()),hasItems(
+                        hasProperty("id", is("Reference 1")),
+                        hasProperty("id", is("Reference 2")),
+                        hasProperty("name", is("Name 1")),
+                        hasProperty("name", is("Name 2"))));
                 }
             );
         }

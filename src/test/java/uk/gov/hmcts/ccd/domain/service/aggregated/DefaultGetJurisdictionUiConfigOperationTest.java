@@ -34,25 +34,25 @@ class DefaultGetJurisdictionUiConfigOperationTest {
 
     @Test
     @DisplayName("return empty list of jurisdiction UI configs for the passed jurisdictions")
-    void shouldReturnEmptyBannerList() {
-        doReturn(createBannersResultWithEmptyCollection()).when(uiDefinitionRepository).getJurisdictionUiConfigs(jurisdictionReferences);
+    void shouldReturnEmptyJurisdictionUiConfigList() {
+        doReturn(createConfigResultWithEmptyCollection()).when(uiDefinitionRepository).getJurisdictionUiConfigs(jurisdictionReferences);
 
         List<JurisdictionUiConfig> configs = defaultGetJurisdictionUiConfigOperation.execute(jurisdictionReferences);
         assertEquals(0, configs.size());
     }
 
     @Test
-    @DisplayName("return list  of banners for the passed jurisdictions")
-    void shouldReturnBannerList() {
+    @DisplayName("return list of jurisdiction UI configs for the passed jurisdictions")
+    void shouldReturnJurisdictionUiConfigList() {
         doReturn(createConfigResultWithCollection()).when(uiDefinitionRepository).getJurisdictionUiConfigs(jurisdictionReferences);
 
         List<JurisdictionUiConfig> configs = defaultGetJurisdictionUiConfigOperation.execute(jurisdictionReferences);
         assertEquals(2, configs.size());
     }
     
-    private JurisdictionUiConfigResult createBannersResultWithEmptyCollection() {
-    	JurisdictionUiConfigResult bannersResult = new JurisdictionUiConfigResult(Lists.emptyList());
-        return bannersResult;
+    private JurisdictionUiConfigResult createConfigResultWithEmptyCollection() {
+    	JurisdictionUiConfigResult jurisdictionUiConfigResult = new JurisdictionUiConfigResult(Lists.emptyList());
+        return jurisdictionUiConfigResult;
     }
 
     private JurisdictionUiConfigResult createConfigResultWithCollection() {

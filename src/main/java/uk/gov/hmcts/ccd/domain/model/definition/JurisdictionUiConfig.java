@@ -8,6 +8,7 @@ import lombok.ToString;
 public class JurisdictionUiConfig implements Serializable {
 
     private String id = null;
+    private String name  = null;
     private Boolean shuttered = null;
     
     public String getId() {
@@ -16,6 +17,14 @@ public class JurisdictionUiConfig implements Serializable {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Boolean getShuttered() {
