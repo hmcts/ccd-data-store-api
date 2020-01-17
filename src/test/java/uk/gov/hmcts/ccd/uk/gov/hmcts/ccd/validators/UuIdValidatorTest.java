@@ -15,14 +15,11 @@ import static org.mockito.Mockito.when;
 
 public class UuIdValidatorTest extends ValidatorTest {
 
-
     @Mock
     private ConstraintValidatorContext constraintValidatorContext;
 
-
     @InjectMocks
     private UuIdValidator uuIdValidatorValid;
-
 
     @BeforeEach
     void setUp() {

@@ -16,14 +16,11 @@ import static org.mockito.Mockito.when;
 @DisplayName("CcdAlphabeticIdValidatorTest")
 public class CcdAlphabeticIdValidatorTest extends ValidatorTest {
 
-
     @Mock
     private ConstraintValidatorContext constraintValidatorContext;
 
-
     @InjectMocks
     private CcdAlphabeticIdValidator ccdAlphabeticIdValidator;
-
 
     @BeforeEach
     void setUp() {

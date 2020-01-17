@@ -28,7 +28,6 @@ public class CaseIDValidatorTest extends ValidatorTest {
     @InjectMocks
     private CaseIDValidator caseIDValidator;
 
-
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
