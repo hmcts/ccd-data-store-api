@@ -35,4 +35,9 @@
         <cve>CVE-2019-11358</cve>
         <cve>CVE-2015-9251</cve>
     </suppress>
+
+    <suppress>
+        <notes>Vemos</notes>
+        <cve>CVE-2019-20330</cve>
+    </suppress>
 </suppressions>
