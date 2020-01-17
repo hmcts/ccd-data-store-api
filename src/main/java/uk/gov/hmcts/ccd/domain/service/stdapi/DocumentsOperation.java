@@ -67,20 +67,26 @@ public class DocumentsOperation {
         String caseTypeId = caseDetails.getCaseTypeId();
         String jurisdictionId = caseDetails.getJurisdiction();
 
+        LOG.info("BEFORE LAUNCHDARKLY FEATURE FLAG EVALUATION");
+
         boolean isUsingCaseDocumentApi = ldClient.boolVariation("download-documents-using-case-document-api",
             ldUser, false);
+
+        LOG.info("FEATURE FLAG STATUS: " + isUsingCaseDocumentApi);
 
         if (!isUsingCaseDocumentApi) {
             ldClient.track("Downloaded document directly from doc store", ldUser);
             try {
                 final CaseType caseType = caseTypeService.getCaseTypeForJurisdiction(caseTypeId, jurisdictionId);
                 final String documentListUrl = caseType.getPrintableDocumentsUrl();
+                LOG.info("DOCUMENT LIST URL: " + documentListUrl);
                 final RestTemplate restTemplate = new RestTemplate();
                 final HttpHeaders headers = securityUtils.authorizationHeaders();
                 headers.setContentType(MediaType.APPLICATION_JSON);
                 final HttpEntity<CaseDetails> requestEntity = new HttpEntity<>(caseDetails, headers);
+                LOG.info("BEFORE CALL TO DOC STORE");
                 final Document[] documents = restTemplate.exchange(documentListUrl, HttpMethod.POST, requestEntity, Document[].class).getBody();
-
+                LOG.info("AFTER CALL TO DOC STORE");
                 return Arrays.asList(documents);
             } catch (Exception e) {
                 LOG.error(String.format(
