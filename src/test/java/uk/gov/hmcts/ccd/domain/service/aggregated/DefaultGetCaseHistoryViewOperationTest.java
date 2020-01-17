@@ -1,27 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
-import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
-import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
-import uk.gov.hmcts.ccd.domain.service.common.UIDService;
-import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
-import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +15,27 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTabCollectionBuilder.aCaseTabCollection;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTabCollectionBuilder.newCaseTabCollection;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService;
+import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
+import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
+import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 class DefaultGetCaseHistoryViewOperationTest {
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
@@ -64,7 +62,12 @@ class DefaultGetCaseHistoryViewOperationTest {
     @Mock
     private UIDService uidService;
 
+    @Mock
+    private CompoundFieldOrderService compoundFieldOrderService;
+
+    @InjectMocks
     private DefaultGetCaseHistoryViewOperation defaultGetCaseHistoryViewOperation;
+
     private CaseDetails caseDetails;
     private AuditEvent event1;
 
@@ -74,10 +77,10 @@ class DefaultGetCaseHistoryViewOperationTest {
 
         caseDetails = new CaseDetails();
         caseDetails.setCaseTypeId(CASE_TYPE_ID);
+        caseDetails.setJurisdiction(JURISDICTION_ID);
         caseDetails.setReference(new Long(CASE_REFERENCE));
         caseDetails.setState(STATE);
-        doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(JURISDICTION_ID, CASE_TYPE_ID,
-            CASE_REFERENCE);
+        doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
 
         event1 = new AuditEvent();
         event1.setSummary(EVENT_SUMMARY_1);
@@ -89,8 +92,8 @@ class DefaultGetCaseHistoryViewOperationTest {
         doReturn(Boolean.TRUE).when(uidService).validateUID(CASE_REFERENCE);
 
 
-        CaseTabCollection caseTabCollection = aCaseTabCollection().withFieldIds("dataTestField1",
-            "dataTestField2").build();
+        CaseTabCollection caseTabCollection = newCaseTabCollection().withFieldIds("dataTestField1",
+                                                                                  "dataTestField2").build();
         doReturn(caseTabCollection).when(uiDefinitionRepository).getCaseTabCollection(CASE_TYPE_ID);
 
         CaseType caseType = new CaseType();
@@ -101,9 +104,6 @@ class DefaultGetCaseHistoryViewOperationTest {
 
         CaseState caseState = new CaseState();
         doReturn(caseState).when(caseTypeService).findState(caseType, STATE);
-
-        defaultGetCaseHistoryViewOperation = new DefaultGetCaseHistoryViewOperation(getCaseOperation,
-            getEventsOperation, uiDefinitionRepository, caseTypeService, uidService);
     }
 
     @Test
@@ -114,8 +114,7 @@ class DefaultGetCaseHistoryViewOperationTest {
         event1.setData(dataMap);
         doReturn(Optional.of(event1)).when(getEventsOperation).getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
 
-        CaseHistoryView caseHistoryView = defaultGetCaseHistoryViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID,
-            CASE_REFERENCE, EVENT_ID);
+        CaseHistoryView caseHistoryView = defaultGetCaseHistoryViewOperation.execute(CASE_REFERENCE, EVENT_ID);
 
         assertAll(() -> verify(getEventsOperation).getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID),
                   () -> assertThat(caseHistoryView.getTabs()[0].getFields(), arrayWithSize(1)),
@@ -132,16 +131,16 @@ class DefaultGetCaseHistoryViewOperationTest {
         doReturn(false).when(uidService).validateUID(CASE_REFERENCE);
 
         assertThrows(BadRequestException.class,
-            () -> defaultGetCaseHistoryViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, EVENT_ID));
+            () -> defaultGetCaseHistoryViewOperation.execute(CASE_REFERENCE, EVENT_ID));
     }
 
     @Test
     @DisplayName("should throw exception when case is not found")
     void shouldThrowExceptionWhenCaseIsNotFound() {
-        doReturn(Optional.empty()).when(getCaseOperation).execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+        doReturn(Optional.empty()).when(getCaseOperation).execute(CASE_REFERENCE);
 
         assertThrows(ResourceNotFoundException.class,
-            () -> defaultGetCaseHistoryViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, EVENT_ID));
+            () -> defaultGetCaseHistoryViewOperation.execute(CASE_REFERENCE, EVENT_ID));
     }
 
     @Test
@@ -150,7 +149,7 @@ class DefaultGetCaseHistoryViewOperationTest {
         doReturn(Optional.empty()).when(getEventsOperation).getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
 
         assertThrows(ResourceNotFoundException.class,
-            () -> defaultGetCaseHistoryViewOperation.execute(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, EVENT_ID));
+            () -> defaultGetCaseHistoryViewOperation.execute(CASE_REFERENCE, EVENT_ID));
     }
 
     private Map<String, JsonNode> buildData(String... dataFieldIds) {

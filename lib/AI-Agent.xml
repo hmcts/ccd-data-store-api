@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ApplicationInsightsAgent>
+    <AgentLogger>INFO</AgentLogger>
+    <Instrumentation>
+        <BuiltIn enabled="true">
+            <HTTP enabled="true"/>
+            <JDBC enabled="true"/>
+            <!-- Set SQL query duration above which query plan is reported. Default is 10000 ms. -->
+            <MaxStatementQueryLimitInMS>10000</MaxStatementQueryLimitInMS>
+        </BuiltIn>
+        <Class name="uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository">
+            <Method name="set"/>
+            <Method name="findByCase"/>
+            <Method name="getCreateEvent"/>
+            <Method name="findByEventId"/>
+        </Class>
+        <Class name="uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository">
+            <Method name="getCaseTypesForJurisdiction"/>
+            <Method name="getCaseType"/>
+            <Method name="getBaseTypes"/>
+            <Method name="getUserRoleClassifications"/>
+            <Method name="getClassificationsForUserRoleList"/>
+            <Method name="getLatestVersion"/>
+            <Method name="getJurisdictions"/>
+        </Class>
+        <Class name="uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository">
+            <Method name="set"/>
+            <Method name="findById"/>
+            <Method name="findByReference"/>
+            <Method name="lockCase"/>
+            <Method name="findUniqueCase"/>
+            <Method name="findByMetaDataAndFieldData"/>
+            <Method name="getPaginatedSearchMetadata"/>
+        </Class>
+        <Class name="uk.gov.hmcts.ccd.data.caseaccess.CaseUserAuditRepository">
+            <Method name="auditGrant"/>
+            <Method name="auditRevoke"/>
+        </Class>
+        <Class name="uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository">
+            <Method name="grantAccess"/>
+            <Method name="revokeAccess"/>
+            <Method name="findCasesUserIdHasAccessTo"/>
+            <Method name="findCaseRoles"/>
+        </Class>
+        <Class name="uk.gov.hmcts.ccd.data.caseaccess.DefaultCaseRoleRepository">
+            <Method name="getCaseRoles"/>
+        </Class>
+        <Class name="uk.gov.hmcts.ccd.data.user.DefaultUserRepository">
+            <Method name="getUserDetails"/>
+            <Method name="getUserDefaultSettings"/>
+        </Class>
+        <Class name="uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository">
+            <Method name="getWorkBasketResult"/>
+            <Method name="getSearchResult"/>
+            <Method name="getSearchInputDefinitions"/>
+            <Method name="getWorkbasketInputDefinitions"/>
+            <Method name="getWizardPageCollection"/>
+            <Method name="getCaseTabCollection"/>
+        </Class>
+        <Class name="uk.gov.hmcts.ccd.data.definition.HttpUIDefinitionGateway">
+            <Method name="getSearchResult"/>
+            <Method name="getSearchInputDefinitions"/>
+            <Method name="getWorkbasketInputDefinitions"/>
+            <Method name="getCaseTabCollection"/>
+            <Method name="getWizardPageCollection"/>
+            <Method name="getWorkBasketResult"/>
+        </Class>
+        <Class name="uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway">
+            <Method name="create"/>
+            <Method name="update"/>
+            <Method name="get"/>
+            <Method name="delete"/>
+            <Method name="getAll"/>
+        </Class>
+        <Class name="uk.gov.hmcts.ccd.domain.types.sanitiser.client.DocumentManagementRestClient">
+            <Method name="getDocument"/>
+        </Class>
+        <Class name="uk.gov.hmcts.ccd.data.casedetails.search.SearchQueryFactoryOperation">
+            <Method name="build"/>
+        </Class>
+    </Instrumentation>
+</ApplicationInsightsAgent>

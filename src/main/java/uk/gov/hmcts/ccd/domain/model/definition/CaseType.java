@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.ToString;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
@@ -7,9 +8,11 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @ToString
 public class CaseType implements Serializable {
+    private static final long serialVersionUID = 5688786015302840008L;
     private String id;
     private String description;
     private Version version;
@@ -25,6 +28,7 @@ public class CaseType implements Serializable {
     private String printableDocumentsUrl;
     @JsonProperty("acls")
     private List<AccessControlList> accessControlLists;
+    private final List<SearchAliasField> searchAliasFields = new ArrayList<>();
 
     public String getId() {
         return id;
@@ -56,6 +60,11 @@ public class CaseType implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @JsonIgnore
+    public String getJurisdictionId() {
+        return jurisdiction.getId();
     }
 
     public Jurisdiction getJurisdiction() {
@@ -123,4 +132,39 @@ public class CaseType implements Serializable {
             .getSecurityLabel());
     }
 
+    public boolean hasDraftEnabledEvent() {
+        return this.events
+            .stream()
+            .anyMatch(caseEvent -> caseEvent.getCanSaveDraft() != null && caseEvent.getCanSaveDraft());
+    }
+
+    public boolean hasEventId(String eventId) {
+        return events.stream().anyMatch(event -> event.getId().equals(eventId));
+    }
+
+    public Optional<CaseEvent> findCaseEvent(String eventId) {
+        return events.stream()
+            .filter(event -> event.getId().equalsIgnoreCase(eventId))
+            .findFirst();
+    }
+
+    public List<SearchAliasField> getSearchAliasFields() {
+        return searchAliasFields;
+    }
+
+    public void setSearchAliasFields(List<SearchAliasField> searchAliasFields) {
+        if (searchAliasFields != null) {
+            this.searchAliasFields.addAll(searchAliasFields);
+        }
+    }
+
+    @JsonIgnore
+    public boolean isCaseFieldACollection(String caseFieldId) {
+        return getCaseField(caseFieldId).map(CaseField::isCollectionFieldType).orElse(false);
+    }
+
+    @JsonIgnore
+    public Optional<CaseField> getCaseField(String caseFieldId) {
+        return caseFields.stream().filter(caseField -> caseField.getId().equalsIgnoreCase(caseFieldId)).findFirst();
+    }
 }

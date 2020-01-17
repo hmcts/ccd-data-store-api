@@ -2,18 +2,23 @@ package uk.gov.hmcts.ccd.domain.service.createcase;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
+import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
+import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.draft.Draft;
+import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
@@ -45,6 +50,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
     private final CaseTypeService caseTypeService;
     private final CallbackInvoker callbackInvoker;
     private final ValidateCaseFieldsOperation validateCaseFieldsOperation;
+    private final DraftGateway draftGateway;
 
     @Inject
     public DefaultCreateCaseOperation(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -56,7 +62,8 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
                                       final CaseSanitiser caseSanitiser,
                                       final CaseTypeService caseTypeService,
                                       final CallbackInvoker callbackInvoker,
-                                      final ValidateCaseFieldsOperation validateCaseFieldsOperation) {
+                                      final ValidateCaseFieldsOperation validateCaseFieldsOperation,
+                                      @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway) {
         this.userRepository = userRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.eventTriggerService = eventTriggerService;
@@ -67,29 +74,21 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         this.caseDataService = caseDataService;
         this.callbackInvoker = callbackInvoker;
         this.validateCaseFieldsOperation = validateCaseFieldsOperation;
+        this.draftGateway = draftGateway;
     }
 
     @Override
-    public CaseDetails createCaseDetails(final String uid,
-                                         final String jurisdictionId,
-                                         final String caseTypeId,
-                                         final Event event,
-                                         final Map<String, JsonNode> data,
-                                         final Boolean ignoreWarning,
-                                         final String token) {
-
+    public CaseDetails createCaseDetails(final String caseTypeId,
+                                         final CaseDataContent caseDataContent,
+                                         final Boolean ignoreWarning) {
+        Event event = caseDataContent.getEvent();
         if (event == null || event.getEventId() == null) {
             throw new ValidationException("Cannot create case because of event is not specified");
         }
 
-        final IDAMProperties idamUser = userRepository.getUserDetails();
         final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
         if (caseType == null) {
             throw new ValidationException("Cannot find case type definition for " + caseTypeId);
-        }
-
-        if (!caseTypeService.isJurisdictionValid(jurisdictionId, caseType)) {
-            throw new ValidationException("Cannot create case because of " + caseTypeId + " is not defined as case type for " + jurisdictionId);
         }
 
         final CaseEvent eventTrigger = eventTriggerService.findCaseEvent(caseType, event.getEventId());
@@ -101,19 +100,22 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
             throw new ValidationException("Cannot create case because of " + eventTrigger.getId() + " has pre-states defined");
         }
 
-        eventTokenService.validateToken(token, uid, eventTrigger, caseType.getJurisdiction(), caseType);
+        String token = caseDataContent.getToken();
+        eventTokenService.validateToken(token, userRepository.getUserId(), eventTrigger, caseType.getJurisdiction(), caseType);
 
-        validateCaseFieldsOperation.validateCaseDetails(jurisdictionId, caseTypeId, event, data);
+        Map<String, JsonNode> data = caseDataContent.getData();
+        validateCaseFieldsOperation.validateCaseDetails(caseTypeId, caseDataContent);
 
         final CaseDetails newCaseDetails = new CaseDetails();
 
         newCaseDetails.setCaseTypeId(caseTypeId);
-        newCaseDetails.setJurisdiction(jurisdictionId);
+        newCaseDetails.setJurisdiction(caseType.getJurisdictionId());
         newCaseDetails.setState(eventTrigger.getPostState());
         newCaseDetails.setSecurityClassification(caseType.getSecurityClassification());
         newCaseDetails.setData(caseSanitiser.sanitise(caseType, data));
         newCaseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(caseType, newCaseDetails.getData(), EMPTY_DATA_CLASSIFICATION));
 
+        final IdamUser idamUser = userRepository.getUser();
         final CaseDetails savedCaseDetails = submitCaseTransaction.submitCase(event,
                                                                               caseType,
                                                                               idamUser,
@@ -123,7 +125,20 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
 
         submittedCallback(eventTrigger, savedCaseDetails);
 
+        deleteDraft(caseDataContent, savedCaseDetails);
+
         return savedCaseDetails;
+    }
+
+    private void deleteDraft(CaseDataContent caseDataContent, CaseDetails savedCaseDetails) {
+        if (StringUtils.isNotBlank(caseDataContent.getDraftId())) {
+            try {
+                draftGateway.delete(Draft.stripId(caseDataContent.getDraftId()));
+                savedCaseDetails.setDeleteDraftResponseEntity(caseDataContent.getDraftId(), ResponseEntity.ok().build());
+            } catch (Exception e) {
+                savedCaseDetails.setIncompleteDeleteDraftResponse();
+            }
+        }
     }
 
     private void submittedCallback(CaseEvent eventTrigger, CaseDetails savedCaseDetails) {

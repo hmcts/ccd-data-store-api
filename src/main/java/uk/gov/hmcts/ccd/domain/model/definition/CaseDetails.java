@@ -14,19 +14,32 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 
+import static java.util.Optional.ofNullable;
 import static org.apache.http.HttpStatus.SC_OK;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CASE_REFERENCE;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CASE_TYPE;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CREATED_DATE;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.JURISDICTION;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.LAST_MODIFIED_DATE;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.SECURITY_CLASSIFICATION;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.CASE_PAYMENT_HISTORY_VIEWER;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.LABEL;
 
 public class CaseDetails implements Cloneable {
     private static final Logger LOG = LoggerFactory.getLogger(CaseDetails.class);
-    private static final String LABEL_FIELD_TYPE = "Label";
-    private static final String CASE_PAYMENT_HISTORY_VIEWER_FIELD_TYPE = "CasePaymentHistoryViewer";
+    public static final String DRAFT_ID = "DRAFT%s";
 
-    private Long id;
+    private String id;
 
     @JsonIgnore
     private Long reference;
+
+    @JsonProperty("version")
+    private Integer version;
 
     private String jurisdiction;
 
@@ -52,23 +65,46 @@ public class CaseDetails implements Cloneable {
     @ApiModelProperty("Same structure as `case_data` with classification (`PUBLIC`, `PRIVATE`, `RESTRICTED`) as field's value.")
     private Map<String, JsonNode> dataClassification;
 
-    /** Attribute passed to UI layer, does not need persistence */
+    /**
+     * Attribute passed to UI layer, does not need persistence
+     */
     @JsonProperty("after_submit_callback_response")
     private AfterSubmitCallbackResponse afterSubmitCallbackResponse;
 
-    /** Attribute passed to UI layer, does not need persistence */
+    /**
+     * Attribute passed to UI layer, does not need persistence
+     */
     @JsonProperty("callback_response_status_code")
     private Integer callbackResponseStatusCode;
 
-    /** Attribute passed to UI layer, does not need persistence */
+    /**
+     * Attribute passed to UI layer, does not need persistence
+     */
     @JsonProperty("callback_response_status")
     private String callbackResponseStatus;
 
-    public Long getId() {
+    /**
+     * Attribute passed to UI layer, does not need persistence
+     */
+    @JsonProperty("delete_draft_response_status_code")
+    private Integer deleteDraftResponseStatusCode;
+
+
+    /**
+     * Attribute passed to UI layer, does not need persistence
+     */
+    @JsonProperty("delete_draft_response_status")
+    private String deleteDraftResponseStatus;
+
+
+    @JsonIgnore
+    private final Map<String, Object> metadata = new HashMap<>();
+
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -77,9 +113,22 @@ public class CaseDetails implements Cloneable {
         return reference;
     }
 
+    @JsonIgnore
+    public String getReferenceAsString() {
+        return reference != null ? reference.toString() : null;
+    }
+
     @JsonSetter("id")
     public void setReference(Long reference) {
         this.reference = reference;
+    }
+
+    public Integer getVersion() {
+        return version;
+    }
+
+    public void setVersion(final Integer version) {
+        this.version = version;
     }
 
     public String getCaseTypeId() {
@@ -147,7 +196,6 @@ public class CaseDetails implements Cloneable {
     }
 
     /**
-     *
      * @deprecated Will be removed in version 2.x. Use {@link CaseDetails#dataClassification} instead.
      */
     @Deprecated
@@ -171,28 +219,56 @@ public class CaseDetails implements Cloneable {
 
     private void setAfterSubmitCallbackResponseEntity(final AfterSubmitCallbackResponse response) {
         this.afterSubmitCallbackResponse = response;
-        this.callbackResponseStatusCode =  SC_OK;
-        this.callbackResponseStatus = "COMPLETED";
+        this.callbackResponseStatusCode = SC_OK;
+        this.callbackResponseStatus = "CALLBACK_COMPLETED";
+    }
+
+    private void setDeleteDraftResponseEntity() {
+        this.deleteDraftResponseStatusCode =  SC_OK;
+        this.deleteDraftResponseStatus = "DELETE_DRAFT_COMPLETED";
     }
 
     public void setIncompleteCallbackResponse() {
         this.callbackResponseStatusCode = SC_OK;  // Front end cannot handle anything other than status 200
-        this.callbackResponseStatus = "INCOMPLETE";
+        this.callbackResponseStatus = "INCOMPLETE_CALLBACK";
+    }
+
+    public void setIncompleteDeleteDraftResponse() {
+        this.deleteDraftResponseStatusCode = SC_OK;  // Front end cannot handle anything other than status 200
+        this.deleteDraftResponseStatus = "INCOMPLETE_DELETE_DRAFT";
     }
 
     public boolean existsInData(CaseTypeTabField caseTypeTabField) {
         return isFieldWithNoValue(caseTypeTabField)
-            || data.keySet().contains(caseTypeTabField.getCaseField().getId());
+            || hasDataForTabField(caseTypeTabField)
+            || getMetadata().containsKey(caseTypeTabField.getCaseField().getId());
+    }
+
+    private boolean hasDataForTabField(CaseTypeTabField caseTypeTabField) {
+        return data.keySet().contains(caseTypeTabField.getCaseField().getId());
     }
 
     private boolean isFieldWithNoValue(CaseTypeTabField caseTypeTabField) {
-        return caseTypeTabField.getCaseField().getFieldType().getType().equals(LABEL_FIELD_TYPE) ||
-            caseTypeTabField.getCaseField().getFieldType().getType().equals(CASE_PAYMENT_HISTORY_VIEWER_FIELD_TYPE);
+        return caseTypeTabField.getCaseField().getFieldType().getType().equals(LABEL)
+            || caseTypeTabField.getCaseField().getFieldType().getType().equals(CASE_PAYMENT_HISTORY_VIEWER);
     }
 
     @JsonIgnore
     public CaseDetails shallowClone() throws CloneNotSupportedException {
         return (CaseDetails) super.clone();
+    }
+
+    @JsonIgnore
+    public void setDeleteDraftResponseEntity(final String draftId, final ResponseEntity<Void>
+                                                         draftResponse) {
+        if (SC_OK == draftResponse.getStatusCodeValue()) {
+            setDeleteDraftResponseEntity();
+        } else {
+            LOG.warn("Incomplete delete draft response for draft={}, statusCode={}",
+                     draftId,
+                     draftResponse.getStatusCodeValue());
+            setIncompleteDeleteDraftResponse();
+        }
     }
 
     @JsonIgnore
@@ -211,9 +287,43 @@ public class CaseDetails implements Cloneable {
     }
 
     @JsonIgnore
+    public Map<String, Object> getMetadata() {
+        if (metadata.isEmpty()) {
+            metadata.put(JURISDICTION.getReference(), getJurisdiction());
+            metadata.put(CASE_TYPE.getReference(), getCaseTypeId());
+            metadata.put(STATE.getReference(), getState());
+            metadata.put(CASE_REFERENCE.getReference(), getReference() != null ? getReference() : getId());
+            metadata.put(CREATED_DATE.getReference(), getCreatedDate());
+            metadata.put(LAST_MODIFIED_DATE.getReference(), getLastModified());
+            metadata.put(SECURITY_CLASSIFICATION.getReference(), getSecurityClassification());
+        }
+        return metadata;
+    }
+
+    public Integer getDeleteDraftResponseStatusCode() {
+        return deleteDraftResponseStatusCode;
+    }
+
+    public String getDeleteDraftResponseStatus() {
+        return deleteDraftResponseStatus;
+    }
+
+    @JsonIgnore
+    public Map<String, Object> getCaseDataAndMetadata() {
+        Map<String, Object> allData = new HashMap<>(getMetadata());
+        ofNullable(getData()).ifPresent(allData::putAll);
+        return allData;
+    }
+
+    @JsonIgnore
     @Override
     public String toString() {
         return ReflectionToStringBuilder.toString(this);
+    }
+
+    @JsonIgnore
+    public boolean hasCaseReference() {
+        return getReference() != null;
     }
 
 }

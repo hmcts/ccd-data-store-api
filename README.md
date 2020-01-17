@@ -1,23 +1,22 @@
 # ccd-data-store-api 
-[![API Docs](https://img.shields.io/badge/API%20Docs-site-green.svg?style=flat-square)](https://hmcts.github.io/ccd-data-store-api/api/latest/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![API v1](https://img.shields.io/badge/API%20Docs-v1-e140ad.svg)](https://hmcts.github.io/reform-api-docs/swagger.html?url=https://hmcts.github.io/reform-api-docs/specs/ccd-data-store-api.v1.json)
+[![API v2 (beta)](https://img.shields.io/badge/API%20Docs-v2%20%28beta%29-4286f4.svg)](https://hmcts.github.io/reform-api-docs/swagger.html?url=https://hmcts.github.io/reform-api-docs/specs/ccd-data-store-api.v2.json)
 [![Build Status](https://travis-ci.org/hmcts/ccd-data-store-api.svg?branch=master)](https://travis-ci.org/hmcts/ccd-data-store-api)
+[![Docker Build Status](https://img.shields.io/docker/build/hmcts/ccd-data-store-api.svg)](https://hub.docker.com/r/hmcts/ccd-data-store-api)
 [![codecov](https://codecov.io/gh/hmcts/ccd-data-store-api/branch/master/graph/badge.svg)](https://codecov.io/gh/hmcts/ccd-data-store-api)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/3038977127484764ad0ae9b81a1a14ad)](https://www.codacy.com/app/adr1ancho/ccd-data-store-api?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=hmcts/ccd-data-store-api&amp;utm_campaign=Badge_Grade)
-[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/3038977127484764ad0ae9b81a1a14ad)](https://www.codacy.com/app/adr1ancho/ccd-data-store-api?utm_source=github.com&utm_medium=referral&utm_content=hmcts/ccd-data-store-api&utm_campaign=Badge_Coverage)
 [![Known Vulnerabilities](https://snyk.io/test/github/hmcts/ccd-data-store-api/badge.svg)](https://snyk.io/test/github/hmcts/ccd-data-store-api)
 [![HitCount](http://hits.dwyl.io/SP9gBJ/ccd-data-store-api.svg)](#ccd-data-store-api)
-[![Issue Stats](http://issuestats.com/github/hmcts/ccd-data-store-api/badge/pr)](http://issuestats.com/github/hmcts/ccd-data-store-api)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Store/search cases and provide workbaskets
+Store/search cases and provide workbaskets.
 
 ### Prerequisites
 
-- [JDK 8](https://www.oracle.com/java)
+- [Open JDK 8](https://openjdk.java.net/)
 - [Docker](https://www.docker.com)
 
 #### Environment variables
-
 The following environment variables are required:
 
 | Name | Default | Description |
@@ -34,20 +33,24 @@ The following environment variables are required:
 | USER_PROFILE_HOST | - | Base URL for the User Profile service. `http://localhost:4453` for the dockerised local instance. |
 | DEFINITION_STORE_HOST | - | Base URL for the Definition Store service. `http://localhost:4451` for the dockerised local instance. |
 | CCD_DM_DOMAIN | - | Base URL for the Document Management domain. |
-| APPINSIGHTS_INSTRUMENTATIONKEY | - | For CNP environment this is provided by the terraform scripts. However any value would do for your local environment. |
-| DATA_STORE_DB_USE_SSL | true | Mandated by Cloud Native Platform.  For local testing, set this variable to false |
+| AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY | - | For CNP environment this is provided by the terraform scripts. However any value would do for your local environment. |
 | DATA_STORE_DEFAULT_LOG_LEVEL | INFO | Default log level for classes under package uk.gov.hmcts.ccd |
 | HTTP_CLIENT_MAX_TOTAL | 100 | Used for Pooling connection manager; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
 | HTTP_CLIENT_SECONDS_IDLE_CONNECTION | 120 | Used for Pooling connection manager; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
 | HTTP_CLIENT_MAX_CLIENT_PER_ROUTE | 20 | Used for Pooling connection manager; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
 | HTTP_CLIENT_VALIDATE_AFTER_INACTIVITY | 0 | Used for Pooling connection manager; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
 | HTTP_CLIENT_CONNECTION_TIMEOUT | 30000 | 30 seconds, Used for Pooling connection manager; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
+| HTTP_CLIENT_CONNECTION_DRAFTS_CREATE_TIMEOUT | 1000 | 1000 milliseconds, Used for Pooling connection manager for create operation for draft store; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
+| HTTP_CLIENT_CONNECTION_DRAFTS_TIMEOUT | 500 | 500 milliseconds, Used for Pooling connection manager for draft store; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
+| DRAFT_STORE_URL | - | Base URL for Draft Store API service. `http://localhost:8800` for the dockerised local instance. |
+| DRAFT_ENCRYPTION_KEY | - | Draft encryption key. The encryption key used by draft store to encrypt documents with. |
+| DRAFT_TTL_DAYS | - | Number of days after which the saved draft will be deleted if unmodified. |
 
 ### Building
 
 The project uses [Gradle](https://gradle.org/).
 
-To build project please execute the following command:
+To build project please execute the following:
 
 ```bash
 ./gradlew clean build
@@ -87,6 +90,25 @@ Database will get initiated when you run `docker-compose up` for the first time 
 You don't need to migrate database manually since migrations are executed every time `docker-compose up` is executed.
 
 You can connect to the database at `http://localhost:5452` with the username and password set in the environment variables.
+
+### Functional Tests
+The functional tests are located in `aat` folder. These are the tests run against an environment. For example if you would 
+like to test your local environment you'll need to export the following variables on your `.bash_profile` script. You'll 
+
+
+```bash
+#Smoke/Functional Tests
+export TEST_URL=http://localhost:4452
+export S2S_URL=http://localhost:4502
+export CCD_GW_SERVICE_NAME=ccd_gw
+export CCD_GW_SERVICE_SECRET=AAAAAAAAAAAAAAAC
+export CCD_CASEWORKER_AUTOTEST_EMAIL=someemail@blob.com
+export CCD_CASEWORKER_AUTOTEST_PASSWORD=XYZT
+```
+
+These tests also rely on the `CCD_CNP_27.xlsx` file to be already imported. The latest version of this file could be found 
+in [ccd-definition-store-api](https://github.com/hmcts/ccd-definition-store-api) project under the `aat/src/resource` folder. You may want to import it to your local installation 
+before trying to run the functional tests against your local environment.  
 
 ## LICENSE
 

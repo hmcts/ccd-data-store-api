@@ -12,10 +12,16 @@
     <module name="FileTabCharacter">
         <property name="eachLine" value="true"/>
     </module>
+    <module name="NewlineAtEndOfFile">
+        <property name="severity" value="error"/>
+        <property name="lineSeparator" value="lf"/>
+    </module>
 
     <module name="SuppressWarningsFilter" />
     <module name="TreeWalker">
-        <module name="UnusedImports"/>
+        <module name="UnusedImports">
+            <property name="severity" value="error"/>
+        </module>
         <module name="HideUtilityClassConstructor"/>
         <module name="SuppressWarningsHolder" />
         <module name="OuterTypeFilename"/>
@@ -51,6 +57,7 @@
             <property name="tokens" value="CLASS_DEF, METHOD_DEF, CTOR_DEF, LITERAL_FOR, LITERAL_WHILE, STATIC_INIT, INSTANCE_INIT"/>
         </module>
         <module name="WhitespaceAround">
+            <property name="severity" value="error"/>
             <property name="allowEmptyConstructors" value="true"/>
             <property name="allowEmptyMethods" value="true"/>
             <property name="allowEmptyTypes" value="true"/>
@@ -66,8 +73,11 @@
         <module name="MissingSwitchDefault"/>
         <module name="FallThrough"/>
         <module name="UpperEll"/>
-        <module name="ModifierOrder"/>
+        <module name="ModifierOrder">
+            <property name="severity" value="error"/>
+        </module>
         <module name="EmptyLineSeparator">
+            <property name="severity" value="error"/>
             <property name="allowNoEmptyLineBetweenFields" value="true"/>
         </module>
         <module name="SeparatorWrap">
@@ -143,6 +153,7 @@
         </module>
         <module name="NoFinalizer"/>
         <module name="GenericWhitespace">
+            <property name="severity" value="error"/>
             <message key="ws.followed"
                      value="GenericWhitespace ''{0}'' is followed by whitespace."/>
             <message key="ws.preceded"
@@ -167,15 +178,18 @@
         <module name="OverloadMethodsDeclarationOrder"/>
         <module name="VariableDeclarationUsageDistance"/>
         <module name="CustomImportOrder">
-            <property name="separateLineBetweenGroups" value="false"/>
-            <property name="customImportOrderRules" value="THIRD_PARTY_PACKAGE###STANDARD_JAVA_PACKAGE###STATIC"/>
+            <property name="severity" value="error"/>
         </module>
-        <module name="MethodParamPad"/>
+        <module name="MethodParamPad">
+            <property name="severity" value="error"/>
+        </module>
         <module name="NoWhitespaceBefore">
             <property name="tokens" value="COMMA, SEMI, POST_INC, POST_DEC, DOT, ELLIPSIS, METHOD_REF"/>
             <property name="allowLineBreaks" value="true"/>
         </module>
-        <module name="ParenPad"/>
+        <module name="ParenPad">
+            <property name="severity" value="error"/>
+        </module>
         <module name="OperatorWrap">
             <property name="option" value="NL"/>
             <property name="tokens" value="BAND, BOR, BSR, BXOR, DIV, EQUAL, GE, GT, LAND, LE, LITERAL_INSTANCEOF, LOR, LT, MINUS, MOD, NOT_EQUAL, PLUS, QUESTION, SL, SR, STAR, METHOD_REF "/>

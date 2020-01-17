@@ -1,0 +1,16 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/user-role?role=Y2FzZXdvcmtlci10ZXN0LXB1YmxpYw%3D%3D"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "role": "caseworker-test-public",
+      "security_classification": "PUBLIC"
+    }
+  }
+}

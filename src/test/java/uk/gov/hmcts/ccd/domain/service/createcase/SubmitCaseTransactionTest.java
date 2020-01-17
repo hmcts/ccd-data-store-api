@@ -1,32 +1,49 @@
 package uk.gov.hmcts.ccd.domain.service.createcase;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InOrder;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
-import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
-import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
-import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
-import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
-import uk.gov.hmcts.ccd.domain.model.std.Event;
-import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
-import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
-import uk.gov.hmcts.ccd.domain.service.common.UIDService;
-import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
-
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Matchers.notNull;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
+import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
+import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
+import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
+import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
+import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
+import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItemType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.Version;
+import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
+import uk.gov.hmcts.ccd.domain.model.std.Event;
+import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
+import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
+import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
+import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
+import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 
 class SubmitCaseTransactionTest {
 
@@ -44,7 +61,10 @@ class SubmitCaseTransactionTest {
     private static final String STATE_ID = "CREATED_ID";
     private static final String STATE_NAME = "Created name";
     private static final String CASE_UID = "1234123412341236";
-    private static final Long CASE_ID = 45677L;
+    private static final String CASE_ID = "45677";
+    public static final String DESCRIPTION = "Description";
+    public static final String URL = "http://www.yahooo.com";
+    public static final SignificantItemType DOCUMENT = SignificantItemType.DOCUMENT;
 
     @Mock
     private CaseDetailsRepository caseDetailsRepository;
@@ -68,11 +88,14 @@ class SubmitCaseTransactionTest {
     @Mock
     private UIDService uidService;
 
-    private SubmitCaseTransaction submitCaseTransaction;
+    @Mock
+    private UserAuthorisation userAuthorisation;
 
+    @InjectMocks
+    private SubmitCaseTransaction submitCaseTransaction;
     private Event event;
     private CaseType caseType;
-    private IDAMProperties idamUser;
+    private IdamUser idamUser;
     private CaseEvent eventTrigger;
     private CaseState state;
 
@@ -86,14 +109,15 @@ class SubmitCaseTransactionTest {
                                                           callbackInvoker,
                                                           uidService,
                                                           securityClassificationService,
-                                                          caseUserRepository);
+                                                          caseUserRepository,
+                                                          userAuthorisation);
 
         event = buildEvent();
         caseType = buildCaseType();
         idamUser = buildIdamUser();
         eventTrigger = buildEventTrigger();
         state = buildState();
-
+        final AboutToSubmitCallbackResponse response = buildResponse();
         doReturn(STATE_ID).when(savedCaseDetails).getState();
 
         doReturn(state).when(caseTypeService).findState(caseType, STATE_ID);
@@ -103,6 +127,23 @@ class SubmitCaseTransactionTest {
         doReturn(savedCaseDetails).when(caseDetailsRepository).set(caseDetails);
 
         doReturn(CASE_ID).when(savedCaseDetails).getId();
+
+        doReturn(response).when(callbackInvoker).invokeAboutToSubmitCallback(eventTrigger,
+                                                                             null,
+                                                                             this.caseDetails, caseType, IGNORE_WARNING
+        );
+
+    }
+
+    private AboutToSubmitCallbackResponse buildResponse() {
+        final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = new AboutToSubmitCallbackResponse();
+        aboutToSubmitCallbackResponse.setState(Optional.of("somestring"));
+        final SignificantItem significantItem = new SignificantItem();
+        significantItem.setType(SignificantItemType.DOCUMENT.name());
+        significantItem.setDescription(DESCRIPTION);
+        significantItem.setUrl(URL);
+        aboutToSubmitCallbackResponse.setSignificantItem(significantItem);
+        return aboutToSubmitCallbackResponse;
     }
 
     private CaseState buildState() {
@@ -150,8 +191,10 @@ class SubmitCaseTransactionTest {
     }
 
     @Test
-    @DisplayName("should grant access to creator")
-    void shouldGrantAccessToCreator() {
+    @DisplayName("should persist event with significant document")
+    void shouldPersistEventWithSignificantDocument() {
+        final ArgumentCaptor<AuditEvent> auditEventCaptor = ArgumentCaptor.forClass(AuditEvent.class);
+
         submitCaseTransaction.submitCase(event,
                                          caseType,
                                          idamUser,
@@ -159,7 +202,40 @@ class SubmitCaseTransactionTest {
                                          this.caseDetails,
                                          IGNORE_WARNING);
 
-        verify(caseUserRepository).grantAccess(CASE_ID, IDAM_ID);
+        assertAll(
+            () -> verify(caseAuditEventRepository).set(auditEventCaptor.capture()),
+            () -> assertAuditEventWithSignificantDocument(auditEventCaptor.getValue())
+        );
+    }
+
+    @Test
+    @DisplayName("when creator has access level GRANTED, then it should grant access to creator")
+    void shouldGrantAccessToAccessLevelGrantedCreator() {
+        when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.GRANTED);
+
+        submitCaseTransaction.submitCase(event,
+                                         caseType,
+                                         idamUser,
+                                         eventTrigger,
+                                         this.caseDetails,
+                                         IGNORE_WARNING);
+
+        verify(caseUserRepository).grantAccess(Long.valueOf(CASE_ID), IDAM_ID, CREATOR.getRole());
+    }
+
+    @Test
+    @DisplayName("when creator has access level ALL, then it should NOT grant access to creator")
+    void shouldNotGrantAccessToAccessLevelAllCreator() {
+        when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.ALL);
+
+        submitCaseTransaction.submitCase(event,
+                                         caseType,
+                                         idamUser,
+                                         eventTrigger,
+                                         this.caseDetails,
+                                         IGNORE_WARNING);
+
+        verifyZeroInteractions(caseUserRepository);
     }
 
     @Test
@@ -177,22 +253,41 @@ class SubmitCaseTransactionTest {
 
     private void assertAuditEvent(final AuditEvent auditEvent) {
         assertAll("Audit event",
-                  () -> assertThat(auditEvent.getCaseDataId(), is(savedCaseDetails.getId())),
-                  () -> assertThat(auditEvent.getUserId(), is(IDAM_ID)),
-                  () -> assertThat(auditEvent.getUserLastName(), is(IDAM_LNAME)),
-                  () -> assertThat(auditEvent.getUserFirstName(), is(IDAM_FNAME)),
-                  () -> assertThat(auditEvent.getEventName(), is(EVENT_NAME)),
-                  () -> assertThat(auditEvent.getCaseTypeId(), is(CASE_TYPE_ID)),
-                  () -> assertThat(auditEvent.getCaseTypeVersion(), is(VERSION)),
-                  () -> assertThat(auditEvent.getStateId(), is(STATE_ID)),
-                  () -> assertThat(auditEvent.getStateName(), is(STATE_NAME)),
-                  () -> assertThat(auditEvent.getEventId(), is(EVENT_ID)),
-                  () -> assertThat(auditEvent.getSummary(), is(EVENT_SUMMARY)),
-                  () -> assertThat(auditEvent.getDescription(), is(EVENT_DESC)));
+            () -> assertThat(auditEvent.getCaseDataId(), is(savedCaseDetails.getId())),
+            () -> assertThat(auditEvent.getUserId(), is(IDAM_ID)),
+            () -> assertThat(auditEvent.getUserLastName(), is(IDAM_LNAME)),
+            () -> assertThat(auditEvent.getUserFirstName(), is(IDAM_FNAME)),
+            () -> assertThat(auditEvent.getEventName(), is(EVENT_NAME)),
+            () -> assertThat(auditEvent.getCaseTypeId(), is(CASE_TYPE_ID)),
+            () -> assertThat(auditEvent.getCaseTypeVersion(), is(VERSION)),
+            () -> assertThat(auditEvent.getStateId(), is(STATE_ID)),
+            () -> assertThat(auditEvent.getStateName(), is(STATE_NAME)),
+            () -> assertThat(auditEvent.getEventId(), is(EVENT_ID)),
+            () -> assertThat(auditEvent.getSummary(), is(EVENT_SUMMARY)),
+            () -> assertThat(auditEvent.getDescription(), is(EVENT_DESC)));
+    }
+
+    private void assertAuditEventWithSignificantDocument(final AuditEvent auditEvent) {
+        assertAll("Audit event",
+            () -> assertThat(auditEvent.getCaseDataId(), is(savedCaseDetails.getId())),
+            () -> assertThat(auditEvent.getUserId(), is(IDAM_ID)),
+            () -> assertThat(auditEvent.getUserLastName(), is(IDAM_LNAME)),
+            () -> assertThat(auditEvent.getUserFirstName(), is(IDAM_FNAME)),
+            () -> assertThat(auditEvent.getEventName(), is(EVENT_NAME)),
+            () -> assertThat(auditEvent.getCaseTypeId(), is(CASE_TYPE_ID)),
+            () -> assertThat(auditEvent.getCaseTypeVersion(), is(VERSION)),
+            () -> assertThat(auditEvent.getStateId(), is(STATE_ID)),
+            () -> assertThat(auditEvent.getStateName(), is(STATE_NAME)),
+            () -> assertThat(auditEvent.getEventId(), is(EVENT_ID)),
+            () -> assertThat(auditEvent.getSummary(), is(EVENT_SUMMARY)),
+            () -> assertThat(auditEvent.getDescription(), is(EVENT_DESC)),
+            () -> assertThat(auditEvent.getSignificantItem().getType(), is(DOCUMENT.name())),
+            () -> assertThat(auditEvent.getSignificantItem().getDescription(), is(DESCRIPTION)),
+            () -> assertThat(auditEvent.getSignificantItem().getUrl(), is(URL)));
     }
 
     private Event buildEvent() {
-        final Event event = new Event();
+        final Event event = anEvent().build();
         event.setEventId(EVENT_ID);
         event.setDescription(EVENT_DESC);
         event.setSummary(EVENT_SUMMARY);
@@ -216,8 +311,8 @@ class SubmitCaseTransactionTest {
     }
 
 
-    private IDAMProperties buildIdamUser() {
-        final IDAMProperties idamUser = new IDAMProperties();
+    private IdamUser buildIdamUser() {
+        final IdamUser idamUser = new IdamUser();
         idamUser.setId(IDAM_ID);
         idamUser.setForename(IDAM_FNAME);
         idamUser.setSurname(IDAM_LNAME);

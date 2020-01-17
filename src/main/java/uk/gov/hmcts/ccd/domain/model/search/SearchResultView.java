@@ -2,27 +2,37 @@ package uk.gov.hmcts.ccd.domain.model.search;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.List;
+
 public class SearchResultView {
     @JsonProperty("columns")
-    private SearchResultViewColumn[] searchResultViewColumns;
+    private List<SearchResultViewColumn> searchResultViewColumns;
     @JsonProperty("results")
-    private SearchResultViewItem[] searchResultViewItems;
+    private List<SearchResultViewItem> searchResultViewItems;
+    @JsonProperty("result_error")
+    private String resultError;
 
     public SearchResultView() {
         // Default constructor for JSON mapper
     }
 
-    public SearchResultView(final SearchResultViewColumn[] searchResultViewColumns,
-                            final SearchResultViewItem[] searchResultViewItems) {
+    public SearchResultView(final List<SearchResultViewColumn> searchResultViewColumns,
+                            final List<SearchResultViewItem> searchResultViewItems,
+                            final String resultError) {
         this.searchResultViewColumns = searchResultViewColumns;
         this.searchResultViewItems = searchResultViewItems;
+        this.resultError = resultError;
     }
 
-    public SearchResultViewColumn[] getSearchResultViewColumns() {
+    public List<SearchResultViewColumn> getSearchResultViewColumns() {
         return searchResultViewColumns;
     }
 
-    public SearchResultViewItem[] getSearchResultViewItems() {
+    public List<SearchResultViewItem> getSearchResultViewItems() {
         return searchResultViewItems;
+    }
+
+    public String getResultError() {
+        return resultError;
     }
 }

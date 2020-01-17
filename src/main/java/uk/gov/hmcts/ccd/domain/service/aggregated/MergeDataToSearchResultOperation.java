@@ -1,54 +1,172 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import org.apache.commons.lang3.StringUtils;
-import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
+import org.springframework.beans.factory.annotation.Qualifier;
+import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
+import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchResultField;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewColumn;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static com.fasterxml.jackson.databind.node.JsonNodeFactory.instance;
+import static java.lang.String.format;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.LABEL;
 
 @Named
 @Singleton
 public class MergeDataToSearchResultOperation {
-    private final UIDefinitionRepository uiDefinitionRepository;
+    private static final String NESTED_ELEMENT_NOT_FOUND_FOR_PATH = "Nested element not found for path %s";
 
-    public MergeDataToSearchResultOperation(final UIDefinitionRepository uiDefinitionRepository) {
-        this.uiDefinitionRepository = uiDefinitionRepository;
+    private final UserRepository userRepository;
+
+    public MergeDataToSearchResultOperation(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
-    public SearchResultView execute(final CaseType caseType, final List<CaseDetails> caseDetails,final String view) {
-        final SearchResult searchResult = getSearchResult(caseType, view);
-        final SearchResultViewColumn[] viewColumns = Arrays.stream(searchResult.getFields())
+    public SearchResultView execute(final CaseType caseType,
+                                    final SearchResult searchResult,
+                                    final List<CaseDetails> caseDetails,
+                                    final String resultError) {
+
+        final List<SearchResultViewColumn> viewColumns = buildSearchResultViewColumn(caseType, searchResult);
+
+        final List<SearchResultViewItem> viewItems = caseDetails.stream()
+            .map(caseData -> buildSearchResultViewItem(caseData, caseType, searchResult))
+            .collect(Collectors.toList());
+
+        return new SearchResultView(viewColumns, viewItems, resultError);
+    }
+
+    private List<SearchResultViewColumn> buildSearchResultViewColumn(CaseType caseType,
+                                                                     SearchResult searchResult) {
+        final HashSet<String> addedFields = new HashSet<>();
+
+        return Arrays.stream(searchResult.getFields())
             .flatMap(searchResultField -> caseType.getCaseFields().stream()
-            .filter(caseField -> caseField.getId().equals(searchResultField.getCaseFieldId()))
-            .map(caseField ->  new SearchResultViewColumn(
-                searchResultField.getCaseFieldId(),
-                caseField.getFieldType(),
-                searchResultField.getLabel(),
-                searchResultField.getDisplayOrder())
-             ))
-            .toArray(SearchResultViewColumn[]::new);
-
-        final SearchResultViewItem[] viewItems = caseDetails.stream()
-            .map(caseData -> new SearchResultViewItem(caseData.getReference().toString(), caseData.getData()))
-            .toArray(SearchResultViewItem[]::new);
-        return new SearchResultView(viewColumns, viewItems);
+                    .filter(caseField -> caseField.getId().equals(searchResultField.getCaseFieldId()))
+                    .filter(caseField -> filterDistinctFieldsByRole(addedFields, searchResultField))
+                    .map(caseField -> createSearchResultViewColumn(searchResultField, caseField))
+                    )
+            .collect(Collectors.toList());
     }
 
-    private SearchResult getSearchResult(final CaseType caseType, final String view) {
-        final SearchResult searchResult;
-        if (StringUtils.equalsAnyIgnoreCase("WORKBASKET", view))        {
-            searchResult= uiDefinitionRepository.getWorkBasketResult(caseType.getId());
+    private SearchResultViewColumn createSearchResultViewColumn(final SearchResultField searchResultField, final CaseField caseField) {
+        return new SearchResultViewColumn(
+            buildCaseFieldId(searchResultField),
+            buildCaseFieldType(searchResultField, caseField),
+            searchResultField.getLabel(),
+            searchResultField.getDisplayOrder(),
+            searchResultField.isMetadata());
+    }
+
+    private boolean filterDistinctFieldsByRole(final HashSet<String> addedFields, final SearchResultField resultField) {
+        if (addedFields.contains(resultField.getCaseFieldId())) {
+            return false;
         } else {
-            searchResult= uiDefinitionRepository.getSearchResult(caseType.getId());
+            if (StringUtils.isEmpty(resultField.getRole()) || userRepository.getUserRoles().contains(resultField.getRole())) {
+                addedFields.add(resultField.getCaseFieldId());
+                return true;
+            } else {
+                return false;
+            }
         }
-        return searchResult;
     }
+
+    private String buildCaseFieldId(SearchResultField searchResultField) {
+        if (StringUtils.isNotBlank(searchResultField.getCaseFieldPath())) {
+            return searchResultField.getCaseFieldId() + '.' + searchResultField.getCaseFieldPath();
+        } else {
+            return searchResultField.getCaseFieldId();
+        }
+    }
+
+    private FieldType buildCaseFieldType(SearchResultField searchResultField, CaseField caseField) {
+        CommonField resultField = caseField.getComplexFieldNestedField(searchResultField.getCaseFieldPath())
+            .orElseThrow(() -> new BadRequestException(format("CaseField %s has no nested elements with code %s.", caseField.getId(), searchResultField.getCaseFieldPath())));
+        return resultField.getFieldType();
+    }
+
+    private SearchResultViewItem buildSearchResultViewItem(final CaseDetails caseDetails,
+                                                           final CaseType caseType,
+                                                           final SearchResult searchResult) {
+
+        Map<String, JsonNode> caseData = new HashMap<>(caseDetails.getData());
+        Map<String, Object> caseMetadata = new HashMap<>(caseDetails.getMetadata());
+        Map<String, TextNode> labels = getLabelsFromCaseFields(caseType);
+        Map<String, Object> caseFields = prepareData(searchResult, caseData, caseMetadata, labels);
+
+        String caseId = caseDetails.hasCaseReference() ? caseDetails.getReferenceAsString() : caseDetails.getId();
+        return new SearchResultViewItem(caseId, caseFields);
+    }
+
+    private Map<String, Object> prepareData(SearchResult searchResult,
+                                            Map<String, JsonNode> caseData,
+                                            Map<String, Object> metadata,
+                                            Map<String, TextNode> labels) {
+
+        Map<String, Object> newResults = new HashMap<>();
+
+        searchResult.getFieldsWithPaths().forEach(searchResultField -> {
+            JsonNode jsonNode = caseData.get(searchResultField.getCaseFieldId());
+            if (jsonNode != null) {
+                newResults.put(searchResultField.getCaseFieldId() + "." + searchResultField.getCaseFieldPath(),
+                    getObjectByPath(searchResultField, jsonNode));
+            }
+        });
+
+        newResults.putAll(caseData);
+        newResults.putAll(labels);
+        newResults.putAll(metadata);
+
+        return newResults;
+    }
+
+    private Object getObjectByPath(SearchResultField searchResultField, JsonNode value) {
+
+        List<String> pathElements = searchResultField.getCaseFieldPathElements();
+
+        return reduce(value, pathElements, searchResultField.getCaseFieldPath());
+    }
+
+    private Object reduce(JsonNode caseFields, List<String> pathElements, String path) {
+        String firstPathElement = pathElements.get(0);
+
+        JsonNode caseField = Optional.ofNullable(caseFields.get(firstPathElement))
+            .orElseThrow(() -> new BadRequestException(format(NESTED_ELEMENT_NOT_FOUND_FOR_PATH, path)));
+
+        if (pathElements.size() == 1) {
+            return caseField;
+        } else {
+            List<String> tail = pathElements.subList(1, pathElements.size());
+            return reduce(caseField, tail, path);
+        }
+    }
+
+    private Map<String, TextNode> getLabelsFromCaseFields(CaseType caseType) {
+        return caseType.getCaseFields()
+            .stream()
+            .filter(caseField -> LABEL.equals(caseField.getFieldType().getType()))
+            .collect(Collectors.toMap(CaseField::getId, caseField -> instance.textNode(caseField.getLabel())));
+    }
+
 }

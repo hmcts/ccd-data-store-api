@@ -1,0 +1,13 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="RDM-5138" author="fatih.ozceylan@hmcts.net">
+        <addColumn tableName="case_data">
+            <column name="version" type="integer" defaultValue="1"/>
+        </addColumn>
+        <dropColumn tableName="case_data" columnName="locked_by_user_id"/>
+    </changeSet>
+
+</databaseChangeLog>
+

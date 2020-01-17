@@ -5,18 +5,20 @@ import com.microsoft.applicationinsights.telemetry.Duration;
 import com.microsoft.applicationinsights.telemetry.RequestTelemetry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.logging.appinsights.AbstractAppInsights;
 
 @Component
-public class AppInsights extends AbstractAppInsights {
+public class AppInsights {
     private static final String MODULE = "CASE_DATA";
     public static final String CASE_DEFINITION = "CASE_DEFINITION";
     public static final String DOC_MANAGEMENT = "DOCUMENT_MANAGEMENT";
+    public static final String DRAFT_STORE = "DRAFT_STORE";
+    private final TelemetryClient telemetry;
 
     @Autowired
     public AppInsights(TelemetryClient telemetry) {
-        super(telemetry);
+        this.telemetry = telemetry;
     }
+
     public void trackRequest(String name, long duration, boolean success) {
         RequestTelemetry rt = new RequestTelemetry();
         rt.setSource(MODULE);

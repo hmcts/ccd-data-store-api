@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.ToString;
 
 import java.io.Serializable;
@@ -51,6 +52,17 @@ public class AccessControlList implements Serializable {
 
     public void setDelete(boolean delete) {
         this.delete = delete;
+    }
+
+    @JsonIgnore
+    public AccessControlList duplicate() {
+        AccessControlList dup = new AccessControlList();
+        dup.setRole(role);
+        dup.setCreate(create);
+        dup.setRead(read);
+        dup.setUpdate(update);
+        dup.setDelete(delete);
+        return dup;
     }
 
 }

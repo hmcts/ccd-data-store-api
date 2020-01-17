@@ -1,15 +1,3 @@
-output "microserviceName" {
-  value = "${local.app_full_name}"
-}
-
-output "vaultUri" {
-  value = "${local.vaultUri}"
-}
-
-output "vaultName" {
-  value = "${local.vaultName}"
-}
-
 output "idam_url" {
   value = "${var.idam_api_url}"
 }
@@ -28,4 +16,20 @@ output "OAUTH2_CLIENT_ID" {
 
 output "OAUTH2_REDIRECT_URI" {
   value = "${local.oauth2_redirect_uri}"
+}
+
+output "ELASTIC_SEARCH_ENABLED" {
+  value = "${var.elastic_search_enabled}"
+}
+
+output "ELASTIC_SEARCH_HOSTS" {
+  value = "${local.elastic_search_hosts}"
+}
+
+output "ELASTIC_SEARCH_DATA_NODES_HOSTS" {
+  value = "${local.elastic_search_data_node_hosts}"
+}
+
+output "DEFINITION_STORE_HOST" {
+  value = "${local.definition_store_host}"
 }

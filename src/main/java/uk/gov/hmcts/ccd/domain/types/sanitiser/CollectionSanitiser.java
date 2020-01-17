@@ -1,11 +1,5 @@
 package uk.gov.hmcts.ccd.domain.types.sanitiser;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -14,11 +8,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+
 @Named
 @Singleton
 public class CollectionSanitiser implements Sanitiser {
 
-    public static final String TYPE = "Collection";
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     public static final String VALUE = "value";
     public static final String ID = "id";
@@ -35,7 +36,7 @@ public class CollectionSanitiser implements Sanitiser {
 
     @Override
     public String getType() {
-        return TYPE;
+        return COLLECTION;
     }
 
     @Override

@@ -18,6 +18,7 @@ public class CaseTypeTab implements Serializable {
     private List<CaseTypeTabField> tabFields = new ArrayList<>();
     @JsonProperty("show_condition")
     private String showCondition;
+    private String role;
 
     public String getId() {
         return id;
@@ -59,4 +60,11 @@ public class CaseTypeTab implements Serializable {
         this.showCondition = showCondition;
     }
 
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(final String role) {
+        this.role = role;
+    }
 }

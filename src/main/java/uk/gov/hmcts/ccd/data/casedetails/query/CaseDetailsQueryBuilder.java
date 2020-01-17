@@ -1,15 +1,5 @@
 package uk.gov.hmcts.ccd.data.casedetails.query;
 
-import uk.gov.hmcts.ccd.data.caseaccess.CaseUserEntity;
-import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
-import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
-import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -19,6 +9,17 @@ import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.apache.commons.collections.CollectionUtils;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseUserEntity;
+import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
+import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 
 public abstract class CaseDetailsQueryBuilder<T> {
 
@@ -81,6 +82,13 @@ public abstract class CaseDetailsQueryBuilder<T> {
         return this;
     }
 
+    public CaseDetailsQueryBuilder whereStates(List<String> states) {
+        if (CollectionUtils.isNotEmpty(states)) {
+            predicates.add(cb.in(root.get("state")).value(states));
+        }
+        return this;
+    }
+
     public CaseDetailsQueryBuilder whereCreatedDate(String createdDate) {
         predicates.add(whereDate(root.get(CREATED_DATE), createdDate));
 
@@ -113,11 +121,13 @@ public abstract class CaseDetailsQueryBuilder<T> {
         return this;
     }
 
-    public CaseDetailsQueryBuilder orderByCreatedDate(String sortDirection) {
+    public CaseDetailsQueryBuilder orderBy(MetaData metadata) {
+        String sortDirection = metadata.getSortDirection().orElse("asc");
+        String sortField = CREATED_DATE;
         if (sortDirection.equalsIgnoreCase("asc")) {
-            orders.add(cb.asc(root.get(CREATED_DATE)));
+            orders.add(cb.asc(root.get(sortField)));
         } else {
-            orders.add(cb.desc(root.get(CREATED_DATE)));
+            orders.add(cb.desc(root.get(sortField)));
         }
 
         return this;
@@ -147,4 +157,5 @@ public abstract class CaseDetailsQueryBuilder<T> {
     private LocalDateTime atStartOfDay(String date) {
         return LocalDate.parse(date).atStartOfDay();
     }
+
 }

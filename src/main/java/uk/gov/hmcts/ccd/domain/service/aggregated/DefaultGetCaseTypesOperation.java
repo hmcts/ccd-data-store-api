@@ -1,5 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import java.util.List;
+import java.util.function.Predicate;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -7,10 +10,13 @@ import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 
-import java.util.List;
-import java.util.function.Predicate;
-
+/**
+ *
+ * @deprecated current implementation has serious performance issues
+ */
+@Deprecated
 @Service
+@SuppressWarnings("squid:S1133")
 @Qualifier(DefaultGetCaseTypesOperation.QUALIFIER)
 public class DefaultGetCaseTypesOperation implements GetCaseTypesOperation {
     public static final String QUALIFIER = "default";

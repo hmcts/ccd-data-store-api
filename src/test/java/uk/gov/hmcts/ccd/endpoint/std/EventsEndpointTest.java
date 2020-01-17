@@ -17,7 +17,7 @@ import static org.mockito.Mockito.verify;
 
 class EventsEndpointTest {
 
-    private static final Integer UID = 1231;
+    private static final String UID = "0";
     private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_TYPE_ID = "GrantOnly";
     private static final String CASE_ID = "1234qwer5678tyui";

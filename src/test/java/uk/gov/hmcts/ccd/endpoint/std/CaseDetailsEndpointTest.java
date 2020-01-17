@@ -1,6 +1,25 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
+import static com.google.common.collect.Maps.newHashMap;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
+
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -17,6 +36,7 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.createcase.CreateCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.createevent.CreateEventOperation;
+import uk.gov.hmcts.ccd.domain.service.createevent.MidEventCallback;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.ClassifiedGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.search.PaginatedSearchMetaDataOperation;
@@ -26,21 +46,6 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.DocumentsOperation;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
-import static com.google.common.collect.Maps.newHashMap;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
-
 class CaseDetailsEndpointTest {
 
     private static final String UID = "1231";
@@ -49,17 +54,15 @@ class CaseDetailsEndpointTest {
     private static final String CASE_ID = "1234qwer5678tyui";
     private static final String EVENT_TRIGGER_ID = "updateEvent";
     private static final Boolean IGNORE_WARNING = Boolean.TRUE;
-    private static final CaseDataContent EVENT_DATA = new CaseDataContent();
-    private static final Event EVENT = new Event();
+    private static final Event EVENT = anEvent().build();
     private static final Map<String, JsonNode> DATA = new HashMap<>();
     private static final String TOKEN = "csdcsdcdscsdcsdcsdcd";
-
-    static {
-        EVENT_DATA.setEvent(EVENT);
-        EVENT_DATA.setData(DATA);
-        EVENT_DATA.setToken(TOKEN);
-        EVENT_DATA.setIgnoreWarning(IGNORE_WARNING);
-    }
+    private static final CaseDataContent EVENT_DATA = newCaseDataContent()
+        .withEvent(EVENT)
+        .withData(DATA)
+        .withToken(TOKEN)
+        .withIgnoreWarning(IGNORE_WARNING)
+        .build();
 
     @Mock
     private ClassifiedGetCaseOperation classifiedGetCaseOperation;
@@ -89,10 +92,13 @@ class CaseDetailsEndpointTest {
     private ValidateCaseFieldsOperation validateCaseFieldsOperation;
 
     @Mock
+    private MidEventCallback midEventCallback;
+
+    @Mock
     private AppInsights appInsights;
 
     private CaseDetailsEndpoint endpoint;
-    private Map<String,String> params = newHashMap();
+    private Map<String, String> params = newHashMap();
 
     @BeforeEach
     void setUp() {
@@ -110,6 +116,7 @@ class CaseDetailsEndpointTest {
                                     validateCaseFieldsOperation,
                                     documentsOperation,
                                     paginatedSearchMetaDataOperation,
+                                    midEventCallback,
                                     appInsights);
     }
 
@@ -144,12 +151,9 @@ class CaseDetailsEndpointTest {
     @Test
     void shouldReturnStartEventTrigger_startEventForCaseworkerForCase() {
         final StartEventTrigger startEventTrigger = new StartEventTrigger();
-        doReturn(startEventTrigger).when(startEventOperation).triggerStartForCase(UID,
-                                                                                     JURISDICTION_ID,
-                                                                                     CASE_TYPE_ID,
-                                                                                     CASE_ID,
-                                                                                     EVENT_TRIGGER_ID,
-                                                                                     IGNORE_WARNING);
+        doReturn(startEventTrigger).when(startEventOperation).triggerStartForCase(CASE_ID,
+                                                                                  EVENT_TRIGGER_ID,
+                                                                                  IGNORE_WARNING);
 
         final StartEventTrigger output = endpoint.startEventForCaseworker(UID,
                                                                           JURISDICTION_ID,
@@ -159,10 +163,7 @@ class CaseDetailsEndpointTest {
                                                                           IGNORE_WARNING);
 
         assertThat(output, sameInstance(startEventTrigger));
-        verify(startEventOperation).triggerStartForCase(UID,
-                                                        JURISDICTION_ID,
-                                                        CASE_TYPE_ID,
-                                                        CASE_ID,
+        verify(startEventOperation).triggerStartForCase(CASE_ID,
                                                         EVENT_TRIGGER_ID,
                                                         IGNORE_WARNING);
     }
@@ -170,11 +171,9 @@ class CaseDetailsEndpointTest {
     @Test
     void shouldReturnStartEventTrigger_startEventForCaseworkerForCaseType() {
         final StartEventTrigger startEventTrigger = new StartEventTrigger();
-        doReturn(startEventTrigger).when(startEventOperation).triggerStartForCaseType(UID,
-                                                                                         JURISDICTION_ID,
-                                                                                         CASE_TYPE_ID,
-                                                                                         EVENT_TRIGGER_ID,
-                                                                                         IGNORE_WARNING);
+        doReturn(startEventTrigger).when(startEventOperation).triggerStartForCaseType(CASE_TYPE_ID,
+                                                                                      EVENT_TRIGGER_ID,
+                                                                                      IGNORE_WARNING);
 
         final StartEventTrigger output = endpoint.startCaseForCaseworker(UID,
                                                                          JURISDICTION_ID,
@@ -183,9 +182,7 @@ class CaseDetailsEndpointTest {
                                                                          IGNORE_WARNING);
 
         assertThat(output, sameInstance(startEventTrigger));
-        verify(startEventOperation).triggerStartForCaseType(UID,
-                                                            JURISDICTION_ID,
-                                                            CASE_TYPE_ID,
+        verify(startEventOperation).triggerStartForCaseType(CASE_TYPE_ID,
                                                             EVENT_TRIGGER_ID,
                                                             IGNORE_WARNING);
     }
@@ -193,13 +190,9 @@ class CaseDetailsEndpointTest {
     @Test
     void createCaseForCaseWorker() {
         final CaseDetails toBeReturned = new CaseDetails();
-        doReturn(toBeReturned).when(createCaseOperation).createCaseDetails(UID,
-                                                                           JURISDICTION_ID,
-                                                                           CASE_TYPE_ID,
-                                                                           EVENT,
-                                                                           DATA,
-                                                                           IGNORE_WARNING,
-                                                                           TOKEN);
+        doReturn(toBeReturned).when(createCaseOperation).createCaseDetails(CASE_TYPE_ID,
+                                                                           EVENT_DATA,
+                                                                           IGNORE_WARNING);
 
         final CaseDetails output = endpoint.saveCaseDetailsForCaseWorker(UID,
                                                                          JURISDICTION_ID,
@@ -209,13 +202,9 @@ class CaseDetailsEndpointTest {
 
         assertAll(
             () -> assertThat(output, sameInstance(toBeReturned)),
-            () -> verify(createCaseOperation).createCaseDetails(UID,
-                                                                JURISDICTION_ID,
-                                                                CASE_TYPE_ID,
-                                                                EVENT_DATA.getEvent(),
-                                                                EVENT_DATA.getData(),
-                                                                IGNORE_WARNING,
-                                                                EVENT_DATA.getToken())
+            () -> verify(createCaseOperation).createCaseDetails(CASE_TYPE_ID,
+                                                                EVENT_DATA,
+                                                                IGNORE_WARNING)
         );
     }
 
@@ -223,14 +212,8 @@ class CaseDetailsEndpointTest {
     void createCaseEventForCaseWorker() {
         final CaseDetails toBeReturned = new CaseDetails();
         doReturn(toBeReturned).when(createEventOperation).createCaseEvent(
-            UID,
-            JURISDICTION_ID,
-            CASE_TYPE_ID,
             CASE_ID,
-            EVENT,
-            DATA,
-            TOKEN,
-            IGNORE_WARNING);
+            EVENT_DATA);
 
         final CaseDetails output = endpoint.createCaseEventForCaseWorker(
             UID,
@@ -242,39 +225,44 @@ class CaseDetailsEndpointTest {
         assertAll(
             () -> assertThat(output, sameInstance(toBeReturned)),
             () -> verify(createEventOperation).createCaseEvent(
-                UID,
-                JURISDICTION_ID,
-                CASE_TYPE_ID,
                 CASE_ID,
-                EVENT_DATA.getEvent(),
-                EVENT_DATA.getData(),
-                EVENT_DATA.getToken(),
-                IGNORE_WARNING)
+                EVENT_DATA)
         );
     }
 
     @Test
     void validateCaseFieldsForCaseWorker() {
-        final Map<String, JsonNode> toBeReturned = new HashMap<>();
-        doReturn(toBeReturned).when(validateCaseFieldsOperation).validateCaseDetails(
-            JURISDICTION_ID,
-            CASE_TYPE_ID,
-            EVENT,
-            DATA);
+        String pageId = "pageId";
+        final Map<String, JsonNode> data = new HashMap<>();
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode objectNode = mapper.createObjectNode();
+        objectNode.set("data", mapper.valueToTree(data));
+        final JsonNode toBeReturned = objectNode;
 
-        final Map<String, JsonNode> output = endpoint.validateCaseDetailsForCaseWorker(
+        doReturn(data).when(validateCaseFieldsOperation).validateCaseDetails(
+            CASE_TYPE_ID,
+            EVENT_DATA);
+        doReturn(toBeReturned).when(midEventCallback).invoke(
+            CASE_TYPE_ID,
+            EVENT_DATA,
+            pageId);
+
+        final JsonNode output = endpoint.validateCaseDetails(
             UID,
             JURISDICTION_ID,
             CASE_TYPE_ID,
+            pageId,
             EVENT_DATA);
 
         assertAll(
             () -> assertThat(output, sameInstance(toBeReturned)),
             () -> verify(validateCaseFieldsOperation).validateCaseDetails(
-                JURISDICTION_ID,
                 CASE_TYPE_ID,
-                EVENT_DATA.getEvent(),
-                DATA)
+                EVENT_DATA),
+            () -> verify(midEventCallback).invoke(
+                CASE_TYPE_ID,
+                EVENT_DATA,
+                pageId)
         );
     }
 
@@ -284,7 +272,7 @@ class CaseDetailsEndpointTest {
         given(fieldMapSanitizeOperation.execute(params)).willReturn(sanitizedParams);
         final ArgumentCaptor<MetaData> argument = ArgumentCaptor.forClass(MetaData.class);
 
-        endpoint.searchCasesForCaseWorkers(JURISDICTION_ID, CASE_TYPE_ID, params);
+        endpoint.searchCasesForCaseWorkers(UID, JURISDICTION_ID, CASE_TYPE_ID, params);
 
         verify(fieldMapSanitizeOperation).execute(params);
         verify(searchOperation).execute(argument.capture(), eq(sanitizedParams));
@@ -301,7 +289,7 @@ class CaseDetailsEndpointTest {
         params.put("notExisting2", "y");
         params.put("state", "z");
         BadRequestException badRequestException = assertThrows(BadRequestException.class,
-                () -> endpoint.searchCasesForCaseWorkers(JURISDICTION_ID, "", params));
+                                                               () -> endpoint.searchCasesForCaseWorkers(UID, JURISDICTION_ID, "", params));
 
         assertThat(badRequestException.getMessage(), is("unknown metadata search parameters: notExisting2,notExisting1"));
     }
@@ -312,7 +300,7 @@ class CaseDetailsEndpointTest {
 
         params.put("security_classification", "XX");
         BadRequestException badRequestException = assertThrows(BadRequestException.class,
-                () -> endpoint.searchCasesForCaseWorkers(JURISDICTION_ID, "", params));
+                                                               () -> endpoint.searchCasesForCaseWorkers(UID, JURISDICTION_ID, "", params));
 
         assertThat(badRequestException.getMessage(), is("unknown security classification 'XX'"));
     }
@@ -323,7 +311,7 @@ class CaseDetailsEndpointTest {
 
         params.put("sortDirection", "XX");
         BadRequestException badRequestException = assertThrows(BadRequestException.class,
-            () -> endpoint.searchCasesForCaseWorkers(JURISDICTION_ID, "", params));
+                                                               () -> endpoint.searchCasesForCaseWorkers(UID, JURISDICTION_ID, "", params));
 
         assertThat(badRequestException.getMessage(), is("Unknown sort direction: XX"));
     }
@@ -334,7 +322,7 @@ class CaseDetailsEndpointTest {
         given(fieldMapSanitizeOperation.execute(params)).willReturn(sanitizedParams);
         final ArgumentCaptor<MetaData> argument = ArgumentCaptor.forClass(MetaData.class);
 
-        endpoint.searchCasesForCitizens(JURISDICTION_ID, CASE_TYPE_ID, params);
+        endpoint.searchCasesForCitizens(UID, JURISDICTION_ID, CASE_TYPE_ID, params);
 
         verify(fieldMapSanitizeOperation).execute(params);
         verify(searchOperation).execute(argument.capture(), eq(sanitizedParams));
@@ -344,7 +332,10 @@ class CaseDetailsEndpointTest {
     }
 
     private Map<String, String> initParams(final String state) {
-        return new HashMap<String, String>() {{
+        return new HashMap<String, String>() {
+            private static final long serialVersionUID = -2644130204347949654L;
+
+            {
             put("state", state);
         }};
     }

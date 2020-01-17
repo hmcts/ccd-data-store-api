@@ -8,6 +8,7 @@ public final class EventTokenProperties {
     public static final String CASE_ID = "case-id";
     public static final String CASE_VERSION = "case-version";
     public static final String CASE_STATE = "case-state";
+    public static final String ENTITY_VERSION = "entity-version";
 
     private final String uid;
     private final String caseId;
@@ -16,6 +17,7 @@ public final class EventTokenProperties {
     private final String caseTypeId;
     private final String version;
     private final String caseState;
+    private final String entityVersion;
 
     public EventTokenProperties(final String uid,
                                 final String caseId,
@@ -23,7 +25,8 @@ public final class EventTokenProperties {
                                 final String eventId,
                                 final String caseTypeId,
                                 final String version,
-                                final String caseState) {
+                                final String caseState,
+                                final String entityVersion) {
         this.uid = uid;
         this.caseId = caseId;
         this.jurisdictionId = jurisdictionId;
@@ -31,6 +34,7 @@ public final class EventTokenProperties {
         this.caseTypeId = caseTypeId;
         this.version = version;
         this.caseState = caseState;
+        this.entityVersion = entityVersion;
     }
 
     public String getCaseId() {
@@ -59,5 +63,9 @@ public final class EventTokenProperties {
 
     public String getCaseState() {
         return caseState;
+    }
+
+    public String getEntityVersion() {
+        return entityVersion;
     }
 }

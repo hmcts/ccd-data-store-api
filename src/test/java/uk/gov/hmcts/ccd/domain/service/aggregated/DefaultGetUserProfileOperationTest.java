@@ -1,19 +1,22 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.data.user.UserService;
-import uk.gov.hmcts.ccd.domain.model.aggregated.*;
-
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.collection.IsArrayContainingInAnyOrder.arrayContainingInAnyOrder;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.user.UserService;
+import uk.gov.hmcts.ccd.domain.model.aggregated.DefaultSettings;
+import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
+import uk.gov.hmcts.ccd.domain.model.aggregated.User;
+import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
 
 public class DefaultGetUserProfileOperationTest {
 
@@ -44,9 +47,7 @@ public class DefaultGetUserProfileOperationTest {
 
     @Test
     void shouldReturnUserProfile() {
-        String userToken = "testToken";
-
-        UserProfile userProfile = defaultGetUserProfileOperation.execute(userToken);
+        UserProfile userProfile = defaultGetUserProfileOperation.execute(CAN_READ);
 
         assertAll(
             () -> assertThat(userProfile.getUser(), is(equalTo(user))),

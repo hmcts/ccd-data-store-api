@@ -3,10 +3,11 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.ToString;
-
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import lombok.ToString;
 
 @ApiModel(description = "")
 @ToString
@@ -17,6 +18,8 @@ public class Jurisdiction implements Serializable {
     private String description = null;
     private Date liveFrom = null;
     private Date liveUntil = null;
+
+    private List<CaseType> caseTypes = new ArrayList<>();
 
     /**
      **/
@@ -76,6 +79,18 @@ public class Jurisdiction implements Serializable {
 
     public void setLiveUntil(Date liveUntil) {
         this.liveUntil = liveUntil;
+    }
+
+    /**
+     **/
+    @ApiModelProperty(value = "")
+    @JsonProperty("case_types")
+    public List<CaseType> getCaseTypes() {
+        return caseTypes;
+    }
+
+    public void setCaseTypes(List<CaseType> caseTypes) {
+        this.caseTypes = caseTypes;
     }
 
 }

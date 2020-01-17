@@ -36,4 +36,13 @@ public class CaseTabCollection implements Serializable {
     public void setTabs(List<CaseTypeTab> tabs) {
         this.tabs = tabs;
     }
+
+    public boolean hasTabFieldType(String tabFieldType) {
+        return this.tabs.stream()
+                        .flatMap(tab -> tab.getTabFields().stream())
+                        .anyMatch(field -> field.getCaseField()
+                                                .getFieldType()
+                                                .getType()
+                                                .equals(tabFieldType));
+    }
 }

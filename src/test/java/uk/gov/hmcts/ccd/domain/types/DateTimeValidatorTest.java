@@ -1,309 +1,357 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.test.util.ReflectionTestUtils;
-import uk.gov.hmcts.ccd.BaseTest;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.test.CaseFieldBuilder;
 
-import javax.inject.Inject;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.List;
 
-import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.StringEndsWith.endsWith;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
-public class DateTimeValidatorTest extends BaseTest implements IVallidatorTest {
-    private static final String CASE_FIELD_STRING =
-        "{\n" +
-        "  \"id\": \"TEST_FIELD_ID\",\n" +
-        "  \"field_type\": {\n" +
-        "    \"type\": \"DATETIME\"\n" +
-        "  }\n" +
-        "}";
+@DisplayName("DateTimeValidator")
+class DateTimeValidatorTest {
+    private static final JsonNodeFactory NODE_FACTORY = JsonNodeFactory.instance;
+    private static final String FIELD_ID = "TEST_FIELD_ID";
+    private static final String DATE_TIME_REGEX = "^(\\d{4}(?!\\d{2}\\b))((-?)((0[1-9]|1[0-2])(\\3([12]\\d|0[1-9]|3[01]))?|W([0-4]\\d|5[0-2])(-?[1-7])?|" +
+        "(00[1-9]|0[1-9]\\d|[12]\\d{2}|3([0-5]\\d|6[1-6])))([T\\s]((([01]\\d|2[0-3])((:?)[0-5]\\d)?|24\\:?00)" +
+        "([\\.,]\\d+(?!:))?)?(\\17[0-5]\\d([\\.,]\\d+)?)?([zZ]|([\\+-])([01]\\d|2[0-3]):?([0-5]\\d)?)?)?)?$";
 
-    @Inject
+    @Mock
+    private FieldType dateTimeFieldType;
+
+    @Mock
+    private CaseDefinitionRepository definitionRepository;
+
     private DateTimeValidator validator;
     private CaseField caseField;
 
-    @Before
-    public void setUp() throws Exception {
-        caseField = MAPPER.readValue(CASE_FIELD_STRING, CaseField.class);
-        ReflectionTestUtils.setField(validator.getType(), "regularExpression",
-            "^(\\d{4}(?!\\d{2}\\b))((-?)((0[1-9]|1[0-2])(\\3([12]\\d|0[1-9]|3[01]))?|W([0-4]\\d|5[0-2])(-?[1-7])?|" +
-                "(00[1-9]|0[1-9]\\d|[12]\\d{2}|3([0-5]\\d|6[1-6])))([T\\s]((([01]\\d|2[0-3])((:?)[0-5]\\d)?|24\\:?00)" +
-                "([\\.,]\\d+(?!:))?)?(\\17[0-5]\\d([\\.,]\\d+)?)?([zZ]|([\\+-])([01]\\d|2[0-3]):?([0-5]\\d)?)?)?)?$");
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.initMocks(this);
+
+        when(definitionRepository.getBaseTypes()).thenReturn(Collections.emptyList());
+        BaseType.setCaseDefinitionRepository(definitionRepository);
+        BaseType.initialise();
+
+        when(dateTimeFieldType.getType()).thenReturn(DateTimeValidator.TYPE_ID);
+        when(dateTimeFieldType.getRegularExpression()).thenReturn(DATE_TIME_REGEX);
+        BaseType.register(new BaseType(dateTimeFieldType));
+
+        validator = new DateTimeValidator();
+
+        caseField = caseField().build();
+    }
+
+    @Nested
+    @DisplayName("when valid datetime")
+    class WhenValidDateTime {
+        @Test
+        @DisplayName("should validate date time: 2012-04-21T00:00:00.000")
+        void shouldValidateDateTimeWithoutTimeZone() {
+            final List<ValidationResult> results = validator.validate(FIELD_ID,
+                                                                      NODE_FACTORY.textNode("2012-04-21T00:00:00.000"),
+                                                                      caseField);
+            assertThat(results, hasSize(0));
+        }
+
+        @Test
+        @DisplayName("should validate date time: 2012-04-21T00:00:00.000Z")
+        void shouldValidateDateTimeWithTimeZoneZ() {
+            final List<ValidationResult> results = validator.validate(FIELD_ID,
+                                                                      NODE_FACTORY.textNode("2012-04-21T00:00:00.000Z"),
+                                                                      caseField);
+            assertThat(results, hasSize(0));
+        }
+
+        @Test
+        @DisplayName("should validate date time: 2012-04-21T00:00:00+01:00")
+        void shouldValidateDateTimeWithTimeZone() {
+            final List<ValidationResult> results = validator.validate(FIELD_ID,
+                                                                      NODE_FACTORY.textNode("2012-04-21T00:00:00+01:00"),
+                                                                      caseField);
+            assertThat(results, hasSize(0));
+        }
+
+        @Test
+        @DisplayName("should validate date time: 2000-02-29T00:00:00Z")
+        void shouldValidateDateTimeLeapYear() {
+            final List<ValidationResult> results = validator.validate(FIELD_ID,
+                                                                      NODE_FACTORY.textNode("2000-02-29T00:00:00Z"),
+                                                                      caseField);
+            assertThat(results, hasSize(0));
+        }
+    }
+
+    @Nested
+    @DisplayName("when invalid datetime")
+    class WhenInvalidDateTime {
+        @Test
+        @DisplayName("should not validate date time: 3321M1 1AA")
+        void shouldNotValidateNotDateTime() {
+            final List<ValidationResult> results = validator.validate(FIELD_ID,
+                                                                      NODE_FACTORY.textNode("3321M1 1AA"),
+                                                                      caseField);
+            assertAll(
+                () -> assertThat(results, hasSize(1)),
+                () -> assertThat(results.get(0).getErrorMessage(),
+                                 equalTo("\"3321M1 1AA\" is not a valid ISO 8601 date time"))
+            );
+        }
+
+        @Test
+        @DisplayName("should not validate date time: 1800-14-14T00:00:00")
+        void shouldNotValidateNotMonth() {
+            final List<ValidationResult> results = validator.validate(FIELD_ID,
+                                                                      NODE_FACTORY.textNode("1800-14-14T00:00:00"),
+                                                                      caseField);
+            assertAll(
+                () -> assertThat(results, hasSize(1)),
+                () -> assertThat(results.get(0).getErrorMessage(),
+                                 equalTo("\"1800-14-14T00:00:00\" is not a valid ISO 8601 date time"))
+            );
+        }
+
+        @Test
+        @DisplayName("should not validate date time: 2001-11-31T00:00:00")
+        void shouldNotValidateNotDay() {
+            final List<ValidationResult> results = validator.validate(FIELD_ID,
+                                                                      NODE_FACTORY.textNode("2001-11-31T00:00:00"),
+                                                                      caseField);
+            assertAll(
+                () -> assertThat(results, hasSize(1)),
+                () -> assertThat(results.get(0).getErrorMessage(),
+                                 equalTo("\"2001-11-31T00:00:00\" is not a valid ISO 8601 date time"))
+            );
+        }
+
+        @Test
+        @DisplayName("should not validate date time: 2001-01-01")
+        void shouldNotValidateNotTime() {
+            final List<ValidationResult> results = validator.validate(FIELD_ID,
+                                                                      NODE_FACTORY.textNode("2001-01-01"),
+                                                                      caseField);
+            assertAll(
+                () -> assertThat(results, hasSize(1)),
+                () -> assertThat(results.get(0).getErrorMessage(),
+                                 equalTo("\"2001-01-01\" is not a valid ISO 8601 date time"))
+            );
+        }
+
+        @Test
+        @DisplayName("should not validate date time: 2100-02-29T00:00:00Z")
+        void shouldNotValidateNotDayLeapYear() {
+            final List<ValidationResult> results = validator.validate(FIELD_ID,
+                                                                      NODE_FACTORY.textNode("2100-02-29T00:00:00Z"),
+                                                                      caseField);
+            assertAll(
+                () -> assertThat(results, hasSize(1)),
+                () -> assertThat(results.get(0).getErrorMessage(),
+                                 equalTo("\"2100-02-29T00:00:00Z\" is not a valid ISO 8601 date time"))
+            );
+        }
     }
 
     @Test
-    public void validDate() {
-        final List<ValidationResult> result01 = validator.validate("TEST_FIELD_ID",
-            NODE_FACTORY.textNode("2012-04-21T00:00:00.000"), caseField);
-        assertEquals(0, result01.size());
-
-        final List<ValidationResult> result02 = validator.validate("TEST_FIELD_ID",
-            NODE_FACTORY.textNode("2012-04-21T00:00:00.000Z"), caseField);
-        assertEquals(0, result02.size());
-
-        final List<ValidationResult> result03 = validator.validate("TEST_FIELD_ID",
-            NODE_FACTORY.textNode("2012-04-21T00:00:00+01:00"), caseField);
-        assertEquals(0, result03.size());
+    void getType() {
+        assertEquals(validator.getType(), BaseType.get("DATETIME"));
     }
 
     @Test
-    public void invalidDate() {
-        final List<ValidationResult> result01 = validator.validate("TEST_FIELD_ID",
-            NODE_FACTORY.textNode("3321M1 1AA"), caseField);
-        assertEquals("Did not catch invalid date 3321M1 1AA", 1, result01.size());
-        assertEquals("\"3321M1 1AA\" is not a valid ISO 8601 date time", result01.get(0).getErrorMessage());
-
-        final List<ValidationResult> result02 = validator.validate("TEST_FIELD_ID",
-            NODE_FACTORY.textNode("1800-14-14T00:00:00"), caseField);
-        assertEquals("Did not catch invalid date 1800-14-14 ", 1, result02.size());
-        assertEquals("\"1800-14-14T00:00:00\" is not a valid ISO 8601 date time", result02.get(0).getErrorMessage());
-
-        final List<ValidationResult> result03 = validator.validate("TEST_FIELD_ID",
-            NODE_FACTORY.textNode("2001-11-31T00:00:00"), caseField);
-        assertEquals("Did not catch invalid date time 2001-11-31", 1, result03.size());
-        assertEquals("\"2001-11-31T00:00:00\" is not a valid ISO 8601 date time", result03.get(0).getErrorMessage());
-
-        // checks that ISO DATE is not accepted by DateTimeValidator
-        final List<ValidationResult> result04 = validator.validate("TEST_FIELD_ID",
-            NODE_FACTORY.textNode("2001-01-01"), caseField);
-        assertEquals("Did not catch invalid date time 2001-01-01", 1, result04.size());
-        assertEquals("\"2001-01-01\" is not a valid ISO 8601 date time", result04.get(0).getErrorMessage());
-
-        final List<ValidationResult> result05 = validator.validate("TEST_FIELD_ID",
-            NODE_FACTORY.textNode("2000-02-29T00:00:00Z"), caseField);
-        assertEquals("Year 2000 is a leap year", 0, result05.size());
-
-        final List<ValidationResult> result06 = validator.validate("TEST_FIELD_ID",
-            NODE_FACTORY.textNode("2100-02-29T00:00:00Z"), caseField);
-        assertEquals("Did not catch invalid date 2100-02-29Z", 1, result06.size());
-        assertEquals("\"2100-02-29T00:00:00Z\" is not a valid ISO 8601 date time", result06.get(0).getErrorMessage());
+    void nullValue() {
+        assertEquals(0, validator.validate(FIELD_ID, null, null).size());
     }
 
     @Test
-    public void getType() {
-        assertEquals("Type is incorrect", validator.getType(), BaseType.get("DATETIME"));
-    }
-
-    @Test
-    public void nullValue() {
-        assertEquals("Did not catch NULL", 0, validator.validate("TEST_FIELD_ID", null, null).size());
-    }
-
-    @Test
-    public void checkMax() throws Exception {
+    void checkMax() {
         final String validDateTime = "2001-01-01T00:00:00Z";
         final String invalidDateTime = "2002-01-01T00:00:00Z";
-        final String maxDate = "2001-12-31T00:00:00+01:00";
-        final Long maxDateTime = convertToLongTime(maxDate);
-        final CaseField caseField = MAPPER.readValue(
-            "{\n" +
-            "  \"id\": \"DATE_TEST\",\n" +
-            "  \"field_type\": {\n" +
-            "    \"type\": \"DATETIME\",\n" +
-            "    \"max\": \"" + maxDateTime + "\"\n" +
-            "  }\n" +
-            "}", CaseField.class);
+        final String maxDateTime = "2001-12-31T00:00:00+01:00";
+        final CaseField caseField = caseField().withMax(datetime(maxDateTime)).build();
 
-        final List<ValidationResult> result01 = validator.validate("TEST_FIELD_ID",
-            NODE_FACTORY.textNode(validDateTime), caseField);
-        assertEquals(result01.toString(), 0, result01.size());
+        final List<ValidationResult> result01 = validator.validate(FIELD_ID,
+                                                                   NODE_FACTORY.textNode(validDateTime), caseField);
+        assertEquals(0, result01.size(), result01.toString());
 
-        final List<ValidationResult> result02 = validator.validate("TEST_FIELD_ID",
-            NODE_FACTORY.textNode(maxDate), caseField);
-        assertEquals(result02.toString(), 0, result02.size());
+        final List<ValidationResult> result02 = validator.validate(FIELD_ID,
+                                                                   NODE_FACTORY.textNode(maxDateTime), caseField);
+        assertEquals(0, result02.size(), result02.toString());
 
-        final List<ValidationResult> result03 = validator.validate("TEST_FIELD_ID",
-            NODE_FACTORY.textNode(invalidDateTime), caseField);
-        assertEquals("Did not catch invalid max-date", 1, result03.size());
-        assertEquals("Validation message", "The date time should be earlier than 2001-12-31T00:00:00",
-            result03.get(0).getErrorMessage());
+        final List<ValidationResult> result03 = validator.validate(FIELD_ID,
+                                                                   NODE_FACTORY.textNode(invalidDateTime), caseField);
+        assertEquals(1, result03.size(), "Did not catch invalid max-date");
+        assertEquals("The date time should be earlier than 2001-12-31T00:00:00",
+                     result03.get(0).getErrorMessage(), "Validation message");
     }
 
     @Test
-    public void checkMin() throws Exception {
+    void checkMin() {
         final String validDateTime = "2001-12-31T00:00:00Z";
         final String invalidDateTime = "2000-01-01T00:00:00Z";
-        final String minDate = "2001-01-01T00:00:00Z";
-        final Long minDateTime = convertToLongTime(minDate);
-        final CaseField caseField = MAPPER.readValue(
-            "{\n" +
-            "  \"id\": \"DATE_TEST\",\n" +
-            "  \"field_type\": {\n" +
-            "    \"type\": \"DATETIME\",\n" +
-            "    \"min\": \"" + minDateTime + "\"\n" +
-            "  }\n" +
-            "}", CaseField.class);
+        final String minDateTime = "2001-01-01T00:00:00Z";
+        final CaseField caseField = caseField().withMin(datetime(minDateTime)).build();
 
-        final List<ValidationResult> result01 = validator.validate("TEST_FIELD_ID",
-            NODE_FACTORY.textNode(validDateTime), caseField);
-        assertEquals(result01.toString(), 0, result01.size());
+        final List<ValidationResult> result01 = validator.validate(FIELD_ID,
+                                                                   NODE_FACTORY.textNode(validDateTime), caseField);
+        assertEquals(0, result01.size(), result01.toString());
 
-        final List<ValidationResult> result02 = validator.validate("TEST_FIELD_ID",
-            NODE_FACTORY.textNode(minDate), caseField);
-        assertEquals(result02.toString(), 0, result02.size());
+        final List<ValidationResult> result02 = validator.validate(FIELD_ID,
+                                                                   NODE_FACTORY.textNode(minDateTime), caseField);
+        assertEquals(0, result02.size(), result02.toString());
 
-        final List<ValidationResult> result03 = validator.validate("TEST_FIELD_ID",
-            NODE_FACTORY.textNode(invalidDateTime), caseField);
-        assertEquals("Did not catch invalid max-date", 1, result03.size());
-        assertEquals("Validation message", "The date time should be later than 2001-01-01T00:00:00",
-            result03.get(0).getErrorMessage());
+        final List<ValidationResult> result03 = validator.validate(FIELD_ID,
+                                                                   NODE_FACTORY.textNode(invalidDateTime), caseField);
+        assertEquals(1, result03.size(), "Did not catch invalid max-date");
+        assertEquals("The date time should be later than 2001-01-01T00:00:00",
+                     result03.get(0).getErrorMessage(),
+                     "Validation message");
     }
 
     @Test
-    public void checkMaxMinWithoutRegEx() throws Exception {
+    void checkMaxMinWithoutRegEx() {
         final String validDateTime = "2001-12-10T00:00:00Z";
         final String invalidMinDateTime = "1999-12-31T00:00:00Z";
         final String invalidMaxDateTime = "2002-01-01T00:00:00Z";
-        final String minDate = "2001-01-01T00:00:00Z";
-        final Long minDateTime = convertToLongTime(minDate);
-        final String maxDate = "2001-12-31T00:00:00Z";
-        final Long maxDateTime = convertToLongTime(maxDate);
-        final CaseField caseField = MAPPER.readValue(
-            "{\n" +
-                "  \"id\": \"DATE_TEST\",\n" +
-                "  \"field_type\": {\n" +
-                "    \"type\": \"DATETIME\",\n" +
-                "    \"max\": \"" + maxDateTime + "\",\n" +
-                "    \"min\": \"" + minDateTime + "\"\n" +
-                "  }\n" +
-                "}", CaseField.class);
+        final String minDateTime = "2001-01-01T00:00:00Z";
+        final String maxDateTime = "2001-12-31T00:00:00Z";
+        final CaseField caseField = caseField().withMin(datetime(minDateTime))
+                                               .withMax(datetime(maxDateTime))
+                                               .build();
 
-        final List<ValidationResult> result01 = validator.validate("TEST_FIELD_ID",
-            NODE_FACTORY.textNode(validDateTime), caseField);
-        assertEquals(result01.toString(), 0, result01.size());
+        final List<ValidationResult> result01 = validator.validate(FIELD_ID,
+                                                                   NODE_FACTORY.textNode(validDateTime), caseField);
+        assertEquals(0, result01.size(), result01.toString());
 
-        final List<ValidationResult> result02 = validator.validate("TEST_FIELD_ID",
-            NODE_FACTORY.textNode(minDate), caseField);
-        assertEquals(result02.toString(), 0, result02.size());
+        final List<ValidationResult> result02 = validator.validate(FIELD_ID,
+                                                                   NODE_FACTORY.textNode(minDateTime), caseField);
+        assertEquals(0, result02.size(), result02.toString());
 
-        final List<ValidationResult> result03 = validator.validate("TEST_FIELD_ID",
-            NODE_FACTORY.textNode(maxDate), caseField);
-        assertEquals(result03.toString(), 0, result03.size());
+        final List<ValidationResult> result03 = validator.validate(FIELD_ID,
+                                                                   NODE_FACTORY.textNode(maxDateTime), caseField);
+        assertEquals(0, result03.size(), result03.toString());
 
-        final List<ValidationResult> result04 = validator.validate("TEST_FIELD_ID",
-            NODE_FACTORY.textNode(invalidMinDateTime), caseField);
-        assertEquals("Did not catch invalid min-date", 1, result04.size());
+        final List<ValidationResult> result04 = validator.validate(FIELD_ID,
+                                                                   NODE_FACTORY.textNode(invalidMinDateTime),
+                                                                   caseField);
+        assertEquals(1, result04.size(), "Did not catch invalid min-date");
 
-        final List<ValidationResult> result05 = validator.validate("TEST_FIELD_ID",
-            NODE_FACTORY.textNode(invalidMaxDateTime), caseField);
-        assertEquals("Did not catch invalid max-date", 1, result05.size());
+        final List<ValidationResult> result05 = validator.validate(FIELD_ID,
+                                                                   NODE_FACTORY.textNode(invalidMaxDateTime),
+                                                                   caseField);
+        assertEquals(1, result05.size(), "Did not catch invalid max-date");
     }
 
     @Test
-    public void invalidFieldTypeRegEx() throws Exception {
-        final Long minDateTime = convertToLongTime("2001-01-01T00:00:00");
-        final Long maxDateTime = convertToLongTime("2001-12-31T00:00:00");
+    void invalidFieldTypeRegEx() {
         final String validDateTime = "2001-12-10T00:00:00Z";
+        final CaseField caseField = caseField().withRegExp("InvalidRegEx").build();
 
-        final CaseField caseField = MAPPER.readValue(
-            "{\n" +
-                "  \"id\": \"DATE_TEST\",\n" +
-                "  \"field_type\": {\n" +
-                "    \"type\": \"DATETIME\",\n" +
-                "    \"max\": \"" + maxDateTime + "\",\n" +
-                "    \"min\": \"" + minDateTime + "\",\n" +
-                "    \"regular_expression\": \"" + "InvalidRegEx" + "\"\n" +
-                "  }\n" +
-                "}", CaseField.class);
-        final List<ValidationResult> result = validator.validate("TEST_FIELD_ID",
-            NODE_FACTORY.textNode(validDateTime), caseField);
-        assertEquals("RegEx validation failed", 1, result.size());
+        final List<ValidationResult> result = validator.validate(FIELD_ID,
+                                                                 NODE_FACTORY.textNode(validDateTime),
+                                                                 caseField);
+        assertEquals(1, result.size(), "RegEx validation failed");
         assertEquals("2001-12-10T00:00:00Z Field Type Regex Failed:InvalidRegEx", result.get(0).getErrorMessage());
-        assertEquals("TEST_FIELD_ID", result.get(0).getFieldId());
+        assertEquals(FIELD_ID, result.get(0).getFieldId());
     }
 
     @Test
-    public void invalidBaseTypeRegEx() throws Exception {
-        ReflectionTestUtils.setField(validator.getType(), "regularExpression", "InvalidRegEx");
-
-        final CaseField caseField = MAPPER.readValue(
-            "{\n" +
-                "  \"id\": \"DATE_TEST\",\n" +
-                "  \"field_type\": {\n" +
-                "    \"type\": \"DATETIME\"\n" +
-                "  }\n" +
-                "}", CaseField.class);
-        final List<ValidationResult> result = validator.validate("TEST_FIELD_ID",
-            NODE_FACTORY.textNode("2001-12-10T00:00:00"), caseField);
-        assertEquals("RegEx validation failed", 1, result.size());
+    void invalidBaseTypeRegEx() {
+        when(dateTimeFieldType.getRegularExpression()).thenReturn("InvalidRegEx");
+        BaseType.register(new BaseType(dateTimeFieldType));
+        final List<ValidationResult> result = validator.validate(FIELD_ID,
+                                                                 NODE_FACTORY.textNode("2001-12-10T00:00:00"),
+                                                                 caseField);
+        assertEquals(1, result.size(), "RegEx validation failed");
         assertEquals("2001-12-10T00:00:00 Date Time Type Regex Failed:InvalidRegEx", result.get(0).getErrorMessage());
-        assertEquals("TEST_FIELD_ID", result.get(0).getFieldId());
+        assertEquals(FIELD_ID, result.get(0).getFieldId());
     }
 
 
     @Test
-    public void validRegEx() throws Exception {
+    void validRegEx() {
         final String validDateTime = "2001-12-10T00:00:00";
-        String LIMITED_REGEX = "^\\\\d{4}-\\\\d{2}-\\\\d{2}[T\\\\s]\\\\d{2}:\\\\d{2}:\\\\d{2}$";
-        final CaseField caseField = MAPPER.readValue(
-            "{\n" +
-                "  \"id\": \"DATE_TEST\",\n" +
-                "  \"field_type\": {\n" +
-                "    \"type\": \"DATETIME\",\n" +
-                "    \"regular_expression\": \"" + LIMITED_REGEX + "\"\n" +
-                "  }\n" +
-                "}", CaseField.class);
+        final String limitedRegex = "^\\d{4}-\\d{2}-\\d{2}[T\\s]\\d{2}:\\d{2}:\\d{2}$";
+        final CaseField caseField = caseField().withRegExp(limitedRegex).build();
 
-        final List<ValidationResult> result = validator.validate("TEST_FIELD_ID",
-            NODE_FACTORY.textNode(validDateTime), caseField);
-        assertEquals("RegEx validation failed", 0, result.size());
+        final List<ValidationResult> result = validator.validate(FIELD_ID,
+                                                                 NODE_FACTORY.textNode(validDateTime),
+                                                                 caseField);
+        assertEquals(0, result.size(), "RegEx validation failed");
     }
 
     @Test
-    public void shouldFail_whenValidatingBooleanNode() {
+    void shouldFail_whenValidatingBooleanNode() {
         final List<ValidationResult>
             result =
-            validator.validate("TEST_FIELD_ID", NODE_FACTORY.booleanNode(true), caseField);
+            validator.validate(FIELD_ID, NODE_FACTORY.booleanNode(true), caseField);
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getErrorMessage(), is("true is not a valid ISO 8601 date time"));
     }
 
     @Test
-    public void shouldFail_whenDataValueIsBinary() {
+    void shouldFail_whenDataValueIsBinary() {
         final List<ValidationResult>
             result =
-            validator.validate("TEST_FIELD_ID", NODE_FACTORY.binaryNode("Ngitb".getBytes()), caseField);
+            validator.validate(FIELD_ID, NODE_FACTORY.binaryNode("Ngitb".getBytes()), caseField);
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getErrorMessage(), endsWith(" is not a valid ISO 8601 date time"));
     }
 
     @Test
-    public void shouldFail_whenValidatingArrayNode() {
+    void shouldFail_whenValidatingArrayNode() {
         final List<ValidationResult>
             result =
-            validator.validate("TEST_FIELD_ID", NODE_FACTORY.arrayNode(), caseField);
+            validator.validate(FIELD_ID, NODE_FACTORY.arrayNode(), caseField);
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getErrorMessage(), is("[] is not a valid ISO 8601 date time"));
     }
 
     @Test
-    public void shouldPass_whenValidatingObjectNode() {
+    void shouldPass_whenValidatingObjectNode() {
         final List<ValidationResult>
-            result = validator.validate("TEST_FIELD_ID", NODE_FACTORY.objectNode(), caseField);
+            result = validator.validate(FIELD_ID, NODE_FACTORY.objectNode(), caseField);
         assertThat(result, empty());
     }
 
     @Test
-    public void shouldFail_whenValidatingPojoNode() {
+    void shouldFail_whenValidatingPojoNode() {
         final List<ValidationResult>
             result =
-            validator.validate("TEST_FIELD_ID", NODE_FACTORY.pojoNode(true), caseField);
+            validator.validate(FIELD_ID, NODE_FACTORY.pojoNode(true), caseField);
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getErrorMessage(), is("true is not a valid ISO 8601 date time"));
     }
 
-    private Long convertToLongTime(final String dateString) {
-        final LocalDateTime dateTimeValue = LocalDateTime.parse(dateString, ISO_DATE_TIME);
-        return dateTimeValue.toEpochSecond(ZoneOffset.UTC) * 1000;
+    private CaseFieldBuilder caseField() {
+        return new CaseFieldBuilder(FIELD_ID).withType(DateTimeValidator.TYPE_ID);
+    }
+
+    private BigDecimal datetime(final String datetimeString) {
+        final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
+        try {
+            return new BigDecimal(df.parse(datetimeString).getTime());
+        } catch (ParseException e) {
+            throw new AssertionError(e);
+        }
     }
 }

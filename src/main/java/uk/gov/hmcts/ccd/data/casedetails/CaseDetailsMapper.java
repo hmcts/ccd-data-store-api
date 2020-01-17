@@ -25,13 +25,14 @@ public class CaseDetailsMapper {
 
         final CaseDetails caseDetails = new CaseDetails();
         caseDetails.setReference(caseDetailsEntity.getReference());
-        caseDetails.setId(caseDetailsEntity.getId());
+        caseDetails.setId(String.valueOf(caseDetailsEntity.getId()));
         caseDetails.setCaseTypeId(caseDetailsEntity.getCaseType());
         caseDetails.setJurisdiction(caseDetailsEntity.getJurisdiction());
         caseDetails.setCreatedDate(caseDetailsEntity.getCreatedDate());
         caseDetails.setLastModified(caseDetailsEntity.getLastModified());
         caseDetails.setState(caseDetailsEntity.getState());
         caseDetails.setSecurityClassification(caseDetailsEntity.getSecurityClassification());
+        caseDetails.setVersion(caseDetailsEntity.getVersion());
         if (caseDetailsEntity.getData() != null) {
             caseDetails.setData(mapper.convertValue(caseDetailsEntity.getData(), STRING_JSON_MAP_TYPE));
             caseDetails.setDataClassification(mapper.convertValue(caseDetailsEntity.getDataClassification(), STRING_JSON_MAP_TYPE));
@@ -45,13 +46,14 @@ public class CaseDetailsMapper {
         }
 
         final CaseDetailsEntity newCaseDetailsEntity = new CaseDetailsEntity();
-        newCaseDetailsEntity.setId(caseDetails.getId());
+        newCaseDetailsEntity.setId(getLongId(caseDetails));
         newCaseDetailsEntity.setReference(caseDetails.getReference());
         newCaseDetailsEntity.setCreatedDate(caseDetails.getCreatedDate());
         newCaseDetailsEntity.setJurisdiction(caseDetails.getJurisdiction());
         newCaseDetailsEntity.setCaseType(caseDetails.getCaseTypeId());
         newCaseDetailsEntity.setState(caseDetails.getState());
         newCaseDetailsEntity.setSecurityClassification(caseDetails.getSecurityClassification());
+        newCaseDetailsEntity.setVersion(caseDetails.getVersion());
         if (caseDetails.getData() == null) {
             newCaseDetailsEntity.setData(mapper.createObjectNode());
         } else {
@@ -59,6 +61,11 @@ public class CaseDetailsMapper {
             newCaseDetailsEntity.setDataClassification(mapper.convertValue(caseDetails.getDataClassification(), JsonNode.class));
         }
         return newCaseDetailsEntity;
+    }
+
+    private Long getLongId(CaseDetails caseDetails) {
+        String id = caseDetails.getId();
+        return id == null ? null : Long.valueOf(id);
     }
 
     public List<CaseDetails> entityToModel(final List<CaseDetailsEntity> caseDataEntities) {

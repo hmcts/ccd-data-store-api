@@ -11,6 +11,7 @@ public class SearchResultViewColumn {
     private FieldType caseFieldType;
     private String label;
     private Integer order;
+    private boolean metadata;
 
     public SearchResultViewColumn() {
         // Default constructor for JSON mapper
@@ -19,11 +20,13 @@ public class SearchResultViewColumn {
     public SearchResultViewColumn(final String caseFieldId,
                                   final FieldType caseFieldType,
                                   final String label,
-                                  final Integer order) {
+                                  final Integer order,
+                                  final boolean metadata) {
         this.caseFieldId = caseFieldId;
         this.caseFieldType = caseFieldType;
         this.label = label;
         this.order = order;
+        this.metadata = metadata;
     }
 
     public String getCaseFieldId() {
@@ -40,5 +43,9 @@ public class SearchResultViewColumn {
 
     public Integer getOrder() {
         return order;
+    }
+
+    public boolean isMetadata() {
+        return metadata;
     }
 }

@@ -33,9 +33,13 @@ class SearchResultUtil {
         }
     }
 
-    static SearchResultField buildSearchResultField(String caseTypedId, String caseFieldId, String label) {
+    static SearchResultField buildSearchResultField(String caseTypedId,
+                                                    String caseFieldId,
+                                                    String caseFieldPath,
+                                                    String label) {
         SearchResultField searchResultField = new SearchResultField();
         searchResultField.setCaseFieldId(caseFieldId);
+        searchResultField.setCaseFieldPath(caseFieldPath);
         searchResultField.setCaseTypeId(caseTypedId);
         searchResultField.setLabel(label);
         searchResultField.setDisplayOrder(1);

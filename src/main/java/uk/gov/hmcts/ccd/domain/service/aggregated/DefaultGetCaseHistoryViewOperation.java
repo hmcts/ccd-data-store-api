@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
@@ -11,6 +12,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.common.DefaultObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
@@ -32,18 +34,22 @@ public class DefaultGetCaseHistoryViewOperation extends AbstractDefaultGetCaseVi
         @Qualifier(CreatorGetCaseOperation.QUALIFIER) GetCaseOperation getCaseOperation,
         @Qualifier("authorised") GetEventsOperation getEventsOperation,
         UIDefinitionRepository uiDefinitionRepository, CaseTypeService caseTypeService,
-        UIDService uidService) {
+        UIDService uidService,
+        DefaultObjectMapperService defaultObjectMapperService,
+        CompoundFieldOrderService compoundFieldOrderService) {
 
-        super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService);
+        super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService, defaultObjectMapperService, compoundFieldOrderService);
         this.getEventsOperation = getEventsOperation;
     }
 
     @Override
-    public CaseHistoryView execute(String jurisdictionId, String caseTypeId, String caseReference, Long eventId) {
+    public CaseHistoryView execute(String caseReference, Long eventId) {
         validateCaseReference(caseReference);
 
+        CaseDetails caseDetails = getCaseDetails(caseReference);
+        String jurisdictionId = caseDetails.getJurisdiction();
+        String caseTypeId = caseDetails.getCaseTypeId();
         CaseType caseType = getCaseType(jurisdictionId, caseTypeId);
-        CaseDetails caseDetails = getCaseDetails(jurisdictionId, caseTypeId, caseReference);
 
         AuditEvent event = getEventsOperation.getEvent(jurisdictionId, caseTypeId, eventId).orElseThrow(
             () -> new ResourceNotFoundException(EVENT_NOT_FOUND));

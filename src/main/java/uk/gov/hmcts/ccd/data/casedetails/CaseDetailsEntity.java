@@ -1,9 +1,9 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 import javax.persistence.*;
 import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 @NamedQueries({
     @NamedQuery(name = CaseDetailsEntity.FIND_BY_METADATA, query =
@@ -31,6 +31,11 @@ import java.time.LocalDateTime;
         query = "SELECT cd FROM CaseDetailsEntity cd" +
             " WHERE cd.jurisdiction = :" + CaseDetailsEntity.JURISDICTION_ID_PARAM +
             " AND cd.reference = :" + CaseDetailsEntity.CASE_REFERENCE_PARAM
+    ),
+
+    @NamedQuery(
+        name = CaseDetailsEntity.CASES_COUNT_BY_CASE_TYPE,
+        query = "SELECT cd.caseType, COUNT(cd) FROM CaseDetailsEntity cd GROUP BY cd.caseType"
     )
 })
 @Table(name = "case_data")
@@ -40,11 +45,13 @@ public class CaseDetailsEntity {
     static final String FIND_CASE = "CaseDataEntity_FIND_CASE";
     static final String FIND_BY_REFERENCE = "CaseDataEntity_FIND_BY_REFERENCE";
     static final String FIND_BY_REF_AND_JURISDICTION = "CaseDataEntity_FIND_BY_REFERENCE_AND_JURISDICTION";
+    static final String CASES_COUNT_BY_CASE_TYPE = "CaseDataEntity_CASES_COUNT_BY_CASE_TYPE";
 
     static final String JURISDICTION_ID_PARAM = "JURISDICTION_ID_PARAM";
     static final String CASE_TYPE_PARAM = "CASE_TYPE_PARAM";
     static final String CASE_REFERENCE_PARAM = "CASE_REFERENCE_PARAM";
     static final String STATE_PARAM = "STATE_PARAM";
+    public static final String ID_FIELD_COL = "id";
     public static final String STATE_FIELD_COL = "state";
     public static final String JURISDICTION_FIELD_COL = "jurisdiction";
     public static final String CASE_TYPE_ID_FIELD_COL = "case_type_id";
@@ -75,15 +82,15 @@ public class CaseDetailsEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = SECURITY_CLASSIFICATION_FIELD_COL, nullable = false)
     private SecurityClassification securityClassification;
-    @Column(name = "locked_by_user_id")
-    private Integer lockedBy;
-    @SuppressWarnings("JpaAttributeTypeInspection")
     @Column(name = "data", nullable = false)
     @Convert(converter = uk.gov.hmcts.ccd.data.JSONBConverter.class)
     private JsonNode data;
     @Column(name = "data_classification", nullable = false)
     @Convert(converter = uk.gov.hmcts.ccd.data.JSONBConverter.class)
     private JsonNode dataClassification;
+
+    @Version
+    private Integer version;
 
     public Long getId() {
         return id;
@@ -92,7 +99,6 @@ public class CaseDetailsEntity {
     public void setId(Long uuid) {
         this.id = uuid;
     }
-
 
     public Long getReference() {
         return reference;
@@ -150,14 +156,6 @@ public class CaseDetailsEntity {
         this.securityClassification = securityClassification;
     }
 
-    public Integer getLockedBy() {
-        return lockedBy;
-    }
-
-    public void setLockedBy(Integer lockedBy) {
-        this.lockedBy = lockedBy;
-    }
-
     public JsonNode getData() {
         return data;
     }
@@ -172,5 +170,13 @@ public class CaseDetailsEntity {
 
     public void setDataClassification(JsonNode dataClassification) {
         this.dataClassification = dataClassification;
+    }
+
+    public Integer getVersion() {
+        return version;
+    }
+
+    public void setVersion(final Integer version) {
+        this.version = version;
     }
 }

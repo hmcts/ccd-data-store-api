@@ -14,7 +14,7 @@ import static uk.gov.hmcts.ccd.domain.types.TextValidator.checkRegex;
 @Named
 @Singleton
 public class NumberValidator implements BaseTypeValidator {
-    private static final String TYPE_ID = "Number";
+    static final String TYPE_ID = "Number";
 
     public BaseType getType() {
         return BaseType.get(TYPE_ID);
@@ -38,7 +38,7 @@ public class NumberValidator implements BaseTypeValidator {
                 // dataValue may be a boolean, array or pojo node
                 return Collections.singletonList(new ValidationResult(dataValue + " is not a number", dataFieldId));
             } else {
-                numberValue =new BigDecimal(value);
+                numberValue = new BigDecimal(value);
             }
             if (!checkMax(caseFieldDefinition.getFieldType().getMax(), numberValue)) {
                 return Collections.singletonList(new ValidationResult("Should be less than or equal to " + caseFieldDefinition.getFieldType().getMax(), dataFieldId));

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.TextNode;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,9 +14,12 @@ import org.mockito.*;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
+import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItemType;
+import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
@@ -25,13 +29,16 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 
 import java.util.*;
 
+import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -41,9 +48,9 @@ class CallbackInvokerTest {
     private static final String URL_ABOUT_TO_START = "http://about-to-start";
     private static final String URL_ABOUT_TO_SUBMIT = "http://about-to-submit";
     private static final String URL_AFTER_SUBMIT = "http://after-submit";
-    private static final List<Integer> RETRIES_ABOUT_TO_START = Collections.unmodifiableList(Arrays.asList(1, 2, 3));
-    private static final List<Integer> RETRIES_ABOUT_TO_SUBMIT = Collections.unmodifiableList(Arrays.asList(4, 5, 6));
-    private static final List<Integer> RETRIES_AFTER_SUBMIT = Collections.unmodifiableList(Arrays.asList(7, 8, 9));
+    private static final String URL_MID_EVENT = "http://mid-event";
+    private static final Boolean IGNORE_WARNINGS = FALSE;
+    private static final List<Integer> RETRIES_DISABLED = Lists.newArrayList(0);
 
     @Mock
     private CallbackService callbackService;
@@ -67,6 +74,7 @@ class CallbackInvokerTest {
     private CaseType caseType;
     private CaseDetails caseDetailsBefore;
     private CaseDetails caseDetails;
+    private WizardPage wizardPage;
     private InOrder inOrder;
 
     @BeforeEach
@@ -75,27 +83,26 @@ class CallbackInvokerTest {
 
         caseEvent = new CaseEvent();
         caseEvent.setCallBackURLAboutToStartEvent(URL_ABOUT_TO_START);
-        caseEvent.setRetriesTimeoutAboutToStartEvent(RETRIES_ABOUT_TO_START);
         caseEvent.setCallBackURLAboutToSubmitEvent(URL_ABOUT_TO_SUBMIT);
-        caseEvent.setRetriesTimeoutURLAboutToSubmitEvent(RETRIES_ABOUT_TO_SUBMIT);
         caseEvent.setCallBackURLSubmittedEvent(URL_AFTER_SUBMIT);
-        caseEvent.setRetriesTimeoutURLSubmittedEvent(RETRIES_AFTER_SUBMIT);
         caseType = new CaseType();
         caseDetailsBefore = new CaseDetails();
         caseDetails = new CaseDetails();
+        wizardPage = new WizardPage();
+        wizardPage.setCallBackURLMidEvent(URL_MID_EVENT);
 
-        doReturn(Optional.empty()).when(callbackService).send(any(), any(), same(caseEvent), same(caseDetails));
+        doReturn(Optional.empty()).when(callbackService).send(any(), same(caseEvent), any(), same(caseDetails), anyBoolean());
         doReturn(Optional.empty()).when(callbackService).send(any(),
-                                                              any(),
                                                               same(caseEvent),
                                                               same(caseDetailsBefore),
-                                                              same(caseDetails));
+                                                              same(caseDetails),
+                                                              anyBoolean());
 
         inOrder = inOrder(callbackService,
-                                  caseTypeService,
-                                  caseDataService,
+                          caseTypeService,
+                          caseDataService,
                           securityValidationService,
-                                  caseSanitiser);
+                          caseSanitiser);
     }
 
     @Nested
@@ -107,7 +114,19 @@ class CallbackInvokerTest {
         void shouldSendCallback() {
             callbackInvoker.invokeAboutToStartCallback(caseEvent, caseType, caseDetails, IGNORE_WARNING);
 
-            verify(callbackService).send(URL_ABOUT_TO_START, RETRIES_ABOUT_TO_START, caseEvent, caseDetails);
+            verify(callbackService).send(URL_ABOUT_TO_START, caseEvent, null, caseDetails, false);
+            verifyNoMoreInteractions(callbackService);
+        }
+
+        @Test
+        @DisplayName("should disable callback retries")
+        void shouldDisableCallbackRetries() {
+            caseEvent.setRetriesTimeoutAboutToStartEvent(RETRIES_DISABLED);
+
+            callbackInvoker.invokeAboutToStartCallback(caseEvent, caseType, caseDetails, IGNORE_WARNING);
+
+            verify(callbackService, times(1)).sendSingleRequest(URL_ABOUT_TO_START, caseEvent, null, caseDetails, false);
+            verifyNoMoreInteractions(callbackService);
         }
     }
 
@@ -118,7 +137,7 @@ class CallbackInvokerTest {
         @Test
         @DisplayName("should send callback")
         void shouldSendCallback() {
-            final Optional<String>
+            final AboutToSubmitCallbackResponse
                 response =
                 callbackInvoker.invokeAboutToSubmitCallback(caseEvent,
                                                             caseDetailsBefore,
@@ -127,11 +146,34 @@ class CallbackInvokerTest {
                                                             IGNORE_WARNING);
 
             verify(callbackService).send(URL_ABOUT_TO_SUBMIT,
-                                         RETRIES_ABOUT_TO_SUBMIT,
                                          caseEvent,
                                          caseDetailsBefore,
-                                         caseDetails);
-            assertThat(response.isPresent(), is(false));
+                                         caseDetails,
+                                         IGNORE_WARNING);
+            verifyNoMoreInteractions(callbackService);
+            assertThat(response.getState().isPresent(), is(false));
+        }
+
+        @Test
+        @DisplayName("should disable callback retries")
+        void shouldDisableCallbackRetries() {
+            caseEvent.setRetriesTimeoutURLAboutToSubmitEvent(RETRIES_DISABLED);
+
+            final AboutToSubmitCallbackResponse
+                response =
+                callbackInvoker.invokeAboutToSubmitCallback(caseEvent,
+                                                            caseDetailsBefore,
+                                                            caseDetails,
+                                                            caseType,
+                                                            IGNORE_WARNING);
+
+            verify(callbackService).sendSingleRequest(URL_ABOUT_TO_SUBMIT,
+                                         caseEvent,
+                                         caseDetailsBefore,
+                                         caseDetails,
+                                         IGNORE_WARNING);
+            verifyNoMoreInteractions(callbackService);
+            assertThat(response.getState().isPresent(), is(false));
         }
 
         @Test
@@ -140,12 +182,11 @@ class CallbackInvokerTest {
             final String expectedState = "uNiCORn";
             doReturn(Optional.of(mockCallbackResponse(expectedState))).when(callbackService)
                                                                       .send(any(),
-                                                                            any(),
                                                                             same(caseEvent),
                                                                             same(caseDetailsBefore),
-                                                                            same(caseDetails));
-            final Optional<String>
-                response =
+                                                                            same(caseDetails),
+                                                                            anyBoolean());
+            final AboutToSubmitCallbackResponse response =
                 callbackInvoker.invokeAboutToSubmitCallback(caseEvent,
                                                             caseDetailsBefore,
                                                             caseDetails,
@@ -153,23 +194,107 @@ class CallbackInvokerTest {
                                                             IGNORE_WARNING);
 
             verify(callbackService).send(URL_ABOUT_TO_SUBMIT,
-                                         RETRIES_ABOUT_TO_SUBMIT,
                                          caseEvent,
                                          caseDetailsBefore,
-                                         caseDetails);
-            assertThat(response.get(), is(expectedState));
+                                         caseDetails,
+                                         true);
+            assertThat(response.getState().get(), is(expectedState));
         }
 
         @Test
         @DisplayName("should send callback and get no state")
         void sendCallbackAndGetNoState() {
             doReturn(Optional.of(mockCallbackResponseWithNoState())).when(callbackService)
-                                                                      .send(any(),
-                                                                            any(),
-                                                                            same(caseEvent),
-                                                                            same(caseDetailsBefore),
-                                                                            same(caseDetails));
-            final Optional<String>
+                                                                    .send(any(),
+                                                                          same(caseEvent),
+                                                                          same(caseDetailsBefore),
+                                                                          same(caseDetails),
+                                                                          anyBoolean());
+            final AboutToSubmitCallbackResponse response =
+                callbackInvoker.invokeAboutToSubmitCallback(caseEvent,
+                                                            caseDetailsBefore,
+                                                            caseDetails,
+                                                            caseType,
+                                                            IGNORE_WARNING);
+
+            verify(callbackService).send(URL_ABOUT_TO_SUBMIT,
+                                         caseEvent,
+                                         caseDetailsBefore,
+                                         caseDetails,
+                                         true);
+            assertThat(response.getState().isPresent(), is(false));
+        }
+
+        @Test
+        @DisplayName("should send callback and get state and significant Item")
+        void sendCallbackAndGetStateAndSignificantDocument() {
+            final String expectedState = "uNiCORn";
+            doReturn(Optional.of(mockCallbackResponseWithSignificantItem(expectedState))).when(callbackService)
+                                                                                         .send(any(),
+                                                                                               same(caseEvent),
+                                                                                               same(caseDetailsBefore),
+                                                                                               same(caseDetails),
+                                                                                               anyBoolean());
+
+            final AboutToSubmitCallbackResponse response =
+                callbackInvoker.invokeAboutToSubmitCallback(caseEvent,
+                                                            caseDetailsBefore,
+                                                            caseDetails,
+                                                            caseType,
+                                                            IGNORE_WARNING);
+
+            verify(callbackService).send(URL_ABOUT_TO_SUBMIT,
+                                         caseEvent,
+                                         caseDetailsBefore,
+                                         caseDetails,
+                                         true);
+            assertThat(response.getState().get(), is(expectedState));
+            assertEquals("description", response.getSignificantItem().getDescription());
+            assertEquals(SignificantItemType.DOCUMENT.name(), response.getSignificantItem().getType());
+            assertEquals("http://www.cnn.com", response.getSignificantItem().getUrl());
+        }
+
+        @Test
+        @DisplayName("should send callback and get state and significant Item with invalid URL")
+        void sendCallbackAndGetStateAndSignificantDocumentWithInvalidURL() {
+            final String expectedState = "uNiCORn";
+            doReturn(Optional.of(mockCallbackResponseWithSignificantItem(expectedState))).when(callbackService)
+                                                                                         .send(any(),
+                                                                                               same(caseEvent),
+                                                                                               same(caseDetailsBefore),
+                                                                                               same(caseDetails),
+                                                                                               anyBoolean());
+
+            final AboutToSubmitCallbackResponse response =
+                callbackInvoker.invokeAboutToSubmitCallback(caseEvent,
+                                                            caseDetailsBefore,
+                                                            caseDetails,
+                                                            caseType,
+                                                            IGNORE_WARNING);
+
+            verify(callbackService).send(URL_ABOUT_TO_SUBMIT,
+                                         caseEvent,
+                                         caseDetailsBefore,
+                                         caseDetails,
+                                         true);
+            assertThat(response.getState().get(), is(expectedState));
+            assertEquals("description", response.getSignificantItem().getDescription());
+            assertEquals(SignificantItemType.DOCUMENT.name(), response.getSignificantItem().getType());
+            assertEquals("http://www.cnn.com", response.getSignificantItem().getUrl());
+        }
+
+        @Test
+        @DisplayName("should send callback with errors of significant item is incorrect")
+        void sendCallbackAndGetStateAndIncorrectSignificantDocument() {
+            final String expectedState = "uNiCORn";
+            CallbackResponse callbackResponse = mockCallbackResponseWithIncorrectSignificantItem(expectedState);
+            doReturn(Optional.of(callbackResponse)).when(callbackService)
+                                                   .send(any(),
+                                                         same(caseEvent),
+                                                         same(caseDetailsBefore),
+                                                         same(caseDetails),
+                                                         anyBoolean());
+            final AboutToSubmitCallbackResponse
                 response =
                 callbackInvoker.invokeAboutToSubmitCallback(caseEvent,
                                                             caseDetailsBefore,
@@ -178,15 +303,44 @@ class CallbackInvokerTest {
                                                             IGNORE_WARNING);
 
             verify(callbackService).send(URL_ABOUT_TO_SUBMIT,
-                                         RETRIES_ABOUT_TO_SUBMIT,
                                          caseEvent,
                                          caseDetailsBefore,
-                                         caseDetails);
-            assertThat(response.isPresent(), is(false));
+                                         caseDetails,
+                                         true);
+            assertThat(response.getState().get(), is(expectedState));
+            assertNull(response.getSignificantItem());
+            assertEquals(3, callbackResponse.getErrors().size());
+
         }
 
         private CallbackResponse mockCallbackResponse(final String state) {
             final CallbackResponse response = new CallbackResponse();
+            final Map<String, JsonNode> data = new HashMap<>();
+            data.put("state", JsonNodeFactory.instance.textNode(state));
+            response.setData(data);
+            return response;
+        }
+
+        private CallbackResponse mockCallbackResponseWithSignificantItem(final String state) {
+            final CallbackResponse response = new CallbackResponse();
+            SignificantItem significantItem = new SignificantItem();
+            significantItem.setUrl("http://www.cnn.com");
+            significantItem.setDescription("description");
+            significantItem.setType(SignificantItemType.DOCUMENT.name());
+            response.setSignificantItem(significantItem);
+            final Map<String, JsonNode> data = new HashMap<>();
+            data.put("state", JsonNodeFactory.instance.textNode(state));
+            response.setData(data);
+            return response;
+        }
+
+        private CallbackResponse mockCallbackResponseWithIncorrectSignificantItem(final String state) {
+            final CallbackResponse response = new CallbackResponse();
+            SignificantItem significantItem = new SignificantItem();
+            significantItem.setUrl("http://www..com");
+            significantItem.setDescription("");
+
+            response.setSignificantItem(significantItem);
             final Map<String, JsonNode> data = new HashMap<>();
             data.put("state", JsonNodeFactory.instance.textNode(state));
             response.setData(data);
@@ -208,11 +362,60 @@ class CallbackInvokerTest {
             callbackInvoker.invokeSubmittedCallback(caseEvent, caseDetailsBefore, caseDetails);
 
             verify(callbackService).send(URL_AFTER_SUBMIT,
-                                         RETRIES_AFTER_SUBMIT,
                                          caseEvent,
                                          caseDetailsBefore,
                                          caseDetails,
                                          AfterSubmitCallbackResponse.class);
+            verifyNoMoreInteractions(callbackService);
+        }
+
+        @Test
+        @DisplayName("should disable callback retries")
+        void shouldDisableCallbackRetries() {
+            caseEvent.setRetriesTimeoutURLSubmittedEvent(RETRIES_DISABLED);
+
+            callbackInvoker.invokeSubmittedCallback(caseEvent, caseDetailsBefore, caseDetails);
+
+            verify(callbackService).sendSingleRequest(URL_AFTER_SUBMIT,
+                                         caseEvent,
+                                         caseDetailsBefore,
+                                         caseDetails,
+                                         AfterSubmitCallbackResponse.class);
+            verifyNoMoreInteractions(callbackService);
+        }
+    }
+
+    @Nested
+    @DisplayName("invokeMidEventCallback()")
+    class MidEvent {
+
+        @Test
+        @DisplayName("should send callback")
+        void shouldSendCallback() {
+            callbackInvoker.invokeMidEventCallback(wizardPage,
+                caseType,
+                caseEvent,
+                caseDetailsBefore,
+                caseDetails,
+                IGNORE_WARNINGS);
+
+            verify(callbackService).send(URL_MID_EVENT, caseEvent, caseDetailsBefore, caseDetails, false);
+        }
+
+        @Test
+        @DisplayName("should disable callback retries")
+        void shouldDisableCallbackRetries() {
+            wizardPage.setRetriesTimeoutMidEvent(RETRIES_DISABLED);
+
+            callbackInvoker.invokeMidEventCallback(wizardPage,
+                caseType,
+                caseEvent,
+                caseDetailsBefore,
+                caseDetails,
+                IGNORE_WARNINGS);
+
+            verify(callbackService).sendSingleRequest(URL_MID_EVENT, caseEvent, caseDetailsBefore, caseDetails, false);
+            verifyNoMoreInteractions(callbackService);
         }
     }
 
@@ -231,12 +434,15 @@ class CallbackInvokerTest {
                 data.put("xxx", TextNode.valueOf("ngitb"));
                 callbackResponse.setData(data);
                 HashMap<String, JsonNode> currentDataClassification = Maps.newHashMap();
-                when(caseDataService.getDefaultSecurityClassifications(caseType, data, caseDetails.getDataClassification())).thenReturn(
+                when(caseDataService.getDefaultSecurityClassifications(caseType,
+                                                                       data,
+                                                                       caseDetails.getDataClassification())).thenReturn(
                     currentDataClassification);
                 when(callbackService.send(caseEvent.getCallBackURLAboutToStartEvent(),
-                                          caseEvent.getRetriesTimeoutAboutToStartEvent(),
                                           caseEvent,
-                                          caseDetails)).thenReturn(Optional.of(callbackResponse));
+                                          null,
+                                          caseDetails,
+                                          false)).thenReturn(Optional.of(callbackResponse));
 
                 callbackInvoker.invokeAboutToStartCallback(caseEvent, caseType, caseDetails, TRUE);
 
@@ -247,7 +453,9 @@ class CallbackInvokerTest {
                     () -> inOrder.verify(caseDataService).getDefaultSecurityClassifications(caseType,
                                                                                             caseDetails.getData(),
                                                                                             caseDetails.getDataClassification()),
-                    () -> inOrder.verify(securityValidationService, never()).setClassificationFromCallbackIfValid(any(), any(), any())
+                    () -> inOrder.verify(securityValidationService, never()).setClassificationFromCallbackIfValid(any(),
+                                                                                                                  any(),
+                                                                                                                  any())
                 );
             }
 
@@ -256,9 +464,10 @@ class CallbackInvokerTest {
             void validateAndDoNotSetData() {
                 final CallbackResponse callbackResponse = new CallbackResponse();
                 when(callbackService.send(caseEvent.getCallBackURLAboutToStartEvent(),
-                                          caseEvent.getRetriesTimeoutAboutToStartEvent(),
                                           caseEvent,
-                                          caseDetails)).thenReturn(Optional.of(callbackResponse));
+                                          null,
+                                          caseDetails,
+                                          false)).thenReturn(Optional.of(callbackResponse));
 
                 callbackInvoker.invokeAboutToStartCallback(caseEvent, caseType, caseDetails, TRUE);
 
@@ -266,8 +475,12 @@ class CallbackInvokerTest {
                     () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE),
                     () -> inOrder.verify(caseTypeService, never()).validateData(any(), any()),
                     () -> inOrder.verify(caseSanitiser, never()).sanitise(any(), any()),
-                    () -> inOrder.verify(caseDataService, never()).getDefaultSecurityClassifications(any(), any(), any()),
-                    () -> inOrder.verify(securityValidationService, never()).setClassificationFromCallbackIfValid(any(), any(), any())
+                    () -> inOrder.verify(caseDataService, never()).getDefaultSecurityClassifications(any(),
+                                                                                                     any(),
+                                                                                                     any()),
+                    () -> inOrder.verify(securityValidationService, never()).setClassificationFromCallbackIfValid(any(),
+                                                                                                                  any(),
+                                                                                                                  any())
                 );
             }
 
@@ -276,9 +489,10 @@ class CallbackInvokerTest {
             void validateAndSetDataMetError() throws ApiException {
                 final CallbackResponse callbackResponse = new CallbackResponse();
                 when(callbackService.send(caseEvent.getCallBackURLAboutToStartEvent(),
-                                          caseEvent.getRetriesTimeoutAboutToStartEvent(),
                                           caseEvent,
-                                          caseDetails)).thenReturn(Optional.of(callbackResponse));
+                                          null,
+                                          caseDetails,
+                                          false)).thenReturn(Optional.of(callbackResponse));
                 final Map<String, JsonNode> data = new HashMap<>();
                 callbackResponse.setData(data);
 
@@ -287,8 +501,10 @@ class CallbackInvokerTest {
                     .when(callbackService).validateCallbackErrorsAndWarnings(any(), any());
 
                 final ApiException apiException =
-                    assertThrows(ApiException.class,
-                                 () -> callbackInvoker.invokeAboutToStartCallback(caseEvent, caseType, caseDetails, TRUE));
+                    assertThrows(ApiException.class, () -> callbackInvoker.invokeAboutToStartCallback(caseEvent,
+                                                                                                      caseType,
+                                                                                                      caseDetails,
+                                                                                                      TRUE));
 
                 assertThat(apiException.getMessage(), is(ErrorMessage));
 
@@ -296,8 +512,12 @@ class CallbackInvokerTest {
                     () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE),
                     () -> inOrder.verify(caseTypeService, never()).validateData(any(), any()),
                     () -> inOrder.verify(caseSanitiser, never()).sanitise(any(), any()),
-                    () -> inOrder.verify(caseDataService, never()).getDefaultSecurityClassifications(any(), any(), any()),
-                    () -> inOrder.verify(securityValidationService, never()).setClassificationFromCallbackIfValid(any(), any(), any())
+                    () -> inOrder.verify(caseDataService, never()).getDefaultSecurityClassifications(any(),
+                                                                                                     any(),
+                                                                                                     any()),
+                    () -> inOrder.verify(securityValidationService, never()).setClassificationFromCallbackIfValid(any(),
+                                                                                                                  any(),
+                                                                                                                  any())
                 );
             }
         }
@@ -324,13 +544,19 @@ class CallbackInvokerTest {
                 callbackResponse.setSecurityClassification(SecurityClassification.PRIVATE);
                 callbackResponse.setDataClassification(allFieldsDataClassification);
                 when(callbackService.send(caseEvent.getCallBackURLAboutToSubmitEvent(),
-                                          caseEvent.getRetriesTimeoutURLAboutToSubmitEvent(),
                                           caseEvent,
                                           caseDetailsBefore,
-                                          caseDetails)).thenReturn(Optional.of(callbackResponse));
+                                          caseDetails,
+                                          TRUE)).thenReturn(Optional.of(callbackResponse));
                 when(caseSanitiser.sanitise(eq(caseType), eq(caseDetails.getData()))).thenReturn(data);
-                when(caseDataService.getDefaultSecurityClassifications(eq(caseType), eq(caseDetails.getData()), eq(currentDataClassification))).thenReturn(newFieldsDataClassification);
-                when(caseDataService.getDefaultSecurityClassifications(eq(caseType), eq(caseDetails.getData()), eq(Maps.newHashMap()))).thenReturn(allFieldsDataClassification);
+                when(caseDataService.getDefaultSecurityClassifications(eq(caseType),
+                                                                       eq(caseDetails.getData()),
+                                                                       eq(currentDataClassification))).thenReturn(
+                    newFieldsDataClassification);
+                when(caseDataService.getDefaultSecurityClassifications(eq(caseType),
+                                                                       eq(caseDetails.getData()),
+                                                                       eq(Maps.newHashMap()))).thenReturn(
+                    allFieldsDataClassification);
             }
 
             @DisplayName("do not validate call back response if no data security passed back")
@@ -349,7 +575,9 @@ class CallbackInvokerTest {
                     () -> inOrder.verify(caseDataService, times(1)).getDefaultSecurityClassifications(eq(caseType),
                                                                                                       eq(caseDetails.getData()),
                                                                                                       eq(currentDataClassification)),
-                    () -> inOrder.verify(securityValidationService, never()).setClassificationFromCallbackIfValid(any(), any(), any())
+                    () -> inOrder.verify(securityValidationService, never()).setClassificationFromCallbackIfValid(any(),
+                                                                                                                  any(),
+                                                                                                                  any())
                 );
             }
 
@@ -369,7 +597,9 @@ class CallbackInvokerTest {
                     () -> inOrder.verify(caseDataService, times(1)).getDefaultSecurityClassifications(eq(caseType),
                                                                                                       eq(caseDetails.getData()),
                                                                                                       eq(currentDataClassification)),
-                    () -> inOrder.verify(securityValidationService, never()).setClassificationFromCallbackIfValid(any(), any(), any())
+                    () -> inOrder.verify(securityValidationService, never()).setClassificationFromCallbackIfValid(any(),
+                                                                                                                  any(),
+                                                                                                                  any())
                 );
             }
 
@@ -388,10 +618,12 @@ class CallbackInvokerTest {
                     () -> inOrder.verify(caseTypeService).validateData(callbackResponse.getData(), caseType),
                     () -> inOrder.verify(caseSanitiser).sanitise(caseType, callbackResponse.getData()),
                     () -> inOrder.verify(caseDataService, times(2)).getDefaultSecurityClassifications(eq(caseType),
-                                                                                            eq(caseDetails.getData()),
-                                                                                            argumentDataClassification.capture()),
-                    () -> inOrder.verify(securityValidationService).setClassificationFromCallbackIfValid(eq(callbackResponse), eq(caseDetails), eq(allFieldsDataClassification)),
-                    () -> assertThat(argumentDataClassification.getAllValues(), contains(currentDataClassification, Maps.newHashMap()))
+                                                                                                      eq(caseDetails.getData()),
+                                                                                                      argumentDataClassification.capture()),
+                    () -> inOrder.verify(securityValidationService).setClassificationFromCallbackIfValid(eq(
+                        callbackResponse), eq(caseDetails), eq(allFieldsDataClassification)),
+                    () -> assertThat(argumentDataClassification.getAllValues(),
+                                     contains(currentDataClassification, Maps.newHashMap()))
                 );
             }
 
@@ -407,32 +639,144 @@ class CallbackInvokerTest {
                     () -> inOrder.verify(caseTypeService).validateData(callbackResponse.getData(), caseType),
                     () -> inOrder.verify(caseSanitiser).sanitise(caseType, callbackResponse.getData()),
                     () -> inOrder.verify(caseDataService, times(2)).getDefaultSecurityClassifications(eq(caseType),
-                                                                                            eq(caseDetails.getData()),
-                                                                                            argumentDataClassification.capture()),
-                    () -> inOrder.verify(securityValidationService).setClassificationFromCallbackIfValid(callbackResponse, caseDetails, allFieldsDataClassification),
-                    () -> assertThat(argumentDataClassification.getAllValues(), contains(currentDataClassification, Maps.newHashMap()))
+                                                                                                      eq(caseDetails.getData()),
+                                                                                                      argumentDataClassification.capture()),
+                    () -> inOrder.verify(securityValidationService).setClassificationFromCallbackIfValid(
+                        callbackResponse,
+                        caseDetails,
+                        allFieldsDataClassification),
+                    () -> assertThat(argumentDataClassification.getAllValues(),
+                                     contains(currentDataClassification, Maps.newHashMap()))
                 );
             }
 
             @DisplayName("validate call back response and there are errors in call back validation when setting data and state")
             @Test
             void validateAndSetStateMetError() throws ApiException {
-                final String errorMessgae = "Royal carriage is stuck AGAIN!!!!";
-                doThrow(new ApiException(errorMessgae))
+                final String errorMessage = "Royal carriage is stuck AGAIN!!!!";
+                doThrow(new ApiException(errorMessage))
                     .when(callbackService).validateCallbackErrorsAndWarnings(any(), any());
                 final ApiException apiException =
-                    assertThrows(ApiException.class,
-                                 () -> callbackInvoker.invokeAboutToSubmitCallback(caseEvent, caseDetailsBefore, caseDetails, caseType, TRUE));
+                    assertThrows(ApiException.class, () -> callbackInvoker.invokeAboutToSubmitCallback(caseEvent,
+                                                                                                       caseDetailsBefore,
+                                                                                                       caseDetails,
+                                                                                                       caseType,
+                                                                                                       TRUE));
 
                 assertAll(
-                    () -> assertThat(apiException.getMessage(), is(errorMessgae)),
+                    () -> assertThat(apiException.getMessage(), is(errorMessage)),
                     () -> assertThat(caseDetails.getState(), is("BAYAN")),
                     () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE),
                     () -> inOrder.verify(caseTypeService, never()).validateData(any(), any()),
                     () -> inOrder.verify(caseSanitiser, never()).sanitise(any(), any()),
+                    () -> inOrder.verify(caseDataService, never()).getDefaultSecurityClassifications(any(),
+                                                                                                     any(),
+                                                                                                     any()),
+                    () -> inOrder.verify(securityValidationService, never()).setClassificationFromCallbackIfValid(any(),
+                                                                                                                  any(),
+                                                                                                                  any())
+                );
+            }
+        }
+
+        @Nested
+        @DisplayName("mid event")
+        class MidEvent {
+
+            @DisplayName("validate callback response and update case details data for about to start")
+            @Test
+            void validateAndSetDataForAboutToStart() {
+                final CallbackResponse callbackResponse = new CallbackResponse();
+                final Map<String, JsonNode> data = new HashMap<>();
+                data.put("xxx", TextNode.valueOf("ngitb"));
+                callbackResponse.setData(data);
+                HashMap<String, JsonNode> currentDataClassification = Maps.newHashMap();
+                when(caseDataService.getDefaultSecurityClassifications(caseType, data, caseDetails.getDataClassification())).thenReturn(
+                    currentDataClassification);
+                when(callbackService.send(wizardPage.getCallBackURLMidEvent(),
+                    caseEvent,
+                    caseDetailsBefore,
+                    caseDetails,
+                    false)).thenReturn(Optional.of(callbackResponse));
+
+                callbackInvoker.invokeMidEventCallback(wizardPage,
+                    caseType,
+                    caseEvent,
+                    caseDetailsBefore,
+                    caseDetails,
+                    IGNORE_WARNINGS);
+
+                assertAll(
+                    () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, FALSE),
+                    () -> inOrder.verify(caseTypeService).validateData(callbackResponse.getData(), caseType),
+                    () -> inOrder.verify(caseSanitiser).sanitise(caseType, callbackResponse.getData()),
+                    () -> inOrder.verify(caseDataService).getDefaultSecurityClassifications(caseType,
+                        caseDetails.getData(),
+                        caseDetails.getDataClassification()),
+                    () -> inOrder.verify(securityValidationService, never())
+                        .setClassificationFromCallbackIfValid(any(), any(), any())
+                );
+            }
+
+            @DisplayName("validate call back response and no case details data is updated")
+            @Test
+            void validateAndDoNotSetData() {
+                final CallbackResponse callbackResponse = new CallbackResponse();
+                when(callbackService.send(wizardPage.getCallBackURLMidEvent(),
+                    caseEvent,
+                    caseDetailsBefore,
+                    caseDetails,
+                    false)).thenReturn(Optional.of(callbackResponse));
+
+                callbackInvoker.invokeMidEventCallback(wizardPage,
+                    caseType,
+                    caseEvent,
+                    caseDetailsBefore,
+                    caseDetails,
+                    IGNORE_WARNINGS);
+
+                assertAll(
+                    () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, FALSE),
+                    () -> inOrder.verify(caseTypeService, never()).validateData(any(), any()),
+                    () -> inOrder.verify(caseSanitiser, never()).sanitise(any(), any()),
                     () -> inOrder.verify(caseDataService, never()).getDefaultSecurityClassifications(any(), any(), any()),
                     () -> inOrder.verify(securityValidationService, never()).setClassificationFromCallbackIfValid(any(), any(), any())
-                );
+                         );
+            }
+
+            @DisplayName("validate call back response and there are errors in call back validation when setting data")
+            @Test
+            void validateAndSetDataMetError() throws ApiException {
+                final CallbackResponse callbackResponse = new CallbackResponse();
+                when(callbackService.send(wizardPage.getCallBackURLMidEvent(),
+                    caseEvent,
+                    caseDetailsBefore,
+                    caseDetails, false)).thenReturn(Optional.of(callbackResponse));
+                final Map<String, JsonNode> data = new HashMap<>();
+                callbackResponse.setData(data);
+
+                final String ErrorMessage = "Royal marriage *!><}{^";
+                doThrow(new ApiException(ErrorMessage))
+                    .when(callbackService).validateCallbackErrorsAndWarnings(any(), any());
+
+                final ApiException apiException =
+                    assertThrows(ApiException.class,
+                        () -> callbackInvoker.invokeMidEventCallback(wizardPage,
+                            caseType,
+                            caseEvent,
+                            caseDetailsBefore,
+                            caseDetails,
+                            IGNORE_WARNINGS));
+
+                assertThat(apiException.getMessage(), is(ErrorMessage));
+
+                assertAll(
+                    () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, FALSE),
+                    () -> inOrder.verify(caseTypeService, never()).validateData(any(), any()),
+                    () -> inOrder.verify(caseSanitiser, never()).sanitise(any(), any()),
+                    () -> inOrder.verify(caseDataService, never()).getDefaultSecurityClassifications(any(), any(), any()),
+                    () -> inOrder.verify(securityValidationService, never()).setClassificationFromCallbackIfValid(any(), any(), any())
+                         );
             }
         }
 

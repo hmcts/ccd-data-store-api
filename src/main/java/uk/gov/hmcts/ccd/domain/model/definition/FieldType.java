@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
@@ -8,7 +9,23 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Collections.emptyList;
+
 public class FieldType implements Serializable {
+
+    public static final String COLLECTION = "Collection";
+    public static final String COMPLEX = "Complex";
+    public static final String MULTI_SELECT_LIST = "MultiSelectList";
+    public static final String FIXED_LIST = "FixedList";
+    public static final String FIXED_RADIO_LIST = "FixedRadioList";
+    public static final String LABEL = "Label";
+    public static final String CASE_PAYMENT_HISTORY_VIEWER = "CasePaymentHistoryViewer";
+    public static final String CASE_HISTORY_VIEWER = "CaseHistoryViewer";
+    public static final String PREDEFINED_COMPLEX_ADDRESS_GLOBAL = "AddressGlobal";
+    public static final String PREDEFINED_COMPLEX_ADDRESS_GLOBAL_UK = "AddressGlobalUK";
+    public static final String PREDEFINED_COMPLEX_ADDRESS_UK = "AddressUK";
+    public static final String PREDEFINED_COMPLEX_ORDER_SUMMARY = "OrderSummary";
+    public static final String PREDEFINED_COMPLEX_CASELINK = "CaseLink";
 
     private String id = null;
     private String type = null;
@@ -69,6 +86,29 @@ public class FieldType implements Serializable {
 
     public void setComplexFields(List<CaseField> complexFields) {
         this.complexFields = complexFields;
+    }
+
+    @JsonIgnore
+    public List<CaseField> getChildren() {
+        if (type.equalsIgnoreCase(COMPLEX)) {
+            return complexFields;
+        } else if (type.equalsIgnoreCase(COLLECTION)) {
+            if (collectionFieldType == null) {
+                return emptyList();
+            }
+            return collectionFieldType.complexFields;
+        } else {
+            return emptyList();
+        }
+    }
+
+    @JsonIgnore
+    public void setChildren(List<CaseField> caseFields) {
+        if (type.equalsIgnoreCase(COMPLEX)) {
+            complexFields = caseFields;
+        } else if (type.equalsIgnoreCase(COLLECTION) && collectionFieldType != null) {
+            collectionFieldType.complexFields = caseFields;
+        }
     }
 
     public String getId() {

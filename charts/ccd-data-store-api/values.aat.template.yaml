@@ -1,0 +1,4 @@
+# config used by staging aat pod
+java:
+  image: ${IMAGE_NAME}
+  ingressHost: ${SERVICE_FQDN}

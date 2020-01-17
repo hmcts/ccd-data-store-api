@@ -1,9 +1,11 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
-import java.io.Serializable;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @ApiModel(description = "")
 public class WizardPageField implements Serializable {
@@ -11,6 +13,7 @@ public class WizardPageField implements Serializable {
     private String caseFieldId = null;
     private Integer order = null;
     private Integer pageColumnNumber;
+    private List<WizardPageComplexFieldOverride> complexFieldOverrides = new ArrayList<>();
 
     @JsonProperty("case_field_id")
     public String getCaseFieldId() {
@@ -37,5 +40,14 @@ public class WizardPageField implements Serializable {
 
     public void setPageColumnNumber(Integer number) {
         this.pageColumnNumber = number;
+    }
+
+    @JsonProperty("complex_field_overrides")
+    public List<WizardPageComplexFieldOverride> getComplexFieldOverrides() {
+        return complexFieldOverrides;
+    }
+
+    public void setComplexFieldOverrides(List<WizardPageComplexFieldOverride> complexFieldOverrides) {
+        this.complexFieldOverrides = complexFieldOverrides;
     }
 }

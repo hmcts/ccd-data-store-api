@@ -1,12 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.callbacks;
 
-import com.google.common.collect.Maps;
-import io.jsonwebtoken.*;
-import io.jsonwebtoken.impl.TextCodec;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.callbacks.EventTokenProperties;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -15,17 +8,24 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.EventTokenException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.infrastructure.RandomKeyGenerator;
 
 import java.util.Date;
 
+import com.google.common.collect.Maps;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.impl.TextCodec;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 @Service
 public class EventTokenService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(EventTokenService.class);
-
     private static final CaseDetails EMPTY_CASE = new CaseDetails();
 
     static {
@@ -69,6 +69,7 @@ public class EventTokenService {
             .claim(EventTokenProperties.JURISDICTION_ID, jurisdiction.getId())
             .claim(EventTokenProperties.CASE_STATE, caseDetails.getState())
             .claim(EventTokenProperties.CASE_VERSION, caseService.hashData(caseDetails))
+            .claim(EventTokenProperties.ENTITY_VERSION, caseDetails.getVersion())
             .compact();
     }
 
@@ -85,7 +86,8 @@ public class EventTokenService {
                 toString(claims.get(EventTokenProperties.TRIGGER_EVENT_ID)),
                 toString(claims.get(EventTokenProperties.CASE_TYPE_ID)),
                 toString(claims.get(EventTokenProperties.CASE_VERSION)),
-                toString(claims.get(EventTokenProperties.CASE_STATE)));
+                toString(claims.get(EventTokenProperties.CASE_STATE)),
+                toString(claims.get(EventTokenProperties.ENTITY_VERSION)));
 
         } catch (ExpiredJwtException | SignatureException e) {
             throw new EventTokenException(e.getMessage());
@@ -121,15 +123,8 @@ public class EventTokenService {
                 throw new ResourceNotFoundException("Cannot find matching start trigger");
             }
 
-            if (caseDetails.getState() != null && !caseDetails.getState().equals(eventTokenProperties.getCaseState())) {
-                LOGGER.info("Event token validation error: Case state has been altered");
-                throw new CaseConcurrencyException("The case state has been altered outside of this transaction");
-            }
-
-            final String currentVersion = caseService.hashData(caseDetails);
-            if (!currentVersion.equals(eventTokenProperties.getVersion())) {
-                LOGGER.info("Event token validation error: Case data has been altered");
-                throw new CaseConcurrencyException("The case data has been altered outside of this transaction");
+            if (eventTokenProperties.getEntityVersion() != null) {
+                caseDetails.setVersion(Integer.parseInt(eventTokenProperties.getEntityVersion()));
             }
         } catch (EventTokenException e) {
             throw new SecurityException("Token is not valid");

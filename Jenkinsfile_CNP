@@ -2,7 +2,7 @@
 properties(
     [
         [
-            $class: 'GithubProjectProperty',
+            $class       : 'GithubProjectProperty',
             projectUrlStr: 'https://github.com/hmcts/ccd-data-store-api'
         ],
         pipelineTriggers([[$class: 'GitHubPushTrigger']])
@@ -15,23 +15,69 @@ def type = "java"
 def product = "ccd"
 def component = "data-store-api"
 
-List<LinkedHashMap<String, Object>> secrets = [
-    secret('caseworkerAutoTest1Email', 'CCD_CASEWORKER_AUTOTEST_EMAIL'),
-    secret('caseworkerAutoTest1Password', 'CCD_CASEWORKER_AUTOTEST_PASSWORD'),
-    secret('microserviceGatewaySecret', 'CCD_GW_SERVICE_SECRET'),
-    secret('gatewayOAuth2ClientSecret', 'OAUTH2_CLIENT_SECRET'),
+def secrets = [
+    'ccd-${env}': [
+        secret('ccd-caseworker-autotest-email', 'CCD_CASEWORKER_AUTOTEST_EMAIL'),
+        secret('ccd-caseworker-autotest-password', 'CCD_CASEWORKER_AUTOTEST_PASSWORD'),
+        secret('ccd-importer-autotest-email', 'CCD_IMPORT_AUTOTEST_EMAIL'),
+        secret('ccd-importer-autotest-password', 'CCD_IMPORT_AUTOTEST_PASSWORD'),
+        secret('ccd-private-caseworker-email', 'CCD_PRIVATE_CASEWORKER_EMAIL'),
+        secret('ccd-private-caseworker-password', 'CCD_PRIVATE_CASEWORKER_PASSWORD'),
+        secret('ccd-restricted-caseworker-email', 'CCD_RESTRICTED_CASEWORKER_EMAIL'),
+        secret('ccd-restricted-caseworker-password', 'CCD_RESTRICTED_CASEWORKER_PASSWORD'),
+        secret('ccd-private-caseworker-solicitor-email', 'CCD_PRIVATE_CASEWORKER_SOLICITOR_EMAIL'),
+        secret('ccd-private-caseworker-solicitor-password', 'CCD_PRIVATE_CASEWORKER_SOLICITOR_PASSWORD'),
+        secret('ccd-private-cross-case-type-worker-email', 'CCD_PRIVATE_CROSS_CASE_TYPE_CASEWORKER_EMAIL'),
+        secret('ccd-private-cross-case-type-caseworker-password', 'CCD_PRIVATE_CROSS_CASE_TYPE_CASEWORKER_PASSWORD'),
+        secret('ccd-private-cross-case-type-solicitor-email', 'CCD_PRIVATE_CROSS_CASE_TYPE_SOLICITOR_EMAIL'),
+        secret('ccd-private-cross-case-type-solicitor-password', 'CCD_PRIVATE_CROSS_CASE_TYPE_SOLICITOR_PASSWORD'),
+        secret('ccd-restricted-cross-case-type-caseworker-email', 'CCD_RESTRICTED_CROSS_CASE_TYPE_CASEWORKER_EMAIL'),
+        secret('ccd-restricted-cross-case-type-caseworker-password', 'CCD_RESTRICTED_CROSS_CASE_TYPE_CASEWORKER_PASSWORD'),
+        secret('ccd-api-gateway-oauth2-client-secret', 'OAUTH2_CLIENT_SECRET'),
+    ],
+    's2s-${env}': [
+        secret('microservicekey-ccd-gw', 'CCD_GW_SERVICE_SECRET')
+    ]
 ]
 
 static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
-    [ $class: 'AzureKeyVaultSecret',
-      secretType: 'Secret',
-      name: secretName,
-      version: '',
-      envVariable: envVar
+    [$class     : 'AzureKeyVaultSecret',
+     secretType : 'Secret',
+     name       : secretName,
+     version    : '',
+     envVariable: envVar
     ]
 }
 
+def vaultOverrides = [
+    'preview' : 'aat',
+    'spreview': 'saat'
+]
+// Vars needed for functional and smoke tests run against AKS
+env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
+env.S2S_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+env.CCD_GW_SERVICE_NAME = "ccd_gw"
+env.OAUTH2_CLIENT_ID = "ccd_gateway"
+env.OAUTH2_REDIRECT_URI = "https://www-ccd.aat.platform.hmcts.net/oauth2redirect"
+env.DEFINITION_STORE_HOST = "https://ccd-definition-store-api-pr-469.service.core-compute-preview.internal/"
+
 withPipeline(type, product, component) {
+    onMaster {
+        enableSlackNotifications('#ccd-master-builds')
+    }
+    onDemo {
+        enableSlackNotifications('#ccd-demo-builds')
+    }
+    onPR {
+        enableSlackNotifications('#ccd-pr-builds')
+    }
+
+    overrideVaultEnvironments(vaultOverrides)
+    enableAksStagingDeployment()
+    disableLegacyDeploymentOnAAT()
     loadVaultSecrets(secrets)
-    enableDbMigration()
+    enableDbMigration('ccd')
+    enableDockerBuild()
+    installCharts()
+    disableLegacyDeployment()
 }

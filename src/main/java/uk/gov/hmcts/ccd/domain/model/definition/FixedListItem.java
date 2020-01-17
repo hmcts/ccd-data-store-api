@@ -9,8 +9,10 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel(description = "")
 public class FixedListItem implements Serializable {
 
+    private static final long serialVersionUID = 6196146295016140921L;
     private String code = null;
     private String label = null;
+    private String order = null;
 
     @ApiModelProperty(value = "")
     @JsonProperty("code")
@@ -29,5 +31,15 @@ public class FixedListItem implements Serializable {
 
     public void setLabel(String label) {
         this.label = label;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("order")
+    public String getOrder() {
+        return order;
+    }
+
+    public void setOrder(final String order) {
+        this.order = order;
     }
 }

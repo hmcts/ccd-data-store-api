@@ -1,9 +1,11 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
@@ -16,6 +18,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
+import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
@@ -23,11 +26,13 @@ import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
 
 import java.util.List;
 
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.CASE_HISTORY_VIEWER;
+
 @Service
 @Qualifier(DefaultGetCaseViewOperation.QUALIFIER)
 public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOperation implements GetCaseViewOperation {
 
-    public static final String QUALIFIER = "default";
+    public static final String QUALIFIER = "defaultCase";
 
     private final GetEventsOperation getEventsOperation;
     private final CaseTypeService caseTypeService;
@@ -39,20 +44,22 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
                                        UIDefinitionRepository uiDefinitionRepository,
                                        CaseTypeService caseTypeService,
                                        EventTriggerService eventTriggerService,
-                                       UIDService uidService) {
-        super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService);
+                                       UIDService uidService,
+                                       ObjectMapperService objectMapperService,
+                                       CompoundFieldOrderService compoundFieldOrderService) {
+        super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService, objectMapperService, compoundFieldOrderService);
         this.getEventsOperation = getEventsOperation;
         this.caseTypeService = caseTypeService;
         this.eventTriggerService = eventTriggerService;
     }
 
     @Override
-    public CaseView execute(String jurisdictionId, String caseTypeId, String caseReference) {
+    public CaseView execute(String caseReference) {
         validateCaseReference(caseReference);
 
-        final CaseType caseType = getCaseType(jurisdictionId, caseTypeId);
-        final CaseDetails caseDetails = getCaseDetails(jurisdictionId, caseTypeId, caseReference);
+        final CaseDetails caseDetails = getCaseDetails(caseReference);
 
+        final CaseType caseType = getCaseType(caseDetails.getJurisdiction(), caseDetails.getCaseTypeId());
         final List<AuditEvent> events = getEventsOperation.getEvents(caseDetails);
         final CaseTabCollection caseTabCollection = getCaseTabCollection(caseDetails.getCaseTypeId());
 
@@ -65,10 +72,15 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
         caseView.setChannels(caseTabCollection.getChannels().toArray(new String[0]));
 
         CaseState caseState = caseTypeService.findState(caseType, caseDetails.getState());
-        caseView.setState(new ProfileCaseState(caseState.getId(), caseState.getName(), caseState.getDescription()));
+        caseView.setState(new ProfileCaseState(caseState.getId(), caseState.getName(), caseState.getDescription(), caseState.getTitleDisplay()));
 
         caseView.setCaseType(CaseViewType.createFrom(caseType));
-        caseView.setTabs(getTabs(caseDetails, caseDetails.getData(), caseTabCollection));
+        final CaseViewEvent[] caseViewEvents = convertToCaseViewEvent(events);
+        if (caseTabCollection.hasTabFieldType(CASE_HISTORY_VIEWER)) {
+            hydrateHistoryField(caseDetails, caseType, Lists.newArrayList(caseViewEvents));
+        }
+        caseView.setTabs(getTabs(caseDetails, caseDetails.getCaseDataAndMetadata(), caseTabCollection));
+        caseView.setMetadataFields(getMetadataFields(caseType, caseDetails));
 
         final CaseViewTrigger[] triggers = caseType.getEvents()
             .stream()
@@ -84,12 +96,16 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
             .toArray(CaseViewTrigger[]::new);
         caseView.setTriggers(triggers);
 
-        caseView.setEvents(events
-            .stream()
-            .map(CaseViewEvent::createFrom)
-            .toArray(CaseViewEvent[]::new));
+        caseView.setEvents(caseViewEvents);
 
         return caseView;
+    }
+
+    private CaseViewEvent[] convertToCaseViewEvent(List<AuditEvent> events) {
+        return events
+            .stream()
+            .map(CaseViewEvent::createFrom)
+            .toArray(size -> new CaseViewEvent[size]);
     }
 
 }

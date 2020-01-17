@@ -6,11 +6,12 @@ services:
     build:
       context: .
     image: hmcts/ccd-data-store-api
+    container_name: ccd-data-store-api
     environment:
       - DATA_STORE_DB_HOST=ccd-data-store-database
       - DATA_STORE_DB_PORT=5432
-      - DATA_STORE_DB_USERNAME
-      - DATA_STORE_DB_PASSWORD
+      - DATA_STORE_DB_USERNAME=data_store
+      - DATA_STORE_DB_PASSWORD=data_store
       - DATA_STORE_IDAM_KEY
       - DATA_STORE_TOKEN_SECRET=iuasbcuasdcbasdgcasdgcuysachjsacyasdgjcgasdj
       - DATA_STORE_S2S_AUTHORISED_SERVICES=ccd_gw
@@ -18,11 +19,12 @@ services:
       - USER_PROFILE_HOST
       - IDAM_USER_URL
       - IDAM_S2S_URL
+      - AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY
       - REFORM_SERVICE_NAME=ccd-data-store-api
       - REFORM_TEAM=ccd
       - REFORM_ENVIRONMENT=local
     ports:
-      - 4452:4452
+      - $SERVER_PORT:$SERVER_PORT
     depends_on:
       - ccd-data-store-database
     links:
@@ -37,8 +39,8 @@ services:
       timeout: 10s
       retries: 10
     environment:
-      - DATA_STORE_DB_USERNAME
-      - DATA_STORE_DB_PASSWORD
+      - DATA_STORE_DB_USERNAME=data_store
+      - DATA_STORE_DB_PASSWORD=data_store
     ports:
       - 5452:5432
     volumes:

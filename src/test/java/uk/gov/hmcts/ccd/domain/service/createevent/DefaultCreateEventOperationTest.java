@@ -8,26 +8,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
-import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
-import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
-import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.model.std.validator.EventValidator;
-import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
-import uk.gov.hmcts.ccd.domain.service.common.*;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
-import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
-import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.hamcrest.CoreMatchers.is;
@@ -36,10 +27,11 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
 class DefaultCreateEventOperationTest {
 
-    private static final String USER_ID = "123";
     private static final String JURISDICTION_ID = "SSCS";
     private static final String CASE_TYPE_ID = "Claim";
     private static final String CASE_REFERENCE = "1234123412341236";
@@ -53,35 +45,11 @@ class DefaultCreateEventOperationTest {
     private static final String CALLBACK_URL = "http://sscs.reform.hmcts.net/callback";
 
     @Mock
-    private UserRepository userRepository;
-    @Mock
-    private CaseDetailsRepository caseDetailsRepository;
-    @Mock
-    private CaseDefinitionRepository caseDefinitionRepository;
-    @Mock
-    private CaseAuditEventRepository caseAuditEventRepository;
-    @Mock
-    private EventTriggerService eventTriggerService;
-    @Mock
-    private EventTokenService eventTokenService;
-    @Mock
-    private CaseDataService caseDataService;
-    @Mock
-    private CaseTypeService caseTypeService;
-    @Mock
     private EventValidator eventValidator;
-    @Mock
-    private CaseSanitiser caseSanitiser;
     @Mock
     private CallbackInvoker callbackInvoker;
     @Mock
-    private UIDService uidService;
-    @Mock
-    private SecurityClassificationService securityClassificationService;
-    @Mock
-    private ValidateCaseFieldsOperation validateCaseFieldsOperation;
-    @Mock
-    private CaseService caseService;
+    private CreateCaseEventService createEventService;
 
     @InjectMocks
     private DefaultCreateEventOperation createEventOperation;
@@ -89,16 +57,15 @@ class DefaultCreateEventOperationTest {
     private Event event;
 
     private Map<String, JsonNode> data;
-    private Jurisdiction jurisdiction;
     private CaseType caseType;
     private CaseEvent eventTrigger;
     private CaseDetails caseDetails;
     private CaseDetails caseDetailsBefore;
     private CaseState postState;
-    private IDAMProperties user;
+    private CaseDataContent caseDataContent;
 
     private static Event buildEvent() {
-        final Event event = new Event();
+        final Event event = anEvent().build();
         event.setEventId(EVENT_ID);
         event.setSummary("Update case summary");
         event.setDescription("Update case description");
@@ -111,8 +78,8 @@ class DefaultCreateEventOperationTest {
 
         event = buildEvent();
         data = buildJsonNodeData();
-
-        jurisdiction = new Jurisdiction();
+        caseDataContent = newCaseDataContent().withEvent(event).withData(data).withToken(TOKEN).withIgnoreWarning(IGNORE_WARNING).build();
+        final Jurisdiction jurisdiction = new Jurisdiction();
         jurisdiction.setId(JURISDICTION_ID);
         final Version version = new Version();
         version.setNumber(VERSION_NUMBER);
@@ -120,8 +87,10 @@ class DefaultCreateEventOperationTest {
         caseType.setId(CASE_TYPE_ID);
         caseType.setJurisdiction(jurisdiction);
         caseType.setVersion(version);
+
         eventTrigger = new CaseEvent();
         eventTrigger.setPostState(POST_STATE);
+
         caseDetails = new CaseDetails();
         caseDetails.setCaseTypeId(CASE_TYPE_ID);
         caseDetails.setState(PRE_STATE_ID);
@@ -129,52 +98,15 @@ class DefaultCreateEventOperationTest {
         caseDetailsBefore = mock(CaseDetails.class);
         postState = new CaseState();
         postState.setId(POST_STATE);
-        user = new IDAMProperties();
-        user.setId("123");
 
-        doReturn(caseType).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
-        doReturn(true).when(caseTypeService).isJurisdictionValid(JURISDICTION_ID, caseType);
-        doReturn(eventTrigger).when(eventTriggerService).findCaseEvent(caseType, EVENT_ID);
-        doReturn(true).when(uidService).validateUID(CASE_REFERENCE);
-        doReturn(caseDetails).when(caseDetailsRepository).lockCase(Long.valueOf(CASE_REFERENCE));
-        doReturn(true).when(eventTriggerService).isPreStateValid(PRE_STATE_ID, eventTrigger);
-        doReturn(caseDetails).when(caseDetailsRepository).set(caseDetails);
-        doReturn(postState).when(caseTypeService).findState(caseType, POST_STATE);
-        doReturn(user).when(userRepository).getUserDetails();
-        doReturn(caseDetailsBefore).when(caseService).clone(caseDetails);
-        given(callbackInvoker.invokeAboutToSubmitCallback(any(),
-                                                          any(),
-                                                          any(),
-                                                          any(),
-                                                          any())).willReturn(Optional.empty());
-    }
+        CreateCaseEventResult caseEventResult =  CreateCaseEventResult.caseEventWith()
+            .caseDetailsBefore(caseDetailsBefore)
+            .savedCaseDetails(caseDetails)
+            .eventTrigger(eventTrigger)
+            .build();
 
-    @Test
-    @DisplayName("should create copy of case before mutating it")
-    void shouldCreateCopyOfCaseBeforeMutation() {
-        createCaseEvent();
+        given(createEventService.createCaseEvent(CASE_REFERENCE, caseDataContent)).willReturn(caseEventResult);
 
-        verify(caseService).clone(caseDetails);
-    }
-
-    @Test
-    @DisplayName("should not interact with before case details copy")
-    void shouldNotInteractWithBeforeCaseDetails() {
-        createCaseEvent();
-
-        verifyZeroInteractions(caseDetailsBefore);
-    }
-
-    @Test
-    @DisplayName("should invoke about to submit callback")
-    void shouldInvokeAboutToSubmitCallback() {
-        createCaseEvent();
-
-        verify(callbackInvoker).invokeAboutToSubmitCallback(eventTrigger,
-            caseDetailsBefore,
-            caseDetails,
-            caseType,
-            IGNORE_WARNING);
     }
 
     @Test
@@ -189,14 +121,14 @@ class DefaultCreateEventOperationTest {
                 caseDetailsBefore,
                 caseDetails);
 
-        final CaseDetails caseDetails = createCaseEvent();
+        final CaseDetails caseDetails = createEventOperation.createCaseEvent(CASE_REFERENCE, caseDataContent);
 
         assertAll(
             () -> verify(callbackInvoker).invokeSubmittedCallback(eventTrigger, caseDetailsBefore, this.caseDetails),
             () -> assertThat(caseDetails.getAfterSubmitCallbackResponse().getConfirmationHeader(), is("Header")),
             () -> assertThat(caseDetails.getAfterSubmitCallbackResponse().getConfirmationBody(), is("Body")),
             () -> assertThat(caseDetails.getCallbackResponseStatusCode(), is(SC_OK)),
-            () -> assertThat(caseDetails.getCallbackResponseStatus(), is("COMPLETED"))
+            () -> assertThat(caseDetails.getCallbackResponseStatus(), is("CALLBACK_COMPLETED"))
         );
     }
 
@@ -209,24 +141,13 @@ class DefaultCreateEventOperationTest {
                 caseDetailsBefore,
                 caseDetails);
 
-        final CaseDetails caseDetails = createCaseEvent();
+        final CaseDetails caseDetails = createEventOperation.createCaseEvent(CASE_REFERENCE, caseDataContent);
 
         assertAll(
             () -> assertNull(caseDetails.getAfterSubmitCallbackResponse()),
             () -> assertThat(caseDetails.getCallbackResponseStatusCode(), is(SC_OK)),
-            () -> assertThat(caseDetails.getCallbackResponseStatus(), is("INCOMPLETE"))
+            () -> assertThat(caseDetails.getCallbackResponseStatus(), is("INCOMPLETE_CALLBACK"))
         );
-    }
-
-    private CaseDetails createCaseEvent() {
-        return createEventOperation.createCaseEvent(USER_ID,
-            JURISDICTION_ID,
-            CASE_TYPE_ID,
-            CASE_REFERENCE,
-            event,
-            data,
-            TOKEN,
-            IGNORE_WARNING);
     }
 
     private Map<String, JsonNode> buildJsonNodeData() {

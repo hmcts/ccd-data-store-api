@@ -1,5 +1,15 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static java.util.Optional.ofNullable;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,14 +24,6 @@ import uk.gov.hmcts.ccd.domain.types.CaseDataValidator;
 import uk.gov.hmcts.ccd.domain.types.ValidationResult;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Named
 @Singleton
@@ -70,12 +72,9 @@ public class CaseTypeService {
 
     public CaseType getCaseTypeForJurisdiction(final String caseTypeId,
                                                final String jurisdictionId) {
-        final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
+        final CaseType caseType = getCaseType(caseTypeId);
 
-        if (null == caseType
-            || null == jurisdictionId
-            || !jurisdictionId.equalsIgnoreCase(caseType.getJurisdiction().getId())) {
-
+        if (null == jurisdictionId || !jurisdictionId.equalsIgnoreCase(caseType.getJurisdiction().getId())) {
             throw new ResourceNotFoundException(
                 String.format(
                     "Case type with id %s could not be found for jurisdiction %s",
@@ -87,6 +86,17 @@ public class CaseTypeService {
         return caseType;
     }
 
+    public CaseType getCaseType(String caseTypeId) {
+        return ofNullable(caseDefinitionRepository.getCaseType(caseTypeId))
+            .orElseThrow(() -> new ResourceNotFoundException(String.format("Case type with id %s could not be found", caseTypeId)));
+    }
+
+    /**
+     *
+     * @deprecated current implementation has serious performance issues
+     */
+    @Deprecated
+    @SuppressWarnings("squid:S1133")
     public List<CaseType> getCaseTypesForJurisdiction(final String jurisdictionId) {
         final List<CaseType> caseTypes = caseDefinitionRepository.getCaseTypesForJurisdiction(jurisdictionId);
 

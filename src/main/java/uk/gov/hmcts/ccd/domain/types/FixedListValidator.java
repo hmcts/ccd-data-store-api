@@ -14,7 +14,7 @@ import static uk.gov.hmcts.ccd.domain.types.TextValidator.checkRegex;
 @Named
 @Singleton
 public class FixedListValidator implements BaseTypeValidator {
-    private static final String TYPE_ID = "FixedList";
+    static final String TYPE_ID = "FixedList";
 
     @Override
     public BaseType getType() {

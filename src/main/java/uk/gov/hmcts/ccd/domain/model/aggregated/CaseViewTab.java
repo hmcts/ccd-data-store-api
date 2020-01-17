@@ -11,17 +11,19 @@ public class CaseViewTab {
     private CaseViewField[] fields;
     @JsonProperty("show_condition")
     private String showCondition;
+    private String role;
 
     public CaseViewTab() {
         // default constructor
     }
 
-    public CaseViewTab(String id, String label, Integer order, CaseViewField[] fields, String showCondition) {
+    public CaseViewTab(String id, String label, Integer order, CaseViewField[] fields, String showCondition, String role) {
         this.id = id;
         this.label = label;
         this.order = order;
         this.fields = fields;
         this.showCondition = showCondition;
+        this.role = role;
     }
 
     public String getId() {
@@ -64,4 +66,11 @@ public class CaseViewTab {
         this.showCondition = showCondition;
     }
 
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(final String role) {
+        this.role = role;
+    }
 }

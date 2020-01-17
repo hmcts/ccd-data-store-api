@@ -1,54 +1,69 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
-import org.hamcrest.MatcherAssert;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.transaction.annotation.Transactional;
-import uk.gov.hmcts.ccd.BaseTest;
-import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
-import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
-import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
-
 import javax.inject.Inject;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+
+import com.google.common.collect.Maps;
+import org.hamcrest.MatcherAssert;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.transaction.annotation.Transactional;
+import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.BaseTest;
+import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
+import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
+import uk.gov.hmcts.ccd.data.casedetails.search.SortOrderField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
+import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
+import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 
 @Transactional
 public class DefaultCaseDetailsRepositoryTest extends BaseTest {
 
-    private final static long CASE_REFERENCE = 999999L;
-    private final static String JURISDICTION_ID = "JeyOne";
-    private final static String CASE_TYPE_ID = "CaseTypeOne";
+    private static final long CASE_REFERENCE = 999999L;
+    private static final String JURISDICTION_ID = "JeyOne";
+    private static final String CASE_TYPE_ID = "CaseTypeOne";
     private static final String JURISDICTION = "PROBATE";
     private static final String WRONG_JURISDICTION = "DIVORCE";
     private static final Long REFERENCE = 1504259907353529L;
     private static final Long WRONG_REFERENCE = 9999999999999999L;
+    public static final int NUMBER_OF_CASES = 18;
 
     private JdbcTemplate template;
 
     @MockBean
     private UserAuthorisation userAuthorisation;
 
+    @MockBean
+    private AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService;
+
     @Inject
     @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
     private CaseDetailsRepository caseDetailsRepository;
+
+    @Inject
+    private ApplicationParams applicationParams;
 
     @Before
     public void setUp() {
@@ -87,7 +102,7 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
 
         final CaseDetails byId = caseDetailsRepository.findById(1L);
         assertAll(
-            () -> assertThat(byId.getId(), is(1L)),
+            () -> assertThat(byId.getId(), is("1")),
             () -> assertThat(byId.getJurisdiction(), is("PROBATE")),
             () -> assertThat(byId.getState(), is("CaseCreated")),
             () -> assertThat(byId.getCaseTypeId(), is("TestAddressBookCase")),
@@ -108,7 +123,7 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
 
         final CaseDetails byReference = caseDetailsRepository.findByReference(1504259907353529L);
         assertAll(
-            () -> assertThat(byReference.getId(), is(1L)),
+            () -> assertThat(byReference.getId(), is("1")),
             () -> assertThat(byReference.getJurisdiction(), is("PROBATE")),
             () -> assertThat(byReference.getState(), is("CaseCreated")),
             () -> assertThat(byReference.getCaseTypeId(), is("TestAddressBookCase")),
@@ -123,8 +138,72 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
     }
 
     @Test
+    public void sanitisesInputs() {
+        String evil = "foo');insert into case users values(1,2,3);--";
+        when(authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds("PROBATE", "TestAddressBookCase", CAN_READ))
+            .thenReturn(asList(evil));
+
+        when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.GRANTED);
+        when(userAuthorisation.getUserId()).thenReturn(evil);
+
+        MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
+        final PaginatedSearchMetadata byMetaData = caseDetailsRepository.getPaginatedSearchMetadata(metadata, Maps.newHashMap());
+
+        // If any input is not correctly sanitized it will cause an exception since query result structure will not be as hibernate expects.
+        assertThat(byMetaData.getTotalResultsCount(), is(0));
+    }
+
+    @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
-    public void getfindByMetadataAndFieldDataReturnCorrectRecords() {
+    public void findByWildcardReturnCorrectRecords() {
+        ReflectionTestUtils.setField(applicationParams, "wildcardSearchAllowed", true);
+        MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
+
+        Map<String, String> params = Maps.newHashMap();
+        params.put("PersonFirstName", "%An%");
+        final PaginatedSearchMetadata byMetaData = caseDetailsRepository.getPaginatedSearchMetadata(metadata, params);
+        // See case types and citizen names in insert_cases.sql to understand this result.
+        assertThat(byMetaData.getTotalResultsCount(), is(5));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
+    public void getFindByMetadataReturnCorrectRecords() {
+        assumeDataInitialised();
+
+        MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
+        final PaginatedSearchMetadata byMetaData = caseDetailsRepository.getPaginatedSearchMetadata(metadata, Maps.newHashMap());
+        assertThat(byMetaData.getTotalResultsCount(), is(7));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
+    public void getFindByMetadataAndFieldDataSortDesc() {
+        assumeDataInitialised();
+
+        MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
+        metadata.setSortDirection(Optional.of("Asc"));
+        SortOrderField sortOrderField = SortOrderField.sortOrderWith()
+            .caseFieldId("[LAST_MODIFIED_DATE]")
+            .metadata(true)
+            .direction("DESC")
+            .build();
+        metadata.addSortOrderField(sortOrderField);
+
+        HashMap<String, String> searchParams = new HashMap<>();
+        searchParams.put("PersonFirstName", "Janet");
+        final List<CaseDetails> byMetaDataAndFieldData = caseDetailsRepository.findByMetaDataAndFieldData(metadata,
+            searchParams);
+
+        // See the timestamps in insert_cases.sql.
+        // Should be ordered by last modified desc, creation date asc.
+        assertThat(byMetaDataAndFieldData.get(0).getId(), is("16"));
+        assertThat(byMetaDataAndFieldData.get(1).getId(), is("1"));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
+    public void getFindByMetadataAndFieldDataReturnCorrectRecords() {
         assumeDataInitialised();
 
         MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
@@ -134,7 +213,7 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
                                                                                                           searchParams);
         assertAll(
             () -> assertThat(byMetaDataAndFieldData.size(), is(2)),
-            () -> assertThat(byMetaDataAndFieldData.get(0).getId(), is(1L)),
+            () -> assertThat(byMetaDataAndFieldData.get(0).getId(), is("1")),
             () -> assertThat(byMetaDataAndFieldData.get(0).getJurisdiction(), is("PROBATE")),
             () -> assertThat(byMetaDataAndFieldData.get(0).getState(), is("CaseCreated")),
             () -> assertThat(byMetaDataAndFieldData.get(0).getCaseTypeId(), is("TestAddressBookCase")),
@@ -144,7 +223,8 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
             () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonLastName").asText(), is("Parker")),
             () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonAddress").get("AddressLine1").asText(), is("123")),
             () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonAddress").get("AddressLine2").asText(), is("Fake Street")),
-            () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonAddress").get("AddressLine3").asText(), is("Hexton"))
+            () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonAddress").get("AddressLine3").asText(), is("Hexton")),
+            () -> verify(authorisedCaseDefinitionDataService).getUserAuthorisedCaseStateIds("PROBATE", "TestAddressBookCase", CAN_READ)
         );
     }
 
@@ -184,7 +264,7 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
         // Check that we have the expected test data set size, this is to ensure
         // that state filtering is correct
         final List<CaseDetails> resultList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect data initiation", 16, resultList.size());
+        assertEquals("Incorrect data initiation", NUMBER_OF_CASES, resultList.size());
     }
 
     @Test
@@ -199,11 +279,11 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
         assertAll(
             () -> assertThat(results, hasSize(2)),
             () -> assertThat(results, hasItem(allOf(
-                hasProperty("id", equalTo(1L)),
+                hasProperty("id", equalTo("1")),
                 hasProperty("reference", equalTo(1504259907353529L))
             ))),
             () -> assertThat(results, hasItem(allOf(
-                hasProperty("id", equalTo(16L)),
+                hasProperty("id", equalTo("16")),
                 hasProperty("reference", equalTo(1504254784737847L))
             )))
         );
@@ -227,10 +307,27 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
         assertAll(
             () -> assertThat(results, hasSize(1)),
             () -> assertThat(results, hasItem(allOf(
-                hasProperty("id", equalTo(16L)),
+                hasProperty("id", equalTo("16")),
                 hasProperty("reference", equalTo(1504254784737847L))
             )))
         );
+        assertThat(caseDetailsRepository.getPaginatedSearchMetadata(metadata, searchParams).getTotalResultsCount(), is(1));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {
+        "classpath:sql/insert_cases.sql",
+        "classpath:sql/insert_case_with_restricted_state.sql"
+    })
+    public void searchWithParams_restrictedStates() {
+        when(authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds("PROBATE", "TestAddressBookCase", CAN_READ))
+            .thenReturn(asList("CaseRestricted"));
+
+        MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
+        final List<CaseDetails> results = caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap());
+
+        assertThat(results.size(), is(1));
+        assertThat(results.get(0).getReference(), is(1504254784737848L));
     }
 
     @Test
@@ -240,7 +337,7 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
 
         final CaseDetails caseDetails = maybeCase.orElseThrow(() -> new AssertionError("No case found"));
 
-        assertCaseDetails(caseDetails, 1L, JURISDICTION, REFERENCE);
+        assertCaseDetails(caseDetails, "1", JURISDICTION, REFERENCE);
     }
 
     @Test
@@ -259,7 +356,17 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
         MatcherAssert.assertThat(maybeCase.isPresent(), is(false));
     }
 
-    private void assertCaseDetails(CaseDetails caseDetails, Long id, String jurisdictionId, Long caseReference) {
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void findByReferenceWithoutJurisdiction() {
+        final Optional<CaseDetails> maybeCase = caseDetailsRepository.findByReference(REFERENCE.toString());
+
+        final CaseDetails caseDetails = maybeCase.orElseThrow(() -> new AssertionError("No case found"));
+
+        assertCaseDetails(caseDetails, "1", JURISDICTION, REFERENCE);
+    }
+
+    private void assertCaseDetails(CaseDetails caseDetails, String id, String jurisdictionId, Long caseReference) {
         MatcherAssert.assertThat(caseDetails.getId(), equalTo(id));
         MatcherAssert.assertThat(caseDetails.getJurisdiction(), equalTo(jurisdictionId));
         MatcherAssert.assertThat(caseDetails.getReference(), equalTo(caseReference));

@@ -1,24 +1,27 @@
 package uk.gov.hmcts.ccd.domain.types;
 
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.List;
+
+import static java.math.BigDecimal.ONE;
+import static org.hamcrest.Matchers.emptyCollectionOf;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.List;
-
-import static java.math.BigDecimal.ONE;
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
-
 public class CollectionValidatorTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final String TYPE_TEXT = "Text";
-    private static final String TYPE_COLLECTION = "Collection";
     private static final String CASE_FIELD_ID = "Aliases";
 
     private CollectionValidator validator;
@@ -34,7 +37,7 @@ public class CollectionValidatorTest {
 
         final FieldType fieldType = new FieldType();
         fieldType.setId(TYPE_TEXT);
-        fieldType.setType(TYPE_COLLECTION);
+        fieldType.setType(COLLECTION);
         fieldType.setCollectionFieldType(collectionFieldType);
 
         caseField = new CaseField();

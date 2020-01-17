@@ -1,14 +1,21 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import java.util.Map;
+import java.util.Optional;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
+import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-
-import java.util.Map;
+import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 // TODO CaseService and CaseDataService could probably be merged together.
 @Service
@@ -17,10 +24,16 @@ public class CaseService {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final CaseDataService caseDataService;
+    private final CaseDetailsRepository caseDetailsRepository;
+    private final UIDService uidService;
 
     @Autowired
-    public CaseService(CaseDataService caseDataService) {
+    public CaseService(CaseDataService caseDataService,
+                       @Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
+                       UIDService uidService) {
         this.caseDataService = caseDataService;
+        this.caseDetailsRepository = caseDetailsRepository;
+        this.uidService = uidService;
     }
 
     /**
@@ -35,7 +48,7 @@ public class CaseService {
     }
 
     /**
-     * @param caseTypeId     caseTypeId of new case details
+     * @param caseTypeId caseTypeId of new case details
      * @param jurisdictionId jurisdictionId of new case details
      * @return <code>CaseDetails</code> - new case details object
      */
@@ -45,6 +58,17 @@ public class CaseService {
         caseDetails.setJurisdiction(jurisdictionId);
         caseDetails.setData(data == null ? Maps.newHashMap() : data);
         return caseDetails;
+    }
+
+    /**
+     * @param content Data received from the client.
+     * @param caseDetails of the case.
+     * @return <code>Optional&lt;CaseDetails&gt;<code/> - CaseDetails wrapped in Optional
+     */
+    public CaseDetails populateCurrentCaseDetailsWithEventFields(CaseDataContent content, CaseDetails caseDetails) {
+
+            content.getEventData().forEach((key, value) -> caseDetails.getData().put(key, value));
+            return caseDetails;
     }
 
     public CaseDetails clone(CaseDetails source) {
@@ -62,6 +86,14 @@ public class CaseService {
         clone.setDataClassification(caseDataService.cloneDataMap(source.getDataClassification()));
 
         return clone;
+    }
+
+    public CaseDetails getCaseDetails(String jurisdictionId, String caseReference) {
+        if (!uidService.validateUID(caseReference)) {
+            throw new BadRequestException("Case reference is not valid");
+        }
+        final Optional<CaseDetails> caseDetails = caseDetailsRepository.findByReference(jurisdictionId, Long.valueOf(caseReference));
+        return caseDetails.orElseThrow(() -> new ResourceNotFoundException("No case exist with id=" + caseReference));
     }
 
 }

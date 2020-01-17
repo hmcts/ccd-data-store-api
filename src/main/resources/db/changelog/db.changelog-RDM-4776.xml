@@ -1,0 +1,20 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+
+    <changeSet id="rdm-4776" author="dwayne.bailey@hmcts.net">
+        <sql dbms="postgresql"
+             endDelimiter="\nGO"
+             splitStatements="true"
+             stripComments="true">
+            CREATE INDEX idx_case_data__subscription_appointeesubscription_tya ON public.case_data USING BTREE ((TRIM(UPPER(data#>>'{subscriptions,appointeeSubscription,tya}'))));
+            CREATE INDEX idx_case_data__subscription_representativesubscription_tya ON public.case_data USING BTREE ((TRIM(UPPER(data#>>'{subscriptions,representativeSubscription,tya}'))));
+            CREATE INDEX idx_case_data__deceased_surname ON public.case_data USING BTREE ((TRIM(UPPER(data#>>'{deceasedSurname}'))));
+            CREATE INDEX idx_case_data__registry_location ON public.case_data USING BTREE ((TRIM(UPPER(data#>>'{registryLocation}'))));
+            CREATE INDEX idx_case_data__evidence_handled ON public.case_data USING BTREE ((TRIM(UPPER(data#>>'{evidenceHandled}'))));
+            CREATE INDEX idx_case_data__grant_issued_date ON public.case_data USING BTREE ((TRIM(UPPER(data#>>'{grantIssuedDate}'))));
+            CREATE INDEX idx_case_data__generated_dob ON public.case_data USING BTREE ((TRIM(UPPER(data#>>'{generatedDOB}'))));
+        </sql>
+    </changeSet>
+</databaseChangeLog>

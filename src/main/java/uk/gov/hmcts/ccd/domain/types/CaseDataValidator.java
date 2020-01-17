@@ -1,25 +1,26 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+
 @Named
 @Singleton
 public class CaseDataValidator {
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
+    private static final TypeReference<HashMap<String, JsonNode>> STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
     };
-    private static final String COMPLEX_TYPE = "Complex";
-    private static final String COLLECTION_TYPE = "Collection";
     private static final String EMPTY_STRING = "";
     private static final String FIELD_SEPARATOR = ".";
 
@@ -63,12 +64,12 @@ public class CaseDataValidator {
 
         final BaseType fieldType = BaseType.get(caseFieldType);
 
-        if (BaseType.get(COMPLEX_TYPE) == fieldType) {
+        if (BaseType.get(COMPLEX) == fieldType) {
             return validate(
                 MAPPER.convertValue(dataValue, STRING_JSON_MAP),
                 caseFieldDefinition.getFieldType().getComplexFields(),
                 fieldIdPrefix + dataFieldId + FIELD_SEPARATOR);
-        } else if (BaseType.get(COLLECTION_TYPE) == fieldType) {
+        } else if (BaseType.get(COLLECTION) == fieldType) {
             final List<ValidationResult> validationResults = validateSimpleField(dataFieldId, dataValue, caseFieldDefinition, fieldIdPrefix, fieldType);
             final Iterator<JsonNode> collectionIterator = dataValue.iterator();
 
@@ -115,7 +116,7 @@ public class CaseDataValidator {
             return Collections.emptyList();
         }
 
-        if (itemValue.isValueNode()) {
+        if (shouldTreatAsValueNode(fieldType, itemValue)) {
             if (!BaseType.contains(fieldType.getType())) {
                 return Collections.singletonList(new ValidationResult("Unknown Type:" + fieldType.getType(), itemFieldId));
             }
@@ -134,6 +135,10 @@ public class CaseDataValidator {
         }
 
         return Collections.singletonList(new ValidationResult("Unsupported collection item:" + itemValue.toString(), itemFieldId));
+    }
+
+    private boolean shouldTreatAsValueNode(FieldType fieldType, JsonNode itemValue) {
+        return itemValue.isValueNode() || fieldType.getType().equalsIgnoreCase(DocumentValidator.TYPE_ID);
     }
 }
 

@@ -1,5 +1,25 @@
 package uk.gov.hmcts.ccd.endpoint.ui;
 
+import javax.inject.Inject;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.notFound;
+import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.doReturn;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.tomakehurst.wiremock.client.WireMock;
@@ -25,19 +45,6 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.endpoint.CallbackTestData;
-
-import javax.inject.Inject;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static org.hamcrest.Matchers.*;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.doReturn;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
 
 public class CallbackTest extends WireMockBaseTest {
     private final JsonNode CALLBACK_DATA = mapper.readTree(
@@ -118,10 +125,10 @@ public class CallbackTest extends WireMockBaseTest {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_TEST_PUBLIC);
 
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
-        System.out.println(CallbackTestData.getTestDefinition(wireMockRule.port()));
-        wireMockRule.stubFor(get(urlMatching("/api/data/case-type/CallbackCase"))
-            .willReturn(okJson(CallbackTestData.getTestDefinition(wireMockRule.port())).withStatus(200)));
-        wireMockRule.stubFor(WireMock.get(urlMatching("/api/display/wizard-page-structure.*"))
+        System.out.println(CallbackTestData.getTestDefinition(super.wiremockPort));
+        stubFor(get(urlMatching("/api/data/case-type/CallbackCase"))
+            .willReturn(okJson(CallbackTestData.getTestDefinition(super.wiremockPort)).withStatus(200)));
+        stubFor(WireMock.get(urlMatching("/api/display/wizard-page-structure.*"))
             .willReturn(okJson(mapper.writeValueAsString(wizardStructureResponse)).withStatus(200)));
     }
 
@@ -135,7 +142,7 @@ public class CallbackTest extends WireMockBaseTest {
         callbackResponse.setDataClassification(mapper.convertValue(CALLBACK_DATA_CLASSIFICATION, STRING_NODE_TYPE));
         callbackResponse.setSecurityClassification(PUBLIC);
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-start.*"))
+        stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
         final MvcResult mvcResult = mockMvc
@@ -159,7 +166,7 @@ public class CallbackTest extends WireMockBaseTest {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setErrors(Lists.newArrayList("Error"));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-start.*"))
+        stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
         final MvcResult mvcResult = mockMvc
@@ -178,7 +185,7 @@ public class CallbackTest extends WireMockBaseTest {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setWarnings(Lists.newArrayList("Warning"));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-start.*"))
+        stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
         final MvcResult mvcResult = mockMvc
@@ -197,7 +204,7 @@ public class CallbackTest extends WireMockBaseTest {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setWarnings(Lists.newArrayList("Warning"));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-start.*"))
+        stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
         final MvcResult mvcResult = mockMvc
@@ -221,7 +228,7 @@ public class CallbackTest extends WireMockBaseTest {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setData(mapper.convertValue(INVALID_CALLBACK_DATA, STRING_NODE_TYPE));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-start.*"))
+        stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
         final MvcResult mvcResult = mockMvc
@@ -240,7 +247,7 @@ public class CallbackTest extends WireMockBaseTest {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setData(mapper.convertValue(CALLBACK_DATA, STRING_NODE_TYPE));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-start.*"))
+        stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
         final MvcResult mvcResult = mockMvc
@@ -256,7 +263,7 @@ public class CallbackTest extends WireMockBaseTest {
     public void shouldReturn404WhenGetEventTriggerForCaseTypeWithInvalidCaseTypeId() throws Exception {
         final String URL = String.format("/aggregated/caseworkers/%d/jurisdictions/%s/case-types/%s/event-triggers/%s", USER_ID, JURISDICTION_ID, INVALID_CASE_TYPE_ID, CREATE_CASE_EVENT_TRIGGER_ID);
 
-        wireMockRule.stubFor(WireMock.get(urlMatching("/api/data/case-type/" + INVALID_CASE_TYPE_ID))
+        stubFor(WireMock.get(urlMatching("/api/data/case-type/" + INVALID_CASE_TYPE_ID))
             .willReturn(notFound()));
 
         mockMvc
@@ -284,7 +291,7 @@ public class CallbackTest extends WireMockBaseTest {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setData(mapper.convertValue(CALLBACK_DATA, STRING_NODE_TYPE));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-start.*"))
+        stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
         final MvcResult mvcResult = mockMvc
@@ -305,7 +312,7 @@ public class CallbackTest extends WireMockBaseTest {
         callbackResponse.setDataClassification(mapper.convertValue(CALLBACK_DATA_CLASSIFICATION, STRING_NODE_TYPE));
         callbackResponse.setSecurityClassification(PUBLIC);
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-start.*"))
+        stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
         final MvcResult mvcResult = mockMvc
@@ -329,7 +336,7 @@ public class CallbackTest extends WireMockBaseTest {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setErrors(Lists.newArrayList("Error"));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-start.*"))
+        stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
         final MvcResult mvcResult = mockMvc
@@ -348,7 +355,7 @@ public class CallbackTest extends WireMockBaseTest {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setWarnings(Lists.newArrayList("Warning"));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-start.*"))
+        stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
         final MvcResult mvcResult = mockMvc
@@ -367,7 +374,7 @@ public class CallbackTest extends WireMockBaseTest {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setWarnings(Lists.newArrayList("Warning"));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-start.*"))
+        stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
         final MvcResult mvcResult = mockMvc
@@ -391,7 +398,7 @@ public class CallbackTest extends WireMockBaseTest {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setData(mapper.convertValue(INVALID_CALLBACK_DATA, STRING_NODE_TYPE));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-start.*"))
+        stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
         final MvcResult mvcResult = mockMvc
@@ -410,7 +417,7 @@ public class CallbackTest extends WireMockBaseTest {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setData(mapper.convertValue(CALLBACK_DATA, STRING_NODE_TYPE));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-start.*"))
+        stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
         final MvcResult mvcResult = mockMvc
@@ -429,7 +436,7 @@ public class CallbackTest extends WireMockBaseTest {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setData(mapper.convertValue(CALLBACK_DATA, STRING_NODE_TYPE));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-start.*"))
+        stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
         final MvcResult mvcResult = mockMvc
@@ -448,7 +455,7 @@ public class CallbackTest extends WireMockBaseTest {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setData(mapper.convertValue(CALLBACK_DATA, STRING_NODE_TYPE));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-start.*"))
+        stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
         final MvcResult mvcResult = mockMvc
@@ -467,7 +474,7 @@ public class CallbackTest extends WireMockBaseTest {
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setData(mapper.convertValue(CALLBACK_DATA, STRING_NODE_TYPE));
 
-        wireMockRule.stubFor(WireMock.post(urlMatching("/before-start.*"))
+        stubFor(WireMock.post(urlMatching("/before-start.*"))
             .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(200)));
 
         final MvcResult mvcResult = mockMvc
@@ -494,7 +501,7 @@ public class CallbackTest extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
-    public void shouldReturn400WhenGetEventTriggerForCaseWithInvalidCaseId() throws Exception {
+    public void shouldReturn404WhenGetEventTriggerForCaseWithInvalidCaseId() throws Exception {
         final String URL = String.format("/aggregated/caseworkers/%d/jurisdictions/%s/case-types/%s/cases/%s/event-triggers/%s", USER_ID, JURISDICTION_ID, CASE_TYPE_ID, INVALID_CASE_REFERENCE, UPDATE_EVENT_TRIGGER_ID);
 
         final MvcResult mvcResult = mockMvc
@@ -502,22 +509,8 @@ public class CallbackTest extends WireMockBaseTest {
             .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
-        assertEquals(mvcResult.getResponse().getContentAsString(), 400, mvcResult.getResponse().getStatus());
+        assertEquals(mvcResult.getResponse().getContentAsString(), 404, mvcResult.getResponse().getStatus());
 
-    }
-
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
-    public void shouldReturn404WhenGetEventTriggerForCaseWithInvalidCaseTypeId() throws Exception {
-        final String URL = String.format("/aggregated/caseworkers/%d/jurisdictions/%s/case-types/%s/cases/%s/event-triggers/%s", USER_ID, JURISDICTION_ID, INVALID_CASE_TYPE_ID, CASE_REFERENCE, CREATE_CASE_EVENT_TRIGGER_ID);
-
-        wireMockRule.stubFor(WireMock.get(urlMatching("/api/data/case-type/" + INVALID_CASE_TYPE_ID))
-            .willReturn(notFound()));
-
-        mockMvc
-            .perform(MockMvcRequestBuilders.get(URL)
-            .contentType(JSON_CONTENT_TYPE))
-            .andExpect(status().is(404));
     }
 
     @Test

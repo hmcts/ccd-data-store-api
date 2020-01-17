@@ -37,24 +37,24 @@ class MetaDataTest {
     }
 
     @Test
-    void shouldBeEqualToItself(){
+    void shouldBeEqualToItself() {
         assertThat(classUnderTest.equals(classUnderTest), is(true));
 
     }
 
     @Test
-    void shouldReturnFalseIfCheckedWithNullObject(){
+    void shouldReturnFalseIfCheckedWithNullObject() {
         assertThat(classUnderTest.equals(null), is(false));
     }
 
     @Test
-    void shouldReturnFalseIfCheckedWithObjectOfOtherClass(){
+    void shouldReturnFalseIfCheckedWithObjectOfOtherClass() {
         Object o = new Object();
         assertThat(classUnderTest.equals(o), is(false));
     }
 
     @Test
-    void shouldReturnFalseIfCheckedWithDifferentModifiedDate(){
+    void shouldReturnFalseIfCheckedWithDifferentModifiedDate() {
         MetaData compare = new MetaData(CASE_TYPE_ID, JURISDICTION_ID);
         compare.setState(Optional.of(STATE));
         compare.setCaseReference(Optional.of(CASE_REFERENCE));
@@ -67,7 +67,7 @@ class MetaDataTest {
 
     @Test
     @DisplayName("Should return false if checked with different CreatedDate")
-    void shouldReturnFalseIfCheckedWithDifferentCreatedDate(){
+    void shouldReturnFalseIfCheckedWithDifferentCreatedDate() {
         MetaData compare = new MetaData(CASE_TYPE_ID, JURISDICTION_ID);
         compare.setState(Optional.of(STATE));
         compare.setCaseReference(Optional.of(CASE_REFERENCE));
@@ -79,7 +79,7 @@ class MetaDataTest {
     }
 
     @Test
-    void shouldReturnTrueIfCheckedWithIdenticalMetadata(){
+    void shouldReturnTrueIfCheckedWithIdenticalMetadata() {
         MetaData compare = new MetaData(CASE_TYPE_ID, JURISDICTION_ID);
         compare.setState(Optional.of(STATE));
         compare.setCaseReference(Optional.of(CASE_REFERENCE));

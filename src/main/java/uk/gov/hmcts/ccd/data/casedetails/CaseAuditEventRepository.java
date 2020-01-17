@@ -42,7 +42,7 @@ public class CaseAuditEventRepository {
 
     public List<AuditEvent> findByCase(final CaseDetails caseDetails) {
         final Query query = em.createNamedQuery(CaseAuditEventEntity.FIND_BY_CASE);
-        query.setParameter(CaseAuditEventEntity.CASE_DATA_ID, caseDetails.getId());
+        query.setParameter(CaseAuditEventEntity.CASE_DATA_ID, Long.valueOf(caseDetails.getId()));
 
         return caseAuditEventMapper.entityToModel(query.getResultList());
     }
@@ -50,7 +50,7 @@ public class CaseAuditEventRepository {
     public Optional<AuditEvent> getCreateEvent(CaseDetails caseDetails) {
         final Query query = em.createNamedQuery(CaseAuditEventEntity.FIND_CREATE_EVENT);
 
-        query.setParameter(CaseAuditEventEntity.CASE_DATA_ID, caseDetails.getId());
+        query.setParameter(CaseAuditEventEntity.CASE_DATA_ID, Long.valueOf(caseDetails.getId()));
         List<CaseAuditEventEntity> auditEvents = query.getResultList();
 
         return (auditEvents == null || auditEvents.size() == 0) ?

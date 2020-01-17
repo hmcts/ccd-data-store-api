@@ -1,12 +1,9 @@
 buildscript {
-    dependencies {
-        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.2.0'
+    ext {
+        springBootVersion = '2.1.4.RELEASE'
     }
     dependencies {
         classpath 'org.jsonschema2pojo:jsonschema2pojo-gradle-plugin:0.5.1'
-    }
-    dependencies {
-        classpath 'gradle.plugin.com.github.spotbugs:gradlePlugin:1.6.0'
     }
     dependencies {
         classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.6.2'
@@ -14,39 +11,46 @@ buildscript {
     dependencies {
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.2'
     }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
 }
 
 plugins {
     id 'application'
-    id 'io.spring.dependency-management' version '1.0.5.RELEASE'
-    id 'org.springframework.boot' version '1.5.14.RELEASE'
     id 'com.github.ben-manes.versions' version '0.20.0'
     id 'org.sonarqube' version '2.6.2'
     id 'jacoco'
     id 'checkstyle'
     id 'com.github.kt3k.coveralls' version '2.8.2'
-    id 'se.patrikerdes.use-latest-versions' version '0.2.3'
-    id 'org.owasp.dependencycheck' version '3.2.1'
+    id 'se.patrikerdes.use-latest-versions' version '0.2.7'
+    id 'org.owasp.dependencycheck' version '5.1.0'
+    id 'com.github.spotbugs' version '1.6.9'
+    id 'net.ltgt.apt' version '0.21'
 }
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
+apply plugin: 'net.ltgt.apt-idea'
 apply plugin: 'application'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
 apply plugin: 'org.sonarqube'
 apply plugin: 'jsonschema2pojo'
-apply plugin: 'org.junit.platform.gradle.plugin'
 apply plugin: 'jacoco'
 apply plugin: 'checkstyle'
 apply plugin: 'pmd'
-apply plugin: 'com.github.spotbugs'
 apply plugin: 'com.github.kt3k.coveralls'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'se.patrikerdes.use-latest-versions'
 apply plugin: 'org.owasp.dependencycheck'
 
 apply from: 'liquibase.gradle'
+
+pmd {
+    toolVersion = '6.11.0'
+}
 
 dependencyUpdates.resolutionStrategy = {
     componentSelection { rules ->
@@ -83,56 +87,54 @@ dependencyCheck {
         // Disable scanning of .NET related binaries
         assemblyEnabled = false
     }
+    // These are non-runtime configurations used during the build.
+    skipConfigurations = ['codacy', 'spotbugs']
 }
 
 mainClassName = 'uk.gov.hmcts.ccd.CoreCaseDataApplication'
 
 // tag::repositories[]
 repositories {
-// https://github.com/hmcts/java-logging/blob/master/java-logging-appinsights/README.md
-    maven {
-        url  'https://dl.bintray.com/hmcts/hmcts-maven'
-    }
     mavenLocal()
+    mavenCentral()
     jcenter()
+    maven {
+        url 'https://dl.bintray.com/hmcts/hmcts-maven'
+    }
 }
 // end::repositories[]
 
 ext {
-    junitVersion = '4.12'
-    junitJupiterVersion = '5.1.1'
-    junitVintageVersion = '5.1.1'
-    junitPlatformVersion = '1.1.1'
-    hibernateVersion = '5.2.16.Final'
-    reformLogging = '2.2.1'
-    swagger2Version = '2.9.0'
+    junitJupiterVersion = '5.2.0'
+    junitVintageVersion = '5.2.0'
+    hibernateVersion = '5.2.18.Final'
+    powermockVersion = '2.0.0-beta.5'
+    reformLogging = '5.1.0'
+    appInsightsVersion = '2.4.1'
+    swagger2Version = '2.9.2'
     limits = [
-            'instruction': 84,
-            'branch'     : 72,  // TODO needs code update
-            'line'       : 85,
-            'complexity' : 80,
-            'method'     : 88,
-            'class'      : 88
+            'instruction': 90,
+            'branch'     : 85,
+            'line'       : 90,
+            'complexity' : 88,
+            'method'     : 90,
+            'class'      : 98
     ]
-    appInsights= '2.0.1'
+    appInsights = '2.0.1'
+    springCloudVersion = 'Greenwich.RELEASE'
 }
 
 group 'uk.gov.hmcts.ccd'
 version '1.2.0-SNAPSHOT'
 
-// tag::jar[]
-jar {
+bootJar {
     baseName = 'core-case-data'
     manifest {
         attributes 'Implementation-Title': project.name,
                 'Implementation-Version': project.version
     }
-    configurations {
-        jar.archiveName = 'core-case-data.jar'
-    }
+    archiveName = 'core-case-data.jar'
 }
-
-// end::jar[]
 
 // tag::dependencies[]
 sourceCompatibility = 1.8
@@ -140,19 +142,16 @@ targetCompatibility = 1.8
 
 configurations {
     providedRuntime
+    annotationProcessor
 //    runtime.exclude group: 'com.microsoft.azure', module: 'applicationinsights-agent'
 
     aatCompile.extendsFrom(testCompile)
     aatRuntime.extendsFrom(testRuntime)
 }
 
-junitPlatform {
-    enableStandardTestTask true
-}
-
 checkstyle {
-    maxWarnings = 99999  // In the Ideal world this should be 0
-    toolVersion = '8.8'
+    maxWarnings = 2934 // In the Ideal world this should be 0
+    toolVersion = '8.18'
 }
 
 checkstyleMain.shouldRunAfter(compileJava)
@@ -165,69 +164,89 @@ tasks.withType(com.github.spotbugs.SpotBugsTask) {
     }
 }
 
-// Delete me once there is no more bug
 spotbugs {
     ignoreFailures = true
 }
 
 dependencies {
-    compile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: reformLogging
-    compile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: reformLogging
-    compileOnly 'org.projectlombok:lombok:1.18.0'
+    compile group: 'uk.gov.hmcts.reform', name: 'logging', version: reformLogging
+    compile group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: reformLogging
 
-    // Needs to explicitly bring in a different hibernate version as in pom.xml
+    // redefining with version 2.4.1 as applicationinsights-agent-2.5.0 has an open issue
+    // https://github.com/glowroot/instrumentation/issues/1
+    compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-logback', version: appInsightsVersion
+    compile group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: appInsightsVersion
+
+    compile 'uk.gov.hmcts.reform:properties-volume-spring-boot-starter:0.0.4'
+    compile 'uk.gov.hmcts.reform:health-spring-boot-starter:0.0.3'
+    compile 'org.projectlombok:lombok:1.18.4'
+    implementation 'org.mapstruct:mapstruct-jdk8:1.3.0.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.2.0.Final', 'org.projectlombok:lombok:1.18.4'
+    testAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.2.0.Final', 'org.projectlombok:lombok:1.18.4'
+
+//     Needs to explicitly bring in a different hibernate version as in pom.xml
     compile "org.hibernate:hibernate-core:${hibernateVersion}"
     compile "org.hibernate:hibernate-entitymanager:${hibernateVersion}"
 
-    compile("org.springframework.boot:spring-boot-starter")
+    compile('org.springframework.boot:spring-boot-starter-actuator')
 
     compile("org.springframework.boot:spring-boot-starter-data-jpa") {
         exclude group: 'org.hibernate', module: 'hibernate-core'
         exclude group: 'org.hibernate', module: 'hibernate-entitymanager'
     }
-
+    compile('org.springframework.boot:spring-boot-starter-hateoas')
     compile(group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc') {
         exclude group: 'org.apache.tomcat', module: 'tomcat-jdbc'
     }
-    compile("org.springframework.boot:spring-boot-starter-cache")
+    compile('org.springframework.boot:spring-boot-starter-web')
+    compile('org.springframework.cloud:spring-cloud-starter-openfeign')
+    compile('org.springframework.retry:spring-retry')
+    compile('org.springframework.boot:spring-boot-starter-cache')
     compile group: 'com.hazelcast', name: 'hazelcast'
     compile group: 'com.hazelcast', name: 'hazelcast-spring'
 
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
-    compile("org.springframework.boot:spring-boot-starter-web")
-    compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.2.RELEASE'
     compile group: 'javax.inject', name: 'javax.inject', version: '1'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.1'
     compile group: 'io.springfox', name: 'springfox-swagger2', version: swagger2Version
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: swagger2Version
-    compile group: 'org.liquibase', name: 'liquibase-core', version: '3.5.5'
-    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.5'
-    compile group: 'uk.gov.hmcts.reform.auth', name: 'auth-checker-lib', version: '2.1.3'
-    compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '0.6.0'
+    compile group: 'org.liquibase', name: 'liquibase-core', version: '3.6.3'
+    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.10'
+    compile (group: 'uk.gov.hmcts.reform.auth', name: 'auth-checker-lib', version: '2.1.3') {
+        // TODO remove when auth-checker-lib upgrades its dependency to spring boot 2.0.x
+        exclude group: 'uk.gov.hmcts.reform', module: 'java-logging-spring'
+    }
+    compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '2.0.0'
     compile group: 'com.sun.mail', name: 'mailapi', version: '1.6.1'
     compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
+    compile group: 'commons-validator', name: 'commons-validator', version: '1.6'
+    // CVE-2019-10086 force update of commons-beanutils.
+    compile group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
+    compile group: 'com.jayway.jsonpath', name: 'json-path', version: '2.4.0'
+    compile group: 'org.awaitility', name: 'awaitility', version: '3.1.6'
 
+    // CVE-2019-12086 - force update of jackson-databind - remove when dependencies move off <2.9.9
+    compile "com.fasterxml.jackson.core:jackson-databind:2.9.10.1"
 
     // FIXME 0.6 doesn't support jsonb; 0.7 doesn't work on Windows
 //    runtime group: 'com.impossibl.pgjdbc-ng', name: 'pgjdbc-ng', version: '0.6'
-    runtime group: 'org.postgresql', name: 'postgresql', version: '42.2.2'
+    runtime group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
     runtime group: 'com.zaxxer', name: 'HikariCP', version: '2.7.9'
 
-    testCompile "junit:junit"
-    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
-    testCompile group: 'com.opentable.components', name: 'otj-pg-embedded', version: '0.12.0'
-    testCompile group: 'com.github.tomakehurst', name: 'wiremock', version: '2.17.0'
-//    testCompile group: 'com.github.tomakehurst', name: 'wiremock', version: '2.18.0'
-    testCompile group: 'org.springframework.cloud', name: 'spring-cloud-contract-wiremock', version: '1.2.4.RELEASE'
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
+    testImplementation('org.springframework.cloud:spring-cloud-starter-contract-stub-runner')
+    testCompile ('com.opentable.components:otj-pg-embedded:0.12.0')
+    testCompile ('com.github.tomakehurst:wiremock-jre8:2.21.0')
+    testCompile ('org.springframework.cloud:spring-cloud-contract-wiremock:2.1.0.RELEASE')
     // To avoid compiler warnings about @API annotations in JUnit5 code.
     testCompileOnly 'org.apiguardian:apiguardian-api:1.0.0'
     testCompile "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
     testRuntime "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
-    testCompile "org.junit.platform:junit-platform-suite-api:${junitPlatformVersion}"
-    testCompile "org.junit.platform:junit-platform-runner:${junitPlatformVersion}"
-    testRuntime "org.junit.platform:junit-platform-launcher:${junitPlatformVersion}"
     testRuntime "org.junit.vintage:junit-vintage-engine:${junitVintageVersion}"
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '1.10.19'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '2.24.0'
+    testCompile group:'org.mockito', name: 'mockito-junit-jupiter', version:'2.24.0'
+    testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: powermockVersion
+    testCompile group: 'org.powermock', name: 'powermock-module-junit4', version: powermockVersion
     testCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.1.0'
     testCompile group: 'com.xebialabs.restito', name: 'restito', version: '0.9.3'
     testCompile 'io.github.openfeign:feign-jackson:9.7.0'
@@ -236,19 +255,62 @@ dependencies {
     testCompile group: 'org.openid4java', name: 'openid4java', version: '1.0.0'
     // remove me once insights is in
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+
+    //excluding log4j-core which causes a vulnerability issue
+    compile(group: 'io.searchbox', name: 'jest', version: '6.3.1') {
+        exclude group: 'org.apache.logging.log4j', module: 'log4j-core'
+    }
+    compile(group: 'org.elasticsearch', name: 'elasticsearch', version: '6.4.2') {
+        exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
+    }
+    compile 'org.jooq:jool-java-8:0.9.14'
 }
 // end::dependencies[]
 
-// tag::wrapper[]
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.6'
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+
+    dependencies {
+        // Versions prior to 24.1.1 vulnerable to CVE-2018-10237
+        dependency 'com.google.guava:guava:24.1.1-jre'
+
+        // CVE-2019-0232 - Java and Command Line injections in Windows
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.30') {
+            entry 'tomcat-embed-core'
+            entry 'tomcat-embed-el'
+            entry 'tomcat-embed-websocket'
+        }
+         // CVE-2019-10086
+        dependencySet(group: 'commons-beanutils', version: '1.9.4') {
+            entry 'commons-beanutils'
+        }
+    }
 }
-// end::wrapper[]
 
 task projectVersion {
     description 'Prints the version of this project; used for publishing JAR file'
     doLast {
         print project.version
+    }
+}
+
+idea {
+    project {
+        // experimental: whether annotation processing will be configured in the IDE; only actually used with the 'idea' task.
+        configureAnnotationProcessing = true
+    }
+    module {
+        apt {
+            // whether generated sources dirs are added as generated sources root
+            addGeneratedSourcesDirs = true
+            // whether the annotationProcessor/apt and testAnnotationProcessor/testApt dependencies are added as module dependencies
+            addAptDependencies = true
+
+            // the dependency scope used for apt and/or compileOnly dependencies (when enabled above)
+            mainDependenciesScope = "PROVIDED" // defaults to "COMPILE" when using the Gradle integration in IntelliJ IDEA
+        }
     }
 }
 
@@ -422,31 +484,23 @@ jacoco {
     toolVersion = "0.8.0"
 }
 
-project.afterEvaluate {
-    def junitPlatformTestTask = project.tasks.getByName('junitPlatformTest')
-
-    // configure jacoco to analyze the junitPlatformTest task
-    jacoco {
-        // IDE may give warning but this is required for now, for the world of Junit5, Gradle and sonar
-        applyTo junitPlatformTestTask
-    }
-
-    // create junit platform jacoco task
-    project.task(type: JacocoReport, "junitPlatformJacocoReport",
-            {
-                executionData junitPlatformTestTask
-            })
-}
-
 sonarqube {
     properties {
-        property "sonar.exclusions", "build/generated-sources/**/*.java"
-        property "sonar.coverage.exclusions", "src/main/java/uk/gov/hmcts/ccd/data/definition/DefaultCaseDefinitionRepository.java,src/main/java/uk/gov/hmcts/ccd/AppInsights.java"
+        property "sonar.exclusions", "build/generated-sources/**/*.java,**/service/doclink/**"
+        property "sonar.coverage.exclusions", "src/main/java/uk/gov/hmcts/ccd/data/definition/DefaultCaseDefinitionRepository.java,src/main/java/uk/gov/hmcts/ccd/AppInsights.java,**/DocLinksRestoreEndpoint.java,**/service/doclink/**"
         property "sonar.jacoco.reportPaths", "${project.buildDir}/jacoco/junitPlatformTest.exec"
         property "sonar.junit.reportPaths", "${project.buildDir}/test-results/junit-platform"
         property "sonar.projectName", "ccd-data-store-api"
         property "sonar.projectKey", "ccd-data-store-api"
     }
+}
+
+compileJava {
+    options.annotationProcessorPath = configurations.annotationProcessor
+}
+
+compileTestJava {
+    options.annotationProcessorPath = configurations.annotationProcessor
 }
 
 // adopted from
@@ -464,7 +518,10 @@ jacocoTestReport {
 
     afterEvaluate {
         classDirectories = files(classDirectories.files.collect {
-            fileTree(dir: it, exclude: ['uk/gov/hmcts/ccd/domain/types/sanitiser/document/**'])
+            fileTree(dir: it, exclude: ['uk/gov/hmcts/ccd/domain/types/sanitiser/document/**',
+                                        '**/service/doclink/**',
+                                        '**/domain/model/definition/CaseEventFieldComplex**',
+                                        '**/domain/model/definition/DisplayContext**'])
         })
     }
 
@@ -510,29 +567,35 @@ jacocoTestReport {
             }
             logger.quiet("---------------------------------------------------------------")
             throw new GradleException("Code coverage failed")
-        } else{
+        } else {
             logger.quiet("Passed Code Coverage Checks")
         }
     }
 }
 
-junitPlatformTest {
-    environment("APPINSIGHTS_INSTRUMENTATIONKEY", "some-key")
-    doFirst {
-        logger.lifecycle("junit platform test cases started {}", timestamp())
-    }
-    doLast {
-        logger.lifecycle("junit platform test cases finished {}", timestamp())
-    }
-}
-
 test {
-    environment("APPINSIGHTS_INSTRUMENTATIONKEY", "some-key")
-    doFirst {
-        logger.lifecycle("junit 4 test cases started {}", timestamp())
+    environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
+
+    useJUnitPlatform()
+
+    testLogging {
+        // set options for log level LIFECYCLE
+        events "failed"
+        exceptionFormat "short"
+
+        // set options for log level DEBUG
+        debug {
+            events "passed", "started", "skipped", "failed"
+            exceptionFormat "full"
+        }
+
+        // remove standard output/error logging from --info builds
+        // by assigning only 'failed' and 'skipped' events
+        info.events = ["failed", "skipped"]
     }
-    doLast {
-        logger.lifecycle("junit 4 test cases finished {}", timestamp())
+
+    reports {
+        html.enabled = true
     }
 }
 
@@ -556,13 +619,14 @@ task smoke(type: Test) {
     systemProperty "https.proxyHost", System.getProperty('https.proxyHost')
     systemProperty "https.proxyPort", System.getProperty('https.proxyPort')
 
-    environment("APPINSIGHTS_INSTRUMENTATIONKEY", "some-key")
+    environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
 
     group = 'Delivery pipeline'
     description = 'Executes smoke tests against an AAT CCD Data Store instance'
     setTestClassesDirs(sourceSets.aat.output.classesDirs)
     setClasspath(sourceSets.aat.runtimeClasspath)
     include "uk/gov/hmcts/ccd/datastore/tests/functional/**"
+    include "uk/gov/hmcts/ccd/datastore/tests/v2/**"
     useJUnitPlatform {
         includeTags 'smoke'
     }
@@ -575,13 +639,14 @@ task functional(type: Test) {
     systemProperty "https.proxyHost", System.getProperty('https.proxyHost')
     systemProperty "https.proxyPort", System.getProperty('https.proxyPort')
 
-    environment("APPINSIGHTS_INSTRUMENTATIONKEY", "some-key")
+    environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
 
     group = 'Delivery pipeline'
     description = 'Executes functional tests against an AAT CCD Data Store instance'
     setTestClassesDirs(sourceSets.aat.output.classesDirs)
     setClasspath(sourceSets.aat.runtimeClasspath)
     include "uk/gov/hmcts/ccd/datastore/tests/functional/**"
+    include "uk/gov/hmcts/ccd/datastore/tests/v2/**"
     useJUnitPlatform()
 }
 
@@ -624,4 +689,7 @@ task sendCoverageToCodacy(type: JavaExec, dependsOn: jacocoTestReport) {
     ]
 }
 
-
+task installDist(overwrite: true) {
+    // This task must be overwritten to do as it's breaking JAR packaging and it's a mandatory step of swagger
+    // documentation publication.
+}

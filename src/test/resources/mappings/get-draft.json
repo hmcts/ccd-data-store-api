@@ -1,0 +1,42 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/drafts/5"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "id": "5",
+      "document": {
+        "userId":"25",
+        "jurisdictionId":"PROBATE",
+        "caseTypeId":"TestAddressBookCase",
+        "eventTriggerId":"createCase",
+        "caseDataContent" : {
+          "event": {
+            "id": "createCase",
+            "summary": "Create Case",
+            "description": "This event will create a new case"
+          },
+          "data": {
+            "PersonFirstName": "John",
+            "PersonLastName": "Smith"
+          },
+          "data_classification": {
+            "PersonFirstName": "PRIVATE",
+            "PersonLastName": "PRIVATE"
+          },
+          "security_classification":"PRIVATE",
+          "event_token": "testToken",
+          "ignore_warning": true
+        }
+      },
+      "type": "caseDataContent",
+      "created": "2018-06-06T19:13:55.882+01:00[Europe/London]",
+      "updated": "2018-06-06T19:18:55.882+01:00[Europe/London]"
+    }
+  }
+}

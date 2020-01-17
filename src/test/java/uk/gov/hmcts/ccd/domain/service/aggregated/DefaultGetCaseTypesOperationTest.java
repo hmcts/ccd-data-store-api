@@ -17,7 +17,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.*;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.aCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 
 class DefaultGetCaseTypesOperationTest {
 
@@ -36,9 +36,9 @@ class DefaultGetCaseTypesOperationTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-        testCaseType1 = aCaseType().build();
-        testCaseType2 = aCaseType().build();
-        testCaseType3 = aCaseType().build();
+        testCaseType1 = newCaseType().build();
+        testCaseType2 = newCaseType().build();
+        testCaseType3 = newCaseType().build();
         defaultGetCaseTypesOperation = new DefaultGetCaseTypesOperation(caseTypeService);
         testCaseTypes = Lists.newArrayList(testCaseType1, testCaseType2, testCaseType3);
         doReturn(testCaseTypes).when(caseTypeService).getCaseTypesForJurisdiction(JURISDICTION_ID);

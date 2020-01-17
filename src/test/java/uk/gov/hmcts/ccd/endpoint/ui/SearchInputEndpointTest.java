@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.endpoint.ui;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.springframework.http.MediaType;

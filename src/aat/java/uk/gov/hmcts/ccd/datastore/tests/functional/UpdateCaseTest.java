@@ -1,96 +1,286 @@
 package uk.gov.hmcts.ccd.datastore.tests.functional;
 
+import static org.hamcrest.Matchers.equalTo;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.JURISDICTION;
+
 import io.restassured.http.ContentType;
-import io.restassured.specification.RequestSpecification;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.BaseTest;
-import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
-import uk.gov.hmcts.ccd.domain.model.std.Event;
-import java.util.function.Supplier;
+import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder;
+import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder.FullCase;
+import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CaseData;
+import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event;
+import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.State;
+import uk.gov.hmcts.ccd.datastore.tests.helper.CaseTestDataLoaderExtension;
 
+@ExtendWith(CaseTestDataLoaderExtension.class)
+@DisplayName("Update case")
 class UpdateCaseTest extends BaseTest {
 
+    private static final String UPDATED_NUMBER = "4732";
 
-    private static final String EVENT_UPDATE = "START_PROGRESS";
-    private static final String JURISDICTION = "AUTOTEST1";
-    private static final String CASE_TYPE = "AAT";
-
-    protected UpdateCaseTest(AATHelper aat) { super(aat); }
+    protected UpdateCaseTest(AATHelper aat) {
+        super(aat);
+    }
 
     @Test
-    @DisplayName("Update a case")
+    @DisplayName("should progress case state")
+    void shouldProgressCaseState() {
+        // Prepare new case in known state
+        final Long caseReference = Event.create()
+                                        .as(asAutoTestCaseworker())
+                                        .withData(AATCaseBuilder.EmptyCase.build())
+                                        .submitAndGetReference();
 
+        Event.startProgress(caseReference)
+             .as(asAutoTestCaseworker())
+             .submit()
+             .then()
+             .statusCode(201)
+             .assertThat()
+             .body("state", equalTo(State.IN_PROGRESS));
+    }
 
-    public void shouldUpdateACase() {
+    @Test
+    @DisplayName("should update a single case field")
+    void shouldUpdateSingleField() {
+        // Prepare new case in known state
+        final Long caseReference = Event.create()
+                                        .as(asAutoTestCaseworker())
+                                        .withData(FullCase.build())
+                                        .submitAndGetReference();
 
-        Long caseID = shouldCreateACase();
+        Event.update(caseReference)
+             .as(asAutoTestCaseworker())
+             .withData(
+                 CaseData.builder()
+                         .numberField(UPDATED_NUMBER)
+                         .build()
+             )
+             .submit()
 
-        String eventToken  = aat.getCcdHelper()
-            .generateTokenUpdateCase(asAutoTestCaseworker(),JURISDICTION,CASE_TYPE,EVENT_UPDATE,caseID);
+             .then()
+             .statusCode(201)
+             .assertThat()
+             .rootPath("case_data")
 
-        String eventBody = createUpdateBody(eventToken).toString();
+             // Field updated
+             .body("NumberField", equalTo(UPDATED_NUMBER))
 
+             // Other fields not updated
+             .body("TextField", equalTo(AATCaseBuilder.TEXT));
+    }
 
-        Supplier<RequestSpecification> asUser = asAutoTestCaseworker();
+    @Test
+    @DisplayName("should update a case if the caseworker has 'CRUD' access on CaseType")
+    void shouldUpdateCaseWithFullAccessForCaseType() {
+        // Case Type with "CRUD" access to the role autoTestCaseWorker
+        final Long caseReference = Event.create("AAT_AUTH_15")
+            .as(asPrivateCaseworker(true))
+            .withData(FullCase.build())
+            .submitAndGetReference();
 
+        Event.update(caseReference)
+            .as(asAutoTestCaseworker())
+            .withData(
+                CaseData.builder()
+                    .numberField(UPDATED_NUMBER)
+                    .build()
+            )
+            .submit()
 
-        asUser.get()
-            .given()
-            .pathParam("jurisdiction", JURISDICTION)
-            .pathParam("caseType", CASE_TYPE)
-            .pathParam("caseID",caseID)
-            .contentType(ContentType.JSON)
-            .body(eventBody)
-            .when()
-            .post(
-                "/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases/{caseID}/events")
+            .then()
+            .statusCode(201)
+            .assertThat()
+            .rootPath("case_data")
+            .body("NumberField", equalTo(UPDATED_NUMBER))
+            .body("TextField", equalTo(AATCaseBuilder.TEXT));
+    }
+
+    @Test
+    @DisplayName("should update a case if the caseworker has 'U' access on CaseType")
+    void shouldUpdateCaseWithUAccessForCaseType() {
+        // Case Type with "U" access to the role autoTestCaseWorker
+        final Long caseReference = Event.create("AAT_AUTH_4")
+            .as(asPrivateCaseworker(true))
+            .withData(FullCase.build())
+            .submitAndGetReference();
+
+        Event.update(caseReference)
+            .as(asAutoTestCaseworker())
+            .withData(
+                CaseData.builder()
+                    .numberField(UPDATED_NUMBER)
+                    .build()
+            )
+            .submit()
+
             .then()
             .statusCode(201);
 
-        }
+        //read the case data using private case worker and verify that the case was successfully updated.
+        asPrivateCaseworker(true).get().given()
+            .pathParam("jurisdiction", JURISDICTION)
+            .pathParam("caseType", "AAT_AUTH_4")
+            .pathParam("caseReference", caseReference)
+            .contentType(ContentType.JSON).when()
+            .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases/{caseReference}")
+            .then().log().ifError().statusCode(200)
+            .assertThat()
+            .rootPath("case_data")
+            .body("NumberField", equalTo(UPDATED_NUMBER))
+            .body("TextField", equalTo(AATCaseBuilder.TEXT));
+    }
 
-        Long shouldCreateACase() {
+    @Test
+    @DisplayName("should update a case if the caseworker has 'CU' access on CaseType")
+    void shouldUpdateCaseWithCUAccessForCaseType() {
+        // Case Type with "CU" access to the role autoTestCaseWorker
+        final Long caseReference = Event.create("AAT_AUTH_5")
+            .as(asPrivateCaseworker(true))
+            .withData(FullCase.build())
+            .submitAndGetReference();
 
-        Long caseID= aat.getCcdHelper()
-            .createCase(asAutoTestCaseworker(), JURISDICTION, CASE_TYPE, "CREATE", createEmptyCase())
+        Event.update(caseReference)
+            .as(asAutoTestCaseworker())
+            .withData(
+                CaseData.builder()
+                    .numberField(UPDATED_NUMBER)
+                    .build()
+            )
+            .submit()
+
             .then()
-            .extract()
-            .path("id");
+            .statusCode(201);
 
-        return caseID;
-        }
+        //read the case data using private case worker and verify that the case was successfully updated.
+        asPrivateCaseworker(true).get().given()
+            .pathParam("jurisdiction", JURISDICTION)
+            .pathParam("caseType", "AAT_AUTH_5")
+            .pathParam("caseReference", caseReference)
+            .contentType(ContentType.JSON).when()
+            .get("/caseworkers/{user}/jurisdictions/{jurisdiction}/case-types/{caseType}/cases/{caseReference}")
+            .then().log().ifError().statusCode(200)
+            .assertThat()
+            .rootPath("case_data")
+            .body("NumberField", equalTo(UPDATED_NUMBER))
+            .body("TextField", equalTo(AATCaseBuilder.TEXT));
+    }
 
-        private CaseDataContent createEmptyCase() {
-            final Event event = new Event();
-            event.setEventId("CREATE");
+    @Test
+    @DisplayName("should update a case if the caseworker has 'RU' access on CaseType")
+    void shouldUpdateCaseWithRUAccessForCaseType() {
+        // Case Type with "RU" access to the role autoTestCaseWorker
+        final Long caseReference = Event.create("AAT_AUTH_6")
+            .as(asPrivateCaseworker(true))
+            .withData(FullCase.build())
+            .submitAndGetReference();
 
-            final CaseDataContent caseData = new CaseDataContent();
-            caseData.setEvent(event);
+        Event.update(caseReference)
+            .as(asAutoTestCaseworker())
+            .withData(
+                CaseData.builder()
+                    .numberField(UPDATED_NUMBER)
+                    .build()
+            )
+            .submit()
 
-        return caseData;
-        }
+            .then()
+            .statusCode(201)
+            .assertThat()
+            .rootPath("case_data")
+            .body("NumberField", equalTo(UPDATED_NUMBER))
+            .body("TextField", equalTo(AATCaseBuilder.TEXT));
+    }
 
-        private JSONObject createUpdateBody(String eventToken){
-          JSONObject eventBody = new JSONObject();
-             try {
-                 eventBody.put("event_token", eventToken);
-                 JSONObject event = new JSONObject();
-                 event.put("description", "This is an update");
-                 event.put("id", EVENT_UPDATE);
-                 event.put("summary", "Well this is a summary");
-                 eventBody.put("event", event);
-                 }
-             catch (JSONException e) { }
+    @Test
+    @DisplayName("should not update a case if the caseworker has 'CR' access on CaseType")
+    void shouldNotUpdateCaseWithCRAccessForCaseType() {
+        // Case Type with "CR" access to the role autoTestCaseWorker
+        final Long caseReference = Event.create("AAT_AUTH_3")
+            .as(asPrivateCaseworker(true))
+            .withData(FullCase.build())
+            .submitAndGetReference();
 
-        return eventBody;
-        }
+        Event.update(caseReference)
+            .as(asAutoTestCaseworker())
+            .withData(
+                CaseData.builder()
+                    .numberField(UPDATED_NUMBER)
+                    .build()
+            )
+            .submit()
 
+            .then()
+            .statusCode(404);
+    }
 
+    @Test
+    @DisplayName("should not update a case if the caseworker has 'C' access on CaseType")
+    void shouldNotUpdateCaseWithCAccessForCaseType() {
+        // Case Type with "C" access to the role autoTestCaseWorker
+        final Long caseReference = Event.create("AAT_AUTH_1")
+            .as(asPrivateCaseworker(true))
+            .withData(FullCase.build())
+            .submitAndGetReference();
 
+        Event.update(caseReference)
+            .as(asAutoTestCaseworker())
+            .withData(
+                CaseData.builder()
+                    .numberField(UPDATED_NUMBER)
+                    .build()
+            )
+            .submit()
 
+            .then()
+            .statusCode(404);
+    }
+
+    @Test
+    @DisplayName("should not update a case if the caseworker has 'R' access on CaseType")
+    void shouldNotUpdateCaseWithRAccessForCaseType() {
+        // Case Type with "R" access to the role autoTestCaseWorker
+        final Long caseReference = Event.create("AAT_AUTH_2")
+            .as(asPrivateCaseworker(true))
+            .withData(FullCase.build())
+            .submitAndGetReference();
+
+        Event.update(caseReference)
+            .as(asAutoTestCaseworker())
+            .withData(
+                CaseData.builder()
+                    .numberField(UPDATED_NUMBER)
+                    .build()
+            )
+            .submit()
+
+            .then()
+            .statusCode(404);
+    }
+
+    @Test
+    @DisplayName("should not update a case if the caseworker has 'D' access on CaseType")
+    void shouldNotUpdateCaseWithDAccessForCaseType() {
+        // Case Type with "D" access to the role autoTestCaseWorker
+        final Long caseReference = Event.create("AAT_AUTH_8")
+            .as(asPrivateCaseworker(true))
+            .withData(FullCase.build())
+            .submitAndGetReference();
+
+        Event.update(caseReference)
+            .as(asAutoTestCaseworker())
+            .withData(
+                CaseData.builder()
+                    .numberField(UPDATED_NUMBER)
+                    .build()
+            )
+            .submit()
+
+            .then()
+            .statusCode(404);
+    }
 }

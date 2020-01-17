@@ -2,7 +2,7 @@ package uk.gov.hmcts.ccd.datastore.tests.helper;
 
 import feign.Feign;
 import feign.jackson.JacksonEncoder;
-import org.springframework.cloud.netflix.feign.support.SpringMvcContract;
+import org.springframework.cloud.openfeign.support.SpringMvcContract;
 import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
 import uk.gov.hmcts.reform.authorisation.generators.ServiceAuthTokenGenerator;
 

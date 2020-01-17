@@ -2,29 +2,54 @@
 @Library("Infrastructure") _
 
 properties([
-  parameters([
-    choice(name: 'ENVIRONMENT', choices: 'saat\nsprod\nsandbox', description: 'Environment where code should be build and deployed')
-  ]),
-  pipelineTriggers([[$class: 'GitHubPushTrigger']])
+    parameters([
+        choice(name: 'ENVIRONMENT', choices: 'saat\nsprod\nsandbox', description: 'Environment where code should be build and deployed')
+    ]),
+    pipelineTriggers([[$class: 'GitHubPushTrigger']])
 ])
 
-List<LinkedHashMap<String, Object>> secrets = [
-    secret('caseworkerAutoTest1Email', 'CCD_CASEWORKER_AUTOTEST_EMAIL'),
-    secret('caseworkerAutoTest1Password', 'CCD_CASEWORKER_AUTOTEST_PASSWORD'),
-    secret('microserviceGatewaySecret', 'CCD_GW_SERVICE_SECRET'),
-    secret('gatewayOAuth2ClientSecret', 'OAUTH2_CLIENT_SECRET'),
+def secrets = [
+    'ccd-${env}': [
+        secret('ccd-caseworker-autotest-email', 'CCD_CASEWORKER_AUTOTEST_EMAIL'),
+        secret('ccd-caseworker-autotest-password', 'CCD_CASEWORKER_AUTOTEST_PASSWORD'),
+        secret('ccd-importer-autotest-email', 'CCD_IMPORT_AUTOTEST_EMAIL'),
+        secret('ccd-importer-autotest-password', 'CCD_IMPORT_AUTOTEST_PASSWORD'),
+        secret('ccd-private-caseworker-email', 'CCD_PRIVATE_CASEWORKER_EMAIL'),
+        secret('ccd-private-caseworker-password', 'CCD_PRIVATE_CASEWORKER_PASSWORD'),
+        secret('ccd-restricted-caseworker-email', 'CCD_RESTRICTED_CASEWORKER_EMAIL'),
+        secret('ccd-restricted-caseworker-password', 'CCD_RESTRICTED_CASEWORKER_PASSWORD'),
+        secret('ccd-private-caseworker-solicitor-email', 'CCD_PRIVATE_CASEWORKER_SOLICITOR_EMAIL'),
+        secret('ccd-private-caseworker-solicitor-password', 'CCD_PRIVATE_CASEWORKER_SOLICITOR_PASSWORD'),
+        secret('ccd-private-cross-case-type-worker-email', 'CCD_PRIVATE_CROSS_CASE_TYPE_CASEWORKER_EMAIL'),
+        secret('ccd-private-cross-case-type-caseworker-password', 'CCD_PRIVATE_CROSS_CASE_TYPE_CASEWORKER_PASSWORD'),
+        secret('ccd-private-cross-case-type-solicitor-email', 'CCD_PRIVATE_CROSS_CASE_TYPE_SOLICITOR_EMAIL'),
+        secret('ccd-private-cross-case-type-solicitor-password', 'CCD_PRIVATE_CROSS_CASE_TYPE_SOLICITOR_PASSWORD'),
+        secret('ccd-restricted-cross-case-type-caseworker-email', 'CCD_RESTRICTED_CROSS_CASE_TYPE_CASEWORKER_EMAIL'),
+        secret('ccd-restricted-cross-case-type-caseworker-password', 'CCD_RESTRICTED_CROSS_CASE_TYPE_CASEWORKER_PASSWORD'),
+        secret('ccd-api-gateway-oauth2-client-secret', 'OAUTH2_CLIENT_SECRET'),
+    ],
+    's2s-${env}': [
+        secret('microservicekey-ccd-gw', 'CCD_GW_SERVICE_SECRET')
+    ]
 ]
 
 static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
-    [ $class: 'AzureKeyVaultSecret',
-      secretType: 'Secret',
-      name: secretName,
-      version: '',
-      envVariable: envVar
+    [$class     : 'AzureKeyVaultSecret',
+     secretType : 'Secret',
+     name       : secretName,
+     version    : '',
+     envVariable: envVar
     ]
 }
 
+def vaultOverrides = [
+    'preview' : 'aat',
+    'spreview': 'saat'
+]
+
 withParameterizedPipeline('java', 'ccd', 'data-store-api', params.ENVIRONMENT, 'sandbox') {
+    enableSlackNotifications('#ccd-param-builds')
     enableDbMigration()
+    overrideVaultEnvironments(vaultOverrides)
     loadVaultSecrets(secrets)
 }

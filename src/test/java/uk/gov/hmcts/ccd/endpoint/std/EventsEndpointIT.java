@@ -11,14 +11,12 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
-import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import javax.inject.Inject;
+
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -36,7 +34,8 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
 public class EventsEndpointIT extends WireMockBaseTest {
-    private static final String GET_EVENTS_AS_CASEWORKER = "/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/1504259907353529/events";
+    private static final String GET_EVENTS_AS_CASEWORKER = "/caseworkers/0000-aaaa-2222-bbbb/jurisdictions/"
+        + "PROBATE/case-types/TestAddressBookCase/cases/1504259907353529/events";
 
     @Inject
     private WebApplicationContext wac;
@@ -69,11 +68,11 @@ public class EventsEndpointIT extends WireMockBaseTest {
         assertCaseDataResultSetSize();
 
         final MvcResult result = mockMvc.perform(get(GET_EVENTS_AS_CASEWORKER)
-            .contentType(JSON_CONTENT_TYPE)
-            .param("case.PersonFirstName", "Janet ")
-            .header(AUTHORIZATION, "Bearer user1"))
-            .andExpect(status().is(200))
-            .andReturn();
+                                                     .contentType(JSON_CONTENT_TYPE)
+                                                     .param("case.PersonFirstName", "Janet ")
+                                                     .header(AUTHORIZATION, "Bearer user1"))
+                                        .andExpect(status().is(200))
+                                        .andReturn();
 
         String responseAsString = result.getResponse().getContentAsString();
         List<AuditEvent> events = Arrays.asList(mapper.readValue(responseAsString, AuditEvent[].class));
@@ -98,6 +97,7 @@ public class EventsEndpointIT extends WireMockBaseTest {
      */
     private void assertCaseDataResultSetSize() {
         final int count = template.queryForObject("SELECT count(1) as n FROM case_data", Integer.class);
-        assertEquals("Incorrect case data size", 16, count);
+        assertEquals("Incorrect case data size", 18, count);
     }
+
 }

@@ -14,12 +14,7 @@ import static uk.gov.hmcts.ccd.domain.model.definition.CaseState.ANY;
 public class EventTriggerService {
     public CaseEvent findCaseEvent(final CaseType caseType,
                                    final String eventId) {
-        return caseType
-            .getEvents()
-            .stream()
-            .filter(event -> event.getId().equalsIgnoreCase(eventId))
-            .findFirst()
-            .orElse(null);
+        return caseType.findCaseEvent(eventId).orElse(null);
     }
 
     public Boolean isPreStateValid(final String preStateId,

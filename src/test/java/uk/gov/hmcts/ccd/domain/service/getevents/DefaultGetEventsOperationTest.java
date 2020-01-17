@@ -49,7 +49,7 @@ class DefaultGetEventsOperationTest {
         MockitoAnnotations.initMocks(this);
 
         caseDetails = new CaseDetails();
-        caseDetails.setId(CASE_ID);
+        caseDetails.setId(String.valueOf(CASE_ID));
 
         doReturn(EVENTS).when(auditEventRepository).findByCase(caseDetails);
 

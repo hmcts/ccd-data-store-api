@@ -1,5 +1,20 @@
 package uk.gov.hmcts.ccd.data.definition;
 
+import java.util.Arrays;
+import java.util.List;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.UserRoleBuilder.aUserRole;
+
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -10,16 +25,6 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
-
-import java.util.Arrays;
-import java.util.List;
-
-import static com.google.common.collect.Lists.newArrayList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.UserRoleBuilder.aUserRole;
 
 class CachedCaseDefinitionRepositoryTest {
 
@@ -69,8 +74,7 @@ class CachedCaseDefinitionRepositoryTest {
 
             doReturn(newArrayList(new CaseType(), new CaseType())).when(caseDefinitionRepository).getCaseTypesForJurisdiction(JURISDICTION_ID);
 
-            final List<CaseType> caseTypes = cachedCaseDefinitionRepository.getCaseTypesForJurisdiction
-                (JURISDICTION_ID);
+            final List<CaseType> caseTypes = cachedCaseDefinitionRepository.getCaseTypesForJurisdiction(JURISDICTION_ID);
 
             assertAll(
                 () -> assertThat(caseTypes, is(expectedCaseTypes)),
@@ -161,43 +165,45 @@ class CachedCaseDefinitionRepositoryTest {
     @DisplayName("getUserRolesClassifications()")
     class GetUserRolesClassifications {
 
+        private final UserRole userRole1 = aUserRole().withRole(USER_ROLE_1).build();
+        private final UserRole userRole2 = aUserRole().withRole(USER_ROLE_2).build();
+
+        @BeforeEach
+        void setUp() {
+            when(caseDefinitionRepository.getUserRoleClassifications(USER_ROLE_1)).thenReturn(userRole1);
+            when(caseDefinitionRepository.getUserRoleClassifications(USER_ROLE_2)).thenReturn(userRole2);
+        }
+
         @Test
         @DisplayName("should initially retrieve user role from decorated repository")
         void shouldRetrieveUserRoleFromDecorated() {
-            final List<UserRole> expectedUserRolesList = Arrays.asList(aUserRole().withRole(USER_ROLE_1).build(),
-                aUserRole().withRole(USER_ROLE_2).build());
-            final List<String> userRoles = Arrays.asList(USER_ROLE_1, USER_ROLE_2);
-            doReturn(expectedUserRolesList).when(caseDefinitionRepository).getClassificationsForUserRoleList(userRoles);
+            List<UserRole> expectedUserRolesList = Arrays.asList(userRole1, userRole2);
+            List<String> userRoles = Arrays.asList(USER_ROLE_1, USER_ROLE_2);
 
-            final List<UserRole> userRolesList = cachedCaseDefinitionRepository.getClassificationsForUserRoleList(userRoles);
+            List<UserRole> userRolesList = cachedCaseDefinitionRepository.getClassificationsForUserRoleList(userRoles);
 
             assertAll(
                 () -> assertThat(userRolesList, is(expectedUserRolesList)),
-                () -> verify(caseDefinitionRepository, times(1)).getClassificationsForUserRoleList(userRoles)
+                () -> verify(caseDefinitionRepository, times(2)).getUserRoleClassifications(anyString())
             );
         }
 
         @Test
         @DisplayName("should cache user role for subsequent calls")
         void shouldCacheUserRoleForSubsequentCalls() {
-            final List<UserRole> expectedUserRolesList = Arrays.asList(aUserRole().withRole(USER_ROLE_1).build(),
-                aUserRole().withRole(USER_ROLE_2).build());
-            final List<String> userRoles = Arrays.asList(USER_ROLE_1, USER_ROLE_2);
-            doReturn(expectedUserRolesList).when(caseDefinitionRepository).getClassificationsForUserRoleList(userRoles);
+            List<String> userRoles = Arrays.asList(USER_ROLE_2, USER_ROLE_1);
 
             cachedCaseDefinitionRepository.getClassificationsForUserRoleList(userRoles);
 
-            verify(caseDefinitionRepository, times(1)).getClassificationsForUserRoleList(userRoles);
+            verify(caseDefinitionRepository, times(2)).getUserRoleClassifications(anyString());
 
-            final List<UserRole> someOtherUserRolesList = Arrays.asList(aUserRole().withRole(USER_ROLE_3).build(),
-                aUserRole().withRole(USER_ROLE_4).build());
-            doReturn(someOtherUserRolesList).when(caseDefinitionRepository).getClassificationsForUserRoleList(userRoles);
+            final List<UserRole> someOtherUserRolesList = Arrays.asList(aUserRole().withRole(USER_ROLE_3).build(), aUserRole().withRole(USER_ROLE_4).build());
+            when(caseDefinitionRepository.getClassificationsForUserRoleList(userRoles)).thenReturn(someOtherUserRolesList);
 
-            final List<UserRole> userRolesList = cachedCaseDefinitionRepository.getClassificationsForUserRoleList
-                (userRoles);
+            final List<UserRole> userRolesList = cachedCaseDefinitionRepository.getClassificationsForUserRoleList(userRoles);
 
             assertAll(
-                () -> assertThat(userRolesList, is(expectedUserRolesList)),
+                () -> assertThat(userRolesList, is(Arrays.asList(userRole2, userRole1))),
                 () -> verifyNoMoreInteractions(caseDefinitionRepository)
             );
         }

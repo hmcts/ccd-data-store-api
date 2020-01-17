@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.callbacks;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
@@ -32,5 +33,15 @@ public class StartEventTrigger {
 
     public void setEventId(String eventId) {
         this.eventId = eventId;
+    }
+
+    @JsonIgnore
+    public String getCaseTypeId() {
+        return caseDetails.getCaseTypeId();
+    }
+
+    @JsonIgnore
+    public String getCaseReference() {
+        return caseDetails.getReferenceAsString();
     }
 }

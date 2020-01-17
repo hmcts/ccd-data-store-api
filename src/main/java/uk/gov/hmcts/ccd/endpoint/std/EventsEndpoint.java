@@ -41,7 +41,7 @@ public class EventsEndpoint {
     })
     public List<AuditEvent> findEventDetailsForCase(
         @ApiParam(value = "Idam user ID", required = true)
-        @PathVariable("uid") final Integer uid,
+        @PathVariable("uid") final String uid,
         @ApiParam(value = "Jurisdiction ID", required = true)
         @PathVariable("jid") final String jurisdictionId,
         @ApiParam(value = "Case type ID", required = true)

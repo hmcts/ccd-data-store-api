@@ -17,9 +17,7 @@ public interface CaseDetailsRepository {
 
     Optional<CaseDetails> findByReference(String jurisdiction, String reference);
 
-    Optional<CaseDetails> lockByReference(String jurisdiction, Long reference);
-
-    Optional<CaseDetails> lockByReference(String jurisdiction, String reference);
+    Optional<CaseDetails> findByReference(String reference);
 
     /**
      *
@@ -38,15 +36,6 @@ public interface CaseDetailsRepository {
      */
     @Deprecated
     CaseDetails findByReference(Long caseReference);
-
-    /**
-     *
-     * @param caseReference Public case reference
-     * @return Case details
-     * @deprecated Use {@link CaseDetailsRepository#lockByReference(String, Long)} instead.
-     */
-    @Deprecated
-    CaseDetails lockCase(Long caseReference);
 
     /**
      *

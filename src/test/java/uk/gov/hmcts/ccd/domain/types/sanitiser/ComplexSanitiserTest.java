@@ -1,16 +1,5 @@
 package uk.gov.hmcts.ccd.domain.types.sanitiser;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mockito;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -18,6 +7,15 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.junit.Before;
+import org.junit.Test;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 
 public class ComplexSanitiserTest {
 
@@ -72,7 +70,7 @@ public class ComplexSanitiserTest {
 
     @Test
     public void getType() {
-        assertThat(complexSanitiser.getType(), equalTo("Complex"));
+        assertThat(complexSanitiser.getType(), equalTo(COMPLEX));
     }
 
     @Test

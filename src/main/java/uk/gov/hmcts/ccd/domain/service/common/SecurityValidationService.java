@@ -40,7 +40,12 @@ public class SecurityValidationService {
 
             caseDetails.setDataClassification(MAPPER.convertValue(callbackResponse.getDataClassification(), STRING_JSON_MAP));
         } else {
-            LOG.warn("callbackResponse={} has lower classification than case={}", callbackResponse, caseDetails);
+            LOG.warn("CallbackCaseClassification={} has lower classification than caseClassification={} for caseReference={}, jurisdiction={} and caseType={}",
+                callbackResponse.getSecurityClassification(),
+                caseDetails.getSecurityClassification(),
+                caseDetails.getReference(),
+                caseDetails.getJurisdiction(),
+                caseDetails.getCaseTypeId());
             throw new ValidationException(VALIDATION_ERR_MSG);
         }
     }
@@ -117,7 +122,7 @@ public class SecurityValidationService {
             LOG.warn("defaultSecurityClassificationValue={} cannot be parsed", defaultClassificationValue);
             throw new ValidationException(VALIDATION_ERR_MSG);
         }
-        if(!callbackSecurityClassification.isPresent()) {
+        if (!callbackSecurityClassification.isPresent()) {
             LOG.warn("callbackSecurityClassificationValue={} cannot be parsed", callbackClassificationValue);
             throw new ValidationException(VALIDATION_ERR_MSG);
         }
