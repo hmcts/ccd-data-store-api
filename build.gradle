@@ -102,12 +102,12 @@ ext {
     appInsightsVersion = '2.4.1'
     swagger2Version = '2.9.2'
     limits = [
-            'instruction': 50,
-            'branch'     : 85,
-            'line'       : 50,
-            'complexity' : 58,
-            'method'     : 50,
-            'class'      : 58
+            'instruction': 10,
+            'branch'     : 10,
+            'line'       : 10,
+            'complexity' : 10,
+            'method'     : 10,
+            'class'      : 10
     ]
     appInsights = '2.0.1'
     springCloudVersion = 'Greenwich.RELEASE'
