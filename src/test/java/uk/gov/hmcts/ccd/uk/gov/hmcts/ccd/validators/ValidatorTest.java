@@ -1,6 +1,10 @@
 package uk.gov.hmcts.ccd.uk.gov.hmcts.ccd.validators;
 
+import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 public class ValidatorTest {
 
@@ -37,6 +41,16 @@ public class ValidatorTest {
                 return null;
             }
         };
+    }
 
+
+    protected void doTheTest(
+        final String value,
+        final boolean expectedResult,
+        final ConstraintValidator constraintValidator,
+        final ConstraintValidatorContext constraintValidatorContext) {
+
+        final boolean result = constraintValidator.isValid(value, constraintValidatorContext);
+        assertThat(result, is(expectedResult));
     }
 }

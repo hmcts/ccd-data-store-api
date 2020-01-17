@@ -9,13 +9,13 @@ import java.util.UUID;
 public class UuIdValidator implements ConstraintValidator<UuId, String> {
 
     @Override
-    public boolean isValid(String value, ConstraintValidatorContext context) {
+    public boolean isValid(final String value, final ConstraintValidatorContext context) {
 
         try {
             UUID.fromString(value);
             return true;
         } catch (Exception exception) {
-            context.buildConstraintViolationWithTemplate("The value" + value + "does not represent a valid id.")
+            context.buildConstraintViolationWithTemplate("The value " + value + " does not represent a valid id.")
                 .addConstraintViolation();
             return false;
         }

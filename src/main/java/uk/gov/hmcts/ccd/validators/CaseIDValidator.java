@@ -20,7 +20,7 @@ public class CaseIDValidator implements ConstraintValidator<CaseID, String> {
 
 
     @Override
-    public boolean isValid(String value, ConstraintValidatorContext context) {
+    public boolean isValid(final String value, final ConstraintValidatorContext context) {
 
         context.disableDefaultConstraintViolation();
         if (value == null || value.isEmpty()) {
@@ -29,7 +29,7 @@ public class CaseIDValidator implements ConstraintValidator<CaseID, String> {
             return false;
         }
         if (!uidService.validateUID(value)) {
-            context.buildConstraintViolationWithTemplate("The case id " + value + "is not valid")
+            context.buildConstraintViolationWithTemplate("The case id " + value + " is not valid.")
                 .addConstraintViolation();
             return false;
         }

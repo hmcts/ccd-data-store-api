@@ -25,8 +25,6 @@ public class CaseIDValidatorTest extends ValidatorTest {
     @Mock
     private ConstraintValidatorContext constraintValidatorContext;
 
-    private ConstraintValidatorContext.ConstraintViolationBuilder constraintViolationBuilder;
-
     @InjectMocks
     private CaseIDValidator caseIDValidator;
 
@@ -39,15 +37,14 @@ public class CaseIDValidatorTest extends ValidatorTest {
     }
 
     @Test
-    @DisplayName("should fail for null")
+    @DisplayName("Should fail for null")
     void shouldFailForNullValues() {
 
-        final boolean result = caseIDValidator.isValid(null, constraintValidatorContext);
-        assertThat(result, is(false));
+        doTheTest(null, false, caseIDValidator, constraintValidatorContext);
     }
 
     @Test
-    @DisplayName("should fail format.")
+    @DisplayName("Should fail format.")
     void shouldFailForCheckSum() {
 
         when(uidService.validateUID(anyString()))
@@ -57,7 +54,7 @@ public class CaseIDValidatorTest extends ValidatorTest {
     }
 
     @Test
-    @DisplayName("should pass for correct format.")
+    @DisplayName("Should pass for correct format.")
     void shouldPassForValidId() {
 
         when(uidService.validateUID(anyString()))

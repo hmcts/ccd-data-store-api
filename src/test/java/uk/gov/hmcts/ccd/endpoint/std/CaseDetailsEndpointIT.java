@@ -948,7 +948,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertCaseDataResultSetSize();
         {
             final MvcResult result = mockMvc
-                .perform(get("/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/1504259907353529")
+                .perform(get("/caseworkers/85fa2a43-4455-49bf-b465-c71e66b40e96/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/1504259907353529")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(200))
                 .andReturn();
@@ -988,7 +988,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         {
             final MvcResult result = mockMvc
-                .perform(get("/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/1504259907353537")
+                .perform(get("/caseworkers/85fa2a43-4455-49bf-b465-c71e66b40e96/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/1504259907353537")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(200))
                 .andReturn();
@@ -1029,7 +1029,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 get("/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/1504259907353545")
                     .contentType(MediaType.APPLICATION_JSON)
             )
-            .andExpect(status().is(404))
+            .andExpect(status().is(400))
             .andReturn();
     }
 
@@ -1163,14 +1163,14 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void shouldReturn404WhenGetCaseWithNonExistentCaseReferenceForCaseworker() throws Exception {
+    public void shouldReturn400WhenGetCaseWithNonExistentCaseReferenceForCaseworker() throws Exception {
         // Check that we have the expected test data set size, this is to ensure that state filtering is correct
         assertCaseDataResultSetSize();
 
         mockMvc
             .perform(get("/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/9999999999999995")
                 .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().is(404));
+            .andExpect(status().is(400));
     }
 
     @Test
@@ -3142,7 +3142,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     private void shouldReturn404WhenGetCaseWithNoCaseTypeReadAccess(String userRole) throws Exception {
         final String caseReference = "1504259907353610";
-        final String url = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_READ_CASE_TYPE_ACCESS
+        final String url = "/" + userRole + "/85fa2a43-4455-49bf-b465-c71e66b40e96/jurisdictions/"
+            + JURISDICTION + "/case-types/" + CASE_TYPE_NO_READ_CASE_TYPE_ACCESS
             + "/cases/" + caseReference;
 
         mockMvc.perform(get(url)
@@ -3157,7 +3158,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         {
             final MvcResult result = mockMvc
-                .perform(get("/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_READ_FIELD_ACCESS + "/cases/1504259907353628")
+                .perform(get("/" + userRole + "/85fa2a43-4455-49bf-b465-c71e66b40e96/jurisdictions/"
+                    + JURISDICTION + "/case-types/" + CASE_TYPE_NO_READ_FIELD_ACCESS + "/cases/1504259907353628")
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(200))
                 .andReturn();
