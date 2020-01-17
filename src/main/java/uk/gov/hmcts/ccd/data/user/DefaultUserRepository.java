@@ -35,7 +35,6 @@ import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.aggregated.*;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserDefault;
@@ -129,7 +128,7 @@ public class DefaultUserRepository implements UserRepository {
                 .map(headers -> headers.get("Message")).orElse(null);
             final String message = headerMessages != null ? headerMessages.get(0) : e.getMessage();
             if (message != null) {
-                if (HttpStatus.NOT_FOUND == e.getStatusCode()) {
+                if (HttpStatus.NOT_FOUND.value() == e.getRawStatusCode()) {
                     throw new ResourceNotFoundException(message);
                 } else {
                     throw new BadRequestException(message);

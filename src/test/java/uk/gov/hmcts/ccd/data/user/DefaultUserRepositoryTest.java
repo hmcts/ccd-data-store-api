@@ -22,13 +22,14 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.anyMap;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -42,15 +43,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
@@ -61,23 +60,9 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.UserDefault;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.hasSize;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
 
 class DefaultUserRepositoryTest {
 
@@ -205,7 +190,9 @@ class DefaultUserRepositoryTest {
     @Test
     void getUserDefaultSettingsShouldReturnServiceExceptionWhenMessageIsNull() {
         assertThrows(ServiceException.class, () -> {
+            when(applicationParams.userDefaultSettingsURL()).thenReturn("http://test.hmcts.net/users?uid={uid}");
             HttpClientErrorException response = createErrorResponse(HttpStatus.BAD_GATEWAY, null);
+            when(restTemplate.exchange(isA(URI.class), eq(HttpMethod.GET), isA(HttpEntity.class), eq(UserDefault.class))).thenThrow(response);
             doThrow(response).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class), anyMap());
 
             userRepository.getUserDefaultSettings("222");
@@ -215,8 +202,9 @@ class DefaultUserRepositoryTest {
     @Test
     void getUserDefaultSettingsShouldReturnResourceNotFoundExceptionWhen404() {
         assertThrows(ResourceNotFoundException.class, () -> {
+            when(applicationParams.userDefaultSettingsURL()).thenReturn("http://test.hmcts.net/users?uid={uid}");
             HttpClientErrorException response = createErrorResponse(HttpStatus.NOT_FOUND, "some message");
-            doThrow(response).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class), anyMap());
+            when(restTemplate.exchange(isA(URI.class), eq(HttpMethod.GET), isA(HttpEntity.class), eq(UserDefault.class))).thenThrow(response);
 
             userRepository.getUserDefaultSettings("222");
         });
@@ -225,7 +213,10 @@ class DefaultUserRepositoryTest {
     @Test
     void getUserDefaultSettingsShouldReturnBadRequestWhenNot404() {
         assertThrows(BadRequestException.class, () -> {
+            when(applicationParams.userDefaultSettingsURL()).thenReturn("http://test.hmcts.net/users?uid={uid}");
             HttpClientErrorException response = createErrorResponse(HttpStatus.BAD_GATEWAY, "some message");
+            when(restTemplate.exchange(isA(URI.class), eq(HttpMethod.GET), isA(HttpEntity.class), eq(UserDefault.class))).thenThrow(response);
+
             doThrow(response).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class), anyMap());
 
             userRepository.getUserDefaultSettings("222");
@@ -237,7 +228,7 @@ class DefaultUserRepositoryTest {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Message", message);
         when(response.getResponseHeaders()).thenReturn(headers);
-        when(response.getStatusCode()).thenReturn(status);
+        when(response.getRawStatusCode()).thenReturn(status.value());
         return response;
     }
 
