@@ -47,8 +47,8 @@ public class UserService {
 
         List<Jurisdiction> jurisdictions = new ArrayList<>();
 
+        LOGGER.debug("Will get jurisdiction(s) '{}' from repository.", jurisdictionIds);
         jurisdictionIds.stream().forEach(id -> {
-            LOGGER.debug("Will get jurisdiction '{}' from repository.", id);
             Jurisdiction jurisdiction = caseDefinitionRepository.getJurisdiction(id);
             if (jurisdiction != null) {
                 jurisdictions.add(jurisdiction);
