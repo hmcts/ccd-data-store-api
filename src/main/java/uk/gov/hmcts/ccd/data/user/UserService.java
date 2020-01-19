@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.data.user;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,8 @@ import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 
 @Service
 public class UserService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
 
     private UserRepository userRepository;
     private CaseDefinitionRepository caseDefinitionRepository;
@@ -44,6 +48,7 @@ public class UserService {
         List<Jurisdiction> jurisdictions = new ArrayList<>();
 
         jurisdictionIds.stream().forEach(id -> {
+            LOGGER.debug("Will get jurisdiction '{}' from repository.", id);
             Jurisdiction jurisdiction = caseDefinitionRepository.getJurisdiction(id);
             if (jurisdiction != null) {
                 jurisdictions.add(jurisdiction);
