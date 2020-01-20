@@ -138,7 +138,7 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
     }
 
     @Test
-    public void sanitisesInputs() {
+    public void sanitisesInputsCountQuery() {
         String evil = "foo');insert into case users values(1,2,3);--";
         when(authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds("PROBATE", "TestAddressBookCase", CAN_READ))
             .thenReturn(asList(evil));
@@ -151,6 +151,27 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
 
         // If any input is not correctly sanitized it will cause an exception since query result structure will not be as hibernate expects.
         assertThat(byMetaData.getTotalResultsCount(), is(0));
+    }
+
+    @Test
+    public void sanitisesInputsMainQuery() {
+        String evil = "foo');insert into case users values(1,2,3);--";
+        when(authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds("PROBATE", "TestAddressBookCase", CAN_READ))
+            .thenReturn(asList(evil));
+
+        when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.GRANTED);
+        when(userAuthorisation.getUserId()).thenReturn(evil);
+
+        MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
+        metadata.addSortOrderField(SortOrderField.sortOrderWith()
+                                       .caseFieldId(evil)
+                                       .metadata(false)
+                                       .direction("DESC")
+                                       .build());
+        List<CaseDetails> caseDetails = caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap());
+
+        // If any input is not correctly sanitized it will cause an exception since query result structure will not be as hibernate expects.
+        assertThat(caseDetails.size(), is(0));
     }
 
     @Test
@@ -178,7 +199,7 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
-    public void getFindByMetadataAndFieldDataSortDesc() {
+    public void getFindByMetadataAndFieldDataSortDescByMetaDataField() {
         assumeDataInitialised();
 
         MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
@@ -199,6 +220,35 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
         // Should be ordered by last modified desc, creation date asc.
         assertThat(byMetaDataAndFieldData.get(0).getId(), is("16"));
         assertThat(byMetaDataAndFieldData.get(1).getId(), is("1"));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
+    public void getFindByMetadataAndFieldDataSortByBothCaseAndMetadataFields() {
+        assumeDataInitialised();
+
+        MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
+        metadata.setSortDirection(Optional.of("Asc"));
+        metadata.addSortOrderField(SortOrderField.sortOrderWith()
+                                       .caseFieldId("[LAST_MODIFIED_DATE]")
+                                       .metadata(true)
+                                       .direction("ASC")
+                                       .build());
+        metadata.addSortOrderField(SortOrderField.sortOrderWith()
+                                       .caseFieldId("PersonLastName")
+                                       .metadata(false)
+                                       .direction("DESC")
+                                       .build());
+
+        HashMap<String, String> searchParams = new HashMap<>();
+        searchParams.put("PersonFirstName", "Janet");
+        final List<CaseDetails> byMetaDataAndFieldData = caseDetailsRepository.findByMetaDataAndFieldData(metadata,
+            searchParams);
+
+        // See the timestamps in insert_cases.sql.
+        // Should be ordered by person last name, last modified desc, creation date asc.
+        assertThat(byMetaDataAndFieldData.get(0).getId(), is("1"));
+        assertThat(byMetaDataAndFieldData.get(1).getId(), is("16"));
     }
 
     @Test

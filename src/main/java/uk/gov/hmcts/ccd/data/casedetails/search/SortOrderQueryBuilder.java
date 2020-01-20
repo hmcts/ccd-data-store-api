@@ -4,6 +4,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.IntStream;
+
+import static java.lang.String.format;
+
 @Component
 public class SortOrderQueryBuilder {
 
@@ -11,14 +17,21 @@ public class SortOrderQueryBuilder {
     private static final String CREATED_DATE = "created_date";
     private static final String SPACE = " ";
     private static final String COMMA = ",";
+    private static final String COLON = ":";
+    private static final String SORT_ORDER_FIELD = "sortOrderField%s";
 
-    public String buildSortOrderClause(MetaData metaData) {
+    public String buildSortOrderClause(MetaData metaData, final Map<String, Object> parametersToBind) {
         StringBuilder sb = new StringBuilder();
-        metaData.getSortOrderFields().forEach(sortOrderField -> {
+        List<SortOrderField> sortOrderFields = metaData.getSortOrderFields();
+        IntStream.range(0, sortOrderFields.size()).forEach(idx -> {
+            SortOrderField sortOrderField = sortOrderFields.get(idx);
+            String sortOrderFieldIdx = format(SORT_ORDER_FIELD, idx);
             if (sortOrderField.isMetadata()) {
-                sb.append(getMataFieldName(sortOrderField.getCaseFieldId()));
+                parametersToBind.put(sortOrderFieldIdx, getMataFieldName(sortOrderField.getCaseFieldId()));
+                sb.append(COLON + sortOrderFieldIdx);
             } else {
-                sb.append(convertFieldNameToJSONBsqlFormat(sortOrderField.getCaseFieldId()));
+                parametersToBind.put(sortOrderFieldIdx, convertFieldNameToJSONBsqlFormat(sortOrderField.getCaseFieldId()));
+                sb.append(COLON + sortOrderFieldIdx);
             }
             sb.append(SPACE);
             sb.append(sortOrderField.getDirection());

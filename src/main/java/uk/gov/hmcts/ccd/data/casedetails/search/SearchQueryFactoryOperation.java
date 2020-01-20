@@ -58,7 +58,7 @@ public class SearchQueryFactoryOperation {
         Map<String, Object> parametersToBind = Maps.newHashMap();
         String queryToFormat = isCountQuery ? MAIN_COUNT_QUERY : MAIN_QUERY;
         String whereClausePart = secure(toClauses(criteria), metadata, parametersToBind);
-        String sortClause = sortOrderQueryBuilder.buildSortOrderClause(metadata);
+        String sortClause = sortOrderQueryBuilder.buildSortOrderClause(metadata, parametersToBind);
 
         String queryString = String.format(queryToFormat, whereClausePart, sortClause);
 
