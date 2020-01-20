@@ -102,12 +102,12 @@ ext {
     appInsightsVersion = '2.4.1'
     swagger2Version = '2.9.2'
     limits = [
-            'instruction': 10,
-            'branch'     : 10,
-            'line'       : 10,
-            'complexity' : 10,
-            'method'     : 10,
-            'class'      : 10
+            'instruction': 90,
+            'branch'     : 85,
+            'line'       : 90,
+            'complexity' : 88,
+            'method'     : 90,
+            'class'      : 98
     ]
     appInsights = '2.0.1'
     springCloudVersion = 'Greenwich.RELEASE'
@@ -256,7 +256,7 @@ dependencies {
     compile 'org.jooq:jool-java-8:0.9.14'
     compile group: 'io.cucumber', name: 'cucumber-java', version: '5.0.0-RC1'
     testCompile group: 'io.cucumber', name: 'cucumber-junit', version: '5.0.0-RC1'
-
+    
     testCompile files('lib/befta-fw-1.0.9-SNAPSHOT.jar')
 }
 // end::dependencies[]
@@ -571,7 +571,7 @@ test {
     environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
     generateCucumberReports.enabled = false
 
-//    useJUnitPlatform()
+    useJUnitPlatform()
 
     testLogging {
         // set options for log level LIFECYCLE
