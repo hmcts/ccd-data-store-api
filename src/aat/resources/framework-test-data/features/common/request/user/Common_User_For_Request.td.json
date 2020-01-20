@@ -1,6 +1,0 @@
-{
-	"_guid_": "Common_User_For_Request",
-
-	"username": "[[$CCD_CASEWORKER_AUTOTEST_EMAIL]]",
-	"password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
-}

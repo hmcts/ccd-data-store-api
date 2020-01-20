@@ -1,7 +1,0 @@
-{
-	"_guid_": "Common_401_Response_Body",
-	"_extends_": "Common_4XX_Response_Body",
-
-	"status": 401,
-	"error": "Unauthorized"
-}

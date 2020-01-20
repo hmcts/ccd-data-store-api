@@ -1,0 +1,12 @@
+{
+  "_guid_": "Befta_Case_Data_Extension",
+  "_extends_": "Befta_Default_Full_Case_Creation_Data",
+  "specs": [
+    "to create a full case"
+  ],
+  "request": {
+    "body": {
+      "event_token": "${[scenarioContext][parentContext][childContexts][Befta_Default_Token_Creation_Data_For_Case_Creation][testData][actualResponse][body][token]}"
+    }
+  }
+}

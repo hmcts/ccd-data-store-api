@@ -64,6 +64,9 @@ public interface AATCaseType {
 
         @JsonProperty("AddressUKField")
         private AddressUKField addressUKField;
+
+        @JsonProperty("DocumentField")
+        private DocumentField documentField;
     }
 
     interface State {
@@ -181,5 +184,19 @@ public interface AATCaseType {
 
         @JsonProperty("Country")
         private String country;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    class DocumentField {
+        @JsonProperty("document_binary_url")
+        private String binaryUrl;
+
+        @JsonProperty("document_filename")
+        private String filename;
+
+        @JsonProperty("document_url")
+        private String url;
     }
 }

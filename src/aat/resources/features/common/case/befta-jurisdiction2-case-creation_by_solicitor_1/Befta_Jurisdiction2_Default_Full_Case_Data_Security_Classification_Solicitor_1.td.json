@@ -1,0 +1,37 @@
+{
+  "_guid_": "Befta_Jurisdiction2_Default_Full_Case_Data_Security_Classification_Solicitor_1",
+  "DocumentField4": "PUBLIC",
+  "MoneyGBPField": "PUBLIC",
+  "AddressUKField": {
+    "value": {
+      "County": "PUBLIC",
+      "Country": "PUBLIC",
+      "PostCode": "PUBLIC",
+      "PostTown": "PUBLIC",
+      "AddressLine1": "PUBLIC",
+      "AddressLine2": "PUBLIC",
+      "AddressLine3": "PUBLIC"
+    },
+    "classification": "PUBLIC"
+  },
+
+  "FixedListField" : "PUBLIC",
+  "FixedRadioListField": "PUBLIC",
+  "DateTimeField": "PUBLIC",
+  "PhoneUKField": "PUBLIC",
+  "DocumentField7": "PUBLIC",
+  "NumberField": "PUBLIC",
+  "MultiSelectListField": "PUBLIC",
+  "YesOrNoField": "PUBLIC",
+  "EmailField": "PUBLIC",
+  "TextField": "PUBLIC",
+  "DateField": "PUBLIC",
+  "TextAreaField": "PUBLIC",
+  "CollectionField": {
+    "value": [],
+    "classification": "PUBLIC"
+  }
+}
+
+
+

@@ -1,14 +1,6 @@
 {
 	"_guid_": "Standard_Full_Case_Creation_Data",
-
-	"productName": "CCD Data Store",
-	"operationName": "Submit case creation as Case worker",
-	"method": "POST",
-	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
-
-	"specs": [
-		"to create a full case"
-	],
+	"_extends_": "Case_Creation_Data_Base",
 
 	"users": {
 		"invokingUser": {
@@ -18,84 +10,23 @@
 	},
 
 	"request": {
-		"headers": {
-			"_extends_": "Common_Request_Headers"
-		},
 		"pathVariables": {
-			"uid": "[[DYNAMIC]]",
 			"jid": "AUTOTEST1",
 			"ctid": "AAT_AUTH_15"
 		},
 		"body": {
 			"data": {
 				"_extends_": "Standard_Full_Case_Data"
-			},
-			"event": {
-				"id": "CREATE",
-				"summary": "",
-				"description": ""
-			},
-			"event_token": "${[scenarioContext][parentContext][childContexts][Standard_Token_Creation_Data_For_Case_Creation][testData][actualResponse][body][token]}",
-			"ignore_warning": false,
-			"draft_id": null
+			}
 		}
 	},
 
 	"expectedResponse": {
-		"_extends_": "Common_201_Response",
-		"headers": {
-			"Content-Encoding": "gzip",
-			"Content-Type": "application/json;charset=UTF-8",
-			"vary": "accept-encoding",
-			"Content-Length": "[[ANY]]"
-		},
 		"body": {
-			"id": "[[ANY]]",
 			"jurisdiction": "AUTOTEST1",
-			"state": "TODO",
-			"version": 0,
 			"case_type_id": "AAT_AUTH_15",
-			"created_date": "[[ANY]]",
-			"last_modified": "[[ANY]]",
-			"security_classification": "PUBLIC",
 			"case_data": {
-				"MoneyGBPField": "4200",
-				"FixedListField": "VALUE3",
-				"AddressUKField": {
-					"AddressLine1": "102 Petty France",
-					"AddressLine2": "CCD",
-					"AddressLine3": "c/o HMCTS Reform",
-					"PostTown": "Westminster",
-					"County": "Greater London",
-					"PostCode": "SW1H 9AJ",
-					"Country": "UK"
-				},
-				"ComplexField": {
-					"ComplexTextField": "Nested text",
-					"ComplexFixedListField": "VALUE2"
-				},
-				"DateTimeField": "[[ANY]]",
-				"PhoneUKField": "07123456789",
-				"NumberField": "164528",
-				"MultiSelectListField": [
-					"OPTION2",
-					"OPTION4"
-				],
-				"YesOrNoField": "Yes",
-				"EmailField": "ccd@hmcts.net",
-				"TextField": "Some Text",
-				"DateField": "2017-02-13",
-				"TextAreaField": "Line1\nLine2",
-				"CollectionField": [
-					{
-						"value": "Alias 1",
-						"id": "CollectionField1"
-					},
-					{
-						"value": "Alias 2",
-						"id": "CollectionField2"
-					}
-				]
+				"_extends_": "Standard_Full_Case_Data"
 			},
 			"data_classification": {
 				"MoneyGBPField": "PUBLIC",
@@ -135,11 +66,6 @@
 					]
 				}
 			},
-			"after_submit_callback_response": null,
-			"callback_response_status_code": null,
-			"callback_response_status": null,
-			"delete_draft_response_status_code": null,
-			"delete_draft_response_status": null,
 			"security_classifications": {
 				"MoneyGBPField": "PUBLIC",
 				"FixedListField": "PUBLIC",
