@@ -1,10 +1,20 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
@@ -15,7 +25,6 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
 import uk.gov.hmcts.ccd.domain.model.aggregated.DefaultSettings;
-import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.ProfileCaseState;
 import uk.gov.hmcts.ccd.domain.model.aggregated.User;
@@ -24,6 +33,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.WorkbasketDefault;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
+import uk.gov.hmcts.ccd.domain.model.definition.Banner;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
@@ -34,6 +44,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTab;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
 import uk.gov.hmcts.ccd.domain.model.definition.ComplexACL;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.FixedListItem;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
@@ -51,22 +62,10 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
 
 public class TestBuildersUtil {
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -498,6 +497,45 @@ public class TestBuildersUtil {
         }
     }
 
+    public static class BannerBuilder {
+
+        private final Banner banner;
+
+        private BannerBuilder() {
+            this.banner = new Banner();
+            this.banner.setJurisdiction(new Jurisdiction());
+        }
+
+        public static BannerBuilder newBanner() {
+            return new BannerBuilder();
+        }
+
+        public BannerBuilder withBannerEnabled(Boolean bannerEnabled) {
+            this.banner.setBannerEnabled(bannerEnabled);
+            return this;
+
+        }
+
+        public BannerBuilder withBannerDescription(String bannerDescription) {
+            this.banner.setBannerDescription(bannerDescription);
+            return this;
+        }
+
+        public BannerBuilder withBannerUrl(String bannerUrl) {
+            banner.setBannerUrl(bannerUrl);
+            return this;
+        }
+
+        public BannerBuilder withBannerUrlText(String bannerUrlText) {
+            banner.setBannerUrlText(bannerUrlText);
+            return this;
+        }
+
+        public Banner build() {
+            return banner;
+        }
+    }
+
     public static class CaseViewBuilder {
         private final CaseView caseView;
         private final List<CaseViewTrigger> caseViewTriggers = newArrayList();
@@ -897,11 +935,6 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public WizardPageComplexFieldOverrideBuilder withOrder(Integer order) {
-            this.wizardPageComplexFieldOverride.setOrder(order);
-            return this;
-        }
-
         public WizardPageComplexFieldOverrideBuilder withLabel(String label) {
             this.wizardPageComplexFieldOverride.setLabel(label);
             return this;
@@ -1035,11 +1068,47 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public CaseFieldBuilder withOrder(final int order) {
+            caseField.setOrder(order);
+            return this;
+        }
+
+        public CaseFieldBuilder withDisplayContextParameter(final String displayContextParameter) {
+            caseField.setDisplayContext(displayContextParameter);
+            return this;
+        }
+
         public CaseField build() {
             caseField.setAccessControlLists(accessControlLists);
             caseField.setComplexACLs(complexACLs);
             caseField.setFieldType(caseFieldType);
             return caseField;
+        }
+    }
+
+    public static class FixedListItemBuilder {
+        private final FixedListItem fixedListItem;
+
+        public FixedListItemBuilder() {
+            this.fixedListItem = new FixedListItem();
+        }
+
+        public static FixedListItemBuilder aFixedListItem() {
+            return new FixedListItemBuilder();
+        }
+
+        public FixedListItemBuilder withCode(String code) {
+            this.fixedListItem.setCode(code);
+            return this;
+        }
+
+        public FixedListItemBuilder withOrder(String order) {
+            this.fixedListItem.setOrder(order);
+            return this;
+        }
+
+        public FixedListItem build() {
+            return fixedListItem;
         }
     }
 
@@ -1081,6 +1150,16 @@ public class TestBuildersUtil {
                 .withComplexField(complexField)
                 .withType(COMPLEX)
                 .build());
+            return this;
+        }
+
+        public FieldTypeBuilder withFixedListItems(final FixedListItem... fixedListItems) {
+            fieldType.setFixedListItems(Lists.newArrayList(fixedListItems));
+            return this;
+        }
+
+        public FieldTypeBuilder withFixedListItems(final List<FixedListItem> fixedListItems) {
+            fieldType.setFixedListItems(fixedListItems);
             return this;
         }
 
@@ -1577,109 +1656,6 @@ public class TestBuildersUtil {
 
         public DefaultSettings build() {
             return this.defaultSettings;
-        }
-    }
-
-    public static class JurisdictionDisplayPropertiesBuilder {
-        private final JurisdictionDisplayProperties jurisdictionDisplayProperties;
-
-        private JurisdictionDisplayPropertiesBuilder() {
-            this.jurisdictionDisplayProperties = new JurisdictionDisplayProperties();
-        }
-
-        public static JurisdictionDisplayPropertiesBuilder newJurisdictionDisplayProperties() {
-            return new JurisdictionDisplayPropertiesBuilder();
-        }
-
-        public JurisdictionDisplayPropertiesBuilder withCaseType(List<CaseType> caseTypes) {
-            jurisdictionDisplayProperties.setCaseTypes(caseTypes);
-            return this;
-        }
-
-        public JurisdictionDisplayPropertiesBuilder withDescription(String description) {
-            jurisdictionDisplayProperties.setDescription(description);
-            return this;
-        }
-
-        public JurisdictionDisplayPropertiesBuilder withId(String id) {
-            jurisdictionDisplayProperties.setId(id);
-            return this;
-        }
-
-        public JurisdictionDisplayPropertiesBuilder withName(String name) {
-            jurisdictionDisplayProperties.setName(name);
-            return this;
-        }
-
-        public JurisdictionDisplayProperties build() {
-            return this.jurisdictionDisplayProperties;
-        }
-    }
-
-    public static class UserBuilder {
-        private final User user;
-
-        private UserBuilder() {
-            this.user = new User();
-        }
-
-        public static UserBuilder newUser() {
-            return new UserBuilder();
-        }
-
-        public UserBuilder withIdamProperties(IDAMProperties idamProperties) {
-            user.setIdamProperties(idamProperties);
-            return this;
-        }
-
-        public User build() {
-            return this.user;
-        }
-    }
-
-    public static class IDAMPropertiesBuilder {
-        private final IDAMProperties idamProperties;
-
-        private IDAMPropertiesBuilder() {
-            this.idamProperties = new IDAMProperties();
-        }
-
-        public static IDAMPropertiesBuilder newIDAMProperties() {
-            return new IDAMPropertiesBuilder();
-        }
-
-        public IDAMPropertiesBuilder withId(String id) {
-            this.idamProperties.setId(id);
-            return this;
-        }
-
-        public IDAMPropertiesBuilder withEmail(String email) {
-            this.idamProperties.setEmail(email);
-            return this;
-        }
-
-        public IDAMPropertiesBuilder withForename(String forename) {
-            this.idamProperties.setForename(forename);
-            return this;
-        }
-
-        public IDAMPropertiesBuilder withSurname(String surname) {
-            this.idamProperties.setSurname(surname);
-            return this;
-        }
-
-        public IDAMPropertiesBuilder withRoles(String[] roles) {
-            this.idamProperties.setRoles(roles);
-            return this;
-        }
-
-        public IDAMPropertiesBuilder withDefaultService(String defaultService) {
-            this.idamProperties.setDefaultService(defaultService);
-            return this;
-        }
-
-        public IDAMProperties build() {
-            return this.idamProperties;
         }
     }
 
