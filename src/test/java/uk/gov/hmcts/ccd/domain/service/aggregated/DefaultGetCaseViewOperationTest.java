@@ -13,7 +13,6 @@ import org.mockito.Spy;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
@@ -85,9 +84,6 @@ class DefaultGetCaseViewOperationTest {
 
     @Mock
     private ObjectMapperService objectMapperService;
-
-    @Mock
-    private CompoundFieldOrderService compoundFieldOrderService;
 
     @Spy
     @InjectMocks

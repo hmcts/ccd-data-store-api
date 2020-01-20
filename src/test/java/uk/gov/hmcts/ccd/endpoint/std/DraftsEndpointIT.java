@@ -234,7 +234,7 @@ public class DraftsEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected tab show condition", "PersonLastName=\"Smith\"", addressTab.getShowCondition());
         assertEquals("Unexpected tab order", 2, addressTab.getOrder().intValue());
 
-        final CommonField[] addressFields = addressTab.getFields();
+        final CaseViewField[] addressFields = addressTab.getFields();
         assertThat("Fields are not empty", addressFields, arrayWithSize(0));
         assertEquals("Unexpected number of fields", 0, addressFields.length);
 
@@ -245,7 +245,7 @@ public class DraftsEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected tab show condition", "PersonFistName=\"George\"", documentTab.getShowCondition());
         assertEquals("Unexpected tab order", 3, documentTab.getOrder().intValue());
 
-        final CommonField[] documentFields = documentTab.getFields();
+        final CaseViewField[] documentFields = documentTab.getFields();
         assertThat("Fields are not empty", documentFields, arrayWithSize(0));
         assertEquals("Unexpected number of fields", 0, documentFields.length);
 

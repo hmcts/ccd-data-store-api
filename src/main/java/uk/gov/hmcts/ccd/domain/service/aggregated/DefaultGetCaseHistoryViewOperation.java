@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
@@ -35,10 +34,9 @@ public class DefaultGetCaseHistoryViewOperation extends AbstractDefaultGetCaseVi
         @Qualifier("authorised") GetEventsOperation getEventsOperation,
         UIDefinitionRepository uiDefinitionRepository, CaseTypeService caseTypeService,
         UIDService uidService,
-        DefaultObjectMapperService defaultObjectMapperService,
-        CompoundFieldOrderService compoundFieldOrderService) {
+        DefaultObjectMapperService defaultObjectMapperService) {
 
-        super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService, defaultObjectMapperService, compoundFieldOrderService);
+        super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService, defaultObjectMapperService);
         this.getEventsOperation = getEventsOperation;
     }
 

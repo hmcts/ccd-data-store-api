@@ -1,17 +1,5 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEventField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +27,18 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessCont
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+
 public class CaseViewFieldBuilderTest {
 
     private static final CaseField CASE_FIELD_2 = new CaseField();
@@ -60,7 +60,7 @@ public class CaseViewFieldBuilderTest {
         .withAcl(acl3)
         .build();
     private static final CaseField CASE_FIELD_3 = newCaseField().withFieldType(textFieldType).withId("STATE").build();
-    private static final String TEXT_TYPE = "Text";
+
 
     static {
         CASE_FIELD.setCaseTypeId("TestAddressBookCase");
@@ -85,7 +85,6 @@ public class CaseViewFieldBuilderTest {
         EVENT_FIELD_3.setCaseFieldId("State");
     }
 
-    private CompoundFieldOrderService compoundFieldOrderService = new CompoundFieldOrderService();
     private CaseViewFieldBuilder fieldBuilder;
 
     @Nested
@@ -93,7 +92,7 @@ public class CaseViewFieldBuilderTest {
     class BuilderTest {
         @BeforeEach
         public void setUp() {
-            fieldBuilder = spy(new CaseViewFieldBuilder(compoundFieldOrderService));
+            fieldBuilder = spy(new CaseViewFieldBuilder());
         }
 
         @Test
@@ -238,7 +237,8 @@ public class CaseViewFieldBuilderTest {
 
     @Nested
     @DisplayName("ACL tests")
-    class CaseViewFieldACLTest {
+    class CaseViewFieldTest {
+        private static final String TEXT_TYPE = "Text";
         private static final String YESNO_TYPE = "YesOrNo";
 
         private static final String FAMILY = "Family";
@@ -301,7 +301,7 @@ public class CaseViewFieldBuilderTest {
 
         @BeforeEach
         public void setUp() {
-            fieldBuilder = spy(new CaseViewFieldBuilder(compoundFieldOrderService));
+            fieldBuilder = spy(new CaseViewFieldBuilder());
         }
 
         @Test
@@ -334,5 +334,4 @@ public class CaseViewFieldBuilderTest {
             verify(caseFieldMock).propagateACLsToNestedFields();
         }
     }
-
 }

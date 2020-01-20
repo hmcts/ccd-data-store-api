@@ -75,6 +75,7 @@ class UIStartTriggerControllerTest {
                     .withDisplayContext("MANDATORY")
                     .withLabel(FIELD_LABEL)
                     .withHintText(FIELD_HINT_TEXT)
+                    .withOrder(1)
                     .withShowCondition(null)
                     .build()))
             .build())

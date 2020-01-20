@@ -12,7 +12,6 @@ import java.util.stream.IntStream;
 
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
-import com.google.common.collect.Maps;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
@@ -55,9 +54,8 @@ public class SearchQueryFactoryOperation {
     public Query build(MetaData metadata, Map<String, String> params, boolean isCountQuery) {
         final List<Criterion> criteria = criterionFactory.build(metadata, params);
 
-        Map<String, Object> parametersToBind = Maps.newHashMap();
         String queryToFormat = isCountQuery ? MAIN_COUNT_QUERY : MAIN_QUERY;
-        String whereClausePart = secure(toClauses(criteria), metadata, parametersToBind);
+        String whereClausePart = secure(toClauses(criteria), metadata);
         String sortClause = sortOrderQueryBuilder.buildSortOrderClause(metadata);
 
         String queryString = String.format(queryToFormat, whereClausePart, sortClause);
@@ -68,31 +66,31 @@ public class SearchQueryFactoryOperation {
         } else {
             query = entityManager.createNativeQuery(queryString, CaseDetailsEntity.class);
         }
-        parametersToBind.forEach((k, v) -> query.setParameter(k, v));
         addParameters(query, criteria);
         return query;
     }
 
-    private String secure(String clauses, MetaData metadata, Map<String, Object> params) {
-        return clauses + addUserCaseAccessClause(params) + addUserCaseStateAccessClause(metadata, params);
+    private String secure(String clauses, MetaData metadata) {
+        return clauses + addUserCaseAccessClause() + addUserCaseStateAccessClause(metadata);
     }
 
-    private String addUserCaseAccessClause(Map<String, Object> params) {
+    private String addUserCaseAccessClause() {
         if (UserAuthorisation.AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
-            params.put("user_id", userAuthorisation.getUserId());
-            return " AND id IN (SELECT cu.case_data_id FROM case_users AS cu WHERE user_id = :user_id)";
+            return String.format(
+                " AND id IN (SELECT cu.case_data_id FROM case_users AS cu WHERE user_id = '%s')",
+                userAuthorisation.getUserId()
+            );
         }
         return "";
     }
 
-    private String addUserCaseStateAccessClause(MetaData metadata, Map<String, Object> params) {
+    private String addUserCaseStateAccessClause(MetaData metadata) {
         // restrict cases to the case states the user has access to
         List<String> caseStateIds = authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds(metadata.getJurisdiction(),
                                                                                                       metadata.getCaseTypeId(),
                                                                                                       CAN_READ);
         if (!caseStateIds.isEmpty()) {
-            params.put("states", caseStateIds);
-            return " AND state IN (:states)";
+            return String.format(" AND state IN ('%s')", String.join("','", caseStateIds));
         }
 
         return "";

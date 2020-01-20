@@ -15,9 +15,6 @@ public class FieldType implements Serializable {
 
     public static final String COLLECTION = "Collection";
     public static final String COMPLEX = "Complex";
-    public static final String MULTI_SELECT_LIST = "MultiSelectList";
-    public static final String FIXED_LIST = "FixedList";
-    public static final String FIXED_RADIO_LIST = "FixedRadioList";
     public static final String LABEL = "Label";
     public static final String CASE_PAYMENT_HISTORY_VIEWER = "CasePaymentHistoryViewer";
     public static final String CASE_HISTORY_VIEWER = "CaseHistoryViewer";
@@ -79,7 +76,7 @@ public class FieldType implements Serializable {
     public void setFixedListItems(List<FixedListItem> fixedListItems) {
         this.fixedListItems = fixedListItems;
     }
-
+    
     public List<CaseField> getComplexFields() {
         return complexFields;
     }
@@ -99,15 +96,6 @@ public class FieldType implements Serializable {
             return collectionFieldType.complexFields;
         } else {
             return emptyList();
-        }
-    }
-
-    @JsonIgnore
-    public void setChildren(List<CaseField> caseFields) {
-        if (type.equalsIgnoreCase(COMPLEX)) {
-            complexFields = caseFields;
-        } else if (type.equalsIgnoreCase(COLLECTION) && collectionFieldType != null) {
-            collectionFieldType.complexFields = caseFields;
         }
     }
 

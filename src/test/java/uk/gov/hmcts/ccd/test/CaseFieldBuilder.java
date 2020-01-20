@@ -7,8 +7,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.FixedListItem;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FixedListItemBuilder.aFixedListItem;
-
 public class CaseFieldBuilder {
 
     private final CaseField caseField = new CaseField();
@@ -63,7 +61,7 @@ public class CaseFieldBuilder {
             caseField.getFieldType().setFixedListItems(new ArrayList<>());
         }
 
-        final FixedListItem item = aFixedListItem().build();
+        final FixedListItem item = new FixedListItem();
         item.setCode(itemCode);
 
         caseField.getFieldType()
@@ -77,7 +75,7 @@ public class CaseFieldBuilder {
             caseField.getFieldType().setFixedListItems(new ArrayList<>());
         }
 
-        final FixedListItem item = aFixedListItem().build();
+        final FixedListItem item = new FixedListItem();
         item.setCode(itemCode);
         item.setLabel(itemValue);
 
