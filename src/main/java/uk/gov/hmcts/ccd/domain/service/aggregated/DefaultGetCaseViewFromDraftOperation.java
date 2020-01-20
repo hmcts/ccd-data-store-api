@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
@@ -51,8 +52,9 @@ public class DefaultGetCaseViewFromDraftOperation extends AbstractDefaultGetCase
                                                 final UIDService uidService,
                                                 @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway,
                                                 final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder,
-                                                final ObjectMapperService objectMapperService) {
-        super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService, objectMapperService);
+                                                final ObjectMapperService objectMapperService,
+                                                final CompoundFieldOrderService compoundFieldOrderService) {
+        super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService, objectMapperService, compoundFieldOrderService);
         this.draftGateway = draftGateway;
         this.draftResponseToCaseDetailsBuilder = draftResponseToCaseDetailsBuilder;
     }

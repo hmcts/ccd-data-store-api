@@ -486,9 +486,8 @@ jacoco {
 
 sonarqube {
     properties {
-        property "sonar.exclusions", "build/generated-sources/**/*.java"
-        property "sonar.coverage.exclusions", "src/main/java/uk/gov/hmcts/ccd/data/definition/DefaultCaseDefinitionRepository.java,src/main/java/uk/gov/hmcts/ccd/AppInsights.java," +
-                "**/DocLinksRestoreEndpoint.java,**/DefaultCaseDetailsRepository.java,**/CasePersistenceException.java"
+        property "sonar.exclusions", "build/generated-sources/**/*.java,**/service/doclink/**"
+        property "sonar.coverage.exclusions", "src/main/java/uk/gov/hmcts/ccd/data/definition/DefaultCaseDefinitionRepository.java,src/main/java/uk/gov/hmcts/ccd/AppInsights.java,**/DocLinksRestoreEndpoint.java,**/service/doclink/**,**/DefaultCaseDetailsRepository.java"
         property "sonar.jacoco.reportPaths", "${project.buildDir}/jacoco/junitPlatformTest.exec"
         property "sonar.junit.reportPaths", "${project.buildDir}/test-results/junit-platform"
         property "sonar.projectName", "ccd-data-store-api"
@@ -519,7 +518,10 @@ jacocoTestReport {
 
     afterEvaluate {
         classDirectories = files(classDirectories.files.collect {
-            fileTree(dir: it, exclude: ['uk/gov/hmcts/ccd/domain/types/sanitiser/document/**', '**/service/doclink/**'])
+            fileTree(dir: it, exclude: ['uk/gov/hmcts/ccd/domain/types/sanitiser/document/**',
+                                        '**/service/doclink/**',
+                                        '**/domain/model/definition/CaseEventFieldComplex**',
+                                        '**/domain/model/definition/DisplayContext**'])
         })
     }
 
