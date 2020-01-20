@@ -83,8 +83,11 @@ public class ApplicationParams {
     @Value("${definition.cache.max-idle.secs}")
     private Integer definitionCacheMaxIdleSecs;
 
-    @Value("${definition.cache.latest-version-ttl.secs}")
+    @Value("${definition.cache.latest-version-ttl}")
     private Integer latestVersionTTLSecs;
+
+    @Value("${definition.cache.jurisdiction-ttl}")
+    private Integer jurisdictionTTL;
 
     @Value("${user.cache.ttl.secs}")
     private Integer userCacheTTLSecs;
@@ -201,6 +204,10 @@ public class ApplicationParams {
         return caseDefinitionHost + "/api/data/jurisdictions";
     }
 
+    public String bannersURL() {
+        return uiDefinitionHost + "/api/display/banners";
+    }
+
     public String searchInputDefinition(final String caseTypeId) {
         return uiDefinitionHost + "/api/display/search-input-definition/" + encode(caseTypeId);
     }
@@ -263,6 +270,10 @@ public class ApplicationParams {
 
     public int getLatestVersionTTLSecs() {
         return latestVersionTTLSecs;
+    }
+
+    public int getJurisdictionTTLSecs() {
+        return jurisdictionTTL;
     }
 
     public Integer getUserCacheTTLSecs() {

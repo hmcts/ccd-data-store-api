@@ -1,9 +1,5 @@
 package uk.gov.hmcts.ccd.data.definition;
 
-import javax.inject.Inject;
-import java.util.Arrays;
-import java.util.List;
-
 import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -18,6 +14,13 @@ import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
 
 import org.hamcrest.collection.IsCollectionWithSize;
 import org.junit.Test;
+
+import javax.inject.Inject;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
@@ -100,8 +103,8 @@ public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
 
     @Test
     public void shouldGetJurisdictionsDefinition() {
-
-        List<Jurisdiction> allJurisdictions = caseDefinitionRepository.getJurisdictions(newArrayList("PROBATE", "DIVORCE", "SSCS"));
+        List<Jurisdiction> allJurisdictions = newArrayList("PROBATE", "DIVORCE", "SSCS").stream()
+                .map(id -> caseDefinitionRepository.getJurisdiction(id)).collect(Collectors.toList());
 
         assertAll(
                 () -> assertThat(allJurisdictions, hasSize(3)),
