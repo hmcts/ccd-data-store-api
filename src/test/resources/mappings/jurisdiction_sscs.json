@@ -1,0 +1,21 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/data/jurisdictions?ids=SSCS"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": [
+      {
+        "id": "SSCS",
+        "name" : "Test 3",
+        "description" : "Test Jurisdiction 3",
+        "live_from": "2017-01-01",
+        "live_until": "2017-01-01"
+      }
+    ]
+  }
+}

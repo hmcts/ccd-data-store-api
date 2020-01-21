@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.data.definition;
 
 import java.util.List;
-
+import uk.gov.hmcts.ccd.domain.model.definition.BannersResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchInputDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
@@ -21,4 +21,6 @@ public interface UIDefinitionGateway {
     CaseTabCollection getCaseTabCollection(int version, String caseTypeId);
 
     List<WizardPage> getWizardPageCollection(int version, String caseTypeId, String eventTriggerId);
+
+    BannersResult getBanners(final List<String> jurisdictionIds);
 }
