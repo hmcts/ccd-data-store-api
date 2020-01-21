@@ -15,7 +15,7 @@ Feature: F-032: Get printable documents
     And the response [contains a link to the printable documents that were uploaded to the case just created, along with a HTTP 200 OK]
     And the response has all other details as expected
 
-  @S-125 @Ignore # defect RDM-6628
+  @S-125 @Ignore #defect RDM-6628
   Scenario: must return 401 when request does not provide valid authentication credentials
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
