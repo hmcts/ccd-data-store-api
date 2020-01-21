@@ -43,7 +43,6 @@ public class ValidatorTest {
         };
     }
 
-
     protected void doTheTest(
         final String value,
         final boolean expectedResult,

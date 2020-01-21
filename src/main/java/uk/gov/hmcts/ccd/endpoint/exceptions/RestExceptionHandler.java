@@ -62,7 +62,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseBody
-    public ResponseEntity<HttpError>  customHandleNotFound(final ConstraintViolationException constraintViolationException, final HttpServletRequest request) {
+    public ResponseEntity<HttpError> handleValidationExceptions(final ConstraintViolationException constraintViolationException, final HttpServletRequest request) {
 
         LOG.warn(constraintViolationException.getMessage(), constraintViolationException);
         appInsights.trackException(constraintViolationException);

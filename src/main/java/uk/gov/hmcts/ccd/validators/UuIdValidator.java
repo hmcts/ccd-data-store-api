@@ -19,6 +19,5 @@ public class UuIdValidator implements ConstraintValidator<UuId, String> {
                 .addConstraintViolation();
             return false;
         }
-
     }
 }

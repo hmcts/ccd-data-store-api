@@ -23,5 +23,4 @@ public @interface CcdAlphabeticId {
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
-
 }

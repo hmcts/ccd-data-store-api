@@ -18,7 +18,6 @@ public class CaseIDValidator implements ConstraintValidator<CaseID, String> {
         this.uidService = uidService;
     }
 
-
     @Override
     public boolean isValid(final String value, final ConstraintValidatorContext context) {
 
