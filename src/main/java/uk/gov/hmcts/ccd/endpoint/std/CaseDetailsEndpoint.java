@@ -44,7 +44,7 @@ import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.validators.annotations.CaseID;
-import uk.gov.hmcts.ccd.validators.annotations.CcdAlphabeticId;
+import uk.gov.hmcts.ccd.validators.annotations.CcdAlphaNumericId;
 import uk.gov.hmcts.ccd.validators.annotations.UuId;
 
 import javax.transaction.Transactional;
@@ -121,11 +121,11 @@ public class CaseDetailsEndpoint {
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
 
-        @CcdAlphabeticId
+        @CcdAlphaNumericId
         @ApiParam(value = "Jurisdiction ID", required = true)
         @PathVariable("jid") final String jurisdictionId,
 
-        @CcdAlphabeticId
+        @CcdAlphaNumericId
         @ApiParam(value = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
 

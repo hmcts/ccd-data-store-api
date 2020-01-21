@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.validators.annotations;
 
-import uk.gov.hmcts.ccd.validators.CcdAlphabeticIdValidator;
+import uk.gov.hmcts.ccd.validators.CcdAlphaNumericIdValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -14,11 +14,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Target({PARAMETER, FIELD})
 @Retention(RUNTIME)
-@Constraint(validatedBy = CcdAlphabeticIdValidator.class)
+@Constraint(validatedBy = CcdAlphaNumericIdValidator.class)
 @Documented
-public @interface CcdAlphabeticId {
+public @interface CcdAlphaNumericId {
 
-    String message() default "This is not a valid alphabetical id.";
+    String message() default "This is not a valid alphanumeric id.";
 
     Class<?>[] groups() default {};
 

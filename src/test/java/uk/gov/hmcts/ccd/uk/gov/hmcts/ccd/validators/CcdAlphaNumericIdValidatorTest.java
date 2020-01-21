@@ -6,21 +6,21 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.validators.CcdAlphabeticIdValidator;
+import uk.gov.hmcts.ccd.validators.CcdAlphaNumericIdValidator;
 
 import javax.validation.ConstraintValidatorContext;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-@DisplayName("CcdAlphabeticIdValidatorTest")
-public class CcdAlphabeticIdValidatorTest extends ValidatorTest {
+@DisplayName("CcdAlphaNumericIdValidatorTest")
+public class CcdAlphaNumericIdValidatorTest extends ValidatorTest {
 
     @Mock
     private ConstraintValidatorContext constraintValidatorContext;
 
     @InjectMocks
-    private CcdAlphabeticIdValidator ccdAlphabeticIdValidator;
+    private CcdAlphaNumericIdValidator ccdAlphaNumericIdValidator;
 
     @BeforeEach
     void setUp() {
@@ -33,27 +33,34 @@ public class CcdAlphabeticIdValidatorTest extends ValidatorTest {
     @DisplayName("Should fail for null")
     void shouldFailForNullValues() {
 
-        doTheTest(null, false, ccdAlphabeticIdValidator, constraintValidatorContext);
+        doTheTest(null, false, ccdAlphaNumericIdValidator, constraintValidatorContext);
     }
 
     @Test
     @DisplayName("Should fail for non valid characters")
     void shouldFailForNotValidCharacters() {
 
-        doTheTest("TY^^^^^****", false, ccdAlphabeticIdValidator, constraintValidatorContext);
+        doTheTest("TY^^^^^****", false, ccdAlphaNumericIdValidator, constraintValidatorContext);
     }
 
     @Test
     @DisplayName("Should fail for spaces")
     void shouldFailForSpaces() {
 
-        doTheTest("TE TE TE ", false, ccdAlphabeticIdValidator, constraintValidatorContext);
+        doTheTest("TE TE TE ", false, ccdAlphaNumericIdValidator, constraintValidatorContext);
+    }
+
+    @Test
+    @DisplayName("Should pass for alpha numeric")
+    void shouldPassForNumbers() {
+
+        doTheTest("TE1", true, ccdAlphaNumericIdValidator, constraintValidatorContext);
     }
 
     @Test
     @DisplayName("Should pass for correct format.")
     void shouldPassForValidId() {
 
-        doTheTest("TEST", true, ccdAlphabeticIdValidator, constraintValidatorContext);
+        doTheTest("TEST", true, ccdAlphaNumericIdValidator, constraintValidatorContext);
     }
 }

@@ -1,13 +1,13 @@
 package uk.gov.hmcts.ccd.validators;
 
-import uk.gov.hmcts.ccd.validators.annotations.CcdAlphabeticId;
+import uk.gov.hmcts.ccd.validators.annotations.CcdAlphaNumericId;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class CcdAlphabeticIdValidator implements ConstraintValidator<CcdAlphabeticId, String> {
+public class CcdAlphaNumericIdValidator implements ConstraintValidator<CcdAlphaNumericId, String> {
 
-    final String alphabeticExpression = "[a-zA-Z]+";
+    final String alphaNumericExpression = "[a-zA-Z0-9]+";
 
     @Override
     public boolean isValid(final String value, final ConstraintValidatorContext context) {
@@ -17,8 +17,8 @@ public class CcdAlphabeticIdValidator implements ConstraintValidator<CcdAlphabet
                 .addConstraintViolation();
             return false;
         }
-        if (!value.matches(alphabeticExpression)) {
-            context.buildConstraintViolationWithTemplate("The id have to be a character sequence of [a-zA-Z]")
+        if (!value.matches(alphaNumericExpression)) {
+            context.buildConstraintViolationWithTemplate("The id have to be a character sequence of [a-zA-Z0-9]")
                 .addConstraintViolation();
             return false;
         }
