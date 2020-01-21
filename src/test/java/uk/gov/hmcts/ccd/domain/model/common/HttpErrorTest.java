@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 
 import javax.servlet.http.HttpServletRequest;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +15,7 @@ import java.util.Map;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
@@ -146,6 +145,40 @@ public class HttpErrorTest {
             .withCallbackWarnings(CALLBACK_WARNINGS);
 
         assertThat(error.getCallbackWarnings(), is(equalTo(CALLBACK_WARNINGS)));
+    }
+
+    @Test
+    public void shouldExtractMessageFromExceptionAndStatus() {
+
+        final Map<String, Object> expectedDetails = new HashMap<>();
+        expectedDetails.put("test1", 1);
+        expectedDetails.put("test2", Arrays.asList(2, 3, 4));
+
+        final CatalogueResponse expectedCatalogueResponse =
+            new CatalogueResponse(CatalogueResponseCode.CALLBACK_FAILURE, expectedDetails);
+
+        final HttpError error = new HttpError(new IllegalArgumentException(MESSAGE), request, expectedCatalogueResponse, 400);
+
+        final CatalogueResponse actualCatalogueResponse = error.getCatalogueResponse();
+        assertThat(actualCatalogueResponse, is(equalTo(expectedCatalogueResponse)));
+        assertThat(error.getStatus(), is(equalTo(400)));
+    }
+
+    @Test
+    public void shouldExtractMessageFromExceptionWithoutStatus() {
+
+        final Map<String, Object> expectedDetails = new HashMap<>();
+        expectedDetails.put("test1", 1);
+        expectedDetails.put("test2", Arrays.asList(2, 3, 4));
+
+        final CatalogueResponse expectedCatalogueResponse =
+            new CatalogueResponse(CatalogueResponseCode.CALLBACK_FAILURE, expectedDetails);
+
+        final HttpError error = new HttpError(new IllegalArgumentException(MESSAGE), request, expectedCatalogueResponse, null);
+
+        final CatalogueResponse actualCatalogueResponse = error.getCatalogueResponse();
+        assertThat(actualCatalogueResponse, is(equalTo(expectedCatalogueResponse)));
+        assertThat(error.getStatus(), is(equalTo(500)));
     }
 
     @ResponseStatus(code = HttpStatus.UNSUPPORTED_MEDIA_TYPE)
