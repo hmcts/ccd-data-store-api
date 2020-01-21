@@ -101,15 +101,6 @@ public class DocumentsOperationTest extends BaseTest {
     }
 
     @Test
-    public void shouldReturnNoDocumentsIfNoDocumentsRetrieved() throws Exception {
-        stubFor(post(urlMatching(TEST_URL + ".*"))
-                    .willReturn(okJson(mapper.writeValueAsString(new ArrayList<>())).withStatus(200)));
-
-        final List<Document> results = documentsOperation.getPrintableDocumentsForCase(TEST_CASE_REFERENCE);
-        assertEquals("Incorrect number of documents", 0, results.size());
-    }
-
-    @Test
     public void shouldReturnDocumentsIfDocumentsRetrieved() throws Exception {
         final List<Document> TEST_DOCUMENTS = buildDocuments();
         stubFor(post(urlMatching(TEST_URL + ".*"))
@@ -133,10 +124,10 @@ public class DocumentsOperationTest extends BaseTest {
         ReflectionTestUtils.setField(documentsOperation, "ldClient", mockLdClient);
 
         Document expectedDocument = new Document();
-        expectedDocument.setName("SAMPLE FROM CASE DOCUMENT API");
-        expectedDocument.setDescription("SAMPLE FROM CASE DOCUMENT API");
-        expectedDocument.setType("SAMPLE FROM CASE DOCUMENT API");
-        expectedDocument.setUrl("SAMPLE FROM CASE DOCUMENT API");
+        expectedDocument.setName("SAMPLE FROM NEW CASE DOCUMENT API");
+        expectedDocument.setDescription("SAMPLE FROM NEW CASE DOCUMENT API");
+        expectedDocument.setType("SAMPLE FROM NEW CASE DOCUMENT API");
+        expectedDocument.setUrl("SAMPLE FROM NEW CASE DOCUMENT API");
         List<Document> expectedResponse = ImmutableList.of(expectedDocument);
 
         final List<Document> actualResponse = documentsOperation.getPrintableDocumentsForCase(TEST_CASE_REFERENCE);
@@ -150,19 +141,12 @@ public class DocumentsOperationTest extends BaseTest {
     }
 
     private List<Document> buildDocuments() {
-        final Document TEST_DOC_1 = new Document();
-        TEST_DOC_1.setDescription("TEST_DOC_1_DESC");
-        TEST_DOC_1.setName("TEST_DOC_1_NAME");
-        TEST_DOC_1.setType("TEST_DOC_1_TYPE");
-        TEST_DOC_1.setUrl("TEST_DOC_1_URL");
-        final Document TEST_DOC_2 = new Document();
-        TEST_DOC_2.setDescription("TEST_DOC_2_DESC");
-        TEST_DOC_2.setName("TEST_DOC_2_NAME");
-        TEST_DOC_2.setType("TEST_DOC_2_TYPE");
-        TEST_DOC_2.setUrl("TEST_DOC_2_URL");
-        final List<Document> TEST_DOCUMENTS = new ArrayList<>();
-        TEST_DOCUMENTS.add(TEST_DOC_1);
-        TEST_DOCUMENTS.add(TEST_DOC_2);
-        return TEST_DOCUMENTS;
+        Document documentFromDocStoreApi = new Document();
+        documentFromDocStoreApi.setName("Screenshot 2019-09-26 at 13.06.47.png");
+        documentFromDocStoreApi.setDescription("Evidence screen capture");
+        documentFromDocStoreApi.setType("png");
+        documentFromDocStoreApi.setUrl("http://dm-store-aat.service.core-compute-aat.internal"
+            + "/documents/1d9e2f5f-2114-4748-b01c-70481000ce6d/binary");
+        return ImmutableList.of(documentFromDocStoreApi);
     }
 }

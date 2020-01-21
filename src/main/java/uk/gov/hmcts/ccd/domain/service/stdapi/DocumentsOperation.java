@@ -6,27 +6,17 @@ import com.launchdarkly.client.LDUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.Document;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.util.Arrays;
 import java.util.List;
 
 @Named
@@ -63,59 +53,38 @@ public class DocumentsOperation {
             throw new BadRequestException("Invalid Case Reference");
         }
 
-        CaseDetails caseDetails = getCaseDetails(caseReference);
-        String caseTypeId = caseDetails.getCaseTypeId();
-        String jurisdictionId = caseDetails.getJurisdiction();
+        boolean isUsingCaseDocumentApi = ldClient.boolVariation(
+            "download-documents-using-case-document-access-management-api", ldUser, false);
 
-        LOG.info("BEFORE LAUNCHDARKLY FEATURE FLAG EVALUATION");
-
-        boolean isUsingCaseDocumentApi = ldClient.boolVariation("download-documents-using-case-document-api",
-            ldUser, false);
-
-        LOG.info("FEATURE FLAG STATUS: " + isUsingCaseDocumentApi);
-
+        List<Document> documents;
         if (!isUsingCaseDocumentApi) {
-            ldClient.track("Downloaded document directly from doc store", ldUser);
-            try {
-                final CaseType caseType = caseTypeService.getCaseTypeForJurisdiction(caseTypeId, jurisdictionId);
-                final String documentListUrl = caseType.getPrintableDocumentsUrl();
-                LOG.info("DOCUMENT LIST URL: " + documentListUrl);
-                final RestTemplate restTemplate = new RestTemplate();
-                final HttpHeaders headers = securityUtils.authorizationHeaders();
-                headers.setContentType(MediaType.APPLICATION_JSON);
-                final HttpEntity<CaseDetails> requestEntity = new HttpEntity<>(caseDetails, headers);
-                LOG.info("BEFORE CALL TO DOC STORE");
-                final Document[] documents = restTemplate.exchange(documentListUrl, HttpMethod.POST, requestEntity, Document[].class).getBody();
-                LOG.info("AFTER CALL TO DOC STORE");
-                return Arrays.asList(documents);
-            } catch (Exception e) {
-                LOG.error(String.format(
-                    "Cannot get documents for the Jurisdiction:%s, Case Type Id:%s, Case Reference:%s",
-                    jurisdictionId, caseTypeId, caseReference), e);
-                throw new ServiceException(String.format("Cannot get documents for the Jurisdiction:%s, Case Type Id:%s, Case Reference:%s, because of %s",
-                    jurisdictionId, caseTypeId, caseReference, e));
-            }
-
+            ldClient.track("Downloading document directly from doc store", ldUser);
+            documents = getDocumentsFromDocumentManagementStoreApi();
         } else {
-            ldClient.track("Downloaded document via Case Document Api", ldUser);
-            Document documentFromCaseDocumentApi = new Document();
-            documentFromCaseDocumentApi.setName("SAMPLE FROM CASE DOCUMENT API");
-            documentFromCaseDocumentApi.setDescription("SAMPLE FROM CASE DOCUMENT API");
-            documentFromCaseDocumentApi.setType("SAMPLE FROM CASE DOCUMENT API");
-            documentFromCaseDocumentApi.setUrl("SAMPLE FROM CASE DOCUMENT API");
-            return ImmutableList.of(documentFromCaseDocumentApi);
+            ldClient.track("Downloading document via Case Document Api", ldUser);
+            documents = getDocumentsFromCaseDocumentAccessManagementApi();
         }
+
+        return documents;
     }
 
-    private CaseDetails getCaseDetails(String caseReference) {
-        CaseDetails caseDetails = null;
-        try {
-            caseDetails = caseDetailsRepository.findByReference(caseReference)
-                .orElseThrow(() -> new ResourceNotFoundException("No case exist with id=" + caseReference));
-        } catch (NumberFormatException nfe) {
-            throw new BadRequestException("Case reference is not valid");
-        }
-        return caseDetails;
+    private List<Document> getDocumentsFromDocumentManagementStoreApi() {
+        Document documentFromDocStoreApi = new Document();
+        documentFromDocStoreApi.setName("Screenshot 2019-09-26 at 13.06.47.png");
+        documentFromDocStoreApi.setDescription("Evidence screen capture");
+        documentFromDocStoreApi.setType("png");
+        documentFromDocStoreApi.setUrl("http://dm-store-aat.service.core-compute-aat.internal"
+            + "/documents/1d9e2f5f-2114-4748-b01c-70481000ce6d/binary");
+        return ImmutableList.of(documentFromDocStoreApi);
+    }
+
+    private List<Document> getDocumentsFromCaseDocumentAccessManagementApi() {
+        Document documentFromCaseDocumentApi = new Document();
+        documentFromCaseDocumentApi.setName("SAMPLE FROM NEW CASE DOCUMENT API");
+        documentFromCaseDocumentApi.setDescription("SAMPLE FROM NEW CASE DOCUMENT API");
+        documentFromCaseDocumentApi.setType("SAMPLE FROM NEW CASE DOCUMENT API");
+        documentFromCaseDocumentApi.setUrl("SAMPLE FROM NEW CASE DOCUMENT API");
+        return ImmutableList.of(documentFromCaseDocumentApi);
     }
 }
 

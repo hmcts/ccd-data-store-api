@@ -2,8 +2,6 @@ package uk.gov.hmcts.ccd.config;
 
 import com.launchdarkly.client.LDClient;
 import com.launchdarkly.client.LDUser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,8 +12,6 @@ import java.io.IOException;
 
 @Configuration
 public class LaunchDarklyConfiguration {
-
-    private static final Logger LOG = LoggerFactory.getLogger(LaunchDarklyConfiguration.class);
 
     private LDClient client;
     private LDUser user;
@@ -31,7 +27,6 @@ public class LaunchDarklyConfiguration {
 
     @PostConstruct
     void LaunchDarkly() {
-        LOG.info("LAUNCHDARKLY CLIENT INITIALISED WITH: " + sdkKey);
         client = new LDClient(sdkKey);
         user = new LDUser.Builder(userKey)
             .custom("component", component)
