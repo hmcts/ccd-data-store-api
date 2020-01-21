@@ -248,3 +248,8 @@ variable "additional_host_name" {
   description = "A custom domain name for this webapp."
   default = "null"
 }
+
+variable "enable_ase" {
+  default = false
+}
+
