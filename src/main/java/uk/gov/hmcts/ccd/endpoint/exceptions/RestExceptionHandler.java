@@ -72,7 +72,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         final CatalogueResponse catalogueResponse =
             new CatalogueResponse(CatalogueResponseCode.VALIDATION_INVALID_DATA, catalogueResponseDetails);
 
-        final HttpError error = new HttpError(constraintViolationException, request, catalogueResponse);
+        final HttpError error = new HttpError(constraintViolationException, request, catalogueResponse,HttpStatus.BAD_REQUEST.value());
         catalogueResponseDetails.put("validationErrors", validationErrors);
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
