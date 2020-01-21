@@ -24,8 +24,7 @@
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "headers": {
-      "_extends_": "Common_Response_Headers",
-      "Transfer-Encoding" : "chunked"
+      "_extends_": "Common_Response_Headers"
     },
     "body": {
       "arrayInMap": [
