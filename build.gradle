@@ -216,7 +216,7 @@ dependencies {
     compile group: 'org.awaitility', name: 'awaitility', version: '3.1.6'
 
     // CVE-2019-12086 - force update of jackson-databind - remove when dependencies move off <2.9.9
-    compile "com.fasterxml.jackson.core:jackson-databind:2.9.10.1"
+    compile "com.fasterxml.jackson.core:jackson-databind:2.9.10.2"
 
     // FIXME 0.6 doesn't support jsonb; 0.7 doesn't work on Windows
 //    runtime group: 'com.impossibl.pgjdbc-ng', name: 'pgjdbc-ng', version: '0.6'
@@ -481,7 +481,7 @@ jacoco {
 sonarqube {
     properties {
         property "sonar.exclusions", "build/generated-sources/**/*.java,**/service/doclink/**"
-        property "sonar.coverage.exclusions", "src/main/java/uk/gov/hmcts/ccd/data/definition/DefaultCaseDefinitionRepository.java,src/main/java/uk/gov/hmcts/ccd/AppInsights.java,**/DocLinksRestoreEndpoint.java,**/service/doclink/**"
+        property "sonar.coverage.exclusions", "src/main/java/uk/gov/hmcts/ccd/data/definition/DefaultCaseDefinitionRepository.java,src/main/java/uk/gov/hmcts/ccd/AppInsights.java,**/DocLinksRestoreEndpoint.java,**/service/doclink/**,**/DefaultCaseDetailsRepository.java"
         property "sonar.jacoco.reportPaths", "${project.buildDir}/jacoco/junitPlatformTest.exec"
         property "sonar.junit.reportPaths", "${project.buildDir}/test-results/junit-platform"
         property "sonar.projectName", "ccd-data-store-api"

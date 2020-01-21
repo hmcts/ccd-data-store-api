@@ -59,7 +59,7 @@ env.S2S_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.int
 env.CCD_GW_SERVICE_NAME = "ccd_gw"
 env.OAUTH2_CLIENT_ID = "ccd_gateway"
 env.OAUTH2_REDIRECT_URI = "https://www-ccd.aat.platform.hmcts.net/oauth2redirect"
-env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-pr-469.service.core-compute-preview.internal/"
+env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-pr-518.service.core-compute-preview.internal/"
 
 withPipeline(type, product, component) {
     onMaster {
