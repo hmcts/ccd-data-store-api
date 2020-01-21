@@ -24,6 +24,7 @@
       "event_token": "${[scenarioContext][parentContext][childContexts][S-579-Prerequisite_Solicitor_3_Token_For_Update_Case][testData][actualResponse][body][token]}"
     }
   },
+
   "expectedResponse": {
     "responseCode": 201,
     "responseMessage": "Created",
