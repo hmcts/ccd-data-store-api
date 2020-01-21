@@ -112,6 +112,7 @@ module "ccd-data-store-api" {
   capacity = "${var.capacity}"
   java_container_version = "9.0"
   appinsights_instrumentation_key = "${var.appinsights_instrumentation_key}"
+  enable_ase                      = "${var.enable_ase}"
 
   app_settings = {
     DATA_STORE_DB_HOST = "${module.data-store-db.host_name}"
@@ -143,6 +144,7 @@ module "ccd-data-store-api" {
 
     DEFINITION_CACHE_MAX_IDLE_SEC       = "${var.definition_cache_max_idle_sec}"
     DEFINITION_CACHE_LATEST_VERSION_TTL_SEC = "${var.definition_cache_latest_version_ttl_sec}"
+    DEFINITION_CACHE_JURISDICTION_TTL_SEC = "${var.definition_cache_jurisdiction_ttl_sec}"
     DEFINITION_CACHE_MAX_SIZE           = "${var.definition_cache_max_size}"
     DEFINITION_CACHE_EVICTION_POLICY    = "${var.definition_cache_eviction_policy}"
 

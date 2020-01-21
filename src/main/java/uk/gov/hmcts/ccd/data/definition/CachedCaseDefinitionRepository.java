@@ -1,16 +1,17 @@
 package uk.gov.hmcts.ccd.data.definition;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
 import static com.google.common.collect.Maps.newHashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
@@ -76,8 +77,8 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     }
 
     @Override
-    public List<Jurisdiction> getJurisdictions(List<String> ids) {
-        return this.caseDefinitionRepository.getJurisdictions(ids);
+    public Jurisdiction getJurisdiction(String jurisdictionId) {
+        return caseDefinitionRepository.getJurisdiction(jurisdictionId);
     }
 
     @Override
