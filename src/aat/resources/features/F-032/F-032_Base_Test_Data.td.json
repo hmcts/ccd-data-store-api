@@ -1,8 +1,11 @@
 {
   "_guid_": "F-032_Base_Test_Data",
 
-  "user": {
-    "_extends_": "Common_User_For_Request"
+  "users": {
+    "invokingUser": {
+      "username":"[[$CCD_PRIVATE_CASEWORKER_EMAIL]]",
+      "password":"[[$CCD_PRIVATE_CASEWORKER_PASSWORD]]"
+    }
   },
 
   "productName": "CCD Data Store",
