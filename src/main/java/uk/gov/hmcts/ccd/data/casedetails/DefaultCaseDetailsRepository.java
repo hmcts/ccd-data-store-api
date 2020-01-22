@@ -42,7 +42,6 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
 
     public static final String QUALIFIER = "default";
     private static final String UNIQUE_REFERENCE_KEY_CONSTRAINT = "case_data_reference_key";
-
     private final CaseDetailsMapper caseDetailsMapper;
 
     @PersistenceContext

@@ -216,7 +216,6 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                 throw new ServiceException("Problem retrieving jurisdictions definition because of " + e.getMessage());
             }
         }
-
     }
 
 }
