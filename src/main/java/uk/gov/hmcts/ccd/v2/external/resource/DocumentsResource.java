@@ -21,7 +21,7 @@ public class DocumentsResource extends ResourceSupport {
     public DocumentsResource(@NonNull String caseId, @NonNull List<Document> documents) {
         documentResources = documents;
 
-        add(linkTo(methodOn(DocumentController.class).getDocuments(caseId)).withSelfRel());
+        add(linkTo(methodOn(DocumentController.class).getDocuments(caseId, "ccd-data-store-api")).withSelfRel());
     }
 
 }

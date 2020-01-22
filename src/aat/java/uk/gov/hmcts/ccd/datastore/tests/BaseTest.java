@@ -4,8 +4,6 @@ import java.util.function.Supplier;
 
 import static java.lang.Boolean.TRUE;
 
-import com.launchdarkly.client.LDClient;
-import com.launchdarkly.client.LDUser;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;

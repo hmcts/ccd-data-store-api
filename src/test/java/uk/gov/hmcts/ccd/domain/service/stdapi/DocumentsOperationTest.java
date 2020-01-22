@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.stdapi;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -97,7 +96,7 @@ public class DocumentsOperationTest extends BaseTest {
     public void shouldThrowBadRequestExceptionIfCaseReferenceInvalid() throws Exception {
         final String TEST_CASE_REFERENCE = "Invalid";
 
-        documentsOperation.getPrintableDocumentsForCase(TEST_CASE_REFERENCE);
+        documentsOperation.getPrintableDocumentsForCase(TEST_CASE_REFERENCE, "ccd-data-store-api");
     }
 
     @Test
@@ -106,7 +105,8 @@ public class DocumentsOperationTest extends BaseTest {
         stubFor(post(urlMatching(TEST_URL + ".*"))
                     .willReturn(okJson(mapper.writeValueAsString(TEST_DOCUMENTS)).withStatus(200)));
 
-        final List<Document> results = documentsOperation.getPrintableDocumentsForCase(TEST_CASE_REFERENCE);
+        final List<Document> results = documentsOperation.getPrintableDocumentsForCase(TEST_CASE_REFERENCE,
+            "ccd-data-store-api");
         assertEquals("Incorrect number of documents", TEST_DOCUMENTS.size(), results.size());
 
         for (int i = 0; i < results.size(); i++) {
@@ -130,7 +130,8 @@ public class DocumentsOperationTest extends BaseTest {
         expectedDocument.setUrl("SAMPLE FROM NEW CASE DOCUMENT API");
         List<Document> expectedResponse = ImmutableList.of(expectedDocument);
 
-        final List<Document> actualResponse = documentsOperation.getPrintableDocumentsForCase(TEST_CASE_REFERENCE);
+        final List<Document> actualResponse = documentsOperation.getPrintableDocumentsForCase(TEST_CASE_REFERENCE,
+            "ccd-data-store-api");
 
         for (int i = 0; i < actualResponse.size(); i++) {
             assertEquals("Incorrect description", actualResponse.get(i).getDescription(), expectedResponse.get(i).getDescription());

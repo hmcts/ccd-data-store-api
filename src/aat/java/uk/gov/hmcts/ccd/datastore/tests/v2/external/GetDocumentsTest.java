@@ -14,7 +14,7 @@ import static org.hamcrest.Matchers.equalTo;
 
 public class GetDocumentsTest extends BaseTest {
 
-    private static final String caseReference = "1234123412341234";
+    private static final String caseReference = "1579610355010609";
 
     private LDClient ldClient;
     private LDUser ldUser;
@@ -27,8 +27,12 @@ public class GetDocumentsTest extends BaseTest {
 
     @Test
     void shouldGetCaseDocuments() {
+        LDUser callingServiceUser = new LDUser.Builder("ccd-data-store-api")
+            .custom("callingService", "ccd-data-store-api")
+            .build();
+
         boolean isUsingCaseDocumentApi = ldClient.boolVariation("download-documents-using-case-document-access-management-api",
-            ldUser, false);
+            callingServiceUser, false);
 
         if (!isUsingCaseDocumentApi) {
             getCaseDocumentsFromDocumentManagementApi();
@@ -49,11 +53,11 @@ public class GetDocumentsTest extends BaseTest {
             .then()
             .assertThat()
             .statusCode(200)
-            .body("documentResources[0].url", equalTo("SAMPLE FROM CASE DOCUMENT API"))
-            .body("documentResources[0].name", equalTo("SAMPLE FROM CASE DOCUMENT API"))
-            .body("documentResources[0].type", equalTo("SAMPLE FROM CASE DOCUMENT API"))
-            .body("documentResources[0].description", equalTo("SAMPLE FROM CASE DOCUMENT API"))
-            .body("_links.self.href", equalTo(String.format("%s/cases/%s/documents", aat.getTestUrl(), caseReference)));
+            .body("documentResources[0].url", equalTo("SAMPLE FROM NEW CASE DOCUMENT API"))
+            .body("documentResources[0].name", equalTo("SAMPLE FROM NEW CASE DOCUMENT API"))
+            .body("documentResources[0].type", equalTo("SAMPLE FROM NEW CASE DOCUMENT API"))
+            .body("documentResources[0].description", equalTo("SAMPLE FROM NEW CASE DOCUMENT API"))
+            .body("_links.self.href", equalTo(String.format("%s/cases/%s/documents?callingService=ccd-data-store-api", aat.getTestUrl(), caseReference)));
     }
 
     private RequestSpecification asAutoTestCaseworker(String caseReference) {

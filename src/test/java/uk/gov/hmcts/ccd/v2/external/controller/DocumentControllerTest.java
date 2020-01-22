@@ -60,13 +60,13 @@ class DocumentControllerTest {
         documents = Lists.newArrayList(document);
 
         when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(TRUE);
-        when(documentsOperation.getPrintableDocumentsForCase(CASE_REFERENCE)).thenReturn(documents);
+        when(documentsOperation.getPrintableDocumentsForCase(CASE_REFERENCE, "ccd-data-store-api")).thenReturn(documents);
     }
 
     @Test
     @DisplayName("should return 200 when case found")
     void caseFound() {
-        final ResponseEntity<DocumentsResource> response = documentController.getDocuments(CASE_REFERENCE);
+        final ResponseEntity<DocumentsResource> response = documentController.getDocuments(CASE_REFERENCE, "ccd-data-store-api");
 
         assertAll(
             () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
@@ -84,16 +84,16 @@ class DocumentControllerTest {
         when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
 
         assertThrows(BadRequestException.class,
-                     () -> documentController.getDocuments(CASE_REFERENCE));
+                     () -> documentController.getDocuments(CASE_REFERENCE, "ccd-data-store-api"));
     }
 
     @Test
     @DisplayName("should propagate exception")
     void shouldPropagateExceptionWhenThrown() {
-        when(documentController.getDocuments(CASE_REFERENCE)).thenThrow(RuntimeException.class);
+        when(documentController.getDocuments(CASE_REFERENCE, "ccd-data-store-api")).thenThrow(RuntimeException.class);
 
         assertThrows(RuntimeException.class,
-                     () -> documentController.getDocuments(CASE_REFERENCE));
+                     () -> documentController.getDocuments(CASE_REFERENCE, "ccd-data-store-api"));
     }
 
 }

@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.domain.model.definition.Document;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
@@ -66,12 +67,13 @@ public class DocumentController {
             message = V2.Error.PRINTABLE_DOCUMENTS_ENDPOINT_DOWN
         )
     })
-    public ResponseEntity<DocumentsResource> getDocuments(@PathVariable("caseId") String caseId) {
+    public ResponseEntity<DocumentsResource> getDocuments(@PathVariable("caseId") String caseId,
+                                                          @RequestParam(defaultValue = "ccd-data-store-api") String callingService) {
         if (!caseReferenceService.validateUID(caseId)) {
             throw new BadRequestException(V2.Error.CASE_ID_INVALID);
         }
 
-        List<Document> printableDocumentList = documentsOperation.getPrintableDocumentsForCase(caseId);
+        List<Document> printableDocumentList = documentsOperation.getPrintableDocumentsForCase(caseId, callingService);
 
         return ResponseEntity.ok(new DocumentsResource(caseId, printableDocumentList));
     }

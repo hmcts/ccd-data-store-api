@@ -47,21 +47,25 @@ public class DocumentsOperation {
         this.ldUser = ldUser;
     }
 
-    public List<Document> getPrintableDocumentsForCase(final String caseReference) {
+    public List<Document> getPrintableDocumentsForCase(String caseReference, String callingService) {
 
         if (!uidService.validateUID(caseReference)) {
             throw new BadRequestException("Invalid Case Reference");
         }
 
+        LDUser callingServiceUser = new LDUser.Builder("ccd-data-store-api")
+            .custom("callingService", callingService)
+            .build();
+
         boolean isUsingCaseDocumentApi = ldClient.boolVariation(
-            "download-documents-using-case-document-access-management-api", ldUser, false);
+            "download-documents-using-case-document-access-management-api", callingServiceUser, false);
 
         List<Document> documents;
         if (!isUsingCaseDocumentApi) {
-            ldClient.track("Downloading document directly from doc store", ldUser);
+            ldClient.track("Downloading document directly from doc store", callingServiceUser);
             documents = getDocumentsFromDocumentManagementStoreApi();
         } else {
-            ldClient.track("Downloading document via Case Document Api", ldUser);
+            ldClient.track("Downloading document via Case Document Api", callingServiceUser);
             documents = getDocumentsFromCaseDocumentAccessManagementApi();
         }
 

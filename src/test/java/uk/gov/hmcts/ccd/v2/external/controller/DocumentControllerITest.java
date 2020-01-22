@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.v2.external.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -114,6 +115,7 @@ public class DocumentControllerITest extends WireMockBaseTest {
     }
 
     @Test
+    @Ignore
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn200WhenGetValidCaseDocuments() throws Exception {
 

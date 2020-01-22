@@ -390,7 +390,7 @@ public class CaseDetailsEndpoint {
         @PathVariable("ctid") String ctid,
         @PathVariable("cid") String cid) {
         try {
-            return documentsOperation.getPrintableDocumentsForCase(cid);
+            return documentsOperation.getPrintableDocumentsForCase(cid, "ccd-data-store-api");
         } catch (NumberFormatException e) {
             throw new ApiException(String.format("Unrecognised Case Reference %s. Case Reference should be a number", cid));
         }
