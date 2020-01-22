@@ -198,13 +198,15 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
 
     private List<Jurisdiction> getJurisdictionsFromDefinitionStore(List<String> jurisdictionIds) {
         try {
+            LOG.debug("Retrieving jurisdiction object(s) from definition store for Jurisdiction IDs: {}.",
+                    jurisdictionIds);
             HttpEntity<List<Jurisdiction>> requestEntity = new HttpEntity<>(securityUtils.authorizationHeaders());
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(applicationParams.jurisdictionDefURL())
                     .queryParam("ids", String.join(",", jurisdictionIds));
             List<Jurisdiction> jurisdictionList = restTemplate.exchange(builder.build().encode().toUri(),
                     HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<Jurisdiction>>() {
                     }).getBody();
-            LOG.debug("Jurisdiction IDs= {}. Retrieved jurisdiction objects: {}", jurisdictionIds, jurisdictionList);
+            LOG.debug("Retrieved jurisdiction object(s) from definition store: {}.", jurisdictionList);
             return jurisdictionList;
         } catch (Exception e) {
             LOG.warn("Error while retrieving jurisdictions definition", e);
