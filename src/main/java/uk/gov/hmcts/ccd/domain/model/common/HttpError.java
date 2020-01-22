@@ -30,27 +30,36 @@ public class HttpError<T extends Serializable> implements Serializable {
 
     public HttpError(final Exception exception, final HttpServletRequest request) {
 
-        this(exception, request, null);
+        this(exception, request, null, null);
     }
 
     public HttpError(final ApiException exception, final HttpServletRequest request) {
 
-        this(exception, request, exception.getCatalogueResponse());
+        this(exception, request, exception.getCatalogueResponse(),null);
     }
 
     public HttpError(
         final Exception exception,
         final HttpServletRequest request,
-        final CatalogueResponse catalogueResponse) {
+        final CatalogueResponse catalogueResponse,
+        final Integer status) {
 
         final ResponseStatus responseStatus = exception.getClass().getAnnotation(ResponseStatus.class);
         this.exception = exception.getClass().getName();
         this.timestamp = LocalDateTime.now(ZoneOffset.UTC);
-        this.status = getStatusFromResponseStatus(responseStatus);
+        this.status = getStatus(status,responseStatus);
         this.error = getErrorReason(responseStatus);
         this.message = exception.getMessage();
         this.path = request.getRequestURI();
         this.catalogueResponse = catalogueResponse;
+    }
+
+    private Integer getStatus(final Integer status, final ResponseStatus responseStatus) {
+        if (status != null) {
+            return status;
+        } else {
+            return getStatusFromResponseStatus(responseStatus);
+        }
     }
 
     private Integer getStatusFromResponseStatus(final ResponseStatus responseStatus) {
