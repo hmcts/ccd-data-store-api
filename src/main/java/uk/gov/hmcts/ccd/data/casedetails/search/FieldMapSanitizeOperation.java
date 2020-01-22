@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 @Singleton
 public class FieldMapSanitizeOperation {
 
-    private static final String VALID_FIELD_NAME_REGEX = "^[A-Za-z0-9_.-]+$";
+    public static final String VALID_FIELD_NAME_REGEX = "^[A-Za-z0-9_.-]+$";
     private static final String CASE_FIELD_PREFIX = "case.";
 
     public Map<String, String> execute(final Map<String, String> params) {

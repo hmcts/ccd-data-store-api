@@ -58,7 +58,7 @@ public class SearchQueryFactoryOperation {
         Map<String, Object> parametersToBind = Maps.newHashMap();
         String queryToFormat = isCountQuery ? MAIN_COUNT_QUERY : MAIN_QUERY;
         String whereClausePart = secure(toClauses(criteria), metadata, parametersToBind);
-        String sortClause = sortOrderQueryBuilder.buildSortOrderClause(metadata, parametersToBind);
+        String sortClause = sortOrderQueryBuilder.buildSortOrderClause(metadata);
 
         String queryString = String.format(queryToFormat, whereClausePart, sortClause);
 
@@ -98,10 +98,10 @@ public class SearchQueryFactoryOperation {
         return "";
     }
 
-    private void addParameters(final Query query, List<Criterion> critereon) {
+    private void addParameters(final Query query, List<Criterion> criterion) {
 
-        IntStream.range(0, critereon.size())
-                .forEach(position -> query.setParameter(position, critereon.get(position).getSoughtValue()));
+        IntStream.range(0, criterion.size())
+                .forEach(position -> query.setParameter(position, criterion.get(position).getSoughtValue()));
     }
 
     private String toClauses(final List<Criterion> criterion) {
