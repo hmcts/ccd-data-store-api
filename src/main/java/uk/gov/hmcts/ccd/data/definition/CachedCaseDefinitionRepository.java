@@ -2,6 +2,8 @@ package uk.gov.hmcts.ccd.data.definition;
 
 import static com.google.common.collect.Maps.newHashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,8 @@ import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 @RequestScope
 // TODO: Make this repository return copies of the maps https://tools.hmcts.net/jira/browse/RDM-1459
 public class CachedCaseDefinitionRepository implements CaseDefinitionRepository {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CachedCaseDefinitionRepository.class);
 
     public static final String QUALIFIER = "cached";
 
@@ -78,6 +82,7 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
 
     @Override
     public Jurisdiction getJurisdiction(String jurisdictionId) {
+        LOGGER.debug("Will get jurisdiction '{}' from repository.", jurisdictionId);
         return caseDefinitionRepository.getJurisdiction(jurisdictionId);
     }
 
