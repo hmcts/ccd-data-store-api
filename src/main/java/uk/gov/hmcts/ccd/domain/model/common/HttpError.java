@@ -47,33 +47,41 @@ public class HttpError<T extends Serializable> implements Serializable {
         final ResponseStatus responseStatus = exception.getClass().getAnnotation(ResponseStatus.class);
         this.exception = exception.getClass().getName();
         this.timestamp = LocalDateTime.now(ZoneOffset.UTC);
-        this.status = getStatus(status,responseStatus);
-        this.error = getErrorReason(responseStatus);
+        this.status = getStatusValue(status, responseStatus);
+        this.error = getErrorReason(status, responseStatus);
         this.message = exception.getMessage();
         this.path = request.getRequestURI();
         this.catalogueResponse = catalogueResponse;
     }
 
-    private Integer getStatus(final Integer status, final ResponseStatus responseStatus) {
+    private Integer getStatusValue(final Integer status, final ResponseStatus responseStatus) {
+        // Option 1: use status as it may be an override value for responseStatus
         if (status != null) {
             return status;
-        } else {
-            return getStatusFromResponseStatus(responseStatus);
-        }
-    }
 
-    private Integer getStatusFromResponseStatus(final ResponseStatus responseStatus) {
-        if (null != responseStatus) {
+        // Option 2: use responseStatus
+        } else if (null != responseStatus) {
             final HttpStatus httpStatus = getHttpStatus(responseStatus);
             if (null != httpStatus) {
                 return httpStatus.value();
             }
         }
 
+        // Option 3: fallback to use default
         return DEFAULT_STATUS;
     }
 
+    private HttpStatus getHttpStatus(final Integer status) {
+        // NB: don't return value if matches default
+        if (HttpStatus.INTERNAL_SERVER_ERROR.value() != status.intValue()) {
+            return HttpStatus.resolve(status.intValue());
+        }
+
+        return null;
+    }
+
     private HttpStatus getHttpStatus(final ResponseStatus responseStatus) {
+        // NB: don't return value if matches default
         if (!HttpStatus.INTERNAL_SERVER_ERROR.equals(responseStatus.value())) {
             return responseStatus.value();
         } else if (!HttpStatus.INTERNAL_SERVER_ERROR.equals(responseStatus.code())) {
@@ -83,8 +91,16 @@ public class HttpError<T extends Serializable> implements Serializable {
         return null;
     }
 
-    private String getErrorReason(final ResponseStatus responseStatus) {
-        if (null != responseStatus) {
+    private String getErrorReason(final Integer status, final ResponseStatus responseStatus) {
+        // Option 1: use status as it may be an override value for responseStatus
+        if (status != null) {
+            final HttpStatus httpStatus = getHttpStatus(status);
+            if (null != httpStatus) {
+                return httpStatus.getReasonPhrase();
+            }
+
+        // Option 2: use responseStatus
+        } else if (null != responseStatus) {
             if (!responseStatus.reason().isEmpty()) {
                 return responseStatus.reason();
             }
@@ -95,6 +111,7 @@ public class HttpError<T extends Serializable> implements Serializable {
             }
         }
 
+        // Option 3: fallback to use default
         return DEFAULT_ERROR;
     }
 

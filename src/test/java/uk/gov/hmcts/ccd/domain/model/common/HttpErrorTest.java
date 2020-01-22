@@ -64,8 +64,49 @@ public class HttpErrorTest {
     }
 
     @Test
-    public void shouldExtractStatusFromExceptionAnnotation_default() {
-        final HttpError error = new HttpError(new NullPointerException(), request);
+    public void shouldExtractStatusFromStatus_withExceptionAnnotationAlsoProvided() {
+        HttpStatus testStatus = HttpStatus.I_AM_A_TEAPOT;
+        final HttpError error = new HttpError(new TestValueStatusException(), request, null, testStatus.value());
+
+        // test Status has taken precedence over ResponseStatus annotation
+        assertThat(error.getStatus(), is(equalTo(testStatus.value())));
+    }
+
+    @Test
+    public void shouldExtractStatusFromStatus_withoutExceptionAnnotation() {
+        HttpStatus testStatus = HttpStatus.I_AM_A_TEAPOT;
+        // NB: NullPointerException has no ResponseStatus annotation
+        final HttpError error = new HttpError(new NullPointerException(), request, null, testStatus.value());
+
+        assertThat(error.getStatus(), is(equalTo(testStatus.value())));
+    }
+
+    @Test
+    public void shouldExtractStatusFromDefault_withExceptionAnnotationThatsBlank() {
+        final HttpError error = new HttpError(new TestBlankResponseStatusException(), request);
+
+        assertThat(error.getStatus(), is(equalTo(HttpError.DEFAULT_STATUS)));
+    }
+
+    @Test
+    public void shouldExtractStatusFromDefault_withExceptionAnnotationThatUses500Status() {
+        final HttpError error = new HttpError(new Test500StatusException(), request);
+
+        assertThat(error.getStatus(), is(equalTo(HttpError.DEFAULT_STATUS)));
+    }
+
+    @Test
+    public void shouldExtractStatusFromDefault_with500Status() {
+        // NB: NullPointerException has no ResponseStatus annotation
+        final HttpError error = new HttpError(new NullPointerException(), request, null, 500);
+
+        assertThat(error.getStatus(), is(equalTo(HttpError.DEFAULT_STATUS)));
+    }
+
+    @Test
+    public void shouldExtractStatusFromDefault_withoutExceptionAnnotationNorStatus() {
+        // NB: NullPointerException has no ResponseStatus annotation
+        final HttpError error = new HttpError(new NullPointerException(), request, null, null);
 
         assertThat(error.getStatus(), is(equalTo(HttpError.DEFAULT_STATUS)));
     }
@@ -78,14 +119,62 @@ public class HttpErrorTest {
     }
 
     @Test
-    public void shouldExtractErrorFromExceptionAnnotation_withStatus() {
+    public void shouldExtractErrorFromExceptionAnnotation_withCode() {
         final HttpError error = new HttpError(new TestCodeStatusException(), request);
 
         assertThat(error.getError(), is(equalTo(HttpStatus.UNSUPPORTED_MEDIA_TYPE.getReasonPhrase())));
     }
 
     @Test
-    public void shouldExtractErrorFromExceptionAnnotation_default() {
+    public void shouldExtractErrorFromExceptionAnnotation_withValue() {
+        final HttpError error = new HttpError(new TestValueStatusException(), request);
+
+        assertThat(error.getError(), is(equalTo(HttpStatus.NOT_FOUND.getReasonPhrase())));
+    }
+
+    @Test
+    public void shouldExtractErrorFromStatus_withExceptionAnnotationAlsoProvided() {
+        HttpStatus testStatus = HttpStatus.I_AM_A_TEAPOT;
+        final HttpError error = new HttpError(new TestValueStatusException(), request, null, testStatus.value());
+
+        // test Status has taken precedence over ResponseStatus annotation
+        assertThat(error.getError(), is(equalTo(testStatus.getReasonPhrase())));
+    }
+
+    @Test
+    public void shouldExtractErrorFromStatus_withoutExceptionAnnotation() {
+        HttpStatus testStatus = HttpStatus.I_AM_A_TEAPOT;
+        // NB: NullPointerException has no ResponseStatus annotation
+        final HttpError error = new HttpError(new NullPointerException(), request, null, testStatus.value());
+
+        assertThat(error.getError(), is(equalTo(testStatus.getReasonPhrase())));
+    }
+
+    @Test
+    public void shouldExtractErrorFromDefault_withExceptionAnnotationThatsBlank() {
+        final HttpError error = new HttpError(new TestBlankResponseStatusException(), request);
+
+        assertThat(error.getError(), is(equalTo(HttpError.DEFAULT_ERROR)));
+    }
+
+    @Test
+    public void shouldExtractErrorFromDefault_withExceptionAnnotationThatUses500Status() {
+        final HttpError error = new HttpError(new Test500StatusException(), request);
+
+        assertThat(error.getError(), is(equalTo(HttpError.DEFAULT_ERROR)));
+    }
+
+    @Test
+    public void shouldExtractErrorFromDefault_with500Status() {
+        // NB: IllegalArgumentException has no ResponseStatus annotation
+        final HttpError error = new HttpError(new IllegalArgumentException(), request, null, 500);
+
+        assertThat(error.getError(), is(equalTo(HttpError.DEFAULT_ERROR)));
+    }
+
+    @Test
+    public void shouldExtractErrorFromDefault_withoutExceptionAnnotationNorStatus() {
+        // NB: IllegalArgumentException has no ResponseStatus annotation
         final HttpError error = new HttpError(new IllegalArgumentException(), request);
 
         assertThat(error.getError(), is(equalTo(HttpError.DEFAULT_ERROR)));
@@ -180,6 +269,15 @@ public class HttpErrorTest {
         assertThat(actualCatalogueResponse, is(equalTo(expectedCatalogueResponse)));
         assertThat(error.getStatus(), is(equalTo(500)));
     }
+
+    @ResponseStatus()
+    class TestBlankResponseStatusException extends RuntimeException {}
+
+    @ResponseStatus(
+        code = HttpStatus.INTERNAL_SERVER_ERROR,
+        value = HttpStatus.INTERNAL_SERVER_ERROR
+    )
+    class Test500StatusException extends RuntimeException {}
 
     @ResponseStatus(code = HttpStatus.UNSUPPORTED_MEDIA_TYPE)
     class TestCodeStatusException extends RuntimeException {}
