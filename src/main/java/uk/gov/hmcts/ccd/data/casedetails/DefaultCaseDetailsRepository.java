@@ -186,31 +186,12 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     private Query getQuery(MetaData metadata, Map<String, String> dataSearchParams, boolean isCountQuery) {
-        Query query;
-        if (dataSearchParams.isEmpty() && applicationParams.isJpaCriteriaSearchEnabled()) {
-            query = isCountQuery ? getCountQueryByMetaData(metadata) : getQueryByMetaData(metadata);
-        } else {
-            query = getQueryByParameters(metadata, dataSearchParams, isCountQuery);
-        }
-        return query;
+        return getQueryByParameters(metadata, dataSearchParams, isCountQuery);
     }
 
     private Query getQueryByParameters(MetaData metadata, final Map<String, String> requestData, boolean isCountQuery) {
         Map<String, String> fieldData = new HashMap<>(requestData);
         return this.queryBuilder.build(metadata, fieldData, isCountQuery);
-    }
-
-    private Query getCountQueryByMetaData(MetaData metadata) {
-        return queryBuilderFactory.count(em, metadata)
-            .whereMetadata(metadata)
-            .build();
-    }
-
-    private Query getQueryByMetaData(MetaData metadata) {
-        return queryBuilderFactory.select(em, metadata)
-            .whereMetadata(metadata)
-            .orderBy(metadata)
-            .build();
     }
 
     private void paginate(Query query, Optional<String> pageOpt) {
