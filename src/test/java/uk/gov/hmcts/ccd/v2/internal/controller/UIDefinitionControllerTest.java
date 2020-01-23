@@ -143,7 +143,7 @@ class UIDefinitionControllerTest {
 
         @Test
         @DisplayName("should return 200 when banners found")
-        void caseFound() {
+        void bannerFound() {
             final ResponseEntity<UIBannerResource> response = uiDefinitionController.getBanners(Optional.of(jurisdictionReferenes));
 
             assertAll(
@@ -166,7 +166,14 @@ class UIDefinitionControllerTest {
         }
 
         @Test
-        @DisplayName("should propagate exception")
+        @DisplayName("should return empty list of banners")
+        void shouldReturnEmptyBannersList() {
+            ResponseEntity<UIBannerResource>  responseEntity = uiDefinitionController.getBanners(Optional.empty());
+            assertEquals(0, responseEntity.getBody().getBanners().size());
+        }
+
+        @Test
+        @DisplayName("should return banners")
         void shouldGetBanners() {
             List<Banner> bannersReturned = getBannerOperation.execute(jurisdictionReferenes);
 
