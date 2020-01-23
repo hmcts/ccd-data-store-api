@@ -9,6 +9,8 @@ import uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.util.Optional.ofNullable;
+
 @Component
 public class SortOrderQueryBuilder {
 
@@ -17,7 +19,6 @@ public class SortOrderQueryBuilder {
     private static final String DATA_FIELD = "data";
     private static final String CREATED_DATE = "created_date";
     private static final String SPACE = " ";
-    private static final String COMMA = ",";
     private static final String SPECIAL_CHARS_REGEXP = "[\\s\\\\\\/,;\\)\\('\"`]";
     private static final Pattern SPECIAL_CHARS_PATTERN = Pattern.compile(SPECIAL_CHARS_REGEXP);
 
@@ -32,8 +33,7 @@ public class SortOrderQueryBuilder {
                     sb.append(convertFieldNameToJSONBsqlFormat(sortOrderField.getCaseFieldId()));
                 }
                 sb.append(SPACE);
-                sb.append(sortOrderField.getDirection());
-                sb.append(COMMA);
+                sb.append(SortDirection.fromOptionalString(ofNullable(sortOrderField.getDirection())));
                 sb.append(SPACE);
             }
         });

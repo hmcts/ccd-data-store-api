@@ -154,7 +154,7 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
     }
 
     @Test
-    public void sanitisesInputsMainQuery() {
+    public void sanitisesInputsMainQuerySortOrderFromFieldData() {
         String evil = "foo');insert into case users values(1,2,3);--";
         when(authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds("PROBATE", "TestAddressBookCase", CAN_READ))
             .thenReturn(asList(evil));
@@ -168,10 +168,46 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
                                        .metadata(false)
                                        .direction("DESC")
                                        .build());
-        List<CaseDetails> caseDetails = caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap());
+        List<CaseDetails> byFieldData = caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap());
 
         // If any input is not correctly sanitized it will cause an exception since query result structure will not be as hibernate expects.
-        assertThat(caseDetails.size(), is(0));
+        assertThat(byFieldData.size(), is(0));
+    }
+
+    @Test
+    public void sanitiseInputMainQuerySortOrderFromMetaDataForCaseFieldId() {
+        String evil = "foo');insert into case users values(1,2,3);--";
+
+        MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
+        metadata.setSortDirection(Optional.of("Asc"));
+        metadata.addSortOrderField(SortOrderField.sortOrderWith()
+                                       .caseFieldId(evil)
+                                       .metadata(true)
+                                       .direction("Desc")
+                                       .build());
+
+        final List<CaseDetails> byMetaData = caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap());
+
+        // If any input is not correctly sanitized it will cause an exception since query result structure will not be as hibernate expects.
+        assertThat(byMetaData.size(), is(0));
+    }
+
+    @Test
+    public void sanitiseInputMainQuerySortOrderFromMetaDataForDirection() {
+        String evil = "foo');insert into case users values(1,2,3);--";
+
+        MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
+        metadata.setSortDirection(Optional.of("Asc"));
+        metadata.addSortOrderField(SortOrderField.sortOrderWith()
+                                       .caseFieldId("[CASE_REFERENCE]")
+                                       .metadata(true)
+                                       .direction(evil)
+                                       .build());
+
+        final List<CaseDetails> byMetaData = caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap());
+
+        // If any input is not correctly sanitized it will cause an exception since query result structure will not be as hibernate expects.
+        assertThat(byMetaData.size(), is(0));
     }
 
     @Test
@@ -240,15 +276,14 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
                                        .direction("DESC")
                                        .build());
 
-        HashMap<String, String> searchParams = new HashMap<>();
-        searchParams.put("PersonFirstName", "Janet");
         final List<CaseDetails> byMetaDataAndFieldData = caseDetailsRepository.findByMetaDataAndFieldData(metadata,
-            searchParams);
+            Maps.newHashMap());
 
-        // See the timestamps in insert_cases.sql.
-        // Should be ordered by person last name, last modified desc, creation date asc.
+        // See the timestamps in insert_cases.sql. (2 results based on pagination size = 2)
+        // Should be ordered by last modified desc, person last name, creation date asc.
+        assertThat(byMetaDataAndFieldData.size(), is(2));
         assertThat(byMetaDataAndFieldData.get(0).getId(), is("1"));
-        assertThat(byMetaDataAndFieldData.get(1).getId(), is("16"));
+        assertThat(byMetaDataAndFieldData.get(1).getId(), is("2"));
     }
 
     @Test
