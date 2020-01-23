@@ -258,6 +258,7 @@ dependencies {
     testCompile group: 'io.cucumber', name: 'cucumber-junit', version: '5.0.0-RC1'
     
     testCompile files('lib/befta-fw-1.0.15-SNAPSHOT.jar')
+
 }
 // end::dependencies[]
 
