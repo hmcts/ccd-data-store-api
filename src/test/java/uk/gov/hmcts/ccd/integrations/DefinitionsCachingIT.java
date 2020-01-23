@@ -33,6 +33,7 @@ import uk.gov.hmcts.ccd.data.definition.HttpUIDefinitionGateway;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.DefaultUserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.Banner;
+import uk.gov.hmcts.ccd.domain.model.definition.BannersResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
@@ -294,12 +295,13 @@ public class DefinitionsCachingIT {
 
     @Test
     public void testBannersCached() {
-        doReturn(bannersList).when(this.httpUIDefinitionGateway).getBanners(anyList());
-
         List<String> jurisdictionIds = new ArrayList<>();
-        httpUIDefinitionGateway.getBanners(jurisdictionIds);
-        httpUIDefinitionGateway.getBanners(jurisdictionIds);
-        httpUIDefinitionGateway.getBanners(jurisdictionIds);
+        BannersResult bannersResult = new BannersResult(bannersList);
+        doReturn(bannersResult).when(this.httpUIDefinitionGateway).getBanners(jurisdictionIds);
+
+        uiDefinitionRepository.getBanners(jurisdictionIds);
+        uiDefinitionRepository.getBanners(jurisdictionIds);
+        uiDefinitionRepository.getBanners(jurisdictionIds);
 
         verify(httpUIDefinitionGateway, times(1)).getBanners(jurisdictionIds);
     }
