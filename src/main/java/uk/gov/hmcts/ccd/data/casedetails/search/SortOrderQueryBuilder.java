@@ -10,6 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.ccd.data.casedetails.search.SortDirection.fromOptionalString;
 
 @Component
 public class SortOrderQueryBuilder {
@@ -21,35 +22,34 @@ public class SortOrderQueryBuilder {
     private static final String SPACE = " ";
     private static final String SPECIAL_CHARS_REGEXP = "[\\s\\\\\\/,;\\)\\('\"`]";
     private static final Pattern SPECIAL_CHARS_PATTERN = Pattern.compile(SPECIAL_CHARS_REGEXP);
+    private static final String COMMA = ",";
 
     public String buildSortOrderClause(MetaData metaData) {
         StringBuilder sb = new StringBuilder();
         metaData.getSortOrderFields().forEach(sortOrderField -> {
             Matcher matcher = SPECIAL_CHARS_PATTERN.matcher(sortOrderField.getCaseFieldId());
-            if (!matcher.find()) {
+            if (matcher.find()) {
+                LOG.error("Illegal sort order field id: {}", sortOrderField.getCaseFieldId());
+                throw new IllegalArgumentException("Illegal sortOrderField.caseFieldId=" + sortOrderField.getCaseFieldId());
+            } else {
                 if (sortOrderField.isMetadata()) {
                     sb.append(getMataFieldName(sortOrderField.getCaseFieldId()));
                 } else {
                     sb.append(convertFieldNameToJSONBsqlFormat(sortOrderField.getCaseFieldId()));
                 }
                 sb.append(SPACE);
-                sb.append(SortDirection.fromOptionalString(ofNullable(sortOrderField.getDirection())));
+                sb.append(fromOptionalString(ofNullable(sortOrderField.getDirection())));
+                sb.append(COMMA);
                 sb.append(SPACE);
             }
         });
         // always sort with creation_date as a last order so that it supports cases where no values at all for the configured fields and also default fallback.
-        return sb.append(CREATED_DATE + SPACE + SortDirection.fromOptionalString(metaData.getSortDirection())).toString();
+        return sb.append(CREATED_DATE + SPACE + fromOptionalString(metaData.getSortDirection())).toString();
     }
 
     private String getMataFieldName(String fieldName) {
         String metaFieldName = fieldName.startsWith("[") ? StringUtils.substringBetween(fieldName, "[", "]") : fieldName;
-        String dbColumnName = null;
-        try {
-            dbColumnName = CaseField.valueOf(metaFieldName).getDbColumnName();
-        } catch (IllegalArgumentException iae) {
-            LOG.warn("Illegal meta field name: {}, exception: {}", fieldName, iae);
-        }
-        return dbColumnName;
+        return CaseField.valueOf(metaFieldName).getDbColumnName();
     }
 
     private static String convertFieldNameToJSONBsqlFormat(final String in) {

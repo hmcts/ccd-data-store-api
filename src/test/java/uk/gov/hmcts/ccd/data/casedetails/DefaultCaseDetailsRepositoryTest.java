@@ -153,8 +153,8 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
         assertThat(byMetaData.getTotalResultsCount(), is(0));
     }
 
-    @Test
-    public void sanitisesInputsMainQuerySortOrderFromFieldData() {
+    @Test(expected = IllegalArgumentException.class)
+    public void validateInputsMainQuerySortOrder() {
         String evil = "foo');insert into case users values(1,2,3);--";
         when(authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds("PROBATE", "TestAddressBookCase", CAN_READ))
             .thenReturn(asList(evil));
@@ -168,32 +168,13 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
                                        .metadata(false)
                                        .direction("DESC")
                                        .build());
-        List<CaseDetails> byFieldData = caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap());
 
-        // If any input is not correctly sanitized it will cause an exception since query result structure will not be as hibernate expects.
-        assertThat(byFieldData.size(), is(0));
+        // If any input is not correctly validated it will pass the query to jdbc driver creating potential sql injection vulnerability
+        caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap());
     }
 
     @Test
-    public void sanitiseInputMainQuerySortOrderFromMetaDataForCaseFieldId() {
-        String evil = "foo');insert into case users values(1,2,3);--";
-
-        MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
-        metadata.setSortDirection(Optional.of("Asc"));
-        metadata.addSortOrderField(SortOrderField.sortOrderWith()
-                                       .caseFieldId(evil)
-                                       .metadata(true)
-                                       .direction("Desc")
-                                       .build());
-
-        final List<CaseDetails> byMetaData = caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap());
-
-        // If any input is not correctly sanitized it will cause an exception since query result structure will not be as hibernate expects.
-        assertThat(byMetaData.size(), is(0));
-    }
-
-    @Test
-    public void sanitiseInputMainQuerySortOrderFromMetaDataForDirection() {
+    public void sanitiseInputMainQuerySortOrderForDirection() {
         String evil = "foo');insert into case users values(1,2,3);--";
 
         MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
@@ -208,6 +189,22 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
 
         // If any input is not correctly sanitized it will cause an exception since query result structure will not be as hibernate expects.
         assertThat(byMetaData.size(), is(0));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void validateInputMainQueryMetaDataFieldId() {
+        String notSoEvil = "[UNKNOWN_FIELD]";
+
+        MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
+        metadata.setSortDirection(Optional.of("Asc"));
+        metadata.addSortOrderField(SortOrderField.sortOrderWith()
+                                       .caseFieldId(notSoEvil)
+                                       .metadata(true)
+                                       .direction("DESC")
+                                       .build());
+
+        // If any input is not correctly validated it will pass the query to jdbc driver creating potential sql injection vulnerability
+        caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap());
     }
 
     @Test
