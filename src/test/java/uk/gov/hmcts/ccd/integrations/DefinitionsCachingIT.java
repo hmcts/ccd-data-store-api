@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.integrations;
 
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
