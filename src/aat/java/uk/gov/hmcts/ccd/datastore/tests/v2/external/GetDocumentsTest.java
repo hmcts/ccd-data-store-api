@@ -17,12 +17,10 @@ public class GetDocumentsTest extends BaseTest {
     private static final String caseReference = "1579610355010609";
 
     private LDClient ldClient;
-    private LDUser ldUser;
 
     protected GetDocumentsTest(AATHelper aat) {
         super(aat);
         this.ldClient = LDHelper.INSTANCE.getClient();
-        this.ldUser = LDHelper.INSTANCE.getUser();
     }
 
     @Test

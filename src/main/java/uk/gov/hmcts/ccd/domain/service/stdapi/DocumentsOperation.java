@@ -28,23 +28,19 @@ public class DocumentsOperation {
     private final CaseDetailsRepository caseDetailsRepository;
     private final CaseTypeService caseTypeService;
     private final UIDService uidService;
-
     private final LDClient ldClient;
-    private final LDUser ldUser;
 
     @Inject
     public DocumentsOperation(final SecurityUtils securityUtils,
                               final CaseTypeService caseTypeService,
                               @Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
                               final UIDService uidService,
-                              final LDClient ldClient,
-                              final LDUser ldUser) {
+                              final LDClient ldClient) {
         this.securityUtils = securityUtils;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseTypeService = caseTypeService;
         this.uidService = uidService;
         this.ldClient = ldClient;
-        this.ldUser = ldUser;
     }
 
     public List<Document> getPrintableDocumentsForCase(String caseReference, String callingService) {
