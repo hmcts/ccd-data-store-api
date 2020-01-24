@@ -2,7 +2,7 @@ package uk.gov.hmcts.ccd.endpoint.exceptions;
 
 import org.junit.Test;
 import uk.gov.hmcts.ccd.domain.model.common.CatalogueResponse;
-import uk.gov.hmcts.ccd.domain.model.common.CatalogueResponseCode;
+import uk.gov.hmcts.ccd.domain.model.common.CatalogueResponseElement;
 
 import java.util.Arrays;
 import java.util.List;
@@ -19,7 +19,7 @@ public class ApiExceptionTest {
 
         // ARRANGE
         final CatalogueResponse testCatalogueResponse =
-            new CatalogueResponse(CatalogueResponseCode.CALLBACK_FAILURE);
+            new CatalogueResponse(CatalogueResponseElement.CALLBACK_FAILURE);
 
         // ACT
         final ApiException cut = new ApiException(testCatalogueResponse);
@@ -36,7 +36,7 @@ public class ApiExceptionTest {
         // ARRANGE
         final String expectedMessage = "my override message";
         final CatalogueResponse testCatalogueResponse =
-            new CatalogueResponse(CatalogueResponseCode.CALLBACK_FAILURE);
+            new CatalogueResponse(CatalogueResponseElement.CALLBACK_FAILURE);
 
         // ACT
         final ApiException cut = new ApiException(testCatalogueResponse, expectedMessage);
@@ -97,7 +97,7 @@ public class ApiExceptionTest {
 
         // ARRANGE
         final CatalogueResponse expectedCatalogueResponse =
-            new CatalogueResponse(CatalogueResponseCode.CALLBACK_FAILURE);
+            new CatalogueResponse(CatalogueResponseElement.CALLBACK_FAILURE);
 
         // ACT
         final ApiException cut = new ApiException(expectedCatalogueResponse);

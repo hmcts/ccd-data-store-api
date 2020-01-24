@@ -187,7 +187,7 @@ public class HttpErrorTest {
         expectedDetails.put("test1", 1);
         expectedDetails.put("test2", Arrays.asList(2, 3, 4));
         final CatalogueResponse expectedCatalogueResponse =
-            new CatalogueResponse(CatalogueResponseCode.CALLBACK_FAILURE, expectedDetails);
+            new CatalogueResponse(CatalogueResponseElement.CALLBACK_FAILURE, expectedDetails);
         final ApiException testException = new ApiException(expectedCatalogueResponse);
 
         // ACT
@@ -244,7 +244,7 @@ public class HttpErrorTest {
         expectedDetails.put("test2", Arrays.asList(2, 3, 4));
 
         final CatalogueResponse expectedCatalogueResponse =
-            new CatalogueResponse(CatalogueResponseCode.CALLBACK_FAILURE, expectedDetails);
+            new CatalogueResponse(CatalogueResponseElement.CALLBACK_FAILURE, expectedDetails);
 
         final HttpError error = new HttpError(new IllegalArgumentException(MESSAGE), request, expectedCatalogueResponse, 400);
 
@@ -261,7 +261,7 @@ public class HttpErrorTest {
         expectedDetails.put("test2", Arrays.asList(2, 3, 4));
 
         final CatalogueResponse expectedCatalogueResponse =
-            new CatalogueResponse(CatalogueResponseCode.CALLBACK_FAILURE, expectedDetails);
+            new CatalogueResponse(CatalogueResponseElement.CALLBACK_FAILURE, expectedDetails);
 
         final HttpError error = new HttpError(new IllegalArgumentException(MESSAGE), request, expectedCatalogueResponse, null);
 

@@ -16,6 +16,21 @@ import static org.junit.Assert.assertTrue;
 public class CatalogueResponseTest {
 
     @Test
+    public void shouldUseNullsInDefaultConstructor() {
+
+        // ARRANGE
+
+        // ACT
+        final CatalogueResponse testCatalogueResponse = new CatalogueResponse();
+
+        // ASSERT
+        assertNull(testCatalogueResponse.getCode());
+        assertNull(testCatalogueResponse.getMessage());
+        assertNull(testCatalogueResponse.getDetails());
+
+    }
+
+    @Test
     public void shouldDeserializeJsonOkViaBuilderWithDetails() throws IOException {
 
         // ARRANGE
@@ -23,10 +38,10 @@ public class CatalogueResponseTest {
         expectedDetails.put("test1", 1);
         expectedDetails.put("test2", "Test String");
         final CatalogueResponse expectedCatalogueResponse =
-            new CatalogueResponse(CatalogueResponseCode.CALLBACK_FAILURE, expectedDetails);
+            new CatalogueResponse(CatalogueResponseElement.CALLBACK_FAILURE, expectedDetails);
         final String testJson = String.format(
             "{ \"code\": \"%s\", \"message\": \"%s\", \"details\": { \"test1\": 1, \"test2\": \"Test String\" } }",
-            CatalogueResponseCode.CALLBACK_FAILURE.getCode(), CatalogueResponseCode.CALLBACK_FAILURE.getMessage());
+            CatalogueResponseElement.CALLBACK_FAILURE.getCode(), CatalogueResponseElement.CALLBACK_FAILURE.getMessage());
         final ObjectMapper mapper = new ObjectMapper();
 
         // ACT
@@ -43,10 +58,10 @@ public class CatalogueResponseTest {
 
         // ARRANGE
         final CatalogueResponse expectedCatalogueResponse =
-            new CatalogueResponse(CatalogueResponseCode.CALLBACK_FAILURE);
+            new CatalogueResponse(CatalogueResponseElement.CALLBACK_FAILURE);
         final String testJson = String.format(
             "{ \"code\": \"%s\", \"message\": \"%s\" }",
-            CatalogueResponseCode.CALLBACK_FAILURE.getCode(), CatalogueResponseCode.CALLBACK_FAILURE.getMessage());
+            CatalogueResponseElement.CALLBACK_FAILURE.getCode(), CatalogueResponseElement.CALLBACK_FAILURE.getMessage());
         final ObjectMapper mapper = new ObjectMapper();
 
         // ACT
