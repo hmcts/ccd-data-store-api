@@ -257,7 +257,8 @@ dependencies {
     compile group: 'io.cucumber', name: 'cucumber-java', version: '5.0.0-RC1'
     testCompile group: 'io.cucumber', name: 'cucumber-junit', version: '5.0.0-RC1'
     
-    testCompile files('lib/befta-fw-1.0.10-SNAPSHOT.jar')
+    testCompile files('lib/befta-fw-1.0.15-SNAPSHOT.jar')
+
 }
 // end::dependencies[]
 
@@ -480,7 +481,7 @@ jacoco {
 
 sonarqube {
     properties {
-        property "sonar.exclusions", "build/generated-sources/**/*.java,**/service/doclink/**"
+        property "sonar.exclusions", "**/*.java,**/**/*.java,build/generated-sources/**/*.java,**/service/doclink/**"
         property "sonar.coverage.exclusions", "src/main/java/uk/gov/hmcts/ccd/data/definition/DefaultCaseDefinitionRepository.java,src/main/java/uk/gov/hmcts/ccd/AppInsights.java,**/DocLinksRestoreEndpoint.java,**/service/doclink/**,**/DefaultCaseDetailsRepository.java"
         property "sonar.jacoco.reportPaths", "${project.buildDir}/jacoco/junitPlatformTest.exec"
         property "sonar.junit.reportPaths", "${project.buildDir}/test-results/junit-platform"

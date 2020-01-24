@@ -21,6 +21,12 @@
           "description": "Printing for CCD"
         }
       ]
+    },
+    "data" : {
+      "DocumentField" : {
+        "document_url" : "[[ANY]]",
+        "document_binary_url" : "[[ANY]]"
+      }
     }
   }
 }
