@@ -4,10 +4,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.ccd.data.casedetails.search.SortDirection.fromOptionalString;
@@ -20,31 +24,42 @@ public class SortOrderQueryBuilder {
     private static final String DATA_FIELD = "data";
     private static final String CREATED_DATE = "created_date";
     private static final String SPACE = " ";
-    private static final String SPECIAL_CHARS_REGEXP = "[\\s\\\\\\/,;\\)\\('\"`]";
-    private static final Pattern SPECIAL_CHARS_PATTERN = Pattern.compile(SPECIAL_CHARS_REGEXP);
     private static final String COMMA = ",";
+    private static final Set<String> VALID_COLUMNS_FOR_ORDER_BY
+        = Collections.unmodifiableSet((Set<? extends String>) Stream
+        .of(CaseDetailsEntity.CREATED_DATE_FIELD_COL,
+            CaseDetailsEntity.LAST_MODIFIED_FIELD_COL,
+            CaseDetailsEntity.JURISDICTION_FIELD_COL,
+            CaseDetailsEntity.CASE_TYPE_ID_FIELD_COL,
+            CaseDetailsEntity.STATE_FIELD_COL,
+            CaseDetailsEntity.REFERENCE_FIELD_COL)
+        .collect(Collectors.toCollection(HashSet::new)));
+
 
     public String buildSortOrderClause(MetaData metaData) {
         StringBuilder sb = new StringBuilder();
         metaData.getSortOrderFields().forEach(sortOrderField -> {
-            Matcher matcher = SPECIAL_CHARS_PATTERN.matcher(sortOrderField.getCaseFieldId());
-            if (matcher.find()) {
-                LOG.error("Illegal sort order field id: {}", sortOrderField.getCaseFieldId());
-                throw new IllegalArgumentException("Illegal sortOrderField.caseFieldId=" + sortOrderField.getCaseFieldId());
-            }
-            if (sortOrderField.isMetadata()) {
-                sb.append(getMataFieldName(sortOrderField.getCaseFieldId()));
-            } else {
-                sb.append(convertFieldNameToJSONBsqlFormat(sortOrderField.getCaseFieldId()));
-            }
+            appendColumnOrDataFieldForOrderBy(sb, sortOrderField);
             sb.append(SPACE);
             sb.append(fromOptionalString(ofNullable(sortOrderField.getDirection())));
             sb.append(COMMA);
             sb.append(SPACE);
-
         });
         // always sort with creation_date as a last order so that it supports cases where no values at all for the configured fields and also default fallback.
         return sb.append(CREATED_DATE + SPACE + fromOptionalString(metaData.getSortDirection())).toString();
+    }
+
+    private void appendColumnOrDataFieldForOrderBy(final StringBuilder sb, final SortOrderField sortOrderField) {
+        if (sortOrderField.isMetadata()) {
+            if (VALID_COLUMNS_FOR_ORDER_BY.contains(getMataFieldName(sortOrderField.getCaseFieldId()))) {
+                sb.append(getMataFieldName(sortOrderField.getCaseFieldId()));
+            } else {
+                LOG.error("Invalid column name for metadata, sortOrderFieldId={}", sortOrderField.getCaseFieldId());
+                throw new IllegalArgumentException("Invalid column name for metadata, sortOrderFieldId=" + sortOrderField.getCaseFieldId());
+            }
+        } else {
+            sb.append(convertFieldNameToJSONBsqlFormat(sortOrderField.getCaseFieldId()));
+        }
     }
 
     private String getMataFieldName(String fieldName) {
