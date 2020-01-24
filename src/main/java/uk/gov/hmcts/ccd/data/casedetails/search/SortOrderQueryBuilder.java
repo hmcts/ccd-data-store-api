@@ -31,17 +31,17 @@ public class SortOrderQueryBuilder {
             if (matcher.find()) {
                 LOG.error("Illegal sort order field id: {}", sortOrderField.getCaseFieldId());
                 throw new IllegalArgumentException("Illegal sortOrderField.caseFieldId=" + sortOrderField.getCaseFieldId());
-            } else {
-                if (sortOrderField.isMetadata()) {
-                    sb.append(getMataFieldName(sortOrderField.getCaseFieldId()));
-                } else {
-                    sb.append(convertFieldNameToJSONBsqlFormat(sortOrderField.getCaseFieldId()));
-                }
-                sb.append(SPACE);
-                sb.append(fromOptionalString(ofNullable(sortOrderField.getDirection())));
-                sb.append(COMMA);
-                sb.append(SPACE);
             }
+            if (sortOrderField.isMetadata()) {
+                sb.append(getMataFieldName(sortOrderField.getCaseFieldId()));
+            } else {
+                sb.append(convertFieldNameToJSONBsqlFormat(sortOrderField.getCaseFieldId()));
+            }
+            sb.append(SPACE);
+            sb.append(fromOptionalString(ofNullable(sortOrderField.getDirection())));
+            sb.append(COMMA);
+            sb.append(SPACE);
+
         });
         // always sort with creation_date as a last order so that it supports cases where no values at all for the configured fields and also default fallback.
         return sb.append(CREATED_DATE + SPACE + fromOptionalString(metaData.getSortDirection())).toString();
