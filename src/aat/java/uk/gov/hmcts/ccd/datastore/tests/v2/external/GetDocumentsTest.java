@@ -41,6 +41,17 @@ public class GetDocumentsTest extends BaseTest {
 
     private void getCaseDocumentsFromDocumentManagementApi() {
         System.out.println("DOWNLOADING FROM DOC STORE");
+        asAutoTestCaseworker(caseReference)
+            .when()
+            .get("/cases/{cid}/documents")
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .body("documentResources[0].url", equalTo("http://dm-store-aat.service.core-compute-aat.internal/documents/1d9e2f5f-2114-4748-b01c-70481000ce6d/binary"))
+            .body("documentResources[0].name", equalTo("Screenshot 2019-09-26 at 13.06.47.png"))
+            .body("documentResources[0].type", equalTo("png"))
+            .body("documentResources[0].description", equalTo("Evidence screen capture"))
+            .body("_links.self.href", equalTo(String.format("%s/cases/%s/documents?callingService=ccd-data-store-api", aat.getTestUrl(), caseReference)));
     }
 
     private void getCaseDocumentsFromCaseDocumentsAccessManagementApi() {
