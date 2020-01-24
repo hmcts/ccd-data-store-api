@@ -29,6 +29,7 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
@@ -162,7 +163,7 @@ class UIDefinitionControllerTest {
 
         @Test
         @DisplayName("should return 200 when banners found")
-        void caseFound() {
+        void bannerFound() {
             final ResponseEntity<UIBannerResource> response = uiDefinitionController.getBanners(Optional.of(jurisdictionReferenes));
 
             assertAll(
@@ -182,6 +183,30 @@ class UIDefinitionControllerTest {
 
             assertThrows(RuntimeException.class,
                 () -> uiDefinitionController.getBanners(Optional.of(jurisdictionReferenes)));
+        }
+
+        @Test
+        @DisplayName("should return empty list of banners")
+        void shouldReturnEmptyBannersList() {
+            ResponseEntity<UIBannerResource>  responseEntity = uiDefinitionController.getBanners(Optional.empty());
+            assertEquals(0, responseEntity.getBody().getBanners().size());
+        }
+
+        @Test
+        @DisplayName("should return banners")
+        void shouldGetBanners() {
+            List<Banner> bannersReturned = getBannerOperation.execute(jurisdictionReferenes);
+
+            assertEquals(2, bannersReturned.size());
+            assertEquals("Test Description1", bannersReturned.get(0).getBannerDescription());
+            assertEquals("Click here to see it.>>>", bannersReturned.get(0).getBannerUrlText());
+            assertEquals("http://localhost:3451/test", bannersReturned.get(0).getBannerUrl());
+            assertEquals(true, bannersReturned.get(0).getBannerEnabled());
+
+            assertEquals("Test Description2", bannersReturned.get(1).getBannerDescription());
+            assertEquals("Click here to see it.>>>", bannersReturned.get(1).getBannerUrlText());
+            assertEquals("http://localhost:3451/test", bannersReturned.get(1).getBannerUrl());
+            assertEquals(true, bannersReturned.get(1).getBannerEnabled());
         }
     }
 
