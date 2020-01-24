@@ -24,6 +24,7 @@ public class AppInsights {
         rt.setSource(MODULE);
         rt.setName(name);
         rt.setSuccess(success);
+
         rt.setDuration(new Duration(duration));
         telemetry.trackRequest(rt);
     }

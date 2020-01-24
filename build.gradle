@@ -487,6 +487,7 @@ sonarqube {
         property "sonar.junit.reportPaths", "${project.buildDir}/test-results/junit-platform"
         property "sonar.projectName", "ccd-data-store-api"
         property "sonar.projectKey", "ccd-data-store-api"
+        property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
     }
 }
 
