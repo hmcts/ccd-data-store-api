@@ -11,18 +11,25 @@ public class CatalogueResponse<T> {
     private final String message;
     private final T details;
 
+    public CatalogueResponse() {
+        super();
+        this.code = null;
+        this.message = null;
+        this.details = null;
+    }
+
     private CatalogueResponse(final String code, final String message, final T details) {
         this.code = code;
         this.message = message;
         this.details = details;
     }
 
-    public CatalogueResponse(final CatalogueResponseCode responseCode, final T details) {
-        this(responseCode.getCode(), responseCode.getMessage(), details);
+    public CatalogueResponse(final CatalogueResponseElement catalogueResponseElement, final T details) {
+        this(catalogueResponseElement.getCode(), catalogueResponseElement.getMessage(), details);
     }
 
-    public CatalogueResponse(final CatalogueResponseCode responseCode) {
-        this(responseCode, null);
+    public CatalogueResponse(final CatalogueResponseElement catalogueResponseElement) {
+        this(catalogueResponseElement, null);
     }
 
     public String getCode() {
