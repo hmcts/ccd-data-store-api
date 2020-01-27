@@ -4,6 +4,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.util.ArrayList;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,6 +31,8 @@ import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.HttpUIDefinitionGateway;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.DefaultUserRepository;
+import uk.gov.hmcts.ccd.domain.model.definition.Banner;
+import uk.gov.hmcts.ccd.domain.model.definition.BannersResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
 import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
@@ -96,6 +99,8 @@ public class DefinitionsCachingIT {
     private SecurityUtils securityUtils;
 
     List<WizardPage> wizardPageList = Collections.emptyList();
+
+    List<Banner> bannersList = Collections.emptyList();
 
     @Before
     public void setup() {
@@ -285,5 +290,20 @@ public class DefinitionsCachingIT {
         ctdv.setVersion(version);
         return ctdv;
     }
+
+
+    @Test
+    public void testBannersCached() {
+        List<String> jurisdictionIds = new ArrayList<>();
+        BannersResult bannersResult = new BannersResult(bannersList);
+        doReturn(bannersResult).when(this.httpUIDefinitionGateway).getBanners(jurisdictionIds);
+
+        uiDefinitionRepository.getBanners(jurisdictionIds);
+        uiDefinitionRepository.getBanners(jurisdictionIds);
+        uiDefinitionRepository.getBanners(jurisdictionIds);
+
+        verify(httpUIDefinitionGateway, times(1)).getBanners(jurisdictionIds);
+    }
+
 }
 

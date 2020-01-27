@@ -1,0 +1,28 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/display/banners?ids=PROBATE,DIVORCE"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "banners": [
+        {
+          "bannerEnabled": true,
+          "bannerDescription": "Test Description1",
+          "bannerUrlText": "Client here to see it.>>>",
+          "bannerUrl": "http://localhost:3451/test1"
+        },
+        {
+          "bannerEnabled": true,
+          "bannerDescription": "Test Description2",
+          "bannerUrlText": "Client here to see it.>>>",
+          "bannerUrl": "http://localhost:3451/test2"
+        }
+      ]
+    }
+  }
+}
