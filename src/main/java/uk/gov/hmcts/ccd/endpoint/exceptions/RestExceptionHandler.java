@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import uk.gov.hmcts.ccd.AppInsights;
 import uk.gov.hmcts.ccd.domain.model.common.CatalogueResponse;
-import uk.gov.hmcts.ccd.domain.model.common.CatalogueResponseCode;
+import uk.gov.hmcts.ccd.domain.model.common.CatalogueResponseElement;
 import uk.gov.hmcts.ccd.domain.model.common.HttpError;
 
 import javax.servlet.http.HttpServletRequest;
@@ -70,7 +70,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         final List<String> validationErrors = toMessages(constraintViolationException.getConstraintViolations());
         final Map<String, Object> catalogueResponseDetails = new HashMap<>();
         final CatalogueResponse catalogueResponse =
-            new CatalogueResponse(CatalogueResponseCode.VALIDATION_INVALID_DATA, catalogueResponseDetails);
+            new CatalogueResponse(CatalogueResponseElement.VALIDATION_INVALID_DATA, catalogueResponseDetails);
 
         final HttpError error = new HttpError(constraintViolationException, request, catalogueResponse,HttpStatus.BAD_REQUEST.value());
         catalogueResponseDetails.put("validationErrors", validationErrors);
