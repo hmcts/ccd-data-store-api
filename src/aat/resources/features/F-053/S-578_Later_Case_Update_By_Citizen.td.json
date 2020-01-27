@@ -8,7 +8,7 @@
   ],
   "user": {
     "username": "befta.citizen.2@gmail.com",
-    "password": "{{CCD_CITIZEN_TWO_AUTOTEST_PASSWORD}}"
+    "password": "[[$CCD_CITIZEN_TWO_AUTOTEST_PASSWORD]]"
   },
   "request": {
     "pathVariables": {

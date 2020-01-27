@@ -13,7 +13,7 @@
   },
   "user": {
     "username": "befta.caseworker.1@gmail.com",
-    "password": "{{CCD_CASEWORKER_ONE_AUTOTEST_PASSWORD}}"
+    "password": "[[$CCD_CASEWORKER_ONE_AUTOTEST_PASSWORD]]"
   },
   "expectedResponse": {
     "headers": {
