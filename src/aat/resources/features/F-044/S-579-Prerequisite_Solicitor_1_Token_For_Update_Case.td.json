@@ -11,7 +11,7 @@
   "users": {
     "invokingUser": {
       "username": "befta.caseworker.2.solicitor.1@gmail.com",
-      "password": "Pa55word11"
+      "password": "{{CCD_CASEWORKER_AUTOTEST_SOLICITOR_ONE_PASSWORD}}"
     }
   },
   "request": {

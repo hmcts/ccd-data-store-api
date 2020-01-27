@@ -9,7 +9,7 @@
   ],
   "user": {
     "username": "auto.test.cnp@gmail.com",
-    "password": "Pa55word11"
+    "password": "{{CCD_IMPORT_AUTOTEST_PASSWORD}}"
   },
   "expectedResponse": {
     "_extends_": "Common_403_Response",

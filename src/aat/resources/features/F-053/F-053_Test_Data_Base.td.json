@@ -8,7 +8,7 @@
   "users": {
     "invokingUser": {
       "username": "befta.citizen.3@gmail.com",
-      "password": "Pa55word11"
+      "password": "{{CCD_CITIZEN_THREE_AUTOTEST_PASSWORD}}"
     }
   },
 

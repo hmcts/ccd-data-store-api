@@ -10,7 +10,7 @@
   ],
   "user": {
     "username": "befta.caseworker.1@gmail.com",
-    "password": "Pa55word11"
+    "password": "{{CCD_CASEWORKER_ONE_AUTOTEST_PASSWORD}}"
   },
   "request": {
     "pathVariables": {
