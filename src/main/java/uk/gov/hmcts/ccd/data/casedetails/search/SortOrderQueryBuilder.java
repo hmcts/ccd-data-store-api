@@ -1,8 +1,6 @@
 package uk.gov.hmcts.ccd.data.casedetails.search;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField;
 
@@ -11,8 +9,6 @@ import static uk.gov.hmcts.ccd.data.casedetails.search.SortDirection.fromOptiona
 
 @Component
 public class SortOrderQueryBuilder {
-
-    private static final Logger LOG = LoggerFactory.getLogger(SortOrderQueryBuilder.class);
 
     private static final String DATA_FIELD = "data";
     private static final String CREATED_DATE = "created_date";
