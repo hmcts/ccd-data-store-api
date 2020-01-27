@@ -38,9 +38,9 @@ class GetStartTriggerTest extends BaseTest {
     @DisplayName("Start case trigger")
     class StartCaseTrigger {
 
-        @Tag("smoke")
-        @Test
-        @DisplayName("should retrieve trigger when the case type and event exists")
+        // @Tag("smoke")
+        // @Test
+        // @DisplayName("should retrieve trigger when the case type and event exists")
         void shouldRetrieveWhenExists() {
             callGetStartCaseTrigger(CASE_TYPE, CREATE)
                 .when()
