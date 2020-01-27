@@ -1,11 +1,11 @@
-idam_api_url = "http://idam-api-idam-sprod.service.core-compute-idam-sprod.internal"
-
+idam_api_url = "https://idam-api.ithc.platform.hmcts.net"
+frontend_url = "https://www-ccd.ithc.platform.hmcts.net"
 
 
 
 capacity = "4"
-asp_name = "ccd-data-store-api-sprod"
-asp_rg = "ccd-data-store-api-sprod"
+asp_name = "ccd-data-store-api-ithc"
+asp_rg = "ccd-data-store-api-ithc"
 elastic_search_enabled = "true"
 
 data_store_max_pool_size = 48
