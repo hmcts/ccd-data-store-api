@@ -1,12 +1,12 @@
 package uk.gov.hmcts.ccd.datastore.tests;
 
+import java.util.function.Supplier;
+
 import io.restassured.specification.RequestSpecification;
 import uk.gov.hmcts.ccd.datastore.tests.helper.CCDHelper;
 import uk.gov.hmcts.ccd.datastore.tests.helper.S2SHelper;
 import uk.gov.hmcts.ccd.datastore.tests.helper.idam.IdamHelper;
 import uk.gov.hmcts.ccd.datastore.tests.helper.idam.OAuth2;
-
-import java.util.function.Supplier;
 
 public enum AATHelper {
 
@@ -35,11 +35,11 @@ public enum AATHelper {
     }
 
     public String getGatewayServiceName() {
-        return Env.require("CCD_GW_SERVICE_NAME");
+        return Env.require("BEFTA_S2S_CLIENT_ID");
     }
 
     public String getGatewayServiceSecret() {
-        return Env.require("CCD_GW_SERVICE_SECRET");
+        return Env.require("BEFTA_S2S_CLIENT_SECRET");
     }
 
     public IdamHelper getIdamHelper() {
