@@ -44,6 +44,8 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.MANDATORY;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.OPTIONAL;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.READONLY;
+import static uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterCollectionOptions.ALLOW_DELETE;
+import static uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterCollectionOptions.ALLOW_INSERT;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
 
 @Service
@@ -279,17 +281,17 @@ public class AccessControlService {
     private String getCollectionAccess(Set<String> userRoles, CommonField field) {
         List<String> collectionAccess = new ArrayList<>();
         if (hasAccessControlList(userRoles, CAN_CREATE, field.getAccessControlLists())) {
-            collectionAccess.add("allowInsert");
+            collectionAccess.add(ALLOW_INSERT.getOption());
         }
         if (hasAccessControlList(userRoles, CAN_DELETE, field.getAccessControlLists())) {
-            collectionAccess.add("allowDelete");
+            collectionAccess.add(ALLOW_DELETE.getOption());
         }
         if (hasAccessControlList(userRoles, CAN_UPDATE, field.getAccessControlLists())) {
-            collectionAccess.add("allowInsert");
-            collectionAccess.add("allowDelete");
+            collectionAccess.add(ALLOW_INSERT.getOption());
+            collectionAccess.add(ALLOW_DELETE.getOption());
         }
-        return DisplayContextParameterUtil.updateDisplayContextParameter(field.getDisplayContextParameter(),
-            DisplayContextParameterUtil.Parameter.COLLECTION, collectionAccess);
+
+        return DisplayContextParameterUtil.updateCollectionDisplayContextParameter(field.getDisplayContextParameter(), collectionAccess);
     }
 
     private void setChildrenAsReadOnlyIfNoAccess(final List<WizardPage> wizardPages, final String rootFieldId, final CaseField caseField, final Predicate<AccessControlList> access, final Set<String> userRoles, final CommonField caseViewField) {

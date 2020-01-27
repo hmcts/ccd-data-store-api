@@ -7,24 +7,22 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterUtil.Parameter.COLLECTION;
-import static uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterUtil.Parameter.TABLE;
-import static uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterUtil.updateDisplayContextParameter;
+import static uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterUtil.updateCollectionDisplayContextParameter;
 
 class DisplayContextParameterUtilTest {
 
     @Test
-    @DisplayName("should create parameter)")
-    void shouldCreateParameter() {
+    @DisplayName("should create collection parameter)")
+    void shouldCreateCollectionParameter() {
         assertAll(
-            () -> assertThat(updateDisplayContextParameter("", COLLECTION, asList("allowInsert", "allowDelete")),
+            () -> assertThat(updateCollectionDisplayContextParameter("", asList("allowInsert", "allowDelete")),
                 is("#COLLECTION(allowDelete,allowInsert)")),
-            () -> assertThat(updateDisplayContextParameter("", COLLECTION, asList("allowDelete")),
+            () -> assertThat(updateCollectionDisplayContextParameter("", asList("allowInsert")),
+                is("#COLLECTION(allowInsert)")),
+            () -> assertThat(updateCollectionDisplayContextParameter("", asList("allowDelete")),
                 is("#COLLECTION(allowDelete)")),
-            () -> assertThat(updateDisplayContextParameter("", TABLE, asList("postcode")),
-                is("#TABLE(postcode)")),
-            () -> assertThat(updateDisplayContextParameter("", TABLE, asList("AddressLine1", "postcode")),
-                is("#TABLE(AddressLine1,postcode)"))
+            () -> assertThat(updateCollectionDisplayContextParameter("", asList("")),
+                is("#COLLECTION()"))
                  );
     }
 
@@ -32,14 +30,16 @@ class DisplayContextParameterUtilTest {
     @DisplayName("should update parameter)")
     void shouldUpdateParameter() {
         assertAll(
-            () -> assertThat(updateDisplayContextParameter("#COLLECTION(allowInsert,allowDelete)", COLLECTION, asList("allowInsert", "allowDelete")),
+            () -> assertThat(updateCollectionDisplayContextParameter("#COLLECTION(allowInsert,allowDelete)", asList("allowInsert", "allowDelete")),
                 is("#COLLECTION(allowDelete,allowInsert)")),
-            () -> assertThat(updateDisplayContextParameter("#COLLECTION(allowInsert,allowDelete)", COLLECTION, asList("allowDelete")),
+            () -> assertThat(updateCollectionDisplayContextParameter("#COLLECTION(allowInsert,allowDelete)", asList("allowDelete", "allowInsert")),
+                is("#COLLECTION(allowDelete,allowInsert)")),
+            () -> assertThat(updateCollectionDisplayContextParameter("#COLLECTION(allowInsert,allowDelete)", asList("allowDelete")),
                 is("#COLLECTION(allowDelete)")),
-            () -> assertThat(updateDisplayContextParameter("#COLLECTION()", COLLECTION, asList("allowInsert")),
-                is("#COLLECTION(allowInsert)")),
-            () -> assertThat(updateDisplayContextParameter("#TABLE(param1,param2)", TABLE, asList("postcode")),
-                is("#TABLE(postcode)"))
+            () -> assertThat(updateCollectionDisplayContextParameter("#COLLECTION(other,allowInsert,allowDelete, other2)", asList("allowDelete")),
+                is("#COLLECTION(allowDelete,other,other2)")),
+            () -> assertThat(updateCollectionDisplayContextParameter("#COLLECTION()", asList("allowInsert")),
+                is("#COLLECTION(allowInsert)"))
                  );
     }
 
@@ -47,14 +47,16 @@ class DisplayContextParameterUtilTest {
     @DisplayName("should update parameter and produce multiple result)")
     void shouldUpdateParameterMultiple() {
         assertAll(
-            () -> assertThat(updateDisplayContextParameter("#TABLE()", COLLECTION, asList("allowInsert", "allowDelete")),
-                is("#COLLECTION(allowDelete,allowInsert),#TABLE()")),
-            () -> assertThat(updateDisplayContextParameter("#TABLE(),#COLLECTION(allowInsert,allowDelete)", COLLECTION, asList("allowDelete")),
-                is("#COLLECTION(allowDelete),#TABLE()")),
-            () -> assertThat(updateDisplayContextParameter("#TABLE(),#COLLECTION(allowInsert,allowDelete)", TABLE, asList("postcode")),
-                is("#COLLECTION(allowDelete,allowInsert),#TABLE(postcode)")),
-            () -> assertThat(updateDisplayContextParameter("#TABLE(postcode),#COLLECTION(allowInsert,allowDelete)", COLLECTION, asList("other")),
-                is("#COLLECTION(other),#TABLE(postcode)"))
+            () -> assertThat(updateCollectionDisplayContextParameter("#TABLE()", asList("allowInsert", "allowDelete")),
+                is("#TABLE(),#COLLECTION(allowDelete,allowInsert)")),
+            () -> assertThat(updateCollectionDisplayContextParameter("#TABLE(),#COLLECTION(allowInsert,allowDelete)", asList("allowDelete")),
+                is("#TABLE(),#COLLECTION(allowDelete)")),
+            () -> assertThat(updateCollectionDisplayContextParameter("#TABLE(),#COLLECTION(other,allowInsert,allowDelete)", asList("allowDelete")),
+                is("#TABLE(),#COLLECTION(allowDelete,other)")),
+            () -> assertThat(updateCollectionDisplayContextParameter("#TABLE(postcode),#COLLECTION(other,allowInsert,allowDelete)", asList("allowDelete")),
+                is("#TABLE(postcode),#COLLECTION(allowDelete,other)")),
+            () -> assertThat(updateCollectionDisplayContextParameter("#TABLE(postcode),#COLLECTION(other,allowInsert,allowDelete)", asList("allowInsert,allowDelete")),
+                is("#TABLE(postcode),#COLLECTION(allowInsert,allowDelete,other)"))
                  );
     }
 
@@ -62,21 +64,21 @@ class DisplayContextParameterUtilTest {
     @DisplayName("should update parameter when display context parameter has spaces)")
     void shouldUpdateParameterWithSpaces() {
         assertAll(
-            () -> assertThat(updateDisplayContextParameter("#TABLE( other  ),#COLLECTION(allowInsert ,  allowDelete )", COLLECTION, asList("allowDelete")),
-                is("#COLLECTION(allowDelete),#TABLE(other)"))
+            () -> assertThat(updateCollectionDisplayContextParameter("#TABLE( other  ),#COLLECTION(allowInsert ,  allowDelete )", asList("allowDelete")),
+                is("#TABLE( other  ),#COLLECTION(allowDelete)"))
                  );
     }
 
     @Test
-    @DisplayName("should filter invalid parameters)")
-    void shouldFilterInvalidParameters() {
+    @DisplayName("should update parameter when display context parameter is null)")
+    void shouldUpdateParameterWhenIsNull() {
         assertAll(
-            () -> assertThat(updateDisplayContextParameter("#INVALID(other),#COLLECTION(allowInsert,allowDelete)",
-                COLLECTION, asList("allowDelete")),
+            () -> assertThat(updateCollectionDisplayContextParameter(null, asList("allowInsert", "allowDelete")),
+                is("#COLLECTION(allowDelete,allowInsert)")),
+            () -> assertThat(updateCollectionDisplayContextParameter(null, asList("allowDelete")),
                 is("#COLLECTION(allowDelete)")),
-            () -> assertThat(updateDisplayContextParameter("#COLLECTION(other),#INVALID(allowInsert,allowDelete)",
-                COLLECTION, asList("allowDelete")),
-                is("#COLLECTION(allowDelete)"))
+            () -> assertThat(updateCollectionDisplayContextParameter(null, asList("")),
+                is("#COLLECTION()"))
                  );
     }
 }
