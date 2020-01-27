@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
@@ -38,6 +39,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserDefault;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
 
@@ -126,7 +128,11 @@ public class DefaultUserRepository implements UserRepository {
                 .map(headers -> headers.get("Message")).orElse(null);
             final String message = headerMessages != null ? headerMessages.get(0) : e.getMessage();
             if (message != null) {
-                throw new BadRequestException(message);
+                if (HttpStatus.NOT_FOUND.value() == e.getRawStatusCode()) {
+                    throw new ResourceNotFoundException(message);
+                } else {
+                    throw new BadRequestException(message);
+                }
             }
             throw new ServiceException("Problem getting user default settings for " + userId);
         } catch (URISyntaxException e) {
