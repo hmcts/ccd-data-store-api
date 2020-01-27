@@ -35,4 +35,10 @@
         <cve>CVE-2019-11358</cve>
         <cve>CVE-2015-9251</cve>
     </suppress>
+
+    <suppress>
+        <notes>Temporary suppression for on going developments to carry on</notes>
+        <cve>CVE-2020-5398</cve>
+    </suppress>
+
 </suppressions>
