@@ -18,6 +18,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.inject.Inject;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -212,8 +213,9 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             LOG.warn("Error while retrieving jurisdictions definition", e);
             if (e instanceof HttpClientErrorException
                     && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
-                throw new ResourceNotFoundException(
-                        "Resource not found when retrieving jurisdictions definition because of " + e.getMessage());
+                LOG.warn("Jurisdiction object(s) configured for user couldn't be found on definition store: {}.",
+                        jurisdictionIds);
+                return new ArrayList<>();
             } else {
                 throw new ServiceException("Problem retrieving jurisdictions definition because of " + e.getMessage());
             }
