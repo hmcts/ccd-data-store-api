@@ -256,29 +256,26 @@ public class AccessControlService {
 
     public CaseEventTrigger updateCollectionDisplayContextParameterByAccess(final CaseEventTrigger caseEventTrigger,
                                                                             final Set<String> userRoles) {
-        caseEventTrigger.getCaseFields()
-            .forEach(caseViewField -> {
-                if (caseViewField.isCollectionFieldType()) {
-                    caseViewField.setDisplayContextParameter(getCollectionAccess(userRoles, caseViewField));
-                }
+        caseEventTrigger.getCaseFields().stream().filter(CommonField::isCollectionFieldType)
+            .forEach(caseViewField -> caseViewField.setDisplayContextParameter(generateDisplayContextParamer(userRoles, caseViewField)));
 
-                setChildrenCollectionDisplayContextParameter(caseViewField.getFieldType().getChildren(), userRoles);
-            });
+        caseEventTrigger.getCaseFields().forEach(caseViewField ->
+            setChildrenCollectionDisplayContextParameter(caseViewField.getFieldType().getChildren(), userRoles));
+
         return caseEventTrigger;
     }
 
     private void setChildrenCollectionDisplayContextParameter(final List<CaseField> caseFields,
                                                               final Set<String> userRoles) {
-        caseFields.forEach(childField -> {
-            if (childField.isCollectionFieldType()) {
-                childField.setDisplayContextParameter(getCollectionAccess(userRoles, childField));
-            }
+        caseFields.stream().filter(CommonField::isCollectionFieldType)
+            .forEach(childField -> childField.setDisplayContextParameter(generateDisplayContextParamer(userRoles, childField)));
 
+        caseFields.forEach(childField -> {
             setChildrenCollectionDisplayContextParameter(childField.getFieldType().getChildren(), userRoles);
         });
     }
 
-    private String getCollectionAccess(Set<String> userRoles, CommonField field) {
+    private String generateDisplayContextParamer(Set<String> userRoles, CommonField field) {
         List<String> collectionAccess = new ArrayList<>();
         if (hasAccessControlList(userRoles, CAN_CREATE, field.getAccessControlLists())) {
             collectionAccess.add(ALLOW_INSERT.getOption());
