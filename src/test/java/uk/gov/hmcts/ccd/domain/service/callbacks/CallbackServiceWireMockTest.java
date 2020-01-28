@@ -19,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
@@ -576,56 +575,6 @@ public class CallbackServiceWireMockTest {
             assertThat(catalogueResponseDetails, is(instanceOf(CatalogueResponse.class)));
             assertThat((catalogueResponseDetails).getCode(), is(expectedCatalogueResponseDetailsCode));
             assertThat((catalogueResponseDetails).getMessage(), is(expectedCatalogueResponseDetailsMessage));
-
-            // rethrow to enable standard junit expected exception verification
-            throw ex;
-        }
-    }
-
-    @Test(expected = CallbackFailureWithAssertForUpstreamException.class)
-    public void validateCallbackErrorsAndWarningsWithErrorsAndAssertForUpstream_permitted() throws Exception {
-        final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setErrors(Collections.singletonList("an error"));
-
-        final int expectedStatusCode = HttpStatus.BAD_REQUEST.value();
-        callbackResponse.setAssertForUpstream(expectedStatusCode);
-
-        try {
-            callbackService.validateCallbackErrorsAndWarnings(callbackResponse, true);
-        } catch (CallbackFailureWithAssertForUpstreamException ex) {
-            // NB: exception thrown as errors present and only warnings can be ignored
-
-            // verify CatalogueResponse provided
-            CatalogueResponse<Map<String, Object>> exceptionCatalogueResponse = ex.getCatalogueResponse();
-            assertNotNull(exceptionCatalogueResponse);
-            assertThat(exceptionCatalogueResponse.getCode(), is(CatalogueResponseElement.CALLBACK_FAILURE.getCode()));
-            assertThat(exceptionCatalogueResponse.getMessage(), is(CatalogueResponseElement.CALLBACK_FAILURE.getMessage()));
-
-            // verify
-            assertThat(ex.getResponseStatusCode(), is(expectedStatusCode));
-
-            // rethrow to enable standard junit expected exception verification
-            throw ex;
-        }
-    }
-
-    @Test(expected = ApiException.class)
-    public void validateCallbackErrorsAndWarningsWithErrorsAndAssertForUpstream_notPermitted() throws Exception {
-        final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setErrors(Collections.singletonList("an error"));
-
-        final int notPermittedStatusCode = ASSERT_UPSTREAM_NOT_PERMITTED;
-        callbackResponse.setAssertForUpstream(notPermittedStatusCode);
-
-        try {
-            callbackService.validateCallbackErrorsAndWarnings(callbackResponse, true);
-        } catch (ApiException ex) {
-            // verify CatalogueResponse provided
-            CatalogueResponse<Map<String, Object>> exceptionCatalogueResponse = ex.getCatalogueResponse();
-            assertNotNull(exceptionCatalogueResponse);
-            assertThat(exceptionCatalogueResponse.getCode(), is(CatalogueResponseElement.CALLBACK_BAD_ASSERT_FOR_UPSTREAM.getCode()));
-            assertThat(exceptionCatalogueResponse.getMessage(), is(CatalogueResponseElement.CALLBACK_BAD_ASSERT_FOR_UPSTREAM.getMessage()));
-            assertThat(exceptionCatalogueResponse.getDetails().get("assertForUpstream"), is(notPermittedStatusCode));
 
             // rethrow to enable standard junit expected exception verification
             throw ex;

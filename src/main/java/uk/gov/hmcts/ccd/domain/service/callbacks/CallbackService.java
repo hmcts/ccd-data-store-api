@@ -160,17 +160,17 @@ public class CallbackService {
     /**
      * Checks if callback's status code and message should be asserted upstream.
      *
-     * @param callbackResponse Populate callback response object
-     * @param callbacksHttpStatus Optional callback HttpStatus code
+     * @param callbackResponse Populated callback response object
+     * @param callbacksHttpStatus Received callback HttpStatus code
      *
      * @return true if this is a AssertForUpstream request that is valid
      *
      * @throws ApiException if AssertForUpstream request has been made but is invalid
      */
-    private boolean checkAssertForUpstreamRequested(CallbackResponse callbackResponse, Integer callbacksHttpStatus) {
+    private boolean checkAssertForUpstreamRequested(CallbackResponse callbackResponse, int callbacksHttpStatus) {
 
         // priority given to AutoAssertUpstreamList
-        if (callbacksHttpStatus != null && applicationParams.getCallbackStatusAutoAssertUpstreamList().contains(callbacksHttpStatus)) {
+        if (applicationParams.getCallbackStatusAutoAssertUpstreamList().contains(callbacksHttpStatus)) {
             return true; // callback's HTTP Status configured for automatic assert
         }
 
@@ -190,9 +190,8 @@ public class CallbackService {
                 );
             }
 
-            // if mismatch between callback's HttpStatus and requested assert value (NB: does not apply to 200:OK callback error responses)
-            if (callbacksHttpStatus != null && callbacksHttpStatus != HttpStatus.OK.value()
-                && callbacksHttpStatus.intValue() != assertForUpstreamValue.intValue()) {
+            // if mismatch between callback's HttpStatus and requested assert value throw error
+            if (callbacksHttpStatus != assertForUpstreamValue.intValue()) {
 
                 Map<String, Object> catalogueResponseDetails = new HashMap<>();
                 catalogueResponseDetails.put("assertForUpstream", assertForUpstreamValue);
@@ -225,25 +224,8 @@ public class CallbackService {
             CatalogueResponse catalogueResponse =
                 generateCCDCatalogueResponseFromCallbackResponse(CatalogueResponseElement.CALLBACK_FAILURE, callbackResponse);
 
-            String message = "Unable to proceed because there are one or more callback Errors or Warnings";
-
-            ApiException ex;
-
-            if (checkAssertForUpstreamRequested(callbackResponse, null)) {
-                ex = new CallbackFailureWithAssertForUpstreamException(
-                    catalogueResponse,
-                    callbackResponse.getAssertForUpstream(),
-                    message
-                );
-            } else {
-                ex = new ApiException(
-                    catalogueResponse,
-                    message
-                );
-            }
-
-            // add errors and warnings to exception
-            throw ex.withErrors(callbackResponse.getErrors())
+            throw new ApiException(catalogueResponse, "Unable to proceed because there are one or more callback Errors or Warnings")
+                .withErrors(callbackResponse.getErrors())
                 .withWarnings(callbackResponse.getWarnings());
         }
     }
