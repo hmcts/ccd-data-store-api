@@ -1,11 +1,13 @@
 package uk.gov.hmcts.ccd.domain.model.callbacks;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
+import uk.gov.hmcts.ccd.domain.model.common.CatalogueResponse;
 
 import java.util.Collections;
 import java.util.List;
@@ -27,6 +29,9 @@ public class CallbackResponse {
     @JsonProperty("significant_item")
     private SignificantItem significantItem;
     private String state;
+
+    private CatalogueResponse catalogueResponse;
+    private Integer assertForUpstream;
 
     private List<String> errors;
     private List<String> warnings;
@@ -83,6 +88,24 @@ public class CallbackResponse {
 
     public void setSignificantItem(SignificantItem significantItem) {
         this.significantItem = significantItem;
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public CatalogueResponse getCatalogueResponse() {
+        return catalogueResponse;
+    }
+
+    public void setCatalogueResponse(final CatalogueResponse catalogueResponse) {
+        this.catalogueResponse = catalogueResponse;
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public Integer getAssertForUpstream() {
+        return assertForUpstream;
+    }
+
+    public void setAssertForUpstream(final Integer assertForUpstream) {
+        this.assertForUpstream = assertForUpstream;
     }
 
     @JsonIgnore

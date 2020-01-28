@@ -35,6 +35,12 @@ public class ApplicationParams {
     @Value("#{'${ccd.callback.retries}'.split(',')}")
     private List<Integer> callbackRetries;
 
+    @Value("#{'${callback.status.allowed-assert-upstream-list}'.split(',')}")
+    private List<Integer> callbackStatusAllowedAssertUpstreamList;
+
+    @Value("#{'${callback.status.auto-assert-upstream-list}'.split(',')}")
+    private List<Integer> callbackStatusAutoAssertUpstreamList;
+
     @Value("${ccd.token.secret}")
     private String tokenSecret;
 
@@ -235,6 +241,14 @@ public class ApplicationParams {
 
     public List<Integer> getCallbackRetries() {
         return callbackRetries;
+    }
+
+    public List<Integer> getCallbackStatusAllowedAssertUpstreamList() {
+        return callbackStatusAllowedAssertUpstreamList;
+    }
+
+    public List<Integer> getCallbackStatusAutoAssertUpstreamList() {
+        return callbackStatusAutoAssertUpstreamList;
     }
 
     public String getValidDMDomain() {

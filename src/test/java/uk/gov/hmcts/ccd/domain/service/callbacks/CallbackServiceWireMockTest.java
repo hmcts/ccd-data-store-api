@@ -1,33 +1,45 @@
 package uk.gov.hmcts.ccd.domain.service.callbacks;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
+import static com.github.tomakehurst.wiremock.client.WireMock.ok;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
+import uk.gov.hmcts.ccd.domain.model.common.CatalogueResponse;
+import uk.gov.hmcts.ccd.domain.model.common.CatalogueResponseElement;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackFailureWithAssertForUpstreamException;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -64,6 +76,12 @@ import org.springframework.web.client.RestTemplate;
 public class CallbackServiceWireMockTest {
     private static final ObjectMapper mapper = new ObjectMapper();
 
+    private static final int ALLOWED_ASSERT_UPSTREAM_1 = 417;
+    private static final int ALLOWED_ASSERT_UPSTREAM_2 = 423;
+    private static final int AUTO_ASSERT_UPSTREAM_1 = 400;
+    private static final int AUTO_ASSERT_UPSTREAM_402 = 402; // i.e. PaymentRequired special case
+    private static final int ASSERT_UPSTREAM_NOT_PERMITTED = 418;
+
     @Inject
     private CallbackService callbackService;
 
@@ -76,6 +94,15 @@ public class CallbackServiceWireMockTest {
         final SecurityUtils securityUtils = Mockito.mock(SecurityUtils.class);
         Mockito.when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
         ReflectionTestUtils.setField(callbackService, "securityUtils", securityUtils);
+
+        // set AssertUpstreamList to known values
+        final ApplicationParams applicationParams = Mockito.mock(ApplicationParams.class);
+        Mockito.when(applicationParams.getCallbackStatusAllowedAssertUpstreamList())
+            .thenReturn(Arrays.asList(ALLOWED_ASSERT_UPSTREAM_1, ALLOWED_ASSERT_UPSTREAM_2, AUTO_ASSERT_UPSTREAM_1, AUTO_ASSERT_UPSTREAM_402));
+        Mockito.when(applicationParams.getCallbackStatusAutoAssertUpstreamList())
+            .thenReturn(Arrays.asList(AUTO_ASSERT_UPSTREAM_1, AUTO_ASSERT_UPSTREAM_402));
+        ReflectionTestUtils.setField(callbackService, "applicationParams", applicationParams);
+
     }
 
     @Test
@@ -149,6 +176,223 @@ public class CallbackServiceWireMockTest {
         assertThat(response.getErrors(), Matchers.contains("Test message"));
     }
 
+    @Test(expected = CallbackFailureWithAssertForUpstreamException.class)
+    public void failurePathWithAssertUpstream_permitted_withoutCallbackCR() throws Exception {
+        final String testUrl = "http://localhost:" + wiremockPort + "/test-callback";
+        final CallbackResponse callbackResponse = new CallbackResponse();
+
+        callbackResponse.setAssertForUpstream(ALLOWED_ASSERT_UPSTREAM_1);
+
+        final int expectedStatusCode = callbackResponse.getAssertForUpstream();
+        stubFor(post(urlMatching("/test-callback.*"))
+            .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(expectedStatusCode)));
+
+        try {
+            callbackService.send(testUrl, new CaseEvent(), null, new CaseDetails(), false);
+        } catch (CallbackFailureWithAssertForUpstreamException ex) {
+            // verify message matches CCD response element
+            assertThat(ex.getMessage(), is(CatalogueResponseElement.CALLBACK_FAILURE.getMessage()));
+
+            // verify CatalogueResponse provided
+            CatalogueResponse<Map<String, Object>> exceptionCatalogueResponse = ex.getCatalogueResponse();
+            assertNotNull(exceptionCatalogueResponse);
+            assertThat(exceptionCatalogueResponse.getCode(), is(CatalogueResponseElement.CALLBACK_FAILURE.getCode()));
+            assertThat(exceptionCatalogueResponse.getMessage(), is(CatalogueResponseElement.CALLBACK_FAILURE.getMessage()));
+            assertNull(exceptionCatalogueResponse.getDetails());
+
+            // verify
+            assertThat(ex.getResponseStatusCode(), is(expectedStatusCode));
+
+            // rethrow to enable standard junit expected exception verification
+            throw ex;
+        }
+    }
+
+    @Test(expected = CallbackFailureWithAssertForUpstreamException.class)
+    public void failurePathWithAssertUpstream_permitted_withCallbackCR_blankMessage() throws Exception {
+        final String testUrl = "http://localhost:" + wiremockPort + "/test-callback";
+        final CallbackResponse callbackResponse = new CallbackResponse();
+
+        // callback CR
+        final String expectedCatalogueResponseDetailsCode = "TEST.1001";
+        final String expectedCatalogueResponseDetailsMessage = "";
+        final CatalogueResponse callbackCatalogueResponse =
+            generateCustomCatalogueResponse(expectedCatalogueResponseDetailsCode, expectedCatalogueResponseDetailsMessage);
+        callbackResponse.setCatalogueResponse(callbackCatalogueResponse);
+
+        callbackResponse.setAssertForUpstream(ALLOWED_ASSERT_UPSTREAM_1);
+
+        final int expectedStatusCode = callbackResponse.getAssertForUpstream();
+        stubFor(post(urlMatching("/test-callback.*"))
+            .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(expectedStatusCode)));
+
+        try {
+            callbackService.send(testUrl, new CaseEvent(), null, new CaseDetails(), false);
+        } catch (CallbackFailureWithAssertForUpstreamException ex) {
+            // verify message matches CCD response element (as callback CR message blank)
+            assertThat(ex.getMessage(), is(CatalogueResponseElement.CALLBACK_FAILURE.getMessage()));
+
+            // verify CatalogueResponse provided
+            CatalogueResponse<Map<String, Object>> exceptionCatalogueResponse = ex.getCatalogueResponse();
+            assertNotNull(exceptionCatalogueResponse);
+            assertThat(exceptionCatalogueResponse.getCode(), is(CatalogueResponseElement.CALLBACK_FAILURE.getCode()));
+            assertThat(exceptionCatalogueResponse.getMessage(), is(CatalogueResponseElement.CALLBACK_FAILURE.getMessage()));
+            assertTrue(EqualsBuilder.reflectionEquals(exceptionCatalogueResponse.getDetails().get("callbackCatalogueResponse"), callbackCatalogueResponse));
+
+            // verify
+            assertThat(ex.getResponseStatusCode(), is(expectedStatusCode));
+
+            // rethrow to enable standard junit expected exception verification
+            throw ex;
+        }
+    }
+
+    @Test(expected = CallbackFailureWithAssertForUpstreamException.class)
+    public void failurePathWithAssertUpstream_permitted_withCallbackCR_nonBlankMessage() throws Exception {
+        final String testUrl = "http://localhost:" + wiremockPort + "/test-callback";
+        final CallbackResponse callbackResponse = new CallbackResponse();
+
+        // callback CR
+        final String expectedCatalogueResponseDetailsCode = "TEST.1001";
+        final String expectedCatalogueResponseDetailsMessage = "Testing callback message";
+        final CatalogueResponse callbackCatalogueResponse =
+            generateCustomCatalogueResponse(expectedCatalogueResponseDetailsCode, expectedCatalogueResponseDetailsMessage);
+        callbackResponse.setCatalogueResponse(callbackCatalogueResponse);
+
+        callbackResponse.setAssertForUpstream(ALLOWED_ASSERT_UPSTREAM_1);
+
+        final int expectedStatusCode = callbackResponse.getAssertForUpstream();
+        stubFor(post(urlMatching("/test-callback.*"))
+            .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(expectedStatusCode)));
+
+        try {
+            callbackService.send(testUrl, new CaseEvent(), null, new CaseDetails(), false);
+        } catch (CallbackFailureWithAssertForUpstreamException ex) {
+            // verify message matches callback CR
+            assertThat(ex.getMessage(), is(callbackCatalogueResponse.getMessage()));
+
+            // verify CatalogueResponse provided
+            CatalogueResponse<Map<String, Object>> exceptionCatalogueResponse = ex.getCatalogueResponse();
+            assertNotNull(exceptionCatalogueResponse);
+            assertThat(exceptionCatalogueResponse.getCode(), is(CatalogueResponseElement.CALLBACK_FAILURE.getCode()));
+            assertThat(exceptionCatalogueResponse.getMessage(), is(CatalogueResponseElement.CALLBACK_FAILURE.getMessage()));
+            assertTrue(EqualsBuilder.reflectionEquals(exceptionCatalogueResponse.getDetails().get("callbackCatalogueResponse"), callbackCatalogueResponse));
+
+            // verify
+            assertThat(ex.getResponseStatusCode(), is(expectedStatusCode));
+
+            // rethrow to enable standard junit expected exception verification
+            throw ex;
+        }
+    }
+
+    @Test(expected = ApiException.class)
+    public void failurePathWithAssertUpstream_permittedButMismatched() throws Exception {
+        final String testUrl = "http://localhost:" + wiremockPort + "/test-callback";
+        final CallbackResponse callbackResponse = new CallbackResponse();
+
+        final int expectedAssertForUpstream = ALLOWED_ASSERT_UPSTREAM_1;
+        callbackResponse.setAssertForUpstream(expectedAssertForUpstream);
+
+        final int expectedStatusCode = ALLOWED_ASSERT_UPSTREAM_2;
+        stubFor(post(urlMatching("/test-callback.*"))
+            .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(expectedStatusCode)));
+
+        try {
+            callbackService.send(testUrl, new CaseEvent(), null, new CaseDetails(), false);
+        } catch (ApiException ex) {
+            // NB: standard API error due to bad assert request
+
+            // verify CatalogueResponse provided
+            CatalogueResponse<Map<String, Object>> exceptionCatalogueResponse = ex.getCatalogueResponse();
+            assertNotNull(exceptionCatalogueResponse);
+            assertThat(exceptionCatalogueResponse.getCode(), is(CatalogueResponseElement.CALLBACK_BAD_ASSERT_FOR_UPSTREAM.getCode()));
+            assertThat(exceptionCatalogueResponse.getMessage(), is(CatalogueResponseElement.CALLBACK_BAD_ASSERT_FOR_UPSTREAM.getMessage()));
+            assertThat(exceptionCatalogueResponse.getDetails().get("assertForUpstream"), is(expectedAssertForUpstream));
+            assertThat(exceptionCatalogueResponse.getDetails().get("callbacksHttpStatus"), is(expectedStatusCode));
+
+            // rethrow to enable standard junit expected exception verification
+            throw ex;
+        }
+    }
+
+    @Test(expected = ApiException.class)
+    public void failurePathWithAssertUpstream_notPermitted() throws Exception {
+        final String testUrl = "http://localhost:" + wiremockPort + "/test-callback";
+        final CallbackResponse callbackResponse = new CallbackResponse();
+
+        final int notPermittedStatusCode = ASSERT_UPSTREAM_NOT_PERMITTED;
+        callbackResponse.setAssertForUpstream(notPermittedStatusCode);
+
+        stubFor(post(urlMatching("/test-callback.*"))
+            .willReturn(okJson(mapper.writeValueAsString(callbackResponse)).withStatus(notPermittedStatusCode)));
+
+        try {
+            callbackService.send(testUrl, new CaseEvent(), null, new CaseDetails(), false);
+        } catch (ApiException ex) {
+            // verify CatalogueResponse provided
+            CatalogueResponse<Map<String, Object>> exceptionCatalogueResponse = ex.getCatalogueResponse();
+            assertNotNull(exceptionCatalogueResponse);
+            assertThat(exceptionCatalogueResponse.getCode(), is(CatalogueResponseElement.CALLBACK_BAD_ASSERT_FOR_UPSTREAM.getCode()));
+            assertThat(exceptionCatalogueResponse.getMessage(), is(CatalogueResponseElement.CALLBACK_BAD_ASSERT_FOR_UPSTREAM.getMessage()));
+            assertThat(exceptionCatalogueResponse.getDetails().get("assertForUpstream"), is(notPermittedStatusCode));
+
+            // rethrow to enable standard junit expected exception verification
+            throw ex;
+        }
+    }
+
+    @Test(expected = CallbackFailureWithAssertForUpstreamException.class)
+    public void failurePathWithAssertUpstream_autoAssert() throws Exception {
+        final String testUrl = "http://localhost:" + wiremockPort + "/test-callback";
+
+        final int expectedStatusCode = AUTO_ASSERT_UPSTREAM_1;
+        stubFor(post(urlMatching("/test-callback.*"))
+            .willReturn(ok("non-JSON").withStatus(expectedStatusCode)));
+
+        try {
+            callbackService.send(testUrl, new CaseEvent(), null, new CaseDetails(), false);
+        } catch (CallbackFailureWithAssertForUpstreamException ex) {
+            // verify CatalogueResponse provided
+            CatalogueResponse<Map<String, Object>> exceptionCatalogueResponse = ex.getCatalogueResponse();
+            assertNotNull(exceptionCatalogueResponse);
+            assertThat(exceptionCatalogueResponse.getCode(), is(CatalogueResponseElement.CALLBACK_FAILURE.getCode()));
+            assertThat(exceptionCatalogueResponse.getMessage(), is(CatalogueResponseElement.CALLBACK_FAILURE.getMessage()));
+
+            // verify
+            assertThat(ex.getResponseStatusCode(), is(expectedStatusCode));
+
+            // rethrow to enable standard junit expected exception verification
+            throw ex;
+        }
+    }
+
+    @Test(expected = CallbackFailureWithAssertForUpstreamException.class)
+    public void failurePathWithAssertUpstream_autoAssert_402SpecialCase() throws Exception {
+        final String testUrl = "http://localhost:" + wiremockPort + "/test-callback";
+
+        final int expectedStatusCode = AUTO_ASSERT_UPSTREAM_402;
+        stubFor(post(urlMatching("/test-callback.*"))
+            .willReturn(ok(null).withStatus(expectedStatusCode)));
+
+        try {
+            callbackService.send(testUrl, new CaseEvent(), null, new CaseDetails(), false);
+        } catch (CallbackFailureWithAssertForUpstreamException ex) {
+            // verify CatalogueResponse provided
+            CatalogueResponse<Map<String, Object>> exceptionCatalogueResponse = ex.getCatalogueResponse();
+            assertNotNull(exceptionCatalogueResponse);
+            // verify CatalogueResponse matches 402 special case for payment required: see RDM-6411 & RDM-7224
+            assertThat(exceptionCatalogueResponse.getCode(), is(CatalogueResponseElement.CALLBACK_PAYMENT_REQUIRED.getCode()));
+            assertThat(exceptionCatalogueResponse.getMessage(), is(CatalogueResponseElement.CALLBACK_PAYMENT_REQUIRED.getMessage()));
+
+            // verify
+            assertThat(ex.getResponseStatusCode(), is(expectedStatusCode));
+
+            // rethrow to enable standard junit expected exception verification
+            throw ex;
+        }
+    }
+
     @Test(expected = CallbackException.class)
     public void notFoundFailurePath() throws Exception {
         final String testUrl = "http://localhost";
@@ -187,7 +431,8 @@ public class CallbackServiceWireMockTest {
         Instant start = Instant.now();
         try {
             callbackService.send(testUrl, caseEvent, null, caseDetails, false);
-        } catch (Exception e) {
+        } catch (CallbackException e) {
+            // CallbackException >> 504 HttpStatus.GATEWAY_TIMEOUT
         }
         final Duration between = Duration.between(start, Instant.now());
         assertThat((int) between.toMillis(), greaterThan(4000));
@@ -216,24 +461,78 @@ public class CallbackServiceWireMockTest {
 
     @Test(expected = ApiException.class)
     public void validateCallbackErrorsAndWarningsWithWarnings() throws Exception {
-        final String TEST_WARNING_1 = "WARNING 1";
-        final String TEST_WARNING_2 = "WARNING 2";
+        final String testWarning1 = "WARNING 1";
+        final String testWarning2 = "WARNING 2";
 
         final CallbackResponse callbackResponse = new CallbackResponse();
         final List<String> warnings = new ArrayList<>();
-        warnings.add(TEST_WARNING_1);
-        warnings.add(TEST_WARNING_2);
+        warnings.add(testWarning1);
+        warnings.add(testWarning2);
 
         callbackResponse.setWarnings(warnings);
-        callbackService.validateCallbackErrorsAndWarnings(callbackResponse, false);
+
+        try {
+            callbackService.validateCallbackErrorsAndWarnings(callbackResponse, false);
+        } catch (ApiException ex) {
+            // NB: exception thrown as warning present
+
+            // verify warnings present in exception
+            assertTrue(ex.getCallbackWarnings().contains(testWarning1));
+            assertTrue(ex.getCallbackWarnings().contains(testWarning2));
+
+            // verify CatalogueResponse provided
+            CatalogueResponse<Map<String, List<String>>> exceptionCatalogueResponse = (CatalogueResponse<Map<String, List<String>>>)ex.getCatalogueResponse();
+            assertNotNull(exceptionCatalogueResponse);
+            assertThat(exceptionCatalogueResponse.getCode(), is(CatalogueResponseElement.CALLBACK_FAILURE.getCode()));
+            assertThat(exceptionCatalogueResponse.getMessage(), is(CatalogueResponseElement.CALLBACK_FAILURE.getMessage()));
+            // verify CatalogueResponse contains callback warnings
+            Map<String, List<String>> details = exceptionCatalogueResponse.getDetails();
+            assertNotNull(details);
+            List<String> callbackWarnings = details.get("callbackWarnings");
+            assertNotNull(callbackWarnings);
+            assertTrue(callbackWarnings.contains(testWarning1));
+            assertTrue(callbackWarnings.contains(testWarning2));
+
+            // rethrow to enable standard junit expected exception verification
+            throw ex;
+        }
     }
 
     @Test(expected = ApiException.class)
     public void validateCallbackErrorsAndWarningsWithErrorsAndIgnore() throws Exception {
         final CallbackResponse callbackResponse = new CallbackResponse();
-        callbackResponse.setErrors(Collections.singletonList("an error"));
-        callbackResponse.setWarnings(Collections.singletonList("a warning"));
-        callbackService.validateCallbackErrorsAndWarnings(callbackResponse, true);
+        final String testError = "an error";
+        final String testWarning = "a warning";
+        callbackResponse.setErrors(Collections.singletonList(testError));
+        callbackResponse.setWarnings(Collections.singletonList(testWarning));
+
+        try {
+            callbackService.validateCallbackErrorsAndWarnings(callbackResponse, true);
+        } catch (ApiException ex) {
+            // NB: exception thrown as errors present and only warnings can be ignored
+
+            // verify errors and warnings present in exception
+            assertTrue(ex.getCallbackErrors().contains(testError));
+            assertTrue(ex.getCallbackWarnings().contains(testWarning));
+
+            // verify CatalogueResponse provided
+            CatalogueResponse<Map<String, List<String>>> exceptionCatalogueResponse = (CatalogueResponse<Map<String, List<String>>>)ex.getCatalogueResponse();
+            assertNotNull(exceptionCatalogueResponse);
+            assertThat(exceptionCatalogueResponse.getCode(), is(CatalogueResponseElement.CALLBACK_FAILURE.getCode()));
+            assertThat(exceptionCatalogueResponse.getMessage(), is(CatalogueResponseElement.CALLBACK_FAILURE.getMessage()));
+            // verify CatalogueResponse contains callback errors and warnings
+            Map<String, List<String>> details = exceptionCatalogueResponse.getDetails();
+            assertNotNull(details);
+            List<String> callbackErrors = details.get("callbackErrors");
+            assertNotNull(callbackErrors);
+            assertTrue(callbackErrors.contains(testError));
+            List<String> callbackWarnings = details.get("callbackWarnings");
+            assertNotNull(callbackWarnings);
+            assertTrue(callbackWarnings.contains(testWarning));
+
+            // rethrow to enable standard junit expected exception verification
+            throw ex;
+        }
     }
 
     @Test
@@ -244,6 +543,93 @@ public class CallbackServiceWireMockTest {
         final List<String> warnings = Collections.singletonList("Test");
         callbackResponse.setWarnings(warnings);
         callbackService.validateCallbackErrorsAndWarnings(callbackResponse, true);
+        // NB: no exception thrown as warnings should been ignored when flag is set
+    }
+
+    @Test(expected = ApiException.class)
+    public void validateCallbackErrorsAndWarningsWithCatalogueResponse() throws Exception {
+        final CallbackResponse callbackResponse = new CallbackResponse();
+        callbackResponse.setErrors(Collections.singletonList("an error"));
+
+        final String expectedCatalogueResponseDetailsCode = "TEST.1001";
+        final String expectedCatalogueResponseDetailsMessage = "Testing";
+        final CatalogueResponse callbackCatalogueResponse = Mockito.mock(CatalogueResponse.class);
+        Mockito.when(callbackCatalogueResponse.getCode()).thenReturn(expectedCatalogueResponseDetailsCode);
+        Mockito.when(callbackCatalogueResponse.getMessage()).thenReturn(expectedCatalogueResponseDetailsMessage);
+
+        callbackResponse.setCatalogueResponse(callbackCatalogueResponse);
+
+        try {
+            callbackService.validateCallbackErrorsAndWarnings(callbackResponse, true);
+        } catch (ApiException ex) {
+            // NB: exception thrown as errors present and only warnings can be ignored
+
+            // verify CatalogueResponse provided
+            CatalogueResponse<Map<String, Object>> exceptionCatalogueResponse = ex.getCatalogueResponse();
+            assertNotNull(exceptionCatalogueResponse);
+            assertThat(exceptionCatalogueResponse.getCode(), is(CatalogueResponseElement.CALLBACK_FAILURE.getCode()));
+            assertThat(exceptionCatalogueResponse.getMessage(), is(CatalogueResponseElement.CALLBACK_FAILURE.getMessage()));
+            // verify CatalogueResponse contains callback's CatalogueResponse
+            CatalogueResponse catalogueResponseDetails =
+                (CatalogueResponse)((HashMap<String, Object>)exceptionCatalogueResponse.getDetails()).get("callbackCatalogueResponse");
+            assertNotNull(catalogueResponseDetails);
+            assertThat(catalogueResponseDetails, is(instanceOf(CatalogueResponse.class)));
+            assertThat((catalogueResponseDetails).getCode(), is(expectedCatalogueResponseDetailsCode));
+            assertThat((catalogueResponseDetails).getMessage(), is(expectedCatalogueResponseDetailsMessage));
+
+            // rethrow to enable standard junit expected exception verification
+            throw ex;
+        }
+    }
+
+    @Test(expected = CallbackFailureWithAssertForUpstreamException.class)
+    public void validateCallbackErrorsAndWarningsWithErrorsAndAssertForUpstream_permitted() throws Exception {
+        final CallbackResponse callbackResponse = new CallbackResponse();
+        callbackResponse.setErrors(Collections.singletonList("an error"));
+
+        final int expectedStatusCode = HttpStatus.BAD_REQUEST.value();
+        callbackResponse.setAssertForUpstream(expectedStatusCode);
+
+        try {
+            callbackService.validateCallbackErrorsAndWarnings(callbackResponse, true);
+        } catch (CallbackFailureWithAssertForUpstreamException ex) {
+            // NB: exception thrown as errors present and only warnings can be ignored
+
+            // verify CatalogueResponse provided
+            CatalogueResponse<Map<String, Object>> exceptionCatalogueResponse = ex.getCatalogueResponse();
+            assertNotNull(exceptionCatalogueResponse);
+            assertThat(exceptionCatalogueResponse.getCode(), is(CatalogueResponseElement.CALLBACK_FAILURE.getCode()));
+            assertThat(exceptionCatalogueResponse.getMessage(), is(CatalogueResponseElement.CALLBACK_FAILURE.getMessage()));
+
+            // verify
+            assertThat(ex.getResponseStatusCode(), is(expectedStatusCode));
+
+            // rethrow to enable standard junit expected exception verification
+            throw ex;
+        }
+    }
+
+    @Test(expected = ApiException.class)
+    public void validateCallbackErrorsAndWarningsWithErrorsAndAssertForUpstream_notPermitted() throws Exception {
+        final CallbackResponse callbackResponse = new CallbackResponse();
+        callbackResponse.setErrors(Collections.singletonList("an error"));
+
+        final int notPermittedStatusCode = ASSERT_UPSTREAM_NOT_PERMITTED;
+        callbackResponse.setAssertForUpstream(notPermittedStatusCode);
+
+        try {
+            callbackService.validateCallbackErrorsAndWarnings(callbackResponse, true);
+        } catch (ApiException ex) {
+            // verify CatalogueResponse provided
+            CatalogueResponse<Map<String, Object>> exceptionCatalogueResponse = ex.getCatalogueResponse();
+            assertNotNull(exceptionCatalogueResponse);
+            assertThat(exceptionCatalogueResponse.getCode(), is(CatalogueResponseElement.CALLBACK_BAD_ASSERT_FOR_UPSTREAM.getCode()));
+            assertThat(exceptionCatalogueResponse.getMessage(), is(CatalogueResponseElement.CALLBACK_BAD_ASSERT_FOR_UPSTREAM.getMessage()));
+            assertThat(exceptionCatalogueResponse.getDetails().get("assertForUpstream"), is(notPermittedStatusCode));
+
+            // rethrow to enable standard junit expected exception verification
+            throw ex;
+        }
     }
 
     @Test
@@ -299,7 +685,7 @@ public class CallbackServiceWireMockTest {
         given(applicationParams.getCallbackRetries()).willReturn(Arrays.asList(3, 5));
 
         // Builds a new callback service to avoid wiremock exception to get in the way
-        final CallbackService underTest = new CallbackService(Mockito.mock(SecurityUtils.class), restTemplate);
+        final CallbackService underTest = new CallbackService(Mockito.mock(SecurityUtils.class), restTemplate, applicationParams);
         final CaseDetails caseDetails = new CaseDetails();
         final CaseEvent caseEvent = new CaseEvent();
         caseEvent.setId("TEST-EVENT");
@@ -310,5 +696,13 @@ public class CallbackServiceWireMockTest {
             assertThat(ex.getMessage(), is("Callback to service has been unsuccessful for event " + caseEvent.getName()));
             throw ex;
         }
+    }
+
+    // NB: cannot use mockito.mock as this will not transfer to JSON correctly
+    private CatalogueResponse generateCustomCatalogueResponse(String code, String message) throws IOException {
+        final String catalogueResponseJson = String.format("{ \"code\": \"%s\", \"message\": \"%s\" }", code, message);
+        final ObjectMapper mapper = new ObjectMapper();
+
+        return mapper.readerFor(CatalogueResponse.class).readValue(catalogueResponseJson);
     }
 }

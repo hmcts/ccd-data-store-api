@@ -39,6 +39,20 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             .body(error);
     }
 
+    @ExceptionHandler(CallbackFailureWithAssertForUpstreamException.class)
+    @ResponseBody
+    public ResponseEntity<HttpError> handleApiException(final HttpServletRequest request, final CallbackFailureWithAssertForUpstreamException exception) {
+        LOG.error(exception.getMessage(), exception);
+        appInsights.trackException(exception);
+        final HttpError<Serializable> error = new HttpError<>(exception, request, exception.getCatalogueResponse(), exception.getResponseStatusCode())
+            .withDetails(exception.getDetails())
+            .withCallbackErrors(exception.getCallbackErrors())
+            .withCallbackWarnings(exception.getCallbackWarnings());
+        return ResponseEntity
+            .status(error.getStatus())
+            .body(error);
+    }
+
     @ExceptionHandler(BadSearchRequest.class)
     @ResponseBody
     public ResponseEntity<HttpError> handleSearchRequestException(HttpServletRequest request, Exception exception) {

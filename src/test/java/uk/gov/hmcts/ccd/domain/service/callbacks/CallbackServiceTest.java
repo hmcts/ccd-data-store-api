@@ -15,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -39,6 +40,9 @@ class CallbackServiceTest {
 
     @Mock
     private RestTemplate restTemplate;
+
+    @Mock
+    private ApplicationParams applicationParams;
 
     @Mock
     private Authentication authentication;
@@ -71,7 +75,7 @@ class CallbackServiceTest {
         callbackResponse.setData(caseDetails.getData());
 
         initSecurityContext();
-        callbackService = new CallbackService(securityUtils, restTemplate);
+        callbackService = new CallbackService(securityUtils, restTemplate, applicationParams);
 
         final ResponseEntity<CallbackResponse> responseEntity = new ResponseEntity<>(callbackResponse, HttpStatus.OK);
         when(restTemplate

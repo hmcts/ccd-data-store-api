@@ -11,7 +11,8 @@ public enum CatalogueResponseElement {
 
     // CCD.02 Callback codes
     CALLBACK_FAILURE(CatalogueResponseGroup.CALLBACK, 1, "Callback failure."),
-    CALLBACK_PAYMENT_REQUIRED(CatalogueResponseGroup.CALLBACK, 2, "Payment required by callback.");
+    CALLBACK_PAYMENT_REQUIRED(CatalogueResponseGroup.CALLBACK, 2, "Payment required by callback."),
+    CALLBACK_BAD_ASSERT_FOR_UPSTREAM(CatalogueResponseGroup.CALLBACK, 3, "Callback response contained a bad AssertForUpstream request");
 
     final CatalogueResponseGroup group;
     final int sequenceNo;
