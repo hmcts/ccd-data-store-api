@@ -72,12 +72,8 @@ public class HttpError<T extends Serializable> implements Serializable {
     }
 
     private HttpStatus getHttpStatus(final Integer status) {
-        // NB: don't return value if matches default
-        if (HttpStatus.INTERNAL_SERVER_ERROR.value() != status.intValue()) {
-            return HttpStatus.resolve(status.intValue());
-        }
 
-        return null;
+        return HttpStatus.resolve(status.intValue());
     }
 
     private HttpStatus getHttpStatus(final ResponseStatus responseStatus) {
@@ -92,10 +88,12 @@ public class HttpError<T extends Serializable> implements Serializable {
     }
 
     private String getErrorReason(final Integer status, final ResponseStatus responseStatus) {
+        // NB: Internal Server Error (500) should return friendlier/generic default message to maintain current behaviour
+
         // Option 1: use status as it may be an override value for responseStatus
         if (status != null) {
             final HttpStatus httpStatus = getHttpStatus(status);
-            if (null != httpStatus) {
+            if (null != httpStatus && httpStatus != HttpStatus.INTERNAL_SERVER_ERROR) {
                 return httpStatus.getReasonPhrase();
             }
 
@@ -106,7 +104,7 @@ public class HttpError<T extends Serializable> implements Serializable {
             }
 
             final HttpStatus httpStatus = getHttpStatus(responseStatus);
-            if (null != httpStatus) {
+            if (null != httpStatus && httpStatus != HttpStatus.INTERNAL_SERVER_ERROR) {
                 return httpStatus.getReasonPhrase();
             }
         }

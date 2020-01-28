@@ -276,6 +276,14 @@ dependencyManagement {
         // Versions prior to 24.1.1 vulnerable to CVE-2018-10237
         dependency 'com.google.guava:guava:24.1.1-jre'
 
+        // CVE-2020-5398
+        dependencySet(group: 'org.springframework.security', version: '5.2.1.RELEASE') {
+            entry 'spring-security-web'
+            entry 'spring-security-config'
+            entry 'spring-security-core'
+            entry 'spring-security-crypto'
+        }
+
         // CVE-2019-0232 - Java and Command Line injections in Windows
         dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.30') {
             entry 'tomcat-embed-core'
@@ -487,11 +495,10 @@ jacoco {
 sonarqube {
     properties {
         property "sonar.exclusions", "build/generated-sources/**/*.java,**/service/doclink/**"
-        property "sonar.coverage.exclusions", "src/main/java/uk/gov/hmcts/ccd/data/definition/DefaultCaseDefinitionRepository.java,src/main/java/uk/gov/hmcts/ccd/AppInsights.java,**/DocLinksRestoreEndpoint.java,**/service/doclink/**,**/DefaultCaseDetailsRepository.java"
-        property "sonar.jacoco.reportPaths", "${project.buildDir}/jacoco/junitPlatformTest.exec"
         property "sonar.junit.reportPaths", "${project.buildDir}/test-results/junit-platform"
         property "sonar.projectName", "ccd-data-store-api"
         property "sonar.projectKey", "ccd-data-store-api"
+        property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
     }
 }
 
