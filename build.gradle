@@ -628,16 +628,15 @@ task smoke(type: Test) {
     systemProperty "https.proxyPort", System.getProperty('https.proxyPort')
 
     environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
-    logger.quiet("TODO: Add smoke tests")
-//    group = 'Delivery pipeline'
-//    description = 'Executes smoke tests against an AAT CCD Data Store instance'
-//    setTestClassesDirs(sourceSets.aat.output.classesDirs)
-//    setClasspath(sourceSets.aat.runtimeClasspath)
-//    include "uk/gov/hmcts/ccd/datastore/tests/functional/**"
-//    include "uk/gov/hmcts/ccd/datastore/tests/v2/**"
-//    useJUnitPlatform {
-//        includeTags 'smoke'
-//    }
+    group = 'Delivery pipeline'
+    description = 'Executes smoke tests against an AAT CCD Data Store instance'
+    setTestClassesDirs(sourceSets.aat.output.classesDirs)
+    setClasspath(sourceSets.aat.runtimeClasspath)
+    include "uk/gov/hmcts/ccd/datastore/tests/functional/**"
+    include "uk/gov/hmcts/ccd/datastore/tests/v2/**"
+    useJUnitPlatform {
+        includeTags 'smoke'
+    }
 
 }
 
