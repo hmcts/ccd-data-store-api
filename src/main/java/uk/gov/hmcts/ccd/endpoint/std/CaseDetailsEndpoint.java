@@ -113,7 +113,7 @@ public class CaseDetailsEndpoint {
     @ApiOperation(value = "Get case", notes = "Retrieve an existing case with its state and data")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Case found for the given ID"),
-        @ApiResponse(code = 400, message = "Invalid case ID"),
+        @ApiResponse(code = 400, message = "Invalid request"),
         @ApiResponse(code = 404, message = "No case found for the given ID")
     })
     public CaseDetails findCaseDetailsForCaseworker(
