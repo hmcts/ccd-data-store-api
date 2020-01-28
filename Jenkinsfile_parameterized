@@ -29,7 +29,7 @@ def secrets = [
         secret('ccd-api-gateway-oauth2-client-secret', 'OAUTH2_CLIENT_SECRET'),
 
         //Required for FTA test RDM-6943
-        secret('ccd-befta-caseworker-2-solicitor-1-pwd ', 'CCD_BEFTA_CASEWORKER_2_SOLICITOR_1_PWD'),
+        secret('ccd-befta-caseworker-2-solicitor-1-pwd', 'CCD_BEFTA_CASEWORKER_2_SOLICITOR_1_PWD'),
         secret('ccd-befta-caseworker-2-solicitor-2-pwd', 'CCD_BEFTA_CASEWORKER_2_SOLICITOR_2_PWD'),
         secret('ccd-befta-caseworker-2-solicitor-3-pwd', 'CCD_BEFTA_CASEWORKER_2_SOLICITOR_3_PWD'),
         secret('ccd-befta-caseworker-1-pwd', 'CCD_BEFTA_CASEWORKER_1_PWD'),
