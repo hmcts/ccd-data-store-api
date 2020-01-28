@@ -29,15 +29,15 @@ def secrets = [
         secret('ccd-api-gateway-oauth2-client-secret', 'OAUTH2_CLIENT_SECRET'),
 
         //Required for FTA test RDM-6943
-        secret('ccd-caseworker-solicitor-one-password', 'CCD_CASEWORKER_AUTOTEST_SOLICITOR_ONE_PASSWORD'),
-        secret('ccd-caseworker-solicitor-two-password', 'CCD_CASEWORKER_AUTOTEST_SOLICITOR_TWO_PASSWORD'),
-        secret('ccd-caseworker-solicitor-three-password', 'CCD_CASEWORKER_AUTOTEST_SOLICITOR_THREE_PASSWORD'),
-        secret('ccd-caseworker-one-password', 'CCD_CASEWORKER_ONE_AUTOTEST_PASSWORD'),
-        secret('ccd-caseworker-two-password', 'CCD_CASEWORKER_TWO_AUTOTEST_PASSWORD'),
-        secret('ccd-caseworker-three-password', 'CCD_CASEWORKER_THREE_AUTOTEST_PASSWORD'),
-        secret('ccd-citizen-two-password', 'CCD_CITIZEN_TWO_AUTOTEST_PASSWORD'),
-        secret('ccd-citizen-three-password', 'CCD_CITIZEN_THREE_AUTOTEST_PASSWORD'),
-        secret('ccd-solicitor-three-password', 'CCD_AUTOTEST_THREE_SOLICITOR_PASSWORD')
+        secret('ccd-caseworker-solicitor-one-password', 'CCD_BEFTA_CASEWORKER_2_SOLICITOR_1_PWD'),
+        secret('ccd-caseworker-solicitor-two-password', 'CCD_BEFTA_CASEWORKER_2_SOLICITOR_2_PWD'),
+        secret('ccd-caseworker-solicitor-three-password', 'CCD_BEFTA_CASEWORKER_2_SOLICITOR_3_PWD'),
+        secret('ccd-caseworker-one-password', 'CCD_BEFTA_CASEWORKER_1_PWD'),
+        secret('ccd-caseworker-two-password', 'CCD_BEFTA_CASEWORKER_2_PWD'),
+        secret('ccd-caseworker-three-password', 'CCD_BEFTA_CASEWORKER_3_PWD'),
+        secret('ccd-citizen-two-password', 'CCD_BEFTA_CITIZEN_2_PWD'),
+        secret('ccd-citizen-three-password', 'CCD_BEFTA_CITIZEN_3_PWD'),
+        secret('ccd-solicitor-three-password', 'CCD_BEFTA_SOLICITOR_3_PWD')
     ],
     's2s-${env}': [
         secret('microservicekey-ccd-gw', 'CCD_GW_SERVICE_SECRET')

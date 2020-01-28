@@ -6,7 +6,7 @@
   "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events",
   "user": {
     "username": "befta.caseworker.2.solicitor.2@gmail.com",
-    "password": "[[$CCD_CASEWORKER_AUTOTEST_SOLICITOR_TWO_PASSWORD]]"
+    "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_2_PWD]]"
   },
   "request": {
     "headers": {
