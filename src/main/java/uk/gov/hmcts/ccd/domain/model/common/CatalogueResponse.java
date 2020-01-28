@@ -24,6 +24,10 @@ public class CatalogueResponse<T> {
         this.details = details;
     }
 
+    private CatalogueResponse(final String code, final String message) {
+        this(code,message,null);
+    }
+
     public CatalogueResponse(final CatalogueResponseElement catalogueResponseElement, final T details) {
         this(catalogueResponseElement.getCode(), catalogueResponseElement.getMessage(), details);
     }
