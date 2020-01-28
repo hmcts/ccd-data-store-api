@@ -8,7 +8,7 @@
   ],
   "user": {
     "username": "befta.citizen.2@gmail.com",
-    "password": "Pa55word11"
+    "password": "[[$CCD_BEFTA_CITIZEN_2_PWD]]"
   },
   "request": {
     "pathVariables": {
