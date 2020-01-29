@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.Banner;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfig;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetBannerOperation;
@@ -25,6 +26,8 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.v2.internal.resource.UIBannerResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.UIJurisdictionResource;
+import uk.gov.hmcts.ccd.domain.service.aggregated.GetJurisdictionUiConfigOperation;
+import uk.gov.hmcts.ccd.v2.internal.resource.UIJurisdictionConfigResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.UISearchInputsResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.UIWorkbasketInputsResource;
 
@@ -42,6 +45,7 @@ import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.SEARCH;
 import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.WORKBASKET;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.BannerBuilder.newBanner;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.JurisdictionUiConfigBuilder.newJurisdictionUiConfig;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.SearchInputBuilder.aSearchInput;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WorkbasketInputBuilder.aWorkbasketInput;
 
@@ -64,9 +68,21 @@ class UIDefinitionControllerTest {
                                         .withBannerUrlText("Click here to see it.>>>")
                                         .withBannerUrl("http://localhost:3451/test").build();
 
+    private JurisdictionUiConfig jurisdictionUiConfig1 = newJurisdictionUiConfig()
+                                                                    .withId("Reference 1")
+                                                                    .withName("Name 1")
+                                                                    .withShutteredEnabled(true)
+                                                                    .build();
+    private JurisdictionUiConfig jurisdictionUiConfig2 = newJurisdictionUiConfig()
+                                                                    .withId("Reference 2")
+                                                                    .withName("Name 2")
+                                                                    .withShutteredEnabled(false)
+                                                                    .build();
+
     private final List<WorkbasketInput> workbasketInputs = Lists.newArrayList(workbasketInput1, workbasketInput2);
     private final List<SearchInput> searchInputs = Lists.newArrayList(searchInput1, searchInput2);
     private final List<Banner> banners = Lists.newArrayList(banner1, banner2);
+    private final List<JurisdictionUiConfig> jurisdictionUiConfigs = Lists.newArrayList(jurisdictionUiConfig1, jurisdictionUiConfig2);
     private final List<String> jurisdictionReferenes = Lists.newArrayList("TEST", "FAMILY LAW");
 
     @Mock
@@ -74,6 +90,9 @@ class UIDefinitionControllerTest {
 
     @Mock
     private GetBannerOperation getBannerOperation;
+    
+    @Mock
+    private GetJurisdictionUiConfigOperation getJurisdictionUiConfigOperation;
 
     @Mock
     private GetUserProfileOperation getUserProfileOperation;
@@ -88,6 +107,7 @@ class UIDefinitionControllerTest {
         doReturn(workbasketInputs).when(getCriteriaOperation).execute(CASE_TYPE_ID, CAN_READ, WORKBASKET);
         doReturn(searchInputs).when(getCriteriaOperation).execute(CASE_TYPE_ID, CAN_READ, SEARCH);
         doReturn(banners).when(getBannerOperation).execute(jurisdictionReferenes);
+        doReturn(jurisdictionUiConfigs).when(getJurisdictionUiConfigOperation).execute(jurisdictionReferenes);
     }
 
     @Nested
@@ -201,7 +221,6 @@ class UIDefinitionControllerTest {
         }
     }
 
-
     @Nested
     @DisplayName("GET /internal/jurisdictions")
     class GetJurisdictions {
@@ -256,6 +275,38 @@ class UIDefinitionControllerTest {
                     assertEquals(2, jurisdictionResource.getJurisdictions().length);
                 }
             );
+        }
+    }
+  
+    @Nested
+    @DisplayName("GET /internal/jurisdiction-ui-configs")
+    class GetJurisdictionUiConfigs {
+
+        @Test
+        @DisplayName("should return 200 when jurisdiction UI configs found")
+        void caseFound() {
+            final ResponseEntity<UIJurisdictionConfigResource> response = uiDefinitionController.getJurisdictionUiConfigs(Optional.of(jurisdictionReferenes));
+
+            assertAll(
+                () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
+                () -> {
+                	UIJurisdictionConfigResource uiJurisdictionConfigResource = response.getBody();
+                    assertThat(Lists.newArrayList(uiJurisdictionConfigResource.getConfigs()),hasItems(
+                        hasProperty("id", is("Reference 1")),
+                        hasProperty("id", is("Reference 2")),
+                        hasProperty("name", is("Name 1")),
+                        hasProperty("name", is("Name 2"))));
+                }
+            );
+        }
+
+        @Test
+        @DisplayName("should propagate exception")
+        void shouldPropagateExceptionWhenThrown() {
+            when(getJurisdictionUiConfigOperation.execute(jurisdictionReferenes)).thenThrow(RuntimeException.class);
+
+            assertThrows(RuntimeException.class,
+                () -> uiDefinitionController.getJurisdictionUiConfigs(Optional.of(jurisdictionReferenes)));
         }
     }
 }
