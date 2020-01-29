@@ -119,4 +119,12 @@
    <packageUrl regex="true">^pkg:maven/org\.springframework/spring-jcl@.*$</packageUrl>
    <cve>CVE-2020-5398</cve>
 </suppress>
+    <!-- FIXME : RDM-7451 -->
+    <suppress>
+        <notes><![CDATA[
+   relates to spring_framework spring-security
+   ]]></notes>
+        <cpe>cpe:/a:pivotal_software:spring_framework</cpe>
+        <cve>CVE-2020-5398</cve>
+    </suppress>
 </suppressions>
