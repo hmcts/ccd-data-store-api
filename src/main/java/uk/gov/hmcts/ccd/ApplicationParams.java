@@ -210,6 +210,10 @@ public class ApplicationParams {
     public String bannersURL() {
         return uiDefinitionHost + "/api/display/banners";
     }
+    
+    public String jurisdictionUiConfigsURL() {
+    	return uiDefinitionHost + "/api/display/jurisdiction-ui-configs";
+    }
 
     public String searchInputDefinition(final String caseTypeId) {
         return uiDefinitionHost + "/api/display/search-input-definition/" + encode(caseTypeId);
