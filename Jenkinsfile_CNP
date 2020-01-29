@@ -74,8 +74,10 @@ withPipeline(type, product, component) {
 
     overrideVaultEnvironments(vaultOverrides)
     enableAksStagingDeployment()
+    disableLegacyDeploymentOnAAT()
     loadVaultSecrets(secrets)
     enableDbMigration('ccd')
     enableDockerBuild()
     installCharts()
+    disableLegacyDeployment()
 }

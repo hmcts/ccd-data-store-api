@@ -112,6 +112,7 @@ module "ccd-data-store-api" {
   capacity = "${var.capacity}"
   java_container_version = "9.0"
   appinsights_instrumentation_key = "${var.appinsights_instrumentation_key}"
+  enable_ase                      = "${var.enable_ase}"
 
   app_settings = {
     DATA_STORE_DB_HOST = "${module.data-store-db.host_name}"
@@ -143,6 +144,7 @@ module "ccd-data-store-api" {
 
     DEFINITION_CACHE_MAX_IDLE_SEC       = "${var.definition_cache_max_idle_sec}"
     DEFINITION_CACHE_LATEST_VERSION_TTL_SEC = "${var.definition_cache_latest_version_ttl_sec}"
+    DEFINITION_CACHE_JURISDICTION_TTL_SEC = "${var.definition_cache_jurisdiction_ttl_sec}"
     DEFINITION_CACHE_MAX_SIZE           = "${var.definition_cache_max_size}"
     DEFINITION_CACHE_EVICTION_POLICY    = "${var.definition_cache_eviction_policy}"
 
@@ -156,6 +158,7 @@ module "ccd-data-store-api" {
     ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED = "${var.elastic_search_nodes_discovery_enabled}"
     ELASTIC_SEARCH_NODES_DISCOVERY_FREQUENCY_MILLIS = "${var.elastic_search_nodes_discovery_frequency_millis}"
     ELASTIC_SEARCH_NODES_DISCOVERY_FILTER = "${var.elastic_search_nodes_discovery_filter}"
+    ELASTIC_SEARCH_REQUEST_TIMEOUT        = "${var.elastic_search_request_timeout}"
 
     HTTP_CLIENT_CONNECTION_TIMEOUT        = "${var.http_client_connection_timeout}"
     HTTP_CLIENT_READ_TIMEOUT              = "${var.http_client_read_timeout}"
@@ -169,7 +172,6 @@ module "ccd-data-store-api" {
     CCD_AM_WRITE_TO_BOTH                  = "${var.ccd_am_write_to_both}"
     CCD_AM_READ_FROM_CCD                  = "${var.ccd_am_read_from_ccd}"
     CCD_AM_READ_FROM_AM                   = "${var.ccd_am_read_from_am}"
-    JPA_CRITERIA_IN_SEARCH_ENABLED        = false
   }
 
 }

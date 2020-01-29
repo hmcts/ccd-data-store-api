@@ -20,7 +20,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.service.getdraft.DefaultGetDraftsOperation;
 import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftsOperation;
-import uk.gov.hmcts.ccd.domain.service.search.CreatorSearchOperation;
+import uk.gov.hmcts.ccd.domain.service.search.AuthorisedSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
 
 @Service
@@ -36,7 +36,7 @@ public class SearchQueryOperation {
     private final UserRepository userRepository;
 
     @Autowired
-    public SearchQueryOperation(@Qualifier(CreatorSearchOperation.QUALIFIER) final SearchOperation searchOperation,
+    public SearchQueryOperation(@Qualifier(AuthorisedSearchOperation.QUALIFIER) final SearchOperation searchOperation,
                                 final MergeDataToSearchResultOperation mergeDataToSearchResultOperation,
                                 @Qualifier(AuthorisedGetCaseTypeOperation.QUALIFIER) final GetCaseTypeOperation getCaseTypeOperation,
                                 @Qualifier(DefaultGetDraftsOperation.QUALIFIER) GetDraftsOperation getDraftsOperation,

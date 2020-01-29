@@ -68,6 +68,11 @@ variable "definition_cache_latest_version_ttl_sec" {
   default = "1"
 }
 
+variable "definition_cache_jurisdiction_ttl_sec" {
+  type = "string"
+  default = "1"
+}
+
 variable "definition_cache_max_size" {
   type = "string"
   default = "5000"
@@ -108,7 +113,7 @@ variable "database_storage_mb" {
 
 variable "authorised-services" {
   type    = "string"
-  default = "ccd_data,ccd_gw,ccd_ps,probate_backend,divorce_ccd_submission,sscs,sscs_bulkscan,cmc,cmc_claim_store,cmc_claim_external_api,jui_webapp,pui_webapp,bulk_scan_orchestrator,fpl_case_service,iac,finrem_ccd_data_migrator,finrem_case_orchestration,employment_tribunals,ethos_repl_service,ccpay_bubble,ctsc_work_allocation,em_ccd_orchestrator,xui_webapp"
+  default = "ccd_data,ccd_gw,ccd_ps,probate_backend,divorce_ccd_submission,sscs,sscs_bulkscan,cmc,cmc_claim_store,cmc_claim_external_api,jui_webapp,pui_webapp,bulk_scan_orchestrator,fpl_case_service,iac,finrem_ccd_data_migrator,finrem_case_orchestration,employment_tribunals,ethos_repl_service,ccpay_bubble,ctsc_work_allocation,em_ccd_orchestrator,xui_webapp,bulk_scan_payment_processor"
 }
 
 variable "idam_api_url" {
@@ -144,6 +149,10 @@ variable "elastic_search_blacklist" {
 
 variable "elastic_search_enabled" {
   default = "false"
+}
+
+variable "elastic_search_request_timeout" {
+  default = "10000"
 }
 
 variable "elastic_search_case_index_name_format" {
@@ -182,7 +191,6 @@ variable "http_client_connection_timeout" {
 }
 
 variable "http_client_read_timeout" {
-  type = "string"
   default = "60000"
 }
 
@@ -240,3 +248,8 @@ variable "additional_host_name" {
   description = "A custom domain name for this webapp."
   default = "null"
 }
+
+variable "enable_ase" {
+  default = false
+}
+

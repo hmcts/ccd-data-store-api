@@ -5,6 +5,8 @@ import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
@@ -33,17 +35,20 @@ public abstract class AbstractDefaultGetCaseViewOperation {
     private final CaseTypeService caseTypeService;
     private final UIDService uidService;
     private final ObjectMapperService objectMapperService;
+    private final CompoundFieldOrderService compoundFieldOrderService;
 
     AbstractDefaultGetCaseViewOperation(GetCaseOperation getCaseOperation,
                                         UIDefinitionRepository uiDefinitionRepository,
                                         CaseTypeService caseTypeService,
                                         UIDService uidService,
-                                        ObjectMapperService objectMapperService) {
+                                        ObjectMapperService objectMapperService,
+                                        CompoundFieldOrderService compoundFieldOrderService) {
         this.getCaseOperation = getCaseOperation;
         this.uiDefinitionRepository = uiDefinitionRepository;
         this.caseTypeService = caseTypeService;
         this.uidService = uidService;
         this.objectMapperService = objectMapperService;
+        this.compoundFieldOrderService = compoundFieldOrderService;
     }
 
     void validateCaseReference(String caseReference) {
@@ -71,12 +76,11 @@ public abstract class AbstractDefaultGetCaseViewOperation {
 
     CaseViewTab[] getTabs(CaseDetails caseDetails, Map<String, ?> data, CaseTabCollection caseTabCollection) {
         return caseTabCollection.getTabs().stream().map(tab -> {
-            CaseViewField[] caseViewFields = tab.getTabFields().stream()
+            CommonField[] caseViewFields = tab.getTabFields().stream()
                 .filter(filterCaseTabFieldsBasedOnSecureData(caseDetails))
-                .map(field -> CaseViewField.createFrom(field, data))
+                .map(caseTypeTabField -> CaseViewField.createFrom(caseTypeTabField, data))
                 .toArray(CaseViewField[]::new);
-
-            return new CaseViewTab(tab.getId(), tab.getLabel(), tab.getDisplayOrder(), caseViewFields,
+            return new CaseViewTab(tab.getId(), tab.getLabel(), tab.getDisplayOrder(), (CaseViewField[])caseViewFields,
                                    tab.getShowCondition(), tab.getRole());
 
         }).toArray(CaseViewTab[]::new);

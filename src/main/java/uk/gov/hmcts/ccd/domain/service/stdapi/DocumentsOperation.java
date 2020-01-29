@@ -17,6 +17,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.Document;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import javax.inject.Inject;
@@ -46,16 +47,15 @@ public class DocumentsOperation {
         this.uidService = uidService;
     }
 
-    public List<Document> getPrintableDocumentsForCase(final String jurisdictionId,
-                                                       final String caseTypeId,
-                                                       final String caseReference) {
+    public List<Document> getPrintableDocumentsForCase(final String caseReference) {
         if (!uidService.validateUID(caseReference)) {
             throw new BadRequestException("Invalid Case Reference");
         }
-
+        CaseDetails caseDetails = getCaseDetails(caseReference);
+        String caseTypeId = caseDetails.getCaseTypeId();
+        String jurisdictionId = caseDetails.getJurisdiction();
         try {
             final CaseType caseType = caseTypeService.getCaseTypeForJurisdiction(caseTypeId, jurisdictionId);
-            final CaseDetails caseDetails = caseDetailsRepository.findByReference(Long.valueOf(caseReference));
             final String documentListUrl = caseType.getPrintableDocumentsUrl();
             final RestTemplate restTemplate = new RestTemplate();
             final HttpHeaders headers = securityUtils.authorizationHeaders();
@@ -72,5 +72,17 @@ public class DocumentsOperation {
                 jurisdictionId, caseTypeId, caseReference, e));
         }
     }
+
+    private CaseDetails getCaseDetails(String caseReference) {
+        CaseDetails caseDetails = null;
+        try {
+            caseDetails = caseDetailsRepository.findByReference(caseReference)
+                .orElseThrow(() -> new ResourceNotFoundException("No case exist with id=" + caseReference));
+        } catch (NumberFormatException nfe) {
+            throw new BadRequestException("Case reference is not valid");
+        }
+        return caseDetails;
+    }
+
 }
 

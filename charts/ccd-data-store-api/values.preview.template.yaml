@@ -23,5 +23,5 @@ java:
     ENABLE_DB_MIGRATE: true
     ELASTIC_SEARCH_ENABLED: false
     ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: false
-postgresql:
-  enabled: true
+  postgresql:
+    enabled: true

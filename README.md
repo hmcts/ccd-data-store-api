@@ -9,7 +9,7 @@
 [![HitCount](http://hits.dwyl.io/SP9gBJ/ccd-data-store-api.svg)](#ccd-data-store-api)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Store/search cases and provide workbaskets
+Store/search cases and provide workbaskets.
 
 ### Prerequisites
 

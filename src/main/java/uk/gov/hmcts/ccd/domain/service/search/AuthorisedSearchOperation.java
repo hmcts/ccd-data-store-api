@@ -21,10 +21,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import static uk.gov.hmcts.ccd.domain.service.search.AuthorisedSearchOperation.QUALIFIER;
 
 @Service
-@Qualifier("authorised")
+@Qualifier(QUALIFIER)
 public class AuthorisedSearchOperation implements SearchOperation {
+    public static final String QUALIFIER = "authorised";
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final TypeReference STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {
     };

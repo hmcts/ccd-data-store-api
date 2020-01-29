@@ -16,14 +16,14 @@ import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ForbiddenException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
-import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseUser;
 
 import java.util.Arrays;
 import java.util.Optional;
-
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Matchers.eq;
@@ -63,7 +63,6 @@ class CaseUserControllerTest {
         when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(true);
         when(caseReferenceService.validateUID(NOT_CASE_REFERENCE)).thenReturn(false);
 
-        when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.ALL);
         when(userAuthorisation.hasJurisdictionRole(JURISDICTION_ID)).thenReturn(true);
 
         caseDetails = new CaseDetails();
@@ -108,13 +107,19 @@ class CaseUserControllerTest {
         }
 
         @Test
-        @DisplayName("should return 403 when user has limited access level")
-        void should403WhenUserLimitedAccess() {
-            when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.GRANTED);
+        @DisplayName("should update when user has jurisdiction role")
+        void shouldUpdateWhenUserHasLimitedAccess() {
+            final ArgumentCaptor<CaseUser> caseUserCaptor = ArgumentCaptor.forClass(CaseUser.class);
 
-            assertThrows(
-                ForbiddenException.class,
-                () -> caseUserController.putUser(CASE_REFERENCE, USER_ID, defaultCaseUser)
+            caseUserController.putUser(CASE_REFERENCE, USER_ID, defaultCaseUser);
+
+            verify(caseAccessOperation).updateUserAccess(eq(caseDetails), caseUserCaptor.capture());
+
+            final CaseUser caseUser = caseUserCaptor.getValue();
+            assertAll(
+                () -> assertThat(caseUser.getUserId(), equalTo(USER_ID)),
+                () -> assertThat(caseUser.getCaseRoles(), hasSize(1)),
+                () -> assertThat(caseUser.getCaseRoles(), contains(CASE_ROLE_1))
             );
         }
 
