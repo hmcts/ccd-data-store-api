@@ -12,10 +12,7 @@ public class CatalogueResponse<T> {
     private final T details;
 
     public CatalogueResponse() {
-        super();
-        this.code = null;
-        this.message = null;
-        this.details = null;
+        this(null,null,null);
     }
 
     private CatalogueResponse(final String code, final String message, final T details) {
