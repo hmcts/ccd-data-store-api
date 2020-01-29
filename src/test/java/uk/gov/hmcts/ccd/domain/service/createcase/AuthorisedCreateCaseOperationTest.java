@@ -53,12 +53,10 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.Jurisdicti
 
 class AuthorisedCreateCaseOperationTest {
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private static final String CASEWORKER_PROBATE_LOA1 = "caseworker-probate-loa1";
     private static final String CASEWORKER_PROBATE_LOA3 = "caseworker-probate-loa3";
     private static final String CASEWORKER_DIVORCE = "caseworker-divorce-loa3";
 
-    private static final String UID = "123";
     private static final String JURISDICTION_ID = "Probate";
     private static final String CASE_TYPE_ID = "Grant";
     private static final Event EVENT = anEvent().build();
@@ -191,7 +189,7 @@ class AuthorisedCreateCaseOperationTest {
     @DisplayName("should fail if user roles not found")
     void shouldFailIfNoUserRolesFound() {
 
-        doReturn(null).when(caseAccessService).getCaseCreationRoles();
+        doThrow(new ValidationException("Cannot find user roles for the user")).when(caseAccessService).getCaseCreationRoles();
         when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseType), eq(null), eq(CAN_CREATE))).thenThrow(NullPointerException.class);
 
         assertThrows(ValidationException.class, () -> authorisedCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,
