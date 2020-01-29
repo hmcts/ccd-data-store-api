@@ -269,14 +269,6 @@ dependencyManagement {
         // Versions prior to 24.1.1 vulnerable to CVE-2018-10237
         dependency 'com.google.guava:guava:24.1.1-jre'
 
-        // CVE-2020-5398
-        dependencySet(group: 'org.springframework.security', version: '5.2.1.RELEASE') {
-            entry 'spring-security-web'
-            entry 'spring-security-config'
-            entry 'spring-security-core'
-            entry 'spring-security-crypto'
-        }
-
         // CVE-2019-0232 - Java and Command Line injections in Windows
         dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.30') {
             entry 'tomcat-embed-core'
@@ -623,7 +615,6 @@ task smoke(type: Test) {
     systemProperty "https.proxyPort", System.getProperty('https.proxyPort')
 
     environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
-
     group = 'Delivery pipeline'
     description = 'Executes smoke tests against an AAT CCD Data Store instance'
     setTestClassesDirs(sourceSets.aat.output.classesDirs)
