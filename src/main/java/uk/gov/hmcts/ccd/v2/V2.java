@@ -36,6 +36,9 @@ public final class V2 {
         public static final String UI_BANNERS =
             "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-banners.v2+json;charset=UTF-8";
 
+        public static final String UI_JURISDICTIONS =
+            "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-jurisdictions.v2+json;charset=UTF-8";
+
     }
 
     public final class Error {

@@ -7,17 +7,24 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
+import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.Banner;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetBannerOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetCriteriaOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.GetUserProfileOperation;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.v2.internal.resource.UIBannerResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.UIJurisdictionResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.UISearchInputsResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.UIWorkbasketInputsResource;
 
@@ -29,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.SEARCH;
 import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.WORKBASKET;
@@ -66,6 +74,9 @@ class UIDefinitionControllerTest {
 
     @Mock
     private GetBannerOperation getBannerOperation;
+
+    @Mock
+    private GetUserProfileOperation getUserProfileOperation;
 
     @InjectMocks
     private UIDefinitionController uiDefinitionController;
@@ -187,6 +198,64 @@ class UIDefinitionControllerTest {
             assertEquals("Click here to see it.>>>", bannersReturned.get(1).getBannerUrlText());
             assertEquals("http://localhost:3451/test", bannersReturned.get(1).getBannerUrl());
             assertEquals(true, bannersReturned.get(1).getBannerEnabled());
+        }
+    }
+
+
+    @Nested
+    @DisplayName("GET /internal/jurisdictions")
+    class GetJurisdictions {
+
+        @Test
+        @DisplayName("should throw exception when access type not found")
+        void accessTypeNotExists() {
+            assertThrows(BadRequestException.class,
+                () -> uiDefinitionController.getJurisdictions("access_not_exists"));
+        }
+
+        @Test
+        @DisplayName("should throw exception when jurisdictions not found")
+        void shouldThrowExceptionWhenJurisdictionsNotFound() {
+            UserProfile userProfile = mock(UserProfile.class);
+            when(getUserProfileOperation.execute(ArgumentMatchers.any())).thenReturn(userProfile);
+
+            assertThrows(ResourceNotFoundException.class,
+                () -> uiDefinitionController.getJurisdictions("create"));
+        }
+
+        @Test
+        @DisplayName("should throw exception when empty jurisdictions found")
+        void shouldThrownExceptionWhenJurisdictionsAreEmpty() {
+            UserProfile userProfile = mock(UserProfile.class);
+            JurisdictionDisplayProperties[] jurisdictionDisplayProperties = new JurisdictionDisplayProperties[0];
+            when(userProfile.getJurisdictions()).thenReturn(jurisdictionDisplayProperties);
+            when(getUserProfileOperation.execute(ArgumentMatchers.any())).thenReturn(userProfile);
+
+            assertThrows(ResourceNotFoundException.class,
+                () -> uiDefinitionController.getJurisdictions("create"));
+        }
+
+        @Test
+        @DisplayName("should return jurisdiction resource when jurisdictions found")
+        void shouldReturnJurisdictionResourceWhenJurisdictionsExists() {
+            UserProfile userProfile = mock(UserProfile.class);
+            JurisdictionDisplayProperties[] jurisdictionDisplayProperties = new JurisdictionDisplayProperties[2];
+            JurisdictionDisplayProperties properties1 = mock(JurisdictionDisplayProperties.class);
+            JurisdictionDisplayProperties properties2 = mock(JurisdictionDisplayProperties.class);
+            jurisdictionDisplayProperties[0] = properties1;
+            jurisdictionDisplayProperties[1] = properties2;
+            when(userProfile.getJurisdictions()).thenReturn(jurisdictionDisplayProperties);
+            when(getUserProfileOperation.execute(ArgumentMatchers.any())).thenReturn(userProfile);
+
+            ResponseEntity<UIJurisdictionResource> response = uiDefinitionController.getJurisdictions("create");
+
+            assertAll(
+                () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
+                () -> {
+                    UIJurisdictionResource jurisdictionResource = response.getBody();
+                    assertEquals(2, jurisdictionResource.getJurisdictions().length);
+                }
+            );
         }
     }
 }
