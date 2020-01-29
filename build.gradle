@@ -619,7 +619,6 @@ task smoke(type: Test) {
     systemProperty "https.proxyPort", System.getProperty('https.proxyPort')
 
     environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
-
     group = 'Delivery pipeline'
     description = 'Executes smoke tests against an AAT CCD Data Store instance'
     setTestClassesDirs(sourceSets.aat.output.classesDirs)
