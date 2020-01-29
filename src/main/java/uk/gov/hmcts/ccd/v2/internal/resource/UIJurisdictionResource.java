@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.hateoas.ResourceSupport;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
@@ -14,6 +15,9 @@ import uk.gov.hmcts.ccd.v2.internal.controller.UIDefinitionController;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
+@Data
+@EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
 public class UIJurisdictionResource extends ResourceSupport {
 
 
