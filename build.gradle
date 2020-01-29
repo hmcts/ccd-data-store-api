@@ -66,6 +66,18 @@ dependencyUpdates.resolutionStrategy = {
     }
 }
 
+configurations.all {	
+    resolutionStrategy {	
+        eachDependency { DependencyResolveDetails details ->	
+            // Wiremock requires old jetty because it still support java 7	
+            // spring bom is currenty upgrading it	
+            if (details.requested.group == 'org.eclipse.jetty') {	
+                details.useVersion '9.2.24.v20180105'	
+            }	
+        }	
+    }	
+}
+
 // https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html
 dependencyCheck {
     // Specifies if the build should be failed if a CVSS score above a specified level is identified.
@@ -479,10 +491,7 @@ jacoco {
 
 sonarqube {
     properties {
-        property "sonar.exclusions", "**/*.java,**/**/*.java,build/generated-sources/**/*.java,**/service/doclink/**"
-        property "sonar.coverage.exclusions", "src/main/java/uk/gov/hmcts/ccd/data/definition/DefaultCaseDefinitionRepository.java,src/main/java/uk/gov/hmcts/ccd/AppInsights.java,**/DocLinksRestoreEndpoint.java,**/service/doclink/**,**/DefaultCaseDetailsRepository.java"
-        property "sonar.jacoco.reportPaths", "${project.buildDir}/jacoco/junitPlatformTest.exec"
-        property "sonar.junit.reportPaths", "${project.buildDir}/test-results/junit-platform"
+        property "sonar.exclusions", "build/generated-sources/**/*.java,**/service/doclink/**"
         property "sonar.projectName", "ccd-data-store-api"
         property "sonar.projectKey", "ccd-data-store-api"
         property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"

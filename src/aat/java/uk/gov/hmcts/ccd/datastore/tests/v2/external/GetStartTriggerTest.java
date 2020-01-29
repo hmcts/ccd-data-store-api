@@ -1,27 +1,21 @@
 package uk.gov.hmcts.ccd.datastore.tests.v2.external;
 
 import static java.lang.Boolean.FALSE;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasToString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isEmptyString;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.CASE_TYPE;
-import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.JURISDICTION;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event.CREATE;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event.START_PROGRESS;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.Event.create;
+import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.JURISDICTION;
 import static uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseType.State.TODO;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import io.restassured.specification.RequestSpecification;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.BaseTest;
 import uk.gov.hmcts.ccd.datastore.tests.fixture.AATCaseBuilder;
@@ -44,9 +38,9 @@ class GetStartTriggerTest extends BaseTest {
     @DisplayName("Start case trigger")
     class StartCaseTrigger {
 
-        // @Tag("smoke")
-        // @Test
-        // @DisplayName("should retrieve trigger when the case type and event exists")
+        @Tag("smoke")
+        @Test
+        @DisplayName("should retrieve trigger when the case type and event exists")
         void shouldRetrieveWhenExists() {
             callGetStartCaseTrigger(CASE_TYPE, CREATE)
                 .when()

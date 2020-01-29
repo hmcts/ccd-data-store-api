@@ -1,12 +1,12 @@
 package uk.gov.hmcts.ccd.datastore.tests;
 
-import java.util.function.Supplier;
-
 import io.restassured.specification.RequestSpecification;
 import uk.gov.hmcts.ccd.datastore.tests.helper.CCDHelper;
 import uk.gov.hmcts.ccd.datastore.tests.helper.S2SHelper;
 import uk.gov.hmcts.ccd.datastore.tests.helper.idam.IdamHelper;
 import uk.gov.hmcts.ccd.datastore.tests.helper.idam.OAuth2;
+
+import java.util.function.Supplier;
 
 public enum AATHelper {
 
