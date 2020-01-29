@@ -1,11 +1,11 @@
 package uk.gov.hmcts.ccd.validators;
 
-import uk.gov.hmcts.ccd.validators.annotations.CcdAlphaNumericId;
+import uk.gov.hmcts.ccd.validators.annotations.AlphaNumeric;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class CcdAlphaNumericIdValidator implements ConstraintValidator<CcdAlphaNumericId, String> {
+public class AlphaNumericValidator implements ConstraintValidator<AlphaNumeric, String> {
 
     final String alphaNumericExpression = "[a-zA-Z0-9]+";
 

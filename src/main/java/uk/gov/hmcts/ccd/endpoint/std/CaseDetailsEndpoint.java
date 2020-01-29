@@ -43,8 +43,8 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.DocumentsOperation;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.validators.annotations.AlphaNumeric;
 import uk.gov.hmcts.ccd.validators.annotations.CaseID;
-import uk.gov.hmcts.ccd.validators.annotations.CcdAlphaNumericId;
 import uk.gov.hmcts.ccd.validators.annotations.UuId;
 
 import javax.transaction.Transactional;
@@ -113,7 +113,7 @@ public class CaseDetailsEndpoint {
     @ApiOperation(value = "Get case", notes = "Retrieve an existing case with its state and data")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Case found for the given ID"),
-        @ApiResponse(code = 400, message = "Invalid request"),
+        @ApiResponse(code = 400, message = "Bad Request"),
         @ApiResponse(code = 404, message = "No case found for the given ID")
     })
     public CaseDetails findCaseDetailsForCaseworker(
@@ -121,11 +121,11 @@ public class CaseDetailsEndpoint {
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
 
-        @CcdAlphaNumericId
+        @AlphaNumeric
         @ApiParam(value = "Jurisdiction ID", required = true)
         @PathVariable("jid") final String jurisdictionId,
 
-        @CcdAlphaNumericId
+        @AlphaNumeric
         @ApiParam(value = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
 
