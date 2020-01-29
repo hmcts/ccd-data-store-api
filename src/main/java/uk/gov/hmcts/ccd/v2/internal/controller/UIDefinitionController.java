@@ -15,14 +15,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.domain.model.definition.Banner;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfig;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
 import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCriteriaOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetBannerOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetJurisdictionUiConfigOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetBannerOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetCriteriaOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.GetJurisdictionUiConfigOperation;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.internal.resource.UIBannerResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.UIJurisdictionConfigResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.UISearchInputsResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.UIWorkbasketInputsResource;
 
@@ -37,12 +41,16 @@ public class UIDefinitionController {
     private final GetCriteriaOperation getCriteriaOperation;
 
     private final GetBannerOperation getBannerOperation;
+    
+    private final GetJurisdictionUiConfigOperation getJurisdictionUiConfigOperation;
 
     @Autowired
     public UIDefinitionController(@Qualifier(AuthorisedGetCriteriaOperation.QUALIFIER) GetCriteriaOperation getCriteriaOperation,
-                                  @Qualifier(DefaultGetBannerOperation.QUALIFIER) GetBannerOperation getBannerOperation) {
+                                  @Qualifier(DefaultGetBannerOperation.QUALIFIER) GetBannerOperation getBannerOperation,
+                                  @Qualifier(DefaultGetJurisdictionUiConfigOperation.QUALIFIER) GetJurisdictionUiConfigOperation getJurisdictionUiConfigOperation) {
         this.getCriteriaOperation = getCriteriaOperation;
         this.getBannerOperation = getBannerOperation;
+        this.getJurisdictionUiConfigOperation = getJurisdictionUiConfigOperation;
     }
 
     @GetMapping(
@@ -132,5 +140,32 @@ public class UIDefinitionController {
                                         ? getBannerOperation.execute(idsOptional.get())
                                         : Lists.newArrayList();
         return ResponseEntity.ok(new UIBannerResource(listOfBanners));
+    }
+    
+    @GetMapping(
+        path = "/jurisdiction-ui-configs",
+        headers = {
+            V2.EXPERIMENTAL_HEADER
+        },
+        produces = {
+            V2.MediaType.UI_JURISDICTION_CONFIGS
+        }
+    )
+    @ApiOperation(
+        value = "Get Jurisdiction UI config information for the jurisdictions",
+        notes = V2.EXPERIMENTAL_WARNING
+    )
+    @ApiResponses({
+        @ApiResponse(
+            code = 200,
+            message = "Success",
+            response = UIJurisdictionConfigResource.class
+        )
+    })
+    public ResponseEntity<UIJurisdictionConfigResource> getJurisdictionUiConfigs(@RequestParam("ids") Optional<List<String>> idsOptional) {
+        List<JurisdictionUiConfig> listOfConfigs = idsOptional.isPresent()
+                                        ? getJurisdictionUiConfigOperation.execute(idsOptional.get())
+                                        : Lists.newArrayList();
+        return ResponseEntity.ok(new UIJurisdictionConfigResource(listOfConfigs));
     }
 }

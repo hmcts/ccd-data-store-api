@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
 import uk.gov.hmcts.ccd.domain.model.definition.BannersResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigResult;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchInputDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
@@ -75,4 +76,10 @@ public class CachedUIDefinitionGateway implements UIDefinitionGateway {
     public BannersResult getBanners(final List<String> jurisdictionIds) {
         return httpUiDefinitionGateway.getBanners(jurisdictionIds);
     }
+    
+    @Override
+    @Cacheable("jurisdictionUiConfigsCache")
+    public JurisdictionUiConfigResult getJurisdictionUiConfigs(final List<String> jurisdictionIds) {
+        return httpUiDefinitionGateway.getJurisdictionUiConfigs(jurisdictionIds);
+    }    
 }
