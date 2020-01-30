@@ -5,7 +5,7 @@ Feature: F-029: Fetch an event trigger in the context of a case type
     Given an appropriate test context as detailed in the test data source
 
   @S-049
-  Scenario: must return successfully a CaseEventTrigger object filtered by case type ID
+  Scenario: must return successfully the current case event data filtered by case type ID
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
     And the request [is prepared with valid input parameters]
