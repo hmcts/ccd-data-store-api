@@ -24,7 +24,7 @@ public class CriterionFactory {
                 .stream()
                 .map(this::buildFromEntry)
                 .collect(Collectors.toList());
-        result.addAll(buildFomMetaData(metadata));
+        result.addAll(buildFromMetaData(metadata));
         return result;
     }
 
@@ -32,7 +32,7 @@ public class CriterionFactory {
         return new FieldDataCriterion(entry.getKey(), entry.getValue());
     }
 
-    private List<Criterion> buildFomMetaData(MetaData metadata) {
+    private List<Criterion> buildFromMetaData(MetaData metadata) {
         List<Criterion> result = new ArrayList<>();
 
         ifPresentAndNotBlank(Optional.ofNullable(metadata.getCaseTypeId()), ct ->
