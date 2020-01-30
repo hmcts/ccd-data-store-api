@@ -1,0 +1,21 @@
+{
+  "_guid_": "S-238",
+  "_extends_": "F-058_Test_Data_Base",
+  "title": "must return 403 when the request contains a jurisdiction id user is unauthorised to access",
+  "specs": [
+    "an active profile in CCD",
+    "contains a jurisdiction id user is unauthorised to access",
+    "code is HTTP-403"
+  ],
+  "request": {
+    "pathVariables": {
+      "jid": "AUTOTEST11"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_403_Response",
+    "body": {
+      "message": "Access Denied"
+    }
+  }
+}

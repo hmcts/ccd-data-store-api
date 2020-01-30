@@ -1,0 +1,43 @@
+{
+  "_guid_": "S-135",
+  "_extends_": "Base_Expecting_403",
+  "title": "must return 403 when request provides authentic credentials without authorized access to the operation",
+  "specs": [
+    "a detailed profile in CCD",
+    "provides authentic credentials without authorized access to the operation"
+  ],
+  "productName": "CCD Data Store",
+  "operationName": "Get the pagination metadata for a case data search for Case Worker",
+  "method": "GET",
+  "user": {
+    "username": "auto.test.cnp@gmail.com",
+    "password": "[[$CCD_IMPORT_AUTOTEST_PASSWORD]]"
+  },
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/pagination_metadata",
+  "request": {
+    "headers": {
+      "Authorization": "InvalidAuthorizationToken"
+    },
+    "pathVariables": {
+      "uid": "[[DYNAMIC]]",
+      "jid": "AUTOTEST1",
+      "ctid": "AAT"
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 403,
+    "responseMessage": "Forbidden",
+    "headers": {
+			"Content-Encoding": "gzip",
+			"Content-Type": "application/json;charset=UTF-8",
+      "Content-Length": "[[ANY]]"
+    },
+    "body": {
+      "timestamp": "[[ANY]]",
+      "status": 403,
+      "error": "Forbidden",
+      "message": "Access Denied",
+      "path": "[[ANY]]"
+    }
+  }
+}

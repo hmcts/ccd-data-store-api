@@ -1,0 +1,24 @@
+{
+  "_guid_": "S-217",
+  "_extends_": "F-064_Test_Data_Base",
+  "title": "must return 401 when request does not provide valid authentication credentials",
+	"specs": [
+		"an active profile in CCD",
+		"does not provide valid authentication credentials",
+		"code is HTTP-401 Unauthorised"
+	],
+  "request": {
+    "headers": {
+      "Authorization": "eyJhbGciOiJIUzI1NiJ9"
+    }
+  },
+	"expectedResponse": {
+		"_extends_": "Common_401_Response",
+    "headers": {
+      "Content-Encoding" : "gzip"
+    },
+		"body": {
+			"message": "Access Denied"
+		}
+	}
+}
