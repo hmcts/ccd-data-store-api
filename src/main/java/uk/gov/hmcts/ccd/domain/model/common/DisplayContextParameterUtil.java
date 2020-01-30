@@ -3,9 +3,11 @@ package uk.gov.hmcts.ccd.domain.model.common;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.util.Collections.emptyList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterCollectionOptions.ALLOW_DELETE;
 import static uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterCollectionOptions.ALLOW_INSERT;
@@ -16,27 +18,26 @@ public class DisplayContextParameterUtil {
 
     public static String updateCollectionDisplayContextParameter(final String currentDisplayContextParameter,
                                                                  final List<String> values) {
-
-        List<String> parameters;
-        if (currentDisplayContextParameter != null) {
-            String[] split = currentDisplayContextParameter.split("#", -1);
-            List<String> collect = removeEmptiesAndDropComa(split);
-
-            if (collect.stream().noneMatch(e -> e.contains(COLLECTION))) {
-                collect.add(COLLECTION + "()");
-            }
-
-            parameters = collect.stream()
-                .map(e -> updateIfCollection(e, values))
-                .map(e -> "#" + e)
-                .collect(Collectors.toList());
-        } else {
-            parameters = new ArrayList<>(values);
-            Collections.sort(parameters);
-            return "#" + COLLECTION + "(" + String.join(",", parameters) + ")";
+        List<String> uniqueValues = new ArrayList<>(new HashSet<>(values));
+        if (currentDisplayContextParameter == null) {
+            return "#" + prepareCollectionParameter(uniqueValues);
         }
 
-        return String.join(",", parameters);
+        List<String> parameters = extractParameters(currentDisplayContextParameter);
+
+        if (parameters.stream().noneMatch(e -> e.contains(COLLECTION))) {
+            parameters.add(prepareCollectionParameter(emptyList()));
+        }
+
+        return parameters.stream()
+            .map(parameter -> updateIfCollection(parameter, uniqueValues))
+            .map(e -> "#" + e)
+            .collect(Collectors.joining(","));
+    }
+
+    private static List<String> extractParameters(String currentDisplayContextParameter) {
+        String[] split = currentDisplayContextParameter.split("#", -1);
+        return removeEmptiesAndDropComa(split);
     }
 
     private static List<String> removeEmptiesAndDropComa(String[] split) {
@@ -53,9 +54,8 @@ public class DisplayContextParameterUtil {
                 .filter(p -> !p.equals(ALLOW_INSERT.getOption()) && !p.equals(ALLOW_DELETE.getOption()))
                 .collect(Collectors.toList());
             collect.addAll(values);
-            Collections.sort(collect);
 
-            return COLLECTION + "(" + String.join(",", collect) + ")";
+            return prepareCollectionParameter(collect);
         }
         return parameter;
     }
@@ -67,8 +67,13 @@ public class DisplayContextParameterUtil {
         String s1 = displayContextParameter.substring(start + prefix.length());
         String s2 = s1.substring(0, s1.indexOf(")"));
 
-        return isBlank(s2) ? Collections.emptyList() : Arrays.stream(s2.split(","))
+        return isBlank(s2) ? emptyList() : Arrays.stream(s2.split(","))
             .map(String::trim)
             .collect(Collectors.toList());
+    }
+
+    private static String prepareCollectionParameter(List<String> values) {
+        Collections.sort(values);
+        return COLLECTION + "(" + String.join(",", values) + ")";
     }
 }

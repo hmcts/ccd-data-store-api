@@ -32,6 +32,8 @@ class DisplayContextParameterUtilTest {
         assertAll(
             () -> assertThat(updateCollectionDisplayContextParameter("#COLLECTION(allowInsert,allowDelete)", asList("allowInsert", "allowDelete")),
                 is("#COLLECTION(allowDelete,allowInsert)")),
+            () -> assertThat(updateCollectionDisplayContextParameter("#COLLECTION(allowInsert)", asList("allowInsert", "allowDelete")),
+                is("#COLLECTION(allowDelete,allowInsert)")),
             () -> assertThat(updateCollectionDisplayContextParameter("#COLLECTION(allowInsert,allowDelete)", asList("allowDelete", "allowInsert")),
                 is("#COLLECTION(allowDelete,allowInsert)")),
             () -> assertThat(updateCollectionDisplayContextParameter("#COLLECTION(allowInsert,allowDelete)", asList("allowDelete")),
@@ -55,8 +57,8 @@ class DisplayContextParameterUtilTest {
                 is("#TABLE(),#COLLECTION(allowDelete,other)")),
             () -> assertThat(updateCollectionDisplayContextParameter("#TABLE(postcode),#COLLECTION(other,allowInsert,allowDelete)", asList("allowDelete")),
                 is("#TABLE(postcode),#COLLECTION(allowDelete,other)")),
-            () -> assertThat(updateCollectionDisplayContextParameter("#TABLE(postcode),#COLLECTION(other,allowInsert,allowDelete)", asList("allowInsert,allowDelete")),
-                is("#TABLE(postcode),#COLLECTION(allowInsert,allowDelete,other)"))
+            () -> assertThat(updateCollectionDisplayContextParameter("#TABLE(postcode),#COLLECTION(other, allowInsert,allowDelete)", asList("allowInsert", "allowDelete")),
+                is("#TABLE(postcode),#COLLECTION(allowDelete,allowInsert,other)"))
                  );
     }
 
@@ -66,6 +68,15 @@ class DisplayContextParameterUtilTest {
         assertAll(
             () -> assertThat(updateCollectionDisplayContextParameter("#TABLE( other  ),#COLLECTION(allowInsert ,  allowDelete )", asList("allowDelete")),
                 is("#TABLE( other  ),#COLLECTION(allowDelete)"))
+                 );
+    }
+
+    @Test
+    @DisplayName("should remove duplicates from parameter values)")
+    void shouldRemoveDuplicatesFromParameterValues() {
+        assertAll(
+            () -> assertThat(updateCollectionDisplayContextParameter("#COLLECTION(allowInsert,allowDelete)", asList("allowDelete" , "allowInsert", "allowInsert")),
+                is("#COLLECTION(allowDelete,allowInsert)"))
                  );
     }
 

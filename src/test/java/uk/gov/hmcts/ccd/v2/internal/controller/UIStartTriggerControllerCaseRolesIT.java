@@ -15,6 +15,7 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.internal.resource.UIStartTriggerResource;
 
@@ -30,6 +31,10 @@ import static org.mockito.Mockito.doReturn;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.ccd.MockUtils.CASE_ROLE_CAN_CREATE;
+import static uk.gov.hmcts.ccd.MockUtils.CASE_ROLE_CAN_DELETE;
+import static uk.gov.hmcts.ccd.MockUtils.CASE_ROLE_CAN_READ;
+import static uk.gov.hmcts.ccd.MockUtils.CASE_ROLE_CAN_UPDATE;
 
 public class UIStartTriggerControllerCaseRolesIT extends WireMockBaseTest {
     private static final String GET_EVENT_TRIGGER_FOR_CASE_TYPE_INTERNAL = "/internal/case-types/CaseRolesCase" +
@@ -53,13 +58,13 @@ public class UIStartTriggerControllerCaseRolesIT extends WireMockBaseTest {
         doReturn(authentication).when(securityContext).getAuthentication();
         SecurityContextHolder.setContext(securityContext);
 
-        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
-
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
     }
 
     @Test
     public void internalGetStartCaseTrigger_200_shouldAddFieldsWithCREATORCaseRole() throws Exception {
+        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
+
         HttpHeaders headers = new HttpHeaders();
         headers.add(AUTHORIZATION, "Bearer user1");
         headers.add(V2.EXPERIMENTAL_HEADER, "true");
@@ -95,5 +100,121 @@ public class UIStartTriggerControllerCaseRolesIT extends WireMockBaseTest {
         assertThat(field1.getAccessControlLists().get(1).isRead(), is(true));
         assertThat(field1.getAccessControlLists().get(1).isUpdate(), is(true));
         assertThat(field1.getAccessControlLists().get(1).isDelete(), is(false));
+    }
+
+    @Test
+    public void internalGetStartCaseTrigger_200_shouldSetCollectionDisplayContextParameterForCreateCaseRole() throws Exception {
+        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, CASE_ROLE_CAN_CREATE);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(AUTHORIZATION, "Bearer user1");
+        headers.add(V2.EXPERIMENTAL_HEADER, "true");
+
+        final MvcResult result = mockMvc.perform(get(GET_EVENT_TRIGGER_FOR_CASE_TYPE_INTERNAL)
+            .contentType(JSON_CONTENT_TYPE)
+            .accept(V2.MediaType.UI_START_CASE_TRIGGER)
+            .headers(headers))
+            .andExpect(status().is(200))
+            .andReturn();
+
+        final UIStartTriggerResource uiStartTriggerResource =
+            mapper.readValue(result.getResponse().getContentAsString(), UIStartTriggerResource.class);
+        assertNotNull("UI Start Trigger Resource is null", uiStartTriggerResource);
+        assertEquals("Unexpected Case Fields", 2, uiStartTriggerResource.getCaseEventTrigger().getCaseFields().size());
+
+        final CaseViewField children = uiStartTriggerResource.getCaseEventTrigger().getCaseFields().get(1);
+        assertThat(children.getFieldType().getType(), equalTo("Collection"));
+        assertThat(children.getDisplayContextParameter(), equalTo("#COLLECTION(allowInsert)"));
+
+        final CaseField hobby = children.getFieldType().getCollectionFieldType().getChildren().get(1);
+        assertThat(hobby.getId(), equalTo("hobbies"));
+        assertThat(hobby.getDisplayContextParameter(), equalTo("#COLLECTION(allowInsert)"));
+    }
+
+    @Test
+    public void internalGetStartCaseTrigger_200_shouldSetCollectionDisplayContextParameterForReadCaseRole() throws Exception {
+        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, CASE_ROLE_CAN_CREATE, CASE_ROLE_CAN_READ);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(AUTHORIZATION, "Bearer user1");
+        headers.add(V2.EXPERIMENTAL_HEADER, "true");
+
+        final MvcResult result = mockMvc.perform(get(GET_EVENT_TRIGGER_FOR_CASE_TYPE_INTERNAL)
+            .contentType(JSON_CONTENT_TYPE)
+            .accept(V2.MediaType.UI_START_CASE_TRIGGER)
+            .headers(headers))
+            .andExpect(status().is(200))
+            .andReturn();
+
+        final UIStartTriggerResource uiStartTriggerResource =
+            mapper.readValue(result.getResponse().getContentAsString(), UIStartTriggerResource.class);
+        assertNotNull("UI Start Trigger Resource is null", uiStartTriggerResource);
+        assertEquals("Unexpected Case Fields", 2, uiStartTriggerResource.getCaseEventTrigger().getCaseFields().size());
+
+        final CaseViewField children = uiStartTriggerResource.getCaseEventTrigger().getCaseFields().get(1);
+        assertThat(children.getFieldType().getType(), equalTo("Collection"));
+        assertThat(children.getDisplayContextParameter(), equalTo("#COLLECTION(allowInsert)"));
+
+        final CaseField hobby = children.getFieldType().getCollectionFieldType().getChildren().get(1);
+        assertThat(hobby.getId(), equalTo("hobbies"));
+        assertThat(hobby.getDisplayContextParameter(), equalTo("#COLLECTION(allowInsert)"));
+    }
+
+    @Test
+    public void internalGetStartCaseTrigger_200_shouldSetCollectionDisplayContextParameterForUpdateCaseRole() throws Exception {
+        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, CASE_ROLE_CAN_CREATE, CASE_ROLE_CAN_UPDATE);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(AUTHORIZATION, "Bearer user1");
+        headers.add(V2.EXPERIMENTAL_HEADER, "true");
+
+        final MvcResult result = mockMvc.perform(get(GET_EVENT_TRIGGER_FOR_CASE_TYPE_INTERNAL)
+            .contentType(JSON_CONTENT_TYPE)
+            .accept(V2.MediaType.UI_START_CASE_TRIGGER)
+            .headers(headers))
+            .andExpect(status().is(200))
+            .andReturn();
+
+        final UIStartTriggerResource uiStartTriggerResource =
+            mapper.readValue(result.getResponse().getContentAsString(), UIStartTriggerResource.class);
+        assertNotNull("UI Start Trigger Resource is null", uiStartTriggerResource);
+        assertEquals("Unexpected Case Fields", 2, uiStartTriggerResource.getCaseEventTrigger().getCaseFields().size());
+
+        final CaseViewField children = uiStartTriggerResource.getCaseEventTrigger().getCaseFields().get(1);
+        assertThat(children.getFieldType().getType(), equalTo("Collection"));
+        assertThat(children.getDisplayContextParameter(), equalTo("#COLLECTION(allowDelete,allowInsert)"));
+
+        final CaseField hobby = children.getFieldType().getCollectionFieldType().getChildren().get(1);
+        assertThat(hobby.getId(), equalTo("hobbies"));
+        assertThat(hobby.getDisplayContextParameter(), equalTo("#COLLECTION(allowDelete,allowInsert)"));
+    }
+
+    @Test
+    public void internalGetStartCaseTrigger_200_shouldSetCollectionDisplayContextParameterForDeleteCaseRole() throws Exception {
+        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, CASE_ROLE_CAN_CREATE, CASE_ROLE_CAN_DELETE);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(AUTHORIZATION, "Bearer user1");
+        headers.add(V2.EXPERIMENTAL_HEADER, "true");
+
+        final MvcResult result = mockMvc.perform(get(GET_EVENT_TRIGGER_FOR_CASE_TYPE_INTERNAL)
+            .contentType(JSON_CONTENT_TYPE)
+            .accept(V2.MediaType.UI_START_CASE_TRIGGER)
+            .headers(headers))
+            .andExpect(status().is(200))
+            .andReturn();
+
+        final UIStartTriggerResource uiStartTriggerResource =
+            mapper.readValue(result.getResponse().getContentAsString(), UIStartTriggerResource.class);
+        assertNotNull("UI Start Trigger Resource is null", uiStartTriggerResource);
+        assertEquals("Unexpected Case Fields", 2, uiStartTriggerResource.getCaseEventTrigger().getCaseFields().size());
+
+        final CaseViewField children = uiStartTriggerResource.getCaseEventTrigger().getCaseFields().get(1);
+        assertThat(children.getFieldType().getType(), equalTo("Collection"));
+        assertThat(children.getDisplayContextParameter(), equalTo("#COLLECTION(allowDelete,allowInsert)"));
+
+        final CaseField hobby = children.getFieldType().getCollectionFieldType().getChildren().get(1);
+        assertThat(hobby.getId(), equalTo("hobbies"));
+        assertThat(hobby.getDisplayContextParameter(), equalTo("#COLLECTION(allowDelete,allowInsert)"));
     }
 }
