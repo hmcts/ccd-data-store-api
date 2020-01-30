@@ -43,7 +43,7 @@ def secrets = [
         secret('ccd-befta-solicitor-3-pwd', 'CCD_BEFTA_SOLICITOR_3_PWD')
     ],
     's2s-${env}': [
-        secret('microservicekey-ccd-gw', 'CCD_GW_SERVICE_SECRET')
+        secret('microservicekey-ccd-gw', 'BEFTA_S2S_CLIENT_SECRET')
     ]
 ]
 
