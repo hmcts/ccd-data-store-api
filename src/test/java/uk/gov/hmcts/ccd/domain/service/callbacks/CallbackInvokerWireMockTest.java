@@ -92,7 +92,7 @@ public class CallbackInvokerWireMockTest {
         WireMock.resetAllRequests();
     }
 
-    // @Test
+    @Test
     public void shouldRetryOnErrorWithIgnoreWarningFalseAndDefaultRetryContext() throws Exception {
 
         stubFor(post(urlMatching("/test-callbackGrrrr.*"))
