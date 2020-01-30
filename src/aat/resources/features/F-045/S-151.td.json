@@ -5,7 +5,7 @@
 
 	"specs": [
 		"an active profile in CCD",
-		"contains as input a valid case-reference that exists in CCD",
+		"uses the id of the case just created",
 		"has the 201 return code"
 	],
   "request": {
