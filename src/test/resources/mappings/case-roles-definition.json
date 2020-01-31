@@ -231,7 +231,7 @@
                   "show_summary_content_option": null,
                   "acls": [
                     {
-                      "role": "[CAN_CREATE]",
+                      "role": "[NO_CREATE_ROLE]",
                       "create": true,
                       "read": false,
                       "update": false,
