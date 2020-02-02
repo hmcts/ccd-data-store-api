@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        springBootVersion = '2.1.4.RELEASE'
+        springBootVersion = '2.2.4.RELEASE'
     }
     dependencies {
         classpath 'org.jsonschema2pojo:jsonschema2pojo-gradle-plugin:0.5.1'
@@ -19,6 +19,7 @@ buildscript {
 plugins {
     id 'application'
     id 'com.github.ben-manes.versions' version '0.20.0'
+    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
     id 'org.sonarqube' version '2.6.2'
     id 'jacoco'
     id 'checkstyle'
@@ -65,18 +66,6 @@ dependencyUpdates.resolutionStrategy = {
     }
 }
 
-configurations.all {
-    resolutionStrategy {
-        eachDependency { DependencyResolveDetails details ->
-            // Wiremock requires old jetty because it still support java 7
-            // spring bom is currenty upgrading it
-            if (details.requested.group == 'org.eclipse.jetty') {
-                details.useVersion '9.2.24.v20180105'
-            }
-        }
-    }
-}
-
 // https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html
 dependencyCheck {
     // Specifies if the build should be failed if a CVSS score above a specified level is identified.
@@ -101,17 +90,18 @@ repositories {
     maven {
         url 'https://dl.bintray.com/hmcts/hmcts-maven'
     }
+    maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local/' }
 }
 // end::repositories[]
 
 ext {
-    junitJupiterVersion = '5.2.0'
-    junitVintageVersion = '5.2.0'
+    junitJupiterVersion = '5.5.2'
+    junitVintageVersion = '5.5.2'
     hibernateVersion = '5.2.18.Final'
     powermockVersion = '2.0.0-beta.5'
     reformLogging = '5.1.0'
     appInsightsVersion = '2.4.1'
-    swagger2Version = '2.9.2'
+    swagger2Version = '3.0.0-SNAPSHOT'
     limits = [
             'instruction': 90,
             'branch'     : 85,
@@ -121,7 +111,7 @@ ext {
             'class'      : 98
     ]
     appInsights = '2.0.1'
-    springCloudVersion = 'Greenwich.RELEASE'
+    springCloudVersion = 'Hoxton.RELEASE'
 }
 
 group 'uk.gov.hmcts.ccd'
@@ -236,8 +226,8 @@ dependencies {
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation('org.springframework.cloud:spring-cloud-starter-contract-stub-runner')
     testCompile ('com.opentable.components:otj-pg-embedded:0.12.0')
-    testCompile ('com.github.tomakehurst:wiremock-jre8:2.21.0')
-    testCompile ('org.springframework.cloud:spring-cloud-contract-wiremock:2.1.0.RELEASE')
+    testCompile ('com.github.tomakehurst:wiremock-jre8:2.25.1')
+    testCompile ('org.springframework.cloud:spring-cloud-contract-wiremock:2.2.1.RELEASE')
     // To avoid compiler warnings about @API annotations in JUnit5 code.
     testCompileOnly 'org.apiguardian:apiguardian-api:1.0.0'
     testCompile "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
