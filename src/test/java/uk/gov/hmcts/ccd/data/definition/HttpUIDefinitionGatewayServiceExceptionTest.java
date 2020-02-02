@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.data.definition;
 
+import com.google.common.collect.Lists;
+import java.util.List;
 import javax.inject.Inject;
 
 import org.junit.Test;
@@ -31,5 +33,11 @@ public class HttpUIDefinitionGatewayServiceExceptionTest extends BaseTest {
     @Test(expected = ServiceException.class)
     public void shouldGetServiceExceptionWhenGettingSearchResults() {
         httpUIDefinitionGateway.getSearchResult(VERSION, "TestAddressBookCase");
+    }
+
+    @Test(expected = ServiceException.class)
+    public void shouldGetServiceExceptionWhenGettinBanners() {
+        List<String> jurisdictionIds = Lists.newArrayList("PROBATE", "DIVORCE");
+        httpUIDefinitionGateway.getBanners(jurisdictionIds);
     }
 }

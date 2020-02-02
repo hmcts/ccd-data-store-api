@@ -28,6 +28,7 @@ plugins {
     id 'org.owasp.dependencycheck' version '5.1.0'
     id 'com.github.spotbugs' version '1.6.9'
     id 'net.ltgt.apt' version '0.21'
+    id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.14'
 }
 
 apply plugin: 'java'
@@ -65,7 +66,6 @@ dependencyUpdates.resolutionStrategy = {
         }
     }
 }
-
 // https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html
 dependencyCheck {
     // Specifies if the build should be failed if a CVSS score above a specified level is identified.
@@ -137,6 +137,7 @@ configurations {
 
     aatCompile.extendsFrom(testCompile)
     aatRuntime.extendsFrom(testRuntime)
+    cucumberRuntime.extendsFrom(functionalRuntime)
 }
 
 checkstyle {
@@ -254,6 +255,9 @@ dependencies {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
     }
     compile 'org.jooq:jool-java-8:0.9.14'
+    
+    testCompile group: 'uk.gov.hmcts', name: 'ccd-api-test-automation-fw', version: '1.0.20'
+
 }
 // end::dependencies[]
 
@@ -477,11 +481,9 @@ jacoco {
 sonarqube {
     properties {
         property "sonar.exclusions", "build/generated-sources/**/*.java,**/service/doclink/**"
-        property "sonar.coverage.exclusions", "src/main/java/uk/gov/hmcts/ccd/data/definition/DefaultCaseDefinitionRepository.java,src/main/java/uk/gov/hmcts/ccd/AppInsights.java,**/DocLinksRestoreEndpoint.java,**/service/doclink/**,**/DefaultCaseDetailsRepository.java"
-        property "sonar.jacoco.reportPaths", "${project.buildDir}/jacoco/junitPlatformTest.exec"
-        property "sonar.junit.reportPaths", "${project.buildDir}/test-results/junit-platform"
         property "sonar.projectName", "ccd-data-store-api"
         property "sonar.projectKey", "ccd-data-store-api"
+        property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
     }
 }
 
@@ -565,6 +567,7 @@ jacocoTestReport {
 
 test {
     environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
+    generateCucumberReports.enabled = false
 
     useJUnitPlatform()
 
@@ -620,6 +623,14 @@ task smoke(type: Test) {
         includeTags 'smoke'
     }
 
+    doFirst {
+        javaexec {
+            main = "uk.gov.hmcts.ccd.datastore.befta.DataStoreTestDataLoader"
+            classpath += sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
+            args = ['']
+        }
+    }
+
 }
 
 task functional(type: Test) {
@@ -637,6 +648,16 @@ task functional(type: Test) {
     include "uk/gov/hmcts/ccd/datastore/tests/functional/**"
     include "uk/gov/hmcts/ccd/datastore/tests/v2/**"
     useJUnitPlatform()
+
+    doFirst {
+        generateCucumberReports.enabled = true
+        javaexec {
+            main = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
+            classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
+            args = ['--plugin', "json:${projectDir}/target/cucumber.json", '--tags', 'not @Ignore', '--glue',
+                    'uk.gov.hmcts.befta.player', 'src/aat/resources/features']
+        }
+    }
 }
 
 
@@ -676,6 +697,11 @@ task sendCoverageToCodacy(type: JavaExec, dependsOn: jacocoTestReport) {
             "-r",
             "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"
     ]
+}
+
+cucumberReports {
+    outputDir = file("${projectDir}/target/cucumber")
+    reports = files("${projectDir}/target/cucumber.json")
 }
 
 task installDist(overwrite: true) {
