@@ -18,7 +18,7 @@
       "Content-Length": "[[ANY]]",
       "Transfer-Encoding": "chunked",
       "Content-Encoding": "gzip",
-      "Content-Type": "application/json;charset=UTF-8"
+      "Content-Type": "application/json"
     },
     "body": {
       "id": "UPDATE",

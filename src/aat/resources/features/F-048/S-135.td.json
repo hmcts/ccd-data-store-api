@@ -29,7 +29,7 @@
     "responseMessage": "Forbidden",
     "headers": {
 			"Content-Encoding": "gzip",
-			"Content-Type": "application/json;charset=UTF-8",
+			"Content-Type": "application/json",
       "Content-Length": "[[ANY]]"
     },
     "body": {
