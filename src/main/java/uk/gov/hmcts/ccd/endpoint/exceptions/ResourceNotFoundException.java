@@ -10,7 +10,7 @@ public class ResourceNotFoundException extends ApiException {
         this(message, null);
     }
 
-    public ResourceNotFoundException(final String message, Throwable cause) {
+    public ResourceNotFoundException(final String message, final Throwable cause) {
         super(message, cause);
     }
 
