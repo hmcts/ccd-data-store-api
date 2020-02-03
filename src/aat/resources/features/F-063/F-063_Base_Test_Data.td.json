@@ -27,8 +27,7 @@
   "expectedResponse": {
     "headers": {
       "Content-Length": "[[ANY]]",
-      "Content-Type": "application/json",
-      "Strict-Transport-Security": "[[ANY]]"
+      "Content-Type": "application/json"
     }
   }
 }

@@ -72,8 +72,8 @@
     "headers": {
       "Content-Length" : "[[ANY]]",
       "Content-Encoding": "gzip",
-      "Content-Type": "application/json",
-      "Strict-Transport-Security": "[[ANY]]"
+      "Content-Type": "application/json"
+
     }
   }
 }
