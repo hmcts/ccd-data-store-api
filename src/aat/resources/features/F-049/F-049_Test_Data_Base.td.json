@@ -20,7 +20,8 @@
 	},
 	"expectedResponse": {
 		"headers": {
-			"Content-Length": "[[ANY]]"
+			"Content-Length": "[[ANY]]",
+      "Strict-Transport-Security": "[[ANY]]"
 		}
 	}
 }
