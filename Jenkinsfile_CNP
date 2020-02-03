@@ -82,6 +82,7 @@ withPipeline(type, product, component) {
         enableSlackNotifications('#ccd-demo-builds')
     }
     onPR {
+        env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN"
         enableSlackNotifications('#ccd-pr-builds')
     }
 
