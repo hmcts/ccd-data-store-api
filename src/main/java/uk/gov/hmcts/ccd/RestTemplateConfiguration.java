@@ -96,7 +96,7 @@ class RestTemplateConfiguration {
         cm.closeIdleConnections(maxSecondsIdleConnection, TimeUnit.SECONDS);
         cm.setDefaultMaxPerRoute(maxClientPerRoute);
 
-        // Temporally 30 value until we can tune the real value then It will be set in the ENV variables.
+        // Temporally 2 value until we can tune the real value then It will be set in the ENV variables.
         cm.setValidateAfterInactivity(2);
         cm.closeIdleConnections(2, TimeUnit.SECONDS);
 
