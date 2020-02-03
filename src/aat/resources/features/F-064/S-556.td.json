@@ -19,7 +19,7 @@
     },
     "body" : {
       "exception" : "[[ANY]]",
-      "message" : "Resource not found when getting case type version for eyJhbGciOiJIUzI1NiJ9 because of 404 Not Found [{\"message\":\"Object Not Found for:eyJhbGciOiJIUzI1NiJ9\"}]",
+      "message" : "Resource not found when getting case type version for eyJhbGciOiJIUzI1NiJ9 because of 404 Not Found: [{\"message\":\"Object Not Found for:eyJhbGciOiJIUzI1NiJ9\"}]",
       "details" : null,
       "callbackErrors" : null,
       "callbackWarnings" : null
