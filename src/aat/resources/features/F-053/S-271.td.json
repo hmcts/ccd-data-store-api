@@ -1,0 +1,18 @@
+{
+  "_guid_": "S-271",
+  "_extends_": "F-053_Test_Data_Base",
+  "title": "must return 401 when request does not provide valid authentication credentials",
+  "specs": [
+    "an active profile in CCD",
+    "does not provide valid authentication credentials",
+    "code is HTTP-401"
+  ],
+  "request": {
+    "headers": {
+      "uid": "not valid User id"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_401_Response"
+  }
+}

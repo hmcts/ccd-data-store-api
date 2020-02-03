@@ -1,0 +1,11 @@
+{
+      "_guid_": "Default_Final_Jurisdiction_Data",
+      "id": "AUTOTEST1",
+      "name": "Auto Test 1",
+      "description": "Content for the Test Jurisdiction.",
+      "caseTypes": [
+          {
+             "_guid_": "Default_Final_Case_Type_Data"
+          }
+      ]
+}

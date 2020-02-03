@@ -1,0 +1,32 @@
+{
+  "title": "must return 404 when request provides authentic credentials without authorized access to the operation",
+
+  "_guid_": "S-214",
+  "_extends_": "F-063_Base_Test_Data",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains an authentication token for a user that does not have read access to the case type",
+    "contains a HTTP 404 Not Found"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "ctid": "AAT_AUTH_1"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "headers": {
+      "Content-Encoding": "gzip"
+    },
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "message": "No case type found",
+      "details": "Unable to find the case type, please try a search or return to the case list overview page.",
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}
