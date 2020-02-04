@@ -2,6 +2,8 @@ package uk.gov.hmcts.ccd.domain.service.stdapi;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -35,6 +37,7 @@ public class CallbackInvoker {
     private final CaseDataService caseDataService;
     private final CaseSanitiser caseSanitiser;
     private final SecurityValidationService securityValidationService;
+    private static final Logger LOG = LoggerFactory.getLogger(CallbackService.class);
 
 
     @Autowired
@@ -86,6 +89,8 @@ public class CallbackInvoker {
         }
 
         if (callbackResponse.isPresent()) {
+            //This is should not be included in the final version.
+            LOG.debug("callback completed");
             return validateAndSetFromAboutToSubmitCallback(caseType,
                 caseDetails,
                 ignoreWarning,
@@ -112,6 +117,8 @@ public class CallbackInvoker {
                 caseDetails,
                 AfterSubmitCallbackResponse.class);
         }
+        //This is should not be included in the final version.
+        LOG.debug("callback completed");
         return afterSubmitCallbackResponseEntity;
     }
 
@@ -143,7 +150,8 @@ public class CallbackInvoker {
                 validateAndSetData(caseType, caseDetails, callbackResponse.getData());
             }
         }
-
+        //This is should not be included in the final version.
+        LOG.debug("callback completed");
         return caseDetails;
     }
 
@@ -186,6 +194,8 @@ public class CallbackInvoker {
                 );
             }
         }
+        //This is should not be included in the final version.
+        LOG.debug("callback completed");
         return aboutToSubmitCallbackResponse;
     }
 
