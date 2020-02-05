@@ -9,8 +9,6 @@
   ],
   "expectedResponse": {
     "_extends_": "Common_200_Response",
-    "headers": {
-    },
     "body": {
       "columns" :"[[ANY]]",
       "results" : "[[ANY]]",
