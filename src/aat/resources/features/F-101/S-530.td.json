@@ -1,0 +1,35 @@
+{
+	"title": "must return 403 error response for invalid authentication",
+	"_guid_": "S-530",
+  "productName": "CCD Data Store",
+  "operationName": "Grant access to a case",
+	"_extends_": "F-101_Test_Data_Base",
+
+	"specs": [
+		"an active solicitor profile in CCD",
+    "another active solicitor profile in CCD",
+		"has invalid auth token",
+		"has the 403 return code"
+	],
+
+  "request": {
+    "headers": {
+      "Authorization": "InvalidAuthorization"
+    },
+    "body": {
+      "case_roles": [
+        "[DEFENDANT]"
+      ]
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_403_Response",
+    "headers" : {
+      "Connection" : "keep-alive",
+      "Content-Encoding" : "gzip",
+      "Content-Type" : "application/json;charset=UTF-8",
+      "Keep-Alive" : "timeout=60",
+      "Transfer-Encoding" : "chunked"
+    }
+  }
+}

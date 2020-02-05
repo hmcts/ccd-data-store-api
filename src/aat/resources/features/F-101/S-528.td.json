@@ -1,0 +1,41 @@
+{
+	"title": "must return 400 error response for invalid case id",
+	"_guid_": "S-528",
+  "productName": "CCD Data Store",
+  "operationName": "Grant access to a case",
+	"_extends_": "F-101_Test_Data_Base",
+
+	"specs": [
+		"an active solicitor profile in CCD",
+    "another active solicitor profile in CCD",
+    "uses a case id that is not valid",
+		"has the 400 return code"
+	],
+  "request": {
+    "pathVariables": {
+      "cid": "1234"
+    },
+    "body": {
+      "case_roles": [
+        "[DEFENDANT]"
+      ]
+    }
+  },
+  "expectedResponse": {
+    "responseCode" : 400,
+    "headers" : {
+      "_extends_": "Common_400_Response"
+    },
+    "body" : {
+      "exception" : "[[ANY]]",
+      "timestamp" : "[[ANY]]",
+      "status" : 400,
+      "error" : "Bad Request",
+      "message" : "Case ID is not valid",
+      "path" : "[[ANY]]",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}
