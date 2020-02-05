@@ -20,7 +20,7 @@
 		}
 	},
 	"expectedResponse": {
-    "responseCode" : "200",
+    "responseCode": "200",
 		"body": {
 			"user": {
 				"idam": {
