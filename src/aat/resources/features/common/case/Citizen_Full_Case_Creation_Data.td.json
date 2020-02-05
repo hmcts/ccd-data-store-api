@@ -47,7 +47,7 @@
       "Content-Encoding": "gzip",
       "Content-Type": "application/json",
       "vary": "accept-encoding",
-      "Content-Length": "[[ANYTHING_PRESENT]]"
+      "Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]"
     },
     "body": {
       "id": "[[ANYTHING_PRESENT]]",
