@@ -20,12 +20,7 @@
 		}
 	},
 	"expectedResponse": {
-    "headers": {
-      "Content-Encoding": "gzip",
-      "Content-Type": "application/json;charset=UTF-8",
-      "Content-Length": "[[ANY]]",
-      "Transfer-Encoding" : "chunked"
-    },
+    "responseCode" : "200",
 		"body": {
 			"user": {
 				"idam": {
