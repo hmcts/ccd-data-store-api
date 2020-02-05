@@ -10,14 +10,14 @@
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "body": {
-      "tabs": "[[ANY]]",
+      "tabs": "[[ANYTHING_PRESENT]]",
       "metadataFields": null,
       "_links": {
         "self": {
-          "href": "[[ANY]]"
+          "href": "[[ANYTHING_PRESENT]]"
         }
       },
-      "case_id": "[[ANY]]",
+      "case_id": "[[ANYTHING_PRESENT]]",
       "case_type": {
         "id": "BEFTA_CASETYPE_1_1",
         "name": "BEFTA Case Type 1 1",
@@ -30,15 +30,15 @@
         "printEnabled": false
       },
       "event": {
-        "id": "[[ANY]]",
-        "timestamp": "[[ANY]]",
+        "id": "[[ANYTHING_PRESENT]]",
+        "timestamp": "[[ANYTHING_PRESENT]]",
         "summary": "",
         "comment": "",
         "event_id": "CREATE",
         "event_name": "Create a new case",
-        "user_id": "[[ANY]]",
-        "user_last_name": "[[ANY]]",
-        "user_first_name": "[[ANY]]",
+        "user_id": "[[ANYTHING_PRESENT]]",
+        "user_last_name": "[[ANYTHING_PRESENT]]",
+        "user_first_name": "[[ANYTHING_PRESENT]]",
         "state_name": "To do",
         "state_id": "TODO",
         "significant_item": null

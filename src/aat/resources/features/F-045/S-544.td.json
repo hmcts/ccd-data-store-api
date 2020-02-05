@@ -22,7 +22,7 @@
     "responseMessage" : "Bad Request",
     "headers" : {
       "_extends_": "Common_Response_Headers",
-      "Content-Length" : "[[ANY]]",
+      "Content-Length" : "[[ANYTHING_PRESENT]]",
       "Vary" : "Accept-Encoding"
     }
   }

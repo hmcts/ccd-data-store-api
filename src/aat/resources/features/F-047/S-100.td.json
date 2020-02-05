@@ -17,7 +17,7 @@
     "_extends_": "Common_403_Response",
     "body": {
       "message": "Access Denied",
-      "path": "[[ANY]]"
+      "path": "[[ANYTHING_PRESENT]]"
     }
   }
 }

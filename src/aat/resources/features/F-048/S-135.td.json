@@ -30,14 +30,14 @@
     "headers": {
 			"Content-Encoding": "gzip",
 			"Content-Type": "application/json",
-      "Content-Length": "[[ANY]]"
+      "Content-Length": "[[ANYTHING_PRESENT]]"
     },
     "body": {
-      "timestamp": "[[ANY]]",
+      "timestamp": "[[ANYTHING_PRESENT]]",
       "status": 403,
       "error": "Forbidden",
       "message": "Access Denied",
-      "path": "[[ANY]]"
+      "path": "[[ANYTHING_PRESENT]]"
     }
   }
 }

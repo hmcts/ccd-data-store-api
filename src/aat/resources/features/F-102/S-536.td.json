@@ -22,9 +22,9 @@
   "expectedResponse": {
     "_extends_": "Common_403_Response",
     "body": {
-      "timestamp": "[[ANY]]",
+      "timestamp": "[[ANYTHING_PRESENT]]",
       "message": "Access Denied",
-      "path": "[[ANY]]"
+      "path": "[[ANYTHING_PRESENT]]"
     }
   }
 }

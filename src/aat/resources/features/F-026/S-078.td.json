@@ -13,8 +13,8 @@
       
     },
     "body": {
-      "columns" :"[[ANY]]",
-      "results" : "[[ANY]]",
+      "columns" :"[[ANYTHING_PRESENT]]",
+      "results" : "[[ANYTHING_PRESENT]]",
       "result_error" : null
     }
   }

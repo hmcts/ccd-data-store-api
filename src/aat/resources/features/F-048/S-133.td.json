@@ -29,15 +29,15 @@
 		"headers": {
 			"Content-Encoding": "gzip",
 			"Content-Type": "application/json",
-			"Content-Length": "[[ANY]]"
+			"Content-Length": "[[ANYTHING_PRESENT]]"
 		},
 		"body": {
 			"exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
-			"timestamp": "[[ANY]]",
+			"timestamp": "[[ANYTHING_PRESENT]]",
 			"status": 400,
 			"error": "Bad Request",
 			"message": "Unknown sort direction: someInvalidSortDirection",
-			"path": "[[ANY]]",
+			"path": "[[ANYTHING_PRESENT]]",
 			"details": null,
 			"callbackErrors": null,
 			"callbackWarnings": null

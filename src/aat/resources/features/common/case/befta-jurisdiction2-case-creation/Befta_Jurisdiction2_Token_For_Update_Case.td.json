@@ -31,11 +31,11 @@
     "headers": {
       "Content-Encoding": "gzip",
       "Content-Type": "application/json",
-      "Content-Length": "[[ANY]]"
+      "Content-Length": "[[ANYTHING_PRESENT]]"
     },
     "body": {
-      "token": "[[ANY]]",
-      "case_details": "[[ANY]]",
+      "token": "[[ANYTHING_PRESENT]]",
+      "case_details": "[[ANYTHING_PRESENT]]",
       "event_id": "UPDATE"
     }
   }

@@ -15,16 +15,16 @@
   "expectedResponse": {
     "_extends_": "Common_403_Response",
     "headers": {
-      "Content-Length": "[[ANY]]",
+      "Content-Length": "[[ANYTHING_PRESENT]]",
       "Content-Encoding": "gzip",
       "Content-Type": "application/json"
     },
     "body" : {
-      "timestamp" : "[[ANY]]",
+      "timestamp" : "[[ANYTHING_PRESENT]]",
       "status" : 403,
       "error" : "Forbidden",
       "message" : "Access Denied",
-      "path" : "[[ANY]]"
+      "path" : "[[ANYTHING_PRESENT]]"
     }
   }
 }

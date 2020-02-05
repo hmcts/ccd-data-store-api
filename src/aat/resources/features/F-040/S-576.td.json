@@ -26,17 +26,17 @@
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "headers": {
-      "Content-Length": "[[ANY]]",
-      "Content-Type": "[[ANY]]"
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Type": "[[ANYTHING_PRESENT]]"
     },
     "body": {
-      "id": "[[ANY]]",
+      "id": "[[ANYTHING_PRESENT]]",
       "jurisdiction": "BEFTA_JURISDICTION_2",
       "state": "TODO",
       "version": 0,
       "case_type_id": "BEFTA_CASETYPE_2_1",
-      "created_date": "[[ANY]]",
-      "last_modified": "[[ANY]]",
+      "created_date": "[[ANYTHING_PRESENT]]",
+      "last_modified": "[[ANYTHING_PRESENT]]",
       "security_classification": "PUBLIC",
       "case_data": {
         "_extends_": "Befta_Jurisdiction2_Default_Full_Case_Data"

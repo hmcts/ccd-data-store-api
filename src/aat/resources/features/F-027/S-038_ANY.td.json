@@ -20,54 +20,54 @@
       "Transfer-Encoding": "chunked"
     },
     "body" : {
-      "tabs" : "[[ANY]]",
-      "metadataFields" : "[[ANY]]",
+      "tabs" : "[[ANYTHING_PRESENT]]",
+      "metadataFields" : "[[ANYTHING_PRESENT]]",
       "state" : {
         "id" : "TODO",
         "name" : "To do",
         "description" : null,
         "title_display" : null
       },
-      "channels" : "[[ANY]]",
+      "channels" : "[[ANYTHING_PRESENT]]",
       "triggers" : [ {
-        "id" : "[[ANY]]",
-        "name" : "[[ANY]]",
+        "id" : "[[ANYTHING_PRESENT]]",
+        "name" : "[[ANYTHING_PRESENT]]",
         "description" : null,
-        "order" : "[[ANY]]"
+        "order" : "[[ANYTHING_PRESENT]]"
       }, {
-        "id" : "[[ANY]]",
-        "name" : "[[ANY]]",
+        "id" : "[[ANYTHING_PRESENT]]",
+        "name" : "[[ANYTHING_PRESENT]]",
         "description" : null,
-        "order" : "[[ANY]]"
+        "order" : "[[ANYTHING_PRESENT]]"
       }, {
-        "id" : "[[ANY]]",
-        "name" : "[[ANY]]",
+        "id" : "[[ANYTHING_PRESENT]]",
+        "name" : "[[ANYTHING_PRESENT]]",
         "description" : null,
-        "order" : "[[ANY]]"
+        "order" : "[[ANYTHING_PRESENT]]"
       } ],
       "events" : [ {
-        "id" : "[[ANY]]",
-        "timestamp" : "[[ANY]]",
+        "id" : "[[ANYTHING_PRESENT]]",
+        "timestamp" : "[[ANYTHING_PRESENT]]",
         "summary" : null,
         "comment" : null,
-        "event_id" : "[[ANY]]",
-        "event_name" : "[[ANY]]",
-        "user_id" : "[[ANY]]",
-        "user_last_name" : "[[ANY]]",
-        "user_first_name" : "[[ANY]]",
-        "state_name" : "[[ANY]]",
-        "state_id" : "[[ANY]]",
+        "event_id" : "[[ANYTHING_PRESENT]]",
+        "event_name" : "[[ANYTHING_PRESENT]]",
+        "user_id" : "[[ANYTHING_PRESENT]]",
+        "user_last_name" : "[[ANYTHING_PRESENT]]",
+        "user_first_name" : "[[ANYTHING_PRESENT]]",
+        "state_name" : "[[ANYTHING_PRESENT]]",
+        "state_id" : "[[ANYTHING_PRESENT]]",
         "significant_item" : null
       } ],
-      "case_id" : "[[ANY]]",
+      "case_id" : "[[ANYTHING_PRESENT]]",
       "case_type" : {
-        "id" : "[[ANY]]",
-        "name" : "[[ANY]]",
-        "description" : "[[ANY]]",
+        "id" : "[[ANYTHING_PRESENT]]",
+        "name" : "[[ANYTHING_PRESENT]]",
+        "description" : "[[ANYTHING_PRESENT]]",
         "jurisdiction" : {
-          "id" : "[[ANY]]",
-          "name" : "[[ANY]]",
-          "description" : "[[ANY]]"
+          "id" : "[[ANYTHING_PRESENT]]",
+          "name" : "[[ANYTHING_PRESENT]]",
+          "description" : "[[ANYTHING_PRESENT]]"
         },
         "printEnabled" : false
       }

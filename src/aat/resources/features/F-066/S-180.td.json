@@ -17,12 +17,12 @@
 	"expectedResponse": {
     "_extends_": "Common_404_Response",
 		"headers": {
-      "Content-Length" : "[[ANY]]",
+      "Content-Length" : "[[ANYTHING_PRESENT]]",
       "Content-Encoding" : "gzip"
     },
     "body" : {
-      "exception" : "[[ANY]]",
-      "message" : "[[ANY]]",
+      "exception" : "[[ANYTHING_PRESENT]]",
+      "message" : "[[ANYTHING_PRESENT]]",
       "details" : null,
       "callbackErrors" : null,
       "callbackWarnings" : null
