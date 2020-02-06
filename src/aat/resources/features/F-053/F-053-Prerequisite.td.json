@@ -31,13 +31,13 @@
     "expectedResponse": {
       "_extends_": "Common_200_Response",
       "headers": {
-        "Content-Length" : "[[ANY]]",
+        "Content-Length" : "[[ANYTHING_PRESENT]]",
         "Content-Encoding" : "gzip",
         "Content-Type": "application/json"
       },
       "body" : {
-        "token" : "[[ANY]]",
-        "case_details" : "[[ANY]]",
+        "token" : "[[ANYTHING_PRESENT]]",
+        "case_details" : "[[ANYTHING_PRESENT]]",
         "event_id" : "CREATE"
       }
     }

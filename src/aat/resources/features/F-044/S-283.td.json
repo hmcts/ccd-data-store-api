@@ -30,9 +30,9 @@
     },
     "body" : {
       "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException",
-      "timestamp" : "[[ANY]]",
+      "timestamp" : "[[ANYTHING_PRESENT]]",
       "message" : "Pre-state condition is not valid for case with state: TODO; and event trigger: STOP_PROGRESS",
-      "path" : "[[ANY]]",
+      "path" : "[[ANYTHING_PRESENT]]",
       "details" : null,
       "callbackErrors" : null,
       "callbackWarnings" : null

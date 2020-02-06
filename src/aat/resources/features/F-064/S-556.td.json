@@ -18,7 +18,7 @@
       "Content-Encoding" : "gzip"
     },
     "body" : {
-      "exception" : "[[ANY]]",
+      "exception" : "[[ANYTHING_PRESENT]]",
       "message" : "Resource not found when getting case type version for 'eyJhbGciOiJIUzI1NiJ9'.",
       "details" : null,
       "callbackErrors" : null,

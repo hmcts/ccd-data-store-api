@@ -18,10 +18,10 @@
   "expectedResponse": {
     "headers": {
       "_extends_": "Common_Response_Headers",
-      "Content-Length": "[[ANY]]",
-      "Transfer-Encoding": "[[ANY]]",
-      "Content-Type": "[[ANY]]",
-      "Content-Encoding": "[[ANY]]"
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Transfer-Encoding": "[[ANYTHING_PRESENT]]",
+      "Content-Type": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "[[ANYTHING_PRESENT]]"
     }
   }
 }

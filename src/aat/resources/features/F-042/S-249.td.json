@@ -20,7 +20,7 @@
   "expectedResponse": {
     "_extends_": "Common_422_Response",
     "headers": {
-      "Content-Length": "[[ANY]]",
+      "Content-Length": "[[ANYTHING_PRESENT]]",
       "Content-Encoding": "gzip",
       "Content-Type": "application/json"
     },

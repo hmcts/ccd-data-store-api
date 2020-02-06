@@ -16,13 +16,13 @@
 	"expectedResponse": {
     "_extends_": "Common_404_Response",
 		"headers": {
-      "Content-Length" : "[[ANY]]",
+      "Content-Length" : "[[ANYTHING_PRESENT]]",
       "Content-Encoding" : "gzip",
       "Content-Type": "application/json"
     },
     "body" : {
       "exception" : "uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException",
-      "message" : "[[ANY]]",
+      "message" : "[[ANYTHING_PRESENT]]",
       "details" : null,
       "callbackErrors" : null,
       "callbackWarnings" : null

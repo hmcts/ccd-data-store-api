@@ -23,27 +23,27 @@
 		"headers": {
 			"Content-Encoding": "gzip",
 			"Content-Type": "application/json",
-			"Content-Length": "[[ANY]]",
+			"Content-Length": "[[ANYTHING_PRESENT]]",
 			"Transfer-Encoding" : "chunked"
 		},
 		"body": {
 			"user": {
 				"idam": {
-					"id": "[[ANY]]",
-					"email": "[[ANY]]",
-					"forename": "[[ANY]]",
-					"surname": "[[ANY]]",
-					"roles": "[[ANY]]",
+					"id": "[[ANYTHING_PRESENT]]",
+					"email": "[[ANYTHING_PRESENT]]",
+					"forename": "[[ANYTHING_PRESENT]]",
+					"surname": "[[ANYTHING_PRESENT]]",
+					"roles": "[[ANYTHING_PRESENT]]",
 					"defaultService": null
 				}
 			},
 			"channels": null,
-			"jurisdictions": "[[ANY]]",
+			"jurisdictions": "[[ANYTHING_PRESENT]]",
 			"default": {
 				"workbasket": {
-					"jurisdiction_id": "[[ANY]]",
-					"case_type_id": "[[ANY]]",
-					"state_id": "[[ANY]]"
+					"jurisdiction_id": "[[ANYTHING_PRESENT]]",
+					"case_type_id": "[[ANYTHING_PRESENT]]",
+					"state_id": "[[ANYTHING_PRESENT]]"
 				}
 			}
 		}
