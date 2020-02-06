@@ -31,7 +31,7 @@ Feature: F-101: Grant access to case by updating User Roles
     And the response [has the 204 return code]
     And the response has all other details as expected
 
-@S-526 @Ignore
+@S-526 @Ignore @RDM-7546
   Scenario: must return 400 error response for user ID with null value
     Given a user with [an active solicitor profile in CCD]
     And a successful call [to create a token for case creation] as in [F101_GetToken]
@@ -69,7 +69,7 @@ Feature: F-101: Grant access to case by updating User Roles
     And the response [has the 400 return code]
     And the response has all other details as expected
 
-@S-529 @Ignore
+@S-529 @Ignore @RDM-7545
   Scenario: must return 404 error response for case not found
     Given a user with [an active solicitor profile in CCD]
     And a user with [another active solicitor profile in CCD]
