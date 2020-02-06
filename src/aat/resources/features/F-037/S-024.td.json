@@ -1,0 +1,121 @@
+{
+  "title": "should create event successfully for an existing case",
+  "_guid_": "S-024",
+  "_extends_": "F-037_Test_Data_Base",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains a case Id that has just been created as in Standard_Full_Case_Creation_Data",
+    "contains a token created as in S-024-Prerequisite",
+    "contains the case detail for the updated case, along with a HTTP 200 OK"
+  ],
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][Standard_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "event_token": "${[scenarioContext][childContexts][S-024-Prerequisite][testData][actualResponse][body][token]}"
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 201,
+    "responseMessage": "OK",
+    "headers": {
+      "_extends_": "Common_Response_Headers",
+      "Vary" : "Accept-Encoding"
+    },
+    "body": {
+      "_links": {
+        "self": {
+          "href": "[[ANY]]"
+        }
+      },
+      "id": "[[ANY]]",
+      "jurisdiction": "[[ANY]]",
+      "case_type": "[[ANY]]",
+      "created_on": "[[ANY]]",
+      "last_modified_on": "[[ANY]]",
+      "state": "[[ANY]]",
+      "security_classification": "[[ANY]]",
+      "data": {
+        "MoneyGBPField": "[[ANY]]",
+        "FixedListField": "[[ANY]]",
+        "AddressUKField": {
+          "County": "[[ANY]]",
+          "Country": "[[ANY]]",
+          "PostCode": "[[ANY]]",
+          "PostTown": "[[ANY]]",
+          "AddressLine1": "[[ANY]]",
+          "AddressLine2": "[[ANY]]",
+          "AddressLine3": "[[ANY]]"
+        },
+        "ComplexField": {
+          "ComplexTextField": "[[ANY]]",
+          "ComplexFixedListField": "[[ANY]]"
+        },
+        "DateTimeField": "[[ANY]]",
+        "PhoneUKField": "[[ANY]]",
+        "NumberField": "[[ANY]]",
+        "MultiSelectListField": "[[ANY]]",
+        "YesOrNoField": "[[ANY]]",
+        "EmailField": "[[ANY]]",
+        "TextField": "[[ANY]]",
+        "DateField": "[[ANY]]",
+        "TextAreaField": "[[ANY]]",
+        "CollectionField": [
+          {
+            "value": "[[ANY]]",
+            "id": "[[ANY]]"
+          },
+          {
+            "value": "[[ANY]]",
+            "id": "[[ANY]]"
+          }
+        ]
+      },
+      "data_classification": {
+        "MoneyGBPField": "PUBLIC",
+        "FixedListField": "PUBLIC",
+        "AddressUKField": {
+          "classification": "PUBLIC",
+          "value": {
+            "County": "PUBLIC",
+            "Country": "PUBLIC",
+            "PostCode": "PUBLIC",
+            "PostTown": "PUBLIC",
+            "AddressLine1": "PUBLIC",
+            "AddressLine2": "PUBLIC",
+            "AddressLine3": "PUBLIC"
+          }
+        },
+        "DateTimeField": "PUBLIC",
+        "PhoneUKField": "PUBLIC",
+        "NumberField": "PUBLIC",
+        "MultiSelectListField": "PUBLIC",
+        "YesOrNoField": "PUBLIC",
+        "EmailField": "PUBLIC",
+        "TextField": "PUBLIC",
+        "DateField": "PUBLIC",
+        "TextAreaField": "PUBLIC",
+        "CollectionField": {
+          "classification": "PUBLIC",
+          "value": [
+            {
+              "id": "[[ANY]]",
+              "classification": "PUBLIC"
+            },
+            {
+              "id": "[[ANY]]",
+              "classification": "PUBLIC"
+            }
+          ]
+        }
+      },
+      "after_submit_callback_response": null,
+      "callback_response_status_code": null,
+      "callback_response_status": null,
+      "delete_draft_response_status_code": null,
+      "delete_draft_response_status": null
+    }
+  }
+}
