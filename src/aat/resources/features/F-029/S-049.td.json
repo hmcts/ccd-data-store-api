@@ -1,5 +1,5 @@
 {
-  "title": "must return successfully a CaseEventTrigger object filtered by case type ID",
+  "title": "must return successfully the current case event data filtered by case type ID",
   "_guid_": "S-049",
   "_extends_": "F-029_Test_Data_Base",
   "specs": [

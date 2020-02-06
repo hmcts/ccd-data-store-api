@@ -69,7 +69,7 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
                 addCcdRole(roleInfo[0], roleInfo[1]);
                 logger.info("\n\nAdded CCD Role {}, {}...", roleInfo[0], roleInfo[1]);
             } catch (Exception e) {
-                logger.info("\n\nCouldn't adding CCD Role {}, {} - Exception: {}.\\n\\n", roleInfo[0], roleInfo[1], e);
+                logger.error("\n\nCouldn't adding CCD Role {}, {} - Exception: {}.\\n\\n", roleInfo[0], roleInfo[1], e);
             }
         }
     }
@@ -97,7 +97,7 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
                 importDefinition(fileName);
                 logger.info("Imported {}.\n\n", fileName);
             } catch (Exception e) {
-                logger.info("Couldn't import {} - Exception: {}.\n\n", fileName, e);
+                logger.error("Couldn't import {} - Exception: {}.\n\n", fileName, e);
             }
         }
     }

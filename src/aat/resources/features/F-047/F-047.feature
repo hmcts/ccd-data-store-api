@@ -8,7 +8,7 @@ Feature: F-047: Get case ids
   Scenario: must return 200 and a list of case ids a user has access to
     Given a user with [an active profile in CCD]
     And a case that has just been created as in [Standard_Full_Case_Creation_Data]
-    And a successful call [to grant access on a case] as in [F-047_Grant_Access]
+    And a successful call [to grant access on the case just created] as in [F-047_Grant_Access]
     When a request is prepared with appropriate values
     And it is submitted to call the [Get case ids] operation of [CCD Data Store]
     Then a positive response is received

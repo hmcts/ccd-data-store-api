@@ -9,7 +9,7 @@ Feature: F-045: Grant access to case
     Given a user with [an active profile in CCD]
     And a case that has just been created as in [Standard_Full_Case_Creation_Data]
     When a request is prepared with appropriate values
-    And the request [contains as input a valid case-reference that exists in CCD]
+    And the request [uses the id of the case just created]
     And it is submitted to call the [Grant access to case] operation of [CCD Data Store]
     Then a positive response is received
     And the response [has the 201 return code]

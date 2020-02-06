@@ -66,6 +66,18 @@ dependencyUpdates.resolutionStrategy = {
     }
 }
 
+configurations.all {	
+    resolutionStrategy {	
+        eachDependency { DependencyResolveDetails details ->	
+            // Wiremock requires old jetty because it still support java 7	
+            // spring bom is currenty upgrading it	
+            if (details.requested.group == 'org.eclipse.jetty') {	
+                details.useVersion '9.2.24.v20180105'	
+            }	
+        }	
+    }	
+}
+
 // https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html
 dependencyCheck {
     // Specifies if the build should be failed if a CVSS score above a specified level is identified.
@@ -255,7 +267,7 @@ dependencies {
     }
     compile 'org.jooq:jool-java-8:0.9.14'
     
-    testCompile group: 'uk.gov.hmcts', name: 'ccd-api-test-automation-fw', version: '1.0.20'
+    testCompile group: 'uk.gov.hmcts', name: 'ccd-api-test-automation-fw', version: '1.0.21'
 
 }
 // end::dependencies[]
@@ -268,14 +280,6 @@ dependencyManagement {
     dependencies {
         // Versions prior to 24.1.1 vulnerable to CVE-2018-10237
         dependency 'com.google.guava:guava:24.1.1-jre'
-
-        // CVE-2020-5398
-        dependencySet(group: 'org.springframework.security', version: '5.2.1.RELEASE') {
-            entry 'spring-security-web'
-            entry 'spring-security-config'
-            entry 'spring-security-core'
-            entry 'spring-security-crypto'
-        }
 
         // CVE-2019-0232 - Java and Command Line injections in Windows
         dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.30') {
@@ -487,10 +491,7 @@ jacoco {
 
 sonarqube {
     properties {
-        property "sonar.exclusions", "**/*.java,**/**/*.java,build/generated-sources/**/*.java,**/service/doclink/**"
-        property "sonar.coverage.exclusions", "src/main/java/uk/gov/hmcts/ccd/data/definition/DefaultCaseDefinitionRepository.java,src/main/java/uk/gov/hmcts/ccd/AppInsights.java,**/DocLinksRestoreEndpoint.java,**/service/doclink/**,**/DefaultCaseDetailsRepository.java"
-        property "sonar.jacoco.reportPaths", "${project.buildDir}/jacoco/junitPlatformTest.exec"
-        property "sonar.junit.reportPaths", "${project.buildDir}/test-results/junit-platform"
+        property "sonar.exclusions", "build/generated-sources/**/*.java,**/service/doclink/**"
         property "sonar.projectName", "ccd-data-store-api"
         property "sonar.projectKey", "ccd-data-store-api"
         property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
@@ -623,7 +624,6 @@ task smoke(type: Test) {
     systemProperty "https.proxyPort", System.getProperty('https.proxyPort')
 
     environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
-
     group = 'Delivery pipeline'
     description = 'Executes smoke tests against an AAT CCD Data Store instance'
     setTestClassesDirs(sourceSets.aat.output.classesDirs)
