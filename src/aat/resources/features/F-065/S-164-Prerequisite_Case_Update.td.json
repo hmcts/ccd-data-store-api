@@ -91,6 +91,7 @@
       "case_type_id" : "AAT_AUTH_15",
       "created_date" : "[[ANY]]",
       "last_modified" : "[[ANY]]",
+      "last_state_modified_date": "[[ANY]]",
       "security_classification" : "PUBLIC",
       "case_data" : {
         "MoneyGBPField" : "[[ANY]]",

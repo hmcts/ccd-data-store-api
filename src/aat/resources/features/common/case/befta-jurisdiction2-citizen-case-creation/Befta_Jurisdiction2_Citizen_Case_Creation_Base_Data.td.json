@@ -42,6 +42,7 @@
       "version": 0,
       "created_date": "[[ANY]]",
       "last_modified": "[[ANY]]",
+      "last_state_modified_date": "[[ANY]]",
       "security_classification": "PUBLIC",
       "after_submit_callback_response": null,
       "callback_response_status_code": null,

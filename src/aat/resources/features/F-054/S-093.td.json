@@ -17,6 +17,7 @@
       "case_type_id" : "BEFTA_CASETYPE_3_2",
       "created_date" : "[[ANY]]",
       "last_modified" : "[[ANY]]",
+      "last_state_modified_date": "[[ANY]]",
       "security_classification" : "PUBLIC",
       "case_data": {
         "_extends_": "Standard_Full_Case_Data"
