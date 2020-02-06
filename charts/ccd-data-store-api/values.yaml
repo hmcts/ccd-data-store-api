@@ -31,6 +31,7 @@ java:
     DEFINITION_CACHE_LATEST_VERSION_TTL_SEC: 1
     DEFINITION_CACHE_MAX_SIZE: 5000
     DEFINITION_CACHE_EVICTION_POLICY: NONE
+    DEFINITION_CACHE_JURISDICTION_TTL_SEC: 120
 
     ELASTIC_SEARCH_ENABLED: true
     ELASTIC_SEARCH_HOSTS: ''
@@ -43,8 +44,6 @@ java:
     ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: 'true'
     ELASTIC_SEARCH_NODES_DISCOVERY_FREQUENCY_MILLIS: '5000'
     ELASTIC_SEARCH_NODES_DISCOVERY_FILTER: '_all'
-
-    JPA_CRITERIA_IN_SEARCH_ENABLED: false
 
     IDAM_S2S_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     DEFINITION_STORE_HOST: http://ccd-definition-store-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal

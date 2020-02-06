@@ -1,15 +1,19 @@
 package uk.gov.hmcts.ccd.data.definition;
 
+import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.BannersResult;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTabCollection;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchInputDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
+import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputDefinition;
 
 @Named
 @Qualifier("Cache")
@@ -64,5 +68,11 @@ public class CachedUIDefinitionGateway implements UIDefinitionGateway {
     public List<WizardPage> getWizardPageCollection(final int version, final String caseTypeId, final String eventTriggerId) {
         LOG.debug("remote retrieving version {} of wizard page collection for {} - {}", version, caseTypeId, eventTriggerId);
         return httpUiDefinitionGateway.getWizardPageCollection(version, caseTypeId, eventTriggerId);
+    }
+
+    @Override
+    @Cacheable("bannersCache")
+    public BannersResult getBanners(final List<String> jurisdictionIds) {
+        return httpUiDefinitionGateway.getBanners(jurisdictionIds);
     }
 }
