@@ -1,7 +1,7 @@
 DELETE FROM case_event;
 DELETE FROM case_data;
 
-INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, created_date, last_modified)
+INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, created_date, last_modified, last_state_modified_date)
 VALUES (1, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBLIC',
         '{
           "PersonFirstName": "Janet",
@@ -30,6 +30,7 @@ VALUES (1, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBLIC',
        }',
        '1504259907353529',
        '2016-06-22 20:44:52.824',
+       '2016-06-24 20:44:52.824',
        '2016-06-24 20:44:52.824'
 );
 

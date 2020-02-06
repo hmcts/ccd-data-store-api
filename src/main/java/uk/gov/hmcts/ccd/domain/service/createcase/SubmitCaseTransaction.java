@@ -76,9 +76,10 @@ class SubmitCaseTransaction {
                                   CaseEvent eventTrigger,
                                   CaseDetails newCaseDetails, Boolean ignoreWarning) {
 
-        final LocalDateTime createdDate = LocalDateTime.now(ZoneOffset.UTC);
+        final LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
 
-        newCaseDetails.setCreatedDate(createdDate);
+        newCaseDetails.setCreatedDate(now);
+        newCaseDetails.setLastStateModifiedDate(now);
         newCaseDetails.setReference(Long.valueOf(uidService.generateUID()));
 
         /*

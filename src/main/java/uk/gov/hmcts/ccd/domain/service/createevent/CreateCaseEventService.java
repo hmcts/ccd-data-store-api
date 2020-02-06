@@ -128,7 +128,7 @@ public class CreateCaseEventService {
             newState = aboutToSubmitCallbackResponse.getState();
 
         validateCaseFieldsOperation.validateData(caseDetails.getData(), caseType);
-        final CaseDetails savedCaseDetails = saveCaseDetails(caseDetails, eventTrigger, newState);
+        final CaseDetails savedCaseDetails = saveCaseDetails(caseDetailsBefore, caseDetails, eventTrigger, newState);
         saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse, content.getEvent(), eventTrigger, savedCaseDetails, caseType);
 
         return CreateCaseEventResult.caseEventWith()
@@ -168,11 +168,14 @@ public class CreateCaseEventService {
             .orElseThrow(() -> new ResourceNotFoundException(format("Case with reference %s could not be found", caseReference)));
     }
 
-    private CaseDetails saveCaseDetails(final CaseDetails caseDetails,
+    private CaseDetails saveCaseDetails(CaseDetails caseDetailsBefore, final CaseDetails caseDetails,
                                         final CaseEvent eventTrigger,
                                         final Optional<String> state) {
         if (!state.isPresent() && !equalsIgnoreCase(CaseState.ANY, eventTrigger.getPostState())) {
             caseDetails.setState(eventTrigger.getPostState());
+        }
+        if (!caseDetails.getState().equalsIgnoreCase(caseDetailsBefore.getState())) {
+            caseDetails.setLastStateModifiedDate(LocalDateTime.now(ZoneOffset.UTC));
         }
         return caseDetailsRepository.set(caseDetails);
     }
