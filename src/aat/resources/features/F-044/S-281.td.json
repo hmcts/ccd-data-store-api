@@ -1,0 +1,20 @@
+{
+	"_guid_": "S-281",
+	"_extends_": "F-044_Test_Data_Base",
+
+	"title": "must return negative response when request contains a non-existing case reference",
+
+	"specs": [
+		"an active profile in CCD",
+		"contains a non-existing case reference",
+		"contains an HTTP 404 'Bad Request'"
+	],
+	"request": {
+		"pathVariables": {
+      "cid": "1234567890123456"
+		}
+	},
+	"expectedResponse": {
+		"_extends_": "Common_404_Response"
+	}
+}

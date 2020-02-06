@@ -1,27 +1,7 @@
 package uk.gov.hmcts.ccd.v2.internal.controller;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.SEARCH;
-import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.WORKBASKET;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.SearchInputBuilder.aSearchInput;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WorkbasketInputBuilder.aWorkbasketInput;
-
-import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
-import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
-import uk.gov.hmcts.ccd.domain.service.aggregated.GetCriteriaOperation;
-import uk.gov.hmcts.ccd.v2.internal.resource.UISearchInputsResource;
-import uk.gov.hmcts.ccd.v2.internal.resource.UIWorkbasketInputsResource;
-
 import java.util.List;
-
+import java.util.Optional;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -32,6 +12,34 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.ccd.domain.model.definition.Banner;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfig;
+import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
+import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
+import uk.gov.hmcts.ccd.domain.service.aggregated.GetBannerOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.GetCriteriaOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.GetJurisdictionUiConfigOperation;
+import uk.gov.hmcts.ccd.v2.internal.resource.UIBannerResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.UIJurisdictionConfigResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.UISearchInputsResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.UIWorkbasketInputsResource;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.SEARCH;
+import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.WORKBASKET;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.BannerBuilder.newBanner;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.JurisdictionUiConfigBuilder.newJurisdictionUiConfig;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.SearchInputBuilder.aSearchInput;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WorkbasketInputBuilder.aWorkbasketInput;
 
 @DisplayName("UIDefinitionController")
 class UIDefinitionControllerTest {
@@ -42,11 +50,42 @@ class UIDefinitionControllerTest {
     private SearchInput searchInput1 = aSearchInput().withFieldId("field1").build();
     private SearchInput searchInput2 = aSearchInput().withFieldId("field2").build();
 
+    private Banner banner1 = newBanner().withBannerEnabled(true)
+                                        .withBannerDescription("Test Description1")
+                                        .withBannerUrlText("Click here to see it.>>>")
+                                        .withBannerUrl("http://localhost:3451/test").build();
+
+    private Banner banner2 = newBanner().withBannerEnabled(true)
+                                        .withBannerDescription("Test Description2")
+                                        .withBannerUrlText("Click here to see it.>>>")
+                                        .withBannerUrl("http://localhost:3451/test").build();
+
+    private JurisdictionUiConfig jurisdictionUiConfig1 = newJurisdictionUiConfig()
+                                                                    .withId("Reference 1")
+                                                                    .withName("Name 1")
+                                                                    .withShutteredEnabled(true)
+                                                                    .build();
+    private JurisdictionUiConfig jurisdictionUiConfig2 = newJurisdictionUiConfig()
+                                                                    .withId("Reference 2")
+                                                                    .withName("Name 2")
+                                                                    .withShutteredEnabled(false)
+                                                                    .build();
+
     private final List<WorkbasketInput> workbasketInputs = Lists.newArrayList(workbasketInput1, workbasketInput2);
     private final List<SearchInput> searchInputs = Lists.newArrayList(searchInput1, searchInput2);
+    private final List<Banner> banners = Lists.newArrayList(banner1, banner2);
+    private final List<JurisdictionUiConfig> jurisdictionUiConfigs = Lists.newArrayList(jurisdictionUiConfig1, jurisdictionUiConfig2);
+    private final List<String> jurisdictionReferenes = Lists.newArrayList("TEST", "FAMILY LAW");
 
     @Mock
     private GetCriteriaOperation getCriteriaOperation;
+
+    @Mock
+    private GetBannerOperation getBannerOperation;
+    
+    @Mock
+    private GetJurisdictionUiConfigOperation getJurisdictionUiConfigOperation;
+
     @InjectMocks
     private UIDefinitionController uiDefinitionController;
 
@@ -56,6 +95,8 @@ class UIDefinitionControllerTest {
 
         doReturn(workbasketInputs).when(getCriteriaOperation).execute(CASE_TYPE_ID, CAN_READ, WORKBASKET);
         doReturn(searchInputs).when(getCriteriaOperation).execute(CASE_TYPE_ID, CAN_READ, SEARCH);
+        doReturn(banners).when(getBannerOperation).execute(jurisdictionReferenes);
+        doReturn(jurisdictionUiConfigs).when(getJurisdictionUiConfigOperation).execute(jurisdictionReferenes);
     }
 
     @Nested
@@ -113,6 +154,91 @@ class UIDefinitionControllerTest {
 
             assertThrows(RuntimeException.class,
                          () -> uiDefinitionController.getSearchInputsDetails(CASE_TYPE_ID));
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /internal/banners")
+    class GetBanners {
+
+        @Test
+        @DisplayName("should return 200 when banners found")
+        void bannerFound() {
+            final ResponseEntity<UIBannerResource> response = uiDefinitionController.getBanners(Optional.of(jurisdictionReferenes));
+
+            assertAll(
+                () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
+                () -> {
+                    UIBannerResource bannerResource = response.getBody();
+                    assertThat(Lists.newArrayList(bannerResource.getBanners()), hasItems(hasProperty("bannerDescription", is("Test Description1")),
+                        hasProperty("bannerDescription", is("Test Description2"))));
+                }
+            );
+        }
+
+        @Test
+        @DisplayName("should propagate exception")
+        void shouldPropagateExceptionWhenThrown() {
+            when(getBannerOperation.execute(jurisdictionReferenes)).thenThrow(RuntimeException.class);
+
+            assertThrows(RuntimeException.class,
+                () -> uiDefinitionController.getBanners(Optional.of(jurisdictionReferenes)));
+        }
+
+        @Test
+        @DisplayName("should return empty list of banners")
+        void shouldReturnEmptyBannersList() {
+            ResponseEntity<UIBannerResource>  responseEntity = uiDefinitionController.getBanners(Optional.empty());
+            assertEquals(0, responseEntity.getBody().getBanners().size());
+        }
+
+        @Test
+        @DisplayName("should return banners")
+        void shouldGetBanners() {
+            List<Banner> bannersReturned = getBannerOperation.execute(jurisdictionReferenes);
+
+            assertEquals(2, bannersReturned.size());
+            assertEquals("Test Description1", bannersReturned.get(0).getBannerDescription());
+            assertEquals("Click here to see it.>>>", bannersReturned.get(0).getBannerUrlText());
+            assertEquals("http://localhost:3451/test", bannersReturned.get(0).getBannerUrl());
+            assertEquals(true, bannersReturned.get(0).getBannerEnabled());
+
+            assertEquals("Test Description2", bannersReturned.get(1).getBannerDescription());
+            assertEquals("Click here to see it.>>>", bannersReturned.get(1).getBannerUrlText());
+            assertEquals("http://localhost:3451/test", bannersReturned.get(1).getBannerUrl());
+            assertEquals(true, bannersReturned.get(1).getBannerEnabled());
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /internal/jurisdiction-ui-configs")
+    class GetJurisdictionUiConfigs {
+
+        @Test
+        @DisplayName("should return 200 when jurisdiction UI configs found")
+        void caseFound() {
+            final ResponseEntity<UIJurisdictionConfigResource> response = uiDefinitionController.getJurisdictionUiConfigs(Optional.of(jurisdictionReferenes));
+
+            assertAll(
+                () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
+                () -> {
+                	UIJurisdictionConfigResource uiJurisdictionConfigResource = response.getBody();
+                    assertThat(Lists.newArrayList(uiJurisdictionConfigResource.getConfigs()),hasItems(
+                        hasProperty("id", is("Reference 1")),
+                        hasProperty("id", is("Reference 2")),
+                        hasProperty("name", is("Name 1")),
+                        hasProperty("name", is("Name 2"))));
+                }
+            );
+        }
+
+        @Test
+        @DisplayName("should propagate exception")
+        void shouldPropagateExceptionWhenThrown() {
+            when(getJurisdictionUiConfigOperation.execute(jurisdictionReferenes)).thenThrow(RuntimeException.class);
+
+            assertThrows(RuntimeException.class,
+                () -> uiDefinitionController.getJurisdictionUiConfigs(Optional.of(jurisdictionReferenes)));
         }
     }
 }

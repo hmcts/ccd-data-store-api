@@ -1,0 +1,23 @@
+{
+  "title": "must validate when all fields are valid",
+  "_guid_": "S-307",
+  "_extends_": "F-059_Test_Data_Base",
+
+  "specs": [
+    "an active profile in CCD",
+    "has the 200 return code"
+  ],
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Length": "[[ANY]]",
+      "Content-Encoding" : "gzip",
+      "Content-Type" : "application/json;charset=UTF-8"
+    },
+    "body": {
+      "data": {
+        "_extends_": "F-059_Common_Data_In_Body"
+      }
+    }
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "_guid_": "S-000-Prerequisite",
+  "_extends_": "S-000-Base-Success",
+
+  "users": {
+    "invokingUser": {
+      "username":"[[$CCD_PRIVATE_CASEWORKER_EMAIL]]",
+      "password":"[[$CCD_PRIVATE_CASEWORKER_PASSWORD]]"
+    }
+  },
+
+  "specs": [
+    "to retrieve a user profile"
+  ],
+
+  "productName": "CCD Data Store",
+  "operationName": "Retrieve a user profile",
+  "method": "GET",
+  "uri": "/caseworkers/{uid}/profile",
+
+  "request": {
+    "pathVariables": {
+      "uid": "[[DYNAMIC]]"
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 200,
+    "headers" : {
+      "X-Frame-Options" : "[[ANY]]",
+      "Transfer-Encoding" : "[[ANY]]",
+      "Cache-Control" : "[[ANY]]",
+      "X-Content-Type-Options" : "[[ANY]]",
+      "X-XSS-Protection" : "[[ANY]]",
+      "Content-Encoding" : "[[ANY]]",
+      "vary" : "[[ANY]]",
+      "Expires" : "[[ANY]]",
+      "Pragma" : "[[ANY]]",
+      "Date" : "[[ANY]]",
+      "Content-Type" : "[[ANY]]",
+      "Content-Length": "[[ANY]]"
+    },
+    "body": {
+      "user": "[[ANY]]",
+      "channels": null,
+      "jurisdictions": "[[ANY]]",
+      "default": "[[ANY]]"
+    }
+  }
+}

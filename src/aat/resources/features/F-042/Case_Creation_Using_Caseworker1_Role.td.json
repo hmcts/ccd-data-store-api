@@ -1,0 +1,49 @@
+{
+	"_guid_": "Case_Creation_Using_Caseworker1_Role",
+	"_extends_": "Case_Creation_Data_Base",
+
+	"users": {
+		"invokingUser": {
+			"username": "befta.caseworker.1@gmail.com",
+			"password": "[[$CCD_BEFTA_CASEWORKER_1_PWD]]"
+		}
+	},
+
+	"request": {
+		"pathVariables": {
+			"jid": "BEFTA_JURISDICTION_1",
+			"ctid": "BEFTA_CASETYPE_1_1"
+		},
+		"body": {
+			"data": {
+				"_extends_": "Case_Data_For_Case_Creation_Using_Caseworker1_Role"
+			}
+		}
+	},
+
+	"expectedResponse": {
+		"body": {
+			"jurisdiction": "BEFTA_JURISDICTION_1",
+			"case_type_id": "BEFTA_CASETYPE_1_1",
+			"case_data": {
+				"_extends_": "Case_Data_For_Case_Creation_Using_Caseworker1_Role"
+			},
+			"data_classification": {
+				"MoneyGBPField": "PUBLIC",
+				"PhoneUKField": "PUBLIC",
+				"NumberField": "PUBLIC",
+				"YesOrNoField": "PUBLIC",
+				"EmailField": "PUBLIC",
+				"TextField": "PUBLIC"
+			},
+			"security_classifications": {
+				"MoneyGBPField": "PUBLIC",
+				"PhoneUKField": "PUBLIC",
+				"NumberField": "PUBLIC",
+				"YesOrNoField": "PUBLIC",
+				"EmailField": "PUBLIC",
+				"TextField": "PUBLIC"
+			}
+		}
+	}
+}
