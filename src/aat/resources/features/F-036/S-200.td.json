@@ -17,14 +17,14 @@
     "_extends_": "Common_400_Response",
     "headers" : {
       "Content-Encoding" : "gzip",
-      "Content-Type" : "application/json;charset=UTF-8",
-      "Content-Length" : "[[ANY]]"
+      "Content-Type": "application/json",
+      "Content-Length" : "[[ANYTHING_PRESENT]]"
     },
     "body" : {
       "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
-      "timestamp" : "[[ANY]]",
+      "timestamp" : "[[ANYTHING_PRESENT]]",
       "message" : "Case ID is not valid",
-      "path" : "[[ANY]]",
+      "path" : "[[ANYTHING_PRESENT]]",
       "details" : null,
       "callbackErrors" : null,
       "callbackWarnings" : null

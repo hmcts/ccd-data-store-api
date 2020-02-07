@@ -22,8 +22,8 @@
 	"expectedResponse": {
 		"headers": {
 			"_extends_": "Common_Response_Headers",
-			"Content-Type": "application/json;charset=UTF-8",
-			"Content-Length": "[[ANY]]"
+			"Content-Type": "application/json",
+			"Content-Length": "[[ANYTHING_PRESENT]]"
 		}
 	}
 }

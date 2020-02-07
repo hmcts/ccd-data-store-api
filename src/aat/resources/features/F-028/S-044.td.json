@@ -15,16 +15,16 @@
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "headers": {
-      "Content-Length": "[[ANY]]",
+      "Content-Length": "[[ANYTHING_PRESENT]]",
       "Transfer-Encoding": "chunked",
       "Content-Encoding": "gzip",
-      "Content-Type": "application/json;charset=UTF-8"
+      "Content-Type": "application/json"
     },
     "body": {
       "id": "UPDATE",
       "name": "Update",
       "description": null,
-      "case_id": "[[ANY]]",
+      "case_id": "[[ANYTHING_PRESENT]]",
       "case_fields": [
         {
           "id": "TextField",
@@ -53,14 +53,14 @@
           "show_summary_content_option": null,
           "acls": [
             {
-              "role": "[[ANY]]",
+              "role": "[[ANYTHING_PRESENT]]",
               "create": true,
               "read": true,
               "update": true,
               "delete": true
             },
             {
-              "role": "[[ANY]]",
+              "role": "[[ANYTHING_PRESENT]]",
               "create": true,
               "read": true,
               "update": true,
@@ -72,7 +72,7 @@
           "id": "NumberField",
           "label": "A `Number` field",
           "hidden": false,
-          "value": "[[ANY]]",
+          "value": "[[ANYTHING_PRESENT]]",
           "metadata": false,
           "hint_text": "A numeric data.",
           "field_type": {
@@ -95,14 +95,14 @@
           "show_summary_content_option": null,
           "acls": [
             {
-              "role": "[[ANY]]",
+              "role": "[[ANYTHING_PRESENT]]",
               "create": true,
               "read": true,
               "update": true,
               "delete": true
             },
             {
-              "role": "[[ANY]]",
+              "role": "[[ANYTHING_PRESENT]]",
               "create": true,
               "read": true,
               "update": true,
@@ -137,14 +137,14 @@
           "show_summary_content_option": null,
           "acls": [
             {
-              "role": "[[ANY]]",
+              "role": "[[ANYTHING_PRESENT]]",
               "create": true,
               "read": true,
               "update": true,
               "delete": true
             },
             {
-              "role": "[[ANY]]",
+              "role": "[[ANYTHING_PRESENT]]",
               "create": true,
               "read": true,
               "update": true,
@@ -156,7 +156,7 @@
           "id": "PhoneUKField",
           "label": "A `PhoneUK` field",
           "hidden": false,
-          "value": "[[ANY]]",
+          "value": "[[ANYTHING_PRESENT]]",
           "metadata": false,
           "hint_text": "A UK phone number.",
           "field_type": {
@@ -179,14 +179,14 @@
           "show_summary_content_option": null,
           "acls": [
             {
-              "role": "[[ANY]]",
+              "role": "[[ANYTHING_PRESENT]]",
               "create": true,
               "read": true,
               "update": true,
               "delete": true
             },
             {
-              "role": "[[ANY]]",
+              "role": "[[ANYTHING_PRESENT]]",
               "create": true,
               "read": true,
               "update": true,
@@ -198,7 +198,7 @@
           "id": "EmailField",
           "label": "An `Email` field",
           "hidden": false,
-          "value": "[[ANY]]",
+          "value": "[[ANYTHING_PRESENT]]",
           "metadata": false,
           "hint_text": "A valid email address.",
           "field_type": {
@@ -221,14 +221,14 @@
           "show_summary_content_option": null,
           "acls": [
             {
-              "role": "[[ANY]]",
+              "role": "[[ANYTHING_PRESENT]]",
               "create": true,
               "read": true,
               "update": true,
               "delete": true
             },
             {
-              "role": "[[ANY]]",
+              "role": "[[ANYTHING_PRESENT]]",
               "create": true,
               "read": true,
               "update": true,
@@ -240,7 +240,7 @@
           "id": "MoneyGBPField",
           "label": "A `MoneyGBP` field",
           "hidden": false,
-          "value": "[[ANY]]",
+          "value": "[[ANYTHING_PRESENT]]",
           "metadata": false,
           "hint_text": "A monetary value.",
           "field_type": {
@@ -263,14 +263,14 @@
           "show_summary_content_option": null,
           "acls": [
             {
-              "role": "[[ANY]]",
+              "role": "[[ANYTHING_PRESENT]]",
               "create": true,
               "read": true,
               "update": true,
               "delete": true
             },
             {
-              "role": "[[ANY]]",
+              "role": "[[ANYTHING_PRESENT]]",
               "create": true,
               "read": true,
               "update": true,
@@ -282,7 +282,7 @@
           "id": "DateField",
           "label": "A `Date` field",
           "hidden": false,
-          "value": "[[ANY]]",
+          "value": "[[ANYTHING_PRESENT]]",
           "metadata": false,
           "hint_text": "A temporal value without time.",
           "field_type": {
@@ -305,14 +305,14 @@
           "show_summary_content_option": null,
           "acls": [
             {
-              "role": "[[ANY]]",
+              "role": "[[ANYTHING_PRESENT]]",
               "create": true,
               "read": true,
               "update": true,
               "delete": true
             },
             {
-              "role": "[[ANY]]",
+              "role": "[[ANYTHING_PRESENT]]",
               "create": true,
               "read": true,
               "update": true,
@@ -324,7 +324,7 @@
           "id": "DateTimeField",
           "label": "A `DateTime` field",
           "hidden": false,
-          "value": "[[ANY]]",
+          "value": "[[ANYTHING_PRESENT]]",
           "metadata": false,
           "hint_text": "A temporal value with time.",
           "field_type": {
@@ -347,14 +347,14 @@
           "show_summary_content_option": null,
           "acls": [
             {
-              "role": "[[ANY]]",
+              "role": "[[ANYTHING_PRESENT]]",
               "create": true,
               "read": true,
               "update": true,
               "delete": true
             },
             {
-              "role": "[[ANY]]",
+              "role": "[[ANYTHING_PRESENT]]",
               "create": true,
               "read": true,
               "update": true,
@@ -389,14 +389,14 @@
           "show_summary_content_option": null,
           "acls": [
             {
-              "role": "[[ANY]]",
+              "role": "[[ANYTHING_PRESENT]]",
               "create": true,
               "read": true,
               "update": true,
               "delete": true
             },
             {
-              "role": "[[ANY]]",
+              "role": "[[ANYTHING_PRESENT]]",
               "create": true,
               "read": true,
               "update": true,
@@ -447,14 +447,14 @@
           "show_summary_content_option": null,
           "acls": [
             {
-              "role": "[[ANY]]",
+              "role": "[[ANYTHING_PRESENT]]",
               "create": true,
               "read": true,
               "update": true,
               "delete": true
             },
             {
-              "role": "[[ANY]]",
+              "role": "[[ANYTHING_PRESENT]]",
               "create": true,
               "read": true,
               "update": true,
@@ -518,14 +518,14 @@
           "show_summary_content_option": null,
           "acls": [
             {
-              "role": "[[ANY]]",
+              "role": "[[ANYTHING_PRESENT]]",
               "create": true,
               "read": true,
               "update": true,
               "delete": true
             },
             {
-              "role": "[[ANY]]",
+              "role": "[[ANYTHING_PRESENT]]",
               "create": true,
               "read": true,
               "update": true,
@@ -539,18 +539,18 @@
           "hidden": false,
           "value": [
             {
-              "id": "[[ANY]]",
+              "id": "[[ANYTHING_PRESENT]]",
               "value": "Alias 1"
             },
             {
-              "id": "[[ANY]]",
+              "id": "[[ANYTHING_PRESENT]]",
               "value": "Alias 2"
             }
           ],
           "metadata": false,
           "hint_text": "Zero to many items, here of type `Text`",
           "field_type": {
-            "id": "[[ANY]]",
+            "id": "[[ANYTHING_PRESENT]]",
             "type": "Collection",
             "min": null,
             "max": null,
@@ -578,14 +578,14 @@
           "show_summary_content_option": null,
           "acls": [
             {
-              "role": "[[ANY]]",
+              "role": "[[ANYTHING_PRESENT]]",
               "create": true,
               "read": true,
               "update": true,
               "delete": true
             },
             {
-              "role": "[[ANY]]",
+              "role": "[[ANYTHING_PRESENT]]",
               "create": true,
               "read": true,
               "update": true,
@@ -635,7 +635,7 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "[[ANY]]",
+                    "role": "[[ANYTHING_PRESENT]]",
                     "create": true,
                     "read": true,
                     "update": true,
@@ -643,7 +643,7 @@
                     "listElementCode": "ComplexTextField"
                   },
                   {
-                    "role": "[[ANY]]",
+                    "role": "[[ANYTHING_PRESENT]]",
                     "create": true,
                     "read": true,
                     "update": true,
@@ -694,7 +694,7 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "[[ANY]]",
+                    "role": "[[ANYTHING_PRESENT]]",
                     "create": true,
                     "read": true,
                     "update": true,
@@ -702,7 +702,7 @@
                     "listElementCode": "ComplexFixedListField"
                   },
                   {
-                    "role": "[[ANY]]",
+                    "role": "[[ANYTHING_PRESENT]]",
                     "create": true,
                     "read": true,
                     "update": true,
@@ -753,14 +753,14 @@
                       "show_condition": null,
                       "acls": [
                         {
-                          "role": "[[ANY]]",
+                          "role": "[[ANYTHING_PRESENT]]",
                           "create": true,
                           "read": true,
                           "update": true,
                           "delete": true
                         },
                         {
-                          "role": "[[ANY]]",
+                          "role": "[[ANYTHING_PRESENT]]",
                           "create": true,
                           "read": true,
                           "update": true,
@@ -771,7 +771,7 @@
                       "display_context": null
                     },
                     {
-                      "id": "[[ANY]]",
+                      "id": "[[ANYTHING_PRESENT]]",
                       "label": "A `Collection` field of `Text` inside a nested complex",
                       "hidden": false,
                       "order": null,
@@ -779,7 +779,7 @@
                       "case_type_id": null,
                       "hint_text": null,
                       "field_type": {
-                        "id": "[[ANY]]",
+                        "id": "[[ANYTHING_PRESENT]]",
                         "type": "Collection",
                         "min": null,
                         "max": null,
@@ -803,14 +803,14 @@
                       "show_condition": null,
                       "acls": [
                         {
-                          "role": "[[ANY]]",
+                          "role": "[[ANYTHING_PRESENT]]",
                           "create": true,
                           "read": true,
                           "update": true,
                           "delete": true
                         },
                         {
-                          "role": "[[ANY]]",
+                          "role": "[[ANYTHING_PRESENT]]",
                           "create": true,
                           "read": true,
                           "update": true,
@@ -829,7 +829,7 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "[[ANY]]",
+                    "role": "[[ANYTHING_PRESENT]]",
                     "create": true,
                     "read": true,
                     "update": true,
@@ -837,7 +837,7 @@
                     "listElementCode": "ComplexNestedField"
                   },
                   {
-                    "role": "[[ANY]]",
+                    "role": "[[ANYTHING_PRESENT]]",
                     "create": true,
                     "read": true,
                     "update": true,
@@ -861,14 +861,14 @@
           "show_summary_content_option": null,
           "acls": [
             {
-              "role": "[[ANY]]",
+              "role": "[[ANYTHING_PRESENT]]",
               "create": true,
               "read": true,
               "update": true,
               "delete": true
             },
             {
-              "role": "[[ANY]]",
+              "role": "[[ANYTHING_PRESENT]]",
               "create": true,
               "read": true,
               "update": true,
@@ -881,13 +881,13 @@
           "label": "A `AddressUK` field",
           "hidden": false,
           "value": {
-            "County": "[[ANY]]",
-            "Country": "[[ANY]]",
-            "PostCode": "[[ANY]]",
-            "PostTown": "[[ANY]]",
-            "AddressLine1": "[[ANY]]",
-            "AddressLine2": "[[ANY]]",
-            "AddressLine3": "[[ANY]]"
+            "County": "[[ANYTHING_PRESENT]]",
+            "Country": "[[ANYTHING_PRESENT]]",
+            "PostCode": "[[ANYTHING_PRESENT]]",
+            "PostTown": "[[ANYTHING_PRESENT]]",
+            "AddressLine1": "[[ANYTHING_PRESENT]]",
+            "AddressLine2": "[[ANYTHING_PRESENT]]",
+            "AddressLine3": "[[ANYTHING_PRESENT]]"
           },
           "metadata": false,
           "hint_text": "A UK address.",
@@ -923,14 +923,14 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "[[ANY]]",
+                    "role": "[[ANYTHING_PRESENT]]",
                     "create": true,
                     "read": true,
                     "update": true,
                     "delete": true
                   },
                   {
-                    "role": "[[ANY]]",
+                    "role": "[[ANYTHING_PRESENT]]",
                     "create": true,
                     "read": true,
                     "update": true,
@@ -964,14 +964,14 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "[[ANY]]",
+                    "role": "[[ANYTHING_PRESENT]]",
                     "create": true,
                     "read": true,
                     "update": true,
                     "delete": true
                   },
                   {
-                    "role": "[[ANY]]",
+                    "role": "[[ANYTHING_PRESENT]]",
                     "create": true,
                     "read": true,
                     "update": true,
@@ -1005,14 +1005,14 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "[[ANY]]",
+                    "role": "[[ANYTHING_PRESENT]]",
                     "create": true,
                     "read": true,
                     "update": true,
                     "delete": true
                   },
                   {
-                    "role": "[[ANY]]",
+                    "role": "[[ANYTHING_PRESENT]]",
                     "create": true,
                     "read": true,
                     "update": true,
@@ -1046,14 +1046,14 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "[[ANY]]",
+                    "role": "[[ANYTHING_PRESENT]]",
                     "create": true,
                     "read": true,
                     "update": true,
                     "delete": true
                   },
                   {
-                    "role": "[[ANY]]",
+                    "role": "[[ANYTHING_PRESENT]]",
                     "create": true,
                     "read": true,
                     "update": true,
@@ -1087,14 +1087,14 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "[[ANY]]",
+                    "role": "[[ANYTHING_PRESENT]]",
                     "create": true,
                     "read": true,
                     "update": true,
                     "delete": true
                   },
                   {
-                    "role": "[[ANY]]",
+                    "role": "[[ANYTHING_PRESENT]]",
                     "create": true,
                     "read": true,
                     "update": true,
@@ -1128,14 +1128,14 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "[[ANY]]",
+                    "role": "[[ANYTHING_PRESENT]]",
                     "create": true,
                     "read": true,
                     "update": true,
                     "delete": true
                   },
                   {
-                    "role": "[[ANY]]",
+                    "role": "[[ANYTHING_PRESENT]]",
                     "create": true,
                     "read": true,
                     "update": true,
@@ -1169,14 +1169,14 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "[[ANY]]",
+                    "role": "[[ANYTHING_PRESENT]]",
                     "create": true,
                     "read": true,
                     "update": true,
                     "delete": true
                   },
                   {
-                    "role": "[[ANY]]",
+                    "role": "[[ANYTHING_PRESENT]]",
                     "create": true,
                     "read": true,
                     "update": true,
@@ -1199,14 +1199,14 @@
           "show_summary_content_option": null,
           "acls": [
             {
-              "role": "[[ANY]]",
+              "role": "[[ANYTHING_PRESENT]]",
               "create": true,
               "read": true,
               "update": true,
               "delete": true
             },
             {
-              "role": "[[ANY]]",
+              "role": "[[ANYTHING_PRESENT]]",
               "create": true,
               "read": true,
               "update": true,
@@ -1241,14 +1241,14 @@
           "show_summary_content_option": null,
           "acls": [
             {
-              "role": "[[ANY]]",
+              "role": "[[ANYTHING_PRESENT]]",
               "create": true,
               "read": true,
               "update": true,
               "delete": true
             },
             {
-              "role": "[[ANY]]",
+              "role": "[[ANYTHING_PRESENT]]",
               "create": true,
               "read": true,
               "update": true,
@@ -1257,7 +1257,7 @@
           ]
         }
       ],
-      "event_token": "[[ANY]]",
+      "event_token": "[[ANYTHING_PRESENT]]",
       "wizard_pages": [
         {
           "id": "UPDATEfirst",

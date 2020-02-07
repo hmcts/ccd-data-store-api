@@ -21,18 +21,18 @@
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "headers": {
-      "Content-Type": "[[ANY]]",
-      "Content-Length": "[[ANY]]",
+      "Content-Type": "[[ANYTHING_PRESENT]]",
+      "Content-Length": "[[ANYTHING_PRESENT]]",
       "Content-Encoding": "gzip"
     },
     "body" : {
-      "id": "[[ANY]]",
+      "id": "[[ANYTHING_PRESENT]]",
       "jurisdiction": "BEFTA_JURISDICTION_2",
       "state": "TODO",
-      "version": "[[ANY]]",
+      "version": "[[ANYTHING_PRESENT]]",
       "case_type_id": "BEFTA_CASETYPE_2_1",
-      "created_date": "[[ANY]]",
-      "last_modified": "[[ANY]]",
+      "created_date": "[[ANYTHING_PRESENT]]",
+      "last_modified": "[[ANYTHING_PRESENT]]",
       "security_classification": "PUBLIC",
       "case_data": {
         "MoneyGBPField": "111100",

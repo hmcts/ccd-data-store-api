@@ -13,6 +13,8 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.Workbasket
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
 
 import java.util.List;
+import java.util.Optional;
+import org.springframework.hateoas.Link;
 
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.DisplayName;
@@ -43,7 +45,9 @@ class UIWorkbasketInputsResourceTest {
     void shouldLinkToSelf() {
         final UIWorkbasketInputsResource resource = new UIWorkbasketInputsResource(workbasketInputs, CASE_TYPE_ID);
 
-        assertThat(resource.getLink("self").getHref(), equalTo(LINK_SELF));
+        Optional<Link> self = resource.getLink("self");
+
+        assertThat(self.get().getHref(), equalTo(LINK_SELF));
     }
 
 }
