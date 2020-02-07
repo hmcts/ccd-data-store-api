@@ -11,10 +11,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.hateoas.Link;
 import uk.gov.hmcts.ccd.domain.model.aggregated.DefaultSettings;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.User;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
+
+import java.util.Optional;
 
 @DisplayName("UserProfileResource")
 class UIUserProfileResourceTest {
@@ -74,7 +77,9 @@ class UIUserProfileResourceTest {
     void shouldLinkToSelf() {
         final UIUserProfileResource resource = new UIUserProfileResource(userProfile);
 
-        assertThat(resource.getLink("self").getHref(), equalTo(LINK_SELF));
+        Optional<Link> self = resource.getLink("self");
+
+        assertThat(self.get().getHref(), equalTo(LINK_SELF));
     }
 
 }

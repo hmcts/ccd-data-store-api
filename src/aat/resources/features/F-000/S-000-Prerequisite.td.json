@@ -37,7 +37,8 @@
       "Pragma" : "[[ANY]]",
       "Date" : "[[ANY]]",
       "Content-Type" : "[[ANY]]",
-      "Content-Length": "[[ANY]]"
+      "Content-Length": "[[ANY]]",
+      "Strict-Transport-Security": "max-age=31536000 ; includeSubDomains"
     },
     "body": {
       "user": "[[ANY]]",
