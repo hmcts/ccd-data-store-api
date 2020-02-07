@@ -478,7 +478,7 @@ jacoco {
 
 sonarqube {
     properties {
-        property "sonar.exclusions", "build/generated-sources/**/*.java,**/service/doclink/**"
+        property "sonar.exclusions", "build/generated-sources/**/*.java,**/service/doclink/**,src/aat/resources/**"
         property "sonar.projectName", "ccd-data-store-api"
         property "sonar.projectKey", "ccd-data-store-api"
         property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
