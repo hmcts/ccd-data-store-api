@@ -1,27 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.createcase;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willDoNothing;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.isNull;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.same;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.core.IsInstanceOf;
@@ -55,6 +33,29 @@ import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.isNull;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.same;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
 
 class DefaultCreateCaseOperationTest {
 
@@ -220,6 +221,34 @@ class DefaultCreateCaseOperationTest {
                                                      IGNORE_WARNING);
 
         verify(draftGateway, never()).delete(DRAFT_ID);
+    }
+
+    @Test
+    @DisplayName("Should set incomplete_delete_draft when exception thrown during draft delete")
+    void shouldSetIncompleteDeleteDraftWhenDeleteDraftThrowsException() {
+        final String caseEventStateId = "Some state";
+        final String draftId = "testDraftId1";
+        eventData = newCaseDataContent().withEvent(event).withToken(TOKEN).withData(data).withDraftId(draftId).build();
+        given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(CASE_TYPE);
+        given(caseTypeService.isJurisdictionValid(JURISDICTION_ID, CASE_TYPE)).willReturn(Boolean.TRUE);
+        given(eventTriggerService.findCaseEvent(CASE_TYPE, "eid")).willReturn(eventTrigger);
+        given(eventTriggerService.isPreStateValid(null, eventTrigger)).willReturn(Boolean.TRUE);
+        given(savedCaseType.getState()).willReturn(caseEventStateId);
+        given(caseTypeService.findState(CASE_TYPE, caseEventStateId)).willReturn(caseEventState);
+        given(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, eventData)).willReturn(data);
+        given(submitCaseTransaction.submitCase(same(event),
+            same(CASE_TYPE),
+            same(IDAM_USER),
+            same(eventTrigger),
+            any(CaseDetails.class),
+            same(IGNORE_WARNING)))
+            .willReturn(savedCaseType);
+        doThrow(RuntimeException.class).when(draftGateway).delete(draftId);
+
+        defaultCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,
+            eventData,
+            IGNORE_WARNING);
+        verify(savedCaseType, times(1)).setIncompleteDeleteDraftResponse();
     }
 
     @Test

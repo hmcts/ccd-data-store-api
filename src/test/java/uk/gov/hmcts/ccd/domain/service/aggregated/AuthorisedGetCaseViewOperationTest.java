@@ -1,5 +1,34 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
+import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
+import uk.gov.hmcts.ccd.domain.model.aggregated.ProfileCaseState;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
+import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+
 import static com.google.common.collect.Sets.newHashSet;
 import static java.lang.String.valueOf;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -24,37 +53,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFi
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewTabBuilder.newCaseViewTab;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewTriggerBuilder.aViewTrigger;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.JurisdictionBuilder.newJurisdiction;
-
-import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
-import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
-import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
-import uk.gov.hmcts.ccd.domain.model.aggregated.ProfileCaseState;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
-import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
-import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
-
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.Set;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
 
 class AuthorisedGetCaseViewOperationTest {
     private static final String JURISDICTION_ID = "Probate";
