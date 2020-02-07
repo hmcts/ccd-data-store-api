@@ -1,16 +1,19 @@
 package uk.gov.hmcts.ccd.v2.internal.resource;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+import static org.springframework.hateoas.server.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.ControllerLinkBuilder.methodOn;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.hateoas.RepresentationModel;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.hateoas.RepresentationModel;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
 import uk.gov.hmcts.ccd.v2.internal.controller.UIStartTriggerController;
 
@@ -35,6 +38,11 @@ public class UIStartTriggerResource extends RepresentationModel {
 
     public static UIStartTriggerResource forDraft(@NonNull CaseEventTrigger caseEventTrigger, String draftId, Boolean ignoreWarning) {
         return new UIStartTriggerResource(caseEventTrigger, draftId, ignoreWarning, Origin.DRAFT);
+    }
+
+    @JsonIgnore
+    public CaseEventTrigger getCaseEventTrigger() {
+        return caseEventTrigger;
     }
 
     private UIStartTriggerResource(@NonNull CaseEventTrigger caseEventTrigger, String id, Boolean ignoreWarning, Origin origin) {
