@@ -34,7 +34,7 @@
     "body": {
       "arrayInMap": [
         {
-          "url": "[[ANY]]",
+          "url": "[[ANYTHING_PRESENT]]",
           "name": "CCD Print",
           "type": "CCD Print Type",
           "description": "Printing for CCD"

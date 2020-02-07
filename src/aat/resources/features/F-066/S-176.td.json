@@ -18,7 +18,11 @@
 		"headers": {
 			"Content-Encoding": "gzip",
 			"Content-Type": "application/json",
+<<<<<<< HEAD
+      "Content-Length" : "[[ANYTHING_PRESENT]]"
+=======
       "Content-Length" : "[[ANY]]"
+>>>>>>> refs/heads/develop
     },
 		"body": {
 			"message": "Access Denied"

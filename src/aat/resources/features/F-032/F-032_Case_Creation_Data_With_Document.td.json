@@ -15,8 +15,8 @@
       "case_data": {
         "_extends_": "Standard_Full_Case_Data_With_Document",
         "DocumentField" : {
-          "document_url" : "[[ANY]]",
-          "document_binary_url" : "[[ANY]]"
+          "document_url" : "[[ANYTHING_PRESENT]]",
+          "document_binary_url" : "[[ANYTHING_PRESENT]]"
         }
       },
       "data_classification": {

@@ -17,13 +17,13 @@
     "headers" : {
       "Content-Encoding" : "gzip",
       "Content-Type": "application/json",
-      "Content-Length" : "[[ANY]]"
+      "Content-Length" : "[[ANYTHING_PRESENT]]"
     },
     "body" : {
       "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
-      "timestamp" : "[[ANY]]",
+      "timestamp" : "[[ANYTHING_PRESENT]]",
       "message" : "Cannot find event INVALID_TRIGGER_ID for case type AAT_AUTH_15",
-      "path" : "[[ANY]]",
+      "path" : "[[ANYTHING_PRESENT]]",
       "details" : null,
       "callbackErrors" : null,
       "callbackWarnings" : null

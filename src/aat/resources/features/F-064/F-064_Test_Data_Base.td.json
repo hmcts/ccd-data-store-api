@@ -18,9 +18,9 @@
 	},
   "expectedResponse": {
     "headers": {
-      "Content-Type": "[[ANY]]",
-      "Content-Length" : "[[ANY]]",
-      "Strict-Transport-Security": "[[ANY]]"
+      "Content-Type": "[[ANYTHING_PRESENT]]",
+      "Content-Length" : "[[ANYTHING_PRESENT]]",
+      "Strict-Transport-Security": "[[ANYTHING_PRESENT]]"
     }
   }
 }

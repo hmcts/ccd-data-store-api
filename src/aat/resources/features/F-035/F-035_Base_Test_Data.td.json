@@ -23,7 +23,7 @@
 		"headers": {
 			"_extends_": "Common_Response_Headers",
 			"Content-Type": "application/json",
-			"Content-Length": "[[ANY]]"
+			"Content-Length": "[[ANYTHING_PRESENT]]"
 		}
 	}
 }

@@ -16,7 +16,7 @@
 		"_extends_": "Common_404_Response",
 		"body": {
 			"exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
-			"message": "[[ANY]]",
+			"message": "[[ANYTHING_PRESENT]]",
 			"details": null,
 			"callbackErrors": null,
 			"callbackWarnings": null

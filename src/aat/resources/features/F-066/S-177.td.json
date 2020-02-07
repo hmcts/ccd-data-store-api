@@ -16,11 +16,11 @@
 	"expectedResponse": {
     "_extends_": "Common_400_Response",
 		"headers": {
-      "Content-Length" : "[[ANY]]",
+      "Content-Length" : "[[ANYTHING_PRESENT]]",
       "Content-Encoding" : "gzip"
     },
     "body" : {
-      "exception" : "[[ANY]]",
+      "exception" : "[[ANYTHING_PRESENT]]",
       "message" : "Case ID is not valid",
       "details" : null,
       "callbackErrors" : null,

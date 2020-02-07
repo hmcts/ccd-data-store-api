@@ -33,14 +33,14 @@
     "body": {
       "_links": {
         "self": {
-          "href": "[[ANY]]"
+          "href": "[[ANYTHING_PRESENT]]"
         }
       },
-      "id": "[[ANY]]",
+      "id": "[[ANYTHING_PRESENT]]",
       "jurisdiction": "BEFTA_JURISDICTION_2",
       "case_type": "BEFTA_CASETYPE_2_1",
-      "created_on": "[[ANY]]",
-      "last_modified_on": "[[ANY]]",
+      "created_on": "[[ANYTHING_PRESENT]]",
+      "last_modified_on": "[[ANYTHING_PRESENT]]",
       "state": "TODO",
       "security_classification": "PUBLIC",
       "data": {

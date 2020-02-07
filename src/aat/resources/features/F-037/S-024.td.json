@@ -27,49 +27,49 @@
     "body": {
       "_links": {
         "self": {
-          "href": "[[ANY]]"
+          "href": "[[ANYTHING_PRESENT]]"
         }
       },
-      "id": "[[ANY]]",
-      "jurisdiction": "[[ANY]]",
-      "case_type": "[[ANY]]",
-      "created_on": "[[ANY]]",
-      "last_modified_on": "[[ANY]]",
-      "state": "[[ANY]]",
-      "security_classification": "[[ANY]]",
+      "id": "[[ANYTHING_PRESENT]]",
+      "jurisdiction": "[[ANYTHING_PRESENT]]",
+      "case_type": "[[ANYTHING_PRESENT]]",
+      "created_on": "[[ANYTHING_PRESENT]]",
+      "last_modified_on": "[[ANYTHING_PRESENT]]",
+      "state": "[[ANYTHING_PRESENT]]",
+      "security_classification": "[[ANYTHING_PRESENT]]",
       "data": {
-        "MoneyGBPField": "[[ANY]]",
-        "FixedListField": "[[ANY]]",
+        "MoneyGBPField": "[[ANYTHING_PRESENT]]",
+        "FixedListField": "[[ANYTHING_PRESENT]]",
         "AddressUKField": {
-          "County": "[[ANY]]",
-          "Country": "[[ANY]]",
-          "PostCode": "[[ANY]]",
-          "PostTown": "[[ANY]]",
-          "AddressLine1": "[[ANY]]",
-          "AddressLine2": "[[ANY]]",
-          "AddressLine3": "[[ANY]]"
+          "County": "[[ANYTHING_PRESENT]]",
+          "Country": "[[ANYTHING_PRESENT]]",
+          "PostCode": "[[ANYTHING_PRESENT]]",
+          "PostTown": "[[ANYTHING_PRESENT]]",
+          "AddressLine1": "[[ANYTHING_PRESENT]]",
+          "AddressLine2": "[[ANYTHING_PRESENT]]",
+          "AddressLine3": "[[ANYTHING_PRESENT]]"
         },
         "ComplexField": {
-          "ComplexTextField": "[[ANY]]",
-          "ComplexFixedListField": "[[ANY]]"
+          "ComplexTextField": "[[ANYTHING_PRESENT]]",
+          "ComplexFixedListField": "[[ANYTHING_PRESENT]]"
         },
-        "DateTimeField": "[[ANY]]",
-        "PhoneUKField": "[[ANY]]",
-        "NumberField": "[[ANY]]",
-        "MultiSelectListField": "[[ANY]]",
-        "YesOrNoField": "[[ANY]]",
-        "EmailField": "[[ANY]]",
-        "TextField": "[[ANY]]",
-        "DateField": "[[ANY]]",
-        "TextAreaField": "[[ANY]]",
+        "DateTimeField": "[[ANYTHING_PRESENT]]",
+        "PhoneUKField": "[[ANYTHING_PRESENT]]",
+        "NumberField": "[[ANYTHING_PRESENT]]",
+        "MultiSelectListField": "[[ANYTHING_PRESENT]]",
+        "YesOrNoField": "[[ANYTHING_PRESENT]]",
+        "EmailField": "[[ANYTHING_PRESENT]]",
+        "TextField": "[[ANYTHING_PRESENT]]",
+        "DateField": "[[ANYTHING_PRESENT]]",
+        "TextAreaField": "[[ANYTHING_PRESENT]]",
         "CollectionField": [
           {
-            "value": "[[ANY]]",
-            "id": "[[ANY]]"
+            "value": "[[ANYTHING_PRESENT]]",
+            "id": "[[ANYTHING_PRESENT]]"
           },
           {
-            "value": "[[ANY]]",
-            "id": "[[ANY]]"
+            "value": "[[ANYTHING_PRESENT]]",
+            "id": "[[ANYTHING_PRESENT]]"
           }
         ]
       },
@@ -101,11 +101,11 @@
           "classification": "PUBLIC",
           "value": [
             {
-              "id": "[[ANY]]",
+              "id": "[[ANYTHING_PRESENT]]",
               "classification": "PUBLIC"
             },
             {
-              "id": "[[ANY]]",
+              "id": "[[ANYTHING_PRESENT]]",
               "classification": "PUBLIC"
             }
           ]

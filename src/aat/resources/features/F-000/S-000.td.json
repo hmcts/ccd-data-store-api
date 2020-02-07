@@ -24,25 +24,25 @@
 	"expectedResponse": {
 		"responseCode": 200,
 		"headers": {
-			"X-Frame-Options": "[[ANY]]",
-			"Transfer-Encoding": "[[ANY]]",
-			"Cache-Control": "[[ANY]]",
-			"X-Content-Type-Options": "[[ANY]]",
-			"X-XSS-Protection": "[[ANY]]",
-			"Content-Encoding": "[[ANY]]",
-			"vary": "[[ANY]]",
-			"Expires": "[[ANY]]",
-			"Pragma": "[[ANY]]",
-			"Date": "[[ANY]]",
-			"Content-Type": "[[ANY]]",
-			"Content-Length": "[[ANY]]",
+			"X-Frame-Options": "[[ANYTHING_PRESENT]]",
+			"Transfer-Encoding": "[[ANYTHING_PRESENT]]",
+			"Cache-Control": "[[ANYTHING_PRESENT]]",
+			"X-Content-Type-Options": "[[ANYTHING_PRESENT]]",
+			"X-XSS-Protection": "[[ANYTHING_PRESENT]]",
+			"Content-Encoding": "[[ANYTHING_PRESENT]]",
+			"vary": "[[ANYTHING_PRESENT]]",
+			"Expires": "[[ANYTHING_PRESENT]]",
+			"Pragma": "[[ANYTHING_PRESENT]]",
+			"Date": "[[ANYTHING_PRESENT]]",
+			"Content-Type": "[[ANYTHING_PRESENT]]",
+			"Content-Length": "[[ANYTHING_PRESENT]]",
 			"Strict-Transport-Security": "max-age=31536000 ; includeSubDomains"
 		},
 		"body": {
-			"user": "[[ANY]]",
+			"user": "[[ANYTHING_PRESENT]]",
 			"channels": null,
-			"jurisdictions": "[[ANY]]",
-			"default": "[[ANY]]"
+			"jurisdictions": "[[ANYTHING_PRESENT]]",
+			"default": "[[ANYTHING_PRESENT]]"
 		}
 	}
 }
