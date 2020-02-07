@@ -21,7 +21,7 @@
 	"expectedResponse": {
 		"headers": {
 			"Content-Length": "[[ANYTHING_PRESENT]]",
-      "Strict-Transport-Security": "[[ANYTHING_PRESENT]]"
+			"Strict-Transport-Security": "[[ANYTHING_PRESENT]]"
 		}
 	}
 }
