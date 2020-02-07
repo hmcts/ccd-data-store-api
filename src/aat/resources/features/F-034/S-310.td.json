@@ -19,11 +19,7 @@
     "_extends_": "Common_404_Response",
     "body" : {
       "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
-<<<<<<< HEAD
       "timestamp" : "[[ANYTHING_PRESENT]]",
-=======
-      "timestamp" : "[[ANY]]",
->>>>>>> refs/heads/develop
       "message" : "Resource not found when getting case type version for abc because of 404 Not Found: [{\"message\":\"Object Not Found for:abc\"}]",
       "path" : "/case-types/abc/validate",
       "details" : null,
