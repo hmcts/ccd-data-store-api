@@ -9,7 +9,7 @@
 	"expectedResponse": {
 		"_extends_": "Common_200_Response",
 		"headers": {
-			"Transfer-Encoding": "ANY_STRING_NULLABLE"
+			"Transfer-Encoding": "[[ANY_STRING_NULLABLE]]"
 		},
 		"body": {
 			"columns": "[[ANYTHING_PRESENT]]",
