@@ -10,7 +10,6 @@
   "expectedResponse": {
     "_extends_": "Common_204_Response",
     "headers": {
-      "Content-Length": "[[ANYTHING_PRESENT]]",
       "Vary" : "[[ANYTHING_PRESENT]]"
     }
   }
