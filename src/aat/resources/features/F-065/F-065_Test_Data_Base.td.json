@@ -22,7 +22,6 @@
     "headers": {
       "_extends_": "Common_Response_Headers",
       "Content-Type" : "[[ANYTHING_PRESENT]]",
-      "Content-Length": "[[ANYTHING_PRESENT]]",
       "Content-Encoding": "gzip"
     }
   }

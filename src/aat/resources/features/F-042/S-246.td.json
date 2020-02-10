@@ -17,8 +17,7 @@
     "headers": {
       "Content-Length": "[[ANYTHING_PRESENT]]",
       "Content-Encoding": "gzip",
-      "Content-Type": "application/json",
-      "Connection": "[[ANYTHING_PRESENT]]"
+      "Content-Type": "application/json"
     },
     "body": {
       "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
