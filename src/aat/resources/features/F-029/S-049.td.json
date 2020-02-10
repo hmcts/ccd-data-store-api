@@ -10,7 +10,8 @@
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "headers": {
-      "Transfer-Encoding": "chunked"
+      "Transfer-Encoding": "chunked",
+      "Content-Length": "[[ANY_INTEGER_NULLABLE]]",
     },
     "body": {
       "id": "CREATE",
