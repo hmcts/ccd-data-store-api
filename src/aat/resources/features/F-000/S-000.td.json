@@ -25,7 +25,6 @@
 		"responseCode": 200,
 		"headers": {
 			"X-Frame-Options": "[[ANYTHING_PRESENT]]",
-			"Transfer-Encoding": "[[ANYTHING_PRESENT]]",
 			"Cache-Control": "[[ANYTHING_PRESENT]]",
 			"X-Content-Type-Options": "[[ANYTHING_PRESENT]]",
 			"X-XSS-Protection": "[[ANYTHING_PRESENT]]",
