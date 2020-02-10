@@ -142,7 +142,7 @@ configurations {
 
 checkstyle {
     maxWarnings = 2934 // In the Ideal world this should be 0
-    toolVersion = '8.29'
+    toolVersion = '8.18'
 }
 
 checkstyleMain.shouldRunAfter(compileJava)

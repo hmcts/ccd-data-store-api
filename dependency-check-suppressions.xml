@@ -127,5 +127,11 @@
         <cpe>cpe:/a:pivotal_software:spring_framework</cpe>
         <cve>CVE-2020-5398</cve>
     </suppress>
+    <!-- FIXME : RDM-78578 -->
+    <suppress>
+        <notes>Temporary suppression for on-going developments</notes>
+        <cpe>cpe:2.3:a:checkstyle:checkstyle:*:*:*:*:*:*:*:*</cpe>
+        <cve>CVE-2019-10782</cve>
+    </suppress>
 
 </suppressions>
