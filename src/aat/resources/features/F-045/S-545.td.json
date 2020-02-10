@@ -17,7 +17,7 @@
   "expectedResponse": {
     "_extends_": "Common_400_Response",
     "headers": {
-      "Content-Length" : "[[ANY]]"
+      "Content-Length" : "[[ANYTHING_PRESENT]]"
     }
   }
 }

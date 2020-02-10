@@ -16,7 +16,7 @@
   "expectedResponse": {
     "_extends_": "Common_403_Response",
     "headers": {
-      "Content-Length": "[[ANY]]",
+      "Content-Length": "[[ANYTHING_PRESENT]]",
       "Content-Encoding" : "gzip",
       "Content-Type": "application/json"
     },

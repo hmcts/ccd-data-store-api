@@ -13,14 +13,14 @@
       "vary" : "accept-encoding"
     },
     "body":{
-      "id": "[[ANY]]",
+      "id": "[[ANYTHING_PRESENT]]",
       "jurisdiction": "BEFTA_JURISDICTION_3",
       "state": "TODO",
       "version": 0,
       "case_type_id": "BEFTA_CASETYPE_3_2",
-      "created_date": "[[ANY]]",
-      "last_modified": "[[ANY]]",
-      "last_state_modified_date": "[[ANY]]",
+      "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+      "created_date": "[[ANYTHING_PRESENT]]",
+      "last_modified": "[[ANYTHING_PRESENT]]",
       "security_classification": "PUBLIC",
       "case_data": {
         "MoneyGBPField": "4200",
@@ -38,7 +38,7 @@
           "ComplexTextField": "Nested text",
           "ComplexFixedListField": "VALUE2"
         },
-        "DateTimeField": "[[ANY]]",
+        "DateTimeField": "[[ANYTHING_PRESENT]]",
         "PhoneUKField": "07123456789",
         "NumberField": "164528",
         "MultiSelectListField": [
@@ -53,11 +53,11 @@
         "CollectionField": [
           {
             "value": "Alias 1",
-            "id": "[[ANY]]"
+            "id": "[[ANYTHING_PRESENT]]"
           },
           {
             "value": "Alias 2",
-            "id": "[[ANY]]"
+            "id": "[[ANYTHING_PRESENT]]"
           }
         ]
       },
@@ -96,11 +96,11 @@
           "classification": "PUBLIC",
           "value": [
             {
-              "id": "[[ANY]]",
+              "id": "[[ANYTHING_PRESENT]]",
               "classification": "PUBLIC"
             },
             {
-              "id": "[[ANY]]",
+              "id": "[[ANYTHING_PRESENT]]",
               "classification": "PUBLIC"
             }
           ]
@@ -146,11 +146,11 @@
           "classification": "PUBLIC",
           "value": [
             {
-              "id": "[[ANY]]",
+              "id": "[[ANYTHING_PRESENT]]",
               "classification": "PUBLIC"
             },
             {
-              "id": "[[ANY]]",
+              "id": "[[ANYTHING_PRESENT]]",
               "classification": "PUBLIC"
             }
           ]

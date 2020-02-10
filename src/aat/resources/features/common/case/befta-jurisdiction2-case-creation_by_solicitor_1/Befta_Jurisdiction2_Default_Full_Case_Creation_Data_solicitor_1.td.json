@@ -29,14 +29,14 @@
 
     },
     "body": {
-      "id": "[[ANY]]",
+      "id": "[[ANYTHING_PRESENT]]",
       "jurisdiction": "BEFTA_JURISDICTION_2",
       "state": "TODO",
-      "version": "[[ANY]]",
+      "version": "[[ANYTHING_PRESENT]]",
       "case_type_id": "BEFTA_CASETYPE_2_1",
-      "created_date": "[[ANY]]",
-      "last_modified": "[[ANY]]",
-      "last_state_modified_date": "[[ANY]]",
+      "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+      "created_date": "[[ANYTHING_PRESENT]]",
+      "last_modified": "[[ANYTHING_PRESENT]]",
       "security_classification": "PUBLIC",
       "case_data": {
         "_extends_": "Befta_Jurisdiction2_Default_Full_Case_Data_Solicitor_1"

@@ -21,9 +21,9 @@
     },
     "body" : {
       "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException",
-      "timestamp" : "[[ANY]]",
+      "timestamp" : "[[ANYTHING_PRESENT]]",
       "message" : "The case status did not qualify for the event",
-      "path" : "[[ANY]]",
+      "path" : "[[ANYTHING_PRESENT]]",
       "details" : null,
       "callbackErrors" : null,
       "callbackWarnings" : null

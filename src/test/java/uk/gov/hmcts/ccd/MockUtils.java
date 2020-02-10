@@ -21,4 +21,11 @@ public class MockUtils {
         Object principal = new ServiceAndUserDetails(username, token, Arrays.asList(authorities), serviceName);
         when(authenticationMock.getPrincipal()).thenReturn(principal);
     }
+
+    public static final void setSecurityAuthorities(String userName, Authentication authenticationMock, String... authorities) {
+        String token = "Bearer jwtToken";
+        String serviceName = "ccd-data";
+        Object principal = new ServiceAndUserDetails(userName, token, Arrays.asList(authorities), serviceName);
+        when(authenticationMock.getPrincipal()).thenReturn(principal);
+    }
 }

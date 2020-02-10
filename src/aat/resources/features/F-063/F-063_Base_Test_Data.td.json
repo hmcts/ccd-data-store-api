@@ -26,7 +26,7 @@
 
   "expectedResponse": {
     "headers": {
-      "Content-Length": "[[ANY]]",
+      "Content-Length": "[[ANYTHING_PRESENT]]",
       "Content-Type": "application/json"
     }
   }

@@ -11,13 +11,13 @@
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "headers" : {
-      "Content-Length" : "[[ANY]]",
+      "Content-Length" : "[[ANYTHING_PRESENT]]",
       "Content-Encoding" : "gzip",
       "Content-Type": "application/json"
     },
     "body": {
-      "total_results_count": "[[ANY]]",
-      "total_pages_count": "[[ANY]]"
+      "total_results_count": "[[ANYTHING_PRESENT]]",
+      "total_pages_count": "[[ANYTHING_PRESENT]]"
     }
   }
 }

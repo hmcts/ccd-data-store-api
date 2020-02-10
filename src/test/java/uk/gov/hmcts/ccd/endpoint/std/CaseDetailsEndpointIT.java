@@ -84,12 +84,15 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private static final String FAKE_EVENT_ID = "FAKE_EVENT";
     private static final String GET_CASES_AS_CASEWORKER = "/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases";
     private static final String GET_PAGINATED_SEARCH_METADATA = "/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/pagination_metadata";
+    private static final String GET_PAGINATED_SEARCH_METADATA_CITIZENS = "/citizens/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/pagination_metadata";
     private static final String TEST_CASE_TYPE = "TestAddressBookCase";
     private static final String TEST_JURISDICTION = "PROBATE";
     private static final String TEST_STATE = "CaseCreated";
     private static final String UID = "123";
     private static final String DRAFT_ID = "5";
     private static final int NUMBER_OF_CASES = 18;
+    private static final String CASE_TYPE_CREATOR_ROLE = "TestAddressBookCreatorCase";
+    private static final String CASE_TYPE_CREATOR_ROLE_NO_CREATE_ACCESS = "TestAddressBookCreatorNoCreateAccessCase";
 
     @Inject
     private WebApplicationContext wac;
@@ -2777,7 +2780,11 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     private void shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccess(String role) throws Exception {
-        final String URL = "/" + role + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_NO_CREATE_CASE_ACCESS + "/cases";
+        shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccess(role, CASE_TYPE_NO_CREATE_CASE_ACCESS);
+    }
+
+    private void shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccess(String role, String caseType) throws Exception {
+        final String URL = "/" + role + "/0/jurisdictions/" + JURISDICTION + "/case-types/" + caseType + "/cases";
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
 
@@ -4029,6 +4036,28 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(metadata.getTotalResultsCount(), is(0));
     }
 
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
+    public void shouldReturnPaginatedSearchMetadataForCitizen() throws Exception {
+
+        assertCaseDataResultSetSize();
+        MockUtils.setSecurityAuthorities(authentication, "role-citizen");
+
+        MvcResult result = mockMvc.perform(get(GET_PAGINATED_SEARCH_METADATA_CITIZENS)
+            .contentType(JSON_CONTENT_TYPE)
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(200))
+            .andReturn();
+
+
+        String responseAsString = result.getResponse().getContentAsString();
+        PaginatedSearchMetadata metadata = mapper.readValue(responseAsString, PaginatedSearchMetadata.class);
+
+        assertThat(metadata.getTotalPagesCount(), is(4));
+        assertThat(metadata.getTotalResultsCount(), is(7));
+    }
+
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases.sql" })
     public void shouldReturn400_whenSearchWithBadRequestParamAsCaseWorker() throws Exception {
@@ -4062,6 +4091,122 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertThat(caseDetails, hasSize(2));
         assertThat(responseAsString, containsString("Janet"));
         assertThat(responseAsString, containsString("Peter"));
+    }
+
+    @Test
+    public void shouldReturn201WhenPostCreateCaseWithCreatorRoleWithNoDataForCaseworker() throws Exception {
+        final String DESCRIPTION = "A very long comment.......";
+        final String SUMMARY = "Short comment";
+
+        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_CREATOR_ROLE + "/cases";
+
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event triggeringEvent = anEvent().build();
+        triggeringEvent.setEventId(TEST_EVENT_ID);
+        triggeringEvent.setDescription(DESCRIPTION);
+        triggeringEvent.setSummary(SUMMARY);
+        caseDetailsToSave.setEvent(triggeringEvent);
+        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_CREATOR_ROLE, TEST_EVENT_ID);
+        caseDetailsToSave.setToken(token);
+
+
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
+            .andReturn();
+
+        assertEquals("Expected empty case data", "", mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").asText());
+
+        final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
+        assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
+
+        final CaseDetails savedCaseDetails = caseDetailsList.get(0);
+        assertTrue("Incorrect Case Reference", uidService.validateUID(String.valueOf(savedCaseDetails.getReference())));
+        assertEquals("Incorrect Case Type", CASE_TYPE_CREATOR_ROLE, savedCaseDetails.getCaseTypeId());
+        assertEquals("Incorrect Data content", "{}", savedCaseDetails.getData().toString());
+        assertEquals("state3", savedCaseDetails.getState());
+
+        final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
+        assertEquals("Incorrect number of case events", 1, caseAuditEventList.size());
+
+        final AuditEvent caseAuditEvent = caseAuditEventList.get(0);
+        assertEquals("123", caseAuditEvent.getUserId());
+        assertEquals(savedCaseDetails.getId(), caseAuditEvent.getCaseDataId());
+        assertEquals(savedCaseDetails.getCaseTypeId(), caseAuditEvent.getCaseTypeId());
+        assertEquals(1, caseAuditEvent.getCaseTypeVersion().intValue());
+        assertEquals(savedCaseDetails.getState(), caseAuditEvent.getStateId());
+        assertEquals("Case in state 3", caseAuditEvent.getStateName());
+        assertEquals(savedCaseDetails.getCreatedDate(), caseAuditEvent.getCreatedDate());
+        assertEquals(savedCaseDetails.getData(), caseAuditEvent.getData());
+        assertEquals("Event ID", TEST_EVENT_ID, caseAuditEvent.getEventId());
+        assertEquals("Description", DESCRIPTION, caseAuditEvent.getDescription());
+        assertEquals("Summary", SUMMARY, caseAuditEvent.getSummary());
+        assertTrue(caseAuditEvent.getDataClassification().isEmpty());
+        assertThat(caseAuditEvent.getSecurityClassification(), equalTo(PRIVATE));
+    }
+
+    @Test
+    public void shouldReturn201WhenPostCreateCaseWithCreatorRoleWithNoDataForCitizen() throws Exception {
+        final String DESCRIPTION = "A very long comment.......";
+        final String SUMMARY = "Short comment";
+
+        final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_CREATOR_ROLE + "/cases";
+
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event triggeringEvent = anEvent().build();
+        triggeringEvent.setEventId(TEST_EVENT_ID);
+        triggeringEvent.setDescription(DESCRIPTION);
+        triggeringEvent.setSummary(SUMMARY);
+        caseDetailsToSave.setEvent(triggeringEvent);
+        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_CREATOR_ROLE, TEST_EVENT_ID);
+        caseDetailsToSave.setToken(token);
+
+
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
+            .andReturn();
+
+        assertEquals("Expected empty case data", "", mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").asText());
+
+        final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
+        assertEquals("Incorrect number of cases", 1, caseDetailsList.size());
+
+        final CaseDetails savedCaseDetails = caseDetailsList.get(0);
+        assertTrue("Incorrect Case Reference", uidService.validateUID(String.valueOf(savedCaseDetails.getReference())));
+        assertEquals("Incorrect Case Type", CASE_TYPE_CREATOR_ROLE, savedCaseDetails.getCaseTypeId());
+        assertEquals("Incorrect Data content", "{}", savedCaseDetails.getData().toString());
+        assertEquals("state3", savedCaseDetails.getState());
+
+        final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
+        assertEquals("Incorrect number of case events", 1, caseAuditEventList.size());
+
+        final AuditEvent caseAuditEvent = caseAuditEventList.get(0);
+        assertEquals("123", caseAuditEvent.getUserId());
+        assertEquals(savedCaseDetails.getId(), caseAuditEvent.getCaseDataId());
+        assertEquals(savedCaseDetails.getCaseTypeId(), caseAuditEvent.getCaseTypeId());
+        assertEquals(1, caseAuditEvent.getCaseTypeVersion().intValue());
+        assertEquals(savedCaseDetails.getState(), caseAuditEvent.getStateId());
+        assertEquals("Case in state 3", caseAuditEvent.getStateName());
+        assertEquals(savedCaseDetails.getCreatedDate(), caseAuditEvent.getCreatedDate());
+        assertEquals(savedCaseDetails.getData(), caseAuditEvent.getData());
+        assertEquals("Event ID", TEST_EVENT_ID, caseAuditEvent.getEventId());
+        assertEquals("Description", DESCRIPTION, caseAuditEvent.getDescription());
+        assertEquals("Summary", SUMMARY, caseAuditEvent.getSummary());
+        assertTrue(caseAuditEvent.getDataClassification().isEmpty());
+        assertThat(caseAuditEvent.getSecurityClassification(), equalTo(PRIVATE));
+    }
+
+    @Test
+    public void shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccessOnCreatorRoleForCaseworker() throws Exception {
+        shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccess("caseworkers", CASE_TYPE_CREATOR_ROLE_NO_CREATE_ACCESS);
+    }
+
+    @Test
+    public void shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccessOnCreatorRoleForCitizen() throws Exception {
+        shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccess("citizens", CASE_TYPE_CREATOR_ROLE_NO_CREATE_ACCESS);
     }
 
     /**

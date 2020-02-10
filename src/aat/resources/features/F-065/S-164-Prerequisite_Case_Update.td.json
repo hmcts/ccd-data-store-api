@@ -79,22 +79,22 @@
     "_extends_": "Common_201_Response",
     "headers": {
       "vary": "accept-encoding",
-      "Content-Length": "[[ANY]]",
+      "Content-Length": "[[ANYTHING_PRESENT]]",
       "Content-Encoding": "gzip",
       "Content-Type": "application/json"
     },
     "body" : {
-      "id" : "[[ANY]]",
+      "id" : "[[ANYTHING_PRESENT]]",
       "jurisdiction" : "AUTOTEST1",
       "state" : "TODO",
       "version" : 1,
       "case_type_id" : "AAT_AUTH_15",
-      "created_date" : "[[ANY]]",
-      "last_modified" : "[[ANY]]",
-      "last_state_modified_date": "[[ANY]]",
+      "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+      "created_date" : "[[ANYTHING_PRESENT]]",
+      "last_modified" : "[[ANYTHING_PRESENT]]",
       "security_classification" : "PUBLIC",
       "case_data" : {
-        "MoneyGBPField" : "[[ANY]]",
+        "MoneyGBPField" : "[[ANYTHING_PRESENT]]",
         "FixedListField" : "VALUE3",
         "AddressUKField" : {
           "County" : "Greater London",
@@ -109,7 +109,7 @@
           "ComplexTextField" : "Nested text",
           "ComplexFixedListField" : "VALUE2"
         },
-        "DateTimeField" : "[[ANY]]",
+        "DateTimeField" : "[[ANYTHING_PRESENT]]",
         "PhoneUKField" : "07123456789",
         "NumberField" : "164528",
         "MultiSelectListField" : [ "OPTION2", "OPTION4" ],
@@ -120,10 +120,10 @@
         "TextAreaField" : "Line1\nLine2",
         "CollectionField" : [ {
           "value" : "Alias 1",
-          "id" : "[[ANY]]"
+          "id" : "[[ANYTHING_PRESENT]]"
         }, {
           "value" : "Alias 2",
-          "id" : "[[ANY]]"
+          "id" : "[[ANYTHING_PRESENT]]"
         } ]
       },
       "data_classification" : {
@@ -153,10 +153,10 @@
         "CollectionField" : {
           "classification" : "PUBLIC",
           "value" : [ {
-            "id" : "[[ANY]]",
+            "id" : "[[ANYTHING_PRESENT]]",
             "classification" : "PUBLIC"
           }, {
-            "id" : "[[ANY]]",
+            "id" : "[[ANYTHING_PRESENT]]",
             "classification" : "PUBLIC"
           } ]
         }
@@ -193,10 +193,10 @@
         "CollectionField" : {
           "classification" : "PUBLIC",
           "value" : [ {
-            "id" : "[[ANY]]",
+            "id" : "[[ANYTHING_PRESENT]]",
             "classification" : "PUBLIC"
           }, {
-            "id" : "[[ANY]]",
+            "id" : "[[ANYTHING_PRESENT]]",
             "classification" : "PUBLIC"
           } ]
         }

@@ -18,16 +18,16 @@
     "headers":{
       "_extends_": "Common_Response_Headers",
       "Content-Encoding" : "gzip",
-      "Content-Length" : "[[ANY]]",
+      "Content-Length" : "[[ANYTHING_PRESENT]]",
       "Vary" : "Accept-Encoding"
     },
     "body" : {
-      "id" : "[[ANY]]",
-      "name" : "[[ANY]]",
+      "id" : "[[ANYTHING_PRESENT]]",
+      "name" : "[[ANYTHING_PRESENT]]",
       "description" : null,
-      "case_id" : "[[ANY]]",
+      "case_id" : "[[ANYTHING_PRESENT]]",
       "case_fields" : [ ],
-      "event_token" : "[[ANY]]",
+      "event_token" : "[[ANYTHING_PRESENT]]",
       "wizard_pages" : [ ],
       "show_summary" : true,
       "show_event_notes" : null,
@@ -35,7 +35,7 @@
       "can_save_draft" : null,
       "_links" : {
         "self" : {
-          "href" : "[[ANY]]"
+          "href" : "[[ANYTHING_PRESENT]]"
         }
       }
     }

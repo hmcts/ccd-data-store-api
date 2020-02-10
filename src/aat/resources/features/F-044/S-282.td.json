@@ -20,9 +20,9 @@
 		"_extends_": "Common_409_Response",
 		"body": {
 			"exception": "uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException",
-			"timestamp": "[[ANY]]",
+			"timestamp": "[[ANYTHING_PRESENT]]",
 			"message": "The case data has been altered outside of this transaction.",
-			"path": "[[ANY]]",
+			"path": "[[ANYTHING_PRESENT]]",
 			"details": null,
 			"callbackErrors": null,
 			"callbackWarnings": null

@@ -32,11 +32,11 @@
     },
     "body" : {
       "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
-      "timestamp" : "[[ANY]]",
+      "timestamp" : "[[ANYTHING_PRESENT]]",
       "status" : 404,
       "error" : "Not Found",
       "message" : "No field found",
-      "path" : "[[ANY]]",
+      "path" : "[[ANYTHING_PRESENT]]",
       "details" : null,
       "callbackErrors" : null,
       "callbackWarnings" : null
