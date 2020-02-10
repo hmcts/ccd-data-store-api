@@ -15,7 +15,7 @@
 	"expectedResponse": {
 		"_extends_": "Common_400_Response",
 		"headers": {
-			"Content-Length": "ANY_INTEGER_NOT_NULLABLE"
+			"Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]"
 		},
 		"body": {
 			"exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
