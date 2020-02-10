@@ -9,7 +9,7 @@
 	"expectedResponse": {
 		"_extends_": "Common_200_Response",
 		"headers": {
-			"Transfer-Encoding": "chunk"
+			"Transfer-Encoding": "chunked"
 		},
 		"body": {
 			"columns": "[[ANYTHING_PRESENT]]",
