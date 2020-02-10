@@ -11,7 +11,7 @@
     "_extends_": "Common_200_Response",
     "headers": {
       "Transfer-Encoding": "chunked",
-      "Content-Length": "[[ANY_INTEGER_NULLABLE]]",
+      "Content-Length": "[[ANY_INTEGER_NULLABLE]]"
     },
     "body": {
       "id": "CREATE",
