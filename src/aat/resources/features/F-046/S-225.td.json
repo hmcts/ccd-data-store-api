@@ -18,16 +18,16 @@
     "_extends_": "Common_403_Response",
     "headers": {
       "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
-      "Date" : "[[ANY]]",
+      "Date" : "[[ANYTHING_PRESENT]]",
       "Expires" : "0",
-      "Content-Length": "[[ANY]]",
-      "Content-Type" : "application/json;charset=UTF-8",
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Type": "application/json",
       "Content-Encoding" : "gzip"
     },
     "body": {
-      "timestamp": "[[ANY]]",
+      "timestamp": "[[ANYTHING_PRESENT]]",
       "message": "Access Denied",
-      "path": "[[ANY]]"
+      "path": "[[ANYTHING_PRESENT]]"
     }
   }
 }

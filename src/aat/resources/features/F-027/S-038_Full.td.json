@@ -16,14 +16,14 @@
     "_extends_": "Common_200_Response",
     "headers": {
       "Content-Encoding": "gzip",
-      "Content-Type": "application/json;charset=UTF-8",
+      "Content-Type": "application/json",
       "Transfer-Encoding": "chunked"
     },
     "body" : {
       "tabs" : [ {
         "id" : "FirstTab",
         "label" : "First tab",
-        "order" :"[[ANY]]",
+        "order" :"[[ANYTHING_PRESENT]]",
         "fields" : [ {
           "id" : "TextField",
           "label" : "A `Text` field",
@@ -43,7 +43,7 @@
           },
           "validation_expr" : null,
           "security_label" : "PUBLIC",
-          "order" : "[[ANY]]",
+          "order" : "[[ANYTHING_PRESENT]]",
           "display_context" : null,
           "display_context_parameter" : null,
           "show_condition" : null,
@@ -66,7 +66,7 @@
           "id" : "NumberField",
           "label" : "A `Number` field",
           "hidden" : false,
-          "value" : "[[ANY]]",
+          "value" : "[[ANYTHING_PRESENT]]",
           "metadata" : false,
           "hint_text" : "A numeric data.",
           "field_type" : {
@@ -81,7 +81,7 @@
           },
           "validation_expr" : null,
           "security_label" : "PUBLIC",
-          "order" : "[[ANY]]",
+          "order" : "[[ANYTHING_PRESENT]]",
           "display_context" : null,
           "display_context_parameter" : null,
           "show_condition" : null,
@@ -119,7 +119,7 @@
           },
           "validation_expr" : null,
           "security_label" : "PUBLIC",
-          "order" : "[[ANY]]",
+          "order" : "[[ANYTHING_PRESENT]]",
           "display_context" : null,
           "display_context_parameter" : null,
           "show_condition" : null,
@@ -142,7 +142,7 @@
           "id" : "PhoneUKField",
           "label" : "A `PhoneUK` field",
           "hidden" : false,
-          "value" : "[[ANY]]",
+          "value" : "[[ANYTHING_PRESENT]]",
           "metadata" : false,
           "hint_text" : "A UK phone number.",
           "field_type" : {
@@ -157,7 +157,7 @@
           },
           "validation_expr" : "^(((\\+44\\s?\\d{4}|\\(?0\\d{4}\\)?)\\s?\\d{3}\\s?\\d{3})|((\\+44\\s?\\d{3}|\\(?0\\d{3}\\)?)\\s?\\d{3}\\s?\\d{4})|((\\+44\\s?\\d{2}|\\(?0\\d{2}\\)?)\\s?\\d{4}\\s?\\d{4}))(\\s?\\#(\\d{4}|\\d{3}))?$",
           "security_label" : "PUBLIC",
-          "order" : "[[ANY]]",
+          "order" : "[[ANYTHING_PRESENT]]",
           "display_context" : null,
           "display_context_parameter" : null,
           "show_condition" : null,
@@ -180,7 +180,7 @@
           "id" : "EmailField",
           "label" : "An `Email` field",
           "hidden" : false,
-          "value" : "[[ANY]]",
+          "value" : "[[ANYTHING_PRESENT]]",
           "metadata" : false,
           "hint_text" : "A valid email address.",
           "field_type" : {
@@ -195,7 +195,7 @@
           },
           "validation_expr" : null,
           "security_label" : "PUBLIC",
-          "order" : "[[ANY]]",
+          "order" : "[[ANYTHING_PRESENT]]",
           "display_context" : null,
           "display_context_parameter" : null,
           "show_condition" : null,
@@ -220,23 +220,23 @@
       }, {
         "id" : "HistoryTab",
         "label" : "History Tab",
-        "order" : "[[ANY]]",
+        "order" : "[[ANYTHING_PRESENT]]",
         "fields" : [ {
           "id" : "HistoryComponentField",
           "label" : "A `HistoryComponent` field",
           "hidden" : false,
           "value" : [ {
-            "id" : "[[ANY]]",
-            "timestamp" : "[[ANY]]",
+            "id" : "[[ANYTHING_PRESENT]]",
+            "timestamp" : "[[ANYTHING_PRESENT]]",
             "summary" : null,
             "comment" : null,
             "event_id" : "CREATE",
             "event_name" : "Create a new case",
-            "user_id" : "[[ANY]]",
+            "user_id" : "[[ANYTHING_PRESENT]]",
             "user_last_name" : "Auto Test",
             "user_first_name" : "CCD",
-            "state_name" : "[[ANY]]",
-            "state_id" : "[[ANY]]",
+            "state_name" : "[[ANYTHING_PRESENT]]",
+            "state_id" : "[[ANYTHING_PRESENT]]",
             "significant_item" : null
           } ],
           "metadata" : false,
@@ -253,7 +253,7 @@
           },
           "validation_expr" : null,
           "security_label" : "PUBLIC",
-          "order" : "[[ANY]]",
+          "order" : "[[ANYTHING_PRESENT]]",
           "display_context" : null,
           "display_context_parameter" : null,
           "show_condition" : null,
@@ -276,14 +276,14 @@
         "role" : null,
         "show_condition" : null
       }, {
-        "id" : "[[ANY]]",
-        "label" : "[[ANY]]",
-        "order" : "[[ANY]]",
+        "id" : "[[ANYTHING_PRESENT]]",
+        "label" : "[[ANYTHING_PRESENT]]",
+        "order" : "[[ANYTHING_PRESENT]]",
         "fields" : [ {
           "id" : "MoneyGBPField",
           "label" : "A `MoneyGBP` field",
           "hidden" : false,
-          "value" : "[[ANY]]",
+          "value" : "[[ANYTHING_PRESENT]]",
           "metadata" : false,
           "hint_text" : "A monetary value.",
           "field_type" : {
@@ -298,7 +298,7 @@
           },
           "validation_expr" : null,
           "security_label" : "PUBLIC",
-          "order" : "[[ANY]]",
+          "order" : "[[ANYTHING_PRESENT]]",
           "display_context" : null,
           "display_context_parameter" : null,
           "show_condition" : null,
@@ -321,7 +321,7 @@
           "id" : "DateField",
           "label" : "A `Date` field",
           "hidden" : false,
-          "value" : "[[ANY]]",
+          "value" : "[[ANYTHING_PRESENT]]",
           "metadata" : false,
           "hint_text" : "A temporal value without time.",
           "field_type" : {
@@ -336,7 +336,7 @@
           },
           "validation_expr" : null,
           "security_label" : "PUBLIC",
-          "order" : "[[ANY]]",
+          "order" : "[[ANYTHING_PRESENT]]",
           "display_context" : null,
           "display_context_parameter" : null,
           "show_condition" : null,
@@ -359,7 +359,7 @@
           "id" : "DateTimeField",
           "label" : "A `DateTime` field",
           "hidden" : false,
-          "value" : "[[ANY]]",
+          "value" : "[[ANYTHING_PRESENT]]",
           "metadata" : false,
           "hint_text" : "A temporal value with time.",
           "field_type" : {
@@ -374,7 +374,7 @@
           },
           "validation_expr" : null,
           "security_label" : "PUBLIC",
-          "order" : "[[ANY]]",
+          "order" : "[[ANYTHING_PRESENT]]",
           "display_context" : null,
           "display_context_parameter" : null,
           "show_condition" : null,
@@ -412,7 +412,7 @@
           },
           "validation_expr" : null,
           "security_label" : "PUBLIC",
-          "order" : "[[ANY]]",
+          "order" : "[[ANYTHING_PRESENT]]",
           "display_context" : null,
           "display_context_parameter" : null,
           "show_condition" : null,
@@ -435,7 +435,7 @@
           "id" : "FixedListField",
           "label" : "A `FixedList` field",
           "hidden" : false,
-          "value" : "[[ANY]]",
+          "value" : "[[ANYTHING_PRESENT]]",
           "metadata" : false,
           "hint_text" : "A dropdown to select one value out of many.",
           "field_type" : {
@@ -445,16 +445,16 @@
             "max" : null,
             "regular_expression" : null,
             "fixed_list_items" : [ {
-              "code" : "[[ANY]]",
-              "label" : "[[ANY]]",
+              "code" : "[[ANYTHING_PRESENT]]",
+              "label" : "[[ANYTHING_PRESENT]]",
               "order" : null
             }, {
-              "code" : "[[ANY]]",
-              "label" : "[[ANY]]",
+              "code" : "[[ANYTHING_PRESENT]]",
+              "label" : "[[ANYTHING_PRESENT]]",
               "order" : null
             }, {
-              "code" : "[[ANY]]",
-              "label" : "[[ANY]]",
+              "code" : "[[ANYTHING_PRESENT]]",
+              "label" : "[[ANYTHING_PRESENT]]",
               "order" : null
             } ],
             "complex_fields" : [ ],
@@ -462,7 +462,7 @@
           },
           "validation_expr" : null,
           "security_label" : "PUBLIC",
-          "order" : "[[ANY]]",
+          "order" : "[[ANYTHING_PRESENT]]",
           "display_context" : null,
           "display_context_parameter" : null,
           "show_condition" : null,
@@ -495,24 +495,24 @@
             "max" : null,
             "regular_expression" : null,
             "fixed_list_items" : [ {
-              "code" : "[[ANY]]",
-              "label" : "[[ANY]]",
+              "code" : "[[ANYTHING_PRESENT]]",
+              "label" : "[[ANYTHING_PRESENT]]",
               "order" : null
             }, {
-              "code" : "[[ANY]]",
-              "label" : "[[ANY]]",
+              "code" : "[[ANYTHING_PRESENT]]",
+              "label" : "[[ANYTHING_PRESENT]]",
               "order" : null
             }, {
-              "code" : "[[ANY]]",
-              "label" : "[[ANY]]",
+              "code" : "[[ANYTHING_PRESENT]]",
+              "label" : "[[ANYTHING_PRESENT]]",
               "order" : null
             }, {
-              "code" : "[[ANY]]",
-              "label" : "[[ANY]]",
+              "code" : "[[ANYTHING_PRESENT]]",
+              "label" : "[[ANYTHING_PRESENT]]",
               "order" : null
             }, {
-              "code" : "[[ANY]]",
-              "label" : "[[ANY]]",
+              "code" : "[[ANYTHING_PRESENT]]",
+              "label" : "[[ANYTHING_PRESENT]]",
               "order" : null
             } ],
             "complex_fields" : [ ],
@@ -520,7 +520,7 @@
           },
           "validation_expr" : null,
           "security_label" : "PUBLIC",
-          "order" : "[[ANY]]",
+          "order" : "[[ANYTHING_PRESENT]]",
           "display_context" : null,
           "display_context_parameter" : null,
           "show_condition" : null,
@@ -545,22 +545,22 @@
       }, {
         "id" : "ThirdTab",
         "label" : "Third tab",
-        "order" : "[[ANY]]",
+        "order" : "[[ANYTHING_PRESENT]]",
         "fields" : [ {
           "id" : "CollectionField",
           "label" : "A `Collection` of `Text` fields",
           "hidden" : false,
           "value" : [ {
-            "id" : "[[ANY]]",
-            "value" : "[[ANY]]"
+            "id" : "[[ANYTHING_PRESENT]]",
+            "value" : "[[ANYTHING_PRESENT]]"
           }, {
-            "id" : "[[ANY]]",
-            "value" : "[[ANY]]"
+            "id" : "[[ANYTHING_PRESENT]]",
+            "value" : "[[ANYTHING_PRESENT]]"
           } ],
           "metadata" : false,
           "hint_text" : "Zero to many items, here of type `Text`",
           "field_type" : {
-            "id" : "[[ANY]]",
+            "id" : "[[ANYTHING_PRESENT]]",
             "type" : "Collection",
             "min" : null,
             "max" : null,
@@ -580,7 +580,7 @@
           },
           "validation_expr" : null,
           "security_label" : "PUBLIC",
-          "order" : "[[ANY]]",
+          "order" : "[[ANYTHING_PRESENT]]",
           "display_context" : null,
           "display_context_parameter" : null,
           "show_condition" : null,
@@ -654,16 +654,16 @@
                 "max" : null,
                 "regular_expression" : null,
                 "fixed_list_items" : [ {
-                  "code" : "[[ANY]]",
-                  "label" : "[[ANY]]",
+                  "code" : "[[ANYTHING_PRESENT]]",
+                  "label" : "[[ANYTHING_PRESENT]]",
                   "order" : null
                 }, {
-                  "code" : "[[ANY]]",
-                  "label" : "[[ANY]]",
+                  "code" : "[[ANYTHING_PRESENT]]",
+                  "label" : "[[ANYTHING_PRESENT]]",
                   "order" : null
                 }, {
-                  "code" : "[[ANY]]",
-                  "label" : "[[ANY]]",
+                  "code" : "[[ANYTHING_PRESENT]]",
+                  "label" : "[[ANYTHING_PRESENT]]",
                   "order" : null
                 } ],
                 "complex_fields" : [ ],
@@ -722,7 +722,7 @@
                   "case_type_id" : null,
                   "hint_text" : null,
                   "field_type" : {
-                    "id" : "[[ANY]]",
+                    "id" : "[[ANYTHING_PRESENT]]",
                     "type" : "Collection",
                     "min" : null,
                     "max" : null,
@@ -762,7 +762,7 @@
           },
           "validation_expr" : null,
           "security_label" : "PUBLIC",
-          "order" : "[[ANY]]",
+          "order" : "[[ANYTHING_PRESENT]]",
           "display_context" : null,
           "display_context_parameter" : null,
           "show_condition" : null,
@@ -976,7 +976,7 @@
           },
           "validation_expr" : null,
           "security_label" : "PUBLIC",
-          "order" : "[[ANY]]",
+          "order" : "[[ANYTHING_PRESENT]]",
           "display_context" : null,
           "display_context_parameter" : null,
           "show_condition" : null,
@@ -1007,22 +1007,22 @@
         "metadata" : true,
         "hint_text" : null,
         "field_type" : {
-          "id" : "[[ANY]]",
-          "type" : "[[ANY]]",
+          "id" : "[[ANYTHING_PRESENT]]",
+          "type" : "[[ANYTHING_PRESENT]]",
           "min" : null,
           "max" : null,
           "regular_expression" : null,
           "fixed_list_items" : [ {
-            "code" : "[[ANY]]",
-            "label" : "[[ANY]]",
+            "code" : "[[ANYTHING_PRESENT]]",
+            "label" : "[[ANYTHING_PRESENT]]",
             "order" : null
           }, {
-            "code" : "[[ANY]]",
-            "label" : "[[ANY]]",
+            "code" : "[[ANYTHING_PRESENT]]",
+            "label" : "[[ANYTHING_PRESENT]]",
             "order" : null
           }, {
-            "code" : "[[ANY]]",
-            "label" : "[[ANY]]",
+            "code" : "[[ANYTHING_PRESENT]]",
+            "label" : "[[ANYTHING_PRESENT]]",
             "order" : null
           } ],
           "complex_fields" : [ ],
@@ -1041,7 +1041,7 @@
         "id" : "[JURISDICTION]",
         "label" : "Jurisdiction",
         "hidden" : false,
-        "value" : "[[ANY]]",
+        "value" : "[[ANYTHING_PRESENT]]",
         "metadata" : true,
         "hint_text" : null,
         "field_type" : {
@@ -1067,7 +1067,7 @@
         "id" : "[CASE_TYPE]",
         "label" : "Case Type",
         "hidden" : false,
-        "value" : "[[ANY]]",
+        "value" : "[[ANYTHING_PRESENT]]",
         "metadata" : true,
         "hint_text" : null,
         "field_type" : {
@@ -1119,7 +1119,7 @@
         "id" : "[CASE_REFERENCE]",
         "label" : "Case Reference",
         "hidden" : false,
-        "value" : "[[ANY]]",
+        "value" : "[[ANYTHING_PRESENT]]",
         "metadata" : true,
         "hint_text" : null,
         "field_type" : {
@@ -1145,7 +1145,7 @@
         "id" : "[CREATED_DATE]",
         "label" : "Created Date",
         "hidden" : false,
-        "value" : "[[ANY]]",
+        "value" : "[[ANYTHING_PRESENT]]",
         "metadata" : true,
         "hint_text" : null,
         "field_type" : {
@@ -1171,7 +1171,7 @@
         "id" : "[LAST_MODIFIED_DATE]",
         "label" : "Last Modified Date",
         "hidden" : false,
-        "value" : "[[ANY]]",
+        "value" : "[[ANYTHING_PRESENT]]",
         "metadata" : true,
         "hint_text" : null,
         "field_type" : {
@@ -1200,44 +1200,44 @@
         "description" : null,
         "title_display" : null
       },
-      "channels" : "[[ANY]]",
+      "channels" : "[[ANYTHING_PRESENT]]",
       "triggers" : [ {
-        "id" : "[[ANY]]",
-        "name" : "[[ANY]]",
+        "id" : "[[ANYTHING_PRESENT]]",
+        "name" : "[[ANYTHING_PRESENT]]",
         "description" : null,
-        "order" : "[[ANY]]"
+        "order" : "[[ANYTHING_PRESENT]]"
       }, {
-        "id" : "[[ANY]]",
-        "name" : "[[ANY]]",
+        "id" : "[[ANYTHING_PRESENT]]",
+        "name" : "[[ANYTHING_PRESENT]]",
         "description" : null,
-        "order" : "[[ANY]]"
+        "order" : "[[ANYTHING_PRESENT]]"
       }, {
-        "id" : "[[ANY]]",
-        "name" : "[[ANY]]",
+        "id" : "[[ANYTHING_PRESENT]]",
+        "name" : "[[ANYTHING_PRESENT]]",
         "description" : null,
-        "order" : "[[ANY]]"
+        "order" : "[[ANYTHING_PRESENT]]"
       } ],
       "events" : [ {
-        "id" : "[[ANY]]",
-        "timestamp" : "[[ANY]]",
+        "id" : "[[ANYTHING_PRESENT]]",
+        "timestamp" : "[[ANYTHING_PRESENT]]",
         "summary" : null,
         "comment" : null,
         "event_id" : "CREATE",
         "event_name" : "Create a new case",
-        "user_id" : "[[ANY]]",
+        "user_id" : "[[ANYTHING_PRESENT]]",
         "user_last_name" : "Auto Test",
         "user_first_name" : "CCD",
-        "state_name" : "[[ANY]]",
-        "state_id" : "[[ANY]]",
+        "state_name" : "[[ANYTHING_PRESENT]]",
+        "state_id" : "[[ANYTHING_PRESENT]]",
         "significant_item" : null
       } ],
-      "case_id" : "[[ANY]]",
+      "case_id" : "[[ANYTHING_PRESENT]]",
       "case_type" : {
-        "id" : "[[ANY]]",
+        "id" : "[[ANYTHING_PRESENT]]",
         "name" : "Demo case AAT_AUTH_15",
         "description" : "Demonstrate everything CCD can do!",
         "jurisdiction" : {
-          "id" : "[[ANY]]",
+          "id" : "[[ANYTHING_PRESENT]]",
           "name" : "Auto Test 1",
           "description" : "Content for the Test Jurisdiction."
         },

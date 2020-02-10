@@ -21,7 +21,7 @@
 	},
   "expectedResponse": {
     "headers": {
-      "Content-Type": "[[ANY]]"
+      "Content-Type": "[[ANYTHING_PRESENT]]"
     }
   }
 }

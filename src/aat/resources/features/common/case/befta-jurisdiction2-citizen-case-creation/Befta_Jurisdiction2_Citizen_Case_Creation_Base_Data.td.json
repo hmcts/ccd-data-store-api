@@ -32,16 +32,16 @@
     "_extends_": "Common_201_Response",
     "headers": {
       "Content-Encoding": "gzip",
-      "Content-Type": "application/json;charset=UTF-8",
+      "Content-Type": "application/json",
       "vary": "accept-encoding",
-      "Content-Length": "[[ANY]]"
+      "Content-Length": "[[ANYTHING_PRESENT]]"
     },
     "body": {
-      "id": "[[ANY]]",
+      "id": "[[ANYTHING_PRESENT]]",
       "state": "TODO",
       "version": 0,
-      "created_date": "[[ANY]]",
-      "last_modified": "[[ANY]]",
+      "created_date": "[[ANYTHING_PRESENT]]",
+      "last_modified": "[[ANYTHING_PRESENT]]",
       "security_classification": "PUBLIC",
       "after_submit_callback_response": null,
       "callback_response_status_code": null,

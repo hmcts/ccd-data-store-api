@@ -15,7 +15,7 @@
 	"expectedResponse": {
 		"_extends_": "Common_400_Response",
 		"body": {
-			"exception": "[[ANY]]",
+			"exception": "[[ANYTHING_PRESENT]]",
 			"message": "Missing start trigger token",
 			"details": null,
 			"callbackErrors": null,

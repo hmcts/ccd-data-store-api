@@ -23,13 +23,13 @@
       "vary" : "accept-encoding"
     },
     "body" : {
-      "id" : "[[ANY]]",
+      "id" : "[[ANYTHING_PRESENT]]",
       "jurisdiction" : "AUTOTEST1",
       "state" : "TODO",
-      "version" : "[[ANY]]",
+      "version" : "[[ANYTHING_PRESENT]]",
       "case_type_id" : "AAT_AUTH_15",
-      "created_date" : "[[ANY]]",
-      "last_modified" : "[[ANY]]",
+      "created_date" : "[[ANYTHING_PRESENT]]",
+      "last_modified" : "[[ANYTHING_PRESENT]]",
       "security_classification" : "PUBLIC",
       "case_data" : {
         "MoneyGBPField" : "4200",
@@ -47,16 +47,16 @@
           "ComplexTextField" : "Nested text",
           "ComplexFixedListField" : "VALUE2"
         },
-        "DateTimeField" : "[[ANY]]",
+        "DateTimeField" : "[[ANYTHING_PRESENT]]",
         "PhoneUKField" : "07123456789",
         "NumberField" : "164528",
-        "MultiSelectListField" : "[[ANY]]",
+        "MultiSelectListField" : "[[ANYTHING_PRESENT]]",
         "YesOrNoField" : "Yes",
         "EmailField" : "ccd@hmcts.net",
         "TextField" : "Some Text",
-        "DateField" : "[[ANY]]",
+        "DateField" : "[[ANYTHING_PRESENT]]",
         "TextAreaField" : "Line1\nLine2",
-        "CollectionField" : "[[ANY]]"
+        "CollectionField" : "[[ANYTHING_PRESENT]]"
       },
       "data_classification" : {
         "MoneyGBPField" : "PUBLIC",
@@ -84,7 +84,7 @@
         "TextAreaField" : "PUBLIC",
         "CollectionField" : {
           "classification" : "PUBLIC",
-          "value" : "[[ANY]]"
+          "value" : "[[ANYTHING_PRESENT]]"
         }
       },
       "after_submit_callback_response" : null,
@@ -118,7 +118,7 @@
         "TextAreaField" : "PUBLIC",
         "CollectionField" : {
           "classification" : "PUBLIC",
-          "value" : "[[ANY]]"
+          "value" : "[[ANYTHING_PRESENT]]"
         }
       }
     }

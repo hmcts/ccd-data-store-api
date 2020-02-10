@@ -20,19 +20,18 @@
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "headers": {
-      "Content-Length": "[[ANY]]",
-      "Content-Type": "[[ANY]]",
-      "Content-Encoding" : "[[ANY]]",
-      "VaRy" : "[[ANY]]",
-      "Transfer-Encoding" : "[[ANY]]"
+      "Content-Type": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding" : "[[ANYTHING_PRESENT]]",
+      "VaRy" : "[[ANYTHING_PRESENT]]",
+      "Transfer-Encoding" : "[[ANYTHING_PRESENT]]"
     },
     "body": {
       "_links": {
         "self": {
-          "href": "[[ANY]]"
+          "href": "[[ANYTHING_PRESENT]]"
         }
       },
-      "case_id": "[[ANY]]",
+      "case_id": "[[ANYTHING_PRESENT]]",
       "case_type": {
         "id": "BEFTA_CASETYPE_2_1",
         "name": "Demo Case BEFTA CASETYPE 2 1",
@@ -44,11 +43,11 @@
         },
         "printEnabled": false
       },
-      "tabs": "[[ANY]]",
-      "metadataFields": "[[ANY]]",
-      "state": "[[ANY]]",
-      "triggers": "[[ANY]]",
-      "events": "[[ANY]]"
+      "tabs": "[[ANYTHING_PRESENT]]",
+      "metadataFields": "[[ANYTHING_PRESENT]]",
+      "state": "[[ANYTHING_PRESENT]]",
+      "triggers": "[[ANYTHING_PRESENT]]",
+      "events": "[[ANYTHING_PRESENT]]"
     }
   }
 }

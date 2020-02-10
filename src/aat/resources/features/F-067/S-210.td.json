@@ -16,9 +16,9 @@
     "_extends_": "Common_400_Response",
     "body": {
       "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
-      "timestamp": "[[ANY]]",
+      "timestamp": "[[ANYTHING_PRESENT]]",
       "message": "Event not found",
-      "path": "[[ANY]]",
+      "path": "[[ANYTHING_PRESENT]]",
       "details": null,
       "callbackErrors": null,
       "callbackWarnings":  null
