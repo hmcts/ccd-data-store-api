@@ -16,8 +16,7 @@
   "expectedResponse": {
     "_extends_": "Common_400_Response",
     "headers": {
-      "_extends_": "Common_400_Response_Headers",
-      "Connection": "[[ANYTHING_PRESENT]]"
+      "_extends_": "Common_400_Response_Headers"
     },
     "body": {
       "_extends_": "Common_400_Response_Body",
