@@ -1,0 +1,29 @@
+{
+  "title": "must return 415 when request provides content type is application/xml",
+
+  "_guid_": "S-1009",
+  "_extends_": "F-1001_Test_Data_Base",
+
+  "specs": [
+    "an active profile in CCD with READ access to a document",
+    "has the case id just created where a document id is associated",
+    "contains content type is application/xml",
+    "contains an HTTP 415 Unsupported Media Type"
+  ],
+
+  "request": {
+    "headers": {
+      "Content-Type": "application/xml"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_415_Response",
+    "body": {
+      "ResponseCode": "415",
+      "status": "Unsupported Media Type",
+      "timeStamp": "[[ANYTHING_PRESENT]]",
+      "errorMessage": "Unsupported Media Type"
+    }
+  }
+}

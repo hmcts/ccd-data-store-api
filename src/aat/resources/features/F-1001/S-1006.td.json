@@ -1,0 +1,29 @@
+{
+  "title": "must return 403 when request provides without valid authorisation",
+
+  "_guid_": "S-1006",
+  "_extends_": "F-1001_Test_Data_Base",
+
+  "specs": [
+    "an active profile in CCD with READ access to a document",
+    "has the case id just created where a document id is associated",
+    "contains null or an invalid user token",
+    "contains an HTTP 403 Access Denied"
+  ],
+
+  "request": {
+    "headers": {
+      "Authorization": "invalidAuthorizationToken"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_403_Response",
+    "body": {
+      "ResponseCode": "403",
+      "status": "Access Denied",
+      "timeStamp": "[[ANYTHING_PRESENT]]",
+      "errorMessage": "Access Denied"
+    }
+  }
+}

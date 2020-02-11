@@ -1,0 +1,30 @@
+{
+  "title": "must receive an error response when document id is not exist",
+
+  "_guid_": "S-1003",
+  "_extends_": "F-1001_Test_Data_Base",
+
+  "specs": [
+    "an active profile in CCD",
+    "has the case id just created",
+    "has a document id which is not exist in the system",
+    "contains an HTTP 404 status code"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "docId": "dummyNonExistingDocId"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "body": {
+      "ResponseCode": "404",
+      "status": "RESOURCE_NOT_FOUND",
+      "timeStamp": "[[ANYTHING_PRESENT]]",
+      "errorMessage": "Resource Not found",
+      "errorDescription": "The request document is not found"
+    }
+  }
+}

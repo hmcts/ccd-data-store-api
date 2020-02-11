@@ -1,0 +1,29 @@
+{
+  "title": "must return 401 when request provides expired authentication",
+
+  "_guid_": "S-1008",
+  "_extends_": "F-1001_Test_Data_Base",
+
+  "specs": [
+    "an active profile in CCD with READ access to a document",
+    "has the case id just created where a document id is associated",
+    "contains an expired user authorisation token",
+    "contains an HTTP 401 Unauthorised"
+  ],
+
+  "request": {
+    "headers": {
+      "Authorization": "expiredUserTokenToBeUpdated"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_401_Response",
+    "body": {
+      "ResponseCode": "401",
+      "status": "Unauthorised",
+      "timeStamp": "[[ANYTHING_PRESENT]]",
+      "errorMessage": "Unauthorised"
+    }
+  }
+}

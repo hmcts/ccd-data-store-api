@@ -1,0 +1,27 @@
+{
+  "_guid_": "S-1002",
+  "_extends_": "F-1001_Test_Data_Base",
+  "title": "must receive an error response when user doesn't have READ permission",
+  "specs": [
+    "an active profile in CCD with no READ access to a document",
+    "has the case id just created where a document id is associated",
+    "contains an HTTP 404 status code"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "docId": "76976634-374f-472b-a819-a3a938b4cc83"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "body": {
+      "ResponseCode": "404",
+      "status": "RESOURCE_NOT_FOUND",
+      "timeStamp": "[[ANYTHING_PRESENT]]",
+      "errorMessage": "Resource Not found",
+      "errorDescription": "The request document is not found"
+    }
+  }
+}

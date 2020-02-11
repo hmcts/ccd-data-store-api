@@ -1,0 +1,25 @@
+{
+  "title": "must receive a document id for a valid user who has READ permission",
+
+  "_guid_": "S-1001",
+  "_extends_": "F-1001_Test_Data_Base",
+
+  "specs": [
+    "an active profile in CCD with READ access to a document",
+    "has the case id just created where a document id is associated",
+    "contains an HTTP 200 OK status code",
+    "contains the document id which was sent in the request"
+  ],
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "ResponseCode": "200",
+      "status": "OK",
+      "timeStamp": "[[ANYTHING_PRESENT]]",
+      "ResponseBody" : {
+        "documentId" : "d7d9b878-4c1c-11ea-b77f-2e728ce88125"
+      }
+    }
+  }
+}
