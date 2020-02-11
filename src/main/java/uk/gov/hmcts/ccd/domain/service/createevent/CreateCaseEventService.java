@@ -34,8 +34,8 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.Map;
 import java.util.Optional;
 
@@ -70,6 +70,7 @@ public class CreateCaseEventService {
     private final SecurityClassificationService securityClassificationService;
     private final ValidateCaseFieldsOperation validateCaseFieldsOperation;
     private final UserAuthorisation userAuthorisation;
+    private final Clock clock;
 
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -86,7 +87,8 @@ public class CreateCaseEventService {
                                   final UIDService uidService,
                                   final SecurityClassificationService securityClassificationService,
                                   final ValidateCaseFieldsOperation validateCaseFieldsOperation,
-                                  final UserAuthorisation userAuthorisation) {
+                                  final UserAuthorisation userAuthorisation,
+                                  @Qualifier("uTCClock") final Clock clock) {
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -102,6 +104,7 @@ public class CreateCaseEventService {
         this.securityClassificationService = securityClassificationService;
         this.validateCaseFieldsOperation = validateCaseFieldsOperation;
         this.userAuthorisation = userAuthorisation;
+        this.clock = clock;
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
@@ -175,9 +178,13 @@ public class CreateCaseEventService {
             caseDetails.setState(eventTrigger.getPostState());
         }
         if (!caseDetails.getState().equalsIgnoreCase(caseDetailsBefore.getState())) {
-            caseDetails.setLastStateModifiedDate(LocalDateTime.now(ZoneOffset.UTC));
+            caseDetails.setLastStateModifiedDate(now());
         }
         return caseDetailsRepository.set(caseDetails);
+    }
+
+    private LocalDateTime now() {
+        return LocalDateTime.now(clock);
     }
 
     private void mergeUpdatedFieldsToCaseDetails(final Map<String, JsonNode> data,
@@ -191,7 +198,7 @@ public class CreateCaseEventService {
             }
             caseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(caseType, caseDetails.getData(), caseDetails.getDataClassification()));
         }
-        caseDetails.setLastModified(LocalDateTime.now(ZoneOffset.UTC));
+        caseDetails.setLastModified(now());
         if (!StringUtils.equalsAnyIgnoreCase(CaseState.ANY, caseEvent.getPostState())) {
             caseDetails.setState(caseEvent.getPostState());
         }
@@ -219,7 +226,7 @@ public class CreateCaseEventService {
         auditEvent.setUserId(user.getId());
         auditEvent.setUserLastName(user.getSurname());
         auditEvent.setUserFirstName(user.getForename());
-        auditEvent.setCreatedDate(LocalDateTime.now(ZoneOffset.UTC));
+        auditEvent.setCreatedDate(now());
         auditEvent.setSecurityClassification(securityClassificationService.getClassificationForEvent(caseType, eventTrigger));
         auditEvent.setDataClassification(caseDetails.getDataClassification());
         auditEvent.setSignificantItem(aboutToSubmitCallbackResponse.getSignificantItem());

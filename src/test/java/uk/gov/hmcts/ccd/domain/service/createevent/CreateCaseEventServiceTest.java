@@ -25,7 +25,10 @@ import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -80,6 +83,10 @@ class CreateCaseEventServiceTest {
     private CaseService caseService;
     @Mock
     private UserAuthorisation userAuthorisation;
+    @Mock
+    private Clock clock;
+
+    private Clock fixedClock = Clock.fixed(Instant.parse("2018-08-19T16:02:42.00Z"), ZoneOffset.UTC);
 
     @InjectMocks
     private CreateCaseEventService createEventService;
@@ -137,6 +144,10 @@ class CreateCaseEventServiceTest {
         IdamUser user = new IdamUser();
         user.setId("123");
 
+        doReturn(fixedClock.instant()).when(clock).instant();
+        doReturn(fixedClock.getZone()).when(clock).getZone();
+
+        doReturn(caseType).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         doReturn(caseType).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         doReturn(true).when(caseTypeService).isJurisdictionValid(JURISDICTION_ID, caseType);
         doReturn(eventTrigger).when(eventTriggerService).findCaseEvent(caseType, EVENT_ID);
@@ -171,7 +182,7 @@ class CreateCaseEventServiceTest {
         CreateCaseEventResult caseEventResult = createEventService.createCaseEvent(CASE_REFERENCE, caseDataContent);
 
         assertThat(caseEventResult.getSavedCaseDetails().getState()).isEqualTo(POST_STATE);
-        assertThat(caseEventResult.getSavedCaseDetails().getLastStateModifiedDate()).isNotEqualTo(LAST_MODIFIED);
+        assertThat(caseEventResult.getSavedCaseDetails().getLastStateModifiedDate()).isEqualTo(LocalDateTime.now(clock));
     }
 
     @Test

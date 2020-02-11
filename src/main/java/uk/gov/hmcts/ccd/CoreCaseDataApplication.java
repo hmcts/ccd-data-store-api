@@ -3,10 +3,14 @@ package uk.gov.hmcts.ccd;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import java.time.Clock;
+import java.time.ZoneOffset;
 
 @SpringBootApplication
 @EnableTransactionManagement(proxyTargetClass = true)
@@ -31,6 +35,11 @@ public class CoreCaseDataApplication {
 //            Configurator.setLevel(LOGGING_LEVEL_SPRINGFRAMEWORK, Level.valueOf(System.getProperty(LOGGING_LEVEL_SPRINGFRAMEWORK).toUpperCase()));
         }
         SpringApplication.run(CoreCaseDataApplication.class, args);
+    }
+
+    @Bean
+    public Clock uTCClock() {
+        return Clock.system(ZoneOffset.UTC);
     }
 
 }
