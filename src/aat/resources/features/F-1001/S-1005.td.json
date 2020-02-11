@@ -6,7 +6,7 @@
 
   "specs": [
     "an active profile in CCD",
-    "has a case id which is not exist in the system",
+    "has a case id which does not exist",
     "contains an HTTP 404 status code"
   ],
 

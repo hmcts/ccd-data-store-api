@@ -1,7 +1,7 @@
 {
   "_guid_": "F-1001_Test_Data_Base",
   "productName": "CCD Data Store",
-  "operationName": "get authorised document id",
+  "operationName": "get document permissions",
   "method": "GET",
   "uri": "/cases/{caseId}/documents/{docId}",
 

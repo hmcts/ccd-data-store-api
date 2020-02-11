@@ -7,7 +7,7 @@
   "specs": [
     "an active profile in CCD",
     "has the case id just created",
-    "has a document id which is not associated with case id",
+    "has a document id which is not associated with that case id",
     "contains an HTTP 404 status code"
   ],
 
