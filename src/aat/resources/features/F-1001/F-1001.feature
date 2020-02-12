@@ -62,39 +62,44 @@ Feature: F-1001: Get case document metadata for a given caseId and documentId
     And the response has all other details as expected
 
   @S-1003
-  Scenario: must receive an error response when document id is not exist
+  Scenario: must receive document metadata with an empty list of permissions when document id is not exist
     Given a case that has just been created as in [Befta_Jurisdiction2_Default_Full_Case_Creation_Data]
     And a user with [an active profile in CCD]
     When a request is prepared with appropriate values
     And the request [has the case id just created]
     And the request [has a document id which does not exist]
     And it is submitted to call the [get document metadata] operation of [CCD Data Store]
-    Then a negative response is received
-    And the response [contains an HTTP 404 status code]
+    Then a positive response is received
+    And the response [contains an 200 OK status code]
+    And the response [contains an empty list of permissions]
+    And the response [contains no document id details]
     And the response has all other details as expected
 
   @S-1004
-  Scenario: must receive an error response when document id is not associated with case id
+  Scenario: must receive document metadata with an empty list of permissions when document id is not associated with case id
     Given a case that has just been created as in [Befta_Jurisdiction2_Default_Full_Case_Creation_Data]
     And a user with [an active profile in CCD]
     When a request is prepared with appropriate values
     And the request [has the case id just created]
     And the request [has a document id which is not associated with that case id]
     And it is submitted to call the [get document metadata] operation of [CCD Data Store]
-    Then a negative response is received
-    And the response [contains an HTTP 404 status code]
+    Then a positive response is received
+    And the response [contains an 200 OK status code]
+    And the response [contains an empty list of permissions]
+    And the response [contains no document id details]
     And the response has all other details as expected
 
   @S-1005
-  Scenario: must receive an error response when case id is not exist
+  Scenario: must receive document metadata with an empty list of permissions when case id is not exist
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
     And the request [has a case id which does not exist]
     And it is submitted to call the [get document metadata] operation of [CCD Data Store]
-    Then a negative response is received
-    And the response [contains an HTTP 404 status code]
+    Then a positive response is received
+    And the response [contains an 200 OK status code]
+    And the response [contains an empty list of permissions]
+    And the response [contains no document id details]
     And the response has all other details as expected
-
   @S-1006
   Scenario: must return 403 when request provides without valid authorisation
     Given a case that has just been created as in [Befta_Jurisdiction2_Default_Full_Case_Creation_Data]
