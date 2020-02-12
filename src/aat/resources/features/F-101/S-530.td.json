@@ -23,13 +23,6 @@
     }
   },
   "expectedResponse": {
-    "_extends_": "Common_403_Response",
-    "headers" : {
-      "Connection" : "keep-alive",
-      "Content-Encoding" : "gzip",
-      "Content-Type" : "application/json;charset=UTF-8",
-      "Keep-Alive" : "timeout=60",
-      "Transfer-Encoding" : "chunked"
-    }
+    "_extends_": "Common_403_Response"
   }
 }

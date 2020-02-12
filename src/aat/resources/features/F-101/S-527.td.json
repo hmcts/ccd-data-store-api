@@ -24,12 +24,12 @@
       "_extends_": "Common_400_Response"
     },
     "body" : {
-      "exception" : "[[ANY]]",
-      "timestamp" : "[[ANY]]",
+      "exception" : "[[ANYTHING_PRESENT]]",
+      "timestamp" : "[[ANYTHING_PRESENT]]",
       "status" : 400,
       "error" : "Bad Request",
       "message" : "Invalid case role: [DEFENDANTS]",
-      "path" : "[[ANY]]",
+      "path" : "[[ANYTHING_PRESENT]]",
       "details" : null,
       "callbackErrors" : null,
       "callbackWarnings" : null
