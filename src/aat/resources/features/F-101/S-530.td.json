@@ -24,7 +24,7 @@
   },
   "expectedResponse": {
     "_extends_": "Common_403_Response",
-    "responseCode" : 403;
+    "responseCode" : 403,
     "headers" : {
       "Content-Encoding" : "gzip",
       "Content-Length" : "[[ANYTHING_PRESENT]]",
