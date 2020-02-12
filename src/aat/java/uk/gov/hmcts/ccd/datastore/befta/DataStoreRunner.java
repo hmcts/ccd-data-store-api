@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.datastore.cucumber;
+package uk.gov.hmcts.ccd.datastore.befta;
 
 import io.cucumber.junit.Cucumber;
 import io.cucumber.junit.CucumberOptions;
