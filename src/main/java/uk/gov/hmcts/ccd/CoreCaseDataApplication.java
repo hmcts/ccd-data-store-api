@@ -10,7 +10,6 @@ import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.time.Clock;
-import java.time.ZoneOffset;
 
 @SpringBootApplication
 @EnableTransactionManagement(proxyTargetClass = true)
@@ -39,7 +38,7 @@ public class CoreCaseDataApplication {
 
     @Bean
     public Clock uTCClock() {
-        return Clock.system(ZoneOffset.UTC);
+        return Clock.systemUTC();
     }
 
 }
