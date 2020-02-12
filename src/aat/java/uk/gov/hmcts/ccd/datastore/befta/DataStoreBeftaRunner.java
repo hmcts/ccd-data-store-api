@@ -15,7 +15,7 @@ public class DataStoreBeftaRunner {
 
     @BeforeClass
     public static void init() {
-        BeftaMain.tearUp();
+        BeftaMain.setUp();
     }
 
 }
