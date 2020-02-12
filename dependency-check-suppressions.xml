@@ -35,6 +35,90 @@
         <cve>CVE-2019-11358</cve>
         <cve>CVE-2015-9251</cve>
     </suppress>
+    <suppress>
+   <notes><![CDATA[
+   file name: spring-aspects-5.1.6.RELEASE.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.springframework/spring-aspects@.*$</packageUrl>
+   <cve>CVE-2020-5398</cve>
+</suppress>
+    <suppress>
+   <notes><![CDATA[
+   file name: spring-orm-5.1.6.RELEASE.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.springframework/spring-orm@.*$</packageUrl>
+   <cve>CVE-2020-5398</cve>
+</suppress>
+    <suppress>
+   <notes><![CDATA[
+   file name: spring-jdbc-5.1.6.RELEASE.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.springframework/spring-jdbc@.*$</packageUrl>
+   <cve>CVE-2020-5398</cve>
+</suppress>
+    <suppress>
+   <notes><![CDATA[
+   file name: spring-webmvc-5.1.6.RELEASE.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.springframework/spring-webmvc@.*$</packageUrl>
+   <cve>CVE-2020-5398</cve>
+</suppress>
+    <suppress>
+   <notes><![CDATA[
+   file name: spring-context-support-5.1.6.RELEASE.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.springframework/spring-context-support@.*$</packageUrl>
+   <cve>CVE-2020-5398</cve>
+</suppress>
+    <suppress>
+   <notes><![CDATA[
+   file name: spring-context-5.1.6.RELEASE.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.springframework/spring-context@.*$</packageUrl>
+   <cve>CVE-2020-5398</cve>
+</suppress>
+    <suppress>
+   <notes><![CDATA[
+   file name: spring-aop-5.1.6.RELEASE.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.springframework/spring-aop@.*$</packageUrl>
+   <cve>CVE-2020-5398</cve>
+</suppress>
+    <suppress>
+   <notes><![CDATA[
+   file name: spring-tx-5.1.6.RELEASE.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.springframework/spring-tx@.*$</packageUrl>
+   <cve>CVE-2020-5398</cve>
+</suppress>
+    <suppress>
+   <notes><![CDATA[
+   file name: spring-tx-5.1.6.RELEASE.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.springframework/spring-tx@.*$</packageUrl>
+   <cve>CVE-2020-5398</cve>
+</suppress>
+    <suppress>
+   <notes><![CDATA[
+   file name: spring-expression-5.1.6.RELEASE.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.springframework/spring-expression@.*$</packageUrl>
+   <cve>CVE-2020-5398</cve>
+</suppress>
+    <suppress>
+   <notes><![CDATA[
+   file name: spring-core-5.1.6.RELEASE.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.springframework/spring-core@.*$</packageUrl>
+   <cve>CVE-2020-5398</cve>
+</suppress>
+    <suppress>
+   <notes><![CDATA[
+   file name: spring-jcl-5.1.6.RELEASE.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.springframework/spring-jcl@.*$</packageUrl>
+   <cve>CVE-2020-5398</cve>
+</suppress>
     <!-- FIXME : RDM-7451 -->
     <suppress>
         <notes><![CDATA[
@@ -42,6 +126,12 @@
    ]]></notes>
         <cpe>cpe:/a:pivotal_software:spring_framework</cpe>
         <cve>CVE-2020-5398</cve>
+    </suppress>
+    <!-- FIXME : RDM-78578 -->
+    <suppress>
+        <notes>Temporary suppression for on-going developments</notes>
+        <cpe>cpe:2.3:a:checkstyle:checkstyle:*:*:*:*:*:*:*:*</cpe>
+        <cve>CVE-2019-10782</cve>
     </suppress>
 
 </suppressions>

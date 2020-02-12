@@ -11,24 +11,24 @@
     "headers": {
       "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.start-event-trigger.v2+json;charset=UTF-8",
       "Content-Encoding" : "gzip",
-      "Content-Length" : "[[ANY]]",
-      "Vary" : "[[ANY]]"
+      "Content-Length" : "[[ANYTHING_PRESENT]]",
+      "Vary" : "[[ANYTHING_PRESENT]]"
     },
     "body": {
-      "token": "[[ANY]]",
+      "token": "[[ANYTHING_PRESENT]]",
       "_links": {
         "self": {
-          "href": "[[ANY]]"
+          "href": "[[ANYTHING_PRESENT]]"
         }
       },
       "case_details": {
-        "id": "[[ANY]]",
+        "id": "[[ANYTHING_PRESENT]]",
         "jurisdiction": "AUTOTEST1",
         "state": "TODO",
         "version": 0,
         "case_type_id": "AAT_AUTH_15",
-        "created_date": "[[ANY]]",
-        "last_modified": "[[ANY]]",
+        "created_date": "[[ANYTHING_PRESENT]]",
+        "last_modified": "[[ANYTHING_PRESENT]]",
         "security_classification": "PUBLIC",
         "case_data": {
           "MoneyGBPField": "4200",
@@ -46,7 +46,7 @@
             "ComplexTextField": "Nested text",
             "ComplexFixedListField": "VALUE2"
           },
-          "DateTimeField": "[[ANY]]",
+          "DateTimeField": "[[ANYTHING_PRESENT]]",
           "PhoneUKField": "07123456789",
           "NumberField": "164528",
           "MultiSelectListField": [
@@ -60,11 +60,11 @@
           "TextAreaField": "Line1\nLine2",
           "CollectionField": [
             {
-              "id": "[[ANY]]",
+              "id": "[[ANYTHING_PRESENT]]",
               "value": "Alias 1"
             },
             {
-              "id": "[[ANY]]",
+              "id": "[[ANYTHING_PRESENT]]",
               "value": "Alias 2"
             }
           ]
@@ -96,11 +96,11 @@
           "CollectionField": {
             "value": [
               {
-                "id": "[[ANY]]",
+                "id": "[[ANYTHING_PRESENT]]",
                 "classification": "PUBLIC"
               },
               {
-                "id": "[[ANY]]",
+                "id": "[[ANYTHING_PRESENT]]",
                 "classification": "PUBLIC"
               }
             ],
@@ -139,11 +139,11 @@
           "CollectionField": {
             "value": [
               {
-                "id": "[[ANY]]",
+                "id": "[[ANYTHING_PRESENT]]",
                 "classification": "PUBLIC"
               },
               {
-                "id": "[[ANY]]",
+                "id": "[[ANYTHING_PRESENT]]",
                 "classification": "PUBLIC"
               }
             ],

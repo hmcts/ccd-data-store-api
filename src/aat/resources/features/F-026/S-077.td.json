@@ -21,7 +21,7 @@
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "body": {
-      "columns": "[[ANY]]",
+      "columns": "[[ANYTHING_PRESENT]]",
       "results": [],
       "result_error": null
     }

@@ -18,8 +18,8 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.hateoas.MediaTypes;
-import org.springframework.hateoas.ResourceSupport;
-import org.springframework.hateoas.mvc.TypeConstrainedMappingJackson2HttpMessageConverter;
+import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.mvc.TypeConstrainedMappingJackson2HttpMessageConverter;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
@@ -65,7 +65,7 @@ class HalConfigTest {
             when(restTemplateBean.getMessageConverters()).thenReturn(messageConverters);
             when(requestAdapterBean.getMessageConverters()).thenReturn(messageConverters);
 
-            when(halConverter.canWrite(ResourceSupport.class, MediaTypes.HAL_JSON)).thenReturn(true);
+            when(halConverter.canWrite(RepresentationModel.class, MediaTypes.HAL_JSON)).thenReturn(true);
 
             halProcessor = halConfig.halConverterPostProcessor();
         }
@@ -133,9 +133,8 @@ class HalConfigTest {
             verify(halConverter).setSupportedMediaTypes(mediaTypesCaptor.capture());
             final List<MediaType> mediaTypes = mediaTypesCaptor.getValue();
             assertAll(
-                () -> assertThat(mediaTypes, hasSize(6)),
+                () -> assertThat(mediaTypes, hasSize(5)),
                 () -> assertThat(mediaTypes, hasItem(MediaTypes.HAL_JSON)),
-                () -> assertThat(mediaTypes, hasItem(MediaTypes.HAL_JSON_UTF8)),
                 () -> assertThat(mediaTypes, hasItem(HalConfig.APPLICATION_HAL_JSON_EXTENDED)),
                 () -> assertThat(mediaTypes, hasItem(HalConfig.APPLICATION_HAL_JSON_EXTENDED_UTF8)),
                 () -> assertThat(mediaTypes, hasItem(HalConfig.APPLICATION_JSON_EXTENDED)),
