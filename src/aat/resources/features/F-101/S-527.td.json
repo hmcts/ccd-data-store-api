@@ -19,10 +19,8 @@
     }
   },
   "expectedResponse": {
+    "_extends_": "Common_400_Response"
     "responseCode": 400,
-    "headers": {
-      "_extends_": "Common_400_Response"
-    },
     "body" : {
       "exception" : "[[ANYTHING_PRESENT]]",
       "timestamp" : "[[ANYTHING_PRESENT]]",
