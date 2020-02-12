@@ -13,7 +13,7 @@ import uk.gov.hmcts.befta.DefaultTestAutomationAdapter;
 @CucumberOptions(plugin = "json:target/cucumber.json",
     glue = "uk.gov.hmcts.befta.player",
     features = {"classpath:features"})
-public class DataStoreRunner extends BeftaMain {
+public class DataStoreBeftaRunner extends BeftaMain {
 
     @BeforeClass
     public static void init() {
