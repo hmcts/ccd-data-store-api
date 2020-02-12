@@ -100,6 +100,7 @@ Feature: F-1001: Get case document metadata for a given caseId and documentId
     And the response [contains an empty list of permissions]
     And the response [contains no document id details]
     And the response has all other details as expected
+
   @S-1006
   Scenario: must return 403 when request provides without valid authorisation
     Given a case that has just been created as in [Befta_Jurisdiction2_Default_Full_Case_Creation_Data]
