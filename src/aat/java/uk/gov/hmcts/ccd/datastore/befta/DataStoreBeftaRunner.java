@@ -1,9 +1,11 @@
 package uk.gov.hmcts.ccd.datastore.befta;
 
-import io.cucumber.junit.Cucumber;
-import io.cucumber.junit.CucumberOptions;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
+
+import io.cucumber.junit.Cucumber;
+import io.cucumber.junit.CucumberOptions;
 import uk.gov.hmcts.befta.BeftaMain;
 
 
@@ -14,8 +16,13 @@ import uk.gov.hmcts.befta.BeftaMain;
 public class DataStoreBeftaRunner {
 
     @BeforeClass
-    public static void init() {
-        BeftaMain.tearUp();
+    public static void setUp() {
+        BeftaMain.setUp(new DataStoreTestAutomationAdapter());
+    }
+
+    @AfterClass
+    public static void tearDown() {
+        BeftaMain.tearDown();
     }
 
 }
