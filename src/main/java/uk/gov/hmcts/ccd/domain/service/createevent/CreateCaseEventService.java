@@ -88,7 +88,7 @@ public class CreateCaseEventService {
                                   final SecurityClassificationService securityClassificationService,
                                   final ValidateCaseFieldsOperation validateCaseFieldsOperation,
                                   final UserAuthorisation userAuthorisation,
-                                  @Qualifier("uTCClock") final Clock clock) {
+                                  @Qualifier("utcClock") final Clock clock) {
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;

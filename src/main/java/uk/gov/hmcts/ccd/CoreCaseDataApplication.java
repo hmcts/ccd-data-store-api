@@ -37,7 +37,7 @@ public class CoreCaseDataApplication {
     }
 
     @Bean
-    public Clock uTCClock() {
+    public Clock utcClock() {
         return Clock.systemUTC();
     }
 
