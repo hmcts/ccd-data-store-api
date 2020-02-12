@@ -10,7 +10,8 @@
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "headers": {
-      "Transfer-Encoding": "chunked"
+      "Transfer-Encoding": "chunked",
+      "Content-Length": "[[ANY_INTEGER_NULLABLE]]"
     },
     "body": {
       "id": "CREATE",
@@ -348,18 +349,18 @@
             "regular_expression": null,
             "fixed_list_items": [
               {
-                "code": "[[ANY]]",
-                "label": "[[ANY]]",
+                "code": "[[ANYTHING_PRESENT]]",
+                "label": "[[ANYTHING_PRESENT]]",
                 "order": null
               },
               {
-                "code": "[[ANY]]",
-                "label": "[[ANY]]",
+                "code": "[[ANYTHING_PRESENT]]",
+                "label": "[[ANYTHING_PRESENT]]",
                 "order": null
               },
               {
-                "code": "[[ANY]]",
-                "label": "[[ANY]]",
+                "code": "[[ANYTHING_PRESENT]]",
+                "label": "[[ANYTHING_PRESENT]]",
                 "order": null
               }
             ],
@@ -399,28 +400,28 @@
             "regular_expression": null,
             "fixed_list_items": [
               {
-                "code": "[[ANY]]",
-                "label": "[[ANY]]",
+                "code": "[[ANYTHING_PRESENT]]",
+                "label": "[[ANYTHING_PRESENT]]",
                 "order": null
               },
               {
-                "code": "[[ANY]]",
-                "label": "[[ANY]]",
+                "code": "[[ANYTHING_PRESENT]]",
+                "label": "[[ANYTHING_PRESENT]]",
                 "order": null
               },
               {
-                "code": "[[ANY]]",
-                "label": "[[ANY]]",
+                "code": "[[ANYTHING_PRESENT]]",
+                "label": "[[ANYTHING_PRESENT]]",
                 "order": null
               },
               {
-                "code": "[[ANY]]",
-                "label": "[[ANY]]",
+                "code": "[[ANYTHING_PRESENT]]",
+                "label": "[[ANYTHING_PRESENT]]",
                 "order": null
               },
               {
-                "code": "[[ANY]]",
-                "label": "[[ANY]]",
+                "code": "[[ANYTHING_PRESENT]]",
+                "label": "[[ANYTHING_PRESENT]]",
                 "order": null
               }
             ],
@@ -453,7 +454,7 @@
           "metadata": false,
           "hint_text": "Zero to many items, here of type `Text`",
           "field_type": {
-            "id": "[[ANY]]",
+            "id": "[[ANYTHING_PRESENT]]",
             "type": "Collection",
             "min": null,
             "max": null,
@@ -555,18 +556,18 @@
                   "regular_expression": null,
                   "fixed_list_items": [
                     {
-                      "code": "[[ANY]]",
-                      "label": "[[ANY]]",
+                      "code": "[[ANYTHING_PRESENT]]",
+                      "label": "[[ANYTHING_PRESENT]]",
                       "order": null
                     },
                     {
-                      "code": "[[ANY]]",
-                      "label": "[[ANY]]",
+                      "code": "[[ANYTHING_PRESENT]]",
+                      "label": "[[ANYTHING_PRESENT]]",
                       "order": null
                     },
                     {
-                      "code": "[[ANY]]",
-                      "label": "[[ANY]]",
+                      "code": "[[ANYTHING_PRESENT]]",
+                      "label": "[[ANYTHING_PRESENT]]",
                       "order": null
                     }
                   ],
@@ -649,7 +650,7 @@
                       "case_type_id": null,
                       "hint_text": null,
                       "field_type": {
-                        "id": "[[ANY]]",
+                        "id": "[[ANYTHING_PRESENT]]",
                         "type": "Collection",
                         "min": null,
                         "max": null,
@@ -1085,40 +1086,40 @@
           ]
         }
       ],
-      "event_token": "[[ANY]]",
+      "event_token": "[[ANYTHING_PRESENT]]",
       "wizard_pages": [
         {
           "id": "CREATEfirst",
           "label": "First page",
-          "order": "[[ANY]]",
+          "order": "[[ANYTHING_PRESENT]]",
           "wizard_page_fields": [
             {
               "case_field_id": "TextField",
-              "order": "[[ANY]]",
+              "order": "[[ANYTHING_PRESENT]]",
               "page_column_no": null,
               "complex_field_overrides": []
             },
             {
               "case_field_id": "NumberField",
-              "order": "[[ANY]]",
+              "order": "[[ANYTHING_PRESENT]]",
               "page_column_no": null,
               "complex_field_overrides": []
             },
             {
               "case_field_id": "YesOrNoField",
-              "order": "[[ANY]]",
+              "order": "[[ANYTHING_PRESENT]]",
               "page_column_no": null,
               "complex_field_overrides": []
             },
             {
               "case_field_id": "PhoneUKField",
-              "order": "[[ANY]]",
+              "order": "[[ANYTHING_PRESENT]]",
               "page_column_no": null,
               "complex_field_overrides": []
             },
             {
               "case_field_id": "EmailField",
-              "order": "[[ANY]]",
+              "order": "[[ANYTHING_PRESENT]]",
               "page_column_no": null,
               "complex_field_overrides": []
             }
@@ -1130,47 +1131,47 @@
         {
           "id": "CREATEsecond",
           "label": "Second page",
-          "order": "[[ANY]]",
+          "order": "[[ANYTHING_PRESENT]]",
           "wizard_page_fields": [
             {
               "case_field_id": "MoneyGBPField",
-              "order": "[[ANY]]",
+              "order": "[[ANYTHING_PRESENT]]",
               "page_column_no": null,
               "complex_field_overrides": []
             },
             {
               "case_field_id": "DateField",
-              "order": "[[ANY]]",
+              "order": "[[ANYTHING_PRESENT]]",
               "page_column_no": null,
               "complex_field_overrides": []
             },
             {
               "case_field_id": "DateTimeField",
-              "order": "[[ANY]]",
+              "order": "[[ANYTHING_PRESENT]]",
               "page_column_no": null,
               "complex_field_overrides": []
             },
             {
               "case_field_id": "TextAreaField",
-              "order": "[[ANY]]",
+              "order": "[[ANYTHING_PRESENT]]",
               "page_column_no": null,
               "complex_field_overrides": []
             },
             {
               "case_field_id": "FixedListField",
-              "order": "[[ANY]]",
+              "order": "[[ANYTHING_PRESENT]]",
               "page_column_no": null,
               "complex_field_overrides": []
             },
             {
               "case_field_id": "MultiSelectListField",
-              "order": "[[ANY]]",
+              "order": "[[ANYTHING_PRESENT]]",
               "page_column_no": null,
               "complex_field_overrides": []
             },
             {
               "case_field_id": "FixedRadioListField",
-              "order": "[[ANY]]",
+              "order": "[[ANYTHING_PRESENT]]",
               "page_column_no": null,
               "complex_field_overrides": []
             }
@@ -1182,29 +1183,29 @@
         {
           "id": "CREATEthird",
           "label": "Third page",
-          "order": "[[ANY]]",
+          "order": "[[ANYTHING_PRESENT]]",
           "wizard_page_fields": [
             {
-              "case_field_id": "[[ANY]]",
-              "order": "[[ANY]]",
+              "case_field_id": "[[ANYTHING_PRESENT]]",
+              "order": "[[ANYTHING_PRESENT]]",
               "page_column_no": null,
               "complex_field_overrides": []
             },
             {
               "case_field_id": "ComplexField",
-              "order": "[[ANY]]",
+              "order": "[[ANYTHING_PRESENT]]",
               "page_column_no": null,
               "complex_field_overrides": []
             },
             {
               "case_field_id": "AddressUKField",
-              "order": "[[ANY]]",
+              "order": "[[ANYTHING_PRESENT]]",
               "page_column_no": null,
               "complex_field_overrides": []
             },
             {
               "case_field_id": "DocumentField",
-              "order": "[[ANY]]",
+              "order": "[[ANYTHING_PRESENT]]",
               "page_column_no": null,
               "complex_field_overrides": []
             }

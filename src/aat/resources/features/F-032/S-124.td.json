@@ -15,7 +15,7 @@
     "body": {
       "arrayInMap": [
         {
-          "url": "[[ANY]]",
+          "url": "[[ANYTHING_PRESENT]]",
           "name": "CCD Print",
           "type": "CCD Print Type",
           "description": "Printing for CCD"
@@ -24,8 +24,8 @@
     },
     "data" : {
       "DocumentField" : {
-        "document_url" : "[[ANY]]",
-        "document_binary_url" : "[[ANY]]"
+        "document_url" : "[[ANYTHING_PRESENT]]",
+        "document_binary_url" : "[[ANYTHING_PRESENT]]"
       }
     }
   }

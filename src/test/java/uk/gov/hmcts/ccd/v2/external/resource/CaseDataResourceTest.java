@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.v2.external.resource;
 
 import java.util.Map;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -13,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.hateoas.Link;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 
 @DisplayName("CaseDataResource")
@@ -48,7 +50,8 @@ class CaseDataResourceTest {
     void shouldLinkToSelf() {
         final CaseDataResource uiStartTriggerResource = new CaseDataResource(CASE_DATA_CONTENT, CASE_TYPE_ID, PAGE_ID);
 
-        assertThat(uiStartTriggerResource.getLink("self").getHref(), equalTo(linkSelfForCaseData));
+        Optional<Link> self = uiStartTriggerResource.getLink("self");
+        assertThat(self.get().getHref(), equalTo(linkSelfForCaseData));
     }
 
 }

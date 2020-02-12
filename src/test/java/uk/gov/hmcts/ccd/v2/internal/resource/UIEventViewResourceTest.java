@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.v2.internal.resource;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.hateoas.Link;
 import uk.gov.hmcts.ccd.domain.model.aggregated.*;
 
 class UIEventViewResourceTest {
@@ -59,7 +61,8 @@ class UIEventViewResourceTest {
     void shouldLinkToSelf() {
         final UIEventViewResource resource = new UIEventViewResource(caseHistoryView, REFERENCE);
 
-        assertThat(resource.getLink("self").getHref(), equalTo(LINK_SELF));
+        Optional<Link> self = resource.getLink("self");
+        assertThat(self.get().getHref(), equalTo(LINK_SELF));
     }
 
     private CaseViewEvent newCaseViewEvent() {

@@ -5,7 +5,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.hateoas.hal.Jackson2HalModule;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.mediatype.hal.Jackson2HalModule;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -24,6 +25,7 @@ import uk.gov.hmcts.ccd.v2.external.resource.DocumentsResource;
 import javax.inject.Inject;
 import javax.sql.DataSource;
 import java.util.List;
+import java.util.Optional;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
@@ -132,9 +134,10 @@ public class DocumentControllerITest extends WireMockBaseTest {
 
         final DocumentsResource documentsResource = mapper.readValue(result.getResponse().getContentAsString(), DocumentsResource.class);
         List<Document> documentResources = documentsResource.getDocumentResources();
+        Optional<Link> self = documentsResource.getLink("self");
 
         assertAll(
-            () -> assertThat(documentsResource.getLink("self").getHref(), is(String.format("http://localhost:%s/cases/1504259907353529/documents", super.wiremockPort))),
+            () -> assertThat(self.get().getHref(), is(String.format("http://localhost:%s/cases/1504259907353529/documents", super.wiremockPort))),
             () -> assertThat(documentResources, hasItems(allOf(hasProperty("name", is("Claimant ID")),
                                                                hasProperty("description", is("Document identifying identity")),
                                                                hasProperty("type", is("ID")),

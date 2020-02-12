@@ -8,8 +8,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.hateoas.Link;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventTrigger;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+
+import java.util.Optional;
 
 @DisplayName("CaseResource")
 class StartTriggerResourceTest {
@@ -60,7 +63,8 @@ class StartTriggerResourceTest {
         void shouldLinkToSelf() {
             final StartTriggerResource startTriggerResource = new StartTriggerResource(startEventTrigger, ignoreWarning, false);
 
-            assertThat(startTriggerResource.getLink("self").getHref(), equalTo(LINK_SELF_FOR_CASE));
+            Optional<Link> self = startTriggerResource.getLink("self");
+            assertThat(self.get().getHref(), equalTo(LINK_SELF_FOR_CASE));
         }
     }
 
@@ -96,7 +100,8 @@ class StartTriggerResourceTest {
         void shouldLinkToSelf() {
             final StartTriggerResource startTriggerResource = new StartTriggerResource(startEventTrigger, ignoreWarning, true);
 
-            assertThat(startTriggerResource.getLink("self").getHref(), equalTo(LINK_SELF_FOR_EVENT));
+            Optional<Link> self = startTriggerResource.getLink("self");
+            assertThat(self.get().getHref(), equalTo(LINK_SELF_FOR_EVENT));
         }
     }
 }
