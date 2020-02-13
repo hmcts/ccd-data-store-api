@@ -1,0 +1,42 @@
+{
+	"title": "must return 400 error response for invalid case role",
+	"_guid_": "S-527",
+  "productName": "CCD Data Store",
+  "operationName": "Grant access to a case",
+	"_extends_": "F-101_Test_Data_Base",
+
+	"specs": [
+		"an active solicitor profile in CCD",
+    "another active solicitor profile in CCD",
+    "uses a case role that is not valid",
+		"has the 400 return code"
+	],
+  "request": {
+    "body": {
+      "case_roles": [
+        "[DEFENDANTS]"
+      ]
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_400_Response",
+    "responseCode": 400,
+    "headers" : {
+      "Cache-Control": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "[[ANYTHING_PRESENT]]",
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Type": "[[ANYTHING_PRESENT]]"
+    },
+    "body" : {
+      "exception" : "[[ANYTHING_PRESENT]]",
+      "timestamp" : "[[ANYTHING_PRESENT]]",
+      "status" : 400,
+      "error" : "Bad Request",
+      "message" : "Invalid case role: [DEFENDANTS]",
+      "path" : "[[ANYTHING_PRESENT]]",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}
