@@ -1,5 +1,5 @@
 {
-  "title": "must return 415 when request provides content type is application/xml",
+  "title": "must return 415 when request provides content type other than application/json",
 
   "_guid_": "S-1009",
   "_extends_": "F-1001_Test_Data_Base",

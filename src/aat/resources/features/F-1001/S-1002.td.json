@@ -1,11 +1,17 @@
 {
+  "title": "must receive an empty list of permissions in response when Solicitor user doesn't have any access",
+
   "_guid_": "S-1002",
   "_extends_": "F-1001_Test_Data_Base",
-  "title": "must receive an error response when user doesn't have READ permission",
+
   "specs": [
-    "an active profile in CCD with no READ access to a document",
+    "an active Solicitor profile in CCD with a specific variation of ACLs on a case type",
+    "an active solicitor profile with another specific variation of ACLs on the same case type",
+    "an active Solicitor profile having full permissions on the same case type",
     "has the case id just created where a document id is associated",
-    "contains an HTTP 404 status code"
+    "contains active Solicitor profile who does not have any access",
+    "contains an HTTP 200 OK status code",
+    "contains the document metadata and an empty list of permissions"
   ],
 
   "request": {
@@ -15,13 +21,29 @@
   },
 
   "expectedResponse": {
-    "_extends_": "Common_404_Response",
+    "_extends_": "Common_200_Response",
     "body": {
-      "ResponseCode": "404",
-      "status": "RESOURCE_NOT_FOUND",
+      "ResponseCode": "200",
+      "status": "OK",
       "timeStamp": "[[ANYTHING_PRESENT]]",
-      "errorMessage": "Resource Not found",
-      "errorDescription": "The request document is not found"
+      "ResponseBody": {
+        "caseDocumentMetadata": {
+          "caseId": "1234567890123456",
+          "caseTypeId": "123",
+          "jurisdictionId": "BEFTA2",
+          "documents": [
+            {
+              "url": "http://dm-store-aat.service.core-compute-aat.internal/documents/e56f0aea-4a5f-46d5-82d3-01b536420870",
+              "name": "Screenshot 2019-11-14 at 1.57.32 pm.png",
+              "type": "png",
+              "description": "sample",
+              "id": "e56f0aea-4a5f-46d5-82d3-01b536420870",
+              "hasedtoken": null,
+              "permissions": {}
+            }
+          ]
+        }
+      }
     }
   }
 }

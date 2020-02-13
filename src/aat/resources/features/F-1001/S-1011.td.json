@@ -1,17 +1,21 @@
 {
-  "title": "must receive a document metadata and list of permissions for a valid Solicitor",
+  "title": "must receive an empty list of permissions when Citizen user doesn't have any access",
 
-  "_guid_": "S-1001",
+  "_guid_": "S-1011",
   "_extends_": "F-1001_Test_Data_Base",
 
   "specs": [
-    "an active Solicitor profile in CCD with a specific variation of ACLs on a case type",
-    "an active solicitor profile with another specific variation of ACLs on the same case type",
-    "an active Solicitor profile having full permissions on the same case type",
+    "an active Citizen profile in CCD with no access to a document",
     "has the case id just created where a document id is associated",
     "contains an HTTP 200 OK status code",
-    "contains the document metadata and list of permissions"
+    "contains the document metadata and an empty list of permissions"
   ],
+
+  "request": {
+    "pathVariables": {
+      "docId": "76976634-374f-472b-a819-a3a938b4cc83"
+    }
+  },
 
   "expectedResponse": {
     "_extends_": "Common_200_Response",
@@ -32,7 +36,7 @@
               "description": "sample",
               "id": "e56f0aea-4a5f-46d5-82d3-01b536420870",
               "hasedtoken": null,
-              "permissions": "{C,R,U}"
+              "permissions": {}
             }
           ]
         }

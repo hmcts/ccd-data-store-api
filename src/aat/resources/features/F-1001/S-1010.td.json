@@ -1,13 +1,11 @@
 {
-  "title": "must receive a document metadata and list of permissions for a valid Solicitor",
+  "title": "must receive a document metadata and list of permissions for a valid Citizen user",
 
-  "_guid_": "S-1001",
+  "_guid_": "S-1010",
   "_extends_": "F-1001_Test_Data_Base",
-
+  
   "specs": [
-    "an active Solicitor profile in CCD with a specific variation of ACLs on a case type",
-    "an active solicitor profile with another specific variation of ACLs on the same case type",
-    "an active Solicitor profile having full permissions on the same case type",
+    "an active Citizen profile in CCD with access to a document",
     "has the case id just created where a document id is associated",
     "contains an HTTP 200 OK status code",
     "contains the document metadata and list of permissions"

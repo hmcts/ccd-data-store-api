@@ -1,0 +1,29 @@
+{
+  "title": "must return 401 when request provides expired s2s serviceAuthorisation",
+
+  "_guid_": "S-1012",
+  "_extends_": "F-1001_Test_Data_Base",
+
+  "specs": [
+    "an active profile in CCD with READ access to a document",
+    "has the case id just created where a document id is associated",
+    "contains an expired s2s serviceAuthorisation token",
+    "contains an HTTP 401 Unauthorised"
+  ],
+
+  "request": {
+    "headers": {
+      "ServiceAuthorization": "expiredServiceAuthorizationTokenToBeUpdated"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_401_Response",
+    "body": {
+      "ResponseCode": "401",
+      "status": "Unauthorised",
+      "timeStamp": "[[ANYTHING_PRESENT]]",
+      "errorMessage": "Unauthorised"
+    }
+  }
+}
