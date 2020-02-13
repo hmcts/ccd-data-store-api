@@ -38,7 +38,6 @@
       "Content-Length": "[[ANYTHING_PRESENT]]",
       "Content-Encoding": "gzip",
       "Content-Type": "application/json"
-
     }
   }
 }
