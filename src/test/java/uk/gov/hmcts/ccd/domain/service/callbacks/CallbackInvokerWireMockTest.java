@@ -89,7 +89,7 @@ public class CallbackInvokerWireMockTest {
         WireMock.resetAllRequests();
     }
 
-    // @Test FIXME: flakey one need some investigation - RDM-7504
+    @Test
     public void shouldRetryOnErrorWithIgnoreWarningFalseAndDefaultRetryContext() throws Exception {
 
         stubFor(post(urlMatching("/test-callbackGrrrr.*"))
