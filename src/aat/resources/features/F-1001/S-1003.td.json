@@ -1,5 +1,5 @@
 {
-  "title": "must receive an error response when document id is not exist",
+  "title": "must receive an error response when document id does not exist",
 
   "_guid_": "S-1003",
   "_extends_": "F-1001_Test_Data_Base",

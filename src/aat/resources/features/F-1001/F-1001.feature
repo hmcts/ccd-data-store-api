@@ -62,7 +62,7 @@ Feature: F-1001: Get case document metadata for a given caseId and documentId
     And the response has all other details as expected
 
   @S-1003
-  Scenario: must receive an error response when document id is not exist
+  Scenario: must receive an error response when document id does not exist
     Given a case that has just been created as in [Befta_Jurisdiction2_Default_Full_Case_Creation_Data]
     And a user with [an active profile in CCD]
     When a request is prepared with appropriate values
@@ -86,7 +86,7 @@ Feature: F-1001: Get case document metadata for a given caseId and documentId
     And the response has all other details as expected
 
   @S-1005
-  Scenario: must receive an error response when case id is not exist
+  Scenario: must receive an error response when case id does not exist
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
     And the request [has a case id which does not exist]

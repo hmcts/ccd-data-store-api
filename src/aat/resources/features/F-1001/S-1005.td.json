@@ -1,5 +1,5 @@
 {
-  "title": "must receive an error response when case id is not exist",
+  "title": "must receive an error response when case id does not exist",
 
   "_guid_": "S-1005",
   "_extends_": "F-1001_Test_Data_Base",
