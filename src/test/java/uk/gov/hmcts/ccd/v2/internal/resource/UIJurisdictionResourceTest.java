@@ -1,8 +1,10 @@
 package uk.gov.hmcts.ccd.v2.internal.resource;
 
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.hateoas.Link;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -38,8 +40,9 @@ class UIJurisdictionResourceTest {
     @DisplayName("should link to itself")
     void shouldLinkToSelf() {
         final UIJurisdictionResource resource = new UIJurisdictionResource(this.displayProperties, ACCESS);
+        Optional<Link> link = resource.getLink("self");
 
-        assertThat(resource.getLink("self").getHref(), equalTo(LINK_SELF));
+        assertThat(link.get().getHref(), equalTo(LINK_SELF));
     }
 
 }
