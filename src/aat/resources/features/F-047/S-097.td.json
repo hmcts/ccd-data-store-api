@@ -9,7 +9,7 @@
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "body": {
-      "arrayInMap": "[[ANY]]"
+      "arrayInMap": "[[ANYTHING_PRESENT]]"
     }
   }
 }

@@ -11,7 +11,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
+import org.springframework.hateoas.Link;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
+
+import java.util.Optional;
 
 class UIDraftResourceTest {
     private static final String CASE_TYPE_ID = "caseTypeId";
@@ -38,7 +41,9 @@ class UIDraftResourceTest {
     void shouldLinkToSelf() {
         final UIDraftResource resource = new UIDraftResource(draftResponse, CASE_TYPE_ID);
 
-        assertThat(resource.getLink("self").getHref(), equalTo(LINK_SELF));
+        Optional<Link> self = resource.getLink("self");
+
+        assertThat(self.get().getHref(), equalTo(LINK_SELF));
     }
 
 }

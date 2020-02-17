@@ -23,10 +23,10 @@
     "body": {
       "_links": {
         "self": {
-          "href": "[[ANY]]"
+          "href": "[[ANYTHING_PRESENT]]"
         }
       },
-      "case_id": "[[ANY]]",
+      "case_id": "[[ANYTHING_PRESENT]]",
       "case_type": {
         "id": "AAT_AUTH_15",
         "name": "Demo case AAT_AUTH_15",
@@ -38,11 +38,11 @@
         },
         "printEnabled": false
       },
-      "tabs": "[[ANY]]",
-      "metadataFields": "[[ANY]]",
-      "state": "[[ANY]]",
-      "triggers": "[[ANY]]",
-      "events": "[[ANY]]"
+      "tabs": "[[ANYTHING_PRESENT]]",
+      "metadataFields": "[[ANYTHING_PRESENT]]",
+      "state": "[[ANYTHING_PRESENT]]",
+      "triggers": "[[ANYTHING_PRESENT]]",
+      "events": "[[ANYTHING_PRESENT]]"
     }
   }
 }

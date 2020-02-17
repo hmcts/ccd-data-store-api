@@ -16,14 +16,13 @@
   "expectedResponse": {
     "_extends_": "Common_400_Response",
     "headers": {
-      "_extends_": "Common_400_Response_Headers",
-      "Connection": "[[ANY]]"
+      "_extends_": "Common_400_Response_Headers"
     },
     "body": {
       "_extends_": "Common_400_Response_Body",
       "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
       "message": "Access can only be 'create', 'read' or 'update'",
-      "path": "[[ANY]]",
+      "path": "[[ANYTHING_PRESENT]]",
       "details": null,
       "callbackErrors": null,
       "callbackWarnings": null

@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.definition.BannersResult;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigResult;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
 import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputDefinition;
 
@@ -41,5 +42,13 @@ public class HttpUIDefinitionGatewayTest extends WireMockBaseTest {
         List<String> jurisdictionIds = Lists.newArrayList("PROBATE", "DIVORCE");
         final BannersResult bannersResult = httpUIDefinitionGateway.getBanners(jurisdictionIds);
         assertThat(bannersResult.getBanners().size(), is(2));
+    }
+
+    @Test
+    @DisplayName("should Return jurisdiction UI configs")
+    public void shouldReturnJurisdictionUiConfigs() {
+        List<String> jurisdictionIds = Lists.newArrayList("PROBATE", "DIVORCE");
+        final JurisdictionUiConfigResult configResult = httpUIDefinitionGateway.getJurisdictionUiConfigs(jurisdictionIds);
+        assertThat(configResult.getConfigs().size(), is(2));
     }
 }

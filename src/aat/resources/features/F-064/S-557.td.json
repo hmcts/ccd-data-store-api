@@ -18,8 +18,8 @@
       "Content-Encoding" : "gzip"
     },
     "body" : {
-      "exception" : "[[ANY]]",
-      "message" : "Resource not found when getting case type version for !@@£ $%%^^  &&  # € because of 404 ",
+      "exception" : "[[ANYTHING_PRESENT]]",
+      "message" : "Resource not found when getting case type version for '!@@£ $%%^^  &&  # € because of 404'.",
       "details" : null,
       "callbackErrors" : null,
       "callbackWarnings" : null

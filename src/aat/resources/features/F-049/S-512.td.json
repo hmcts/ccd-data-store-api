@@ -16,11 +16,11 @@
 		"_extends_": "Common_404_Response",
 		"headers": {
 			"Content-Encoding": "gzip",
-			"Content-Type": "application/json;charset=UTF-8"
+			"Content-Type": "application/json"
 		},
 		"body": {
 			"exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
-			"message": "Resource not found when getting case type version for Dummy because of 404 Not Found",
+			"message": "Resource not found when getting case type version for 'Dummy'.",
 			"details": null,
 			"callbackErrors": null,
 			"callbackWarnings": null

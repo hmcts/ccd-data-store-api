@@ -2,7 +2,7 @@ package uk.gov.hmcts.ccd.v2.internal.resource;
 
 import java.util.List;
 
-import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.RepresentationModel;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -13,7 +13,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfig;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class UIJurisdictionConfigResource extends ResourceSupport {
+public class UIJurisdictionConfigResource extends RepresentationModel {
 
     private List<JurisdictionUiConfig> configs;
 

@@ -22,7 +22,7 @@
 		},
 		"body": {
 			"exception": "uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException",
-			"message": "[[ANY]]",
+			"message": "[[ANYTHING_PRESENT]]",
 			"details": null,
 			"callbackErrors": null,
 			"callbackWarnings": null
