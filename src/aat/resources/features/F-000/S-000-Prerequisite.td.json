@@ -36,7 +36,8 @@
       "Pragma" : "[[ANYTHING_PRESENT]]",
       "Date" : "[[ANYTHING_PRESENT]]",
       "Content-Type" : "[[ANYTHING_PRESENT]]",
-      "Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]",
+      "Content-Length": "[[ANY_INTEGER_NULLABLE]]",
+      "Transfer-Encoding": "[[ANY_STRING_NULLABLE]]",
       "Strict-Transport-Security": "max-age=31536000 ; includeSubDomains"
     },
     "body": {

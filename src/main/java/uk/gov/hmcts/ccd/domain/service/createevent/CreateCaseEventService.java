@@ -131,8 +131,9 @@ public class CreateCaseEventService {
             newState = aboutToSubmitCallbackResponse.getState();
 
         validateCaseFieldsOperation.validateData(caseDetails.getData(), caseType);
-        final CaseDetails savedCaseDetails = saveCaseDetails(caseDetailsBefore, caseDetails, eventTrigger, newState);
-        saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse, content.getEvent(), eventTrigger, savedCaseDetails, caseType);
+        LocalDateTime timeNow = now();
+        final CaseDetails savedCaseDetails = saveCaseDetails(caseDetailsBefore, caseDetails, eventTrigger, newState, timeNow);
+        saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse, content.getEvent(), eventTrigger, savedCaseDetails, caseType, timeNow);
 
         return CreateCaseEventResult.caseEventWith()
             .caseDetailsBefore(caseDetailsBefore)
@@ -173,12 +174,12 @@ public class CreateCaseEventService {
 
     private CaseDetails saveCaseDetails(CaseDetails caseDetailsBefore, final CaseDetails caseDetails,
                                         final CaseEvent eventTrigger,
-                                        final Optional<String> state) {
+                                        final Optional<String> state, LocalDateTime timeNow) {
         if (!state.isPresent() && !equalsIgnoreCase(CaseState.ANY, eventTrigger.getPostState())) {
             caseDetails.setState(eventTrigger.getPostState());
         }
         if (!caseDetails.getState().equalsIgnoreCase(caseDetailsBefore.getState())) {
-            caseDetails.setLastStateModifiedDate(now());
+            caseDetails.setLastStateModifiedDate(timeNow);
         }
         return caseDetailsRepository.set(caseDetails);
     }
@@ -208,7 +209,7 @@ public class CreateCaseEventService {
                                               final Event event,
                                               final CaseEvent eventTrigger,
                                               final CaseDetails caseDetails,
-                                              final CaseType caseType) {
+                                              final CaseType caseType, LocalDateTime timeNow) {
         final IdamUser user = userRepository.getUser();
         final CaseState caseState = caseTypeService.findState(caseType, caseDetails.getState());
         final AuditEvent auditEvent = new AuditEvent();
@@ -226,7 +227,7 @@ public class CreateCaseEventService {
         auditEvent.setUserId(user.getId());
         auditEvent.setUserLastName(user.getSurname());
         auditEvent.setUserFirstName(user.getForename());
-        auditEvent.setCreatedDate(now());
+        auditEvent.setCreatedDate(timeNow);
         auditEvent.setSecurityClassification(securityClassificationService.getClassificationForEvent(caseType, eventTrigger));
         auditEvent.setDataClassification(caseDetails.getDataClassification());
         auditEvent.setSignificantItem(aboutToSubmitCallbackResponse.getSignificantItem());
