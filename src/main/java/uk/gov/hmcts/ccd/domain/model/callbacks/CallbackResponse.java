@@ -3,9 +3,9 @@ package uk.gov.hmcts.ccd.domain.model.callbacks;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.base.Strings;
 import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import org.elasticsearch.common.Strings;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 
 import java.util.Collections;
