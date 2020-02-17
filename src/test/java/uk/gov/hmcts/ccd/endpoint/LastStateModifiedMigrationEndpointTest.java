@@ -61,7 +61,7 @@ public class LastStateModifiedMigrationEndpointTest extends WireMockBaseTest {
         List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
         assertThat(caseDetailsList).filteredOn(c -> c.getLastStateModifiedDate() == null).size().isEqualTo(2);
 
-        final MvcResult mvcResult = mockMvc.perform(post("/last-state-modified/migrate?jurisdiction=PROBATE")
+        final MvcResult mvcResult = mockMvc.perform(post("/last-state-modified/migrate?jurisdiction=PROBATE&dryRun=false")
             .contentType(JSON_CONTENT_TYPE))
             .andExpect(status().is(200))
             .andReturn();

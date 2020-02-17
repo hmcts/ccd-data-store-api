@@ -18,8 +18,8 @@ public class LastStateModifiedMigrationEndpoint {
 
     @PostMapping(value = "/last-state-modified/migrate")
     public void migrate(@RequestParam(value = "jurisdiction") final String jurisdiction,
-                                           @RequestParam(value = "batchSize", required = false, defaultValue = "5000") final int batchSize,
-                                           @RequestParam(value = "dryRun", required = false, defaultValue = "false") final boolean dryRun) {
+                                           @RequestParam(value = "batchSize", required = false, defaultValue = "2000") final int batchSize,
+                                           @RequestParam(value = "dryRun", required = false, defaultValue = "true") final boolean dryRun) {
         service.migrate(jurisdiction, batchSize, dryRun);
     }
 }
