@@ -1,11 +1,12 @@
 package uk.gov.hmcts.ccd.datastore.befta;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.ResourceUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,6 +22,8 @@ import uk.gov.hmcts.befta.exception.FunctionalTestException;
 public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter {
 
     private Logger logger = LoggerFactory.getLogger(DataStoreTestAutomationAdapter.class);
+
+    private static final File TEMP_FILE = new File("___temp___.temp");
 
     private static final String[] TEST_DEFINITIONS_NEEDED_FOR_TA = {
             "uk/gov/hmcts/befta/dse/ccd/definitions/CCD_CNP_27.xlsx",
@@ -100,15 +103,17 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
                 logger.info("Imported {}.\n\n", fileName);
             } catch (Exception e) {
                 logger.error("Couldn't import {} - Exception: {}.\n\n", fileName, e);
+            } finally {
+                TEMP_FILE.delete();
             }
         }
     }
 
     private void importDefinition(String fileName) throws IOException {
-        File file = ResourceUtils.getFile("classpath:" + fileName);
-        // InputStream stream =
-        // getClass().getClassLoader().getResource(fileName).openStream();
-        Response response = asAutoTestImporter().given().multiPart(file).when().post("/import");
+        InputStream stream = getClass().getClassLoader().getResource(fileName).openStream();
+        FileUtils.copyInputStreamToFile(stream, TEMP_FILE);
+        Response response = asAutoTestImporter().given().multiPart(TEMP_FILE).when().post("/import");
+
         if (response.getStatusCode() != 201) {
             String message = "Import failed with response body: " + response.body().prettyPrint();
             message += "\nand http code: " + response.statusCode();
