@@ -14,3 +14,4 @@ database_sku_capacity = "8"
 definition_cache_latest_version_ttl_sec = 30
 definition_cache_jurisdiction_ttl_sec = 30
 enable_ase = true
+http_client_validate_after_inactivity = 2000
