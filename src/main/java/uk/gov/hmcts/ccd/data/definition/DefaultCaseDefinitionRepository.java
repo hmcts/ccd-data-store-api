@@ -167,7 +167,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
 
     public CaseTypeDefinitionVersion getLatestVersionFromDefinitionStore(String caseTypeId) {
         try {
-            final HttpEntity requestEntity = new HttpEntity<CaseType>(securityUtils.authorizationHeaders());
+            final HttpEntity<CaseType> requestEntity = new HttpEntity<>(securityUtils.authorizationHeaders());
             CaseTypeDefinitionVersion version = restTemplate.exchange(applicationParams.caseTypeLatestVersionUrl(caseTypeId),
                     HttpMethod.GET, requestEntity, CaseTypeDefinitionVersion.class).getBody();
             LOG.debug("retrieved latest version for case type: {}: {}", caseTypeId, version);
@@ -176,9 +176,10 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         } catch (Exception e) {
             LOG.warn("Error while retrieving case type version", e);
             if (e instanceof HttpClientErrorException && ((HttpClientErrorException)e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
-                throw new ResourceNotFoundException("Resource not found when getting case type version for " + caseTypeId + " because of " + e.getMessage());
+                throw new ResourceNotFoundException(
+                        "Resource not found when getting case type version for '" + caseTypeId + "'.", e);
             } else {
-                throw new ServiceException("Problem getting case type version for " + caseTypeId + " because of " + e.getMessage());
+                throw new ServiceException("Problem getting case type version for '" + caseTypeId + "'.", e);
             }
         }
     }
