@@ -623,7 +623,7 @@ task smoke(type: Test) {
 
     doFirst {
         javaexec {
-            main = "uk.gov.hmcts.ccd.datastore.befta.TestLoaderMain"
+            main = "uk.gov.hmcts.ccd.datastore.befta.TestDataLoaderMain"
             classpath += sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
             args = ['']
         }
