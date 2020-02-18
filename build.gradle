@@ -88,7 +88,7 @@ dependencyCheck {
         assemblyEnabled = false
     }
     // These are non-runtime configurations used during the build.
-    skipConfigurations = ['codacy', 'spotbugs']
+    skipConfigurations = ['codacy', 'spotbugs', 'checkstyle']
 }
 
 mainClassName = 'uk.gov.hmcts.ccd.CoreCaseDataApplication'
