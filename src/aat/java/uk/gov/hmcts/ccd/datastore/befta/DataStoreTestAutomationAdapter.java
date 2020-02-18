@@ -21,14 +21,14 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
     private Logger logger = LoggerFactory.getLogger(DataStoreTestAutomationAdapter.class);
 
     private static final String[] TEST_DEFINITIONS_NEEDED_FOR_TA = {
-            "src/aat/resources/CCD_CNP_27.xlsx",
-            "src/aat/resources/CCD_CNP_27_AUTOTEST1.xlsx",
-            "src/aat/resources/CCD_CNP_27_AUTOTEST2.xlsx",
-            "src/aat/resources/CCD_CNP_RDM5118.xlsx",
+            "uk/gov/hmcts/befta/dse/ccd/definitions/CCD_CNP_27.xlsx",
+            "uk/gov/hmcts/befta/dse/ccd/definitions/CCD_CNP_27_AUTOTEST1.xlsx",
+            "uk/gov/hmcts/befta/dse/ccd/definitions/CCD_CNP_27_AUTOTEST2.xlsx",
+            "uk/gov/hmcts/befta/dse/ccd/definitions/CCD_CNP_RDM5118.xlsx",
 
-            "src/aat/resources/CCD_BEFTA_JURISDICTION1.xlsx",
-            "src/aat/resources/CCD_BEFTA_JURISDICTION2.xlsx",
-            "src/aat/resources/CCD_BEFTA_JURISDICTION3.xlsx"
+            "uk/gov/hmcts/befta/dse/ccd/definitions/CCD_BEFTA_JURISDICTION1.xlsx",
+            "uk/gov/hmcts/befta/dse/ccd/definitions/CCD_BEFTA_JURISDICTION2.xlsx",
+            "uk/gov/hmcts/befta/dse/ccd/definitions/CCD_BEFTA_JURISDICTION3.xlsx"
     };
 
     private static final String[][] CCD_ROLES_NEEDED_FOR_TA = {
@@ -102,8 +102,9 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
         }
     }
 
-    private void importDefinition(String file) {
-        Response response = asAutoTestImporter().given().multiPart(new File(file)).when().post("/import");
+    private void importDefinition(String fileName) {
+        File file = new File(getClass().getClassLoader().getResource(fileName).getFile());
+        Response response = asAutoTestImporter().given().multiPart(file).when().post("/import");
         if (response.getStatusCode() != 201) {
             String message = "Import failed with response body: " + response.body().prettyPrint();
             message += "\nand http code: " + response.statusCode();
