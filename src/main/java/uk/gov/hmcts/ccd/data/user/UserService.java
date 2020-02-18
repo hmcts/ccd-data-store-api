@@ -28,11 +28,13 @@ public class UserService {
     private UserRepository userRepository;
     private CaseDefinitionRepository caseDefinitionRepository;
     private JurisdictionMapper jurisdictionMapper;
+    private JurisdictionsResolver jurisdictionsResolver;
 
     @Inject
     public UserService(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
                        @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) CaseDefinitionRepository caseDefinitionRepository,
-                       JurisdictionMapper jurisdictionMapper) {
+                       JurisdictionMapper jurisdictionMapper,
+                       @Qualifier(JurisdictionsResolverFromIdam.QUALIFIER) JurisdictionsResolver jurisdictionsResolver) {
         this.userRepository = userRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.jurisdictionMapper = jurisdictionMapper;
@@ -43,7 +45,7 @@ public class UserService {
         IDAMProperties idamProperties = userRepository.getUserDetails();
         String userId = idamProperties.getEmail();
         UserDefault userDefault = userRepository.getUserDefaultSettings(userId);
-        List<String> jurisdictionIds = userDefault.getJurisdictionsId();
+        List<String> jurisdictionIds = jurisdictionsResolver.getJurisdictionsFromIdam(idamProperties.getRoles() );
 
         List<Jurisdiction> jurisdictions = new ArrayList<>();
 

@@ -38,6 +38,8 @@ public class UserServiceTest {
     private JurisdictionDisplayProperties jdp2;
     @Mock
     private JurisdictionDisplayProperties jdp3;
+    @Mock
+    private JurisdictionsResolver jurisdictionsResolver;
 
     private Jurisdiction j1;
     private Jurisdiction j2;
@@ -47,7 +49,7 @@ public class UserServiceTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        userService = new UserService(userRepoMock, caseDefinitionRepoMock, jurisdictionMapperMock);
+        userService = new UserService(userRepoMock, caseDefinitionRepoMock, jurisdictionMapperMock,jurisdictionsResolver);
         when(mockIDAMProps.getEmail()).thenReturn("email");
         initialiseJurisdictions();
     }
