@@ -100,7 +100,7 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
             try {
                 logger.info("\n\nImporting {}...", fileName);
                 importDefinition(fileName);
-                logger.info("Imported {}.\n\n", fileName);
+                logger.info("\nImported {}.\n\n", fileName);
             } catch (Exception e) {
                 logger.error("Couldn't import {} - Exception: {}.\n\n", fileName, e);
             } finally {
