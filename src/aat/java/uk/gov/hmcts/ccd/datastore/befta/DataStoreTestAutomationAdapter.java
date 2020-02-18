@@ -3,7 +3,8 @@ package uk.gov.hmcts.ccd.datastore.befta;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -102,9 +103,9 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
         }
     }
 
-    private void importDefinition(String fileName) {
-        File file = new File(getClass().getClassLoader().getResource(fileName).getFile());
-        Response response = asAutoTestImporter().given().multiPart(file).when().post("/import");
+    private void importDefinition(String fileName) throws IOException {
+        InputStream stream = getClass().getClassLoader().getResource(fileName).openStream();
+        Response response = asAutoTestImporter().given().body(stream).when().post("/import");
         if (response.getStatusCode() != 201) {
             String message = "Import failed with response body: " + response.body().prettyPrint();
             message += "\nand http code: " + response.statusCode();
