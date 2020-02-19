@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.datastore.befta;
 
 import uk.gov.hmcts.befta.DefaultTestAutomationAdapter;
-import uk.gov.hmcts.befta.dse.ccd.definitions.TestDataLoaderToDefinitionStore;
+import uk.gov.hmcts.befta.dse.ccd.TestDataLoaderToDefinitionStore;
 
 public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter {
 
