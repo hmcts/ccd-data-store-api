@@ -1,0 +1,18 @@
+{
+  "_guid_": "F101_Case_Data_Solicitor",
+  "_extends_": "Befta_Jurisdiction2_Default_Full_Case_Creation_Data_solicitor_1",
+  "specs": [
+    "to create a full case for solicitor"
+  ],
+  "users": {
+    "invokingUser": {
+      "username": "befta.caseworker.2.solicitor.2@gmail.com",
+      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+    }
+  },
+  "request": {
+    "body" : {
+      "event_token" : "${[scenarioContext][parentContext][childContexts][F101_GetToken][testData][actualResponse][body][token]}"
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+	"title": "must return 400 error response for user ID with null value",
+	"_guid_": "S-526",
+  "productName": "CCD Data Store",
+  "operationName": "Grant access to a case",
+	"_extends_": "F-101_Test_Data_Base",
+
+	"specs": [
+		"an active solicitor profile in CCD",
+    "uses null value for user id",
+		"has the 400 return code"
+	],
+  "request": {
+    "body": {
+      "case_roles": [
+        "[DEFENDANT]"
+      ]
+    }
+  },
+  "expectedResponse": {
+    "responseCode" : 400,
+    "headers" : {
+      "_extends_": "Common_400_Response"
+    }
+  }
+}
