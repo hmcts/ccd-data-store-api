@@ -76,6 +76,7 @@ class UIStartTriggerControllerTest {
                     .withLabel(FIELD_LABEL)
                     .withHintText(FIELD_HINT_TEXT)
                     .withShowCondition(null)
+                    .withDisplayContextParameter(null)
                     .build()))
             .build())
         .withShowSummary(IS_SHOW_SUMMARY)

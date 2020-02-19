@@ -76,7 +76,7 @@ public class CaseViewFieldBuilderTest {
 
         EVENT_FIELD.setCaseFieldId("PersonFirstName");
         EVENT_FIELD.setDisplayContext(READONLY);
-        EVENT_FIELD.setDisplayContext("#TABLE(Title, FirstName, MiddleName)");
+        EVENT_FIELD.setDisplayContextParameter("#TABLE(Title, FirstName, MiddleName)");
         EVENT_FIELD.setShowCondition("ShowCondition");
         EVENT_FIELD.setShowSummaryChangeOption(Boolean.TRUE);
         EVENT_FIELD.setShowSummaryContentOption(3);
@@ -111,7 +111,7 @@ public class CaseViewFieldBuilderTest {
             assertThat(field.getSecurityLabel(), equalTo(CASE_FIELD.getSecurityLabel()));
             assertThat(field.getValidationExpression(), is(nullValue()));
             assertThat(field.getDisplayContext(), is(EVENT_FIELD.getDisplayContext()));
-            assertThat(field.getDisplayContextParameter(), is(EVENT_FIELD.getDisplayContextParamter()));
+            assertThat(field.getDisplayContextParameter(), is(EVENT_FIELD.getDisplayContextParameter()));
             assertThat(field.getShowCondition(), is(EVENT_FIELD.getShowCondition()));
             assertThat(field.getShowSummaryChangeOption(), is(Boolean.TRUE));
             assertThat(field.getShowSummaryContentOption(), is(3));

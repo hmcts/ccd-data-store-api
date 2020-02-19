@@ -983,6 +983,11 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public WizardPageComplexFieldOverrideBuilder withDisplayContextParameter(String displayContextParameter) {
+            this.wizardPageComplexFieldOverride.setDisplayContextParameter(displayContextParameter);
+            return this;
+        }
+
         public WizardPageComplexFieldOverride build() {
             return this.wizardPageComplexFieldOverride;
         }
@@ -1420,6 +1425,11 @@ public class TestBuildersUtil {
 
         public static CaseTypeTabFieldBuilder newCaseTabField() {
             return new CaseTypeTabFieldBuilder();
+        }
+
+        public CaseTypeTabFieldBuilder withDisplayContextParameter(final String displayContextParameter) {
+            caseTypeTabField.setDisplayContextParameter(displayContextParameter);
+            return this;
         }
 
     }
