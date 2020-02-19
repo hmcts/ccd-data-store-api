@@ -11,6 +11,7 @@ public class CriteriaField implements Serializable {
     private String label;
     private Integer displayOrder;
     private String role;
+    private String displayContextParameter = null;
 
     /**
      **/
@@ -68,5 +69,15 @@ public class CriteriaField implements Serializable {
 
     public void setRole(final String role) {
         this.role = role;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("display_context_parameter")
+    public String getDisplayContextParameter() {
+        return displayContextParameter;
+    }
+
+    public void setDisplayContextParameter(String displayContextParameter) {
+        this.displayContextParameter = displayContextParameter;
     }
 }
