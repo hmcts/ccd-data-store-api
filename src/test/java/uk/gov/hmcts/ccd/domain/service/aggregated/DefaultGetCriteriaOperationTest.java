@@ -160,6 +160,7 @@ public class DefaultGetCriteriaOperationTest {
 
     private WorkbasketInputDefinition generateWorkbasketInput() {
         WorkbasketInputDefinition workbasketInputDefinition = new WorkbasketInputDefinition();
+        workbasketInputDefinition.setDisplayContextParameter("#DATETIME(“YYYY-MM-DD hh:mm:ss”)");
         workbasketInputDefinition.setCaseTypeId(caseType.getId());
         workbasketInputDefinition.setFields(
             asList(getWorkbasketInputField(caseField1.getId(), 1),
@@ -200,6 +201,7 @@ public class DefaultGetCriteriaOperationTest {
         String path = PERSON + "." + NAME;
         SearchInputDefinition searchInputDefinition = new SearchInputDefinition();
         searchInputDefinition.setCaseTypeId(caseType.getId());
+        searchInputDefinition.setDisplayContextParameter("#DATETIME(“YYYY-MM-DD hh:mm:ss”)");
         searchInputDefinition.setFields(asList(
             getSearchInputField(caseField1.getId(), 1),
             getSearchInputField(caseField2.getId(), 2),
@@ -230,6 +232,7 @@ public class DefaultGetCriteriaOperationTest {
         searchInputField.setLabel(id);
         searchInputField.setDisplayOrder(order);
         searchInputField.setCaseFieldPath(path);
+        searchInputField.setDisplayContextParameter("#DATETIME(“YYYY-MM-DD hh:mm:ss”)");
         return searchInputField;
     }
 }
