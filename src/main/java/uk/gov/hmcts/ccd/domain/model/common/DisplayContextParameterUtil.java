@@ -14,7 +14,7 @@ import static uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterCollec
 
 public class DisplayContextParameterUtil {
 
-    public static String COLLECTION = "COLLECTION";
+    public static final String COLLECTION = "COLLECTION";
 
     public static String updateCollectionDisplayContextParameter(final String currentDisplayContextParameter,
                                                                  final List<String> values) {
