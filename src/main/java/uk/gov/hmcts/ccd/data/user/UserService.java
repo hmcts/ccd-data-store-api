@@ -38,6 +38,7 @@ public class UserService {
         this.userRepository = userRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.jurisdictionMapper = jurisdictionMapper;
+        this.jurisdictionsResolver = jurisdictionsResolver;
     }
 
     public UserProfile getUserProfile() {
@@ -45,7 +46,7 @@ public class UserService {
         IDAMProperties idamProperties = userRepository.getUserDetails();
         String userId = idamProperties.getEmail();
         UserDefault userDefault = userRepository.getUserDefaultSettings(userId);
-        List<String> jurisdictionIds = jurisdictionsResolver.getJurisdictionsFromIdam(idamProperties.getRoles() );
+        List<String> jurisdictionIds = jurisdictionsResolver.getJurisdictionsFromIdam(idamProperties.getRoles());
 
         List<Jurisdiction> jurisdictions = new ArrayList<>();
 
